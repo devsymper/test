@@ -162,7 +162,18 @@ export default {
                 this.curInput = $(e.target);
                 let autoEL = $(this.$el).detach();
                 $(e.target).parent().append(autoEL);
-                this.positionBox = {'top':'26px','left':'0px'};
+                let inputOffset = $(e.target).offset();
+            
+                if(window.innerWidth < inputOffset.left + $('.card-autocomplete').width() + 10){
+                    this.positionBox = {'top':'26px','right':'0px'};
+                }
+                else{
+                    this.positionBox = {'top':'26px','left':'0px'};
+                }
+                if(window.innerHeight < inputOffset.top + $('.card-autocomplete').height() + 40){
+                    delete this.positionBox.top;
+                    this.positionBox['bottom'] = '26px';
+                }
             }
         },
         setSearch(query){

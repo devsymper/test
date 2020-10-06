@@ -127,6 +127,14 @@
         :dataflowId="dataFlow.id" 
         :width="'100%'"
         :ref="'dataFlow'+dataFlow.id"/>
+        <UploadFile 
+        :objectType="'document'"
+        :iconName="`mdi-upload-outline`"
+        ref="fileUploadView"
+        class="d-none"
+        @uploaded-file="afterFileUpload"
+        :objectIdentifier="docId+''" />
+        
         <!-- v-for="dataFlow in listDataFlow" :key="dataFlow.id"  -->
         
          
@@ -158,6 +166,7 @@
             :listFormulasTrace="listFormulasTrace"
             ref="traceControlView" v-show="isShowTraceControlSidebar" />
         </v-navigation-drawer>
+
     </div>
      
 </template>
@@ -175,6 +184,7 @@ import PageControl from "./pageControl";
 import TabControl from "./tabControl";
 import DatePicker from "./../../../components/common/DateTimePicker";
 import TimeInput from "./../../../components/common/TimeInput";
+import UploadFile from "@/components/common/UploadFile.vue";
 import Table from "./table.js";
 import SymperDragPanel from "./../../../components/common/SymperDragPanel.vue";
 import { util } from "./../../../plugins/util.js";
@@ -236,6 +246,13 @@ export default {
             type: String,
             default: ''
         },
+        /**
+         * Biến chỉ ra bản ghi nằm trong app nào
+         */
+        appId:{
+            type:Number,
+            default:0
+        },
         
         workflowVariable:{
             type:Object,
@@ -281,6 +298,7 @@ export default {
         "err-message": ErrMessagePanel,
         EmbedDataflow,
         Preloader,
+        UploadFile,
         SidebarTraceFormulas,
         VuePerfectScrollbar,
         VBoilerplate: {
@@ -352,7 +370,9 @@ export default {
             titleObjectFormulas:null,
             isShowTraceControlSidebar:false,
             listFormulasTrace:{},
-            controlTrace:null
+            controlTrace:null,
+            listFileControl:[],
+            currentImageControl:null
         };
 
     },
@@ -459,6 +479,14 @@ export default {
             }
             
         });
+        /**
+         * Hàm gọi mở sub form submit
+         */
+        this.$evtBus.$on("document-submit-image-click", data => {
+            this.currentImageControl = $(data.target).closest('.s-control-image')
+            this.$refs.fileUploadView.onButtonClick();
+            
+        });
 
         // hàm nhận sự kiện thay đổi của input
         this.$evtBus.$on("document-submit-input-change", locale => {
@@ -542,6 +570,7 @@ export default {
         }); 
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
+
             if(thisCpn._inactive == true) return;
             try {
                 if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
@@ -565,6 +594,7 @@ export default {
                 else if((e.e.keyCode < 37 || e.e.keyCode > 40)){
                     thisCpn.$refs.autocompleteInput.hide();
                 }
+                
                 
             } catch (error) {
                 
@@ -835,7 +865,7 @@ export default {
                 let dataInput = this.getDataInputFormulas(e.formulasInstance,e);
                 e.formulasInstance.handleBeforeRunFormulas(dataInput).then(res=>{
                     res.status = 200
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val(),true)
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,true)
                 });
             }
             else{
@@ -854,7 +884,7 @@ export default {
             if(['select','combobox'].includes(type)){
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
                 e.selectFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,"",false)
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,false)
                 });
             }
             else{
@@ -872,7 +902,7 @@ export default {
                         }
                     }
                     e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                        thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val(),"")
+                        thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,false)
                     });
                 }
                 else{
@@ -899,8 +929,9 @@ export default {
         },
         /**
          * Hàm bind dữ liệu cho box autocomplete, cho component autocompleteInput
+         * và đưa dữ liệu vào cache
          */
-        setDataForControlAutocomplete(res,aliasControl,controlTitle, textTyping="",fromSqlite=false){
+        setDataForControlAutocomplete(res,aliasControl,controlTitle, fromSqlite=false){
             let controlAs = {};
             controlAs[aliasControl] = controlTitle;
             if(res.data != undefined){
@@ -916,7 +947,9 @@ export default {
                     this.$refs.autocompleteInput.setData(dataTable);
                     if(dataTable.hasOwnProperty('headers')){
                         let item = {}
+                        let textTyping = this.getTextTypingInSqlQuery(res.data.sql);
                         item[textTyping] = dataTable.dataBody
+                        console.log("sadsadsadsa",item);
                         this.$store.commit("document/cacheDataAutocomplete",{
                             instance: this.keyInstance,
                             controlName:aliasControl,
@@ -935,6 +968,21 @@ export default {
                 this.$refs.autocompleteInput.setData(dataTable);
                 this.$refs.autocompleteInput.hideHeader();
             }
+        },
+
+        /**
+         * Hàm tìm ra đoạn text đã typing để query autocomplete
+         */
+        getTextTypingInSqlQuery(sql){
+            let textQuery = sql.match(/%.*?%/g);
+            if(textQuery){
+                textQuery = textQuery[0];
+                textQuery = textQuery.replace(/%*/g,"");
+            }
+            else{
+                textQuery = ""
+            }
+            return textQuery;
         },
         /**
          * Hàm bind dữ liệu cho control, và control trong bảng khi chọn apply trên timepicker
@@ -1499,7 +1547,7 @@ export default {
 
 
         // Hàm chỉ ra control được đánh định danh trong document (sct...)
-        getColumnIdentifier(){
+        getDataRefreshControl(){
             if(this.objectIdentifier == undefined){
                 return {}
             }
@@ -1508,9 +1556,7 @@ export default {
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlNameIdentifier);
             if(controlInstance != false && controlInstance.controlFormulas.hasOwnProperty('formulas')){
                 let dataInput = this.getDataInputFormulas(controlInstance.controlFormulas['formulas']['instance'])
-                controlIdentifier['dataInput'] = dataInput;
-                // controlIdentifier['dataInput'] = 
-                // return controlIdentifier;
+                controlIdentifier['dataInputIdentifier'] = dataInput;
             }
             return controlIdentifier;
             
@@ -1566,18 +1612,15 @@ export default {
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
             dataPost['documentId'] = this.documentId;
-            let controlIdentifier = this.getColumnIdentifier();
-            if(Object.keys(controlIdentifier).length>0){
-                dataPost['dataRefreshControl'] = JSON.stringify(controlIdentifier);
-            }
+            let dataInputFormulas = this.getDataRefreshControl();
             if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
                 let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
-                await thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput);
-                this.callApiSubmit(dataPost);
+                dataInputFormulas['dataInputSubmit'] = dataInput;
             }
-            else{
-                this.callApiSubmit(dataPost);
+            if(Object.keys(dataInputFormulas).length>0){
+                dataPost['dataInputFormulas'] = dataInputFormulas;
             }
+            this.callApiSubmit(dataPost);
             
         },
         resetCheckRefreshData(){
@@ -1589,13 +1632,19 @@ export default {
         },
         async callApiSubmit(dataPost){
             let thisCpn = this;
-            let titleObject = "";
             if(this.titleObjectFormulas != null){
                 let dataInputTitle = thisCpn.getDataInputFormulas(this.titleObjectFormulas);
-                let res = await this.titleObjectFormulas.handleBeforeRunFormulas(dataInputTitle);
-                let value = this.getValueFromDataResponse(res);
-                dataPost['titleObject'] = value
+                dataPost['dataInputFormulas']['dataInputTitle'] = dataInputTitle;
             }
+            if(this.appId){
+                dataPost['appId'] = this.appId;
+            }
+            else{
+                if(this.$route.params.extraData && this.$route.params.extraData.appId){
+                    dataPost['appId'] = this.$route.params.extraData.appId
+                }
+            }
+            dataPost['dataInputFormulas'] = JSON.stringify(dataPost['dataInputFormulas']);
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
                 dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;
@@ -1683,6 +1732,9 @@ export default {
                 if(listInput[controlName].inTable != false){
                     continue;
                 }
+                if(!listInput[controlName].checkProps('isSaveToDB')){
+                    continue;
+                }
                 if (listInput[controlName].type == "table") {
                     let value = this.getDataTableInput(listInput[controlName]);
                     Object.assign(dataControl, value);
@@ -1724,6 +1776,9 @@ export default {
                 dataColObjectId.pop();
             dataControlInTable['child_object_id'] = dataColObjectId;
             for (let i in indexCol) {
+                if(!listInput[i].checkProps('isSaveToDB')){
+                    continue;
+                }
                 let dataCol = tableControl.tableInstance.tableInstance.getDataAtCol(
                     indexCol[i]
                 );
@@ -2235,6 +2290,11 @@ export default {
             if(Object.keys(this.overrideControls).length > 0 && Object.keys(this.overrideControls).includes(controlName)){
                 field.formulas.formulas.value[Object.keys(field.formulas.formulas.value)[0]] = this.overrideControls[controlName]['formulas'];
             }
+        },
+        afterFileUpload(data){
+            let url = data.serverPath;
+            let image = '<img height="70" src="'+url+'">';
+            this.currentImageControl.html(image);
         }
     }
     

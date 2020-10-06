@@ -4,6 +4,8 @@ import { util } from "../plugins/util";
 
 var api = new Api(appConfigs.apiDomain.user);
 var coreApi = new Api(appConfigs.apiDomain.user);
+var permissionApi = new Api(appConfigs.apiDomain.permission);
+var operationsApi = new Api(appConfigs.apiDomain.operations);
 export const userApi = {
     /** 
      * Kiểm tra username và password của user
@@ -15,6 +17,13 @@ export const userApi = {
         };
         return api.post(appConfigs.apiDomain.account + "auth/login", data);
     },
+    changePassUser(pass) {
+        let data = {
+            oldPassword: pass,
+            newPassword: pass
+        };
+        return api.post('user/change-password', data)
+    },
     getListUser(page, pageSize) {
         return api.get("users?page=" + page + "&pageSize=" + pageSize);
     },
@@ -24,7 +33,9 @@ export const userApi = {
     addUser(data) {
         return api.post('users', data);
     },
-
+    changeUserProfile(data) {
+        return api.put('user/profile', data)
+    },
     updateUser(id, data) {
         return api.put('users/' + id, data);
     },
@@ -96,5 +107,15 @@ export const userApi = {
     getCurrentRoleOperations() {
         let roleIden = util.auth.getCurrentUserRole();
         return api.get(`https://accesscontrol.symper.vn/roles/${roleIden}/accesscontrol`);
+    },
+    getActionAndObject(role) {
+        return permissionApi.get('roles/' + role + '/accesscontrol')
+    },
+    getOperationsObject(data) {
+        return operationsApi.post('objects', data);
+    },
+    getAllListObj() {
+        return operationsApi.get('/actions')
     }
+
 };

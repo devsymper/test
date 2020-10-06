@@ -15,12 +15,12 @@
     <v-list dense>
         <v-row class="ml-5 mt-1 mr-6">
             <span class="font "><b class="color-grey fw-500 fs-13">
-                Import dữ liệu cho chứng từ: {{nameDocument}}</b>
+                Import dữ liệu cho: {{nameDocument}}</b>
             </span>
         </v-row>
         <v-row class="ml-0 mt-1" style="height:32px">
             <v-col class="col-md-4" style="margin-left:-5px; margin-top:-5px">
-           <span class="font ml-3 "> Chọn kiểu import:</span>
+           <span class="font ml-3 fs-13 "> Chọn kiểu import:</span>
             </v-col>
              <v-col class="col-md-4 ml-9" style="margin-top:-25px">
                   <v-select 
@@ -37,7 +37,8 @@
             <v-row class="ml-2 mt-1">
                 <UploadFile 
                     @dataExcel="getDataExcel" 
-                    :documentId="documentId" 
+                    :objId="objId"
+                    :objType="objType"
                     :selectType="selectType" 
                     @clearFiles="clearFiles" 
                     @keyUpload="setKey"/>
@@ -46,10 +47,13 @@
             <span style="color:red" class="fs-12">{{errorType}}</span>
         </v-row>
         <v-row class="ml-5">
-            <span><b class="color-grey fs-13 fw-500">Khớp dữ liệu chứng từ và tệp</b></span>
+            <span><b class="color-grey fs-13 fw-500">Lưu ý về việc khớp dữ liệu: </b></span>
         </v-row>
         <v-row class="ml-5 mt-1 mr-5 color-grey fs-12">
-            Các trường dữ liệu tại cột đích có ký hiệu * là các trường bắt buộc phải import
+            - Các trường dữ liệu tại cột đích có ký hiệu * là các trường bắt buộc phải import
+        </v-row>
+        <v-row v-if="objType=='user'" class="ml-5 mt-1 mr-7 color-grey fs-12">
+           - Mật khẩu gồm tối thiểu 8 ký tự, không quá 24 kí tự, bao gồm ít nhất 1 chữ cái thường, 1 chữ cái hoa và số
         </v-row>
     </v-list>
     <!-- Thông tin chung -->
@@ -61,14 +65,21 @@
                     <v-icon v-else size="18" class='ml-3'>mdi-table</v-icon>
                     <span class="color-grey fs-13 pl-1">
                         <b class="fw-500">{{table.title}}
-                            <span v-if="tables[tableIdx]==tables[0]" style="color:red">*
+                        <span v-if="tables[tableIdx]==tables[0]" style="color:red">*</span>
+                               <span v-if="objType!='user'"> 
+                                   ({{sumCount(tableIdx,'document')}})
                             </span>
-                           ({{sumCount(table.controls.filter(p => p.dataColumn!=null).length, table.keyColumn?(table.keyColumn.enable?1:0):0)}}/{{table.controls.filter(p => p.dataType!='table').length+1}})</b></span>
+                            <span v-else>
+                                 ({{sumCount(tableIdx,'user')}})
+                            </span>   
+                        </b>
+                        </span>
                 </v-col>
                 <v-col class="col-md-6 py-0" style="margin-top: -13px">
-                    <v-autocomplete :value="table.sheetMap" 
-                    @input="value => onChangeSheet(tableIdx, value)" 
-                    class="auto-complete color-normal mt-4 mb-3 fs-13 " 
+                    <v-autocomplete 
+                        :value="table.sheetMap" 
+                        @input="value => onChangeSheet(tableIdx, value)" 
+                        class="auto-complete color-normal mt-4 mb-3 fs-13 " 
                         :items="nameSheets" 
                         item-text="name" 
                         return-object 
@@ -88,26 +99,32 @@
                 </v-col>
                 <!-- khoá ngoai -->
             </v-row>
-            <v-row class=" mr-1 mb-3" style="margin-top: -27px">
-                <v-col class="col-md-5 ml-1 pl-4 pb-5 d-flex justify-content">
+            <v-row v-if="objType!='user'" class=" mr-1 mb-3" style="margin-top: -27px">
+                <v-col  class="col-md-5 ml-1 pl-4 pb-5 d-flex justify-content">
                     <v-icon style=" margin-top:-19px; font-size:13px " class="pr-3" size="18">mdi mdi-key</v-icon>
-                    <div class="color-normal" style="float:left; margin-top:-13px">Khoá<span v-if="tables[tableIdx]==tables[0]" style="color:red"> *</span></div>
+                    <div class="color-normal" style="float:left; margin-top:-13px">Khoá
+                        <span v-if="tables[tableIdx]==tables[0]" style="color:red"> *</span>
+                    </div>
                 </v-col>
                 <v-col class="col-md-6 py-0" style="margin-left:2px">
                     <v-autocomplete class=" color-normal auto-complete" 
-                    style="width: 215px"
-                     :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" item-text="name" 
-                     return-object 
-                     v-model="table.keyColumn" clearable :menu-props="{'nudge-top':-10, 'max-width': 300}">
-                        <template v-slot:item="{ item, on, attrs }">
-                            <v-list-item v-on="on" v-bind="attrs">
-                                <v-list-item-content>
-                                    <v-list-item-title>
-                                        {{item.name}}
-                                    </v-list-item-title>
-                                </v-list-item-content>
-                            </v-list-item>
-                        </template>
+                        style="width: 215px"
+                        :value="table.keyColumn" 
+                        @input="value => onChangeKey(tableIdx, value)" 
+                        :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" 
+                        item-text="name" 
+                        return-object 
+                        clearable 
+                        :menu-props="{'nudge-top':-10, 'max-width': 300}">
+                            <template v-slot:item="{ item, on, attrs }">
+                                <v-list-item v-on="on" v-bind="attrs">
+                                    <v-list-item-content>
+                                        <v-list-item-title>
+                                            {{item.name}}
+                                        </v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </template>
                     </v-autocomplete>
                 </v-col>
             </v-row>
@@ -167,17 +184,14 @@ export default {
     components: {
         UploadFile
     },
-    props: ['deleteFileName', 'documentId'],
+    props: ['deleteFileName', 'objId','objType',"nameDocument","tables"],
     data() {
         return {
             newLastKeyTables:[],
             lastKeyTables:[],
             lastKeyGeneral:{},
             selectType:'',
-            drawer: null,
             isSelecting: false,
-            propertyDocument: [],
-            nameDocument: '',
             nameSheets: [],
             lastTable:[],
             nameColumnDetail: {},
@@ -187,7 +201,6 @@ export default {
             import:false,
             errorType:'',
             dataExel: {},
-            tables: [],
             showCancelBtn: true,
             errorMessage: '',
             key:'',
@@ -198,11 +211,32 @@ export default {
     computed: {
       newImport() {
         return this.$store.state.importExcel.newImport;
-      }
+      },
+    },
+    created(){
+       
+          
     },
     methods: {
-        sumCount(a,b){
-            return a + b;
+        sumCount(tableIdx,type){
+            let totalAllRow = 0;
+            let totalFilledRow = this.tables[tableIdx].controls.filter(p => p.dataColumn!=null).length;
+            let isFilledKey =  this.tables[tableIdx].keyColumn?(this.tables[tableIdx].keyColumn.enable?1:0):0;
+            if(type!='user'){
+                totalAllRow = this.tables[tableIdx].controls.filter(p => p.dataType!='table').length+1;
+            }else{
+                 totalAllRow = this.tables[tableIdx].controls.filter(p => p.dataType!='table').length;
+            }
+            return totalFilledRow + isFilledKey + '/'+ totalAllRow;
+        },
+             //Sự kiện xảy ra khi thay đổi Key
+        onChangeKey(tableIdx,value){
+            if(value){
+                 this.tables[tableIdx].keyColumn.enable=true;
+            }else{
+                 this.tables[tableIdx].keyColumn.enable = false;
+            }
+           
         },
         //Chọn key cho bảng
         selectKeyControl(control, allControls) {
@@ -217,7 +251,7 @@ export default {
         },
         cancel() {
             this.$emit('cancel');
-             this.$emit('stopSetInterval');
+            this.$emit('stopSetInterval');
             this.$store.commit('importExcel/setNewImport', true);  
         },
         // xoá dữ liệu trở về mặc định
@@ -259,7 +293,6 @@ export default {
         },
         // Sự kiện được gọi khi ấn import
         importFile() {
-          //  debugger
             let cleanedTables = this.tables.map((t, idx) => ({
                 ...idx !== 0 && {
                     name: t.name
@@ -293,9 +326,9 @@ export default {
                 fileName: this.data.fileName,
                 documentName: this.nameDocument,
                 key: this.key,
-                documentId: this.documentId,
+                documentId: this.objId,
                 typeImport: this.selectType,
-                objType: 'documnent',
+                objType: this.objType,
                 mode: 'full',
                 mapping: {
                     general: general[0],
@@ -310,18 +343,26 @@ export default {
                 })
                 .catch(err => {
                 });
+                    
+                let a= this.objType;
                 // kiểm tra key rỗng của table chung
                    let check = true;
                     if (this.tables[0].keyColumn==undefined||this.tables[0].keyColumn.index==-1) {
-                        this.errorMessage = '* Bạn chưa chọn khóa cho thông tin chung';
+                        if(this.objType=='document'){
+                            
+                            this.errorMessage = '* Bạn chưa chọn khóa cho thông tin chung';
                         check = false;
+                        }
+                        
                     };
                     if (this.tables[0].sheetMap == '') {
                         this.errorMessage = '* Điền thiếu trường thông tin chung';
                         check = false;
                     };
                    // kiểm tra bảng con
+                     if(this.objType=='document'){
                     for (let i = 0; i < this.tables.length; i++) {
+                        
                         if(this.tables[i].sheetMap!='')
                         {
                             if(this.tables[i].keyColumn==undefined||this.tables[i].keyColumn.index==-1){
@@ -330,6 +371,7 @@ export default {
                             }
                         }
                     };
+                     }
                     if(check)
                      {
                         this.errorMessage = '';
@@ -371,61 +413,9 @@ export default {
             }
         },
         // Lấy tên cột trong db theo từng bảng
-        findControlsForTable(nameTable) {
-            let controls = [];
-            let property = this.propertyDocument.filter(p => p.listFields && p.properties.name == nameTable);
-            for (let i = 0; i < property.length; i++) {
-                let list = Object.values(property[i].listFields);
-                for (let j = 0; j < list.length; j++) {
-                    controls.push({
-                        name: list[j].properties.name,
-                        title:list[j].properties.title,
-                        isKeyControl: false,
-                        dataColumn: null,
-                        dataType: this.getDataType(list[j].type)
-                    });
-                }
-            }
-            return controls;
-        },
+       
         // Khởi tạo giá trị của các bảng
-        createTable(tableNames,tableTitle) {
-            // general
-            let controls = [];
-            for (let i = 0; i < this.propertyDocument.length; i++) {
-                if(['submit','approvalHistory','reset','draft'].includes(this.propertyDocument[i].type)){
-                    continue
-                }
-                controls.push({
-                    name: this.propertyDocument[i].properties.name,
-                    title: this.propertyDocument[i].properties.title,
-                    isKeyControl: false,
-                    dataColumn: null,
-                    dataType: this.getDataType(this.propertyDocument[i].type)
-                });
-             
-            };
-            let tables = [{
-                sheetMap: '',
-                name: 'Thông tin chung',
-                title: 'Thông tin chung',
-                controls,
-            }]
-            // tables
-            for (let i = 0; i < tableNames.length; i++) {
-                tables.push({
-                    sheetMap: '',
-                   title:tableTitle[i],
-                    keyColumn: {
-                        index: -1,
-                        name: ''
-                    },
-                    name: tableNames[i],
-                    controls: this.findControlsForTable(tableNames[i]),
-                 })
-            }
-            this.tables = tables;
-        },
+       
         //Lấy ra tên các sheet trong excel
         getSheetAndColumnName() {
             let sheets = [];
@@ -452,6 +442,7 @@ export default {
             this.getMappingTable();
               
         },
+   
         //Sự kiện xảy ra khi thay đổi tên Sheet
         onChangeSheet(tableIdx, value) {
             // 1. Khi select sheet 
@@ -528,7 +519,7 @@ export default {
 
         getLastData(){
             const self = this;
-            importApi.getMapping(this.documentId)
+            importApi.getMapping(this.objId)
             .then(res => {
                 if (res.status === 200) {
                     let mapping = JSON.parse(res.data[0].mapping);    
@@ -668,7 +659,7 @@ export default {
             let columnAr = this.nameColumnDetail;
             columnAr = Object.values(columnAr);
             if(column.length>2){
-                //debugger
+                //
                 for(let m = 0; m<this.lastNameSheet.length;m++){
                     for(let k = 0; k<this.nameSheets.length;k++){
                         if(this.lastNameSheet[m]==this.nameSheets[k].name){
@@ -711,32 +702,6 @@ export default {
                 this.selectType='';
             }
         },
-        documentId(val) {
-            if (val) {
-                  // lấy API của documnent
-                documentApi.detailDocument(this.documentId)
-                    .then(res => {
-                        if (res.status === 200) {
-                            this.nameDocument = res.data.document.title;
-                            this.propertyDocument = Object.values(res.data.fields);
-                            // lưu tên của các property từ API document vào mảng  
-                            let tableNames = [];
-                            let tableTitle = [];
-                            for (let i = 0; i < this.propertyDocument.length; i++) {
-                                if (this.propertyDocument[i].type === 'table') {
-                                  tableNames.push(this.propertyDocument[i].properties.name);
-                                  tableTitle.push(this.propertyDocument[i].properties.title);
-                                };
-                            };
-                            // khởi tạo mảng lưu các giá trị của table document
-                            this.createTable(tableNames, tableTitle);
-                        }
-                    })
-                    .catch(err => {
-                        console.log(err)
-                    })
-            }
-        }
     },
 };
 </script>

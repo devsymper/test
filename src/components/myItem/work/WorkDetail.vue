@@ -120,8 +120,8 @@
                                     cols="2"
                                     class="fs-13 "
                                 >  
-                                    <symperAvatar :size="20"  />
-                                    {{processParent.startUserId}}
+                                    <symperAvatar :size="20" :userId="workInfo.startUserId" />
+                                    {{workInfo.startUserName}}
                                 </v-col>
                                 <v-col
                                     cols="2"
@@ -132,9 +132,12 @@
 
                                 <v-col
                                     cols="4"
-                                    class="fs-13 "
+                                    class="fs-13 py-0 "
                                 >
                                     <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
+                                    <div class="pa-0 grey--text justify-space-between">
+                                        {{workInfo.appName}}
+                                    </div>
                                 </v-col>
                             </v-row>
                         </v-expansion-panel-content>
@@ -178,8 +181,8 @@
                                         cols="2"
                                         class="fs-13 "
                                     >  
-                                        <symperAvatar :size="20"  />
-                                        {{obj.startUserId}}
+                                        <symperAvatar :size="20" :userId="workInfo.startUserId" />
+                                         {{workInfo.startUserName}}
                                     </v-col>
                                     <v-col
                                         cols="2"
@@ -190,9 +193,12 @@
 
                                     <v-col
                                         cols="4"
-                                        class="fs-13 "
+                                        class="fs-13 py-0"
                                     >
                                         <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
+                                        <div class="pa-0 grey--text justify-space-between">
+                                            {{workInfo.appName}}
+                                        </div>
                                     </v-col>
                                 </v-row>
                             </div>
@@ -216,7 +222,7 @@
                                 >
                                     <v-col
                                         cols="4"
-                                        class="pl-3 fs-13 "
+                                        class="pl-3 fs-13"
                                     >
                                         <div class="pa-0 lighten-2 d-flex justify-space-between">
                                             <div
@@ -237,8 +243,8 @@
                                         cols="2"
                                         class="fs-13 "
                                     >  
-                                        <symperAvatar :size="20"  />
-                                        {{obj.startUserId}}
+                                        <symperAvatar :size="20" :userId="workInfo.startUserId" />
+                                        {{workInfo.startUserName}}
                                     </v-col>
                                     <v-col
                                         cols="2"
@@ -248,9 +254,12 @@
                                     </v-col>
                                     <v-col
                                         cols="4"
-                                        class="fs-13 "
+                                        class="fs-13 py-0"
                                     >
                                         <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
+                                        <div class="pa-0 grey--text justify-space-between">
+                                            {{workInfo.appName}}
+                                        </div>
                                     </v-col>
                                 </v-row>
                             </div>
@@ -262,11 +271,14 @@
         <div v-else-if="filterObject==1 && statusDetailWork==false">
             <listTask 
                 :listTask="listTaskCurrent"
+                :appName="workInfo.appName"
+
             />
         </div>
         <div v-if="statusDetailWork">
             <workDetailSub 
                 :workId="idWorkSelected"
+                :appName="workInfo.appName"
             />
         </div>
         <SideBarDetail
@@ -371,22 +383,6 @@ export default {
                 instanceName: '',
                 name: ''
             },
-            descriptionTask:'',
-            tabsData: {
-                people: {
-                    assignee: [],
-                    owner: [],
-                    participant: [],
-                    watcher: []
-                },
-                task: {},
-                'sub-task': {},
-                attachment: {},
-                comment: {},
-                info: {},
-                'related-items': {}
-            },
-            linkTask:'',
             taskActionBtns: [
                 {
                     text:"Submit",
@@ -526,38 +522,13 @@ export default {
             if (isCheck=="") { // set for work
                 this.breadcrumb.name = this.workInfo.name;
                 this.breadcrumb.definitionName=this.workInfo.processDefinitionName;
-                await this.getProcessInstanceVars(this.workInfo.id);
             }else{
                 this.breadcrumb.name = processInstance.name;
                 this.breadcrumb.definitionName=processInstance.processDefinitionName;
-                await this.getProcessInstanceVars(processInstance.id);
             }
+            this.breadcrumb.appName=this.workInfo.appName;
         },
-        async getProcessInstanceVars(processInstanceId){
-            let self=this;
-            await BPMNEngine.getProcessInstanceVars(processInstanceId).then((res) => {
-                const symperAppId = res.find(element => element.name=='symper_application_id');
-                    if (symperAppId) {
-                        self.appId=symperAppId.value;
-                        console.log(res,"symperApp");
-                    }else{
-                        self.appId='';
-                    }
-            }).catch(()=>{
-                self.appId='';
-            });
 
-            if (this.appId!=-1 && this.appId!="") {
-                await appManagementApi.getAppDetails(Number(this.appId)).then((res) => {
-                    console.log(res,"Appdetail");
-                    self.breadcrumb.appName=res.data.listObject.name;
-                }).catch(()=>{
-                    self.breadcrumb.appName=null;
-                });
-            }else{
-                self.breadcrumb.appName=null;
-            }
-        },
         closeDetail() {
             this.$emit("close-detail", {});
         },
@@ -598,7 +569,6 @@ export default {
                 filter.processInstanceId=superProcessInstanceId;
                 let res = await BPMNEngine.getProcessInstanceHistory(filter);
                 self.processParent=res.data[0];
-                console.log("ProcessParent", res.data[0]);
             } catch (error) {
                 self.processParent=[];
                 self.$snotifyError(error, "Get Process Parent failed");
@@ -609,13 +579,14 @@ export default {
             try {
                 let filter={};
                 filter.processInstanceId=processInstanceId;
+                filter.sort= "startTime";
+                filter.order= "desc";
                 let res = await BPMNEngine.postTaskHistory(filter);
                 if (res.total>0) {
                     self.listTaskCurrent=res.data;
                 }else{
                     self.listTaskCurrent=[];
                 }
-                console.log("listTaskCurrent", res.data);
             } catch (error) {
                 self.listTaskCurrent=[];
                 self.$snotifyError(error, "Get task process current failed");
@@ -634,14 +605,12 @@ export default {
                         }else{
                             self.processSibling=[];
                         }
-                        console.log("ProcessSibling", res.data);
                     }else if(isCheck=='subWork'){
                         if (res.total>0) {
                             self.processSub=res.data;
                         }else{
                             self.processSub=[];
                         }
-                        console.log("ProcessSub", res.data);
                     }
                 } catch (error) {
                     if (isCheck=='siblingWork') {

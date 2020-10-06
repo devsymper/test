@@ -84,7 +84,7 @@ Handsontable.renderers.UserRenderer = function(instance, td, row, col, prop, val
 Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     if (value == null) value = ""
-    let div = `<div class="select-cell" style="position:relative;height:24px;width:100%;">` + value + `
+    let div = `<div class="select-cell" style="position:relative;height:22px;width:100%;">` + value + `
                     <span class="select-chervon-bottom" style="position: absolute;right:8px;top:2px;font-size: 10px;color: #eee;">▼</span>
                 </div>`
     $(td).off('click')
@@ -160,7 +160,7 @@ const makeDelay = function(ms) {
     };
 };
 var delay = makeDelay(1000);
-var delayTypingEnter = makeDelay(100);
+var delayTypingEnter = makeDelay(500);
 
 
 /**
@@ -261,6 +261,10 @@ export default class Table {
 
                 beforeKeyDown: function(event) {
                     let cellMeta = this.getSelected();
+                    if (!cellMeta) {
+                        return;
+                    }
+                    thisObj.checkEnterInsertRowEvent(event, cellMeta);
                     // ấn f2 vào cell thì trace control đó
                     if (event.key == 'F2' && store.state.app.accountType == 'ba') {
                         let control = thisObj.getControlInstance(thisObj.currentControlSelected);
@@ -298,7 +302,7 @@ export default class Table {
                             event.stopImmediatePropagation();
                         }
                     }
-                    if (thisObj.checkControlType('user', columnIndex)) {
+                    if (thisObj.checkControlType('user', columnIndex)) { // nếu gõ vào control user thì autocomplete chọn user
                         if (event.keyCode == 13 && thisObj.showPopupUser) {
                             thisObj.showPopupUser = false;
                             event.curTarget = this.getActiveEditor().TEXTAREA;
@@ -328,9 +332,18 @@ export default class Table {
                             return;
                         }
                         if (thisObj.listAutoCompleteColumns[thisObj.currentControlSelected] != false) {
+                            // nếu đang auto complete mà gõ các kí tư lên xuống hay sang trái phải thì chặn sự kiện mặc định của handson
+                            // để có thể di chuyển lên xuống trong poup
                             if ((event.keyCode == 40 || event.keyCode == 38 ||
                                     event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting) {
                                 event.stopImmediatePropagation();
+                            }
+                            if (event.key == 'Tab') { // trường hợp ấn tab trong table thì đóng popup
+                                let e = util.cloneDeep(event);
+                                e.keyCode = 200;
+                                SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
+                                    e: e,
+                                })
                             }
                             if (listKeyCodeNotChange.includes(event.keyCode)) {
                                 return;
@@ -356,9 +369,19 @@ export default class Table {
                             return;
                         }
                         if (thisObj.listAutoCompleteColumns[thisObj.currentControlSelected] != false) {
+
+                            // nếu đang auto complete mà gõ các kí tư lên xuống hay sang trái phải thì chặn sự kiện mặc định của handson
+                            // để có thể di chuyển lên xuống trong poup
                             if ((event.keyCode == 40 || event.keyCode == 38 ||
                                     event.keyCode == 37 || event.keyCode == 39) && thisObj.isAutoCompleting) {
                                 event.stopImmediatePropagation();
+                            }
+                            if (event.key == 'Tab') { // trường hợp ấn tab trong table thì đóng popup
+                                let e = util.cloneDeep(event);
+                                e.keyCode = 200;
+                                SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
+                                    e: e,
+                                })
                             }
                             if (listKeyCodeNotChange.includes(event.keyCode)) {
                                 return;
@@ -407,6 +430,11 @@ export default class Table {
                     SYMPER_APP.$evtBus.$emit("symper-app-wrapper-clicked", event);
 
                 },
+                /**
+                 * Sau khi chọn vào bảng thì đánh dấu doc chuyển qua chế độ input(phục vụ cho việc check process công thức)
+                 * @param {*} row 
+                 * @param {*} col 
+                 */
                 afterSelectionEnd: function(row, col) {
                     store.commit("document/addToDocumentSubmitStore", {
                         key: 'docStatus',
@@ -414,37 +442,30 @@ export default class Table {
                         instance: thisObj.keyInstance
                     });
                 },
-                /**
-                 * Hàm xử lí thêm và xóa dòng sau khi bấm shift + enter, shift + delete
-                 * @param {*} e 
-                 */
-                afterDocumentKeyDown: function(e) {
-                    let cellMeta = this.getSelected();
-                    if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
-                        this.alter('insert_row', cellMeta[0][0] + 1, 1);
-                        thisObj.dataInsertRows.push([]);
-                        delayTypingEnter(function(e) {
-                            let listRootTable = sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'];
-                            if (listRootTable.hasOwnProperty(thisObj.tableName)) {
-                                let rowData = util.cloneDeep(listRootTable[thisObj.tableName]['defaultRow']);
-                                for (let index = 0; index < thisObj.dataInsertRows.length; index++) {
-                                    let newRowData = util.cloneDeep(rowData);
-                                    newRowData[0][0] = cellMeta[0][0] + index + 1;
-                                    thisObj.tableInstance.setDataAtRowProp(newRowData, null, null, 'auto_set');
-                                }
-                            }
 
-                        });
-                    } else if (e.key === 'Delete' && e.shiftKey == true) {
-                        this.alter('remove_row', cellMeta[0][0], 1);
-                    }
-                },
+                /**
+                 * Sau khi thay đổi giá trị trong bảng thì cần update hoặc insert lại vào bảng sql lite
+                 * @param {*} changes 
+                 * @param {*} source 
+                 */
                 afterChange: function(changes, source) {
-                    if (changes == null || changes[0][1] == undefined) {
+
+                    if (!changes) {
                         return
+                    }
+                    // check nếu ko có thay đổi trong cell thì return
+                    if (changes[0][2] == changes[0][3]) {
+                        return;
+                    }
+                    if (!changes[0][2] && !changes[0][3]) {
+                        return;
                     }
                     if (getSDocumentSubmitStore(thisObj.keyInstance).docStatus == 'init' &&
                         sDocument.state.viewType[thisObj.keyInstance] == 'update') {
+                        return;
+                    }
+
+                    if (/=SUM(.*)/.test(changes[0][2]) || /=SUM(.*)/.test(changes[0][3])) {
                         return;
                     }
 
@@ -489,6 +510,7 @@ export default class Table {
                             });
 
                         }
+                        console.log("sadsadsadf", source, changes);
                         if (source == "edit") {
                             thisObj.handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName);
                         } else {
@@ -505,6 +527,45 @@ export default class Table {
                 }
             }
             listTableInstance[this.tableName] = this;
+        }
+        /**
+         * Hàm xử lí thêm và xóa dòng sau khi bấm shift + enter, shift + delete
+         * @param {*} e 
+         */
+
+    checkEnterInsertRowEvent(e, cellMeta) {
+            if (!e) {
+                return;
+            }
+            // nếu shift + enter ở dòng tính tổng thì ko làm gì cả
+            if (this.tableHasRowSum && cellMeta[0][0] == this.tableInstance.countRows() - 1) {
+                return;
+            }
+            if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
+                this.tableInstance.alter('insert_row', cellMeta[0][0] + 1, 1, 'auto_set');
+                this.dataInsertRows.push([]);
+                let thisObj = this;
+                delayTypingEnter(function() {
+                    console.log("dataInsertRowsdataInsertRows", thisObj.dataInsertRows);
+                    let listRootTable = sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'];
+                    if (listRootTable.hasOwnProperty(thisObj.tableName)) {
+                        let rowData = util.cloneDeep(listRootTable[thisObj.tableName]['defaultRow']);
+                        for (let index = 0; index < thisObj.dataInsertRows.length; index++) {
+                            let newRowData = util.cloneDeep(rowData);
+                            for (let i = 0; i < newRowData.length; i++) {
+                                newRowData[i][0] = cellMeta[0][0] + index + 1;
+                            }
+                            thisObj.tableInstance.setDataAtRowProp(newRowData, null, null, 'auto_set');
+                        }
+                    }
+                    thisObj.dataInsertRows = []
+                });
+            } else if (e.key === 'Delete' && e.shiftKey == true) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                e.stopPropagation();
+                this.tableInstance.alter('remove_row', cellMeta[0][0], 1);
+            }
         }
         // kiểm tra nếu đang edit ở cell cuối cùng mà ấn enter thì cho cell selected về dòng đầu tiên (lỗi do control hidden)
     checkLastCell(cellMeta, hotTb) {
@@ -582,7 +643,6 @@ export default class Table {
          * Hàm xử lí dữ liệu thay đổi ở cell bởi User edit (hàm set data của handson)
          */
     async handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName) {
-        console.log("asdasda", changes);
         let thisObj = this;
         for (let index = 0; index < currentRowData.length; index++) {
             let cell = currentRowData[index];
@@ -606,7 +666,11 @@ export default class Table {
     }
 
 
-
+    /**
+     * Hàm kiểm tra cột của bảng ứng với kiểu control nào
+     * @param {*} type 
+     * @param {*} col 
+     */
     checkControlType(type, col) {
             let columns = this.columnsInfo.columns;
             if (columns[col] == undefined) {
@@ -661,6 +725,8 @@ export default class Table {
                 let controlRequireEffected = controlInstance.getEffectedRequireControl();
                 let controlLinkEffected = controlInstance.getEffectedLinkControl();
                 let controlValidateEffected = controlInstance.getEffectedValidateControl();
+                console.trace("sadasdsadsa");
+
                 this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
                 this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readonly');
                 this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
@@ -749,13 +815,15 @@ export default class Table {
          * @param {*} formulasInstance  Object cua formulas giá trị của control bị ảnh hưởng
          */
     async handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance) {
-
             let listIdRow = this.tableInstance.getDataAtCol(this.tableInstance.getDataAtRow(0).length - 1);
             if (this.tableHasRowSum) {
                 listIdRow.pop();
             }
             let dataPost = {};
             let thisObj = this;
+            /***
+             * Chuẩn bị data để gọi api thực thi công thức cho các control trong table
+             */
             if (Object.keys(dataInput).length > 0) {
                 let allRowDataInput = [];
                 for (let control in dataInput) {
@@ -832,6 +900,9 @@ export default class Table {
                         }
 
                         thisObj.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+                        /**
+                         * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
+                         */
                         markBinedField(thisObj.keyInstance, controlInstance.name);
                         store.commit("document/updateListInputInDocument", {
                             controlName: controlInstance.name,
@@ -1066,6 +1137,36 @@ export default class Table {
                 let id = Date.now();
                 thisObj.tableInstance.setDataAtCell(index, thisObj.tableInstance.getDataAtRow(0).length - 1, id);
             },
+            afterRemoveRow: function(index, amount, physicalRows, source) {
+                let listInput = thisObj.getListInputInDocument();
+                let rowData = this.getDataAtRow(index);
+                console.log(rowData, 'rowDatarowData');
+                let rowId = rowData[rowData.length - 1]
+                for (let controlName in thisObj.controlObj.listInsideControls) {
+                    let controlInstance = listInput[controlName];
+                    let controlValue = util.cloneDeep(controlInstance.value);
+                    if (Array.isArray(controlValue)) {
+                        controlValue.splice(index, 1);
+                        store.commit("document/updateListInputInDocument", {
+                            controlName: controlName,
+                            key: 'value',
+                            value: controlValue,
+                            instance: thisObj.keyInstance
+                        });
+
+                    }
+                }
+                ClientSQLManager.deleteRow(thisObj.keyInstance, thisObj.tableName, 'where s_table_id_sql_lite = ' + rowId);
+                let pattern = index + '_\\d';
+                let reg = new RegExp(pattern, 'g');
+                for (let key in thisObj.validateValueMap) {
+                    if (reg.test(key)) {
+                        delete thisObj.validateValueMap[key]
+                    }
+                }
+                this.render();
+
+            },
 
         });
 
@@ -1084,8 +1185,6 @@ export default class Table {
     getContextMenu() {
         return {
             callback: function(key, selection, clickEvent) {
-                // Common callback for all options
-
                 if (key == 'row_below') {
                     var indexArr = this.getSelected();
                     var selectedData = this.getDataAtRow(indexArr[0]);
@@ -1145,19 +1244,25 @@ export default class Table {
 
 
     // Hàm set data cho table
+    // hàm gọi sau khi chạy công thức 
     setData(vls) {
             ClientSQLManager.delete(this.keyInstance, this.tableName, false);
             if (vls != false) {
                 let data = vls;
                 let controlBinding = Object.keys(data[0]);
                 let dataToStore = {};
+                let dataToSqlLite = [];
+                let columnInsert = [];
                 for (let index = 0; index < data.length; index++) {
                     let rowId = Date.now() + index;
                     data[index]['s_table_id_sql_lite'] = rowId;
 
                     let listKey = Object.keys(data[index]);
+                    columnInsert = listKey;
+                    let rowData = [];
                     for (let j = 0; j < listKey.length; j++) {
                         let controlName = listKey[j];
+                        rowData.push("'" + data[index][controlName] + "'");
                         if (controlName == 's_table_id_sql_lite') {
                             continue;
                         }
@@ -1167,8 +1272,10 @@ export default class Table {
                         if (data[index] != undefined)
                             dataToStore[controlName].push(data[index][controlName]);
                     }
+                    dataToSqlLite.push('(' + rowData.join() + ')');
 
                 }
+                ClientSQLManager.insertDataToTable(this.keyInstance, this.tableName, columnInsert.join(), dataToSqlLite.join())
                 for (let controlName in dataToStore) {
                     store.commit("document/updateListInputInDocument", {
                         controlName: controlName,
@@ -1178,14 +1285,17 @@ export default class Table {
                     });
                 }
                 // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
-                if (this.tableHasRowSum) {
+                if (this.tableHasRowSum && sDocument.state.viewType[this.keyInstance] == 'submit') {
                     data.push({})
                 }
 
                 this.tableInstance.updateSettings({
-                        data: data
-                    })
-                    // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
+                    data: data
+                })
+                setTimeout((self) => {
+                    self.tableInstance.render()
+                }, 50, this);
+                // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
                 if (!this.checkDetailView())
                     setTimeout((thisObj) => {
                         for (let index = 0; index < controlBinding.length; index++) {
@@ -1237,7 +1347,7 @@ export default class Table {
             let id = Date.now();
             firstRow['s_table_id_sql_lite'] = id;
             data.push(firstRow);
-            if (this.tableHasRowSum) {
+            if (this.tableHasRowSum && sDocument.state.viewType[this.keyInstance] == 'submit') {
                 data.push([''])
             }
             if (!this.checkDetailView()) {

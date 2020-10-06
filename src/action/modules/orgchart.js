@@ -43,4 +43,5 @@ export default [{
             this.$goToPage('/orgchart/' + param.id + '/view', tabName);
         }
     },
+    
 ]

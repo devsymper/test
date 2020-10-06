@@ -28,15 +28,14 @@
                 </v-list-item-avatar>
                 <v-list-item-content>
                     <v-list-item-title class=" mb-2">
-                        <span class="mt-1 position-relative" style="top: 0px; position: relative;">
+                        <span 
+                            class="mt-1 position-relative cursor-pointer" 
+                            style="top: 0px; position: relative;" 
+                            @click="$emit('show-user-detail')"
+                        >
                             {{ sapp.baInfo.name ? sapp.baInfo.name : sapp.endUserInfo.displayName }}
-                        </span> 
-                        <!-- <v-tooltip top>
-                            <template v-slot:activator="{ on }">
-                                <i @click="logout" v-on="on" class="float-right py-1 pl-1 cursor-pointer mdi mdi-exit-to-app fs-15"></i>
-                            </template>
-                            <span>{{$t('common.logout')}}</span>
-                        </v-tooltip> -->
+                            <v-icon  @click="$emit('show-user-detail')"></v-icon>
+                        </span>
                     </v-list-item-title>
                     <div class="w-100 mb-1 ">
                         <div class="w-100 d-flex" v-if="sapp.baInfo.name"  style="color: rgba(0, 0, 0, 0.54)">
@@ -233,7 +232,7 @@
                                             {{ item.icon }}
                                             </v-icon>
                                         </template>
-                                    <span class="fs-13">{{ $t('common.sidebar.'+item.title) }}</span>
+                                    <span class="fs-13">{{item.title ? $t('common.sidebar.'+item.title) : '' }}</span>
                                     </v-tooltip>
                                 </template>
                                 <v-list dense v-if="item.children">
@@ -262,72 +261,64 @@
         </v-list>
         <template v-slot:append>
             <v-list-item>
-                <!-- <v-list-item-icon class="collapse-action-icon d-flex justify-start"> -->
-                    <div style="margin-left:-8px">
-                        <v-btn
-                            icon
-                            tile 
-                            v-if="showChevIcon"
-                            @click.stop="invertSidebarShow()" 
-                        >
-                            <v-icon
-                                style="font-size: 20px">
-                                mdi mdi-chevron-left
-                            </v-icon>
-                        </v-btn>
-                        <v-btn
-                            icon
-                            tile 
-                            v-else 
-                            @click.stop="invertSidebarShow()" 
-                        >
-                            <v-icon
-                                style="font-size: 20px">
-                                mdi mdi-chevron-right
-                            </v-icon>
-                        </v-btn>
-                    </div>
-                    
-                    <!-- <v-icon v-else 
+                <div style="margin-left:-8px">
+                    <v-btn
+                        icon
+                        tile 
+                        v-if="showChevIcon"
                         @click.stop="invertSidebarShow()" 
-                        style="font-size: 20px">
-                        mdi mdi-chevron-right
-                    </v-icon> -->
-                <!-- </v-list-item-icon> -->
-                      <v-menu top nudge-top='40' nudge-left='60'>
-                        <template v-slot:activator="{ on: menu }">
-                            <v-btn style="margin-left:140px" icon tile v-on="menu">
-                                <v-icon style="font-size:18px">mdi-cog-outline</v-icon>
-                            </v-btn>
-                        </template>
-                        <v-list dense>
-                            <v-list-item class="v-list-item--link" style="background-color:white!important" dense>
-                                <v-menu  right nudge-top="10" nudge-right='80'>
-                                    <template v-slot:activator="{ on: menu1 }">
-                                        <v-list-item-title class="fs-13 fm" style="padding-left:4px" v-on="menu1">
-                                            Ngôn ngữ
-                                        </v-list-item-title>
-                                    </template>
-                                    <v-list-item dense
-                                        style="background-color:white!important"
-                                        class="v-list-item--link"
-                                        v-for="item in sapp.supportedLanguages"
-                                        :key="item.key"
-                                        @click="changeLocale(item)">
-                                         <v-list-item-title class="fs-13 fm">{{ item.title }}</v-list-item-title>
-                                    </v-list-item>
-                                </v-menu>
-                            </v-list-item>
-                            <v-list-item  class="v-list-item--link">
-                                <v-list-item-title   @click="logout" class="fs-13 fm ">
-                                    <v-icon  @click="logout" class="font-size:18px"></v-icon>
-                                    Đăng xuất
-                                </v-list-item-title>
-                            </v-list-item>
-                            
-                        </v-list>
-                    </v-menu>
-                </v-list-item>
+                    >
+                        <v-icon
+                            style="font-size: 20px">
+                            mdi mdi-chevron-left
+                        </v-icon>
+                    </v-btn>
+                    <v-btn
+                        icon
+                        tile 
+                        v-else 
+                        @click.stop="invertSidebarShow()" 
+                    >
+                        <v-icon
+                            style="font-size: 20px">
+                            mdi mdi-chevron-right
+                        </v-icon>
+                    </v-btn>
+                </div>
+                    <v-menu top nudge-top='40' nudge-left='60'>
+                    <template v-slot:activator="{ on: menu }">
+                        <v-btn style="margin-left:140px" icon tile v-on="menu">
+                            <v-icon style="font-size:18px">mdi-cog-outline</v-icon>
+                        </v-btn>
+                    </template>
+                    <v-list dense>
+                        <v-list-item class="v-list-item--link" style="background-color:white!important" dense>
+                            <v-menu  right nudge-top="10" nudge-right='80'>
+                                <template v-slot:activator="{ on: menu1 }">
+                                    <v-list-item-title class="fs-13 fm" style="padding-left:4px" v-on="menu1">
+                                        Ngôn ngữ
+                                    </v-list-item-title>
+                                </template>
+                                <v-list-item dense
+                                    style="background-color:white!important"
+                                    class="v-list-item--link"
+                                    v-for="item in sapp.supportedLanguages"
+                                    :key="item.key"
+                                    @click="changeLocale(item)">
+                                        <v-list-item-title class="fs-13 fm">{{ item.title }}</v-list-item-title>
+                                </v-list-item>
+                            </v-menu>
+                        </v-list-item>
+                        <v-list-item  class="v-list-item--link">
+                            <v-list-item-title   @click="logout" class="fs-13 fm ">
+                                <v-icon  @click="logout" class="font-size:18px"></v-icon>
+                                Đăng xuất
+                            </v-list-item-title>
+                        </v-list-item>
+                        
+                    </v-list>
+                </v-menu>
+            </v-list-item>
         </template>
     </v-navigation-drawer>
 </template>
@@ -364,9 +355,12 @@ export default {
     components: {
         VuePerfectScrollbar,
         UserRoleSelector,
-        SymperAvatar
+        SymperAvatar,
     },
     computed: {
+        showUserInfo(){
+            return this.$store.state.user.showUserInfo;
+        },
         currentUserAvatar(){
             let userId = this.$store.state.app.endUserInfo.id;
             return appConfigs.apiDomain.fileManagement+'readFile/user_avatar_' + userId;
@@ -394,6 +388,12 @@ export default {
     },
     methods: {
         // thêm nhóm cho Menu
+        showChangeInfoUser(){
+            if(this.sapp.baInfo.id==0){
+                this.$store.commit('user/setShowUser', !this.showUserInfo);
+                this.$router.push("/");
+            }
+        },
         addGroupInMenu(){
              this.menu = this.userMenuItems;
              let menuItem = [];
@@ -507,6 +507,7 @@ export default {
             indexActive: "sdsd",
             selectingItem: {},
             selectingChildItem: {},
+            showMyInfo: false
         };
     }
 };
@@ -535,7 +536,8 @@ export default {
     height: 32px!important;
 }
  .menu-group-active{
-    background-color:#f7f7f7; 
+    background-color:#eaeaea;
+    border-radius: 4px; 
  }  
 .v-navigation-drawer  >>> .ps__rail-x{    
     display:none

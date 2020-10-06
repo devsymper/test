@@ -21,6 +21,7 @@
         "export_excel": "Export Excel",
         "list": "List",
         "search": "Search",
+        "note": "Note",
         "quickSearch": "Quick search",
         "list_config": "List config",
         "save": "Save",
@@ -121,8 +122,9 @@
             "documents": "Documents",
             "orgchart": "Organization chart",
             "myItem": "My item"
-
-        }
+        },
+        "system": "System",
+        "copy": "Copy"
     },
     "validate": {
         "required": "Not be empty",
@@ -195,13 +197,15 @@
         "general": {
             "title": "Basic info",
             "personalInfo": {
+                "status": "Status",
                 "title": "personal information",
                 "userName": "User name",
+                "phoneNumber": "Phone",
                 "email": "Email",
                 "firstName": "First name",
                 "lastName": "Last name",
                 "displayName": "Display name",
-                "phoneNumber": "Phone number"
+                "phone": "Phone number"
             },
             "passwordSetting": {
                 "title": "Password setting",
@@ -261,8 +265,15 @@
             "updateAt": "Update at",
             "contextMenu": {
                 "passwordSetting": "Password setting",
-                "edit": "Edit"
+                "edit": "Edit",
+                "delete": "Delete",
+                "view": "View"
             }
+        },
+        "myInfo": {
+            "title": "My infomation",
+            "generalInfo": "General infomation",
+            "myPosition": "My position"
         }
     },
     "snippet": {
@@ -395,8 +406,8 @@
                     "title": "Document title",
                     "fullSize": "Full size Form Submit",
                     "type": "Document type",
-                    "note": "Note",
-                    "titleObject": "Title Object",
+                    "note": "Note (Serve for searching)",
+                    "titleObject": "Title Object (Serve for display on MyItem, formulas execute on server)",
                     "titlePrint": "Title Form Print"
                 },
                 "swapType": {
@@ -474,8 +485,12 @@
         },
         "validate": {
             "emptyTitle": "Title must not be blank",
+            "emptyName": "Name must not be blank",
+            "nameNotValid": "Name not valid",
             "emptyContentControlTemplate": "Please select the template before saving the control template",
-            "controlNotExist": "Control does not exist, please create new control"
+            "controlNotExist": "Control does not exist, please create new control",
+            "docNameExist": "Document name exist",
+            "checkNameRelate": "The name of this document can be used in formulas on objects in the system. Select Test to re-check the object"
         }
     },
     "documentObject": {
@@ -599,7 +614,7 @@
         },
         "icon": {
             "document_instance": "mdi mdi-file-document-outline",
-            "user": "mdi-account-multiple-outline",
+            "account": "mdi-account-multiple-outline",
             "Tất cả": "mdi-all-inclusive",
             "document_definition": "mdi mdi-file-outline",
             "workflow_definition": "mdi mdi-lan",
@@ -705,6 +720,24 @@
                 "list": "List",
                 "drop": "Delete",
                 "unfavorite": "Remove favorite"
+            },
+            "document_instance": {
+                "update": "Update",
+                "delete": "Delete",
+                "restore": "Restore",
+                "detail": "Detail",
+                "print": "Print",
+                "list_trash": "List trash"
+            },
+            "syql": {
+                "update": "Update",
+                "create": "Create",
+                "execute": "Execute"
+            },
+            "application_definition": {
+                "update": "Update",
+                "view": "View",
+                "remove": "Remove"
             }
         },
         "iconListActions": {
@@ -895,8 +928,10 @@
             "showLess": "Show less task related",
             "showMoreFile": "Show more file"
         },
-        "alert":{
-            "title_aproval":"Action work"
+        "alert": {
+            "title_aproval": "Action work",
+            "titlePermissionDenied":"Permission denied!",
+            "contentPermissionDenied":"You are not authorized to do this!"
         }
 
     },
@@ -908,7 +943,7 @@
         "header": {
             "type": "Type",
             "approval": "Approval",
-            "groupApproval":"Approval Group",
+            "groupApproval": "Approval Group",
             "submit": "Submit",
             "date": "Date",
             "dueDate": "Due Date",

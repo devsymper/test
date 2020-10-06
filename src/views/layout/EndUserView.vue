@@ -1,6 +1,6 @@
 <template>
     <v-app id="symper-platform-app">
-        <ba-sidebar />
+        <ba-sidebar @show-user-detail="showMyInfo = true" />
         <v-content>
             <v-container fluid fill-height class="pa-0">
                 <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #e6e5e5">
@@ -48,7 +48,7 @@
                             style="z-index:1000"
                             >
                             <template v-slot:activator="{ on }">
-                                <v-btn icon v-on="on" @click="showPopup">
+                                <v-btn icon v-on="on">
                                     <v-icon>mdi-apps</v-icon>
                                 </v-btn>
                             </template>
@@ -93,6 +93,21 @@
                 </v-layout>
             </v-container>
         </v-content>
+        
+        <v-navigation-drawer
+            v-bind:class="[isExpand==true?'width-1200':'width-500']"
+            right
+            v-model="showMyInfo"
+            absolute
+            temporary>
+            <DetailUser 
+                :userInfo="sapp.endUserInfo"
+                @expand-panel="isExpand=true"
+                :close="isExpand"
+                @make-small-panel="isExpand=false"
+                @closePanel="showMyInfo=false"
+            />
+        </v-navigation-drawer>
     </v-app>
 </template>
 
@@ -100,15 +115,25 @@
 import Api from "../../api/api.js";
 import { appConfigs } from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
+
 import listApp from "@/components/common/listApp";
 import EndUserPopup from './../apps/EndUserPopup.vue';
 import NotificationBar from "@/components/notification/NotificationBar.vue";
 import Search from "@/components/search/Search";
+import DetailUser from "@/components/common/user/DetailUser.vue";
 
 export default {
+    watch:{
+        showMyInfo(){
+            if(!this.showMyInfo){
+                this.isExpand = false;
+            }
+        }
+
+    },
     methods: {
         showPopup(){
-            this.$store.commit('appConfig/showPopup')
+            // $(".v-menu__content").css("display", "inline-block")
         },
         /**
          * Xử lý các tab
@@ -162,7 +187,8 @@ export default {
         "list-app": listApp,
         "list-notification": NotificationBar,
         EndUserPopup,
-        SearchInput: Search
+        SearchInput: Search,
+        DetailUser
     },
     created() {
         let self = this;
@@ -198,9 +224,11 @@ export default {
     },
     data: function() {
         return {
+            isExpand:false,
             showSearchInput: false,
             isShowDialog: false,
-			isShowDialogNotification: false,
+            isShowDialogNotification: false,
+            showMyInfo: false
         };
     }
 };
@@ -213,5 +241,12 @@ export default {
 .nofitication-title-bar{
     font-size: 13px;
     font-weight: bold;
+}
+.width-1200{
+    width:1200px!important
+
+}
+.width-500{
+    width:500px!important
 }
 </style>

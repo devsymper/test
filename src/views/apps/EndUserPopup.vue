@@ -1,5 +1,5 @@
 <template>
-  <div class="end-user-popup" v-if="showPopup"> 
+  <div class="end-user-popup" > 
 	<v-card> 
 		<v-tabs
 			v-model="tab"

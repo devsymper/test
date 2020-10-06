@@ -45,7 +45,7 @@ const nodeStatusColors = {
     },
     todo: {
         fill: "#ffffff",
-        stroke: "#f5bb00"
+        stroke: "#0760D9"
     },
     done: {
         fill: "#edffee",
@@ -55,6 +55,7 @@ const nodeStatusColors = {
         fill: "#f3f3f3",
         stroke: "#797979"
     }
+  
 };
 
 export default {
@@ -71,16 +72,20 @@ export default {
             type:String,
             default:'',
         },
+        needFocus: {
+            type: Boolean,
+            default: true
+        }
     },
     watch:{
         instanceId(){
             this.setInstanceXML();
-            this.getInstanceRuntimeData();
+           // this.getInstanceRuntimeData();
         }
     },
     created() {
         this.setInstanceXML();
-        this.getInstanceRuntimeData();
+        //this.getInstanceRuntimeData();
  
     },
     data() {
@@ -115,9 +120,11 @@ export default {
     },
     methods: {
         eventAfterRender(){
-            setTimeout((self) => {
-                self.$refs.symperBpmn.focus();
-            }, 100,this);
+            if(this.needFocus){
+                setTimeout((self) => {
+                    self.$refs.symperBpmn.focus();
+                }, 100,this);
+            }
         },
         handleClosePopup(){
             this.$store.commit("task/setStatusPopupTracking",false);
@@ -158,14 +165,13 @@ export default {
         },
         setElementMap(els){
             let map = {};
-            let nodeStatus = ''
+            let nodeStatus = '';
             for (let item of els) {
                 if (item.endTime) {
                     nodeStatus = "done";
                 } else {
                     nodeStatus = "todo";
                 } // chưa có overdue, server cần trả về thêm thông tin của deadline
-
                 if(!map[item.activityId]){
                     map[item.activityId] = {
                         activityId: item.activityId,
@@ -178,7 +184,7 @@ export default {
                             done: 0,
                             todo: 0,
                             overdue: 0
-                        }
+                        },
                     };
                 }
                 map[item.activityId].instancesStatusCount[nodeStatus] += 1;
@@ -194,11 +200,19 @@ export default {
                 if (nodeInfo.activityType) {
                     if(nodeInfo.activityType.includes('Task')){
                         let symBpmn = this.$refs.symperBpmn;
+                        let currentNode=false;
+                        if (nodeInfo.currentNode) {
+                            currentNode=true;
+                        }
+                        console.log(eleId,"aaaaaxx");
                         symBpmn.updateElementProperties(eleId, {
-                            statusCount: nodeInfo.instancesStatusCount
+                            statusCount: nodeInfo.instancesStatusCount,
+                            currentNode: currentNode
                         });
                     }
                 }
+
+
             }
         },
         // Đặt màu cho các node trong diagram
@@ -214,9 +228,7 @@ export default {
                         let allNode = symBpmn.getAllNodes();
                         let nodeStatus = "";
                         if(self.elementId){
-                            self.runtimeNodeMap[self.elementId] = {
-                                nodeStatus: 'todo'
-                            };
+                            self.runtimeNodeMap[self.elementId].currentNode = true;
                         }
                         for (let node of allNode) {
                             if (node.$type != "bpmn:Process") {
@@ -227,7 +239,7 @@ export default {
                                 }
                                 symBpmn.changeElementColor(
                                     node.id,
-                                    nodeStatusColors[nodeStatus]
+                                    nodeStatusColors[nodeStatus],
                                 );
                             }
                         }
@@ -244,12 +256,12 @@ export default {
                     return self.getDefinitionData(res.data[0].processDefinitionId);
                 })
                 .then(res => {
-                    
                     let resourceDataUrl = appConfigs.apiDomain.bpmne.general + 'symper-rest/service/repository/deployments/'+res.deploymentId+'/resourcedata/process_draft.bpmn';
                     return self.getDefinitionXML(resourceDataUrl);
                 })
                 .then(res => {
                     self.diagramXML = res;
+                    self.getInstanceRuntimeData();
                     self.setColorForNodes().then(() => {
                         self.setTasksStatus();
                     });

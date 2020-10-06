@@ -50,8 +50,8 @@
 				
 				<v-expansion-panel>
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.worflowInfo')}}</v-expansion-panel-header>
-					<v-expansion-panel-content class="sym-v-expand-content" style="height:200px">
-						<v-row class="border-top-1" style="height:200px">
+					<v-expansion-panel-content class="sym-v-expand-content border-top-1" style="height:200px">
+						<v-row class="ma-0" style="height:200px">
 							<trackingProcessInstance
 								v-if="taskInfo.action.parameter.processInstanceId"
 								:instanceId="taskInfo.action.parameter.processInstanceId"
@@ -215,7 +215,7 @@
 		</VuePerfectScrollbar>
 	</div>
 		<Comment style="height:100%" 
-			:objectIdentifier="originData.id"
+			:objectIdentifier="String(originData.id)"
 			ref="commentTaskView"
 			/>
 	
@@ -488,10 +488,7 @@ export default {
 				}
 			})
 			.catch(err => {
-
 			})
-			.always(() => {});
-
 		this.$evtBus.$on('symper-app-wrapper-clicked', (evt) => {
             if(!($(evt.target).hasClass('symper-select-user-autocomplete') || $(evt.target).parents('.symper-select-user-autocomplete').length > 0)){
                 for(let key in  this.showDelegatedUser){
@@ -836,5 +833,9 @@ export default {
 	}
 	.v-expansion-panel::before{
 		box-shadow: none;
+	}
+	.border-top-1 >>>.v-expansion-panel-content__wrap{
+		border: 1px solid #cecece!important;
+		border-radius: 5px;
 	}
 </style>

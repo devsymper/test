@@ -92,7 +92,8 @@ export default {
 			this.appId = appId
 		},
 		clickAction(action,sideBySide = false,allAppMode = false){
-			$(".context-menu").css("display", "none")
+			$(".v-menu__content").css("display", "none")
+			debugger
 			this.$store.commit('appConfig/showPopup')
 			let appId
 			if(allAppMode == true){

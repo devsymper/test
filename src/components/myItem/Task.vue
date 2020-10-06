@@ -6,6 +6,7 @@
             :docId="Number(docId)"
             :workflowVariable="workflowVariable"
             :showSubmitButton="false"
+            :appId="Number(appId)"
             :documentObjectTaskId="workflowInfo.documentObjectTaskId"
             :documentObjectWorkflowId="workflowInfo.documentObjectWorkflowId"
             :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
@@ -94,6 +95,7 @@
                 class="bg-white"
                 ref="panelUpdateSubmitedDocument"
                 :docId="Number(docId)"
+                :appId="Number(appId)"
                 :workflowVariable="workflowVariable"
                 :showSubmitButton="false"
                 :documentObjectTaskId="workflowInfo.documentObjectTaskId"
@@ -178,6 +180,10 @@ export default {
             type: Object,
             default: () => {}
         },
+        appId:{
+            type:String,
+            default:'',
+        }
     },
     computed:{
         stask() {

@@ -21,6 +21,7 @@
         "export_excel": "Xuất excel",
         "list": "Danh sách",
         "search": "Tìm kiếm",
+        "note": "Ghi chú",
         "quickSearch": "Tìm nhanh",
         "list_config": "Cấu hình danh sách",
         "save": "Lưu",
@@ -120,7 +121,9 @@
             "documents": "Văn bản",
             "orgchart": "Sơ đồ tổ chức",
             "myItem": "My item"
-        }
+        },
+        "system": "Hệ thống",
+        "copy": "Sao chép"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -193,13 +196,15 @@
         "general": {
             "title": "Thông tin cơ bản",
             "personalInfo": {
+                "phoneNumber": "Điện thoại",
+                "status": "Trạng thái",
                 "title": "Thông tin cá nhân",
                 "userName": "Tên tài khoản",
                 "email": "Email",
                 "firstName": "Tên",
                 "lastName": "Họ",
                 "displayName": "Tên hiển thị",
-                "phoneNumber": "Số điện thoại"
+                "phone": "Số điện thoại"
             },
             "passwordSetting": {
                 "title": "Tùy chọn mật khẩu",
@@ -260,8 +265,14 @@
             "contextMenu": {
                 "passwordSetting": "Tùy chọn mật khẩu",
                 "edit": "Sửa",
-                "delete": "Xóa"
+                "delete": "Xóa",
+                "view": "Xem"
             }
+        },
+        "myInfo": {
+            "title": "Thông tin của tôi",
+            "generalInfo": "Thông tin chung",
+            "myPosition": "Vị trí của tôi"
         }
     },
     "snippet": {
@@ -447,12 +458,19 @@
         "listAction": {
             "create": "thêm",
             "edit": "sửa",
-            "submit": "hiển thị",
+            "submit": "xem",
             "list": "danh sách",
             "list_trash": "danh sách nháp",
             "list_instance": "danh sách bản ghi",
             "deploy": "triển khai",
             "drop": "xóa",
+            "view": "xem",
+            "remove": "xóa",
+            "update": "sửa",
+            "execute": "thực thi",
+            "restore": "khôi phục",
+            "detail": "xem",
+            "print": "in",
             "start_instance": "bắt đầu quy trình"
         },
         "icon": {
@@ -530,8 +548,8 @@
                     "title": "Tiêu đề Document",
                     "fullSize": "Hiển thị toàn màn hình Form Submit",
                     "type": "Loại văn bản",
-                    "note": "Ghi chú",
-                    "titleObject": "Tiêu đề bản ghi",
+                    "note": "Ghi chú (Phục vụ cho việc tìm kiếm)",
+                    "titleObject": "Tiêu đề bản ghi (Phục vụ cho việc hiển thị trên MyItem, công thức chạy trên server)",
                     "titlePrint": "Tiêu đề bản In"
                 },
                 "swapType": {
@@ -606,8 +624,13 @@
         },
         "validate": {
             "emptyTitle": "Không được bỏ trống tiêu đề",
+            "emptyName": "Không được bỏ trống tên",
+            "nameNotValid": "Tên không hợp lệ",
             "emptyContentControlTemplate": "Vui chọn template trước khi lưu control template",
-            "controlNotExist": "Control Không tồn tại, vui lòng tạo control mới"
+            "controlNotExist": "Control Không tồn tại, vui lòng tạo control mới",
+            "docNameExist": "Tên document đã tồn tại",
+            "checkNameRelate": "Tên của văn bản này có thể được sử dụng trong công thức ở các đối tượng trong hệ thống. Chọn kiểm tra để kiểm tra lại các đối tượng"
+
         }
     },
     "documentObject": {
@@ -707,6 +730,9 @@
         },
 
         "listType": {
+            "documents": "Văn bản",
+            "workflows": "Quy trình làm việc",
+            "reports": "Báo cáo",
             "documentMajor": "Chứng từ",
             "documentCategory": "Danh mục",
             "workflow": "Quy trình làm việc",
@@ -872,25 +898,25 @@
                 "unfavorite": "Loại bỏ yêu thích"
             },
             "document_definition": {
-                "create": "Tạo mới văn bản ",
-                "edit": "Chỉnh sửa văn bản",
-                "submit": "Gửi văn bản",
-                "drop": "Xóa văn bản",
+                "create": "Tạo ",
+                "edit": "Sửa",
+                "submit": "Gửi",
+                "drop": "Xóa",
                 "restore": "Khôi phục",
-                "list": "Danh sách văn bản",
+                "list": "Danh sách",
                 "list_trash": "Thùng rác",
-                "list_instance": "Danh sách bản ghi",
-                "unfavorite": "Loại bỏ yêu thích"
+                "list_instance": "Ds bản ghi",
+                "unfavorite": "Bỏ yêu thích"
             },
             "workflow_definition": {
-                "list": "Danh sách quy trình ",
-                "create": "Tạo mới quy trình ",
+                "list": "Danh sách",
+                "create": "Tạo mới",
                 "deploy": "Triển khai",
-                "drop": "Xóa quy trình ",
-                "update": "Cập nhật quy trình ",
-                "list_instance": "Danh sách bản ghi",
-                "start_instance": "Bắt đầu quy trình",
-                "unfavorite": "Loại bỏ yêu thích"
+                "drop": "Xóa",
+                "update": "Sửa",
+                "list_instance": "Ds bản ghi",
+                "start_instance": "Bắt đầu",
+                "unfavorite": "Bỏ yêu thích"
             },
             "dashboard": {
                 "create": "Tạo mới",
@@ -899,6 +925,24 @@
                 "list": "Danh sách",
                 "drop": "Xóa",
                 "unfavorite": "Loại bỏ yêu thích"
+            },
+            "document_instance": {
+                "update": "Sửa",
+                "delete": "Xóa",
+                "restore": "Khôi phục",
+                "detail": "Chi tiết",
+                "print": "In",
+                "list_trash": "Thùng rác"
+            },
+            "syql": {
+                "update": "Sửa",
+                "create": "Tạo ",
+                "execute": "Thực thi"
+            },
+            "application_definition": {
+                "update": "Sửa",
+                "view": "Xem",
+                "remove": "Xóa"
             }
         },
         "iconListActions": {
@@ -1015,8 +1059,10 @@
             "showMoreFile": "Xem thêm các tệp"
 
         },
-        "alert":{
-            "title_aproval":"Thực thi công việc"
+        "alert": {
+            "title_aproval": "Thực thi công việc",
+            "titlePermissionDenied":"Từ chối thực thi!",
+            "contentPermissionDenied":"Bạn không có quyền thực hiện công việc này!"
         }
 
     },
@@ -1028,7 +1074,7 @@
         "header": {
             "type": "Loại",
             "approval": "Phê duyệt",
-            "groupApproval":"Nhóm phê duyệt",
+            "groupApproval": "Nhóm phê duyệt",
             "submit": "Gửi văn bản",
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",

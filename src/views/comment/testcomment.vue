@@ -12,7 +12,12 @@
 			self.left= e.clientX-550
 		})sp; &nbsp;vd: F.1.1-Design uml</p></div>
 				<comment :showComment="showComment" :top="top" :left="left" :heightComment="heightComment" :widthComment="'600px'" :objectIdentifier="'djasdjajdsj12312u31u2d12e'" :objectType="'documentssss'" :uuid="uuid" :contentTargetArea="contentTargetArea" />
+				<UploadFile :objectIentifier="'ádasdadadasdasd12131'" :objectType="'document'"  @selected-file="selected" /> 
+				<v-img :src="srcImg">
+					
+				</v-img>
 		</div>	
+
 </template>
 
 <script>
@@ -39,6 +44,7 @@ export default {
 			top: null,
 			left:null,
 			idItem:null,
+			srcImg: '',
 			uuidArea:'0',
 			contentTargetArea:'',
 			objType:'',
@@ -59,6 +65,9 @@ export default {
 			this.heightComment = height
 			this.widthComemnt = width
 			this.contentTargetArea = contentTargetArea
+		},
+		selected(data){
+			this.srcImg = data
 		}
 	},
 	mounted(){

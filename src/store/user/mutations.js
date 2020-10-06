@@ -6,7 +6,11 @@ const setAvatarUrl = (state, data) => {
         url: data.url ? data.url : defaultAvatar
     });
 };
+const setShowUser = (state, data) => {
+    state.showUserInfo = data;
+}
 
 export {
-    setAvatarUrl
+    setAvatarUrl,
+    setShowUser
 };
