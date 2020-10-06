@@ -377,6 +377,9 @@ export default {
             const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===processInstanceId);
             if (dataVariable) {
                 self.appId=dataVariable.value;
+                if (this.$store.state.task.allAppActive.length==0) {
+                    await self.$store.dispatch("task/getAllAppActive");
+                }
                 let allApp = this.$store.state.task.allAppActive;
                 let app=allApp.find(element => element.id== self.appId);
                 if (app) {
