@@ -30,13 +30,14 @@ export default {
             tableContextMenu: {
                 restore: {
                     name: "restore",
+                    multipleSelection:true,
                     text: this.$t("actions.listActions.document.restore"),
                     callback: async (rows, refreshList) => {
                         let ids = [];
-                       // for(let item of rows){
-                           debugger
-                            ids.push(rows.id);
-                       /// }
+                        for(let item of rows){
+                            ids.push(item.id);
+                        }
+                        debugger
                         try {
                             let res = await bpmnApi.restoreListModels(ids);
                             if(res.status == 200){
