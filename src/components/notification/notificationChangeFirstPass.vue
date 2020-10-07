@@ -7,7 +7,7 @@
         </v-col>
         <v-col class="col-md-7 h-100">
             <div class="fs-13">
-                Đổi mật khẩu đăng nhập lần đầu
+                Đổi mật khẩu đăng nhập
             </div>
             <div class="fs-10 fm mt-1 mb-2" style="color:rgb(0,0,0,0.4)">
                 Mật khẩu phải có tối thiểu 8 ký tự và ít hơn 24 kí tự

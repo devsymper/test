@@ -213,7 +213,8 @@
                 "firstName": "Tên",
                 "lastName": "Họ",
                 "displayName": "Tên hiển thị",
-                "phone": "Số điện thoại"
+                "phone": "Số điện thoại",
+                "pass": "Mật khẩu"
             },
             "passwordSetting": {
                 "title": "Tùy chọn mật khẩu",

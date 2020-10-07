@@ -163,7 +163,7 @@
         <!-- showErrorUser -->
         <v-list v-if="processing.preprocessing.isDone&&processing.validating.errors.length==0&&processing.importing.processed>1&&processing.dataUserError.length>0" class="ml-6 fs-13">
            Danh sách tài khoản import không thành công
-           <v-row v-if="existEmail.length>0"> Lỗi trùng email</v-row>
+           <v-row class="ml-0" v-if="existEmail.length>0"> Lỗi trùng email</v-row>
            <v-row v-if="existEmail.length>0" style="background-color:#F5F5F5; height: 30px" class="ml-0 mr-5">
                 <v-col class="col-md-6">
                     Tên tài khoản

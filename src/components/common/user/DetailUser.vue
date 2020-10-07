@@ -90,6 +90,56 @@
                             </v-tooltip>
                         </v-btn>
                     </div>
+                    <div class="ml-4">
+                         <div class="detail-user-label">
+                            {{$t('user.general.personalInfo.pass')}}
+                        </div>
+                        <div @click="changePass()" class="detail-user-value editable-value">  
+                            Đổi mật khẩu
+                               <v-icon style = "font-size: 16px; margin-top:-2px">mdi-lock-outline</v-icon>
+                        </div>
+                    </div>
+                    <div v-if="checkPass" style="margin-top:-10px; margin-bottom:-25px">
+                        <v-col cols="12">
+                            <span  class="fs-12 st-icon-pandora" style="color:grey">
+                                Mật khẩu ít nhất 8 kí tự và ít hơn 24 kí tự
+                            </span>
+                        </v-col>
+                    </div>
+                    <v-row  v-if="checkPass"  class="mt-1">
+                        <v-col cols="10">
+                            <v-text-field class="fs-13 ml-3"
+                                v-model="oldPassword" 
+                                ref="newPass" dense
+                                placeholder="Mật khẩu cũ"
+                                outlined
+                                prepend-inner-icon="mdi-lock-outline"
+                                :rules="[rules.required, rules.min, rules.max]" 
+                                :type="showPass ? 'text' : 'password'" 
+                                @click:prepend-inner="showPass = !showPass">
+                            </v-text-field>
+                        </v-col>
+                    </v-row>
+                    <v-row  v-if="checkPass" style="margin-top:-40px; margin-bottom:-45px" >
+                        <v-col cols="10">
+                            <v-text-field
+                                class="fs-13 ml-3" 
+                                prepend-inner-icon="mdi-lock-open-outline"
+                                v-model="newPassword" 
+                                ref="reNewPass" 
+                                dense 
+                                placeholder="Mật khẩu mới"
+                                outlined
+                                :rules="[rules.required, rules.min, rules.max, rules.match]" 
+                                :type="showPass ? 'text' : 'password'"
+                                @click:prepend-inner="showPass = !showPass">
+                        </v-text-field>
+                        </v-col>
+                            <v-col cols="2">
+                            <v-icon @click="submit()" style="color:green; margin-top:5px; font-size: 18px">mdi mdi-check</v-icon>
+                            </v-col>
+                    </v-row>
+
                 </div>
 
                 <!-- Avatar -->
@@ -198,7 +248,17 @@ export default {
     data(){
         return {
             role:[],
+            checkPass:false,
+            newPass:'',
+            oldPassword:'',
+             rules: {
+                required: value => !!value || 'Không được bỏ trống.',
+                min: v => (typeof v != 'undefined' && v != undefined && v.length >= 8) || 'Yêu cầu mật khẩu lớn hơn 8 kí tự',
+                max: v => (typeof v != 'undefined' && v != undefined && v.length < 25) || 'Yêu cầu mật khẩu ít hơn 24 kí tự',
+                match: v => (v!=this.oldPassword) || 'Mật khẩu không được trùng khớp',
+            },
             avatarUrl:'',
+            showPass: false,
             avatarFileName:'',
             isViewUserRole:false,
             lazyUserInfo: {
@@ -230,6 +290,37 @@ export default {
         }
     },
     methods: {
+        submit() {
+            let check = false;
+            if (this.newPassword&&this.oldPassword!=this.newPassword&&this.newPassword.length>=8&&this.newPassword.length<25) {
+                check = true;
+            }
+            if(check){
+                 this.changePassUser(this.oldPassword);
+            }
+        },
+        changePassUser(pass){
+            userApi.changePassUser(pass).then(res => {
+                if (res.status == 200) {
+                    this.$snotify({
+                        type: "success",
+                        title: this.$t("user.notification.successChangePass")
+                    });
+                    this.$emit('cancel');
+                } else {
+                    this.$snotify({
+                        type: "error",
+                        title: this.$t("user.notification."+res.message)
+                    });
+                }
+            })
+            .catch(err => {
+                console.log("error from change pass user api!!!", err);
+            })
+        },
+        changePass(){
+            this.checkPass=!this.checkPass;
+        },
          logout(){
             util.auth.logout();
             location.reload();
