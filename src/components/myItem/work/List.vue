@@ -406,6 +406,8 @@ export default {
             this.allFlatWorks.length > 0  && !this.loadingTaskList && !this.loadingMoreTask
         ) {
             this.myOwnFilter.page += 1;
+            this.filterListProcessUserStartWork.page +=1;
+
             if ((this.myOwnFilter.page-1)*this.myOwnFilter.size <this.totalWork) {
                 this.getWorks();
             }
@@ -480,7 +482,6 @@ export default {
             }
         }
         await this.getProcessInstanceUserStart(processIdUserStart);
-
         self.filterVariables.pageSize=(processId.length)*2;
         self.filterVariables.processInstanceIds=JSON.stringify(processId);
         
@@ -500,17 +501,19 @@ export default {
         self.loadingMoreTask = false;
     },
     async getProcessInstanceUserStart(processIdUserStart){
-        let self=this;
-        let filter={};
-        filter.size= processIdUserStart.length+1;
-        filter.sort= "startTime";
-        filter.order= "desc";
-        filter.processInstanceIds=processIdUserStart;
-        let res={};
-        res = await BPMNEngine.getProcessInstanceHistory(filter);
-        for (let work of res.data) {
-            if (!self.allFlatWorks[work.id]) {
-                self.allFlatWorks.push(work);
+        if (processIdUserStart.length>0) {
+            let self=this;
+            let filter={};
+            filter.size= processIdUserStart.length+1;
+            filter.sort= "startTime";
+            filter.order= "desc";
+            filter.processInstanceIds=processIdUserStart;
+            let res={};
+            res = await BPMNEngine.getProcessInstanceHistory(filter);
+            for (let work of res.data) {
+                if (!self.allFlatWorks[work.id]) {
+                    self.allFlatWorks.push(work);
+                }
             }
         }
     }
