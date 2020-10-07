@@ -103,7 +103,7 @@
                 <v-col  class="col-md-5 ml-1 pl-4 pb-5 d-flex justify-content">
                     <v-icon style=" margin-top:-19px; font-size:13px " class="pr-3" size="18">mdi mdi-key</v-icon>
                     <div class="color-normal" style="float:left; margin-top:-13px">Khoá
-                        <span v-if="tables[tableIdx]==tables[0]" style="color:red"> *</span>
+                        <span style="color:red">*</span>
                     </div>
                 </v-col>
                 <v-col class="col-md-6 py-0" style="margin-left:2px">
@@ -133,7 +133,8 @@
                     <v-icon class='fs-14 mr-2 color-normal'>{{getIcon(control.dataType)}}</v-icon>
                     <v-tooltip right>
                         <template v-slot:activator="{ on}">
-                            <span v-on="on" class="color-normal"> {{control.title ? control.title : control.name}}</span>
+                            <span style="color:red"> {{control.isNull?' ':'*'}}</span>
+                            <span v-on="on" class="color-normal"> {{control.title ? control.title : control.name}} </span>
                         </template>
                         {{control.title ? control.title : control.name}}
                     </v-tooltip>
@@ -213,10 +214,6 @@ export default {
         return this.$store.state.importExcel.newImport;
       },
     },
-    created(){
-       
-          
-    },
     methods: {
         sumCount(tableIdx,type){
             let totalAllRow = 0;
@@ -259,14 +256,13 @@ export default {
         },
         // xoá dữ liệu trở về mặc định
         clearFiles(){
-            //
             this.errorType="";
             this.errorMessage ="";
             this.data=[];
             this.nameSheets=[];
             this.showCancelBtn = true;
             this.nameColumnDetail={};
-             this.$emit('stopSetInterval');
+            this.$emit('stopSetInterval');
             this.$emit('closeValidate');
             for (let i = 0; i < this.tables.length; i++){
                 this.tables[i].keyColumn= {enable:false, index:-1, name:''};
@@ -339,23 +335,13 @@ export default {
                 },
             };
 
-            importApi.pushDataExcel(dataImport)
-                .then(res => {
-                    if (res.status === 200) {
-                         console.log(dataImport);                    }
-                })
-                .catch(err => {
-                });
+            let check = true;
                 // kiểm tra key rỗng của table chung
-                   let check = true;
-                   debugger
                     if (this.tables[0].keyColumn==undefined||this.tables[0].keyColumn.index==-1) {
                         if(this.objType=='document'){
-                            
                             this.errorMessage = '* Bạn chưa chọn khóa cho thông tin chung';
-                        check = false;
+                            check = false;
                         }
-                        
                     };
                     if (this.tables[0].sheetMap == '') {
                         this.errorMessage = '* Điền thiếu trường thông tin chung';
@@ -363,19 +349,29 @@ export default {
                     };
                    // kiểm tra bảng con
                      if(this.objType=='document'){
-                    for (let i = 0; i < this.tables.length; i++) {
-                        
-                        if(this.tables[i].sheetMap!='')
-                        {
+                        for (let i = 0; i < this.tables.length; i++) {
                             if(this.tables[i].keyColumn==undefined||this.tables[i].keyColumn.index==-1){
-                            this.errorMessage = '* Bạn chưa chọn khóa cho bảng '+ this.tables[i].title;
-                            check = false;
-                            }
+                                this.errorMessage = '* Bạn chưa chọn khóa ';
+                                check = false;
+                            };
                         }
-                    };
-                     }
-                    if(check)
-                     {
+                    }
+                       //kiểm tra bắt buộc điền
+                    // for (let index = 0; index < this.tables.length; index++) {
+                    //     for(let j=0; j<this.tables[index].controls.length;j++){
+                    //         if(this.tables[index].controls[j].dataColumn==null&&this.tables[index].controls[j].isNull==false)
+                    //             this.errorMessage = '* Bạn chưa điền thông tin bắt buộc';
+                    //             check = false;
+                    //     }
+                    // };  
+                    if(check){
+                        importApi.pushDataExcel(dataImport)
+                        .then(res => {
+                            if (res.status === 200) {
+                                console.log(dataImport);                    }
+                        })
+                        .catch(err => {
+                        });     
                         this.errorMessage = '';
                         this.$emit('import', {fileName:this.data.fileName});
                         this.showCancelBtn = false;
@@ -414,10 +410,6 @@ export default {
                 return 'text';
             }
         },
-        // Lấy tên cột trong db theo từng bảng
-       
-        // Khởi tạo giá trị của các bảng
-       
         //Lấy ra tên các sheet trong excel
         getSheetAndColumnName() {
             let sheets = [];
@@ -442,7 +434,6 @@ export default {
             }
             this.nameColumnDetail = columnDetail;
             this.getMappingTable();
-              
         },
    
         //Sự kiện xảy ra khi thay đổi tên Sheet

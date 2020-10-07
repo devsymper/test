@@ -161,8 +161,8 @@ export default {
 			for(let i= 0; i<arrAction.length;i++){
 				for(let j = 0; j<this.allListAction[this.menuTitle].action.length;j++){
 					if(arrAction[i]==this.allListAction[this.menuTitle].action[j]){
-							this.action.push(arrAction[i]);
-							debugger// if(this.allListAction[arrA])
+						this.action.push(arrAction[i]);
+						debugger// if(this.allListAction[arrA])
 					}
 				}
 				
