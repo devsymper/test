@@ -786,7 +786,7 @@ export default {
                     let colName = Object.keys(rowData)[col];
                     let callBackOption = thisCpn.tableContextMenu[key];
 
-                    if(callBackOption.multipleSelection){
+                    if(callBackOption && callBackOption.multipleSelection){
                         rowData = [];
                         for(let i = selection[0].start.row; i < selection[0].end.row; i++){
                             rowData.push(thisCpn.data[i]);
