@@ -3,7 +3,7 @@
         <list-items
             ref="listModels"
             :useDefaultContext="false"
-            :pageTitle="$t('process.list.title')"
+            :pageTitle="$t('process.list.titleTrash')"
             :tableContextMenu="tableContextMenu"
             :containerHeight="containerHeight"
             :getDataUrl="getListUrl"
@@ -17,6 +17,8 @@
 import ListItems from "./../../components/common/ListItems.vue";
 import bpmnApi from "./../../api/BPMNEngine.js";
 import { appConfigs } from "./../../configs.js";
+import { util } from "./../../plugins/util.js";
+
 export default {
     components: {
         ListItems: ListItems
@@ -64,6 +66,14 @@ export default {
             }
         };
     },
+    mounted() {
+        this.calcContainerHeight();
+    },
+    methods:{
+        calcContainerHeight() {
+            this.containerHeight = util.getComponentSize(this).h;
+        },
+    }
    
 }
 </script>
