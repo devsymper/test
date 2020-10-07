@@ -15,8 +15,8 @@
             @change-density="isSmallRow = !isSmallRow"
             @changeObjectType="changeObjectType"
             @filter-change-value="handleChangeFilterValue"
-            @create-task="getTasks({})"
-            @refresh-task-list="getTasks()"
+            @create-task="getWorks({})"
+            @refresh-task-list="getWorks()"
             ></listHeader>
             <v-divider v-if="!sideBySideMode"></v-divider>
             <v-row class="ml-0 mr-0" v-if="!sideBySideMode">
@@ -330,9 +330,10 @@ export default {
         isSmallRow: false,
         sideBySideMode: false,
         allFlatWorks: [],
+        allWorkIdUserStart:[],
         allVariableProcess:[],
         myOwnFilter: {
-            size: 20,
+            size: 40,
             sort: "startTime",
             order: "desc",
             page: 1,
@@ -343,8 +344,13 @@ export default {
             page:1,
             processInstanceIds:[]
         },
-      defaultAvatar: appConfigs.defaultAvatar,
-      listIdProcessInstance:[],
+        filterListProcessUserStartWork:{
+            names:"symper_user_id_start_workflow",
+            page:1,
+            values:this.$store.state.app.endUserInfo.id
+        },
+        defaultAvatar: appConfigs.defaultAvatar,
+        listIdProcessInstance:[],
     };
   },
   created() {
@@ -354,7 +360,7 @@ export default {
     this.$store
       .dispatch("process/getAllDefinitions")
       .then(res => {
-        self.getTasks();
+        self.getWorks();
       })
       .catch(err => {});
     self.reCalcListTaskHeight();
@@ -401,19 +407,19 @@ export default {
         ) {
             this.myOwnFilter.page += 1;
             if ((this.myOwnFilter.page-1)*this.myOwnFilter.size <this.totalWork) {
-                this.getTasks();
+                this.getWorks();
             }
         }
     },
     handleTaskSubmited() {
         this.sideBySideMode = false;
-        this.getTasks();
+        this.getWorks();
     },
     handleChangeFilterValue(data) {
         for (let key in data) {
             this.$set(this.myOwnFilter, key, data[key]);
         }
-        this.getTasks();
+        this.getWorks();
     },
     reCalcListTaskHeight() {
         this.listTaskHeight =util.getComponentSize(this.$el.parentElement).h - 125;
@@ -437,7 +443,7 @@ export default {
       this.$emit("change-height", "calc(100vh - 120px)");
     },
 
-    async getTasks(filter = {}) { // đây là get processInstance chứ k phải get Task
+    async getWorks(filter = {}) { // đây là get processInstance chứ k phải get Task
         if (this.loadingTaskList || this.loadingMoreTask) {
             return;
         }
@@ -460,8 +466,22 @@ export default {
             self.allFlatWorks.push(work);
             processIden.push('work:'+work.id);
             processId.push(work.id);
+            self.listIdProcessInstance.push(work.id);
         }
-        self.filterVariables.pageSize=self.myOwnFilter.size*2;
+        // get variable process mà user start
+        let res2 = {};
+        res2 = await taskApi.getVariableWorkflow(self.filterListProcessUserStartWork);
+        let processIdUserStart=[];
+        for (let item of res2.data) {
+            if (self.listIdProcessInstance.indexOf(item.processInstanceId) === -1) {
+                processIdUserStart.push(item.processInstanceId);
+                processId.push(item.processInstanceId);
+                processIden.push('work:'+item.processInstanceId);
+            }
+        }
+        await this.getProcessInstanceUserStart(processIdUserStart);
+
+        self.filterVariables.pageSize=(processId.length)*2;
         self.filterVariables.processInstanceIds=JSON.stringify(processId);
         
         let resVariable = {};
@@ -479,6 +499,21 @@ export default {
         self.loadingTaskList = false;
         self.loadingMoreTask = false;
     },
+    async getProcessInstanceUserStart(processIdUserStart){
+        let self=this;
+        let filter={};
+        filter.size= processIdUserStart.length+1;
+        filter.sort= "startTime";
+        filter.order= "desc";
+        filter.processInstanceIds=processIdUserStart;
+        let res={};
+        res = await BPMNEngine.getProcessInstanceHistory(filter);
+        for (let work of res.data) {
+            if (!self.allFlatWorks[work.id]) {
+                self.allFlatWorks.push(work);
+            }
+        }
+    }
   }
 };
 </script>
