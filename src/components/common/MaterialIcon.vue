@@ -226,7 +226,8 @@ export default {
             ],
             searchIconKeyword: null,
             link: null,
-            isShow:false
+            isShow:false,
+            context:""
         }
     },
     mounted() {
@@ -259,7 +260,10 @@ export default {
         },
         selectIcon(icon,type='img') {
 			// console.log(icon);
-            this.$emit("selected", {icon: icon.trim(),type:type});
+            this.$emit("selected", {icon: icon.trim(),type:type,context:this.context});
+        },
+        setContext(ctx){
+            this.context = ctx
         },
         show(position){
             this.isShow = true;
@@ -270,6 +274,7 @@ export default {
         },
         hide(){
             this.isShow = false;
+            this.context = ""
         }
     }
 }

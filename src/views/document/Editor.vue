@@ -117,7 +117,7 @@ import 'tinymce/plugins/image';
 import 'tinymce/plugins/table';
 import 'tinymce/plugins/print';
 import 'tinymce/plugins/preview';
-import 'tinymce/plugins/code';
+// import 'tinymce/plugins/code';
 import 'tinymce/plugins/fullscreen';
 import 'tinymce/plugins/paste';
 import 'tinymce/plugins/hr';
@@ -177,13 +177,13 @@ export default {
             plugins: [
             'advlist autolink lists link image table print preview',
             ' fullscreen',
-            'table paste code hr'
+            'table paste hr'
             ],
             contextmenu: 'inserttable table | settingtable | dragTable',
             toolbar:
             'undo redo | fontselect fontsizeselect formatselect pageSize| bold italic forecolor backcolor | \
             alignleft aligncenter alignright alignjustify | \
-            bullist numlist indent hr | removeformat  table |  preview margin rotatePage',
+            bullist numlist indent hr | removeformat  table |  preview margin rotatePage mdiIcon',
             fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
             font_formats: 'Roboto=Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times,serif;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
             valid_elements: '*[*]',
@@ -236,7 +236,7 @@ export default {
                         }
                     });
                     ed.ui.registry.addButton('rotatePage', {
-                    icon:'rotate',
+                    icon:'reload',
                     tooltip:'Xoay',
                         onAction: function (_) {
                             self.rotatePage(ed);
@@ -256,6 +256,16 @@ export default {
                 tooltip:'Margin',
                     onAction: function (_) {
                         self.showPaddingPageConfig(ed);
+                    }
+                }); 
+                ed.ui.registry.addButton('mdiIcon', {
+                icon:'emoji',
+                tooltip:'Icon',
+                    onAction: function (e,evt) {
+                        console.log(e,evt);
+                        let buttonOff = $('#document-editor-'+self.keyInstance+'_ifr').closest('.tox-editor-container').find('button[title="Icon"]').offset();
+                        self.$refs.materialIconPicker.setContext('toolbar')
+                        self.$refs.materialIconPicker.show(buttonOff)
                     }
                 }); 
                 
@@ -427,6 +437,7 @@ export default {
         },
         handlePasteContent(e){
             var content = ((e.originalEvent || e).clipboardData || window.clipboardData).getData("text/html");
+
             content = content.replace(/((<|(<\/))html>)|((<|(<\/))body>)/g,"");
             let contentEl = $(content);
             let listControls = contentEl.find('.s-control:not(.s-control-table .s-control)');
@@ -459,9 +470,24 @@ export default {
                 
             }
             else{   // trường hợp copy từ dekko
-                setTimeout((self) => {
-                    self.setContentForDocumentV1();
-                }, 300,this);
+                if(contentEl.find('.bkerp-input').length > 0){
+                    setTimeout((self) => {
+                        self.setContentForDocumentV1();
+                    }, 300,this);
+                }
+                else{
+                    content = content.match(/<span .*>.*<\/span>/gm);
+                    this.editorCore.insertContent('&nbsp;<em>You clicked menu item 1!</em>');
+                    //  this.editorCore.execCommand('mceInsertRawHTML', false,content);
+                    //  var parentEditor = parent.tinyMCE.activeEditor;
+                    // // parentEditor.execCommand('mceInsertRawHTML', false, html);
+                    // let preTag = $(this.editorCore.selection.getNode()).closest('pre');
+                    // debugger
+                    // let parent = preTag.parent();
+                    // preTag.remove();
+                    // parent.prepend(content[0]);
+                }
+                
             }
             
         },
@@ -1477,9 +1503,16 @@ export default {
             }
         },
         selectedIcon(data){
-            this.currentTabSelectedIcon.removeClass();
-            this.currentTabSelectedIcon.addClass('icon-page mdi '+data.icon);
+            let context = data.context
+            if(context == 'toolbar'){
+                 this.editorCore.insertContent('&nbsp;<span class="mdi '+data.icon+'"></span>&nbsp;');
+            }
+            else{
+                this.currentTabSelectedIcon.removeClass();
+                this.currentTabSelectedIcon.addClass('icon-page mdi '+data.icon);
+            }
             this.$refs.materialIconPicker.hide()
+            
         },
         // hàm click ra ngoài editor thì cập nhật lại dữ liệu của store
         detectBlurEditorEvent(event){
@@ -2339,10 +2372,21 @@ export default {
         configColumnTablePrint(listRowData){
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-table.on-selected');
             let thead = elements.find('thead th');
+            let tbody = elements.find('tbody tr td');
             for (let index = 0; index < thead.length; index++) {
                 let th = thead[index];
-                $(th).css({width:listRowData[index].colWidth})
-                $(th).attr('data-mce-style',$(th).attr('style'))
+                let newCell = listRowData.filter(row=>{
+                    return row.colIndex == index;
+                })
+                if(newCell.length == 0){
+                    $(th).remove();
+                    $(tbody[index]).remove();
+                }
+                else{
+                    $(th).css({width:newCell[0].colWidth})
+                    $(th).attr('data-mce-style',$(th).attr('style'))
+                }
+                
                 
             }
         },
@@ -2360,9 +2404,8 @@ export default {
                 if($(tbody[0].innerHTML).length > 0){
                     for(let i = 0; i< thead.length; i++){
                         let style = $(thead[i]).attr('style');
-                        console.log("sadsadasdasda",style);
                         let width = style.match(/(?<=width:\s)\s*([^;"]*)(?=\;)/gmi);
-                        let row = {title: $(thead[i]).text(),colWidth:width[0]}
+                        let row = {title: $(thead[i]).text(),colWidth:width[0],colIndex:i}
                         listData.push(row)
                     }
                 }

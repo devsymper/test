@@ -81,7 +81,7 @@ export default {
             },
             tableContextMenu: {
                 update: {
-                    name: "edit",
+                    name: "update",
                     text: this.$t("common.edit"),
                     callback: (row, callback) => {
                         self.actionOnItem = 'update';
@@ -89,7 +89,7 @@ export default {
                     }
                 },
                 drop: {
-                    name: "remove",
+                    name: "drop",
                     text: this.$t("common.delete"),
                     callback: async (rows, refreshList) => {
                         let ids = [];
@@ -115,7 +115,7 @@ export default {
                     }
                 },
                 update_password: {
-                    name: "updatePassword",
+                    name: "update_password",
                     text: this.$t("common.updatePassword"),
                     callback: (row, callback) => {
                         self.applyDataToForm(row);
