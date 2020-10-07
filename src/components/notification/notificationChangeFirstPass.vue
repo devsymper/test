@@ -10,13 +10,13 @@
                 Đổi mật khẩu đăng nhập lần đầu
             </div>
             <div class="fs-10 fm mt-1 mb-2" style="color:rgb(0,0,0,0.4)">
-                Mật khẩu phải có tối thiểu 8 ký tự, có ít nhất 1 ký tự hoa, 1 chữ số và 1 chữ thường.
+                Mật khẩu phải có tối thiểu 8 ký tự và ít hơn 24 kí tự
             </div>
             <v-row class="mt-1">
                  <v-text-field class="fs-13 ml-3" 
-                    v-model="newPassword" 
+                    v-model="oldPassword" 
                     ref="newPass" dense
-                    placeholder="Mật khẩu mới"
+                    placeholder="Mật khẩu cũ"
                     outlined
                     prepend-inner-icon="mdi-lock-outline"
                     :rules="[rules.required, rules.min, rules.max]" 
@@ -28,10 +28,10 @@
                 <v-text-field
                     class="fs-13 ml-3" 
                     prepend-inner-icon="mdi-lock-open-outline"
-                    v-model="reNewPassword" 
+                    v-model="newPassword" 
                     ref="reNewPass" 
                     dense 
-                    placeholder="Xác nhận mật khẩu"
+                    placeholder="Mật khẩu mới"
                     outlined
                     :rules="[rules.required, rules.min, rules.max, rules.match]" 
                     :type="showPass ? 'text' : 'password'"
@@ -50,14 +50,14 @@ import { userApi } from "./../../api/user.js";
 export default {
     data() {
         return {
+            oldPassword: "",
             newPassword: "",
-            reNewPassword: "",
             showPass: false,
             rules: {
                 required: value => !!value || 'Không được bỏ trống.',
                 min: v => (typeof v != 'undefined' && v != undefined && v.length >= 8) || 'Yêu cầu mật khẩu lớn hơn 8 kí tự',
                 max: v => (typeof v != 'undefined' && v != undefined && v.length < 25) || 'Yêu cầu mật khẩu ít hơn 24 kí tự',
-                match: v => (v==this.newPassword) || 'Mật khẩu không trùng khớp',
+                match: v => (v!=this.oldPassword) || 'Mật khẩu không được trùng khớp',
             },
         }
     },
@@ -74,13 +74,13 @@ export default {
                 if (res.status == 200) {
                     this.$snotify({
                         type: "success",
-                        title: this.$t("notification.changePass") + " " + this.$t("notification.successTitle")
+                         title: this.$t("user.notification.successChangePass")
                     });
                     this.$emit('cancel');
                 } else {
                     this.$snotify({
                         type: "error",
-                        title: this.$t("notification.changePass") + " " + this.$t("notification.error")
+                        title: this.$t("user.notification."+res.message)
                     });
                 }
             })
@@ -93,13 +93,13 @@ export default {
                 if (res.status == 200) {
                     this.$snotify({
                         type: "success",
-                        title: this.$t("notification.changePass") + " " + this.$t("notification.successTitle")
+                        title: this.$t("user.notification.successChangePass")
                     });
                     this.$emit('cancel');
                 } else {
                     this.$snotify({
                         type: "error",
-                        title: this.$t("notification.changePass") + " " + this.$t("notification.error")
+                        title: this.$t("user.notification."+res.message)
                     });
                 }
             })
@@ -112,15 +112,15 @@ export default {
                 id: this.sapp.endUserInfo.id
             };
             let check = false;
-            if (this.newPassword&&this.newPassword==this.reNewPassword&&this.newPassword.length>=8&&this.newPassword.length<25) {
-                data.password = this.newPassword;
+            if (this.newPassword&&this.oldPassword!=this.newPassword&&this.newPassword.length>=8&&this.newPassword.length<25) {
+                data.password = this.oldPassword;
                 check = true;
             }
             if(check){
                 if(this.$store.state.app.allBA.length>0){
                     this.updateBaPass(this.sapp.endUserInfo.id);
                 }else{
-                     this.changePassUser(this.newPassword);
+                     this.changePassUser(this.oldPassword);
                 }
             }
         },

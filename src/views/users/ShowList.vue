@@ -225,6 +225,7 @@ export default {
             this.$refs.listUser.closeactionPanel();
         },
         addUser(){
+            debugger
             this.isSettingPasswordView = false;
             this.showViewInfo = false;
             this.actionType = 'add';

@@ -8,6 +8,7 @@ const defaultState = {
     endUserInfo: {
         name: 'Nguyễn Quốc Tân',
         id: 0,
+        status: 1,
         currentRole: {
             // Vai trò hiện tại của enduser đang đóng
             id: 0,
