@@ -75,7 +75,9 @@
                             {{showableUserInfo[key]}}
                         </div>
                         <v-btn 
-                            icon tile class="float-right" v-if=" !isEditing && (key == 'email' || key == 'phone')" small style="position: relative; bottom: 2px">
+                            icon tile class="float-right" v-if=" !isEditing && (key == 'email' || key == 'phone')" 
+                            small
+                            style="position: relative; bottom: 2px">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
                                     <v-icon
@@ -120,7 +122,7 @@
                             </v-text-field>
                         </v-col>
                     </v-row>
-                    <v-row  v-if="checkPass" style="margin-top:-40px; margin-bottom:-45px" >
+                    <v-row  v-if="checkPass" style="margin-top:-30px; margin-bottom:-45px" >
                         <v-col cols="10">
                             <v-text-field
                                 class="fs-13 ml-3" 
@@ -139,9 +141,7 @@
                             <v-icon @click="submit()" style="color:green; margin-top:5px; font-size: 18px">mdi mdi-check</v-icon>
                             </v-col>
                     </v-row>
-
                 </div>
-
                 <!-- Avatar -->
                 <div class="user-avatar d-inline-block pa-2" style="width: 35%" >
                     <v-avatar :size="80">
@@ -213,7 +213,6 @@
                     </div>
                 </div>  
             </div>
-           
         <div  class="w-100 h-100" v-if="isViewUserRole">
             <ViewRoles 
                 @show-userInfo="showUserInfo()"
@@ -224,7 +223,8 @@
                 <v-btn @click="logout" text class="mt-10" style="align-self: flex-end">
                     <span class="fm fw-400  mr-5 " 
                     >Đăng xuất</span>
-                </v-btn></div>
+                </v-btn>
+            </div>
         </div>
     </div>
 </template>
@@ -249,7 +249,7 @@ export default {
         return {
             role:[],
             checkPass:false,
-            newPass:'',
+            newPassword:'',
             oldPassword:'',
              rules: {
                 required: value => !!value || 'Không được bỏ trống.',
