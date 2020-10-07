@@ -784,6 +784,15 @@ export default {
                     let row = selection[0].start.row;
                     let rowData = thisCpn.data[row];
                     let colName = Object.keys(rowData)[col];
+                    let callBackOption = thisCpn.tableContextMenu[key];
+
+                    if(callBackOption.multipleSelection){
+                        rowData = [];
+                        for(let i = selection[0].start.row; i < selection[0].end.row; i++){
+                            rowData.push(thisCpn.data[i]);
+                        }
+                    }
+
                     /**
                      * Phát sự kiện khi có một hành động đối với một row, hoặc cell.
                      * tham số thứ nhất: row ( index của row đang được chọn)
