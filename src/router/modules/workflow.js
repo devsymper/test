@@ -5,6 +5,12 @@ export default [{
             import ('../../views/process/ProcessList.vue'),
     },
     {
+        path: "/workflow/trash",
+        name: "processListTrash",
+        component: () =>
+            import ('../../views/process/ProcessListTrash.vue'),
+    },
+    {
         path: "/workflow/:id/edit",
         name: "editProcess",
         component: () =>

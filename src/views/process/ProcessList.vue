@@ -63,6 +63,7 @@ export default {
                 drop: {
                     name: "remove",
                     text: this.$t("common.delete"),
+                    multipleSelection:true,
                     callback: async (rows, refreshList) => {
                         let ids = [];
                         for(let item of rows){
