@@ -1059,9 +1059,7 @@ export default class Table {
             formulas: true,
             height: 'auto',
             afterRender: function(isForced) {
-                if (thisObj.tableHasRowSum) {
-                    $('#' + thisObj.tableControlId + ' span.rowHeader').last().text('Tổng').css({ 'font-weight': 'bold' });
-                }
+
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
                 if (tbHeight < MAX_TABLE_HEIGHT) {} else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
@@ -1077,6 +1075,11 @@ export default class Table {
                         }
                         hotTb.render();
                     }, 500, this);
+                }
+            },
+            afterGetRowHeader: function(row, TH) {
+                if (thisObj.tableHasRowSum && row === this.countRows() - 1) {
+                    $(TH).text('Tổng').css({ 'font-weight': 'bold' });
                 }
             },
 
@@ -1121,6 +1124,12 @@ export default class Table {
                     }, 10);
                 } else if (source == 'timeValidator') {
 
+                } else if (changes[0][3].includes("=SUM")) {
+                    console.log("ádadasdsad", changes);
+
+                    setTimeout((self) => {
+                        self.render()
+                    }, 500, this);
                 } else {
                     thisObj.isAutoCompleting = false;
                 }
@@ -1307,9 +1316,7 @@ export default class Table {
             } else {
                 let defaultRow = this.getDefaultData(false);
                 this.tableInstance.loadData(defaultRow);
-                setTimeout((thisObj) => {
-                    thisObj.setDataForSumRow();
-                }, 50, this);
+                thisObj.setDataForSumRow();
             }
         }
         /**
@@ -1317,12 +1324,14 @@ export default class Table {
          */
     setDataForSumRow() {
             if (this.tableHasRowSum) {
-                for (let controlName in this.columnHasSum) {
-                    let colIndex = this.getColumnIndexFromControlName(controlName);
-                    let CharAt = String.fromCharCode(65 + this.columnHasSum[controlName]);
-                    let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (this.tableInstance.countRows() - 1) + ')';
-                    this.tableInstance.setDataAtCell(this.tableInstance.countRows() - 1, colIndex, sumValue, AUTO_SET);
-                }
+                setTimeout((self) => {
+                    for (let controlName in self.columnHasSum) {
+                        let colIndex = self.getColumnIndexFromControlName(controlName);
+                        let CharAt = String.fromCharCode(65 + self.columnHasSum[controlName]);
+                        let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (self.tableInstance.countRows() - 1) + ')';
+                        self.tableInstance.setDataAtCell(self.tableInstance.countRows() - 1, colIndex, sumValue);
+                    }
+                }, 300, this);
             }
         }
         /**
