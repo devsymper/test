@@ -336,9 +336,11 @@ export default {
         },
         showUserInfo(){
             this.isViewUserRole=false;
+            debugger
             this.$emit('make-small-panel')
         },
         viewUserRole(role){
+            debugger
 			this.isViewUserRole =! this.isViewUserRole;
             this.role = role;
             this.$emit("expand-panel")

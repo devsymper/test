@@ -205,6 +205,7 @@ export default {
 		// xử lý chuyển tên object    
     },
     created(){
+		debugger
 		this.getActionAndObject();
 		this.getListActionAllObj();
     },
