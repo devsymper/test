@@ -144,6 +144,9 @@ export default {
         allControlTemplate(){  
             return this.$store.state.document.editor[this.keyInstance].allControlTemplate;
         },
+        allControlDeleted(){  
+            return this.$store.state.document.editor[this.keyInstance].allControlDeleted;
+        },
     }, 
     components: {
         'sidebar-left' : SideBarLeft,
@@ -475,19 +478,6 @@ export default {
                         self.setContentForDocumentV1();
                     }, 300,this);
                 }
-                else{
-                    content = content.match(/<span .*>.*<\/span>/gm);
-                    this.editorCore.insertContent('&nbsp;<em>You clicked menu item 1!</em>');
-                    //  this.editorCore.execCommand('mceInsertRawHTML', false,content);
-                    //  var parentEditor = parent.tinyMCE.activeEditor;
-                    // // parentEditor.execCommand('mceInsertRawHTML', false, html);
-                    // let preTag = $(this.editorCore.selection.getNode()).closest('pre');
-                    // debugger
-                    // let parent = preTag.parent();
-                    // preTag.remove();
-                    // parent.prepend(content[0]);
-                }
-                
             }
             
         },
@@ -1207,6 +1197,7 @@ export default {
         
         //hoangnd: hàm mở modal tablesetting của control table
         showSettingControlTable(e) {
+             $('.tox-pop').css({display:'none'})
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected').closest('.s-control-table');
             if(elements.is('.s-control-table')){
                 let thead = elements.find('thead tr th');
@@ -1502,6 +1493,9 @@ export default {
                 this.hideAutocompletaControl();
             }
         },
+        /**
+         * Hàm nhận sự kiện ném ra từ compon material icon sau khi chọn icon
+         */
         selectedIcon(data){
             let context = data.context
             if(context == 'toolbar'){
@@ -2150,11 +2144,8 @@ export default {
                     return $element.prop('tagName');
                 }
             };
-
-
-            $(".sym-document-tab-control .sym-control").attr('draggable', 'true');
             
-            $(document).on('dragstart','.sym-control,.control-template-item', function(event) {
+            $(document).on('dragstart','.sym-control .control-content,.control-template-item', function(event) {
                 dragoverqueue_processtimer = setInterval(function() {
                     DragDropFunctions.ProcessDragOverQueue();
                 }, 100);
@@ -2168,12 +2159,25 @@ export default {
                     control = control[0]
                 }
                 else{
-                    control = GetControlProps(controlType);
+                    if($(this).attr('control-id')){
+                        let tableId = $(this).attr('table-id');
+                        let controlId = $(this).attr('control-id');
+                        if(tableId){
+                            control = thisCpn.allControlDeleted[tableId]['listFields'][controlId];
+                        }
+                        else{
+                            control = thisCpn.allControlDeleted[controlId];
+                        }
+                        control.isConfigPrint = true;
+                    }
+                    else{
+                        control = GetControlProps(controlType);
+                    }
                 }
                 event.originalEvent.dataTransfer.setData("control", JSON.stringify(control));
             });
 
-            $(document).on('dragend','.sym-control,.control-template-item', function() {
+            $(document).on('dragend','.sym-control .control-content,.control-template-item', function() {
                 clearInterval(dragoverqueue_processtimer);
                 DragDropFunctions.removePlaceholder();
                 DragDropFunctions.ClearContainerContext();
@@ -2233,46 +2237,56 @@ export default {
                         thisCpn.dropControlTemplate(insertionPoint,control);
                     }
                     else{
-                        var checkDiv = $(control.html);
-                        let typeControl = checkDiv.attr('s-control-type');
-                        if(typeControl == 'dataFlow'){
-                            control.properties.dataFlowId.options = thisCpn.listDataFlow;
-                        }
-                        if(control.properties.hasOwnProperty('quickSubmit')){
-                            control.properties.quickSubmit.options = thisCpn.listDocument;
-                        }
-                        var inputid = 's-control-id-' + Date.now();
-                        checkDiv.attr('id', inputid);
-                        insertionPoint.after(checkDiv);
-                        let table = insertionPoint.closest('.s-control-table'); // nếu kéo control vào table thì lưu prop của control đó vào table trong allControl của state
-                        let idTable = '';
-                        checkDiv.prop('readonly', false);
-                        if (checkDiv.attr('s-control-type') != 'table') {
-                            checkDiv.attr('contenteditable', false);
-                        }
-                        checkDiv.addClass('on-selected');
-                        if(typeControl == 'tabPage'){
-                            let newPageId = 's-control-id-' + (Date.now() + 1);
-                            checkDiv.find('.page-item.sb-page-active').attr('id',newPageId);
-                            checkDiv.find('.page-content.page-active').attr('s-page-content-id',newPageId);
-                            let control = GetControlProps('page');
-                            control.properties.title.value = "Trang số 1";
-                            control.properties.name.value = "pg_1";
-                            thisCpn.addToAllControlInDoc(newPageId,{properties: control.properties, formulas : control.formulas,type:'page'});
-                        }
-                        thisCpn.selectControl(control.properties, control.formulas,inputid,typeControl);
-                        if(table.length > 0){   // nếu keo control vào trong table thì update dữ liệu trong table của state
-                            idTable = table.attr('id');
-                            thisCpn.addToAllControlInTable(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl},idTable);
+                        let isControlPrint = control.isConfigPrint;
+                        if(isControlPrint){
+                            let controlEl = GetControlProps(control.type);
+                            var checkDiv = $(controlEl.html);
+                            checkDiv.attr('id', control.id);
+                            insertionPoint.after(checkDiv);
+                            thisCpn.$store.commit(
+                                "document/deleteControlInAllControlDeleted",{id:control.id,table:control.tableId,instance:thisCpn.keyInstance}
+                            );  
                         }
                         else{
-                            thisCpn.addToAllControlInDoc(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl});
+                            var checkDiv = $(control.html);
+                            let typeControl = checkDiv.attr('s-control-type');
+                            if(typeControl == 'dataFlow'){
+                                control.properties.dataFlowId.options = thisCpn.listDataFlow;
+                            }
+                            if(control.properties.hasOwnProperty('quickSubmit')){
+                                control.properties.quickSubmit.options = thisCpn.listDocument;
+                            }
+                            var inputid = 's-control-id-' + Date.now();
+                            checkDiv.attr('id', inputid);
+                            insertionPoint.after(checkDiv);
+                            let table = insertionPoint.closest('.s-control-table'); // nếu kéo control vào table thì lưu prop của control đó vào table trong allControl của state
+                            let idTable = '';
+                            checkDiv.prop('readonly', false);
+                            if (checkDiv.attr('s-control-type') != 'table') {
+                                checkDiv.attr('contenteditable', false);
+                            }
+                            checkDiv.addClass('on-selected');
+                            if(typeControl == 'tabPage'){
+                                let newPageId = 's-control-id-' + (Date.now() + 1);
+                                checkDiv.find('.page-item.sb-page-active').attr('id',newPageId);
+                                checkDiv.find('.page-content.page-active').attr('s-page-content-id',newPageId);
+                                let control = GetControlProps('page');
+                                control.properties.title.value = "Trang số 1";
+                                control.properties.name.value = "pg_1";
+                                thisCpn.addToAllControlInDoc(newPageId,{properties: control.properties, formulas : control.formulas,type:'page'});
+                            }
+                            thisCpn.selectControl(control.properties, control.formulas,inputid,typeControl);
+                            if(table.length > 0){   // nếu keo control vào trong table thì update dữ liệu trong table của state
+                                idTable = table.attr('id');
+                                thisCpn.addToAllControlInTable(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl},idTable);
+                            }
+                            else{
+                                thisCpn.addToAllControlInDoc(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl});
+                            }
                         }
+                        
                     }
                     insertionPoint.remove();
-
-                    
-                    
                 } catch (e) {}
             });
             
@@ -2311,9 +2325,7 @@ export default {
          * Hàm xử lí khi click vào control thì lấy thông tin của control đó và hiển thị vào sidebar
          */
         setSelectedControlProp(e,el,clientFrameWindow,fromTreeView = false){
-            if(el.hasClass('on-selected')){
-                return;
-            }
+            
             e.preventDefault();
             let type = el.attr('s-control-type');
             if(!['tab','page'].includes(type)){
@@ -2327,6 +2339,9 @@ export default {
             if(table.length > 0 && controlId != table.attr('id')){
                 if(!fromTreeView)
                 tinyMCE.activeEditor.selection.setNode($(e.target).parent());
+                if(el.hasClass('on-selected')){
+                    return;
+                }
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
                 if(!control){
@@ -2336,6 +2351,9 @@ export default {
                 this.selectControl(control.properties, control.formulas,controlId,type);
             }
             else{
+                if(el.hasClass('on-selected')){
+                    return;
+                }
                 let control = this.editorStore.allControl[controlId];
                 if(!control){
                     this.showDialogEditor("",this.$t('document.validate.controlNotExist'));
@@ -2490,6 +2508,9 @@ export default {
             try {
                 $("#document-editor-"+this.keyInstance+"_ifr").contents().find(".selection-highlight").removeClass('selection-highlight');
                 let contentSelection = this.editorCore.selection.getContent();
+                if($(contentSelection).is('.s-control-table')){
+                    return;
+                }
                 let allControlInForm = $(contentSelection).find('.s-control');
                 for (let index = 0; index < allControlInForm.length; index++) {
                     let element = allControlInForm[index];
