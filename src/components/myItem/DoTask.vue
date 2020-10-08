@@ -4,6 +4,7 @@
             :taskInfo="data.taskInfo"
             :originData="data.originData"
             :parentHeight="taskDetailHeight" 
+            :allVariableProcess="variableProcess"
             @close-detail="closeDetail"
             @task-submited="handleTaskSubmited"
             >
@@ -16,15 +17,22 @@ import TaskDetail from "./TaskDetail";
 import BPMNEngine from '@/api/BPMNEngine';
 import { extractTaskInfoFromObject, addMoreInfoToTask } from '@/components/process/processAction';
 import { util } from '@/plugins/util';
-
+import { taskApi } from "@/api/task.js";
 export default {
+    name:"DoTask",
     data: function(){
         return {
             data: {
                 taskInfo: {},
                 originData: {}
             },
-            taskDetailHeight: 500
+            taskDetailHeight: 500,
+            variableProcess:[],
+            filterVariables:{
+                names:"symper_application_id",
+                page:1,
+                processInstanceIds:[]
+            },
         }
     },
     watch:{
@@ -62,7 +70,19 @@ export default {
                 task = addMoreInfoToTask(task);
                 self.$set(self.data, 'taskInfo', taskInfo);
                 self.$set(self.data, 'originData', task);
+                if (task.processInstanceId && task.processInstanceId!=null) {
+                    await self.getVariablesProcess(task.processInstanceId)
+                }
             }
+        },
+        async getVariablesProcess(processInstanceId){
+            let self=this;
+            let arrProcess=[];
+            arrProcess.push(processInstanceId);
+            self.filterVariables.processInstanceIds=JSON.stringify(arrProcess);
+            let resVariable = {};
+            resVariable =await taskApi.getVariableWorkflow(self.filterVariables);
+            self.variableProcess=resVariable.data;
         },
         closeDetail(){
             this.$router.push("/myitem");
