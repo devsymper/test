@@ -43,7 +43,8 @@ const defaultState = {
             listControlTreeData: [],
             allControlForTableOption: [],
             listDataFlow: [],
-            allControlTemplate: []
+            allControlTemplate: [],
+            allControlDeleted: {}
         }
     },
     submit: {

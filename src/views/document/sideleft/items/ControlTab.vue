@@ -31,6 +31,20 @@
                             </v-list>
                         </v-expansion-panel-content>
                     </v-expansion-panel>
+                     <v-expansion-panel v-if="isConfigPrint">
+                        <v-expansion-panel-header class="v-expand-header">Control</v-expansion-panel-header>
+                        <v-expansion-panel-content class="sym-v-expand-content">
+                            <v-list>
+                               
+                                <control
+                                v-for="(control,index) in allControlDeleted"
+                                :key="index"
+                                :type="control.type"
+                                :control="control"
+                                />
+                            </v-list>
+                        </v-expansion-panel-content>
+                    </v-expansion-panel>
                     <v-expansion-panel v-if="!isConfigPrint">
                         <v-expansion-panel-header class="v-expand-header">Hiển thị</v-expansion-panel-header>
                         <v-expansion-panel-content class="sym-v-expand-content">
@@ -108,7 +122,18 @@ export default {
         isConfigPrint:{
             type:Boolean,
             default:false
+        },
+        instance:{
+            type:Number
         }
+    },
+    computed: {
+        sDocumentEditor() {
+            return this.$store.state.document.editor[this.instance].allControl;
+        },
+        allControlDeleted() {
+            return this.$store.state.document.editor[this.instance].allControlDeleted;
+        },
     },
     components:{
         'control' : Control,
@@ -118,7 +143,7 @@ export default {
         panel: [0, 1, 2, 3, 4],
         listControlPrint:   ['labelPrint'],
         listControlDisplay: ['label','image','qrCode'],
-        listControlInput:   ['textInput','richText','number','date','dateTime','time','month','select','combobox','department','documentSelect','phone','email','currency','radio','checkbox','color','percent','user','inputFilter','hidden'],
+        listControlInput:   ['textInput','number','date','dateTime','time','month','select','combobox','department','documentSelect','phone','email','currency','radio','checkbox','color','percent','user','inputFilter','hidden'],
         listControlLayout:  ['table','panel','fileUpload','tabPage'],
         listControlReport:  ['dataFlow','report','approvalHistory','trackingValue'],
         listControlAction:  ['submit','reset','draft']
