@@ -207,16 +207,14 @@ const deleteControlInAllControlDeleted = (state, params) => {
     let id = params.id;
     let instance = params.instance;
     let table = params.table;
-    let allControlDeleted = util.cloneDeep(state.editor[instance].allControlDeleted);
     if (table) {
-        delete allControlDeleted[table]['listFields'][id];
-        if (Object.keys(allControlDeleted[table]['listFields']).length == 0) {
-            delete allControlDeleted[table];
+        Vue.delete(state.editor[instance].allControlDeleted[table]['listFields'], id)
+        if (Object.keys(state.editor[instance].allControlDeleted[table]['listFields']).length == 0) {
+            Vue.delete(state.editor[instance].allControlDeleted, table)
         }
     } else {
-        delete allControlDeleted[id];
+        Vue.delete(state.editor[instance].allControlDeleted, id)
     }
-    Vue.set(state.editor[instance], 'allControlDeleted', allControlDeleted);
 
 };
 /**

@@ -2168,6 +2168,7 @@ export default {
                         else{
                             control = thisCpn.allControlDeleted[controlId];
                         }
+                        
                         control.isConfigPrint = true;
                     }
                     else{
@@ -2284,13 +2285,10 @@ export default {
                                 thisCpn.addToAllControlInDoc(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl});
                             }
                         }
-                        
                     }
                     insertionPoint.remove();
                 } catch (e) {}
             });
-            
-
         },
 
 
@@ -2339,9 +2337,7 @@ export default {
             if(table.length > 0 && controlId != table.attr('id')){
                 if(!fromTreeView)
                 tinyMCE.activeEditor.selection.setNode($(e.target).parent());
-                if(el.hasClass('on-selected')){
-                    return;
-                }
+                
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
                 if(!control){
@@ -2351,9 +2347,6 @@ export default {
                 this.selectControl(control.properties, control.formulas,controlId,type);
             }
             else{
-                if(el.hasClass('on-selected')){
-                    return;
-                }
                 let control = this.editorStore.allControl[controlId];
                 if(!control){
                     this.showDialogEditor("",this.$t('document.validate.controlNotExist'));
@@ -2362,8 +2355,6 @@ export default {
                 this.selectControl(control.properties, control.formulas,controlId,type);
             }
         },
-
-        
 
 
         checkSelectedTabPageControl(e,control,controlId){
