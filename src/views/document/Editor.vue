@@ -290,6 +290,12 @@ export default {
                 ed.on('paste', function(e) {
                     self.handlePasteContent(e);
                 });
+                ed.on('dragstart', function(e) {
+                    self.handleDragControlInEditor(e);
+                });
+                ed.on('drop', function(e) {
+                    self.handleDropControlInEditor(e);
+                });
                 ed.on('ExecCommand', function(e) {
                     self.handleExecCommand(e);
                 });
@@ -348,7 +354,9 @@ export default {
             isConfigPrint:false,
             listDocument:[],
             inputSaveControlTemplate:{},
-            sizePrint:{}
+            sizePrint:{},
+            currentDragging:null,
+            oldTableId:null,
 
         }
     },
@@ -438,6 +446,45 @@ export default {
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
             }
         },
+
+        /**
+         * Hàm xử lí khi drag control
+         */
+        handleDragControlInEditor(e){
+            this.currentDragging = $(e.target);
+            let idControl = this.currentDragging.attr('id');
+            let currentLocation =  $("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+idControl);
+            if(!currentLocation.is('.s-control-table') && currentLocation.closest('.s-control-table')){
+                this.oldTableId  = currentLocation.closest('.s-control-table').attr('id');
+            }
+        },
+        /**
+         * Hàm xử lí khi drop control
+         */
+        handleDropControlInEditor(e){
+            setTimeout((self) => {
+                let idControl = self.currentDragging.attr('id');
+                let currentLocation =  $("#document-editor-"+self.keyInstance+"_ifr").contents().find('#'+idControl);
+                let newTableId = false;
+                if(!currentLocation.is('.s-control-table') && currentLocation.closest('.s-control-table')){
+                    let tableContain = currentLocation.closest('.s-control-table');
+                    newTableId = tableContain.attr('id');
+                }
+                self.handleMoveDataControl(idControl,newTableId)
+            }, 100,this);
+            
+        },
+        handleMoveDataControl(controlId, newTableId){
+            if(newTableId == this.oldTableId){
+                return
+            }
+            if(newTableId || this.oldTableId ){
+                this.$store.commit("document/moveControl",{instance:this.keyInstance,controlId:controlId,oldTableId:this.oldTableId,newTableId:newTableId});  
+            }
+        },
+        /**
+         * Hàm xử lí khi paste nội dung vào editor
+         */
         handlePasteContent(e){
             var content = ((e.originalEvent || e).clipboardData || window.clipboardData).getData("text/html");
 

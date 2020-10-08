@@ -1,12 +1,17 @@
 import { util } from "./../../plugins/util.js";
 
 import Vue from "vue";
-const addControl = (state, params) => {
-    let id = params.id
-    let prop = params.props
-    let instance = params.instance
-    Vue.set(state.editor[instance].allControl, id, prop);
 
+/**
+ * thêm mới control ngoài table
+ * @param {*} state 
+ * @param {*} params 
+ */
+const addControl = (state, params) => {
+    let id = params.id;
+    let prop = params.props;
+    let instance = params.instance;
+    Vue.set(state.editor[instance].allControl, id, prop);
 };
 
 const addToListInputInDocument = (state, params) => {
@@ -17,7 +22,11 @@ const addToListInputInDocument = (state, params) => {
     Vue.set(state.submit[instance].listInputInDocument, name, control);
 };
 
-
+/**
+ * thêm mới control ngoài table
+ * @param {*} state 
+ * @param {*} params 
+ */
 const addControlToTable = (state, params) => {
     let id = params.id
     let prop = params.props
@@ -30,6 +39,45 @@ const addControlToTable = (state, params) => {
     Vue.set(state.editor[instance].allControl[tableId]['listFields'], id, prop);
 
 };
+/**
+ * kéo thả thay đổi vị trí control, cần sửa lại data nếu kéo vào table hoặc kéo từ table ra
+ * @param {*} state 
+ * @param {*} params 
+ */
+const moveControl = (state, params) => {
+    let newTableId = params.newTableId;
+    let controlId = params.controlId;
+    let oldTableId = params.oldTableId;
+    let instance = params.instance;
+    let allControls = util.cloneDeep(state.editor[instance].allControl);
+    if (oldTableId) {
+        let controlProps = allControls[oldTableId]['listFields'][controlId];
+        Vue.delete(state.editor[instance].allControl[oldTableId]['listFields'], controlId);
+        if (newTableId) {
+            if (state.editor[instance].allControl[newTableId]['listFields']) {} else {
+                state.editor[instance].allControl[newTableId]['listFields'] = {};
+            }
+            Vue.set(state.editor[instance].allControl[newTableId]['listFields'], controlId, controlProps);
+        } else {
+            Vue.set(state.editor[instance].allControl, controlId, controlProps);
+        }
+    } else {
+        let controlProps = allControls[controlId];
+        Vue.delete(state.editor[instance].allControl, controlId);
+
+        if (newTableId) {
+            if (state.editor[instance].allControl[newTableId]['listFields']) {} else {
+                state.editor[instance].allControl[newTableId]['listFields'] = {};
+            }
+            Vue.set(state.editor[instance].allControl[newTableId]['listFields'], controlId, controlProps);
+        }
+    }
+};
+/**
+ * Hàm set các thuộc tính của control được click trong editor(hiển thị bên side bar phải)
+ * @param {*} state 
+ * @param {*} control 
+ */
 const addCurrentControl = (state, control) => {
     let instance = control.instance
     Vue.set(state.editor[instance].currentSelectedControl, 'formulas', control.formulas);
@@ -415,6 +463,7 @@ const updateDataToTableControlRoot = (state, params) => {
 
 export {
     addControl,
+    moveControl,
     addCurrentControl,
     addControlToTable,
     updateProp,
