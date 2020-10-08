@@ -521,6 +521,7 @@
     "process": {
         "list": {
             "title": "Workflow list",
+            "titleTrash": "Workflow list deleted",
             "deploy_history": "Deploy history",
             "start": "Start workflow",
             "instances": "List lastest instances"

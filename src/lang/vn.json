@@ -670,6 +670,7 @@
     "process": {
         "list": {
             "title": "Danh sách quy trình",
+            "titleTrash": "Danh sách quy trình đã xóa",
             "deploy_history": "Lịch sử deploy",
             "start": "Bắt đầu quy trình",
             "instances": "Các bản đã chạy gần nhất"

@@ -29,6 +29,12 @@ export default {
     getListModels(filter = {}) {
         return bpmneApi.get("", filter);
     },
+    getListModelsTrash(filter = {}) {
+        return bpmneApi.get("/trash", filter);
+    },
+    restoreListModels(ids){
+        return bpmneApi.put("/restore",{ids:JSON.stringify(ids)} );
+    },
     deleteModels(ids) {
         return bpmneApi.delete(ids.join(','));
     },
