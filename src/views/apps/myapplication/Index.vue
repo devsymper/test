@@ -23,7 +23,6 @@ export default {
             $(document).click(function(e){
 				if(!$(e.target).is('.context-menu')){
                     $('.context-menu').css('display', 'none')
-			        self.$store.commit('appConfig/updateActiveChildItem', ' ')
                     if(self.viewSideBySide == true){
                         if(self.$refs.ViewSideBySideApp){
                             self.$refs.ViewSideBySideApp.hideContextMenu()
