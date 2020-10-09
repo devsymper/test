@@ -14,11 +14,13 @@
                 <span class="float-left pl-2 drag-panel-title">
                     <i :class="'mr-2 mdi '+titleIcon" v-if="titleIcon != ''"></i>{{actionTitle}}
                 </span>
-                <v-icon
-                    @click="hide"
-                    class="close-btn float-right"
-                    style="font-size:16px;position: relative;top: -3px;"
-                >mdi-close</v-icon>
+                <div class="panel-header-action">
+                    <slot name="panel-action"></slot>
+                    <v-icon
+                        @click="hide"
+                        class="close-btn"
+                    >mdi-close</v-icon>
+                </div>
             </div>
             <div class="symper-drag-panel-body px-2 pb-2" :style="styleBody">
                 <slot name="drag-panel-content" :panelData="panelData"></slot>
@@ -161,11 +163,22 @@ export default {
         stopResize(e) {
             window.removeEventListener('mousemove', this.resize, false);
             window.removeEventListener('mouseup', this.stopResize, false);
-        }
+        },
+        
     },
 };
 </script>
 
+
+<style scoped>
+    .panel-header-action{
+        margin-left: auto;
+        margin-top: -5px;
+    }
+    .panel-header-action >>> .v-icon{
+        font-size: 18px;
+    }
+</style>
 <style>
 
 .symper-drag-panel {
@@ -177,6 +190,7 @@ export default {
 }
 
 .symper-drag-panel .symper-drag-panel-header {
+    display: flex;
     cursor: move;
     border-bottom: 1px solid #ededed;
 }
