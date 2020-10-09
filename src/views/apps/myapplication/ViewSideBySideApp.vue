@@ -11,7 +11,7 @@
                     <span style="font:13px roboto;padding-left:8px">Yêu thích</span>
                 </div>
 				<VuePerfectScrollbar :style="{height:heightListApp}"  >
-					<div  v-for="(item,i) in listApp" :key="i" 
+					<div v-for="(item,i) in listApp" :key="i" 
 						:class="{'list-app-item': true,'active': item.id == activeIndex}"
 						@click="clickDetails(item)"
 						>
@@ -44,9 +44,9 @@
          <div v-else class="favorite-area-item">
               <h4>Danh sách yêu thích</h4>
 					<VuePerfectScrollbar :style="{height:heightListFavorite}"  >
-						<ul style="margin:0px 0px;" v-if="sFavorite.length > 0">
-							<li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
-								<div style="position:relative">
+						<ul style="margin:0px -12px 0px -24px;" v-if="sFavorite.length > 0">
+							<li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer" :class="{'child-item-active': item.objectIdentifier == activeIndexChild}" > 
+								<div style="position:relative" >
 									<div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
 									<div v-else  class="title-item-favorite">{{item.name}}</div> 
 									<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:4px;right:14px">mdi-star</v-icon>
@@ -72,7 +72,6 @@ import SymperActionView from '@/action/SymperActionView.vue'
 import {util} from './../../../plugins/util'
     export default {
     created(){
-        // this.getActiveapps()
         this.getFavorite()
     },
     components:{
@@ -99,13 +98,17 @@ import {util} from './../../../plugins/util'
 		},
 		listApp(){
             return this.$store.state.appConfig.listApps
-        }
+		},
+		activeIndexChild(){
+			return this.$store.state.appConfig.activeChildItem
+		},
 		
     },
     methods:{
         rightClickHandler(event,item,type){
 			event.stopPropagation();
 			event.preventDefault();
+			this.$store.commit('appConfig/updateActiveChildItem', item.objectIdentifier )
 			if(!item.actions.includes('unfavorite')){
 				item.actions.push('unfavorite')
 			}
@@ -373,7 +376,7 @@ x				}
     data(){
         return { 
             apps: [],
-            activeIndex: '',
+			activeIndex: '',
             showDetailDiv:false,
             searchKey: '',
             listFavorite:[],
@@ -518,7 +521,10 @@ x				}
 }
 .view-side-by-side-apps >>> .favorite-area-item li{
     list-style: none;    
-    padding:6px;
+    padding:6px 20px;
+}
+.view-side-by-side-apps >>> .favorite-area-item .child-item-active{
+	background-color: #E9E9E9
 }
 .view-side-by-side-apps >>> .favorite-area-item li:hover{
 }
