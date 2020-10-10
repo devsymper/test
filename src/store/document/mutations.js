@@ -459,6 +459,13 @@ const updateDataToTableControlRoot = (state, params) => {
 }
 
 
+const addSqlLiteDb = (state, params) => {
+    let instance = params.instance;
+    let db = params.db;
+    Vue.set(state['clientSqlLite'], instance, db);
+}
+
+
 
 
 export {
@@ -489,6 +496,7 @@ export {
     cacheDataAutocomplete,
     updateAllControlDeleted,
     deleteControlInAllControlDeleted,
-    updateDataToTableControlRoot
+    updateDataToTableControlRoot,
+    addSqlLiteDb
 
 };

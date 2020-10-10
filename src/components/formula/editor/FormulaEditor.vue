@@ -28,7 +28,7 @@
                 <div class="result__header--title">
                     <v-icon>mdi-calculator-variant</v-icon>
                     <span>Kết quả</span>
-                    <span>thành công</span>
+                    <span v-if="debugStatus" :style="(debugStatus.status) ? {background:'green'} : {background:'red'}">{{debugStatus.message}}</span>
                 </div>
                 <div class="result__header--time">
                     <span>Thời gian</span>
@@ -36,17 +36,21 @@
                 </div>
             </div>
             <div class="result__body">
-                <AgGridVue style="width: 100%; height: 100%;"
+                <div v-if="error" class="result__body--error">
+                    {{error}}
+                </div>
+                <AgGridVue v-else style="width: 100%; height: 100%;"
                     :animateRows="true"
                     @grid-ready="onGridReady"
                     class="ag-theme-balham mt-2"
                     :columnDefs="columnDefs"
                     :rowData="rowData">
                 </AgGridVue>
+                
             </div>
-            <div class="result__footer">
+            <div class="result__footer" v-if="!error">
                 <Pagination
-                    :total="100"
+                    :total="totalRecord"
                     :totalVisible="7"
                 ></Pagination>
             </div>
@@ -64,9 +68,11 @@ import AgDataTable from "./../../../components/common/agDataTable/AgDataTable.vu
 import Pagination from './../../../components/common/Pagination'
 import Formulas from '../../../views/document/submit/formulas';
 import {AgGridVue} from "ag-grid-vue";
+import ClientSQLManager from '../../../views/document/submit/clientSQLManager';
 export default {
     created(){
         this.$store.dispatch('document/setListDocuments');
+        ClientSQLManager.createDB(this.instance);
     },
     data(){
         return {
@@ -76,13 +82,15 @@ export default {
             inputViewHeight:0,
             columnDefs: null,
             rowData: null,
-            agApi:null
-
+            agApi:null,
+            error:null,
+            instance:Date.now(),
+            totalRecord:0,
+            debugStatus:null
         }
     },
     beforeMount() {
         this.columnDefs = [];
-
         this.rowData = [];
     },
     mounted(){
@@ -178,13 +186,14 @@ export default {
         }
     },
     methods:{
-        changeSelection(e){
-            console.log("ádsad");
-        },
         toggleDebugView(){
             this.showDebugView = !this.showDebugView;
             this.debugResultHeight = "calc(100% - "+this.height+" - 30px)"
-            this.inputViewHeight = this.height
+            this.inputViewHeight = this.height;
+            this.columnDefs = [];
+            this.rowData = [];
+            this.totalRecord = 0;
+            this.debugStatus = null;
         },
         async handleEditorInput(formula){
             let pos = this.$refs.edtScript.editor.getCursorPosition();
@@ -263,16 +272,53 @@ export default {
             })
         },
         executeFormulas(){
+            this.error = null;
             let selectionText = this.$refs.edtScript.editor.getSelectedText();
-            let formulas = new Formulas(0,selectionText,"");
+            if(!selectionText){
+                selectionText = this.$refs.edtScript.editor.getValue();
+            }
+            if(!selectionText){
+                return;
+            }
+            let formulas = new Formulas(this.instance,selectionText,"");
             let dataInput = {};
             let self = this;
             for(let input in this.allInput){
                 dataInput[input] = this.allInput[input].value;
             }
             formulas.handleBeforeRunFormulas(dataInput).then(rs=>{
-                let data = rs.data.data;
-                self.handleDataToTable(data);
+                self.debugStatus = {status:true,message:"Thành công"};
+                self.rowData = [];
+                self.columnDefs = [];
+                if(rs.server){
+                    let data = rs.data.data;
+                    let err = rs.data.lastErrorMessage;
+                    if(err){
+                        self.debugStatus = {status:false,message:"Lỗi"};
+                        self.error = err;
+                    }
+                    self.handleDataToTable(data);
+                }
+                else{
+                    let columns = rs.data[0].columns;
+                    let values = rs.data[0].values;
+                    self.totalRecord = values.length;
+                    for (let index = 0; index < columns.length; index++) {
+                        let col = columns[index];
+                        self.columnDefs.push( {headerName: col, field: col});
+                    }
+                    for (let k = 0; k < values.length; k++) {
+                        let rowVal = values[k];
+                        let row = {};
+                        for (let i = 0; i < rowVal.length; i++) {
+                            let cellVal = rowVal[i];
+                            row[columns[i]] = cellVal;
+                        }
+                        self.rowData.push(row);
+                    }
+                    self.agApi.sizeColumnsToFit();
+                }
+                
             });
         },
         handleDataToTable(data){
@@ -281,6 +327,7 @@ export default {
                 this.columnDefs.push( {headerName: column, field: column});
             }
             this.rowData = data;
+            this.totalRecord = this.rowData.length;
             this.agApi.sizeColumnsToFit();
         },
         onGridReady(params) {
@@ -339,7 +386,6 @@ export default {
         margin: 0 8px;
     }
     .result__header--title span:last-child{
-        background: green;
         color: white;
         display: inline-block;
         padding: 1px 8px;
