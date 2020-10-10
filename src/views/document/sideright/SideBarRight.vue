@@ -133,7 +133,7 @@ export default {
          */
         "controlPropsGroup.name":function(){
             setTimeout(() => {
-                $('.sym-v-expand-content input').first().focus();
+                // $('.sym-v-expand-content input').first().focus();
             }, 200);
         }
         

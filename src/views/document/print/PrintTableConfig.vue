@@ -15,10 +15,13 @@
                     <table border="0" class="table">
                     <thead >
                         <tr>
-                            <th class="text-center" v-for="(col,index) in listRows" :key="index" :style="{width:col.colWidth}"><span contenteditable="true" @blur="afterChangeColWidth($event,col)" class="col-width">{{col.colWidth}}</span></th>
+                            <th class="text-center" v-for="(col,index) in listRows" :key="index" :style="{width:col.colWidth}">
+                                <span contenteditable="true" @blur="afterChangeColWidth($event,col)" class="col-width">{{col.colWidth}}
+                                </span>
+                            </th>
                         </tr>
                         <tr>
-                            <th class="text-center title-control" v-for="(col,index) in listRows" :key="index"><div class="text-ellip">{{col.title}}</div></th>
+                            <th class="text-center title-control" v-for="(col,index) in listRows" :key="index" :style="{width:col.colWidth}"><div class="text-ellip" >{{col.title}}</div></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -141,9 +144,9 @@ export default {
         outline: none;
     }
     .text-ellip{
-            width: inherit;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    overflow: hidden;
+        width: 100%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
     }
 </style>
