@@ -2,7 +2,7 @@
     
     <v-dialog
         v-model="isShow"
-        width="800"
+        width="1200"
         scrollable
         style="overflow:hidden;"
         >
@@ -12,18 +12,21 @@
             <v-divider></v-divider>
             <v-card-text>
                 <VuePerfectScrollbar style="position:relative;height:100px;padding: 8px 0;">
-                    <table border="0" class="table" v-columns-resizable>
-                    <thead>
+                    <table border="0" class="table">
+                    <thead >
                         <tr>
-                            <th class="text-center" v-for="(col,index) in listRows" :key="index"><span contenteditable="true" @blur="afterChangeColWidth($event,col)" class="col-width">{{col.colWidth}}</span></th>
+                            <th class="text-center" v-for="(col,index) in listRows" :key="index" :style="{width:col.colWidth}">
+                                <span contenteditable="true" @blur="afterChangeColWidth($event,col)" class="col-width">{{col.colWidth}}
+                                </span>
+                            </th>
                         </tr>
                         <tr>
-                            <th class="text-center title-control" v-for="(col,index) in listRows" :key="index">{{col.title}}</th>
+                            <th class="text-center title-control" v-for="(col,index) in listRows" :key="index" :style="{width:col.colWidth}"><div class="text-ellip" >{{col.title}}</div></th>
                         </tr>
                     </thead>
                     <tbody>
                         <tr>
-                            <td class="text-center" v-for="(col,index) in listRows" :key="index"><button class="btn-delete-column" @click="deleteColumn($event,col)">Xóa cột</button></td>
+                            <td class="text-center" v-for="(col,index) in listRows" :key="index"><button class="btn-delete-column" @click="deleteColumn($event,col)">X</button></td>
                         </tr>
                     </tbody>
                     </table>
@@ -58,16 +61,12 @@
     
 </template>
 <script>
-import Vue from "vue";
-import VueColumnsResizableVuetify from 'vue-columns-resizable-vuetify';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
- 
-Vue.use(VueColumnsResizableVuetify);
 export default {
     data(){
         return {
             listRows:[],
-            isShow:false
+            isShow:false,
         }
     },
     components:{
@@ -128,9 +127,7 @@ export default {
     .table th input:focus{
         outline: none;
     }
-    .title-control{
-        min-width: 130px;
-    }
+  
     td {
         border: var(--symper-border);
         border-collapse: collapse;
@@ -145,5 +142,11 @@ export default {
     }
     .btn-delete-column:focus{
         outline: none;
+    }
+    .text-ellip{
+        width: 100%;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        overflow: hidden;
     }
 </style>

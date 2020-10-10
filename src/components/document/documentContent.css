@@ -467,11 +467,11 @@ button:hover {
 
 .table-print td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 3px;
 }
 
 .table-print th {
-    padding: 2px;
+    padding: 3px;
     text-align: left;
     border: 1px solid #ddd;
 }

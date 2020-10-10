@@ -69,7 +69,7 @@ export default {
         },
         addControl(event){
             if(event.keyCode == 13){
-                let type = $('#list-control-autocomplete .first-active').attr('control-type');
+                let type = $('#list-control-autocomplete .first-active .control-content').attr('control-type');
                 $(".tf-search-control").val('');
                 $('#list-control-autocomplete .sym-control').removeClass('d-none');
                 $('#list-control-autocomplete .sym-control').removeClass('first-active');

@@ -259,8 +259,9 @@ export default {
     },
     methods: {
         checkShowEditRecord(){
-            if(this.taskInfo.originData){
-                let isPendding = !this.taskInfo.originData.endTime;
+            let taskInfo = this.taskInfo;
+            if(this.originData){
+                let isPendding = !this.originData.endTime;
                 let isApprovalTask = taskInfo.action.action == 'approval';
                 let hasEditableControls = !taskInfo.approvalEditableControls || (taskInfo.approvalEditableControls && taskInfo.approvalEditableControls.length);
                 return isPendding && isApprovalTask && hasEditableControls;

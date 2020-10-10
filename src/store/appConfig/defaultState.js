@@ -5,6 +5,7 @@ const defaultState = {
 	currentAppId: 0,
 	listApps:{},
 	selectingItemType: '',
+	activeChildItem: '',
 	listItemSelected: {
 		workflow_definition: {
 			icon: 'mdi-lan',

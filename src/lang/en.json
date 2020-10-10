@@ -193,6 +193,16 @@
         }
     },
     "user": {
+        "notification": {
+            "email_already_exist!": "Email already exist!",
+            "add_success": "Success!",
+            "update_success": "Success!",
+            "user_name_already_exist": "User name already exist!",
+            "Old password incorrect": "Old password incorrect",
+            "successChangePass": "Your password has been changed successfully!"
+
+
+        },
         "title": "User list",
         "general": {
             "title": "Basic info",

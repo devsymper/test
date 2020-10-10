@@ -1,16 +1,17 @@
-import { getIconFromType } from './../../components/document/controlPropsFactory.js';
-import { defaultState } from "./defaultState";
 import { util } from "./../../plugins/util.js";
 
 import Vue from "vue";
-import { type } from 'jquery';
 
+/**
+ * thêm mới control ngoài table
+ * @param {*} state 
+ * @param {*} params 
+ */
 const addControl = (state, params) => {
-    let id = params.id
-    let prop = params.props
-    let instance = params.instance
+    let id = params.id;
+    let prop = params.props;
+    let instance = params.instance;
     Vue.set(state.editor[instance].allControl, id, prop);
-
 };
 
 const addToListInputInDocument = (state, params) => {
@@ -21,7 +22,11 @@ const addToListInputInDocument = (state, params) => {
     Vue.set(state.submit[instance].listInputInDocument, name, control);
 };
 
-
+/**
+ * thêm mới control ngoài table
+ * @param {*} state 
+ * @param {*} params 
+ */
 const addControlToTable = (state, params) => {
     let id = params.id
     let prop = params.props
@@ -34,6 +39,45 @@ const addControlToTable = (state, params) => {
     Vue.set(state.editor[instance].allControl[tableId]['listFields'], id, prop);
 
 };
+/**
+ * kéo thả thay đổi vị trí control, cần sửa lại data nếu kéo vào table hoặc kéo từ table ra
+ * @param {*} state 
+ * @param {*} params 
+ */
+const moveControl = (state, params) => {
+    let newTableId = params.newTableId;
+    let controlId = params.controlId;
+    let oldTableId = params.oldTableId;
+    let instance = params.instance;
+    let allControls = util.cloneDeep(state.editor[instance].allControl);
+    if (oldTableId) {
+        let controlProps = allControls[oldTableId]['listFields'][controlId];
+        Vue.delete(state.editor[instance].allControl[oldTableId]['listFields'], controlId);
+        if (newTableId) {
+            if (state.editor[instance].allControl[newTableId]['listFields']) {} else {
+                state.editor[instance].allControl[newTableId]['listFields'] = {};
+            }
+            Vue.set(state.editor[instance].allControl[newTableId]['listFields'], controlId, controlProps);
+        } else {
+            Vue.set(state.editor[instance].allControl, controlId, controlProps);
+        }
+    } else {
+        let controlProps = allControls[controlId];
+        Vue.delete(state.editor[instance].allControl, controlId);
+
+        if (newTableId) {
+            if (state.editor[instance].allControl[newTableId]['listFields']) {} else {
+                state.editor[instance].allControl[newTableId]['listFields'] = {};
+            }
+            Vue.set(state.editor[instance].allControl[newTableId]['listFields'], controlId, controlProps);
+        }
+    }
+};
+/**
+ * Hàm set các thuộc tính của control được click trong editor(hiển thị bên side bar phải)
+ * @param {*} state 
+ * @param {*} control 
+ */
 const addCurrentControl = (state, control) => {
     let instance = control.instance
     Vue.set(state.editor[instance].currentSelectedControl, 'formulas', control.formulas);
@@ -66,13 +110,13 @@ const updateCurrentControlProps = (state, params) => {
     Vue.set(state.editor[instance].currentSelectedControl.properties[group][prop], typeProp, value);
 }
 const updateCurrentControlFormulas = (state, params) => {
-        let type = params.type;
-        let typeProp = params.typeProp;
-        let value = params.value;
-        let instance = params.instance
-        Vue.set(state.editor[instance].currentSelectedControl.formulas[type], typeProp, value);
-    }
-    // hàm xóa control đang chọn ra khỏi store
+    let type = params.type;
+    let typeProp = params.typeProp;
+    let value = params.value;
+    let instance = params.instance
+    Vue.set(state.editor[instance].currentSelectedControl.formulas[type], typeProp, value);
+};
+// hàm xóa control đang chọn ra khỏi store
 const resetCurrentControl = (state, params) => {
 
     let currentSelectedControl = {
@@ -138,7 +182,6 @@ const updateFormulasId = (state, params) => {
         if (state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name]) {
             state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name]['formulasId'] = value
         }
-
     } else {
         if (state.editor[instance].allControl[id]['formulas'][name]) {
             state.editor[instance].allControl[id]['formulas'][name]['formulasId'] = value
@@ -146,27 +189,82 @@ const updateFormulasId = (state, params) => {
     }
 }
 
+/**
+ * Hàm loại bỏ dữ liệu của các control đã bị xóa
+ * @param {*} state 
+ * @param {*} params 
+ */
 const minimizeControl = (state, params) => {
     let instance = params.instance
     let allControl = util.cloneDeep(state.editor[instance].allControl);
-    for (let i of Object.keys(allControl)) {
-        if (allControl[i]['listFields']) {
-            for (let j of Object.keys(allControl[i]['listFields'])) {
+    for (let i in allControl) {
+        if (params.allId.indexOf(i) === -1) {
+            updateAllControlDeleted(state, { id: i, dataControl: allControl[i], instance: instance });
+            for (let j in allControl[i]['listFields']) {
                 if (params.allId.indexOf(j) === -1) {
+                    updateAllControlDeleted(state, { id: j, dataControl: allControl[i]['listFields'][j], instance: instance, table: i });
                     delete allControl[i]['listFields'][j];
                 }
             }
-        } else {
-            if (params.allId.indexOf(i) === -1) {
-                delete allControl[i];
+            delete allControl[i];
+        }
+        if (allControl[i] && allControl[i].type == 'table') {
+            for (let childId in allControl[i]['listFields']) {
+                if (params.allId.indexOf(childId) === -1) {
+                    updateAllControlDeleted(state, { id: childId, dataControl: allControl[i]['listFields'][childId], instance: instance, table: i });
+                    delete allControl[i]['listFields'][childId];
+                }
             }
         }
     }
     Vue.set(state.editor[instance], 'allControl', allControl);
+};
 
+/**
+ * Hàm lưu lại các control đã xóa trong editor print config, để phục vụ cho việc dùng lại
+ * @param {*} state 
+ * @param {*} params 
+ */
+const updateAllControlDeleted = (state, params) => {
+    let id = params.id;
+    let dataControl = util.cloneDeep(params.dataControl);
+    dataControl.id = id;
+    let instance = params.instance;
+    let table = params.table;
+    if (table) {
+        dataControl.tableId = table;
+        if (!state.editor[instance].allControlDeleted[table]) {
+            let tableControl = util.cloneDeep(state.editor[instance].allControl[table]);
+            tableControl['listFields'] = {};
+            Vue.set(state.editor[instance].allControlDeleted, table, tableControl);
+        }
+        Vue.set(state.editor[instance].allControlDeleted[table]['listFields'], id, dataControl);
+    } else {
+        if (dataControl.hasOwnProperty('listFields')) {
+            dataControl['listFields'] = {};
+        }
+        Vue.set(state.editor[instance].allControlDeleted, id, dataControl);
+    }
+};
+/**
+ * Hàm xóa các control được lưu vào biến các control xóa trong form print config
+ * @param {*} state 
+ * @param {*} params 
+ */
+const deleteControlInAllControlDeleted = (state, params) => {
+    let id = params.id;
+    let instance = params.instance;
+    let table = params.table;
+    if (table) {
+        Vue.delete(state.editor[instance].allControlDeleted[table]['listFields'], id)
+        if (Object.keys(state.editor[instance].allControlDeleted[table]['listFields']).length == 0) {
+            Vue.delete(state.editor[instance].allControlDeleted, table)
+        }
+    } else {
+        Vue.delete(state.editor[instance].allControlDeleted, id)
+    }
 
-}
-
+};
 /**
  * hàm thêm instance SQLLite vào store
  */
@@ -176,7 +274,7 @@ const addInstanceSubmitDB = (state, params) => {
     let sqlLite = params.sqlLite
         // state.editor.allControl[id] = prop;
     Vue.set(state.submit[instance].SQLLiteDB, instance, sqlLite);
-}
+};
 
 
 /**
@@ -256,7 +354,7 @@ const setDefaultSubmitStore = (state, params) => {
     }
     let instance = params.instance;
     Vue.set(state.submit, instance, value);
-}
+};
 const setDefaultEditorStore = (state, params) => {
     let value = {
         allControl: {
@@ -279,11 +377,12 @@ const setDefaultEditorStore = (state, params) => {
         listControlTreeData: [],
         allControlForTableOption: [],
         listDataFlow: [],
-        allControlTemplate: []
+        allControlTemplate: [],
+        allControlDeleted: {}
     }
     let instance = params.instance;
     Vue.set(state.editor, instance, value);
-}
+};
 const setDefaultDetailStore = (state, params) => {
     let value = {
         allData: {
@@ -292,13 +391,13 @@ const setDefaultDetailStore = (state, params) => {
     }
     let instance = params.instance;
     Vue.set(state.detail, instance, value);
-}
+};
 const updateCurrentControlEditByUser = (state, params) => {
     let currentControl = params.currentControl;
     let instance = params.instance;
     console.log(state.submit);
     Vue.set(state.submit[instance], 'currentControlEditByUser', currentControl);
-}
+};
 const addToRelatedLocalFormulas = (state, params) => {
     let key = params.key
     let instance = params.instance;
@@ -315,7 +414,7 @@ const addToRelatedLocalFormulas = (state, params) => {
     }
 
     Vue.set(state.submit[instance], 'localRelated', curListRelate);
-}
+};
 
 /**
  * Khadm:
@@ -330,26 +429,26 @@ const setAllDocuments = (state, docs) => {
     Vue.set(state, 'listAllDocument', docs);
 }
 const cacheDataAutocomplete = (state, params) => {
-        let controlName = params.controlName
-        let header = params.header
-        let cacheData = params.cacheData
-        let object = { header: header, cacheData: cacheData }
-        let instance = params.instance;
-        if (state.submit[instance]['autocompleteData'].hasOwnProperty(controlName)) {
-            Vue.set(state.submit[instance]['autocompleteData'][controlName]['cacheData'], Object.keys(cacheData)[0], Object.values(cacheData)[0]);
-            if (state.submit[instance]['autocompleteData'][controlName]['header'].length == 0) {
-                Vue.set(state.submit[instance]['autocompleteData'][controlName], 'header', header);
-            }
-        } else {
-            Vue.set(state.submit[instance]['autocompleteData'], controlName, object);
+    let controlName = params.controlName
+    let header = params.header
+    let cacheData = params.cacheData
+    let object = { header: header, cacheData: cacheData }
+    let instance = params.instance;
+    if (state.submit[instance]['autocompleteData'].hasOwnProperty(controlName)) {
+        Vue.set(state.submit[instance]['autocompleteData'][controlName]['cacheData'], Object.keys(cacheData)[0], Object.values(cacheData)[0]);
+        if (state.submit[instance]['autocompleteData'][controlName]['header'].length == 0) {
+            Vue.set(state.submit[instance]['autocompleteData'][controlName], 'header', header);
         }
-
+    } else {
+        Vue.set(state.submit[instance]['autocompleteData'], controlName, object);
     }
-    /**
-     * Hàm update dữ liệu vào danh sách các control root trong table
-     * @param {*} state 
-     * @param {*} params 
-     */
+
+};
+/**
+ * Hàm update dữ liệu vào danh sách các control root trong table
+ * @param {*} state 
+ * @param {*} params 
+ */
 const updateDataToTableControlRoot = (state, params) => {
     let controlName = params.controlName;
     let tableName = params.tableName;
@@ -361,8 +460,10 @@ const updateDataToTableControlRoot = (state, params) => {
 
 
 
+
 export {
     addControl,
+    moveControl,
     addCurrentControl,
     addControlToTable,
     updateProp,
@@ -386,6 +487,8 @@ export {
     setDefaultDetailStore,
     updateCurrentControlEditByUser,
     cacheDataAutocomplete,
+    updateAllControlDeleted,
+    deleteControlInAllControlDeleted,
     updateDataToTableControlRoot
 
 };

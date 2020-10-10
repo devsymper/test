@@ -438,14 +438,14 @@ let groupType = {
 const controlTypes = {
     labelPrint: {
         icon: `/icon/ic_label.png`,
-        html: `<span class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label">Aa</span>&nbsp;`,
+        html: `<label class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label">Aa</label>&nbsp;`,
         title: "Label in",
         inProps: ['width', 'color', 'fontSize'],
         formulas: ['formulas']
     },
     label: {
         icon: `/icon/ic_label.png`,
-        html: `<span class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label">Aa</span>&nbsp;`,
+        html: `<label class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label">Aa</label>&nbsp;`,
         title: "Label",
         notInProps: ['isQuickSubmit', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'formatDate', 'isSumTable', 'isReadOnly'],
         formulas: ['link', 'formulas', 'hidden']
