@@ -9,6 +9,5 @@ export const userRoleApi = {
     },
     getAllSymperRoles(){
         return moduleApi.get("role");
-
     }
 };
