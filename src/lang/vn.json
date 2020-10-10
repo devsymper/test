@@ -1091,6 +1091,7 @@
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",
             "createDate": "Ngày khởi tạo",
+            "endTime": "Ngày hoàn thành",
             "app": "Ứng dụng",
             "description": "Mô tả",
             "owner": "Người sở hữu",

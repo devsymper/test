@@ -1,43 +1,40 @@
 <template>
     <div class="pt-2">
         <div class="subtask-container">
-        <div
-            v-for="(item, idex) in listTaskRelated"
+            <div v-for="(item, idex) in listTaskRelated"
                 :key="idex"
             >
                 <v-row  :class="{
                     'mr-0 ml-0 single-row': true ,
-                    'd-active':showByIndex==idex 
                     }"
                     :style="{
                         minHeight: '25px'
                     }"
                     v-if="checkShowTotalTask(idex)"
-	                @mouseover="showByIndex = idex"
-                    @mouseout="showByIndex = null"
+                    @mouseover="showInfoTask"
                 >
                     <v-col cols="8" >
                         <div style="white-space: nowrap;
                             overflow: hidden;
-                            text-overflow: ellipsis;"  @click="goDoTask(item.id)">
+                            text-overflow: ellipsis;"  @dblclick="goDoTask(item.id)">
                             <v-icon style="font-size:16px">{{displayIcon(item.description)}}</v-icon>
                             <span style=" font-size:13px">{{displayContent(item.description)}}</span>
                         </div>
-                        <div  @click="goDoTask(item.id)">
-                              <v-icon v-if="item.createTime" style="font-size:11px; color:blue;margin-left: 3px;">mdi-circle</v-icon>
-                              <v-icon v-else style="font-size:11px ; color:green;margin-left: 3px;">mdi-circle</v-icon>
-                              {{displayDescription(item.description)}}
+                        <div  @dblclick="goDoTask(item.id)">
+                            <v-icon v-if="item.createTime" style="font-size:11px; color:blue;margin-left: 3px;">mdi-circle</v-icon>
+                            <v-icon v-else style="font-size:11px ; color:green;margin-left: 3px;">mdi-circle</v-icon>
+                            {{displayDescription(item.description)}}
                         </div>
                     </v-col>
                     <v-col cols="4" style="padding-top:15px">
                         <v-icon x-small >mdi-clock-time-nine-outline</v-icon>
                         {{item.createTime ? $moment(item.createTime).format('DD/MM/YY HH:mm'):$moment(item.endTime).format('DD/MM/YY HH:mm')}}
-
                     </v-col>
-             
+            
                 </v-row>
             </div>
         </div>
+
     </div>
 </template>
 
@@ -107,6 +104,11 @@ export default {
         }
     },
     methods:{
+        showInfoTask(){
+            // setTimeout((self) => {
+            //     alert("heelo");
+            // }, 1000,this);
+        },
         checkShowTotalTask(idex){
             if (this.showMoreTask==false) {
                 if (idex<=2) {
@@ -323,10 +325,9 @@ export default {
 </script>
 
 <style scoped>
-.single-row{
+.single-row:hover{
+    background: #e5e5e5;
     cursor: pointer;
 }
-.d-active {
-    background: #e5e5e5;
-}
+
 </style>

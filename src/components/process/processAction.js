@@ -347,17 +347,42 @@ export const extractTaskInfoFromObject = function(obj) {
     return taskInfo;
 }
 
+function getRoleUser(roleIdentify){
+    let arrDataRole=roleIdentify.split(":");
+    let allSymperRole=SYMPER_APP.$store.state.app.allSymperRoles;
+    let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+    return role;
+}
 
 export const addMoreInfoToTask = function(task) {
     let mapUser = SYMPER_APP.$store.getters['app/mapIdToUser'];
     task.assigneeInfo = {};
     if (mapUser[task.assignee]) {
-        task.assigneeInfo = mapUser[task.assignee];
+        let assigneeId=task.assignee;
+        let roleInfo={};
+        //check assinee là userId hay userId:role
+        if (task.assignee.indexOf(":")>0) {
+            let arrDataAssignee=task.assignee.split(":");
+            assigneeId=arrDataAssignee[0];
+            let roleIdentify=task.assignee.slice(assigneeId.length);
+            roleInfo=getRoleUser(roleIdentify);
+        }
+        task.assigneeInfo = mapUser[assigneeId];
+        task.assigneeInfo.roleInfo=roleInfo;
     }
 
     task.ownerInfo = {};
     if (mapUser[task.owner]) {
-        task.ownerInfo = mapUser[task.owner];
+        let ownerId=task.owner;
+        let roleInfo={};
+        if (task.owner.indexOf(":")>0) {
+            let arrDataOwner=task.owner.split(":");
+            ownerId=arrDataOwner[0];
+            let roleIdentify=task.owner.slice(ownerId.length);
+            roleInfo=getRoleUser(roleIdentify);
+        }
+        task.ownerInfo = mapUser[ownerId];
+        task.ownerInfo.roleInfo=roleInfo;
     }
     let allDefinitions = SYMPER_APP.$store.state.process.allDefinitions;
     let processDefinitionId = task.processDefinitionId;
@@ -394,6 +419,5 @@ export const getLastestDefinition = function(row, needDeploy = false) {
             });
             resolve(defData);
         }
-
     });
 }

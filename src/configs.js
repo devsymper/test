@@ -35,7 +35,6 @@ export const appConfigs = {
         userRole: "https://orgchart.symper.vn/",
         permission: "https://accesscontrol.symper.vn/",
         dashboard: "https://bi-service.symper.vn/report-and-dashboard/",
-        importExcel: 'https://io.dev.symper.vn/',
         search: 'https://search.symper.vn/',
         biService: "https://bi-service.symper.vn",
         permissionPacks: "https://accesscontrol.symper.vn/permission_packs",

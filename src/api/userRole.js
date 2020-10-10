@@ -7,4 +7,8 @@ export const userRoleApi = {
     getRoleData(id) {
         return moduleApi.get("role/" + id, );
     },
+    getAllSymperRoles(){
+        return moduleApi.get("role");
+
+    }
 };
