@@ -237,7 +237,6 @@
             @changeUpdateAsignee="changeUpdateAsignee"
             ></taskDetail>
         </v-col>
-        <userSelector ref="user" class="d-none"></userSelector>
         </v-row>
     </div>
 </template>
@@ -379,7 +378,7 @@ export default {
                 sort: "createTime",
                 order: "desc",
                 page: 1,
-                involvedUser: this.$store.state.app.endUserInfo.id
+                involvedUser: this.$store.state.app.endUserInfo.id+"%"
             },
             filterVariables:{
                 names:"symper_application_id",
@@ -471,9 +470,6 @@ export default {
     reCalcListTaskHeight() {
       this.listTaskHeight =
         util.getComponentSize(this.$el.parentElement).h - 125;
-    },
-    getUser(id) {
-      this.$refs.user.getUser(id);
     },
     selectObject(obj, idx,idex) {
       this.index = idx;
@@ -577,18 +573,9 @@ export default {
         this.$store.dispatch('comment/getWaitingCommentCountPerObj');
      
         console.log(listTasks, "listTassk");
-        this.addOtherProcess(listTasks);
         this.loadingTaskList = false;
         this.loadingMoreTask = false;
     },
-    addOtherProcess(listTasks) {
-      for (let index in listTasks) {
-        listTasks[index].assignee = this.getUser(
-          parseInt(listTasks[index].assignee)
-        );
-        listTasks[index].owner = this.getUser(parseInt(listTasks[index].owner));
-      }
-    }
   }
 };
 </script>

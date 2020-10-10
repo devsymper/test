@@ -948,6 +948,7 @@
             "submit": "Submit",
             "date": "Date",
             "dueDate": "Due Date",
+            "endTime": "Finish day",
             "createDate": "Create date",
             "app": "Application",
             "description": "Task description",
