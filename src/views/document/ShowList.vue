@@ -20,6 +20,7 @@
             :objType="'document'"
             :nameDocument="nameDocument"
             :nameRows="listRowDocument"
+            :subObjType="subObjType"
             :objId="documentId"
             :open="showImportPanel" />
 
@@ -43,6 +44,7 @@ export default {
     },
     data(){
         return {
+            subObjType:'',
             nameDocument:'',
             propertyDocument:[],
             listRowDocument:[],
@@ -235,6 +237,8 @@ export default {
             documentApi.detailDocument(this.documentId)
             .then(res => {
                 if (res.status === 200) {
+                    this.subObjType = res.data.document.type;
+                    debugger
                     this.nameDocument = res.data.document.title;
                     this.propertyDocument = Object.values(res.data.fields);
                     // lưu tên của các property từ API document vào mảng  

@@ -30,6 +30,7 @@
             :objType="'user'"
             :nameDocument="'Import User'"
             :nameRows="listRowUser"
+            :subObjType="-1"
             :open="showImportUser" />
     </div>
 </template>
@@ -110,7 +111,7 @@ export default {
         this.calcContainerHeight();
     },
     created(){
-        this.getListUrl = appConfigs.apiDomain.user+'users?page=1&pageSize=50';
+        this.getListUrl = appConfigs.apiDomain.user+'';
     
         let thisCpn = this;
         this.$evtBus.$on('change-user-locale',(locale)=>{

@@ -13,6 +13,7 @@
         "menu": "Menu",
         "users": "Tài khoản người dùng",
         "add": "Thêm",
+        "import_excel_history": "Lịch sử Import",
         "edit": "Sửa",
         "cancel": "Hủy",
         "update": "Cập nhật",
@@ -190,6 +191,27 @@
         "email": "Email không hợp lệ",
         "notValid": "Trường này không hợp lệ",
         "password": "Yêu cầu mật khẩu có cả chữ hoa và số"
+    },
+    "import": {
+        "import_history": "Lịch sử import",
+        "table": {
+            "id": "Id",
+            "firstName": "Họ",
+
+            "displayName": "Tên hiển thị",
+            "email": "Địa chỉ email",
+            "phone": "Số điện thoại",
+            "avatar": "Ảnh đại diện",
+            "status": "Trạng thái",
+            "createAt": "Thời gian tạo",
+            "updateAt": "Thời gian cập nhật",
+            "contextMenu": {
+                "passwordSetting": "Tùy chọn mật khẩu",
+                "edit": "Sửa",
+                "delete": "Xóa",
+                "view": "Xem"
+            }
+        }
     },
     "user": {
         "notification": {

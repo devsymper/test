@@ -11,5 +11,8 @@ export default {
     },
     getMapping(objId) {
         return api.get('mapping/document/' + objId)
+    },
+    cancelImport(fileName) {
+        return api.get('stop-process/' + fileName)
     }
 }

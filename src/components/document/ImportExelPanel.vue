@@ -6,51 +6,52 @@
         temporary
         right
         style="height: 100vh"
-        v-bind:class="[showValidate==true?'manage-timesheet-800':'manage-timesheet-500']"  >
-        <v-row>
-        <v-dialog v-model="dialog"
-            width="500">
-                <v-card>
-                    <v-card-title style="height:50px; margin-top:-10px" class="headline grey lighten-2">
-                        <span class="mb-3">Thông báo</span>
-                        </v-card-title>
-                        <v-card-text class="pt-6" style="height:40px">
-                    <v-icon style="color:green" class="mdi mdi-check"></v-icon> Hoàn thành import
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn
-                            color="primary"
-                            text
-                            @click="cancel()">
-                            Thoát
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
-            <v-dialog v-model="dialogError"
-            width="500">
-                <v-card>
-                    <v-card-title style="height:50px; margin-top:-10px" class="headline grey lighten-2">
-                        <span class="mb-3">Thông báo</span>
-                        </v-card-title>
-                    <v-card-text  class="pt-6" style="height:40px">
-                    <v-icon style="color:red" class="mdi mdi-alert-circle"></v-icon> {{messageError}}
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn
-                            color="primary"
-                            text
-                            @click="dialogError = false">
-                            Thoát
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
+        v-bind:class="[showValidate==true?'manage-timesheet-1000':'manage-timesheet-620']"  >
+        <v-row class="h-100">
+            <v-dialog v-model="dialog"
+                width="500">
+                    <v-card>
+                        <v-card-title style="height:50px; margin-top:-10px" class="headline grey lighten-2">
+                            <span class="mb-3">Thông báo</span>
+                            </v-card-title>
+                            <v-card-text class="pt-6" style="height:40px">
+                        <v-icon style="color:green" class="mdi mdi-check"></v-icon> Hoàn thành import
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                color="primary"
+                                text
+                                @click="cancel()">
+                                Thoát
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+                <v-dialog v-model="dialogError"
+                width="500">
+                    <v-card>
+                        <v-card-title style="height:50px; margin-top:-10px" class="headline grey lighten-2">
+                            <span class="mb-3">Thông báo</span>
+                            </v-card-title>
+                        <v-card-text  class="pt-6" style="height:40px">
+                        <v-icon style="color:red" class="mdi mdi-alert-circle"></v-icon> {{messageError}}
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                color="primary"
+                                text
+                                @click="dialogError = false">
+                                Thoát
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
             <v-col class="col-md-7">
                 <ImportFile 
                     :objId="objId"
+                    :subObjType="subObjType"
                     :tables="nameRows"
                     :nameDocument="nameDocument"
                     :objType="objType"
@@ -114,6 +115,9 @@ export default {
         },
         nameDocument:{
             default:''
+        },
+        subObjType:{
+            default:''
         }
     },
     methods: {
@@ -158,11 +162,11 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.manage-timesheet-500{
-    width: 470px!important;
+.manage-timesheet-620{
+    width: 620px!important;
 }
-.manage-timesheet-800{
-    width: 800px!important  ;
+.manage-timesheet-1000{
+    width: 1000px!important  ;
 }
 .manage-timesheet ::v-deep .v-card {
     box-shadow: none !important;
