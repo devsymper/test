@@ -34,7 +34,7 @@
                             @click="$emit('show-user-detail')"
                         >
                             {{ sapp.baInfo.name ? sapp.baInfo.name : sapp.endUserInfo.displayName }}
-                            <v-icon  @click="$emit('show-user-detail')"></v-icon>
+                            <v-icon  @click="$emit('show-user-detail')" style="font-size:14px" class="ml-2"> mdi-information-outline</v-icon>
                         </span>
                     </v-list-item-title>
                     <div class="w-100 mb-1 ">

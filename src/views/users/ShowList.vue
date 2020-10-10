@@ -188,6 +188,38 @@ export default {
                         name:"password",
                         title:"Mật khẩu",
                         isNull:true
+                    },
+                    {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"password",
+                        title:"Mật khẩu",
+                        isNull:true
+                    },
+                    {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"password",
+                        title:"Mật khẩu",
+                        isNull:true
+                    },
+                    {
+                        dataColumn:null,
+                        dataType:"number",
+                        isKeyControl:false,
+                        name:"orgchart_id",
+                        title:"Mã sơ đồ tổ chức",
+                        isNull:true
+                    },
+                    {
+                        dataColumn:null,
+                        dataType:"number",
+                        isKeyControl:false,
+                        name:"position_id",
+                        title:"Vị trí",
+                        isNull:true
                     }
                 ]
             }]
@@ -225,6 +257,7 @@ export default {
             this.$refs.listUser.closeactionPanel();
         },
         addUser(){
+            debugger
             this.isSettingPasswordView = false;
             this.showViewInfo = false;
             this.actionType = 'add';

@@ -192,6 +192,15 @@
         "password": "Yêu cầu mật khẩu có cả chữ hoa và số"
     },
     "user": {
+        "notification": {
+            "email_already_exist!": "Email đã tồn tại!",
+            "add_success": "Thêm mới tài khoản thành công!",
+            "update_success": "Cập nhật tài khoản thành công!",
+            "user_name_already_exist": "Tên tài khoản đã tồn tại",
+            "Old password incorrect": "Mật khẩu cũ không đúng",
+            "successChangePass": "Đổi mật khẩu thành công"
+
+        },
         "title": "Danh sách User",
         "general": {
             "title": "Thông tin cơ bản",
@@ -204,7 +213,8 @@
                 "firstName": "Tên",
                 "lastName": "Họ",
                 "displayName": "Tên hiển thị",
-                "phone": "Số điện thoại"
+                "phone": "Số điện thoại",
+                "pass": "Mật khẩu"
             },
             "passwordSetting": {
                 "title": "Tùy chọn mật khẩu",
@@ -214,6 +224,7 @@
                 "sendEmailAfterDone": "Gửi mật khẩu trong email sau khi hoàn thành",
                 "activeAccount": "Kích hoạt tài khoản"
             }
+
         },
         "permission": {
             "title": "Phân quyền",
