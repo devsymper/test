@@ -1,6 +1,6 @@
 <template>
    <v-card class="context-menu" v-show="isShowContext" >
-		<div class="item" v-for="(action,i) in listAction" :key="i" @click="clickAction(action,sideBySide, allAppMode)">
+		<div class="context-menu-item" v-for="(action,i) in listAction" :key="i" @click="clickAction(action,sideBySide, allAppMode)">
 				<span v-html="reduce(action)"></span>
 		</div>
    </v-card>
@@ -153,7 +153,7 @@ export default {
 	-moz-box-shadow: 2px 0px 24px 0px rgba(0,0,0,0.75);
 	box-shadow: 2px 0px 24px 0px rgba(0,0,0,0.75);
 }
-.context-menu >>> .item{
+.context-menu >>> .context-menu-item{
 	padding: 8px 10px;
 	font-size: 13px;
 	cursor: pointer;
@@ -161,7 +161,7 @@ export default {
 	text-align: left;
 	border-bottom:unset;
 }
-.context-menu >>> .item:hover{
+.context-menu >>> .context-menu-item:hover{
 	background: #f7f7f7;
 }
 .context-menu >>> .v-icon {
