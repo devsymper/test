@@ -11,7 +11,7 @@
                 :height="height">
             </code-editor>
             <div class="debug-input-view" v-if="showDebugView">
-                <p>(x) Tham số đầu vào:</p>
+                <p>{{$t('formulasEditor.inputParams')}}</p>
                 <VuePerfectScrollbar :style="{height: 'calc(100% - 30px)','padding-right': '12px'}">
                     <table style="width:100%">
                         <tr v-for="(input,key) in allInput" :key="key">
@@ -27,12 +27,12 @@
             <div class="result__header">
                 <div class="result__header--title">
                     <v-icon>mdi-calculator-variant</v-icon>
-                    <span>Kết quả</span>
+                    <span>{{$t('formulasEditor.result')}}</span>
                     <span v-if="debugStatus" :style="(debugStatus.status) ? {background:'green'} : {background:'red'}">{{debugStatus.message}}</span>
                 </div>
                 <div class="result__header--time">
-                    <span>Thời gian</span>
-                    <span>:1.1222s</span>
+                    <span>{{$t('formulasEditor.time')}}</span>
+                    <span>:{{timeRequest}}</span>
                 </div>
             </div>
             <div class="result__body">
@@ -86,7 +86,8 @@ export default {
             error:null,
             instance:Date.now(),
             totalRecord:0,
-            debugStatus:null
+            debugStatus:null,
+            timeRequest:0
         }
     },
     beforeMount() {
@@ -272,6 +273,7 @@ export default {
             })
         },
         executeFormulas(){
+            this.timeRequest = 0;
             this.error = null;
             let selectionText = this.$refs.edtScript.editor.getSelectedText();
             if(!selectionText){
@@ -286,15 +288,16 @@ export default {
             for(let input in this.allInput){
                 dataInput[input] = this.allInput[input].value;
             }
+            let start = Date.now();
             formulas.handleBeforeRunFormulas(dataInput).then(rs=>{
-                self.debugStatus = {status:true,message:"Thành công"};
+                self.debugStatus = {status:true,message:this.$t('formulasEditor.success')};
                 self.rowData = [];
                 self.columnDefs = [];
                 if(rs.server){
                     let data = rs.data.data;
                     let err = rs.data.lastErrorMessage;
                     if(err){
-                        self.debugStatus = {status:false,message:"Lỗi"};
+                        self.debugStatus = {status:false,message:this.$t('formulasEditor.error')};
                         self.error = err;
                     }
                     self.handleDataToTable(data);
@@ -319,6 +322,14 @@ export default {
                     self.agApi.sizeColumnsToFit();
                 }
                 
+                let end = Date.now();
+                self.timeRequest = end-start;
+                if(self.timeRequest >= 1000){
+                    self.timeRequest = Math.round(((end-start)/1000) * 100) / 100 + 's'
+                }   
+                else{
+                    self.timeRequest = self.timeRequest + 'ms';
+                }
             });
         },
         handleDataToTable(data){

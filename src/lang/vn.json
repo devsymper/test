@@ -497,6 +497,13 @@
             "dataflow": "mdi mdi-arrange-send-to-back"
         }
     },
+    "formulasEditor": {
+        "inputParams": "(x) Tham số đầu vào:",
+        "result": "Kết quả",
+        "time": "Thời gian",
+        "success": "Thành công",
+        "error": "Lỗi"
+    },
     "document": {
         "instance": {
             "showlist": {
