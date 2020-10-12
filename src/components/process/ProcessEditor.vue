@@ -274,7 +274,7 @@ export default {
                 for (let i in allElements) {
                     let items=allElements[i].attrs;
                     for (let j in items) {
-                        if (items[j].validateStatus && items[j].validateStatus.isValid==false ) {
+                        if (items[j] && items[j].validateStatus && items[j].validateStatus.isValid==false ) {
                             isCheck=false;
                             self.$snotifyError({},'Error when validate','Error at node ' +allElements[i].id+', property ' +items[j].title+' with detail:'+items[j].validateStatus.message )
                         }
@@ -405,7 +405,9 @@ export default {
                 jsonConfig[elName] = {};
                 for(let attrName in allSymEls[elName].attrs){
                     let attr = allSymEls[elName].attrs[attrName];
-                    jsonConfig[elName][attrName] = attr.getValue(attr.value);
+                    if(attr){
+                        jsonConfig[elName][attrName] = attr.getValue(attr.value);
+                    }
                 }
             }
             let modelDataAsFlowable = this.getModelData();
