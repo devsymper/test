@@ -398,6 +398,9 @@ export default class Formulas {
     // Hàm kiểm tra các tham số của workflow và thay thế lại giá trị tương ứng
     // hàm này thực hiện khi chạy quy trình
     replaceWorkflowParams(formulas) {
+        if (!sDocument.state.submit[this.keyInstance]) {
+            return formulas;
+        }
         let workflowVariable = sDocument.state.submit[this.keyInstance].workflowVariable;
         for (let param in workflowVariable) {
             let regex = new RegExp("{" + param + "}", "g");

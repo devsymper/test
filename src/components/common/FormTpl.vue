@@ -98,7 +98,19 @@
             :showPanel="largeFormulaEditor.open"
             :actionTitle="largeFormulaEditor.data.title"
             :panelData="largeFormulaEditor.data"
+            :dragPanelWidth="dragPanelWidth"
+            :dragPanelHeight="dragPanelHeight"
             ref="dragPanel">
+            <template slot="panel-action">
+                <v-icon
+                    v-if="isDebugMode && !isShowDebugMode"
+                    @click="showDebugMode"
+                >mdi-bug-outline</v-icon>
+                <v-icon
+                    v-if="isShowDebugMode"
+                    @click="debug"
+                >mdi-play-outline</v-icon>
+            </template>
             <template slot="drag-panel-content" slot-scope="{panelData}">
                 <orgchart-selector
                     @input="translateOrgchartValuesToTags"
@@ -119,7 +131,8 @@
                     v-model="panelData.value"
                     ref="edtFormula"
                     :width="'100%'"
-                    :height="'370px'"
+                    :height="isShowDebugMode ? '250px' : '365px'"
+                    :isDebugView="true"
                 ></formula-editor>
             </template>
         </symper-drag-panel>
@@ -335,10 +348,41 @@ export default {
                 open: false, // có mở largeFormulaEditor hay ko
                 data: {}, // Dữ liệu của input cần mở lên để edit trong khung lớn,
             },
-            currentPointer:{left:'35px',top:'0'}
+            currentPointer:{left:'35px',top:'0'},
+            dragPanelWidth:500,
+            isShowDebugMode:false,
+            isDebugMode:true,
+            dragPanelHeight:400
         };
     },
     methods: {
+        /**
+         * hoangnd
+         * Hàm mở sang chế độ debug để kiểm tra công thức
+         * (syntax, query...)
+         */
+        showDebugMode(){
+            this.isShowDebugMode = true;
+            this.dragPanelWidth = 900;
+            this.dragPanelHeight = 700;
+            this.$refs.edtFormula.toggleDebugView();
+        },
+        /**
+         * hoangnd
+         * Ẩn chế độ debug
+         */
+        hideDebugMode(){
+            this.isShowDebugMode = false;
+            this.dragPanelWidth = 500;
+            this.dragPanelHeight = 400;
+            this.$refs.edtFormula.toggleDebugView();
+        },
+        /**
+         * Hàm thực thi query khi ấn debug
+         */
+        debug(){
+            this.$refs.edtFormula.executeFormulas();
+        },
         setActiveTabForUserAssignment(){
             if(!this.markAllInputChangeByInternal){
                 for(let inputName in this.allInputs){
@@ -353,7 +397,7 @@ export default {
             this.$emit('append-icon-click');
         },
         handleLargeFormulaEditorBlur(){
-            this.hideDragPanel();
+            // this.hideDragPanel();
             let name = this.largeFormulaEditor.name;
             let inputInfo = this.allInputs[name];
             this.handleInputBlur(inputInfo, name);
@@ -423,6 +467,9 @@ export default {
             }, 50, this);
         },
         closeLargeFormulaEditor() {
+            if(this.isShowDebugMode){
+                this.hideDebugMode();
+            }
             let info = this.largeFormulaEditor;
             setTimeout((self) => {
                 self.largeFormulaEditor.name = '';

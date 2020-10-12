@@ -284,6 +284,12 @@ export default {
             type:Number,
             default:0
         },
+        dataPreview:{
+            type:Object,
+            default(){
+                return
+            }
+        }
     },
     name: "submitDocument",
 
@@ -483,7 +489,7 @@ export default {
          * Hàm gọi mở sub form submit
          */
         this.$evtBus.$on("document-submit-image-click", data => {
-            this.currentImageControl = $(data.target).closest('.s-control-image')
+            this.currentImageControl = {el:$(data.target).closest('.s-control-image'),controlName:data.controlName}
             this.$refs.fileUploadView.onButtonClick();
             
         });
@@ -796,6 +802,20 @@ export default {
             if(this.isShowTraceControlSidebar && after == false){
                 this.$refs.traceControlView.removeTrace();
                 this.$refs.traceControlView.removeCurrentControlTrace();
+            }
+        },
+        dataPreview:{
+            immediate:true,
+            deep:true,
+            handler:function(vl){
+                this.contentDocument = vl.content;
+                setTimeout((self) => {
+                    setDataForPropsControl(vl.fields,self.keyInstance,'submit');
+                }, 500,this);
+                setTimeout(() => {
+                    
+                    this.processHtml(vl.content);
+                }, 700);
             }
         }
     },
@@ -1246,7 +1266,7 @@ export default {
             );
             let thisCpn = this;
             let isSetEffectedControl = false;
-            let listDataFlow = []
+            let listDataFlow = [];
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
@@ -1633,6 +1653,9 @@ export default {
             let thisCpn = this;
             if(this.titleObjectFormulas != null){
                 let dataInputTitle = thisCpn.getDataInputFormulas(this.titleObjectFormulas);
+                if(!dataPost['dataInputFormulas']){
+                    dataPost['dataInputFormulas'] = {}
+                }
                 dataPost['dataInputFormulas']['dataInputTitle'] = dataInputTitle;
             }
             if(this.appId){
@@ -2293,7 +2316,13 @@ export default {
         afterFileUpload(data){
             let url = data.serverPath;
             let image = '<img height="70" src="'+url+'">';
-            this.currentImageControl.html(image);
+            this.currentImageControl.el.html(image);
+            
+            this.updateListInputInDocument(
+                this.currentImageControl.controlName,
+                "value",
+                url
+            );
         }
     }
     
