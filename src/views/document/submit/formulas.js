@@ -370,20 +370,24 @@ export default class Formulas {
          * @param {String} formulas 
          */
     replaceParamsToData(dataInput, formulas) {
-
         // thay thế các tham số của workflow 
         formulas = this.replaceWorkflowParams(formulas);
 
         if (Object.keys(dataInput).length == 0 || dataInput == false) {
             return formulas;
         }
-        let listControlInDoc = this.getDataSubmitInStore();
+        let listControlInDoc = {}
+        try {
+            listControlInDoc = this.getDataSubmitInStore();
+        } catch (error) {
+
+        }
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
             let value = dataInput[controlName];
             if (value == undefined || typeof value == 'undefined' || value == null) {
                 value = ""
-                if (listControlInDoc[controlName].type == 'number' || listControlInDoc[controlName].type == 'percent') {
+                if (dataFromStore && listControlInDoc[controlName].type == 'number' || listControlInDoc[controlName].type == 'percent') {
                     value = 0;
                 }
             }

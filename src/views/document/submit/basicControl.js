@@ -330,6 +330,10 @@ export default class BasicControl extends Control {
         }
         if (this.type == 'label') {
             this.ele.text(value)
+        } else if (this.type == 'image') {
+            this.ele.empty();
+            let image = '<img height="70" src="' + value + '">';
+            this.ele.append(image);
         } else {
             this.ele.val(value)
         }
