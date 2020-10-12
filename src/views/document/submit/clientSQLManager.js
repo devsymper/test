@@ -5,7 +5,7 @@ const dataSubmitStore = sDocument.state.submit
 const initSqlJs = require('sql.js');
 
 /**
- * hoangnd:26/5/2020
+ * hoangnd:26/5/2020 
  * Class xử lí việc chạy câu lệnh SQL trên client
  */
 export default class ClientSQLManager {
@@ -29,8 +29,11 @@ export default class ClientSQLManager {
          * @param {SQLLite} SQLDBInstance 
          */
     static addSQLInstanceDBToStore(keyInstance, SQLDBInstance) {
+            // store.commit(
+            //     "document/addInstanceSubmitDB", { instance: keyInstance, sqlLite: SQLDBInstance }
+            // );
             store.commit(
-                "document/addInstanceSubmitDB", { instance: keyInstance, sqlLite: SQLDBInstance }
+                "document/addSqlLiteDb", { instance: keyInstance, db: SQLDBInstance }
             );
         }
         /**
@@ -39,7 +42,7 @@ export default class ClientSQLManager {
          * @param {String} keyInstance 
          */
     static getInstanceDB(keyInstance) {
-            return dataSubmitStore[keyInstance].SQLLiteDB[keyInstance]
+            return sDocument.state.clientSqlLite[keyInstance]
         }
         /**
          * hoangnd:26/5/2020

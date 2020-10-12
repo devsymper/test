@@ -1124,9 +1124,7 @@ export default class Table {
                     }, 10);
                 } else if (source == 'timeValidator') {
 
-                } else if (changes[0][3].includes("=SUM")) {
-                    console.log("ádadasdsad", changes);
-
+                } else if (isNaN(changes[0][3]) && changes[0][3].includes("=SUM")) {
                     setTimeout((self) => {
                         self.render()
                     }, 500, this);

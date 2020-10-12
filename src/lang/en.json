@@ -353,6 +353,13 @@
             "allOperation": "Operation for all object"
         }
     },
+    "formulasEditor": {
+        "inputParams": "(x) Input params:",
+        "result": "Result",
+        "time": "Time",
+        "success": "Success",
+        "error": "Error"
+    },
     "document": {
 
         "instance": {
