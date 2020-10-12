@@ -67,7 +67,6 @@
 										class="fs-13"
 										ref="userName"
 										required
-										:rules="[rules.required]"
 										v-model="user.userName"
 										dense
 									></v-text-field>
@@ -160,12 +159,12 @@
 							</v-checkbox>
 						</div>
 						<div v-if="actionType == 'add'">
-							<!-- <h4 class="setting-password">{{ $t('user.general.passwordSetting.title')}}</h4>
+							<h4 class="setting-password">{{ $t('user.general.passwordSetting.title')}}</h4>
 							<v-checkbox dense class="sym-small-size" 
 								v-model="autoRenPassword" 
 								@click="enabledPassword = !enabledPassword" 
 								:label="$t('user.general.passwordSetting.autoGeneratePassword')">
-							</v-checkbox> -->
+							</v-checkbox>
 							<v-row>
 								<v-col cols="4">
 									<v-checkbox 
@@ -206,9 +205,7 @@
 						</div>	
 					<v-btn class="btn-next-step"
 						ref="addUserBtn"
-						:loading="loading"
-						:disabled="loading"
-						@click="loader = 'loading'">
+						@click="validateForm()">
 						{{actionType=='add'?actionPanel="Tạo tài khoản":"Cập nhật tài khoản"}}
 					</v-btn>
 					</v-stepper-content>
@@ -297,8 +294,6 @@ export default {
 			url: avatarDefault,
 			stepper: 1,
 			editStep: false,
-			loader: null,
-			loading: false,
 			actionPanel : this.$t('user.other.createUser'),
 			enabledPassword:false,
 			autoRenPassword:true,
@@ -356,15 +351,8 @@ export default {
 				this.user.status = false;
 			}
 		},
-		loader () {
-			if(this.loader == 'loading'){
-				this.validateForm();
-			}
-		},
 		formHasErr(){
 			if(this.formHasErr){
-				this.loading = false;
-				this.loader = null;
 				this.formHasErr = !this.formHasErr;
 			}
 		},
@@ -424,6 +412,7 @@ export default {
 		},
 		actionUser(){
 			if(this.actionType == 'add'){
+				debugger
 				this.addNewUser()
 			}
 			else if(this.actionType == 'edit'){
@@ -442,6 +431,7 @@ export default {
 		 * Hàm check validate các trường input   (password, email, user name)
 		 */
 		validateForm(){
+			debugger
 			this.formHasErr = false;
 			let validUserName = this.$refs.userName.validate(true);
 			let validEmail = this.$refs.email.validate(true);
@@ -514,6 +504,7 @@ export default {
 		 * Hàm tạo mới user
 		 */
 		addNewUser(){
+			debugger
 			const cpn = this;
 			let passProps = {
 				needChange:this.needChangePassword,
@@ -542,23 +533,23 @@ export default {
 				if (res.status == 200) {
 					//cpn.loadPermission();
 					//cpn.setStepper(2);
-					cpn.loading = false;
 					cpn.editStep = true;
-					cpn.loader = null;
 					cpn.user.id = res.user.id;
                     cpn.avatarFileName = 'user_avatar_'+res.user.id;
                     setTimeout(() => {
                         cpn.$refs.uploadAvatar.uploadFile();
 					}, 10);
-					cpn.$emit("refresh-data");
-					this.$snotify({
-					type: "success",
-					title: this.$t("notification.successTitle")});
+						cpn.$emit("refresh-data");
+						this.$snotify({
+						type: "success",
+						title: this.$t("notification.successTitle")});
 				}
 				else{
+					debugger
+					res.message = res.message.split(' ').join('_')
 					this.$snotify({
-					type: "error",
-					title: this.$t("notification.error")});
+						type: "error",
+						title: this.$t("user.notification."+res.message)});
 				}
 			})
 			.catch(err => {
@@ -618,8 +609,6 @@ export default {
 			}
 			userApi.updateUser(this.user.id, data).then(res => {
 				if (res.status == 200) {
-					cpn.loading = false;
-					cpn.loader = null;
 					cpn.$emit("refresh-data");
 					this.$snotify({
 					type: "success",
@@ -896,8 +885,6 @@ export default {
 			this.user = {id:'', firstName:'', lastName:'', displayName:'', userName:'', email:'', password:'', phone:'', active:true},
 			this.stepper = 1,
 			this.url = avatarDefault,
-			this.loader = null,
-			this.loading = false,
 			this.actionPanel = 'Tạo User',
 			this.enabledPassword =false,
 			this.autoRenPassword =true,

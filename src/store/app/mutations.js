@@ -1,6 +1,10 @@
 const changeCollapseSidebar = (state, newValue) => {
     state.collapseSideBar = newValue;
 };
+const changeStatus = (state, newValue) => {
+    state.endUserInfo.status = newValue;
+};
+
 const decreaseUnreadNotification = (state, delta = 1) => {
     state.unreadNotification -= delta;
 };
@@ -90,5 +94,6 @@ export {
     setAllUsers,
     setAllBA,
     setUserRoleByType,
-    setUserActionsForObjects
+    setUserActionsForObjects,
+    changeStatus
 };

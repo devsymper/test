@@ -281,6 +281,7 @@ export default {
                     name: this.propertyDocument[i].properties.name,
                     title: this.propertyDocument[i].properties.title,
                     isKeyControl: false,
+                    isNull:this.checkIsRequired(this.propertyDocument[i].properties.isRequired),
                     dataColumn: null,
                     dataType: this.getDataType(this.propertyDocument[i].type)
                 });
@@ -296,7 +297,7 @@ export default {
             for (let i = 0; i < tableNames.length; i++) {
                 tables.push({
                     sheetMap: '',
-                   title:tableTitle[i],
+                    title:tableTitle[i],
                     keyColumn: {
                         index: -1,
                         name: ''
@@ -306,6 +307,13 @@ export default {
                  })
             }
             this.listRowDocument = tables;
+        },
+        checkIsRequired(isRequired){
+            if(isRequired==0){
+                return true
+            }else{
+                return false
+            }
         },
          findControlsForTable(nameTable) {
             let controls = [];

@@ -120,6 +120,9 @@ const updateFavoriteMyAppItem = (state, data) => {
 const updateSelectingItemType = (state, data) => {
     state.selectingItemType = data
 }
+const updateActiveChildItem = (state, data) => {
+    state.activeChildItem  = data
+}
 export {
     updateListItemSelected,
     removeItemSelected,
@@ -136,4 +139,5 @@ export {
     setListApps,
     updateFavoriteMyAppItem,
     updateSelectingItemType,    
+    updateActiveChildItem
 };
