@@ -287,7 +287,7 @@ export default {
         dataPreview:{
             type:Object,
             default(){
-                return
+                return {}
             }
         }
     },
@@ -413,6 +413,7 @@ export default {
     },
 
     created() {
+        this.createSqlLite();
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
@@ -808,12 +809,14 @@ export default {
             immediate:true,
             deep:true,
             handler:function(vl){
+                if(!vl){
+                    return
+                }
                 this.contentDocument = vl.content;
                 setTimeout((self) => {
                     setDataForPropsControl(vl.fields,self.keyInstance,'submit');
                 }, 500,this);
                 setTimeout(() => {
-                    
                     this.processHtml(vl.content);
                 }, 700);
             }
@@ -821,6 +824,9 @@ export default {
     },
     
     methods: {
+        async createSqlLite(){
+            await ClientSQLManager.createDB(this.keyInstance);
+        },
         /**
          * Hàm ẩn loader
          */
@@ -1157,7 +1163,7 @@ export default {
         },
         // Khadm: load data của document lên để hiển thị và xử lý
         async loadDocumentData() {
-            await ClientSQLManager.createDB(this.keyInstance);
+            
             if (this.documentId) {
                 let thisCpn = this;
                 documentApi
