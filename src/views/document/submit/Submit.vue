@@ -562,6 +562,7 @@ export default {
             if(thisCpn._inactive == true) return;
             thisCpn.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
             thisCpn.leftPositionDragPanel = e.screenX - e.offsetX;
+            thisCpn.$refs.inputFilter.setControlName(e.controlName);
             thisCpn.runInputFilterFormulas(e.controlName);
             thisCpn.$refs.symDragPanel.show();
             thisCpn.$refs.inputFilter.setFormulas(e.formulas,e.controlName);
@@ -832,9 +833,7 @@ export default {
                 }); 
         },
         saveInputFilter(data){
-            let controlId = data.controlId
-            let value = data.value
-            $('#'+controlId).val(value);
+            this.handleInputChangeBySystem(data.controlName,data.value)
             this.$refs.symDragPanel.hide()
         },
         searchDataFilter(data){
