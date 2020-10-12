@@ -112,6 +112,7 @@ export default {
             set(value){
                 this.$emit('input', value);
                 this.$emit('change', value);
+                this.getInputParams();
             }
         },
         listAllDocs(){
@@ -259,18 +260,24 @@ export default {
                 if(!self.showDebugView){
                     return;
                 }
-                self.allInput = {};
-                let selectionText = edt.getSelectedText();
-                if(selectionText.length > 0){
-                    let dataInput = selectionText.match(/(?<={)[A-Za-z0-9_]+(?=})/gi);
-                    if(dataInput){
-                        self.allInput = dataInput.reduce(function(obj, cur, i) {
-                            obj[cur] = {value:""};
-                            return obj;
-                        }, {});
-                    }
-                }
+                self.getInputParams()
             })
+        },
+        getInputParams(){
+            this.allInput = {};
+            let selectionText = this.$refs.edtScript.editor.getSelectedText();
+            if(!selectionText){
+                selectionText = this.$refs.edtScript.editor.getValue();
+            }
+            if(selectionText.length > 0){
+                let dataInput = selectionText.match(/(?<={)[A-Za-z0-9_]+(?=})/gi);
+                if(dataInput){
+                    this.allInput = dataInput.reduce(function(obj, cur, i) {
+                        obj[cur] = {value:""};
+                        return obj;
+                    }, {});
+                }
+            }
         },
         executeFormulas(){
             this.timeRequest = 0;
