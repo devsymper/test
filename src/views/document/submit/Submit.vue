@@ -809,17 +809,17 @@ export default {
             immediate:true,
             deep:true,
             handler:function(vl){
-                // if(!vl){
-                //     return
-                // }
-                // this.contentDocument = vl.content;
-                // setTimeout((self) => {
-                //     setDataForPropsControl(vl.fields,self.keyInstance,'submit');
-                // }, 500,this);
-                // setTimeout(() => {
+                if(!vl){
+                    return
+                }
+                this.contentDocument = vl.content;
+                setTimeout((self) => {
+                    setDataForPropsControl(vl.fields,self.keyInstance,'submit');
+                }, 500,this);
+                setTimeout(() => {
                     
-                //     this.processHtml(vl.content);
-                // }, 700);
+                    this.processHtml(vl.content);
+                }, 700);
             }
         }
     },
@@ -2391,6 +2391,7 @@ export default {
     width: 100%;
     height: calc(100vh - 100px);
     overflow: hidden;
+    background: white;
 }
 .wrap-content-submit .scroll-content{
     overflow-x: hidden;

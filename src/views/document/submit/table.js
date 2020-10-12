@@ -129,7 +129,6 @@ Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, val
     let table = store.state.document.submit[instance.keyInstance];
     if (table && instance.tableName) {
         let btnAdd = table.listInputInDocument[prop].genFileView(row);
-        console.log("adadsadsa", btnAdd);
         td.innerHTML = btnAdd;
         td.classList.add("upload-file-wrapper-inTb");
         $(td).off('click', '.file-add');
@@ -174,7 +173,7 @@ const supportCellsType = {
     date: 'DateRenderer',
     dateTime: 'DatetimeRenderer',
     time: 'TimeRenderer',
-    image: 'ImageRenderer',
+    image: 'FileRenderer',
     fileUpload: 'FileRenderer',
     label: 'TextRenderer',
     percent: 'PercentRenderer',

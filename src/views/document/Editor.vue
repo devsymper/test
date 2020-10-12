@@ -24,6 +24,7 @@
                     @document-action-check-control="checkBeforeControlNameChange"
                     @document-action-swap-type-control="openPanelSwapType"
                     @document-action-control-template="showFormAddControlTemplate"
+                    @document-action-preview-submit="previewSubmitDocument"
                     />
                 </div>
                 <textarea ref="editorLibWrapper" :id="'document-editor-'+keyInstance">
@@ -72,7 +73,16 @@
                 <v-btn color="green darken-1" text @click="acceptDialog">Đồng ý</v-btn>
                 </v-card-actions>
             </v-card>
-            </v-dialog>
+        </v-dialog>
+        <v-dialog v-model="isShowPreviewSubmit" max-width="800" :style="{
+            'overflow':'hidden',
+            'background':'white'            
+        }">
+            <Submit
+                :showSubmitButton="false"
+                ref="subSubmitView" 
+                :dataPreview="dataPreviewSubmit"/>
+        </v-dialog>
     </v-flex>
 </template>
 <script>
@@ -103,6 +113,7 @@ import { getInsertionCSS } from "./../../components/document/documentUtil.js";
 import VueResizable from 'vue-resizable';
 import { minimizeControl } from '../../store/document/mutations';
 
+import Submit from './submit/Submit'
 import tinymce from 'tinymce/tinymce';
 
 import 'tinymce/icons/default';
@@ -163,7 +174,8 @@ export default {
         MaterialIcon,
         PrintTableConfig,
         QuickInfoControl,
-        FormModal
+        FormModal,
+        Submit
     },
     mounted(){
         let self = this;
@@ -357,7 +369,8 @@ export default {
             sizePrint:{},
             currentDragging:null,
             oldTableId:null,
-
+            dataPreviewSubmit:null,
+            isShowPreviewSubmit:false
         }
     },
     
@@ -741,6 +754,34 @@ export default {
                 let currentControl = this.editorStore.currentSelectedControl;
                 if(currentControl.properties.name.hasOwnProperty('name')){
                     this.$refs.formModalView.show();
+                }
+            }
+        },
+        /**
+         * Hàm xem trước submit form
+         */
+        previewSubmitDocument(){
+            $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.on-selected').removeClass('on-selected');
+            this.isShowPreviewSubmit = true;
+            let fieldForSubmit = util.cloneDeep(this.editorStore.allControl);
+            this.prepareDataForPreview(fieldForSubmit);
+            this.dataPreviewSubmit = {fields:fieldForSubmit,content:this.editorCore.getContent()}
+        },
+        prepareDataForPreview(fieldForSubmit){
+            for(let controlId in fieldForSubmit){
+                for(let prop in fieldForSubmit[controlId].properties){
+                    fieldForSubmit[controlId].properties[prop] = fieldForSubmit[controlId].properties[prop].value;
+                }
+                for(let formulasType in fieldForSubmit[controlId].formulas){
+                    let formulasItem = {};
+                    formulasItem[Date.now()] = fieldForSubmit[controlId].formulas[formulasType].value;
+                    if(!fieldForSubmit[controlId].formulas[formulasType].value){
+                        formulasItem = ""
+                    }
+                    fieldForSubmit[controlId].formulas[formulasType] = formulasItem;
+                }
+                if(fieldForSubmit[controlId].type == 'table'){
+                    this.prepareDataForPreview(fieldForSubmit[controlId].listFields)
                 }
             }
         },
@@ -2387,7 +2428,7 @@ export default {
             let table = el.closest('.s-control-table');
             if(table.length > 0 && controlId != table.attr('id')){
                 if(!fromTreeView)
-                tinyMCE.activeEditor.selection.setNode($(e.target));
+                tinyMCE.activeEditor.selection.setNode($(e.target).closest('.s-control'));
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
                 if(!control){
