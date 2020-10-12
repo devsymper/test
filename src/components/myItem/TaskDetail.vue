@@ -72,8 +72,6 @@
                     <span>Sửa nội dung văn bản</span>
                 </v-tooltip>
 
-
-
                 <!-- <button @click="getTaskTest">Click</button> -->
 
                 <v-btn small tile icon text  @click="closeDetail">
@@ -185,6 +183,7 @@ export default {
     data: function() {
         return {
             showDialogAlert:false,
+            isRole:false, //value =falses khi assignee = userId, =true khi assignee = userId:role
             appId:'',
             isShowSidebar:false,
             loadingActionTask:false,
@@ -397,10 +396,10 @@ export default {
         },
         async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
             //check xem user có phải assignee
+            // kiểm tra xem user hiện tại có role được phân quyền trong task không? 
             if (this.$store.state.app.endUserInfo.id != this.originData.assigneeInfo.id) {
                 this.showDialogAlert=true;
-            }else
-            {
+            }else if(this.checkRoleUser(this.originData)){
                 this.loadingActionTask=true;
                     if(this.taskAction == 'submit' || this.taskAction == 'update' ){
                         this.$refs.task.submitForm(value);
@@ -442,7 +441,9 @@ export default {
                         let res = await this.submitTask(taskData);
                         this.$emit('task-submited', res);
                     }
-                }
+            }else{
+                this.showDialogAlert=true;
+            }
             this.loadingActionTask=false;
         },
         saveApprovalHistory(value){
@@ -464,7 +465,7 @@ export default {
         },
         async submitTask(taskData){
             let self = this;
-            if (this.taskAction=='submit') {
+            if (this.taskAction=='submit' || this.isRole==false) { // isRole == false thi update task cập nhật role hiện tại
                 await this.updateTask(taskData);
             }
             return new Promise(async (resolve, reject) => {
@@ -483,19 +484,44 @@ export default {
                     reject(error);
                 }
             });
-            
+        },
+        async checkRoleUser(originData){
+            let self=this;
+            if (originData.assignee.indexOf(":")>0) {
+                let arrDataAssignee=originData.assignee.split(":");
+                let assigneeId=arrDataAssignee[0];
+                let roleIdentify=originData.assignee.slice(assigneeId.length);
+                // ktra enduser có tồn tại role trong assignee không
+                let rolesUser=self.$store.state.app.endUserInfo.roles;
+                let role=rolesUser[arrDataAssignee[1]].find(element => element.id==originData.assignee);
+                if (role) {
+                    self.isRole=true;
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                self.isRole=false;
+                return true;
+            }
         },
         async updateTask(taskData) {
-            let description;
-            if ((typeof this.descriptionTask)=="string" ) {
-                description=JSON.parse(this.descriptionTask) ;
-            }else{
-                description=this.descriptionTask;
-            }
-            description.action.parameter.documentObjectId=taskData.variables[0].value;
-            let taskId=taskData.variables[5].value;
             let data = {};
-            data.description= JSON.stringify(description);
+            if (this.isRole==false) {
+                data.assignee=this.originData.assignee+":"+this.$store.state.app.endUserInfo.currentRole.id;
+            }
+            if (this.taskAction=='submit') { // khi submit task
+                let description;
+                if ((typeof this.descriptionTask)=="string" ) {
+                    description=JSON.parse(this.descriptionTask) ;
+                }else{
+                    description=this.descriptionTask;
+                }
+                description.action.parameter.documentObjectId=taskData.variables[0].value;
+                data.description= JSON.stringify(description);
+            }
+          
+            let taskId=this.originData.id;
             return BPMNEngine.updateTask(taskId,data);
         },
         async handleTaskSubmited(data){

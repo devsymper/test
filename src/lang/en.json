@@ -937,7 +937,9 @@
         "sidebar": {
             "showMoreTask": "Show more task related",
             "showLess": "Show less task related",
-            "showMoreFile": "Show more file"
+            "showMoreFile": "Show more file",
+            "quickView":"Quick view"
+
         },
         "alert": {
             "title_aproval": "Action work",

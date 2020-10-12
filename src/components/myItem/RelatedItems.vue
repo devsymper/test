@@ -11,7 +11,6 @@
                         minHeight: '25px'
                     }"
                     v-if="checkShowTotalTask(idex)"
-                    @mouseover="showInfoTask"
                 >
                     <v-col cols="8" >
                         <div style="white-space: nowrap;
@@ -29,29 +28,42 @@
                     <v-col cols="4" style="padding-top:15px">
                         <v-icon x-small >mdi-clock-time-nine-outline</v-icon>
                         {{item.createTime ? $moment(item.createTime).format('DD/MM/YY HH:mm'):$moment(item.endTime).format('DD/MM/YY HH:mm')}}
+                        <div class="quickView" @click="showInfoTask($event,item)">{{$t("myItem.sidebar.quickView")}}</div>
                     </v-col>
             
                 </v-row>
             </div>
         </div>
-
+        <infoTaskRelated
+            v-show="statusQuickView && taskSelected"
+            :taskSelected="taskSelected"
+            :appId="appId"
+            @closeInfoTaskRelated="closeInfoTaskRelated"
+            ref="infoTaskRelated"
+         />
     </div>
 </template>
 
 <script>
 import BPMNEngine from "@/api/BPMNEngine.js";
+import infoTaskRelated from "./InfoTaskRelated";
 
 export default {
     name: "relatedItems",
     components: {
+        infoTaskRelated
     },
     data(){
         return{
+            x:-1,
+            y:-1,
             showByIndex: null,
             processParent:{},
             listSubProcessInstance:[],
             listProcessSibling:[],
-            processInstanceCurrent:{}
+            processInstanceCurrent:{},
+            statusQuickView:false,
+            taskSelected:{},
         }
     },
     props: {
@@ -74,6 +86,10 @@ export default {
         showMoreTask:{
             type:Boolean,
             default:false
+        },
+        appId:{
+            type:Number,
+            default:0,
         }
     },
     watch:{
@@ -84,7 +100,6 @@ export default {
     computed: {
         taskFilter(){
             return {
-                // ownerLike: String(this.$store.state.app.endUserInfo.id),
                 processInstanceId: this.taskInfo.action.parameter.processInstanceId,
                 assigneeLike:  String(this.$store.state.app.endUserInfo.id)
             }
@@ -99,15 +114,19 @@ export default {
             tasks=tasks.concat(this.stask.listTaskDoneInProcessParent);
             tasks=tasks.concat(this.stask.listTaskInProcessSub);
             tasks=tasks.concat(this.stask.listTaskInProcessSibling);
-            console.log("listTaskRelated",tasks);
             return tasks;
         }
     },
     methods:{
-        showInfoTask(){
-            // setTimeout((self) => {
-            //     alert("heelo");
-            // }, 1000,this);
+        closeInfoTaskRelated(){
+            this.statusQuickView=false;
+        },
+        showInfoTask(e,item){
+            this.taskSelected={};
+            this.taskSelected=item;
+            this.statusQuickView=!this.statusQuickView;
+            this.$refs.infoTaskRelated.setPosittion({bottom:$(document).height() - e.clientY + 30 + 'px'})
+
         },
         checkShowTotalTask(idex){
             if (this.showMoreTask==false) {
@@ -122,6 +141,7 @@ export default {
         },
         goDoTask(id){
             this.$router.push("/myitem/tasks/"+id);
+          
         },
         displayIcon(description){
             let data=JSON.parse(description);
@@ -328,6 +348,9 @@ export default {
 .single-row:hover{
     background: #e5e5e5;
     cursor: pointer;
+}
+.quickView:hover{
+    text-decoration-line:underline
 }
 
 </style>

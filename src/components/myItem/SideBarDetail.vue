@@ -126,6 +126,7 @@
 						<RelatedItems
 							:taskInfo="taskInfo"
 							:tabsData="tabsData"
+							:appId="appId"
 							:showMoreTask="showMoreTask"
 						 />
 						 <span class="showMoreRelated" @click="handleShowMoreTask" v-if="!showMoreTask" >{{$t('myItem.sidebar.showMoreTask')}}</span>
@@ -427,6 +428,10 @@ export default {
 		documentObjectId:{
 			type:String,
 			default:""
+		},
+		appId:{
+			type:Number,
+			default:0
 		}
 	
 	},

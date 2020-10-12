@@ -136,12 +136,12 @@
                                         </v-col>
                                         <v-col
                                         v-if="!sideBySideMode"
-                                        style="line-height: 42px"
                                         cols="2"
-                                        class="fs-12 px-1 py-0"
+                                        class="fs-12 px-1 py-0 mt-2"
                                         >
-                                        <symperAvatar :size="20" :userId="obj.assigneeInfo.id" />
-                                        {{obj.assigneeInfo.displayName}}
+                                            <symperAvatar :size="20" :userId="obj.assigneeInfo.id" />
+                                            {{obj.assigneeInfo.displayName}}
+                                            <div class="fs-11 ml-5 grey--text" v-if="obj.assigneeRole">{{obj.assigneeRole.name}}</div>
                                         </v-col>
                                         <v-col
                                         v-if="!sideBySideMode"
@@ -270,6 +270,21 @@ export default {
        
         groupFlatTasks() {
             let allTask = this.allFlatTasks;
+            allTask.sort(function(a, b) {
+                if (a.endTime) {
+                    var keyA = new Date(a.endTime);
+                }else{
+                    var keyA = new Date(a.createTime);
+                }
+                if (b.endTime) {
+                    var keyB = new Date(b.endTime);
+                }else{
+                    var keyB = new Date(b.createTime);
+                }
+                if (keyA > keyB) return -1;
+                if (keyA < keyB) return 1;
+                return 0;
+            });
             const groups = allTask.reduce((groups, task) => {
                 let date;
                 if ( task.createTime) {
@@ -291,6 +306,7 @@ export default {
                   tasks: groups[fromNow]
                 };
             });
+            console.log("taskkkk",groupArraysTask);
             return groupArraysTask;
         },
         stask() {
@@ -472,24 +488,25 @@ export default {
         util.getComponentSize(this.$el.parentElement).h - 125;
     },
     selectObject(obj, idx,idex) {
-      this.index = idx;
-      this.dataIndex = idex;
-      this.$set(this.selectedTask, "originData", obj);
-      if (this.smallComponentMode) {
-        this.$goToPage("/tasks/" + obj.id, "Do task");
-      } else {
-        this.selectedTask.idx = idx;
-        if (!this.compackMode) {
-          this.sideBySideMode = true;
-          let taskInfo = extractTaskInfoFromObject(obj);
-          this.$set(this.selectedTask, "taskInfo", taskInfo);
-          this.$emit("change-height", "calc(100vh - 88px)");
+        console.log("avsvsv",obj);
+        this.index = idx;
+        this.dataIndex = idex;
+        this.$set(this.selectedTask, "originData", obj);
+        if (this.smallComponentMode) {
+            this.$goToPage("/tasks/" + obj.id, "Do task");
+        } else {
+            this.selectedTask.idx = idx;
+            if (!this.compackMode) {
+            this.sideBySideMode = true;
+            let taskInfo = extractTaskInfoFromObject(obj);
+            this.$set(this.selectedTask, "taskInfo", taskInfo);
+            this.$emit("change-height", "calc(100vh - 88px)");
+            }
         }
-      }
     },
     closeDetail() {
-      this.sideBySideMode = false;
-      this.$emit("change-height", "calc(100vh - 120px)");
+        this.sideBySideMode = false;
+        this.$emit("change-height", "calc(100vh - 120px)");
     },
     getTaskData(task) {
         let rsl = {
@@ -547,9 +564,10 @@ export default {
         if (Object.keys(this.$store.state.process.allDefinitions).length === 0) { //ktra xem store đã có thông tin của các processDefinition chưa
             await this.$store.dispatch("process/getAllDefinitions");
         }
+
         for (let task of listTasks) {
             task.taskData = self.getTaskData(task);
-            task = addMoreInfoToTask(task);
+            addMoreInfoToTask(task);
             self.allFlatTasks.push(task);
             taskIden.push('task:'+task.id);
             if (task.processInstanceId && task.processInstanceId!=null) {

@@ -224,6 +224,23 @@ export default {
     groupAllProcessInstance() {
         let allUserById = this.$store.getters['app/mapIdToUser'];
         let allPrcess = this.allFlatWorks;
+
+        // allPrcess.sort(function(a, b) {
+        //         if (a.endTime) {
+        //             var keyA = new Date(a.endTime);
+        //         }else{
+        //             var keyA = new Date(a.startTime);
+        //         }
+        //         if (b.endTime) {
+        //             var keyB = new Date(b.endTime);
+        //         }else{
+        //             var keyB = new Date(b.startTime);
+        //         }
+        //         if (keyA > keyB) return -1;
+        //         if (keyA < keyB) return 1;
+        //         return 0;
+        // });
+
         const groups = allPrcess.reduce((groups, work) => {
             let date;
             work.startUserId = 0;
