@@ -71,7 +71,7 @@ Handsontable.cellTypes.registerCellType('percent', {
 Handsontable.renderers.UserRenderer = function(instance, td, row, col, prop, value, cellProperties) {
         Handsontable.renderers.TextRenderer.apply(this, arguments);
         if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
-            let listUser = store.state.document.submit[instance.keyInstance].listUser;
+            let listUser = store.state.app.allUsers;
             let user = listUser.filter(user => {
                 return user.id === value
             })
@@ -1303,17 +1303,17 @@ export default class Table {
                 }, 50, this);
                 // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
                 if (!this.checkDetailView())
-                    setTimeout((thisObj) => {
+                    setTimeout((self) => {
                         for (let index = 0; index < controlBinding.length; index++) {
-                            thisObj.handlerCheckEffectedControlInTable(controlBinding[index], 'all');
+                            self.handlerCheckEffectedControlInTable(controlBinding[index], 'all');
                         }
-                        thisObj.setDataForSumRow();
+                        self.setDataForSumRow();
                     }, 50, this);
 
             } else {
                 let defaultRow = this.getDefaultData(false);
                 this.tableInstance.loadData(defaultRow);
-                thisObj.setDataForSumRow();
+                this.setDataForSumRow();
             }
         }
         /**
