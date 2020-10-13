@@ -1307,11 +1307,11 @@ export default class Table {
                 }, 50, this);
                 // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
                 if (!this.checkDetailView())
-                    setTimeout((thisObj) => {
+                    setTimeout((self) => {
                         for (let index = 0; index < controlBinding.length; index++) {
-                            thisObj.handlerCheckEffectedControlInTable(controlBinding[index], 'all');
+                            self.handlerCheckEffectedControlInTable(controlBinding[index], 'all');
                         }
-                        thisObj.setDataForSumRow();
+                        self.setDataForSumRow();
                     }, 50, this);
 
             } else {
