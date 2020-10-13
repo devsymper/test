@@ -40,6 +40,7 @@
             :taskInfo="taskInfo"
             :originData="originData"
             :tabsData="tabsData"
+            :appId="Number(appId)"
             @changeUpdateAsignee="changeUpdateAsignee"
             @showContentFile="showContentFile"
             @showPopupTracking="showPopupTracking"
@@ -59,7 +60,7 @@
         <!-- Phần này cần tách thành component riêng -->
         
         <v-dialog
-            class="bg-white "
+            :content-class="'dialog-edit-doc'"
             v-model="showUpdateSubmitedDocument"
             width="80%">
             <div class="w-100 py-2 px-4 bg-white justify-space-between d-flex border-bottom-1">
@@ -327,6 +328,10 @@ export default {
 .task-style >>> .wrap-content-submit{
     width:96%!important;
 }
+::v-deep .dialog-edit-doc{
+    overflow: hidden;
+}
+
 
 
 </style>

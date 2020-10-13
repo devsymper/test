@@ -524,6 +524,13 @@
             "dataflow": "mdi mdi-arrange-send-to-back"
         }
     },
+    "formulasEditor": {
+        "inputParams": "(x) Tham số đầu vào:",
+        "result": "Kết quả",
+        "time": "Thời gian",
+        "success": "Thành công",
+        "error": "Lỗi"
+    },
     "document": {
         "instance": {
             "showlist": {
@@ -587,7 +594,7 @@
                     "fullSize": "Hiển thị toàn màn hình Form Submit",
                     "type": "Loại văn bản",
                     "note": "Ghi chú (Phục vụ cho việc tìm kiếm)",
-                    "titleObject": "Tiêu đề bản ghi (Phục vụ cho việc hiển thị trên MyItem)",
+                    "titleObject": "Tiêu đề bản ghi (Phục vụ cho việc hiển thị trên MyItem, công thức chạy trên server)",
                     "titlePrint": "Tiêu đề bản In"
                 },
                 "swapType": {
@@ -708,6 +715,7 @@
     "process": {
         "list": {
             "title": "Danh sách quy trình",
+            "titleTrash": "Danh sách quy trình đã xóa",
             "deploy_history": "Lịch sử deploy",
             "start": "Bắt đầu quy trình",
             "instances": "Các bản đã chạy gần nhất"
@@ -1094,11 +1102,14 @@
         "sidebar": {
             "showMoreTask": "Xem thêm các task liên quan",
             "showLess": "Thu gọn",
-            "showMoreFile": "Xem thêm các tệp"
+            "showMoreFile": "Xem thêm các tệp",
+            "quickView":"Xem nhanh"
 
         },
         "alert": {
-            "title_aproval": "Thực thi công việc"
+            "title_aproval": "Thực thi công việc",
+            "titlePermissionDenied": "Từ chối thực thi!",
+            "contentPermissionDenied": "Bạn không có quyền thực hiện công việc này!"
         }
 
     },
@@ -1115,6 +1126,7 @@
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",
             "createDate": "Ngày khởi tạo",
+            "endTime": "Ngày hoàn thành",
             "app": "Ứng dụng",
             "description": "Mô tả",
             "owner": "Người sở hữu",

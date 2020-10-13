@@ -182,16 +182,18 @@ export default {
 
         this.$evtBus.$on('symper-app-wrapper-clicked',evt=>{
             if(thisCpn._inactive == true) return;
-            if($(evt.target).is('.highlight-history')){
-                this.$refs.historyView.show($(evt.target))    
-            }
-            else{
-                if(
-                    !$(evt.target).hasClass("v-data-table") &&
+            if(this.$refs.historyView){
+                if($(evt.target).is('.highlight-history')){
+                    this.$refs.historyView.show($(evt.target))    
+                }
+                else{
+                    if(!$(evt.target).hasClass("v-data-table") &&
                     $(evt.target).closest(".v-data-table").length == 0){
                         this.$refs.historyView.hide() 
                     }
+                }
             }
+            
         })
     },
     watch:{

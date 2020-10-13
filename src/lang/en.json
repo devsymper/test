@@ -357,6 +357,13 @@
             "allOperation": "Operation for all object"
         }
     },
+    "formulasEditor": {
+        "inputParams": "(x) Input params:",
+        "result": "Result",
+        "time": "Time",
+        "success": "Success",
+        "error": "Error"
+    },
     "document": {
 
         "instance": {
@@ -421,7 +428,7 @@
                     "fullSize": "Full size Form Submit",
                     "type": "Document type",
                     "note": "Note (Serve for searching)",
-                    "titleObject": "Title Object (Serve for display on MyItem)",
+                    "titleObject": "Title Object (Serve for display on MyItem, formulas execute on server)",
                     "titlePrint": "Title Form Print"
                 },
                 "swapType": {
@@ -535,6 +542,7 @@
     "process": {
         "list": {
             "title": "Workflow list",
+            "titleTrash": "Workflow list deleted",
             "deploy_history": "Deploy history",
             "start": "Start workflow",
             "instances": "List lastest instances"
@@ -940,10 +948,14 @@
         "sidebar": {
             "showMoreTask": "Show more task related",
             "showLess": "Show less task related",
-            "showMoreFile": "Show more file"
+            "showMoreFile": "Show more file",
+            "quickView":"Quick view"
+
         },
         "alert": {
-            "title_aproval": "Action work"
+            "title_aproval": "Action work",
+            "titlePermissionDenied": "Permission denied!",
+            "contentPermissionDenied": "You are not authorized to do this!"
         }
 
     },
@@ -959,6 +971,7 @@
             "submit": "Submit",
             "date": "Date",
             "dueDate": "Due Date",
+            "endTime": "Finish day",
             "createDate": "Create date",
             "app": "Application",
             "description": "Task description",

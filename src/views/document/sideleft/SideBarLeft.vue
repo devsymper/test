@@ -26,7 +26,7 @@
             v-for="tab in sideLeftTabs"
             :key="tab.id"
         >
-            <control-tab v-if="tab.id == 'control'" :isConfigPrint="isConfigPrint">
+            <control-tab :instance="instance" v-if="tab.id == 'control'" :isConfigPrint="isConfigPrint">
 
             </control-tab>
             <list-control-tab :instance="instance" v-if="tab.id == 'listControl'">

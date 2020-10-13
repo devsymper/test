@@ -284,6 +284,12 @@ export default {
             type:Number,
             default:0
         },
+        dataPreview:{
+            type:Object,
+            default(){
+                return {}
+            }
+        }
     },
     name: "submitDocument",
 
@@ -406,7 +412,8 @@ export default {
         })
     },
 
-    created() {
+    async created() {
+        await ClientSQLManager.createDB(this.keyInstance);
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
@@ -483,7 +490,7 @@ export default {
          * Hàm gọi mở sub form submit
          */
         this.$evtBus.$on("document-submit-image-click", data => {
-            this.currentImageControl = $(data.target).closest('.s-control-image')
+            this.currentImageControl = {el:$(data.target).closest('.s-control-image'),controlName:data.controlName}
             this.$refs.fileUploadView.onButtonClick();
             
         });
@@ -562,6 +569,7 @@ export default {
             if(thisCpn._inactive == true) return;
             thisCpn.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
             thisCpn.leftPositionDragPanel = e.screenX - e.offsetX;
+            thisCpn.$refs.inputFilter.setControlName(e.controlName);
             thisCpn.runInputFilterFormulas(e.controlName);
             thisCpn.$refs.symDragPanel.show();
             thisCpn.$refs.inputFilter.setFormulas(e.formulas,e.controlName);
@@ -570,7 +578,7 @@ export default {
         }); 
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
-            console.log("ádsadsad",e);
+
             if(thisCpn._inactive == true) return;
             try {
                 if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
@@ -594,6 +602,7 @@ export default {
                 else if((e.e.keyCode < 37 || e.e.keyCode > 40)){
                     thisCpn.$refs.autocompleteInput.hide();
                 }
+                
                 
             } catch (error) {
                 
@@ -795,10 +804,28 @@ export default {
                 this.$refs.traceControlView.removeTrace();
                 this.$refs.traceControlView.removeCurrentControlTrace();
             }
+        },
+        dataPreview:{
+            immediate:true,
+            deep:true,
+            handler:function(vl){
+                if(!vl){
+                    return
+                }
+                this.contentDocument = vl.content;
+                setTimeout((self) => {
+                    setDataForPropsControl(vl.fields,self.keyInstance,'submit');
+                }, 500,this);
+                setTimeout(() => {
+                    
+                    this.processHtml(vl.content);
+                }, 700);
+            }
         }
     },
     
     methods: {
+        
         /**
          * Hàm ẩn loader
          */
@@ -831,9 +858,7 @@ export default {
                 }); 
         },
         saveInputFilter(data){
-            let controlId = data.controlId
-            let value = data.value
-            $('#'+controlId).val(value);
+            this.handleInputChangeBySystem(data.controlName,data.value)
             this.$refs.symDragPanel.hide()
         },
         searchDataFilter(data){
@@ -864,7 +889,7 @@ export default {
                 let dataInput = this.getDataInputFormulas(e.formulasInstance,e);
                 e.formulasInstance.handleBeforeRunFormulas(dataInput).then(res=>{
                     res.status = 200
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val(),true)
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,true)
                 });
             }
             else{
@@ -883,7 +908,7 @@ export default {
             if(['select','combobox'].includes(type)){
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
                 e.selectFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,"",false)
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,false)
                 });
             }
             else{
@@ -901,7 +926,7 @@ export default {
                         }
                     }
                     e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                        thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val(),"")
+                        thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,false)
                     });
                 }
                 else{
@@ -928,8 +953,9 @@ export default {
         },
         /**
          * Hàm bind dữ liệu cho box autocomplete, cho component autocompleteInput
+         * và đưa dữ liệu vào cache
          */
-        setDataForControlAutocomplete(res,aliasControl,controlTitle, textTyping="",fromSqlite=false){
+        setDataForControlAutocomplete(res,aliasControl,controlTitle, fromSqlite=false){
             let controlAs = {};
             controlAs[aliasControl] = controlTitle;
             if(res.data != undefined){
@@ -945,7 +971,9 @@ export default {
                     this.$refs.autocompleteInput.setData(dataTable);
                     if(dataTable.hasOwnProperty('headers')){
                         let item = {}
+                        let textTyping = this.getTextTypingInSqlQuery(res.data.sql);
                         item[textTyping] = dataTable.dataBody
+                        console.log("sadsadsadsa",item);
                         this.$store.commit("document/cacheDataAutocomplete",{
                             instance: this.keyInstance,
                             controlName:aliasControl,
@@ -964,6 +992,21 @@ export default {
                 this.$refs.autocompleteInput.setData(dataTable);
                 this.$refs.autocompleteInput.hideHeader();
             }
+        },
+
+        /**
+         * Hàm tìm ra đoạn text đã typing để query autocomplete
+         */
+        getTextTypingInSqlQuery(sql){
+            let textQuery = sql.match(/%.*?%/g);
+            if(textQuery){
+                textQuery = textQuery[0];
+                textQuery = textQuery.replace(/%*/g,"");
+            }
+            else{
+                textQuery = ""
+            }
+            return textQuery;
         },
         /**
          * Hàm bind dữ liệu cho control, và control trong bảng khi chọn apply trên timepicker
@@ -1119,7 +1162,6 @@ export default {
         },
         // Khadm: load data của document lên để hiển thị và xử lý
         async loadDocumentData() {
-            await ClientSQLManager.createDB(this.keyInstance);
             if (this.documentId) {
                 let thisCpn = this;
                 documentApi
@@ -1228,7 +1270,7 @@ export default {
             );
             let thisCpn = this;
             let isSetEffectedControl = false;
-            let listDataFlow = []
+            let listDataFlow = [];
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
@@ -1528,7 +1570,7 @@ export default {
 
 
         // Hàm chỉ ra control được đánh định danh trong document (sct...)
-        getColumnIdentifier(){
+        getDataRefreshControl(){
             if(this.objectIdentifier == undefined){
                 return {}
             }
@@ -1537,9 +1579,7 @@ export default {
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlNameIdentifier);
             if(controlInstance != false && controlInstance.controlFormulas.hasOwnProperty('formulas')){
                 let dataInput = this.getDataInputFormulas(controlInstance.controlFormulas['formulas']['instance'])
-                controlIdentifier['dataInput'] = dataInput;
-                // controlIdentifier['dataInput'] = 
-                // return controlIdentifier;
+                controlIdentifier['dataInputIdentifier'] = dataInput;
             }
             return controlIdentifier;
             
@@ -1595,18 +1635,15 @@ export default {
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
             dataPost['documentId'] = this.documentId;
-            let controlIdentifier = this.getColumnIdentifier();
-            if(Object.keys(controlIdentifier).length>0){
-                dataPost['dataRefreshControl'] = JSON.stringify(controlIdentifier);
-            }
+            let dataInputFormulas = this.getDataRefreshControl();
             if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
                 let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
-                await thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput);
-                this.callApiSubmit(dataPost);
+                dataInputFormulas['dataInputSubmit'] = dataInput;
             }
-            else{
-                this.callApiSubmit(dataPost);
+            if(Object.keys(dataInputFormulas).length>0){
+                dataPost['dataInputFormulas'] = dataInputFormulas;
             }
+            this.callApiSubmit(dataPost);
             
         },
         resetCheckRefreshData(){
@@ -1618,16 +1655,12 @@ export default {
         },
         async callApiSubmit(dataPost){
             let thisCpn = this;
-            let titleObject = "";
             if(this.titleObjectFormulas != null){
                 let dataInputTitle = thisCpn.getDataInputFormulas(this.titleObjectFormulas);
-                try {
-                    let res = await this.titleObjectFormulas.handleBeforeRunFormulas(dataInputTitle);
-                    let value = this.getValueFromDataResponse(res);
-                    dataPost['titleObject'] = value
-                } catch (error) {
-                    
+                if(!dataPost['dataInputFormulas']){
+                    dataPost['dataInputFormulas'] = {}
                 }
+                dataPost['dataInputFormulas']['dataInputTitle'] = dataInputTitle;
             }
             if(this.appId){
                 dataPost['appId'] = this.appId;
@@ -1637,6 +1670,7 @@ export default {
                     dataPost['appId'] = this.$route.params.extraData.appId
                 }
             }
+            dataPost['dataInputFormulas'] = JSON.stringify(dataPost['dataInputFormulas']);
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
                 dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;
@@ -1724,6 +1758,9 @@ export default {
                 if(listInput[controlName].inTable != false){
                     continue;
                 }
+                if(!listInput[controlName].checkProps('isSaveToDB')){
+                    continue;
+                }
                 if (listInput[controlName].type == "table") {
                     let value = this.getDataTableInput(listInput[controlName]);
                     Object.assign(dataControl, value);
@@ -1765,6 +1802,9 @@ export default {
                 dataColObjectId.pop();
             dataControlInTable['child_object_id'] = dataColObjectId;
             for (let i in indexCol) {
+                if(!listInput[i].checkProps('isSaveToDB')){
+                    continue;
+                }
                 let dataCol = tableControl.tableInstance.tableInstance.getDataAtCol(
                     indexCol[i]
                 );
@@ -2280,7 +2320,13 @@ export default {
         afterFileUpload(data){
             let url = data.serverPath;
             let image = '<img height="70" src="'+url+'">';
-            this.currentImageControl.html(image);
+            this.currentImageControl.el.html(image);
+            
+            this.updateListInputInDocument(
+                this.currentImageControl.controlName,
+                "value",
+                url
+            );
         }
     }
     
@@ -2345,6 +2391,7 @@ export default {
     width: 100%;
     height: calc(100vh - 100px);
     overflow: hidden;
+    background: white;
 }
 .wrap-content-submit .scroll-content{
     overflow-x: hidden;

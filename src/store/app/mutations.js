@@ -66,6 +66,10 @@ const setOrgchartNodes = (state, orgchartNodes) => {
 const setAllUsers = (state, allUsers) => {
     Vue.set(state, 'allUsers', allUsers);
 }
+const setAllSymperRoles = (state, allSymperRoles) => {
+    Vue.set(state, 'allSymperRoles', allSymperRoles);
+}
+
 const setAllBA = (state, allBA) => {
     Vue.set(state, 'allBA', allBA);
 }
@@ -95,5 +99,6 @@ export {
     setAllBA,
     setUserRoleByType,
     setUserActionsForObjects,
+    setAllSymperRoles,
     changeStatus
 };

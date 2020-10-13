@@ -5,7 +5,14 @@ const defaultState = {
 	currentAppId: 0,
 	listApps:{},
 	selectingItemType: '',
+	activeChildItem: '',
 	listItemSelected: {
+		workflow_definition: {
+			icon: 'mdi-lan',
+			title: 'Workflows',
+			name: 'workflow_definition',
+			item: []
+		},
 		document_category:{
 			icon : 'mdi-file-document-outline',
 			title: "Danh mục",
@@ -36,12 +43,7 @@ const defaultState = {
 			name: 'dashboard',
 			item: []
 		},
-		workflow_definition: {
-			icon: 'mdi-lan',
-			title: 'Workflows',
-			name: 'workflow_definition',
-			item: []
-		},
+		
 	}
 };
 export default defaultState;

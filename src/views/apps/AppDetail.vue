@@ -7,6 +7,7 @@
 							<li  v-if="isEndUserCpn == true" 
 								v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)"
 								v-on:click="rightClickHandler($event,childItem,itemT.name)"
+								:class="{'child-item-active': childItem.objectIdentifier == activeIndexChild}"
 							>
 								<div style="position:relative">
 									<v-tooltip bottom v-if="itemT.name == 'document_category' || itemT.name == 'document_major'">
@@ -110,6 +111,9 @@ export default {
 				return this.objFilter
 			}
 		},
+		activeIndexChild(){
+			return this.$store.state.appConfig.activeChildItem
+		},
 		listItemHeight(){
 			if(this.isMyApplication == true){
 				return 'calc(100vh - 125px)'
@@ -190,6 +194,7 @@ export default {
 		rightClickHandler(event,item,type){
 			event.stopPropagation();
 			event.preventDefault();
+			this.$store.commit('appConfig/updateActiveChildItem', item.objectIdentifier )
 			this.$refs.contextMenu.setContextItem([...new Set(item.actions)])
 			this.$refs.contextMenu.show(event)
 			this.$refs.contextMenu.setItem(item)
@@ -293,6 +298,10 @@ export default {
 	position:absolute;
 	top:-2px;
 	right:0px;
+}
+.app-details >>> .app-item .app-child-item .child-item-active{
+	background-color: #E9E9E9;
+
 }
 .app-details >>> .app-item li{
 	cursor: pointer;

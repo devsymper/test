@@ -22,7 +22,7 @@ export default {
             listTrash: {
                 title: "Lists trash",
                 icon: "mdi-trash",
-                link: "/documents/trash"
+                link: "/workflow/trash"
             }
         }
     },

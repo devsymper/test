@@ -95,7 +95,18 @@ export default {
             else{
                 let autoEL = $(this.$el).detach();
                 $(e.target).parent().append(autoEL);
-                this.positionBox = {'top':'26px','left':'0px'};
+                let inputOffset = $(e.target).offset();
+                if(window.innerWidth < inputOffset.left + $('.card-datetime-picker').width() + 10){
+                    this.position = {'top':'26px','right':'0px'};
+                }
+                else{
+                    this.position = {'top':'26px','left':'0px'};
+                }
+                if(window.innerHeight < inputOffset.top + $('.card-datetime-picker').height() + 40){
+                    delete this.position.top;
+                    this.position['bottom'] = '26px';
+                }
+                
             }
         },
         applyDateTime(){

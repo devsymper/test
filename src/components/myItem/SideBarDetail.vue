@@ -29,15 +29,19 @@
 							<table class="general-info">
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.dateCreate')}}</td>
-									<td>{{originData.createTime ? $moment(originData.createTime).format('DD/MM/YY HH:mm:ss'):$moment(originData.endTime).format('DD/MM/YY HH:mm:ss')}}</td>
+									<td class="pl-2">{{originData.createTime ? $moment(originData.createTime).format('DD/MM/YY HH:mm:ss'):$moment(originData.endTime).format('DD/MM/YY HH:mm:ss')}}</td>
 								</tr>
-								<!-- <tr>
-									<td>{{$t('document.detail.sidebar.body.general.history')}}</td>
-									<td @click="showHistory" style="text-decoration: underline;cursor:pointer;color:#F1853B;">Đã sửa 2 lần</td>
-								</tr> -->
+								<tr>
+									<td>{{$t('tasks.header.dueDate')}}</td>
+									<td class="pl-2">{{originData.dueDate ? $moment(originData.dueDate).fromNow():""}}</td>
+								</tr>
+								<tr v-if="originData.endTime">
+									<td>{{$t('tasks.header.endTime')}}</td>
+									<td class="pl-2">{{ $moment(originData.endTime).fromNow()}}</td>
+								</tr>
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.comment')}}</td>
-									<td style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
+									<td class="pl-2" style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
 										{{$t('document.detail.sidebar.body.general.has')}} 
 										{{countCommentNotResolve}} 
 										{{$t('document.detail.sidebar.body.general.commentNotResolve')}}
@@ -122,6 +126,7 @@
 						<RelatedItems
 							:taskInfo="taskInfo"
 							:tabsData="tabsData"
+							:appId="appId"
 							:showMoreTask="showMoreTask"
 						 />
 						 <span class="showMoreRelated" @click="handleShowMoreTask" v-if="!showMoreTask" >{{$t('myItem.sidebar.showMoreTask')}}</span>
@@ -423,6 +428,10 @@ export default {
 		documentObjectId:{
 			type:String,
 			default:""
+		},
+		appId:{
+			type:Number,
+			default:0
 		}
 	
 	},
@@ -488,10 +497,7 @@ export default {
 				}
 			})
 			.catch(err => {
-
 			})
-			.always(() => {});
-
 		this.$evtBus.$on('symper-app-wrapper-clicked', (evt) => {
             if(!($(evt.target).hasClass('symper-select-user-autocomplete') || $(evt.target).parents('.symper-select-user-autocomplete').length > 0)){
                 for(let key in  this.showDelegatedUser){

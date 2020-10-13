@@ -71,7 +71,7 @@ Handsontable.cellTypes.registerCellType('percent', {
 Handsontable.renderers.UserRenderer = function(instance, td, row, col, prop, value, cellProperties) {
         Handsontable.renderers.TextRenderer.apply(this, arguments);
         if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
-            let listUser = store.state.document.submit[instance.keyInstance].listUser;
+            let listUser = store.state.app.allUsers;
             let user = listUser.filter(user => {
                 return user.id === value
             })
@@ -84,7 +84,7 @@ Handsontable.renderers.UserRenderer = function(instance, td, row, col, prop, val
 Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     if (value == null) value = ""
-    let div = `<div class="select-cell" style="position:relative;height:24px;width:100%;">` + value + `
+    let div = `<div class="select-cell" style="position:relative;height:22px;width:100%;">` + value + `
                     <span class="select-chervon-bottom" style="position: absolute;right:8px;top:2px;font-size: 10px;color: #eee;">▼</span>
                 </div>`
     $(td).off('click')
@@ -129,7 +129,6 @@ Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, val
     let table = store.state.document.submit[instance.keyInstance];
     if (table && instance.tableName) {
         let btnAdd = table.listInputInDocument[prop].genFileView(row);
-        console.log("adadsadsa", btnAdd);
         td.innerHTML = btnAdd;
         td.classList.add("upload-file-wrapper-inTb");
         $(td).off('click', '.file-add');
@@ -174,7 +173,7 @@ const supportCellsType = {
     date: 'DateRenderer',
     dateTime: 'DatetimeRenderer',
     time: 'TimeRenderer',
-    image: 'ImageRenderer',
+    image: 'FileRenderer',
     fileUpload: 'FileRenderer',
     label: 'TextRenderer',
     percent: 'PercentRenderer',
@@ -260,8 +259,11 @@ export default class Table {
 
 
                 beforeKeyDown: function(event) {
-                    console.log("sadsadasd", event);
                     let cellMeta = this.getSelected();
+                    if (!cellMeta) {
+                        return;
+                    }
+                    thisObj.checkEnterInsertRowEvent(event, cellMeta);
                     // ấn f2 vào cell thì trace control đó
                     if (event.key == 'F2' && store.state.app.accountType == 'ba') {
                         let control = thisObj.getControlInstance(thisObj.currentControlSelected);
@@ -439,31 +441,7 @@ export default class Table {
                         instance: thisObj.keyInstance
                     });
                 },
-                /**
-                 * Hàm xử lí thêm và xóa dòng sau khi bấm shift + enter, shift + delete
-                 * @param {*} e 
-                 */
-                afterDocumentKeyDown: function(e) {
-                    let cellMeta = this.getSelected();
-                    if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
-                        this.alter('insert_row', cellMeta[0][0] + 1, 1, 'auto_set');
-                        thisObj.dataInsertRows.push([]);
-                        delayTypingEnter(function(e) {
-                            let listRootTable = sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'];
-                            if (listRootTable.hasOwnProperty(thisObj.tableName)) {
-                                let rowData = util.cloneDeep(listRootTable[thisObj.tableName]['defaultRow']);
-                                for (let index = 0; index < thisObj.dataInsertRows.length; index++) {
-                                    let newRowData = util.cloneDeep(rowData);
-                                    newRowData[0][0] = cellMeta[0][0] + index + 1;
-                                    thisObj.tableInstance.setDataAtRowProp(newRowData, null, null, 'auto_set');
-                                }
-                            }
 
-                        });
-                    } else if (e.key === 'Delete' && e.shiftKey == true) {
-                        this.alter('remove_row', cellMeta[0][0], 1);
-                    }
-                },
                 /**
                  * Sau khi thay đổi giá trị trong bảng thì cần update hoặc insert lại vào bảng sql lite
                  * @param {*} changes 
@@ -471,7 +449,7 @@ export default class Table {
                  */
                 afterChange: function(changes, source) {
 
-                    if (!changes && !changes[0][1]) {
+                    if (!changes) {
                         return
                     }
                     // check nếu ko có thay đổi trong cell thì return
@@ -548,6 +526,45 @@ export default class Table {
                 }
             }
             listTableInstance[this.tableName] = this;
+        }
+        /**
+         * Hàm xử lí thêm và xóa dòng sau khi bấm shift + enter, shift + delete
+         * @param {*} e 
+         */
+
+    checkEnterInsertRowEvent(e, cellMeta) {
+            if (!e) {
+                return;
+            }
+            // nếu shift + enter ở dòng tính tổng thì ko làm gì cả
+            if (this.tableHasRowSum && cellMeta[0][0] == this.tableInstance.countRows() - 1) {
+                return;
+            }
+            if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
+                this.tableInstance.alter('insert_row', cellMeta[0][0] + 1, 1, 'auto_set');
+                this.dataInsertRows.push([]);
+                let thisObj = this;
+                delayTypingEnter(function() {
+                    console.log("dataInsertRowsdataInsertRows", thisObj.dataInsertRows);
+                    let listRootTable = sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'];
+                    if (listRootTable.hasOwnProperty(thisObj.tableName)) {
+                        let rowData = util.cloneDeep(listRootTable[thisObj.tableName]['defaultRow']);
+                        for (let index = 0; index < thisObj.dataInsertRows.length; index++) {
+                            let newRowData = util.cloneDeep(rowData);
+                            for (let i = 0; i < newRowData.length; i++) {
+                                newRowData[i][0] = cellMeta[0][0] + index + 1;
+                            }
+                            thisObj.tableInstance.setDataAtRowProp(newRowData, null, null, 'auto_set');
+                        }
+                    }
+                    thisObj.dataInsertRows = []
+                });
+            } else if (e.key === 'Delete' && e.shiftKey == true) {
+                e.stopImmediatePropagation();
+                e.preventDefault();
+                e.stopPropagation();
+                this.tableInstance.alter('remove_row', cellMeta[0][0], 1);
+            }
         }
         // kiểm tra nếu đang edit ở cell cuối cùng mà ấn enter thì cho cell selected về dòng đầu tiên (lỗi do control hidden)
     checkLastCell(cellMeta, hotTb) {
@@ -797,7 +814,6 @@ export default class Table {
          * @param {*} formulasInstance  Object cua formulas giá trị của control bị ảnh hưởng
          */
     async handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance) {
-
             let listIdRow = this.tableInstance.getDataAtCol(this.tableInstance.getDataAtRow(0).length - 1);
             if (this.tableHasRowSum) {
                 listIdRow.pop();
@@ -1042,9 +1058,7 @@ export default class Table {
             formulas: true,
             height: 'auto',
             afterRender: function(isForced) {
-                if (thisObj.tableHasRowSum) {
-                    $('#' + thisObj.tableControlId + ' span.rowHeader').last().text('Tổng').css({ 'font-weight': 'bold' });
-                }
+
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
                 if (tbHeight < MAX_TABLE_HEIGHT) {} else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
@@ -1060,6 +1074,11 @@ export default class Table {
                         }
                         hotTb.render();
                     }, 500, this);
+                }
+            },
+            afterGetRowHeader: function(row, TH) {
+                if (thisObj.tableHasRowSum && row === this.countRows() - 1) {
+                    $(TH).text('Tổng').css({ 'font-weight': 'bold' });
                 }
             },
 
@@ -1104,6 +1123,10 @@ export default class Table {
                     }, 10);
                 } else if (source == 'timeValidator') {
 
+                } else if (isNaN(changes[0][3]) && changes[0][3].includes("=SUM")) {
+                    setTimeout((self) => {
+                        self.render()
+                    }, 500, this);
                 } else {
                     thisObj.isAutoCompleting = false;
                 }
@@ -1119,6 +1142,36 @@ export default class Table {
             afterCreateRow: function(index, amount, source) {
                 let id = Date.now();
                 thisObj.tableInstance.setDataAtCell(index, thisObj.tableInstance.getDataAtRow(0).length - 1, id);
+            },
+            afterRemoveRow: function(index, amount, physicalRows, source) {
+                let listInput = thisObj.getListInputInDocument();
+                let rowData = this.getDataAtRow(index);
+                console.log(rowData, 'rowDatarowData');
+                let rowId = rowData[rowData.length - 1]
+                for (let controlName in thisObj.controlObj.listInsideControls) {
+                    let controlInstance = listInput[controlName];
+                    let controlValue = util.cloneDeep(controlInstance.value);
+                    if (Array.isArray(controlValue)) {
+                        controlValue.splice(index, 1);
+                        store.commit("document/updateListInputInDocument", {
+                            controlName: controlName,
+                            key: 'value',
+                            value: controlValue,
+                            instance: thisObj.keyInstance
+                        });
+
+                    }
+                }
+                ClientSQLManager.deleteRow(thisObj.keyInstance, thisObj.tableName, 'where s_table_id_sql_lite = ' + rowId);
+                let pattern = index + '_\\d';
+                let reg = new RegExp(pattern, 'g');
+                for (let key in thisObj.validateValueMap) {
+                    if (reg.test(key)) {
+                        delete thisObj.validateValueMap[key]
+                    }
+                }
+                this.render();
+
             },
 
         });
@@ -1204,13 +1257,18 @@ export default class Table {
                 let data = vls;
                 let controlBinding = Object.keys(data[0]);
                 let dataToStore = {};
+                let dataToSqlLite = [];
+                let columnInsert = [];
                 for (let index = 0; index < data.length; index++) {
                     let rowId = Date.now() + index;
                     data[index]['s_table_id_sql_lite'] = rowId;
 
                     let listKey = Object.keys(data[index]);
+                    columnInsert = listKey;
+                    let rowData = [];
                     for (let j = 0; j < listKey.length; j++) {
                         let controlName = listKey[j];
+                        rowData.push("'" + data[index][controlName] + "'");
                         if (controlName == 's_table_id_sql_lite') {
                             continue;
                         }
@@ -1220,8 +1278,10 @@ export default class Table {
                         if (data[index] != undefined)
                             dataToStore[controlName].push(data[index][controlName]);
                     }
+                    dataToSqlLite.push('(' + rowData.join() + ')');
 
                 }
+                ClientSQLManager.insertDataToTable(this.keyInstance, this.tableName, columnInsert.join(), dataToSqlLite.join())
                 for (let controlName in dataToStore) {
                     store.commit("document/updateListInputInDocument", {
                         controlName: controlName,
@@ -1236,23 +1296,24 @@ export default class Table {
                 }
 
                 this.tableInstance.updateSettings({
-                        data: data
-                    })
-                    // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
+                    data: data
+                })
+                setTimeout((self) => {
+                    self.tableInstance.render()
+                }, 50, this);
+                // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
                 if (!this.checkDetailView())
-                    setTimeout((thisObj) => {
+                    setTimeout((self) => {
                         for (let index = 0; index < controlBinding.length; index++) {
-                            thisObj.handlerCheckEffectedControlInTable(controlBinding[index], 'all');
+                            self.handlerCheckEffectedControlInTable(controlBinding[index], 'all');
                         }
-                        thisObj.setDataForSumRow();
+                        self.setDataForSumRow();
                     }, 50, this);
 
             } else {
                 let defaultRow = this.getDefaultData(false);
                 this.tableInstance.loadData(defaultRow);
-                setTimeout((thisObj) => {
-                    thisObj.setDataForSumRow();
-                }, 50, this);
+                this.setDataForSumRow();
             }
         }
         /**
@@ -1260,12 +1321,14 @@ export default class Table {
          */
     setDataForSumRow() {
             if (this.tableHasRowSum) {
-                for (let controlName in this.columnHasSum) {
-                    let colIndex = this.getColumnIndexFromControlName(controlName);
-                    let CharAt = String.fromCharCode(65 + this.columnHasSum[controlName]);
-                    let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (this.tableInstance.countRows() - 1) + ')';
-                    this.tableInstance.setDataAtCell(this.tableInstance.countRows() - 1, colIndex, sumValue, AUTO_SET);
-                }
+                setTimeout((self) => {
+                    for (let controlName in self.columnHasSum) {
+                        let colIndex = self.getColumnIndexFromControlName(controlName);
+                        let CharAt = String.fromCharCode(65 + self.columnHasSum[controlName]);
+                        let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (self.tableInstance.countRows() - 1) + ')';
+                        self.tableInstance.setDataAtCell(self.tableInstance.countRows() - 1, colIndex, sumValue);
+                    }
+                }, 300, this);
             }
         }
         /**

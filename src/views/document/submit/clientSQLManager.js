@@ -1,11 +1,10 @@
 import sDocument from './../../../store/document'
 import store from './../../../store'
 
-const dataSubmitStore = sDocument.state.submit
 const initSqlJs = require('sql.js');
 
 /**
- * hoangnd:26/5/2020
+ * hoangnd:26/5/2020 
  * Class xử lí việc chạy câu lệnh SQL trên client
  */
 export default class ClientSQLManager {
@@ -17,7 +16,7 @@ export default class ClientSQLManager {
      */
     static async createDB(keyInstance) {
             const SQL = await initSqlJs({
-                locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.3.0/dist/sql-wasm.wasm`
+                locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.3.2/dist/sql-wasm.wasm`
             });
             let db = new SQL.Database();
             this.addSQLInstanceDBToStore(keyInstance, db);
@@ -29,8 +28,11 @@ export default class ClientSQLManager {
          * @param {SQLLite} SQLDBInstance 
          */
     static addSQLInstanceDBToStore(keyInstance, SQLDBInstance) {
+            // store.commit(
+            //     "document/addInstanceSubmitDB", { instance: keyInstance, sqlLite: SQLDBInstance }
+            // );
             store.commit(
-                "document/addInstanceSubmitDB", { instance: keyInstance, sqlLite: SQLDBInstance }
+                "document/addSqlLiteDb", { instance: keyInstance, db: SQLDBInstance }
             );
         }
         /**
@@ -39,7 +41,7 @@ export default class ClientSQLManager {
          * @param {String} keyInstance 
          */
     static getInstanceDB(keyInstance) {
-            return dataSubmitStore[keyInstance].SQLLiteDB[keyInstance]
+            return sDocument.state.clientSqlLite[keyInstance]
         }
         /**
          * hoangnd:26/5/2020

@@ -23,6 +23,16 @@ export const taskApi = {
     },
     getListNodeInProcess(){
         return workfloweExtend.get("activitys");
+    },
+    getVariableWorkflow(filter){
+        if (filter.size) {
+            filter.pageSize = filter.size;
+            delete filter.size;
+        }
+        return workfloweExtend.post("variables/query",filter);
+    },
+    getDocumentInVariables(filter){
+        return workfloweExtend.get("variables/documents",{page:filter.page,pageSize:filter.pageSize});
     }
 
     

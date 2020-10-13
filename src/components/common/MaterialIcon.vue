@@ -16,7 +16,7 @@
                 </v-col>
             </v-row>
         </v-container>
-        <div style="width: 100%; max-height: 300px; overflow:auto;">
+        <VuePerfectScrollbar style="width: 100%; height: 300px">
             <v-container>
                 <v-row class="ml-0 mr-0">
                     <v-col 
@@ -29,13 +29,18 @@
                     </v-col>
                 </v-row>
             </v-container>
-        </div>
+        </VuePerfectScrollbar>
     </v-card>
 </template>
 
 <script>
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
+
 export default {
     name: "MaterialIcon",
+    components:{
+        VuePerfectScrollbar
+    },
     props: {
         defaultIcon: {
             type: String,
@@ -226,7 +231,8 @@ export default {
             ],
             searchIconKeyword: null,
             link: null,
-            isShow:false
+            isShow:false,
+            context:""
         }
     },
     mounted() {
@@ -259,7 +265,10 @@ export default {
         },
         selectIcon(icon,type='img') {
 			// console.log(icon);
-            this.$emit("selected", {icon: icon.trim(),type:type});
+            this.$emit("selected", {icon: icon.trim(),type:type,context:this.context});
+        },
+        setContext(ctx){
+            this.context = ctx
         },
         show(position){
             this.isShow = true;
@@ -270,6 +279,7 @@ export default {
         },
         hide(){
             this.isShow = false;
+            this.context = ""
         }
     }
 }

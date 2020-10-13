@@ -60,6 +60,9 @@ const setAllAppActive = (state, allAppActive) => {
 const setListNodeInProcess = (state, listNodeInProcess) => {
     Vue.set(state, 'listNodeInProcess', listNodeInProcess);
 }
+const setVariableOfProcess = (state, variableOfProcess) => {
+    Vue.set(state, 'variableOfProcess', variableOfProcess);
+}
 
 export {
     setArrFileAttach,
@@ -78,7 +81,8 @@ export {
     setListDocumentObjId,
     setListDocumentObjIdWithUserSubmit,
     setAllAppActive,
-    setListNodeInProcess
+    setListNodeInProcess,
+    setVariableOfProcess
 
 
 };
