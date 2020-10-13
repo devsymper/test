@@ -1075,7 +1075,8 @@
         "sidebar": {
             "showMoreTask": "Xem thêm các task liên quan",
             "showLess": "Thu gọn",
-            "showMoreFile": "Xem thêm các tệp"
+            "showMoreFile": "Xem thêm các tệp",
+            "quickView":"Xem nhanh"
 
         },
         "alert": {
@@ -1098,6 +1099,7 @@
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",
             "createDate": "Ngày khởi tạo",
+            "endTime": "Ngày hoàn thành",
             "app": "Ứng dụng",
             "description": "Mô tả",
             "owner": "Người sở hữu",

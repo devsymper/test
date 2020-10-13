@@ -126,7 +126,7 @@ const defaultState = {
             title: 'English',
         },
     ],
-
+    allSymperRoles:{}, // danh sách tất cả các roles trong hệ thống
     /**
      * Danh sách các node của các orgchart
      * dạng: {

@@ -29,11 +29,15 @@
 							<table class="general-info">
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.dateCreate')}}</td>
-									<td>{{workInfo.startTime ? $moment(workInfo.startTime).format('DD/MM/YY HH:mm:ss'):''}}</td>
+									<td class="pl-2">{{workInfo.startTime ? $moment(workInfo.startTime).format('DD/MM/YY HH:mm:ss'):''}}</td>
+								</tr>
+								<tr v-if="workInfo.endTime">
+									<td>{{$t('tasks.header.endTime')}}</td>
+									<td class="pl-2">{{ $moment(workInfo.endTime).fromNow()}}</td>
 								</tr>
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.comment')}}</td>
-									<td style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
+									<td class="pl-2" style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
 										{{$t('document.detail.sidebar.body.general.has')}} 
 										{{countCommentNotResolve}} 
 										{{$t('document.detail.sidebar.body.general.commentNotResolve')}}

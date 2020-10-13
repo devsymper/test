@@ -1,60 +1,69 @@
 <template>
     <div class="pt-2">
         <div class="subtask-container">
-        <div
-            v-for="(item, idex) in listTaskRelated"
+            <div v-for="(item, idex) in listTaskRelated"
                 :key="idex"
             >
                 <v-row  :class="{
                     'mr-0 ml-0 single-row': true ,
-                    'd-active':showByIndex==idex 
                     }"
                     :style="{
                         minHeight: '25px'
                     }"
                     v-if="checkShowTotalTask(idex)"
-	                @mouseover="showByIndex = idex"
-                    @mouseout="showByIndex = null"
                 >
                     <v-col cols="8" >
                         <div style="white-space: nowrap;
                             overflow: hidden;
-                            text-overflow: ellipsis;"  @click="goDoTask(item.id)">
+                            text-overflow: ellipsis;"  @dblclick="goDoTask(item.id)">
                             <v-icon style="font-size:16px">{{displayIcon(item.description)}}</v-icon>
                             <span style=" font-size:13px">{{displayContent(item.description)}}</span>
                         </div>
-                        <div  @click="goDoTask(item.id)">
-                              <v-icon v-if="item.createTime" style="font-size:11px; color:blue;margin-left: 3px;">mdi-circle</v-icon>
-                              <v-icon v-else style="font-size:11px ; color:green;margin-left: 3px;">mdi-circle</v-icon>
-                              {{displayDescription(item.description)}}
+                        <div  @dblclick="goDoTask(item.id)">
+                            <v-icon v-if="item.createTime" style="font-size:11px; color:blue;margin-left: 3px;">mdi-circle</v-icon>
+                            <v-icon v-else style="font-size:11px ; color:green;margin-left: 3px;">mdi-circle</v-icon>
+                            {{displayDescription(item.description)}}
                         </div>
                     </v-col>
                     <v-col cols="4" style="padding-top:15px">
                         <v-icon x-small >mdi-clock-time-nine-outline</v-icon>
                         {{item.createTime ? $moment(item.createTime).format('DD/MM/YY HH:mm'):$moment(item.endTime).format('DD/MM/YY HH:mm')}}
-
+                        <div class="quickView" @click="showInfoTask($event,item)">{{$t("myItem.sidebar.quickView")}}</div>
                     </v-col>
-             
+            
                 </v-row>
             </div>
         </div>
+        <infoTaskRelated
+            v-show="statusQuickView && taskSelected"
+            :taskSelected="taskSelected"
+            :appId="appId"
+            @closeInfoTaskRelated="closeInfoTaskRelated"
+            ref="infoTaskRelated"
+         />
     </div>
 </template>
 
 <script>
 import BPMNEngine from "@/api/BPMNEngine.js";
+import infoTaskRelated from "./InfoTaskRelated";
 
 export default {
     name: "relatedItems",
     components: {
+        infoTaskRelated
     },
     data(){
         return{
+            x:-1,
+            y:-1,
             showByIndex: null,
             processParent:{},
             listSubProcessInstance:[],
             listProcessSibling:[],
-            processInstanceCurrent:{}
+            processInstanceCurrent:{},
+            statusQuickView:false,
+            taskSelected:{},
         }
     },
     props: {
@@ -77,6 +86,10 @@ export default {
         showMoreTask:{
             type:Boolean,
             default:false
+        },
+        appId:{
+            type:Number,
+            default:0,
         }
     },
     watch:{
@@ -87,7 +100,6 @@ export default {
     computed: {
         taskFilter(){
             return {
-                // ownerLike: String(this.$store.state.app.endUserInfo.id),
                 processInstanceId: this.taskInfo.action.parameter.processInstanceId,
                 assigneeLike:  String(this.$store.state.app.endUserInfo.id)
             }
@@ -102,11 +114,20 @@ export default {
             tasks=tasks.concat(this.stask.listTaskDoneInProcessParent);
             tasks=tasks.concat(this.stask.listTaskInProcessSub);
             tasks=tasks.concat(this.stask.listTaskInProcessSibling);
-            console.log("listTaskRelated",tasks);
             return tasks;
         }
     },
     methods:{
+        closeInfoTaskRelated(){
+            this.statusQuickView=false;
+        },
+        showInfoTask(e,item){
+            this.taskSelected={};
+            this.taskSelected=item;
+            this.statusQuickView=!this.statusQuickView;
+            this.$refs.infoTaskRelated.setPosittion({bottom:$(document).height() - e.clientY + 30 + 'px'})
+
+        },
         checkShowTotalTask(idex){
             if (this.showMoreTask==false) {
                 if (idex<=2) {
@@ -120,6 +141,7 @@ export default {
         },
         goDoTask(id){
             this.$router.push("/myitem/tasks/"+id);
+          
         },
         displayIcon(description){
             let data=JSON.parse(description);
@@ -323,10 +345,12 @@ export default {
 </script>
 
 <style scoped>
-.single-row{
+.single-row:hover{
+    background: #e5e5e5;
     cursor: pointer;
 }
-.d-active {
-    background: #e5e5e5;
+.quickView:hover{
+    text-decoration-line:underline
 }
+
 </style>
