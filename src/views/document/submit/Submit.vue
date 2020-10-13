@@ -527,7 +527,7 @@ export default {
                         controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+locale.controlName)
                     }
                     else{
-                        controlInstance.removeValidateIcon()
+                        controlInstance.removeValidateIcon();
                     }
                 }
                 resetImpactedFieldsList(thisCpn.keyInstance);
@@ -809,7 +809,7 @@ export default {
             immediate:true,
             deep:true,
             handler:function(vl){
-                if(!vl){
+                if(Object.keys(vl) == 0){
                     return
                 }
                 this.contentDocument = vl.content;
@@ -817,7 +817,6 @@ export default {
                     setDataForPropsControl(vl.fields,self.keyInstance,'submit');
                 }, 500,this);
                 setTimeout(() => {
-                    
                     this.processHtml(vl.content);
                 }, 700);
             }
@@ -1081,6 +1080,7 @@ export default {
          */
         handleInputChangeBySystem(controlName,valueControl, fromAutocomplete = false){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
+            debugger
             if(controlInstance.getValue() == valueControl && this.sDocumentSubmit.docStatus != 'beforeSubmit'){ // kiểm tra ko có sự thay đổi giá trị của control thì return
                 return;
             }
@@ -1173,9 +1173,9 @@ export default {
                             thisCpn.getTitleObjectFormulas(res.data.document.titleObjectFormulasId)
                             thisCpn.docSize = (parseInt(res.data.document.isFullSize) == 1) ? "100%":"21cm";
                             thisCpn.contentDocument = content;
-							if(res.data.document.dataPrepareSubmit != "" && res.data.document.dataPrepareSubmit != null)
+							if(res.data.document.dataPrepareSubmit != null && res.data.document.dataPrepareSubmit != "")
                             thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
-                            if(res.data.document.otherInfo != "" && res.data.document.otherInfo != null)
+                            if(res.data.document.otherInfo != null && res.data.document.otherInfo != "")
 							thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
 							thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
                             setDataForPropsControl(res.data.fields,thisCpn.keyInstance,'submit'); // ddang chay bat dong bo
@@ -1262,6 +1262,7 @@ export default {
             }
         },
         processHtml(content) {
+            console.trace("ok");
             $("#sym-submit-" + this.keyInstance).find('.page-content').addClass('d-block');
             $("#sym-submit-" + this.keyInstance).find('.list-page-content').addClass('d-flex');
             
@@ -1397,7 +1398,6 @@ export default {
                 }
             }
             this.listDataFlow = listDataFlow;
-            console.log(this.sDocumentSubmit,'sDocumentSubmitsDocumentSubmit');
             if(!isSetEffectedControl);
             this.getEffectedControl();
             if(this.docObjId == null){
@@ -1416,6 +1416,7 @@ export default {
                             let controlFormulas = controlInstance.controlFormulas;
                             if(controlFormulas.hasOwnProperty('formulas')){
                                 let formulasInstance = controlFormulas['formulas'].instance;
+                                // chạy công thức để lấy giá trị dòng mặc định trong table(phục vụ cho việc shift enter xuống dòng phải có dữ liệu mặc định)
                                 this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
                             }
                             

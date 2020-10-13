@@ -59,19 +59,14 @@ export default class BasicControl extends Control {
         //         this.controlProperties['isSaveToDB'].value !== 1)) {
         //     this.ele.css({ display: 'none' })
         // }
-        if (!this.checkDetailView() && this.value === "" &&
-            this.controlProperties['isRequired'] !== undefined &&
-            (this.controlProperties['isRequired'].value === "1" ||
-                this.controlProperties['isRequired'].value === 1)) {
+        if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
             this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
         }
         if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
             this.ele.attr('disabled', 'disabled');
         }
 
-        if (this.controlProperties['isHidden'] != undefined &&
-            (this.controlProperties['isHidden'].value === "1" ||
-                this.controlProperties['isHidden'].value === 1)) {
+        if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
             this.ele.css({ 'display': 'none' })
         }
 
@@ -187,9 +182,10 @@ export default class BasicControl extends Control {
             this.ele.on('change', function(e) {
                 let valueChange = $(e.target).val();
                 if (thisObj.type == 'label') {
-                    valueChange = $(e.target).text()
+                    valueChange = $(e.target).text();
                 }
-                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: valueChange })
+                thisObj.value = valueChange;
+                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.name, val: valueChange })
             })
             this.ele.on('focus', function(e) {
                 store.commit("document/addToDocumentSubmitStore", {
@@ -298,7 +294,10 @@ export default class BasicControl extends Control {
             } else if (this.type == 'number') {
                 let v = parseInt(value);
                 if (!isNaN(v))
-                    $('#' + this.id).val(numbro(value).format(this.numberFormat))
+                    $('#' + this.id).val(numbro(value).format(this.numberFormat));
+                else {
+                    $('#' + this.id).val("");
+                }
             } else {
                 $('#' + this.id).val(value);
             }
@@ -552,7 +551,7 @@ export default class BasicControl extends Control {
         })
         this.ele.on('focus', function(e) {
             if (/^[-0-9,.]+$/.test($(this).val())) {
-                $(this).val(thisObj.value)
+                $(this).val($(this).val())
             }
         })
     }
