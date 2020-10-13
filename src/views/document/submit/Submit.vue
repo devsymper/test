@@ -1261,7 +1261,6 @@ export default {
             }
         },
         processHtml(content) {
-            console.trace("ok");
             $("#sym-submit-" + this.keyInstance).find('.page-content').addClass('d-block');
             $("#sym-submit-" + this.keyInstance).find('.list-page-content').addClass('d-flex');
             
@@ -1345,6 +1344,7 @@ export default {
                         //truong hop la control table
                         else {
                             let listInsideControls = {};
+                            let controlInTable = {};
                             let tableControl = new TableControl(
                                 idField,
                                 $(allInputControl[index]),
@@ -1385,8 +1385,10 @@ export default {
                                 childControl.setEffectedData(childPrepareData);
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
+                                 controlInTable[childControlName] = childControl;
                             });
                             tableControl.listInsideControls = listInsideControls;
+                            tableControl.controlInTable = controlInTable;
                             tableControl.renderTable();
                             if(this.viewType !== 'submit'){
                                 tableControl.setData(valueInput);
