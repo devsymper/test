@@ -462,10 +462,9 @@ const controlTypes = {
     },
     image: {
         icon: "/icon/ic_image.png",
-        html: `<span class="s-control s-control-image" contenteditable="false"  title="Image" style="cursor: pointer;text-align: center;display: inline-block;width: 25px;height: 25px;" s-control-type="image">
+        html: `<label class="s-control s-control-image" contenteditable="false"  title="Image" style="cursor: pointer;text-align: center;display: inline-block;width: 25px;height: 25px;" s-control-type="image">
                     <span class="mdi mdi-image-area" style="font-size: 22px;color: #757575;"></span>
-                    <input type="hidden" >
-                </span>&nbsp;`,
+                </label>&nbsp;`,
         title: "Image",
         notInProps: ['isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatDate', 'fontSize', 'color', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['link', 'formulas', 'hidden']

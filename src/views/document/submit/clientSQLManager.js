@@ -1,7 +1,6 @@
 import sDocument from './../../../store/document'
 import store from './../../../store'
 
-const dataSubmitStore = sDocument.state.submit
 const initSqlJs = require('sql.js');
 
 /**
