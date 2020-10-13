@@ -280,6 +280,7 @@
                 "passwordSetting": "Password setting",
                 "edit": "Edit",
                 "delete": "Delete",
+                "restore": "Restore",
                 "view": "View"
             }
         },

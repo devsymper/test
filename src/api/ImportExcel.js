@@ -14,5 +14,5 @@ export default {
     },
     cancelImport(fileName) {
         return api.get('stop-process/' + fileName)
-    }
+    },
 }

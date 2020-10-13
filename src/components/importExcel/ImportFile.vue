@@ -753,8 +753,8 @@ export default {
             debugger
             this.nameImport = " ";
             this.description = " ";
-              this.stepper= 1;
-               this.mapImport = false;
+            this.stepper= 1;
+            this.mapImport = false;
             this.showImport= true;
             if (val) {
                 this.nameSheets = [];

@@ -1,17 +1,49 @@
 <template>
-	<div class="h-100 ml-4 mr-3 mt-3">
-        <div><span class="ml-3 mt-3 fs-15" style="font-weight:430px">Import {{importInfo.status}} </span></div>
+	<div class=" ml-4 mr-3 mt-3">
+        <div><span class="ml-3 mt-3 fs-15" style="font-weight:430px">
+             Import: 
+            <span style="color:orange" v-if="importInfo.status=='Chưa import'">
+                 {{importInfo.status}}
+            </span>
+             <span style="color:blue" v-if="importInfo.status=='Đang xử lý'">
+                 {{importInfo.status}} 
+            </span>
+             <span style="color:green" v-if="importInfo.status=='Hoàn thành'">
+                 {{importInfo.status}}
+            </span>
+             <span style="color:red" v-if="importInfo.status=='Lỗi'">
+                {{importInfo.status}}
+            </span>
+    
+         
+         </span></div>
         <div>
             <span class="ml-3 mt-3 fs-13">Tên đối tượng: </span>
+            <span class="ml-3 mt-3 fs-13"  style="color:grey">{{importInfo.objId}} </span>
+        </div>
+          <div>
+            <span class="ml-3 mt-3 fs-13">Nội dung: </span>
             <span class="ml-3 mt-3 fs-13"  style="color:grey">{{importInfo.nameImport}} </span>
+        </div>
+             <div>
+            <span class="ml-3 mt-3 fs-13">Ghi chú: </span>
+            <span class="ml-3 mt-3 fs-13"  style="color:grey">{{importInfo.description}} </span>
         </div>
         <div>
             <span class="ml-3 mt-3 fs-13">Thông tin chi tiết: </span>
             <span class="ml-3 mt-3 fs-13"  style="color:grey"> {{importInfo.fileName}}</span>
         </div>
         <div>
+              <div v-if="importInfo.status=='Đang xử lý'" class="fs-13 ml-3">
+                  Dừng import Excel:
+           </div>
+        </div>
+        <div>
+              <div v-if="importInfo.status=='Đang xử lý'">
+               <v-btn small   color="primary" class="mt-4 ml-3" @click="stopImport()">Stop</v-btn>
+           </div>
         <v-data-table 
-             v-if="JSON.parse(importInfo.infoImport).validating.errors.length>0"
+             v-if="errorImport&&errorImport.validating.errors.length>0"
             dense
             style="font-size:13px!important"
             :headers="headers"
@@ -24,11 +56,16 @@
 </template>
 <script>
 import {documentApi} from "./../../api/Document";
+import importApi from "./../../api/ImportExcel";
+
 export default {
 	props:['importInfo'],
 	computed: {
         sapp() {
             return this.$store.state.app;
+        },
+        errorImport(){
+            return JSON.parse(this.importInfo.infoImport)
         },
         headers () {
             return [{
@@ -58,16 +95,27 @@ export default {
         }
      },
      created(){
-         debugger
          this.getDetailDocument();
      },
      watch:{
          importInfo(){
+             debugger
              this.getDetailDocument();
              this.pushImportDataToTable();
          }
      },
      methods:{
+         stopImport(){
+             debugger
+             importApi.cancelImport(this.importInfo.fileName)
+              .then(res => {
+                        if (res.status === 200) {
+                            debugger
+                       
+                        }
+                    })
+                    .catch(console.log);
+         },
          async getDetailDocument(){
             let self = this;
             let id = self.importInfo.id;
@@ -84,7 +132,7 @@ export default {
         pushImportDataToTable(){
             debugger
             this.dataImport = [];
-            let dataImport = this.importInfo.infoImport?JSON.parse( this.importInfo.infoImport).validating.errors:'';
+            let dataImport = JSON.parse( this.importInfo.infoImport).validating?JSON.parse( this.importInfo.infoImport).validating.errors:'';
             let dem = 0;
             for(let i=0; i<dataImport.length; i++){
                 for(let j = 0; j<dataImport[i].errors.length; j++){
@@ -94,8 +142,8 @@ export default {
                        // value: this.getValue(i),
                         row: dataImport[i].errors[j].info[k].row,
                         sheet: dataImport[i].sheet,
-                        value:dataImport[i].errors[j].type,
-                        status:dataImport[i].errors[j].info[k].value
+                        status:dataImport[i].errors[j].type,
+                        value:dataImport[i].errors[j].info[k].value
                         // status: dataImport[i].status,
                     })
                     dem++;
