@@ -1080,7 +1080,6 @@ export default {
          */
         handleInputChangeBySystem(controlName,valueControl, fromAutocomplete = false){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
-            debugger
             if(controlInstance.getValue() == valueControl && this.sDocumentSubmit.docStatus != 'beforeSubmit'){ // kiểm tra ko có sự thay đổi giá trị của control thì return
                 return;
             }

@@ -1060,7 +1060,10 @@ export default class Table {
             afterRender: function(isForced) {
 
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
-                if (tbHeight < MAX_TABLE_HEIGHT) {} else {
+                console.log('tbHeighttbHeight', tbHeight);
+                if (tbHeight < MAX_TABLE_HEIGHT) {
+                    $(this.rootElement).css('height', 'auto');
+                } else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
                 }
                 if (!this.reRendered) {
