@@ -944,7 +944,9 @@
         "sidebar": {
             "showMoreTask": "Show more task related",
             "showLess": "Show less task related",
-            "showMoreFile": "Show more file"
+            "showMoreFile": "Show more file",
+            "quickView":"Quick view"
+
         },
         "alert": {
             "title_aproval": "Action work",
@@ -965,6 +967,7 @@
             "submit": "Submit",
             "date": "Date",
             "dueDate": "Due Date",
+            "endTime": "Finish day",
             "createDate": "Create date",
             "app": "Application",
             "description": "Task description",

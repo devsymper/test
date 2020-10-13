@@ -350,6 +350,7 @@ export default {
             }
         });
         this.$store.dispatch("app/getAllUsers");
+        this.$store.dispatch("app/getAllSymperRoles");
         this.$store.dispatch('app/getAllRoles', this.$store.state.app.endUserInfo.id);
     },
     components: {

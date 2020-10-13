@@ -108,6 +108,19 @@ const getAllUsers = async(context) => {
         }
     }
 }
+
+const getAllSymperRoles = async(context) => {
+    try {
+        let res = await userRoleApi.getAllSymperRoles();
+        if (res.status == 200) {
+            context.commit('setAllSymperRoles', res.data);
+        } else {
+            SYMPER_APP.$snotifyError(error, "Can not get all symper roles!");
+        }
+    } catch (error) {
+        SYMPER_APP.$snotifyError(error, "Can not get all symper roles!");
+    }
+}
 const getAllBA = async(context) => {
     if (context.state.allBA.length == 0) {
         try {
@@ -298,5 +311,6 @@ export {
     getAllBA,
     getAllRoles,
     setUserInfo,
-    changeUserRole
+    changeUserRole,
+    getAllSymperRoles
 };
