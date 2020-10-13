@@ -91,6 +91,7 @@
         "always_show_sidebar": "Always show sidebar",
         "import_excel": "Import excel",
         "sidebar": {
+            "account_trash": "Account trash",
             "myApplication": "My Application",
             "My work": "My work",
             "tasks": "Tasks",
@@ -204,6 +205,7 @@
 
         },
         "title": "User list",
+        "trash": "Lists trash user",
         "general": {
             "title": "Basic info",
             "personalInfo": {
@@ -263,6 +265,7 @@
         },
         "table": {
             "id": "Id",
+            "restore": "Restore",
             "firstName": "First name",
             "lastName": "Last name",
             "userName": "User name",

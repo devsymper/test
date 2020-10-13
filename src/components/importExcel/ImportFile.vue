@@ -1,141 +1,109 @@
 <template>
-<v-row style="width:700px; height:97%">
-    <div 
-        style="width: 600px;margin-top:-5px;border-bottom:1px solid rgba(0,0,0,0.2)" 
-        class="pb-1 w-100">
-            <i class="mdi mdi-file-upload-outline fs-16 mr-6 ml-5" ></i>
-            <span class="font-normal">Import data</span>
-            <button 
-                v-if="showCancelBtn" 
-                @click="cancel()" 
-                class="ml-10 mr-6" 
-                style="float:right">
-                <i class="mdi mdi-close fs-16 mr-2"></i>
-            </button>
-    </div>
-    <v-row style="height:100%; margin-top:5px; margin-left:0px!important">
-        <v-col cols="3" class="ml-2" style=" border-right:1px solid rgba(0,0,0,0.2)">
-            <v-list class="ml-2">
-                    <v-list-item-group style="margin-top:-18px">
-                        <v-list-item style="padding:0px!important" link @click="showImportInfo()">
-                            <v-list-item-content class="fs-13 ml-2">
-                            Thông tin import
-                            </v-list-item-content>
-                        </v-list-item>
-                        <v-list-item style="padding:0px!important" link @click="mapImportInfo()">
-                            <v-list-item-content  class="fs-13 ml-2">
-                                Khớp trường thông tin
-                            </v-list-item-content>
-                        </v-list-item>
-                    </v-list-item-group>
-                </v-list>
-        </v-col>
-        <v-col cols="8" style="margin-left:-15px" v-if="showImport">
-            <v-row class="ml-5 mt-1 mr-6">
-                <span class="font "><b class="color-grey fw-500 fs-13">
-                  Thông tin import cho: {{nameDocument}}</b>
-                </span>
-            </v-row>
-
-            <v-row class="ml-2 mt-1">
-                <UploadFile 
-                    @dataExcel="getDataExcel" 
-                    :objId="objId"
-                    :importInfo="importInfo"
-                    :objType="objType"
-                    :subObjType="subObjType"
-                    :errorMessage="errorMessage"
-                    @showMapping="nextToImport"
-                    @selectType="selectType" 
-                    @clearFiles="clearFiles" 
-                    @keyUpload="setKey"/>
-            </v-row>
-            <v-row class="ml-5 mt-1">
-                <span style="color:red" class="fs-12">{{errorType}}</span>
-            </v-row>
-        </v-col>
-        <v-col cols="8" v-if="mapImport" >
-             <v-row class="ml-5 mt-1 mr-6">
-                <span class="font "><b class="color-grey fw-500 fs-13">
+    <v-stepper v-model="stepper" style="width: 620px; height: 100%; margin-top:-10px; box-shadow: none;">
+        <div 
+            style="width: 600px;margin-top:5px;border-bottom:1px solid rgba(0,0,0,0.2)" 
+            class="pb-1 w-100">
+                <i class="mdi mdi-file-upload-outline fs-16 mr-6 ml-5" ></i>
+                <span class="font-normal">Import data</span>
+                <button 
+                    v-if="showCancelBtn" 
+                    @click="cancel()" 
+                    class="ml-10 mr-1" 
+                    style="float:right">
+                    <i class="mdi mdi-close fs-16"></i>
+                </button>
+        </div>
+        <v-row style="height:100%; margin-top:5px; margin-left:0px!important">
+            <v-col cols="3" style=" border-right:1px solid rgba(0,0,0,0.2)">
+                <v-list>
+                    <v-stepper-header class="stepper-header" >
+						<v-stepper-step class="fs-13 font-normal" editable step="1" @click="showImportInfo()">
+					 Thông tin
+						</v-stepper-step>
+					</v-stepper-header>
+                      <v-stepper-header class="stepper-header" >
+						<v-stepper-step class="fs-13 font-normal" editable step="2" @click="mapImportInfo()">
+					   Khớp thông tin
+						</v-stepper-step>
+					</v-stepper-header>
+                    </v-list>
+            </v-col>
+            <v-col cols="9" style="margin-left:-15px" v-if="showImport">
+                <v-row class="ml-5 mt-1 mr-6">
+                    <span class="font "><b class="color-grey fw-500 fs-13">
                     Thông tin import cho: {{nameDocument}}</b>
-                </span>
-            </v-row>
-            <v-list dense>
-                <v-row class="ml-5">
-                    <span><b class="color-grey fs-13 fw-500">Lưu ý về việc khớp dữ liệu: </b></span>
+                    </span>
                 </v-row>
-                <v-row class="ml-5 mt-1 mr-5 color-grey fs-12">
-                    - Các trường dữ liệu tại cột đích có ký hiệu * là các trường bắt buộc phải import
+
+                <v-row class="ml-2 mt-1">
+                    <UploadFile 
+                        @dataExcel="getDataExcel" 
+                        :objId="objId"
+                        :importInfo="importInfo"
+                        :objType="objType"
+                        :subObjType="subObjType"
+                        :errorMessage="errorMessage"
+                        @showMapping="nextToImport"
+                        @selectType="selectType" 
+                        @clearFiles="clearFiles" 
+                        @keyUpload="setKey"/>
                 </v-row>
-                <v-row v-if="objType=='user'" class="ml-5 mt-1 mr-7 color-grey fs-12">
-                - Mật khẩu gồm tối thiểu 8 ký tự, không quá 24 kí tự, bao gồm ít nhất 1 chữ cái thường, 1 chữ cái hoa và số
+                <v-row class="ml-5 mt-1">
+                    <span style="color:red" class="fs-12">{{errorType}}</span>
                 </v-row>
-            </v-list>
-            <!-- Thông tin chung -->
-            <v-list class="fs-13 ml-4 mr-0">
-            <div class="col-flex" 
-                style= "margin-bottom:-26px"
-                v-for="(table, tableIdx) in tables" 
-                :key="tableIdx">
-                <v-row  class=" mr-1">
-                    <v-col class="ellipsis col-md-5 ml-1 pl-1 " style="margin-top: -13px">
-                        <v-icon v-if="tables[tableIdx]==tables[0]" size="18">mdi-file-outline</v-icon>
-                        <v-icon v-else size="18" class='ml-3'>mdi-table</v-icon>
-                        <span class="color-grey fs-13 pl-1">
-                            <b class="fw-500">{{table.title}}
-                            <span v-if="tables[tableIdx]==tables[0]" style="color:red">*</span>
-                                <span v-if="objType!='user'"> 
-                                    ({{sumCount(tableIdx,'document')}})
+            </v-col>
+            <v-col cols="9" v-if="mapImport" >
+                <v-row class="ml-2 mt-1 mr-6">
+                    <span class="font "><b class="color-grey fw-500 fs-13">
+                        Thông tin import cho: {{nameDocument}}</b>
+                    </span>
+                </v-row>
+                <v-list dense>
+                    <v-row class="ml-2">
+                        <span><b class="color-grey fs-13 fw-500">Lưu ý về việc khớp dữ liệu: </b></span>
+                    </v-row>
+                    <v-row class="ml-2 mt-1 mr-5 color-grey fs-12">
+                        - Các trường dữ liệu tại cột đích có ký hiệu * là các trường bắt buộc phải import
+                    </v-row>
+                    <v-row v-if="objType=='user'" class="ml-2 mt-1 mr-7 color-grey fs-12">
+                    - Mật khẩu gồm tối thiểu 8 ký tự, không quá 24 kí tự, bao gồm ít nhất 1 chữ cái thường, 1 chữ cái hoa và số
+                    </v-row>
+                </v-list>
+                <!-- Thông tin chung -->
+                <v-list class="fs-13 ml-4 mr-0">
+                <div class="col-flex" 
+                    style= "margin-bottom:-26px"
+                    v-for="(table, tableIdx) in tables" 
+                    :key="tableIdx">
+                    <v-row  class=" mr-1">
+                        <v-col class="ellipsis col-md-5 ml-1 pl-1 " style="margin-top: -13px">
+                            <v-icon v-if="tables[tableIdx]==tables[0]" size="18">mdi-file-outline</v-icon>
+                            <v-icon v-else size="18" class='ml-3'>mdi-table</v-icon>
+                            <span class="color-grey fs-13 pl-1">
+                                <b class="fw-500">{{table.title}}
+                                <span v-if="tables[tableIdx]==tables[0]" style="color:red">*</span>
+                                    <span v-if="objType!='user'"> 
+                                        ({{sumCount(tableIdx,'document')}})
+                                    </span>
+                                    <span v-else>
+                                        ({{sumCount(tableIdx,'user')}})
+                                    </span>   
+                                </b>
                                 </span>
-                                <span v-else>
-                                    ({{sumCount(tableIdx,'user')}})
-                                </span>   
-                            </b>
-                            </span>
-                    </v-col>
-                    <v-col class="col-md-6 py-0" style="margin-top: -13px">
-                        <v-autocomplete 
-                            :value="table.sheetMap" 
-                            @input="value => onChangeSheet(tableIdx, value)" 
-                            class="auto-complete color-normal mt-4 mb-3 fs-13 " 
-                            :items="nameSheets" 
-                            item-text="name" 
-                            return-object 
-                            style="width: 195px;padding-left:2px" 
-                            clearable 
-                            :menu-props="{'nudge-top':-10, 'max-width': 300}">
-                            <template v-slot:item="{ item, on, attrs }">
-                                <v-list-item v-show="item.enable" v-on="on" v-bind="attrs">
-                                    <v-list-item-content>
-                                        <v-list-item-title>
-                                            {{item.name}}
-                                        </v-list-item-title>
-                                    </v-list-item-content>
-                                </v-list-item>
-                            </template>
-                        </v-autocomplete>
-                    </v-col>
-                    <!-- khoá ngoai -->
-                </v-row>
-                <v-row v-if="objType!='user'" class=" mr-1 mb-3" style="margin-top: -27px">
-                    <v-col  class="col-md-5 ml-1 pl-4 pb-5 d-flex justify-content">
-                        <v-icon style=" margin-top:-19px; font-size:13px " class="pr-3" size="18">mdi mdi-key</v-icon>
-                        <div class="color-normal" style="float:left; margin-top:-13px">Khoá
-                            <span style="color:red">*</span>
-                        </div>
-                    </v-col>
-                    <v-col class="col-md-6 py-0" style="margin-left:2px">
-                        <v-autocomplete class=" color-normal auto-complete" 
-                            style="width: 210px"
-                            :value="table.keyColumn" 
-                            @input="value => onChangeKey(tableIdx, value)" 
-                            :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" 
-                            item-text="name" 
-                            return-object 
-                            clearable 
-                            :menu-props="{'nudge-top':-10, 'max-width': 300}">
+                        </v-col>
+                        <v-col class="col-md-6 py-0" style="margin-top: -13px">
+                            <v-autocomplete 
+                                :value="table.sheetMap" 
+                                @input="value => onChangeSheet(tableIdx, value)" 
+                                class="auto-complete color-normal mt-4 mb-3 fs-13 " 
+                                :items="nameSheets" 
+                                item-text="name" 
+                                return-object 
+                                style="width: 195px;padding-left:2px" 
+                                clearable 
+                                :menu-props="{'nudge-top':-10, 'max-width': 300}">
                                 <template v-slot:item="{ item, on, attrs }">
-                                    <v-list-item v-on="on" v-bind="attrs">
+                                    <v-list-item v-show="item.enable" v-on="on" v-bind="attrs">
                                         <v-list-item-content>
                                             <v-list-item-title>
                                                 {{item.name}}
@@ -143,57 +111,87 @@
                                         </v-list-item-content>
                                     </v-list-item>
                                 </template>
-                        </v-autocomplete>
-                    </v-col>
-                </v-row>
-                <v-row class="mr-3" v-for="(control, controlIdx) in table.controls" v-if="control.dataType!='table'&&control.title" :key="controlIdx">
-                    <v-col  class="col-md-5 ml-2 pl-3 ellipsis" style=" margin-top:-40px">
-                        <v-icon class='fs-14 mr-2 color-normal'>{{getIcon(control.dataType)}}</v-icon>
-                        <v-tooltip right>
-                            <template v-slot:activator="{ on}">
-                                <span style="color:red"> {{control.isNull?' ':'*'}}</span>
-                                <span v-on="on" class="color-normal"> {{control.title ? control.title : control.name}} </span>
-                            </template>
-                            {{control.title ? control.title : control.name}}
-                        </v-tooltip>
-                    </v-col>
-                    <v-col class="col-md-6 " style="margin-top:-39px;margin-left:2px">
-                        <v-autocomplete style="width: 215px;" class="auto-complete color-normal"
-                        :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" 
-                        item-text="name" 
-                        return-object :value="control.dataColumn" 
-                        @input="value => onChangeDetailInfo(tableIdx, controlIdx, value)" 
-                        clearable 
-                        :menu-props="{'nudge-top':-10, 'max-width': 300}">
-                            <template v-slot:item="{ item, on, attrs }">
-                                <v-list-item v-show="item.enable" v-on="on" v-bind="attrs">
-                                    <v-list-item-content>
-                                        <v-list-item-title>
-                                            {{item.name}}
-                                        </v-list-item-title>
-                                    </v-list-item-content>
-                                </v-list-item>
-                            </template>
-                        </v-autocomplete>
-                    </v-col>
-                </v-row>
-            </div>
-            <v-row class="ml-3"> <span style="color:red; float:right">{{errorMessage}}</span></v-row>
-            <v-row class="mr-3 ">
-                <v-col class="col-md-9 "></v-col>
-                <v-col>
-                    <v-btn class="ml-1" small @click="importFile()" 
-                    depressed color="info" style="height:27px; width: 60px; border-radius:2px!important">
-                        <span class='fs-13 fw-400'>Import</span>
-                    </v-btn>
-                    <!-- <button @click="test()">Null</button> -->
-                    </v-col>
-                </v-row>
-            </v-list>
-        </v-col>
-  
-    </v-row>
- </v-row >
+                            </v-autocomplete>
+                        </v-col>
+                        <!-- khoá ngoai -->
+                    </v-row>
+                    <v-row v-if="objType!='user'" class=" mr-1 mb-3" style="margin-top: -27px">
+                        <v-col  class="col-md-5 ml-1 pl-4 pb-5 d-flex justify-content">
+                            <v-icon style=" margin-top:-19px; font-size:13px " class="pr-4" size="18">mdi mdi-key</v-icon>
+                            <div class="color-normal" style="float:left; margin-top:-13px">Khoá
+                                <span style="color:red">*</span>
+                            </div>
+                        </v-col>
+                        <v-col class="col-md-6 py-0" style="margin-right: 2px;">
+                            <v-autocomplete class=" color-normal auto-complete" 
+                                :value="table.keyColumn" 
+                                @input="value => onChangeKey(tableIdx, value)" 
+                                :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" 
+                                item-text="name" 
+                                return-object 
+                                clearable 
+                                :menu-props="{'nudge-top':-10, 'max-width': 300}">
+                                    <template v-slot:item="{ item, on, attrs }">
+                                        <v-list-item v-on="on" v-bind="attrs">
+                                            <v-list-item-content>
+                                                <v-list-item-title>
+                                                    {{item.name}}
+                                                </v-list-item-title>
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </template>
+                            </v-autocomplete>
+                        </v-col>
+                    </v-row>
+                    <v-row class="mr-3" v-for="(control, controlIdx) in table.controls" v-if="control.dataType!='table'&&control.title" :key="controlIdx">
+                        <v-col  class="col-md-5 ml-2 pl-3 ellipsis" style=" margin-top:-40px">
+                            <v-icon class='fs-14 mr-2 color-normal'>{{getIcon(control.dataType)}}</v-icon>
+                            <v-tooltip right>
+                                <template v-slot:activator="{ on}">
+                                    <span style="color:red"> {{control.isNull?' ':'*'}}</span>
+                                    <span v-on="on" class="color-normal"> {{control.title ? control.title : control.name}} </span>
+                                </template>
+                                {{control.title ? control.title : control.name}}
+                            </v-tooltip>
+                        </v-col>
+                        <v-col class="col-md-6 " style="margin-top:-39px;margin-left:2px">
+                            <v-autocomplete style="width: 215px;" class="auto-complete color-normal"
+                            :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" 
+                            item-text="name" 
+                            return-object :value="control.dataColumn" 
+                            @input="value => onChangeDetailInfo(tableIdx, controlIdx, value)" 
+                            clearable 
+                            :menu-props="{'nudge-top':-10, 'max-width': 300}">
+                                <template v-slot:item="{ item, on, attrs }">
+                                    <v-list-item v-show="item.enable" v-on="on" v-bind="attrs">
+                                        <v-list-item-content>
+                                            <v-list-item-title>
+                                                {{item.name}}
+                                            </v-list-item-title>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </template>
+                            </v-autocomplete>
+                        </v-col>
+                    </v-row>
+                </div>
+                <v-row class="ml-3"> <span style="color:red; float:right">{{errorMessage}}</span></v-row>
+                <v-row class="mr-3 ">
+                    <v-col class="col-md-9 "></v-col>
+                    <v-col>
+                        <v-btn class="ml-1" small @click="importFile()" 
+                        depressed color="info" style="height:27px; width: 60px; border-radius:2px!important">
+                            <span class='fs-13 fw-400'>Import</span>
+                        </v-btn>
+                        <!-- <button @click="test()">Null</button> -->
+                        </v-col>
+                    </v-row>
+                </v-list>
+            </v-col>
+    
+        </v-row>
+    </v-stepper>
+
 </template>
 <script>
 import UploadFile from "./UploadFile";
@@ -209,6 +207,7 @@ export default {
     props: ['deleteFileName', 'objId','objType',"nameDocument","tables",'subObjType'],
     data() {
         return {
+            stepper: 1,
             importInfo:{},
             mapImport:false,
             showImport:true,
@@ -238,14 +237,19 @@ export default {
         return this.$store.state.importExcel.newImport;
       },
     },
+    created(){
+        debugger
+        this.stepper= 1
+    },
     methods: {
         nextToImport(dataUpload){
+  
             let check = false;
             if(dataUpload.data.nameImport!=''){
                 check = true;
             }
             if(check){
-                debugger
+                this.stepper = 2;
                 this.mapImportInfo();
                 this.selectType = dataUpload.selectType
             }else{
@@ -254,6 +258,7 @@ export default {
             
         },
         showImportInfo(){
+            this.stepper = 2;
             this.mapImport = false;
             this.showImport= true;
         },
@@ -276,8 +281,9 @@ export default {
              //Sự kiện xảy ra khi thay đổi Key
         onChangeKey(tableIdx,value){
             if(value){
+                debugger
                  this.tables[tableIdx].keyColumn.enable=true;
-                 this.tables[tableIdx].keyColumn.index=1;
+                 this.tables[tableIdx].keyColumn.index=value.index;
             }else{
                  this.tables[tableIdx].keyColumn.enable = false;
                  this.tables[tableIdx].keyColumn.index=-1;
@@ -744,6 +750,12 @@ export default {
 
         },
         newImport(val) {
+            debugger
+            this.nameImport = " ";
+            this.description = " ";
+              this.stepper= 1;
+               this.mapImport = false;
+            this.showImport= true;
             if (val) {
                 this.nameSheets = [];
                 this.nameColumnDetail = {};
@@ -829,6 +841,13 @@ export default {
     overflow: hidden;
     white-space: nowrap; 
     text-overflow: ellipsis
+}
+.stepper-header{
+        margin-left:-23px;
+    	width: 170px;
+		height: auto;
+		display: block;
+		box-shadow: none;
 }
 </style>
 <style >

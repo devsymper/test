@@ -91,6 +91,7 @@
         "always_show_sidebar": "Luôn hiển thị sidebar",
         "import_excel": "Nhập bằng excel",
         "sidebar": {
+            "account_trash": "Tài khoản đã xóa",
             "Lists trash": "Danh sách bản xóa",
             "myApplication": "Ứng dụng của tôi",
             "tasks": "Tasks",
@@ -195,21 +196,22 @@
     "import": {
         "import_history": "Lịch sử import",
         "table": {
-            "id": "Id",
-            "firstName": "Họ",
+            "history-import": {
+                "id": "ID",
+                "userEmail": "Email người dùng",
+                "subObjType": "Loại đối tượng",
+                "objId": " Tên đối tượng",
+                "description": "Ghi chú",
+                "userId": "Người import",
+                "createdAt": "Ngày tạo",
+                "status": "Trạng thái",
+                "fileName": "Tên tệp",
+                "nameImport": "Nội dung"
 
-            "displayName": "Tên hiển thị",
-            "email": "Địa chỉ email",
-            "phone": "Số điện thoại",
-            "avatar": "Ảnh đại diện",
-            "status": "Trạng thái",
-            "createAt": "Thời gian tạo",
-            "updateAt": "Thời gian cập nhật",
+
+            },
             "contextMenu": {
-                "passwordSetting": "Tùy chọn mật khẩu",
-                "edit": "Sửa",
-                "delete": "Xóa",
-                "view": "Xem"
+                "viewDetail": "Xem chi tiết"
             }
         }
     },
@@ -224,6 +226,7 @@
 
         },
         "title": "Danh sách User",
+        "trash": "Danh sách user đã xóa",
         "general": {
             "title": "Thông tin cơ bản",
             "personalInfo": {
@@ -287,6 +290,7 @@
             "id": "Id",
             "firstName": "Họ",
             "lastName": "Tên",
+            "restore": "Khôi phục",
             "userName": "Tên đầy đủ",
             "displayName": "Tên hiển thị",
             "email": "Địa chỉ email",
@@ -298,6 +302,7 @@
             "contextMenu": {
                 "passwordSetting": "Tùy chọn mật khẩu",
                 "edit": "Sửa",
+                "restore": "Restore",
                 "delete": "Xóa",
                 "view": "Xem"
             }

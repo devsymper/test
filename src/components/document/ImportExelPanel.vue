@@ -6,7 +6,7 @@
         temporary
         right
         style="height: 100vh"
-        v-bind:class="[showValidate==true?'manage-timesheet-1000':'manage-timesheet-620']"  >
+        v-bind:class="[showValidate==true?'manage-timesheet-1020':'manage-timesheet-620']"  >
         <v-row class="h-100">
             <v-dialog v-model="dialog"
                 width="500">
@@ -165,8 +165,8 @@ export default {
 .manage-timesheet-620{
     width: 620px!important;
 }
-.manage-timesheet-1000{
-    width: 1000px!important  ;
+.manage-timesheet-1020{
+    width: 1020px!important  ;
 }
 .manage-timesheet ::v-deep .v-card {
     box-shadow: none !important;

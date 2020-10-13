@@ -55,9 +55,35 @@ export default {
             listRowUser:[],
             showImportUser:false,
             customAPIResult: {
+                 setStatusImport(status){
+                    let nameStatus = '';
+                    switch(status){
+                        case '0':
+                            nameStatus = "Đã khóa";
+                            break;
+                        case '-1':
+                            nameStatus = "Đã xóa";
+                            break;
+                         case '1':
+                            nameStatus = "Đang hoạt động";
+                            break;
+                            
+                        case '2':
+                            nameStatus = "Mới tạo";
+                            break;
+                    }
+                    return nameStatus;
+                },
                 reformatData(res){
                     let data = res.data;
-                    return data;
+                    for(let i = 0; i<data.listObject.length; i++){
+                        data.listObject[i].status = this.setStatusImport(data.listObject[i].status);
+                      //  data.listObject[i].userId= this.getName(data.listObject[i].userId);
+                        
+
+                    }
+                        // return test
+                    return  data;
                 } 
             },
             commonActionProps: {

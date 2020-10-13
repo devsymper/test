@@ -140,6 +140,11 @@ export default {
                 icon: "mdi-account-settings",
                 link: "/users",
             },
+            account_trash: {
+                title: "account_trash",
+                icon: "mdi-account-settings",
+                link: "/users/trash",
+            },
             ba_account: {
                 title: "baAccount",
                 icon: "mdi-account-tie",
