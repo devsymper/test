@@ -560,15 +560,24 @@ export default {
                 instance: thisCpn.keyInstance
             });
         });
-      
-        // this.$evtBus.$on("document-submit-search-in-filter-input", e => {
-        //     if(thisCpn._inactive == true) return;
-        //     thisCpn.runInputFilterFormulas(e.controlName,e.search);
-        // }); 
+        /**
+         * Sự kiện bắn ra từ click vào input filter để mở popup
+         */
         this.$evtBus.$on("document-submit-filter-input-click", e => {
             if(thisCpn._inactive == true) return;
-            thisCpn.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
-            thisCpn.leftPositionDragPanel = e.screenX - e.offsetX;
+            if($(document).height() - $(e.target).offset().top > 420){
+                thisCpn.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
+            }
+            else{
+                thisCpn.topPositionDragPanel = $(e.target).offset().top  - 400 
+            }
+            if(e.screenX - e.offsetX > 600){
+                thisCpn.leftPositionDragPanel = e.screenX - e.offsetX ;
+            }
+            else{
+                thisCpn.leftPositionDragPanel = e.screenX - e.offsetX - 300;
+            }
+            
             thisCpn.$refs.inputFilter.setControlName(e.controlName);
             thisCpn.runInputFilterFormulas(e.controlName);
             thisCpn.$refs.symDragPanel.show();
@@ -1261,7 +1270,6 @@ export default {
             }
         },
         processHtml(content) {
-            console.trace("ok");
             $("#sym-submit-" + this.keyInstance).find('.page-content').addClass('d-block');
             $("#sym-submit-" + this.keyInstance).find('.list-page-content').addClass('d-flex');
             
@@ -1345,6 +1353,7 @@ export default {
                         //truong hop la control table
                         else {
                             let listInsideControls = {};
+                            let controlInTable = {};
                             let tableControl = new TableControl(
                                 idField,
                                 $(allInputControl[index]),
@@ -1385,8 +1394,10 @@ export default {
                                 childControl.setEffectedData(childPrepareData);
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
+                                 controlInTable[childControlName] = childControl;
                             });
                             tableControl.listInsideControls = listInsideControls;
+                            tableControl.controlInTable = controlInTable;
                             tableControl.renderTable();
                             if(this.viewType !== 'submit'){
                                 tableControl.setData(valueInput);
@@ -2007,8 +2018,12 @@ export default {
                 }
                 else{
                     if(this.sDocumentSubmit.listInputInDocument.hasOwnProperty(inputControlName)){
-                        let valueInputControlItem = this.sDocumentSubmit.listInputInDocument[inputControlName].value;
-                        dataInput[inputControlName] = valueInputControlItem;
+                        let controlIns = getControlInstanceFromStore(this.keyInstance,inputControlName)
+                        let valueInputControl = controlIns.value;
+                        if(controlIns.type == 'inputFilter'){
+                            valueInputControl = valueInputControl.split(',')
+                        }
+                        dataInput[inputControlName] = valueInputControl;
                     }
                 }
             }

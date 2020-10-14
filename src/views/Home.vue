@@ -1,5 +1,6 @@
 <template>
     <div class="home h-100 w-100">
+        <!-- <OrgchartElementSelector v-model="testData"/> -->
         <!-- <v-btn @click="runDataflow" color="primary">Primary</v-btn> -->
          <v-dialog
             v-model="dialog"
@@ -30,6 +31,8 @@
 </template>
 <script>
 import FormTpl from "./../components/common/FormTpl.vue";
+import OrgchartElementSelector from "./../components/common/OrgchartElementSelector.vue";
+
 import OrgchartSelector from "./../components/user/OrgchartSelector.vue";
 import TimelineTreeview from "./../components/common/TimelineTreeview";
 import Handsontable from 'handsontable';
@@ -41,6 +44,7 @@ import EmbedDataflow from "./../components/dataflow/EmbedDataflow";
 import NotificationChangePass from "./../components/notification/notificationChangeFirstPass";
 import { userApi } from "./../../src/api/user";
 import SymperActionView from "./../action/SymperActionView";
+
 export default {
     name: "Home",
     methods: {
@@ -107,6 +111,7 @@ export default {
     },
     data() {
         return {
+            testData: [],
             detailInfoUser:{},
             dialog:false,
             isShowChangePassFirstLogin:false,
@@ -161,6 +166,7 @@ export default {
         };
     },
     components: {
+        OrgchartElementSelector,
         "form-tpl": FormTpl,
         'orgchart-selector': OrgchartSelector,
         TimelineTreeview,

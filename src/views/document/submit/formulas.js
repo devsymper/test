@@ -385,6 +385,16 @@ export default class Formulas {
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
             let value = dataInput[controlName];
+            if (Array.isArray(value)) { // các trường hợp query điều kiện là in thì cần đưa datainput về dạng sql hiểu được
+                let valueForArray = '';
+                for (let index = 0; index < value.length; index++) {
+                    let v = value[index];
+                    valueForArray += "'" + v + "',";
+                }
+                valueForArray = valueForArray.trim();
+                valueForArray = valueForArray.substring(0, valueForArray.length - 1);
+                value = valueForArray;
+            }
             if (value == undefined || typeof value == 'undefined' || value == null) {
                 value = ""
                 if (dataFromStore && listControlInDoc[controlName].type == 'number' || listControlInDoc[controlName].type == 'percent') {
@@ -519,18 +529,20 @@ export default class Formulas {
         return listSqlite;
     }
 
+    /**
+     * Ham call api chạy công thức trên server
+     * @param String formulas 
+     * @param {key:value} dataInput 
+     */
     runSyql(formulas, dataInput = false) {
         let syql = formulas;
         syql = syql.replace(/\r?\n|\r/g, ' ');
-
         let dataPost = {
-            formula: syql,
-            data_input: JSON.stringify(dataInput)
+            formula: syql
         };
-        if (dataInput == false)
-            dataPost = {
-                formula: syql
-            };
+        if (dataInput != false) {
+            dataPost['data_input'] = JSON.stringify(dataInput);
+        }
         return formulasApi.execute(dataPost);
     }
     queryOrgchart(formulas) {
