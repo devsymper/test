@@ -1,4 +1,5 @@
 import Control from "./control";
+import moment from "moment-timezone";
 
 export default class TableControl extends Control {
     constructor(idField, ele, controlProps, curParentInstance) {
@@ -87,21 +88,25 @@ export default class TableControl extends Control {
             this.ele.find('table tbody').append(bodyHtml);
             this.ele.find('table').attr('contenteditable', 'false')
         } else {
-            for (let controlName in data) {
-                let dataControl = data[controlName];
-
-                let vls = [];
-                for (let index = 0; index < dataControl.length; index++) {
-                    let row = dataControl[index];
-                    if (row == null || row == 'null')
-                        row = '';
-                    if (!isNaN(row)) {
-                        row = Number(row);
+            let dataTable = [];
+            let rowLength = data[Object.keys(data)[0]].length;
+            for (let index = 0; index < rowLength; index++) {
+                let rowData = {};
+                for (let i = 0; i < Object.keys(data).length; i++) {
+                    let key = Object.keys(data)[i];
+                    let control = this.controlInTable[key];
+                    if (control && control.type == 'date') {
+                        data[key][index] = moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
                     }
-                    vls.push([index, controlName, row]);
+                    rowData[key] = data[key][index];
                 }
-                this.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+                dataTable.push(rowData)
+
             }
+            this.tableInstance.tableInstance.loadData(dataTable);
+            setTimeout((self) => {
+                self.tableInstance.tableInstance.render();
+            }, 100, this);
             if (this.tableInstance.tableHasRowSum) { // trường hợp có dòng tính tổng thì thêm dòng ở cuối hiển thị tổng cột
                 this.tableInstance.tableInstance.alter('insert_row', Object.keys(data).length, 1);
             }

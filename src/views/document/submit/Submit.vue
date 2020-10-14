@@ -527,7 +527,7 @@ export default {
                         controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+locale.controlName)
                     }
                     else{
-                        controlInstance.removeValidateIcon()
+                        controlInstance.removeValidateIcon();
                     }
                 }
                 resetImpactedFieldsList(thisCpn.keyInstance);
@@ -560,15 +560,24 @@ export default {
                 instance: thisCpn.keyInstance
             });
         });
-      
-        // this.$evtBus.$on("document-submit-search-in-filter-input", e => {
-        //     if(thisCpn._inactive == true) return;
-        //     thisCpn.runInputFilterFormulas(e.controlName,e.search);
-        // }); 
+        /**
+         * Sự kiện bắn ra từ click vào input filter để mở popup
+         */
         this.$evtBus.$on("document-submit-filter-input-click", e => {
             if(thisCpn._inactive == true) return;
-            thisCpn.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
-            thisCpn.leftPositionDragPanel = e.screenX - e.offsetX;
+            if($(document).height() - $(e.target).offset().top > 420){
+                thisCpn.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
+            }
+            else{
+                thisCpn.topPositionDragPanel = $(e.target).offset().top  - 400 
+            }
+            if(e.screenX - e.offsetX > 600){
+                thisCpn.leftPositionDragPanel = e.screenX - e.offsetX ;
+            }
+            else{
+                thisCpn.leftPositionDragPanel = e.screenX - e.offsetX - 300;
+            }
+            
             thisCpn.$refs.inputFilter.setControlName(e.controlName);
             thisCpn.runInputFilterFormulas(e.controlName);
             thisCpn.$refs.symDragPanel.show();
@@ -809,7 +818,7 @@ export default {
             immediate:true,
             deep:true,
             handler:function(vl){
-                if(!vl){
+                if(Object.keys(vl) == 0){
                     return
                 }
                 this.contentDocument = vl.content;
@@ -817,7 +826,6 @@ export default {
                     setDataForPropsControl(vl.fields,self.keyInstance,'submit');
                 }, 500,this);
                 setTimeout(() => {
-                    
                     this.processHtml(vl.content);
                 }, 700);
             }
@@ -1173,9 +1181,9 @@ export default {
                             thisCpn.getTitleObjectFormulas(res.data.document.titleObjectFormulasId)
                             thisCpn.docSize = (parseInt(res.data.document.isFullSize) == 1) ? "100%":"21cm";
                             thisCpn.contentDocument = content;
-							if(res.data.document.dataPrepareSubmit != "" && res.data.document.dataPrepareSubmit != null)
+							if(res.data.document.dataPrepareSubmit != null && res.data.document.dataPrepareSubmit != "")
                             thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
-                            if(res.data.document.otherInfo != "" && res.data.document.otherInfo != null)
+                            if(res.data.document.otherInfo != null && res.data.document.otherInfo != "")
 							thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
 							thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
                             setDataForPropsControl(res.data.fields,thisCpn.keyInstance,'submit'); // ddang chay bat dong bo
@@ -1345,6 +1353,7 @@ export default {
                         //truong hop la control table
                         else {
                             let listInsideControls = {};
+                            let controlInTable = {};
                             let tableControl = new TableControl(
                                 idField,
                                 $(allInputControl[index]),
@@ -1385,8 +1394,10 @@ export default {
                                 childControl.setEffectedData(childPrepareData);
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
+                                 controlInTable[childControlName] = childControl;
                             });
                             tableControl.listInsideControls = listInsideControls;
+                            tableControl.controlInTable = controlInTable;
                             tableControl.renderTable();
                             if(this.viewType !== 'submit'){
                                 tableControl.setData(valueInput);
@@ -1397,7 +1408,6 @@ export default {
                 }
             }
             this.listDataFlow = listDataFlow;
-            console.log(this.sDocumentSubmit,'sDocumentSubmitsDocumentSubmit');
             if(!isSetEffectedControl);
             this.getEffectedControl();
             if(this.docObjId == null){
@@ -1416,6 +1426,7 @@ export default {
                             let controlFormulas = controlInstance.controlFormulas;
                             if(controlFormulas.hasOwnProperty('formulas')){
                                 let formulasInstance = controlFormulas['formulas'].instance;
+                                // chạy công thức để lấy giá trị dòng mặc định trong table(phục vụ cho việc shift enter xuống dòng phải có dữ liệu mặc định)
                                 this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
                             }
                             
@@ -2007,8 +2018,12 @@ export default {
                 }
                 else{
                     if(this.sDocumentSubmit.listInputInDocument.hasOwnProperty(inputControlName)){
-                        let valueInputControlItem = this.sDocumentSubmit.listInputInDocument[inputControlName].value;
-                        dataInput[inputControlName] = valueInputControlItem;
+                        let controlIns = getControlInstanceFromStore(this.keyInstance,inputControlName)
+                        let valueInputControl = controlIns.value;
+                        if(controlIns.type == 'inputFilter'){
+                            valueInputControl = valueInputControl.split(',')
+                        }
+                        dataInput[inputControlName] = valueInputControl;
                     }
                 }
             }
