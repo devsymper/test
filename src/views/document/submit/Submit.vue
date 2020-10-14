@@ -2009,8 +2009,12 @@ export default {
                 }
                 else{
                     if(this.sDocumentSubmit.listInputInDocument.hasOwnProperty(inputControlName)){
-                        let valueInputControlItem = this.sDocumentSubmit.listInputInDocument[inputControlName].value;
-                        dataInput[inputControlName] = valueInputControlItem;
+                        let controlIns = getControlInstanceFromStore(this.keyInstance,inputControlName)
+                        let valueInputControl = controlIns.value;
+                        if(controlIns.type == 'inputFilter'){
+                            valueInputControl = valueInputControl.split(',')
+                        }
+                        dataInput[inputControlName] = valueInputControl;
                     }
                 }
             }
