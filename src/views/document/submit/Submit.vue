@@ -1162,6 +1162,7 @@ export default {
         },
         // Khadm: load data của document lên để hiển thị và xử lý
         async loadDocumentData() {
+            debugger
             if (this.documentId) {
                 let thisCpn = this;
                 documentApi
@@ -1191,10 +1192,10 @@ export default {
                         }
                     })
                     .catch(err => {
-                        thisCpn.$snotify({
-                            type: "error",
-                            title: "error from detail document api!!!"
-                        }); 
+                        // thisCpn.$snotify({
+                        //     type: "error",
+                        //     title: "error from detail document api123!!!"
+                        // }); 
                     })
                     .always(() => {});
             }

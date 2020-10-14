@@ -277,6 +277,7 @@ export default {
             this.$emit('cancel');
         },
         getApiProcessingImport(){
+            debugger
             const self= this;
             importApi.getProcessing(
                 this.fileName
@@ -289,7 +290,10 @@ export default {
                     }
                 }else{
                      clearInterval(this.loopCheckProcess); 
-                     this.$emit("error",'Tên sheet trùng nhau');
+                     this.$snotify({
+                        type: "error",
+                        title: res.message
+                    });  
                 }
             })
             .catch(err => {

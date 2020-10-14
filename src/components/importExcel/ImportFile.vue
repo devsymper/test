@@ -1,10 +1,10 @@
 <template>
     <v-stepper v-model="stepper" style="width: 620px; height: 100%; margin-top:-10px; box-shadow: none;">
         <div 
-            style="width: 600px;margin-top:5px;border-bottom:1px solid rgba(0,0,0,0.2)" 
+            style="width: 580px;margin-top:5px;border-bottom:1px solid rgba(0,0,0,0.2)" 
             class="pb-1 w-100">
                 <i class="mdi mdi-file-upload-outline fs-16 mr-6 ml-5" ></i>
-                <span class="font-normal">Import data</span>
+                <span class="fs-13" style="font-weight:430">Import data</span>
                 <button 
                     v-if="showCancelBtn" 
                     @click="cancel()" 
@@ -15,7 +15,7 @@
         </div>
         <v-row style="height:100%; margin-top:5px; margin-left:0px!important">
             <v-col cols="3" style=" border-right:1px solid rgba(0,0,0,0.2)">
-                <v-list>
+                <v-list style="margin-top:-25px">
                     <v-stepper-header class="stepper-header" >
 						<v-stepper-step class="fs-13 font-normal" editable step="1" @click="showImportInfo()">
 					 Thông tin
@@ -29,7 +29,7 @@
                     </v-list>
             </v-col>
             <v-col cols="9" style="margin-left:-15px" v-if="showImport">
-                <v-row class="ml-5 mt-1 mr-6">
+                <v-row class="ml-5 mt-1 ">
                     <span class="font "><b class="color-grey fw-500 fs-13">
                     Thông tin import cho: {{nameDocument}}</b>
                     </span>
@@ -53,7 +53,7 @@
                 </v-row>
             </v-col>
             <v-col cols="9" v-if="mapImport" >
-                <v-row class="ml-2 mt-1 mr-6">
+                <v-row class="ml-2 mt-1">
                     <span class="font "><b class="color-grey fw-500 fs-13">
                         Thông tin import cho: {{nameDocument}}</b>
                     </span>
@@ -62,7 +62,7 @@
                     <v-row class="ml-2">
                         <span><b class="color-grey fs-13 fw-500">Lưu ý về việc khớp dữ liệu: </b></span>
                     </v-row>
-                    <v-row class="ml-2 mt-1 mr-5 color-grey fs-12">
+                    <v-row class="ml-2 mt-1 mr-7 color-grey fs-12">
                         - Các trường dữ liệu tại cột đích có ký hiệu * là các trường bắt buộc phải import
                     </v-row>
                     <v-row v-if="objType=='user'" class="ml-2 mt-1 mr-7 color-grey fs-12">
@@ -70,7 +70,7 @@
                     </v-row>
                 </v-list>
                 <!-- Thông tin chung -->
-                <v-list class="fs-13 ml-4 mr-0">
+                <v-list class="fs-13 ml-2 mr-0">
                 <div class="col-flex" 
                     style= "margin-bottom:-26px"
                     v-for="(table, tableIdx) in tables" 
@@ -238,8 +238,8 @@ export default {
       },
     },
     created(){
-        debugger
-        this.stepper= 1
+        this.stepper= 1;
+        this.errorMessage =" "
     },
     methods: {
         nextToImport(dataUpload){
@@ -280,13 +280,15 @@ export default {
         },
              //Sự kiện xảy ra khi thay đổi Key
         onChangeKey(tableIdx,value){
+            debugger
             if(value){
-                debugger
                  this.tables[tableIdx].keyColumn.enable=true;
                  this.tables[tableIdx].keyColumn.index=value.index;
+                 this.tables[tableIdx].keyColumn.name=value.name;
             }else{
                  this.tables[tableIdx].keyColumn.enable = false;
                  this.tables[tableIdx].keyColumn.index=-1;
+                 this.tables[tableIdx].keyColumn.name=' ';
 
             }
            
@@ -328,9 +330,7 @@ export default {
         },
         // Lấy dữ liệu từ API
         getDataExcel(data) {
-            debugger
             if(data.data){
-                debugger
                 this.importInfo.nameImport =  data.data.nameImport;
                 this.importInfo.description = data.data.description;
                 this.importInfo.selectType = data.data.typeImport;
@@ -414,7 +414,7 @@ export default {
                      if(this.objType=='document'){
                         for (let i = 0; i < this.tables.length; i++) {
                             if(this.tables[i].keyColumn==undefined||this.tables[i].keyColumn.index==-1){
-                                this.errorMessage = '* Bạn chưa chọn khóa ';
+                                this.errorMessage = '* Bạn chưa chọn khóa cho bảng '+this.tables[i].name;
                                 check = false;
                             };
                         }
@@ -652,6 +652,7 @@ export default {
         },
         //phần mapping--- hàm tìm key cho cột
           setLastKeyGeneral(){
+     
               // xử lý key bảng chung
             for(let i = 0; i<this.nameSheets.length; i++){
                  let arr = this.nameColumnDetail[this.nameSheets[i].name];
@@ -666,6 +667,7 @@ export default {
         },
         // hàm xử lý key từng bảng con, so sánh với dòng trong excel nếu trùng thì set sheetMap
         setLastKeyTables(){
+            debugger
             // kiểm tra để lấy key
             let newLastKeyTables = [];
             for(let i = 0; i<this.lastKeyTables.length; i++){
@@ -750,12 +752,10 @@ export default {
 
         },
         newImport(val) {
-            debugger
-            this.nameImport = " ";
-            this.description = " ";
             this.stepper= 1;
             this.mapImport = false;
             this.showImport= true;
+            this.errorMessage =" "
             if (val) {
                 this.nameSheets = [];
                 this.nameColumnDetail = {};
@@ -845,7 +845,7 @@ export default {
 .stepper-header{
         margin-left:-23px;
     	width: 170px;
-		height: auto;
+		height: 50px;
 		display: block;
 		box-shadow: none;
 }

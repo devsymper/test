@@ -255,7 +255,7 @@ export default {
                 }
             })
             .catch(err => {
-                console.log(err)
+               // console.log(err)
             })
         },
         getDataType(controlType) {
@@ -282,6 +282,7 @@ export default {
                     continue
                 }
                 controls.push({
+                
                     name: this.propertyDocument[i].properties.name,
                     title: this.propertyDocument[i].properties.title,
                     isKeyControl: false,
@@ -289,6 +290,7 @@ export default {
                     dataColumn: null,
                     dataType: this.getDataType(this.propertyDocument[i].type)
                 });
+                debugger
              
             };
             let tables = [{
@@ -313,6 +315,7 @@ export default {
             this.listRowDocument = tables;
         },
         checkIsRequired(isRequired){
+            debugger
             if(isRequired==0){
                 return true
             }else{

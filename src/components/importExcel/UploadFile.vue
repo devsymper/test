@@ -92,7 +92,7 @@
      <v-row class="mr-3 ">
                 <v-col class="col-md-9 "></v-col>
                 <v-col>
-                    <v-btn class="ml-1" small @click="nextStep()" 
+                    <v-btn class="ml-4" small @click="nextStep()" 
                     depressed color="info" style="height:27px; width: 60px; border-radius:2px!important">
                         <span class='fs-13 fw-400'>Tiếp</span>
                     </v-btn>
@@ -120,7 +120,7 @@ export default {
         },
         newImport(val) {
           if (val) {
-            this.selectType='';
+            this.selectType='Excel';
             this.$refs.upload.uploader.cancel();
           }
         },
@@ -130,7 +130,7 @@ export default {
     },
     data() {
         return {
-            selectType:'',
+            selectType:'Excel',
             event:{},
             dem:0,
             nameImport:'',
@@ -165,9 +165,9 @@ export default {
     },
     created(){
         debugger
-        this.nameImport =  this.importInfo.nameImport;
-        this.description = this.importInfo.description;
-        this.selectType = this.importInfo.selectType;
+        this.nameImport = " ";
+        this.description =" ";
+        this.selectType ="Excel" ;
 
     },
     methods: {

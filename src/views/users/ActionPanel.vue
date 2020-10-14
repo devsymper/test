@@ -11,14 +11,16 @@
 					{{ $t('user.other.updateUser')}}
 				</h3>
 				<v-stepper v-model="stepper" class="d-flex stepper-create-user">
-				<v-stepper-header class="stepper-header" >
-					<v-stepper-step class="fs-13 font-normal" editable step="1">
-						{{ $t('user.general.title')}}
-					</v-stepper-step>
-					<!-- <v-stepper-step :editable="editStep" @click="loadPermission()" step="2">{{ $t('user.permission.title')}}</v-stepper-step> -->
-				</v-stepper-header>
+					<v-stepper-header class="stepper-header" >
+						<v-stepper-step class="fs-13 font-normal" editable step="1">
+							{{ $t('user.general.title')}}
+						</v-stepper-step>
+						<v-stepper-step :editable="editStep" @click="loadPermission()" step="2">
+							{{ $t('user.permission.title')}}
+						</v-stepper-step>
+					</v-stepper-header>
 				<v-stepper-items class="stepper-items">
-					<v-stepper-content step="1">
+					<v-stepper-content step="2">
 					<h4>{{ $t('user.general.personalInfo.title')}}</h4>
 					<v-row class="mt-1" >
 						<!-- thong tin -->
@@ -209,6 +211,9 @@
 						{{actionType=='add'?actionPanel="Tạo tài khoản":"Cập nhật tài khoản"}}
 					</v-btn>
 					</v-stepper-content>
+					<v-stepper-content step="1">
+						<Permission />
+					</v-stepper-content>
 				</v-stepper-items>
 				</v-stepper>
 			</div>
@@ -232,6 +237,7 @@
 </template>
 <script>
 import ChangePassword from "./../../views/users/ChangePass.vue";
+import Permission from "./Permission";
 import DetailUserInfo from "./../../views/users/DetailUserInfo.vue";
 import { userApi } from "./../../api/user.js";
 import { permissionPackageApi } from "./../../api/PermissionPackage.js";
@@ -247,7 +253,8 @@ export default {
 	components:{
 		"vue-resizable":VueResizable,
         "v-change-password":ChangePassword,
-		UploadFile, 
+		UploadFile,
+		Permission,
 		DetailUserInfo
 	},
 	props:{
@@ -411,6 +418,7 @@ export default {
 
 		},
 		actionUser(){
+			
 			if(this.actionType == 'add'){
 				debugger
 				this.addNewUser()
@@ -531,8 +539,8 @@ export default {
 			}
 			userApi.addUser(data).then(res => {
 				if (res.status == 200) {
-					//cpn.loadPermission();
-					//cpn.setStepper(2);
+					cpn.loadPermission();
+					cpn.setStepper(2);
 					cpn.editStep = true;
 					cpn.user.id = res.user.id;
                     cpn.avatarFileName = 'user_avatar_'+res.user.id;

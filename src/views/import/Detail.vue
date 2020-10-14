@@ -1,6 +1,6 @@
 <template>
 	<div class=" ml-4 mr-3 mt-3">
-        <div><span class="ml-3 mt-3 fs-15" style="font-weight:430px">
+        <div class="mb-1"><span class="ml-3 mt-3 fs-15" style="font-weight:430px">
              Import: 
             <span style="color:orange" v-if="importInfo.status=='Chưa import'">
                  {{importInfo.status}}
@@ -17,11 +17,11 @@
     
          
          </span></div>
-        <div>
+        <div class="mb-1">
             <span class="ml-3 mt-3 fs-13">Tên đối tượng: </span>
             <span class="ml-3 mt-3 fs-13"  style="color:grey">{{importInfo.objId}} </span>
         </div>
-          <div>
+          <div class="mb-1">
             <span class="ml-3 mt-3 fs-13">Nội dung: </span>
             <span class="ml-3 mt-3 fs-13"  style="color:grey">{{importInfo.nameImport}} </span>
         </div>
@@ -29,16 +29,16 @@
             <span class="ml-3 mt-3 fs-13">Ghi chú: </span>
             <span class="ml-3 mt-3 fs-13"  style="color:grey">{{importInfo.description}} </span>
         </div>
-        <div>
+        <div class="mb-1">
             <span class="ml-3 mt-3 fs-13">Thông tin chi tiết: </span>
             <span class="ml-3 mt-3 fs-13"  style="color:grey"> {{importInfo.fileName}}</span>
         </div>
-        <div>
+        <div class="mb-1">
               <div v-if="importInfo.status=='Đang xử lý'" class="fs-13 ml-3">
                   Dừng import Excel:
            </div>
         </div>
-        <div>
+        <div class="mb-1">
               <div v-if="importInfo.status=='Đang xử lý'">
                <v-btn small   color="primary" class="mt-4 ml-3" @click="stopImport()">Stop</v-btn>
            </div>

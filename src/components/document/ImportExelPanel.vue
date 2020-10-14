@@ -6,7 +6,7 @@
         temporary
         right
         style="height: 100vh"
-        v-bind:class="[showValidate==true?'manage-timesheet-1020':'manage-timesheet-620']"  >
+        v-bind:class="[showValidate==true?'manage-timesheet-1020':'manage-timesheet-600']"  >
         <v-row class="h-100">
             <v-dialog v-model="dialog"
                 width="500">
@@ -162,8 +162,8 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.manage-timesheet-620{
-    width: 620px!important;
+.manage-timesheet-600{
+    width: 600px!important;
 }
 .manage-timesheet-1020{
     width: 1020px!important  ;
