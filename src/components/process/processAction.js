@@ -132,7 +132,7 @@ function moreInfoForInstanceVars() {
     let rsl = [{
         "name": 'symper_user_id_start_workflow',
         "type": 'string',
-        "value": SYMPER_APP.$store.state.app.endUserInfo.id,
+        "value": SYMPER_APP.$store.state.app.endUserInfo.id+":"+SYMPER_APP.$store.state.app.endUserInfo.currentRole.id,
         "valueUrl": "",
         "scope": "global"
     }];

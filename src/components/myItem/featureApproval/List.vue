@@ -220,6 +220,7 @@ export default {
     },
     data(){
         return{
+            isRole:false, //value =falses khi assignee = userId, =true khi assignee = userId:role
             dialogApproval:false,
             sideBySideMode:false,
             index:0,
@@ -328,6 +329,7 @@ export default {
                     let taskInfo=JSON.parse(originData.description)
                     let elId = originData.taskDefinitionKey;
                     let taskData = {
+
                         // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
                         "action": "complete",
                         "assignee": "1",
@@ -352,19 +354,28 @@ export default {
                         ],
                         // "transientVariables": []
                     }
-                    let res = await self.submitTask(taskData,taskInfo);
-                    self.saveApprovalHistory(value,taskInfo);
-                    self.$emit('task-submited', res);
+                    
+                    if(this.checkRoleUser(originData)){
+                        let res = await self.submitTask(taskData,taskInfo,originData);
+                        self.saveApprovalHistory(value,taskInfo);
+                        self.$emit('task-submited', res);
+                    }else{
+                        self.$snotifyError("", "Permission denied!");
+                    }
+                   
                 }
                 self.$store.commit("task/setListNodeInProcess",[]);
                 self.getData();
                 self.selectedNode=0;
                 self.sideBySideMode=false;
             }
-         
         },
-        async submitTask(taskData,taskInfo){
+
+        async submitTask(taskData,taskInfo,originData){
             let self = this;
+            if (this.isRole==false) { // isRole == false thi update task cập nhật role hiện tại
+                await this.updateTask(originData);
+            }
             return new Promise(async (resolve, reject) => {
                 try {
                     let taskId = taskInfo.action.parameter.taskId;
@@ -382,6 +393,32 @@ export default {
                 }
             });
             
+        },
+        checkRoleUser(originData){
+            let self=this;
+            if (originData.assignee.indexOf(":")>0) {
+                let arrDataAssignee=originData.assignee.split(":");
+                let assigneeId=arrDataAssignee[0];
+                let roleIdentify=originData.assignee.slice(assigneeId.length);
+                // ktra enduser có tồn tại role trong assignee không
+                let rolesUser=self.$store.state.app.endUserInfo.roles;
+                let role=rolesUser[arrDataAssignee[1]].find(element => element.id==originData.assignee);
+                if (role) {
+                    self.isRole=true;
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                self.isRole=false;
+                return true;
+            }
+        },
+        async updateTask(originData) {
+            let data = {};
+            data.assignee=originData.assignee+":"+this.$store.state.app.endUserInfo.currentRole.id;
+            let taskId=originData.id;
+            await BPMNEngine.updateTask(taskId,data);
         },
         saveApprovalHistory(value,taskInfo){
             let title = this.taskActionBtns.reduce((tt, el) => {
