@@ -418,40 +418,40 @@ export default {
             );
             return;
         }
-      let data = {
-        ...this.taskObject,
-        assignee: this.taskObject.assignee,
-        parentTaskId: this.parentTaskId ? this.parentTaskId : "",
-        owner: this.$store.state.app.endUserInfo.id
-      };
-      let description = util.cloneDeep(defaultTaskDescription);
-      if (this.taskObject.docId) {
-        description.action.action = "submit";
-        description.action.parameter.documentId = this.taskObject.docId;
-      }
+        let data = {
+            ...this.taskObject,
+            assignee: this.taskObject.assignee,
+            parentTaskId: this.parentTaskId ? this.parentTaskId : "",
+            owner: this.$store.state.app.endUserInfo.id+":"+this.$store.state.app.endUserInfo.currentRole.id
+        };
+        let description = util.cloneDeep(defaultTaskDescription);
+        if (this.taskObject.docId) {
+            description.action.action = "submit";
+            description.action.parameter.documentId = this.taskObject.docId;
+        }
 
-      description.content = this.taskObject.name;
+        description.content = this.taskObject.name;
 
-      if (
-        this.taskObject.description == "" ||
-        this.taskObject.description == null
-      ) {
-        description.extraLabel = this.$t("tasks.header.alertDescription");
-      } else {
-        description.extraLabel = this.taskObject.description;
-      }
-      data.description = JSON.stringify(description);
-      let res = await BPMNEngine.addTask(JSON.stringify(data));
-      if (res.id != undefined) {
-        this.selectedProcess = null;
-        this.dialog = false;
-        this.$emit("create-task", res);
-        this.$snotifySuccess(this.$t("tasks.created"));
-      } else {
-        this.showError();
-      }
+        if (
+            this.taskObject.description == "" ||
+            this.taskObject.description == null
+        ) {
+            description.extraLabel = this.$t("tasks.header.alertDescription");
+        } else {
+            description.extraLabel = this.taskObject.description;
+        }
+        data.description = JSON.stringify(description);
+        let res = await BPMNEngine.addTask(JSON.stringify(data));
+            if (res.id != undefined) {
+            this.selectedProcess = null;
+            this.dialog = false;
+            this.$emit("create-task", res);
+            this.$snotifySuccess(this.$t("tasks.created"));
+            } else {
+                this.showError();
+            }
+        }
     }
-  }
 };
 </script>
 

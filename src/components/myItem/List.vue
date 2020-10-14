@@ -145,13 +145,14 @@
                                         </v-col>
                                         <v-col
                                         v-if="!sideBySideMode"
-                                        style="line-height: 42px"
                                         cols="2"
-                                        class="fs-12 px-1 py-0"
+                                        class="fs-12 px-1 py-0 mt-2"
                                         >
                                         <symperAvatar v-if="obj.ownerInfo.id" :size="20" :userId="obj.ownerInfo.id" />
                                         <symperAvatar v-else :size="20" :userId="obj.assigneeInfo.id" />
                                             {{obj.ownerInfo.id ? obj.ownerInfo.displayName: obj.assigneeInfo.displayName }}
+                                            <div class="fs-11 ml-5 grey--text" v-if="obj.ownerRole">{{obj.ownerRole.name}}</div>
+
                                         </v-col>
                                         <v-col
                                             v-if="!sideBySideMode"
