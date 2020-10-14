@@ -560,15 +560,24 @@ export default {
                 instance: thisCpn.keyInstance
             });
         });
-      
-        // this.$evtBus.$on("document-submit-search-in-filter-input", e => {
-        //     if(thisCpn._inactive == true) return;
-        //     thisCpn.runInputFilterFormulas(e.controlName,e.search);
-        // }); 
+        /**
+         * Sự kiện bắn ra từ click vào input filter để mở popup
+         */
         this.$evtBus.$on("document-submit-filter-input-click", e => {
             if(thisCpn._inactive == true) return;
-            thisCpn.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
-            thisCpn.leftPositionDragPanel = e.screenX - e.offsetX;
+            if($(document).height() - $(e.target).offset().top > 420){
+                thisCpn.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
+            }
+            else{
+                thisCpn.topPositionDragPanel = $(e.target).offset().top  - 400 
+            }
+            if(e.screenX - e.offsetX > 600){
+                thisCpn.leftPositionDragPanel = e.screenX - e.offsetX ;
+            }
+            else{
+                thisCpn.leftPositionDragPanel = e.screenX - e.offsetX - 300;
+            }
+            
             thisCpn.$refs.inputFilter.setControlName(e.controlName);
             thisCpn.runInputFilterFormulas(e.controlName);
             thisCpn.$refs.symDragPanel.show();
