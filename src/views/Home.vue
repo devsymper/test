@@ -1,14 +1,14 @@
 <template>
     <div class="home h-100 w-100">
-        <OrgchartElementSelector/>
+        <!-- <OrgchartElementSelector v-model="testData"/> -->
         <!-- <v-btn @click="runDataflow" color="primary">Primary</v-btn> -->
-         <!-- <v-dialog
+         <v-dialog
             v-model="dialog"
             width="397"
             >
             <NotificationChangePass @cancel="cancelDialog()"/>
         </v-dialog>
-        <Dashboard></Dashboard> -->
+        <Dashboard></Dashboard>
      
         <!-- <EmbedDataflow 
         ref="dataflow"
@@ -111,6 +111,7 @@ export default {
     },
     data() {
         return {
+            testData: [],
             detailInfoUser:{},
             dialog:false,
             isShowChangePassFirstLogin:false,
