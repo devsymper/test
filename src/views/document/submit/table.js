@@ -8,6 +8,8 @@ import { SYMPER_APP } from './../../../main.js'
 import { Date } from 'core-js';
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
 import { util } from '../../../plugins/util';
+import moment from "moment-timezone";
+
 class UserEditor extends Handsontable.editors.TextEditor {
     createElements() {
         super.createElements();
@@ -724,8 +726,6 @@ export default class Table {
                 let controlRequireEffected = controlInstance.getEffectedRequireControl();
                 let controlLinkEffected = controlInstance.getEffectedLinkControl();
                 let controlValidateEffected = controlInstance.getEffectedValidateControl();
-                console.trace("sadasdsadsa");
-
                 this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
                 this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readonly');
                 this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
@@ -1060,7 +1060,10 @@ export default class Table {
             afterRender: function(isForced) {
 
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
-                if (tbHeight < MAX_TABLE_HEIGHT) {} else {
+                console.log('tbHeighttbHeight', tbHeight);
+                if (tbHeight < MAX_TABLE_HEIGHT) {
+                    $(this.rootElement).css('height', 'auto');
+                } else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
                 }
                 if (!this.reRendered) {
@@ -1274,6 +1277,10 @@ export default class Table {
                         }
                         if (!dataToStore.hasOwnProperty(controlName)) {
                             dataToStore[controlName] = [];
+                        }
+                        let controlIns = this.getControlInstance(controlName);
+                        if (controlIns.type == 'date') {
+                            data[index][controlName] = moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
                         }
                         if (data[index] != undefined)
                             dataToStore[controlName].push(data[index][controlName]);

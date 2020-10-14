@@ -115,12 +115,12 @@
                     
                         <v-col
                             v-if="!sideBySideMode"
-                            style="line-height: 42px"
                             cols="2"
-                            class="fs-12 px-1 py-0"
+                            class="fs-12 px-1 py-0 mt-2"
                         >
                             <symperAvatar :size="20"  :userId="obj.startUserId" />
                             <span class="ml-1">{{obj.startUserName}}</span>
+                            <div class="fs-11 ml-5 grey--text" v-if="obj.roleInfo">{{obj.roleInfo.name}}</div>
                         </v-col> 
                         <v-col
                             v-if="!sideBySideMode"
@@ -245,11 +245,22 @@ export default {
             let date;
             work.startUserId = 0;
             work.startUserName = '';
+            let roleInfo={};
+
             const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===work.id && element.name==="symper_user_id_start_workflow" );
             if (dataVariable) {
-                let appId=dataVariable.value;
-                work.startUserId = dataVariable.value;
+                let userIdStart=dataVariable.value;
+                if (dataVariable.value.indexOf(":")>0) {  //check là userId hay userId:role
+                    let arrDataUserIden=dataVariable.value.split(":");
+                    userIdStart=arrDataUserIden[0];
+                    if (arrDataUserIden.length>3) { // loại trừ trường hợp role=0
+                        let roleIdentify=dataVariable.value.slice(userIdStart.length+1);
+                        roleInfo=this.getRoleUser(roleIdentify);
+                    }
+                }
+                work.startUserId = userIdStart;
                 work.startUserName = allUserById[work.startUserId] ? allUserById[work.startUserId].displayName : '';
+                work.roleInfo = roleInfo;
             }
 
             if ( work.startTime) {
@@ -350,7 +361,7 @@ export default {
         allWorkIdUserStart:[],
         allVariableProcess:[],
         myOwnFilter: {
-            size: 40,
+            size: 50,
             sort: "startTime",
             order: "desc",
             page: 1,
@@ -364,7 +375,7 @@ export default {
         filterListProcessUserStartWork:{
             names:"symper_user_id_start_workflow",
             page:1,
-            values:this.$store.state.app.endUserInfo.id
+            valueLike:this.$store.state.app.endUserInfo.id+"%"
         },
         defaultAvatar: appConfigs.defaultAvatar,
         listIdProcessInstance:[],
@@ -383,6 +394,12 @@ export default {
     self.reCalcListTaskHeight();
   },
   methods: {
+    getRoleUser(roleIdentify){
+        let arrDataRole=roleIdentify.split(":");
+        let allSymperRole=this.$store.state.app.allSymperRoles;
+        let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+        return role;
+    },  
     changeUpdateAsignee(){
       this.handleTaskSubmited();
     },
@@ -475,18 +492,7 @@ export default {
         }
         filter = Object.assign(filter, this.filterFromParent);
         filter = Object.assign(filter, this.myOwnFilter);
-        let res = {};
-        let listWork = [];
-        res = await BPMNEngine.getProcessInstanceHistory(filter);
-        listWork = res.data;
-        this.totalWork = Number(res.total);
         let processIden = [],processId=[];
-        for (let work of listWork) {
-            self.allFlatWorks.push(work);
-            processIden.push('work:'+work.id);
-            processId.push(work.id);
-            self.listIdProcessInstance.push(work.id);
-        }
         // get variable process mà user start
         let res2 = {};
         res2 = await taskApi.getVariableWorkflow(self.filterListProcessUserStartWork);
@@ -499,6 +505,23 @@ export default {
             }
         }
         await this.getProcessInstanceUserStart(processIdUserStart);
+        // get processInstance theo involvedUser
+        let res = {};
+        let listWork = [];
+        res = await BPMNEngine.getProcessInstanceHistory(filter);
+        listWork = res.data;
+        this.totalWork = Number(res.total);
+       
+        for (let work of listWork) {
+            if (self.listIdProcessInstance.indexOf(work.processInstanceId) === -1) {
+                self.allFlatWorks.push(work);
+                processIden.push('work:'+work.id);
+                processId.push(work.id);
+                self.listIdProcessInstance.push(work.id);
+            }
+        }
+       
+        
         self.filterVariables.pageSize=(processId.length)*2;
         self.filterVariables.processInstanceIds=JSON.stringify(processId);
         

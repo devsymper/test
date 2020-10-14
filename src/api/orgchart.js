@@ -75,10 +75,13 @@ export const orgchartApi = {
     queryOrgchart(data) {
         return orgchart.post("orgchart/query", data);
     },
-    updatePermissionInRole(data){
+    updatePermissionInRole(data) {
         return accessControlApi.post(
             "roles/set-permissions",
             data
         )
+    },
+    getAllOrgchartStruct() {
+        return orgchart.get("orgchart/struct-only");
     }
 };

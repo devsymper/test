@@ -199,9 +199,11 @@ export default {
             let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
             if(name == "width"){
                 elements.css({width:value});
+                elements.attr('data-mce-style',elements.attr('style'))
             }
             if(name == "height"){
                 elements.css({height:value});
+                elements.attr('data-mce-style',elements.attr('style'))
             }
             let tableId = checkInTable(elements);
             if( tableId == this.sCurrentDocument.id)

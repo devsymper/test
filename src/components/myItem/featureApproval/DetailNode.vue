@@ -68,23 +68,23 @@
                     <v-col
                         @click="selectObject(obj, idx)"
                         v-if="!sideBySideMode"
-                        style="line-height: 42px"
                         cols="2"
-                        class="fs-12 pl-3 px-1 py-0"
+                        class="fs-12 pl-3 px-1 py-0 mt-2"
                     >
                     <symperAvatar :size="20" :userId="obj.assigneeInfo.id" />
                     {{obj.assigneeInfo.displayName}}
+                    <div class="fs-11 ml-5 grey--text" v-if="obj.assigneeRole">{{obj.assigneeRole.name}}</div>
                     </v-col>
                     <v-col
                         @click="selectObject(obj, idx)"
                         v-if="!sideBySideMode"
-                        style="line-height: 42px"
                         cols="2"
-                        class="fs-12 pl-3 px-1 py-0"
+                        class="fs-12 pl-3 px-1 py-0 mt-2"
                         >
                     <symperAvatar v-if="obj.ownerInfo.id" :size="20" :userId="obj.ownerInfo.id" />
                     <symperAvatar v-else :size="20" :userId="obj.assigneeInfo.id" />
                     {{obj.ownerInfo.id ? obj.ownerInfo.displayName: obj.assigneeInfo.displayName }}
+                    <div class="fs-11 ml-5 grey--text" v-if="obj.ownerRole">{{obj.ownerRole.name}}</div>
                     </v-col>
                     <v-col
                        @click="selectObject(obj, idx)"
@@ -334,7 +334,6 @@ export default {
             this.$emit("changeSideBySide",false);
         },
         async getData(){
-           
             let self=this;
              if (self.nodeInfo.process_definition_id) {
                  let filter={};
