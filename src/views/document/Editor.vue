@@ -327,15 +327,18 @@ export default {
     },
     created() {
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
+        this.isConfigPrint = false;
         if(this.routeName == 'printConfigDocument'){
             this.isConfigPrint = true;
             this.printConfigId = this.$route.params.printConfigId;
         }
-        else{
-            this.isConfigPrint = false;
-            this.getDataFlow();
+        else if(this.routeName == 'editControlTemplate'){
+            this.controlTemplateId = Number(this.$route.params.id);
         }
-        this.documentId = this.$route.params.id;
+        else{
+            this.getDataFlow();
+            this.documentId = this.$route.params.id;
+        }
         /**
          * Nhận sự kiên từ click treeview danh sách các control trong doc thì highlight control và selected control
          */
@@ -370,7 +373,8 @@ export default {
             currentDragging:null,
             oldTableId:null,
             dataPreviewSubmit:null,
-            isShowPreviewSubmit:false
+            isShowPreviewSubmit:false,
+            controlTemplateId:0
         }
     },
     
@@ -809,7 +813,10 @@ export default {
         },
         // mở modal lưu , edit doc
         openPanelSaveDocument(){
-            if(this.isConfigPrint){
+            if(this.routeName == 'editControlTemplate'){
+                this.$refs.formModalView.show();
+            }
+            else if(this.isConfigPrint){
                 this.$refs.saveDocPanel.showDialog()
             }
             else{
@@ -1205,7 +1212,8 @@ export default {
             let title = allInputs.title.value;
             let content = this.editorCore.selection.getContent();
             let allControlProps = {};
-            if(content){
+            if(this.routeName == "editControlTemplate"){
+                content = this.editorCore.getContent();
                 let allControlInForm = $(content).find('.s-control');
                 for (let index = 0; index < allControlInForm.length; index++) {
                     const element = allControlInForm[index];
@@ -1215,19 +1223,32 @@ export default {
                 this.callApiSaveControlTemplate(title,content,allControlProps);
             }
             else{
-                let currentControl = this.editorStore.currentSelectedControl;
-                if(currentControl.properties.name.hasOwnProperty('name')){
-                    let id = currentControl.id;
-                    allControlProps[id] = this.editorStore['allControl'][id];
-                    this.callApiSaveControlTemplate(title,content,allControlProps,true);
+                if(content){
+                    let allControlInForm = $(content).find('.s-control');
+                    for (let index = 0; index < allControlInForm.length; index++) {
+                        const element = allControlInForm[index];
+                        let controlId = $(element).attr('id');
+                        allControlProps[controlId] = this.editorStore['allControl'][controlId];
+                    }
+                    this.callApiSaveControlTemplate(title,content,allControlProps);
                 }
                 else{
-                    this.$snotify({
-                        type: "error",
-                        title: this.$t('document.validate.emptyContentControlTemplate')
-                    });  
+                    let currentControl = this.editorStore.currentSelectedControl;
+                    if(currentControl.properties.name.hasOwnProperty('name')){
+                        let id = currentControl.id;
+                        allControlProps[id] = this.editorStore['allControl'][id];
+                        content = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+id).clone().wrap('<div></div>').parent().html();
+                        this.callApiSaveControlTemplate(title,content,allControlProps,true);
+                    }
+                    else{
+                        this.$snotify({
+                            type: "error",
+                            title: this.$t('document.validate.emptyContentControlTemplate')
+                        });  
+                    }
                 }
             }
+            
         },
         /**
          * Api lưu control template
@@ -1239,29 +1260,50 @@ export default {
             if(isSingleControl){
                 dataPost['isSingleControl'] = 1;
             }
-            documentApi.saveControlTemplate(dataPost).then(res=>{
-                self.$refs.formModalView.hide()
-                if(res.status == 200){
-                    this.$snotify({
-                        type: "success",
-                        title: "Lưu Control Template thành công"
-                    });  
-                    let allControlTemplate = self.editorStore.allControlTemplate;
-                    let control = res.data;
-                    control.ba_create = control.baCreate;
-                    control.create_at = control.createAt;
-                    allControlTemplate.push(control);
-                    self.$store.commit(
-                        "document/addToDocumentEditorStore",{key:'allControlTemplate',value:allControlTemplate,instance:self.keyInstance}
-                    );
-                }
-                else{
-                    this.$snotify({
-                        type: "error",
-                        title: res.message
-                    });  
-                }
-            })
+
+            if(this.routeName == "editControlTemplate"){
+                documentApi.editControlTemplate(this.controlTemplateId, dataPost).then(res=>{
+                    self.$refs.formModalView.hide();
+                    if(res.status == 200){
+                        this.$snotify({
+                            type: "success",
+                            title: "Lưu Control Template thành công"
+                        });  
+                    }
+                    else{
+                        this.$snotify({
+                            type: "error",
+                            title: res.message
+                        });  
+                    }
+                })   
+            }
+            else{
+                documentApi.saveControlTemplate(dataPost).then(res=>{
+                    self.$refs.formModalView.hide();
+                    if(res.status == 200){
+                        this.$snotify({
+                            type: "success",
+                            title: "Lưu Control Template thành công"
+                        });  
+                        let allControlTemplate = self.editorStore.allControlTemplate;
+                        let control = res.data;
+                        control.ba_create = control.baCreate;
+                        control.create_at = control.createAt;
+                        allControlTemplate.push(control);
+                        self.$store.commit(
+                            "document/addToDocumentEditorStore",{key:'allControlTemplate',value:allControlTemplate,instance:self.keyInstance}
+                        );
+                    }
+                    else{
+                        this.$snotify({
+                            type: "error",
+                            title: res.message
+                        });  
+                    }
+                })
+            }
+            
         },
         /**
          * Hàm xoay trang
@@ -1711,6 +1753,17 @@ export default {
                 }
             })
         },
+        /**
+         * Hàm call api lấy thông tin control template
+         */
+        async getContentControlTemplate(){
+            if(this.routeName == 'editControlTemplate' && this.controlTemplateId != 0){
+                let res = await documentApi.getDetailControlTemplate(this.controlTemplateId);
+                this.editorCore.setContent(res.data.form);
+                this.setDataForPropsControl(JSON.parse(res.data.controlProps));
+                this.inputSaveControlTemplate.title.value = res.data.title;
+            }
+        },
         // hàm gọi request lấy thông tin của document khi vào edit doc
         async getContentDocument(){
             if(this.documentId != 0){
@@ -1725,7 +1778,6 @@ export default {
                         content = res1.data.content;
                         this.setDocumentProperties({title:res1.data.title});
                     }
-                    
                     this.editorCore.setContent(content);
                     $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body select').each(function(e){
                         let id = $(this).attr('id')
@@ -1746,7 +1798,6 @@ export default {
                     this.setDataForPropsControl(fields);
                     this.wrapTableElement();
                 }
-                
             }
         },
         // wrap div cho table truong hợp trước đây chưa có scroll
@@ -1841,7 +1892,10 @@ export default {
             // $('.sym-document-editor .tox .tox-edit-area').css({'overflow':'auto'})
             let thisCpn = this;
             if(this.documentId != 0 && this.documentId != undefined)    // trường họp edit doc thì gọi api lấy dữ liệu
-            thisCpn.getContentDocument();
+                this.getContentDocument();
+            if(this.controlTemplateId != 0){
+                this.getContentControlTemplate()
+            }
             var currentElement, currentElementChangeFlag, elementRectangle, countdown, dragoverqueue_processtimer;
             // object xử lí các vấn đề với kéo thả control vào document
             var DragDropFunctions = {
@@ -2385,27 +2439,36 @@ export default {
 
 
         dropControlTemplate(insertionPoint, control){
+            let self = this;
             let contentEl = $(control.content);
             let controlInEL = contentEl.find('.s-control:not(.s-control-table .s-control)');
             let allControlProp = JSON.parse(control.control_props);
             for (let index = 0; index < controlInEL.length; index++) {
                 let controlEl = $(controlInEL[index]);
-                let newId = Date.now();
-                let controlProp = allControlProp[controlEl.attr('id')];
-                contentEl.find('#'+controlEl.attr('id')).attr('id',newId);
-                let controlType = controlEl.attr('s-control-type');
-                this.addToAllControlInDoc(newId,{properties: controlProp.properties, formulas : controlProp.formulas,type:controlType});
-                if(controlType == 'table'){
-                    controlEl.find(".s-control").each(function() {
-                        let childControlId = $(this).attr("id");
-                        let newChildId = Date.now();
-                        let childControlProp = allControlProp[childControlId];
-                        contentEl.find('#'+childControlId.attr('id')).attr('id',newChildId);
-                        idTable = controlEl.attr('id');
-                        this.addToAllControlInTable(newChildId,{properties: childControlProp.properties, formulas : childControlProp.formulas,type:$(this).attr('s-control-type')},newId);
-                    });
-                    
-                }
+                setTimeout(() => {
+                    let newId = 's-control-id-' + Date.now();
+                    let controlProp = allControlProp[controlEl.attr('id')];
+                    contentEl.find('#'+controlEl.attr('id')).attr('id',newId);
+                    let controlType = controlProp.type;
+                    self.addToAllControlInDoc(newId,{properties: controlProp.properties, formulas : controlProp.formulas,type:controlType});
+                    if(controlType == 'table'){
+                        controlEl.find(".s-control").each(function() {
+                            let childControlId = $(this).attr("id");
+                            setTimeout(() => {
+                                let newChildId = 's-control-id-' + Date.now();
+                                let childControlProp = allControlProp[childControlId];
+                                contentEl.find('#'+childControlId.attr('id')).attr('id',newChildId);
+                                idTable = controlEl.attr('id');
+                                self.addToAllControlInTable(newChildId,
+                                                            {properties: childControlProp.properties, formulas : childControlProp.formulas,type:$(this).attr('s-control-type')},
+                                                            newId);
+                            }, 1);
+                            
+                        });
+                        
+                    }
+                }, 1);
+                
             }
             insertionPoint.after(contentEl);
             
