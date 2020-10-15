@@ -62,8 +62,11 @@
 								</span>
 							</v-col>
 							<v-col cols="6">
-								<span style="color:green" v-if="detailInfo.status==1" class="fs-13">
+								<span style="color:green" v-if="detailInfo.status=='Đang hoạt động'" class="fs-13">
 									Hoạt động
+								</span>
+								<span style="color:red" class="fs-13" v-else-if="detailInfo.status=='Mới tạo'">
+									Mới tạo
 								</span>
 								<span style="color:orange" class="fs-13" v-else>
 									Khóa

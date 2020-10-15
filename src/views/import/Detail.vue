@@ -68,19 +68,20 @@ export default {
             return JSON.parse(this.importInfo.infoImport)
         },
         headers () {
-            return [{
-                text: 'STT',
-                align: 'start',
-                sortable: false,
-                value: 'stt',
+            return [
+                {
+                    text: 'STT',
+                    align: 'start',
+                    sortable: false,
+                    value: 'stt',
                 },
                 {
-                text: 'Dòng',
-                value: 'row',
+                    text: 'Dòng',
+                    value: 'row',
                 },
                 {
-                text: 'Giá trị',
-                value: 'value',
+                    text: 'Giá trị',
+                    value: 'value',
                 },
                 { text: 'Trang', value: 'sheet' },
                 { text: 'Trạng thái', value: 'status' },

@@ -1,20 +1,14 @@
 <template>
     <div class="home h-100 w-100">
         <!-- <OrgchartElementSelector v-model="testData"/> -->
-        <!-- <v-btn @click="runDataflow" color="primary">Primary</v-btn> -->
+         <!-- <v-btn @click="runDataflow" color="primary">Primary</v-btn> -->
          <v-dialog
             v-model="dialog"
             width="397"
-            >
+        >
             <NotificationChangePass @cancel="cancelDialog()"/>
         </v-dialog>
         <Dashboard></Dashboard>
-     
-        <!-- <EmbedDataflow 
-        ref="dataflow"
-        :dataflowId="124"
-         /> -->
-
         <!-- <SymperActionView 
             :actionDef="{
                 module: 'document',
@@ -32,7 +26,6 @@
 <script>
 import FormTpl from "./../components/common/FormTpl.vue";
 import OrgchartElementSelector from "./../components/common/OrgchartElementSelector.vue";
-
 import OrgchartSelector from "./../components/user/OrgchartSelector.vue";
 import TimelineTreeview from "./../components/common/TimelineTreeview";
 import Handsontable from 'handsontable';
