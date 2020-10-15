@@ -7,7 +7,7 @@
 				</v-btn>
             <div style="margin:20px 0px 0px 0px">
                 <div :class="{'favorite-area': true , 'active': showFavorite == true}" @click="showListFavorite">
-                    <v-icon style="font-size:16px" color="yellow"> mdi-star</v-icon>
+                    <v-icon style="font-size:16px" color="#F6BE4F"> mdi-star</v-icon>
                     <span style="font:13px roboto;padding-left:8px">Yêu thích</span>
                 </div>
 				<VuePerfectScrollbar :style="{height:heightListApp}"  >
@@ -44,12 +44,12 @@
          <div v-else class="favorite-area-item">
               <h4>Danh sách yêu thích</h4>
 					<VuePerfectScrollbar :style="{height:heightListFavorite}"  >
-						<ul style="margin:0px -12px 0px -24px;" v-if="sFavorite.length > 0">
+						<ul style="margin:0px 0px 0px -24px" v-if="sFavorite.length > 0">
 							<li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer" :class="{'child-item-active': item.objectIdentifier == activeIndexChild}" > 
 								<div style="position:relative" >
 									<div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
 									<div v-else  class="title-item-favorite">{{item.name}}</div> 
-									<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:4px;right:14px">mdi-star</v-icon>
+									<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:4px;right:4px">mdi-star</v-icon>
 								</div>
 							</li>
 						</ul>
@@ -464,7 +464,7 @@ x				}
    font:15px roboto;
 }
 .view-side-by-side-apps .list-apps .active{
-    background-color: #f7f7f7;
+    background-color: #E9E9E9;
 }
 .view-side-by-side-apps .detail-app h4{
    padding-left:8px;
@@ -522,6 +522,9 @@ x				}
 .view-side-by-side-apps >>> .favorite-area-item li{
     list-style: none;    
     padding:6px 20px;
+}
+.view-side-by-side-apps >>> .favorite-area-item {
+	overflow-x: hidden;
 }
 .view-side-by-side-apps >>> .favorite-area-item .child-item-active{
 	background-color: #E9E9E9
