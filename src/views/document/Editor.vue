@@ -179,7 +179,7 @@ export default {
     },
     mounted(){
         let self = this;
-         tinymce.init({
+        tinymce.init({
             theme: 'silver',
             skin: 'oxide',
             selector:  '#document-editor-'+self.keyInstance,
