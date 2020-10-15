@@ -1,5 +1,5 @@
 <template>
-    <div class="card-infoTask" :style="boxPosition">
+    <div class="card-infoTask" :style="boxPosition" v-if="taskSelected.id">
         <v-card class="card-task">
             <div class="ml-1">
                 <div class="mt-1" style="white-space: nowrap;
@@ -126,7 +126,7 @@ export default {
             deep:true,
             immediate:true,
             handler(vl){ 
-                if (vl) {
+                if (vl.id) {
                     this.getMoreInfoTask(vl);
                     this.$store.dispatch('file/getWaitingFileCountPerObj');
                     this.$store.dispatch('comment/getWaitingCommentCountPerObj');

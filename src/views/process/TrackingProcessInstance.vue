@@ -9,6 +9,8 @@
             <v-icon v-else class="action-btn"  @click="handleClosePopup">mdi-close</v-icon>
         </div>
         <symper-bpmn
+            class="symper-bpmn"
+            style="height:95%!important"
             @node-clicked="handleNodeSelected"
             ref="symperBpmn"
             :readOnly="true"
@@ -155,6 +157,7 @@ export default {
                     self.setColorForNodes().then(() => {
                         self.setTasksStatus();
                     });
+                    self.$emit("dataInstanceRuntime",res.data);
                 })
                 .catch(err => {
                     self.$snotifyError(
@@ -193,6 +196,12 @@ export default {
             }
             this.runtimeNodeMap = map;
         },
+        getRoleUser(roleIdentify){
+            let arrDataRole=roleIdentify.split(":");
+            let allSymperRole=this.$store.state.app.allSymperRoles;
+            let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+            return role;
+        },
         // set các ô màu cho task
         setTasksStatus(){
             for(let eleId in this.runtimeNodeMap){
@@ -204,10 +213,33 @@ export default {
                         if (nodeInfo.currentNode) {
                             currentNode=true;
                         }
-                        console.log(eleId,"aaaaaxx");
+                        let mapUser = this.$store.getters['app/mapIdToUser'];
+                        let infoAssignee={};
+                        let roleInfo={};
+                        infoAssignee.assignee={};
+                        infoAssignee.role={};
+                        let taskInfo=nodeInfo.instancesMap;
+                        Object.keys(taskInfo).forEach(item => {
+                            let task=taskInfo[item];
+                            let assigneeId=task.assignee;
+                            if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
+                                let arrDataAssignee=task.assignee.split(":");
+                                assigneeId=arrDataAssignee[0];
+                                if (arrDataAssignee.length>3) { // loại trừ trường hợp role=0
+                                    let roleIdentify=task.assignee.slice(assigneeId.length+1);
+                                    roleInfo=this.getRoleUser(roleIdentify);
+                                }
+                            }
+                            if (mapUser[assigneeId]) {
+                                infoAssignee.assignee = mapUser[assigneeId];
+                                infoAssignee.role = roleInfo;
+                            }
+                        });
+                        //console.log(taskInfo,"aaaaaxx");
                         symBpmn.updateElementProperties(eleId, {
                             statusCount: nodeInfo.instancesStatusCount,
-                            currentNode: currentNode
+                            currentNode: currentNode,
+                            infoAssignee: infoAssignee
                         });
                     }
                 }
