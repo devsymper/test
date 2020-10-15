@@ -4,7 +4,8 @@ import {
     append as svgAppend,
     attr as svgAttr,
     classes as svgClasses,
-    create as svgCreate
+    create as svgCreate,
+    innerSVG
 } from 'tiny-svg';
 
 import {
@@ -43,7 +44,8 @@ export default class CustomRenderer extends BaseRenderer {
         if (element.type.includes('Task')) {
             let instanceStatus = element.businessObject.$attrs.statusCount;
             let currentNode=element.businessObject.$attrs.currentNode;
-         
+            let infoAssignee=element.businessObject.$attrs.infoAssignee;
+            
             let runner = 0;
             let r = 8;
             let color;
@@ -62,7 +64,10 @@ export default class CustomRenderer extends BaseRenderer {
             if (currentNode) {
                 // let rect = drawRect(parentNode, r+108, r+88, 10, "#FF8003");
                 let rect = insertImage(parentNode,imgPosition,r+30, r+30);
-             
+               
+            }
+            if (infoAssignee) {
+                insertText(parentNode,infoAssignee);
             }
           
         }
@@ -121,4 +126,25 @@ function insertImage(parentNode,href, width, height) {
     });
     svgAppend(parentNode, img);
     return img;
+}
+function insertText(parentNode,infoAssignee) {
+    const text = svgCreate('text');
+    const textRole = svgCreate('text');
+    svgAttr(text, {
+        x:0,
+        y:100,
+        fill:"#52B415"
+    });
+    svgAttr(textRole, {
+        x:0,
+        y:115,
+        fill:"#aaaaaa"
+    });
+    svgAppend(parentNode, text);
+    svgAppend(parentNode, textRole);
+    innerSVG(text,infoAssignee.assignee.displayName);
+    if (infoAssignee.role) {
+        innerSVG(textRole,infoAssignee.role.name);
+    }
+    return text;
 }
