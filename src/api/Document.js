@@ -109,10 +109,16 @@ export const documentApi = {
     saveControlTemplate(data) {
         return coreApi.post('control-templates', data);
     },
+    editControlTemplate(id, data) {
+        return coreApi.put('control-templates/' + id, data);
+    },
     deleteControlTemplate(id) {
         return coreApi.delete('control-templates/' + id);
     },
     getControlTemplate() {
         return coreApi.get('control-templates');
+    },
+    getDetailControlTemplate(id) {
+        return coreApi.get('control-templates/' + id);
     },
 };

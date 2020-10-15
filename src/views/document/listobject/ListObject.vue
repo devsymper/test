@@ -184,7 +184,7 @@ export default {
                         },[]);
                         let thisCpn = this;
                         documentApi
-                        .deleteDocumentObject({objectIds:ids.join()})
+                        .deleteDocumentObject({objectIds:JSON.stringify(ids)})
                         .then(res => {
                             if (res.status == 200) {
                                 thisCpn.$snotify({

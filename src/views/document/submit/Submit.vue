@@ -1695,11 +1695,12 @@ export default {
                     });        
                     // nếu submit từ form sub submit thì ko rediect trang
                     // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
-                    thisCpn.resetDataSubmit();
                     if(this.$getRouteName() == 'submitDocument' && this.$route.params.id == this.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                     }
-                
+                    else{
+                        thisCpn.resetDataSubmit();
+                    }
                 }
                 else{
                     thisCpn.$snotify({

@@ -30,9 +30,18 @@
                             </template>
                             <v-list class="menu-list">
                                 <v-list-item
-                                v-for="(action, index) in actions"
-                                :key="index+action.title"  @click="action.action(item.id)">
-                                    <v-list-item-title>{{ action.title }}</v-list-item-title>
+                                @click="deleteControlTemplate(item)">
+                                    <v-list-item-title>Xóa</v-list-item-title>
+                                </v-list-item>
+
+
+                                <v-list-item
+                                @click="editControlTemplate(item)">
+                                    <v-list-item-title>Sửa</v-list-item-title>
+                                </v-list-item>
+                                <v-list-item
+                                @click="previewControlTemplate(item)">
+                                    <v-list-item-title>Xem trước</v-list-item-title>
                                 </v-list-item>
                             </v-list>
                         </v-menu>
@@ -74,29 +83,7 @@ export default {
     },
     data(){
         return {
-            actions: [
-                { 
-                    title: 'Xóa',action:function(id){
-                        let thisCpn = this;
-                        documentApi.deleteControlTemplate(id).then(res=>{
-                            // let allControlTemplate = thisCpn.allControlTemplate;
-                            // let controlTemplate = allControlTemplate.filter(c=>{
-                            //     return c.id == id
-                            // });
-                            // delete allControlTemplate[allControlTemplate.indexOf(controlTemplate[0])]
-                            // thisCpn.$store.commit(
-                            //     "document/addToDocumentEditorStore",{key:'allControlTemplate',value:allControlTemplate,instance:thisCpn.instance}
-                            // );
-                        }).catch(err => {
-                        })
-                        .always(() => {});
-                    } 
-                    },
-                    { title: 'Sửa' ,action:function(){
-                        
-                    }
-                }
-            ],
+           
         }
     },
     computed:{
@@ -124,6 +111,27 @@ export default {
                 self.$refs.skeletonView.hide();
             })
         },
+        editControlTemplate(control){
+            this.$goToPage('/documents/control-template/'+control.id,control.title);
+        },
+        previewControlTemplate(control){
+
+        },  
+        deleteControlTemplate(control){
+            let thisCpn = this;
+                        documentApi.deleteControlTemplate(id).then(res=>{
+                            // let allControlTemplate = thisCpn.allControlTemplate;
+                            // let controlTemplate = allControlTemplate.filter(c=>{
+                            //     return c.id == id
+                            // });
+                            // delete allControlTemplate[allControlTemplate.indexOf(controlTemplate[0])]
+                            // thisCpn.$store.commit(
+                            //     "document/addToDocumentEditorStore",{key:'allControlTemplate',value:allControlTemplate,instance:thisCpn.instance}
+                            // );
+                        }).catch(err => {
+                        })
+                        .always(() => {});
+        }
     },
     mounted(){
         $.expr[":"].Contains = jQuery.expr.createPseudo(function(arg) {
