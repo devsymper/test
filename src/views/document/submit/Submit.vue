@@ -1647,10 +1647,7 @@ export default {
             let dataPost = this.getDataPostSubmit();
             dataPost['documentId'] = this.documentId;
             let dataInputFormulas = this.getDataRefreshControl();
-            if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
-                let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
-                dataInputFormulas['dataInputSubmit'] = dataInput;
-            }
+            
             if(Object.keys(dataInputFormulas).length>0){
                 dataPost['dataInputFormulas'] = dataInputFormulas;
             }
@@ -1701,6 +1698,12 @@ export default {
                     else{
                         thisCpn.resetDataSubmit();
                     }
+                    if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
+                        let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
+                        thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{
+                            alert('ok')
+                        });
+                    }
                 }
                 else{
                     thisCpn.$snotify({
@@ -1711,7 +1714,6 @@ export default {
                 }
             })
             .catch(err => {
-                console.warn(err);
                 thisCpn.$snotify({
                         type: "error",
                         title: "error from submit document api!!!"
