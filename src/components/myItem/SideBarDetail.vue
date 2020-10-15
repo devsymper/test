@@ -839,6 +839,10 @@ export default {
 		cursor:pointer;
 		margin-right: 20px;
 		margin-bottom: 20px;
+		
+	}
+	.showMoreRelated:hover{
+		text-decoration-line:underline
 	}
 	.v-expansion-panel::before{
 		box-shadow: none;

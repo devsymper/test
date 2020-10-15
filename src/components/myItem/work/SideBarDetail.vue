@@ -65,16 +65,16 @@
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.userRelated.title')}}</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
 						<div v-if="objSideBar=='work'"  class="w-100 pl-2" >
-							<div style="height: 30px" class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
+							<div style="height: 25px" class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
 								<span>
 									<v-icon class="mr-3" size="18">mdi-account</v-icon> 
 									<span mt-1>{{$t("tasks.header.userCreate")}}</span>
 								</span>
-							
 							</div>
 							<div class="pl-7 justify-space-between user-show">
 								<symperAvatar :size="20"  :userId="workInfo.startUserId" />
 								<span class="ml-1">{{workInfo.startUserName}}</span>
+                                <div class="fs-11 ml-5 grey--text" v-if="workInfo.roleInfo">{{workInfo.roleInfo.name}}</div>
 							</div>
 						</div>
 					</v-expansion-panel-content>
