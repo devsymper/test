@@ -61,7 +61,6 @@
                            <span class="iconify" data-icon="mdi-cogs" data-inline="false"></span>
                         </v-btn>
                         <!-- config -->
-                            <!-- <ConfigNotification :isShow="showConfigNotification"/> -->
                               <v-navigation-drawer
                                     v-model="showConfigNotification"
                                     width="552"

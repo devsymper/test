@@ -83,7 +83,11 @@
                     maxlength="120"
                     full-width
                     single-line
-                ></v-textarea>
+                >
+                  <v-chip
+                    class="ma-2"
+                    color="primary"
+                ></v-chip></v-textarea>
             </v-col>
             
             <v-col class="col-md-5 mr-3">

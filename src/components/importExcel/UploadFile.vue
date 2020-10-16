@@ -1,112 +1,119 @@
 <template>
-<div class="w-100">
-    <v-row class="fs-13 ml-0">
-        <v-col cols='3'>
-            Tên import
-            <span style="color:red">*</span>
-        </v-col>
-        <v-col cols='8'>
-            <v-text-field
-                background-color="#F7F7F7"
-                class="auto-complete color-normal ml-3 mt-4 mb-3 fs-13 " 
-                filled
-                flat
-                hide-details
-                v-model="nameImport"
-            >                
-            </v-text-field>
-        </v-col>
-    </v-row>
-    <v-row style="margin-top:-20px" class="fs-13 ml-0">
-        <v-col cols='3'>
-            Ghi chú
-        </v-col>
-        <v-col cols='8'>
-            <v-text-field
-                filled
-                background-color="#F7F7F7"
-                class="auto-complete color-normal mt-4 ml-3 fs-13 " 
-                flat
-                hide-details
-                v-model="description"
-            >                
-            </v-text-field>
-        </v-col>
-    </v-row>
-     <v-row class="ml-1 mt-1 mb-4" style="height:32px">
-        <v-col class="col-md-4" style="margin-left:-5px; margin-top:-10px">
-        <span class="font fs-13 "> Chọn kiểu import:</span>
-        </v-col>
-        <v-col class="col-md-8" style="margin-top:-30px; margin-left:-37px">
-            <v-select 
-                class="select-type ml-3 pr-3 w-100" 
-                v-model="selectType"
-                :menu-props="{'nudge-top':-40,'fixed':false}" 
-                :items="selectTypeImport" 
-                item-color="white" 
-                label="--- Chọn ---" 
-                background-color="#F7F7F7">
-            </v-select>
-        </v-col>
-    </v-row>
-     <div class=" mt-2 flex items-center justify-center w-full h-screen text-center mr-15 ml-3 mr-3 custom-upload" v-show="selectType" >
-        <uploader 
-            class="mb-3"
-          :options="options" 
-          :autoStart="true"
-          @dragover="handleDrop"
-          @file-success="handleFileUploaded"
-          @change="handleChange" 
-          ref="upload">
-            <uploader-unsupport></uploader-unsupport>
-            <uploader-drop style="width:405px!important; height: 200px" >
-                <p class="font-normal mb-3">Kéo thả file vào đây để upload</p>
-                <uploader-btn  v-show="selectType=='Excel'" 
-                    depressed class="mt-10 font-normal btn-upload fs-13"
-                    :single="true"
-                    style="background-color:#3092E6; color:white; border-radius:2px; border:1px solid #3092E6">
-                    Chọn file
-                </uploader-btn>
-                <uploader-btn  
-                    v-show="selectType=='CSV'" 
-                    depressed class=" mt-10 font-normal btn-upload"
-                    :single="false"
-                    style="background-color:green; color:white; border-radius:2px; border:1px solid green; font-size:13px">
-                    Chọn file
-                </uploader-btn>
-                <v-btn 
-                  v-show ="dem > 0" 
-                  color ="error" class="ml-1" 
-                  style ="margin-bottom:3px; font-weight: 400; border-radius: 0px !important" 
-                  small depressed 
-                  @click = "clearFiles">
-                  Xoá 
-                </v-btn>
-            </uploader-drop>
-            <uploader-list style="width:405px!important"></uploader-list>
-        </uploader>
-    </div>
-    <div style="color:red">
-        {{errorMessage}}
-    </div>
-     <v-row class="mr-3 ">
-                <v-col class="col-md-9 "></v-col>
-                <v-col>
-                    <v-btn class="ml-4" small @click="nextStep()" 
-                    depressed color="info" style="height:27px; width: 60px; border-radius:2px!important">
-                        <span class='fs-13 fw-400'>Tiếp</span>
+    <div class="w-100 upload-panel">
+        <v-row class="fs-13 ml-0">
+            <v-col cols='3'>
+                Tên import
+                <span class="color-red">*</span>
+            </v-col>
+            <v-col cols='8'>
+                <v-text-field
+                    background-color="#F7F7F7"
+                    class="auto-complete ml-3 mt-4 mb-3" 
+                    filled
+                    flat
+                    hide-details
+                    v-model="nameImport"
+                >                
+                </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row style="margin-top:-20px" class="fs-13 ml-0">
+            <v-col cols='3'>
+                Ghi chú
+            </v-col>
+            <v-col cols='8'>
+                <v-text-field
+                    filled
+                    background-color="#F7F7F7"
+                    class="auto-complete mt-4 ml-3" 
+                    flat
+                    hide-details
+                    v-model="description"
+                >                
+                </v-text-field>
+            </v-col>
+        </v-row>
+        <v-row class="ml-1 mt-1 mb-4" style="height:32px">
+            <v-col class="col-md-4" style="margin-left:-5px; margin-top:-10px">
+            <span class="font fs-13"> Chọn kiểu import:</span>
+            </v-col>
+            <v-col class="col-md-8" style="margin-top:-30px; margin-left:-37px">
+                <v-select 
+                    class="select-type ml-3 pr-3 w-100" 
+                    v-model="selectType"
+                    :menu-props="{'nudge-top':-40,'fixed':false}" 
+                    :items="selectTypeImport" 
+                    item-color="white" 
+                    label="--- Chọn ---" 
+                    background-color="#F7F7F7">
+                </v-select>
+            </v-col>
+        </v-row>
+        <div class=" mt-2 justify-center text-center mr-15 ml-3 mr-3 custom-upload" v-show="selectType" >
+            <uploader 
+                class="mb-3"
+                :options="options" 
+                :autoStart="true"
+                @dragover="handleDrop"
+                @file-success="handleFileUploaded"
+                @change="handleChange" 
+                ref="upload"
+            >
+                <uploader-unsupport></uploader-unsupport>
+                <uploader-drop style="width:405px!important; height: 200px" >
+                    <p class="font-normal mb-3">Kéo thả file vào đây để upload</p>
+                    <uploader-btn  v-show="selectType=='Excel'" 
+                        depressed class="mt-10 font-normal btn-upload fs-13"
+                        :single="true"
+                        style="background-color:#3092E6; color:white; border-radius:2px; border:1px solid #3092E6">
+                        Chọn file
+                    </uploader-btn>
+                    <uploader-btn  
+                        v-show="selectType=='CSV'" 
+                        depressed 
+                        class=" mt-10 font-normal btn-upload fs-13"
+                        :single="false"
+                        style="background-color:green; color:white; border-radius:2px; border:1px solid green">
+                        Chọn file
+                    </uploader-btn>
+                    <v-btn 
+                        v-show ="dem > 0" 
+                        color ="error" class="ml-1 fw-400" 
+                        style ="margin-bottom:3px; border-radius: 0px!important" 
+                        small 
+                        depressed 
+                        @click = "clearFiles">
+                        Xoá 
                     </v-btn>
-                    <!-- <button @click="test()">Null</button> -->
-                    </v-col>
-                </v-row>
-</div>
+                </uploader-drop>
+                <uploader-list style="width:405px!important"></uploader-list>
+            </uploader>
+        </div>
+        <div class="color-red">
+            {{errorMessage}}
+        </div>
+        <v-row class="mr-3 ">
+            <v-col class="col-md-9 "></v-col>
+            <v-col>
+                <v-btn 
+                    class="ml-4 next-step-button" 
+                    small 
+                    @click="nextStep()" 
+                    depressed 
+                    color="info" 
+                    >
+                    <span class='fs-13 fw-400'>Tiếp</span>
+                </v-btn>
+            </v-col>
+        </v-row>
+    </div>
 </template>
 <script>
 import { util } from '../../plugins/util';
 import uploader from 'vue-simple-uploader'
 
 export default {
-    props: ["objId","objType",'errorMessage','subObjType','importInfo'],
+    props: ['errorMessage','importInfo'],
     computed: {
         newImport() {
             return this.$store.state.importExcel.newImport;
@@ -114,7 +121,6 @@ export default {
     },
     watch: {
         importInfo(value){
-            debugger
             this.nameImport = value.nameImport;
             this.description = value.description;
         },
@@ -187,40 +193,34 @@ export default {
             this.$emit('clearFiles')
         },
         handleFileUploaded(rootFile, file, response, chunk) {
-            //this.$refs.upload.uploader.cancel()
             //this.$refs.upload.uploader.resume();
             response = JSON.parse(response);
             this.$emit('dataExcel', response);
             this.$emit('keyUpload', this.options.query.key);
         },
         handleDrop(event){
-
-            this.$refs.upload.uploader.cancel()
+            this.handelEventImport(event);
             this.dem = event.dataTransfer.items.length;
             this.options.query.total = event.dataTransfer.items.length;
+        },
+        handelEventImport(event){
+            this.$refs.upload.uploader.cancel();
             this.options.query.key = util.str.randomString(6)+Date.now();
             this.options.query.typeImport = this.selectType;
-            if(this.objType=='document'){
-                this.options.query.objId = this.objId;
+            this.options.query.subObjType= this.importInfo.options.subObjType;
+            this.options.query.objType = this.importInfo.options.objType;
+            this.options.query.nameImport = this.nameImport;
+            this.options.query.description = this.description;
+             if(this.importInfo.options.objType=='document'){
+                 debugger
+                this.options.query.objId = this.importInfo.options.objId;
             }
-            this.options.query.objType = this.objType;
-            this.options.query.subObjType= this.subObjType;
-            this.$emit('clearFiles');
+             this.$emit('clearFiles');
         },
         handleChange(event) {
-            this.$refs.upload.uploader.cancel()
+            this.handelEventImport(event);
             this.options.query.total = event.currentTarget.files.length;
             this.dem = event.currentTarget.files.length;
-            this.options.query.key = util.str.randomString(6)+Date.now();
-            this.options.query.typeImport = this.selectType;
-            this.options.query.objType = this.objType;
-            this.options.query.subObjType= this.subObjType;
-            this.options.query.nameImport = this.nameImport;
-            this.options.query.description = this.nameImport;
-             if(this.objType=='document'){
-                this.options.query.objId = this.objId;
-            }
-            this.$emit('clearFiles');
         },
     }
 }
@@ -257,10 +257,15 @@ export default {
 .auto-complete ::v-deep .v-input__slot {
     margin-top: -19px;
     min-height: 30px!important;
-    height: 30px!important
+    height: 30px!important;
+    font-size:13px
     
 }
-
+.next-step-button{
+    height:27px; 
+    width: 60px;
+     border-radius:2px!important
+}
 .auto-complete ::v-deep .v-input__slot:after {
     border-color: transparent !important
 }
@@ -280,48 +285,56 @@ export default {
     color:black
     
 }
-
 .select-type {
     height: 15px !important;
     font-size: 13px !important;
     border-radius: 1px;
      font-family: Roboto !important;
 }
-
 .select-type ::v-deep .v-input__control .v-input__slot {
     font-size: 13px !important;
     font-family: Roboto !important;
 }
-
 .select-type ::v-deep .v-input__control .v-select__selection {
     margin-left: 5px;
      font-size: 13px !important;
     font-family: Roboto !important;
 }
-
 .select-type ::v-deep .v-label--active {
     display: none;
     font-family: Roboto !important;
 }
-
 .select-type ::v-deep .v-list-item__title {
     font-size: 13px !important;
     font-family: Roboto !important;
 }
-
 .select-type ::v-deep .v-input__slot:before {
     border-color: transparent !important;
 }
-
 .select-type ::v-deep .v-input__slot:after {
     border-color: transparent !important;
 }
-
 .select-type-item {
     color: rgba(0, 0, 0, 0.87) !important;
     caret-color: rgba(0, 0, 0, 0.87) !important;
 }
 .select-type ::v-deep .v-select__slot{
     height:28px!important
+}
+
+.v-list-item__content{
+    font-size:13px!important;
+    color:black!important
+}
+</style>
+<style >
+.v-list-item__title{
+    font-size:13px!important;
+    color:black!important
+}
+.v-select__slot{
+    padding-left:7px;
+    font-size:13px!important;
+    font-family: Roboto;
 }
 </style>

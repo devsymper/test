@@ -27,10 +27,8 @@
         </div>
     </list-items>
           <ImportExcelPanel
-            :objType="'user'"
-            :nameDocument="'Import User'"
+            :options="options"
             :nameRows="listRowUser"
-            :subObjType="-1"
             :open="showImportUser" />
     </div>
 </template>
@@ -51,6 +49,11 @@ export default {
     },
     data(){
         return {
+            options:{
+                objType:'user',
+                nameObj:'Import User',
+                subObjType:-1
+            },
             showDetailView:false,
             listRowUser:[],
             showImportUser:false,
@@ -78,11 +81,7 @@ export default {
                     let data = res.data;
                     for(let i = 0; i<data.listObject.length; i++){
                         data.listObject[i].status = this.setStatusImport(data.listObject[i].status);
-                      //  data.listObject[i].userId= this.getName(data.listObject[i].userId);
-                        
-
                     }
-                        // return test
                     return  data;
                 } 
             },

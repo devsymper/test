@@ -697,3 +697,44 @@ html {
 .v-btn--tile {
     border-radius: 4px;
 }
+
+
+/* font */
+
+.font-normal {
+    font-size: 13px!important;
+    font-family: Roboto!important;
+    font-weight: normal!important;
+}
+
+.fw-430 {
+    font-weight: 430
+}
+
+.fw-500 {
+    font-weight: 500;
+}
+
+.fw-400 {
+    font-weight: 400;
+}
+
+.fw-300 {
+    font-weight: 300;
+}
+
+.color-red {
+    color: red
+}
+
+.color-grey {
+    color: grey;
+}
+
+.color-green {
+    color: green
+}
+
+.color-normal {
+    color: #707070
+}
