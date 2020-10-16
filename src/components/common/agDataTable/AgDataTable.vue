@@ -19,6 +19,7 @@
                  :frameworkComponents="frameworkComponents"
                  :modules="modules"
                  :getDataPath="getDataPath"
+                 @grid-ready="onGridReady"
                  >
     </ag-grid-vue>
 </template>
@@ -188,6 +189,9 @@ export default {
         },
         cellDoubleClick(params){
             this.$emit('on-cell-dbl-click',params)
+        },
+        onGridReady(param){
+            this.$emit('grid-ready', param)
         }
         
     },
