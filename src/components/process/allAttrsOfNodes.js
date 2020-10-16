@@ -2314,7 +2314,8 @@ let allAttrs = {
         options: [{
             text: 'Script',
             value: 'script'
-        }]
+        }],
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     serviceTaskTypeHTTP: {
         "title": "",
@@ -2322,7 +2323,13 @@ let allAttrs = {
         "type": 'text',
         "value": "http",
         "info": "",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "type",
+            "isAttr": true,
+            "type": "String"
+        },
     },
     serviceTaskScriptValue: {
         "title": "Script for service task ",
@@ -2330,6 +2337,7 @@ let allAttrs = {
         "value": "",
         "info": "",
         "dg": "formula",
+        pushToXML: attrToXMLMethods.notPushToXML,
     },
     // serviceTaskHTTPType: {
     //     "title": "",
