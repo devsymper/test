@@ -140,18 +140,18 @@ export default {
         },  
         deleteControlTemplate(control){
             let thisCpn = this;
-                        documentApi.deleteControlTemplate(id).then(res=>{
-                            // let allControlTemplate = thisCpn.allControlTemplate;
-                            // let controlTemplate = allControlTemplate.filter(c=>{
-                            //     return c.id == id
-                            // });
-                            // delete allControlTemplate[allControlTemplate.indexOf(controlTemplate[0])]
-                            // thisCpn.$store.commit(
-                            //     "document/addToDocumentEditorStore",{key:'allControlTemplate',value:allControlTemplate,instance:thisCpn.instance}
-                            // );
-                        }).catch(err => {
-                        })
-                        .always(() => {});
+            documentApi.deleteControlTemplate(control.id).then(res=>{
+                let allControlTemplate = thisCpn.allControlTemplate;
+                let controlTemplate = allControlTemplate.filter(c=>{
+                    return c.id == control.id
+                });
+                delete allControlTemplate[allControlTemplate.indexOf(controlTemplate[0])]
+                thisCpn.$store.commit(
+                    "document/addToDocumentEditorStore",{key:'allControlTemplate',value:allControlTemplate,instance:thisCpn.instance}
+                );
+            }).catch(err => {
+            })
+            .always(() => {});
         }
     },
     mounted(){

@@ -425,7 +425,14 @@
                     "type": "Document type",
                     "note": "Note (Serve for searching)",
                     "titleObject": "Title Object (Serve for display on MyItem, formulas execute on server)",
-                    "titlePrint": "Title Form Print"
+                    "titlePrint": "Title Form Print",
+                    "systemMapping": {
+                        "title": "Mapping Doc with System object",
+                        "itemTitle": "Select the object to be linked (Can open the Doc record within the system object)",
+                        "condition": "Links follow conditions",
+                        "conditionDoc": "Links follow document conditions",
+                        "conditionSystem": "Links follow system conditions"
+                    }
                 },
                 "swapType": {
                     "heading": "Swap type control",
@@ -945,7 +952,7 @@
             "showMoreTask": "Show more task related",
             "showLess": "Show less task related",
             "showMoreFile": "Show more file",
-            "quickView":"Quick view"
+            "quickView": "Quick view"
 
         },
         "alert": {
