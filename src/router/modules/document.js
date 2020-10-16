@@ -46,6 +46,13 @@ export default [
 
     },
     {
+        path: "/documents/control-template/:id?",
+        name: "editControlTemplate",
+        component: () =>
+            import ('../../views/document/Editor.vue'),
+
+    },
+    {
         path: "/documents/:id?/submit",
         name: "submitDocument",
         component: () =>

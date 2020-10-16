@@ -145,84 +145,123 @@ export const reformatValueToStr = function(value) {
 
 // export const defaultXML = `<?xml version="1.0" encoding="UTF-8"?>
 // <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:flowable="http://flowable.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.flowable.org/processdef">
-//   <process id="test_gateway" name="test gateway" isExecutable="true">
-//     <dataObject id="new_data_object_1" name="ccc" itemSubjectRef="xsd:double">
-//       <extensionElements>
-//         <flowable:value>10.0</flowable:value>
-//       </extensionElements>
-//     </dataObject>
-//     <dataObject id="new_data_object_2" name="cvvvvvv" itemSubjectRef="xsd:double">
-//       <extensionElements>
-//         <flowable:value>20.0</flowable:value>
-//       </extensionElements>
-//     </dataObject>
-//     <startEvent id="startEvent1" flowable:formFieldValidation="true"></startEvent>
-//     <exclusiveGateway id="sid-43625D6B-F5F7-4AF1-867F-F386EBBD84C9"></exclusiveGateway>
-//     <sequenceFlow id="sid-52EB100A-A145-415A-A48C-074BEB298E9A" sourceRef="startEvent1" targetRef="sid-43625D6B-F5F7-4AF1-867F-F386EBBD84C9"></sequenceFlow>
-//     <endEvent id="sid-A686BECD-D98E-4357-BC95-4E28C88981DC"></endEvent>
-//     <sequenceFlow id="sid-0F3C7AC6-8119-4156-84E5-73A0AC44DE8D" sourceRef="sid-43625D6B-F5F7-4AF1-867F-F386EBBD84C9" targetRef="sid-A686BECD-D98E-4357-BC95-4E28C88981DC">
-//       <conditionExpression xsi:type="tFormalExpression"><![CDATA[xấ axsaa ấ]]></conditionExpression>
-//     </sequenceFlow>
-//     <callActivity id="callactivity" name="call acccccccc" flowable:async="true" calledElement="cccccccccccccccccccccccc" flowable:calledElementType="id" flowable:processInstanceName="testCallacitvity" flowable:businessKey="bussinesskey" flowable:inheritBusinessKey="true" flowable:useLocalScopeForOutParameters="true" flowable:inheritVariables="true" flowable:sameDeployment="true" flowable:completeAsync="true" flowable:fallbackToDefaultTenant="true" flowable:idVariableName="mmmmmmmmmmmmmmmmmmmmm">
-//       <documentation>acascac
-// ac
-// asc
-// sac
-// ac
-// c</documentation>
-//       <extensionElements>
-//         <flowable:in source="aaaaa" target="cccc"></flowable:in>
-//         <flowable:in source="eeeee" target="ggggg"></flowable:in>
-//         <flowable:out source="jjjjjjj" target="llllll"></flowable:out>
-//       </extensionElements>
-//       <multiInstanceLoopCharacteristics isSequential="true" flowable:collection="collectionsss" flowable:elementVariable="elementvariablesssssss">
-//         <loopCardinality>1000</loopCardinality>
-//         <completionCondition>completeconditionssssssssssss</completionCondition>
-//       </multiInstanceLoopCharacteristics>
-//     </callActivity>
-//     <sequenceFlow id="sid-4EF31FD8-1172-4316-8C16-440E7B7DA824" sourceRef="sid-43625D6B-F5F7-4AF1-867F-F386EBBD84C9" targetRef="callactivity"></sequenceFlow>
-//     <userTask id="sid-D2EBD8DD-814F-4978-900A-554066FFDAA2" flowable:formFieldValidation="true">
-//       <extensionElements>
-//         <flowable:formProperty id="new_property_1" name="vv" type="boolean" expression="ccđ" variable="bb" default="a"></flowable:formProperty>
-//       </extensionElements>
-//     </userTask>
-//     <sequenceFlow id="sid-87FEFF8D-9375-48E6-A454-32BE8807305A" sourceRef="sid-43625D6B-F5F7-4AF1-867F-F386EBBD84C9" targetRef="sid-D2EBD8DD-814F-4978-900A-554066FFDAA2"></sequenceFlow>
-//   </process>
-//   <bpmndi:BPMNDiagram id="BPMNDiagram_test_gateway">
-//     <bpmndi:BPMNPlane bpmnElement="test_gateway" id="BPMNPlane_test_gateway">
-//       <bpmndi:BPMNShape bpmnElement="startEvent1" id="BPMNShape_startEvent1">
-//         <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="163.0"></omgdc:Bounds>
-//       </bpmndi:BPMNShape>
-//       <bpmndi:BPMNShape bpmnElement="sid-43625D6B-F5F7-4AF1-867F-F386EBBD84C9" id="BPMNShape_sid-43625D6B-F5F7-4AF1-867F-F386EBBD84C9">
-//         <omgdc:Bounds height="40.0" width="40.0" x="175.0" y="158.0"></omgdc:Bounds>
-//       </bpmndi:BPMNShape>
-//       <bpmndi:BPMNShape bpmnElement="sid-A686BECD-D98E-4357-BC95-4E28C88981DC" id="BPMNShape_sid-A686BECD-D98E-4357-BC95-4E28C88981DC">
-//         <omgdc:Bounds height="28.0" width="28.0" x="260.0" y="164.0"></omgdc:Bounds>
-//       </bpmndi:BPMNShape>
-//       <bpmndi:BPMNShape bpmnElement="callactivity" id="BPMNShape_callactivity">
-//         <omgdc:Bounds height="80.0" width="100.0" x="369.0" y="77.0"></omgdc:Bounds>
-//       </bpmndi:BPMNShape>
-//       <bpmndi:BPMNShape bpmnElement="sid-D2EBD8DD-814F-4978-900A-554066FFDAA2" id="BPMNShape_sid-D2EBD8DD-814F-4978-900A-554066FFDAA2">
-//         <omgdc:Bounds height="80.0" width="100.0" x="134.0" y="8.0"></omgdc:Bounds>
-//       </bpmndi:BPMNShape>
-//       <bpmndi:BPMNEdge bpmnElement="sid-4EF31FD8-1172-4316-8C16-440E7B7DA824" id="BPMNEdge_sid-4EF31FD8-1172-4316-8C16-440E7B7DA824">
-//         <omgdi:waypoint x="211.14499999999984" y="174.1842105263158"></omgdi:waypoint>
-//         <omgdi:waypoint x="368.99999999999994" y="130.74463087248324"></omgdi:waypoint>
-//       </bpmndi:BPMNEdge>
-//       <bpmndi:BPMNEdge bpmnElement="sid-52EB100A-A145-415A-A48C-074BEB298E9A" id="BPMNEdge_sid-52EB100A-A145-415A-A48C-074BEB298E9A">
-//         <omgdi:waypoint x="129.9496588110467" y="178.09285545292158"></omgdi:waypoint>
-//         <omgdi:waypoint x="175.375" y="178.375"></omgdi:waypoint>
-//       </bpmndi:BPMNEdge>
-//       <bpmndi:BPMNEdge bpmnElement="sid-87FEFF8D-9375-48E6-A454-32BE8807305A" id="BPMNEdge_sid-87FEFF8D-9375-48E6-A454-32BE8807305A">
-//         <omgdi:waypoint x="193.79929577464787" y="159.19450317124733"></omgdi:waypoint>
-//         <omgdi:waypoint x="187.52049808429118" y="87.95"></omgdi:waypoint>
-//       </bpmndi:BPMNEdge>
-//       <bpmndi:BPMNEdge bpmnElement="sid-0F3C7AC6-8119-4156-84E5-73A0AC44DE8D" id="BPMNEdge_sid-0F3C7AC6-8119-4156-84E5-73A0AC44DE8D">
-//         <omgdi:waypoint x="214.55918693981667" y="178.37820512820514"></omgdi:waypoint>
-//         <omgdi:waypoint x="260.0002755524838" y="178.08885188426407"></omgdi:waypoint>
-//       </bpmndi:BPMNEdge>
-//     </bpmndi:BPMNPlane>
-//   </bpmndi:BPMNDiagram>
-// </definitions>`;
+//     <process id="tan" name="Tan_test" isExecutable="true">
+//         <startEvent id="startEvent1" flowable:formFieldValidation="true"></startEvent>
+//         <scriptTask id="sid-2F0A479D-8C2F-475E-BD84-A5AE37721246" flowable:autoStoreVariables="false">
+//             <script>
+//                 <![CDATA[xxxxxxx assdc ac aca scas cas casc asc sa csa csa csa csa csa c sac]]>
+//             </script>
+//         </scriptTask>
+//         <sequenceFlow id="sid-E86B735D-0451-4D72-A5E6-5F69D37C0548" sourceRef="startEvent1" targetRef="sid-2F0A479D-8C2F-475E-BD84-A5AE37721246"></sequenceFlow>
+//         <serviceTask id="ppppppppppppppppppppppppp" name="cscsd ssd sd" flowable:async="true" flowable:type="http" flowable:skipExpression="vvv">
+//             <documentation>documenttttttttttttt</documentation>
+//             <extensionElements>
+//                 <flowable:field name="requestMethod">
+//                     <flowable:string>
+//                         <![CDATA[POST]]>
+//                     </flowable:string>
+//                 </flowable:field>
 
+
+//                 <flowable:field name="requestUrl">
+//                     <flowable:string>
+//                         <![CDATA[htpps://ccc/cccc]]>
+//                     </flowable:string>
+//                 </flowable:field>
+//                 <flowable:field name="requestHeaders">
+//                     <flowable:string>
+//                         <![CDATA[ssdcsdcsdc]]>
+//                     </flowable:string>
+//                 </flowable:field>
+//                 <flowable:field name="requestBody">
+//                     <flowable:string>
+//                         <![CDATA[vsvsdvds ssđs sv]]>
+//                     </flowable:string>
+//                 </flowable:field>
+//                 <flowable:field name="requestBodyEncoding">
+//                     <flowable:string>
+//                         <![CDATA[scsdc
+// sdc
+// s
+
+// cdcscds
+// scsd]]>
+//                     </flowable:string>
+//                 </flowable:field>
+//                 <flowable:field name="requestTimeout">
+//                     <flowable:string>
+//                         <![CDATA[200]]>
+//                     </flowable:string>
+//                 </flowable:field>
+//                 <flowable:field name="disallowRedirects">
+//                     <flowable:string>
+//                         <![CDATA[ssv]]>
+//                     </flowable:string>
+//                 </flowable:field>
+//                 <flowable:field name="failStatusCodes">
+//                     <flowable:string>
+//                         <![CDATA[300]]>
+//                     </flowable:string>
+//                 </flowable:field>
+//                 <flowable:field name="handleStatusCodes">
+//                     <flowable:string>
+//                         <![CDATA[cấc]]>
+//                     </flowable:string>
+//                 </flowable:field>
+//                 <flowable:field name="responseVariableName">
+//                     <flowable:string>
+//                         <![CDATA[aaa]]>
+//                     </flowable:string>
+//                 </flowable:field>
+//                 <flowable:field name="ignoreException">
+//                     <flowable:string>
+//                         <![CDATA[ccs]]>
+//                     </flowable:string>
+//                 </flowable:field>
+//                 <flowable:field name="saveRequestVariables">
+//                     <flowable:string>
+//                         <![CDATA[cccccc]]>
+//                     </flowable:string>
+//                 </flowable:field>
+//                 <flowable:field name="saveResponseParameters">
+//                     <flowable:string>
+//                         <![CDATA[vvv]]>
+//                     </flowable:string>
+//                 </flowable:field>
+//                 <flowable:field name="resultVariablePrefix">
+//                     <flowable:string>
+//                         <![CDATA[ccv]]>
+//                     </flowable:string>
+//                 </flowable:field>
+//                 <flowable:field name="saveResponseParametersTransient">
+//                     <flowable:string>
+//                         <![CDATA[dđ]]>
+//                     </flowable:string>
+//                 </flowable:field>
+//                 <flowable:field name="saveResponseVariableAsJson">
+//                     <flowable:string>
+//                         <![CDATA[ccccc]]>
+//                     </flowable:string>
+//                 </flowable:field>
+//             </extensionElements>
+//         </serviceTask>
+//     </process>
+//     <bpmndi:BPMNDiagram id="BPMNDiagram_tan">
+//         <bpmndi:BPMNPlane bpmnElement="tan" id="BPMNPlane_tan">
+//             <bpmndi:BPMNShape bpmnElement="startEvent1" id="BPMNShape_startEvent1">
+//                 <omgdc:Bounds height="30.0" width="30.0" x="100.0" y="163.0"></omgdc:Bounds>
+//             </bpmndi:BPMNShape>
+//             <bpmndi:BPMNShape bpmnElement="sid-2F0A479D-8C2F-475E-BD84-A5AE37721246" id="BPMNShape_sid-2F0A479D-8C2F-475E-BD84-A5AE37721246">
+//                 <omgdc:Bounds height="80.0" width="100.0" x="206.0" y="123.0"></omgdc:Bounds>
+//             </bpmndi:BPMNShape>
+//             <bpmndi:BPMNShape bpmnElement="ppppppppppppppppppppppppp" id="BPMNShape_ppppppppppppppppppppppppp">
+//                 <omgdc:Bounds height="80.0" width="100.0" x="238.25001674145415" y="272.01562797976646"></omgdc:Bounds>
+//             </bpmndi:BPMNShape>
+//             <bpmndi:BPMNEdge bpmnElement="sid-E86B735D-0451-4D72-A5E6-5F69D37C0548" id="BPMNEdge_sid-E86B735D-0451-4D72-A5E6-5F69D37C0548">
+//                 <omgdi:waypoint x="129.8673288586201" y="176.41307953547377"></omgdi:waypoint>
+//                 <omgdi:waypoint x="205.9999999999999" y="168.31382978723403"></omgdi:waypoint>
+//             </bpmndi:BPMNEdge>
+//         </bpmndi:BPMNPlane>
+//     </bpmndi:BPMNDiagram>
+// </definitions>`
 export const defaultXML = `<?xml version="1.0" encoding="UTF-8"?><bpmn:definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmn="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:dc="http://www.omg.org/spec/DD/20100524/DC" id="Definitions_0c10uce" targetNamespace="http://bpmn.io/schema/bpmn" exporter="bpmn-js (https://demo.bpmn.io)" exporterVersion="6.5.1"><bpmn:process id="Process_1gacmib" isExecutable="false"><bpmn:startEvent id="StartEvent_17nrhtw" /></bpmn:process><bpmndi:BPMNDiagram id="BPMNDiagram_1"><bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="Process_1gacmib"><bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_17nrhtw"><dc:Bounds x="156" y="81" width="36" height="36" /></bpmndi:BPMNShape></bpmndi:BPMNPlane></bpmndi:BPMNDiagram></bpmn:definitions>`;
