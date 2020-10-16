@@ -2304,17 +2304,22 @@ let allAttrs = {
         pushToXML: attrToXMLMethods.notPushToXML
     },
 
-
     serviceTaskType: {
         "title": "Service task type",
         "type": "select",
         "value": "script",
         "info": "",
         "dg": "detail",
-        options: [{
-            text: 'Script',
-            value: 'script'
-        }],
+        options: [
+            {
+                text: 'Script',
+                value: 'script',
+            },
+            {
+                text: 'Notification',
+                value: 'notification',
+            }
+        ],
         pushToXML: attrToXMLMethods.notPushToXML
     },
     serviceTaskTypeHTTP: {
@@ -2336,9 +2341,11 @@ let allAttrs = {
         "type": "script",
         "value": "",
         "info": "",
-        "dg": "formula",
+        "dg": "detail",
+        hidden:false,
         pushToXML: attrToXMLMethods.notPushToXML,
     },
+
     // serviceTaskHTTPType: {
     //     "title": "",
     //     "type": "text",
@@ -2393,6 +2400,22 @@ let allAttrs = {
                 "type": "String"
             }]
         }
+    },
+    serviceNotificationReceiver: {
+        title: 'Receiver',
+        type: 'userAssignment', // trong user assignment có hai tab: select qua orgchart và viết script
+        value: {
+            orgChart: [],
+            formula: '',
+            orgchartSelectorValue: [] // dạng value của orgchartselector để hiển thị lên
+        },
+        getValueForXML(value) {
+            return userAssignmentToXMLValue(value);
+        },
+        activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
+        dg: 'assignment',
+        hidden:false,
+        pushToXML: attrToXMLMethods.notPushToXML,
     },
 
 }
