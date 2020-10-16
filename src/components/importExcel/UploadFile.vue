@@ -174,16 +174,15 @@ export default {
         this.nameImport = " ";
         this.description =" ";
         this.selectType ="Excel" ;
-
     },
     methods: {
         nextStep(){
             let data = {
                 selectType:this.selectType,
-                data: this.options.query
+                data: this.options.query,
+                nameImport: this.nameImport
             }
             this.$emit("showMapping",data);
-        
         },
         clearFiles() {
             this.$refs.upload.uploader.cancel()
@@ -212,7 +211,6 @@ export default {
             this.options.query.nameImport = this.nameImport;
             this.options.query.description = this.description;
              if(this.importInfo.options.objType=='document'){
-                 debugger
                 this.options.query.objId = this.importInfo.options.objId;
             }
              this.$emit('clearFiles');

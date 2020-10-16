@@ -219,8 +219,7 @@ export default {
             mapImport:false,
             showImport:true,
             newLastKeyTables:[],
-            lastKeyTables:[],
-            lastKeyGeneral:{},
+            lastKey:[],
             selectType:'',
             isSelecting: false,
             nameSheets: [],
@@ -250,19 +249,23 @@ export default {
     },
     methods: {
         nextToImport(dataUpload){
-  
-            let check = false;
-            if(dataUpload.data.nameImport!=''){
-                check = true;
+            let check = true;
+            if(dataUpload.data.key==''){
+                 this.errorMessage="Bạn chưa chọn file"
+                  check = false;
             }
-            if(check){
-                this.stepper = 2;
-                this.mapImportInfo();
-                this.selectType = dataUpload.selectType
-            }else{
+            if(dataUpload.nameImport==' '){
+                check = false;
                 this.errorMessage="Bạn chưa chọn tên cho file"
             }
             
+            if(check){
+                this.errorMessage="",
+                this.stepper = 2;
+                this.mapImportInfo();
+                this.selectType = dataUpload.selectType
+            }
+        
         },
         showImportInfo(){
             this.stepper = 2;
@@ -277,6 +280,7 @@ export default {
         sumCount(tableIdx,type){
             let totalAllRow = 0;
             let totalFilledRow = this.tables[tableIdx].controls.filter(p => p.dataColumn!=null).length;
+            debugger
             let isFilledKey =  this.tables[tableIdx].keyColumn?(this.tables[tableIdx].keyColumn.enable?1:0):0;
             if(type!='user'){
                 totalAllRow = this.tables[tableIdx].controls.filter(p => p.dataType!='table').length+1;
@@ -288,14 +292,18 @@ export default {
              //Sự kiện xảy ra khi thay đổi Key
         onChangeKey(tableIdx,value){
             if(value){
-                 this.tables[tableIdx].keyColumn.enable=true;
-                 this.tables[tableIdx].keyColumn.index=value.index;
-                 this.tables[tableIdx].keyColumn.name=value.name;
+                debugger
+                this.tables[tableIdx].keyColumn={
+                    enable:true,
+                    index:value.index,
+                    name:value.name
+                };
             }else{
-                 this.tables[tableIdx].keyColumn.enable = false;
-                 this.tables[tableIdx].keyColumn.index=-1;
-                 this.tables[tableIdx].keyColumn.name=' ';
-
+                 this.tables[tableIdx].keyColumn={
+                    enable:false,
+                    index:-1,
+                    name:''
+                 }
             }
            
         },
@@ -401,39 +409,45 @@ export default {
                 },
 
             };
-            let check = true;
-                // kiểm tra key rỗng của table chung
-                    if (this.tables[0].keyColumn==undefined||this.tables[0].keyColumn.index==-1) {
-                        if(this.options.objType=='document'){
-                            this.errorMessage = '* Bạn chưa chọn khóa cho thông tin chung';
-                            check = false;
-                        }
-                    };
-                    if (this.tables[0].sheetMap == '') {
-                        this.errorMessage = '* Điền thiếu trường thông tin chung';
+            let check = this.checkValidate();
+            if(check){
+                importApi.pushDataExcel(dataImport)
+                .then(res => {
+                    if (res.status === 200) {
+                        console.log(dataImport);                    }
+                })
+                .catch(err => {
+                });     
+                this.errorMessage = '';
+                this.$emit('import', {fileName:this.data.fileName});
+                this.showCancelBtn = false;
+            }
+        },
+        //
+        checkValidate(){
+            let check=true;
+              // kiểm tra key rỗng của table chung
+            if (this.tables[0].keyColumn==undefined||this.tables[0].keyColumn.index==-1) {
+                if(this.options.objType=='document'){
+                    this.errorMessage = '* Bạn chưa chọn khóa cho thông tin chung';
+                    check = false;
+                }
+            };
+            if (this.tables[0].sheetMap == '') {
+                this.errorMessage = '* Điền thiếu trường thông tin chung';
+                check = false;
+            };
+            // kiểm tra bảng con
+                if(this.options.objType=='document'){
+                for (let i = 0; i < this.tables.length; i++) {
+                    if(this.tables[i].keyColumn==undefined||this.tables[i].keyColumn.index==-1){
+                        this.errorMessage = '* Bạn chưa chọn khóa cho bảng '+this.tables[i].name;
                         check = false;
                     };
-                   // kiểm tra bảng con
-                     if(this.options.objType=='document'){
-                        for (let i = 0; i < this.tables.length; i++) {
-                            if(this.tables[i].keyColumn==undefined||this.tables[i].keyColumn.index==-1){
-                                this.errorMessage = '* Bạn chưa chọn khóa cho bảng '+this.tables[i].name;
-                                check = false;
-                            };
-                        }
-                    }
-                    if(check){
-                        importApi.pushDataExcel(dataImport)
-                        .then(res => {
-                            if (res.status === 200) {
-                                console.log(dataImport);                    }
-                        })
-                        .catch(err => {
-                        });     
-                        this.errorMessage = '';
-                        this.$emit('import', {fileName:this.data.fileName});
-                        this.showCancelBtn = false;
-                    }
+                }
+            }
+            return check;
+
         },
         //Lấy icon theo kiểu dữ liệu
         getIcon(controlType) {
@@ -483,13 +497,13 @@ export default {
             if (value) {
                 // chuyển giá trị được chọn thành false
                 value.enable = false;
+                 this.tables[tableIdx].keyColumn=null;
                 // đẩy giá trị cũ thành true
                 if (this.tables[tableIdx].sheetMap) {
                     this.tables[tableIdx].sheetMap.enable = true;
                 }
                 // kiểm tra những sheet đã tồn tại khi lấy giá trị từ mapping 
-                 for(let i = 0; i<this.nameSheets.length; i++)
-                {
+                 for(let i = 0; i<this.nameSheets.length; i++){
                     if(this.nameSheets[i].name ==  this.tables[tableIdx].sheetMap.name){
                         this.nameSheets[i].enable= true;
                     }
@@ -500,6 +514,7 @@ export default {
                 let name = this.tables[tableIdx].sheetMap.name;
                 this.tables[tableIdx].sheetMap.enable = true;
                 this.tables[tableIdx].sheetMap = '';
+                this.tables[tableIdx].keyColumn=null;
                 for(let i = 0; i<this.nameSheets.length; i++)
                 {
                     if(this.nameSheets[i].name == name){
@@ -558,17 +573,19 @@ export default {
                 if (res.status === 200) {
                     let mapping = JSON.parse(res.data[0].mapping);    
                     mapping = mapping.mapping;
-                    // tạo 1 mảng lưu những row được lấy
                     let row = [];
                     let lastNameSheet = [];
                     lastNameSheet.push(mapping.general.sheetMap)
-                    this.lastKeyGeneral = {enable:true,index:-1,name:'',nameSheet:''};
-                    this.lastKeyTables = [];
+                    this.lastKey = [];
                     if(mapping.general.keyColumn){
-                        this.lastKeyGeneral.enable = mapping.general.keyColumn.enable;
-                        this.lastKeyGeneral.index = mapping.general.keyColumn.index;
-                        this.lastKeyGeneral.name = mapping.general.keyColumn.name;
-                        this.lastKeyGeneral.nameSheet = mapping.general.sheetMap;
+                        this.lastKey.push({
+                            enable: mapping.general.keyColumn.enable,
+                            index: mapping.general.keyColumn.index,
+                            name :  mapping.general.keyColumn.name,
+                            nameSheet :  mapping.general.sheetMap,
+                            nameTable: 'Thông tin chung'
+
+                        })
                     }
                     for (let i = 0; i < mapping.general.controls.length; i++) {
                         row.push({
@@ -582,7 +599,7 @@ export default {
                             lastNameSheet.push(mapping.tables[i].sheetMap);
                             if(mapping.tables[i].keyColumn){
                                 let nameLastKeyTables = mapping.tables[i].keyColumn.name
-                                this.lastKeyTables.push({
+                                this.lastKey.push({
                                     name:nameLastKeyTables, 
                                     index:-1,
                                     enable:false,
@@ -606,21 +623,6 @@ export default {
                 console.log(err)
             })
         },
-        // phần mapping --- hàm đẩy giá trị mapping vào tables
-        pushMappingInTables(name, column){
-            this.setLastKeyGeneral();
-            for(let i = 0; i<this.tables.length; i++){
-               for(let j= 0; j<this.tables[i].controls.length; j++){
-                   if(this.tables[i].controls[j].name==name){
-                       this.tables[i].controls[j].dataColumn = {name: '',index: 0, enable:false};
-                       this.tables[i].controls[j].dataColumn.name= column;
-                       //this.tables[i].sheetMap={name:'',enable:false};
-                      // this.tables[i].sheetMap.name = this.getNameSheetMapping(column);
-                       this.tables[i].controls[j].dataColumn.index = this.getIndexColumnMapping(column);
-                   }
-               }
-            }
-        },
         //phần mapping --- hàm tìm index mới cho cột
          getIndexColumnMapping(value){
             let index = -1;
@@ -628,40 +630,41 @@ export default {
                  let arr = this.nameColumnDetail[this.nameSheets[i].name];
                 for(let j = 0; j<arr.length; j++){
                     if(arr[j].name==value){
-                        // 
                         this.nameColumnDetail[this.nameSheets[i].name][j].enable=false;
                          return index = arr[j].index;
                     }
                 }
             }
         },
-        //phần mapping--- hàm tìm key cho cột
-          setLastKeyGeneral(){
-           
-              // xử lý key bảng chung
-            for(let i = 0; i<this.nameSheets.length; i++){
-                 let arr = this.nameColumnDetail[this.nameSheets[i].name];
-                for(let j = 0; j<arr.length; j++){
-                    if(arr[j].name==this.lastKeyGeneral.name&&this.tables[0].keyColumn){
-                        this.tables[0].keyColumn.name=this.lastKeyGeneral.name;
-                        this.tables[0].keyColumn.enable= true;
-                        this.tables[0].keyColumn.index= this.getIndexColumnMapping(arr[j].name);
-                    }
+        //checkSheet có tồn tại
+        checkNameSheetExist(nameSheet){
+            let check = false;
+            for(let j=0;j<this.nameSheets.length;j++){
+                if(this.nameSheets[j].name==nameSheet){
+                    check = true;
                 }
+            }
+            return check
+        },
+        //phần mapping--- hàm tìm key cho cột
+        setLastKeyGeneral(){
+            if(this.tables[0].sheetMap.name==this.lastTable[0].nameSheet&&this.checkNameSheetExist(this.lastTable[0].nameSheet)){
+                this.tables[0].keyColumn.name=this.lastKey[0].name;
+                this.tables[0].keyColumn.enable= true;
+                this.tables[0].keyColumn.index= this.getIndexColumnMapping(this.lastKey[0].name);
             }
         },
         // hàm xử lý key từng bảng con, so sánh với dòng trong excel nếu trùng thì set sheetMap
         setLastKeyTables(){
-           
             // kiểm tra để lấy key
             let newLastKeyTables = [];
-            for(let i = 0; i<this.lastKeyTables.length; i++){
+            for(let i = 1; i<this.lastKey.length; i++){
                  for(let j = 0; j<this.nameSheets.length; j++){
                     let arr = this.nameColumnDetail[this.nameSheets[j].name];
                     for(let k = 0; k<arr.length; k++){
-                        if(arr[k].name==this.lastKeyTables[i].name){
+                        if(arr[k].name==this.lastKey[i].name){
                             newLastKeyTables.push({
-                                name:this.lastKeyTables[i].name,
+                                name:this.lastKey[i].name,
                                 sheet: this.nameSheets[j].name,
                                 index: arr[k].index,
                                 enable: true});
@@ -682,21 +685,12 @@ export default {
                     }
                 }
         },
-        //phần mapping --- hàm tìm sheet lưu cho cột 
-        getNameSheetMapping(value){
-            debugger
-            let nameSheetMapping = '';
+        //phần mapping --- ẩn tên sheet 
+        hideNameSheet(value){
             for(let i = 0; i<this.nameSheets.length; i++){
                 if(this.nameSheets[i].name==value){
-                       this.nameSheets[i].enable=false;
+                    this.nameSheets[i].enable=false;
                 }
-                //  let arr = this.nameColumnDetail[this.nameSheets[i].name];
-                // for(let j = 0; j<arr.length; j++){
-                //     if(arr[j].name==value){
-                //         debugger
-                //      
-                //     }
-                // }
             }
         },
         //phần mapping---hàm so sánh tên cột trong danh sách file excel và tên cột trong mapping
@@ -708,19 +702,23 @@ export default {
             if(column.length>2){
                 for(let i = 0; i<this.tables.length;i++){
                     for(let j=0; j<this.lastTable.length;j++){
-                        if(this.lastTable[j].nameTable==this.tables[i].name){
-                            for(let k= 0; k<this.tables[i].controls.length;k++){
+                        if(this.lastTable[j].nameTable==this.tables[i].name&&this.checkNameSheetExist(this.lastTable[j].nameSheet)){
+                            debugger
+                            for(let k = 0; k<this.tables[i].controls.length;k++){
                                if(this.tables[i].controls[k].name==this.lastTable[j].controlName){
-                                     this.tables[i].sheetMap={name:'',enable:false};
-                                     this.getNameSheetMapping(this.lastTable[j].nameSheet);
-                                     this.tables[i].sheetMap.name = this.lastTable[j].nameSheet;
-                                     // tắt table
-                                      this.pushMappingInTables(this.lastTable[j].controlName,this.lastTable[j].dataColumn)
+                                    this.hideNameSheet(this.lastTable[j].nameSheet);
+                                    debugger
+                                    this.tables[i].sheetMap={name:'',enable:false};
+                                    this.tables[i].controls[k].dataColumn = {name: '',index: 0, enable:false};
+                                    this.tables[i].sheetMap.name = this.lastTable[j].nameSheet;
+                                    this.tables[i].controls[k].dataColumn.name= this.lastTable[j].dataColumn;
+                                    this.tables[i].controls[k].dataColumn.index = this.getIndexColumnMapping(this.lastTable[j].dataColumn);
                                }
                             }
                         }
                     }
                 }
+            this.setLastKeyGeneral();
             this.setLastKeyTables();
             }else{
                 console.log('Không có file Mapping')
