@@ -503,6 +503,7 @@ export default {
                     self.isRole=true;
                     return true;
                 }else{
+                    self.isRole=false;
                     return false;
                 }
             }else{
