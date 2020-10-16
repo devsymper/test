@@ -369,7 +369,7 @@ export default {
 			name: "",
 			type: "",
             sidebarWidth:400,
-            filterObject:0,
+            filterObject:1,
             indexObj:null,
             indexSub:null,
             panel: [0, 1, 2, 3, 4],

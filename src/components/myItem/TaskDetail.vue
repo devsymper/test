@@ -492,6 +492,7 @@ export default {
         async checkRoleUser(originData){
             let self=this;
             if (originData.assignee.indexOf(":")>0) {
+                debugger
                 let arrDataAssignee=originData.assignee.split(":");
                 let assigneeId=arrDataAssignee[0];
                 let roleIdentify=originData.assignee.slice(assigneeId.length);
@@ -512,7 +513,7 @@ export default {
         async updateTask(taskData) {
             let data = {};
             if (this.isRole==false) {
-                data.assignee=this.originData.assignee+":"+this.$store.state.app.endUserInfo.currentRole.id;
+                data.assignee=this.$store.state.app.endUserInfo.id+":"+this.$store.state.app.endUserInfo.currentRole.id;
             }
             if (this.taskAction=='submit') { // khi submit task
                 let description;
