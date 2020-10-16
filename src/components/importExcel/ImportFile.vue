@@ -153,13 +153,15 @@
                             </v-tooltip>
                         </v-col>
                         <v-col class="col-md-6" style="margin-top:-39px; margin-left:2px">
-                            <v-autocomplete style="width: 215px;" class="auto-complete color-normal"
-                            :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" 
-                            item-text="name" 
-                            return-object :value="control.dataColumn" 
-                            @input="value => onChangeDetailInfo(tableIdx, controlIdx, value)" 
-                            clearable 
-                            :menu-props="{'nudge-top':-10, 'max-width': 300}">
+                            <v-autocomplete 
+                                style="width: 215px" 
+                                class="auto-complete color-normal"
+                                :items="nameColumnDetail[table.sheetMap.name] ? nameColumnDetail[table.sheetMap.name] : []" 
+                                item-text="name" 
+                                return-object :value="control.dataColumn" 
+                                @input="value => onChangeDetailInfo(tableIdx, controlIdx, value)" 
+                                clearable 
+                                :menu-props="{'nudge-top':-10, 'max-width': 300}">
                                 <template v-slot:item="{ item, on, attrs }">
                                     <v-list-item v-show="item.enable" v-on="on" v-bind="attrs">
                                         <v-list-item-content>
@@ -285,7 +287,6 @@ export default {
         },
              //Sự kiện xảy ra khi thay đổi Key
         onChangeKey(tableIdx,value){
-            debugger
             if(value){
                  this.tables[tableIdx].keyColumn.enable=true;
                  this.tables[tableIdx].keyColumn.index=value.index;
@@ -339,7 +340,6 @@ export default {
                 this.importInfo.nameImport =  data.data.nameImport;
                 this.importInfo.description = data.data.description;
                 this.importInfo.selectType = data.data.typeImport;
-                debugger
                 this.data = data.data;
                     if(Array.isArray(this.data)){}
                     else{
@@ -384,7 +384,6 @@ export default {
                 }
                 general.push(tb);
             }
-            debugger
             let dataImport = {
                 fileName: this.data.fileName,
                 subObjType:this.options.subObjType,
@@ -423,14 +422,6 @@ export default {
                             };
                         }
                     }
-                       //kiểm tra bắt buộc điền
-                    // for (let index = 0; index < this.tables.length; index++) {
-                    //     for(let j=0; j<this.tables[index].controls.length;j++){
-                    //         if(this.tables[index].controls[j].dataColumn==null&&this.tables[index].controls[j].isNull==false)
-                    //             this.errorMessage = '* Bạn chưa điền thông tin bắt buộc';
-                    //             check = false;
-                    //     }
-                    // };  
                     if(check){
                         importApi.pushDataExcel(dataImport)
                         .then(res => {
@@ -559,7 +550,7 @@ export default {
                 this.tables[tableIdx].controls[controlIdx].dataColumn = null;
             }
         },
-
+        // lưu tất cả dữ liệu mapping lần cuối vào lastTable
         getLastData(){
             const self = this;
             importApi.getMapping(this.options.objId)
@@ -571,17 +562,19 @@ export default {
                     let row = [];
                     let lastNameSheet = [];
                     lastNameSheet.push(mapping.general.sheetMap)
-                    this.lastKeyGeneral = {enable:true,index:-1,name:''};
+                    this.lastKeyGeneral = {enable:true,index:-1,name:'',nameSheet:''};
                     this.lastKeyTables = [];
                     if(mapping.general.keyColumn){
                         this.lastKeyGeneral.enable = mapping.general.keyColumn.enable;
                         this.lastKeyGeneral.index = mapping.general.keyColumn.index;
                         this.lastKeyGeneral.name = mapping.general.keyColumn.name;
+                        this.lastKeyGeneral.nameSheet = mapping.general.sheetMap;
                     }
                     for (let i = 0; i < mapping.general.controls.length; i++) {
                         row.push({
                             controlName:mapping.general.controls[i].name,
                             nameSheet: mapping.general.sheetMap,
+                            nameTable:'Thông tin chung',
                             dataColumn:mapping.general.controls[i].dataColumn.name});
                     };
                     if(mapping.tables){
@@ -589,19 +582,24 @@ export default {
                             lastNameSheet.push(mapping.tables[i].sheetMap);
                             if(mapping.tables[i].keyColumn){
                                 let nameLastKeyTables = mapping.tables[i].keyColumn.name
-                                this.lastKeyTables.push({name:nameLastKeyTables, index:-1,enable:false});
+                                this.lastKeyTables.push({
+                                    name:nameLastKeyTables, 
+                                    index:-1,
+                                    enable:false,
+                                    nameSheet: mapping.tables[i].sheetMap
+                                });
                             }
                             for(let j = 0; j< mapping.tables[i].controls.length;j++)
                                 row.push({
                                     nameSheet: mapping.tables[i].sheetMap,
                                     controlName:mapping.tables[i].controls[j].name,
-                                    dataColumn:mapping.tables[i].controls[j].dataColumn.name
+                                    dataColumn:mapping.tables[i].controls[j].dataColumn.name,
+                                    nameTable:mapping.tables[i].name
                                 });
                             }
                         }
                     self.lastTable = row;
                     self.lastNameSheet = lastNameSheet;
-                //hàm tìm sheet theo row
                 }; 
             })
             .catch(err => {
@@ -616,8 +614,8 @@ export default {
                    if(this.tables[i].controls[j].name==name){
                        this.tables[i].controls[j].dataColumn = {name: '',index: 0, enable:false};
                        this.tables[i].controls[j].dataColumn.name= column;
-                       this.tables[i].sheetMap={name:'',enable:false};
-                       this.tables[i].sheetMap.name = this.getNameSheetMapping(column);
+                       //this.tables[i].sheetMap={name:'',enable:false};
+                      // this.tables[i].sheetMap.name = this.getNameSheetMapping(column);
                        this.tables[i].controls[j].dataColumn.index = this.getIndexColumnMapping(column);
                    }
                }
@@ -639,22 +637,22 @@ export default {
         },
         //phần mapping--- hàm tìm key cho cột
           setLastKeyGeneral(){
-     
+           
               // xử lý key bảng chung
             for(let i = 0; i<this.nameSheets.length; i++){
                  let arr = this.nameColumnDetail[this.nameSheets[i].name];
                 for(let j = 0; j<arr.length; j++){
                     if(arr[j].name==this.lastKeyGeneral.name&&this.tables[0].keyColumn){
-                    this.tables[0].keyColumn.name=this.lastKeyGeneral.name;
-                    this.tables[0].keyColumn.enable= true;
-                    this.tables[0].keyColumn.index= this.getIndexColumnMapping(arr[j].name);
+                        this.tables[0].keyColumn.name=this.lastKeyGeneral.name;
+                        this.tables[0].keyColumn.enable= true;
+                        this.tables[0].keyColumn.index= this.getIndexColumnMapping(arr[j].name);
                     }
                 }
             }
         },
         // hàm xử lý key từng bảng con, so sánh với dòng trong excel nếu trùng thì set sheetMap
         setLastKeyTables(){
-            debugger
+           
             // kiểm tra để lấy key
             let newLastKeyTables = [];
             for(let i = 0; i<this.lastKeyTables.length; i++){
@@ -686,15 +684,19 @@ export default {
         },
         //phần mapping --- hàm tìm sheet lưu cho cột 
         getNameSheetMapping(value){
+            debugger
             let nameSheetMapping = '';
             for(let i = 0; i<this.nameSheets.length; i++){
-                 let arr = this.nameColumnDetail[this.nameSheets[i].name];
-                for(let j = 0; j<arr.length; j++){
-                    if(arr[j].name==value){
-                        this.nameSheets[i].enable=false;
-                         return nameSheetMapping = this.nameSheets[i].name;
-                    }
+                if(this.nameSheets[i].name==value){
+                       this.nameSheets[i].enable=false;
                 }
+                //  let arr = this.nameColumnDetail[this.nameSheets[i].name];
+                // for(let j = 0; j<arr.length; j++){
+                //     if(arr[j].name==value){
+                //         debugger
+                //      
+                //     }
+                // }
             }
         },
         //phần mapping---hàm so sánh tên cột trong danh sách file excel và tên cột trong mapping
@@ -704,25 +706,21 @@ export default {
             let columnAr = this.nameColumnDetail;
             columnAr = Object.values(columnAr);
             if(column.length>2){
-                //
-                for(let m = 0; m<this.lastNameSheet.length;m++){
-                    for(let k = 0; k<this.nameSheets.length;k++){
-                        if(this.lastNameSheet[m]==this.nameSheets[k].name){
-                            for (let i = 0; i < this.lastTable.length; i++) {
-                                // nếu file đã được upload, có giá trị lưu tên cột trong file excel
-                                for(let j = 0; j < columnAr.length; j++){
-                                    for(let k = 0; k < columnAr[j].length; k++){
-                                        //nếu tên cột trong file excel trùng giá trị lần mapping cũ 
-                                        if(this.lastTable[i].dataColumn==columnAr[j][k].name){
-                                            // đẩy giá trị mapping vào
-                                            this.pushMappingInTables(this.lastTable[i].controlName,this.lastTable[i].dataColumn)
-                                        }
-                                    }
-                                }
+                for(let i = 0; i<this.tables.length;i++){
+                    for(let j=0; j<this.lastTable.length;j++){
+                        if(this.lastTable[j].nameTable==this.tables[i].name){
+                            for(let k= 0; k<this.tables[i].controls.length;k++){
+                               if(this.tables[i].controls[k].name==this.lastTable[j].controlName){
+                                     this.tables[i].sheetMap={name:'',enable:false};
+                                     this.getNameSheetMapping(this.lastTable[j].nameSheet);
+                                     this.tables[i].sheetMap.name = this.lastTable[j].nameSheet;
+                                     // tắt table
+                                      this.pushMappingInTables(this.lastTable[j].controlName,this.lastTable[j].dataColumn)
+                               }
                             }
                         }
                     }
-                };
+                }
             this.setLastKeyTables();
             }else{
                 console.log('Không có file Mapping')

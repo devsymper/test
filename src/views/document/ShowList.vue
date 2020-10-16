@@ -312,6 +312,7 @@ export default {
             this.listRowDocument = tables;
         },
         checkIsRequired(isRequired){
+            debugger
             if(isRequired==0){
                 return true
             }else{
@@ -324,10 +325,12 @@ export default {
             for (let i = 0; i < property.length; i++) {
                 let list = Object.values(property[i].listFields);
                 for (let j = 0; j < list.length; j++) {
+                    debugger
                     controls.push({
                         name: list[j].properties.name,
                         title:list[j].properties.title,
                         isKeyControl: false,
+                        isNull:this.checkIsRequired(list[j].properties.isRequired),
                         dataColumn: null,
                         dataType: this.getDataType(list[j].type)
                     });
