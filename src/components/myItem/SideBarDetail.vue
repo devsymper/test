@@ -39,6 +39,19 @@
 									<td>{{$t('tasks.header.endTime')}}</td>
 									<td class="pl-2">{{ $moment(originData.endTime).fromNow()}}</td>
 								</tr>
+								<tr >
+									<td>{{$t('tasks.header.description')}}</td>
+									<td class="pl-2">
+										<v-tooltip bottom>
+											<template v-slot:activator="{ on }">
+											<div v-on="on" class="text-ellipsis" style="width:250px">
+												{{taskInfo.extraLabel}} {{taskInfo.extraValue}}
+											</div>
+										</template>
+										<span>{{taskInfo.extraLabel}} {{taskInfo.extraValue}}</span>
+										</v-tooltip>
+									</td>
+								</tr>
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.comment')}}</td>
 									<td class="pl-2" style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
@@ -75,9 +88,6 @@
 									<v-icon class="mr-3" size="18">mdi-account</v-icon> 
 									<span mt-1>{{$t("tasks.header."+role)}}</span>
 								</span>
-								<!-- <v-btn small icon @click="addUserForRole(role)" class="ml-3 symper-add-user-btn" style="display: none" v-if="roleCanAddUser[role]">
-									<v-icon>mdi-plus</v-icon>
-								</v-btn> -->
 							</div>
 							<div class="pl-7 d-flex justify-space-between user-show" v-for="userItem in tabsData[role]" :key="userItem.id" >
 								<user :user="userItem" class="float-left"></user>
@@ -110,13 +120,10 @@
 											<div class="bg-white" style="width: 200px; z-index: 1002" :ref="'selectUserWrapper_'+role+'_'+idx">
 											</div>
 										</v-menu>
-
-										<!-- <v-btn v-else depressed class="mr-3" small @click="handleAction(btn.name, role, idx)" >
-											<v-icon left>{{btn.icon}}</v-icon> {{btn.text}}
-										</v-btn> -->
 									</div>
 								</div>
 							</div>
+							<div class="pl-15" v-if="users.length>0 && originData[role+'Role'] " style="clear:both">{{originData[role+'Role'].name}}</div>
 						</div>
 					</v-expansion-panel-content>
 				</v-expansion-panel>

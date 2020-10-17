@@ -1,6 +1,35 @@
 import { allNodesAttrs } from "./../allAttrsOfNodes";
 import attrToXMLMethods from "./attrToXMLMethods";
 import { util } from "../../../plugins/util";
+import serviceTaskDefinitions from "./serviceTaskDefinitions";
+
+function translateServiceTaskToHTTPTask(el, attrs, bpmnModeler) {
+    let moddle = bpmnModeler.get('moddle');
+    let modeling = bpmnModeler.get('modeling');
+    let bizEl = el.businessObject;
+    let extensionElements = bizEl.extensionElements;
+
+
+    extensionElements = moddle.create('bpmn:ExtensionElements');
+    extensionElements.values = [];
+    let items = serviceTaskDefinitions[attrs.serviceTaskType.value].params;
+    serviceTaskDefinitions[attrs.serviceTaskType.value].makeRequestBody(attrs);
+    for (let name in items) {
+        let subEl = moddle.create('symper:field');
+        subEl.name = name;
+        let value = String(items[name]).replace(/\n/g, '');
+        if (String(value)) {
+            subEl.text = `<symper:string>
+                <![CDATA[${value}]]>
+            </symper:string>`;
+            extensionElements.values.push(subEl);
+        }
+    }
+    modeling.updateProperties(el, {
+        extensionElements
+    });
+}
+
 
 /**
  * 
@@ -16,8 +45,8 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
         if (bizVizEl.$type == 'bpmn:Process' || bizVizEl.$type == 'bpmn:Collaboration') {
             elKey = 'rootElements';
             vizEl = bizVizEl.$parent;
-        } else if (bizVizEl) {
-
+        } else if (bizVizEl.$type == 'bpmn:ServiceTask') {
+            translateServiceTaskToHTTPTask(vizEl, attrs, bpmnModeler);
         }
 
         if (elKey) {

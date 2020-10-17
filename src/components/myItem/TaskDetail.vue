@@ -333,7 +333,11 @@ export default {
                 console.log(res,"task");
                 for(let role in self.tabsData.people){
                     if(res[role]){
-                        self.tabsData.people[role] = res[role].split(',').reduce((arr, el) => {
+                        let userIdentifier=res[role];
+                        if (userIdentifier.indexOf(":")>0){
+                            userIdentifier=(userIdentifier.split(":"))[0];
+                        }
+                        self.tabsData.people[role] =userIdentifier.split(',').reduce((arr, el) => {
                             if(self.usersMap[el]){
                                 arr.push(self.usersMap[el]);
                             }else{

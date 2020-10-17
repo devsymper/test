@@ -365,7 +365,7 @@ export default {
             sort: "startTime",
             order: "desc",
             page: 1,
-            involvedUser: this.$store.state.app.endUserInfo.id
+            involvedUser: this.$store.state.app.endUserInfo.id+"%"
         },
         filterVariables:{
             names:"symper_application_id,symper_user_id_start_workflow",
