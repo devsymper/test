@@ -57,21 +57,6 @@
                         <v-btn icon @click="showSearchInput = !showSearchInput">
                             <v-icon>mdi-magnify</v-icon>
                         </v-btn>
-                        <v-btn icon @click="showConfigNotification = !showConfigNotification">
-                           <span class="iconify" data-icon="mdi-cogs" data-inline="false"></span>
-                        </v-btn>
-                        <!-- config -->
-                              <v-navigation-drawer
-                                    v-model="showConfigNotification"
-                                    width="552"
-                                    absolute
-                                    right
-                                    temporary
-                                >
-                                    <ConfigNotification :isShow="showConfigNotification"/>
-                                </v-navigation-drawer>
-                        <!-- config -->
-                       
                         <v-menu  v-model="isShowDialogNotification"
                             z-index="161"
                             :close-on-content-click="false"
@@ -129,7 +114,6 @@
 import Api from "../../api/api.js";
 import { appConfigs } from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
-import ConfigNotification from "@/components/notification/ConfigNotification.vue";
 import listApp from "@/components/common/listApp";
 import EndUserPopup from './../apps/EndUserPopup.vue';
 import NotificationBar from "@/components/notification/NotificationBar.vue";
@@ -194,7 +178,6 @@ export default {
         
     },
     components: {
-        ConfigNotification,
         "ba-sidebar": BASidebar,
         "list-app": listApp,
         "list-notification": NotificationBar,
