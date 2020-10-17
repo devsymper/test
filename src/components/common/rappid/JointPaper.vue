@@ -72,7 +72,7 @@ export default {
             viewport: function(view) {
                 var modelS = view.model;
                 // Hide elements and links which are currently collapsed
-                debugger
+                
                 if (modelS.get('hidden')) {
                     return false
                 };

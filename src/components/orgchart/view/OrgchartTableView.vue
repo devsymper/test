@@ -126,6 +126,7 @@ import ListItems from '@/components/common/ListItems.vue'
 import VueResizable from 'vue-resizable';
 import { util } from "./../../../plugins/util.js";
 import Detail from '@/views/document/detail/Detail.vue'
+import { orgchartApi } from "@/api/orgchart.js";
 export default {
     props: {
         allDepartments: {
@@ -418,10 +419,24 @@ export default {
                viewDetails: {
                     name: "View details",
                     text: "Xem chi tiết",
-                    callback: (app, callback) => {
-                    this.docObjInfo = {docObjId:3986681,docSize:'21cm'}
-                       self.$refs.listUser.actionPanel = true;
-                       this.$emit('view-details',app)
+                    callback: (user, callback) => {
+                        let data = {
+                            // object_identifier: "account:971"
+                            object_identifier: "account:"+user.id
+                        }
+                        let self = this
+                        orgchartApi.getDocumentByUserId(data).then(res=>{
+                            if(res.data.length > 0){
+                                let idDoc = res.data[0].documentObjectId
+                               self.docObjInfo = {docObjId:idDoc,docSize:'21cm'}
+                               self.$refs.listUser.actionPanel = true;
+                            }else{
+                                self.$snotify({
+                                    type: "error",
+                                    title: "Không tìm thấy hồ sơ nhân sự",
+                                });
+                            }
+                        }).catch(err=>{})
                     },
                 },
              

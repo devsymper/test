@@ -6,6 +6,7 @@ import {
 let orgchart = new Api(appConfigs.apiDomain.orgchart);
 let coreApi = new Api(appConfigs.apiDomain.core);
 let accessControlApi = new Api(appConfigs.apiDomain.permission);
+let documentApi = new Api(appConfigs.apiDomain.documentService);
 import Vue from "vue";
 
 
@@ -81,7 +82,10 @@ export const orgchartApi = {
             data
         )
     },
-    getAllOrgchartStruct() {
+    getAllOrgchartStruct(){
         return orgchart.get("orgchart/struct-only");
+    },
+    getDocumentByUserId(data){
+        return documentApi.post("documents/map-query", data)
     }
 };
