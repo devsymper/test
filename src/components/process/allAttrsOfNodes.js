@@ -4,7 +4,7 @@ import attrToXMLMethods from "./elementDefinitions/attrToXMLMethods";
 
 
 
-function userAssignmentToXMLValue(config) {
+export const userAssignmentToXMLValue = function (config) {
     let rsl = {
         formula: config.formula,
         users: [
@@ -2362,7 +2362,7 @@ let allAttrs = {
         "dg": "detail",
         toXML: {
             "symper_position": "el",
-            "name": "field",
+            "name": "symper_symper_field_tag",
             "superClass": ["Element"],
             "properties": [{
                 "name": "name",
@@ -2419,7 +2419,7 @@ let allAttrs = {
     },
     serviceNotificationTitle: {
         "title": "Title",
-        "type": "text",
+        "type": "script",
         "value": "",
         "info": "",
         "dg": "detail",
@@ -2440,10 +2440,12 @@ let allAttrs = {
                 Vue.set(this, 'validateStatus', item);
             }
         },
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
     serviceNotificationDescription: {
         "title": "Description",
-        "type": "text",
+        "type": "script",
         "value": "",
         "info": "",
         "dg": "detail",
@@ -2464,6 +2466,7 @@ let allAttrs = {
                 Vue.set(this, 'validateStatus', item);
             }
         },
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     serviceNotificationActionForElement: { //action chon node trong workflow
         title: 'Action chose node',

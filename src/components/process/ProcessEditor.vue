@@ -433,8 +433,8 @@ export default {
             // &lt;![CDATA[pppppppppppppppppppp]]&gt;
             xml = xml.replace(/\&lt\;\!\[CDATA\[/g, '<![CDATA[');
             xml = xml.replace(/\]\]\&gt;/g, ']]>');
-            xml = xml.replace(/&lt;symper:string&gt;/g,'<symper:string>');
-            xml = xml.replace(/&lt;\/symper:string&gt;/g,'</symper:string>');
+            xml = xml.replace(/&lt;symper:symper_symper_string_tag&gt;/g,'<symper:symper_symper_string_tag>');
+            xml = xml.replace(/&lt;\/symper:symper_symper_string_tag&gt;/g,'</symper:symper_symper_string_tag>');
             return xml;
         },
         /**
@@ -540,10 +540,10 @@ export default {
         fillValueForHiddenServiceTaskAttr(nodeId){
             let sNodeAttrs = this.stateAllElements[nodeId];
             let seletedType = serviceTaskDefinitions[sNodeAttrs.attrs.serviceTaskType.value];
-            for (let key in seletedType) {
+            for (let key in seletedType.params) {
                 let attr = sNodeAttrs.attrs['httptask'+key.toLowerCase()];
                 if(attr){
-                    attr.value = seletedType[key];
+                    attr.value = seletedType.params[key];
                 }
             }
         },
@@ -1280,9 +1280,8 @@ export default {
                     && el.attrs.taskAction.value == 'approval'){
                     this.setEditableControlsForNode(el, this.stateAllElements[el.attrs.approvalForElement.value]);
                 }
-                 if(el.type.includes('ServiceTask') 
-                    && el.attrs.taskAction.value == 'approval'){
-                    this.setEditableControlsForNode(el, this.stateAllElements[el.attrs.approvalForElement.value]);
+                 if(el.type.includes('ServiceTask') ){
+                    this.setEditableControlsForNode(el, this.stateAllElements[el.attrs.serviceNotificationActionForElement.value]);
                 }
             }
             this.setInitItemsForFormReferences(formKeyToNodeIdMap);

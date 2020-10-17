@@ -1,3 +1,5 @@
+import { data } from "jquery";
+import {userAssignmentToXMLValue} from "../allAttrsOfNodes" ;
 export default {
     script: {
         params: {
@@ -47,24 +49,26 @@ export default {
         makeRequestBody(nodeAttr) {
             let title = nodeAttr.serviceNotificationTitle.value;
             let description = nodeAttr.serviceNotificationDescription.value;
-            let receiver = nodeAttr.serviceNotificationReceiver.value;
+            let receiver =userAssignmentToXMLValue(nodeAttr.serviceNotificationReceiver.value);
             let nodeAction=nodeAttr.serviceNotificationActionForElement.value;
-            this.params.requestBody = `{
-                "title": "${title}",
-                "content": "${description}",
-                "action": "{
-                                'module':'workflow',
-                                'resource':'workflow',
-                                'scope':'workflow',
-                                'action':'notification',
-                                'parameter':{
-                                    processInstanceId: \${execution.getProcessInstanceId()},
-                                    processDefinitionId: \${execution.getProcessDefinitionId()},
-                                    nodeInfo:'${nodeAction}'
-                                }
-                            }",
-                "user_id":"${receiver}"
-            }`;
+            let action={
+                module:'workflow',
+                resource:'workflow',
+                scope:'workflow',
+                action:'notification',
+                parameter:{
+                    processInstanceId: '${execution.getProcessInstanceId()}',
+                    processDefinitionId: '${execution.getProcessDefinitionId()}',
+                    nodeId:nodeAction
+                }
+            };
+            
+            this.params.requestBody =JSON.stringify({
+                "title": title,
+                "content": description,
+                "action": JSON.stringify(action),
+                "user_id":receiver
+            });
         }
     }
 }

@@ -15,13 +15,13 @@ function translateServiceTaskToHTTPTask(el, attrs, bpmnModeler) {
     let items = serviceTaskDefinitions[attrs.serviceTaskType.value].params;
     serviceTaskDefinitions[attrs.serviceTaskType.value].makeRequestBody(attrs);
     for (let name in items) {
-        let subEl = moddle.create('symper:field');
+        let subEl = moddle.create('symper:symper_symper_field_tag');
         subEl.name = name;
         let value = String(items[name]).replace(/\n/g, '');
         if (String(value)) {
-            subEl.text = `<symper:string>
+            subEl.text = `<symper:symper_symper_string_tag>
                 <![CDATA[${value}]]>
-            </symper:string>`;
+            </symper:symper_symper_string_tag>`;
             extensionElements.values.push(subEl);
         }
     }
