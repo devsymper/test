@@ -4,7 +4,7 @@ import attrToXMLMethods from "./elementDefinitions/attrToXMLMethods";
 
 
 
-function userAssignmentToXMLValue(config) {
+export const userAssignmentToXMLValue = function (config) {
     let rsl = {
         formula: config.formula,
         users: [
@@ -2304,17 +2304,22 @@ let allAttrs = {
         pushToXML: attrToXMLMethods.notPushToXML
     },
 
-
     serviceTaskType: {
         "title": "Service task type",
         "type": "select",
         "value": "script",
         "info": "",
         "dg": "detail",
-        options: [{
-            text: 'Script',
-            value: 'script'
-        }],
+        options: [
+            {
+                text: 'Script',
+                value: 'script',
+            },
+            {
+                text: 'Notification',
+                value: 'notification',
+            }
+        ],
         pushToXML: attrToXMLMethods.notPushToXML
     },
     serviceTaskTypeHTTP: {
@@ -2336,9 +2341,11 @@ let allAttrs = {
         "type": "script",
         "value": "",
         "info": "",
-        "dg": "formula",
+        "dg": "detail",
+        hidden:false,
         pushToXML: attrToXMLMethods.notPushToXML,
     },
+
     // serviceTaskHTTPType: {
     //     "title": "",
     //     "type": "text",
@@ -2355,7 +2362,7 @@ let allAttrs = {
         "dg": "detail",
         toXML: {
             "symper_position": "el",
-            "name": "field",
+            "name": "symper_symper_field_tag",
             "superClass": ["Element"],
             "properties": [{
                 "name": "name",
@@ -2393,6 +2400,85 @@ let allAttrs = {
                 "type": "String"
             }]
         }
+    },
+    serviceNotificationReceiver: {
+        title: 'Receiver',
+        type: 'userAssignment', // trong user assignment có hai tab: select qua orgchart và viết script
+        value: {
+            orgChart: [],
+            formula: '',
+            orgchartSelectorValue: [] // dạng value của orgchartselector để hiển thị lên
+        },
+        getValueForXML(value) {
+            return userAssignmentToXMLValue(value);
+        },
+        activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
+        dg: 'detail',
+        hidden:false,
+        pushToXML: attrToXMLMethods.notPushToXML,
+    },
+    serviceNotificationTitle: {
+        "title": "Title",
+        "type": "script",
+        "value": "",
+        "info": "",
+        "dg": "detail",
+        hidden:false,
+        validate() {
+            let vl = this.value;
+            if (vl == null || vl == '') {
+                let item = {
+                    'isValid': false,
+                    'message': "Please enter title"
+                }
+                Vue.set(this, 'validateStatus', item);
+            } else {
+                let item = {
+                    'isValid': true,
+                    'message': "success"
+                }
+                Vue.set(this, 'validateStatus', item);
+            }
+        },
+        pushToXML: attrToXMLMethods.notPushToXML
+
+    },
+    serviceNotificationDescription: {
+        "title": "Description",
+        "type": "script",
+        "value": "",
+        "info": "",
+        "dg": "detail",
+        hidden:false,
+        validate() {
+            let vl = this.value;
+            if (vl == null || vl == '') {
+                let item = {
+                    'isValid': false,
+                    'message': "Please enter description"
+                }
+                Vue.set(this, 'validateStatus', item);
+            } else {
+                let item = {
+                    'isValid': true,
+                    'message': "success"
+                }
+                Vue.set(this, 'validateStatus', item);
+            }
+        },
+        pushToXML: attrToXMLMethods.notPushToXML
+    },
+    serviceNotificationActionForElement: { //action chon node trong workflow
+        title: 'Action chose node',
+        type: 'autocomplete',
+        value: '',
+        info: '',
+        options: [],
+        dg: 'detail',
+        showId: false,
+        isSymperProp: true,
+        hidden:false,
+        pushToXML: attrToXMLMethods.notPushToXML
     },
 
 }

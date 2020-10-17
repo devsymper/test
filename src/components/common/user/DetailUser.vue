@@ -1,19 +1,18 @@
 <template>
-    <div class="symper-detail-user pl-4 pt-2 h-100">
+    <div class="symper-detail-user pl-4 pt-2">
         <!-- panel title -->
-        <div class="w-100 h-100 d-flex flex-column flex-grow-1" style="min-height:700px!important" v-if="isViewUserRole==false">
+        <div class="w-100 h-100 d-flex flex-column flex-grow-1" v-if="isViewUserRole==false">
             <div class="symper-title">
                 {{$t('user.myInfo.title')}}
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
                         <v-icon
                             v-on="on"
-                            style="font-size:18px"
-                            class="close-btn float-right mr-4"
+                            class="close-btn float-right"
                             @click="closePanel"
                         >mdi-close</v-icon>
                     </template>
-                    <span >{{$t('common.close')}}</span>
+                    <span>{{$t('common.close')}}</span>
                 </v-tooltip>
             </div>
 
@@ -75,9 +74,7 @@
                             {{showableUserInfo[key]}}
                         </div>
                         <v-btn 
-                            icon tile class="float-right" v-if=" !isEditing && (key == 'email' || key == 'phone')" 
-                            small
-                            style="position: relative; bottom: 2px">
+                            icon tile class="float-right" v-if=" !isEditing && (key == 'email' || key == 'phone')" small style="position: relative; bottom: 2px">
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
                                     <v-icon
@@ -93,55 +90,19 @@
                         </v-btn>
                     </div>
                     <div class="ml-4">
-                         <div class="detail-user-label">
+                         <div @click="changePass()" class="detail-user-label">
                             {{$t('user.general.personalInfo.pass')}}
+                              <v-icon style = "font-size: 16px; margin-top:-2px">mdi-lock-outline</v-icon>
                         </div>
-                        <div @click="changePass()" class="detail-user-value editable-value">  
-                            Đổi mật khẩu
-                               <v-icon style = "font-size: 16px; margin-top:-2px">mdi-lock-outline</v-icon>
-                        </div>
+                          <v-dialog
+                                v-model="openChangePassForm"
+                                width="397"
+                                >
+                            <NotificationChangePass @cancel="cancelDialog()"/>
+                        </v-dialog>
                     </div>
-                    <div v-if="checkPass" style="margin-top:-10px; margin-bottom:-25px">
-                        <v-col cols="12">
-                            <span  class="fs-12 st-icon-pandora" style="color:grey">
-                                Mật khẩu ít nhất 8 kí tự và ít hơn 24 kí tự
-                            </span>
-                        </v-col>
-                    </div>
-                    <v-row  v-if="checkPass"  class="mt-1">
-                        <v-col cols="10">
-                            <v-text-field class="fs-13 ml-3"
-                                v-model="oldPassword" 
-                                ref="newPass" dense
-                                placeholder="Mật khẩu cũ"
-                                outlined
-                                prepend-inner-icon="mdi-lock-outline"
-                                :rules="[rules.required, rules.min, rules.max]" 
-                                :type="showPass ? 'text' : 'password'" 
-                                @click:prepend-inner="showPass = !showPass">
-                            </v-text-field>
-                        </v-col>
-                    </v-row>
-                    <v-row  v-if="checkPass" style="margin-top:-30px; margin-bottom:-45px" >
-                        <v-col cols="10">
-                            <v-text-field
-                                class="fs-13 ml-3" 
-                                prepend-inner-icon="mdi-lock-open-outline"
-                                v-model="newPassword" 
-                                ref="reNewPass" 
-                                dense 
-                                placeholder="Mật khẩu mới"
-                                outlined
-                                :rules="[rules.required, rules.min, rules.max, rules.match]" 
-                                :type="showPass ? 'text' : 'password'"
-                                @click:prepend-inner="showPass = !showPass">
-                        </v-text-field>
-                        </v-col>
-                            <v-col cols="2">
-                            <v-icon @click="submit()" style="color:green; margin-top:5px; font-size: 18px">mdi mdi-check</v-icon>
-                            </v-col>
-                    </v-row>
                 </div>
+
                 <!-- Avatar -->
                 <div class="user-avatar d-inline-block pa-2" style="width: 35%" >
                     <v-avatar :size="80">
@@ -211,20 +172,13 @@
                             </div>
                         </div>
                     </div>
-                </div>  
+                </div>
             </div>
+        </div>
         <div  class="w-100 h-100" v-if="isViewUserRole">
             <ViewRoles 
                 @show-userInfo="showUserInfo()"
                 :rolesList="role"/>
-        </div>
-         <div class=" mr-4 d-flex align-end" 
-            style=" height: 330px!important; align-self: flex-end">
-                <v-btn @click="logout" text class="mt-10" style="align-self: flex-end">
-                    <span class="fm fw-400  mr-5 " 
-                    >Đăng xuất</span>
-                </v-btn>
-            </div>
         </div>
     </div>
 </template>
@@ -236,6 +190,7 @@ import UploadFile from "./../../../components/common/UploadFile";
 import { util } from '../../../plugins/util';
 import VueClipboard from 'vue-clipboard2';
 import ViewRoles from "../../../views/users/ViewRoles";
+import NotificationChangePass from "./../../../components/notification/notificationChangeFirstPass";
 import Vue from "vue";
 import { userApi } from '../../../api/user';
 Vue.use(VueClipboard)
@@ -243,22 +198,15 @@ export default {
     components: {
         SymperAvatar,
         ViewRoles,
-        UploadFile
+        UploadFile,
+        NotificationChangePass
     },
     data(){
         return {
             role:[],
-            checkPass:false,
-            newPassword:'',
-            oldPassword:'',
-             rules: {
-                required: value => !!value || 'Không được bỏ trống.',
-                min: v => (typeof v != 'undefined' && v != undefined && v.length >= 8) || 'Yêu cầu mật khẩu lớn hơn 8 kí tự',
-                max: v => (typeof v != 'undefined' && v != undefined && v.length < 25) || 'Yêu cầu mật khẩu ít hơn 24 kí tự',
-                match: v => (v!=this.oldPassword) || 'Mật khẩu không được trùng khớp',
-            },
+            dialog:false,
+            openChangePassForm:false,
             avatarUrl:'',
-            showPass: false,
             avatarFileName:'',
             isViewUserRole:false,
             lazyUserInfo: {
@@ -290,36 +238,8 @@ export default {
         }
     },
     methods: {
-        submit() {
-            let check = false;
-            if (this.newPassword&&this.oldPassword!=this.newPassword&&this.newPassword.length>=8&&this.newPassword.length<25) {
-                check = true;
-            }
-            if(check){
-                 this.changePassUser(this.oldPassword);
-            }
-        },
-        changePassUser(pass){
-            userApi.changePassUser(pass).then(res => {
-                if (res.status == 200) {
-                    this.$snotify({
-                        type: "success",
-                        title: this.$t("user.notification.successChangePass")
-                    });
-                    this.$emit('cancel');
-                } else {
-                    this.$snotify({
-                        type: "error",
-                        title: this.$t("user.notification."+res.message)
-                    });
-                }
-            })
-            .catch(err => {
-                console.log("error from change pass user api!!!", err);
-            })
-        },
         changePass(){
-            this.checkPass=!this.checkPass;
+            this.openChangePassForm=!this.openChangePassForm;
         },
          logout(){
             util.auth.logout();
@@ -329,13 +249,12 @@ export default {
             this.avatarUrl= appConfigs.apiDomain.fileManagement+'readFile/user_avatar_'+ this.lazyUserInfo.id;
         },
         handleAvatarSelected(tempUrl){
-            debugger
             this.avatarUrl = tempUrl;
             this.avatarFileName = 'user_avatar_' + this.lazyUserInfo.id;
             this.$refs.uploadAvatar.uploadFile();
         },
         showUserInfo(){
-            this.isViewUserRole=false;
+            this.isViewUserRole=false; 
             this.$emit('make-small-panel')
         },
         viewUserRole(role){

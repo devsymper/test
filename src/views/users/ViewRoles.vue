@@ -85,7 +85,6 @@ export default {
 		// lấy ra tất cả action và object 
 		async getActionAndObject(){
             let res = await userApi.getActionAndObject(this.rolesList);
-			debugger
 			const self = this;
 			if (res.status === 200) {
 				self.listActionAndObj = res.data;	
@@ -119,7 +118,6 @@ export default {
 			}else{
 				return false
 			}
-			debugger
 		},
 		// view theo từng đối tượng 
 		detailView(object){
@@ -162,14 +160,9 @@ export default {
 				for(let j = 0; j<this.allListAction[this.menuTitle].action.length;j++){
 					if(arrAction[i]==this.allListAction[this.menuTitle].action[j]){
 						this.action.push(arrAction[i]);
-
 					}
 				}
-				
-			
 			}
-			debugger
-			let a = action
 		 },
 		//group những loại đối tượng dạng document_de:123123 trùng tên với nhau 
 		groupNameObj(){

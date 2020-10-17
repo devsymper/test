@@ -2,59 +2,58 @@
     <v-navigation-drawer
         v-model="showImportPanel"
         absolute
-        class="d-none d-sm-none d-md-flex"
+        class="d-none d-sm-none d-md-flex navigation"
         temporary
         right
         style="height: 100vh"
-        v-bind:class="[showValidate==true?'manage-timesheet-800':'manage-timesheet-500']"  >
-        <v-row>
-        <v-dialog v-model="dialog"
-            width="500">
-                <v-card>
-                    <v-card-title style="height:50px; margin-top:-10px" class="headline grey lighten-2">
-                        <span class="mb-3">Thông báo</span>
-                        </v-card-title>
-                        <v-card-text class="pt-6" style="height:40px">
-                    <v-icon style="color:green" class="mdi mdi-check"></v-icon> Hoàn thành import
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn
-                            color="primary"
-                            text
-                            @click="cancel()">
-                            Thoát
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
-            <v-dialog v-model="dialogError"
-            width="500">
-                <v-card>
-                    <v-card-title style="height:50px; margin-top:-10px" class="headline grey lighten-2">
-                        <span class="mb-3">Thông báo</span>
-                        </v-card-title>
-                    <v-card-text  class="pt-6" style="height:40px">
-                    <v-icon style="color:red" class="mdi mdi-alert-circle"></v-icon> {{messageError}}
-                    </v-card-text>
-                    <v-card-actions>
-                        <v-spacer></v-spacer>
-                        <v-btn
-                            color="primary"
-                            text
-                            @click="dialogError = false">
-                            Thoát
-                        </v-btn>
-                    </v-card-actions>
-                </v-card>
-            </v-dialog>
+        v-bind:class="[showValidate==true?'manage-import-1020':'manage-import-600']"  >
+        <v-row class="h-100">
+            <v-dialog v-model="dialog"
+                width="500">
+                    <v-card>
+                        <v-card-title  class="card-title headline grey lighten-2">
+                            <span class="mb-3">Thông báo</span>
+                            </v-card-title>
+                            <v-card-text class="pt-6" style="height:40px">
+                        <v-icon class="color-green mdi mdi-check"></v-icon> Hoàn thành import
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                color="primary"
+                                text
+                                @click="cancel()">
+                                Thoát
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
+                <v-dialog 
+                    v-model="dialogError"
+                    width="500">
+                    <v-card>
+                        <v-card-title class=" card-title headline grey lighten-2">
+                            <span class="mb-3">Thông báo</span>
+                            </v-card-title>
+                        <v-card-text  class="pt-6" style="height:40px">
+                        <v-icon class="color-red mdi mdi-alert-circle"></v-icon> {{messageError}}
+                        </v-card-text>
+                        <v-card-actions>
+                            <v-spacer></v-spacer>
+                            <v-btn
+                                color="primary"
+                                text
+                                @click="dialogError = false">
+                                Thoát
+                            </v-btn>
+                        </v-card-actions>
+                    </v-card>
+                </v-dialog>
             <v-col class="col-md-7">
                 <ImportFile 
-                    :objId="objId"
+                    :options="options"
                     :tables="nameRows"
-                    :nameDocument="nameDocument"
-                    :objType="objType"
-                    @stopSetInterval ="setInterval=false"
+                    @stopSetInterval="setInterval=false"
                     :deleteFileName="deleteFileName" 
                     @cancel="cancel()"
                     @closeValidate="showValidate=false"
@@ -92,7 +91,6 @@ export default {
             importFile:false,
             deleteFileName:false,
             setInterval:false,
-            drawer: null,
             showImport:true,
             fileName:'',
             error:false,
@@ -100,8 +98,8 @@ export default {
         }
     },
     props: {
-        objId: {
-            default: 0
+        options: {
+            default: {}
         },
         nameRows:{
              default: []
@@ -109,12 +107,6 @@ export default {
         open: {
             default: false
         },
-        objType:{
-            default:'document'
-        },
-        nameDocument:{
-            default:''
-        }
     },
     methods: {
         importFiles(data){
@@ -158,61 +150,32 @@ export default {
 }
 </script>
 <style lang="scss" scoped>
-.manage-timesheet-500{
-    width: 470px!important;
+.manage-import-600{
+    width: 600px!important;
 }
-.manage-timesheet-800{
-    width: 800px!important  ;
+.manage-import-1020{
+    width: 1020px!important  ;
 }
-.manage-timesheet ::v-deep .v-card {
+.manage-import ::v-deep .v-card {
     box-shadow: none !important;
     height: 100%;
     display: flex;
     flex-direction: column;
 }
 
-.manage-timesheet ::v-deep .v-window {
+.manage-import ::v-deep .v-window {
     display: flex;
     flex-direction: column;
 }
 
-.manage-timesheet ::v-deep .v-window__container {
+.manage-import ::v-deep .v-window__container {
     flex-grow: 1;
     display: flex;
     flex-direction: column;
 }
-.fw-500 {
-    font-weight: 500;
-}
-.fw-400{
-    font-weight: 400;
-}
-
-.fw-300 {
-    font-weight: 300;
-}
-.font-normal {
-    font-size: 13px!important;
-    font-family: Roboto!important;
-    font-weight: normal!important;
-}
-.font{
-    font-size: 13px!important;
-    font-family: Roboto!important;
-}
-
-.color-normal {
-    color: #707070
+.card-title{
+    height:50px; 
+    margin-top:-10px
 }
 </style>
-<style>
-.v-list-item__title{
-    font-size:13px!important;
-}
-.v-select__slot{
-    padding-left:7px;
-    font-size:13px!important;
-    font-family: Roboto;
-}
 
-</style>

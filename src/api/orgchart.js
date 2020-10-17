@@ -85,6 +85,9 @@ export const orgchartApi = {
     getAllOrgchartStruct(){
         return orgchart.get("orgchart/struct-only");
     },
+    getUserIdentifiFromProcessModeler(data){
+        return orgchart.post("role/query-users", data, {}, {dataType:"text"});
+    },
     getDocumentByUserId(data){
         return documentApi.post("documents/map-query", data)
     }

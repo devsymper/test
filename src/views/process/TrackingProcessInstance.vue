@@ -39,7 +39,7 @@ import bpmneApi from "./../../api/BPMNEngine";
 import CustomRenderInstance from "./../../components/process/CustomRenderInstance";
 import SymperDragPanel from '../../components/common/SymperDragPanel.vue';
 import { appConfigs } from '../../configs';
-
+import {orgchartApi} from "@/api/orgchart";
 const nodeStatusColors = {
     failed: {
         fill: "#e24747",
@@ -56,7 +56,8 @@ const nodeStatusColors = {
     notStart: {
         fill: "#f3f3f3",
         stroke: "#797979"
-    }
+    },
+    
   
 };
 
@@ -108,7 +109,9 @@ export default {
                     top: 0
                 },
                 data: {}
-            }
+            },
+            processDefinitionId:'',
+            flowElementMap:[],//thông tin model của process instance có dạng: {idNode : {thông tin}}
         };
     },
     components: {
@@ -146,6 +149,88 @@ export default {
         closeDetailPanel(){
             this.nodeDetailPanel.show = false;
         },
+        //lấy model của processDefinition
+        async getDefinitionModel(){
+            let self=this;
+            if (this.processDefinitionId) {
+                bpmneApi
+                .getDefinitionModel(this.processDefinitionId)
+                .then(res => {
+                    let data=res.mainProcess.flowElementMap;
+                    for (const key in data) {
+                        if (data[key].assignee && !self.runtimeNodeMap[key]) {
+                            self.flowElementMap.push(data[key]);
+                        }
+                    }
+                    self.getVariableProcessInstance(self.instanceId);
+                    console.log("aaaax",self.flowElementMap);
+                })
+                .catch(err => {
+                    self.$snotifyError(
+                        err,
+                        "Can not get model process definition"
+                    );
+                });
+            }
+        },
+        async getVariableProcessInstance(instanceId){
+            let self=this;
+            let filter={};
+            filter.includeProcessVariables=true;
+            filter.processInstanceId=instanceId;
+            await bpmneApi
+                .getProcessInstanceHistory(filter)
+                .then(res => {
+                    self.updateDrawDataInDiagram(res.data[0].variables);
+                })
+                .catch(err => {
+                    self.$snotifyError(
+                        err,
+                        "Can not get variable process!"
+                    );
+                });
+        },
+        async updateDrawDataInDiagram(variables){
+            let symBpmn = this.$refs.symperBpmn;
+            let mapUser = this.$store.getters['app/mapIdToUser'];
+            for (let index = 0; index < this.flowElementMap.length; index++) {
+                if (!isFinite(this.flowElementMap[index].assignee)) { // kiểm tra assginee có phải dạng number
+                    let dataInput={};
+                    for (let i = 0; i < variables.length; i++) {
+                        dataInput[variables[i].name]=variables[i].value;
+                    }
+                    let data={};
+                    data.dataInput=JSON.stringify(dataInput);
+                    data.data=this.flowElementMap[index].assignee;
+                    data.type="multiple";
+                    let res=await orgchartApi.getUserIdentifiFromProcessModeler(data);
+                    this.flowElementMap[index].assignee=res;
+                }
+
+                let infoAssignee={};
+                let roleInfo={};
+                infoAssignee.assignee={};
+                infoAssignee.role={};
+                let task=this.flowElementMap[index];
+                let assigneeId=task.assignee;
+                if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
+                    let arrDataAssignee=task.assignee.split(":");
+                    assigneeId=arrDataAssignee[0];
+                    if (arrDataAssignee.length>3) { // loại trừ trường hợp role=0
+                        let roleIdentify=task.assignee.slice(assigneeId.length+1);
+                        roleInfo=this.getRoleUser(roleIdentify);
+                    }
+                }
+                if (mapUser[assigneeId]) {
+                    infoAssignee.assignee = mapUser[assigneeId];
+                    infoAssignee.role = roleInfo;
+                }
+                symBpmn.updateElementProperties(this.flowElementMap[index].id, {
+                    infoAssignee: infoAssignee,
+                    setColor:nodeStatusColors.notStart
+                });
+            }
+        },
         // Lấy ra thông tin chạy của các node của instance
         getInstanceRuntimeData() {
             let self = this;
@@ -153,6 +238,7 @@ export default {
             bpmneApi
                 .getProcessInstanceRuntimeHistory(idInstance)
                 .then(res => {
+                    console.log("elementMap",res.data);
                     self.setElementMap(res.data)
                     self.setColorForNodes().then(() => {
                         self.setTasksStatus();
@@ -199,11 +285,15 @@ export default {
         getRoleUser(roleIdentify){
             let arrDataRole=roleIdentify.split(":");
             let allSymperRole=this.$store.state.app.allSymperRoles;
-            let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
-            return role;
+            if (Object.keys(allSymperRole).length>0) {
+                let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+                return role;
+            }
+            return {}
         },
         // set các ô màu cho task
         setTasksStatus(){
+            console.log("dattaaa",this.runtimeNodeMap);
             for(let eleId in this.runtimeNodeMap){
                 let nodeInfo = this.runtimeNodeMap[eleId];
                 if (nodeInfo.activityType) {
@@ -285,6 +375,7 @@ export default {
             let self = this;
             this.getInstanceData()
                 .then(res => {
+                    self.processDefinitionId=res.data[0].processDefinitionId;
                     return self.getDefinitionData(res.data[0].processDefinitionId);
                 })
                 .then(res => {
@@ -297,6 +388,8 @@ export default {
                     self.setColorForNodes().then(() => {
                         self.setTasksStatus();
                     });
+                    self.getDefinitionModel();
+
                 })
                 .catch(errInfo => {
                     let err = errInfo.err;
@@ -306,6 +399,7 @@ export default {
                     self.$snotifyError(err, errInfo.msg);
                 });
         },
+
         // Lấy data của instance
         getInstanceData() {
             let instanceId = this.instanceId ? this.instanceId : this.$route.params.idInstance;
@@ -373,8 +467,8 @@ export default {
 
 <style scoped>
 .action-diagram-bpmn{
-    width:98%;
-    margin-right: 20px;
+    width:100%;
+    margin-right: 10px;
 }
 .action-btn{
     cursor: pointer;

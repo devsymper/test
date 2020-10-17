@@ -10,16 +10,10 @@
          <v-dialog
             v-model="dialog"
             width="397"
-            >
+        >
             <NotificationChangePass @cancel="cancelDialog()"/>
         </v-dialog>
         <Dashboard></Dashboard>
-     
-        <!-- <EmbedDataflow 
-        ref="dataflow"
-        :dataflowId="124"
-         /> -->
-
         <!-- <SymperActionView 
             :actionDef="{
                 module: 'document',
@@ -37,7 +31,6 @@
 <script>
 import FormTpl from "./../components/common/FormTpl.vue";
 import OrgchartElementSelector from "./../components/common/OrgchartElementSelector.vue";
-
 import OrgchartSelector from "./../components/user/OrgchartSelector.vue";
 import TimelineTreeview from "./../components/common/TimelineTreeview";
 import Handsontable from 'handsontable';
@@ -60,13 +53,11 @@ export default {
             this.num += 1;
         },
         cancelDialog(){
-            debugger
             this.dialog = false;
             this.$store.commit('app/changeStatus', 1)
         },
         checkStatus(){
             if(this.sapp.endUserInfo.status==2){
-                debugger
                 this.dialog = true;
             }
         },

@@ -416,7 +416,7 @@ export default {
         },
         async updateTask(originData) {
             let data = {};
-            data.assignee=originData.assignee+":"+this.$store.state.app.endUserInfo.currentRole.id;
+            data.assignee=this.$store.state.app.endUserInfo.id+":"+this.$store.state.app.endUserInfo.currentRole.id;
             let taskId=originData.id;
             await BPMNEngine.updateTask(taskId,data);
         },

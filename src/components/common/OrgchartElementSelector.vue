@@ -52,6 +52,7 @@ export default {
     },
     watch: {
         value(){
+            
             let mapNode = this.$store.state.orgchart.allOrgchartStruct.map;
             for(let item of this.value){
                 if(mapNode[item]){

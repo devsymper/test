@@ -291,12 +291,9 @@ export default {
                 self.syqlId.content= res.data[0].context;
                 self.syqlId.objectIdentifier = res.data[0].objectIdentifier;
                 self.syqlId.objectType = res.data[0].objectType!='workflow'?'Document':'Workflow'
-                
-       }
-    },
+            }
+        },
     }
-   
-   
 }
 </script>
 <style scoped >
