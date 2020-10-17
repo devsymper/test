@@ -2413,9 +2413,69 @@ let allAttrs = {
             return userAssignmentToXMLValue(value);
         },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
-        dg: 'assignment',
+        dg: 'detail',
         hidden:false,
         pushToXML: attrToXMLMethods.notPushToXML,
+    },
+    serviceNotificationTitle: {
+        "title": "Title",
+        "type": "text",
+        "value": "",
+        "info": "",
+        "dg": "detail",
+        hidden:false,
+        validate() {
+            let vl = this.value;
+            if (vl == null || vl == '') {
+                let item = {
+                    'isValid': false,
+                    'message': "Please enter title"
+                }
+                Vue.set(this, 'validateStatus', item);
+            } else {
+                let item = {
+                    'isValid': true,
+                    'message': "success"
+                }
+                Vue.set(this, 'validateStatus', item);
+            }
+        },
+    },
+    serviceNotificationDescription: {
+        "title": "Description",
+        "type": "text",
+        "value": "",
+        "info": "",
+        "dg": "detail",
+        hidden:false,
+        validate() {
+            let vl = this.value;
+            if (vl == null || vl == '') {
+                let item = {
+                    'isValid': false,
+                    'message': "Please enter description"
+                }
+                Vue.set(this, 'validateStatus', item);
+            } else {
+                let item = {
+                    'isValid': true,
+                    'message': "success"
+                }
+                Vue.set(this, 'validateStatus', item);
+            }
+        },
+    },
+    serviceNotificationActionForElement: { //action chon node trong workflow
+        title: 'Action chose node',
+        type: 'autocomplete',
+        value: '',
+        info: '',
+        options: [],
+        dg: 'detail',
+        showId: false,
+        isSymperProp: true,
+        hidden:false,
+        pushToXML: attrToXMLMethods.notPushToXML
     },
 
 }

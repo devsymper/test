@@ -45,10 +45,26 @@ export default {
             saveResponseVariableAsJson: false,
         },
         makeRequestBody(nodeAttr) {
-            // let notification = nodeAttr.serviceTaskScriptValue.value;
-            // this.params.requestBody = `{
-            //     "formula": "${formula}"
-            // }`;
+            let title = nodeAttr.serviceNotificationTitle.value;
+            let description = nodeAttr.serviceNotificationDescription.value;
+            let receiver = nodeAttr.serviceNotificationReceiver.value;
+            let nodeAction=nodeAttr.serviceNotificationActionForElement.value;
+            this.params.requestBody = `{
+                "title": "${title}",
+                "content": "${description}",
+                "action": "{
+                                'module':'workflow',
+                                'resource':'workflow',
+                                'scope':'workflow',
+                                'action':'notification',
+                                'parameter':{
+                                    processInstanceId: \${execution.getProcessInstanceId()},
+                                    processDefinitionId: \${execution.getProcessDefinitionId()},
+                                    nodeInfo:'${nodeAction}'
+                                }
+                            }",
+                "user_id":"${receiver}"
+            }`;
         }
     }
 }

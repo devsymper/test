@@ -97,11 +97,32 @@ export const nodeAttrsDefinition = {
     },
     'ServiceTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs",
-        attrs: ["servicetasktriggerable", "servicetaskclass", "servicetaskexpression", "servicetaskdelegateexpression", "servicetaskfields", "servicetaskexceptions", "servicetaskresultvariable", "servicetaskresultvariableUseLocalScope", "skipexpression", "servicetaskfailedjobretrytimecycle", "servicetaskstoreresultvariabletransient"],
+        attrs: [
+            'httptaskrequesturl', 'httptaskrequestheaders', 'httptaskrequestbody', 'httptaskrequestbodyencoding', 'httptaskrequesttimeout', 'httptaskdisallowredirects', 'httptaskfailstatuscodes', 'httptaskhandlestatuscodes', 'httptaskignoreexception', 'httptasksaveresponseparameterstransient', 'httptasksaveresponseasjson', 'httptaskresponsevariablename', 'httptasksaverequestvariables', 'httptasksaveresponseparameters', 'httptaskresultvariableprefix',
+            'serviceTaskType', 'serviceTaskScriptValue', 'skipexpression', 'serviceTaskTypeHTTP',
+            'serviceNotificationReceiver','serviceNotificationTitle','serviceNotificationDescription','serviceNotificationActionForElement'
+        ],
         validate: function(attrs) {
 
         },
         checkShowOrHideInput: function(attrs) {
+            let serviceTaskType = attrs.serviceTaskType;
+            if (serviceTaskType.value == 'script') {
+                attrs.serviceTaskScriptValue.hidden = false;
+                attrs.serviceNotificationReceiver.hidden = true;
+                attrs.serviceNotificationTitle.hidden = true;
+                attrs.serviceNotificationDescription.hidden = true;
+                attrs.serviceNotificationActionForElement.hidden = true;
+              
+            } else if (serviceTaskType.value == 'notification') {
+                attrs.serviceTaskScriptValue.hidden = true;
+                attrs.serviceNotificationReceiver.hidden = false;
+                attrs.serviceNotificationTitle.hidden = false;
+                attrs.serviceNotificationDescription.hidden = false;
+                attrs.serviceNotificationActionForElement.hidden = false;
+
+
+            }
 
         },
         docker: dockerGroups.task

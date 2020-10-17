@@ -226,24 +226,46 @@ export const collectInfoForTaskDescription = function(allVizEls, allSymEls, bpmn
     for (let idEl in allSymEls) {
         let el = allSymEls[idEl];
         if (el.type == 'UserTask' || el.type == 'Task') {
-            let elDocumentation = util.cloneDeep(defaultTaskDescription);
-            elDocumentation.action.action = el.attrs.taskAction.value;
-            elDocumentation.action.parameter.activityId = el.id;
-
-            elDocumentation.content = el.attrs.notificationContent.value;
-            elDocumentation.extraLabel = el.attrs.extraInfoLabel.value;
-            elDocumentation.extraValue = el.attrs.extraInfoValue.value;
-            elDocumentation.approvalEditableControls = el.attrs.approvalEditableControls.value;
-
-            if (el.attrs.taskAction.value == 'submit') {
-                elDocumentation.action.parameter.documentId = el.attrs.formreference.value;
-            } else if (el.attrs.taskAction.value == 'approval') {
-                elDocumentation.targetElement = el.attrs.approvalForElement.value;
-                elDocumentation.approvalActions = JSON.stringify(filterValue(el.attrs.approvalActions.value));
-            } else if (el.attrs.taskAction.value == 'update') {
-                elDocumentation.targetElement = el.attrs.updateForElement.value;
-            }
-            el.attrs.documentation.value = JSON.stringify(elDocumentation);
+            setInfoForTaskDescription(el);
         }
+        // else if(el.type == 'ServiceTask'){
+        //     setInfoForServicesTask(el);
+        // }
     }
 }
+
+function setInfoForTaskDescription(el){
+    let elDocumentation = util.cloneDeep(defaultTaskDescription);
+    elDocumentation.action.action = el.attrs.taskAction.value;
+    elDocumentation.action.parameter.activityId = el.id;
+
+    elDocumentation.content = el.attrs.notificationContent.value;
+    elDocumentation.extraLabel = el.attrs.extraInfoLabel.value;
+    elDocumentation.extraValue = el.attrs.extraInfoValue.value;
+    elDocumentation.approvalEditableControls = el.attrs.approvalEditableControls.value;
+
+    if (el.attrs.taskAction.value == 'submit') {
+        elDocumentation.action.parameter.documentId = el.attrs.formreference.value;
+    } else if (el.attrs.taskAction.value == 'approval') {
+        elDocumentation.targetElement = el.attrs.approvalForElement.value;
+        elDocumentation.approvalActions = JSON.stringify(filterValue(el.attrs.approvalActions.value));
+    } else if (el.attrs.taskAction.value == 'update') {
+        elDocumentation.targetElement = el.attrs.updateForElement.value;
+    }
+    el.attrs.documentation.value = JSON.stringify(elDocumentation);
+}
+// function setInfoForServicesTask(el){
+//     let elDocumentation = util.cloneDeep(defaultTaskDescription);
+//     elDocumentation.action.module = "workflow";
+//     elDocumentation.action.resource = "workflow";
+//     elDocumentation.action.scope = "workflow";
+//     elDocumentation.action.action = el.attrs.serviceTaskType.value;
+//     elDocumentation.action.parameter.activityId = el.id;
+
+//     elDocumentation.receiver = el.attrs.serviceNotificationReceiver.value;
+//     elDocumentation.extraLabel = el.attrs.serviceNotificationTitle.value;
+//     elDocumentation.extraValue = el.attrs.serviceNotificationDescription.value;
+//     elDocumentation.targetElement = el.attrs.serviceNotificationActionForElement.value;
+
+//     el.attrs.documentation.value = JSON.stringify(elDocumentation);
+// }
