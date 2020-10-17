@@ -249,7 +249,6 @@ export default {
             this.avatarUrl= appConfigs.apiDomain.fileManagement+'readFile/user_avatar_'+ this.lazyUserInfo.id;
         },
         handleAvatarSelected(tempUrl){
-            debugger
             this.avatarUrl = tempUrl;
             this.avatarFileName = 'user_avatar_' + this.lazyUserInfo.id;
             this.$refs.uploadAvatar.uploadFile();

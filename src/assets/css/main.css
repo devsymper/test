@@ -78,7 +78,7 @@ html {
 }
 
 .fs-11 {
-    font-size: 11px;
+    font-size: 11px!important;
 }
 
 .w-100 {
@@ -488,7 +488,7 @@ html {
 }
 
 .fw-400 {
-    font-weight: 400;
+    font-weight: 400!important;
 }
 
 
@@ -724,17 +724,17 @@ html {
 }
 
 .color-red {
-    color: red
+    color: red!important
 }
 
 .color-grey {
-    color: grey;
+    color: grey!important;
 }
 
 .color-green {
-    color: green
+    color: green!important
 }
 
 .color-normal {
-    color: #707070
+    color: #707070!important
 }

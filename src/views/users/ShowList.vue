@@ -275,21 +275,15 @@ export default {
             this.$refs.listUser.openactionPanel();
 
         },
-        changePage(page){
-            alert('ok');
-        },
         closePanel(){
             this.isSettingPasswordView = false;
             this.$refs.listUser.closeactionPanel();
         },
         addUser(){
-            debugger
             this.isSettingPasswordView = false;
             this.showViewInfo = false;
             this.actionType = 'add';
             this.$refs.listUser.openactionPanel();
-            // chỗ này, muốn sửa giá trị của no chỗ này
-            // this.$router.push('/users/add');
         },
         editUser(user){
             this.isSettingPasswordView = false;
@@ -306,14 +300,9 @@ export default {
             this.data.unshift(user);
         },
         calcContainerHeight() {
-            debugger
             this.containerHeight = util.getComponentSize(this).h;
         }
     }
 }
 </script>
-<style >
-    /* .v-navigation-drawer{
-        width: 1200px!important
-    } */
-</style>
+

@@ -280,7 +280,7 @@ export default {
         sumCount(tableIdx,type){
             let totalAllRow = 0;
             let totalFilledRow = this.tables[tableIdx].controls.filter(p => p.dataColumn!=null).length;
-            debugger
+            
             let isFilledKey =  this.tables[tableIdx].keyColumn?(this.tables[tableIdx].keyColumn.enable?1:0):0;
             if(type!='user'){
                 totalAllRow = this.tables[tableIdx].controls.filter(p => p.dataType!='table').length+1;
@@ -292,7 +292,7 @@ export default {
              //Sự kiện xảy ra khi thay đổi Key
         onChangeKey(tableIdx,value){
             if(value){
-                debugger
+                
                 this.tables[tableIdx].keyColumn={
                     enable:true,
                     index:value.index,
@@ -703,11 +703,9 @@ export default {
                 for(let i = 0; i<this.tables.length;i++){
                     for(let j=0; j<this.lastTable.length;j++){
                         if(this.lastTable[j].nameTable==this.tables[i].name&&this.checkNameSheetExist(this.lastTable[j].nameSheet)){
-                            debugger
                             for(let k = 0; k<this.tables[i].controls.length;k++){
                                if(this.tables[i].controls[k].name==this.lastTable[j].controlName){
                                     this.hideNameSheet(this.lastTable[j].nameSheet);
-                                    debugger
                                     this.tables[i].sheetMap={name:'',enable:false};
                                     this.tables[i].controls[k].dataColumn = {name: '',index: 0, enable:false};
                                     this.tables[i].sheetMap.name = this.lastTable[j].nameSheet;

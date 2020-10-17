@@ -100,19 +100,15 @@ export default {
      },
      watch:{
          importInfo(){
-             debugger
              this.getDetailDocument();
              this.pushImportDataToTable();
          }
      },
      methods:{
          stopImport(){
-             debugger
              importApi.cancelImport(this.importInfo.fileName)
               .then(res => {
                         if (res.status === 200) {
-                            debugger
-                       
                         }
                     })
                     .catch(console.log);
@@ -131,7 +127,6 @@ export default {
         //      }
         // },
         pushImportDataToTable(){
-            debugger
             this.dataImport = [];
             let dataImport = JSON.parse( this.importInfo.infoImport).validating?JSON.parse( this.importInfo.infoImport).validating.errors:'';
             let dem = 0;

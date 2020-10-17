@@ -102,7 +102,6 @@ export default {
             this.showOrgchart=true;
         },
         handleSelection(data){
-            debugger
             if(data.value){
                 this.listSelected.push(data.item.roleIdentify)
             }else{
@@ -113,7 +112,6 @@ export default {
             this.insertRole();
         },
         insertRole(){
-            debugger
             let data= [{"userId": this.userId, "roles": this.listSelected}];
             userApi.updateRole({items:JSON.stringify(data)}).then(res=>{
                   if(res.status==200){

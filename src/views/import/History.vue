@@ -90,9 +90,6 @@ export default {
                 },
                 setNameDocument(){
                     let listDoc = this.listDocument;
-                    //let test = this.$refs.test
-                   
-                     //for(let i = 0; i<data.listObject.length; i++){
                 },
                 reformatData(ress){
                     let data = ress.data;
@@ -103,30 +100,22 @@ export default {
                         }
                         data.listObject[i].status = this.setStatusImport(data.listObject[i].status);
                         data.listObject[i].subObjType = this.setObjectType(data.listObject[i].subObjType);
-                      //  data.listObject[i].userId= this.getName(data.listObject[i].userId);
                     }
                     let listDocName = [];
                     listIdDoc=listIdDoc.filter((item, index) => listIdDoc.indexOf(item) === index);
                     documentApi.getBatchDocument({ids:JSON.stringify(listIdDoc)}).then(res => {
                         if (res.status === 200) {
-                          listDocName.push(res.data);
-                          debugger
-                          for(let i = 0; i<data.listObject.length; i++){
-                        for(let j = 0; j<listDocName[0].length;j++)
-                        {
-                            if(listDocName[0][j].id==data.listObject[i].objId){
-                                data.listObject[i].objId = listDocName[0][j].title;
-                                debugger
+                            listDocName.push(res.data);
+                            for(let i = 0; i<data.listObject.length; i++){
+                                for(let j = 0; j<listDocName[0].length;j++){
+                                    if(listDocName[0][j].id==data.listObject[i].objId){
+                                        data.listObject[i].objId = listDocName[0][j].title;
+                                    }
+                                }
                             }
-                        }
-                     }
-                       
                         }
                     })
                     .catch(console.log);
-                    debugger
-                     
-                        // return test
                     return  data;
                 } 
             },
@@ -155,9 +144,6 @@ export default {
         this.calcContainerHeight();
     },
     created(){
-         //this.getListsDocument();
-        // this.$refs.listUser.showExportButton=false;
-        // this.$refs.listUser.showButtonAdd=false;
         this.getListUrl = appConfigs.apiDomain.importExcel+'history?page=1&pageSize=20';
        
     },
@@ -165,9 +151,7 @@ export default {
         
     },
     methods:{
-       
         showDetail(importEx){
-            debugger
              this.importInfo = importEx;
              this.drawer =!this.drawer
         },
@@ -186,8 +170,3 @@ export default {
     }
 }
 </script>
-<style >
-    /* .v-navigation-drawer{
-        width: 1200px!important
-    } */
-</style>

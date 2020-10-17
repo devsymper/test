@@ -1170,7 +1170,6 @@ export default {
         },
         // Khadm: load data của document lên để hiển thị và xử lý
         async loadDocumentData() {
-            debugger
             if (this.documentId) {
                 let thisCpn = this;
                 documentApi

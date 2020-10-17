@@ -421,7 +421,7 @@ export default {
 		actionUser(){
 			
 			if(this.actionType == 'add'){
-				debugger
+
 				this.addNewUser()
 			}
 			else if(this.actionType == 'edit'){
@@ -440,7 +440,6 @@ export default {
 		 * Hàm check validate các trường input   (password, email, user name)
 		 */
 		validateForm(){
-			debugger
 			this.formHasErr = false;
 			let validUserName = this.$refs.userName.validate(true);
 			let validEmail = this.$refs.email.validate(true);
@@ -513,7 +512,6 @@ export default {
 		 * Hàm tạo mới user
 		 */
 		addNewUser(){
-			debugger
 			const cpn = this;
 			let passProps = {
 				needChange:this.needChangePassword,
@@ -540,7 +538,7 @@ export default {
 			}
 			userApi.addUser(data).then(res => {
 				if (res.status == 200) {
-					debugger
+	
 					cpn.loadPermission();
 					cpn.setStepper(2);
 					cpn.editStep = true;
@@ -556,7 +554,6 @@ export default {
 						title: this.$t("notification.successTitle")});
 				}
 				else{
-					debugger
 					res.message = res.message.split(' ').join('_')
 					this.$snotify({
 						type: "error",

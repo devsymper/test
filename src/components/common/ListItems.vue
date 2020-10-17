@@ -1484,7 +1484,6 @@ export default {
             this.actionPanel = false;
         },
         openactionPanel() {
-            debugger
             this.actionPanel = true;
         },
         addItem() {

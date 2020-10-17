@@ -277,7 +277,6 @@ export default {
             this.$emit('cancel');
         },
         getApiProcessingImport(){
-            debugger
             const self= this;
             importApi.getProcessing(
                 this.fileName
@@ -338,9 +337,7 @@ export default {
                      setTimeout(()=>this.$emit('showNotification'), 1000);
                }
                else{
-    
                    if(this.processing.dataUserError.length>0){
-                       debugger
                        this.existEmail = this.processing.dataUserError.filter(x=>x.result=='Email already exist');
                        this.invalidEmail= this.processing.dataUserError.filter(x=>x.result=='Email invalid');
                        this.invalidPass = this.processing.dataUserError.filter(x=>x.result=='Password invalid');

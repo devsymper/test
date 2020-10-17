@@ -91,6 +91,8 @@
         "always_show_sidebar": "Luôn hiển thị sidebar",
         "import_excel": "Nhập bằng excel",
         "sidebar": {
+            "Setting": "Cài đặt",
+            "Notification": "Thông báo",
             "account_trash": "Tài khoản đã xóa",
             "Lists trash": "Danh sách bản xóa",
             "myApplication": "Ứng dụng của tôi",
@@ -1103,7 +1105,7 @@
             "showMoreTask": "Xem thêm các task liên quan",
             "showLess": "Thu gọn",
             "showMoreFile": "Xem thêm các tệp",
-            "quickView":"Xem nhanh"
+            "quickView": "Xem nhanh"
 
         },
         "alert": {

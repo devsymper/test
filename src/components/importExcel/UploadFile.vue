@@ -170,7 +170,6 @@ export default {
       },
     },
     created(){
-        debugger
         this.nameImport = " ";
         this.description =" ";
         this.selectType ="Excel" ;

@@ -48,13 +48,11 @@ export default {
             this.num += 1;
         },
         cancelDialog(){
-            debugger
             this.dialog = false;
             this.$store.commit('app/changeStatus', 1)
         },
         checkStatus(){
             if(this.sapp.endUserInfo.status==2){
-                debugger
                 this.dialog = true;
             }
         },

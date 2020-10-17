@@ -23,7 +23,6 @@ export const permissionApi = {
     },
 
     getAllPermission() {
-        debugger
         return permissionPackApi.get("");
     },
     getPermissionOfRole(roleId) {

@@ -180,6 +180,12 @@ export default {
         link: "/apps",
         group: "My work"
     },
+    settingNotication: {
+        title: 'Notification',
+        icon: 'mdi-bell-check-outline',
+        link: '/setting-notification',
+        group: "Setting"
+    },
     // comment: {
     // 	title: 'tesstsdádasdad',
     // 	icon: 'mdi-file-edit-outline',
