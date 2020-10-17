@@ -27,8 +27,7 @@
         </div>
     </list-items>
           <ImportExcelPanel
-            :objType="'user'"
-            :nameDocument="'Import User'"
+            :options="options"
             :nameRows="listRowUser"
             :open="showImportUser" />
     </div>
@@ -50,13 +49,40 @@ export default {
     },
     data(){
         return {
+            options:{
+                objType:'user',
+                nameObj:'Import User',
+                subObjType:-1
+            },
             showDetailView:false,
             listRowUser:[],
             showImportUser:false,
             customAPIResult: {
+                 setStatusImport(status){
+                    let nameStatus = '';
+                    switch(status){
+                        case '0':
+                            nameStatus = "Đã khóa";
+                            break;
+                        case '-1':
+                            nameStatus = "Đã xóa";
+                            break;
+                         case '1':
+                            nameStatus = "Đang hoạt động";
+                            break;
+                            
+                        case '2':
+                            nameStatus = "Mới tạo";
+                            break;
+                    }
+                    return nameStatus;
+                },
                 reformatData(res){
                     let data = res.data;
-                    return data;
+                    for(let i = 0; i<data.listObject.length; i++){
+                        data.listObject[i].status = this.setStatusImport(data.listObject[i].status);
+                    }
+                    return  data;
                 } 
             },
             commonActionProps: {
@@ -110,7 +136,7 @@ export default {
         this.calcContainerHeight();
     },
     created(){
-        this.getListUrl = appConfigs.apiDomain.user+'users?page=1&pageSize=50';
+        this.getListUrl = appConfigs.apiDomain.user+'';
     
         let thisCpn = this;
         this.$evtBus.$on('change-user-locale',(locale)=>{
@@ -249,21 +275,15 @@ export default {
             this.$refs.listUser.openactionPanel();
 
         },
-        changePage(page){
-            alert('ok');
-        },
         closePanel(){
             this.isSettingPasswordView = false;
             this.$refs.listUser.closeactionPanel();
         },
         addUser(){
-            debugger
             this.isSettingPasswordView = false;
             this.showViewInfo = false;
             this.actionType = 'add';
             this.$refs.listUser.openactionPanel();
-            // chỗ này, muốn sửa giá trị của no chỗ này
-            // this.$router.push('/users/add');
         },
         editUser(user){
             this.isSettingPasswordView = false;
@@ -280,14 +300,9 @@ export default {
             this.data.unshift(user);
         },
         calcContainerHeight() {
-            debugger
             this.containerHeight = util.getComponentSize(this).h;
         }
     }
 }
 </script>
-<style >
-    /* .v-navigation-drawer{
-        width: 1200px!important
-    } */
-</style>
+

@@ -12,6 +12,12 @@ export default [{
             import ('../../views/users/ActionPanel.vue'),
     },
     {
+        path: "/users/trash",
+        name: "List trash",
+        component: () =>
+            import ('../../views/users/ListsTrash.vue'),
+    },
+    {
         path: "/users/edit/:id",
         name: "editUser",
         component: () =>

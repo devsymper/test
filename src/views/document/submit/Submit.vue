@@ -1199,10 +1199,10 @@ export default {
                         }
                     })
                     .catch(err => {
-                        thisCpn.$snotify({
-                            type: "error",
-                            title: "error from detail document api!!!"
-                        }); 
+                        // thisCpn.$snotify({
+                        //     type: "error",
+                        //     title: "error from detail document api123!!!"
+                        // }); 
                     })
                     .always(() => {});
             }

@@ -57,7 +57,6 @@
                         <v-btn icon @click="showSearchInput = !showSearchInput">
                             <v-icon>mdi-magnify</v-icon>
                         </v-btn>
-                       
                         <v-menu  v-model="isShowDialogNotification"
                             z-index="161"
                             :close-on-content-click="false"
@@ -115,7 +114,6 @@
 import Api from "../../api/api.js";
 import { appConfigs } from '../../configs';
 import BASidebar from "@/components/common/BASidebar.vue";
-
 import listApp from "@/components/common/listApp";
 import EndUserPopup from './../apps/EndUserPopup.vue';
 import NotificationBar from "@/components/notification/NotificationBar.vue";
@@ -221,6 +219,7 @@ export default {
     },
     data: function() {
         return {
+            showConfigNotification:false,
             isExpand:false,
             showSearchInput: false,
             isShowDialog: false,

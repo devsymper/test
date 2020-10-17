@@ -11,203 +11,210 @@
 					{{ $t('user.other.updateUser')}}
 				</h3>
 				<v-stepper v-model="stepper" class="d-flex stepper-create-user">
-				<v-stepper-header class="stepper-header" >
-					<v-stepper-step class="fs-13 font-normal" editable step="1">
-						{{ $t('user.general.title')}}
-					</v-stepper-step>
-					<!-- <v-stepper-step :editable="editStep" @click="loadPermission()" step="2">{{ $t('user.permission.title')}}</v-stepper-step> -->
-				</v-stepper-header>
-				<v-stepper-items class="stepper-items">
+					<v-stepper-header class="stepper-header" >
+						<v-stepper-step class="fs-13 font-normal" editable step="1">
+							{{ $t('user.general.title')}}
+						</v-stepper-step>
+						<v-stepper-step :editable="editStep" @click="loadPermission()" step="2">
+							{{ $t('user.permission.title')}}
+						</v-stepper-step>
+					</v-stepper-header>
+				<v-stepper-items style="overflow:auto;overflow-y:scroll" class="stepper-items">
 					<v-stepper-content step="1">
-					<h4>{{ $t('user.general.personalInfo.title')}}</h4>
-					<v-row class="mt-1" >
-						<!-- thong tin -->
-						<v-col cols="8">
-							<v-row>
-								<v-col cols="6">
-									<span class="fs-13 st-icon-pandora">
-												Họ & đệm
-									</span>
-								</v-col>
-								<v-col  cols="6">
-									<span class="fs-13 st-icon-pandora">
-												{{ $t('user.general.personalInfo.firstName')}}
-											</span>
-								</v-col>
-							</v-row>
-							<v-row>
-								<v-col cols="6">
-									<v-text-field
+						<h4>{{ $t('user.general.personalInfo.title')}}</h4>
+						<v-row style="margin-bottom:-30px" >
+							<!-- thong tin -->
+							<v-col cols="8" >
+								<v-row >
+									<v-col cols="6" >
+										<span class="fs-13 st-icon-pandora">
+											Họ & đệm
+										</span>
+									</v-col>
+									<v-col  cols="6" >
+										<span class="fs-13 st-icon-pandora">
+											{{ $t('user.general.personalInfo.firstName')}}
+										</span>
+									</v-col>
+								</v-row>
+								<v-row  style="margin-bottom:-15px">
+									<v-col cols="6">
+										<v-text-field
+											outlined	
+											class="fs-13 font-normal"
+											v-model="user.lastName"
+											dense
+										></v-text-field>
+									</v-col>
+									<v-col cols="6" >
+										<v-text-field
+											outlined	
+											class="fs-13 font-normal"
+											v-model="user.firstName"
+											dense
+										></v-text-field>
+									</v-col>	
+								</v-row>
+									<v-row>
+									<v-col >
+										<span class="fs-13 st-icon-pandora">
+											{{ $t('user.general.personalInfo.userName')}}
+										</span>
+									</v-col>
+								</v-row>
+								<v-row  style="margin-bottom:-15px" >
+									<v-col cols="12">
+										<v-text-field
+											outlined	
+											class="fs-13"
+											ref="userName"
+											required
+											v-model="user.userName"
+											dense
+										></v-text-field>
+									</v-col>
+								</v-row>
+								<v-row >
+									<v-col >
+										<span class="fs-13 st-icon-pandora">
+											{{ $t('user.general.personalInfo.displayName')}}
+										</span>
+									</v-col>
+								</v-row>
+								<v-row  style="margin-bottom:-15px">
+									<v-col cols="12">
+										<v-text-field
+											outlined	
+											class="fs-13"
+											ref="displayName"
+											required
+											:rules="[rules.required]"
+											v-model="user.displayName"
+											dense
+										></v-text-field>
+									</v-col>
+								</v-row>
+								<v-row >
+									<v-col >
+										<span class="fs-13 st-icon-pandora">
+											{{ $t('user.general.personalInfo.email')}}
+										</span>
+									</v-col>
+								</v-row>
+								<v-row  style="margin-bottom:-15px" >
+									<v-col cols="12">
+										<v-text-field
 										outlined	
-										class="fs-13 font-normal"
-										v-model="user.lastName"
+										class="fs-13"
+										ref="email"
+										v-model="user.email"
+										:rules="[rules.required, rules.email]"
 										dense
-									></v-text-field>
-								</v-col>
-								<v-col cols="6" >
-									<v-text-field
-										outlined	
-										class="fs-13 font-normal"
-										v-model="user.firstName"
-										dense
-									></v-text-field>
-								</v-col>	
-							</v-row>
+										></v-text-field>
+									</v-col>
+								</v-row>
 								<v-row>
-								<v-col >
-									<span class="fs-13 st-icon-pandora">
-										{{ $t('user.general.personalInfo.userName')}}
-									</span>
-								</v-col>
-							</v-row>
-							<v-row >
-								<v-col cols="12">
-									<v-text-field
-										outlined	
-										class="fs-13"
-										ref="userName"
-										required
-										v-model="user.userName"
-										dense
-									></v-text-field>
-								</v-col>
-							</v-row>
-							<v-row>
-								<v-col >
-									<span class="fs-13 st-icon-pandora">
-										{{ $t('user.general.personalInfo.displayName')}}
-									</span>
-								</v-col>
-							</v-row>
-							<v-row >
-								<v-col cols="12">
-									<v-text-field
-										outlined	
-										class="fs-13"
-										ref="displayName"
-										required
-										:rules="[rules.required]"
-										v-model="user.displayName"
-										dense
-									></v-text-field>
-								</v-col>
-							</v-row>
-							<v-row>
-								<v-col >
-									<span class="fs-13 st-icon-pandora">
-										{{ $t('user.general.personalInfo.email')}}
-									</span>
-								</v-col>
-							</v-row>
-							<v-row >
-								<v-col cols="12">
-									<v-text-field
-									outlined	
-									class="fs-13"
-									ref="email"
-									v-model="user.email"
-									:rules="[rules.required, rules.email]"
-									dense
-									></v-text-field>
-								</v-col>
-							</v-row>
-							<v-row>
-								<v-col >
-									<span class="fs-13 st-icon-pandora">
-										{{ $t('user.general.personalInfo.phoneNumber')}}
-									</span>
-								</v-col>
-							</v-row>	
-							<v-row>
-								<v-col cols="12">
-									<v-text-field
-										outlined
-										class="fs-13"
-										v-model="user.phone"
-										dense
-									></v-text-field>
-								</v-col>
-						</v-row>
-						</v-col>
-						<!-- kt thong tin -->
-						<!-- ảnh -->
-						<v-col cols="4">
-								<v-col cols="3" class="text-center ">
-								<v-avatar :size="80">
-									<img v-if="avatarUrl != ''"
-										:src="avatarUrl"
-									>
-									<img v-if="avatarUrl== ''"
-										:src="require('./../../assets/image/avatar_default.jpg')"
-									>
-								</v-avatar>
-								<UploadFile 
-									style="margin-top:-30px; margin-left:50px"
-									ref="uploadAvatar"
-									:autoUpload="false"
-									:fileName="avatarFileName"
-									@selected-file="handleAvatarSelected" />
+									<v-col >
+										<span class="fs-13 st-icon-pandora">
+											{{ $t('user.general.personalInfo.phoneNumber')}}
+										</span>
+									</v-col>
+								</v-row>	
+								<v-row>
+									<v-col cols="12">
+										<v-text-field
+											outlined
+											class="fs-13"
+											v-model="user.phone"
+											dense
+										></v-text-field>
+									</v-col>
+								</v-row>
 							</v-col>
-						</v-col>	
-						<!-- ket thuc anh -->
-					</v-row>
-						<div v-if="actionType == 'edit'">
-							<v-checkbox dense 
-								class="sym-small-size" 
-								v-model="user.status" 
-								:label="$t('user.general.passwordSetting.activeAccount')">
-							</v-checkbox>
-						</div>
-						<div v-if="actionType == 'add'">
-							<h4 class="setting-password">{{ $t('user.general.passwordSetting.title')}}</h4>
-							<v-checkbox dense class="sym-small-size" 
-								v-model="autoRenPassword" 
-								@click="enabledPassword = !enabledPassword" 
-								:label="$t('user.general.passwordSetting.autoGeneratePassword')">
-							</v-checkbox>
-							<v-row>
-								<v-col cols="4">
-									<v-checkbox 
-										dense 
-										class="sym-small-size" 
-										v-model="enabledPassword" 
-										@click="autoRenPassword = !autoRenPassword" 
-										:label="$t('user.general.passwordSetting.yourPassword')">
-									</v-checkbox>
+							<!-- kt thong tin -->
+							<!-- ảnh -->
+							<v-col cols="4">
+									<v-col cols="3" class="text-center ">
+									<v-avatar :size="80">
+										<img v-if="avatarUrl != ''"
+											:src="avatarUrl"
+										>
+										<img v-if="avatarUrl== ''"
+											:src="require('./../../assets/image/avatar_default.jpg')"
+										>
+									</v-avatar>
+									<UploadFile 
+										style="margin-top:-30px; margin-left:50px"
+										ref="uploadAvatar"
+										:autoUpload="false"
+										:fileName="avatarFileName"
+										@selected-file="handleAvatarSelected" />
 								</v-col>
-								<v-col cols="8 input-password">
-									<v-text-field
-										class="fs-13"
-										ref="password"
-										v-model="user.password"
-										:disabled="!enabledPassword"
-										dense
-										:append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
-										:rules="[rules.required, rules.min, rules.max,rules.password]"
-										:type="showPass ? 'text' : 'password'"
-										counter
-										@click:append="showPass = !showPass"
-									></v-text-field>
-								</v-col>
-							</v-row>
-							<v-checkbox 
-								dense 
-								class="sym-small-size" 
-								v-model="needChangePassword" 
-								:label="$t('user.general.passwordSetting.requireChangePassFirstLogin')">
-							</v-checkbox>
-							<v-checkbox 
-								dense 
-								class="sym-small-size" 
-								v-model="sendMailAfterChange" 
-								:label="$t('user.general.passwordSetting.sendEmailAfterDone')">
-							</v-checkbox>
-						</div>	
-					<v-btn class="btn-next-step"
-						ref="addUserBtn"
-						@click="validateForm()">
-						{{actionType=='add'?actionPanel="Tạo tài khoản":"Cập nhật tài khoản"}}
-					</v-btn>
+							</v-col>	
+							<!-- ket thuc anh -->
+						</v-row>
+							<div v-if="actionType == 'edit'">
+								<v-checkbox dense 
+									class="sym-small-size " 
+									v-model="user.status" 
+									:label="$t('user.general.passwordSetting.activeAccount')">
+								</v-checkbox>
+							</div>
+							<div v-if="actionType == 'add'">
+								<h4 class="setting-password">{{ $t('user.general.passwordSetting.title')}}</h4>
+								<v-checkbox dense class="sym-small-size" 
+									v-model="autoRenPassword" 
+									@click="enabledPassword = !enabledPassword" 
+									:label="$t('user.general.passwordSetting.autoGeneratePassword')">
+								</v-checkbox>
+								<v-row>
+									<v-col cols="4">
+										<v-checkbox 
+											dense 
+											class="sym-small-size" 
+											v-model="enabledPassword" 
+											@click="autoRenPassword = !autoRenPassword" 
+											:label="$t('user.general.passwordSetting.yourPassword')">
+										</v-checkbox>
+									</v-col>
+									<v-col cols="8 input-password">
+										<v-text-field
+											class="fs-13"
+											ref="password"
+											v-model="user.password"
+											:disabled="!enabledPassword"
+											dense
+											:append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+											:rules="[rules.required, rules.min, rules.max,rules.password]"
+											:type="showPass ? 'text' : 'password'"
+											counter
+											@click:append="showPass = !showPass"
+										></v-text-field>
+									</v-col>
+								</v-row>
+								<v-checkbox 
+									dense 
+									class="sym-small-size" 
+									v-model="needChangePassword" 
+									:label="$t('user.general.passwordSetting.requireChangePassFirstLogin')">
+								</v-checkbox>
+								<v-checkbox 
+									dense 
+									class="sym-small-size" 
+									v-model="sendMailAfterChange" 
+									:label="$t('user.general.passwordSetting.sendEmailAfterDone')">
+								</v-checkbox>
+							</div>	
+							<div class="w-100 d-flex justify-end" >
+								<v-btn class="btn-next-step"
+								ref="addUserBtn"
+								@click="validateForm()">
+								{{actionType=='add'?actionPanel="Tạo tài khoản":"Cập nhật tài khoản"}}
+								</v-btn>
+							</div>
+					</v-stepper-content>
+					<v-stepper-content step="2">
+						<Permission :userId="user.id" />
 					</v-stepper-content>
 				</v-stepper-items>
 				</v-stepper>
@@ -228,10 +235,10 @@
 				:detailInfo="detailInfoUser"
 			/>
 	</div>
-	
 </template>
 <script>
 import ChangePassword from "./../../views/users/ChangePass.vue";
+import Permission from "./Permission";
 import DetailUserInfo from "./../../views/users/DetailUserInfo.vue";
 import { userApi } from "./../../api/user.js";
 import { permissionPackageApi } from "./../../api/PermissionPackage.js";
@@ -247,7 +254,8 @@ export default {
 	components:{
 		"vue-resizable":VueResizable,
         "v-change-password":ChangePassword,
-		UploadFile, 
+		UploadFile,
+		Permission,
 		DetailUserInfo
 	},
 	props:{
@@ -411,8 +419,9 @@ export default {
 
 		},
 		actionUser(){
+			
 			if(this.actionType == 'add'){
-				debugger
+
 				this.addNewUser()
 			}
 			else if(this.actionType == 'edit'){
@@ -431,7 +440,6 @@ export default {
 		 * Hàm check validate các trường input   (password, email, user name)
 		 */
 		validateForm(){
-			debugger
 			this.formHasErr = false;
 			let validUserName = this.$refs.userName.validate(true);
 			let validEmail = this.$refs.email.validate(true);
@@ -504,7 +512,6 @@ export default {
 		 * Hàm tạo mới user
 		 */
 		addNewUser(){
-			debugger
 			const cpn = this;
 			let passProps = {
 				needChange:this.needChangePassword,
@@ -531,10 +538,12 @@ export default {
 			}
 			userApi.addUser(data).then(res => {
 				if (res.status == 200) {
-					//cpn.loadPermission();
-					//cpn.setStepper(2);
+	
+					cpn.loadPermission();
+					cpn.setStepper(2);
 					cpn.editStep = true;
 					cpn.user.id = res.user.id;
+					// cpn.user.id = 973;
                     cpn.avatarFileName = 'user_avatar_'+res.user.id;
                     setTimeout(() => {
                         cpn.$refs.uploadAvatar.uploadFile();
@@ -545,7 +554,6 @@ export default {
 						title: this.$t("notification.successTitle")});
 				}
 				else{
-					debugger
 					res.message = res.message.split(' ').join('_')
 					this.$snotify({
 						type: "error",
@@ -1006,9 +1014,6 @@ export default {
 	}
 	
 	.btn-next-step{
-		position: absolute;
-		bottom: 20px;
-		right: 20px;
 		box-shadow: none ;
 		background: white ;
 		color: green ;
@@ -1102,4 +1107,5 @@ export default {
 	/* .v-navigation-drawer{
 		 width: 1200px!important
 	} */
+
 </style>

@@ -6,6 +6,7 @@ var api = new Api(appConfigs.apiDomain.user);
 var coreApi = new Api(appConfigs.apiDomain.user);
 var permissionApi = new Api(appConfigs.apiDomain.permission);
 var operationsApi = new Api(appConfigs.apiDomain.operations);
+var systemRoleApi = new Api(appConfigs.apiDomain.systemRole);
 export const userApi = {
     /** 
      * Kiểm tra username và password của user
@@ -116,6 +117,12 @@ export const userApi = {
     },
     getAllListObj() {
         return operationsApi.get('/actions')
-    }
+    },
+    getListSystemRole() {
+        return systemRoleApi.get('/role')
+    },
+    updateRole(data) {
+        return systemRoleApi.put('/set-users-to-roles', data)
+    },
 
 };
