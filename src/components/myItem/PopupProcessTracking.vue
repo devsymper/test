@@ -28,7 +28,6 @@
 					</v-row>
 				</v-col>
 			</v-row>
-            
         </div>
 		<div class="tracking-process" style="height:100%" v-else-if="showType==''">
             <trackingProcessInstance

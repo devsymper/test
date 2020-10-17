@@ -1105,7 +1105,8 @@
             "showMoreTask": "Xem thêm các task liên quan",
             "showLess": "Thu gọn",
             "showMoreFile": "Xem thêm các tệp",
-            "quickView": "Xem nhanh"
+            "quickView":"Xem nhanh",
+            "openTask": "Mở công việc"
 
         },
         "alert": {
