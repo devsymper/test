@@ -117,9 +117,22 @@ export default {
             filter: true,
             sortable: true,
             resizable: true,
+            // cellStyle: (params) => {
+            //     const { level } = params.node;
+            //     const groupCell = params.value === params.node.key;
+            //     const indent = 22; // change this value to your liking
+            //     if (!groupCell) {
+            //         return {
+            //             paddingLeft: (level + 1) * indent + "px",
+            //             marginBottom: 10+"px",
+            //         };
+            //     }
+            // }
         };
         this.autoGroupColumnDef = { minWidth: 100 };
         this.gridOptions = {};
+        // this.gridOptions.rowStyle = { height: '21px', background: "#f7f7f7" ,padding: "unset",marginBottom:"-10px" }  
+        this.gridOptions.rowHeight = 20;
         this.columns = this.allColumns;
         this.rowDataTable = this.rowData;
         this.autoGroupColumnDef = {
@@ -156,7 +169,6 @@ export default {
     },
     
     mounted(){
-        // this.gridOptions.api.sizeColumnsToFit();
     },  
     methods:{
         refreshData(columns){
@@ -202,6 +214,7 @@ export default {
 <style scoped>
     .like-handson-table >>> .ag-header{
         background-color: #FFFFFF;
+        
     }
     .like-handson-table >>> .ag-header-icon .ag-icon{
         display: inline-block;
@@ -218,10 +231,41 @@ export default {
     .like-handson-table >>> .ag-cell-wrapper .ag-row-group .ag-row-group-indent-3 {
         padding-left: 0px !important;
     }
-    /* .like-handson-table >>> .ag-row{
-        height:20px !important;
+     .like-handson-table >>> .ag-header{
+        min-height:unset !important;
+        height: 26px !important;
     }
-    .like-handson-table >>> .ag-header-cell-label .ag-focus-managed .ag-pivot-off{
-        height:20px !important; 
+     .like-handson-table >>> .ag-header .ag-header-cell-text,
+     .like-handson-table >>> .ag-header .ag-header-icon{
+         margin-bottom:9px;
+         font:12px roboto;
+         font-weight: 600;
+    }
+     .like-handson-table >>> .ag-row{
+         /* transform: translateY(20px) !important; */
+    }
+    /* .like-handson-table >>> .ag-cell-wrapper.ag-row-group[class*="ag-row-group-indent"],
+    .like-handson-table >>> .ag-cell-wrapper.ag-row-group-leaf-indent[class*="ag-row-group-indent"] {
+      padding-left: 2;
     } */
+    .like-handson-table >>> .ag-cell-wrapper.ag-row-group{
+        align-items:unset !important;
+    }
+    .like-handson-table >>> .ag-cell{
+        margin-bottom:unset;
+    }
+    .like-handson-table >>> .ag-cell-wrapper {
+        /* height:unset !important */
+    }
+    .like-handson-table >>> .ag-cell{
+        line-height: unset !important;
+    }
+    .like-handson-table >>> .ag-group-child-count{
+        display:none !important;
+    }
+    .like-handson-table >>> .ag-group-expanded,
+    .like-handson-table >>> .ag-group-contracted{
+        height: unset !important;
+    }
+   
 </style>

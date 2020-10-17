@@ -43,8 +43,8 @@
                     <AgDataTable
                         :tableHeight="'calc(100% - 100px)'"
                         ref="displayTable" 
-                        :likeHandsonTable="true"
                         :allColumns="allColumns"
+                        :likeHandsonTable="true"
                         :rowData="dataTable"
                         :editable="false"
                          @grid-ready="onGridReady"
@@ -60,7 +60,7 @@
                     <!-- <TableSideBySildeView /> -->
                         <VueResizable :width="500" :max-width="600" :min-width="300" :active ="['r']">
                            <div style="display:flex;flex-direction:column" class="h-100 w-100">
-                               <div style="height:50px;display:flex;align-items:center">
+                               <div style="height:52px;display:flex;align-items:center">
                                      <h2 style="font:17px roboto ;font-weight:500" >Sơ đồ tổ chức</h2>
                                </div>
                                 <AgDataTable
@@ -347,7 +347,6 @@ export default {
         onTabClicked(data){
             this.currentTab = data.action
             this.titleToolbar = data.title
-
         }
     },
     data(){
