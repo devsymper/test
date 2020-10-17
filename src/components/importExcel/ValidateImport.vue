@@ -289,7 +289,10 @@ export default {
                     }
                 }else{
                      clearInterval(this.loopCheckProcess); 
-                     this.$emit("error",'Tên sheet trùng nhau');
+                     this.$snotify({
+                        type: "error",
+                        title: res.message
+                    });  
                 }
             })
             .catch(err => {
@@ -334,9 +337,7 @@ export default {
                      setTimeout(()=>this.$emit('showNotification'), 1000);
                }
                else{
-    
                    if(this.processing.dataUserError.length>0){
-                       debugger
                        this.existEmail = this.processing.dataUserError.filter(x=>x.result=='Email already exist');
                        this.invalidEmail= this.processing.dataUserError.filter(x=>x.result=='Email invalid');
                        this.invalidPass = this.processing.dataUserError.filter(x=>x.result=='Password invalid');

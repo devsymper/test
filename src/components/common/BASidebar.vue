@@ -4,25 +4,31 @@
         mobile-breakpoint="0" 
         :mini-variant="sapp.collapseSideBar"
         :v-model="true" app>
-        <v-list dense nav class="py-0 pr-0">
-            <v-list-item :class="{ 
+        <v-list dense nav class="py-0 pr-0 list-item">
+            <v-list-item 
+                    :class="{ 
                     'px-0': sapp.collapseSideBar,
-                    'ma-0 pt-2 pb-1': true }" 
+                    'ma-0 pt-2': true }" 
                 v-show="!sapp.collapseSideBar">
                 <img
                     @click="goToHome()"
                     height="30px"
                     :src="require('./../../assets/image/symper-full-logo.png')"/>
             </v-list-item>
-            <v-list-item class=" pt-2 px-0 ma-0 pb-1" v-show="sapp.collapseSideBar">
+            <v-list-item 
+                class=" pt-2 px-0 ma-0" v-show="sapp.collapseSideBar">
                 <img
                     @click="goToHome()"
                     height="30px"
                     :src="require('./../../assets/image/symper-short-logo.png')"/>
             </v-list-item>
-            <v-list-item two-line :class="{ 
+            <v-list-item
+                    class="list-item" 
+                    two-line 
+                    style="margin-bottom:-15px!important"
+                    :class="{ 
                     'px-0': sapp.collapseSideBar,
-                    'ma-0 pb-1': true ,}">
+                    'ma-0': true}">
                 <v-list-item-avatar @click="invertSidebarShow()">
                     <SymperAvatar :userId="sapp.endUserInfo.id"/>
                 </v-list-item-avatar>
@@ -215,7 +221,7 @@
                         dense
                         v-for="item in menu"
                         :key="item.title" 
-                        :style="{'border-bottom': item.titleGroup=='Administrator'||item.titleGroup=='Applications'? '1px solid lightgrey':'','height':item.titleGroup=='Administrator'||item.titleGroup=='Applications'?'10px':''}"
+                        :style="{'border-bottom': isBorderTop(item.titleGroup)? '1px solid lightgrey':'','height': isBorderTop(item.titleGroup)?'10px':''}"
                         link
                         no-action
                         :symper-action="$bindAction(item.action?item.action:'')"
@@ -315,7 +321,6 @@
                                 Đăng xuất
                             </v-list-item-title>
                         </v-list-item>
-                        
                     </v-list>
                 </v-menu>
             </v-list-item>
@@ -388,6 +393,14 @@ export default {
         this.reCalcSidebarHeight();
     },
     methods: {
+        isBorderTop(titleGroup){
+            if(titleGroup=='Administrator'||titleGroup=='Applications'||titleGroup=='Setting'){
+                return true
+            }else{
+                return false
+            }
+            
+        },
         // thêm nhóm cho Menu
         showChangeInfoUser(){
             if(this.sapp.baInfo.id==0){
@@ -595,11 +608,10 @@ export default {
 .menu-not-interact >>> .v-list-group__header:focus::before{
     background: white !important;
 }
-
-
 .menu-group >>> .v-list-item:first-child{
     margin-bottom: 0 !important;
 }
+
 </style>
 <style>
 .v-menu__content::-webkit-scrollbar {

@@ -140,6 +140,11 @@ export default {
                 icon: "mdi-account-settings",
                 link: "/users",
             },
+            account_trash: {
+                title: "account_trash",
+                icon: "mdi-account-settings",
+                link: "/users/trash",
+            },
             ba_account: {
                 title: "baAccount",
                 icon: "mdi-account-tie",
@@ -174,6 +179,12 @@ export default {
         icon: "mdi mdi-widgets-outline",
         link: "/apps",
         group: "My work"
+    },
+    settingNotication: {
+        title: 'Notification',
+        icon: 'mdi-bell-check-outline',
+        link: '/setting-notification',
+        group: "Setting"
     },
     // comment: {
     // 	title: 'tesstsdádasdad',

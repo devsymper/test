@@ -13,6 +13,7 @@
         "menu": "Menu",
         "users": "Tài khoản người dùng",
         "add": "Thêm",
+        "import_excel_history": "Lịch sử Import",
         "edit": "Sửa",
         "cancel": "Hủy",
         "update": "Cập nhật",
@@ -90,6 +91,9 @@
         "always_show_sidebar": "Luôn hiển thị sidebar",
         "import_excel": "Nhập bằng excel",
         "sidebar": {
+            "Setting": "Cài đặt",
+            "Notification": "Thông báo",
+            "account_trash": "Tài khoản đã xóa",
             "Lists trash": "Danh sách bản xóa",
             "myApplication": "Ứng dụng của tôi",
             "tasks": "Tasks",
@@ -191,6 +195,28 @@
         "notValid": "Trường này không hợp lệ",
         "password": "Yêu cầu mật khẩu có cả chữ hoa và số"
     },
+    "import": {
+        "import_history": "Lịch sử import",
+        "table": {
+            "history-import": {
+                "id": "ID",
+                "userEmail": "Email người dùng",
+                "subObjType": "Loại đối tượng",
+                "objId": " Tên đối tượng",
+                "description": "Ghi chú",
+                "userId": "Người import",
+                "createdAt": "Ngày tạo",
+                "status": "Trạng thái",
+                "fileName": "Tên tệp",
+                "nameImport": "Nội dung"
+
+
+            },
+            "contextMenu": {
+                "viewDetail": "Xem chi tiết"
+            }
+        }
+    },
     "user": {
         "notification": {
             "email_already_exist!": "Email đã tồn tại!",
@@ -202,6 +228,7 @@
 
         },
         "title": "Danh sách User",
+        "trash": "Danh sách user đã xóa",
         "general": {
             "title": "Thông tin cơ bản",
             "personalInfo": {
@@ -265,6 +292,7 @@
             "id": "Id",
             "firstName": "Họ",
             "lastName": "Tên",
+            "restore": "Khôi phục",
             "userName": "Tên đầy đủ",
             "displayName": "Tên hiển thị",
             "email": "Địa chỉ email",
@@ -276,6 +304,7 @@
             "contextMenu": {
                 "passwordSetting": "Tùy chọn mật khẩu",
                 "edit": "Sửa",
+                "restore": "Restore",
                 "delete": "Xóa",
                 "view": "Xem"
             }

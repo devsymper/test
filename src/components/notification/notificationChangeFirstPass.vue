@@ -1,46 +1,63 @@
 <template>
 <v-card class="w-100 h-100">
-    <v-row class="w-100" style="height:176px" >
+    <v-row class="w-100 h-100">
+         <v-row class="fs-14 ml-4 mt-2 w-100">
+                <span class="ml-3" style="font-weight:430">Đổi mật khẩu đăng nhập</span>
+        </v-row>
+        <v-row class="fs-11 fm ml-7" style="color:rgb(0,0,0,0.4)">
+                Mật khẩu phải có tối thiểu 8 ký tự và ít hơn 24 kí tự
+        </v-row>
         <v-col class="col-md-5 h-100">
-            <img class="ml-3 mt-5 image-change-pass" 
+            <img class="ml-3 image-change-pass" 
                 :src="require('./../../assets/image/changePass.png')">
         </v-col>
         <v-col class="col-md-7 h-100">
-            <div class="fs-13">
-                Đổi mật khẩu đăng nhập
-            </div>
-            <div class="fs-10 fm mt-1 mb-2" style="color:rgb(0,0,0,0.4)">
-                Mật khẩu phải có tối thiểu 8 ký tự và ít hơn 24 kí tự
-            </div>
+          
             <v-row class="mt-1">
                  <v-text-field class="fs-13 ml-3" 
                     v-model="oldPassword" 
-                    ref="newPass" dense
+                    dense
                     placeholder="Mật khẩu cũ"
                     outlined
+                    :append-icon="showPassOld ? 'mdi-eye' : 'mdi-eye-off'"
                     prepend-inner-icon="mdi-lock-outline"
                     :rules="[rules.required, rules.min, rules.max]" 
-                    :type="showPass ? 'text' : 'password'" 
-                    @click:prepend-inner="showPass = !showPass">
+                    :type="showPassOld ? 'text' : 'password'" 
+                    @click:append="showPassOld = !showPassOld">
                 </v-text-field>
             </v-row>
             <v-row style="margin-top:-10px" >
                 <v-text-field
                     class="fs-13 ml-3" 
                     prepend-inner-icon="mdi-lock-open-outline"
-                    v-model="newPassword" 
-                    ref="reNewPass" 
+                    v-model="newPassword"
+                    :append-icon="showPassNew ? 'mdi-eye' : 'mdi-eye-off'"
                     dense 
                     placeholder="Mật khẩu mới"
                     outlined
-                    :rules="[rules.required, rules.min, rules.max, rules.match]" 
-                    :type="showPass ? 'text' : 'password'"
-                    @click:prepend-inner="showPass = !showPass">
+                    :rules="[rules.required, rules.min, rules.max, rules.notMatch]" 
+                    :type="showPassNew ? 'text' : 'password'"
+                    @click:append="showPassNew = !showPassNew">
+                </v-text-field>
+            </v-row>
+            <v-row style="margin-top:-10px" >
+                <v-text-field
+                    class="fs-13 ml-3" 
+                    prepend-inner-icon="mdi-lock-open-outline"
+                    v-model="reNewPassword" 
+                    ref="reNewPass" 
+                    dense 
+                    :append-icon="showPassRenew ? 'mdi-eye' : 'mdi-eye-off'"
+                    placeholder="Xác nhận mật khẩu mới"
+                    outlined
+                    :rules="[rules.required, rules.min, rules.max, rules.match,rules.notMatch]" 
+                    :type="showPassRenew ? 'text' : 'password'"
+                    @click:append="showPassRenew = !showPassRenew">
                 </v-text-field>
             </v-row>
         </v-col>
     </v-row>
-    <v-card-actions class="d-flex justify-end h-100">
+    <v-card-actions class="d-flex justify-end h-100 mr-1" style="margin-top:-30px">
         <v-btn small color="success" dark @click="submit()">Cập nhật</v-btn>
     </v-card-actions>
 </v-card>
@@ -51,13 +68,18 @@ export default {
     data() {
         return {
             oldPassword: "",
+            reNewPassword:'',
+            showPassRenew:false,
+            showPassNew:false,
+            showPassOld:false,
             newPassword: "",
-            showPass: false,
             rules: {
                 required: value => !!value || 'Không được bỏ trống.',
                 min: v => (typeof v != 'undefined' && v != undefined && v.length >= 8) || 'Yêu cầu mật khẩu lớn hơn 8 kí tự',
                 max: v => (typeof v != 'undefined' && v != undefined && v.length < 25) || 'Yêu cầu mật khẩu ít hơn 24 kí tự',
-                match: v => (v!=this.oldPassword) || 'Mật khẩu không được trùng khớp',
+                notMatch: v => (v!=this.oldPassword) || 'Mật khẩu mới không được trùng khớp mật khẩu cũ',
+                match: v => (v==this.newPassword) || 'Mật khẩu mới và xác nhận không trùng nhau',
+
             },
         }
     },
@@ -108,12 +130,11 @@ export default {
             })
         },
         submit() {
-           let data = {
+            let data = {
                 id: this.sapp.endUserInfo.id
             };
             let check = false;
-            if (this.newPassword&&this.oldPassword!=this.newPassword&&this.newPassword.length>=8&&this.newPassword.length<25) {
-                data.password = this.oldPassword;
+            if (this.newPassword&&this.oldPassword!=this.newPassword&&this.newPassword.length>=8&&this.newPassword.length<25&&this.newPassword==this.reNewPassword) {
                 check = true;
             }
             if(check){
@@ -132,7 +153,7 @@ export default {
     font-family:Roboto;
 }
 .image-change-pass{
-    width:122px;
-    height:136px 
+    width:140px;
+    height:146px 
 }
 </style>
