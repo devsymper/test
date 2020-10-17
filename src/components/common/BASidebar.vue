@@ -611,10 +611,7 @@ export default {
 .menu-group >>> .v-list-item:first-child{
     margin-bottom: 0 !important;
 }
-.list-item >>> section{
-    height: 560px!important;
 
-}
 </style>
 <style>
 .v-menu__content::-webkit-scrollbar {
