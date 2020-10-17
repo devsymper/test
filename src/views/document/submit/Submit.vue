@@ -161,6 +161,7 @@
             @submit-document-success="submitSubFormSuccess"
             ref="subSubmitView" :isQickSubmit="true" :action="'submit'" :docId="docSubFormId"/>
             <SidebarTraceFormulas 
+            :documentInfo="documentInfo"
             :controlTrace="controlTrace"
             :keyInstance="keyInstance"
             :listFormulasTrace="listFormulasTrace"
@@ -338,6 +339,7 @@ export default {
     data() {
         return {
             contentDocument: null,
+            documentInfo:null,
             documentId: null,
             documentName: null,
             docSize: null,
@@ -1178,6 +1180,7 @@ export default {
                         if (res.status == 200) {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
+                            thisCpn.documentInfo = res.data.document;
                             thisCpn.getTitleObjectFormulas(res.data.document.titleObjectFormulasId)
                             thisCpn.docSize = (parseInt(res.data.document.isFullSize) == 1) ? "100%":"21cm";
                             thisCpn.contentDocument = content;
@@ -1284,6 +1287,7 @@ export default {
                 let controlType = $(allInputControl[index]).attr('s-control-type');
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let field = this.sDocumentEditor.allControl[id];
+                    console.log('fieldfieldfield',field);
                     let controlName = allControlNotSetData.includes(controlType) ? field.type : field.properties.name.value;
                     this.checkEditableControl(controlName,field);
                     this.checkOverrideFormulas(controlName,field);
