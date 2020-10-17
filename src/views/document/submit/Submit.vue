@@ -2338,7 +2338,6 @@ export default {
             let url = data.serverPath;
             let image = '<img height="70" src="'+url+'">';
             this.currentImageControl.el.html(image);
-            
             this.updateListInputInDocument(
                 this.currentImageControl.controlName,
                 "value",

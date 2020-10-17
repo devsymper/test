@@ -202,7 +202,7 @@ export default {
         async saveFormulasForRecord(){
             
             if(this.$getRouteName() == 'editDocument'){
-                this.$refs.systemDataMapping.editMapping(this.$route.params.id)
+                this.$refs.systemDataMapping.editMapping(this.$route.params.id);
             }
             if(this.documentProps.titleObjectFormulas.formulasId != 0){
                 let formulas = {};

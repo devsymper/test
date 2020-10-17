@@ -113,7 +113,6 @@ export default {
             allObjectIdentifier: [],
             listMapping:[{objectType:{},controlIdentifier:{},systemObjectIdentifier:{selected:null,options:[]},isNew:true}],
             cacheDataObject:{},
-            allItemDeleted:[]
         }
     },
     created(){
@@ -157,7 +156,6 @@ export default {
                 }
             });
         }
-        
     },
     methods:{
         onClickObjectIdentifier(mapItem){
@@ -170,8 +168,15 @@ export default {
             if(this.listMapping.length == 1){
                 return;
             }
-            this.allItemDeleted.push(this.listMapping[index].id)
+            if(this.listMapping[index].id){
+                systemDataMappingApi.delete(this.listMapping[index].id).then(res=>{
+                }).always({}).catch({})
+            }
             this.listMapping.splice(index, 1);
+        },
+        deleteMappingInDoc(documentId){
+            systemDataMappingApi.deleteInDoc(documentId).then(res=>{
+                }).always({}).catch({})
         },
         /**
          * Thay đổi kiểu đối tượng thì gọi lại api lấy dánh sách các column của object hệ thống
@@ -198,32 +203,38 @@ export default {
             })
         },
         saveMapping(documentId, newMappings = []){
-            let listMap = this.listMapping;
-            if(newMappings.length > 0){
-                listMap = newMappings;
-            }
-            listMap = this.reduceData(listMap);
-            systemDataMappingApi.saveBatch({values:JSON.stringify(listMap),documentId:documentId}).then(res=>{
-
-            }).always({}).catch({})
-        },
-        editMapping(documentId){
-            let newMapping = this.listMapping.filter(mp=>{
-                return mp.isNew === true
-            });
-            let curMapping = this.listMapping.filter(mp=>{
-                return mp.isNew !== true
-            });
-            if(newMapping.length > 0){
-                this.saveMapping(documentId, newMapping);
-            }
-            if(curMapping.length > 0){
-                let listMap = this.reduceData(curMapping);
-                systemDataMappingApi.editBatch({values:JSON.stringify(listMap),documentId:documentId}).then(res=>{
+            if(this.checkedMapping){
+                let listMap = this.listMapping;
+                if(newMappings.length > 0){
+                    listMap = newMappings;
+                }
+                listMap = this.reduceData(listMap);
+                systemDataMappingApi.saveBatch({values:JSON.stringify(listMap),documentId:documentId}).then(res=>{
 
                 }).always({}).catch({})
             }
-            
+        },
+        editMapping(documentId){
+            if(this.checkedMapping){
+                let newMapping = this.listMapping.filter(mp=>{
+                    return mp.isNew === true
+                });
+                let curMapping = this.listMapping.filter(mp=>{
+                    return mp.isNew !== true
+                });
+                if(newMapping.length > 0){
+                    this.saveMapping(documentId, newMapping);
+                }
+                if(curMapping.length > 0){
+                    let listMap = this.reduceData(curMapping);
+                    systemDataMappingApi.editBatch({values:JSON.stringify(listMap),documentId:documentId}).then(res=>{
+
+                    }).always({}).catch({})
+                }
+            }
+            else{
+                this.deleteMappingInDoc(documentId);
+            }
         },
         reduceData(allMapping){
             let listMap = allMapping.reduce((arr,obj)=>{

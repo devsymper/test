@@ -17,6 +17,12 @@ export const systemDataMappingApi = {
     },
     getByDoc(documentId) {
         return api.get('system-mapping/' + documentId);
+    },
+    delete(id) {
+        return api.delete('system-mapping/' + id);
+    },
+    deleteInDoc(documentId) {
+        return api.delete('system-mapping/documents/' + documentId);
     }
 
 };
