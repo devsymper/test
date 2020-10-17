@@ -124,7 +124,7 @@
                                                 </v-tooltip>
                                                 <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
                                                     <div
-                                                        class="fs-11 pr-6 text-ellipsis"
+                                                        class="fs-11 pr-6 text-ellipsis" style="width:60%"
                                                     >{{obj.taskData.extraLabel}} {{obj.taskData.extraValue}}</div>
 
                                                     <div class="fs-11 py-0 pr-2 text-ellipsis">

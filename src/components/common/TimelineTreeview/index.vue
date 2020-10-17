@@ -1,6 +1,6 @@
 <template>
     <div class="symper-timeline-tree-view">
-        <div class="milestone-datetimes">
+        <!-- <div class="milestone-datetimes">
             <div
                 v-for="(times, date) in listMilestoneTime"
                 :key="date"
@@ -24,8 +24,8 @@
                     >{{time}}</div>
                 </div>
             </div>
-        </div>
-        <div class="tree-view">
+        </div> -->
+        <div class="tree-view w-100">
             <TimelineTreeviewItem
                 :item="treeData"
                 :itemIndent="itemIndent"

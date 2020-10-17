@@ -95,6 +95,7 @@ import customExtension from "./elementDefinitions/customExtension";
 import { pushCustomElementsToModel, collectInfoForTaskDescription } from "./elementDefinitions/customExtToModel";
 import Api from "./../../api/api.js";
 import { appConfigs } from '../../configs';
+import serviceTaskDefinitions from "@/components/process/elementDefinitions/serviceTaskDefinitions";
 
 const apiCaller = new Api('');
 
@@ -424,6 +425,8 @@ export default {
             // &lt;![CDATA[pppppppppppppppppppp]]&gt;
             xml = xml.replace(/\&lt\;\!\[CDATA\[/g, '<![CDATA[');
             xml = xml.replace(/\]\]\&gt;/g, ']]>');
+            xml = xml.replace(/&lt;symper:string&gt;/g,'<symper:string>');
+            xml = xml.replace(/&lt;\/symper:string&gt;/g,'</symper:string>');
             return xml;
         },
         /**
@@ -525,6 +528,18 @@ export default {
                     self.$snotifyError(err, "Can not save process model");
                 });
         },
+
+        fillValueForHiddenServiceTaskAttr(nodeId){
+            let sNodeAttrs = this.stateAllElements[nodeId];
+            let seletedType = serviceTaskDefinitions[sNodeAttrs.attrs.serviceTaskType.value];
+            for (let key in seletedType) {
+                let attr = sNodeAttrs.attrs['httptask'+key.toLowerCase()];
+                if(attr){
+                    attr.value = seletedType[key];
+                }
+            }
+        },
+
         /**
          * Lấy dữ liệu của tất cả các node dưới dạng json để gửi về server lưu
          * @returns {Object} chứa data của process và thông tin của tất cả các node trong nó
@@ -560,11 +575,21 @@ export default {
                         nodeData.bounds = this.getNodeBounds(bnode);
                         nodeData.dockers = [];
                         nodeData.outgoing = [];
+
+                        
+                        if(nodeType == "ServiceTask"){
+                            this.fillValueForHiddenServiceTaskAttr(bnode.id);
+                        }
                     }
+
                     nodeData.resourceId = bnode.id;
                 }
                 nodeData.properties = this.getNodeProperties(bnode.id, false);
                 nodeData.stencil.id = nodeType; // flowable quy định loại node nằm trong nodeData.stencil.id
+
+                if(nodeData.stencil.id == 'ServiceTask'){
+                    nodeData.stencil.id = 'HttpTask';
+                }
                 mapSaveNodes[bnode.id] = nodeData;
             }
 

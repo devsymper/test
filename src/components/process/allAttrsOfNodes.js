@@ -856,116 +856,154 @@ let allAttrs = {
         "dg": "detail"
     },
     "httptaskrequesturl": {
+        hidden: true,
         "title": "Request URL",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKREQUESTURLPACKAGE.HTTPTASKREQUESTURL.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
     "httptaskrequestheaders": {
+        hidden: true,
+
         "title": "Request headers",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKREQUESTHEADERSPACKAGE.HTTPTASKREQUESTHEADERS.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskrequestbody": {
+        hidden: true,
         "title": "Request body",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKREQUESTBODYPACKAGE.HTTPTASKREQUESTBODYPACKAGE.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskrequestbodyencoding": {
+        hidden: true,
         "title": "Request body encoding",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKREQUESTBODYENCODINGPACKAGE.HTTPTASKREQUESTBODYENCODING.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskrequesttimeout": {
+        hidden: true,
         "title": "Request timeout",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKREQUESTTIMEOUTPACKAGE.HTTPTASKREQUESTTIMEOUT.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskdisallowredirects": {
+        hidden: true,
         "title": "Disallow redirects",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKDISALLOWREDIRECTSPACKAGE.HTTPTASKDISALLOWREDIRECTS.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskfailstatuscodes": {
+        hidden: true,
         "title": "Fail status codes",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKFAILSTATUSCODESPACKAGE.HTTPTASKFAILSTATUSCODES.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskhandlestatuscodes": {
+        hidden: true,
         "title": "Handle status codes",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKHANDLESTATUSCODESPACKAGE.HTTPTASKHANDLESTATUSCODES.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskignoreexception": {
+        hidden: true,
         "title": "Ignore exception",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKIGNOREEXCEPTIONPACKAGE.HTTPTASKIGNOREEXCEPTION.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptasksaveresponseparameterstransient": {
+        hidden: true,
         "title": "Save response as a transient variable",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKSAVERESPONSEPARAMETERSTRANSIENTPACKAGE.HTTPTASKSAVERESPONSEPARAMETERSTRANSIENT.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptasksaveresponseasjson": {
+        hidden: true,
         "title": "Save response as JSON",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKSAVERESPONSEASJSONPACKAGE.HTTPTASKSAVERESPONSEASJSON.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "skipexpression": {
         "title": "Skip expression",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.SKIPEXPRESSIONPACKAGE.SKIPEXPRESSION.DESCRIPTION",
-        "dg": "formula"
+        "dg": "formula",
+        toXML: {
+            "symper_position": "attr",
+            "name": "skipExpression",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "httptaskresponsevariablename": {
+        hidden: true,
         "title": "Response variable name",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKRESPONSEVARIABLENAMEPACKAGE.HTTPTASKRESPONSEVARIABLENAME.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptasksaverequestvariables": {
+        hidden: true,
         "title": "Save request variables",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKSAVEREQUESTVARIABLESPACKAGE.HTTPTASKSAVEREQUESTVARIABLES.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptasksaveresponseparameters": {
+        hidden: true,
         "title": "Save response status, headers",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKSAVERESPONSEPARAMETERSPACKAGE.HTTPTASKSAVERESPONSEPARAMETERS.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskresultvariableprefix": {
+        hidden: true,
         "title": "Result variable prefix",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKRESULTVARIABLEPREFIXPACKAGE.HTTPTASKRESULTVARIABLEPREFIX.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "callactivitycalledelement": {
         "title": "Called element",
@@ -2265,6 +2303,98 @@ let allAttrs = {
         "dg": "general",
         pushToXML: attrToXMLMethods.notPushToXML
     },
+
+
+    serviceTaskType: {
+        "title": "Service task type",
+        "type": "select",
+        "value": "script",
+        "info": "",
+        "dg": "detail",
+        options: [{
+            text: 'Script',
+            value: 'script'
+        }],
+        pushToXML: attrToXMLMethods.notPushToXML
+    },
+    serviceTaskTypeHTTP: {
+        "title": "",
+        hidden: true,
+        "type": 'text',
+        "value": "http",
+        "info": "",
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "type",
+            "isAttr": true,
+            "type": "String"
+        },
+    },
+    serviceTaskScriptValue: {
+        "title": "Script for service task ",
+        "type": "script",
+        "value": "",
+        "info": "",
+        "dg": "formula",
+        pushToXML: attrToXMLMethods.notPushToXML,
+    },
+    // serviceTaskHTTPType: {
+    //     "title": "",
+    //     "type": "text",
+    //     "value": "",
+    //     "info": "",
+    //     "dg": "detail",
+    // },
+    serviceTaskField: {
+        "title": "",
+        hidden: true,
+        "type": "",
+        "value": "",
+        "info": "",
+        "dg": "detail",
+        toXML: {
+            "symper_position": "el",
+            "name": "field",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "name",
+                "isAttr": true,
+                "type": "String"
+            }, {
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }],
+            "extraElements": [{
+                "name": "String",
+                "properties": [{
+                    "name": "text",
+                    "isBody": true,
+                    "type": "String"
+                }]
+            }]
+        }
+    },
+    serviceTaskString: {
+        "title": "",
+        hidden: true,
+        "type": "",
+        "value": "",
+        "info": "",
+        "dg": "detail",
+        toXML: {
+            "symper_position": "el",
+            "name": "string",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        }
+    },
+
 }
 
 for (let name in allAttrs) {
