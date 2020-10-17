@@ -11,7 +11,7 @@
                 <div class="mapping-object-item" v-for="(mappingItem, index) in listMapping" :key="index">
                     <div class="mapping-object-item__title">
                         <p>{{$t('document.editor.dialog.saveDoc.systemMapping.itemTitle')}}</p>
-                        <v-icon @click="deleteMappingItem(index)">mdi-close</v-icon>
+                        <v-icon v-if="listMapping.length > 1" @click="deleteMappingItem(index)">mdi-close</v-icon>
                     </div>
                     <v-select
                         :items="listObjectMapping"
@@ -50,8 +50,9 @@
                         <div class="system-object-condition">
                             <span>{{$t('document.editor.dialog.saveDoc.systemMapping.conditionSystem')}}</span>
                             <v-select
-                            :items="allObjectIdentifier"
-                            v-model="mappingItem.systemObjectIdentifier"
+                            :items="mappingItem.systemObjectIdentifier.options"
+                            v-model="mappingItem.systemObjectIdentifier.selected"
+                            @click="onClickObjectIdentifier(mappingItem)"
                             hide-details
                             hide-selected
                             dense
@@ -110,8 +111,9 @@ export default {
             controlSelected:null,
             allControl: [],
             allObjectIdentifier: [],
-            listMapping:[{objectType:{},controlIdentifier:{},systemObjectIdentifier:{}}],
-            cacheDataObject:{}
+            listMapping:[{objectType:{},controlIdentifier:{},systemObjectIdentifier:{selected:null,options:[]},isNew:true}],
+            cacheDataObject:{},
+            allItemDeleted:[]
         }
     },
     created(){
@@ -135,9 +137,6 @@ export default {
             if(data.type == 'create'){
                 this.saveMapping(data.documentId);
             }
-            else{
-                this.editMapping(data.documentId);
-            }
         });
         if(this.$getRouteName() == 'editDocument'){
             let documentId = this.$route.params.id;
@@ -148,14 +147,12 @@ export default {
                     self.listMapping = [];
                     for (let index = 0; index < data.length; index++) {
                         let mapObject = data[index];
-                        let objectType = self.listObjectMapping.filter(obj=>{
-                            return obj.name == mapObject.object_type
-                        })
+                        let objectType = JSON.parse(mapObject.object_type);
                         let controlIdentifier = this.allControl.filter(c=>{
                             return c.id == mapObject.field_id
                         })
-                        let systemObjectIdentifier = {name:mapObject.object_identifier,title:mapObject.object_identifier}
-                        self.listMapping.push({objectType:objectType[0],controlIdentifier:controlIdentifier[0],systemObjectIdentifier:systemObjectIdentifier})
+                        let objectIdentifier = JSON.parse(mapObject.object_identifier);
+                        self.listMapping.push({id:mapObject.id,objectType:objectType,controlIdentifier:controlIdentifier[0],systemObjectIdentifier:{selected:objectIdentifier.selected,options:[objectIdentifier.selected]}})
                     }
                 }
             });
@@ -163,13 +160,17 @@ export default {
         
     },
     methods:{
+        onClickObjectIdentifier(mapItem){
+            this.onChangeSelectedObject(mapItem);
+        },
         addMapping(){
-            this.listMapping.push({objectType:{},controlIdentifier:{},systemObjectIdentifier:{}})
+            this.listMapping.push({objectType:{},controlIdentifier:{},systemObjectIdentifier:{selected:null,options:[]},isNew:true})
         },
         deleteMappingItem(index){
             if(this.listMapping.length == 1){
                 return;
             }
+            this.allItemDeleted.push(this.listMapping[index].id)
             this.listMapping.splice(index, 1);
         },
         /**
@@ -177,12 +178,11 @@ export default {
          */
         onChangeSelectedObject(mappingItem){
             if(mappingItem.objectType.name != 'account'){
-                this.allObjectIdentifier = [];
-                mappingItem.systemObjectIdentifier.name = null;
+                mappingItem.systemObjectIdentifier.options = [];
                 return;
             }
             if(this.cacheDataObject[mappingItem.objectType.name]){ // nếu có dữ liệu trong cache rồi thì lấy ra
-                this.allObjectIdentifier = this.cacheDataObject[mappingItem.objectType.name];
+               mappingItem.systemObjectIdentifier.options = this.cacheDataObject[mappingItem.objectType.name];
                 return
             }
             let self = this;
@@ -192,22 +192,47 @@ export default {
                 let data = res.data;
                 for(let columnName in data){
                     let columnObject = data[columnName];
-                    self.allObjectIdentifier.push({title:columnName,name:columnObject.name});
+                    mappingItem.systemObjectIdentifier.options.push({title:columnName,name:columnObject.name});
                 }
-                self.cacheDataObject[mappingItem.objectType.name] = self.allObjectIdentifier;
+                self.cacheDataObject[mappingItem.objectType.name] = mappingItem.systemObjectIdentifier.options;
             })
         },
-        saveMapping(documentId){
-            let dataPost = {objectType:this.objectSelected.name,fieldId:this.controlSelected.id,objectIdentifier:this.systemObjectSelected.name,documentId:documentId}
-            systemDataMappingApi.save(dataPost).then(res=>{
+        saveMapping(documentId, newMappings = []){
+            let listMap = this.listMapping;
+            if(newMappings.length > 0){
+                listMap = newMappings;
+            }
+            listMap = this.reduceData(listMap);
+            systemDataMappingApi.saveBatch({values:JSON.stringify(listMap),documentId:documentId}).then(res=>{
 
             }).always({}).catch({})
         },
         editMapping(documentId){
-            let dataPost = {objectType:this.objectSelected.name,fieldId:this.controlSelected.id,objectIdentifier:this.systemObjectSelected.name}
-            systemDataMappingApi.edit(documentId, dataPost).then(res=>{
+            let newMapping = this.listMapping.filter(mp=>{
+                return mp.isNew === true
+            });
+            let curMapping = this.listMapping.filter(mp=>{
+                return mp.isNew !== true
+            });
+            if(newMapping.length > 0){
+                this.saveMapping(documentId, newMapping);
+            }
+            if(curMapping.length > 0){
+                let listMap = this.reduceData(curMapping);
+                systemDataMappingApi.editBatch({values:JSON.stringify(listMap),documentId:documentId}).then(res=>{
 
-            }).always({}).catch({})
+                }).always({}).catch({})
+            }
+            
+        },
+        reduceData(allMapping){
+            let listMap = allMapping.reduce((arr,obj)=>{
+                let newObj = obj;
+                delete newObj.systemObjectIdentifier.options
+                arr.push(newObj)
+                return arr
+            },[]);
+            return listMap;
         }
     }
 }

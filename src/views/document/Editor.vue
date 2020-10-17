@@ -1105,7 +1105,6 @@ export default {
                         type: "success",
                         title: "Save document success!"
                     });
-                    thisCpn.$evtBus.$emit('save-document-successful',{type:'edit',documentId:thisCpn.documentId})
                 }
                 else{
                     thisCpn.$snotify({
