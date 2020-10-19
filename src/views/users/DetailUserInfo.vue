@@ -121,6 +121,16 @@
 				:rolesList="role"/>
 			</div>
 			<!-- user roles -->
+
+			<v-btn  
+				style="position: absolute;top: 8px; right: 8px"
+				v-if="showDetailView"
+				small 
+				text
+				@click="triggerEditUser">
+				<i class="mdi mdi-pencil mr-2 fs-18"></i>
+				<span>{{$t('common.update')}}</span>
+			</v-btn>
 		</v-stepper>
 	</div>
 </template>
@@ -146,6 +156,9 @@ export default {
         },
     },
     methods:{
+		triggerEditUser(){
+			this.$emit('edit-user-info', this.detailInfo);
+		},
 		// xử lý chuyển tên object
 		async getRoleOrgchartByUser(id){
 			const self = this;

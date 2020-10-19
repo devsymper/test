@@ -229,7 +229,8 @@
 			</v-change-password>
 		</div>
 			<DetailUserInfo 
-				class="h-100" 
+				class="h-100"
+				@edit-user-info="triggerEditUser" 
 				v-if="showViewInfo"
 				:showDetailView="showDetailView"
 				:detailInfo="detailInfoUser"
@@ -382,6 +383,9 @@ export default {
   	},
   
   	methods:{
+		triggerEditUser(detailInfo){
+			this.$emit('edit-user-info', detailInfo);
+		},
         getAvatarUrl(){
               return appConfigs.apiDomain.fileManagement+'readFile/user_avatar_'+this.user.id;
           },
