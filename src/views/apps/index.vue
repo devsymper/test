@@ -66,7 +66,8 @@ export default {
             customAPIResult: {
                 reformatData(res){
                    return{
-                         listObject: res.data.listObject,
+						 listObject: res.data.listObject,
+						 total: res.data.listObject.length,
                          columns: [
                                 {name: "id", title: "id", 	type: "text", },
                                 {name: "name", title: "name", type: "text"},

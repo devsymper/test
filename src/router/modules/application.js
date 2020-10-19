@@ -11,6 +11,12 @@ export default [{
             import ('../../views/apps/yourApp.vue'),
     },
     {
+        path: "/apps/trash",
+        name: "trashApplication",
+        component: () =>
+            import ('../../views/apps/ListTrashApplication.vue'),
+    },
+    {
         path: '/my-applications',
         name: "my-applications",
         component: () =>

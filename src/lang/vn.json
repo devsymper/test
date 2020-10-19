@@ -124,7 +124,9 @@
             "workflows": "Quy trình",
             "documents": "Văn bản",
             "orgchart": "Sơ đồ tổ chức",
-            "myItem": "My item"
+            "myItem": "My item",
+            "listApps": "Danh sách ứng dụng",
+            "listTrashApps": "Danh sách ứng dụng đã xóa"
         },
         "system": "Hệ thống",
         "copy": "Sao chép"
