@@ -2,5 +2,5 @@ export default [{
     path: "/setting-notification",
     name: "Setting Notification",
     component: () =>
-        import ('../../components/notification/setting/main.vue'),
+        import ('../../views/settingNotification/index.vue'),
 }]
