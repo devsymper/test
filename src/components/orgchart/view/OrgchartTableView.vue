@@ -234,7 +234,7 @@ export default {
                     {
                         "headerName": this.$t('common.manager'),
                         "field": "managers",
-                        "width":  size/3,
+                        "width":  size/5+50,
                         "colId": "managers",
                         "cellRenderer": "UserInNodeView",
                          "resizable":true,

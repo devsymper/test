@@ -67,11 +67,11 @@ export default {
                     name: "detail",
                     text: this.$t("common.detail"),
                     callback: (row, callback) => {
-                        
                         self.$goToPage(
                             "/orgchart/"+row.id+"/view",
                             self.$t("common.detail") + "  " + (row.name ? row.name : row.key)
                         );
+                        
                     }
                 },
                   clone:{

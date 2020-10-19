@@ -124,7 +124,10 @@
             "workflows": "Quy trình",
             "documents": "Văn bản",
             "orgchart": "Sơ đồ tổ chức",
-            "myItem": "My item"
+            "myItem": "My item",
+            "listOrgchart": "Danh sách SĐTC",
+            "listTrashOrgchart": "Danh sách SĐTC đã xóa",
+            "viewOrgchart": "Xem SĐTC mặc định"
         },
         "system": "Hệ thống",
         "copy": "Sao chép"

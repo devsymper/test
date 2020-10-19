@@ -56,11 +56,19 @@ export default {
         title: "orgchart",
         icon: "mdi-office-building-outline",
         group: "My work",
-        action: {
-            "module": "orgchart",
-            "resource": "orgchart",
-            "scope": "orgchart",
-            "action": "list"
+        children:{
+            list: {
+                title: "listOrgchart",
+                link: "/orgchart"
+            },
+            trash: {
+                title: "listTrashOrgchart",
+                link: "/orgchart/trash"
+            },
+            viewOrgchart: {
+                title: "viewOrgchart",
+                // link: "/orgchart/:id/view"
+            },
         }
     },
     myItem: {

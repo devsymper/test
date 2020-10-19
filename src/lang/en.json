@@ -124,7 +124,10 @@
             "workflows": "Workflows",
             "documents": "Documents",
             "orgchart": "Organization chart",
-            "myItem": "My item"
+            "myItem": "My item",
+            "listOrgchart": "List orgchart",
+            "listTrashOrgchart": "List trash orgchart",
+            "viewOrgchart": "View orgchart default"
         },
         "system": "System",
         "copy": "Copy"
