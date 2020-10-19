@@ -16,8 +16,9 @@ import {
 export const allControlNotSetData = ['approvalHistory', 'submit', 'draft', 'reset']
 export const setDataForPropsControl = function(fields, instance, from) {
     for (let controlId in fields) {
-        let control = GetControlProps(fields[controlId].type)
-        let properties = control.properties
+        let control = GetControlProps(fields[controlId].type);
+        let userUpdate = fields[controlId].userUpdate
+        let properties = control.properties;
         let formulas = control.formulas
         let type = fields[controlId].type
         let id = fields[controlId]['properties'].id;
@@ -56,7 +57,8 @@ export const setDataForPropsControl = function(fields, instance, from) {
                 formulas: formulas,
                 type: type,
                 value: value,
-                prepareData: prepareData
+                prepareData: prepareData,
+                userUpdate: userUpdate
             }, instance, from);
         } else {
             let listField = fields[controlId].listFields
@@ -127,7 +129,8 @@ export const setDataForPropsControl = function(fields, instance, from) {
                     type: fields[controlId].type,
                     listFields: listChildField,
                     value: colValue,
-                    prepareData: prepareData
+                    prepareData: prepareData,
+                    userUpdate: userUpdate
                 },
                 instance, from);
         }

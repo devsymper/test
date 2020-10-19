@@ -2,7 +2,7 @@ import Api from "./api";
 import { appConfigs } from "./../configs.js";
 
 var coreApi = new Api(appConfigs.apiDomain.sdocumentManagement);
-var formulasApi = new Api(appConfigs.apiDomain.formulasService)
+var formulasApi = new Api(appConfigs.apiDomain.formulasService);
 export const documentApi = {
     getListDocument() {
         return coreApi.get("documents?pageSize=3000");

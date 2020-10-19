@@ -151,7 +151,7 @@ Handsontable.cellTypes.registerCellType('file', {
 });
 let listKeyCodeNotChange = [18, 17, 9, 20, 27, 16, 192, 91, 37, 38, 39, 40]
 let listTableInstance = {}
-const MAX_TABLE_HEIGHT = 300;
+const MAX_TABLE_HEIGHT = 500;
 
 const makeDelay = function(ms) {
     var timer = 0;

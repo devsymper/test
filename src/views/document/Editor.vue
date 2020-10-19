@@ -179,7 +179,7 @@ export default {
     },
     mounted(){
         let self = this;
-         tinymce.init({
+        tinymce.init({
             theme: 'silver',
             skin: 'oxide',
             selector:  '#document-editor-'+self.keyInstance,
@@ -1073,6 +1073,7 @@ export default {
                         type: "success",
                         title: "Save document success!"
                     });
+                    thisCpn.$evtBus.$emit('save-document-successful',{type:'create',documentId:res.data})
                 }
                 else{
                     thisCpn.$snotify({
