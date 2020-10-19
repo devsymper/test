@@ -548,7 +548,8 @@
                 "prev": "Trước đó",
                 "copyLink": "Sao chép đường dẫn",
                 "download": "Tải xuống",
-                "info": "Thông tin bản ghi"
+                "info": "Thông tin bản ghi",
+                "update": "Sửa bản ghi của văn bản "
             }
         },
         "create": "Tạo mới văn bản",
