@@ -328,7 +328,7 @@ export default {
            this.refreshList();
         },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
-            if(value && !$.isEmptyObject(this.currentItemDataClone)){
+            if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
                 this.openactionPanel();
             }else{
                 this.closeactionPanel();
