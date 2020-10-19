@@ -13,7 +13,7 @@
                 
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
-                        <v-icon @click="toggleSideBar" v-on="on">mdi-information-outline</v-icon>
+                        <v-icon @click="showSideBar" v-on="on">mdi-information-outline</v-icon>
                     </template>
                     <span>{{$t('document.detail.fab.otherInfo')}}</span>
                 </v-tooltip>
@@ -36,8 +36,8 @@
       
         <side-bar-detail 
         v-if="!isPrint"
+        ref="sidebarView"
         :sidebarWidth="sidebarWidth"  
-        :isShowSidebar="isShowSidebar"
         :userId="userId"
         :taskId="taskId"
         :createTime="createTime"
@@ -139,7 +139,6 @@ export default {
             keyInstance: Date.now(),
             contentMargin:'auto',
             sidebarWidth:400,
-            isShowSidebar:false,
             workflowId:"",
             taskId:"",
             createTime:"",
@@ -326,11 +325,8 @@ export default {
                 
             }
         },
-        toggleSideBar(){
-            this.isShowSidebar = !this.isShowSidebar;
-        },
-        isShow(){
-            return this.isShowSidebar
+        showSideBar(){
+            this.$refs.sidebarView.show()
         },
         getListInputInDocument() {
             return getSDocumentSubmitStore(this.keyInstance).listInputInDocument;

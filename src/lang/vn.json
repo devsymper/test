@@ -600,7 +600,14 @@
                     "type": "Loại văn bản",
                     "note": "Ghi chú (Phục vụ cho việc tìm kiếm)",
                     "titleObject": "Tiêu đề bản ghi (Phục vụ cho việc hiển thị trên MyItem, công thức chạy trên server)",
-                    "titlePrint": "Tiêu đề bản In"
+                    "titlePrint": "Tiêu đề bản In",
+                    "systemMapping": {
+                        "title": "Liên kết Doc và đối tượng hệ thống",
+                        "itemTitle": "Chọn đối tượng để liên kết (Có thể mở được bản ghi của Doc ngay trong đối tượng hệ thống)",
+                        "condition": "Liên kết theo điều kiện",
+                        "conditionDoc": "Điều kiện liên kết trên Doc",
+                        "conditionSystem": "Điều kiện liên kết ở đối tượng"
+                    }
                 },
                 "swapType": {
                     "heading": "Chuyển đổi kiểu control",
@@ -1110,7 +1117,6 @@
             "showMoreFile": "Xem thêm các tệp",
             "quickView":"Xem nhanh",
             "openTask": "Mở công việc"
-
         },
         "alert": {
             "title_aproval": "Thực thi công việc",

@@ -37,6 +37,8 @@ export default class Control {
         this.idField = idField;
         this.value = value;
         this.defaultValue = "";
+        console.log('controlProps', controlProps);
+        this.lastUserUpdate = controlProps.userUpdate
 
 
     }

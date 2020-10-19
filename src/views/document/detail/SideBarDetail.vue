@@ -5,7 +5,7 @@
 	permanent
 	right
 	:width="400"
-	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)'}"
+	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)','display':displaySidebar}"
 	>
 	<div class="main-info">
 		<div style="display:flex;">
@@ -165,17 +165,13 @@ export default {
                 {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:2, controls:[{id:'s-control-id-1596780634836',data:[]},{id:'s-control-id-1596780602772',data:[]},{id:'s-control-id-1596780611212',data:[]}]},
                 {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:1, controls:[{id:'s-control-id-1596780602772',data:[]}]},
 			],
-			
+			displaySidebar:'none'
 		}
 	},
 	props:{
 		sidebarWidth:{
 			type:Number,
 			default:400
-		},
-		isShowSidebar:{
-			type:Boolean,
-			default:true
 		},
 		showCommentInDoc:{
 			type:Boolean,
@@ -203,10 +199,6 @@ export default {
 		}
 	},
 	watch:{
-		
-		isShowSidebar(after){
-			this.isShow = !this.isShow
-		},
 		userId(after){
 			userApi.getDetailUser(after).then(res=>{
 				if(res.status == 200)
@@ -271,10 +263,16 @@ export default {
 	methods:{
 		hide(){
 			this.isShow = false;
+			setTimeout((self) => {
+					self.displaySidebar = 'none';
+				}, 250, this);
 			this.$emit('after-hide-sidebar');
 		},
 		show(){
-			this.isShow = true;
+			this.displaySidebar = '';
+			setTimeout((self) => {
+				self.isShow = true;
+			}, 10, this);
 		},
 		showHistoryControl(history){
 			$('.highlight-history').removeClass('highlight-history');
