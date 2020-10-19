@@ -522,14 +522,6 @@ export default {
             type: String,
             default: ''
         },
-        showImportButton: {
-            type: Boolean,
-            default: true
-        },
-        showExportButton: {
-            type: Boolean,
-            default: true
-        },
         debounceRowSelectTime: {
             type: Number,
             default: 100
