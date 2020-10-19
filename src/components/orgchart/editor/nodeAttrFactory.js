@@ -56,7 +56,14 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
         style: getNodeStyleConfig(),
         collapseExpandStatus: 'collapse' // expand | collapse
     };
-
+    if(nodeId == "SYMPER_HOME_ORGCHART"){
+        let isDefault = {   
+            "title": "SĐTC mặc định",
+            "type": "checkbox",
+            "value": false,
+        }
+        config.commonAttrs.isDefault = isDefault
+    }
     if (isDepartment) {
         config.positionDiagramCells = {
             instanceKey: Date.now(),

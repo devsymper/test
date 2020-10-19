@@ -184,10 +184,10 @@ export default {
             paper.on('element:collapse', function(view, evt) {
                 evt.stopPropagation();
                 self.toggleBranch(view.model);
+                // self.$refs.jointPaper.actionOnToolbar('zoomToFit');
             });
         },
         toggleBranch(root){
-            
             let self = this
             var shouldHide = !root.isCollapsed();
             root.set({ collapsed: shouldHide });
@@ -205,6 +205,7 @@ export default {
             var center = focusPoint || treeLayout.getLayoutBBox().center();
             this.resizePaper();
             this.paperScroller.center(center.x, center.y);
+            debugger
         },
         resizePaper() {
             let treeLayout = this.$refs.jointPaper.treeLayout;
