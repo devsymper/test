@@ -232,6 +232,7 @@
 				class="h-100"
 				@edit-user-info="triggerEditUser" 
 				v-if="showViewInfo"
+				:showUpdateBtn="true"
 				:showDetailView="showDetailView"
 				:detailInfo="detailInfoUser"
 			/>

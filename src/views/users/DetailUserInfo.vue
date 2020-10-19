@@ -124,9 +124,10 @@
 
 			<v-btn  
 				style="position: absolute;top: 8px; right: 8px"
-				v-if="showDetailView"
+				v-if="showUpdateBtn"
 				small 
 				text
+				color="primary"
 				@click="triggerEditUser">
 				<i class="mdi mdi-pencil mr-2 fs-18"></i>
 				<span>{{$t('common.update')}}</span>
@@ -149,7 +150,7 @@ export default {
 		ViewRoles
 	},
 	props:
-        ['detailInfo','changeDetail','showDetailView'],
+        ['detailInfo','changeDetail','showDetailView','showUpdateBtn'],
 	computed: {
         sapp() {
             return this.$store.state.app;
