@@ -8,16 +8,21 @@
             :containerHeight="containerHeight"
             :getDataUrl="getListUrl"
             :useActionPanel="true"
+            :debounceRowSelectTime="200"
             :headerPrefixKeypath="'common'"
             :currentItemData="currentItemData"
             :customAPIResult="customAPIResult"
+            :showActionPanelInDisplayConfig="true"
             :actionPanelWidth="600"
             @after-open-add-panel="handleAddItem"
+            @row-selected="onRowSelected"
             :commonActionProps="commonActionProps"
         >
             <template slot="right-panel-content" slot-scope="{itemData}">
                 <ActionPackForm
+                    @trigger-update-action-pack="updateActionPack"
                     @saved-item-data="handleSavedItem"
+                    @close-form="closeForm"
                     :action="actionOnItem"
                     :itemData="itemData"
                     ref="actionPackForm"
@@ -89,10 +94,7 @@ export default {
                     name: "edit",
                     text: this.$t("common.edit"),
                     callback: (row, callback) => {
-                        self.getActionPackOperations(row.id);
-                        self.actionOnItem = "update";
-                        self.applyDataToForm(row);
-                        self.$refs.actionPackForm.objectTypeToDocumentDefinition();
+                        self.updateActionPack(row);
                     }
                 },
                 remove: {
@@ -128,11 +130,7 @@ export default {
                     name: "detail",
                     text: this.$t("common.detail"),
                     callback: (row, callback) => {
-                        self.$refs.listActionPack.actionPanel = true;
-                        self.getActionPackOperations(row.id);
-                        self.actionOnItem = "detail";
-                        self.applyDataToForm(row);
-                        self.$refs.actionPackForm.objectTypeToDocumentDefinition();
+                        self.detailActionPack(row);
                     }
                 }
             },
@@ -140,13 +138,13 @@ export default {
     },
     mounted() {
         this.calcContainerHeight();
-        setTimeout(
-            self => {
-                self.$refs.listActionPack.addItem();
-            },
-            500,
-            this
-        );
+        // setTimeout(
+        //     self => {
+        //         self.$refs.listActionPack.addItem();
+        //     },
+        //     500,
+        //     this
+        // );
     },
     created() {
         this.$store.dispatch("actionPack/getAllActionByObjectType");
@@ -158,6 +156,30 @@ export default {
         }
     },
     methods: {
+        closeForm(){
+            this.$refs.listActionPack.closeactionPanel();
+        },
+        detailActionPack(row){
+            let self = this;
+            self.$refs.listActionPack.actionPanel = true;
+            self.getActionPackOperations(row.id);
+            self.actionOnItem = "detail";
+            self.applyDataToForm(row);
+            self.$refs.actionPackForm.objectTypeToDocumentDefinition();
+        },
+        updateActionPack(row){
+            let self = this;
+            self.getActionPackOperations(row.id);
+            self.actionOnItem = "update";
+            self.applyDataToForm(row);
+            self.$refs.actionPackForm.objectTypeToDocumentDefinition();
+        },
+        onRowSelected(row){
+            this.focusingUser = row;
+            if(this.$refs.listActionPack.alwaysShowActionPanel){
+                this.detailActionPack(row);
+            }
+        },
         makeOperationMapByObjectType(idActionPack, operations){
             let allActionByObjectType = this.$store.state.actionPack.allActionByObjectType;
             
