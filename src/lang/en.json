@@ -90,6 +90,7 @@
         "entries": "Entries",
         "always_show_sidebar": "Always show sidebar",
         "import_excel": "Import excel",
+        "isDefault": "Default orgchart",
         "sidebar": {
             "Setting": "Setting",
             "Notification": "Notification",

@@ -90,6 +90,7 @@
         "entries": "bản ghi",
         "always_show_sidebar": "Luôn hiển thị sidebar",
         "import_excel": "Nhập bằng excel",
+        "isDefault": "SĐTC mặc định",
         "sidebar": {
             "Setting": "Cài đặt",
             "Notification": "Thông báo",
