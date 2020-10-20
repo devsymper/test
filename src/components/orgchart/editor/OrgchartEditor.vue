@@ -158,7 +158,6 @@ export default {
 			checkPageEmpty: false,
 			listUserIds:null,
             headerActions: {
-              
                 zoomIn: {
                     icon: "mdi-plus-circle-outline",
                     text: "process.header_bar.zoom_out",
@@ -310,6 +309,7 @@ export default {
             homeConfig.commonAttrs.name.value = config.name;
             homeConfig.commonAttrs.description.value = config.description;
             homeConfig.commonAttrs.code.value = config.code;
+            homeConfig.commonAttrs.isDefault.value = config.isDefault == "1" ? true : false;
             homeConfig.customAttributes = config.dynamicAttributes;
         },
         correctDiagramDisplay(content){
@@ -487,6 +487,7 @@ export default {
 				this.$refs.positionDiagram.initOrgchartData();
             }
             this.$store.state.orgchart.editor[subInstanceKey].homeConfig = this.selectingNode;
+            
         },
         storeDepartmentPositionCells(){
             let cells = this.$refs.positionDiagram.$refs.editorWorkspace.getAllDiagramCells();
@@ -680,6 +681,7 @@ export default {
 
             if(passed){
                 let orgchartData = this.getDataToSave();
+                debugger
                 this.$emit('save-orgchart-data', orgchartData);    
             }
         },
@@ -693,7 +695,8 @@ export default {
                 description: orgchartAttr.commonAttrs.description.value,
                 dynamicAttrs: JSON.stringify(orgchartAttr.customAttributes),
                 name: orgchartAttr.commonAttrs.name.value,
-                code: orgchartAttr.commonAttrs.code.value
+                code: orgchartAttr.commonAttrs.code.value,
+                isDefault: orgchartAttr.commonAttrs.isDefault.value == true ? 1 : 0
 			};
             return data;
         },

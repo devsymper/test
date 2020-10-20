@@ -1,6 +1,6 @@
 <template>
-    <span margin-left:-2px>
-        <i :class="'mdi mr-2 fs-16 '+icon" style="margin-top:-4px"></i>
+    <span margin-left:-2px style="margin-top:-4px">
+        <i :class="'mdi mr-2 fs-16 '+icon"></i>
         <span style="padding-right:8px;margin-top:-4px;font:12px roboto">{{text}}</span>
     </span>
 </template>

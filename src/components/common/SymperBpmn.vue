@@ -4,7 +4,7 @@
             'containers h-100 w-100': true,
             'hide-process-palette': readOnly 
         }" ref="content">
-        <div class="symper-bpm-canvas h-100" ref="canvas"></div>
+        <div class="symper-bpm-canvas" :style="{height: height > 0 ? height+'px' : '100%!important'}" ref="canvas"></div>
         <a ref="downloadLinkXML" href></a>
         <a ref="downloadLinkSVG" href></a>
     </div>
@@ -24,6 +24,9 @@ import { util } from '../../plugins/util';
 export default {
     name: "symper-bpmn",
     props: {
+        height: {
+            default: 0
+        },
         diagramXML: {
             type: String,
             default:

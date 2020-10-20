@@ -1,7 +1,12 @@
 <template>
     <div class="home h-100 w-100">
-        <!-- <OrgchartElementSelector v-model="testData"/> -->
-         <!-- <v-btn @click="runDataflow" color="primary">Primary</v-btn> -->
+        <!-- <v-text-field
+            label="Prepend"
+            prepend-icon="mdi-map-marker"
+            v-model="searchKey"
+          ></v-text-field>
+        <OrgchartElementSelector v-model="testData" :searchKey="searchKey"/> -->
+        <!-- <v-btn @click="runDataflow" color="primary">Primary</v-btn> -->
          <v-dialog
             v-model="dialog"
             width="397"
@@ -105,6 +110,7 @@ export default {
             testData: [],
             detailInfoUser:{},
             dialog:false,
+            searchKey:"",
             isShowChangePassFirstLogin:false,
             selectedPermission: [
                     {

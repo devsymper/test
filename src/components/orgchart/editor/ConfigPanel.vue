@@ -320,6 +320,9 @@ export default {
                     );
                 }
             }
+        },
+        isDefault(val){
+            this.handleAttrValueInput("isDefault", 'sdsadas', val)
         }
     },
     data() {
@@ -350,6 +353,7 @@ export default {
             showUpdateAttr: false,
             currentTab: null,
             openAddPanel: false,
+            isDefault:false,
             addPanelAction: "add",
             selectingAttrIndex: null,
             dynamicValueInputs: {

@@ -23,8 +23,7 @@
         ref="listObject"
     >
         <div slot="right-panel-content" class="h-100">
-            
-            <div class="panel-header">
+            <div class="panel-header" v-if="actionOnRightSidebar == 'detail'">
                 <div class="left-action">
                     <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
@@ -67,11 +66,37 @@
                         </template>
                         <span>{{$t('document.instance.showlist.info')}}</span>
                     </v-tooltip>
-                    
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                                <v-icon @click="updateCurrentRecord" v-on="on">mdi-pencil</v-icon>
+                        </template>
+                        <span>{{$t('document.instance.showlist.update')}}</span>
+                    </v-tooltip>
                 </div>
             </div>
+            <div  v-else-if="actionOnRightSidebar == 'update'">
+                <span class="title float-left">
+                    {{$t('document.instance.showlist.update')}}
+                </span>
+                <v-icon
+                    class="close-btn float-right"
+                    @click="hidePanel"
+                >mdi-close</v-icon>
+            </div>
             <div class="panel-body">
-                <detail-object @after-hide-sidebar="afterHideSidebarDetail" ref="viewDetail" @after-load-document="handleAfterLoadDocument" :quickView="true" :docObjInfo="docObjInfo"/>
+                <detail-object 
+                    v-if="actionOnRightSidebar == 'detail'"
+                    @after-hide-sidebar="afterHideSidebarDetail" 
+                    ref="viewDetail" 
+                    @after-load-document="handleAfterLoadDocument" 
+                    :quickView="true" 
+                    :docObjInfo="docObjInfo"/>
+
+                <DocumentSubmit 
+                    v-if="actionOnRightSidebar == 'update'"
+                    :action="'update'"
+                    :documentObjectId="docObjInfo.docObjId"
+                    @submit-document-success="onDocumentUpdateSuccess"/>
             </div>
         </div>
     </list-items>
@@ -120,7 +145,9 @@ import Tablet from "./../../../components/common/Tablet";
 
 import { documentApi } from "./../../../api/Document.js";
 import { util } from "./../../../plugins/util.js";
-import Detail from './../detail/Detail.vue'
+import Detail from './../detail/Detail.vue';
+import DocumentSubmit from "@/views/document/submit/Submit.vue";
+
 export default {
     components: {
         "list-items": ListItems,
@@ -128,11 +155,12 @@ export default {
         "action-panel": ActionPanel,
         Tablet,
         BottomSheet,
-        PrintView
-
+        PrintView,
+        DocumentSubmit
     },
     data(){
         return {
+            actionOnRightSidebar: 'detail',
             commonActionProps: {
                 "module": "document",
                 "resource": "document_instance",
@@ -272,6 +300,12 @@ export default {
         }
     },
     methods:{
+        onDocumentUpdateSuccess(){
+            this.actionOnRightSidebar = 'detail';
+        },
+        updateCurrentRecord(){
+            this.actionOnRightSidebar = 'update';
+        },
         afterGetData(data){
             this.dataTable = data
         },
@@ -422,6 +456,7 @@ export default {
          * Sự kiện khi selection vào cell
          */
         afterCellSelection(rowData){
+            this.actionOnRightSidebar = 'detail';
             this.currentRowData = rowData;
         }
     }

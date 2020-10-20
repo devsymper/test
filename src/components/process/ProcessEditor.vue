@@ -32,6 +32,7 @@
                 @node-clicked="handleNodeSelected"
                 @node-changed="handleNodeChangeProps"
                 ref="symperBpmn"
+                :height="diagramHeight"
                 :diagramXML="diagramXML"
                 :customExtension="customExtension"
             ></symper-bpmn>
@@ -143,6 +144,9 @@ const mappNodeActivity={
 
 export default {
     methods: {
+        calcDiagramHeight(){
+            this.diagramHeight = window.innerHeight - 80;
+        },
         /**
          * Tìm và đặt các control cho việc lựa chọn cho phép edit trong lúc duyệt
          */
@@ -1414,7 +1418,7 @@ export default {
     },
     mounted(){
         this.resetAttrPanelHeight();
-        
+        this.calcDiagramHeight();
         let uniqueId = util.str.randomString(6)+'_'+Date.now();
         console.log(uniqueId.toLowerCase(), 'uniqueIduniqueIduniqueId');
         
@@ -1429,6 +1433,7 @@ export default {
             modelAction: "create", // hành động đối với model này là gì: create | clone | edit
             modelId: "", // Id của model này trong DB
             searchAttrKey: "",
+            diagramHeight: 300,
             headerActions: {
                 undo: {
                     icon: "mdi-undo",

@@ -328,7 +328,7 @@ export default {
            this.refreshList();
         },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
-            if(value && !$.isEmptyObject(this.currentItemDataClone)){
+            if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
                 this.openactionPanel();
             }else{
                 this.closeactionPanel();
@@ -521,14 +521,6 @@ export default {
         widgetIdentifier: {
             type: String,
             default: ''
-        },
-        showImportButton: {
-            type: Boolean,
-            default: true
-        },
-        showExportButton: {
-            type: Boolean,
-            default: true
         },
         debounceRowSelectTime: {
             type: Number,
