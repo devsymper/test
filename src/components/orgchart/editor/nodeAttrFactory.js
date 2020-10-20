@@ -160,15 +160,27 @@ export const jointLinkNode = function(source, target) {
             },
             label: {
                 text: 'Hello',
+            },
+            isHidden: function() {
+                // If the target element is collapsed, we don't want to
+                // show the link either
+                var targetElement = this.getTargetElement();
+                return !targetElement || targetElement.isHidden();
             }
 
         },
-    }, {
         isHidden: function() {
             // If the target element is collapsed, we don't want to
             // show the link either
             var targetElement = this.getTargetElement();
             return !targetElement || targetElement.isHidden();
         }
+    }, {
+        // isHidden: function() {
+        //     // If the target element is collapsed, we don't want to
+        //     // show the link either
+        //     var targetElement = this.getTargetElement();
+        //     return !targetElement || targetElement.isHidden();
+        // }
     });
 }
