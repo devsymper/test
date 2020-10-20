@@ -17,6 +17,7 @@
         "cancel": "Cancel",
         "update": "Update",
         "delete": "Delete",
+        "restore": "Restore",
         "refresh": "Refresh",
         "userDeletedName": "User deleted",
         "roleDeleted": "Role deleted",
@@ -670,7 +671,9 @@
         }
     },
     "apps": {
-        "titleMyApplication": "Danh sách công việc của tôi",
+        "titleMyApplication": "My application",
+        "titleApplication": "Applications",
+        "titleTrashApplication": "List trash applications",
         "header": {
             "id": "ID",
             "name": "Name",
@@ -679,7 +682,10 @@
             "price": "Price",
             "status": "Status",
             "created_at": "Date create",
-            "updated_at": "Last update"
+            "userDeletedName": "User deleted name",
+            "userAgent": "User agent",
+            "roleDeleted": "Role deleted",
+            "deletedAt": "Deleted At"
         },
         "emptyApp": "List application epmty",
         "emptyFavorite": " List favorite empty",
