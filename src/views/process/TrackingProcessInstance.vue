@@ -309,20 +309,23 @@ export default {
                         infoAssignee.assignee={};
                         infoAssignee.role={};
                         let taskInfo=nodeInfo.instancesMap;
+                        
                         Object.keys(taskInfo).forEach(item => {
                             let task=taskInfo[item];
                             let assigneeId=task.assignee;
-                            if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
-                                let arrDataAssignee=task.assignee.split(":");
-                                assigneeId=arrDataAssignee[0];
-                                if (arrDataAssignee.length>3) { // loại trừ trường hợp role=0
-                                    let roleIdentify=task.assignee.slice(assigneeId.length+1);
-                                    roleInfo=this.getRoleUser(roleIdentify);
+                            if (task.assignee) {
+                                if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
+                                    let arrDataAssignee=task.assignee.split(":");
+                                    assigneeId=arrDataAssignee[0];
+                                    if (arrDataAssignee.length>3) { // loại trừ trường hợp role=0
+                                        let roleIdentify=task.assignee.slice(assigneeId.length+1);
+                                        roleInfo=this.getRoleUser(roleIdentify);
+                                    }
                                 }
-                            }
-                            if (mapUser[assigneeId]) {
-                                infoAssignee.assignee = mapUser[assigneeId];
-                                infoAssignee.role = roleInfo;
+                                if (mapUser[assigneeId]) {
+                                    infoAssignee.assignee = mapUser[assigneeId];
+                                    infoAssignee.role = roleInfo;
+                                }
                             }
                         });
                         //console.log(taskInfo,"aaaaaxx");
