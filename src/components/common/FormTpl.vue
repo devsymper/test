@@ -239,7 +239,7 @@ const inputTypeConfigs = {
             return {
                 simpleMode: true,
                 width: "100%",
-                height: "80px",
+                height: (config.style && config.style.height) ? config.style.height : '80px',
                 formulaValue: config.value
             };
         }

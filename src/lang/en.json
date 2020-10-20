@@ -386,6 +386,7 @@
                 "printRecord": "Print record",
                 "selectPrintConfig": "Select print config",
                 "printMultiple": "Print Multiple",
+                "deleteMultiple": "Delete Multiple",
                 "listPrintConfig": "List print config",
                 "print": "Print",
                 "copied": "copied",
