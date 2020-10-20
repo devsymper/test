@@ -8,6 +8,12 @@ export default {
         return api.get('sources')
     },
     showListsSubcribed() {
-        return apiSyql.post('channels')
+        return api.get('channels')
+    },
+    addChanel(data) {
+        return api.post('channels', data)
+    },
+    subscribeChanel(id) {
+        return api.post('channels/' + id, id)
     }
 }

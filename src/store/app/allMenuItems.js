@@ -186,6 +186,12 @@ export default {
         link: '/setting-notification',
         group: "Setting"
     },
+    // settingNoticationBA: {
+    //     title: 'Notification',
+    //     icon: 'mdi-bell-check-outline',
+    //     link: '/setting-notificationBA',
+    //     group: "Setting"
+    // },
     // comment: {
     // 	title: 'tesstsdádasdad',
     // 	icon: 'mdi-file-edit-outline',

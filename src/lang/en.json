@@ -92,6 +92,7 @@
         "import_excel": "Import excel",
         "sidebar": {
             "Setting": "Setting",
+            "action_pack": "Action Pack",
             "Notification": "Notification",
             "account_trash": "Account trash",
             "myApplication": "My Application",
@@ -612,7 +613,7 @@
     },
     "objects": {
         "document_instance": "Document instance",
-        "user": "Nhân viên",
+        "user": "User",
         "document_definition": "Loại văn bản",
         "document": "Văn bản",
         "workflow_definition": "Workflow",

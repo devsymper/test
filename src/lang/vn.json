@@ -481,8 +481,10 @@
         "Timesheet": "Thời gian biểu"
     },
     "objects": {
+        "user": "Tài khoản người dùng",
         "document_instance": "Bản ghi dữ liệu",
         "account": "Nhân viên",
+        "action_pack": "Action Pack",
         "document_definition": "Loại văn bản",
         "document": "Văn bản",
         "workflow_definition": "Workflow",

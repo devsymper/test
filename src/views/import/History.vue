@@ -39,6 +39,7 @@ export default {
         "action-panel": ActionPanel,
     },
     data(){
+        let self = this
         return {
             showDetailView:false,
             listRowUser:[],
@@ -116,6 +117,7 @@ export default {
                         }
                     })
                     .catch(console.log);
+                    data.columns[7].renderer
                     return  data;
                 } 
             },

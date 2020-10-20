@@ -15,12 +15,14 @@
                 </v-btn>
             </v-col >
         </v-row>
-        <SettingNotification v-if="showMain" :type="type" :listItems="items"/>
+        <SettingNotification v-if="showMain" :type="type" :listItems="items" :listSubcribed="listSubcribed"/>
         <SettingNotification v-if="showFollow" :type="type" :listItems ="items1"/>
         <SettingNotification v-if="showUnfollow" :type="type" :listItems ="items"/>
     </div>
 </template>
 <script>
+import _ from 'lodash';
+import notification from "./../../api/settingNotification";
 import SettingNotification from "./../../components/notification/setting/main.vue"
 export default {
   watch: {
@@ -29,46 +31,23 @@ export default {
         SettingNotification,
     },
   created () {
+      this.getSource();
+      this.getAllListChanel()
   },
   data () {
     return {
         type:'main',
+        listSubcribed:[],
         showMain:true,
-        showFollow:false,
+        listModules:[],
+        listSource:[],
+        listNameModules:[],
         showUnfollow:false,
-        items: [
-            {
-                action: 'mdi-ticket',
-                items: [
-                    { title: 'List Item' }
-                ],
-                title: 'Bình luận',
-            },
-            {
-                action: 'mdi-silverware-fork-knife',
-                active: true,
-                items: [
-                    { title: 'Được nhắc đến' },
-                    { title: 'Tin nhắn được trả lời' },
-                    { title: 'Công việc được bình luận' },
-                    ],
-                title: 'Thông tin cá nhân',
-            },
-            {
-                action: 'mdi-school',
-                items: [{ title: 'List Item' }],
-                title: 'Phân quyền',
-            },
-            {
-                action: 'mdi-run',
-                items: [
-                    { title: 'List Item' }
-                ],
-                title: 'Công việc',
-            },
-        ],
+        showFollow:false,
+        items: [],
         items1: [
             {
+                icon: 'mdi-ticket',
                 action: 'mdi-ticket',
                 items: [
                     { title: 'List Item' }
@@ -79,20 +58,70 @@ export default {
     }
   },
   methods: {
-       isShowUnFollow(){
-            this.type="unfollow";
-            this.showFollow=false;
-            this.showUnfollow=true;
-            this.showMain=false;
-        },
-        isShowFollow(){
-            this.type="follow";
-            this.showFollow=true;
-            this.showUnfollow=false;
-            this.showMain=false;
-        }
+     async getAllListChanel(){
+         
+        const self= this;
+        let res = await notification.showListsSubcribed();
+           if(res.status==200){
+            
+            let format = [];
+             let listModules = res.data;
+             for(let i = 0; i<listModules.length;i++){
+                 if(listModules[i].objectType){
+                     format.push(listModules[i])
+
+                 }
+             }
+             let formatListModules = _.groupBy(format, 'objectType');
+             let name = Object.keys(formatListModules);
+             
+             for(let i=0;i<name.length;i++){
+                 let a = name[i];
+                  self.items.push({
+                        title: name[i],
+                        items: [],
+                    })      
+                 for(let j=0; j<formatListModules[name[i]].length;j++){
+                      self.items[i].items.push({
+                            title: formatListModules[name[i]][j].event,
+                            id:formatListModules[name[i]][j].id,
+                            // event: formatListModules[name[i]][j].event[j],
+                            // source:name[i],
+                            // receiver:formatListModules[name[i]][j].receiver[0].value,
+                            // action:formatListModules[name[i]][j].action[0].value,
+                            // name: 'default',
+                            active:formatListModules[name[i]][j].subscribed
+
+                        });
+                 }
+             }
+
+           }
+    },
+    getSource(){
+        const self = this;
+        notification.showAllModuleConfig().then(res=>{
+            if(res.status==200){
+                debugger
+                self.listSource = res.data;
+            }
+        })
+    },
+    rename(){
+
+    },
+    isShowUnFollow(){
+        this.type="unfollow";
+        this.showFollow=false;
+        this.showUnfollow=true;
+        this.showMain=false;
+    },
+    isShowFollow(){
+        this.type="follow";
+        this.showFollow=true;
+        this.showUnfollow=false;
+        this.showMain=false;
+    }
   },
-  
-    
 }
 </script>
