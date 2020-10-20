@@ -199,8 +199,6 @@ export default {
                 let filter={};
                 if (isCheckProcess=='') {
                     filter.processInstanceId=processInstanceId;
-                    filter.assigneeLike= String(self.$store.state.app.endUserInfo.id);
-                    filter.assignee=self.tabsData.assignee.length>0 ? self.tabsData.assignee[0].id: '';
                     filter.size=100;
                     filter.sort= 'createTime';
                     filter.order= 'desc';

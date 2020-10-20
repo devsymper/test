@@ -45,6 +45,7 @@ export default class CustomRenderer extends BaseRenderer {
             let instanceStatus = element.businessObject.$attrs.statusCount;
             let currentNode=element.businessObject.$attrs.currentNode;
             let infoAssignee=element.businessObject.$attrs.infoAssignee;
+            let colorSet=element.businessObject.$attrs.setColor;
             
             let runner = 0;
             let r = 8;
@@ -67,7 +68,7 @@ export default class CustomRenderer extends BaseRenderer {
                
             }
             if (infoAssignee) {
-                insertText(parentNode,infoAssignee);
+                insertText(parentNode,infoAssignee,colorSet);
             }
           
         }
@@ -127,13 +128,13 @@ function insertImage(parentNode,href, width, height) {
     svgAppend(parentNode, img);
     return img;
 }
-function insertText(parentNode,infoAssignee) {
+function insertText(parentNode,infoAssignee,colorSet=null) {
     const text = svgCreate('text');
     const textRole = svgCreate('text');
     svgAttr(text, {
         x:0,
         y:100,
-        fill:"#52B415"
+        fill:colorSet?colorSet.stroke:"#52B415"
     });
     svgAttr(textRole, {
         x:0,

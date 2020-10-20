@@ -61,11 +61,19 @@ export default {
         title: "orgchart",
         icon: "mdi-office-building-outline",
         group: "My work",
-        action: {
-            "module": "orgchart",
-            "resource": "orgchart",
-            "scope": "orgchart",
-            "action": "list"
+        children:{
+            list: {
+                title: "listOrgchart",
+                link: "/orgchart"
+            },
+            trash: {
+                title: "listTrashOrgchart",
+                link: "/orgchart/trash"
+            },
+            viewOrgchart: {
+                title: "viewOrgchart",
+                // link: "/orgchart/:id/view"
+            },
         }
     },
     myItem: {
@@ -132,7 +140,7 @@ export default {
     fileManagement: {
         title: 'File',
         icon: 'mdi-upload-outline',
-        link: '/knowledge',
+        link: '/file-management',
         group: "Applications"
     },
     userManager: {
@@ -144,6 +152,11 @@ export default {
                 title: "users",
                 icon: "mdi-account-settings",
                 link: "/users",
+            },
+            account_trash: {
+                title: "account_trash",
+                icon: "mdi-account-settings",
+                link: "/users/trash",
             },
             ba_account: {
                 title: "baAccount",
@@ -177,8 +190,26 @@ export default {
     application_definition: {
         title: "apps",
         icon: "mdi mdi-widgets-outline",
-        link: "/apps",
-        group: "My work"
+        group: "My work",
+        children: {
+            listApp: {
+                title: "listApps",
+                icon: "mdi-folder-account",
+                link: "/apps",
+            },
+            listTrashApp: {
+                title: "listTrashApps",
+                icon: "mdi-access-point-network",
+                link: "/apps/trash"
+            },
+           
+        }
+    },
+    settingNotication: {
+        title: 'Notification',
+        icon: 'mdi-bell-check-outline',
+        link: '/setting-notification',
+        group: "Setting"
     },
     // comment: {
     // 	title: 'tesstsdádasdad',

@@ -39,7 +39,7 @@ const dockerGroups = {
 export const nodeAttrsDefinition = {
     'UserTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
-        attrs: ['taskAction', "usertaskassignment", 'taskOwner', 'assignee', 'candidateUsers', 'notificationTitle', 'notificationContent', "formkeydefinition", "formreference", "formfieldvalidation", "duedatedefinition", "prioritydefinition", 'approvalActions', 'updateForElement', "formproperties", "tasklisteners", "skipexpression", "categorydefinition", "approvalForElement", "approvalEditableControls", "extraInfoLabel", "extraInfoValue"],
+        attrs: ['taskAction', "usertaskassignment", 'taskOwner', 'assignee', 'candidateUsers', 'notificationTitle', 'notificationContent', "formkeydefinition", "formreference", "formfieldvalidation", "duedatedefinition", "prioritydefinition", 'approvalActions', 'updateForElement', "formproperties", "tasklisteners", "skipexpression", "categorydefinition", "approvalForElement", "approvalEditableControls", "extraInfoLabel", "extraInfoValue","selectDefaultControlDocument"],
         exclude: ['asynchronousdefinition', 'exclusivedefinition'],
         validate: function(attrs) {
 
@@ -58,12 +58,15 @@ export const nodeAttrsDefinition = {
                 attrs.updateForElement.hidden = true;
                 attrs.approvalForElement.hidden = true;
                 attrs.approvalEditableControls.hidden = true;
+                attrs.selectDefaultControlDocument.hidden = false;
+                
             } else if (taskAction.value == 'approval') {
                 attrs.approvalActions.hidden = false;
                 attrs.formreference.hidden = true;
                 attrs.updateForElement.hidden = true;
                 attrs.approvalForElement.hidden = false;
                 attrs.approvalEditableControls.hidden = false;
+                attrs.selectDefaultControlDocument.hidden = true;
 
             } else if (taskAction.value == 'update') {
                 attrs.approvalActions.hidden = true;
@@ -71,6 +74,8 @@ export const nodeAttrsDefinition = {
                 attrs.approvalForElement.hidden = true;
                 attrs.updateForElement.hidden = false;
                 attrs.approvalEditableControls.hidden = true;
+                attrs.selectDefaultControlDocument.hidden = true;
+
 
             } else if (taskAction.value == 'undefined') {
                 attrs.approvalActions.hidden = true;
@@ -78,7 +83,7 @@ export const nodeAttrsDefinition = {
                 attrs.approvalForElement.hidden = true;
                 attrs.updateForElement.hidden = true;
                 attrs.approvalEditableControls.hidden = true;
-
+                attrs.selectDefaultControlDocument.hidden = true;
             }
 
         },
@@ -97,15 +102,32 @@ export const nodeAttrsDefinition = {
     },
     'ServiceTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs",
-        // attrs: ["servicetasktriggerable", "servicetaskclass", "servicetaskexpression", "servicetaskdelegateexpression", "servicetaskfields", "servicetaskexceptions", "servicetaskresultvariable", "servicetaskresultvariableUseLocalScope", "skipexpression", "servicetaskfailedjobretrytimecycle", "servicetaskstoreresultvariabletransient"],
         attrs: [
             'httptaskrequesturl', 'httptaskrequestheaders', 'httptaskrequestbody', 'httptaskrequestbodyencoding', 'httptaskrequesttimeout', 'httptaskdisallowredirects', 'httptaskfailstatuscodes', 'httptaskhandlestatuscodes', 'httptaskignoreexception', 'httptasksaveresponseparameterstransient', 'httptasksaveresponseasjson', 'httptaskresponsevariablename', 'httptasksaverequestvariables', 'httptasksaveresponseparameters', 'httptaskresultvariableprefix',
-            'serviceTaskType', 'serviceTaskScriptValue', 'skipexpression', 'serviceTaskTypeHTTP'
+            'serviceTaskType', 'serviceTaskScriptValue', 'skipexpression', 'serviceTaskTypeHTTP',
+            'serviceNotificationReceiver','serviceNotificationTitle','serviceNotificationDescription','serviceNotificationActionForElement'
         ],
         validate: function(attrs) {
 
         },
         checkShowOrHideInput: function(attrs) {
+            let serviceTaskType = attrs.serviceTaskType;
+            if (serviceTaskType.value == 'script') {
+                attrs.serviceTaskScriptValue.hidden = false;
+                attrs.serviceNotificationReceiver.hidden = true;
+                attrs.serviceNotificationTitle.hidden = true;
+                attrs.serviceNotificationDescription.hidden = true;
+                attrs.serviceNotificationActionForElement.hidden = true;
+              
+            } else if (serviceTaskType.value == 'notification') {
+                attrs.serviceTaskScriptValue.hidden = true;
+                attrs.serviceNotificationReceiver.hidden = false;
+                attrs.serviceNotificationTitle.hidden = false;
+                attrs.serviceNotificationDescription.hidden = false;
+                attrs.serviceNotificationActionForElement.hidden = false;
+
+
+            }
 
         },
         docker: dockerGroups.task

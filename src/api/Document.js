@@ -4,6 +4,12 @@ import { appConfigs } from "./../configs.js";
 var coreApi = new Api(appConfigs.apiDomain.sdocumentManagement);
 var formulasApi = new Api(appConfigs.apiDomain.formulasService);
 export const documentApi = {
+    getListDocument() {
+        return coreApi.get("documents?pageSize=3000");
+    },
+    getBatchDocument(data) {
+        return coreApi.post("documents/batch",data);
+    },
     saveDocument(data) {
         return coreApi.post("documents", data);
     },

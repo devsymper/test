@@ -17,10 +17,8 @@
         </div> 
     </list-items>
          <ImportExcelPanel
-            :objType="'document'"
-            :nameDocument="nameDocument"
+            :options="options"
             :nameRows="listRowDocument"
-            :objId="documentId"
             :open="showImportPanel" />
 
 </div>
@@ -43,7 +41,9 @@ export default {
     },
     data(){
         return {
-            nameDocument:'',
+            documentId:0,
+            options:{
+            },
             propertyDocument:[],
             listRowDocument:[],
             commonActionProps: {
@@ -51,7 +51,6 @@ export default {
                 "resource": "document_definition",
                 "scope": "document",
             },
-            documentId:0,
             showImportPanel:false,
             actionPanelWidth:830,
             containerHeight: 200,
@@ -232,26 +231,30 @@ export default {
     },
     methods:{
         getApiDocument(){
+            const self = this;
             documentApi.detailDocument(this.documentId)
             .then(res => {
                 if (res.status === 200) {
-                    this.nameDocument = res.data.document.title;
-                    this.propertyDocument = Object.values(res.data.fields);
+                   self.options.objId =self.documentId;
+                   self.options.objType = 'document';
+                   self.options.subObjType = res.data.document.type;
+                   self.options.nameObj = res.data.document.title;
+                   self.propertyDocument = Object.values(res.data.fields);
                     // lưu tên của các property từ API document vào mảng  
                     let tableNames = [];
                     let tableTitle = [];
-                    for (let i = 0; i <  this.propertyDocument.length; i++) {
+                    for (let i = 0; i < self.propertyDocument.length; i++) {
                         if (this.propertyDocument[i].type === 'table') {
-                            tableNames.push( this.propertyDocument[i].properties.name);
-                            tableTitle.push( this.propertyDocument[i].properties.title);
+                            tableNames.push(self.propertyDocument[i].properties.name);
+                            tableTitle.push(self.propertyDocument[i].properties.title);
                         };
                     };
                     // khởi tạo mảng lưu các giá trị của table document
-                        this.createTable(tableNames, tableTitle);
+                       self.createTable(tableNames, tableTitle);
                 }
             })
             .catch(err => {
-                console.log(err)
+               // console.log(err)
             })
         },
         getDataType(controlType) {
@@ -270,7 +273,7 @@ export default {
                 return 'text';
             }
         },
-         createTable(tableNames,tableTitle) {
+        createTable(tableNames,tableTitle) {
             // general
             let controls = [];
             for (let i = 0; i < this.propertyDocument.length; i++) {
@@ -325,6 +328,7 @@ export default {
                         name: list[j].properties.name,
                         title:list[j].properties.title,
                         isKeyControl: false,
+                        isNull:this.checkIsRequired(list[j].properties.isRequired),
                         dataColumn: null,
                         dataType: this.getDataType(list[j].type)
                     });

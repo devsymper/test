@@ -1202,10 +1202,10 @@ export default {
                         }
                     })
                     .catch(err => {
-                        thisCpn.$snotify({
-                            type: "error",
-                            title: "error from detail document api!!!"
-                        }); 
+                        // thisCpn.$snotify({
+                        //     type: "error",
+                        //     title: "error from detail document api123!!!"
+                        // }); 
                     })
                     .always(() => {});
             }
@@ -2335,7 +2335,17 @@ export default {
          */
         checkOverrideFormulas(controlName, field){
             if(Object.keys(this.overrideControls).length > 0 && Object.keys(this.overrideControls).includes(controlName)){
-                field.formulas.formulas.value[Object.keys(field.formulas.formulas.value)[0]] = this.overrideControls[controlName]['formulas'];
+                this.preDataSubmit.rootControl.push(controlName)
+
+                if(!field.formulas.formulas){
+                    field.formulas['formulas'] = {
+                        value:{}
+                    }
+                    field.formulas['formulas']['value'][Date.now()] = this.overrideControls[controlName]['formulas'];
+                }
+                else{
+                    field.formulas.formulas.value[Object.keys(field.formulas.formulas.value)[0]] = this.overrideControls[controlName]['formulas'];
+                }
             }
         },
         afterFileUpload(data){

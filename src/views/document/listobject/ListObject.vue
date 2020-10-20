@@ -42,7 +42,7 @@
                 </v-btn>
             </div>
             <div v-else>
-                <div class="panel-header">
+                <div class="panel-header" v-if="actionOnRightSidebar == 'detail'">
                     <div class="left-action">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
@@ -85,11 +85,40 @@
                             </template>
                             <span>{{$t('document.instance.showlist.info')}}</span>
                         </v-tooltip>
-                        
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                    <v-icon @click="updateCurrentRecord" v-on="on">mdi-pencil</v-icon>
+                            </template>
+                            <span>{{$t('document.instance.showlist.update')}}</span>
+                        </v-tooltip>
                     </div>
+                    <v-btn small @click="deleteRecord" class="delete-record-btn">
+                        <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
+                    </v-btn>
+                </div>
+                <div  v-else-if="actionOnRightSidebar == 'update'">
+                    <span class="title float-left">
+                        {{$t('document.instance.showlist.update')}}
+                    </span>
+                    <v-icon
+                        class="close-btn float-right"
+                        @click="hidePanel"
+                    >mdi-close</v-icon>
                 </div>
                 <div class="panel-body">
-                    <detail-object @after-hide-sidebar="afterHideSidebarDetail" ref="viewDetail" @after-load-document="handleAfterLoadDocument" :quickView="true" :docObjInfo="docObjInfo"/>
+                    <detail-object 
+                        v-if="actionOnRightSidebar == 'detail'"
+                        @after-hide-sidebar="afterHideSidebarDetail" 
+                        ref="viewDetail" 
+                        @after-load-document="handleAfterLoadDocument" 
+                        :quickView="true" 
+                        :docObjInfo="docObjInfo"/>
+
+                    <DocumentSubmit 
+                        v-if="actionOnRightSidebar == 'update'"
+                        :action="'update'"
+                        :documentObjectId="docObjInfo.docObjId"
+                        @submit-document-success="onDocumentUpdateSuccess"/>
                 </div>
             </div>
         </div>
@@ -149,7 +178,9 @@ import Tablet from "./../../../components/common/Tablet";
 import FormTpl from "@/components/common/FormTpl.vue"
 import { documentApi } from "./../../../api/Document.js";
 import { util } from "./../../../plugins/util.js";
-import Detail from './../detail/Detail.vue'
+import Detail from './../detail/Detail.vue';
+import DocumentSubmit from "@/views/document/submit/Submit.vue";
+
 export default {
     components: {
         "list-items": ListItems,
@@ -158,11 +189,13 @@ export default {
         Tablet,
         BottomSheet,
         PrintView,
+        DocumentSubmit,
         FormTpl
 
     },
     data(){
         return {
+            actionOnRightSidebar: 'detail',
             commonActionProps: {
                 "module": "document",
                 "resource": "document_instance",
@@ -323,6 +356,12 @@ export default {
         }
     },
     methods:{
+         onDocumentUpdateSuccess(){
+            this.actionOnRightSidebar = 'detail';
+        },
+        updateCurrentRecord(){
+            this.actionOnRightSidebar = 'update';
+        },
         deleteRecord(){
             let itemSelected = Object.values(this.recordSelected);
             let ids = itemSelected.reduce((arr,obj)=>{
@@ -519,6 +558,7 @@ export default {
          * Sự kiện khi selection vào cell
          */
         afterCellSelection(rowData){
+            this.actionOnRightSidebar = 'detail';
             this.currentRowData = rowData;
         }
     }

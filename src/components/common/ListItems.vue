@@ -66,6 +66,18 @@
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel')}}</span>
                         </v-btn>
+                        
+                    
+                        <v-btn
+                            depressed
+                            small
+                            @click="showImportHistory()"
+                            class="mr-2"
+                            v-if="showImportHistory && !actionPanel"
+                        >
+                            <v-icon left dark>mdi-database-import</v-icon>
+                            <span>{{$t('common.import_excel_history')}}</span>
+                        </v-btn>
                           <!-- show menu khi hien sidebar -->
                          <v-menu
                             
@@ -316,7 +328,7 @@ export default {
            this.refreshList();
         },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
-            if(value && !$.isEmptyObject(this.currentItemDataClone)){
+            if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
                 this.openactionPanel();
             }else{
                 this.closeactionPanel();
@@ -509,14 +521,6 @@ export default {
         widgetIdentifier: {
             type: String,
             default: ''
-        },
-        showImportButton: {
-            type: Boolean,
-            default: true
-        },
-        showExportButton: {
-            type: Boolean,
-            default: true
         },
         debounceRowSelectTime: {
             type: Number,
@@ -744,6 +748,12 @@ export default {
     methods: {
         importExcel(){
             this.$emit('import-excel');
+        },
+        showImportHistory(){
+            this.$router.push("/viewHistory");
+        },
+        cancelImport(){
+            this.$emit('cancel-import');
         },
         async exportExcel(){
             let exportUrl = this.exportLink

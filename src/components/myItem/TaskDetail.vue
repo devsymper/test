@@ -502,6 +502,7 @@ export default {
                     self.isRole=true;
                     return true;
                 }else{
+                    self.isRole=false;
                     return false;
                 }
             }else{
@@ -512,7 +513,7 @@ export default {
         async updateTask(taskData) {
             let data = {};
             if (this.isRole==false) {
-                data.assignee=this.originData.assignee+":"+this.$store.state.app.endUserInfo.currentRole.id;
+                data.assignee=this.$store.state.app.endUserInfo.id+":"+this.$store.state.app.endUserInfo.currentRole.id;
             }
             if (this.taskAction=='submit') { // khi submit task
                 let description;

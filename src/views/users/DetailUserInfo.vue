@@ -62,8 +62,11 @@
 								</span>
 							</v-col>
 							<v-col cols="6">
-								<span style="color:green" v-if="detailInfo.status==1" class="fs-13">
+								<span style="color:green" v-if="detailInfo.status=='Đang hoạt động'" class="fs-13">
 									Hoạt động
+								</span>
+								<span style="color:red" class="fs-13" v-else-if="detailInfo.status=='Mới tạo'">
+									Mới tạo
 								</span>
 								<span style="color:orange" class="fs-13" v-else>
 									Khóa
@@ -118,6 +121,17 @@
 				:rolesList="role"/>
 			</div>
 			<!-- user roles -->
+
+			<v-btn  
+				style="position: absolute;top: 8px; right: 8px"
+				v-if="showUpdateBtn"
+				small 
+				text
+				color="primary"
+				@click="triggerEditUser">
+				<i class="mdi mdi-pencil mr-2 fs-18"></i>
+				<span>{{$t('common.update')}}</span>
+			</v-btn>
 		</v-stepper>
 	</div>
 </template>
@@ -136,13 +150,16 @@ export default {
 		ViewRoles
 	},
 	props:
-        ['detailInfo','changeDetail','showDetailView'],
+        ['detailInfo','changeDetail','showDetailView','showUpdateBtn'],
 	computed: {
         sapp() {
             return this.$store.state.app;
         },
     },
     methods:{
+		triggerEditUser(){
+			this.$emit('edit-user-info', this.detailInfo);
+		},
 		// xử lý chuyển tên object
 		async getRoleOrgchartByUser(id){
 			const self = this;
@@ -174,7 +191,6 @@ export default {
 			this.getRolesByUser(this.detailInfo.id);
 		 },
 		 showDetailView(){
-			 debugger
 			 this.isViewUserRole=false
 		 }
     },

@@ -44,6 +44,8 @@ function cleanContent(content, configValue) {
         .replace(/&#10;/g, ' ')
         .replace(/symper_symper_in_tag/g, 'symper:in')
         .replace(/symper_symper_out_tag/g, 'symper:out')
+        .replace(/symper_symper_string_tag/g, 'symper:string')
+        .replace(/symper_symper_field_tag/g, 'symper:field')
         .replace(/symper_symper_value_tag/g, 'symper:value');
 
     let symperMatches = rsl.match(/<symper:([a-zA-Z0-9_]+)/g);
@@ -89,6 +91,8 @@ export const deployProcess = function(self, processData) {
     return new Promise((deployResolve, deployReject) => {
         bpmnApi.getModelData(processData.id).then(res => {
             let content = cleanContent(res.data.content, JSON.parse(res.data.configValue));
+            console.log(content, 'contentcontentcontentcontentcontentcontent');
+
             let file = util.makeStringAsFile(content, "process_draft.bpmn");
             let processName=processData.name.replace(/[^\sA-Za-z0-9._-]/g," ");
             bpmnApi.deployProcess({

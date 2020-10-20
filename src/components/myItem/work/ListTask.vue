@@ -1,5 +1,5 @@
 <template>
-     <div class="h-100 w-100">
+    <div class="h-100 w-100">
             <v-row class="ml-0 mr-0" >
                 <v-col cols="12" class="list-tasks pt-0 pb-0">
                     <v-row>

@@ -13,11 +13,16 @@
         "menu": "Menu",
         "users": "Tài khoản người dùng",
         "add": "Thêm",
+        "import_excel_history": "Lịch sử Import",
         "edit": "Sửa",
         "cancel": "Hủy",
         "update": "Cập nhật",
         "delete": "Xóa",
         "refresh": "Làm mới",
+        "userDeletedName": "Họ và tên người xóa",
+        "roleDeleted": "Role người xóa",
+        "userAgent": "Trình duyệt xóa",
+        "deletedAt": "Thời gian xóa",
         "export_excel": "Xuất excel",
         "list": "Danh sách",
         "search": "Tìm kiếm",
@@ -89,7 +94,12 @@
         "entries": "bản ghi",
         "always_show_sidebar": "Luôn hiển thị sidebar",
         "import_excel": "Nhập bằng excel",
+        "isDefault": "SĐTC mặc định",
+        "restore": "Khôi phục",
         "sidebar": {
+            "Setting": "Cài đặt",
+            "Notification": "Thông báo",
+            "account_trash": "Tài khoản đã xóa",
             "Lists trash": "Danh sách bản xóa",
             "myApplication": "Ứng dụng của tôi",
             "tasks": "Tasks",
@@ -121,7 +131,12 @@
             "documents": "Văn bản",
             "orgchart": "Sơ đồ tổ chức",
             "myItem": "My item",
-            "deleteHistory": "Lịch sử xóa"
+            "deleteHistory": "Lịch sử xóa",
+            "listApps": "Danh sách ứng dụng",
+            "listTrashApps": "Danh sách ứng dụng đã xóa",
+            "listOrgchart": "Danh sách SĐTC",
+            "listTrashOrgchart": "Danh sách SĐTC đã xóa",
+            "viewOrgchart": "Xem SĐTC mặc định"
         },
         "system": "Hệ thống",
         "copy": "Sao chép"
@@ -192,6 +207,28 @@
         "notValid": "Trường này không hợp lệ",
         "password": "Yêu cầu mật khẩu có cả chữ hoa và số"
     },
+    "import": {
+        "import_history": "Lịch sử import",
+        "table": {
+            "history-import": {
+                "id": "ID",
+                "userEmail": "Email người dùng",
+                "subObjType": "Loại đối tượng",
+                "objId": " Tên đối tượng",
+                "description": "Ghi chú",
+                "userId": "Người import",
+                "createdAt": "Ngày tạo",
+                "status": "Trạng thái",
+                "fileName": "Tên tệp",
+                "nameImport": "Nội dung"
+
+
+            },
+            "contextMenu": {
+                "viewDetail": "Xem chi tiết"
+            }
+        }
+    },
     "user": {
         "notification": {
             "email_already_exist!": "Email đã tồn tại!",
@@ -203,6 +240,7 @@
 
         },
         "title": "Danh sách User",
+        "trash": "Danh sách user đã xóa",
         "general": {
             "title": "Thông tin cơ bản",
             "personalInfo": {
@@ -266,6 +304,7 @@
             "id": "Id",
             "firstName": "Họ",
             "lastName": "Tên",
+            "restore": "Khôi phục",
             "userName": "Tên đầy đủ",
             "displayName": "Tên hiển thị",
             "email": "Địa chỉ email",
@@ -277,6 +316,7 @@
             "contextMenu": {
                 "passwordSetting": "Tùy chọn mật khẩu",
                 "edit": "Sửa",
+                "restore": "Restore",
                 "delete": "Xóa",
                 "view": "Xem"
             }
@@ -521,7 +561,8 @@
                 "prev": "Trước đó",
                 "copyLink": "Sao chép đường dẫn",
                 "download": "Tải xuống",
-                "info": "Thông tin bản ghi"
+                "info": "Thông tin bản ghi",
+                "update": "Sửa bản ghi của văn bản "
             }
         },
         "create": "Tạo mới văn bản",
@@ -753,6 +794,8 @@
     },
     "apps": {
         "titleMyApplication": "Danh sách công việc của tôi",
+        "titleApplication": "Danh sách ứng dụng",
+        "titleTrashApplication": "Danh sách ứng dụng đã xóa",
         "header": {
             "id": "ID",
             "name": "Tên",
@@ -761,7 +804,11 @@
             "price": "Giá",
             "status": "Kích hoạt",
             "created_at": "Ngày tạo",
-            "updated_at": "Cập nhật lần cuối"
+            "updated_at": "Cập nhật lần cuối",
+            "userDeletedName": "Tên người xóa ",
+            "userAgent": "Trình duyệt xóa ",
+            "roleDeleted": "Role người xóa ",
+            "deletedAt": "Thời gian xóa"
         },
 
         "listType": {
@@ -1092,8 +1139,8 @@
             "showMoreTask": "Xem thêm các task liên quan",
             "showLess": "Thu gọn",
             "showMoreFile": "Xem thêm các tệp",
-            "quickView": "Xem nhanh"
-
+            "quickView": "Xem nhanh",
+            "openTask": "Mở công việc"
         },
         "alert": {
             "title_aproval": "Thực thi công việc",
@@ -1158,7 +1205,8 @@
     },
     "orgchart": {
         "list": {
-            "title": "Danh sách sơ đồ tổ chức"
+            "title": "Danh sách sơ đồ tổ chức",
+            "titleTrash": "Danh sách sơ đồ tổ chức đã xóa"
         },
         "create": {
             "title": " Tạo sơ đồ tổ chức"

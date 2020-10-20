@@ -323,7 +323,10 @@ export default {
             }
         },
         getScope(action){
-            return JSON.parse(action).scope
+            if(action){
+                return JSON.parse(action).scope
+            }
+            
         },
         changeDate(value){
             return dayjs.unix(value).format('DD/MM/YYYY')

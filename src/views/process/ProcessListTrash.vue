@@ -39,7 +39,6 @@ export default {
                         for(let item of rows){
                             ids.push(item.id);
                         }
-                        debugger
                         try {
                             let res = await bpmnApi.restoreListModels(ids);
                             if(res.status == 200){

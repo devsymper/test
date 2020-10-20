@@ -17,7 +17,12 @@
         "cancel": "Cancel",
         "update": "Update",
         "delete": "Delete",
+        "restore": "Restore",
         "refresh": "Refresh",
+        "userDeletedName": "User deleted",
+        "roleDeleted": "Role deleted",
+        "userAgent": "Agent deleted",
+        "deletedAt": "Time deleted",
         "export_excel": "Export Excel",
         "list": "List",
         "search": "Search",
@@ -90,7 +95,12 @@
         "entries": "Entries",
         "always_show_sidebar": "Always show sidebar",
         "import_excel": "Import excel",
+        "isDefault": "Default orgchart",
+        "restore": "Restore",
         "sidebar": {
+            "Setting": "Setting",
+            "Notification": "Notification",
+            "account_trash": "Account trash",
             "myApplication": "My Application",
             "My work": "My work",
             "tasks": "Tasks",
@@ -122,7 +132,12 @@
             "documents": "Documents",
             "orgchart": "Organization chart",
             "myItem": "My item",
-            "deleteHistory": "History"
+            "deleteHistory": "History",
+            "listApps": "List application",
+            "listTrashApps": "List trash application",
+            "listOrgchart": "List orgchart",
+            "listTrashOrgchart": "List trash orgchart",
+            "viewOrgchart": "View orgchart default"
         },
         "system": "System",
         "copy": "Copy"
@@ -205,6 +220,7 @@
 
         },
         "title": "User list",
+        "trash": "Lists trash user",
         "general": {
             "title": "Basic info",
             "personalInfo": {
@@ -264,6 +280,7 @@
         },
         "table": {
             "id": "Id",
+            "restore": "Restore",
             "firstName": "First name",
             "lastName": "Last name",
             "userName": "User name",
@@ -278,6 +295,7 @@
                 "passwordSetting": "Password setting",
                 "edit": "Edit",
                 "delete": "Delete",
+                "restore": "Restore",
                 "view": "View"
             }
         },
@@ -378,7 +396,8 @@
                 "prev": "Previous record",
                 "copyLink": "Copy link",
                 "download": "Download",
-                "info": "Information"
+                "info": "Information",
+                "update": "Update document record"
             }
         },
         "create": "Create document",
@@ -660,7 +679,9 @@
         }
     },
     "apps": {
-        "titleMyApplication": "Danh sách công việc của tôi",
+        "titleMyApplication": "My application",
+        "titleApplication": "Applications",
+        "titleTrashApplication": "List trash applications",
         "header": {
             "id": "ID",
             "name": "Name",
@@ -669,7 +690,10 @@
             "price": "Price",
             "status": "Status",
             "created_at": "Date create",
-            "updated_at": "Last update"
+            "userDeletedName": "User deleted name",
+            "userAgent": "User agent",
+            "roleDeleted": "Role deleted",
+            "deletedAt": "Deleted At"
         },
         "emptyApp": "List application epmty",
         "emptyFavorite": " List favorite empty",
@@ -961,8 +985,8 @@
             "showMoreTask": "Show more task related",
             "showLess": "Show less task related",
             "showMoreFile": "Show more file",
-            "quickView": "Quick view"
-
+            "quickView": "Quick view",
+            "openTask": "Open task"
         },
         "alert": {
             "title_aproval": "Action work",
@@ -1028,7 +1052,8 @@
     },
     "orgchart": {
         "list": {
-            "title": "List orgchart"
+            "title": "List orgchart",
+            "titleTrash": "List trash orgchart"
         },
         "create": {
             "title": " Create orgchart"

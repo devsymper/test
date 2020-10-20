@@ -123,13 +123,27 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 	},
 
 	'.btn-collapse-expand': {
-		'ref-dx': -shapeSize.width / 2 ,
+		'ref-dx': 0,
 		'ref-y': shapeSize.height + CEConfig.stickHeight - 20,
 		'ref': '.card',
 		event: 'element:collapse',
 		cursor: 'pointer'
 	},
-	
+	'.btn-collapse-expand>circle': {
+		r: 7,
+		fill: 'yellow',
+		stroke: 'yellow',
+		'stroke-width': 0
+	},
+	'.btn-collapse-expand>text': {
+		fill: 'white',
+		'font-size': 15,
+		'font-weight': 400,
+		stroke: 'white',
+		x: -4,
+		y: 5,
+		'font-family': 'Roboto'
+	},
 	'.collapse-expand-circle': {
 		r: CEConfig.radius,
 		fill: '#848484',
@@ -193,7 +207,10 @@ export const departmentMarkup =
                 <circle class="add"/>
                 <text class="add">+</text>
             </g>
-		
+			<g class="btn-collapse-expand">
+				<circle class="collapse-expand-circle"/>
+				<text class="expand-text">+</text>
+			</g>
             <g class="btn remove orgchart-action">
                 <circle class="remove"/>
                 <text class="remove">X</text>
@@ -201,10 +218,7 @@ export const departmentMarkup =
            
         </g>
     </g>`.replace(/\n/g, '').replace(/\s+/g, ' ');
-	// <g class="btn-collapse-expand">
-			// 	<circle class="collapse-expand-circle"/>
-			// 	<text class="expand-text">+</text>
-			// </g>
+	
 	export const defineDepartment = function () {
 	SymperDepartment = joint.shapes.org.Member.define('Symper.Department', {
 		size: {
@@ -215,7 +229,7 @@ export const departmentMarkup =
 		attrs: DEFAULT_DEPARTMENT_ATTRS,
 		markup: departmentMarkup,
 	}, {
-		hidden: false,
+		hidden:false,
 		isHidden: function () {
 			return !!this.get('hidden');
 		},
