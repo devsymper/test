@@ -49,7 +49,8 @@ export const appConfigs = {
         search: "https://search.symper.vn/",
         importExcel: 'https://io.dev.symper.vn/',
         uiConfig: "https://ui.symper.vn",
-        workflowExtend: "https://workflow-extend.symper.vn/"
+        workflowExtend: "https://workflow-extend.symper.vn/",
+        trash: "https://trash.symper.vn/"
     },
     notificationTimeout: {
         success: 3000,

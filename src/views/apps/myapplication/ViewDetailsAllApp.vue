@@ -151,7 +151,6 @@ export default {
             for(let i = 0; i < appArr.length; i++){
                 rsl[i%2][appArr[i].id] = appArr[i];
             }
-            
             return rsl;
         }
     },

@@ -5,6 +5,12 @@ export default [{
             import ('../../views/orgchart/OrgchartList.vue'),
     },
     {
+        path: "/orgchart/trash",
+        name: "trashOrgchart",
+        component: () =>
+            import ('../../views/orgchart/ListTrashOrgchart.vue'),
+    },
+    {
         path: "/orgchart/create",
         name: "createOrgchart",
         component: () =>

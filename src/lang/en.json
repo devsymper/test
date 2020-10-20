@@ -18,6 +18,10 @@
         "update": "Update",
         "delete": "Delete",
         "refresh": "Refresh",
+        "userDeletedName": "User deleted",
+        "roleDeleted": "Role deleted",
+        "userAgent": "Agent deleted",
+        "deletedAt": "Time deleted",
         "export_excel": "Export Excel",
         "list": "List",
         "search": "Search",
@@ -90,6 +94,8 @@
         "entries": "Entries",
         "always_show_sidebar": "Always show sidebar",
         "import_excel": "Import excel",
+        "isDefault": "Default orgchart",
+        "restore": "Restore",
         "sidebar": {
             "Setting": "Setting",
             "Notification": "Notification",
@@ -126,7 +132,10 @@
             "orgchart": "Organization chart",
             "myItem": "My item",
             "listApps": "List application",
-            "listTrashApps": "List trash application"
+            "listTrashApps": "List trash application",
+            "listOrgchart": "List orgchart",
+            "listTrashOrgchart": "List trash orgchart",
+            "viewOrgchart": "View orgchart default"
         },
         "system": "System",
         "copy": "Copy"
@@ -1028,7 +1037,8 @@
     },
     "orgchart": {
         "list": {
-            "title": "List orgchart"
+            "title": "List orgchart",
+            "titleTrash": "List trash orgchart"
         },
         "create": {
             "title": " Create orgchart"
