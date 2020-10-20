@@ -135,7 +135,7 @@ export default {
     fileManagement: {
         title: 'File',
         icon: 'mdi-upload-outline',
-        link: '/knowledge',
+        link: '/file-management',
         group: "Applications"
     },
     userManager: {
@@ -185,8 +185,20 @@ export default {
     application_definition: {
         title: "apps",
         icon: "mdi mdi-widgets-outline",
-        link: "/apps",
-        group: "My work"
+        group: "My work",
+        children: {
+            listApp: {
+                title: "listApps",
+                icon: "mdi-folder-account",
+                link: "/apps",
+            },
+            listTrashApp: {
+                title: "listTrashApps",
+                icon: "mdi-access-point-network",
+                link: "/apps/trash"
+            },
+           
+        }
     },
     settingNotication: {
         title: 'Notification',

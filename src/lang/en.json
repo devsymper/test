@@ -391,7 +391,8 @@
                 "prev": "Previous record",
                 "copyLink": "Copy link",
                 "download": "Download",
-                "info": "Information"
+                "info": "Information",
+                "update": "Update document record"
             }
         },
         "create": "Create document",

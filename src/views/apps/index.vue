@@ -8,10 +8,12 @@
             :containerHeight="tableHeight"
             :tableContextMenu="tableContextMenu"
             :useDefaultContext="false"
-            :actionPanelWidth="600"
+            :actionPanelWidth="600" 
             @after-open-add-panel="showAddModal"
             :customAPIResult="customAPIResult"
+            :showActionPanelInDisplayConfig="true"
             :commonActionProps="commonActionProps"
+            @row-selected="onRowSelected"
         >
             <div slot="right-panel-content" class="h-100">
                 <updateApp
@@ -19,6 +21,7 @@
                     :isEdit="isEdit"
                     @add-app="addApp"
                     @update-app="updateApp"
+					@close-app-form="closeAppForm"
                 ></updateApp>
             </div>
         </ListItems>
@@ -50,6 +53,7 @@ export default {
 		this.$store.dispatch('actionPack/getAllActionByObjectType')
     },
     data: function() {
+		let self = this;
         return {
             commonActionProps: {
                 "module": "application",
@@ -62,7 +66,8 @@ export default {
             customAPIResult: {
                 reformatData(res){
                    return{
-                         listObject: res.data.listObject,
+						 listObject: res.data.listObject,
+						 total: res.data.listObject.length,
                          columns: [
                                 {name: "id", title: "id", 	type: "text", },
                                 {name: "name", title: "name", type: "text"},
@@ -139,20 +144,7 @@ export default {
                     text: this.$t("apps.contextMenu.edit"),
                     callback: (app, callback) => {
                         this.editCallback = callback;
-                        appManagementApi.getAppDetailBa(app.id).then(res => {
-                        if (res.status == 200) {
-							if(Object.keys(res.data.listObject.childrenApp).length > 0){
-								this.checkChildrenApp(res.data.listObject.childrenApp)
-							}else{
-								this.$store.commit('appConfig/emptyItemSelected')
-							}
-                             this.showEditAppPanel(res.data.listObject)   
-                        }else {
-                            this.showError()
-                        }
-                         }).catch((err) => {
-                                this.showError()
-                        });
+                        self.openUpdateApp(app);
                     },
                 },
                 remove: {
@@ -181,6 +173,31 @@ export default {
         this.tableHeight = document.body.clientHeight - 0;
     },
     methods: {
+		closeAppForm(){
+			this.$refs.listApp.closeactionPanel();
+		},
+		openUpdateApp(app){
+			appManagementApi.getAppDetailBa(app.id).then(res => {
+				if (res.status == 200) {
+					if(Object.keys(res.data.listObject.childrenApp).length > 0){
+						this.checkChildrenApp(res.data.listObject.childrenApp)
+					}else{
+						this.$store.commit('appConfig/emptyItemSelected')
+					}
+						this.showEditAppPanel(res.data.listObject)   
+				}else {
+					this.showError()
+				}
+			}).catch((err) => {
+				this.showError()
+			});
+		},
+		onRowSelected(row){
+			if(this.$refs.listApp.alwaysShowActionPanel){
+				this.$refs.listApp.openactionPanel();
+				this.openUpdateApp(row);
+            }
+		},
         showEditAppPanel(app) {
             this.isEdit = true;
             this.$refs.actionPanel.setAppObject(app);

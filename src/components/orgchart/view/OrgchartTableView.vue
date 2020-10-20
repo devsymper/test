@@ -353,7 +353,7 @@ export default {
     data(){
         let self = this
         return {
-            currentTab: 1,
+            currentTab: 2,
             agApi:null,
             currentSize: {},
             customAgComponents: {

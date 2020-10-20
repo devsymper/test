@@ -1,5 +1,12 @@
 <template>
-    <div class="pa-2 h-100">
+    <div class="pl-2 pr-2 h-100">
+        <div class="title mb-2">
+            {{$t('common.'+action) }} {{$t('common.actionPack')}}
+            <v-icon
+                class="close-btn float-right"
+                @click="closeActionPackForm"
+            >mdi-close</v-icon>
+        </div>
         <FormTpl
          
             ref="comonAttr"
@@ -64,7 +71,8 @@
                 color="primary"
                 @click="saveActionPack">
 
-                <v-icon class="mr-2" primary>mdi-content-save</v-icon>
+                <v-icon class="mr-2" v-if="action == 'detail'" primary>mdi-pencil</v-icon>
+                <v-icon class="mr-2" v-else primary>mdi-content-save</v-icon>
                 {{action == 'create' ? $t('common.save') : $t('common.update')}}
             </v-btn>
         </div>
@@ -111,6 +119,9 @@ export default {
         this.genAllInputForFormTpl();
     },
     methods: { 
+        closeActionPackForm(){
+            this.$emit('close-form');
+        },
         genAllInputForFormTpl(){
             this.allInputs = null;
             this.allInputs = {
@@ -614,6 +625,8 @@ export default {
                     }else{
                         this.$snotifyError(res, "Error when create item");
                     }
+                }else if(this.action == 'detail'){
+                    this.$emit('trigger-update-action-pack', this.itemData);
                 }
                 this.$emit('saved-item-data',res);
             } catch (error) {

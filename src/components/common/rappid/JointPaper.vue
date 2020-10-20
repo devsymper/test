@@ -65,15 +65,21 @@ export default {
 			model: this.graph,
 			width: this.width,
 			height: this.height,
-			background: '#ffffff',
+            background: '#ffffff',
+            async: true,
+            defaultAnchor: { name: 'modelCenter' },
+            defaultConnectionPoint: { name: 'boundary' },
+            defaultConnector: { name: 'normal' },
             interactive: !this.readonly,
             sorting: joint.dia.Paper.sorting.APPROX,
             // dung na them 
-            viewport: function(view) {
+            viewport(view) {
                 var modelS = view.model;
                 // Hide elements and links which are currently collapsed
+                console.log(modelS,'modelmodelmodelmodelmodel');
                 
                 if (modelS.get('hidden')) {
+                    debugger
                     return false
                 };
                 // Hide elements and links which are not in the viewport
