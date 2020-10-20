@@ -163,6 +163,7 @@ import DateTimePicker from './../common/DateTimePicker.vue';
 import SymperListOrdering from "./../common/symperInputs/SymperListOrdering";
 import SymperListAutocomplete from "./../common/symperInputs/SymperListAutocomplete";
 import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicker.vue";
+import SymperDefaultControlDocument from "@/components/common/symperInputs/SymperDefaultControlDocument.vue";
 
 const inputTypeConfigs = {
     numeric: {
@@ -321,8 +322,17 @@ const inputTypeConfigs = {
             }
         }
     },
+    defaultControlDocument:{
+        tag:"default-control-document",
+        props(config){
+            return{
+                docId: config.docId
+            }
+        }
+    }
 };
 export default {
+    name:"formTpl",
     created(){
         this.setActiveTabForUserAssignment();
     },
@@ -616,7 +626,8 @@ export default {
         SymperListOrdering: SymperListOrdering,
         SymperListAutocomplete,
         "datetime-picker" : DateTimePicker,
-        SymperColorPicker: SymperColorPicker
+        SymperColorPicker: SymperColorPicker,
+        "default-control-document":SymperDefaultControlDocument
 
     }
 };
