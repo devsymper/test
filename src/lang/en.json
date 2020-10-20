@@ -121,7 +121,8 @@
             "workflows": "Workflows",
             "documents": "Documents",
             "orgchart": "Organization chart",
-            "myItem": "My item"
+            "myItem": "My item",
+            "deleteHistory": "History"
         },
         "system": "System",
         "copy": "Copy"
@@ -397,7 +398,14 @@
             "updateAt": "Update at",
             "userCreate": "BA Create",
             "userUpdate": "BA update",
-            "countRecord": "count record"
+            "countRecord": "count record",
+            "history": {
+                "name": "Document name",
+                "title": "Document title",
+                "countDelete": "Count record",
+                "userDelete": "User delete",
+                "timeDelete": "Time"
+            }
         },
         "editor": {
             "dialog": {

@@ -44,6 +44,11 @@ export default {
                 title: "Lists trash",
                 icon: "mdi-trash",
                 link: "/documents/trash"
+            },
+            history: {
+                title: "deleteHistory",
+                icon: "mdi-file-document-edit-outline",
+                link: "/documents/delete-history"
             }
         }
     },

@@ -120,7 +120,8 @@
             "workflows": "Quy trình",
             "documents": "Văn bản",
             "orgchart": "Sơ đồ tổ chức",
-            "myItem": "My item"
+            "myItem": "My item",
+            "deleteHistory": "Lịch sử xóa"
         },
         "system": "Hệ thống",
         "copy": "Sao chép"
@@ -540,7 +541,14 @@
             "updateAt": "Thời gian update",
             "userCreate": "Người tạo",
             "userUpdate": "Người cập nhật",
-            "countRecord": "Số lượng bản ghi"
+            "countRecord": "Số lượng bản ghi",
+            "history": {
+                "name": "Tên văn bản",
+                "title": "Tiêu đề văn bản",
+                "countDelete": "Số lượng đã xóa",
+                "userDelete": "Người xóa",
+                "timeDelete": "Thời gian xóa"
+            }
         },
         "editor": {
             "dialog": {

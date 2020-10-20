@@ -13,6 +13,12 @@ export default [
             import ('../../views/document/trash/ShowListTrash.vue'),
     },
     {
+        path: "/documents/delete-history",
+        name: "documentHistory",
+        component: () =>
+            import ('../../views/document/trash/History.vue'),
+    },
+    {
         path: "/documents/:id?/print-config",
         name: "prinConfigDocument",
         component: () =>
