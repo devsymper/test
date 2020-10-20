@@ -380,7 +380,7 @@ export default {
                 manualColumnResize: true,
                 renderAllRows: false,
                 manualRowResize: true,
-                readOnly: true,
+                readOnly: this.isTablereadOnly,
                 contextMenu: {},
                 viewportRowRenderingOffset: 20,
                 viewportColumnRenderingOffset: 20,
@@ -653,6 +653,13 @@ export default {
             default(){
                 return {}
             }
+        },
+        isTablereadOnly:{
+            type:Boolean,
+            default:true
+        },
+        conditionByFormula:{
+            type:String
         }
     },
     mounted() {},
@@ -1119,7 +1126,8 @@ export default {
                 page: this.page,
                 pageSize: configs.pageSize ? configs.pageSize : this.pageSize,
                 columns: columns ? columns : [],
-                distinct: configs.distinct ? configs.distinct : false
+                distinct: configs.distinct ? configs.distinct : false,
+                formulaCondition:this.conditionByFormula
             };
         },
         /**

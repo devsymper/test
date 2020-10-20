@@ -243,6 +243,7 @@ function setInfoForTaskDescription(el){
     elDocumentation.extraLabel = el.attrs.extraInfoLabel.value;
     elDocumentation.extraValue = el.attrs.extraInfoValue.value;
     elDocumentation.approvalEditableControls = el.attrs.approvalEditableControls.value;
+    elDocumentation.selectDefaultControlDocument = el.attrs.selectDefaultControlDocument.value;
 
     if (el.attrs.taskAction.value == 'submit') {
         elDocumentation.action.parameter.documentId = el.attrs.formreference.value;

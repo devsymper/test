@@ -961,12 +961,23 @@ export default {
                 this.$delete(this.stateAllElements, oldId);
                 this.$set(this.stateAllElements, newId, this.selectingNode);
             }
+            
 
             // Nếu set formreference cho StartNoneEvent thì đặt các lựa chọn control để làm business key
             if(this.selectingNode.type == 'StartNoneEvent' && name == 'formreference'){
                 this.setControlsForBizKey(inputInfo.value);
             }
+            // set documentId cho selectDefaultControlDocument để cấu hình điền sẵn các giá trị mặc định cho document
+            if (this.selectingNode.type=="UserTask" 
+                && this.selectingNode.attrs.taskAction.value=="submit"
+                && name=="formreference"
+                ) {
+                this.selectingNode.attrs.selectDefaultControlDocument.docId=data.value;
+            }
+            
+
         },
+        
         /**
          * Thay đổi giá trị của id cho các node có attr cần lựa chọn dùng tới node nào.
          * VD: approvalForElement, updateForElement ...
@@ -1066,6 +1077,9 @@ export default {
             if(nodeData.type == 'UserTask'){
                 this.setTaskActionableNodes(nodeData, 'approvalForElement');
                 this.setTaskActionableNodes(nodeData, 'updateForElement');
+                if (nodeData.attrs.taskAction.value=="submit" && nodeData.attrs.formreference.value) {
+                    this.selectingNode.attrs.selectDefaultControlDocument.docId=nodeData.attrs.formreference.value;
+                }
             }else if(nodeData.type == 'BPMNDiagram'){
                 nodeData.attrs.controlsForBizKey.options = this.controlsForBizKey;
             }else if(nodeData.type.includes('Gateway')){
