@@ -492,7 +492,6 @@ export default {
         async checkRoleUser(originData){
             let self=this;
             if (originData.assignee.indexOf(":")>0) {
-                debugger
                 let arrDataAssignee=originData.assignee.split(":");
                 let assigneeId=arrDataAssignee[0];
                 let roleIdentify=originData.assignee.slice(assigneeId.length);
