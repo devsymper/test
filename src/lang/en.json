@@ -91,6 +91,7 @@
         "always_show_sidebar": "Always show sidebar",
         "import_excel": "Import excel",
         "isDefault": "Default orgchart",
+        "restore": "Restore",
         "sidebar": {
             "Setting": "Setting",
             "Notification": "Notification",
@@ -1029,7 +1030,8 @@
     },
     "orgchart": {
         "list": {
-            "title": "List orgchart"
+            "title": "List orgchart",
+            "titleTrash": "List trash orgchart"
         },
         "create": {
             "title": " Create orgchart"

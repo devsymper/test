@@ -91,6 +91,7 @@
         "always_show_sidebar": "Luôn hiển thị sidebar",
         "import_excel": "Nhập bằng excel",
         "isDefault": "SĐTC mặc định",
+        "restore": "Khôi phục",
         "sidebar": {
             "Setting": "Cài đặt",
             "Notification": "Thông báo",
@@ -1182,7 +1183,8 @@
     },
     "orgchart": {
         "list": {
-            "title": "Danh sách sơ đồ tổ chức"
+            "title": "Danh sách sơ đồ tổ chức",
+            "titleTrash": "Danh sách sơ đồ tổ chức đã xóa"
         },
         "create": {
             "title": " Tạo sơ đồ tổ chức"

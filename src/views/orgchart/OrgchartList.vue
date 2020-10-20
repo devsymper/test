@@ -43,16 +43,16 @@ export default {
                             {name: "name", title: "name", type: "text"},
                             {name: "isDefault", title: "isDefault", type: "text",
                                 renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-										let span;
-										Handsontable.dom.empty(td);
-										span = document.createElement('span')
-										if(value == "1"){
-											$(span).text('Mặc định')
-										}else{
-                                            $(span).text('')
-                                        }
-                                        td.appendChild(span);
-										return td
+                                    let span;
+                                    Handsontable.dom.empty(td);
+                                    span = document.createElement('span')
+                                    if(value == "1"){
+                                        $(span).text('Mặc định')
+                                    }else{
+                                        $(span).text('')
+                                    }
+                                    td.appendChild(span);
+                                    return td
                                 },
                             },
                             {name: "description", title: "description", type: "text"},
@@ -61,9 +61,6 @@ export default {
                        ],
                        listObject:res.data.listObject,
                        total: res.data.listObject.length
-
-                         
-
                    }
                 }
             },
