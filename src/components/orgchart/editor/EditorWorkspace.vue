@@ -182,9 +182,9 @@ export default {
             });
             
             paper.on('element:collapse', function(view, evt) {
+                debugger
                 evt.stopPropagation();
                 self.toggleBranch(view.model);
-                // self.$refs.jointPaper.actionOnToolbar('zoomToFit');
             });
         },
         toggleBranch(root){
@@ -197,15 +197,14 @@ export default {
                     collapsed: false
                 });
             });
-            this.layoutAndFocus(self.viewportRect.center());
+            this.layoutAndFocus(this.viewportRect.center());
         },
         layoutAndFocus(focusPoint) {
             let treeLayout = this.$refs.jointPaper.treeLayout;
             treeLayout.layout();
-            var center = focusPoint || treeLayout.getLayoutBBox().center();
+            var center = treeLayout.getLayoutBBox().center();
             this.resizePaper();
             this.paperScroller.center(center.x, center.y);
-            debugger
         },
         resizePaper() {
             let treeLayout = this.$refs.jointPaper.treeLayout;
@@ -313,7 +312,6 @@ export default {
             }
         },
         setupGraph(graph, paper, paperScroller,viewportRect){
-            //dung them dong nay 
             this.viewportRect = viewportRect
             this.paper = paper
             this.paperScroller = paperScroller
