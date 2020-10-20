@@ -4,7 +4,7 @@
             ref="listApp"
             :getDataUrl="apiUrl"
             :headerPrefixKeypath="'apps.header'"
-            :pageTitle="$t('apps.title')"
+            :pageTitle="$t('apps.titleApplication')"
             :containerHeight="tableHeight"
             :tableContextMenu="tableContextMenu"
             :useDefaultContext="false"

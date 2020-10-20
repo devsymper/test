@@ -18,6 +18,7 @@
         "cancel": "Hủy",
         "update": "Cập nhật",
         "delete": "Xóa",
+        "restore": "Khôi phục",
         "refresh": "Làm mới",
         "export_excel": "Xuất excel",
         "list": "Danh sách",
@@ -775,6 +776,8 @@
     },
     "apps": {
         "titleMyApplication": "Danh sách công việc của tôi",
+        "titleApplication": "Danh sách ứng dụng",
+        "titleTrashApplication": "Danh sách ứng dụng đã xóa",
         "header": {
             "id": "ID",
             "name": "Tên",

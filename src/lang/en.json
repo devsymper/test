@@ -17,6 +17,7 @@
         "cancel": "Cancel",
         "update": "Update",
         "delete": "Delete",
+        "restore": "Restore",
         "refresh": "Refresh",
         "export_excel": "Export Excel",
         "list": "List",
@@ -659,7 +660,9 @@
         }
     },
     "apps": {
-        "titleMyApplication": "Danh sách công việc của tôi",
+        "titleMyApplication": "My application",
+        "titleApplication": "Applications",
+        "titleTrashApplication": "List trash applications",
         "header": {
             "id": "ID",
             "name": "Name",
