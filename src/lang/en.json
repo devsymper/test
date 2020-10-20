@@ -19,6 +19,10 @@
         "delete": "Delete",
         "restore": "Restore",
         "refresh": "Refresh",
+        "userDeletedName": "User deleted",
+        "roleDeleted": "Role deleted",
+        "userAgent": "Agent deleted",
+        "deletedAt": "Time deleted",
         "export_excel": "Export Excel",
         "list": "List",
         "search": "Search",
@@ -91,6 +95,8 @@
         "entries": "Entries",
         "always_show_sidebar": "Always show sidebar",
         "import_excel": "Import excel",
+        "isDefault": "Default orgchart",
+        "restore": "Restore",
         "sidebar": {
             "Setting": "Setting",
             "Notification": "Notification",
@@ -127,7 +133,10 @@
             "orgchart": "Organization chart",
             "myItem": "My item",
             "listApps": "List application",
-            "listTrashApps": "List trash application"
+            "listTrashApps": "List trash application",
+            "listOrgchart": "List orgchart",
+            "listTrashOrgchart": "List trash orgchart",
+            "viewOrgchart": "View orgchart default"
         },
         "system": "System",
         "copy": "Copy"
@@ -378,6 +387,7 @@
                 "printRecord": "Print record",
                 "selectPrintConfig": "Select print config",
                 "printMultiple": "Print Multiple",
+                "deleteMultiple": "Delete Multiple",
                 "listPrintConfig": "List print config",
                 "print": "Print",
                 "copied": "copied",
@@ -385,7 +395,8 @@
                 "prev": "Previous record",
                 "copyLink": "Copy link",
                 "download": "Download",
-                "info": "Information"
+                "info": "Information",
+                "update": "Update document record"
             }
         },
         "create": "Create document",
@@ -1030,7 +1041,8 @@
     },
     "orgchart": {
         "list": {
-            "title": "List orgchart"
+            "title": "List orgchart",
+            "titleTrash": "List trash orgchart"
         },
         "create": {
             "title": " Create orgchart"

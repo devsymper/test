@@ -2480,6 +2480,18 @@ let allAttrs = {
         hidden:false,
         pushToXML: attrToXMLMethods.notPushToXML
     },
+    selectDefaultControlDocument: { // cấu hình form định nghĩa sẵn dữ liệu cho control của document
+        title: 'Giá trị mặc định',
+        type: 'defaultControlDocument',
+        value: [],
+        info: '',
+        docId: 0,
+        options: [],
+        dg: 'taskAction',
+        isSymperProp: true,
+        hidden:false,
+        pushToXML: attrToXMLMethods.notPushToXML
+    },
 
 }
 

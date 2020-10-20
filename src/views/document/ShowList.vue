@@ -273,7 +273,7 @@ export default {
                 return 'text';
             }
         },
-         createTable(tableNames,tableTitle) {
+        createTable(tableNames,tableTitle) {
             // general
             let controls = [];
             for (let i = 0; i < this.propertyDocument.length; i++) {

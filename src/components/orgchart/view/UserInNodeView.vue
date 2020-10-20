@@ -27,7 +27,6 @@ export default {
         if(ids){
             for(let idUser of ids){
                 if(!isNaN(idUser)){
-
                     let user = mapIdToUser[idUser];
                     users.push({
                         id: user.id,
