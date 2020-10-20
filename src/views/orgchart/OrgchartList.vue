@@ -35,7 +35,6 @@ export default {
             getListUrl: appConfigs.apiDomain.orgchart+'orgchart',
             customAPIResult:{
                  reformatData(res){
-                     debugger
                    return{
                        columns:[
                             {name: "id", title: "id", type: "numeric"},

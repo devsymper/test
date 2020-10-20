@@ -21,6 +21,8 @@ import { appConfigs } from "./../../configs.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import { orgchartApi } from '../../api/orgchart';
 import Handsontable from 'handsontable';
+import { type } from 'jquery';
+
 export default {
     data() {
         let self = this;
@@ -32,35 +34,31 @@ export default {
             },
             containerHeight: 300,
             listItemOptions: {},
-            getListUrl: appConfigs.apiDomain.orgchart+'orgchart',
+            getListUrl: appConfigs.apiDomain.trash+'/items?type=orgchart',
             customAPIResult:{
                  reformatData(res){
-                     debugger
+                     let mapIdToUser = self.$store.getters['app/mapIdToUser'];
+                     res.data.forEach(function(e){
+                         if(e.data != ""){
+                            let newData = JSON.parse(e.data)
+                            e.orgchartId = newData.orgchart.id
+                            e.orgchartCode = newData.orgchart.code
+                            e.orgchartName = newData.orgchart.name
+                            e.userDeletedName = mapIdToUser[e.userDeleted].displayName
+                         }
+                     })
                    return{
                        columns:[
-                            {name: "id", title: "id", type: "numeric"},
-                            {name: "code", title: "code", type: "text"},
-                            {name: "name", title: "name", type: "text"},
-                            {name: "isDefault", title: "isDefault", type: "text",
-                                renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-                                    let span;
-                                    Handsontable.dom.empty(td);
-                                    span = document.createElement('span')
-                                    if(value == "1"){
-                                        $(span).text('Mặc định')
-                                    }else{
-                                        $(span).text('')
-                                    }
-                                    td.appendChild(span);
-                                    return td
-                                },
-                            },
-                            {name: "description", title: "description", type: "text"},
-                            {name: "createAt", title: "create_at", type: "date"},
-                            {name: "lastUpdateAt", title: "last_update_at", type: "date"}
+                            {name: "orgchartId", title: "id", type: "numeric", noFilter: true},
+                            {name: "orgchartCode", title: "code", type: "text", noFilter: true},
+                            {name: "orgchartName", title: "name", type: "text", noFilter: true},
+                            {name: "userDeletedName", title: "userDeletedName", type: "text", noFilter: true,},
+                            {name: "userAgent", title: "userAgent", type: "text",noFilter: true},
+                            {name: "roleDeleted", title: "roleDeleted", type: "date",noFilter: true},
+                            {name: "deletedAt", title: "deletedAt", type: "date",noFilter: true}
                        ],
-                       listObject:res.data.listObject,
-                       total: res.data.listObject.length
+                       listObject:res.data,
+                       total: res.data.length
                    }
                 }
             },
@@ -68,8 +66,20 @@ export default {
                   restore:{
                     name:"restore",
                     text: this.$t("common.restore"),
-                    callback:(row, callback) => {
-                       
+                    callback:(row, refreshList) => {
+                       orgchartApi.restore(row.orgchartId).then(res=>{
+                           if(res.status == 200){
+                               orgchartApi.deleteTrashItem(row.orgchartId).then(resA=>{
+                                   if(resA.status == 200){
+                                     refreshList();
+                                     self.$snotify({
+                                        type: "success",
+                                        title: "Restore success",
+                                    });
+                                   }
+                               })
+                           }
+                       }).catch(err=>{})
                     }
                 }
             }
@@ -90,6 +100,9 @@ export default {
         getDataAnddeploy(processId){
           
         },
+        gettrash(){
+            
+        }
     },
     components: {
         ListItems: ListItems

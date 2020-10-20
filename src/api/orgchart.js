@@ -7,6 +7,7 @@ let orgchart = new Api(appConfigs.apiDomain.orgchart);
 let coreApi = new Api(appConfigs.apiDomain.core);
 let accessControlApi = new Api(appConfigs.apiDomain.permission);
 let documentApi = new Api(appConfigs.apiDomain.documentService);
+let trashApi = new Api(appConfigs.apiDomain.trash);
 import Vue from "vue";
 
 
@@ -93,5 +94,15 @@ export const orgchartApi = {
     },
     getIdOrgchartDefault(){
         return orgchart.get('get-orgchart-default')
-    }
+    },
+    getListTrash(){
+        return trashApi.get('items', {type: "orgchart"})
+    },
+    deleteTrashItem(id){
+        return trashApi.delete('items/object/orgchart:'+id)
+    },
+    restore(id){
+        return orgchart.put('restore/'+id,)
+    },
+
 };
