@@ -18,7 +18,7 @@ import Api from "./../../api/api.js";
 import ListItems from "../../components/common/ListItems";
 import {appManagementApi} from './../../api/AppManagement.js'
 import Handsontable from 'handsontable';
-import { appConfigs } from "@/config.js";
+import { appConfigs } from "@/configs.js";
 
 export default {
     name: "listApps",
@@ -27,29 +27,26 @@ export default {
     },
     
     created(){
-        let self = this;
     },
     data: function() {
+         let self = this;
         return {
-            apiUrl: appConfigs.apiDomain.trash+'/items?type=application_defination',
+            apiUrl: appConfigs.apiDomain.trash+'/items?type=application_definition',
             customAPIResult: {
                 reformatData(res){
-                    debugger
                      let mapIdToUser = self.$store.getters['app/mapIdToUser'];
                      res.data.forEach(function(e){
                          if(e.data != ""){
                             let newData = JSON.parse(e.data)
-                            e.orgchartId = newData.orgchart.id
-                            e.orgchartCode = newData.orgchart.code
-                            e.orgchartName = newData.orgchart.name
+                            e.appId = newData.id
+                            e.appName = newData.name
                             e.userDeletedName = mapIdToUser[e.userDeleted].displayName
                          }
                      })
                    return{
                        columns:[
-                            {name: "orgchartId", title: "id", type: "numeric", noFilter: true},
-                            {name: "orgchartCode", title: "code", type: "text", noFilter: true},
-                            {name: "orgchartName", title: "name", type: "text", noFilter: true},
+                            {name: "appId", title: "id", type: "numeric", noFilter: true},
+                            {name: "appName", title: "name", type: "text", noFilter: true},
                             {name: "userDeletedName", title: "userDeletedName", type: "text", noFilter: true,},
                             {name: "userAgent", title: "userAgent", type: "text",noFilter: true},
                             {name: "roleDeleted", title: "roleDeleted", type: "date",noFilter: true},
@@ -64,10 +61,10 @@ export default {
                restore: {
                     name: "restore",
                     text: this.$t("common.restore"),
-                    callback: (app, refreshList) => {
-                          orgchartApi.restore(row.orgchartId).then(res=>{
+                    callback: (row, refreshList) => {
+                          appManagementApi.restore(row.appId).then(res=>{
                            if(res.status == 200){
-                               orgchartApi.deleteTrashItem(row.orgchartId).then(resA=>{
+                               appManagementApi.deleteTrashItem(row.appId).then(resA=>{
                                    if(resA.status == 200){
                                      refreshList();
                                      self.$snotify({

@@ -18,7 +18,6 @@
         "cancel": "Hủy",
         "update": "Cập nhật",
         "delete": "Xóa",
-        "restore": "Khôi phục",
         "refresh": "Làm mới",
         "userDeletedName": "Họ và tên người xóa",
         "roleDeleted": "Role người xóa",
@@ -797,7 +796,11 @@
             "price": "Giá",
             "status": "Kích hoạt",
             "created_at": "Ngày tạo",
-            "updated_at": "Cập nhật lần cuối"
+            "updated_at": "Cập nhật lần cuối",
+            "userDeletedName": "Tên người xóa ",
+            "userAgent": "Trình duyệt xóa ",
+            "roleDeleted": "Role người xóa ",
+            "deletedAt": "Thời gian xóa"
         },
 
         "listType": {

@@ -682,7 +682,10 @@
             "price": "Price",
             "status": "Status",
             "created_at": "Date create",
-            "updated_at": "Last update"
+            "userDeletedName": "User deleted name",
+            "userAgent": "User agent",
+            "roleDeleted": "Role deleted",
+            "deletedAt": "Deleted At"
         },
         "emptyApp": "List application epmty",
         "emptyFavorite": " List favorite empty",
