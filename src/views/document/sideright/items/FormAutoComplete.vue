@@ -49,7 +49,7 @@
                         </v-icon>
                         </v-list-item-avatar>
                         <v-list-item-content>
-                        <v-list-item-title > <span>{{item.title}}</span> <span style="font:11px roboto;font-weight:200">{{item.subTitle}}</span></v-list-item-title>
+                        <v-list-item-title > <span>{{item.title}}</span> <span style="font:11px roboto;font-weight:200;padding-left:4px">{{item.subTitle}}</span></v-list-item-title>
                         </v-list-item-content>
                         <v-list-item-action>
                         <v-btn icon tile @click="pinnedItem(item)">
@@ -59,7 +59,7 @@
                     </v-list-item>
                 </div>
             </div>
-            <TreeSqlConfig @tree-renderer="handleSqlRenderer" />
+            <TreeSqlConfig @tree-renderer="handleTreeRenderer" />
         </v-card>
             <ListColumnAutoComplete 
                 ref="listColumnn"
@@ -110,7 +110,7 @@ export default {
         removeItem(item){
             this.listColumnSelected.splice(this.listColumnSelected.indexOf(item),1)
         },
-        handleSqlRenderer(data){
+        handleTreeRenderer(data){
         }
     },
     components:{

@@ -21,14 +21,40 @@
                             mdi-sort  
                             </v-icon>
                         </v-btn>
-                        <v-btn icon tile @click="addItem(item)">
-                            <v-icon>
-                            mdi-plus-circle 
-                            </v-icon>
-                        </v-btn>
+                       
+                          <v-menu
+                                bottom
+                                left
+                            >
+                                <template v-slot:activator="{ on, attrs }">
+                                    <v-btn
+                                        dark
+                                        icon
+                                        tile 
+                                        v-bind="attrs"
+                                        v-on="on"
+                                    >
+                                        <v-icon> mdi-plus-circle </v-icon>
+                                    </v-btn>
+                                </template>
+                                <v-list>
+                                <v-list-item
+                                    v-for="(type, i) in listType"
+                                    :key="i"
+                                    @click="addItem(item, type.value)"
+                                >
+                                    <v-list-item-title>{{ type.title }}</v-list-item-title>
+                                </v-list-item>
+                                </v-list>
+                            </v-menu>
                    </div>
                 </div>
                 <div v-else class="tree-item-slot">
+                     <v-btn icon tile @click="removeItem(item)">
+                            <v-icon>
+                                mdi-close
+                            </v-icon>
+                    </v-btn>
                      <v-autocomplete
                         :items="listColumn"
                         item-text="title"
@@ -117,6 +143,17 @@ export default {
                 },
              
             ],
+            listType:[
+                {
+                    title: "Group",
+                    value:"group"
+                },
+                {
+                    title: "Item",
+                    value:"item"
+                },
+
+            ],
             treeData: [
                 {
                     id: 1,
@@ -131,7 +168,7 @@ export default {
                             value:'10001'
                         },
                         { 
-                            id: 2,
+                            id: 3,
                             type:"item",
                             column:1,
                             operator:"notBlank",
@@ -140,14 +177,21 @@ export default {
                     ],
                 },
                 {
-                id: 5,
+                id: 4,
                 type:"group",
                 value: "or",
                 children: [
                     {
-                    id: 6,
+                    id: 5,
                     type:"group",
                     value: "and",
+                    children: [
+                        {
+                        id: 6,
+                        type:"group",
+                        value: "and",
+                        },
+                    ],
                     },
                    
                 ],
@@ -160,14 +204,61 @@ export default {
     },
     methods: {
         removeItem(item){
-            
+            let data = this.searchItemInTree(this.treeData, item.id)
+            this.treeData = data
+        },
+        searchItemInTree(data ,id , type = ''){
+            let self = this
+            if(type == ''){
+                data.forEach(function(e){
+                     if(e.id == id){
+                        data.splice(data.indexOf(e),1);
+                    }else{
+                        if(e.children){
+                            self.searchItemInTree(e.children, id);
+                        }
+                    }
+                })
+                return data;
+            }else{
+                data.forEach(function(e){
+                    if(e.id == id){
+                        if(!e.children){
+                            e.children = []
+                        }
+                        if(type == "group"){
+                            e.children.push({
+                                id: Math.floor(Math.random() * 10000),
+                                type:"group",
+                                value:"and"
+                            })
+                        }else{
+                             e.children.push({
+                                id: Math.floor(Math.random() * 10000),
+                                type:"item",
+                                column:1,
+                                operator:"notBlank",
+                                value:''
+                            })
+                        }
+                        }else{
+                            if(e.children && e.children.length > 0){
+                                self.searchItemInTree(e.children, id, type);
+                            }
+                    }
+                })
+                return data;
+            }
         },
         switchOperator(item){
             let newValue = item.value == "or" ? "and" : "or" 
             item.value = newValue
         },
-        addItem(item){
-
+     
+        addItem(item , type){
+            let data = this.searchItemInTree(this.treeData, item.id,type)
+            this.$set(this, 'treeData' , data)
+            debugger
         },
     },
     watch:{
@@ -223,5 +314,13 @@ export default {
 }
 .tree-sql-config >>> .tree-item-slot .v-input{
     margin: unset;
+}
+
+ .v-list-item{
+    min-height: unset !important;
+    padding:4px 12px;
+}
+ .v-list-item .v-list-item__title{
+    font:13px roboto !important;
 }
 </style>

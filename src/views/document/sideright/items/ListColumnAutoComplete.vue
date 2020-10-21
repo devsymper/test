@@ -6,8 +6,10 @@
             :position-y="y"
             absolute
             offset-x
+             :max-height="200"
+            :nudge-width="220"
+            :close-on-content-click="false"
             class="menu-list-column"
-            z-index="333333333333333333"
         >
              <v-list-item
                 v-for="(item,i) in listColumn"
@@ -23,7 +25,7 @@
             </v-icon>
             </v-list-item-avatar>
             <v-list-item-content>
-            <v-list-item-title > <span>{{item.title}}</span> <span style="font:11px roboto;font-weight:200">{{item.subTitle}}</span></v-list-item-title>
+            <v-list-item-title > <span>{{item.title}}</span> <span style="font:11px roboto;font-weight:200;padđing-left:4px">{{item.subTitle}}</span></v-list-item-title>
             </v-list-item-content>
                 <v-icon v-if="listColumnSelected.includes(item)" color="green lighten-1">mdi-check-outline</v-icon>
         </v-list-item>
@@ -82,7 +84,7 @@ export default {
         },
         show(e){
             this.showListColumn = !this.showListColumn
-            this.x = e.clientX
+            this.x = e.clientX+40
             this.y = e.clientY+20
         }
     },
@@ -94,25 +96,26 @@ export default {
 </script>
 
 <style scoped>
-.portrait.v-menu__content{
+.v-menu__content{
     background-color: #ffffff !important;
 }
-.portrait.v-menu__content  .v-icon{
+.v-menu__content  .v-icon{
     font-size: 10px !important;
 }
-.portrait.v-menu__content  .v-avatar{
+.v-menu__content  .v-avatar{
     height: 12px !important;
     width: 12px !important;
     min-width: unset !important;
 }
-.portrait.v-menu__content .v-list-item__content .v-list-item__title{
+.v-menu__content .v-list-item__content .v-list-item__title{
     font:13px roboto;
 }
-.portrait.v-menu__content  .v-list-item__action .v-btn{
+
+.v-menu__content  .v-list-item__action .v-btn{
     width: 12px;
     height: 12px;
 }
-.portrait.v-menu__content  .v-list-item{
+.v-menu__content  .v-list-item{
     min-height: unset;
     height: 30px;
     padding:0px 4px;
