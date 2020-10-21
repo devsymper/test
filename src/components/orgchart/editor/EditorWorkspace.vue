@@ -182,7 +182,6 @@ export default {
             });
             
             paper.on('element:collapse', function(view, evt) {
-                debugger
                 evt.stopPropagation();
                 self.toggleBranch(view.model);
             });

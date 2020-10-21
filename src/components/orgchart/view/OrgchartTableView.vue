@@ -353,7 +353,7 @@ export default {
     data(){
         let self = this
         return {
-            currentTab: 2,
+            currentTab: 1,
             agApi:null,
             currentSize: {},
             customAgComponents: {
@@ -381,17 +381,17 @@ export default {
             menuPickTab:[
                 {
                     icon: "mdi-grid",
-                    title:"SDDTC dạng bảng",
+                    title:"SĐTC dạng bảng",
                     action:"tableView"
                 },
                 {
                     icon: "mdi-account-multiple",
-                    title:"SDDTC dạng cây",
+                    title:"SĐTC dạng cây",
                     action:"tableSideBySideView"
                 },
                 {
                     icon: "mdi-share-variant",
-                    title:"SDDTC dạng lưu đồ",
+                    title:"SĐTC dạng lưu đồ",
                     action:"diagramView"
                 },
 

@@ -131,6 +131,8 @@
             "documents": "Văn bản",
             "orgchart": "Sơ đồ tổ chức",
             "myItem": "My item",
+            "listApps": "Danh sách ứng dụng",
+            "listTrashApps": "Danh sách ứng dụng đã xóa",
             "listOrgchart": "Danh sách SĐTC",
             "listTrashOrgchart": "Danh sách SĐTC đã xóa",
             "viewOrgchart": "Xem SĐTC mặc định"
@@ -784,6 +786,8 @@
     },
     "apps": {
         "titleMyApplication": "Danh sách công việc của tôi",
+        "titleApplication": "Danh sách ứng dụng",
+        "titleTrashApplication": "Danh sách ứng dụng đã xóa",
         "header": {
             "id": "ID",
             "name": "Tên",
@@ -792,7 +796,11 @@
             "price": "Giá",
             "status": "Kích hoạt",
             "created_at": "Ngày tạo",
-            "updated_at": "Cập nhật lần cuối"
+            "updated_at": "Cập nhật lần cuối",
+            "userDeletedName": "Tên người xóa ",
+            "userAgent": "Trình duyệt xóa ",
+            "roleDeleted": "Role người xóa ",
+            "deletedAt": "Thời gian xóa"
         },
 
         "listType": {
