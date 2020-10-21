@@ -162,6 +162,10 @@ export default {
         allVariableProcess:{
             type:Array,
             default:[]
+        },
+        appId:{
+            type:String,
+            default:''
         }
     },
     watch: {
@@ -184,7 +188,7 @@ export default {
         return {
             showDialogAlert:false,
             isRole:false, //value =falses khi assignee = userId, =true khi assignee = userId:role
-            appId:'',
+          
             isShowSidebar:false,
             loadingActionTask:false,
             breadcrumb: {
@@ -332,6 +336,7 @@ export default {
             BPMNEngine.getATaskInfo(taskId,filter).then((res) => {
                 console.log(res,"task");
                 for(let role in self.tabsData.people){
+                    self.tabsData.people[role]=[];
                     if(res[role]){
                         let userIdentifier=res[role];
                         if (userIdentifier.indexOf(":")>0){
@@ -378,9 +383,7 @@ export default {
         },
         async getAppName(processInstanceId){
             let self=this;
-            const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===processInstanceId);
-            if (dataVariable) {
-                self.appId=dataVariable.value;
+            if (this.appId) {
                 if (this.$store.state.task.allAppActive.length==0) {
                     await self.$store.dispatch("task/getAllAppActive");
                 }
@@ -392,8 +395,24 @@ export default {
                     self.breadcrumb.appName= "";
                 }
             }else{
-                self.breadcrumb.appName="";
+                const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===processInstanceId);
+                if (dataVariable) {
+                    self.appId=dataVariable.value;
+                    if (this.$store.state.task.allAppActive.length==0) {
+                        await self.$store.dispatch("task/getAllAppActive");
+                    }
+                    let allApp = this.$store.state.task.allAppActive;
+                    let app=allApp.find(element => element.id== self.appId);
+                    if (app) {
+                        self.breadcrumb.appName=app.name;
+                    }else{
+                        self.breadcrumb.appName= "";
+                    }
+                }else{
+                    self.breadcrumb.appName="";
+                }
             }
+           
         },
         closeDetail() {
             this.$emit("close-detail", {});
