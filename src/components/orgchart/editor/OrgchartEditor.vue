@@ -440,7 +440,6 @@ export default {
             }
         },
         centerDiagram(){
-            debugger
             setTimeout((self) => {
                 self.$refs.editorWorkspace.handleHeaderAction('zoomToFit');
             }, 200, this);
@@ -685,6 +684,7 @@ export default {
 
             if(passed){
                 let orgchartData = this.getDataToSave();
+                debugger
                 this.$emit('save-orgchart-data', orgchartData);    
             }
         },
