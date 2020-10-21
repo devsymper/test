@@ -24,6 +24,27 @@
                 ></resolve-backlog-request>
             </v-dialog>
         </component>
+        
+        <v-dialog v-model="conflicSignInUser" width="500">
+            <v-card>
+                <v-card-title class="headline"> <i class="mdi mdi-alert red--text mr-2"></i> Conflict login user</v-card-title>
+                <v-card-text>
+                    Your machine is logged in with more than one account!
+                    <br>
+                    <span class="font-weight-medium">Please reload page</span>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn
+                        depressed
+                        color="primary"
+                        @click="reloadPage"
+                    >
+                        Reload page
+                    </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -40,6 +61,7 @@ import { appConfigs } from "./configs.js";
 var firebase = require("firebase/app");
 import { IndexedDB } from "./plugins/utilModules/indexedDB.js";
 import ResolveBacklogRequest from "./components/app/ResolveBacklogRequest";
+import { util } from './plugins/util.js';
 require("@/assets/css/handsontable.min.css");
 require("firebase/messaging");
 require('@/assets/css/kh.css')
@@ -51,6 +73,7 @@ export default {
     created() {
         this.initFirebase();
         this.$store.dispatch('app/getAndSetUserOperations');
+        this.checkUniqueUserInAllTab();
     },
     data() {
         return {
@@ -59,7 +82,8 @@ export default {
                 needResolve: {},
                 resolved: {},
                 resolving: {}
-            }
+            },
+            conflicSignInUser: false
         };
     },
     components: {
@@ -70,6 +94,31 @@ export default {
         this.checkBacklogRequest();
     },
     methods: {
+        reloadPage(){
+            location.reload();
+        },
+        checkUniqueUserInAllTab(){
+            let self = this;
+            document.addEventListener("visibilitychange", function() {
+                if(!document.hidden){
+                    self.conflicSignInUser = false;
+                    let storageData = util.auth.getSavedUserInfo();
+                    let stateData = self.$store.state.app;
+
+                    if(!$.isEmptyObject(storageData)){
+                        // Nếu BA đăng nhập
+                        if(stateData.baInfo.id != storageData.baId){ 
+                            self.conflicSignInUser = true;
+                        }else if (stateData.baInfo.id == '0'){
+                            // Nếu enduser đăng nhập
+                            if(stateData.endUserInfo.id != storageData.endUserId){
+                                self.conflicSignInUser = true;
+                            }
+                        }
+                    }
+                }
+            });
+        },
         handleClickApp(evt) {
             this.$evtBus.$emit("symper-app-wrapper-clicked", evt);
             if($(evt.target).attr('symper-action')){

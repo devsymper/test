@@ -6,16 +6,18 @@
             :docId="Number(docId)"
             :workflowVariable="workflowVariable"
             :showSubmitButton="false"
+            :appId="Number(appId)"
             :documentObjectTaskId="workflowInfo.documentObjectTaskId"
             :documentObjectWorkflowId="workflowInfo.documentObjectWorkflowId"
             :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
             :action="action"
             :documentObjectId="converstNumber(documentObjectId)"
+            :overrideControls="overrideControls"
             @submit-document-success="onSubmitDone">
         </DocumentSubmit>
         <Detail 
             :showCommentInDoc="false"
-            v-else-if="(showDoTaskComponent && (action == 'approval')) || filter=='done'"
+            v-else-if="(showDetailDocument && showDoTaskComponent && (action == 'approval')) || filter=='done'"
             :docObjInfo="docObjInfo">
         </Detail>
         <div style="width:100%" v-else-if="filter=='done-noneObj'">
@@ -24,12 +26,12 @@
         <div v-else-if="action == 'undefined'">
             <div class="text-md-center mt-6">
                 <span class="fs-16 font-weight-bold">
-                    {{taskInfo.action.parameter.title}}
+                    {{taskInfo.content}}
                 </span>
             </div>
             <div class="text-md-center ">
                 <span class="text--grey fs-14 mt-6">
-                    {{taskInfo.action.parameter.description}}
+                    {{taskInfo.extraLabel}}
                 </span>
             </div>
         </div>
@@ -39,6 +41,7 @@
             :taskInfo="taskInfo"
             :originData="originData"
             :tabsData="tabsData"
+            :appId="Number(appId)"
             @changeUpdateAsignee="changeUpdateAsignee"
             @showContentFile="showContentFile"
             @showPopupTracking="showPopupTracking"
@@ -52,8 +55,59 @@
         />
         <PopupProcessTracking 
             :taskInfo="taskInfo"
+            :definitionName="definitionName"
         />
 
+        <!-- Phần này cần tách thành component riêng -->
+        
+        <v-dialog
+            :content-class="'dialog-edit-doc'"
+            v-model="showUpdateSubmitedDocument"
+            width="80%">
+            <div class="w-100 py-2 px-4 bg-white justify-space-between d-flex border-bottom-1">
+                <span class="float-left title">
+                    {{$t('common.update')}} {{$t('common.documents')}}
+                </span>
+                <div class="float-right">
+                     <v-btn
+                        depressed
+                        color="primary" 
+                        small
+                        @click="updateSubmitedDocument"
+                        class="mr-2">
+                        {{$t('tasks.header.submit')}}
+                    </v-btn>
+                    
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <v-btn  
+                                @click="closeUpdatePanel()"
+                                icon
+                                tile
+                                v-on="on" text small>
+                                    <v-icon  small>mdi-close</v-icon>
+                            </v-btn>
+                        </template>
+                        <span>{{$t('common.close')}}</span>
+                    </v-tooltip>
+                </div>
+            </div>
+            <DocumentSubmit 
+                v-if="showUpdateSubmitedDocument"
+                class="bg-white"
+                ref="panelUpdateSubmitedDocument"
+                :docId="Number(docId)"
+                :appId="Number(appId)"
+                :workflowVariable="workflowVariable"
+                :showSubmitButton="false"
+                :documentObjectTaskId="workflowInfo.documentObjectTaskId"
+                :documentObjectWorkflowId="workflowInfo.documentObjectWorkflowId"
+                :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
+                :action="'update'"
+                :editableControls="taskInfo.approvalEditableControls"
+                :documentObjectId="converstNumber(documentObjectId)"
+                @submit-document-success="onDocumentUpdateSuccess"/>
+        </v-dialog>
     </div>
 </template> 
 <script>
@@ -98,7 +152,9 @@ export default {
             },
             showDoTaskComponent: false,
             documentObjectId: 0,
-            filter:'notDone'
+            filter:'notDone',
+            showUpdateSubmitedDocument: false,
+            showDetailDocument: true,
         }
     },
     props: {
@@ -109,6 +165,10 @@ export default {
                     docId: 0
                 }
             }
+        },
+        definitionName:{
+            type:String,
+            default:'',
         },
         originData:  {
             type: Object,
@@ -122,11 +182,30 @@ export default {
             type: Object,
             default: () => {}
         },
+        appId:{
+            type:String,
+            default:'',
+        }
     },
     computed:{
         stask() {
             return this.$store.state.task;
         },
+        overrideControls(){
+            let overrideValueControls={};
+            if (this.taskInfo.selectDefaultControlDocument) {
+                if (this.taskInfo.selectDefaultControlDocument.length>0) {
+                    let selectDefaultControlDocument=this.taskInfo.selectDefaultControlDocument;
+                    for (let index = 0; index < selectDefaultControlDocument.length; index++) {
+                        if (selectDefaultControlDocument[index].name && selectDefaultControlDocument[index].value) {
+                            overrideValueControls[selectDefaultControlDocument[index].name]={formulas:"SELECT '"+selectDefaultControlDocument[index].value+"'"};
+                        }
+                    }
+                }
+                return overrideValueControls;
+            }
+          
+        }
     },
     watch: {
         taskInfo: {
@@ -186,6 +265,19 @@ export default {
         }
     },
     methods: {
+        onDocumentUpdateSuccess(){
+            this.showDetailDocument = false;
+            setTimeout((self) => {
+                self.showDetailDocument = true;            
+            }, 50, this);
+            this.closeUpdatePanel();
+        },
+        updateSubmitedDocument(){
+            this.$refs.panelUpdateSubmitedDocument.handlerSubmitDocumentClick();
+        },
+        closeUpdatePanel(){
+            this.showUpdateSubmitedDocument = false;
+        },
         showPopupTracking(){
             this.$store.commit("task/setStatusPopupTracking",true)
         },
@@ -252,6 +344,10 @@ export default {
 .task-style >>> .wrap-content-submit{
     width:96%!important;
 }
+::v-deep .dialog-edit-doc{
+    overflow: hidden;
+}
+
 
 
 </style>

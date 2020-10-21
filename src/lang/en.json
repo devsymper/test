@@ -17,10 +17,16 @@
         "cancel": "Cancel",
         "update": "Update",
         "delete": "Delete",
+        "restore": "Restore",
         "refresh": "Refresh",
+        "userDeletedName": "User deleted",
+        "roleDeleted": "Role deleted",
+        "userAgent": "Agent deleted",
+        "deletedAt": "Time deleted",
         "export_excel": "Export Excel",
         "list": "List",
         "search": "Search",
+        "note": "Note",
         "quickSearch": "Quick search",
         "list_config": "List config",
         "save": "Save",
@@ -38,6 +44,7 @@
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
         "myItem": "My Item",
+        "myApplication": "My Application",
         "other": "Other",
         "deploy": "Deploy",
         "start": "Start",
@@ -64,6 +71,7 @@
         "last_update_at": "Last updated at",
         "create_at": "Created at",
         "user_create": "User create",
+        "last_user_update": "Last update by",
         "filter": "Filter",
         "sort": "Sort",
         "status": "Status",
@@ -86,7 +94,52 @@
         "of": "of",
         "entries": "Entries",
         "always_show_sidebar": "Always show sidebar",
-        "import_excel": "Import excel"
+        "import_excel": "Import excel",
+        "isDefault": "Default orgchart",
+        "restore": "Restore",
+        "sidebar": {
+            "Setting": "Setting",
+            "Notification": "Notification",
+            "account_trash": "Account trash",
+            "myApplication": "My Application",
+            "My work": "My work",
+            "tasks": "Tasks",
+            "Lists trash": "Lists trash",
+            "works": "Works",
+            "App": "Applications",
+            "permissions": "Permissions",
+            "userRoleSetting": "User Role Setting",
+            "actionPack": "actionPack",
+            "users": "User account",
+            "baAccount": "BA account",
+            "Manage timesheet": "Manage timesheet",
+            "Timesheet": "Timesheet",
+            "List workflows": "List workflows",
+            "List documents": "List documents",
+            "myWork": "Calendar",
+            "Timesheet report": "Timesheet reports",
+            "Administrator": "Administrator",
+            "apps": "My apps",
+            "Account management": "Account manager",
+            "Access Management": "Access management",
+            "Applications": "Applications",
+            "Lists to do": "Lists to do",
+            "My application": "My application",
+            "KH": "Knowledge Hub",
+            "Report": "Report",
+            "File": "File",
+            "workflows": "Workflows",
+            "documents": "Documents",
+            "orgchart": "Organization chart",
+            "myItem": "My item",
+            "listApps": "List application",
+            "listTrashApps": "List trash application",
+            "listOrgchart": "List orgchart",
+            "listTrashOrgchart": "List trash orgchart",
+            "viewOrgchart": "View orgchart default"
+        },
+        "system": "System",
+        "copy": "Copy"
     },
     "validate": {
         "required": "Not be empty",
@@ -155,17 +208,30 @@
         }
     },
     "user": {
+        "notification": {
+            "email_already_exist!": "Email already exist!",
+            "add_success": "Success!",
+            "update_success": "Success!",
+            "user_name_already_exist": "User name already exist!",
+            "Old password incorrect": "Old password incorrect",
+            "successChangePass": "Your password has been changed successfully!"
+
+
+        },
         "title": "User list",
+        "trash": "Lists trash user",
         "general": {
             "title": "Basic info",
             "personalInfo": {
+                "status": "Status",
                 "title": "personal information",
                 "userName": "User name",
+                "phoneNumber": "Phone",
                 "email": "Email",
                 "firstName": "First name",
                 "lastName": "Last name",
                 "displayName": "Display name",
-                "phoneNumber": "Phone number"
+                "phone": "Phone number"
             },
             "passwordSetting": {
                 "title": "Password setting",
@@ -213,17 +279,29 @@
         },
         "table": {
             "id": "Id",
+            "restore": "Restore",
             "firstName": "First name",
+            "lastName": "Last name",
+            "userName": "User name",
             "displayName": "Display name",
             "email": "email",
-            "phoneNumber": "Phone number",
+            "phone": "Phone number",
+            "avatar": "Avatar",
             "status": "Status",
             "createAt": "Create at",
             "updateAt": "Update at",
             "contextMenu": {
                 "passwordSetting": "Password setting",
-                "edit": "Edit"
+                "edit": "Edit",
+                "delete": "Delete",
+                "restore": "Restore",
+                "view": "View"
             }
+        },
+        "myInfo": {
+            "title": "My infomation",
+            "generalInfo": "General infomation",
+            "myPosition": "My position"
         }
     },
     "snippet": {
@@ -293,7 +371,34 @@
             "allOperation": "Operation for all object"
         }
     },
+    "formulasEditor": {
+        "inputParams": "(x) Input params:",
+        "result": "Result",
+        "time": "Time",
+        "success": "Success",
+        "error": "Error"
+    },
     "document": {
+
+        "instance": {
+            "showlist": {
+                "select": "Selected",
+                "record": "Record",
+                "printRecord": "Print record",
+                "selectPrintConfig": "Select print config",
+                "printMultiple": "Print Multiple",
+                "deleteMultiple": "Delete Multiple",
+                "listPrintConfig": "List print config",
+                "print": "Print",
+                "copied": "copied",
+                "next": "Next record",
+                "prev": "Previous record",
+                "copyLink": "Copy link",
+                "download": "Download",
+                "info": "Information",
+                "update": "Update document record"
+            }
+        },
         "create": "Create document",
         "edit": "Edit document",
         "title": "List Document",
@@ -338,9 +443,16 @@
                     "title": "Document title",
                     "fullSize": "Full size Form Submit",
                     "type": "Document type",
-                    "note": "Note",
-                    "titleObject": "Title Object",
-                    "titlePrint": "Title Form Print"
+                    "note": "Note (Serve for searching)",
+                    "titleObject": "Title Object (Serve for display on MyItem, formulas execute on server)",
+                    "titlePrint": "Title Form Print",
+                    "systemMapping": {
+                        "title": "Mapping Doc with System object",
+                        "itemTitle": "Select the object to be linked (Can open the Doc record within the system object)",
+                        "condition": "Links follow conditions",
+                        "conditionDoc": "Links follow document conditions",
+                        "conditionSystem": "Links follow system conditions"
+                    }
                 },
                 "swapType": {
                     "heading": "Swap type control",
@@ -417,7 +529,12 @@
         },
         "validate": {
             "emptyTitle": "Title must not be blank",
-            "emptyContentControlTemplate": "Please select the template before saving the control template"
+            "emptyName": "Name must not be blank",
+            "nameNotValid": "Name not valid",
+            "emptyContentControlTemplate": "Please select the template before saving the control template",
+            "controlNotExist": "Control does not exist, please create new control",
+            "docNameExist": "Document name exist",
+            "checkNameRelate": "The name of this document can be used in formulas on objects in the system. Select Test to re-check the object"
         }
     },
     "documentObject": {
@@ -448,6 +565,7 @@
     "process": {
         "list": {
             "title": "Workflow list",
+            "titleTrash": "Workflow list deleted",
             "deploy_history": "Deploy history",
             "start": "Start workflow",
             "instances": "List lastest instances"
@@ -495,25 +613,67 @@
         }
     },
     "objectType": {
-        "Document definition": "Văn bản",
-        "Document instance": "Danh sách bản ghi",
-        "Orgchart": "Sơ đồ tổ chức",
-        "Dataflow": "Luồng xử lý dữ liệu",
-        "Workflow definition": "Quy trình",
-        "Workflow instance": "Văn bản",
-        "Syql": "Công thức",
-        "Account": "Tài khoản người dùng",
-        "Report": "Báo cáo",
+        "Document definition": "Document definition",
+        "Document instance": "Document instance",
+        "Orgchart": "Orgchart",
+        "Dataflow": "Dataflow",
+        "Workflow definition": "Workflow definition",
+        "Workflow instance": "Workflow instance",
+        "Syql": "Syql",
+        "Account": "Account",
+        "Report": "Report",
         "Dashboard": "Dashboard",
         "Job": "Job",
         "Operation": "Operation",
-        "Action pack": "Nhóm hành động",
-        "Knowledge": "Văn bản nội bộ",
-        "File": "Quản lý tệp",
-        "Department": "Phòng ban",
-        "Timesheet": "Thời gian biểu"
+        "Action pack": "Action pack",
+        "Knowledge": "Knowledge",
+        "File": "File",
+        "Department": "Department",
+        "Timesheet": "Timesheet"
+    },
+    "objects": {
+        "document_instance": "Document instance",
+        "user": "Nhân viên",
+        "document_definition": "Loại văn bản",
+        "document": "Văn bản",
+        "workflow_definition": "Workflow",
+        "orgchart": "Sơ đồ tổ chức",
+        "process_definition": "Quy trình",
+        "application_definition": "Ứng dụng",
+        "syql": "Công thức",
+        "dataflow": "Data flow",
+        "file": "Tệp",
+        "knowledge": "Văn bản nội bộ",
+        "comment": "Bình luận",
+        "dashboard": "Dashboard",
+        "listAction": {
+            "create": "create",
+            "edit": "edit",
+            "submit": "submit",
+            "list": "list",
+            "list_trash": "list_trash",
+            "list_instance": "list_instance",
+            "deploy": "triển khai",
+            "drop": "xóa",
+            "start_instance": "bắt đầu quy trình"
+        },
+        "icon": {
+            "document_instance": "mdi mdi-file-document-outline",
+            "account": "mdi-account-multiple-outline",
+            "Tất cả": "mdi-all-inclusive",
+            "document_definition": "mdi mdi-file-outline",
+            "workflow_definition": "mdi mdi-lan",
+            "orgchart": "mdi mdi-sitemap",
+            "process_definition": "mdi mdi-sitemap",
+            "application_definition": "mdi mdi-apps",
+            "syql": "mdi mdi-alpha-f",
+            "dataflow": "mdi mdi-arrange-send-to-back"
+        }
     },
     "apps": {
+        "titleMyApplication": "My application",
+        "titleApplication": "Applications",
+        "titleTrashApplication": "List trash applications",
         "header": {
             "id": "ID",
             "name": "Name",
@@ -522,15 +682,19 @@
             "price": "Price",
             "status": "Status",
             "created_at": "Date create",
-            "updated_at": "Last update"
+            "userDeletedName": "User deleted name",
+            "userAgent": "User agent",
+            "roleDeleted": "Role deleted",
+            "deletedAt": "Deleted At"
         },
         "emptyApp": "List application epmty",
         "emptyFavorite": " List favorite empty",
         "listType": {
-            "documents": "Documents",
-            "workflows": "Work flows",
-            "reports": "Reports",
-            "orgcharts": "Orgcharts"
+            "documentMajor": "Business Document",
+            "documentCategory": "Category Document",
+            "workflow": "Work flows",
+            "dashboard": "Dashboard",
+            "orgchart": "Orgcharts"
         },
         "addApp": "Add application",
         "editApp": "Edit application",
@@ -606,6 +770,24 @@
                 "list": "List",
                 "drop": "Delete",
                 "unfavorite": "Remove favorite"
+            },
+            "document_instance": {
+                "update": "Update",
+                "delete": "Delete",
+                "restore": "Restore",
+                "detail": "Detail",
+                "print": "Print",
+                "list_trash": "List trash"
+            },
+            "syql": {
+                "update": "Update",
+                "create": "Create",
+                "execute": "Execute"
+            },
+            "application_definition": {
+                "update": "Update",
+                "view": "View",
+                "remove": "Remove"
             }
         },
         "iconListActions": {
@@ -742,7 +924,9 @@
     "notification": {
         "error": "Error occurred. Please try again later",
         "errorTitle": "Error",
-        "successTitle": "Success"
+        "successTitle": "Success",
+        "older": "Older",
+        "today": "Today"
     },
     "virtualdoc": {
         "header": {
@@ -788,7 +972,20 @@
             "parentWork": "Parent work",
             "siblingWork": "Sibling work",
             "subWork": "Sub work"
+        },
+        "sidebar": {
+            "showMoreTask": "Show more task related",
+            "showLess": "Show less task related",
+            "showMoreFile": "Show more file",
+            "quickView":"Quick view",
+            "openTask": "Open task"
+        },
+        "alert": {
+            "title_aproval": "Action work",
+            "titlePermissionDenied": "Permission denied!",
+            "contentPermissionDenied": "You are not authorized to do this!"
         }
+
     },
     "tasks": {
         "error": {
@@ -796,13 +993,15 @@
             "canNotCreateTask": "Can not create task"
         },
         "header": {
-            "type": "Loại",
-            "approval": "Phê duyệt",
-            "submit": "Gửi văn bản",
+            "type": "Type",
+            "approval": "Approval",
+            "groupApproval": "Approval Group",
+            "submit": "Submit",
             "date": "Date",
             "dueDate": "Due Date",
+            "endTime": "Finish day",
             "createDate": "Create date",
-            "app": "Ứng dụng",
+            "app": "Application",
             "description": "Task description",
             "owner": "Task Owner",
             "userCreate": "Creator",
@@ -845,7 +1044,8 @@
     },
     "orgchart": {
         "list": {
-            "title": "List orgchart"
+            "title": "List orgchart",
+            "titleTrash": "List trash orgchart"
         },
         "create": {
             "title": " Create orgchart"

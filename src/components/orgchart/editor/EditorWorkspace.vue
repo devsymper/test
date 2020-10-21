@@ -10,7 +10,7 @@
 import JointPaper from "@/components/common/rappid/JointPaper";
 import { createDepartmentNode, defineDepartment, DEFAULT_DEPARTMENT_DISPLAY, FOUCUS_DEPARTMENT_DISPLAY } from "./../nodeDefinition/departmentDefinition";
 import { createPositionNode, definePosition, DEFAULT_POSITION_DISPLAY, FOUCUS_POSITION_DISPLAY } from "./../nodeDefinition/positionDefinition";
-import { SYMPER_HOME_ORGCHART, getDefaultConfigNodeData, jointLinkNode } from './nodeAttrFactory';
+import { SYMPER_HOME_ORGCHART, getDefaultConfigNodeData, jointLinkNode } from './nodeAttrFactory';  
 import avatarDefault from "@/assets/image/avatar_default.jpg";
 require('@/plugins/rappid/rappid.css');
 export default {
@@ -56,7 +56,10 @@ export default {
 			gridSize: 30,
 			drawGrid: {
 				name: 'mesh'
-			}
+            },
+            viewportRect:null,
+            paper: null,
+            paperScroller: null,
         }
     },
 	methods: {
@@ -73,6 +76,7 @@ export default {
             return this.$refs.jointPaper.graph.toJSON();
         },
         updateCellAttrs(cellId, attrName, value){
+            
             let mapName = {
                 name: '.name/text',
                 border: '.card',
@@ -91,7 +95,11 @@ export default {
                         cell.attr(mapName[attrName]+'/'+key, value[key]);
                     }
                 }else{
-                     let newValue =   joint.util.breakText(
+                    if(value.includes('https://file.symper.vn/readFileSvg/user_avatar')){
+                          cell.attr(mapName[attrName], value,
+                        );
+                    }else{
+                           let newValue =   joint.util.breakText(
                             value, 
                             {
                                 width: 130,
@@ -100,8 +108,10 @@ export default {
                             { 'font-size': 13 },
                             { ellipsis: true  }
                         )
-                    cell.attr(mapName[attrName], newValue,
-                    );
+                        cell.attr(mapName[attrName], newValue,
+                        );
+                    }
+                  
                    
                 }
             }
@@ -111,6 +121,7 @@ export default {
             let graph = this.$refs.jointPaper.graph;
             let treeLayout = this.$refs.jointPaper.treeLayout;
             let self = this;
+
             paper.on('element:remove', function(elementView, evt, x, y) {
                 evt.stopPropagation();
                 let allChildIds = self.getAllChildIdOfNode(elementView.model.id);
@@ -151,6 +162,7 @@ export default {
                 elementView.model.remove();
                 treeLayout.layout();
             });
+          
 
             paper.on('cell:pointerclick', function(elementView, evt, x, y) {
                 evt.stopPropagation();
@@ -172,10 +184,10 @@ export default {
             paper.on('element:collapse', function(view, evt) {
                 evt.stopPropagation();
                 self.toggleBranch(view.model);
-                treeLayout.layout();
             });
         },
         toggleBranch(root){
+            let self = this
             var shouldHide = !root.isCollapsed();
             root.set({ collapsed: shouldHide });
             this.$refs.jointPaper.graph.getSuccessors(root).forEach(function(successor) {
@@ -183,6 +195,23 @@ export default {
                     hidden: shouldHide,
                     collapsed: false
                 });
+            });
+            this.layoutAndFocus(this.viewportRect.center());
+        },
+        layoutAndFocus(focusPoint) {
+            let treeLayout = this.$refs.jointPaper.treeLayout;
+            treeLayout.layout();
+            var center = treeLayout.getLayoutBBox().center();
+            this.resizePaper();
+            this.paperScroller.center(center.x, center.y);
+        },
+        resizePaper() {
+            let treeLayout = this.$refs.jointPaper.treeLayout;
+            this.paper.fitToContent({
+                useModelGeometry: true,
+                allowNewOrigin: 'any',
+                padding: 30,
+                contentArea: treeLayout.getLayoutBBox()
             });
         },
         getAllElementModel(){
@@ -264,24 +293,27 @@ export default {
         },
         changeUserDisplayInNode(userIdList){
             let lastUserInfo = this.mapUserById[userIdList[userIdList.length - 1]];
-            
+            let avatarUser = "https://file.symper.vn/readFileSvg/user_avatar_"+lastUserInfo.id
             if(this.context == 'department'){
                 if(!lastUserInfo) return;
                 this.updateCellAttrs(this.selectingNode.id, 'managerName', lastUserInfo.displayName );
-                this.updateCellAttrs( this.selectingNode.id, 'managerAvartar', lastUserInfo.avatar ? lastUserInfo.avatar : avatarDefault );
+                this.updateCellAttrs( this.selectingNode.id, 'managerAvartar', avatarUser);
             }else if(this.context == 'position' && this.selectingNode.id != 'SYMPER_HOME_ORGCHART' ){
                 if(userIdList.length == 0){
-                    this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', '/img/empty_avatar.PNG');
+                    this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', avatarUser);
                     this.updateCellAttrs( this.selectingNode.id, 'accountNumberPlus', '');
                 }else{
                     if(!lastUserInfo) return;
-                    this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', lastUserInfo.avatar ? lastUserInfo.avatar : avatarDefault );
+                    this.updateCellAttrs( this.selectingNode.id, 'userInPositionAvartar', avatarUser );
                     let plusUser = userIdList.length == 1 ? '' : ('+' + (userIdList.length - 1));
                     this.updateCellAttrs( this.selectingNode.id, 'accountNumberPlus', plusUser);
                 }
             }
         },
-        setupGraph(graph, paper, paperScroller){
+        setupGraph(graph, paper, paperScroller,viewportRect){
+            this.viewportRect = viewportRect
+            this.paper = paper
+            this.paperScroller = paperScroller
             this.graph = graph;
             let self = this;
             let nodeName = this.context == 'department' ? this.$t('orgchart.editor.department') : this.$t('orgchart.editor.position');
@@ -336,6 +368,11 @@ export default {
             let firstNode = graph.getCells()[0];
             firstNode.position(300,20);
             
+        },
+        changeTypeView(type){
+            let treeLayout = this.$refs.jointPaper.treeLayout;
+            treeLayout.set('direction', type);
+            treeLayout.layout();
         },
 		exampleSetupGraph(graph) {
 			

@@ -92,6 +92,11 @@ export default {
         }
     },
     methods: {
+        autoSetScriptMode(){
+            if(this.value.formula.trim()){
+                this.activeTab = 'script';
+            }
+        },
         setValue(value){
             this.$refs.formulaEditor.setValue(value.formula);
         },
@@ -118,7 +123,9 @@ export default {
                 .indexOf(query.toString().toLowerCase()) > -1;
         }
     },
-    created() {}
+    created() {
+        this.autoSetScriptMode();
+    }
 };
 </script>
 

@@ -11,6 +11,10 @@ html {
     --symper-background-active: rgba(0 0 0 / 0.1);
     --symper-background-hover: rgba(0 0 0 / 0.05);
     --symper-border: 1px solid rgb(230, 229, 229);
+    --symper-text-color-default: rgb(0 0 0 / 0.8);
+    --symper-font-size-default: 13px;
+    --symper-box-shadow-top: 0px -1px 6px #00000029;
+    --symper-box-shadow-bottom: 0px 3px 6px #00000029;
 }
 
 .symper-bg-orange {
@@ -74,7 +78,7 @@ html {
 }
 
 .fs-11 {
-    font-size: 11px;
+    font-size: 11px!important;
 }
 
 .w-100 {
@@ -448,10 +452,6 @@ html {
     display: block !important;
 }
 
-.v-dialog__content {
-    z-index: 9999 !important;
-}
-
 .mh-15 {
     min-height: 15px;
 }
@@ -488,7 +488,7 @@ html {
 }
 
 .fw-400 {
-    font-weight: 400;
+    font-weight: 400!important;
 }
 
 
@@ -638,7 +638,7 @@ html {
 }
 
 .border-bottom-1 {
-    border-bottom: 1px solid rgb(224, 224, 224);
+    border-bottom: 1px solid rgb(224, 224, 224)!important;
 }
 
 .border-right-1 {
@@ -689,6 +689,52 @@ html {
 .w-auto {
     width: 100% !important;
 }
-#symper-app .dialog-preview-image-comment{
-    overflow:hidden
+
+#symper-app .dialog-preview-image-comment {
+    overflow: hidden
+}
+
+.v-btn--tile {
+    border-radius: 4px;
+}
+
+
+/* font */
+
+.font-normal {
+    font-size: 13px!important;
+    font-family: Roboto!important;
+    font-weight: normal!important;
+}
+
+.fw-430 {
+    font-weight: 430
+}
+
+.fw-500 {
+    font-weight: 500;
+}
+
+.fw-400 {
+    font-weight: 400;
+}
+
+.fw-300 {
+    font-weight: 300;
+}
+
+.color-red {
+    color: red!important
+}
+
+.color-grey {
+    color: grey!important;
+}
+
+.color-green {
+    color: green!important
+}
+
+.color-normal {
+    color: #707070!important
 }

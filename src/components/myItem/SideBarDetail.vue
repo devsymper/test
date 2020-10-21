@@ -20,6 +20,7 @@
 			v-model="panel"
 			multiple
 			class="s-detail-sidebar"
+			style="overflow-x: hidden;"
 			>
 				<v-expansion-panel>
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.general.title')}}</v-expansion-panel-header>
@@ -28,17 +29,34 @@
 							<table class="general-info">
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.dateCreate')}}</td>
-									<td>{{originData.createTime ? $moment(originData.createTime).format('DD/MM/YY HH:mm:ss'):$moment(originData.endTime).format('DD/MM/YY HH:mm:ss')}}</td>
+									<td class="pl-2">{{originData.createTime ? $moment(originData.createTime).format('DD/MM/YY HH:mm:ss'):$moment(originData.endTime).format('DD/MM/YY HH:mm:ss')}}</td>
 								</tr>
 								<tr>
-									<td>{{$t('document.detail.sidebar.body.general.history')}}</td>
-									<td @click="showHistory" style="text-decoration: underline;cursor:pointer;color:#F1853B;">Đã sửa 2 lần</td>
+									<td>{{$t('tasks.header.dueDate')}}</td>
+									<td class="pl-2">{{originData.dueDate ? $moment(originData.dueDate).fromNow():""}}</td>
+								</tr>
+								<tr v-if="originData.endTime">
+									<td>{{$t('tasks.header.endTime')}}</td>
+									<td class="pl-2">{{ $moment(originData.endTime).fromNow()}}</td>
+								</tr>
+								<tr >
+									<td>{{$t('tasks.header.description')}}</td>
+									<td class="pl-2">
+										<v-tooltip bottom>
+											<template v-slot:activator="{ on }">
+											<div v-on="on" class="text-ellipsis" style="width:250px">
+												{{taskInfo.extraLabel}} {{taskInfo.extraValue}}
+											</div>
+										</template>
+										<span>{{taskInfo.extraLabel}} {{taskInfo.extraValue}}</span>
+										</v-tooltip>
+									</td>
 								</tr>
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.comment')}}</td>
-									<td style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
+									<td class="pl-2" style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
 										{{$t('document.detail.sidebar.body.general.has')}} 
-										<!-- {{countCommentNotResolve}}  -->
+										{{countCommentNotResolve}} 
 										{{$t('document.detail.sidebar.body.general.commentNotResolve')}}
 									</td>
 								</tr>
@@ -49,8 +67,8 @@
 				
 				<v-expansion-panel>
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.worflowInfo')}}</v-expansion-panel-header>
-					<v-expansion-panel-content class="sym-v-expand-content" style="height:200px">
-						<v-row class="border-top-1" style="height:200px">
+					<v-expansion-panel-content class="sym-v-expand-content border-top-1" style="height:200px">
+						<v-row class="ma-0" style="height:200px">
 							<trackingProcessInstance
 								v-if="taskInfo.action.parameter.processInstanceId"
 								:instanceId="taskInfo.action.parameter.processInstanceId"
@@ -64,17 +82,14 @@
 				<v-expansion-panel>
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.userRelated.title')}}</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
-				   		<div class="w-100 mb-2 pl-3" v-for="(users, role) in dataTask" :key="role" >
+				   		<div class="w-100 pl-2" v-for="(users, role) in dataTask" :key="role" >
 							<div v-if="users.length>0 " style="height: 30px" class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
 								<span>
 									<v-icon class="mr-3" size="18">mdi-account</v-icon> 
 									<span mt-1>{{$t("tasks.header."+role)}}</span>
 								</span>
-								<!-- <v-btn small icon @click="addUserForRole(role)" class="ml-3 symper-add-user-btn" style="display: none" v-if="roleCanAddUser[role]">
-									<v-icon>mdi-plus</v-icon>
-								</v-btn> -->
 							</div>
-							<div class="pl-10 py-2 d-flex justify-space-between user-show" v-for="userItem in tabsData[role]" :key="userItem.id" >
+							<div class="pl-7 d-flex justify-space-between user-show" v-for="userItem in tabsData[role]" :key="userItem.id" >
 								<user :user="userItem" class="float-left"></user>
 								<div class="float-right action-for-role d-flex"  >
 									<div v-for="(btn, idx) in actionsForRole[role]" :key="idx" class="d-flex" >
@@ -105,13 +120,10 @@
 											<div class="bg-white" style="width: 200px; z-index: 1002" :ref="'selectUserWrapper_'+role+'_'+idx">
 											</div>
 										</v-menu>
-
-										<!-- <v-btn v-else depressed class="mr-3" small @click="handleAction(btn.name, role, idx)" >
-											<v-icon left>{{btn.icon}}</v-icon> {{btn.text}}
-										</v-btn> -->
 									</div>
 								</div>
 							</div>
+							<div class="pl-15" v-if="users.length>0 && originData[role+'Role'] " style="clear:both">{{originData[role+'Role'].name}}</div>
 						</div>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
@@ -121,18 +133,22 @@
 						<RelatedItems
 							:taskInfo="taskInfo"
 							:tabsData="tabsData"
+							:appId="appId"
+							:showMoreTask="showMoreTask"
 						 />
+						 <span class="showMoreRelated" @click="handleShowMoreTask" v-if="!showMoreTask" >{{$t('myItem.sidebar.showMoreTask')}}</span>
+						 <span class="showMoreRelated" @click="handleShowMoreTask" v-else >{{$t('myItem.sidebar.showLess')}}</span>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
-					<v-expansion-panel style="margin-bottom: 20px;">
-					<v-expansion-panel-header class="v-expand-header">{{$t('tasks.header.attachment')}}
+				<v-expansion-panel style="margin-bottom: 20px;">
+				<v-expansion-panel-header style="padding:0px" class="v-expand-header">{{$t('tasks.header.attachment')}}
 						  <UploadFile
 							@uploaded-file="uploaded"
 							:objectIdentifier="taskInfo.action.parameter.taskId"
 							:objectType="`task`"
 							:iconName="`mdi-upload-outline`"
 							/>
-					</v-expansion-panel-header>
+				</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
 						<div
 							v-for="(item, idex) in listFileAttachment"
@@ -146,6 +162,7 @@
 								:style="{
 									minHeight: '25px'
 								}"
+								v-if="checkShowMoreFile(idex)"
 								@mouseover="showByIndex = idex"
                     			@mouseout="showByIndex = null"
 							>
@@ -202,53 +219,17 @@
 								</v-list>
 							</v-menu>
 						</div>
+						<span class="showMoreRelated" @click="handleShowMoreFile" v-if="!showMoreFile" >{{$t('myItem.sidebar.showMoreFile')}}</span>
+						<span class="showMoreRelated" @click="handleShowMoreFile" v-else >{{$t('myItem.sidebar.showLess')}}</span>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
 			</v-expansion-panels>
 		</VuePerfectScrollbar>
 	</div>
-	<div class="history-info" style="transform:translateX(400px)">
-		<div style="display:flex;">
-			<span class="mdi mdi-keyboard-backspace" @click="hideHistory"></span>
-			<span style="font-size:15px;">LỊCH SỬ CHỈNH SỬA</span>
-			<!-- <span class="mdi mdi-close" @click="hide"></span> -->
-		</div>
-
-		<v-divider></v-divider>
-
-		<VuePerfectScrollbar style="calc(100% - 62px);">
-			<div v-for="history in listHistoryControl" 
-			:key="history.id" 
-			@click="showHistoryControl(history)"
-			class="history-item">
-				<div class="history-item__info">
-					<div class="date-update">
-						{{history.date}}
-					</div>
-					<div>
-						<img src="https://randomuser.me/api/portraits/men/81.jpg" height="14px" alt="">
-						<span>{{history.userUpdate}}</span>
-					</div>
-				</div>
-				<div class="history-item__action">
-					<v-tooltip left>
-						<template v-slot:activator="{ on }">
-							<div v-on="on">
-								<v-btn small>
-									<v-icon>mdi-backup-restore</v-icon>
-								</v-btn>
-							</div>
-						</template>
-						<span>Khôi phục</span>
-					</v-tooltip>
-				</div>
-			</div>
-		</VuePerfectScrollbar>
-	</div>
 		<Comment style="height:100%" 
-			:objectIdentifier="originData.id"
+			:objectIdentifier="String(originData.id)"
 			ref="commentTaskView"
-			@close-comment="hide" />
+			/>
 	
 	<div class="w-100 h-100 symper-select-user-autocomplete " style="z-index:1010" v-show="statusChange" ref="selectUserAutocomplete">
 			<v-autocomplete
@@ -314,6 +295,8 @@ export default {
 		return {
 			x:0,
 			y:0,
+			showMoreTask:false,
+			showMoreFile:false,
 			headerDialog:'',
       		titleDialog:'',
 			dialogAlert: false,
@@ -452,7 +435,12 @@ export default {
 		documentObjectId:{
 			type:String,
 			default:""
+		},
+		appId:{
+			type:Number,
+			default:0
 		}
+	
 	},
 	watch:{
 		isShowSidebar(after){
@@ -464,6 +452,9 @@ export default {
 		
 	},
 	computed:{
+		countCommentNotResolve(){
+			return this.$store.state.comment.listComment.length
+		},
 		sapp(){
             return this.$store.state.app;
         },
@@ -513,10 +504,7 @@ export default {
 				}
 			})
 			.catch(err => {
-
 			})
-			.always(() => {});
-
 		this.$evtBus.$on('symper-app-wrapper-clicked', (evt) => {
             if(!($(evt.target).hasClass('symper-select-user-autocomplete') || $(evt.target).parents('.symper-select-user-autocomplete').length > 0)){
                 for(let key in  this.showDelegatedUser){
@@ -526,6 +514,23 @@ export default {
 		});
 	},
 	methods:{
+		handleShowMoreTask(){
+			this.showMoreTask=!this.showMoreTask;
+		},
+		handleShowMoreFile(){
+			this.showMoreFile=!this.showMoreFile;
+		},
+		checkShowMoreFile(idex){
+            if (this.showMoreFile==false) {
+                if (idex<=2) {
+                    return true
+                }else{
+                    return false
+                }
+            }else{
+                return true;
+            }
+        },
 		showPopupDiagram(){
 			this.$emit("showPopupTracking");
 		},
@@ -536,7 +541,9 @@ export default {
 			.deleteFile(data)
 			.then(res => {
 			if (res.status == 200) {
-				this.$store.dispatch("task/removeFileAttachToStore", this.fileId);
+                this.$store.dispatch("task/removeFileAttachToStore", this.fileId);
+                this.$store.commit("file/setWaitingFileCountPerObj", 'task:'+taskInfo.action.parameter.taskId);
+                this.$store.commit("comment/setWaitingCommentCountPerObj", 'task:'+taskInfo.action.parameter.taskId);
 			} else if (res.status == 403) {
 				this.$snotifyError("Error", res.message);
 			} else {
@@ -713,7 +720,7 @@ export default {
 		margin-top: 0px !important;
 	}
 	.s-drawer{
-		z-index: 1000;
+		z-index: 160;
 		padding: 12px 6px 6px 12px;
 		top:86px!important;
 	}
@@ -833,5 +840,22 @@ export default {
 	}
 	.main-info{
 		height: 100%;
+	}
+	.showMoreRelated{
+		float: right;
+		cursor:pointer;
+		margin-right: 20px;
+		margin-bottom: 20px;
+		
+	}
+	.showMoreRelated:hover{
+		text-decoration-line:underline
+	}
+	.v-expansion-panel::before{
+		box-shadow: none;
+	}
+	.border-top-1 >>>.v-expansion-panel-content__wrap{
+		border: 1px solid #cecece!important;
+		border-radius: 5px;
 	}
 </style>

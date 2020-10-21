@@ -3,9 +3,13 @@
     :id="'autocomplete-control-'+key"
     v-show="isShowAutoComplete" 
     class="card-autocomplete" :style="positionBox">
-        <v-data-table
+        <div v-if="inputType == 'combobox'" class="search-data-input">
+            <input v-model="search" type="text" :placeholder="$t('common.search')">
+        </div>
+        <v-data-table 
         :headers="headers"
         :items="dataTable"
+        :search="search"
         disable-pagination
         fixed-header
         hide-default-footer
@@ -17,15 +21,16 @@
         >
         <template v-slot:item="{ item }">
             <tr @click="handleClickRow(item)" class="active-row" v-if="item.active" style="background: #f0f0f0">
-                <td v-for="(key,value) in item" :key="key+value" :class="{'d-none':(value == 'active')}">{{ (value != 'active') ? key : '' }}</td>
+                <td v-for="(key,value) in item" :key="key+value" :class="{'row-item':true,'d-none':(value == 'active')}">{{ (value != 'active') ? key : '' }}</td>
             </tr>
-            <tr @click="handleClickRow(item)" v-else>
-                <td v-for="(key,value) in item" :key="key+value" :class="{'d-none':(value == 'active')}">{{ key }}</td>
+            <tr @click="handleClickRow(item)" v-else class="row-item">
+                <td v-for="(key,value) in item" :key="key+value" :class="{'d-none':(value == 'active' || value == 'checked')}">{{ key }}</td>
+                <span class="mdi mdi-check icon-checked" v-if="item.checked"></span>
             </tr>
         </template>
         <template v-slot:no-results v-if="$parent.$options.name == 'submitDocument'">
             <div>
-                <v-btn text small @click="openSubForm">Thêm</v-btn>
+                <v-btn text small @click="openSubForm">{{$t('common.add')}}</v-btn>
             </div>
         </template>
         </v-data-table>
@@ -49,15 +54,16 @@ export default {
             dataTable: [],
             alias:'',
             curInput:null,
-            isHideHeader:false
+            isHideHeader:false,
+            search: '',
+            inputType:false,
+            isSingleSelectCombobox:true,
+            dataSelected:{}
         }
     },
-    created(){
-        
-    
-    },
-    
+   
     methods:{
+       
         show(e){
             this.isShowAutoComplete = true;
             this.calculatorPositionBox(e);
@@ -114,6 +120,16 @@ export default {
             if(data.headers.length > 0)
             this.headers = data.headers;
             this.dataTable = data.dataBody;
+            for (let index = 0; index < this.dataTable.length; index++) {
+                let rowData = this.dataTable[index];
+                for (let i = 0; i < Object.values(rowData).length; i++) {
+                    const cellValue = Object.values(rowData)[i];
+                    if(this.dataSelected[this.alias].includes(cellValue)){
+                        this.$set(this.dataTable[index],'checked',true)
+                    }
+                }
+               
+            }
             this.indexActive = 0;
         },
         showHeader(){
@@ -138,8 +154,6 @@ export default {
                 if($(e.curTarget).is('div.select-cell .select-chervon-bottom')){
                     edtos = $(e.curTarget).parent().parent().offset();
                 }
-                console.log(e); 
-                
                 let tbcos = $(e.curTarget).closest('.wrap-table').find('[s-control-type="table"]').offset();
                 this.positionBox = {'top':edtos.top - tbcos.top + $(e.curTarget).height() +'px','left':edtos.left - tbcos.left+'px'};
             }
@@ -148,7 +162,18 @@ export default {
                 this.curInput = $(e.target);
                 let autoEL = $(this.$el).detach();
                 $(e.target).parent().append(autoEL);
-                this.positionBox = {'top':'26px','left':'0px'};
+                let inputOffset = $(e.target).offset();
+            
+                if(window.innerWidth < inputOffset.left + $('.card-autocomplete').width() + 10){
+                    this.positionBox = {'top':'26px','right':'0px'};
+                }
+                else{
+                    this.positionBox = {'top':'26px','left':'0px'};
+                }
+                if(window.innerHeight < inputOffset.top + $('.card-autocomplete').height() + 40){
+                    delete this.positionBox.top;
+                    this.positionBox['bottom'] = '26px';
+                }
             }
         },
         setSearch(query){
@@ -156,6 +181,15 @@ export default {
         },
         setAliasControl(aliasControl){
             this.alias = aliasControl;
+            if(!this.dataSelected.hasOwnProperty(this.alias)){
+                this.dataSelected[this.alias] = []
+            }
+        },
+        setTypeInput(controlType=false){
+            this.inputType = controlType;
+        },
+        setSingleSelectCombobox(isSingleSelectCombobox=false){
+            this.isSingleSelectCombobox = isSingleSelectCombobox;
         },
         handleClickRow(item,fromEnterKey = false){
             this.curInput.off('keydown');
@@ -166,9 +200,45 @@ export default {
             else if(item.hasOwnProperty('column1')){
                 value = item['column1'];
             }
+            
+            if(this.inputType =='combobox'){
+                if(this.isSingleSelectCombobox){
+                    for (let index = 0; index < this.dataTable.length; index++) {
+                        let row = this.dataTable[index];
+                        this.$set(row,'checked',false);
+                    }
+                    if(this.dataSelected[this.alias].indexOf(value) === -1){
+                        this.dataSelected[this.alias] = [value];
+                        this.$set(item,'checked',true);
+                    }
+                    else{
+                        this.dataSelected[this.alias] = [];
+                    }
+                }
+                else{
+                    if(this.dataSelected[this.alias].indexOf(value) !== -1){
+                        this.dataSelected[this.alias].splice(this.dataSelected[this.alias].indexOf(value), 1);
+                        this.$set(item,'checked',false);
+                    }
+                    else{
+                        this.dataSelected[this.alias].push(value);
+                        this.$set(item,'checked',true);
+                    }
+                }
+                
+                let dataValue = []
+                for (let index = 0; index < this.dataSelected[this.alias].length; index++) {
+                    const element = this.dataSelected[this.alias][index];
+                    dataValue.push(element)
+                }
+                value = dataValue.join(",");
+            }
+            else{
+                this.dataTable = [];
+                this.hide();
+            }
             this.$emit('after-select-row',{value:value,fromEnterKey:fromEnterKey});
-            this.dataTable = []
-            this.hide();
+
         },
         openSubForm(){
             this.hide();
@@ -200,5 +270,29 @@ export default {
         /* display: flex!important; */
         white-space: nowrap;
     }
-
+    .card-autocomplete >>> tr{
+        position: relative;
+    }
+    .search-data-input{
+        width: 150px;
+        padding: 8px;
+    }
+    .search-data-input input{
+        padding: 0 4px;
+        width: 100%;
+        background: var(--symper-background-default);
+        height: 25px;
+        border-radius: 4px;
+    }
+    .search-data-input input:focus{
+        outline: none;
+    }
+    .icon-checked{
+        position: absolute;
+        color: green;
+        right: 6px;
+    }
+    .row-item{
+        position: relative;
+    }
 </style>

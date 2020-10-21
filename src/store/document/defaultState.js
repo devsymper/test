@@ -43,7 +43,8 @@ const defaultState = {
             listControlTreeData: [],
             allControlForTableOption: [],
             listDataFlow: [],
-            allControlTemplate: []
+            allControlTemplate: [],
+            allControlDeleted: {}
         }
     },
     submit: {
@@ -77,7 +78,6 @@ const defaultState = {
                 }
             },
             orgchartTableSqlName: {}, // biến lưu lại tên các bảng sqlite được tạo ra sau khi chạy công thức orgchart  
-            tableLoaded: {},
             readyLoaded: false, // biến đánh dấu công thức đã chạy xong mỗi lần thực thi hay chưa
             listTableRootControl: {}, // biến lưu lại các controk được coi là root trong trong table (trường hợp công thức ko có đầu vào thì là root)
         }
@@ -94,7 +94,10 @@ const defaultState = {
     needGetAllDoc: true, // flag đánh dấu có cần lấy tất cả các doc hay không, thằng đầu tiên muốn lấy sẽ set biến này về false để những thằng sau ko cần lấy nữa
     viewType: {
         instance: null
-    } // chỉ định là submit, detail, hay update
+    }, // chỉ định là submit, detail, hay update,
+    clientSqlLite: {
+
+    }
 };
 
 export default defaultState;

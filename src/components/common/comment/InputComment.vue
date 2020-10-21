@@ -252,26 +252,31 @@ export default {
 			this.dataPostComment.content = this.inputComment
 			this.dataPostComment.attachments = this.attachments
 			this.dataPostComment.tags = this.tags
+			let emptyCheck = this.dataPostComment.content.trim().length == 0 &&  this.dataPostComment.attachments.length == 0
 			if(this.isAdd == true){
-				let data = JSON.stringify(this.dataPostComment)
-				commentApi.addComment(data).then(res => {
-					setTimeout(function(){}, 1000);
-					this.$store.commit('comment/updateParentCommentTarget',0)
-					this.updateComment()
-					this.inputComment = ''
-					this.attachments = []
-					this.tags = []
-				});
-			}
-			else{
-				this.dataPostComment.id = this.item.id
-				let dataEdit = JSON.stringify(this.dataPostComment)
-				commentApi.editComment(dataEdit).then(res => {
-					this.$store.commit('comment/updateParentCommentTarget',0)
-					this.updateComment()
-					this.attachments = []
-					this.tags = []
-				});
+				if(emptyCheck == false){
+					let data = JSON.stringify(this.dataPostComment)
+					commentApi.addComment(data).then(res => {
+						this.$store.commit('comment/updateParentCommentTarget',0)
+						this.updateComment()
+						this.inputComment = ''
+						this.attachments = []
+						this.tags = []
+						this.$store.commit('comment/setWaitingCommentCountPerObj', this.sComment.objectType+':'+this.sComment.objectIdentifier);
+					});
+				}
+				
+			} else {
+				if(emptyCheck == false){
+					this.dataPostComment.id = this.item.id
+					let dataEdit = JSON.stringify(this.dataPostComment)
+					commentApi.editComment(dataEdit).then(res => {
+						this.$store.commit('comment/updateParentCommentTarget',0)
+						this.updateComment()
+						this.attachments = []
+						this.tags = []
+					});
+				}
 			}
 			this.$store.commit('comment/updateReplyStatus',false)
 		},

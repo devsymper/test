@@ -29,6 +29,12 @@ export default {
     getListModels(filter = {}) {
         return bpmneApi.get("", filter);
     },
+    getListModelsTrash(filter = {}) {
+        return bpmneApi.get("/trash", filter);
+    },
+    restoreListModels(ids){
+        return bpmneApi.put("/restore",{ids:JSON.stringify(ids)} );
+    },
     deleteModels(ids) {
         return bpmneApi.delete(ids.join(','));
     },
@@ -77,6 +83,7 @@ export default {
     },
     // Lấy danh sách của process definition 
     getDefinitions(filter = {}) {
+
         return bpmneApi.get(appConfigs.apiDomain.bpmne.definitions, filter, testHeader);
     },
     // Lấy data của process definition
@@ -91,7 +98,11 @@ export default {
     },
     // Lấy data của một process instance
     getProcessInstanceData(id) {
-        return bpmneApi.get(appConfigs.apiDomain.bpmne.instances + '/' + id, {}, testHeader);
+        let filter={};
+        filter.processInstanceId= id;
+       
+        return bpmneApi.post(appConfigs.apiDomain.bpmne.historyInstances, JSON.stringify(filter), testHeader);
+        //return bpmneApi.get(appConfigs.apiDomain.bpmne.instances + '/' + id, {}, testHeader);
     },
     // Lấy các viriable của một process instance
     getProcessInstanceVars(id) {
@@ -105,6 +116,10 @@ export default {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.instances, filter, testHeader);
     },
     getProcessInstanceHistory(filter={}) {
+        if (filter.page && filter.size) {
+            filter.start=(filter.page-1)*filter.size;
+            delete filter.page;
+        }
         filter= JSON.stringify(filter);
         return bpmneApi.post(appConfigs.apiDomain.bpmne.historyInstances, filter, testHeader);
     },
@@ -120,21 +135,25 @@ export default {
         if (filter.nameLike == '%%') {
             delete filter.nameLike;
         }
-        //ss
+        if (filter.page && filter.size) {
+            filter.start=(filter.page-1)*filter.size;
+            delete filter.page;
+        }
         if (filter.status == 'done') {
             filter.sort = filter.sort == 'createTime' ? 'startTime' : filter.sort;
             if (filter.assignee) {
                 filter.taskAssignee = filter.assignee;
             }
-
             if (filter.owner) {
                 filter.taskOwner = filter.owner;
             }
-
             if (filter.nameLike) {
                 filter.taskNameLike = filter.nameLike;
             }
-          
+            if (filter.involvedUser) {
+                filter.taskInvolvedUser=filter.involvedUser;
+                delete filter.involvedUser;
+            }
             filter.finished = true
             return bpmneApi.get(appConfigs.apiDomain.bpmne.tasksHistory, filter, testHeader);
         } else {
@@ -145,6 +164,10 @@ export default {
         if (filter.status=='done') {
             filter.parentTaskId=idParent;
             filter.finished=true;
+            if (filter.page && filter.size) {
+                filter.start=(filter.page-1)*filter.size;
+                delete filter.page;
+            }
             filter.sort='endTime';
             filter= JSON.stringify(filter);
             return bpmneApi.post(appConfigs.apiDomain.bpmne.postTasksHistory , filter, testHeader);
@@ -188,6 +211,15 @@ export default {
             filter.taskAssignee = filter.assignee;
             delete filter.assignee;
         }
+        if (filter.involvedUser) {
+            filter.taskInvolvedUser=filter.involvedUser;
+            delete filter.involvedUser;
+        }
+        if (filter.page && filter.size) {
+            filter.start=(filter.page-1)*filter.size;
+            delete filter.page;
+        }
+        filter.sort = filter.sort == 'createTime' ? 'startTime' : filter.sort;
         filter= JSON.stringify(filter);
         return bpmneApi.post(appConfigs.apiDomain.bpmne.postTasksHistory , filter, testHeader);
     },

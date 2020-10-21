@@ -1,10 +1,41 @@
 <template>
-    <div class="wraper-tracking" :class="{'d-none':stask.statusPopupTracking==false}" >
-        <div class="tracking-process" style="height:100%">
+    <div class="wraper-tracking pa-0" :class="{'d-none':stask.statusPopupTracking==false}" >
+        <div class="tracking-process" style="height:100%" v-if="showType=='work'">
+			<v-row class="ma-0 pl-2 pt-2 fs-13" style="height:5%; border-bottom:1px solid #cecece">
+				{{definitionName}}
+			</v-row>
+			<v-row class="w-100 ma-0" style="height:95%">
+				<v-col cols="4" class="h-100 pa-0" style="border-right:1px solid #cecece">
+					<timeLineAuditTrail
+						class="timeLineAuditTrail pl-2 pt-2"
+						:treeData="listInstanceRuntime"
+					/>
+				</v-col>
+				<v-col cols="8" class="h-100 pa-0 ma-0">
+					<v-row class="ma-0" style="height:60%">
+						<trackingProcessInstance
+							:needFocus="false"
+							v-if="workInfo.id"
+							:instanceId="workInfo.id"
+							@dataInstanceRuntime="dataInstanceRuntime"
+							>
+						</trackingProcessInstance>
+					</v-row>
+					<v-row class="ma-0"  style="height:40%;border-top:1px solid #cecece">
+						<detailItemAuditTrail
+							:infoItem="itemAuditTrail"
+						/>
+					</v-row>
+				</v-col>
+			</v-row>
+        </div>
+		<div class="tracking-process" style="height:100%" v-else-if="showType==''">
             <trackingProcessInstance
+                :needFocus="false"
                 v-if="taskInfo.action.parameter.processInstanceId"
                 :instanceId="taskInfo.action.parameter.processInstanceId"
                 :elementId="taskInfo.action.parameter.activityId"
+				:definitionName="definitionName"
                 >
             </trackingProcessInstance>
         </div>
@@ -13,13 +44,27 @@
 
 <script>
 import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue";
+import bpmneApi from "@/api/BPMNEngine";
+import timeLineAuditTrail from "@/components/common/TimelineTreeview/index.vue";
+import detailItemAuditTrail from "./DetailItemAuditTrail.vue";
 
 export default {
     components:{
 		trackingProcessInstance,
+		timeLineAuditTrail,
+		detailItemAuditTrail
     },
     data(){
 		return {
+			listInstanceRuntime:{},
+			itemAuditTrail:{},
+			icon:{
+				processName:"mdi-progress-check	",
+				startEvent:"mdi-play-outline",
+				userTask:"mdi-file-document-edit-outline",
+				callActivity:"mdi-cog-outline",
+				endEvent:"mdi-record"
+			}
 		}
     },
     props:{
@@ -27,30 +72,116 @@ export default {
 			type: Object,
 			default: () => {}
 		},
+		workInfo: {
+			type: Object,
+			default: () => {}
+		},
+		definitionName:{
+            type:String,
+            default:'',
+		},
+		showType:{
+			type:String,
+            default:'',
+		}
     },
     methods:{
+		dataInstanceRuntime(data,isCheck=false){
+			let arrIndexRemove=[];
+			for(let index in data){
+				let nodeInfo = data[index];
+				if (nodeInfo.activityType) {
+                    if(nodeInfo.activityType.includes('Flow') || nodeInfo.activityType.includes('Gateway')){
+						arrIndexRemove.push(Number(index));
+					}else{
+						data[index].name=data[index].activityName;
+						data[index].time=data[index].startTime;
+						data[index].icon=this.icon[data[index].activityType];
+					}
+				}
+			}
+			for (var i = arrIndexRemove.length -1; i >= 0; i--){
+				data.splice(arrIndexRemove[i],1);
+			}
+			if (isCheck==false) {
+				this.getChildrenCallActivity(data);
+			}else{
+				return data;
+			}
+		},
+		async getChildrenCallActivity(data){
+			let self=this;
+			for(let index in data){
+				let nodeInfo = data[index];
+				if (nodeInfo.activityType) {
+                    if(nodeInfo.activityType.includes('callActivity')){
+						let res={};
+						let detailProcess={};
+						let idInstance=nodeInfo.calledProcessInstanceId;
+						if (idInstance) {
+							res=await bpmneApi.getProcessInstanceRuntimeHistory(idInstance);
+							detailProcess=await bpmneApi.getProcessInstanceHistory({processInstanceId:idInstance});
+							if (res.total>0) {
+								let child=self.dataInstanceRuntime(res.data,true);
+								data[index]['children']=child;
+								data[index]['name']=detailProcess.data[0].name;
+								data[index]['time']=detailProcess.data[0].startTime;
+								data[index]['icon']=self.icon.callActivity;
+							}
+						}
+					}
+				}
+			}
+			await self.getNameProcessInstance(data);
+		},
+		async getNameProcessInstance(data){
+			let res={};
+			let treeData={};
+			res=await bpmneApi.getProcessInstanceHistory({processInstanceId:data[0].processInstanceId});
+			treeData.name=res.data[0].name;
+			treeData.icon=this.icon.processName;
+			treeData.time=res.data[0].startTime;
+			treeData.children=data;
+			this.$set(this.listInstanceRuntime,"icon",treeData.icon);
+			this.$set(this.listInstanceRuntime,"name",treeData.name);
+			this.$set(this.listInstanceRuntime,"time",treeData.time);
+			this.$set(this.listInstanceRuntime,"children",treeData.children);
+			console.log("InstanceRuntime",this.listInstanceRuntime);
+		}
+
 	},
 	computed:{
 		stask() {
 			return this.$store.state.task;
 		},
+	},
+	created(){
+	 	let self = this;
+        this.$evtBus.$on('selected-item-audit-trail', (data) =>{
+			if (data.id) {
+				self.itemAuditTrail=data;
+			}else{
+				self.itemAuditTrail={};
+			}
+        });
 	}
 }
 </script>
 
 <style scoped>
     .wraper-tracking{
-		position: absolute;
-		right:50px;
+		position: fixed;
+		top:50%;
+		left:50%;
+		transform: translate(-50%,-50%);
 		width: 70%;
-		height: 60%;
+		height: 80%;
 		background: white;
 		z-index: 9999;
 		padding: 12px 6px 6px 11px;
 		transition: all ease-in-out 250ms;
 		border: 1px solid #dedede;
-    	box-shadow: 1px 1px #e0d9d9;
+    	box-shadow: 1px 1px  #e0d9d9;
+		border-radius: 4px;
 	}
-
-
 </style>>

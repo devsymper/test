@@ -1,6 +1,14 @@
 <template>
-    <div class="pa-2 h-100">
+    <div class="pl-2 pr-2 h-100">
+        <div class="title mb-2">
+            {{$t('common.'+action) }} {{$t('common.actionPack')}}
+            <v-icon
+                class="close-btn float-right"
+                @click="closeActionPackForm"
+            >mdi-close</v-icon>
+        </div>
         <FormTpl
+         
             ref="comonAttr"
             :viewOnly="action == 'detail'"
             :singleLine="false"
@@ -16,10 +24,10 @@
             <hot-table
                 :settings="tableSettingsForObjectType"
                 :data="tableDataForObjectType"
-                :height="55"
+                :height="70"
                 :columns="tableColumnsForObjectType"
                 :colHeaders="colHeadersForObjectType"
-                class="fs-13"
+                class="fs-13 action-form"
                 ref="dataTableForObjectType">
 
             </hot-table>
@@ -63,7 +71,8 @@
                 color="primary"
                 @click="saveActionPack">
 
-                <v-icon class="mr-2" primary>mdi-content-save</v-icon>
+                <v-icon class="mr-2" v-if="action == 'detail'" primary>mdi-pencil</v-icon>
+                <v-icon class="mr-2" v-else primary>mdi-content-save</v-icon>
                 {{action == 'create' ? $t('common.save') : $t('common.update')}}
             </v-btn>
         </div>
@@ -107,8 +116,36 @@ export default {
         this.reCaculateTableHeight();
     },
     created(){
+        this.genAllInputForFormTpl();
     },
     methods: { 
+        closeActionPackForm(){
+            this.$emit('close-form');
+        },
+        genAllInputForFormTpl(){
+            this.allInputs = null;
+            this.allInputs = {
+                name: {
+                    "title": this.$t('common.name'),
+                    "type": "text",
+                    "value": this.itemData.name,
+                    "info": "",
+                },
+                description: {
+                    "title": this.$t('common.description'),
+                    "type": "text",
+                    "value": this.itemData.description,
+                    "info": "",
+                },
+                objectType: {
+                    "title": this.$t('permissions.actionPack.objectType'),
+                    "type": 'select',
+                    "value": this.itemData.objectType,
+                    "info": "",
+                    options: this.getObjectTypeSelections()
+                }
+            };
+        },
         caculateTableDataForAllInstancesDocDef(rowsOfDocDefs){
             let operationForInstancesOfDocDef = this.multipleLevelObjects.document_definition.savedOpsForAllInstancesDocDef;
             operationForInstancesOfDocDef = operationForInstancesOfDocDef ? operationForInstancesOfDocDef : [];
@@ -385,7 +422,7 @@ export default {
             this.reCaculateTableHeight();
         },
         reCaculateTableHeight(){
-            let h = util.getComponentSize(this).h - util.getComponentSize(this.$refs.comonAttr).h - 180;
+            let h = util.getComponentSize(this).h - util.getComponentSize(this.$refs.comonAttr).h - 200;
             if(this.allInputs.objectType.value == 'application_definition'){
                 h = h*2/3;
             }else if(this.allInputs.objectType.value == 'document_definition'){
@@ -588,6 +625,8 @@ export default {
                     }else{
                         this.$snotifyError(res, "Error when create item");
                     }
+                }else if(this.action == 'detail'){
+                    this.$emit('trigger-update-action-pack', this.itemData);
                 }
                 this.$emit('saved-item-data',res);
             } catch (error) {
@@ -769,6 +808,7 @@ export default {
             // Tiêu đề của các cột  cần hiển thị
             colHeaders: [],
             colHeadersForObjectType: [],
+            allInputs: null
         }
     },
     components: {
@@ -810,31 +850,38 @@ export default {
             }
             return rsl;
         },
-        allInputs(){
-            return {
-                name: {
-                    "title": this.$t('common.name'),
-                    "type": "text",
-                    "value": this.itemData.name,
-                    "info": "",
-                },
-                description: {
-                    "title": this.$t('common.description'),
-                    "type": "text",
-                    "value": this.itemData.description,
-                    "info": "",
-                },
-                objectType: {
-                    "title": this.$t('permissions.actionPack.objectType'),
-                    "type": 'select',
-                    "value": this.itemData.objectType,
-                    "info": "",
-                    options: this.getObjectTypeSelections()
-                }
-            };
-        }, 
+        // allInputs(){
+        //     return {
+        //         name: {
+        //             "title": this.$t('common.name'),
+        //             "type": "text",
+        //             "value": this.itemData.name,
+        //             "info": "",
+        //         },
+        //         description: {
+        //             "title": this.$t('common.description'),
+        //             "type": "text",
+        //             "value": this.itemData.description,
+        //             "info": "",
+        //         },
+        //         objectType: {
+        //             "title": this.$t('permissions.actionPack.objectType'),
+        //             "type": 'select',
+        //             "value": this.itemData.objectType,
+        //             "info": "",
+        //             options: this.getObjectTypeSelections()
+        //         }
+        //     };
+        // }, 
     },
     watch: {
+        itemData: {
+            deep: true,
+            immediate: true,
+            handler(vl){
+                this.genAllInputForFormTpl();
+            }
+        },
         listAction: {
             immediate: true,
             deep: true,
@@ -851,5 +898,11 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.action-form ::v-deep .wtHolder{
+    height: 88px!important
+}
+.action-form ::v-deep .ht_clone_left{
+    height: 58px!important
+}
 </style>

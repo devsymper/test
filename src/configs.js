@@ -35,6 +35,7 @@ export const appConfigs = {
         userRole: "https://orgchart.symper.vn/",
         permission: "https://accesscontrol.symper.vn/",
         dashboard: "https://bi-service.symper.vn/report-and-dashboard/",
+        search: 'https://search.symper.vn/',
         biService: "https://bi-service.symper.vn",
         permissionPacks: "https://accesscontrol.symper.vn/permission_packs",
         actionPacks: "https://accesscontrol.symper.vn/action_packs",
@@ -47,13 +48,15 @@ export const appConfigs = {
         timesheet: 'https://timesheet-service.dev.symper.vn/',
         search: "https://search.symper.vn/",
         importExcel: 'https://io.dev.symper.vn/',
-        uiConfig: "https://ui.symper.vn"
+        uiConfig: "https://ui.symper.vn",
+        workflowExtend: "https://workflow-extend.symper.vn/",
+        trash: "https://trash.symper.vn/"
     },
     notificationTimeout: {
-        success: 10000,
-        warning: 20000,
-        info: 20000,
-        error: 30000,
+        success: 3000,
+        warning: 5000,
+        info: 3000,
+        error: 6000,
     },
     firebaseConfig: {
         apiKey: "AIzaSyBW8O6OeIUpaNbEYwyihGF7QsuVrwtOM4w",
@@ -64,5 +67,17 @@ export const appConfigs = {
         messagingSenderId: "801948571579",
         appId: "1:801948571579:web:d01c00ea89bb60df08d69e",
         measurementId: "G-7WZC29YT0G"
+    },
+    actionDefinition: {
+        icons: {
+            create: '',
+        },
+        commonProps: {
+            document_definition: {
+                "module": "document",
+                "resource": "document_definition",
+                "scope": "document"
+            }
+        }
     }
 };

@@ -13,14 +13,20 @@
         "menu": "Menu",
         "users": "Tài khoản người dùng",
         "add": "Thêm",
+        "import_excel_history": "Lịch sử Import",
         "edit": "Sửa",
         "cancel": "Hủy",
         "update": "Cập nhật",
         "delete": "Xóa",
         "refresh": "Làm mới",
+        "userDeletedName": "Họ và tên người xóa",
+        "roleDeleted": "Role người xóa",
+        "userAgent": "Trình duyệt xóa",
+        "deletedAt": "Thời gian xóa",
         "export_excel": "Xuất excel",
         "list": "Danh sách",
         "search": "Tìm kiếm",
+        "note": "Ghi chú",
         "quickSearch": "Tìm nhanh",
         "list_config": "Cấu hình danh sách",
         "save": "Lưu",
@@ -38,6 +44,7 @@
         "virtualdocs": "Virtualdocs",
         "tasks": "Tasks",
         "myItem": "My Item",
+        "myApplication": "My Application",
         "other": "Khác",
         "deploy": "Deploy",
         "start": "Bắt đầu",
@@ -63,6 +70,7 @@
         "last_update_at": "Cập nhật lần cuối",
         "create_at": "Tạo lúc",
         "user_create": "Người tạo",
+        "last_user_update": "Người cập nhật cuối",
         "filter": "Bộ lọc",
         "sort": "Sắp xếp",
         "status": "Trạng thái",
@@ -85,7 +93,52 @@
         "of": "của",
         "entries": "bản ghi",
         "always_show_sidebar": "Luôn hiển thị sidebar",
-        "import_excel": "Nhập bằng excel"
+        "import_excel": "Nhập bằng excel",
+        "isDefault": "SĐTC mặc định",
+        "restore": "Khôi phục",
+        "sidebar": {
+            "Setting": "Cài đặt",
+            "Notification": "Thông báo",
+            "account_trash": "Tài khoản đã xóa",
+            "Lists trash": "Danh sách bản xóa",
+            "myApplication": "Ứng dụng của tôi",
+            "tasks": "Tasks",
+            "works": "Works",
+            "My work": "Công việc của tôi",
+            "myWork": "Lịch làm việc",
+            "Manage timesheet": "Quản lý  thời gian biểu",
+            "Timesheet report": "Báo cáo thời gian biểu",
+            "Timesheet": "Thời gian biểu",
+            "App": "Ứng dụng",
+            "Administrator": "Quản trị viên",
+            "Account management": "Quản lý tài khoản",
+            "Access Management": "Quản lý truy cập",
+            "users": "Tài khoản người dùng",
+            "baAccount": "Tài khoản BA",
+            "actionPack": "Action Pack",
+            "permissions": "Phân quyền",
+            "userRoleSetting": "Vai trò người dùng",
+            "KH": "Tri thức nội bộ",
+            "apps": "Cài đặt ứng dụng",
+            "Applications": "Ứng dụng",
+            "Lists to do": "Việc cần làm",
+            "My application": "Ứng dụng",
+            "Report": "Báo cáo",
+            "List workflows": "Danh sách quy trình",
+            "List documents": "Danh sách văn bản",
+            "File": "Quản lý tệp",
+            "workflows": "Quy trình",
+            "documents": "Văn bản",
+            "orgchart": "Sơ đồ tổ chức",
+            "myItem": "My item",
+            "listApps": "Danh sách ứng dụng",
+            "listTrashApps": "Danh sách ứng dụng đã xóa",
+            "listOrgchart": "Danh sách SĐTC",
+            "listTrashOrgchart": "Danh sách SĐTC đã xóa",
+            "viewOrgchart": "Xem SĐTC mặc định"
+        },
+        "system": "Hệ thống",
+        "copy": "Sao chép"
     },
     "login": {
         "title": "Đăng nhập hệ thống",
@@ -153,18 +206,53 @@
         "notValid": "Trường này không hợp lệ",
         "password": "Yêu cầu mật khẩu có cả chữ hoa và số"
     },
+    "import": {
+        "import_history": "Lịch sử import",
+        "table": {
+            "history-import": {
+                "id": "ID",
+                "userEmail": "Email người dùng",
+                "subObjType": "Loại đối tượng",
+                "objId": " Tên đối tượng",
+                "description": "Ghi chú",
+                "userId": "Người import",
+                "createdAt": "Ngày tạo",
+                "status": "Trạng thái",
+                "fileName": "Tên tệp",
+                "nameImport": "Nội dung"
+
+
+            },
+            "contextMenu": {
+                "viewDetail": "Xem chi tiết"
+            }
+        }
+    },
     "user": {
+        "notification": {
+            "email_already_exist!": "Email đã tồn tại!",
+            "add_success": "Thêm mới tài khoản thành công!",
+            "update_success": "Cập nhật tài khoản thành công!",
+            "user_name_already_exist": "Tên tài khoản đã tồn tại",
+            "Old password incorrect": "Mật khẩu cũ không đúng",
+            "successChangePass": "Đổi mật khẩu thành công"
+
+        },
         "title": "Danh sách User",
+        "trash": "Danh sách user đã xóa",
         "general": {
             "title": "Thông tin cơ bản",
             "personalInfo": {
+                "phoneNumber": "Điện thoại",
+                "status": "Trạng thái",
                 "title": "Thông tin cá nhân",
                 "userName": "Tên tài khoản",
                 "email": "Email",
                 "firstName": "Tên",
                 "lastName": "Họ",
                 "displayName": "Tên hiển thị",
-                "phoneNumber": "Số điện thoại"
+                "phone": "Số điện thoại",
+                "pass": "Mật khẩu"
             },
             "passwordSetting": {
                 "title": "Tùy chọn mật khẩu",
@@ -174,6 +262,7 @@
                 "sendEmailAfterDone": "Gửi mật khẩu trong email sau khi hoàn thành",
                 "activeAccount": "Kích hoạt tài khoản"
             }
+
         },
         "permission": {
             "title": "Phân quyền",
@@ -212,18 +301,29 @@
         },
         "table": {
             "id": "Id",
-            "firstName": "Tên",
+            "firstName": "Họ",
+            "lastName": "Tên",
+            "restore": "Khôi phục",
+            "userName": "Tên đầy đủ",
             "displayName": "Tên hiển thị",
             "email": "Địa chỉ email",
-            "phoneNumber": "Số điện thoại",
+            "phone": "Số điện thoại",
+            "avatar": "Ảnh đại diện",
             "status": "Trạng thái",
             "createAt": "Thời gian tạo",
             "updateAt": "Thời gian cập nhật",
             "contextMenu": {
                 "passwordSetting": "Tùy chọn mật khẩu",
                 "edit": "Sửa",
-                "delete": "Xóa"
+                "restore": "Restore",
+                "delete": "Xóa",
+                "view": "Xem"
             }
+        },
+        "myInfo": {
+            "title": "Thông tin của tôi",
+            "generalInfo": "Thông tin chung",
+            "myPosition": "Vị trí của tôi"
         }
     },
     "snippet": {
@@ -368,6 +468,7 @@
         "department": "Phòng ban"
     },
     "objectType": {
+
         "Document definition": "Văn bản",
         "Document instance": "Danh sách bản ghi",
         "Orgchart": "Sơ đồ tổ chức",
@@ -390,7 +491,79 @@
         "Department": "Phòng ban",
         "Timesheet": "Thời gian biểu"
     },
+    "objects": {
+        "document_instance": "Bản ghi dữ liệu",
+        "account": "Nhân viên",
+        "document_definition": "Loại văn bản",
+        "document": "Văn bản",
+        "workflow_definition": "Workflow",
+        "orgchart": "Sơ đồ tổ chức",
+        "process_definition": "Quy trình",
+        "application_definition": "Ứng dụng",
+        "syql": "Công thức",
+        "dataflow": "Data flow",
+        "file": "Tệp",
+        "knowledge": "Văn bản nội bộ",
+        "comment": "Bình luận",
+        "dashboard": "Dashboard",
+        "listAction": {
+            "create": "thêm",
+            "edit": "sửa",
+            "submit": "xem",
+            "list": "danh sách",
+            "list_trash": "danh sách nháp",
+            "list_instance": "danh sách bản ghi",
+            "deploy": "triển khai",
+            "drop": "xóa",
+            "view": "xem",
+            "remove": "xóa",
+            "update": "sửa",
+            "execute": "thực thi",
+            "restore": "khôi phục",
+            "detail": "xem",
+            "print": "in",
+            "start_instance": "bắt đầu quy trình"
+        },
+        "icon": {
+            "document_instance": "mdi mdi-file-document-outline",
+            "account": "mdi-account-multiple-outline",
+            "Tất cả": "mdi-all-inclusive",
+            "document_definition": "mdi mdi-file-outline",
+            "workflow_definition": "mdi mdi-lan",
+            "orgchart": "mdi mdi-sitemap",
+            "process_definition": "mdi mdi-sitemap",
+            "application_definition": "mdi mdi-apps",
+            "syql": "mdi mdi-alpha-f",
+            "dataflow": "mdi mdi-arrange-send-to-back"
+        }
+    },
+    "formulasEditor": {
+        "inputParams": "(x) Tham số đầu vào:",
+        "result": "Kết quả",
+        "time": "Thời gian",
+        "success": "Thành công",
+        "error": "Lỗi"
+    },
     "document": {
+        "instance": {
+            "showlist": {
+                "select": "Đã chọn",
+                "record": "Bản ghi",
+                "printRecord": "In bản ghi",
+                "selectPrintConfig": "Chọn mẫu in",
+                "printMultiple": "In nhiều bản ghi",
+                "deleteMultiple": "Xóa nhiều bản ghi",
+                "listPrintConfig": "Danh sách mẫu in",
+                "print": "In nhanh",
+                "copied": "Đã sao chép",
+                "next": "Tiếp theo",
+                "prev": "Trước đó",
+                "copyLink": "Sao chép đường dẫn",
+                "download": "Tải xuống",
+                "info": "Thông tin bản ghi",
+                "update": "Sửa bản ghi của văn bản "
+            }
+        },
         "create": "Tạo mới văn bản",
         "edit": "Chỉnh sửa văn bản",
         "title": "Danh sách văn bản",
@@ -435,9 +608,16 @@
                     "title": "Tiêu đề Document",
                     "fullSize": "Hiển thị toàn màn hình Form Submit",
                     "type": "Loại văn bản",
-                    "note": "Ghi chú",
-                    "titleObject": "Tiêu đề bản ghi",
-                    "titlePrint": "Tiêu đề bản In"
+                    "note": "Ghi chú (Phục vụ cho việc tìm kiếm)",
+                    "titleObject": "Tiêu đề bản ghi (Phục vụ cho việc hiển thị trên MyItem, công thức chạy trên server)",
+                    "titlePrint": "Tiêu đề bản In",
+                    "systemMapping": {
+                        "title": "Liên kết Doc và đối tượng hệ thống",
+                        "itemTitle": "Chọn đối tượng để liên kết (Có thể mở được bản ghi của Doc ngay trong đối tượng hệ thống)",
+                        "condition": "Liên kết theo điều kiện",
+                        "conditionDoc": "Điều kiện liên kết trên Doc",
+                        "conditionSystem": "Điều kiện liên kết ở đối tượng"
+                    }
                 },
                 "swapType": {
                     "heading": "Chuyển đổi kiểu control",
@@ -498,7 +678,6 @@
                         "subTitle1": "Người phê duyệt",
                         "subTitle2": "Người tham gia"
                     }
-
                 }
             },
             "fab": {
@@ -512,7 +691,13 @@
         },
         "validate": {
             "emptyTitle": "Không được bỏ trống tiêu đề",
-            "emptyContentControlTemplate": "Vui chọn template trước khi lưu control template"
+            "emptyName": "Không được bỏ trống tên",
+            "nameNotValid": "Tên không hợp lệ",
+            "emptyContentControlTemplate": "Vui chọn template trước khi lưu control template",
+            "controlNotExist": "Control Không tồn tại, vui lòng tạo control mới",
+            "docNameExist": "Tên document đã tồn tại",
+            "checkNameRelate": "Tên của văn bản này có thể được sử dụng trong công thức ở các đối tượng trong hệ thống. Chọn kiểm tra để kiểm tra lại các đối tượng"
+
         }
     },
     "documentObject": {
@@ -552,6 +737,7 @@
     "process": {
         "list": {
             "title": "Danh sách quy trình",
+            "titleTrash": "Danh sách quy trình đã xóa",
             "deploy_history": "Lịch sử deploy",
             "start": "Bắt đầu quy trình",
             "instances": "Các bản đã chạy gần nhất"
@@ -599,6 +785,9 @@
         }
     },
     "apps": {
+        "titleMyApplication": "Danh sách công việc của tôi",
+        "titleApplication": "Danh sách ứng dụng",
+        "titleTrashApplication": "Danh sách ứng dụng đã xóa",
         "header": {
             "id": "ID",
             "name": "Tên",
@@ -607,14 +796,22 @@
             "price": "Giá",
             "status": "Kích hoạt",
             "created_at": "Ngày tạo",
-            "updated_at": "Cập nhật lần cuối"
+            "updated_at": "Cập nhật lần cuối",
+            "userDeletedName": "Tên người xóa ",
+            "userAgent": "Trình duyệt xóa ",
+            "roleDeleted": "Role người xóa ",
+            "deletedAt": "Thời gian xóa"
         },
 
         "listType": {
             "documents": "Văn bản",
             "workflows": "Quy trình làm việc",
             "reports": "Báo cáo",
-            "orgcharts": "Sơ đồ tổ chức"
+            "documentMajor": "Chứng từ",
+            "documentCategory": "Danh mục",
+            "workflow": "Quy trình làm việc",
+            "dashboard": "Báo cáo",
+            "orgchart": "Sơ đồ tổ chức"
         },
         "addApp": "Thêm ứng dụng",
         "editApp": "Sửa ứng dụng",
@@ -758,11 +955,6 @@
                 "remove operation": "Xoá",
                 "add action pack": "Thêm",
                 "remove action pack": "Xoá"
-
-
-
-
-
             },
             "dataflow": {
                 "detail": "Chi tiết",
@@ -780,25 +972,25 @@
                 "unfavorite": "Loại bỏ yêu thích"
             },
             "document_definition": {
-                "create": "Tạo mới văn bản ",
-                "edit": "Chỉnh sửa văn bản",
-                "submit": "Gửi văn bản",
-                "drop": "Xóa văn bản",
+                "create": "Tạo ",
+                "edit": "Sửa",
+                "submit": "Gửi",
+                "drop": "Xóa",
                 "restore": "Khôi phục",
-                "list": "Danh sách văn bản",
+                "list": "Danh sách",
                 "list_trash": "Thùng rác",
-                "list_instance": "Danh sách bản ghi",
-                "unfavorite": "Loại bỏ yêu thích"
+                "list_instance": "Ds bản ghi",
+                "unfavorite": "Bỏ yêu thích"
             },
             "workflow_definition": {
-                "list": "Danh sách quy trình ",
-                "create": "Tạo mới quy trình ",
+                "list": "Danh sách",
+                "create": "Tạo mới",
                 "deploy": "Triển khai",
-                "drop": "Xóa quy trình ",
-                "update": "Cập nhật quy trình ",
-                "list_instance": "Danh sách bản ghi",
-                "start_instance": "Bắt đầu quy trình",
-                "unfavorite": "Loại bỏ yêu thích"
+                "drop": "Xóa",
+                "update": "Sửa",
+                "list_instance": "Ds bản ghi",
+                "start_instance": "Bắt đầu",
+                "unfavorite": "Bỏ yêu thích"
             },
             "dashboard": {
                 "create": "Tạo mới",
@@ -807,6 +999,24 @@
                 "list": "Danh sách",
                 "drop": "Xóa",
                 "unfavorite": "Loại bỏ yêu thích"
+            },
+            "document_instance": {
+                "update": "Sửa",
+                "delete": "Xóa",
+                "restore": "Khôi phục",
+                "detail": "Chi tiết",
+                "print": "In",
+                "list_trash": "Thùng rác"
+            },
+            "syql": {
+                "update": "Sửa",
+                "create": "Tạo ",
+                "execute": "Thực thi"
+            },
+            "application_definition": {
+                "update": "Sửa",
+                "view": "Xem",
+                "remove": "Xóa"
             }
         },
         "iconListActions": {
@@ -861,7 +1071,9 @@
     "notification": {
         "error": "Đã có lỗi xảy ra. Vui lòng thử lại sau",
         "errorTitle": "Lỗi",
-        "successTitle": "Thành công"
+        "successTitle": "Thành công",
+        "older": "Cũ hơn",
+        "today": "Hôm nay"
     },
     "virtualdoc": {
         "header": {
@@ -914,6 +1126,18 @@
             "parentWork": "Parent work",
             "siblingWork": "Sibling work",
             "subWork": "Sub work"
+        },
+        "sidebar": {
+            "showMoreTask": "Xem thêm các task liên quan",
+            "showLess": "Thu gọn",
+            "showMoreFile": "Xem thêm các tệp",
+            "quickView":"Xem nhanh",
+            "openTask": "Mở công việc"
+        },
+        "alert": {
+            "title_aproval": "Thực thi công việc",
+            "titlePermissionDenied": "Từ chối thực thi!",
+            "contentPermissionDenied": "Bạn không có quyền thực hiện công việc này!"
         }
 
     },
@@ -925,10 +1149,12 @@
         "header": {
             "type": "Loại",
             "approval": "Phê duyệt",
+            "groupApproval": "Nhóm phê duyệt",
             "submit": "Gửi văn bản",
             "date": "Ngày tạo",
             "dueDate": "Ngày đến hạn",
             "createDate": "Ngày khởi tạo",
+            "endTime": "Ngày hoàn thành",
             "app": "Ứng dụng",
             "description": "Mô tả",
             "owner": "Người sở hữu",
@@ -971,7 +1197,8 @@
     },
     "orgchart": {
         "list": {
-            "title": "Danh sách sơ đồ tổ chức"
+            "title": "Danh sách sơ đồ tổ chức",
+            "titleTrash": "Danh sách sơ đồ tổ chức đã xóa"
         },
         "create": {
             "title": " Tạo sơ đồ tổ chức"
@@ -1010,6 +1237,11 @@
         "overMaxOpen": {
             "title": "Không thể tạo thêm tab mới",
             "detail": "Số lượng tab vượt quá giới hạn, hãy xóa một vài tab"
+        }
+    },
+    "dashboard": {
+        "detail": {
+            "title": "Detail dashboard "
         }
     },
     "comment": {

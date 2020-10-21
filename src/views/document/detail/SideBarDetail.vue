@@ -4,8 +4,8 @@
 	absolute
 	permanent
 	right
-	:width="sidebarWidth"
-	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)'}"
+	:width="400"
+	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)','display':displaySidebar}"
 	>
 	<div class="main-info">
 		<div style="display:flex;">
@@ -76,35 +76,27 @@
 						</div>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
-				<v-expansion-panel>
+				<v-expansion-panel v-show="showPanelWorkflow">
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.worflowInfo')}}</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
 
 						<table class="workflow-info" v-if="workflowId !='' ">
 							<tr>
-								<!-- <td><span class="mdi mdi-share-variant"></span></td> -->
-								<td>{{workflowName}}</td>
+								<td><v-icon style="font-size:15px ; padding-right:6px">mdi-lan</v-icon> {{workflowName}}</td>
 							<tr>
-								<!-- <td><span class="mdi mdi-briefcase-variant-outline"></span></td> -->
-								<td>{{workflowOtherName}}</td>
+								<td v-if="taskName != ''"> <v-icon style="font-size:15px ; padding-right:6px">mdi-format-list-checkbox</v-icon>{{taskName}}</td>
 							</tr>
 							
 						</table>
-					<!-- mdi-share-variant -->
-					<!-- mdi-briefcase-variant-outline -->
 					</v-expansion-panel-content>
 				</v-expansion-panel>
-
-				
-				
 			</v-expansion-panels>
 		</VuePerfectScrollbar>
 	</div>
-	<div class="history-info" style="transform:translateX(300px)">
+	<div class="history-info" style="transform:translateX(400px)">
 		<div style="display:flex;">
 			<span class="mdi mdi-keyboard-backspace" @click="hideHistory"></span>
 			<span style="font-size:15px;">LỊCH SỬ CHỈNH SỬA</span>
-			<!-- <span class="mdi mdi-close" @click="hide"></span> -->
 		</div>
 
 		<v-divider></v-divider>
@@ -138,7 +130,9 @@
 			</div>
 		</VuePerfectScrollbar>
 	</div>
-	<Comment v-if="showCommentInDoc" style="height:100%" ref="commentView" :objectIdentifier="documentObjectId" @close-comment="hide" />
+	<Comment v-if="showCommentInDoc" 
+	style="height:100%" ref="commentView" 
+	:objectIdentifier="String(documentObjectId)" />
 
 	</v-navigation-drawer>
 </template>
@@ -163,24 +157,21 @@ export default {
 			userCreate:"",
 			createdDate:"",
 			workflowName:"",
-			workflowOtherName:"",
+			showPanelWorkflow:true,
+			taskName:"",
 			listApprovalUser:[],
 			listRelatedUser:[],
 			listHistoryControl:[
                 {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:2, controls:[{id:'s-control-id-1596780634836',data:[]},{id:'s-control-id-1596780602772',data:[]},{id:'s-control-id-1596780611212',data:[]}]},
                 {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:1, controls:[{id:'s-control-id-1596780602772',data:[]}]},
 			],
-			
+			displaySidebar:'none'
 		}
 	},
 	props:{
 		sidebarWidth:{
 			type:Number,
-			default:300
-		},
-		isShowSidebar:{
-			type:Boolean,
-			default:true
+			default:400
 		},
 		showCommentInDoc:{
 			type:Boolean,
@@ -208,25 +199,29 @@ export default {
 		}
 	},
 	watch:{
-		
-		isShowSidebar(after){
-			this.isShow = !this.isShow
-		},
 		userId(after){
 			userApi.getDetailUser(after).then(res=>{
 				if(res.status == 200)
 				this.userCreate = res.data.user.displayName
-			}).always({}).catch({});
+			});
 		},
 		workflowId(after){
-			// bpmnApi.getDefinitionData(this.workflowId).then(res=>{ 
-            //         console.log('resresres',res);
-			// 	}).always({}).catch({});
+			let self = this
+			if(after != ""){
+				bpmnApi.getProcessInstanceData(this.workflowId).then(res=>{
+					self.workflowName = res.data[0].processDefinitionName
+				});
+			}
+			
 		},
 		taskId(after){
-			// bpmnApi.getATaskInfo(this.taskId).then(res=>{
-            //         console.log('resresres',res);
-            //     }).always({}).catch({});
+			let self = this
+			if(after != ""){
+				bpmnApi.getATaskInfo(this.taskId).then(res=>{
+                   self.taskName = res.name == null ? "" : res.name
+                });
+			}
+			
 		},
 		createTime(after){
 			this.createdDate = after
@@ -268,10 +263,16 @@ export default {
 	methods:{
 		hide(){
 			this.isShow = false;
+			setTimeout((self) => {
+					self.displaySidebar = 'none';
+				}, 250, this);
 			this.$emit('after-hide-sidebar');
 		},
 		show(){
-			this.isShow = true;
+			this.displaySidebar = '';
+			setTimeout((self) => {
+				self.isShow = true;
+			}, 10, this);
 		},
 		showHistoryControl(history){
 			$('.highlight-history').removeClass('highlight-history');
@@ -282,7 +283,7 @@ export default {
 			
 		},
 		hideHistory(){
-			$('.history-info').css({transform:'translateX(300px)'})
+			$('.history-info').css({transform:'translateX(400px)'})
 		},
 		showHistory(){
 			$('.history-info').css({transform:'translateX(0px)'})
@@ -315,6 +316,7 @@ export default {
     }
     .s-detail-sidebar{
         overflow: hidden;
+		width:400px;
         max-height: 100%;
     }
 	
@@ -341,6 +343,9 @@ export default {
 	.workflow-info,
 	.general-info{
 		font-size: 13px;
+	}
+	.workflow-info td{
+		padding:5px 0px;
 	}
 	.related-user-info img, .approval-info img{
 		height: 24px;

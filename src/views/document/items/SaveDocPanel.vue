@@ -17,13 +17,14 @@
             <h4 class="headline">{{$t('document.editor.dialog.saveDoc.heading')}}</h4>
             <v-divider></v-divider>
             <v-card-text style="height: calc(100% - 84px);    overflow: auto;">
-                <div id="setting-control-table" class="setting-control-table">
-                    <div class="content-setting-control-table">
+                <div>
+                    <div>
                         <form-save-doc 
                         @append-icon-click="checkNameDocument"
                         @input-value-changed="handleChangeInput" 
                          :allInputs="documentProps"/>
                     </div>
+                    <SystemDataMapping ref="systemDataMapping" :instance="instance"/>
                 </div>
             </v-card-text>
                 <v-divider></v-divider>
@@ -53,7 +54,7 @@
     <validate 
     @after-click-confirm="checkNameDocument" 
     @after-click-ignore="showNoteChangeName = false" 
-    :title="'Chú ý'" 
+    :title="$t('common.note')" 
     :message="messageValidate" 
     :isShowAction="true"
      ref="validate" />
@@ -68,12 +69,13 @@ import { util } from "./../../../plugins/util.js";
 import { documentApi } from "./../../../api/Document.js";
 import { formulasApi } from "./../../../api/Formulas.js";
 import Validate from "./../common/Validate";
-
+import SystemDataMapping from "./../editor/SystemDataMapping"
 export default {
     
     components:{
         'form-save-doc' : FormTpl,
         "validate": Validate,
+        SystemDataMapping
     },
     props:{
         instance:{
@@ -132,7 +134,7 @@ export default {
                     if (res.status == 200) {
                         let message = ""
                         if(res.data === true){
-                            message = "Tên document đã tồn tại"
+                            message = this.$t('document.validate.docNameExist');
                             thisCpn.isValidName = false;
                         }
                         else{
@@ -160,12 +162,12 @@ export default {
         checkValidateNameDocument(value){
             let message = "";
             if(value.length == 0){
-                message = "Không được bỏ trống";
+                message = this.$t('document.validate.emptyName');
                 this.isValidName = false;
             }
             else{
                 if(/^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(value) == false){
-                    message = "Tên không hợp lệ";
+                    message = this.$t('document.validate.nameNotValid');
                     this.isValidName = false;
                 }
                 else{
@@ -180,10 +182,10 @@ export default {
                 this.$emit("save-form-print-action",this.documentProps);
             }
             else{
-                if(this.showValidate && this.showNoteChangeName && this.$route.name == 'editDocument'){
+                if(this.showValidate && this.showNoteChangeName && this.$getRouteName() == 'editDocument'){
                     this.showValidate = false;
-                    this.messageValidate = "Tên của văn bản này có thể được sử dụng trong công thức ở các đối tượng trong hệ thống. Chọn kiểm tra để kiểm tra lại các đối tượng";
-                    this.$refs.validate.show(false)
+                    this.messageValidate = this.$t('document.validate.checkNameRelate');
+                    this.$refs.validate.show(false);
                 }
                 else{
                     if(this.isValidName && this.isValidTitle){
@@ -198,6 +200,10 @@ export default {
         },
 
         async saveFormulasForRecord(){
+            
+            if(this.$getRouteName() == 'editDocument'){
+                this.$refs.systemDataMapping.editMapping(this.$route.params.id);
+            }
             if(this.documentProps.titleObjectFormulas.formulasId != 0){
                 let formulas = {};
                 formulas['syql'] = this.documentProps.titleObjectFormulas.value;
@@ -229,7 +235,7 @@ export default {
             let message = ""
             if(!this.documentProps.title.value){
                 this.isValidTitle = false;
-                message = "Vui lòng nhập tiêu đề document"
+                message = this.$t('document.validate.emptyTitle');
             }
             else{
                 this.isValidTitle = true;

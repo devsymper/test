@@ -2,8 +2,14 @@ import Api from "./api";
 import { appConfigs } from "./../configs.js";
 
 var coreApi = new Api(appConfigs.apiDomain.sdocumentManagement);
-var formulasApi = new Api(appConfigs.apiDomain.formulasService)
+var formulasApi = new Api(appConfigs.apiDomain.formulasService);
 export const documentApi = {
+    getListDocument() {
+        return coreApi.get("documents?pageSize=3000");
+    },
+    getBatchDocument(data) {
+        return coreApi.post("documents/batch",data);
+    },
     saveDocument(data) {
         return coreApi.post("documents", data);
     },
@@ -109,7 +115,16 @@ export const documentApi = {
     saveControlTemplate(data) {
         return coreApi.post('control-templates', data);
     },
+    editControlTemplate(id, data) {
+        return coreApi.put('control-templates/' + id, data);
+    },
+    deleteControlTemplate(id) {
+        return coreApi.delete('control-templates/' + id);
+    },
     getControlTemplate() {
         return coreApi.get('control-templates');
+    },
+    getDetailControlTemplate(id) {
+        return coreApi.get('control-templates/' + id);
     },
 };

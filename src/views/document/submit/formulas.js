@@ -370,21 +370,34 @@ export default class Formulas {
          * @param {String} formulas 
          */
     replaceParamsToData(dataInput, formulas) {
-        // debugger
-
         // thay thế các tham số của workflow 
         formulas = this.replaceWorkflowParams(formulas);
 
         if (Object.keys(dataInput).length == 0 || dataInput == false) {
             return formulas;
         }
-        let listControlInDoc = this.getDataSubmitInStore();
+        let listControlInDoc = {}
+        try {
+            listControlInDoc = this.getDataSubmitInStore();
+        } catch (error) {
+
+        }
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
             let value = dataInput[controlName];
+            if (Array.isArray(value)) { // các trường hợp query điều kiện là in thì cần đưa datainput về dạng sql hiểu được
+                let valueForArray = '';
+                for (let index = 0; index < value.length; index++) {
+                    let v = value[index];
+                    valueForArray += "'" + v + "',";
+                }
+                valueForArray = valueForArray.trim();
+                valueForArray = valueForArray.substring(0, valueForArray.length - 1);
+                value = valueForArray;
+            }
             if (value == undefined || typeof value == 'undefined' || value == null) {
                 value = ""
-                if (listControlInDoc[controlName].type == 'number' || listControlInDoc[controlName].type == 'percent') {
+                if (dataFromStore && listControlInDoc[controlName].type == 'number' || listControlInDoc[controlName].type == 'percent') {
                     value = 0;
                 }
             }
@@ -399,6 +412,9 @@ export default class Formulas {
     // Hàm kiểm tra các tham số của workflow và thay thế lại giá trị tương ứng
     // hàm này thực hiện khi chạy quy trình
     replaceWorkflowParams(formulas) {
+        if (!sDocument.state.submit[this.keyInstance]) {
+            return formulas;
+        }
         let workflowVariable = sDocument.state.submit[this.keyInstance].workflowVariable;
         for (let param in workflowVariable) {
             let regex = new RegExp("{" + param + "}", "g");
@@ -513,18 +529,20 @@ export default class Formulas {
         return listSqlite;
     }
 
+    /**
+     * Ham call api chạy công thức trên server
+     * @param String formulas 
+     * @param {key:value} dataInput 
+     */
     runSyql(formulas, dataInput = false) {
         let syql = formulas;
         syql = syql.replace(/\r?\n|\r/g, ' ');
-
         let dataPost = {
-            formula: syql,
-            data_input: JSON.stringify(dataInput)
+            formula: syql
         };
-        if (dataInput == false)
-            dataPost = {
-                formula: syql
-            };
+        if (dataInput != false) {
+            dataPost['data_input'] = JSON.stringify(dataInput);
+        }
         return formulasApi.execute(dataPost);
     }
     queryOrgchart(formulas) {

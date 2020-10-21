@@ -31,7 +31,6 @@ export default {
 	methods:{
 	},
 	mounted(){
-		console.log(this.heightListComment,'heightListCommentheightListComment');
 	},
 	components: {
 		VuePerfectScrollbar,
@@ -77,7 +76,10 @@ export default {
 	},
 	watch:{
 		searchItem(val){
+		},
+		heightListComment(val){
 		}
+
 	}
 }	
 </script>

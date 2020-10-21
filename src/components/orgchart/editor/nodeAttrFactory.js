@@ -54,9 +54,16 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
         customAttributes: [],
         id: nodeId,
         style: getNodeStyleConfig(),
-        collapseExpandStatus: 'expand' // expand | collapse
+        collapseExpandStatus: 'collapse' // expand | collapse
     };
-
+    if(nodeId == "SYMPER_HOME_ORGCHART"){
+        let isDefault = {   
+            "title": "SĐTC mặc định",
+            "type": "checkbox",
+            "value": false,
+        }
+        config.commonAttrs.isDefault = isDefault
+    }
     if (isDepartment) {
         config.positionDiagramCells = {
             instanceKey: Date.now(),
@@ -65,6 +72,7 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
     } else {
         config.users = [];
         config.permissions = [];
+        config.isSetPermissions = false;
     }
     return config;
 }
@@ -149,14 +157,30 @@ export const jointLinkNode = function(source, target) {
             },
             '.marker-arrowheads': {
                 display: 'none'
+            },
+            label: {
+                text: 'Hello',
+            },
+            isHidden: function() {
+                // If the target element is collapsed, we don't want to
+                // show the link either
+                var targetElement = this.getTargetElement();
+                return !targetElement || targetElement.isHidden();
             }
+
         },
-    }, {
         isHidden: function() {
             // If the target element is collapsed, we don't want to
             // show the link either
             var targetElement = this.getTargetElement();
             return !targetElement || targetElement.isHidden();
         }
+    }, {
+        // isHidden: function() {
+        //     // If the target element is collapsed, we don't want to
+        //     // show the link either
+        //     var targetElement = this.getTargetElement();
+        //     return !targetElement || targetElement.isHidden();
+        // }
     });
 }

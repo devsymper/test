@@ -4,7 +4,7 @@
             'containers h-100 w-100': true,
             'hide-process-palette': readOnly 
         }" ref="content">
-        <div class="symper-bpm-canvas h-100" ref="canvas"></div>
+        <div class="symper-bpm-canvas" :style="{height: height > 0 ? height+'px' : '100%!important'}" ref="canvas"></div>
         <a ref="downloadLinkXML" href></a>
         <a ref="downloadLinkSVG" href></a>
     </div>
@@ -24,6 +24,9 @@ import { util } from '../../plugins/util';
 export default {
     name: "symper-bpmn",
     props: {
+        height: {
+            default: 0
+        },
         diagramXML: {
             type: String,
             default:
@@ -73,11 +76,13 @@ export default {
                 val = val.replace(/\n/g, "");
                 self.bpmnModeler.importXML(val, function(err) {
                     if (err) {
-                        self.$emit('after-render-diagram-from-xml', {})
                         console.error(err, "errror on import XML");
+                    }else{
+                        self.$emit('after-render-diagram-from-xml', {})
                     }
                 });
             }, 100);
+     
         }
     },
     methods: {
@@ -107,7 +112,7 @@ export default {
                 });
             });
         },
-        changeElementColor(ele,data){
+        changeElementColor(ele,data,isCurrentNode=false){
             if(typeof ele == 'string'){ // Nếu truyền vào id
                 ele = this.bpmnModeler.get("elementRegistry").get(ele);
             }
@@ -205,6 +210,7 @@ export default {
             this.moddle = this.bpmnModeler.get("moddle");
             this.modeling = this.bpmnModeler.get("modeling");
             this.listenModellerEvts();
+          
         },
         saveSVG(done) {
             if (!done) {

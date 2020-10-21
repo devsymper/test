@@ -1,22 +1,34 @@
 <template>
     <div class="wraper-comment" :style="style">
-        <div class="comment-content " style="height:100%">
-				<!-- <span class="mdi mdi-keyboard-backspace" @click="hide"></span> -->
-			<Comment style="margin-left:-12px;margin-right:8px" :showComment="true" :objectIdentifier="objectIdentifierCmt" :objectType="'document'" :height="'100%'" :buttonClose="true" @close-comment="hide" />
+        <div class="comment-content " style="height:97%">
+			<Comment style="margin-left:-12px;margin-right:8px" 
+				:showComment="true" 
+				:objectIdentifier="String(objectIdentifierCmt)" 
+				:objectType="'document'" 
+				:height="'100%'"
+				:buttonClose="true" 
+				@close-comment="hide"
+			/>
         </div>
 	</div>
 </template>
 <script>
 import Comment from '@/components/common/comment/Comment.vue'
+import { parseJSON } from 'jquery'
 export default {
 	props:{
 		objectIdentifier:{
-			type: Number,
+			type: String,
 		}
 	},
-	watch:{
-		objectIdentifier(after){
-			this.objectIdentifierCmt = after + ""
+	// watch:{
+	// 	objectIdentifier(after){
+	// 		this.objectIdentifierCmt = after + ""
+	// 	}
+	// },
+	computed:{
+		objectIdentifierCmt(){
+			return parseInt(this.objectIdentifier)
 		}
 	},
 	components:{
@@ -24,13 +36,12 @@ export default {
 	},
     data () { 
         return {
-			style:'transform:translateX(300px)',
-			objectIdentifierCmt:""
+			style:'transform:translateX(400px)',
         }
     },
     methods:{
         hide(){
-			this.style = 'transform:translateX(300px)'
+			this.style = 'transform:translateX(400px)'
 			this.$emit('close-comment')
 		},
 		show(){
@@ -45,6 +56,7 @@ export default {
 		top: 0;
 		right: 0;
 		width: 400px;
+		/* left:100px; */
 		height: 100%;
 		background: white;
 		z-index: 9999;

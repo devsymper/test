@@ -116,9 +116,8 @@ export default {
 		},
 	},
 	mounted(){
-		 var x =util.getComponentSize(this);
-		 this.heightListComment = x.h - 120
-		
+		 let windowHeight = $(window).height();
+		 this.heightListComment = windowHeight - 250
 	},
 	
 	 props: {
@@ -277,25 +276,23 @@ export default {
 			this.getCommentById()
 		},
 		uuid:function(val){
-			if(val == "0"){
-				this.getCommentById()
-			}else{
-				this.getCommentByUuid()
-				this.floatComment = true
-				 var x = util.getComponentSize(this);
-				 debugger
-				 let item =  $('.symper-comment-float .comment-item')
-				 let height = 0
-				 $.each(item,function(k,v){
-					 height += $(v).height()
-				 })
-				 debugger
-				 let targetArea = $(".symper-comment-float .target-area-comment").height()
-				 if(height + targetArea + 70 > 500){
-					this.heightListComment = 500
-				 }
+			// if(val == "0"){
+			// 	this.getCommentById()
+			// }else{
+			// 	this.getCommentByUuid()
+			// 	this.floatComment = true
+			// 	 var x = util.getComponentSize(this);
+			// 	 let item =  $('.symper-comment-float .comment-item')
+			// 	 let height = 0
+			// 	 $.each(item,function(k,v){
+			// 		 height += $(v).height()
+			// 	 })
+			// 	 let targetArea = $(".symper-comment-float .target-area-comment").height()
+			// 	 if(height + targetArea + 70 > 500){
+			// 		this.heightListComment = 500
+			// 	 }
 
-			}
+			// }
 				
 		},
 		tab:function(val){
@@ -418,7 +415,5 @@ export default {
 .symper-comment >>> .content-comment-img .v-slide-group__prev{
 	padding-top:12px
 }
-.symper-comment >>> .v-dialog {
-	overflow:hidden;
-}
+
 </style>

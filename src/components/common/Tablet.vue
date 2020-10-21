@@ -6,8 +6,9 @@
         </div>
         <div class="form-tablet__body">
             <div class="form-tablet__sidebar">
-                <div v-for="(printConfig,index) in listPrintConfig" :key="index" class="print-item" @click="chooseItem($event,printConfig)">
-                    {{printConfig.title}}
+                <div v-for="(item,index) in listItem" :key="index" 
+                :class="{'active-sb':item.activeSb,'print-item':true}" @click="chooseItem(item)">
+                    {{item.title}}
                 </div>
             </div>
             <div class="form-tablet__detail">
@@ -15,35 +16,28 @@
 
                 </div>
                 <VuePerfectScrollbar>
-                    <Print v-if="formId != 0" :formId="formId" :docObjectId="docObjectId"/>
+                    <slot name="contentBinding"></slot>
                 </VuePerfectScrollbar>
             </div>
         </div>
         <div class="form-tablet__footer">
-            <button v-for="(action,index) in actions" :key="index" @click="action.action({documentObjectId:docObjectId,formId:formId})">
-                {{action.title}}
-            </button>
-            
+            <slot name="actionBinding"></slot>
         </div>
         
     </div>
 </template>
 
 <script>
-import Print from "./Print";
-import { documentApi } from "./../../../api/Document.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-
+/**
+ * hoangnd:
+ * component hiển thị view dưới dạng table
+ */
 export default {
     components:{
-        Print,
         VuePerfectScrollbar
     },
     props:{
-        documentId: {
-            type: Number,
-            default: 0 
-        },
         width:{
             type: String,
             default: '800px'
@@ -56,32 +50,34 @@ export default {
             type: String,
             default: ''
         },
-        actions:{
-            type: Object,
+        listobject:{
+            type:Object,
             default(){
-                return {
-                    close:{
-                        title: this.$t('common.close'),
-                        icon : '',
-                        action: function(data){}
-
-                    }
-                }
+                return {}
             }
-        }
+        },
+        listItem:{
+            type:Array,
+            default(){
+                return []
+            }
+        },
     },
     created(){
         let thisCpn = this;
-        documentApi.getListPrintConfig(this.documentId).then(res=>{
-            thisCpn.listPrintConfig = res.data.listObject
-        }).catch(err => {}).always(() => {});
     },
     data(){
         return {
             isShow:false,
-            docObjectId:0,
-            formId:0,
-            listPrintConfig:[]
+        }
+    },
+    watch:{
+        listobject:{
+            deep:true,
+            immediate:true,
+            handler(val){
+                this.chooseItem(this.listItem[0])
+            }
         }
     },
     methods:{
@@ -91,13 +87,16 @@ export default {
         hide(){
             this.isShow = false;
         },
-        setDocObjectId(docObjectId){
-            this.docObjectId = parseInt(docObjectId);
-        },
-        chooseItem(event,printConfig){
-            $(event.target).siblings().removeClass('active-sb');
-            $(event.target).addClass('active-sb');
-            this.formId = parseInt(printConfig.formId);
+        chooseItem(item){
+            if(!item){
+                return;
+            }
+            let oldActive = this.listItem.filter(item=>{
+                return item.activeSb == true;
+            })
+            oldActive[0].activeSb = false;
+            item.activeSb = true;
+            this.$emit('after-selected-item-tablet',item)
         }
     }
 }

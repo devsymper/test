@@ -18,7 +18,7 @@ export const store = {
             dom = comp;
         }
 
-        if (dom) {
+        if (dom && dom.getBoundingClientRect) {
             let rect = dom.getBoundingClientRect();
             return {
                 h: rect.height,
@@ -91,4 +91,7 @@ export const store = {
             }, 200);
         }
     },
+    isPromise(value) {
+        return value && value.then && typeof value.then === 'function';
+    }
 }

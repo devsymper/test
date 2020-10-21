@@ -4,7 +4,8 @@ import {
     append as svgAppend,
     attr as svgAttr,
     classes as svgClasses,
-    create as svgCreate
+    create as svgCreate,
+    innerSVG
 } from 'tiny-svg';
 
 import {
@@ -22,10 +23,10 @@ const HIGH_PRIORITY = 1500;
 
 const STATUS_COLORS = {
     done: '#52B415',
-    todo: '#ffc800',
+    todo: '#0760D9',
     overdue: '#cc0000'
 };
-
+import imgPosition from "@/assets/image/imagePosition.png";
 export default class CustomRenderer extends BaseRenderer {
     constructor(eventBus, bpmnRenderer) {
         super(eventBus, HIGH_PRIORITY);
@@ -42,13 +43,17 @@ export default class CustomRenderer extends BaseRenderer {
         const shape = this.bpmnRenderer.drawShape(parentNode, element);
         if (element.type.includes('Task')) {
             let instanceStatus = element.businessObject.$attrs.statusCount;
+            let currentNode=element.businessObject.$attrs.currentNode;
+            let infoAssignee=element.businessObject.$attrs.infoAssignee;
+            let colorSet=element.businessObject.$attrs.setColor;
+            
             let runner = 0;
             let r = 8;
+            let color;
             svgClasses(shape).add('cursor-pointer');
-
             for (let key in instanceStatus) {
                 if (instanceStatus[key]) {
-                    let color = STATUS_COLORS[key];
+                    color = STATUS_COLORS[key];
                     let rect = drawRect(parentNode, r, r, r / 2, color);
                     let offset = runner * r * 1.5;
                     svgAttr(rect, {
@@ -57,6 +62,15 @@ export default class CustomRenderer extends BaseRenderer {
                     runner += 1;
                 }
             }
+            if (currentNode) {
+                // let rect = drawRect(parentNode, r+108, r+88, 10, "#FF8003");
+                let rect = insertImage(parentNode,imgPosition,r+30, r+30);
+               
+            }
+            if (infoAssignee) {
+                insertText(parentNode,infoAssignee,colorSet);
+            }
+          
         }
         return shape;
     }
@@ -87,7 +101,6 @@ CustomRenderer.$inject = ['eventBus', 'bpmnRenderer'];
 // copied from https://github.com/bpmn-io/bpmn-js/blob/master/lib/draw/BpmnRenderer.js
 function drawRect(parentNode, width, height, borderRadius, color) {
     const rect = svgCreate('rect');
-
     svgAttr(rect, {
         width: width,
         height: height,
@@ -95,10 +108,44 @@ function drawRect(parentNode, width, height, borderRadius, color) {
         ry: borderRadius,
         stroke: color,
         strokeWidth: 2,
-        fill: color
+        fill: color+'00'
     });
 
     svgAppend(parentNode, rect);
 
     return rect;
+}
+
+function insertImage(parentNode,href, width, height) {
+    const img = svgCreate('image');
+    svgAttr(img, {
+        width: width,
+        height: height,
+        href:href,
+        x:75,
+        y:-25
+    });
+    svgAppend(parentNode, img);
+    return img;
+}
+function insertText(parentNode,infoAssignee,colorSet=null) {
+    const text = svgCreate('text');
+    const textRole = svgCreate('text');
+    svgAttr(text, {
+        x:0,
+        y:100,
+        fill:colorSet?colorSet.stroke:"#52B415"
+    });
+    svgAttr(textRole, {
+        x:0,
+        y:115,
+        fill:"#aaaaaa"
+    });
+    svgAppend(parentNode, text);
+    svgAppend(parentNode, textRole);
+    innerSVG(text,infoAssignee.assignee.displayName);
+    if (infoAssignee.role) {
+        innerSVG(textRole,infoAssignee.role.name);
+    }
+    return text;
 }

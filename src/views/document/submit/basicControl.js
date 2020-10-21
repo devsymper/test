@@ -59,19 +59,14 @@ export default class BasicControl extends Control {
         //         this.controlProperties['isSaveToDB'].value !== 1)) {
         //     this.ele.css({ display: 'none' })
         // }
-        if (!this.checkDetailView() && this.value === "" &&
-            this.controlProperties['isRequired'] !== undefined &&
-            (this.controlProperties['isRequired'].value === "1" ||
-                this.controlProperties['isRequired'].value === 1)) {
+        if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
             this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
         }
         if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
             this.ele.attr('disabled', 'disabled');
         }
 
-        if (this.controlProperties['isHidden'] != undefined &&
-            (this.controlProperties['isHidden'].value === "1" ||
-                this.controlProperties['isHidden'].value === 1)) {
+        if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
             this.ele.css({ 'display': 'none' })
         }
 
@@ -108,7 +103,6 @@ export default class BasicControl extends Control {
             this.renderDateTimeControl();
         } else if (this.ele.hasClass('s-control-file-upload')) {
             this.renderFileControl();
-
         } else if (this.ele.hasClass('s-control-user')) {
             this.renderUserControl();
 
@@ -127,9 +121,7 @@ export default class BasicControl extends Control {
         if (sDocument.state.viewType[this.curParentInstance] != 'submit') {
             this.setValueControl();
         }
-        if (sDocument.state.viewType[this.curParentInstance] == 'submit') {
-            this.setDefaultValue();
-        }
+        this.setDefaultValue();
         this.setEvent();
         if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete')) {
             let allTable = this.controlFormulas.autocomplete.instance.autocompleteDetectTableQuery();
@@ -155,8 +147,11 @@ export default class BasicControl extends Control {
      * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
      */
     setDefaultValue() {
-        if (['submit', 'update'].includes(sDocument.state.viewType[this.curParentInstance]) &&
+        if (['submit'].includes(sDocument.state.viewType[this.curParentInstance]) &&
             this.controlProperties['defaultValue'] != undefined) {
+            if (typeof this.controlProperties['defaultValue'].value == 'object') {
+                return;
+            }
             this.value = this.controlProperties['defaultValue'].value;
             this.setValueControl();
         }
@@ -187,15 +182,10 @@ export default class BasicControl extends Control {
             this.ele.on('change', function(e) {
                 let valueChange = $(e.target).val();
                 if (thisObj.type == 'label') {
-                    valueChange = $(e.target).text()
+                    valueChange = $(e.target).text();
                 }
-                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.controlProperties.name.value, val: valueChange })
-                if (thisObj.type == 'date') {
-                    if (this.formatDate != "" && typeof this.formatDate === 'string') {
-                        thisObj.value = $(this).val();
-                        $(this).val(moment($(this).val()).format(thisObj.formatDate))
-                    }
-                }
+                thisObj.value = valueChange;
+                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.name, val: valueChange })
             })
             this.ele.on('focus', function(e) {
                 store.commit("document/addToDocumentSubmitStore", {
@@ -277,6 +267,8 @@ export default class BasicControl extends Control {
                 } else if (thisObj.type == 'time') {
                     e.curTarget = e.target
                     SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', e)
+                } else if (thisObj.type == 'image') {
+                    SYMPER_APP.$evtBus.$emit('document-submit-image-click', e)
                 }
 
             });
@@ -302,7 +294,10 @@ export default class BasicControl extends Control {
             } else if (this.type == 'number') {
                 let v = parseInt(value);
                 if (!isNaN(v))
-                    $('#' + this.id).val(numbro(value).format(this.numberFormat))
+                    $('#' + this.id).val(numbro(value).format(this.numberFormat));
+                else {
+                    $('#' + this.id).val("");
+                }
             } else {
                 $('#' + this.id).val(value);
             }
@@ -326,14 +321,18 @@ export default class BasicControl extends Control {
         if (this.type == 'percent') {
             value *= 100
         } else if (this.type == 'number') {
-            if (typeof value == 'number')
-                value = numbro(value).format(this.numberFormat)
+            if (!isNaN(Number(value)))
+                value = numbro(Number(value)).format(this.numberFormat)
 
         } else if (this.type == 'date') {
             value = moment(value).format(this.formatDate);
         }
         if (this.type == 'label') {
             this.ele.text(value)
+        } else if (this.type == 'image') {
+            this.ele.empty();
+            let image = '<img height="70" src="' + value + '">';
+            this.ele.append(image);
         } else {
             this.ele.val(value)
         }
@@ -341,6 +340,13 @@ export default class BasicControl extends Control {
         if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
             this.defaultValue = value;
         }
+    }
+    formatNumberValue(data) {
+        let value = data;
+        let formatPt = this.getNumberFormat();
+        if (!isNaN(Number(value)) && formatPt)
+            value = numbro(Number(value)).format(formatPt);
+        return value;
     }
 
     /**
@@ -451,7 +457,7 @@ export default class BasicControl extends Control {
                             </div>`
                     thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name)
                     thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
-                    let curValue = sDocument.state.submit[this.curParentInstance].listInputInDocument[thisObj.name].value;
+                    let curValue = sDocument.state.submit[thisObj.curParentInstance].listInputInDocument[thisObj.name].value;
                     let tableName = thisObj.inTable;
                     if (tableName != false) {
                         if (!Array.isArray(curValue)) {
@@ -463,15 +469,16 @@ export default class BasicControl extends Control {
                         curValue[rowId].push(response.data.name);
                     } else {
                         curValue += "," + response.data.name;
-                        this.value = curValue;
+                        thisObj.value = curValue;
                     }
                     store.commit("document/updateListInputInDocument", {
                         controlName: thisObj.name,
                         key: 'value',
-                        value: curValue
+                        value: curValue,
+                        instance: thisObj.curParentInstance
                     });
                     if (tableName != false) {
-                        sDocument.state.submit[this.curParentInstance].listInputInDocument[tableName].tableInstance.tableInstance.render();
+                        sDocument.state.submit[thisObj.curParentInstance].listInputInDocument[tableName].tableInstance.tableInstance.render();
                     }
 
                 }
@@ -481,6 +488,7 @@ export default class BasicControl extends Control {
     setDeleteFileEvent(ele, controlName) {
         let listInputInDocument = sDocument.state.submit[this.curParentInstance].listInputInDocument
         let value = listInputInDocument[controlName].value;
+        let thisObj = this;
         ele.off('click', '.remove-file')
         ele.on('click', '.remove-file', function(e) {
             let rowId = $(this).attr('data-rowid');
@@ -501,15 +509,19 @@ export default class BasicControl extends Control {
             store.commit("document/updateListInputInDocument", {
                 controlName: controlName,
                 key: 'value',
-                value: newValue
+                value: newValue,
+                instance: thisObj.curParentInstance
             });
         })
+    }
+    getNumberFormat() {
+        return (this.controlProperties.hasOwnProperty('formatNumber')) ? this.controlProperties.formatNumber.value : "";
     }
     renderNumberControl() {
         let thisObj = this;
         this.ele.css('text-align', 'right');
         this.ele.attr('type', 'text');
-        this.numberFormat = (this.controlProperties.hasOwnProperty('formatNumber')) ? this.controlProperties.formatNumber.value : "";
+        this.numberFormat = this.getNumberFormat();
         this.ele.on('blur', function(e) {
             if ($(this).val() == "") {
                 thisObj.ele.removeClass('error');
@@ -518,7 +530,7 @@ export default class BasicControl extends Control {
                 if (/^[-0-9,.]+$/.test($(this).val())) {
                     thisObj.ele.removeClass('error')
                     thisObj.ele.removeAttr('valid');
-                    if (this.numberFormat) {
+                    if (thisObj.numberFormat) {
                         $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
                     } else {
                         if (/,|\.$/.test($(this).val())) {
@@ -539,7 +551,7 @@ export default class BasicControl extends Control {
         })
         this.ele.on('focus', function(e) {
             if (/^[-0-9,.]+$/.test($(this).val())) {
-                $(this).val(thisObj.value)
+                $(this).val($(this).val())
             }
         })
     }
@@ -561,8 +573,12 @@ export default class BasicControl extends Control {
                 let user = listUser.filter(u => {
                     return u.id == this.value
                 })
-                this.value = user[0].displayName;
-                this.ele.val(this.value)
+                if (user[0]) {
+                    this.value = user[0].displayName;
+                    this.ele.val(this.value)
+                } else {
+                    this.ele.val(this.value)
+                }
             }
 
         } else {
@@ -572,12 +588,6 @@ export default class BasicControl extends Control {
         }
     }
     renderLabelControl() {
-        let id = this.ele.attr('id');
-        let thisObj = this;
-        let keyinstance = this.ele.attr('key-instance');
-        // this.ele.parent().css({ 'width': '60%' });
-        // this.ele.replaceWith('<input class="s-control s-control-label" s-control-type="label" type="text" disabled title="Label" id="' + id + '" style="width:100%;border:none;" key-instance="' + keyinstance + '">');
-        this.ele = $('#' + id);
         this.ele.text('').css({ border: 'none' })
     }
     renderSelectControl(isReadOnly = true) {
@@ -593,7 +603,11 @@ export default class BasicControl extends Control {
                 return;
             }
             let formulasInstance = thisObj.controlFormulas.list.instance;
-            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title })
+            let isSingleSelect = false;
+            if (thisObj.type == 'combobox') {
+                isSingleSelect = thisObj.checkProps('isSingleSelect');
+            }
+            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title, type: thisObj.type, isSingleSelect: isSingleSelect })
         });
     }
 
@@ -611,6 +625,7 @@ export default class BasicControl extends Control {
     renderDateControl() {
         this.ele.attr('type', 'text');
         this.formatDate = (this.controlProperties.hasOwnProperty('formatDate')) ? this.controlProperties.formatDate.value : "";
+        console.log('this.formatDatethis.formatDate', this.formatDate);
         if (this.checkDetailView()) return;
     }
     renderTimeControl() {

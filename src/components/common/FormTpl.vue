@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-1">
+    <div class="mt-1 symper-form-input">
         <div
             v-for="(inputInfo, name) in allInputs"
             :key="name"
@@ -40,7 +40,7 @@
                     :class="{'mdi mdi-function float-right input-item-func': true, 'active':inputInfo.activeTab == 'script'}"
                     @click="changeAssignmentType(inputInfo, name, 'script')"
                     style="border-right: 1px solid #cccccc; "
-                    v-if="inputInfo.type == 'userAssignment'"
+                    v-if="inputInfo.type == 'userAssignment' "
                 ></i>
                 <i
                     :class="{'mdi mdi-sitemap float-right input-item-func': true, 'active':inputInfo.activeTab == 'orgchart'}"
@@ -98,7 +98,19 @@
             :showPanel="largeFormulaEditor.open"
             :actionTitle="largeFormulaEditor.data.title"
             :panelData="largeFormulaEditor.data"
+            :dragPanelWidth="dragPanelWidth"
+            :dragPanelHeight="dragPanelHeight"
             ref="dragPanel">
+            <template slot="panel-action">
+                <v-icon
+                    v-if="isDebugMode && !isShowDebugMode"
+                    @click="showDebugMode"
+                >mdi-bug-outline</v-icon>
+                <v-icon
+                    v-if="isShowDebugMode"
+                    @click="debug"
+                >mdi-play-outline</v-icon>
+            </template>
             <template slot="drag-panel-content" slot-scope="{panelData}">
                 <orgchart-selector
                     @input="translateOrgchartValuesToTags"
@@ -119,7 +131,8 @@
                     v-model="panelData.value"
                     ref="edtFormula"
                     :width="'100%'"
-                    :height="'370px'"
+                    :height="isShowDebugMode ? '250px' : '365px'"
+                    :isDebugView="true"
                 ></formula-editor>
             </template>
         </symper-drag-panel>
@@ -150,6 +163,7 @@ import DateTimePicker from './../common/DateTimePicker.vue';
 import SymperListOrdering from "./../common/symperInputs/SymperListOrdering";
 import SymperListAutocomplete from "./../common/symperInputs/SymperListAutocomplete";
 import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicker.vue";
+import SymperDefaultControlDocument from "@/components/common/symperInputs/SymperDefaultControlDocument.vue";
 
 const inputTypeConfigs = {
     numeric: {
@@ -225,7 +239,7 @@ const inputTypeConfigs = {
             return {
                 simpleMode: true,
                 width: "100%",
-                height: "80px",
+                height: (config.style && config.style.height) ? config.style.height : '80px',
                 formulaValue: config.value
             };
         }
@@ -246,10 +260,17 @@ const inputTypeConfigs = {
             let props = {
                 columns: config.columns,
                 data: config.value,
-                showId: config.hasOwnProperty('showId') ? config.showId : true
+                multipleSelection: config.multipleSelection,
+                showId: config.hasOwnProperty('showId') ? config.showId : true,
+                isSelectionChip:(config.isSelectionChip == false) ? false : true,
+                value: config.value
+                
             };
             if(config.onSearch){
                 props.onSearch  = config.onSearch;
+            }
+            if(config.properties){
+                props.properties = config.properties
             }
 
             if(config.textKey){
@@ -301,10 +322,32 @@ const inputTypeConfigs = {
             }
         }
     },
+    defaultControlDocument:{
+        tag:"default-control-document",
+        props(config){
+            return{
+                docId: config.docId
+            }
+        }
+    }
 };
 export default {
+    name:"formTpl",
+    created(){
+        this.setActiveTabForUserAssignment();
+    },
+    watch: {
+        allInputs: {
+            immediate: true,
+            deep: true,
+            handler(){
+                this.setActiveTabForUserAssignment();
+            }
+        }
+    },
     data() {
         return {
+            markAllInputChangeByInternal: false, // đánh dấu một key trong allInput thay đổi là do trong component thay đổi ko phải do compoennt cha thay đổi
             alwaysSingleLine: {
                 checkbox: true,
                 switch: true,
@@ -315,15 +358,56 @@ export default {
                 open: false, // có mở largeFormulaEditor hay ko
                 data: {}, // Dữ liệu của input cần mở lên để edit trong khung lớn,
             },
-            currentPointer:{left:'35px',top:'0'}
+            currentPointer:{left:'35px',top:'0'},
+            dragPanelWidth:500,
+            isShowDebugMode:false,
+            isDebugMode:true,
+            dragPanelHeight:400
         };
     },
     methods: {
+        /**
+         * hoangnd
+         * Hàm mở sang chế độ debug để kiểm tra công thức
+         * (syntax, query...)
+         */
+        showDebugMode(){
+            this.isShowDebugMode = true;
+            this.dragPanelWidth = 900;
+            this.dragPanelHeight = 700;
+            this.$refs.edtFormula.toggleDebugView();
+        },
+        /**
+         * hoangnd
+         * Ẩn chế độ debug
+         */
+        hideDebugMode(){
+            this.isShowDebugMode = false;
+            this.dragPanelWidth = 500;
+            this.dragPanelHeight = 400;
+            this.$refs.edtFormula.toggleDebugView();
+        },
+        /**
+         * Hàm thực thi query khi ấn debug
+         */
+        debug(){
+            this.$refs.edtFormula.executeFormulas();
+        },
+        setActiveTabForUserAssignment(){
+            if(!this.markAllInputChangeByInternal){
+                for(let inputName in this.allInputs){
+                    let input = this.allInputs[inputName];
+                    if(input.type == 'userAssignment' && input.value.formula){
+                        this.allInputs[inputName].activeTab = 'script';
+                    }
+                }
+            }
+        },
         handleClickAppend(){
             this.$emit('append-icon-click');
         },
         handleLargeFormulaEditorBlur(){
-            this.hideDragPanel();
+            // this.hideDragPanel();
             let name = this.largeFormulaEditor.name;
             let inputInfo = this.allInputs[name];
             this.handleInputBlur(inputInfo, name);
@@ -385,9 +469,17 @@ export default {
         },
         changeAssignmentType(inputInfo, name, type) {
             this.$refs["inputItem_" + name][0].switchToTab(type);
+            this.markAllInputChangeByInternal = true;
             inputInfo.activeTab = type;
+
+            setTimeout((self) => {
+                self.markAllInputChangeByInternal = false;
+            }, 50, this);
         },
         closeLargeFormulaEditor() {
+            if(this.isShowDebugMode){
+                this.hideDebugMode();
+            }
             let info = this.largeFormulaEditor;
             setTimeout((self) => {
                 self.largeFormulaEditor.name = '';
@@ -534,7 +626,8 @@ export default {
         SymperListOrdering: SymperListOrdering,
         SymperListAutocomplete,
         "datetime-picker" : DateTimePicker,
-        SymperColorPicker: SymperColorPicker
+        SymperColorPicker: SymperColorPicker,
+        "default-control-document":SymperDefaultControlDocument
 
     }
 };

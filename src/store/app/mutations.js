@@ -1,6 +1,10 @@
 const changeCollapseSidebar = (state, newValue) => {
     state.collapseSideBar = newValue;
 };
+const changeStatus = (state, newValue) => {
+    state.endUserInfo.status = newValue;
+};
+
 const decreaseUnreadNotification = (state, delta = 1) => {
     state.unreadNotification -= delta;
 };
@@ -62,6 +66,10 @@ const setOrgchartNodes = (state, orgchartNodes) => {
 const setAllUsers = (state, allUsers) => {
     Vue.set(state, 'allUsers', allUsers);
 }
+const setAllSymperRoles = (state, allSymperRoles) => {
+    Vue.set(state, 'allSymperRoles', allSymperRoles);
+}
+
 const setAllBA = (state, allBA) => {
     Vue.set(state, 'allBA', allBA);
 }
@@ -90,5 +98,7 @@ export {
     setAllUsers,
     setAllBA,
     setUserRoleByType,
-    setUserActionsForObjects
+    setUserActionsForObjects,
+    setAllSymperRoles,
+    changeStatus
 };

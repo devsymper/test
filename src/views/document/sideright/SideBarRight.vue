@@ -76,7 +76,7 @@
             </VuePerfectScrollbar>
         </v-tab-item>
         <v-tab-item
-            class="p-2 h-100 formulas-control-tab"
+            class="h-100 formulas-control-tab"
         >
         <VuePerfectScrollbar style="height:calc(100vh - 90px);">
             <control-props-config 
@@ -127,14 +127,13 @@ export default {
     },
     watch:{
         "controlPropsGroup.table.mapParamsDataflow.value":function(after){
-            // debugger    
         },
         /**
          * Tự động focus vào input name sau khi chọn control
          */
         "controlPropsGroup.name":function(){
             setTimeout(() => {
-                $('.sym-v-expand-content input').first().focus();
+                // $('.sym-v-expand-content input').first().focus();
             }, 200);
         }
         
@@ -186,8 +185,12 @@ export default {
             if(input.groupType == "formulas"){
                 this.handleValidateControl(name, input, data);
             }
-            if(['numberFormat','checkbox','formatDate'].includes(input.type)){
+            if(['numberFormat','checkbox','dateFormat'].includes(input.type)){
                 input.value = data
+                this.handleValidateControl(name, input, data);
+            }
+            else if(name == 'dataFlowId'){
+                input.value = {id:input.value}
                 this.handleValidateControl(name, input, data);
             }
         },
@@ -196,9 +199,11 @@ export default {
             let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
             if(name == "width"){
                 elements.css({width:value});
+                elements.attr('data-mce-style',elements.attr('style'))
             }
             if(name == "height"){
                 elements.css({height:value});
+                elements.attr('data-mce-style',elements.attr('style'))
             }
             let tableId = checkInTable(elements);
             if( tableId == this.sCurrentDocument.id)
@@ -238,5 +243,11 @@ export default {
     }
     .sym-v-expand-content{
         padding-left: 8px;
+    }
+    .formulas-control-tab ::v-deep .symper-form-input{
+        margin-right: 10px;
+    }
+    .formulas-control-tab{
+        padding: 0.5rem 0 0.5rem 0.5rem !important;
     }
 </style>

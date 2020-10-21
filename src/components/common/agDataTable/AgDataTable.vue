@@ -19,6 +19,7 @@
                  :frameworkComponents="frameworkComponents"
                  :modules="modules"
                  :getDataPath="getDataPath"
+                 @grid-ready="onGridReady"
                  >
     </ag-grid-vue>
 </template>
@@ -62,6 +63,10 @@ export default {
             default(){
                 return {}
             }
+        },
+        minWidth:{
+            type: Number,
+            default:400
         },
 
         // tìm keyword trong https://www.ag-grid.com/javascript-grid-provided-renderer-group/ để biết thêm thông tin chi tiết
@@ -112,16 +117,30 @@ export default {
             filter: true,
             sortable: true,
             resizable: true,
+            // cellStyle: (params) => {
+            //     const { level } = params.node;
+            //     const groupCell = params.value === params.node.key;
+            //     const indent = 22; // change this value to your liking
+            //     if (!groupCell) {
+            //         return {
+            //             paddingLeft: (level + 1) * indent + "px",
+            //             marginBottom: 10+"px",
+            //         };
+            //     }
+            // }
         };
         this.autoGroupColumnDef = { minWidth: 100 };
         this.gridOptions = {};
+        // this.gridOptions.rowStyle = { height: '21px', background: "#f7f7f7" ,padding: "unset",marginBottom:"-10px" }  
+        this.gridOptions.rowHeight = 20;
         this.columns = this.allColumns;
         this.rowDataTable = this.rowData;
         this.autoGroupColumnDef = {
             editable:this.editable,
             field:'name',
             headerName: 'Tên',
-            minWidth: 200,
+            minWidth: this.minWidth,
+
             cellRendererParams: this.cellRendererParams,
             valueSetter: function(params){
                 let x = util.cloneDeep(params.newValue)
@@ -150,7 +169,6 @@ export default {
     },
     
     mounted(){
-        // this.gridOptions.api.sizeColumnsToFit();
     },  
     methods:{
         refreshData(columns){
@@ -182,7 +200,10 @@ export default {
             this.$emit('on-cell-change',params)
         },
         cellDoubleClick(params){
-            this.$emit('on-cell-db-click',params)
+            this.$emit('on-cell-dbl-click',params)
+        },
+        onGridReady(param){
+            this.$emit('grid-ready', param)
         }
         
     },
@@ -193,6 +214,7 @@ export default {
 <style scoped>
     .like-handson-table >>> .ag-header{
         background-color: #FFFFFF;
+        
     }
     .like-handson-table >>> .ag-header-icon .ag-icon{
         display: inline-block;
@@ -206,4 +228,44 @@ export default {
     .like-handson-table >>> .ag-cell-wrapper span{
         margin-left:0px
     }
+    .like-handson-table >>> .ag-cell-wrapper .ag-row-group .ag-row-group-indent-3 {
+        padding-left: 0px !important;
+    }
+     .like-handson-table >>> .ag-header{
+        min-height:unset !important;
+        height: 26px !important;
+    }
+     .like-handson-table >>> .ag-header .ag-header-cell-text,
+     .like-handson-table >>> .ag-header .ag-header-icon{
+         margin-bottom:9px;
+         font:12px roboto;
+         font-weight: 600;
+    }
+     .like-handson-table >>> .ag-row{
+         /* transform: translateY(20px) !important; */
+    }
+    /* .like-handson-table >>> .ag-cell-wrapper.ag-row-group[class*="ag-row-group-indent"],
+    .like-handson-table >>> .ag-cell-wrapper.ag-row-group-leaf-indent[class*="ag-row-group-indent"] {
+      padding-left: 2;
+    } */
+    .like-handson-table >>> .ag-cell-wrapper.ag-row-group{
+        align-items:unset !important;
+    }
+    .like-handson-table >>> .ag-cell{
+        margin-bottom:unset;
+    }
+    .like-handson-table >>> .ag-cell-wrapper {
+        /* height:unset !important */
+    }
+    .like-handson-table >>> .ag-cell{
+        line-height: unset !important;
+    }
+    .like-handson-table >>> .ag-group-child-count{
+        display:none !important;
+    }
+    .like-handson-table >>> .ag-group-expanded,
+    .like-handson-table >>> .ag-group-contracted{
+        height: unset !important;
+    }
+   
 </style>

@@ -1,6 +1,5 @@
 <template>
     <div class="d-flex w-100 h-100">
-        <!-- <NodeSelector class="border-right-1"></NodeSelector> -->
         <div class="h-100 flex-grow-1">
             <div class="border-bottom-1 pt-1 pl-2">
                 <v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
@@ -27,7 +26,7 @@
                             <v-icon size="21" v-on="on">mdi-plus-thick</v-icon>
                         </v-btn>
                     </template>
-                    <span>them node moi </span>
+                    <span>thêm node moi </span>
                 </v-tooltip>
                 <v-btn
                     v-if="action != 'view' && context == 'department'"
@@ -45,7 +44,7 @@
                 position: absolute;
                 width: calc(100% - 267px);
                 height: 100%;
-                background-color: white;
+                background-color: white; 
                 z-index: 99;">
                 <v-progress-circular
                     :size="50"
@@ -154,11 +153,11 @@ export default {
     data(){
         return {
             loadingDiagramView: true,
+            typeView: "B",
 			positionEditor: false,
 			checkPageEmpty: false,
 			listUserIds:null,
             headerActions: {
-              
                 zoomIn: {
                     icon: "mdi-plus-circle-outline",
                     text: "process.header_bar.zoom_out",
@@ -184,7 +183,11 @@ export default {
                 home: {
                     icon: "mdi-home-outline",
                     text: ""
-				},
+                },
+                changeTypeView:{
+                    icon: "mdi-align-vertical-center",
+                    text: "change type view"
+                }
 				
             },
         }
@@ -306,6 +309,7 @@ export default {
             homeConfig.commonAttrs.name.value = config.name;
             homeConfig.commonAttrs.description.value = config.description;
             homeConfig.commonAttrs.code.value = config.code;
+            homeConfig.commonAttrs.isDefault.value = config.isDefault == "1" ? true : false;
             homeConfig.customAttributes = config.dynamicAttributes;
         },
         correctDiagramDisplay(content){
@@ -331,6 +335,10 @@ export default {
                     let departments = this.correctDiagramDisplay(savedData.orgchart.content);
                     this.$refs.editorWorkspace.loadDiagramFromJson(departments);
                     this.centerDiagram();
+                    if(this.action == "clone"){
+                        savedData.orgchart.code = ""
+                        savedData.orgchart.name = ""
+                    }
                     this.restoreMainOrgchartConfig(savedData.orgchart);
                     let mapIdToDpm = {};
 
@@ -343,7 +351,7 @@ export default {
                             users: this.getListUserAsArr(node.users)
                         };
 
-                        if(node.content && node.content !== 'false'){
+                        if(node.content && node.content !== 'false'){ 
                             nodeData.positionDiagram = {
                                 cells: JSON.parse(node.content)
                             }         
@@ -381,8 +389,6 @@ export default {
                     this.showOrgchartConfig();
                     setTimeout((self) => {
                         self.loadingDiagramView = false;
-                    //  this.$refs.editorWorkspace.createFirstVizNode()
-
                     }, 1500, this);
                 }else{
                     this.$snotifyError(res, "Can not get orgchart data",res.message);
@@ -442,7 +448,7 @@ export default {
 				this.$store.commit('orgchart/updateCurrentFatherNode',{id:nodeId,instanceKey:this.instanceKey})
 				this.positionEditor = true;
 				this.$store.commit('orgchart/updateInstanceKey', this.instanceKey)
-				this.selectNode(nodeId);
+                this.selectNode(nodeId);
                 setTimeout((self) => {
 					self.checkAndCreateOrgchartData();
                     if(self.selectingNode.positionDiagramCells.cells){
@@ -464,6 +470,8 @@ export default {
                     self.$refs.positionDiagram.centerDiagram();
                     self.$refs.positionDiagram.$refs.editorWorkspace.scrollPaperToTop(200);
                     self.$refs.positionDiagram.showOrgchartConfig();
+                    self.$refs.positionDiagram.$refs.editorWorkspace.changeTypeView(self.typeView);
+
                 }, 200, this);
             }
         },
@@ -479,6 +487,7 @@ export default {
 				this.$refs.positionDiagram.initOrgchartData();
             }
             this.$store.state.orgchart.editor[subInstanceKey].homeConfig = this.selectingNode;
+            
         },
         storeDepartmentPositionCells(){
             let cells = this.$refs.positionDiagram.$refs.editorWorkspace.getAllDiagramCells();
@@ -602,11 +611,14 @@ export default {
                     }
                     let dpm = allDpmns[dpmId];
                     let posNodeIds = []
-                    dpm.positionDiagramCells.cells.cells.forEach(function(e){
-                        if(e.type == "Symper.Position"){
-                            posNodeIds.push(e.id)
-                        }
-                    })
+                    if(dpm.positionDiagramCells.cells != false){
+                          dpm.positionDiagramCells.cells.cells.forEach(function(e){
+                            if(e.type == "Symper.Position"){
+                                posNodeIds.push(e.id)
+                                }
+                            })
+                    }
+                  
                     let allPos = self.$store.state.orgchart.editor[dpm.positionDiagramCells.instanceKey].allNode;
                     let resAllPos = []
                     posNodeIds.forEach(function(e){
@@ -669,6 +681,7 @@ export default {
 
             if(passed){
                 let orgchartData = this.getDataToSave();
+                debugger
                 this.$emit('save-orgchart-data', orgchartData);    
             }
         },
@@ -682,7 +695,8 @@ export default {
                 description: orgchartAttr.commonAttrs.description.value,
                 dynamicAttrs: JSON.stringify(orgchartAttr.customAttributes),
                 name: orgchartAttr.commonAttrs.name.value,
-                code: orgchartAttr.commonAttrs.code.value
+                code: orgchartAttr.commonAttrs.code.value,
+                isDefault: orgchartAttr.commonAttrs.isDefault.value == true ? 1 : 0
 			};
             return data;
         },
@@ -760,10 +774,12 @@ export default {
                 }
             }else{
                 data.users = typeof node.users == 'string' ? JSON.parse(node.users) : node.users;
-                data.permissions = node.permissions.reduce((arr, el) => {
-                    arr.push(el.id);
-                    return arr;
-                }, []);
+                if(node.isSetPermissions){
+                    data.permissions = node.permissions.reduce((arr, el) => {
+                        arr.push(el.id);
+                        return arr;
+                    }, []);
+                }
             }
             return data;
         },
@@ -822,6 +838,11 @@ export default {
                 if(passed){
                     this.$snotifySuccess("Validate passed!");  
                 }
+            }else if(action == "changeTypeView"){
+                let type = this.typeView == "B" ? "R" : "B"
+                this.typeView = type
+                this.$refs.editorWorkspace.changeTypeView(type);
+                // this.$refs.positionDiagram.$refs.editorWorkspace.changeTypeView(type);
             }else{
                 this.$refs.editorWorkspace.handleHeaderAction(action);
             }
@@ -889,6 +910,7 @@ export default {
          
             this.$refs.editorWorkspace.highlightNode(); 
             if(this.context == 'position'){
+                this.selectingNode.isSetPermissions = true;
                 this.showPermissionsOfNode();
             }       
         },

@@ -1,5 +1,5 @@
 <template>
-  <div class="end-user-popup"> 
+  <div class="end-user-popup" > 
 	<v-card> 
 		<v-tabs
 			v-model="tab"
@@ -167,8 +167,8 @@ export default {
 		 }
 	},
 	created(){
-		this.getActiveapps()
-		this.getFavorite()
+            this.getActiveapps()
+			this.getFavorite()
 	},
 	mounted(){
 		 let thisCpn = this;
@@ -179,6 +179,7 @@ export default {
 			});
 			$(document).click(function(e){
 				if(!$(e.target).is('.context-menu')){
+					$(".context-menu").css("display", "none")
 					if(thisCpn.tab == 'tab-1'){
 						thisCpn.$refs.contextMenu.hide()
 					}else{
@@ -198,14 +199,21 @@ export default {
 		},
 		sFavorite(){
 			return this.$store.state.appConfig.listFavorite
-		}
+		},
+		listApp(){
+            return this.$store.state.appConfig.listApps
+		},
+		
+		
 	},
+	
 	methods:{
 		getActiveapps(){
 			appManagementApi.getActiveApp().then(res => {
 				this.loadingApp = false
 				if (res.status == 200) {
 					this.apps = res.data.listObject
+					// this.$store.commit('appConfig/setListApps', res.data.listObject)
 				}
 			}).catch((err) => {
 			});
@@ -327,7 +335,7 @@ export default {
 			if(!item.actions.includes('unfavorite')){
 				item.actions.push('unfavorite')
 			}
-			this.$refs.contextMenu.setContextItem(item.actions)
+			this.$refs.contextMenu.setContextItem([...new Set(item.actions)])
 			this.$refs.contextMenu.show(event)
 			this.$refs.contextMenu.setItem(item)
 			this.$refs.contextMenu.setType(type)

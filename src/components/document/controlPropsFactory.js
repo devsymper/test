@@ -5,14 +5,18 @@ import {
 // đầu ra: tất cả các thuộc tính của control đó
 const commonProps = {
     dataFlowId: {
-        title: "dataflow id",
+        title: "Dataflow",
         type: "autocomplete",
         groupType: "name",
-        // items: function() {
-        //     debugger
-        //     return [];
-        // },
         options: [],
+        properties: {
+            dense: true,
+            solo: true,
+            'hide-details': true,
+            flat: true,
+        },
+        isSelectionChip: false,
+        value: {}
     },
     name: {
         title: "Tên",
@@ -407,7 +411,7 @@ let commonFormulas = {
         groupType: "formulas"
     },
     submit: {
-        title: "Công thức submit",
+        title: "Công thức sau submit",
         value: "",
         formulasId: 0,
         type: "script",
@@ -434,14 +438,14 @@ let groupType = {
 const controlTypes = {
     labelPrint: {
         icon: `/icon/ic_label.png`,
-        html: `<span class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label">Aa</span>&nbsp;`,
+        html: `<label class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label">Aa</label>&nbsp;`,
         title: "Label in",
         inProps: ['width', 'color', 'fontSize'],
         formulas: ['formulas']
     },
     label: {
         icon: `/icon/ic_label.png`,
-        html: `<span class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label">Aa</span>&nbsp;`,
+        html: `<label class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label">Aa</label>&nbsp;`,
         title: "Label",
         notInProps: ['isQuickSubmit', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'formatDate', 'isSumTable', 'isReadOnly'],
         formulas: ['link', 'formulas', 'hidden']
@@ -458,10 +462,9 @@ const controlTypes = {
     },
     image: {
         icon: "/icon/ic_image.png",
-        html: `<span class="s-control s-control-image" contenteditable="false"  title="Image" style="cursor: pointer;text-align: center;display: inline-block;width: 25px;height: 25px;" s-control-type="image">
+        html: `<label class="s-control s-control-image" contenteditable="false"  title="Image" style="cursor: pointer;text-align: center;display: inline-block;width: 25px;height: 25px;" s-control-type="image">
                     <span class="mdi mdi-image-area" style="font-size: 22px;color: #757575;"></span>
-                    <input type="hidden" >
-                </span>&nbsp;`,
+                </label>&nbsp;`,
         title: "Image",
         notInProps: ['isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatDate', 'fontSize', 'color', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['link', 'formulas', 'hidden']
@@ -673,7 +676,7 @@ const controlTypes = {
     },
     dataFlow: {
         icon: "/icon/ic_report.png",
-        html: `<div class="s-control s-control-data-flow" contenteditable="false" title="Data Flow" s-control-type="dataFlow" style="display: inline-block;font-size: 11px;width: 100%;max-width: 100%;position:relative;" >
+        html: `<div class="s-control s-control-data-flow" contenteditable="false" title="Data Flow" s-control-type="dataFlow" >
                     <button class="run-dataflow d-none"><span class="mdi mdi-play-outline"></span></button>
                     <div>
                         <span class="panel-title2" style="background: #f2f2f2;color: gray;height: 30px;font-weight: bold;width: 100%;text-align: center;display: inline-block;line-height: 2.5;">Data Flow</span>
@@ -690,7 +693,7 @@ const controlTypes = {
                     </div>
                 </div>&nbsp;`,
         title: "Data Flow",
-        inProps: ['dataFlowId', 'mapParamsDataflow', 'name', 'title', 'width', 'height', 'isAllowPrint'],
+        inProps: ['mapParamsDataflow', 'name', 'title', 'dataFlowId', 'width', 'height', 'isAllowPrint'],
         formulas: []
     },
     approvalHistory: {

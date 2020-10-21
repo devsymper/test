@@ -30,6 +30,7 @@ export default class ActionControl extends Control {
             console.log(this.value);
             let thisCpn = this;
             let listUser = store.state.app.allUsers;
+            thisCpn.ele.empty();
             documentApi.getListApprovalHistory(this.value).then(res => {
                     if (res.status == 200) {
                         let data = res.data;
@@ -45,11 +46,12 @@ export default class ActionControl extends Control {
                                     user = user[0]
                                 }
                                 let item = `<div class="approved-item">
-                                                            <span>Người duyệt ` + index + 1 + `: </span>  <img src="https://file.symper.vn/readFile/user_avatar_` + user.id + `" style="    height: 18px;
+                                                            <span> </span>  <img src="https://file.symper.vn/readFile/user_avatar_` + user.id + `" style="    height: 18px;
                                                             border-radius: 50%;
                                                             width: 18px;
-                                                            margin-bottom: -4px;"> <strong>` + user.displayName + `</strong> <span>đã duyệt ` + moment(approvalHistory.createAt).fromNow() + ` ( ` + approvalHistory.createAt + ` )</span>
+                                                            margin-bottom: -4px;"> <strong>` + user.displayName + `</strong> <span>Thực hiện <span style="font-weight:500;">` + approvalHistory.actionTitle + "</span> " + moment(approvalHistory.createAt).fromNow() + ` ( ` + approvalHistory.createAt + ` )</span>
                                                         </div>`
+                                console.log("asdsadsad#D", thisCpn);
                                 thisCpn.ele.append(item)
                             }
                         }

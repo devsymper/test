@@ -24,6 +24,7 @@
                     @document-action-check-control="checkBeforeControlNameChange"
                     @document-action-swap-type-control="openPanelSwapType"
                     @document-action-control-template="showFormAddControlTemplate"
+                    @document-action-preview-submit="previewSubmitDocument"
                     />
                 </div>
                 <textarea ref="editorLibWrapper" :id="'document-editor-'+keyInstance">
@@ -65,14 +66,23 @@
 
         <v-dialog v-model="dialog" persistent max-width="290">
             <v-card>
-                <v-card-title class="headline">{{titleDialog}}</v-card-title>
+                <v-card-title class="notice-title">{{titleDialog}}</v-card-title>
                 <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn color="green darken-1" text @click="dialog = false">Hủy bỏ</v-btn>
                 <v-btn color="green darken-1" text @click="acceptDialog">Đồng ý</v-btn>
                 </v-card-actions>
             </v-card>
-            </v-dialog>
+        </v-dialog>
+        <v-dialog v-model="isShowPreviewSubmit" max-width="800" :style="{
+            'overflow':'hidden',
+            'background':'white'            
+        }">
+            <Submit
+                :showSubmitButton="false"
+                ref="subSubmitView" 
+                :dataPreview="dataPreviewSubmit"/>
+        </v-dialog>
     </v-flex>
 </template>
 <script>
@@ -103,6 +113,7 @@ import { getInsertionCSS } from "./../../components/document/documentUtil.js";
 import VueResizable from 'vue-resizable';
 import { minimizeControl } from '../../store/document/mutations';
 
+import Submit from './submit/Submit'
 import tinymce from 'tinymce/tinymce';
 
 import 'tinymce/icons/default';
@@ -117,7 +128,7 @@ import 'tinymce/plugins/image';
 import 'tinymce/plugins/table';
 import 'tinymce/plugins/print';
 import 'tinymce/plugins/preview';
-import 'tinymce/plugins/code';
+// import 'tinymce/plugins/code';
 import 'tinymce/plugins/fullscreen';
 import 'tinymce/plugins/paste';
 import 'tinymce/plugins/hr';
@@ -129,6 +140,9 @@ const CODUMENT_PROPS = "documentProperties"
 export default { 
     name: 'DocumentEditor',
     computed: {
+        routeName(){
+            return this.$getRouteName();
+        },
         editorStore(){  
             return this.$store.state.document.editor[this.keyInstance];
         },
@@ -140,6 +154,9 @@ export default {
         },
         allControlTemplate(){  
             return this.$store.state.document.editor[this.keyInstance].allControlTemplate;
+        },
+        allControlDeleted(){  
+            return this.$store.state.document.editor[this.keyInstance].allControlDeleted;
         },
     }, 
     components: {
@@ -157,27 +174,31 @@ export default {
         MaterialIcon,
         PrintTableConfig,
         QuickInfoControl,
-        FormModal
+        FormModal,
+        Submit
     },
     mounted(){
         let self = this;
-         tinymce.init({
+        tinymce.init({
             theme: 'silver',
             skin: 'oxide',
             selector:  '#document-editor-'+self.keyInstance,
             forced_root_block:'div',
             toolbar_items_size : 'small',
             menubar: false,
+            branding: false,
+            draggable_modal: true,
+            toolbar_mode: 'sliding',
             plugins: [
             'advlist autolink lists link image table print preview',
             ' fullscreen',
-            'table paste code hr'
+            'table paste hr'
             ],
             contextmenu: 'inserttable table | settingtable | dragTable',
             toolbar:
             'undo redo | fontselect fontsizeselect formatselect pageSize| bold italic forecolor backcolor | \
             alignleft aligncenter alignright alignjustify | \
-            bullist numlist indent hr | removeformat  table |  preview margin rotatePage',
+            bullist numlist indent hr | removeformat  table |  preview margin rotatePage mdiIcon',
             fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
             font_formats: 'Roboto=Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times,serif;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
             valid_elements: '*[*]',
@@ -188,7 +209,7 @@ export default {
                     text: 'Setting table',
                     disabled : false,
                     onAction: function(e) {
-                        if(self.$route.name == 'printConfigDocument'){
+                        if(self.routeName == 'printConfigDocument'){
                             self.showPrintConfigTable(e);
                         }
                         else{
@@ -197,7 +218,7 @@ export default {
                         
                     }
                 });
-                if(self.$route.name == 'printConfigDocument'){
+                if(self.routeName == 'printConfigDocument'){
                     ed.ui.registry.addMenuButton('pageSize', {
                         text: 'Kích thước',
                         fetch: function (callback) {
@@ -229,6 +250,13 @@ export default {
                             callback(items);
                         }
                     });
+                    ed.ui.registry.addButton('rotatePage', {
+                    icon:'reload',
+                    tooltip:'Xoay',
+                        onAction: function (_) {
+                            self.rotatePage(ed);
+                        }
+                    }); 
                 }
                 ed.ui.registry.addMenuItem('dragTable', {
                     text: 'Drag table',
@@ -237,8 +265,7 @@ export default {
                         self.showDragTable(e);
                     }
                 });
-             
-            
+                    
                 ed.ui.registry.addButton('margin', {
                 icon:'margin',
                 tooltip:'Margin',
@@ -246,13 +273,17 @@ export default {
                         self.showPaddingPageConfig(ed);
                     }
                 }); 
-                ed.ui.registry.addButton('rotatePage', {
-                icon:'rotate',
-                tooltip:'Xoay',
-                    onAction: function (_) {
-                        self.rotatePage(ed);
+                ed.ui.registry.addButton('mdiIcon', {
+                icon:'emoji',
+                tooltip:'Icon',
+                    onAction: function (e,evt) {
+                        console.log(e,evt);
+                        let buttonOff = $('#document-editor-'+self.keyInstance+'_ifr').closest('.tox-editor-container').find('button[title="Icon"]').offset();
+                        self.$refs.materialIconPicker.setContext('toolbar')
+                        self.$refs.materialIconPicker.show(buttonOff)
                     }
                 }); 
+                
                 for(let i = 0;i < self.listIconToolbar.length;i++){
                     ed.ui.registry.addIcon(self.listIconToolbar[i].name,`<i class='mdi `+self.listIconToolbar[i].icon+`' style='font-size:18px;rgba(0, 0, 0, 0.54);'></i>`)
                 }
@@ -269,7 +300,16 @@ export default {
                     self.keyHandler(e)
                 });
                 ed.on('paste', function(e) {
-                    self.handlePasteContent();
+                    self.handlePasteContent(e);
+                });
+                ed.on('dragstart', function(e) {
+                    self.handleDragControlInEditor(e);
+                });
+                ed.on('drop', function(e) {
+                    self.handleDropControlInEditor(e);
+                });
+                ed.on('ExecCommand', function(e) {
+                    self.handleExecCommand(e);
                 });
                 ed.on('SelectionChange',function (e) {
                     self.handleHighlightControlSelection(e)
@@ -278,7 +318,7 @@ export default {
                 
             },
             init_instance_callback : function(editor) {
-                self.editorCore = editor
+                self.editorCore = editor;
                 self.initEditor()
             },
         });
@@ -287,15 +327,18 @@ export default {
     },
     created() {
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
-        if(this.$route.name == 'printConfigDocument'){
+        this.isConfigPrint = false;
+        if(this.routeName == 'printConfigDocument'){
             this.isConfigPrint = true;
             this.printConfigId = this.$route.params.printConfigId;
         }
-        else{
-            this.isConfigPrint = false;
-            this.getDataFlow();
+        else if(this.routeName == 'editControlTemplate'){
+            this.controlTemplateId = Number(this.$route.params.id);
         }
-        this.documentId = this.$route.params.id;
+        else{
+            this.getDataFlow();
+            this.documentId = this.$route.params.id;
+        }
         /**
          * Nhận sự kiên từ click treeview danh sách các control trong doc thì highlight control và selected control
          */
@@ -326,8 +369,12 @@ export default {
             isConfigPrint:false,
             listDocument:[],
             inputSaveControlTemplate:{},
-            sizePrint:{}
-
+            sizePrint:{},
+            currentDragging:null,
+            oldTableId:null,
+            dataPreviewSubmit:null,
+            isShowPreviewSubmit:false,
+            controlTemplateId:0
         }
     },
     
@@ -416,10 +463,87 @@ export default {
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
             }
         },
-        handlePasteContent(){
+
+        /**
+         * Hàm xử lí khi drag control
+         */
+        handleDragControlInEditor(e){
+            this.currentDragging = $(e.target);
+            let idControl = this.currentDragging.attr('id');
+            let currentLocation =  $("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+idControl);
+            if(!currentLocation.is('.s-control-table') && currentLocation.closest('.s-control-table')){
+                this.oldTableId  = currentLocation.closest('.s-control-table').attr('id');
+            }
+        },
+        /**
+         * Hàm xử lí khi drop control
+         */
+        handleDropControlInEditor(e){
             setTimeout((self) => {
-                self.setContentForDocumentV1();
-            }, 300,this);
+                let idControl = self.currentDragging.attr('id');
+                let currentLocation =  $("#document-editor-"+self.keyInstance+"_ifr").contents().find('#'+idControl);
+                let newTableId = false;
+                if(!currentLocation.is('.s-control-table') && currentLocation.closest('.s-control-table')){
+                    let tableContain = currentLocation.closest('.s-control-table');
+                    newTableId = tableContain.attr('id');
+                }
+                self.handleMoveDataControl(idControl,newTableId)
+            }, 100,this);
+            
+        },
+        handleMoveDataControl(controlId, newTableId){
+            if(newTableId == this.oldTableId){
+                return
+            }
+            if(newTableId || this.oldTableId ){
+                this.$store.commit("document/moveControl",{instance:this.keyInstance,controlId:controlId,oldTableId:this.oldTableId,newTableId:newTableId});  
+            }
+        },
+        /**
+         * Hàm xử lí khi paste nội dung vào editor
+         */
+        handlePasteContent(e){
+            var content = ((e.originalEvent || e).clipboardData || window.clipboardData).getData("text/html");
+
+            content = content.replace(/((<|(<\/))html>)|((<|(<\/))body>)/g,"");
+            let contentEl = $(content);
+            let listControls = contentEl.find('.s-control:not(.s-control-table .s-control)');
+            if(listControls.length > 0){
+                setTimeout((self) => {
+                    for (let index = 0; index < listControls.length; index++) {
+                        const controlEl = listControls[index];
+                        let controlId = $(controlEl).attr('id');
+                        var inputId = 's-control-id-' + Date.now();
+                        let controlType = $(controlEl).attr('s-control-type');
+                        let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
+                        elements.attr('id',inputId);
+                        let control = GetControlProps(controlType);
+                        this.addToAllControlInDoc(inputId,{properties: control.properties, formulas : control.formulas,type:controlType});
+                        if(controlType == 'table'){ // nếu là table thì xử lí các control trong table
+                            let allControlInTable = elements.find('.s-control');
+                            for (let i = 0; i < allControlInTable.length; i++) {
+                                const childControlEl = allControlInTable[i];
+                                let childControlId = $(childControlEl).attr('id');
+                                var childInputId = 's-control-id-' + Date.now();
+                                let childControlType = $(childControlEl).attr('s-control-type');
+                                let childElements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+childControlId);
+                                childElements.attr('id',childInputId);
+                                let childControl = GetControlProps(childControlType);
+                                this.addToAllControlInTable(childInputId,{properties: childControl.properties, formulas : childControl.formulas,type:childControlType},inputId);
+                            }
+                        }
+                    }
+                }, 300,this);
+                
+            }
+            else{   // trường hợp copy từ dekko
+                if(contentEl.find('.bkerp-input').length > 0){
+                    setTimeout((self) => {
+                        self.setContentForDocumentV1();
+                    }, 300,this);
+                }
+            }
+            
         },
         px2cm(px) {
             return (Math.round((px / 37.7952) * 100) / 100).toFixed(1);
@@ -638,6 +762,34 @@ export default {
             }
         },
         /**
+         * Hàm xem trước submit form
+         */
+        previewSubmitDocument(){
+            $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.on-selected').removeClass('on-selected');
+            this.isShowPreviewSubmit = true;
+            let fieldForSubmit = util.cloneDeep(this.editorStore.allControl);
+            this.prepareDataForPreview(fieldForSubmit);
+            this.dataPreviewSubmit = {fields:fieldForSubmit,content:this.editorCore.getContent()}
+        },
+        prepareDataForPreview(fieldForSubmit){
+            for(let controlId in fieldForSubmit){
+                for(let prop in fieldForSubmit[controlId].properties){
+                    fieldForSubmit[controlId].properties[prop] = fieldForSubmit[controlId].properties[prop].value;
+                }
+                for(let formulasType in fieldForSubmit[controlId].formulas){
+                    let formulasItem = {};
+                    formulasItem[Date.now()] = fieldForSubmit[controlId].formulas[formulasType].value;
+                    if(!fieldForSubmit[controlId].formulas[formulasType].value){
+                        formulasItem = ""
+                    }
+                    fieldForSubmit[controlId].formulas[formulasType] = formulasItem;
+                }
+                if(fieldForSubmit[controlId].type == 'table'){
+                    this.prepareDataForPreview(fieldForSubmit[controlId].listFields)
+                }
+            }
+        },
+        /**
          * Sự kiện bấm mở popup chuyển đổi kiểu control
          */
         openPanelSwapType(){
@@ -661,7 +813,10 @@ export default {
         },
         // mở modal lưu , edit doc
         openPanelSaveDocument(){
-            if(this.isConfigPrint){
+            if(this.routeName == 'editControlTemplate'){
+                this.$refs.formModalView.show();
+            }
+            else if(this.isConfigPrint){
                 this.$refs.saveDocPanel.showDialog()
             }
             else{
@@ -815,7 +970,10 @@ export default {
                     isCheck = true;
                 }
                 else{
-                    if(allControl[controlId].type == 'table'){
+                    if(allControl[controlId].type == 'dataFlow'){
+                        allControl[controlId].properties.dataFlowId.value = allControl[controlId].properties.dataFlowId.value.id;
+                    }
+                    else if(allControl[controlId].type == 'table'){
                         if(allId.indexOf(controlId) === -1){
                             for(let childControlId in allControl[controlId].listFields){
                                 let childControl = allControl[controlId].listFields[childControlId]
@@ -870,7 +1028,7 @@ export default {
                                 );   
                             }
                         } 
-                        if(this.$route.name == "editDocument"){   //edit doc
+                        if(this.routeName == "editDocument"){   //edit doc
                             this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
                         } 
                         else{
@@ -886,7 +1044,7 @@ export default {
                     }
                 }
                 else{
-                    if(this.$route.name == "editDocument"){   //edit doc
+                    if(this.routeName == "editDocument"){   //edit doc
                         this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
                     }
                     else{
@@ -915,6 +1073,7 @@ export default {
                         type: "success",
                         title: "Save document success!"
                     });
+                    thisCpn.$evtBus.$emit('save-document-successful',{type:'create',documentId:res.data})
                 }
                 else{
                     thisCpn.$snotify({
@@ -1054,7 +1213,8 @@ export default {
             let title = allInputs.title.value;
             let content = this.editorCore.selection.getContent();
             let allControlProps = {};
-            if(content){
+            if(this.routeName == "editControlTemplate"){
+                content = this.editorCore.getContent();
                 let allControlInForm = $(content).find('.s-control');
                 for (let index = 0; index < allControlInForm.length; index++) {
                     const element = allControlInForm[index];
@@ -1064,19 +1224,32 @@ export default {
                 this.callApiSaveControlTemplate(title,content,allControlProps);
             }
             else{
-                let currentControl = this.editorStore.currentSelectedControl;
-                if(currentControl.properties.name.hasOwnProperty('name')){
-                    let id = currentControl.id;
-                    allControlProps[id] = this.editorStore['allControl'][id];
-                    this.callApiSaveControlTemplate(title,content,allControlProps,true);
+                if(content){
+                    let allControlInForm = $(content).find('.s-control');
+                    for (let index = 0; index < allControlInForm.length; index++) {
+                        const element = allControlInForm[index];
+                        let controlId = $(element).attr('id');
+                        allControlProps[controlId] = this.editorStore['allControl'][controlId];
+                    }
+                    this.callApiSaveControlTemplate(title,content,allControlProps);
                 }
                 else{
-                    this.$snotify({
-                        type: "error",
-                        title: this.$t('document.validate.emptyContentControlTemplate')
-                    });  
+                    let currentControl = this.editorStore.currentSelectedControl;
+                    if(currentControl.properties.name.hasOwnProperty('name')){
+                        let id = currentControl.id;
+                        allControlProps[id] = this.editorStore['allControl'][id];
+                        content = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+id).clone().wrap('<div></div>').parent().html();
+                        this.callApiSaveControlTemplate(title,content,allControlProps,true);
+                    }
+                    else{
+                        this.$snotify({
+                            type: "error",
+                            title: this.$t('document.validate.emptyContentControlTemplate')
+                        });  
+                    }
                 }
             }
+            
         },
         /**
          * Api lưu control template
@@ -1088,31 +1261,51 @@ export default {
             if(isSingleControl){
                 dataPost['isSingleControl'] = 1;
             }
-            documentApi.saveControlTemplate(dataPost).then(res=>{
-                self.$refs.formModalView.hide()
-                if(res.status == 200){
-                    this.$snotify({
-                        type: "success",
-                        title: "Lưu Control Template thành công"
-                    });  
-                    let allControlTemplate = self.editorStore.allControlTemplate;
-                    let control = res.data;
-                    control.ba_create = control.baCreate;
-                    control.create_at = control.createAt;
-                    allControlTemplate.push(control);
-                    self.$store.commit(
-                        "document/addToDocumentEditorStore",{key:'allControlTemplate',value:allControlTemplate,instance:self.keyInstance}
-                    );
-                }
-                else{
-                    this.$snotify({
-                        type: "error",
-                        title: res.message
-                    });  
-                }
-            })
-        },
 
+            if(this.routeName == "editControlTemplate"){
+                documentApi.editControlTemplate(this.controlTemplateId, dataPost).then(res=>{
+                    self.$refs.formModalView.hide();
+                    if(res.status == 200){
+                        this.$snotify({
+                            type: "success",
+                            title: "Lưu Control Template thành công"
+                        });  
+                    }
+                    else{
+                        this.$snotify({
+                            type: "error",
+                            title: res.message
+                        });  
+                    }
+                })   
+            }
+            else{
+                documentApi.saveControlTemplate(dataPost).then(res=>{
+                    self.$refs.formModalView.hide();
+                    if(res.status == 200){
+                        this.$snotify({
+                            type: "success",
+                            title: "Lưu Control Template thành công"
+                        });  
+                        let allControlTemplate = self.editorStore.allControlTemplate;
+                        let control = res.data;
+                        control.ba_create = control.baCreate;
+                        control.create_at = control.createAt;
+                        allControlTemplate.push(control);
+                        self.$store.commit(
+                            "document/addToDocumentEditorStore",{key:'allControlTemplate',value:allControlTemplate,instance:self.keyInstance}
+                        );
+                    }
+                    else{
+                        this.$snotify({
+                            type: "error",
+                            title: res.message
+                        });  
+                    }
+                })
+            }
+            
+        },
         /**
          * Hàm xoay trang
          */
@@ -1135,6 +1328,7 @@ export default {
         
         //hoangnd: hàm mở modal tablesetting của control table
         showSettingControlTable(e) {
+             $('.tox-pop').css({display:'none'})
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected').closest('.s-control-table');
             if(elements.is('.s-control-table')){
                 let thead = elements.find('thead tr th');
@@ -1171,13 +1365,13 @@ export default {
         },
         // set config cho phần sidebar phải các thuộc tính control đang được click
         selectControl(properties,formulas,id,type){
-            if(type == 'dataFlow'){
-                // console.log(this.listDataFlow,'listDataFlowlistDataFlow');
-                // let curDataFlow = this.listDataFlow.filter(df=>{
-                //     return df.id == properties['dataFlowId'].value
-                // })
-                // console.log(curDataFlow,'listDataFlowlistDataFlow');
-                // properties[k].value = this.listDataFlow
+            if(type == 'dataFlow' && properties['dataFlowId'].value.id){
+                let curDataFlow = this.listDataFlow.filter(df=>{
+                    return df.id == properties['dataFlowId'].value.id;
+                })
+                if(curDataFlow && curDataFlow.length > 0)
+                properties['dataFlowId'].value = curDataFlow[0];
+                properties['dataFlowId'].options = this.listDataFlow;
             }
             this.$store.commit(
                 "document/addCurrentControl",
@@ -1430,10 +1624,20 @@ export default {
                 this.hideAutocompletaControl();
             }
         },
+        /**
+         * Hàm nhận sự kiện ném ra từ compon material icon sau khi chọn icon
+         */
         selectedIcon(data){
-            this.currentTabSelectedIcon.removeClass();
-            this.currentTabSelectedIcon.addClass('icon-page mdi '+data.icon);
+            let context = data.context
+            if(context == 'toolbar'){
+                 this.editorCore.insertContent('&nbsp;<span class="mdi '+data.icon+'"></span>&nbsp;');
+            }
+            else{
+                this.currentTabSelectedIcon.removeClass();
+                this.currentTabSelectedIcon.addClass('icon-page mdi '+data.icon);
+            }
             this.$refs.materialIconPicker.hide()
+            
         },
         // hàm click ra ngoài editor thì cập nhật lại dữ liệu của store
         detectBlurEditorEvent(event){
@@ -1493,7 +1697,6 @@ export default {
                     controlProps = JSON.parse(controlProps);
                     let controlProp = {};
                     let controlFormulas = {};
-                    console.log('safashd',controlProps);
                     $.each(controlProps,function(k,v){
                         if(mappingOldVersionControlProps[k] != undefined && controlV2.properties[mappingOldVersionControlProps[k]] != undefined){
                             controlV2.properties[mappingOldVersionControlProps[k]].value = v;
@@ -1551,12 +1754,23 @@ export default {
                 }
             })
         },
+        /**
+         * Hàm call api lấy thông tin control template
+         */
+        async getContentControlTemplate(){
+            if(this.routeName == 'editControlTemplate' && this.controlTemplateId != 0){
+                let res = await documentApi.getDetailControlTemplate(this.controlTemplateId);
+                this.editorCore.setContent(res.data.form);
+                this.setDataForPropsControl(JSON.parse(res.data.controlProps));
+                this.inputSaveControlTemplate.title.value = res.data.title;
+            }
+        },
         // hàm gọi request lấy thông tin của document khi vào edit doc
         async getContentDocument(){
             if(this.documentId != 0){
                 let res = await documentApi.detailDocument(this.documentId)
                 if (res.status == 200) {
-                    if(this.$route.name == "editDocument"){
+                    if(this.routeName == "editDocument"){
                         this.setDocumentProperties(res.data.document);
                     }
                     let content = res.data.document.content;
@@ -1565,11 +1779,14 @@ export default {
                         content = res1.data.content;
                         this.setDocumentProperties({title:res1.data.title});
                     }
-                    
                     this.editorCore.setContent(content);
                     $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body select').each(function(e){
                         let id = $(this).attr('id')
                         $(this).replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '">');
+                    })
+                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body span.s-control-label').each(function(e){
+                        let id = $(this).attr('id')
+                        $(this).replaceWith('<label class="s-control s-control-label" contenteditable="false" s-control-type="label" id="' + id + '" title="Label">Aa</label>');
                     })
                     $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body .s-control-select').each(function(e){
                         let id = $(this).attr('id')
@@ -1582,7 +1799,6 @@ export default {
                     this.setDataForPropsControl(fields);
                     this.wrapTableElement();
                 }
-                
             }
         },
         // wrap div cho table truong hợp trước đây chưa có scroll
@@ -1612,8 +1828,14 @@ export default {
                         properties[k].value = fields[controlId]['properties'][k] == true
                     }
                     else{
-                        if(typeof fields[controlId]['properties'][k] != "object")
-                        properties[k].value = fields[controlId]['properties'][k];
+                        if(type == 'dataFlow' && k == 'dataFlowId'){
+                            properties[k].value = {id:fields[controlId]['properties'][k]};
+                        }
+                        else{
+                            if(typeof fields[controlId]['properties'][k] != "object"){
+                                properties[k].value = fields[controlId]['properties'][k];
+                            }
+                        }
                     }
                     if(k =='name'){
                         properties[k].oldName =  properties[k].value
@@ -1671,7 +1893,10 @@ export default {
             // $('.sym-document-editor .tox .tox-edit-area').css({'overflow':'auto'})
             let thisCpn = this;
             if(this.documentId != 0 && this.documentId != undefined)    // trường họp edit doc thì gọi api lấy dữ liệu
-            thisCpn.getContentDocument();
+                this.getContentDocument();
+            if(this.controlTemplateId != 0){
+                this.getContentControlTemplate()
+            }
             var currentElement, currentElementChangeFlag, elementRectangle, countdown, dragoverqueue_processtimer;
             // object xử lí các vấn đề với kéo thả control vào document
             var DragDropFunctions = {
@@ -2066,11 +2291,8 @@ export default {
                     return $element.prop('tagName');
                 }
             };
-
-
-            $(".sym-document-tab-control .sym-control").attr('draggable', 'true');
             
-            $(document).on('dragstart','.sym-control,.control-template-item', function(event) {
+            $(document).on('dragstart','.sym-control .control-content,.control-template-item', function(event) {
                 dragoverqueue_processtimer = setInterval(function() {
                     DragDropFunctions.ProcessDragOverQueue();
                 }, 100);
@@ -2084,12 +2306,26 @@ export default {
                     control = control[0]
                 }
                 else{
-                    control = GetControlProps(controlType);
+                    if($(this).attr('control-id')){
+                        let tableId = $(this).attr('table-id');
+                        let controlId = $(this).attr('control-id');
+                        if(tableId){
+                            control = thisCpn.allControlDeleted[tableId]['listFields'][controlId];
+                        }
+                        else{
+                            control = thisCpn.allControlDeleted[controlId];
+                        }
+                        
+                        control.isConfigPrint = true;
+                    }
+                    else{
+                        control = GetControlProps(controlType);
+                    }
                 }
                 event.originalEvent.dataTransfer.setData("control", JSON.stringify(control));
             });
 
-            $(document).on('dragend','.sym-control,.control-template-item', function() {
+            $(document).on('dragend','.sym-control .control-content,.control-template-item', function() {
                 clearInterval(dragoverqueue_processtimer);
                 DragDropFunctions.removePlaceholder();
                 DragDropFunctions.ClearContainerContext();
@@ -2149,75 +2385,91 @@ export default {
                         thisCpn.dropControlTemplate(insertionPoint,control);
                     }
                     else{
-                        var checkDiv = $(control.html);
-                        let typeControl = checkDiv.attr('s-control-type');
-                        if(typeControl == 'dataFlow'){
-                            control.properties.dataFlowId.options = thisCpn.listDataFlow;
-                        }
-                        if(control.properties.hasOwnProperty('quickSubmit')){
-                            control.properties.quickSubmit.options = thisCpn.listDocument;
-                        }
-                        var inputid = 's-control-id-' + Date.now();
-                        checkDiv.attr('id', inputid);
-                        insertionPoint.after(checkDiv);
-                        let table = insertionPoint.closest('.s-control-table'); // nếu kéo control vào table thì lưu prop của control đó vào table trong allControl của state
-                        let idTable = '';
-                        checkDiv.prop('readonly', false);
-                        if (checkDiv.attr('s-control-type') != 'table') {
-                            checkDiv.attr('contenteditable', false);
-                        }
-                        checkDiv.addClass('on-selected');
-                        if(typeControl == 'tabPage'){
-                            let newPageId = 's-control-id-' + (Date.now() + 1);
-                            checkDiv.find('.page-item.sb-page-active').attr('id',newPageId);
-                            checkDiv.find('.page-content.page-active').attr('s-page-content-id',newPageId);
-                            let control = GetControlProps('page');
-                            control.properties.title.value = "Trang số 1";
-                            control.properties.name.value = "pg_1";
-                            thisCpn.addToAllControlInDoc(newPageId,{properties: control.properties, formulas : control.formulas,type:'page'});
-                        }
-                        thisCpn.selectControl(control.properties, control.formulas,inputid,typeControl);
-                        if(table.length > 0){   // nếu keo control vào trong table thì update dữ liệu trong table của state
-                            idTable = table.attr('id');
-                            thisCpn.addToAllControlInTable(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl},idTable);
+                        let isControlPrint = control.isConfigPrint;
+                        if(isControlPrint){
+                            let controlEl = GetControlProps(control.type);
+                            var checkDiv = $(controlEl.html);
+                            checkDiv.attr('id', control.id);
+                            insertionPoint.after(checkDiv);
+                            thisCpn.$store.commit(
+                                "document/deleteControlInAllControlDeleted",{id:control.id,table:control.tableId,instance:thisCpn.keyInstance}
+                            );  
                         }
                         else{
-                            thisCpn.addToAllControlInDoc(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl});
+                            var checkDiv = $(control.html);
+                            let typeControl = checkDiv.attr('s-control-type');
+                            if(typeControl == 'dataFlow'){
+                                control.properties.dataFlowId.options = thisCpn.listDataFlow;
+                            }
+                            if(control.properties.hasOwnProperty('quickSubmit')){
+                                control.properties.quickSubmit.options = thisCpn.listDocument;
+                            }
+                            var inputid = 's-control-id-' + Date.now();
+                            checkDiv.attr('id', inputid);
+                            insertionPoint.after(checkDiv);
+                            let table = insertionPoint.closest('.s-control-table'); // nếu kéo control vào table thì lưu prop của control đó vào table trong allControl của state
+                            let idTable = '';
+                            checkDiv.prop('readonly', false);
+                            if (checkDiv.attr('s-control-type') != 'table') {
+                                checkDiv.attr('contenteditable', false);
+                            }
+                            checkDiv.addClass('on-selected');
+                            if(typeControl == 'tabPage'){
+                                let newPageId = 's-control-id-' + (Date.now() + 1);
+                                checkDiv.find('.page-item.sb-page-active').attr('id',newPageId);
+                                checkDiv.find('.page-content.page-active').attr('s-page-content-id',newPageId);
+                                let control = GetControlProps('page');
+                                control.properties.title.value = "Trang số 1";
+                                control.properties.name.value = "pg_1";
+                                thisCpn.addToAllControlInDoc(newPageId,{properties: control.properties, formulas : control.formulas,type:'page'});
+                            }
+                            thisCpn.selectControl(control.properties, control.formulas,inputid,typeControl);
+                            if(table.length > 0){   // nếu keo control vào trong table thì update dữ liệu trong table của state
+                                idTable = table.attr('id');
+                                thisCpn.addToAllControlInTable(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl},idTable);
+                            }
+                            else{
+                                thisCpn.addToAllControlInDoc(inputid,{properties: control.properties, formulas : control.formulas,type:typeControl});
+                            }
                         }
                     }
                     insertionPoint.remove();
-
-                    
-                    
                 } catch (e) {}
             });
-            
-
         },
 
 
         dropControlTemplate(insertionPoint, control){
+            let self = this;
             let contentEl = $(control.content);
             let controlInEL = contentEl.find('.s-control:not(.s-control-table .s-control)');
             let allControlProp = JSON.parse(control.control_props);
             for (let index = 0; index < controlInEL.length; index++) {
                 let controlEl = $(controlInEL[index]);
-                let newId = Date.now();
-                let controlProp = allControlProp[controlEl.attr('id')];
-                contentEl.find('#'+controlEl.attr('id')).attr('id',newId);
-                let controlType = controlEl.attr('s-control-type');
-                this.addToAllControlInDoc(newId,{properties: controlProp.properties, formulas : controlProp.formulas,type:controlType});
-                if(controlType == 'table'){
-                    controlEl.find(".s-control").each(function() {
-                        let childControlId = $(this).attr("id");
-                        let newChildId = Date.now();
-                        let childControlProp = allControlProp[childControlId];
-                        contentEl.find('#'+childControlId.attr('id')).attr('id',newChildId);
-                        idTable = controlEl.attr('id');
-                        this.addToAllControlInTable(newChildId,{properties: childControlProp.properties, formulas : childControlProp.formulas,type:$(this).attr('s-control-type')},newId);
-                    });
-                    
-                }
+                setTimeout(() => {
+                    let newId = 's-control-id-' + Date.now();
+                    let controlProp = allControlProp[controlEl.attr('id')];
+                    contentEl.find('#'+controlEl.attr('id')).attr('id',newId);
+                    let controlType = controlProp.type;
+                    self.addToAllControlInDoc(newId,{properties: controlProp.properties, formulas : controlProp.formulas,type:controlType});
+                    if(controlType == 'table'){
+                        controlEl.find(".s-control").each(function() {
+                            let childControlId = $(this).attr("id");
+                            setTimeout(() => {
+                                let newChildId = 's-control-id-' + Date.now();
+                                let childControlProp = allControlProp[childControlId];
+                                contentEl.find('#'+childControlId.attr('id')).attr('id',newChildId);
+                                idTable = controlEl.attr('id');
+                                self.addToAllControlInTable(newChildId,
+                                                            {properties: childControlProp.properties, formulas : childControlProp.formulas,type:$(this).attr('s-control-type')},
+                                                            newId);
+                            }, 1);
+                            
+                        });
+                        
+                    }
+                }, 1);
+                
             }
             insertionPoint.after(contentEl);
             
@@ -2227,6 +2479,7 @@ export default {
          * Hàm xử lí khi click vào control thì lấy thông tin của control đó và hiển thị vào sidebar
          */
         setSelectedControlProp(e,el,clientFrameWindow,fromTreeView = false){
+            
             e.preventDefault();
             let type = el.attr('s-control-type');
             if(!['tab','page'].includes(type)){
@@ -2239,16 +2492,26 @@ export default {
             let table = el.closest('.s-control-table');
             if(table.length > 0 && controlId != table.attr('id')){
                 if(!fromTreeView)
-                tinyMCE.activeEditor.selection.setNode($(e.target).parent());
+                tinyMCE.activeEditor.selection.setNode($(e.target).closest('.s-control'));
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
+                if(!control){
+                    this.showDialogEditor("",this.$t('document.validate.controlNotExist'));
+                    return;
+                }
                 this.selectControl(control.properties, control.formulas,controlId,type);
             }
             else{
                 let control = this.editorStore.allControl[controlId];
+                if(!control){
+                    this.showDialogEditor("",this.$t('document.validate.controlNotExist'));
+                    return;
+                }
                 this.selectControl(control.properties, control.formulas,controlId,type);
             }
         },
+
+
         checkSelectedTabPageControl(e,control,controlId){
             if($(e.target).closest('.page-item').length > 0){
                 let pageId = $(e.target).closest('.page-item').attr('id');
@@ -2273,16 +2536,28 @@ export default {
         configColumnTablePrint(listRowData){
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-table.on-selected');
             let thead = elements.find('thead th');
+            let tbody = elements.find('tbody tr td');
             for (let index = 0; index < thead.length; index++) {
                 let th = thead[index];
-                $(th).css({width:listRowData[index].colWidth})
-                $(th).attr('data-mce-style',$(th).attr('style'))
+                let newCell = listRowData.filter(row=>{
+                    return row.colIndex == index;
+                })
+                if(newCell.length == 0){
+                    $(th).remove();
+                    $(tbody[index]).remove();
+                }
+                else{
+                    $(th).css({width:newCell[0].colWidth})
+                    $(th).attr('data-mce-style',$(th).attr('style'))
+                }
+                
                 
             }
         },
 
         //hoangnd: hàm mở modal tablesetting của control table
         showPrintConfigTable(e) {
+            $('.tox-pop').css({display:'none'})
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected').closest('.s-control-table');
             if(elements.is('.s-control-table')){
                 let thead = elements.find('thead tr th');
@@ -2293,9 +2568,8 @@ export default {
                 if($(tbody[0].innerHTML).length > 0){
                     for(let i = 0; i< thead.length; i++){
                         let style = $(thead[i]).attr('style');
-                        console.log("sadsadasdasda",style);
                         let width = style.match(/(?<=width:\s)\s*([^;"]*)(?=\;)/gmi);
-                        let row = {title: $(thead[i]).text(),colWidth:width[0]}
+                        let row = {title: $(thead[i]).text(),colWidth:width[0],colIndex:i}
                         listData.push(row)
                     }
                 }
@@ -2380,6 +2654,9 @@ export default {
             try {
                 $("#document-editor-"+this.keyInstance+"_ifr").contents().find(".selection-highlight").removeClass('selection-highlight');
                 let contentSelection = this.editorCore.selection.getContent();
+                if($(contentSelection).is('.s-control-table')){
+                    return;
+                }
                 let allControlInForm = $(contentSelection).find('.s-control');
                 for (let index = 0; index < allControlInForm.length; index++) {
                     let element = allControlInForm[index];
@@ -2392,9 +2669,35 @@ export default {
             }
             
            
+        },
+        /**
+     * Xử li sau khi thy đổi font size , font family thì thêm style cho control
+     */
+    handleExecCommand(e){
+        let mapCommandToStyle = {FontSize:'font-size',FontName:'font-family'}
+        try {
+            let value = e.value;
+            if(Object.keys(mapCommandToStyle).includes(e.command)){
+                let contentSelection = this.editorCore.selection.getContent();
+                let allControlInForm = $(contentSelection).find('.s-control');
+                for (let index = 0; index < allControlInForm.length; index++) {
+                    let element = allControlInForm[index];
+                    let id = $(element).attr('id');
+                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).css(mapCommandToStyle[e.command],value);
+                    let curStyle = $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).attr('style');
+                    
+                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).attr('data-mce-style',curStyle)
+                }
+            }
+            
+            
+        } catch (error) {
+            
         }
+    }
 
     },
+    
 }
 </script>
 <style>
@@ -2481,6 +2784,11 @@ export default {
     }
     .tox-toolbar__group .tox-tbtn__select-label{
         font-size: 11px !important;
+    }
+    .notice-title{
+        word-break: break-word;
+        font-size: 15px !important;
+        padding: 12px !important;
     }
 
 </style>

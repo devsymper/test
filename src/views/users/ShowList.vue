@@ -1,54 +1,40 @@
 <template>
-<!-- <div class="w-100"> -->
-    <list-items
+<div class="w-100">
+     <list-items
         ref="listUser"
         @after-open-add-panel="addUser"
-        :headerPrefixKeypath="'user'"
+        :headerPrefixKeypath="'user.table'"
         :useDefaultContext="false"
         :pageTitle="$t('user.title')"
+        :debounceRowSelectTime="200"
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
+        :showActionPanelInDisplayConfig="true"
         :customAPIResult="customAPIResult"
-        :actionPanelType="'elastic'"
         :getDataUrl="getListUrl+'users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
-        :commonActionProps="commonActionProps"
         @import-excel="importExcel()"
-    >
+        @row-selected="onRowSelected"
+        :commonActionProps="commonActionProps">
         <div slot="right-panel-content" class="h-100">
             <action-panel
-            ref="panel"
-            @refresh-data="refreshListUser"
-            @refresh-new-user="setNewUserItem"
-            @close-panel="closePanel"
-            :actionType="actionType"
-            :isSettingPasswordView="isSettingPasswordView"
+                ref="panel"
+                :showDetailView="showDetailView"
+                @refresh-data="refreshListUser"
+                @refresh-new-user="setNewUserItem"
+                @close-panel="closePanel"
+                @edit-user-info="handleEditUserInfo"
+                :actionType="actionType"
+                :isSettingPasswordView="isSettingPasswordView"
+                :showViewInfo="showViewInfo"
             />
         </div>
-          <!-- <v-navigation-drawer 
-            v-model="drawerImportExelPanel" 
-            absolute
-            class="d-none d-sm-none d-md-flex"
-            temporary
-            style="height: 100vh"
-            right>
-
-            asdnajsdkalsdjklasdjklasjdkl
-            <!-- <ImportExcelPanel 
-                @cancel="closeImportExcelPanel" 
-              
-                @showValidate="showValidateComponent"
-                :drawerImportExelPanel="drawerImportExelPanel" /> -->
-        <!-- </v-navigation-drawer> -->
-        </list-items>
-         <!-- <v-navigation-drawer
-            v-model="drawer"
-            absolute
-            right
-            temporary
-        >
-        </v-navigation-drawer> -->
-    <!-- </div> -->
+    </list-items>
+          <ImportExcelPanel
+            :options="options"
+            :nameRows="listRowUser"
+            :open="showImportUser" />
+    </div>
 </template>
 <script>
 import ImportExcelPanel from "./../../components/document/ImportExelPanel";
@@ -64,21 +50,43 @@ export default {
         "list-items": ListItems,
         "action-panel": ActionPanel,
         ImportExcelPanel: ImportExcelPanel,
-
     },
     data(){
         return {
-            showValidate:false,
-            drawer:false,
-            drawerImportExelPanel: null,
-           
+            options:{
+                objType:'user',
+                nameObj:'Import User',
+                subObjType:-1
+            },
+            showDetailView:false,
+            listRowUser:[],
+            showImportUser:false,
             customAPIResult: {
+                 setStatusImport(status){
+                    let nameStatus = '';
+                    switch(status){
+                        case '0':
+                            nameStatus = "Đã khóa";
+                            break;
+                        case '-1':
+                            nameStatus = "Đã xóa";
+                            break;
+                         case '1':
+                            nameStatus = "Đang hoạt động";
+                            break;
+                            
+                        case '2':
+                            nameStatus = "Mới tạo";
+                            break;
+                    }
+                    return nameStatus;
+                },
                 reformatData(res){
                     let data = res.data;
-                    for(let col of data.columns){
-                        col.title = col.title.replace('user.','');
+                    for(let i = 0; i<data.listObject.length; i++){
+                        data.listObject[i].status = this.setStatusImport(data.listObject[i].status);
                     }
-                    return data;
+                    return  data;
                 } 
             },
             commonActionProps: {
@@ -86,7 +94,7 @@ export default {
                 "resource": "account",
                 "scope": "account",
             },
-            getListUrl: appConfigs.apiDomain.user,
+            getListUrl: {},
             actionPanelWidth:800,
             containerHeight: 200,
             tableContextMenu:{
@@ -95,6 +103,7 @@ export default {
                     text:this.$t('user.table.contextMenu.passwordSetting'),
                     callback: (user, callback) => {
                         this.showViewSetingPassword(user);
+                    
                     }
                 },
                 update: {
@@ -110,26 +119,36 @@ export default {
                     callback: (user, callback) => {
                         this.deleteUser(user);
                     }
+                },
+                view: {
+                    name:"view",
+                    text:this.$t('user.table.contextMenu.view'), 
+                    callback: (user, callback) => {
+                        this.showViewDetailInfo(user);
+                    }
                 }
             },
             columns: [],
             data: [],
             totalPage: 6,
             actionType:'',
-            isSettingPasswordView : false
+            isSettingPasswordView : false,
+            showViewInfo: false
         }
     },
     mounted() {
         this.calcContainerHeight();
     },
     created(){
+        this.getListUrl = appConfigs.apiDomain.user+'';
+    
         let thisCpn = this;
         this.$evtBus.$on('change-user-locale',(locale)=>{
              thisCpn.tableContextMenu = [
                 {name:"passwordsetting",text:this.$t('user.table.contextMenu.passwordSetting')},
                 {name:"edit",text:this.$t('user.table.contextMenu.edit')},
-                {name:"xóa",text:this.$t('user.table.contextMenu.delete')}
-
+                {name:"xóa",text:this.$t('user.table.contextMenu.delete')},
+                {name:"xem chi tiết",text:this.$t('user.table.contextMenu.view')}
             ]
 
         });
@@ -138,15 +157,116 @@ export default {
         
     },
     methods:{
-        closeImportExcelPanel(){
-            this.drawerImportExelPanel = false;
+        handleEditUserInfo(info){
+            this.editUser(info);  
         },
-        showValidateComponent(data){
-            this.showValidate = data;
+        onRowSelected(row){
+            this.focusingUser = row;
+            if(this.$refs.listUser.alwaysShowActionPanel){
+                this.showViewDetailInfo(row);
+            }
         },
+         getListFieldUser(){
+             this.listRowUser =  [{
+                sheetMap: '',
+                name: 'Thông tin chung',
+                title: 'Thông tin chung',
+                controls:[
+                    {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"firstName",
+                        title:"Tên ",
+                        isNull:true
+                    },
+                     {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"lastName",
+                        title:"Họ",
+                        isNull:true
+                    },
+                     {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"userName",
+                        title:"Tên tên khoản",
+                         isNull:false
+                    },
+                    {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"displayName",
+                        title:"Tên hiển thị",
+                        isNull:false
+                    },
+                     {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"email",
+                        title:"Email",
+                         isNull:false
+                    },
+                    {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"phone",
+                        title:"Điện thoại",
+                         isNull:true
+                    },
+                     {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"password",
+                        title:"Mật khẩu",
+                        isNull:true
+                    },
+                    {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"password",
+                        title:"Mật khẩu",
+                        isNull:true
+                    },
+                    {
+                        dataColumn:null,
+                        dataType:"text",
+                        isKeyControl:false,
+                        name:"password",
+                        title:"Mật khẩu",
+                        isNull:true
+                    },
+                    {
+                        dataColumn:null,
+                        dataType:"number",
+                        isKeyControl:false,
+                        name:"orgchart_id",
+                        title:"Mã sơ đồ tổ chức",
+                        isNull:true
+                    },
+                    {
+                        dataColumn:null,
+                        dataType:"number",
+                        isKeyControl:false,
+                        name:"position_id",
+                        title:"Vị trí",
+                        isNull:true
+                    }
+                ]
+            }]
+
+         },
         importExcel(){
-            debugger
-           this.drawer = true
+            this.showImportUser = !this.showImportUser;
+            this.getListFieldUser();
         },
         refreshListUser(){
             this.$refs.listUser.refreshList();
@@ -157,11 +277,16 @@ export default {
         },
         showViewSetingPassword(user){
             this.isSettingPasswordView = true;
-            this.$refs.panel.setUser(user);
+            this.showViewInfo = false;
+            this.$refs.panel.setDetailInfo(user);
             this.$refs.listUser.openactionPanel();
         },
-        changePage(page){
-            alert('ok');
+        showViewDetailInfo(user){
+            this.showDetailView=!this.showDetailView;
+            this.showViewInfo = true;
+            this.$refs.panel.setDetailInfo(user);
+            this.$refs.listUser.openactionPanel();
+
         },
         closePanel(){
             this.isSettingPasswordView = false;
@@ -169,19 +294,19 @@ export default {
         },
         addUser(){
             this.isSettingPasswordView = false;
+            this.showViewInfo = false;
             this.actionType = 'add';
             this.$refs.listUser.openactionPanel();
-            // chỗ này, muốn sửa giá trị của no chỗ này
-            // this.$router.push('/users/add');
         },
         editUser(user){
             this.isSettingPasswordView = false;
+            this.showViewInfo = false;
             this.actionType = 'edit';
             this.$refs.panel.resetData();
             this.$refs.panel.setUser(user);
         },
        deleteUser(user){
-           this.$refs.panel.deleteUser(user[0].id);
+           this.$refs.panel.deleteUser(user);
 
        },
         setNewUserItem(user){
@@ -193,3 +318,4 @@ export default {
     }
 }
 </script>
+

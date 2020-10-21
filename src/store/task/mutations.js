@@ -16,6 +16,13 @@ const setStatusPopupTracking= (state, item) => {
 const setArrDocObjId = (state, arrDocObjId) => {
     Vue.set(state, 'arrDocObjId', arrDocObjId);
 }
+const setListDocumentObjId = (state, listDocumentObjId) => {
+    Vue.set(state, 'listDocumentObjId', listDocumentObjId);
+}
+const setListDocumentObjIdWithUserSubmit = (state, listDocumentObjIdWithUserSubmit) => {
+    Vue.set(state, 'listDocumentObjIdWithUserSubmit', listDocumentObjIdWithUserSubmit);
+}
+
 const removeFileAttachToStore = (state, id) => {
     let currentArrFileAttach = state.arrFileAttach;
     let obj = currentArrFileAttach.find(data => data.id === id)
@@ -47,6 +54,15 @@ const setListTaskInProcessSibling = (state, listTaskInProcessSibling) => {
 const setIsStatusSubmit = (state, isStatusSubmit) => {
     Vue.set(state, 'isStatusSubmit', isStatusSubmit);
 }
+const setAllAppActive = (state, allAppActive) => {
+    Vue.set(state, 'allAppActive', allAppActive);
+}
+const setListNodeInProcess = (state, listNodeInProcess) => {
+    Vue.set(state, 'listNodeInProcess', listNodeInProcess);
+}
+const setVariableOfProcess = (state, variableOfProcess) => {
+    Vue.set(state, 'variableOfProcess', variableOfProcess);
+}
 
 export {
     setArrFileAttach,
@@ -61,7 +77,12 @@ export {
     setListTaskDoneInProcessInstance,
     setListTaskDoneInProcessParent,
     setListTaskInProcessSibling,
-    setIsStatusSubmit
+    setIsStatusSubmit,
+    setListDocumentObjId,
+    setListDocumentObjIdWithUserSubmit,
+    setAllAppActive,
+    setListNodeInProcess,
+    setVariableOfProcess
 
 
 };

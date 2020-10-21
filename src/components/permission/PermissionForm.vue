@@ -4,6 +4,10 @@
             <span class="title">
                 {{ title }}
             </span>
+            <v-icon
+                class="close-btn float-right"
+                @click="$emit('close-form')"
+            >mdi-close</v-icon>
         </div>
         <FormTpl
             :viewOnly="action == 'detail'"

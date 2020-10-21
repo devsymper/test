@@ -1,16 +1,23 @@
 <template>
-    <v-combobox @keydown="enter" class="auto-complete" style="border-radius:4px"
+    <v-combobox 
+        @keydown="enter" 
+        class="auto-complete" 
+        style="border-radius:4px"
         :hide-no-data="true" no-filter :items="searchItems"
         :menu-props="{ maxHeight:300, maxWidth:330, nudgeBottom:5}"
         :search-input.sync="value" label="Tìm kiếm">
          <template v-slot:append>
-            <i aria-hidden="true" style = "font-size:20px" class="fs- 13 v-icon notranslate mdi mdi-magnify theme--light"></i>
+            <i style="font-size:20px" 
+                class="v-icon notranslate mdi mdi-magnify theme--light">
+            </i>
         </template>
         <template v-slot:item="{ item, attrs }">
             <template v-if="item.group">
                 <v-list-item style="margin-top:-10px; margin-bottom:-10px">
                     <v-list-item-content>
-                        <v-list-item-title class="item-header">{{formatGroupName(item.group)}}</v-list-item-title>
+                        <v-list-item-title class="item-header">
+                            {{$t('objects.'+item.group)}}
+                        </v-list-item-title>
                     </v-list-item-content>
                 </v-list-item>
             </template>
@@ -21,41 +28,32 @@
                     class="pl-7 search-menu" 
                     :attrs="attrs">
                     <SymperAvatar 
-                        v-if="item.type === 'user'" 
+                        v-if="item.type === 'account'" 
                         style="height: 35px!important; width:35px!important; margin-left:-5px" 
                         class="mr-4" :userId="item.userId"/>
-                    <v-list-item-content v-if="item.type!='syql'" style="margin-left:-15px">
-                        <v-list-item-title v-if="item.type!= 'document_definition'&&item.type!='workflow_definition'&&item.type!='user'"
-                            :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}" 
+                    <v-list-item-content style="margin-left:-15px">
+                        <v-list-item-title 
+                            v-if="item.type!= 'document_definition'&&item.type!='workflow_definition'&&item.type!='account'"
+                            style=" margin-left: 0.5rem" 
                             class="item-title" v-html="item.displayName">
                         </v-list-item-title>
                            <v-list-item-title v-else
                             class="item-title" >
-                            <span v-if="item.searchField!=undefined" v-html="item.searchField"></span>
+                            <span v-if="item.searchField!=undefined&&item.type!='account'" v-html="item.searchField"></span>
                             <span v-else v-html="item.displayName"></span>
                         </v-list-item-title>
-                        <v-list-item-subtitle v-if="item.type!= 'document_definition'&&item.type!='workflow_definition'&&item.type!='user'"
-                            :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}"
+                        <v-list-item-subtitle v-if="item.type!= 'document_definition'&&item.type!='workflow_definition'&&item.type!='account'"
+                            :style="{'margin-left': item.type === 'account' ? '0' : '0.5rem'}"
                             class="item-subtitle mt-1" v-html="item.searchField">
                         </v-list-item-subtitle>
-                          <v-list-item-title v-else-if="item.type!='user'"
-                            :style="{'margin-left': item.type === 'user' ? '0' : '0.5rem'}" 
+                          <v-list-item-title v-else-if="item.type!='account'"
+                            :style="{'margin-left': item.type === 'account' ? '0' : '0.5rem'}" 
                             class="item-subtitle" v-html="item.description">
                         </v-list-item-title>
                          <v-list-item-title v-else
                             class="item-subtitle" v-html="item.email">
                         </v-list-item-title>
                     </v-list-item-content>
-                    <!-- sql -->
-                        <v-list-item-content v-else style="margin-left:-15px">
-                        <v-list-item-title 
-                            class="item-title">Nguồn: {{item.objectType}} - Tên: {{item.nameSql}}
-                        </v-list-item-title>
-                        <v-list-item-subtitle
-                            class="item-subtitle mt-1">{{item.displayName}}
-                        </v-list-item-subtitle>
-                    </v-list-item-content>
-                    <!-- sql -->
                     <v-list-item-action v-show="item.enable && item.actions.length>0" class="dot">
                         <v-menu
                             bottom offset-y 
@@ -70,7 +68,7 @@
                                  <v-list-item-title v-for="(itemsAction,index) in item.actions" :key="index" 
                                         class="fm fs-13 mt-1 action-button ml-2" style="width:130px!important" 
                                         @click="gotoPage(itemsAction,item.type,item.id,item.displayName)">
-                                             {{formatAction(itemsAction)}}
+                                             {{$t('objects.listAction.'+itemsAction)}}
                                     </v-list-item-title>
                             </v-list>
                         </v-menu>
@@ -146,24 +144,7 @@ export default {
         }
     },
     methods:{
-          formatAction(value){
-            if(value== 'create'){
-                return "thêm";
-            }else if (value == 'edit'){
-                return "sửa"
-            }else if (value == 'submit'){
-                return "submit"
-            }else if (value == 'list'){
-                return "danh sách"
-             }else if (value == 'list_trash'){
-                return "danh sách bản nháp"
-             }else if (value == 'list_instance'){
-                return "list instance"
-            }else{
-                return value;
-            }
-        },
-        enter(event){
+         enter(event){
             if (event.code == "Enter"){
             this.setMenu();
             this.$store.commit('search/setSearch',  this.searchItems);
@@ -172,7 +153,7 @@ export default {
             this.$store.commit('search/setCountResult', this.searchItems.filter(x=>x.type).length);
             this.$router.push('/search/general');
             };
-            this.menu = this.searchItemsAll;
+            this.menu= this.searchItemsAll;
             this.searchItems =[];
             this.$store.commit('search/setSearch', this.menu );
 
@@ -196,8 +177,7 @@ export default {
            this.searchItems[id].enable = true;
         },
         hideDotButton(id){
-           this.searchItems[id].enable = false;
-
+           this.searchItems[id].enable = true;
         },
         //hiển thị tên của thuộc tính
          getValueSearch() {
@@ -221,21 +201,13 @@ export default {
                                     returnObjSearch.iconType = data.iconType;
                                     returnObjSearch.iconName = data.iconName;
                                 }
-                                if(data.type=== 'user'){
+                                if(data.type=== 'account'){
                                     returnObjSearch.displayName = data.displayName? data.displayName:"Không có tên";
                                     returnObjSearch.email = data.email;
                                     returnObjSearch.userId = data.id;
                                 }else if(data.type=='document_definition'){
                                      returnObjSearch.displayName = data.title?data.title:"Không có tên";
-    
                                      returnObjSearch.description = data.note?data.note:'Chưa điền mô tả';
-                                }else if(data.type=='syql'){
-                                    let name = self.getNameSyql(self.getInfoSyql(data.id));
-                        
-                    
-                                     returnObjSearch.displayName = data.lastContent?data.lastContent:"Không có công thức";
-                                     returnObjSearch.nameSql = name.content;
-                                     returnObjSearch.objectType = name.objectType;
                                      // lấy api của tên
                                 }else{
                                      returnObjSearch.displayName = data.name? data.name:"Không có tên";
@@ -259,6 +231,25 @@ export default {
                                 if(data.type!='document_definition'){
                                       returnObjSearch.description = data.description?data.description:(data.description==null||data.description==''?"Mô tả đang để trống":"Symper");
                                 }
+                                if(data.type=='file'){
+                                   !data.source?data.source="Chưa có nguồn":'Document';
+                                     returnObjSearch.searchField="Nguồn: "+(data.objectType?data.objectType:"Để trống");
+                                      returnObjSearch.description ="Nguồn: "+(data.objectType?data.objectType:"Để trống");
+                                   // returnObjSearch.description ="Nguồn"
+                                }
+                                if(data.type=='comment'){
+                                     returnObjSearch.displayName = data.content?data.content:"Không có nội dung";
+                                     returnObjSearch.searchField = "Nguồn: "+data.objectType+ " -Ngày bình luận: " + (data.updatedAt?data.updatedAt:data.createdAt);
+                                      returnObjSearch.description = "Nguồn: "+data.objectType+ " -Ngày bình luận: " + (data.updatedAt?data.updatedAt:data.createdAt);
+                                }
+                                if(data.type=='syql'){
+                                    self.getNameSyql(data.id);
+                                    //returnObjSearch.displayName ="Nguồn:" + self.syqlId.content;
+                                   returnObjSearch.displayName = "Nguồn: "+ (name.objectType?name.objectType:'')+ " -"+ (name.objectIdentifier?name.objectIdentifier:"") + "- Tên văn bản: " + (name.content?name.content:'');
+                                   returnObjSearch.description = data.lastContent?data.lastContent:"Không có công thức"; ;
+                                   returnObjSearch.searchField = returnObjSearch.description ;
+                                }
+                               
                                 return returnObjSearch;
                             })
                             const groupByType = _.groupBy(normalizedData, 'type');
@@ -284,7 +275,6 @@ export default {
                         console.log(err);
                         this.$store.commit('search/setSearch', []);
                         //this.$store.commit('search/setSearch', []);
-
                     });
             }
         }
@@ -294,67 +284,16 @@ export default {
             this.$store.commit('search/setWordSearch', newVal);  
         }
        },
-       getNameSyql(id){
-          id =  this.syqlIdInfo;
-           let name = this.getInfoSyql(this.syqlIdInfo);
-           if(JSON.stringify(name) === '{}'){
-            // this.getNameSyql(id);
-           }
-           return name;
-       },
-       // lấy API hiển thì nguồn công thức
-         getInfoSyql(syqlId){
-           const self = this;
-           this.syqlIdInfo = syqlId;
-           searchApi.getInfoSyql(syqlId)
-            .then(res => {
-                 if (res.status === 200) {
-                     self.syqlId.content= res.data[0].context;
-                     self.syqlId.objectType = res.data[0].objectType!='workflow'?'Document':'Workflow';
-                 }
-            })
-            .catch(err => {
-                console.log('Đã gửi mà lỗi');
-                console.log(err);
-                //this.$store.commit('search/setSearch', []);
-
-            });
-             return this.syqlId;
-       },
-        //hiển thị tên của các menu
-        formatGroupName(value){
-            let name = '';
-            if(value=='document_instance'){
-                name =  'Bản ghi dữ liệu';
-            }else if(value =='user'){
-                name =  'Nhân viên'
-            }else if(value =='document_definition'){
-                name =  'Loại văn bản'
-            }else if(value == 'workflow_definition'){
-                name =  'Workflow'
-            }else if(value == 'orgchart'){
-                name =  'Sơ đồ tổ chức'
-            }else if(value == 'process_definition'){
-                name =  'Quy trình'
-            }else if(value == 'application_definition'){
-                name =  'Ứng dụng'
-            }else if(value == 'syql'){
-                name =  'Công thức'
-            }else if(value == 'dataflow'){
-                name =  'Data flow'
-            }else if(value == 'file'){
-                name =  'Tệp'
-            }else if(value == 'knowledge'){
-                name =  'Knowledge'
-            }else if(value == 'comment'){
-                name =  'Bình luận'
-            }else{
-                name = value;}
-            return name
-        }
-    },
-   
-   
+       async getNameSyql(id){
+         const self = this;
+           let res= await searchApi.getInfoSyql(id);
+            if (res.status == 200) {
+                self.syqlId.content= res.data[0].context;
+                self.syqlId.objectIdentifier = res.data[0].objectIdentifier;
+                self.syqlId.objectType = res.data[0].objectType!='workflow'?'Document':'Workflow'
+            }
+        },
+    }
 }
 </script>
 <style scoped >

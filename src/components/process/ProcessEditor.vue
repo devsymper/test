@@ -17,7 +17,7 @@
                 </v-tooltip>
 
                 <v-btn
-                    v-if="$route.name != 'viewProcess'"
+                    v-if="routeName != 'viewProcess'"
                     class="float-right mr-1"
                     @click="saveProcess"
                     small
@@ -32,6 +32,7 @@
                 @node-clicked="handleNodeSelected"
                 @node-changed="handleNodeChangeProps"
                 ref="symperBpmn"
+                :height="diagramHeight"
                 :diagramXML="diagramXML"
                 :customExtension="customExtension"
             ></symper-bpmn>
@@ -95,6 +96,7 @@ import customExtension from "./elementDefinitions/customExtension";
 import { pushCustomElementsToModel, collectInfoForTaskDescription } from "./elementDefinitions/customExtToModel";
 import Api from "./../../api/api.js";
 import { appConfigs } from '../../configs';
+import serviceTaskDefinitions from "@/components/process/elementDefinitions/serviceTaskDefinitions";
 
 const apiCaller = new Api('');
 
@@ -132,8 +134,68 @@ const mapLibNameToFlowableName = {
     Participant: "Pool"
 };
 
+const mappNodeActivity={
+    SendTask :"SendTask",
+    UserTask :"UserTask",
+    CallActivity :"CallActivity",
+    ReceiveTask :"ReceiveTask",
+    ScriptTask :"ScriptTask"
+}
+
 export default {
     methods: {
+        calcDiagramHeight(){
+            this.diagramHeight = window.innerHeight - 80;
+        },
+        /**
+         * Tìm và đặt các control cho việc lựa chọn cho phép edit trong lúc duyệt
+         */
+        async setEditableControlsForNode(approvalNodeData, submitNodeData){
+            let docId = submitNodeData.attrs.formreference.value;
+            let docDetail = await documentApi.detailDocument(docId);
+            
+            let fieldsMap = docDetail.data.fields;
+            let ctrls = [
+                {
+                    name: 'SYMPER_NONE_CONTROLS',
+                    title: 'NOT SELECT',
+                    id: 'SYMPER_NONE_CONTROLS',
+                },
+                {
+                    name: 'SYMPER_ALL_CONTROLS',
+                    title: 'ALL CONTROLS',
+                    id: 'SYMPER_ALL_CONTROLS',
+                }
+            ];
+
+            let tbs = [];
+            for(let ctrlName in fieldsMap){
+                let ctrl = fieldsMap[ctrlName];
+                if(ctrl.properties.name){
+                    ctrls.push({
+                        name: ctrl.properties.name,
+                        title: ctrl.properties.title,
+                        id: ctrl.properties.name
+                    });
+                }
+
+                if(ctrl.type == 'table'){
+                    for(let childName in ctrl.listFields){
+                        let childCtrl = ctrl.listFields[childName];
+                        if(childCtrl.properties.name){
+                            ctrls.push({
+                                name: childCtrl.properties.name,
+                                title: childCtrl.properties.title,
+                                id: childCtrl.properties.name
+                            });
+                        }
+                    }
+                }
+            }
+
+            approvalNodeData.attrs.approvalEditableControls.options = null;
+            approvalNodeData.attrs.approvalEditableControls.options = ctrls;
+        },
         resetAttrPanelHeight(){
             this.attrPannelHeight = (util.getComponentSize(this).h - 50)+'px';
         },
@@ -225,7 +287,7 @@ export default {
                 for (let i in allElements) {
                     let items=allElements[i].attrs;
                     for (let j in items) {
-                        if (items[j].validateStatus && items[j].validateStatus.isValid==false ) {
+                        if (items[j] && items[j].validateStatus && items[j].validateStatus.isValid==false ) {
                             isCheck=false;
                             self.$snotifyError({},'Error when validate','Error at node ' +allElements[i].id+', property ' +items[j].title+' with detail:'+items[j].validateStatus.message )
                         }
@@ -249,12 +311,26 @@ export default {
             let self = this;
             return new Promise((resolve, reject) => {
                 let modelAttr = self.getModelData();
+                if (!modelAttr.name) {
+                    reject({
+                        type: "emptyModelName",
+                        title: "Process name shoud not empty!"
+                    });
+                } else {
+                    resolve();
+                }
+
                 if (!modelAttr.key) {
                     reject({
                         type: "emptyModelKey",
                         title: "Process identifier shoud not empty!"
                     });
-                } else {
+                } else if (modelAttr.name==modelAttr.key ||modelAttr.name==null) { // khi không điền tên quy trình thì name đc gán bằng key -> bắn lôĩ
+                    reject({
+                        type: "emptyModelName",
+                        title: "Process name shoud not empty!"
+                    });
+                } {
                     resolve();
                 }
             });
@@ -275,9 +351,9 @@ export default {
                 isExecutable: modelAttr.attrs.isexecutable.value
             });
             modelAttr = modelAttr.attrs;
-            if (!modelAttr.name.value) {
-                modelAttr.name.value = modelAttr.process_id.value;
-            }
+            // if (!modelAttr.name.value) {
+            //     modelAttr.name.value = modelAttr.process_id.value;
+            // }
             return {
                 name: modelAttr.name.value,
                 key: modelAttr.process_id.value,
@@ -342,7 +418,9 @@ export default {
                 jsonConfig[elName] = {};
                 for(let attrName in allSymEls[elName].attrs){
                     let attr = allSymEls[elName].attrs[attrName];
-                    jsonConfig[elName][attrName] = attr.getValue(attr.value);
+                    if(attr){
+                        jsonConfig[elName][attrName] = attr.getValue(attr.value);
+                    }
                 }
             }
             let modelDataAsFlowable = this.getModelData();
@@ -359,6 +437,8 @@ export default {
             // &lt;![CDATA[pppppppppppppppppppp]]&gt;
             xml = xml.replace(/\&lt\;\!\[CDATA\[/g, '<![CDATA[');
             xml = xml.replace(/\]\]\&gt;/g, ']]>');
+            xml = xml.replace(/&lt;symper:symper_symper_string_tag&gt;/g,'<symper:symper_symper_string_tag>');
+            xml = xml.replace(/&lt;\/symper:symper_symper_string_tag&gt;/g,'</symper:symper_symper_string_tag>');
             return xml;
         },
         /**
@@ -375,7 +455,7 @@ export default {
         },
         // Lưu lại data của process model hiện tại
         saveProcess() {
-            if(this.$route.name == 'viewProcess'){
+            if(this.routeName == 'viewProcess'){
                 return;
             }
             let self = this;
@@ -460,6 +540,18 @@ export default {
                     self.$snotifyError(err, "Can not save process model");
                 });
         },
+
+        fillValueForHiddenServiceTaskAttr(nodeId){
+            let sNodeAttrs = this.stateAllElements[nodeId];
+            let seletedType = serviceTaskDefinitions[sNodeAttrs.attrs.serviceTaskType.value];
+            for (let key in seletedType.params) {
+                let attr = sNodeAttrs.attrs['httptask'+key.toLowerCase()];
+                if(attr){
+                    attr.value = seletedType.params[key];
+                }
+            }
+        },
+
         /**
          * Lấy dữ liệu của tất cả các node dưới dạng json để gửi về server lưu
          * @returns {Object} chứa data của process và thông tin của tất cả các node trong nó
@@ -495,11 +587,21 @@ export default {
                         nodeData.bounds = this.getNodeBounds(bnode);
                         nodeData.dockers = [];
                         nodeData.outgoing = [];
+
+                        
+                        if(nodeType == "ServiceTask"){
+                            this.fillValueForHiddenServiceTaskAttr(bnode.id);
+                        }
                     }
+
                     nodeData.resourceId = bnode.id;
                 }
                 nodeData.properties = this.getNodeProperties(bnode.id, false);
                 nodeData.stencil.id = nodeType; // flowable quy định loại node nằm trong nodeData.stencil.id
+
+                if(nodeData.stencil.id == 'ServiceTask'){
+                    nodeData.stencil.id = 'HttpTask';
+                }
                 mapSaveNodes[bnode.id] = nodeData;
             }
 
@@ -846,6 +948,9 @@ export default {
                 );
             }
 
+            if(name == 'approvalForElement'|| name == 'serviceNotificationActionForElement'){
+                this.setEditableControlsForNode(this.selectingNode, this.stateAllElements[data.value]);
+            }
             
             if (name == "overrideid" || name == "process_id") {
                 let oldId = this.selectingNode.id;
@@ -856,12 +961,23 @@ export default {
                 this.$delete(this.stateAllElements, oldId);
                 this.$set(this.stateAllElements, newId, this.selectingNode);
             }
+            
 
             // Nếu set formreference cho StartNoneEvent thì đặt các lựa chọn control để làm business key
             if(this.selectingNode.type == 'StartNoneEvent' && name == 'formreference'){
                 this.setControlsForBizKey(inputInfo.value);
             }
+            // set documentId cho selectDefaultControlDocument để cấu hình điền sẵn các giá trị mặc định cho document
+            if (this.selectingNode.type=="UserTask" 
+                && this.selectingNode.attrs.taskAction.value=="submit"
+                && name=="formreference"
+                ) {
+                this.selectingNode.attrs.selectDefaultControlDocument.docId=data.value;
+            }
+            
+
         },
+        
         /**
          * Thay đổi giá trị của id cho các node có attr cần lựa chọn dùng tới node nào.
          * VD: approvalForElement, updateForElement ...
@@ -870,6 +986,7 @@ export default {
             let needReassignAttrName = {
                 approvalForElement: true,
                 updateForElement: true,
+                serviceNotificationActionForElement: true,
             };
 
             for(let nodeId in this.stateAllElements){
@@ -957,16 +1074,20 @@ export default {
                 instanceKey: this.instanceKey,
                 data: nodeData
             });
-
             if(nodeData.type == 'UserTask'){
                 this.setTaskActionableNodes(nodeData, 'approvalForElement');
                 this.setTaskActionableNodes(nodeData, 'updateForElement');
+                if (nodeData.attrs.taskAction.value=="submit" && nodeData.attrs.formreference.value) {
+                    this.selectingNode.attrs.selectDefaultControlDocument.docId=nodeData.attrs.formreference.value;
+                }
             }else if(nodeData.type == 'BPMNDiagram'){
                 nodeData.attrs.controlsForBizKey.options = this.controlsForBizKey;
             }else if(nodeData.type.includes('Gateway')){
                 this.setFlowsOrderForGateway(nodeData);
             }else if(nodeData.type == 'CallActivity'){
                 this.setItemForSelectProcessModel();
+            }else if(nodeData.type == 'ServiceTask'){
+                this.setTaskActionableNodes(nodeData, 'serviceNotificationActionForElement',"serviceTask");
             }
         },
         setItemForSelectProcessModel(){
@@ -1013,8 +1134,9 @@ export default {
         },
         /**
          * Tìm các node ở trước node hiện tại để có thể duyệt, phục vụ cho việc select node cần duyệt: approvalForElement
+         * // tham số object để check trường hợp là services task thì sẽ tìm cả node duyệt và node submit
          */
-        setTaskActionableNodes(nodeData, attrName = 'approvalForElement'){
+        setTaskActionableNodes(nodeData, attrName = 'approvalForElement',object=''){ 
             let allEls = this.$refs.symperBpmn.getAllNodes();
             let currBizNode = {};
             let submitTasks = [];
@@ -1036,36 +1158,55 @@ export default {
             });
             let searchedNodeMap = {};
             let nodeToFind = 
-            this.findSubmitTasksFromNode(submitTasks, currBizNode, searchedNodeMap);
+            this.findSubmitTasksFromNode(submitTasks, currBizNode, searchedNodeMap,object);
             nodeData.attrs[attrName].options = submitTasks;
             if(submitTasks.length == 0){ // nếu ko có node nào là ứng cử viên thì đặt giá trị về rỗng
                 nodeData.attrs[attrName].value = '';
             }else if(!nodeData.attrs[attrName].value ){ // Tự động chọn phần tử đầu tiên làm giá trị
                 nodeData.attrs[attrName].value = submitTasks[0].id;
+                this.setEditableControlsForNode(nodeData, submitTasks[0].nodeData);
             }
         },
         // Tìm từ node hiện tại về node đầu để ra các node là submit task 
-        findSubmitTasksFromNode(result, currBizNode, searchedNodeMap){
+        findSubmitTasksFromNode(result, currBizNode, searchedNodeMap,object=''){
             let nodeData = this.stateAllElements[currBizNode.id];
-            console.log(currBizNode.id, result, searchedNodeMap);
             
             if(searchedNodeMap[currBizNode.id] || !nodeData){
                 return;
             }
             // Nếu là UserTask và là submit hoặc là node bắt đầu quy trình và có form submit
-            if(nodeData && (nodeData.type == 'UserTask' && nodeData.attrs.taskAction.value == 'submit') ||
-                (nodeData.type == 'StartNoneEvent' && nodeData.attrs.formreference.value)){
-                    result.push({
-                        id: nodeData.id,
-                        title: currBizNode.name
-                    });
+            // check trường hợp có tham số object, nếu object=servicesTask thì sẽ tìm các node duyệt và submit
+            if (object=='') {
+                if(nodeData && (nodeData.type == 'UserTask' && nodeData.attrs.taskAction.value == 'submit' ) ||
+                //if(nodeData && nodeData.type == 'UserTask' ||
+                    (nodeData.type == 'StartNoneEvent' && nodeData.attrs.formreference.value)){
+                        result.push({
+                            id: nodeData.id,
+                            title: currBizNode.name,
+                            nodeData: nodeData
+                        });
+                        searchedNodeMap[nodeData.id] = true;
+                }else{
                     searchedNodeMap[nodeData.id] = true;
-            }else{
-                searchedNodeMap[nodeData.id] = true;
+                }
+            }else if (object=='serviceTask') {
+                if(nodeData && mappNodeActivity[nodeData.type] ||
+                    (nodeData.type == 'StartNoneEvent' && nodeData.attrs.formreference.value)){
+                        result.push({
+                            id: nodeData.id,
+                            title: currBizNode.name,
+                            nodeData: nodeData
+                        });
+                        searchedNodeMap[nodeData.id] = true;
+                }else{
+                    searchedNodeMap[nodeData.id] = true;
+                }
             }
+            
+
             for(let id in currBizNode.symper_link_prev){
                 let prevNode = this.$refs.symperBpmn.getElData(id);
-                this.findSubmitTasksFromNode(result, prevNode.businessObject, searchedNodeMap);                
+                this.findSubmitTasksFromNode(result, prevNode.businessObject, searchedNodeMap,object);                
                 searchedNodeMap[id] = true;
             }
         },
@@ -1150,8 +1291,15 @@ export default {
                 }
 
                 if(el.type.includes('StartNoneEvent') && el.attrs.formreference.value){
-                    
                     this.setControlsForBizKey(el.attrs.formreference.value);
+                }
+
+                if(el.type.includes('UserTask') 
+                    && el.attrs.taskAction.value == 'approval'){
+                    this.setEditableControlsForNode(el, this.stateAllElements[el.attrs.approvalForElement.value]);
+                }
+                 if(el.type.includes('ServiceTask') ){
+                    this.setEditableControlsForNode(el, this.stateAllElements[el.attrs.serviceNotificationActionForElement.value]);
                 }
             }
             this.setInitItemsForFormReferences(formKeyToNodeIdMap);
@@ -1226,7 +1374,6 @@ export default {
                     if(el.$type == "bpmn:Process"){
                         let uniqueId = util.str.randomString(6)+'_'+Date.now();
                         uniqueId = uniqueId.toLowerCase();
-                        console.log(uniqueId, 'uniqueIduniqueIduniqueId');
                         self.$refs.symperBpmn.updateElementProperties(
                             el.id,
                             {
@@ -1252,17 +1399,17 @@ export default {
         
         this.$store.dispatch('process/getAllDefinitions');
         
-        if (this.$route.name == "editProcess") {
+        if (this.routeName == "editProcess") {
             this.modelAction = "edit";
             this.modelId = this.$route.params.id;
-        } else if (this.$route.name == "cloneProcess") {
+        } else if (this.routeName == "cloneProcess") {
             this.modelAction = "clone";
         }
 
         if (
-            this.$route.name == "editProcess" ||
-            this.$route.name == "cloneProcess" ||
-            this.$route.name == "viewProcess"
+            this.routeName == "editProcess" ||
+            this.routeName == "cloneProcess" ||
+            this.routeName == "viewProcess"
         ) {
             this.applySavedData(this.$route.params.id);
         }
@@ -1271,7 +1418,7 @@ export default {
     },
     mounted(){
         this.resetAttrPanelHeight();
-        
+        this.calcDiagramHeight();
         let uniqueId = util.str.randomString(6)+'_'+Date.now();
         console.log(uniqueId.toLowerCase(), 'uniqueIduniqueIduniqueId');
         
@@ -1286,6 +1433,7 @@ export default {
             modelAction: "create", // hành động đối với model này là gì: create | clone | edit
             modelId: "", // Id của model này trong DB
             searchAttrKey: "",
+            diagramHeight: 300,
             headerActions: {
                 undo: {
                     icon: "mdi-undo",
@@ -1342,6 +1490,9 @@ export default {
         }
     },
     computed: {
+        routeName(){
+            return this.$getRouteName();
+        },
         selectingNode() {
             return this.$store.state.process.editor[this.instanceKey].selectingNode;
         },

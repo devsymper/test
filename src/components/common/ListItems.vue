@@ -1,10 +1,10 @@
 <template>
-    <div class="ml-2 w-100 pr-3 pt-3">
+    <div class="ml-2 w-100 pr-3 pt-3 list-item-common-symper" >
         <div :style="{width:contentWidth, display: 'inline-block'}">
             <v-row no-gutters class="pb-2" ref="topBar">
                 <v-col>
                     <span class="symper-title float-left">{{pageTitle}}</span>
-                    <div class="float-right overline">
+                    <div :class="{'float-right': true, 'overline' : true , 'show-panel-mode': actionPanel } ">
                         <v-text-field
                             @input="bindToSearchkey"
                             class="d-inline-block mr-2 sym-small-size"
@@ -15,7 +15,8 @@
                             label="Search"
                             :placeholder="$t('common.search')"
                         ></v-text-field>
-                        <v-btn
+                         <v-btn
+                            v-show="showButtonAdd && !actionPanel"
                             depressed
                             small
                             :loading="loadingRefresh"
@@ -25,7 +26,7 @@
                             v-if="checkShowCreateButton()"
                         >
                             <v-icon left dark>mdi-plus</v-icon>
-                            {{$t('common.add')}}
+                            <span >{{$t('common.add')}}</span>
                         </v-btn>
                         <v-btn
                             depressed
@@ -33,12 +34,14 @@
                             :loading="loadingRefresh"
                             :disabled="loadingRefresh"
                             class="mr-2"
-                            v-if="!isCompactMode"
+                            v-if="!isCompactMode && !actionPanel "
                             @click="refreshList"
                         >
                             <v-icon left dark>mdi-refresh</v-icon>
-                            {{$t('common.refresh')}}
+                            <span >{{$t('common.refresh')}}</span>
                         </v-btn>
+                     
+                      
                         <v-btn
                             depressed
                             small
@@ -46,10 +49,10 @@
                             :loading="loadingExportExcel"
                             class="mr-2"
                             :disabled="loadingExportExcel"
-                            v-if="!isCompactMode && showExportButton"
+                            v-if="!isCompactMode && showExportButton && !actionPanel"
                         >
                             <v-icon left dark>mdi-microsoft-excel</v-icon>
-                            {{$t('common.export_excel')}}
+                            <span v-show="!actionPanel">{{$t('common.export_excel')}}</span>
                         </v-btn>
 
                         
@@ -58,11 +61,82 @@
                             small
                             @click="importExcel()"
                             class="mr-2"
-                            v-if="showImportButton"
+                            v-if="showImportButton && !actionPanel"
                         >
                             <v-icon left dark>mdi-database-import</v-icon>
-                            {{$t('common.import_excel')}}
+                            <span>{{$t('common.import_excel')}}</span>
                         </v-btn>
+                        
+                    
+                        <v-btn
+                            depressed
+                            small
+                            @click="showImportHistory()"
+                            class="mr-2"
+                            v-if="showImportHistory && !actionPanel"
+                        >
+                            <v-icon left dark>mdi-database-import</v-icon>
+                            <span>{{$t('common.import_excel_history')}}</span>
+                        </v-btn>
+                          <!-- show menu khi hien sidebar -->
+                         <v-menu
+                            
+                            bottom
+                            left
+                            >
+                            <template v-slot:activator="{ on, attrs }">
+                                 <v-btn 
+                                    icon
+                                    tile 
+                                    v-show="actionPanel"
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    style="width:29px;height:29px;margin:0px 4px"    
+                                >
+                                        <v-icon>
+                                            mdi-dots-vertical
+                                        </v-icon>
+                                </v-btn>
+                            </template>
+                            <v-list class="group-action-list">
+                                <v-list-item  v-show="showButtonAdd"  @click="addItem">
+                                    <v-list-item-icon>
+                                         <v-icon>mdi-plus</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title> {{$t('common.add')}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item  v-show="!isCompactMode"  @click="refreshList">
+                                    <v-list-item-icon>
+                                         <v-icon>mdi-refresh</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title> {{$t('common.refresh')}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item  v-show="!isCompactMode && showExportButton"  @click="exportExcel()">
+                                    <v-list-item-icon>
+                                         <v-icon>mdi-microsoft-excel</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title>{{$t('common.export_excel')}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item  v-show="showImportButton"  @click="importExcel()">
+                                    <v-list-item-icon>
+                                         <v-icon>
+                                             mdi-database-import
+                                         </v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title> 
+                                             {{$t('common.import_excel')}}
+                                        </v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
 
                         <component
                             :is="'span'"
@@ -102,7 +176,6 @@
                         :rowHeights="21"
                         :renderAllRows="true"
                         :columns="tableColumns"
-                        :contextMenu="hotTableContextMenuItems"
                         :colHeaders="colHeaders"
                         :hiddenColumns="{
                             columns: tableDisplayConfig.value.hiddenColumns
@@ -121,7 +194,7 @@
                 ></Pagination>
             </v-row>
         </div>
-
+    
         <component
             :is="actionPanelWrapper"
             :width="actionPanelWidth"
@@ -130,8 +203,8 @@
             class="pa-3"
             absolute
             right
-            v-if="actionPanelType != 'drag'"
-            :temporary="actionPanelType == 'temporary'"
+            v-if="reComputeActionPanelType != 'drag'"
+            :temporary="reComputeActionPanelType == 'temporary'"
         >
             <slot name="right-panel-content" :itemData="currentItemDataClone">
                 <v-card flat>
@@ -172,6 +245,7 @@
             :tableDisplayConfig="tableDisplayConfig"
             :tableColumns="tableColumns"
             :headerPrefixKeypath="headerPrefixKeypath"
+            :showActionPanelInDisplayConfig="showActionPanelInDisplayConfig"
         ></display-config>
 
         <table-filter
@@ -249,11 +323,22 @@ export default {
             if (this.actionPanel == true) {
                 this.$emit("open-panel");
             }
+        },
+        getDataUrl(){   
+           this.refreshList();
+        },
+        'tableDisplayConfig.value.alwaysShowSidebar'(value) {
+            if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
+                this.openactionPanel();
+            }else{
+                this.closeactionPanel();
+            }
         }
     },
     data() {
         let self = this;
         return {
+            tmpTableContextMenu: null,
             deleteDialogShow: false, // có hiển thị cảnh báo xóa hay không
             deleteItems: [], // danh sách các row cần xóa
             savingConfigs: false, // có đang lưu cấu hình của showlist hay không
@@ -293,13 +378,17 @@ export default {
                 filters: true,
                 manualColumnMove: true,
                 manualColumnResize: true,
-                renderAllRows: true,
+                renderAllRows: false,
                 manualRowResize: true,
+                readOnly: this.isTablereadOnly,
+                contextMenu: {},
+                viewportRowRenderingOffset: 20,
+                viewportColumnRenderingOffset: 20,
                 rowHeights: 21,
                 stretchH: "all",
                 licenseKey: "non-commercial-and-evaluation",
                 afterRender: isForced => {
-                    
+                    console.count('list item render table');
                 },
                 afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
                     if(self.debounceEmitRowSelectEvt){
@@ -319,7 +408,7 @@ export default {
                     }
                     this.debounceRelistContextmenu = setTimeout((self) => {
                         self.relistContextmenu();
-                    }, 200, this);
+                    }, 100, this);
                 },
                 afterChange: function (change, source) {
                      
@@ -327,10 +416,20 @@ export default {
                 },
                 beforeKeyDown:function(change, source){
                     let cellMeta = this.getSelected();
-                    self.$emit('before-keydown',{event:event,row:self.data[cellMeta[0][0]]});
+                    self.$emit('before-keydown',{event:event,cell:{col:cellMeta[0][1],row:cellMeta[0][0]},rowData:self.data[cellMeta[0][0]]});
                 },
                 afterOnCellMouseDown:function(event, coords, TD){
-                    self.$emit('after-cell-mouse-down',{event:event,row:self.data[coords.row]});
+                    self.$emit('after-cell-mouse-down',{event:event,cell:coords,rowData:self.data[coords.row]});
+                },
+                afterColumnMove(movedColumns, finalIndex, dropIndex, movePossible, orderChanged){
+
+                },
+                beforeOnCellMouseDown(){
+                    if(event.which == 3){ // nếu select bằng context menu thì mới set lại các option
+                        self.$refs.dataTable.hotInstance.updateSettings({
+                            contextMenu: util.cloneDeep(self.tmpTableContextMenu)
+                        });
+                    }
                 }
             },
             tableFilter: {
@@ -400,11 +499,16 @@ export default {
         // });
         this.getData();
         this.restoreTableDisplayConfig();
+        document.addEventListener('keyup', function (evt) {
+            if (evt.keyCode === 27) {
+                thisCpn.closeactionPanel();
+            }
+        });
     },
     props: {
         showImportButton: {
             type: Boolean,
-            default: true
+            default: false
         },
         exportLink: {
             type: String,
@@ -412,7 +516,7 @@ export default {
         },
         showExportButton: {
             type: Boolean,
-            default: true
+            default: false
         },
         widgetIdentifier: {
             type: String,
@@ -427,6 +531,14 @@ export default {
             default() {
                 return {};
             }
+        },
+        showButtonAdd:{
+            type:Boolean,
+            default: true
+        },
+        showActionPanelInDisplayConfig:{
+            type: Boolean,
+            default: false,
         },
         /**
          * Prefix cho keypath trong file đa ngôn ngữ để hiển thị header của table
@@ -541,16 +653,29 @@ export default {
             default(){
                 return {}
             }
+        },
+        isTablereadOnly:{
+            type:Boolean,
+            default:true
+        },
+        conditionByFormula:{
+            type:String
         }
     },
     mounted() {},
     computed: {
+        alwaysShowActionPanel(){
+            return this.tableDisplayConfig.value.alwaysShowSidebar;
+        },
+        reComputeActionPanelType(){
+            return this.tableDisplayConfig.value.alwaysShowSidebar ? 'elastic' : this.actionPanelType;
+        },
         currentItemDataClone() {
             return util.cloneDeep(this.currentItemData);
         },
         actionTitle() {},
         contentWidth() {
-            if (this.actionPanel && this.actionPanelType == "elastic") {
+            if (this.actionPanel && this.reComputeActionPanelType == "elastic") {
                 return "calc(100% - " + this.actionPanelWidth + "px)";
             } else if (this.tableDisplayConfig.show) {
                 return "calc(100% - " + this.tableDisplayConfig.width + "px)";
@@ -594,12 +719,16 @@ export default {
                     markFilter = "applied-filter";
                 }
                 let headerName = prefix ? thisCpn.$t(prefix + colTitles[col]) : colTitles[col];
-                return `<span>
+                let filterIcon =  '';
+                if(!thisCpn.tableColumns[col].noFilter){
+                    filterIcon = `<i col-name="${colName}" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button ${markFilter}"></i>`;
+                }
+                return `<span class="d-flex justify-space-between">
                             <span class="font-weight-medium">
                                 ${headerName}
                             </span>
                             <span class="float-right symper-filter-button">
-                                <i col-name="${colName}" onclick="tableDropdownClickHandle(this, event)" class="grey-hover mdi mdi-filter-variant symper-table-dropdown-button ${markFilter}"></i>
+                                ${filterIcon}
                             </span>
                         </span>`;
                 //.replace(/\n|\r\n/g,'')
@@ -611,14 +740,20 @@ export default {
                 temporary: "v-navigation-drawer",
                 elastic: "v-navigation-drawer"
             };
-            return mapType[this.actionPanelType]
-                ? mapType[this.actionPanelType]
+            return mapType[this.reComputeActionPanelType]
+                ? mapType[this.reComputeActionPanelType]
                 : mapType["temporary"];
         }
     },
     methods: {
         importExcel(){
             this.$emit('import-excel');
+        },
+        showImportHistory(){
+            this.$router.push("/viewHistory");
+        },
+        cancelImport(){
+            this.$emit('cancel-import');
         },
         async exportExcel(){
             let exportUrl = this.exportLink
@@ -630,10 +765,9 @@ export default {
                 }
             }
             
-            this.loadingExportExcel = true;
-            await apiObj.get(exportUrl);
-            this.loadingExportExcel = false;
+            window.open(exportUrl,'_blank');
         },
+       
         checkShowCreateButton(){
             let rsl = !this.isCompactMode;
             let objectType = this.commonActionProps.resource;
@@ -657,7 +791,7 @@ export default {
                 let parentId = this.commonActionProps.parentId ? this.commonActionProps.parentId : id;
                 items = actionHelper.filterAdmittedActions(items, objectType, parentId ,id);
             }
-            this.hotTableContextMenuItems =  this.getItemContextMenu(items);
+            this.tmpTableContextMenu = this.getItemContextMenu(items);
         },
         getItemContextMenu(rawItems) {
             let thisCpn = this;
@@ -667,6 +801,13 @@ export default {
                     let row = selection[0].start.row;
                     let rowData = thisCpn.data[row];
                     let colName = Object.keys(rowData)[col];
+                    let callBackOption = thisCpn.tableContextMenu[key];
+                    if(callBackOption && callBackOption.multipleSelection){
+                        rowData = [];
+                        for(let i = selection[0].start.row; i <= selection[0].end.row; i++){
+                            rowData.push(thisCpn.data[i]);
+                        }
+                    }
                     /**
                      * Phát sự kiện khi có một hành động đối với một row, hoặc cell.
                      * tham số thứ nhất: row ( index của row đang được chọn)
@@ -985,7 +1126,8 @@ export default {
                 page: this.page,
                 pageSize: configs.pageSize ? configs.pageSize : this.pageSize,
                 columns: columns ? columns : [],
-                distinct: configs.distinct ? configs.distinct : false
+                distinct: configs.distinct ? configs.distinct : false,
+                formulaCondition:this.conditionByFormula
             };
         },
         /**
@@ -999,7 +1141,8 @@ export default {
                 thisCpn.loadingData = true;
                 let options = this.getOptionForGetList(configs, columns);
                 let header = {};
-                if(thisCpn.$route.name == "deployHistory" || thisCpn.$route.name == "listProcessInstances"){
+                let routeName = this.$getRouteName();
+                if(routeName == "deployHistory" || routeName == "listProcessInstances"){
                     header = {
                         Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0'
                     };
@@ -1147,6 +1290,7 @@ export default {
                         symperFixed: false,
                         symperHide: false,
                         columnTitle: item.title,
+                        noFilter: item.noFilter ? item.noFilter : false
                     };
                     // Render image - icon
                     if (item.type === 'image') {
@@ -1179,12 +1323,21 @@ export default {
                 let orderedCols = [];
                 let noneOrderedCols = [];
                 for (let col of savedOrderCols) {
-                    if (colMap[col.data]) {
-                        colMap[col.data].symperFixed = col.symperFixed;
-                        colMap[col.data].symperHide = col.symperHide;
-                        orderedCols.push(colMap[col.data]);
-                    } else {
-                        noneOrderedCols.push(colMap[col.data]);
+                    if(colMap[col.data]){
+                        colMap[col.data].checkedOrder = true;
+                        if (colMap[col.data]) {
+                            colMap[col.data].symperFixed = col.symperFixed;
+                            colMap[col.data].symperHide = col.symperHide;
+                            orderedCols.push(colMap[col.data]);
+                        } else {
+                            noneOrderedCols.push(colMap[col.data]);
+                        }
+                    }
+                }
+
+                for(let colName in colMap){
+                    if(!colMap[colName].checkedOrder){
+                        noneOrderedCols.push(colMap[colName]);
                     }
                 }
                 return orderedCols.concat(noneOrderedCols);
@@ -1228,6 +1381,10 @@ export default {
             this.tableDisplayConfig.show = !this.tableDisplayConfig.show;
         },
         showTableDropdownMenu(x, y, colName) {
+            var windowWidth = $(window).width()/1.1;
+            if(x > windowWidth){
+                x -= 190;
+            }
             let filterDom = $(this.$refs.tableFilter.$el);
             filterDom.css("left", x + "px").css("top", y + 10 + "px");
             this.$refs.dataTable.hotInstance.deselectCell();
@@ -1381,7 +1538,7 @@ export default {
         // hoangnd: thêm cột checkbox
         addCheckBoxColumn(){
             this.hasColumnsChecked = true;
-            this.tableColumns.unshift({name:"checkbox_select_item",title:"Chọn",type:"checkbox"});
+            this.tableColumns.unshift({name:"checkbox_select_item",data:"checkbox_select_item",title:"Chọn",type:"checkbox"});
         },
         removeCheckBoxColumn(){
             this.hasColumnsChecked = false;
@@ -1400,13 +1557,22 @@ export default {
          */
         handleAfterChangeDataTable(change, source) {
             if(source == 'edit' && this.hasColumnsChecked){
-                if(change[0][3] == true){
-                    this.allRowChecked[change[0][0]] = this.data[change[0][0]]
-                }else{
-                    delete this.allRowChecked[change[0][0]];
+                for (let index = 0; index < change.length; index++) {
+                    let rowChange = change[index];
+                    if(change[index][3] == true){
+                        this.allRowChecked[change[index][0]] = this.data[change[index][0]]
+                    }else{
+                        delete this.allRowChecked[change[index][0]];
+                    }
                 }
+                
+                this.$emit('after-selected-row',this.allRowChecked)
             }
+        },
+        isShowSidebar(){
+            return this.alwaysShowActionPanel
         }
+        
     },
     components: {
         HotTable,
@@ -1420,7 +1586,29 @@ export default {
     }
 };
 </script>
-
+<style scoped>
+    .group-action-list >>> .v-list-item {
+        min-height:unset;
+        height:30px;
+        margin:2px 8px;
+        padding: 0;
+        overflow: hidden;
+    }
+    .group-action-list >>> .v-list-item .v-list-item__title{
+        font-size: 13px;
+    }
+    .group-action-list >>> .v-list-item__icon  {
+        margin: 18px 2px 0 0;
+        font-size: 13px;
+        min-height:unset;
+    }
+    .group-action-list >>> .v-list-item__icon i{
+        font-size: 20px;
+    }
+    .group-action-list >>> .v-list-item i{
+        margin-top:-12px;
+    }
+</style>
 <style>
 .ht_clone_top.handsontable {
     z-index: 6;
@@ -1434,7 +1622,7 @@ export default {
     white-space: nowrap !important;
 }
 .symper-custom-table.loosen-row .ht_master.handsontable .htCore td,
-.symper-custom-table.loosen-row .ht_clone_left.handsontable .htCore td {
+.symper-custom-table.loosen-row .htgetDataUrl_clone_left.handsontable .htCore td {
     height: 40px !important;
     line-height: 40px !important;
 }
@@ -1490,4 +1678,9 @@ i.applied-filter {
     border-color: #bbb;
     border-right: 0;
 }
+.ht_clone_left {
+    z-index: 8;
+}
+
 </style>
+

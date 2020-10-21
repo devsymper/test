@@ -22,18 +22,31 @@ export default {
         let self = this 
             $(document).click(function(e){
 				if(!$(e.target).is('.context-menu')){
+                    $('.context-menu').css('display', 'none')
                     if(self.viewSideBySide == true){
                         if(self.$refs.ViewSideBySideApp){
-                            self.$refs.ViewSideBySideApp.hideContextMenu()		
+                            self.$refs.ViewSideBySideApp.hideContextMenu()
                         }
                     }else{
                         if(self.$refs.ViewDetailsAllApp){
-                            self.$refs.ViewDetailsAllApp.hideContextMenu()		
+                            self.$refs.ViewDetailsAllApp.hideContextMenu()	
                         }
-                        //  self.$refs.ViewDetailsAllApp.hideContextMenu()		
                     }
 				}
 			})
+    },
+    watch:{
+        // viewSideBySide(val){
+        //     if(val == true ){
+        //          if(this.$refs.ViewDetailsAllApp){
+        //                     this.$refs.ViewDetailsAllApp.hideContextMenu()		
+        //         }
+        //     }else{
+        //          if(this.$refs.ViewSideBySideApp){
+        //                     this.$refs.ViewSideBySideApp.hideContextMenu()		
+        //         }
+        //     }
+        // }
     }
 }
 </script>

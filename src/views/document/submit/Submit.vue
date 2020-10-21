@@ -4,7 +4,8 @@
     'sym-sub-form-submit':(parrentInstance == 0) ? false : true
 
     }">
-        <Loader ref="skeletonView"/>
+    <VuePerfectScrollbar class="scroll-content h-100">
+        <Preloader ref="preLoaderView"/>
         <div
             :key="keyInstance"
             class="sym-form-submit"
@@ -126,9 +127,24 @@
         :dataflowId="dataFlow.id" 
         :width="'100%'"
         :ref="'dataFlow'+dataFlow.id"/>
+        <UploadFile 
+        :objectType="'document'"
+        :iconName="`mdi-upload-outline`"
+        ref="fileUploadView"
+        class="d-none"
+        @uploaded-file="afterFileUpload"
+        :objectIdentifier="docId+''" />
+        
         <!-- v-for="dataFlow in listDataFlow" :key="dataFlow.id"  -->
         
-         <v-navigation-drawer
+         
+        <div class="sub-form-action" v-if="parrentInstance != 0">
+            <button @click="goToListDocument()" class=subfom-action__item>{{$t('document.submit.goToList')}}</button>
+            <button @click="handlerSubmitDocumentClick(true);" class=subfom-action__item><span class="mdi mdi-content-save-move-outline"></span>{{$t('document.submit.continueSubmit')}}</button>
+            <button @click="handlerSubmitDocumentClick" class=subfom-action__item><span class="mdi mdi-content-save-settings-outline"></span>{{$t('document.submit.fab.submit')}}</button>
+        </div>
+        </VuePerfectScrollbar>
+        <v-navigation-drawer
             v-if="parrentInstance == 0" 
             :width="(isShowTraceControlSidebar) ? 300 : 830"
             v-model="drawer"
@@ -145,16 +161,13 @@
             @submit-document-success="submitSubFormSuccess"
             ref="subSubmitView" :isQickSubmit="true" :action="'submit'" :docId="docSubFormId"/>
             <SidebarTraceFormulas 
+            :documentInfo="documentInfo"
             :controlTrace="controlTrace"
             :keyInstance="keyInstance"
             :listFormulasTrace="listFormulasTrace"
             ref="traceControlView" v-show="isShowTraceControlSidebar" />
         </v-navigation-drawer>
-        <div class="sub-form-action" v-if="parrentInstance != 0">
-            <button @click="goToListDocument()" class=subfom-action__item>{{$t('document.submit.goToList')}}</button>
-            <button @click="handlerSubmitDocumentClick(true);" class=subfom-action__item><span class="mdi mdi-content-save-move-outline"></span>{{$t('document.submit.continueSubmit')}}</button>
-            <button @click="handlerSubmitDocumentClick" class=subfom-action__item><span class="mdi mdi-content-save-settings-outline"></span>{{$t('document.submit.fab.submit')}}</button>
-        </div>
+
     </div>
      
 </template>
@@ -172,6 +185,7 @@ import PageControl from "./pageControl";
 import TabControl from "./tabControl";
 import DatePicker from "./../../../components/common/DateTimePicker";
 import TimeInput from "./../../../components/common/TimeInput";
+import UploadFile from "@/components/common/UploadFile.vue";
 import Table from "./table.js";
 import SymperDragPanel from "./../../../components/common/SymperDragPanel.vue";
 import { util } from "./../../../plugins/util.js";
@@ -186,8 +200,10 @@ import './customControl.css';
 import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
 import moment from "moment-timezone";
 import EmbedDataflow from "@/components/dataflow/EmbedDataflow";
-import Loader from './../../../components/common/Loader';
+// import Loader from './../../../components/common/Loader';
+import Preloader from './../../../components/common/Preloader';
 import {listControlNotNameProp} from "./../../../components/document/controlPropsFactory.js"
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 
 
@@ -231,6 +247,13 @@ export default {
             type: String,
             default: ''
         },
+        /**
+         * Biến chỉ ra bản ghi nằm trong app nào
+         */
+        appId:{
+            type:Number,
+            default:0
+        },
         
         workflowVariable:{
             type:Object,
@@ -262,6 +285,12 @@ export default {
             type:Number,
             default:0
         },
+        dataPreview:{
+            type:Object,
+            default(){
+                return {}
+            }
+        }
     },
     name: "submitDocument",
 
@@ -275,8 +304,10 @@ export default {
         "sym-drag-panel": SymperDragPanel,
         "err-message": ErrMessagePanel,
         EmbedDataflow,
-        Loader,
+        Preloader,
+        UploadFile,
         SidebarTraceFormulas,
+        VuePerfectScrollbar,
         VBoilerplate: {
             functional: true,
             render (h, { data, props, children }) {
@@ -308,6 +339,7 @@ export default {
     data() {
         return {
             contentDocument: null,
+            documentInfo:null,
             documentId: null,
             documentName: null,
             docSize: null,
@@ -346,7 +378,9 @@ export default {
             titleObjectFormulas:null,
             isShowTraceControlSidebar:false,
             listFormulasTrace:{},
-            controlTrace:null
+            controlTrace:null,
+            listFileControl:[],
+            currentImageControl:null
         };
 
     },
@@ -371,7 +405,8 @@ export default {
             thisCpn.$refs.validate.show(e);
 
         });
-        $(document).on('click','.run-dataflow',function(e){
+        $(document).find('#sym-submit-'+this.keyInstance).off('click','.run-dataflow')
+        $(document).find('#sym-submit-'+this.keyInstance).on('click','.run-dataflow',function(e){
             let idControl = $(this).closest('.s-control-data-flow').attr('id');
             let control = thisCpn.sDocumentEditor.allControl[idControl];
             let dataParams = thisCpn.getParamsForRunDataFlow(control.properties);
@@ -379,7 +414,8 @@ export default {
         })
     },
 
-    created() {
+    async created() {
+        await ClientSQLManager.createDB(this.keyInstance);
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
@@ -392,13 +428,13 @@ export default {
         let thisCpn = this;
         if (this.docId != 0) {
             this.documentId = this.docId;
-        } else if (this.$route.name == "submitDocument") {
+        } else if (this.$getRouteName() == "submitDocument") {
             this.$store.commit("document/changeViewType", {
                 key: this.keyInstance,
                 value: 'submit',
             });
             this.documentId = this.$route.params.id;
-        } else if (this.$route.name == "updateDocumentObject") {
+        } else if (this.$getRouteName() == "updateDocumentObject") {
             this.$store.commit("document/changeViewType", {
                 key: this.keyInstance,
                 value: 'update',
@@ -452,6 +488,14 @@ export default {
             }
             
         });
+        /**
+         * Hàm gọi mở sub form submit
+         */
+        this.$evtBus.$on("document-submit-image-click", data => {
+            this.currentImageControl = {el:$(data.target).closest('.s-control-image'),controlName:data.controlName}
+            this.$refs.fileUploadView.onButtonClick();
+            
+        });
 
         // hàm nhận sự kiện thay đổi của input
         this.$evtBus.$on("document-submit-input-change", locale => {
@@ -485,7 +529,7 @@ export default {
                         controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+locale.controlName)
                     }
                     else{
-                        controlInstance.removeValidateIcon()
+                        controlInstance.removeValidateIcon();
                     }
                 }
                 resetImpactedFieldsList(thisCpn.keyInstance);
@@ -518,15 +562,25 @@ export default {
                 instance: thisCpn.keyInstance
             });
         });
-      
-        // this.$evtBus.$on("document-submit-search-in-filter-input", e => {
-        //     if(thisCpn._inactive == true) return;
-        //     thisCpn.runInputFilterFormulas(e.controlName,e.search);
-        // }); 
+        /**
+         * Sự kiện bắn ra từ click vào input filter để mở popup
+         */
         this.$evtBus.$on("document-submit-filter-input-click", e => {
             if(thisCpn._inactive == true) return;
-            thisCpn.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
-            thisCpn.leftPositionDragPanel = e.screenX - e.offsetX;
+            if($(document).height() - $(e.target).offset().top > 420){
+                thisCpn.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
+            }
+            else{
+                thisCpn.topPositionDragPanel = $(e.target).offset().top  - 400 
+            }
+            if(e.screenX - e.offsetX > 600){
+                thisCpn.leftPositionDragPanel = e.screenX - e.offsetX ;
+            }
+            else{
+                thisCpn.leftPositionDragPanel = e.screenX - e.offsetX - 300;
+            }
+            
+            thisCpn.$refs.inputFilter.setControlName(e.controlName);
             thisCpn.runInputFilterFormulas(e.controlName);
             thisCpn.$refs.symDragPanel.show();
             thisCpn.$refs.inputFilter.setFormulas(e.formulas,e.controlName);
@@ -535,6 +589,7 @@ export default {
         }); 
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
+
             if(thisCpn._inactive == true) return;
             try {
                 if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
@@ -558,6 +613,7 @@ export default {
                 else if((e.e.keyCode < 37 || e.e.keyCode > 40)){
                     thisCpn.$refs.autocompleteInput.hide();
                 }
+                
                 
             } catch (error) {
                 
@@ -604,7 +660,11 @@ export default {
                             value: e.alias,
                             instance: thisCpn.keyInstance
                         });
-                thisCpn.getDataForAutocomplete(e,'select',e.alias);
+                thisCpn.$refs.autocompleteInput.setTypeInput(e.type);
+                if(e.type == 'combobox'){
+                    thisCpn.$refs.autocompleteInput.setSingleSelectCombobox(e.isSingleSelect);
+                }
+                thisCpn.getDataForAutocomplete(e,e.type,e.alias);
             } catch (error) {
                 
             }
@@ -618,9 +678,9 @@ export default {
             if(thisCpn._inactive == true) return;
             try {
                 if (
+                    !$(evt.target).hasClass("s-control-combobox") &&
                     !$(evt.target).hasClass("s-control-select") &&
-                    !$(evt.target).hasClass("v-data-table") &&
-                    $(evt.target).closest(".v-data-table").length == 0
+                    $(evt.target).closest(".card-autocomplete").length == 0
                 ) {
                     thisCpn.$refs.autocompleteInput.hide();
                     let currentTableInteractive = thisCpn.sDocumentSubmit.currentTableInteractive
@@ -697,7 +757,7 @@ export default {
         },
         "sDocumentSubmit.readySubmit":function(data){
             if(data == true){
-                this.submitDocument()
+                this.submitDocument();
             }
         },
         /**
@@ -755,15 +815,33 @@ export default {
                 this.$refs.traceControlView.removeTrace();
                 this.$refs.traceControlView.removeCurrentControlTrace();
             }
+        },
+        dataPreview:{
+            immediate:true,
+            deep:true,
+            handler:function(vl){
+                if(Object.keys(vl) == 0){
+                    return
+                }
+                this.contentDocument = vl.content;
+                setTimeout((self) => {
+                    setDataForPropsControl(vl.fields,self.keyInstance,'submit');
+                }, 500,this);
+                setTimeout(() => {
+                    this.processHtml(vl.content);
+                }, 700);
+            }
         }
     },
     
     methods: {
+        
         /**
          * Hàm ẩn loader
          */
         hidePreloader(){
-            this.$refs.skeletonView.hide();
+            
+            this.$refs.preLoaderView.hide();
             $("#sym-submit-" + this.keyInstance).find('.page-content').removeClass('d-block');
             $("#sym-submit-" + this.keyInstance).find('.list-page-content').removeClass('d-flex');
             $("#sym-submit-" + this.keyInstance).css({opacity:'1'});
@@ -790,28 +868,26 @@ export default {
                 }); 
         },
         saveInputFilter(data){
-            let controlId = data.controlId
-            let value = data.value
-            $('#'+controlId).val(value);
+            this.handleInputChangeBySystem(data.controlName,data.value)
             this.$refs.symDragPanel.hide()
         },
         searchDataFilter(data){
             if(this._inactive == false) return;
             this.runInputFilterFormulas(data.controlName,data.search);
         },
+        /**
+         * Sau khi compon dataflow load xong thì cần gán lại html vào control tương ứng
+         */
         afterDataFlowMounted(id){
             for (let index = 0; index < this.listDataFlow.length; index++) {
                 const controlDataFlow = this.listDataFlow[index];
                 let dataFlowActionEl = controlDataFlow.el.find('.run-dataflow').detach();
-                controlDataFlow.el.empty();
+                controlDataFlow.el.find('div').first().addClass('d-none')
                 let element = $(this.$refs['dataFlow'+controlDataFlow.id][0].$el);
                 
                 controlDataFlow.el.append(dataFlowActionEl);
                 controlDataFlow.el.append(element.detach());
                 controlDataFlow.el.find('.run-dataflow').css({display:'block'})
-                // var iframe = controlDataFlow.el.find('iframe') // or some other selector to get the iframe
-                // $('.joint-paper-scroller', iframe.contents()).css({overflow:'hidden'});
-                // $(this.$refs['dataFlow'+controlDataFlow.id].$el).append(controlDataFlow.el);
                 
             }
         },
@@ -823,7 +899,7 @@ export default {
                 let dataInput = this.getDataInputFormulas(e.formulasInstance,e);
                 e.formulasInstance.handleBeforeRunFormulas(dataInput).then(res=>{
                     res.status = 200
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val(),true)
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,true)
                 });
             }
             else{
@@ -839,10 +915,10 @@ export default {
          */
         getDataForAutocomplete(e,type,aliasControl=""){ 
             let thisCpn = this
-            if(type == 'select'){
+            if(['select','combobox'].includes(type)){
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
                 e.selectFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,"",false)
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,false)
                 });
             }
             else{
@@ -860,7 +936,7 @@ export default {
                         }
                     }
                     e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                        thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val(),"")
+                        thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,false)
                     });
                 }
                 else{
@@ -887,8 +963,9 @@ export default {
         },
         /**
          * Hàm bind dữ liệu cho box autocomplete, cho component autocompleteInput
+         * và đưa dữ liệu vào cache
          */
-        setDataForControlAutocomplete(res,aliasControl,controlTitle, textTyping="",fromSqlite=false){
+        setDataForControlAutocomplete(res,aliasControl,controlTitle, fromSqlite=false){
             let controlAs = {};
             controlAs[aliasControl] = controlTitle;
             if(res.data != undefined){
@@ -904,7 +981,9 @@ export default {
                     this.$refs.autocompleteInput.setData(dataTable);
                     if(dataTable.hasOwnProperty('headers')){
                         let item = {}
+                        let textTyping = this.getTextTypingInSqlQuery(res.data.sql);
                         item[textTyping] = dataTable.dataBody
+                        console.log("sadsadsadsa",item);
                         this.$store.commit("document/cacheDataAutocomplete",{
                             instance: this.keyInstance,
                             controlName:aliasControl,
@@ -923,6 +1002,21 @@ export default {
                 this.$refs.autocompleteInput.setData(dataTable);
                 this.$refs.autocompleteInput.hideHeader();
             }
+        },
+
+        /**
+         * Hàm tìm ra đoạn text đã typing để query autocomplete
+         */
+        getTextTypingInSqlQuery(sql){
+            let textQuery = sql.match(/%.*?%/g);
+            if(textQuery){
+                textQuery = textQuery[0];
+                textQuery = textQuery.replace(/%*/g,"");
+            }
+            else{
+                textQuery = ""
+            }
+            return textQuery;
         },
         /**
          * Hàm bind dữ liệu cho control, và control trong bảng khi chọn apply trên timepicker
@@ -1078,7 +1172,6 @@ export default {
         },
         // Khadm: load data của document lên để hiển thị và xử lý
         async loadDocumentData() {
-            await ClientSQLManager.createDB(this.keyInstance);
             if (this.documentId) {
                 let thisCpn = this;
                 documentApi
@@ -1087,12 +1180,13 @@ export default {
                         if (res.status == 200) {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
+                            thisCpn.documentInfo = res.data.document;
                             thisCpn.getTitleObjectFormulas(res.data.document.titleObjectFormulasId)
                             thisCpn.docSize = (parseInt(res.data.document.isFullSize) == 1) ? "100%":"21cm";
                             thisCpn.contentDocument = content;
-							if(res.data.document.dataPrepareSubmit != "" && res.data.document.dataPrepareSubmit != null)
+							if(res.data.document.dataPrepareSubmit != null && res.data.document.dataPrepareSubmit != "")
                             thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
-                            if(res.data.document.otherInfo != "" && res.data.document.otherInfo != null)
+                            if(res.data.document.otherInfo != null && res.data.document.otherInfo != "")
 							thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
 							thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
                             setDataForPropsControl(res.data.fields,thisCpn.keyInstance,'submit'); // ddang chay bat dong bo
@@ -1108,10 +1202,10 @@ export default {
                         }
                     })
                     .catch(err => {
-                        thisCpn.$snotify({
-                            type: "error",
-                            title: "error from detail document api!!!"
-                        }); 
+                        // thisCpn.$snotify({
+                        //     type: "error",
+                        //     title: "error from detail document api123!!!"
+                        // }); 
                     })
                     .always(() => {});
             }
@@ -1187,12 +1281,13 @@ export default {
             );
             let thisCpn = this;
             let isSetEffectedControl = false;
-            let listDataFlow = []
+            let listDataFlow = [];
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let field = this.sDocumentEditor.allControl[id];
+                    console.log('fieldfieldfield',field);
                     let controlName = allControlNotSetData.includes(controlType) ? field.type : field.properties.name.value;
                     this.checkEditableControl(controlName,field);
                     this.checkOverrideFormulas(controlName,field);
@@ -1241,6 +1336,7 @@ export default {
                             if(controlType == 'dataFlow'){
                                 let id = field.properties.dataFlowId.value;
                                 let mapParamsDataflow = field.properties.mapParamsDataflow.value;
+                                $(allInputControl[index]).find('.run-dataflow').removeClass('d-none')
                                 listDataFlow.push({id:id,controlName:controlName,el:$(allInputControl[index]),mapParamsDataflow:mapParamsDataflow});
                             }
                             else{
@@ -1261,18 +1357,19 @@ export default {
                         //truong hop la control table
                         else {
                             let listInsideControls = {};
+                            let controlInTable = {};
                             let tableControl = new TableControl(
                                 idField,
                                 $(allInputControl[index]),
                                 field,
                                 thisCpn.keyInstance
                             );
-                            this.addToTableLoadedStore(controlName)
                             tableControl.initTableControl();
                             tableControl.setEffectedData(prepareData);
                             tableControl.tableInstance = new Table(
                                 tableControl,
                                 controlName,
+                                id,
                                 thisCpn.keyInstance
                             );
                             let tableEle = $(allInputControl[index]);
@@ -1301,8 +1398,10 @@ export default {
                                 childControl.setEffectedData(childPrepareData);
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
                                 listInsideControls[childControlName] = true;
+                                 controlInTable[childControlName] = childControl;
                             });
                             tableControl.listInsideControls = listInsideControls;
+                            tableControl.controlInTable = controlInTable;
                             tableControl.renderTable();
                             if(this.viewType !== 'submit'){
                                 tableControl.setData(valueInput);
@@ -1313,13 +1412,12 @@ export default {
                 }
             }
             this.listDataFlow = listDataFlow;
-            console.log(this.sDocumentSubmit,'sDocumentSubmitsDocumentSubmit');
             if(!isSetEffectedControl);
             this.getEffectedControl();
             if(this.docObjId == null){
                 thisCpn.findRootControl();
             }
-            else{
+            else{   // trường hơp đã lưu cấu trúc root trên server
                 if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
                     impactedFieldsList = this.preDataSubmit.impactedFieldsList;
                     let impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
@@ -1330,8 +1428,12 @@ export default {
                         for(let controlInTable in tableRootControl){
                             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlInTable);
                             let controlFormulas = controlInstance.controlFormulas;
-                            let formulasInstance = controlFormulas['formulas'].instance;
-                            this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+                            if(controlFormulas.hasOwnProperty('formulas')){
+                                let formulasInstance = controlFormulas['formulas'].instance;
+                                // chạy công thức để lấy giá trị dòng mặc định trong table(phục vụ cho việc shift enter xuống dòng phải có dữ liệu mặc định)
+                                this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+                            }
+                            
                         }
                     }
                    
@@ -1361,16 +1463,6 @@ export default {
         },
 
 
-        addToTableLoadedStore(controlName){
-            let curTableLoaded = this.sDocumentSubmit.tableLoaded;
-            curTableLoaded[controlName] = false;
-            console.log('curTableLoaded',controlName,curTableLoaded);
-            this.$store.commit("document/addToDocumentSubmitStore", {
-                key: 'tableLoaded',
-                value: curTableLoaded,
-                instance: this.keyInstance
-            });
-        },
         /**
          * Sự kiện phát ra khi click vào date của date picker
          */
@@ -1465,7 +1557,7 @@ export default {
         },
         handlerSubmitDocumentClick(isContinueSubmit = false){
             this.isContinueSubmit = isContinueSubmit;
-            if($('.validate-icon').length == 0 && $('.error').length == 0){
+            if($('.wrap-content-submit .validate-icon').length == 0 && $('.wrap-content-submit .error').length == 0){
                 if(this.viewType == 'submit'){
                     this.handleRefreshDataBeforeSubmit();
                 }
@@ -1474,8 +1566,8 @@ export default {
                 }
             }
             else{
-                let controlNotValid = $('.validate-icon');
-                let controlError = $('.error');
+                let controlNotValid = $('.wrap-content-submit .validate-icon');
+                let controlError = $('.wrap-content-submit .error');
                 let listErr = []
                 $.each(controlNotValid,function(k,v){
                     let message = $(v).attr('title');
@@ -1493,7 +1585,7 @@ export default {
 
 
         // Hàm chỉ ra control được đánh định danh trong document (sct...)
-        getColumnIdentifier(){
+        getDataRefreshControl(){
             if(this.objectIdentifier == undefined){
                 return {}
             }
@@ -1502,9 +1594,7 @@ export default {
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlNameIdentifier);
             if(controlInstance != false && controlInstance.controlFormulas.hasOwnProperty('formulas')){
                 let dataInput = this.getDataInputFormulas(controlInstance.controlFormulas['formulas']['instance'])
-                controlIdentifier['dataInput'] = dataInput;
-                // controlIdentifier['dataInput'] = 
-                // return controlIdentifier;
+                controlIdentifier['dataInputIdentifier'] = dataInput;
             }
             return controlIdentifier;
             
@@ -1560,29 +1650,39 @@ export default {
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
             dataPost['documentId'] = this.documentId;
-            let controlIdentifier = this.getColumnIdentifier();
-            if(Object.keys(controlIdentifier).length>0){
-                dataPost['dataRefreshControl'] = JSON.stringify(controlIdentifier);
-            }
-            if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
-                let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
-                await thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput);
-                this.callApiSubmit(dataPost);
-            }
-            else{
-                this.callApiSubmit(dataPost);
-            }
+            let dataInputFormulas = this.getDataRefreshControl();
             
+            if(Object.keys(dataInputFormulas).length>0){
+                dataPost['dataInputFormulas'] = dataInputFormulas;
+            }
+            this.callApiSubmit(dataPost);
+            
+        },
+        resetCheckRefreshData(){
+            this.$store.commit("document/addToDocumentSubmitStore", {
+                key: 'readySubmit',
+                value: false,
+                instance: this.keyInstance
+            });
         },
         async callApiSubmit(dataPost){
             let thisCpn = this;
-            let titleObject = "";
             if(this.titleObjectFormulas != null){
                 let dataInputTitle = thisCpn.getDataInputFormulas(this.titleObjectFormulas);
-                let res = await this.titleObjectFormulas.handleBeforeRunFormulas(dataInputTitle);
-                let value = this.getValueFromDataResponse(res);
-                dataPost['titleObject'] = value
+                if(!dataPost['dataInputFormulas']){
+                    dataPost['dataInputFormulas'] = {}
+                }
+                dataPost['dataInputFormulas']['dataInputTitle'] = dataInputTitle;
             }
+            if(this.appId){
+                dataPost['appId'] = this.appId;
+            }
+            else{
+                if(this.$route.params.extraData && this.$route.params.extraData.appId){
+                    dataPost['appId'] = this.$route.params.extraData.appId
+                }
+            }
+            dataPost['dataInputFormulas'] = JSON.stringify(dataPost['dataInputFormulas']);
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
                 dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;
@@ -1596,25 +1696,33 @@ export default {
                     });        
                     // nếu submit từ form sub submit thì ko rediect trang
                     // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
-                    thisCpn.resetDataSubmit();
-                    if(this.$route.name == 'submitDocument' && this.$route.params.id == this.documentId){
+                    if(this.$getRouteName() == 'submitDocument' && this.$route.params.id == this.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                     }
-                
+                    else{
+                        thisCpn.resetDataSubmit();
+                    }
+                    // nếu có công thức nút submit
+                    if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
+                        let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
+                        thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
+                    }
                 }
                 else{
                     thisCpn.$snotify({
                         type: "error",
                         title: res.message
                     });
+                    thisCpn.resetCheckRefreshData();
                 }
             })
             .catch(err => {
-                console.warn(err);
                 thisCpn.$snotify({
                         type: "error",
                         title: "error from submit document api!!!"
                     });
+                thisCpn.resetCheckRefreshData();
+                thisCpn.isSubmitting = false;
             })
             .always(() => {
             });
@@ -1636,7 +1744,7 @@ export default {
                         type: "success",
                         title: "update document success!"
                     });        
-                    if(thisCpn.$route.name == 'updateDocumentObject')
+                    if(thisCpn.$getRouteName() == 'updateDocumentObject')
                      thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
                 else{
@@ -1665,6 +1773,9 @@ export default {
             let dataControl = {};
             for (let controlName in listInput) {
                 if(listInput[controlName].inTable != false){
+                    continue;
+                }
+                if(!listInput[controlName].checkProps('isSaveToDB')){
                     continue;
                 }
                 if (listInput[controlName].type == "table") {
@@ -1704,8 +1815,13 @@ export default {
             let dataColObjectId = tableControl.tableInstance.tableInstance.getDataAtCol(
                     columnObjectIdIndex
                 );
+            if(tableControl.tableInstance.tableHasRowSum == true)
+                dataColObjectId.pop();
             dataControlInTable['child_object_id'] = dataColObjectId;
             for (let i in indexCol) {
+                if(!listInput[i].checkProps('isSaveToDB')){
+                    continue;
+                }
                 let dataCol = tableControl.tableInstance.tableInstance.getDataAtCol(
                     indexCol[i]
                 );
@@ -1908,8 +2024,12 @@ export default {
                 }
                 else{
                     if(this.sDocumentSubmit.listInputInDocument.hasOwnProperty(inputControlName)){
-                        let valueInputControlItem = this.sDocumentSubmit.listInputInDocument[inputControlName].value;
-                        dataInput[inputControlName] = valueInputControlItem;
+                        let controlIns = getControlInstanceFromStore(this.keyInstance,inputControlName)
+                        let valueInputControl = controlIns.value;
+                        if(controlIns.type == 'inputFilter'){
+                            valueInputControl = valueInputControl.split(',')
+                        }
+                        dataInput[inputControlName] = valueInputControl;
                     }
                 }
             }
@@ -2215,8 +2335,28 @@ export default {
          */
         checkOverrideFormulas(controlName, field){
             if(Object.keys(this.overrideControls).length > 0 && Object.keys(this.overrideControls).includes(controlName)){
-                field.formulas.formulas.value[Object.keys(field.formulas.formulas.value)[0]] = this.overrideControls[controlName]['formulas'];
+                this.preDataSubmit.rootControl.push(controlName)
+
+                if(!field.formulas.formulas){
+                    field.formulas['formulas'] = {
+                        value:{}
+                    }
+                    field.formulas['formulas']['value'][Date.now()] = this.overrideControls[controlName]['formulas'];
+                }
+                else{
+                    field.formulas.formulas.value[Object.keys(field.formulas.formulas.value)[0]] = this.overrideControls[controlName]['formulas'];
+                }
             }
+        },
+        afterFileUpload(data){
+            let url = data.serverPath;
+            let image = '<img height="70" src="'+url+'">';
+            this.currentImageControl.el.html(image);
+            this.updateListInputInDocument(
+                this.currentImageControl.controlName,
+                "value",
+                url
+            );
         }
     }
     
@@ -2280,7 +2420,10 @@ export default {
 .wrap-content-submit{
     width: 100%;
     height: calc(100vh - 100px);
-    overflow-y: auto;
+    overflow: hidden;
+    background: white;
+}
+.wrap-content-submit .scroll-content{
     overflow-x: hidden;
 }
 .wrap-content-submit .icon{

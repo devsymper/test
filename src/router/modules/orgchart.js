@@ -5,6 +5,12 @@ export default [{
             import ('../../views/orgchart/OrgchartList.vue'),
     },
     {
+        path: "/orgchart/trash",
+        name: "trashOrgchart",
+        component: () =>
+            import ('../../views/orgchart/ListTrashOrgchart.vue'),
+    },
+    {
         path: "/orgchart/create",
         name: "createOrgchart",
         component: () =>
@@ -22,5 +28,11 @@ export default [{
         name: "viewOrgchart",
         component: () =>
             import ('../../views/orgchart/ViewOrgchart.vue'),
+    },
+    {
+        path: "/orgchart/:id/clone",
+        name: "cloneOrgchart",
+        component: () =>
+            import ('../../views/orgchart/CloneOrgchart.vue'),
     }
 ]

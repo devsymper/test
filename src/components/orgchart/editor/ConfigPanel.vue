@@ -78,7 +78,9 @@
                     Select permissions
                     </span>
                     <PermissionSelector
-                        v-model="selectingNode.permissions">
+                        :value="selectingNode.permissions"
+                        @input="selectedPermissions"
+                        >
                     </PermissionSelector>
                 </div>
             </v-tab-item>
@@ -318,6 +320,9 @@ export default {
                     );
                 }
             }
+        },
+        isDefault(val){
+            this.handleAttrValueInput("isDefault", 'sdsadas', val)
         }
     },
     data() {
@@ -348,6 +353,7 @@ export default {
             showUpdateAttr: false,
             currentTab: null,
             openAddPanel: false,
+            isDefault:false,
             addPanelAction: "add",
             selectingAttrIndex: null,
             dynamicValueInputs: {
@@ -379,10 +385,13 @@ export default {
         };
     },
     methods: {
+        selectedPermissions(data){
+            this.$store.commit('orgchart/updatePermissionsSelectingNode', {instanceKey: this.instanceKey, data:data} )
+        },
         changeNodeStyle(styleData) {
             try {
                 let style = styleData.content;
-                for (let key in style) {
+                for (let key in style){
                     this.nodeStyleConfig[key].value = style[key];
                 }
             } catch (error) {

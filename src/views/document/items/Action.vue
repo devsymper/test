@@ -25,7 +25,7 @@
 <script>
 export default {
     created(){
-        if(this.$route.name == 'editDocument'){
+        if(this.$getRouteName() == 'editDocument'){
             let checkControlItem = { text: 'Kiểm tra Control', icon: 'mdi-puzzle-check' ,action:'check-control'};
             this.items.splice(5,0,checkControlItem);
         }
@@ -43,6 +43,7 @@ export default {
                 { text: 'Lưu control template', icon: 'mdi-content-save-move' ,action:'control-template'},
                
                 { text: 'Tổng hợp control', icon: 'mdi-cog' ,action:'list-control-option'},
+                { text: 'Xem trước nhập liệu', icon: 'mdi-eye-settings-outline' ,action:'preview-submit'},
                 { text: 'Lưu document', icon: 'mdi-content-save' ,action:'save-document'},
             ],
         }

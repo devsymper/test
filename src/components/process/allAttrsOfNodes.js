@@ -4,7 +4,7 @@ import attrToXMLMethods from "./elementDefinitions/attrToXMLMethods";
 
 
 
-function userAssignmentToXMLValue(config) {
+export const userAssignmentToXMLValue = function (config) {
     let rsl = {
         formula: config.formula,
         users: [
@@ -111,6 +111,22 @@ let allAttrs = {
         //     "isAttr": true,
         //     "type": "String"
         // }
+        validate() {
+            let vl = this.value;
+            if (vl == null || vl == '') {
+                let item = {
+                    'isValid': false,
+                    'message': "Please enter name"
+                }
+                Vue.set(this, 'validateStatus', item);
+            } else {
+                let item = {
+                    'isValid': true,
+                    'message': "success"
+                }
+                Vue.set(this, 'validateStatus', item);
+            }
+        },
     },
     "documentation": {
         "title": "Documentation",
@@ -643,7 +659,18 @@ let allAttrs = {
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.SCRIPTTEXTPACKAGE.SCRIPTTEXT.DESCRIPTION",
-        "dg": "formula"
+        "dg": "formula",
+        toXML: {
+            "symper_position": "el",
+            "name": "symperScriptTagPlacehoder",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        },
+        pushToXML: attrToXMLMethods.scriptTextForScriptNodeMethod,
     },
     "scriptautostorevariables": {
         "title": "Auto Store Variables",
@@ -829,116 +856,154 @@ let allAttrs = {
         "dg": "detail"
     },
     "httptaskrequesturl": {
+        hidden: true,
         "title": "Request URL",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKREQUESTURLPACKAGE.HTTPTASKREQUESTURL.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
+
     },
     "httptaskrequestheaders": {
+        hidden: true,
+
         "title": "Request headers",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKREQUESTHEADERSPACKAGE.HTTPTASKREQUESTHEADERS.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskrequestbody": {
+        hidden: true,
         "title": "Request body",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKREQUESTBODYPACKAGE.HTTPTASKREQUESTBODYPACKAGE.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskrequestbodyencoding": {
+        hidden: true,
         "title": "Request body encoding",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKREQUESTBODYENCODINGPACKAGE.HTTPTASKREQUESTBODYENCODING.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskrequesttimeout": {
+        hidden: true,
         "title": "Request timeout",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKREQUESTTIMEOUTPACKAGE.HTTPTASKREQUESTTIMEOUT.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskdisallowredirects": {
+        hidden: true,
         "title": "Disallow redirects",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKDISALLOWREDIRECTSPACKAGE.HTTPTASKDISALLOWREDIRECTS.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskfailstatuscodes": {
+        hidden: true,
         "title": "Fail status codes",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKFAILSTATUSCODESPACKAGE.HTTPTASKFAILSTATUSCODES.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskhandlestatuscodes": {
+        hidden: true,
         "title": "Handle status codes",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKHANDLESTATUSCODESPACKAGE.HTTPTASKHANDLESTATUSCODES.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskignoreexception": {
+        hidden: true,
         "title": "Ignore exception",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKIGNOREEXCEPTIONPACKAGE.HTTPTASKIGNOREEXCEPTION.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptasksaveresponseparameterstransient": {
+        hidden: true,
         "title": "Save response as a transient variable",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKSAVERESPONSEPARAMETERSTRANSIENTPACKAGE.HTTPTASKSAVERESPONSEPARAMETERSTRANSIENT.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptasksaveresponseasjson": {
+        hidden: true,
         "title": "Save response as JSON",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKSAVERESPONSEASJSONPACKAGE.HTTPTASKSAVERESPONSEASJSON.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "skipexpression": {
         "title": "Skip expression",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.SKIPEXPRESSIONPACKAGE.SKIPEXPRESSION.DESCRIPTION",
-        "dg": "formula"
+        "dg": "formula",
+        toXML: {
+            "symper_position": "attr",
+            "name": "skipExpression",
+            "isAttr": true,
+            "type": "String"
+        }
     },
     "httptaskresponsevariablename": {
+        hidden: true,
         "title": "Response variable name",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKRESPONSEVARIABLENAMEPACKAGE.HTTPTASKRESPONSEVARIABLENAME.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptasksaverequestvariables": {
+        hidden: true,
         "title": "Save request variables",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKSAVEREQUESTVARIABLESPACKAGE.HTTPTASKSAVEREQUESTVARIABLES.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptasksaveresponseparameters": {
+        hidden: true,
         "title": "Save response status, headers",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKSAVERESPONSEPARAMETERSPACKAGE.HTTPTASKSAVERESPONSEPARAMETERS.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "httptaskresultvariableprefix": {
+        hidden: true,
         "title": "Result variable prefix",
         "type": "text",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.HTTPTASKRESULTVARIABLEPREFIXPACKAGE.HTTPTASKRESULTVARIABLEPREFIX.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.notPushToXML
     },
     "callactivitycalledelement": {
         "title": "Called element",
@@ -1553,20 +1618,20 @@ let allAttrs = {
                 "type": "String"
             }]
         },
-        validate(){
-            let vl=this.value;
-            if (Number(vl) <=0) {
-                let item={
-                    'isValid':false,
-                    'message':"Please enter a number greater than 0"
+        validate() {
+            let vl = this.value;
+            if (Number(vl) <= 0) {
+                let item = {
+                    'isValid': false,
+                    'message': "Please enter a number greater than 0"
                 }
-                Vue.set(this,'validateStatus',item);
-            }else{
-                let item={
-                    'isValid':true,
-                    'message':"success"
+                Vue.set(this, 'validateStatus', item);
+            } else {
+                let item = {
+                    'isValid': true,
+                    'message': "success"
                 }
-                Vue.set(this,'validateStatus',item);
+                Vue.set(this, 'validateStatus', item);
             }
         },
         pushToXML: attrToXMLMethods.subLoopCharMethod,
@@ -2130,6 +2195,18 @@ let allAttrs = {
         isSymperProp: true,
         pushToXML: attrToXMLMethods.notPushToXML
     },
+    approvalEditableControls: {
+        title: 'Editable controls on approval',
+        type: 'autocomplete',
+        value: '',
+        info: '',
+        options: [],
+        dg: 'taskAction',
+        multipleSelection: true,
+        showId: false,
+        isSymperProp: true,
+        pushToXML: attrToXMLMethods.notPushToXML
+    },
     updateForElement: {
         title: 'Update for element',
         type: 'autocomplete',
@@ -2226,6 +2303,196 @@ let allAttrs = {
         "dg": "general",
         pushToXML: attrToXMLMethods.notPushToXML
     },
+
+    serviceTaskType: {
+        "title": "Service task type",
+        "type": "select",
+        "value": "script",
+        "info": "",
+        "dg": "detail",
+        options: [
+            {
+                text: 'Script',
+                value: 'script',
+            },
+            {
+                text: 'Notification',
+                value: 'notification',
+            }
+        ],
+        pushToXML: attrToXMLMethods.notPushToXML
+    },
+    serviceTaskTypeHTTP: {
+        "title": "",
+        hidden: true,
+        "type": 'text',
+        "value": "http",
+        "info": "",
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "type",
+            "isAttr": true,
+            "type": "String"
+        },
+    },
+    serviceTaskScriptValue: {
+        "title": "Script for service task ",
+        "type": "script",
+        "value": "",
+        "info": "",
+        "dg": "detail",
+        hidden:false,
+        pushToXML: attrToXMLMethods.notPushToXML,
+    },
+
+    // serviceTaskHTTPType: {
+    //     "title": "",
+    //     "type": "text",
+    //     "value": "",
+    //     "info": "",
+    //     "dg": "detail",
+    // },
+    serviceTaskField: {
+        "title": "",
+        hidden: true,
+        "type": "",
+        "value": "",
+        "info": "",
+        "dg": "detail",
+        toXML: {
+            "symper_position": "el",
+            "name": "symper_symper_field_tag",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "name",
+                "isAttr": true,
+                "type": "String"
+            }, {
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }],
+            "extraElements": [{
+                "name": "String",
+                "properties": [{
+                    "name": "text",
+                    "isBody": true,
+                    "type": "String"
+                }]
+            }]
+        }
+    },
+    serviceTaskString: {
+        "title": "",
+        hidden: true,
+        "type": "",
+        "value": "",
+        "info": "",
+        "dg": "detail",
+        toXML: {
+            "symper_position": "el",
+            "name": "string",
+            "superClass": ["Element"],
+            "properties": [{
+                "name": "text",
+                "isBody": true,
+                "type": "String"
+            }]
+        }
+    },
+    serviceNotificationReceiver: {
+        title: 'Receiver',
+        type: 'userAssignment', // trong user assignment có hai tab: select qua orgchart và viết script
+        value: {
+            orgChart: [],
+            formula: '',
+            orgchartSelectorValue: [] // dạng value của orgchartselector để hiển thị lên
+        },
+        getValueForXML(value) {
+            return userAssignmentToXMLValue(value);
+        },
+        activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
+        dg: 'detail',
+        hidden:false,
+        pushToXML: attrToXMLMethods.notPushToXML,
+    },
+    serviceNotificationTitle: {
+        "title": "Title",
+        "type": "script",
+        "value": "",
+        "info": "",
+        "dg": "detail",
+        hidden:false,
+        validate() {
+            let vl = this.value;
+            if (vl == null || vl == '') {
+                let item = {
+                    'isValid': false,
+                    'message': "Please enter title"
+                }
+                Vue.set(this, 'validateStatus', item);
+            } else {
+                let item = {
+                    'isValid': true,
+                    'message': "success"
+                }
+                Vue.set(this, 'validateStatus', item);
+            }
+        },
+        pushToXML: attrToXMLMethods.notPushToXML
+
+    },
+    serviceNotificationDescription: {
+        "title": "Description",
+        "type": "script",
+        "value": "",
+        "info": "",
+        "dg": "detail",
+        hidden:false,
+        validate() {
+            let vl = this.value;
+            if (vl == null || vl == '') {
+                let item = {
+                    'isValid': false,
+                    'message': "Please enter description"
+                }
+                Vue.set(this, 'validateStatus', item);
+            } else {
+                let item = {
+                    'isValid': true,
+                    'message': "success"
+                }
+                Vue.set(this, 'validateStatus', item);
+            }
+        },
+        pushToXML: attrToXMLMethods.notPushToXML
+    },
+    serviceNotificationActionForElement: { //action chon node trong workflow
+        title: 'Action chose node',
+        type: 'autocomplete',
+        value: '',
+        info: '',
+        options: [],
+        dg: 'detail',
+        showId: false,
+        isSymperProp: true,
+        hidden:false,
+        pushToXML: attrToXMLMethods.notPushToXML
+    },
+    selectDefaultControlDocument: { // cấu hình form định nghĩa sẵn dữ liệu cho control của document
+        title: 'Giá trị mặc định',
+        type: 'defaultControlDocument',
+        value: [],
+        info: '',
+        docId: 0,
+        options: [],
+        dg: 'taskAction',
+        isSymperProp: true,
+        hidden:false,
+        pushToXML: attrToXMLMethods.notPushToXML
+    },
+
 }
 
 for (let name in allAttrs) {

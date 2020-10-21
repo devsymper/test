@@ -1,31 +1,35 @@
 <template>
    <div class="view-side-by-side-apps h-100">
        <div class="list-apps h-100">
-             <h4>Ứng dụng</h4>
-             <v-icon @click="changeView" style="position:absolute;top:12px;right:6px;font-size:13px" >mdi-page-previous-outline</v-icon>  
-            <div style="margin:20px 0px 0px 8px">
+				 <h4>Ứng dụng</h4>
+				<v-btn icon tile style="position:absolute;top:2px;right:6px;font-size:13px" >
+					<v-icon @click="changeView" style="font-size:13px" >mdi-page-previous-outline</v-icon>  
+				</v-btn>
+            <div style="margin:20px 0px 0px 0px">
                 <div :class="{'favorite-area': true , 'active': showFavorite == true}" @click="showListFavorite">
-                    <v-icon style="font-size:16px"> mdi-star</v-icon>
+                    <v-icon style="font-size:16px" color="#F6BE4F"> mdi-star</v-icon>
                     <span style="font:13px roboto;padding-left:8px">Yêu thích</span>
                 </div>
-                 <div  v-for="(item,i) in apps" :key="i" 
-                    :class="{'list-app-item': true,'active': item.id == activeIndex}"
-                    @click="clickDetails(item)"
+				<VuePerfectScrollbar :style="{height:heightListApp}"  >
+					<div v-for="(item,i) in listApp" :key="i" 
+						:class="{'list-app-item': true,'active': item.id == activeIndex}"
+						@click="clickDetails(item)"
+						>
+							<v-icon v-if="item.iconType == 'icon'" style="font-size:16px">{{item.iconName}}</v-icon>
+							<img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
+						<v-tooltip bottom>
+							<template v-slot:activator="{ on, attrs }">
+								<div v-bind="attrs" class="title-app-sbs"
+								v-on="on">{{item.name}}</div>
+							</template>
+							<span>{{item.name}}</span>
+						</v-tooltip>
+					</div>
+				</VuePerfectScrollbar>
 
-                    >
-                        <v-icon v-if="item.iconType == 'icon'" style="font-size:16px">{{item.iconName}}</v-icon>
-                        <img v-else-if="item.iconType == 'img'" :src="item.iconName" class="app-item-img"/>
-                    <v-tooltip bottom>
-                        <template v-slot:activator="{ on, attrs }">
-                            <h5 v-bind="attrs"
-                            v-on="on">{{item.name}}</h5>
-                        </template>
-                        <span>{{item.name}}</span>
-                    </v-tooltip>
-                </div>
             </div>
        </div>
-       <div class="detail-app" v-show="showDetailDiv">
+       <div class="detail-app" v-show="showDetailArea">
           <div v-if="showFavorite == false">
                <h4>Chi tiết ứng dụng</h4>
                 <v-text-field
@@ -39,22 +43,22 @@
           </div>
          <div v-else class="favorite-area-item">
               <h4>Danh sách yêu thích</h4>
-                <VuePerfectScrollbar :style="{height:heightListFavorite}"  >
-                    <ul style="margin:0px 0px;" v-if="sFavorite.length > 0">
-                        <li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
-                            <div style="position:relative">
-                                <div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
-                                <div v-else  class="title-item-favorite">{{item.name}}</div> 
-                                <v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:4px;right:12px">mdi-star</v-icon>
-                            </div>
-                        </li>
-                    </ul>
-                </VuePerfectScrollbar>
+					<VuePerfectScrollbar :style="{height:heightListFavorite}"  >
+						<ul style="margin:0px 0px 0px -24px" v-if="sFavorite.length > 0">
+							<li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer" :class="{'child-item-active': item.objectIdentifier == activeIndexChild}" > 
+								<div style="position:relative" >
+									<div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
+									<div v-else  class="title-item-favorite">{{item.name}}</div> 
+									<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:4px;right:4px">mdi-star</v-icon>
+								</div>
+							</li>
+						</ul>
+					</VuePerfectScrollbar>
          </div>
         <ContextMenu ref="contextMenu" :sideBySide="true" />
        </div>
-       <div class="action-area h-100 w-100">
-            <SymperActionView :actionDef="actionDef" :param="param" />
+       <div class="action-area h-100 " style="width:calc(100% - 520px)" >
+            <SymperActionView :actionDef="actionDef"  :param="param" />
        </div>
    </div>
 </template>
@@ -65,9 +69,9 @@ import AppDetail from './../AppDetail.vue'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue'
 import SymperActionView from '@/action/SymperActionView.vue'
+import {util} from './../../../plugins/util'
     export default {
     created(){
-        this.getActiveapps()
         this.getFavorite()
     },
     components:{
@@ -75,7 +79,10 @@ import SymperActionView from '@/action/SymperActionView.vue'
         VuePerfectScrollbar,
         ContextMenu,
         SymperActionView
-    },
+	},
+	mounted(){
+		this.widthActionArea = "calc(100% - 520px)"
+	},
     computed:{
         sFavorite(){
 			return this.$store.state.appConfig.listFavorite
@@ -85,16 +92,27 @@ import SymperActionView from '@/action/SymperActionView.vue'
         },
         param(){
              return this.$store.state.appConfig.param
-        }
+		},
+		showDetailArea(){
+			return this.$store.state.appConfig.showDetailArea
+		},
+		listApp(){
+            return this.$store.state.appConfig.listApps
+		},
+		activeIndexChild(){
+			return this.$store.state.appConfig.activeChildItem
+		},
+		
     },
     methods:{
         rightClickHandler(event,item,type){
 			event.stopPropagation();
 			event.preventDefault();
+			this.$store.commit('appConfig/updateActiveChildItem', item.objectIdentifier )
 			if(!item.actions.includes('unfavorite')){
 				item.actions.push('unfavorite')
 			}
-			this.$refs.contextMenu.setContextItem(item.actions)
+			this.$refs.contextMenu.setContextItem([...new Set(item.actions)])
 			this.$refs.contextMenu.show(event)
 			this.$refs.contextMenu.setItem(item)
 			this.$refs.contextMenu.setType(type)
@@ -102,7 +120,7 @@ import SymperActionView from '@/action/SymperActionView.vue'
         showListFavorite(){
             this.showFavorite = true
             this.activeIndex = '000'
-            this.showDetailDiv = true
+			this.$store.commit('appConfig/showDetailAppArea')
         },
         getFavorite(){
 			this.listFavorite= []
@@ -254,7 +272,8 @@ x				}
             this.activeIndex = item.id
             this.showFavorite = false
             this.$store.commit("appConfig/updateCurrentAppId",item.id);
-            this.showDetailDiv = true
+			// this.showDetailDiv = true
+			this.$store.commit('appConfig/showDetailAppArea')
 			this.$store.commit('appConfig/emptyItemSelected')
 			appManagementApi.getAppDetails(item.id).then(res => {
 				if (res.status == 200) {
@@ -357,13 +376,16 @@ x				}
     data(){
         return { 
             apps: [],
-            activeIndex: '',
+			activeIndex: '',
             showDetailDiv:false,
             searchKey: '',
             listFavorite:[],
             showFavorite:false,
             activeFavorite:false,
-            heightListFavorite: 'calc(100vh - 100px)',
+			heightListFavorite: 'calc(100vh - 110px)',
+			heightListApp: 'calc(100vh - 130px)',
+			widthActionArea:null,
+			widthActionArea: '',
             arrType:{
                 document_definition:[],
                 orgchart:[],
@@ -397,7 +419,6 @@ x				}
             deep: true,
             immediate: true,
             handler(newValue){
-                debugger
             }
         }
     }
@@ -413,6 +434,7 @@ x				}
    display: flex;
    align-items: center;
    height:40px;
+   padding-left:10px
 }
 .view-side-by-side-apps .favorite-area .active{
     background-color: active;
@@ -424,6 +446,17 @@ x				}
     border-right:1px solid lightgray;
     position: relative;
 }
+.view-side-by-side-apps >>> .list-apps .v-icon{
+	background-color:unset !important;
+}
+.view-side-by-side-apps .list-apps .title-app-sbs{
+    white-space: nowrap; 
+	width: 200px; 
+	overflow: hidden;
+	text-overflow: ellipsis; 
+	font:13px roboto;
+	padding-left:8px;
+}
 
 .view-side-by-side-apps .list-apps h4{
    flex-grow:1;
@@ -431,7 +464,7 @@ x				}
    font:15px roboto;
 }
 .view-side-by-side-apps .list-apps .active{
-    background-color: #f7f7f7;
+    background-color: #E9E9E9;
 }
 .view-side-by-side-apps .detail-app h4{
    padding-left:8px;
@@ -444,7 +477,7 @@ x				}
 .view-side-by-side-apps .list-apps .list-app-item {
     display:flex;
     width: inherit;
-    padding:12px 0px;
+    padding:12px 0px 12px 10px;
 }
 .view-side-by-side-apps .list-apps .list-app-item  h5{
     font:13px roboto;
@@ -488,12 +521,23 @@ x				}
 }
 .view-side-by-side-apps >>> .favorite-area-item li{
     list-style: none;    
-    padding:6px;
+    padding:6px 20px;
+}
+.view-side-by-side-apps >>> .favorite-area-item {
+	overflow-x: hidden;
+}
+.view-side-by-side-apps >>> .favorite-area-item .child-item-active{
+	background-color: #E9E9E9
+}
+.view-side-by-side-apps >>> .favorite-area-item li:hover{
 }
 .view-side-by-side-apps >>> .favorite-area-item .title-item-favorite{
    	white-space: nowrap; 
+	font:13px roboto;
 	width: 90%; 
 	overflow: hidden;
 	text-overflow: ellipsis; 
+	padding:4px 0px;
 }
+
 </style>

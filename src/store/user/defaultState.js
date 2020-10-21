@@ -9,7 +9,8 @@ const defaultState = {
      */
     userAvatars: {
 
-    }
+    },
+    showUserInfo: false,
 };
 
 export default defaultState;

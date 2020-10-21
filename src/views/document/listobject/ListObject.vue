@@ -2,65 +2,200 @@
     
     <div class="h-100 w-100">
         <list-items
-        :getDataUrl="'https://sdocument-management.symper.vn/documents/'+docId+'/objects'"   
+        :getDataUrl="'https://sdocument-management.symper.vn/documents/'+docId+'/objects'"
+        :exportLink="'https://sdocument-management.symper.vn/documents/'+docId+'/export-excel'" 
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('documentObject.title')"
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
         :actionPanelType="'elastic'"
+        :showActionPanelInDisplayConfig="true"
+        :showExportButton="true"
+        :showImportButton="true"
+        :isTablereadOnly="false"
+        :conditionByFormula="formulasInput.formula.value"
         @after-open-add-panel="submitDocument"
         @data-get="afterGetData"
         @before-keydown="afterRowSelected"
         @after-cell-mouse-down="afterRowSelected"
+        @after-selected-row="afterSelectedRow"
+        @row-selected="afterCellSelection"
         :commonActionProps="commonActionProps"
         ref="listObject"
     >
         <div slot="right-panel-content" class="h-100">
-            
-            <div class="panel-header">
-                <div class="left-action">
-                    <span @click="prevRecord" class="mdi mdi-chevron-left"></span>
-                    <span @click="nextRecord" class="mdi mdi-chevron-right"></span>
-                    <span class="document-title">{{panelDocTitle}}</span>
+            <div v-if="isDeleteMultiple" class="h-100">
+                <div class="d-flex">
+                    <h2>Công thức truy vẫn xóa</h2>
+                    <v-icon @click="closePanelFormulas" style="margin-left:auto;font-size:20px;">mdi-close</v-icon>
                 </div>
-                <div class="right-action">
-                    <span class="copyed d-none" transition="scroll-y-reverse-transition">Đã sao chép</span>
-                    <span @click="addToClipboard($event)" :clipboard="dataClipboard" class="mdi mdi-page-next-outline"></span>
-                    <span class="mdi mdi-download-outline"></span>
-                    <span @click="showDetailInfoDocument" class="mdi mdi-information-outline"></span>
+                <div class="formulas-input">
+                    <FormTpl  
+                        :singleLine="false" 
+                        :labelWidth="`100px`"  
+                        :allInputs="formulasInput"/>
+                    <v-icon @click="runFormulas" class="run-formulas-btn">mdi-send</v-icon>
                 </div>
+                <v-btn small @click="deleteRecord" class="delete-record-btn">
+                    <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
+                </v-btn>
             </div>
-            <div class="panel-body">
-                <detail-object @after-hide-sidebar="afterHideSidebarDetail" ref="viewDetail" @after-load-document="handleAfterLoadDocument" :quickView="true" :docObjInfo="docObjInfo"/>
+            <div v-else>
+                <div class="panel-header" v-if="actionOnRightSidebar == 'detail'">
+                    <div class="left-action">
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-icon  @click="hidePanel" v-on="on">mdi-close</v-icon>
+                            </template>
+                            <span>{{$t('common.close')}}</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-icon  @click="prevRecord" v-on="on">mdi-chevron-left</v-icon>
+                            </template>
+                            <span>{{$t('document.instance.showlist.prev')}}</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-icon  @click="nextRecord" v-on="on">mdi-chevron-right</v-icon>
+                            </template>
+                            <span>{{$t('document.instance.showlist.next')}}</span>
+                        </v-tooltip>
+                        <span class="document-title">{{panelDocTitle}}</span>
+                    </div>
+                    <div class="right-action">
+                        
+                        <span class="copyed d-none" transition="scroll-y-reverse-transition">{{$t('document.instance.showlist.copied')}}</span>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-icon  @click="addToClipboard($event)" :clipboard="dataClipboard" v-on="on">mdi-page-next-outline</v-icon>
+                            </template>
+                            <span>{{$t('document.instance.showlist.copyLink')}}</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-icon  v-on="on">mdi-download-outline</v-icon>
+                            </template>
+                            <span>{{$t('document.instance.showlist.download')}}</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-icon  @click="showDetailInfoDocument" v-on="on">mdi-information-outline</v-icon>
+                            </template>
+                            <span>{{$t('document.instance.showlist.info')}}</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                    <v-icon @click="updateCurrentRecord" v-on="on">mdi-pencil</v-icon>
+                            </template>
+                            <span>{{$t('document.instance.showlist.update')}}</span>
+                        </v-tooltip>
+                    </div>
+                    <v-btn small @click="deleteRecord" class="delete-record-btn">
+                        <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
+                    </v-btn>
+                </div>
+                <div  v-else-if="actionOnRightSidebar == 'update'">
+                    <span class="title float-left">
+                        {{$t('document.instance.showlist.update')}}
+                    </span>
+                    <v-icon
+                        class="close-btn float-right"
+                        @click="hidePanel"
+                    >mdi-close</v-icon>
+                </div>
+                <div class="panel-body">
+                    <detail-object 
+                        v-if="actionOnRightSidebar == 'detail'"
+                        @after-hide-sidebar="afterHideSidebarDetail" 
+                        ref="viewDetail" 
+                        @after-load-document="handleAfterLoadDocument" 
+                        :quickView="true" 
+                        :docObjInfo="docObjInfo"/>
+
+                    <DocumentSubmit 
+                        v-if="actionOnRightSidebar == 'update'"
+                        :action="'update'"
+                        :documentObjectId="docObjInfo.docObjId"
+                        @submit-document-success="onDocumentUpdateSuccess"/>
+                </div>
             </div>
         </div>
     </list-items>
-        <ListPrintConfig :documentId="docId"
+        <Tablet 
+        :listobject="recordPreview"
+        :listItem="listTabletItem"
         :width="'30cm'" 
         :height="'80%'" 
         :title="`<span class='mdi mdi-printer-settings'></span> &nbsp;Chọn mẫu in`" 
-        :actions="listActionForPrint"
-        class="view-print-config" ref="listPrintView"/>
+        @after-selected-item-tablet="afterSelectedItem"
+        class="view-print-config" ref="listPrintView">
+            <template slot="contentBinding">
+                <PrintView :isAlwaysPrint="false" :allObject="allObjectPrint"/>
+            </template>
+            <template slot="actionBinding">
+                <button v-for="(action,index) in listActionForPrint" :key="index" @click="action.action()">
+                    {{action.title}}
+                </button>
+            </template>
+        </Tablet>
+        <BottomSheet ref="bottomSheetView" class="h-100">
+            <div slot="content" class="sheet-content d-flex">
+                <div class="count-selection">
+                    <span>{{$t('document.instance.showlist.select')}} {{countRecordSelected}} {{$t('document.instance.showlist.record')}}</span>
+                </div>
+                <div class="sheet-action">
+                    <div v-if="isDeleteMultiple">
+                        <v-btn small @click="printSelected" >
+                            <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
+                        </v-btn>
+                        <v-btn @click="hideBottomSheet" tile small> {{$t('common.close')}}
+                        </v-btn>
+                    </div>
+                    <div v-else>
+                        <v-btn tile small @click="printSelected" >
+                            <v-icon left>mdi-printer</v-icon> {{$t('document.instance.showlist.printRecord')}}
+                        </v-btn>
+                        <v-btn @click="selectPrintConfig" tile small>
+                            <v-icon left>mdi-printer-pos</v-icon> {{$t('document.instance.showlist.selectPrintConfig')}}
+                        </v-btn>
+                        <v-btn @click="hideBottomSheet" tile small> {{$t('common.close')}}
+                        </v-btn>
+                    </div>
+                    
+                </div>
+            </div>
+        </BottomSheet>
     </div>
 </template>
 <script>
 import ListItems from "./../../../components/common/ListItems.vue";
+import BottomSheet from './../../../components/common/BottomSheet'
+import PrintView from "./../print/PrintView";
 import ActionPanel from "./../../../views/users/ActionPanel.vue";
-import ListPrintConfig from "./../print/ListPrintConfig";
-
+import Tablet from "./../../../components/common/Tablet";
+import FormTpl from "@/components/common/FormTpl.vue"
 import { documentApi } from "./../../../api/Document.js";
 import { util } from "./../../../plugins/util.js";
-import Detail from './../detail/Detail.vue'
+import Detail from './../detail/Detail.vue';
+import DocumentSubmit from "@/views/document/submit/Submit.vue";
+
 export default {
     components: {
         "list-items": ListItems,
         "detail-object": Detail,
         "action-panel": ActionPanel,
-        ListPrintConfig
+        Tablet,
+        BottomSheet,
+        PrintView,
+        DocumentSubmit,
+        FormTpl
+
     },
     data(){
         return {
+            actionOnRightSidebar: 'detail',
             commonActionProps: {
                 "module": "document",
                 "resource": "document_instance",
@@ -74,13 +209,39 @@ export default {
             actionPanelWidth:800,
             containerHeight: 200,
             dataTable:[],
+            countRecordSelected:0,
+            recordSelected:{},
+            recordPreview:{},
+            curentFormActive:0,
+            listTabletItem:[],
+            currentRowData:{},
+            allObjectPrint:[],
+            totalRecord:0,
+            isDeleteMultiple:false,
             dataClipboard:"",
-            listActionForPrint:{
+            formulasInput:{
+                formula : {
+                    title: "Nhập công thức",
+                    type: "script",
+                    value: '',
+                    style:{
+                        height:'300px'
+                    }
+                }, 
+            },
+            listActionForPrint:{    // data truyền vào cho slot action view table
                 print:{
                     title: this.$t('common.print'),
                     icon : '',
-                    action: function(data){
-                        this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:[{document_object_id:data.documentObjectId}]});
+                    action: function(){
+                        let listObj = []
+                        for(let rowId in this.recordPreview){
+                            let rowData = this.recordPreview[rowId];
+                            let item = {document_object_id:rowData.document_object_id,formId:this.curentFormActive};
+                            listObj.push(item);
+                        }
+                        this.hideBottomSheet();
+                        this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:listObj});
                     }.bind(this)
 
                 },
@@ -89,7 +250,7 @@ export default {
             tableContextMenu:{
                 delete: {
                     name:"delete",
-                    text:'Xóa',
+                    text:this.$t('common.delete'),
                     callback: (documentObject, callback) => {
                         let ids = documentObject.reduce((arr,obj)=>{
                             arr.push(obj.document_object_id);
@@ -97,7 +258,7 @@ export default {
                         },[]);
                         let thisCpn = this;
                         documentApi
-                        .deleteDocumentObject({objectIds:ids.join()})
+                        .deleteDocumentObject({objectIds:JSON.stringify(ids)})
                         .then(res => {
                             if (res.status == 200) {
                                 thisCpn.$snotify({
@@ -120,45 +281,43 @@ export default {
                 },
                 detail: {
                     name: "detail",
-                    text: "Xem chi tiết",
+                    text: this.$t('common.detail'),
                     callback: (documentObject, callback) => {
                         this.$goToPage('/documents/objects/'+documentObject.document_object_id,"Danh sách bản ghi");
                     },
                 },
-                print: {
-                    name: "print",
-                    text: "In nhanh",
-                    callback: (documentObject, callback) => {
-                        if(this.$refs.listObject.isShowCheckedRow()){
-                            let listobject = this.$refs.listObject.getAllRowChecked();
-                            this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:listobject});
-                        }
-                        else{
-                            this.$goToPage('/documents/objects/'+documentObject.document_object_id+'/print/',"In");
-                        }
-                    },
-                },
+                
                 list_print: {
                     name: "listPrint",
-                    text: "Danh sách mẫu in",
+                    text: this.$t('document.instance.showlist.listPrintConfig'),
                     callback: (documentObject, callback) => {
                         this.$refs.listPrintView.show();
-                        this.$refs.listPrintView.setDocObjectId(documentObject.document_object_id);
+                        this.recordPreview = {record:{document_object_id:documentObject.document_object_id}}
+                    },
+                },
+                print: {
+                    name: "print",
+                    text: this.$t('document.instance.showlist.print'),
+                    callback: (documentObject, callback) => {
+                        this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:[{document_object_id:documentObject.document_object_id}]});
                     },
                 },
                 show_checkbox: {
                     name: "showCheckBox",
-                    text: "Hiển thị checkbox",
+                    text: this.$t('document.instance.showlist.printMultiple'),
                     callback: (documentObject, callback) => {
-                        if(this.$refs.listObject.isShowCheckedRow()){
-                            this.$refs.listObject.removeCheckBoxColumn();
-                            this.tableContextMenu.show_checkbox.text = "Hiển thị checkbox"
-                        }
-                        else{
-                            this.$refs.listObject.addCheckBoxColumn();
-                            this.tableContextMenu.show_checkbox.text = "Ẩn checkbox"
-                        }
-                        
+                        this.toggleCheckBoxListItem()
+                    
+                    },
+                },
+                delete_multi: {
+                    name: "deleteMulti",
+                    text: this.$t('document.instance.showlist.deleteMultiple'),
+                    callback: (documentObject, callback) => {
+                        this.isDeleteMultiple = true;
+                        this.toggleCheckBoxListItem(false);
+                        this.actionPanelWidth = 400;
+                        this.$refs.listObject.openactionPanel();
                     },
                 },
                 // detail_in_view: {
@@ -173,7 +332,7 @@ export default {
                 // },
                 update: {
                     name: "edit",
-                    text: "Cập nhật",
+                    text: this.$t('common.update'),
                     callback: (documentObject, callback) => {
                         this.$goToPage('/document/objects/update/'+documentObject.document_object_id,"Cập nhật");
                     },
@@ -181,25 +340,74 @@ export default {
             },
         }
     },
-    computed:{
-      
-    },
     mounted() {
         this.calcContainerHeight();
     },
     created(){
         let thisCpn = this;
-        this.$evtBus.$on('change-user-locale',(locale)=>{
-            
-        });
+        documentApi.getListPrintConfig(this.docId).then(res=>{
+            thisCpn.listTabletItem = res.data.listObject;
+            thisCpn.listTabletItem[0].activeSb = true;
+        }).catch(err => {}).always(() => {});
     },
-    watch:{
-        
+    activated(){
+        if(this.$refs.listObject.isShowCheckedRow()){
+            this.showBottomSheet();
+        }
     },
     methods:{
+         onDocumentUpdateSuccess(){
+            this.actionOnRightSidebar = 'detail';
+        },
+        updateCurrentRecord(){
+            this.actionOnRightSidebar = 'update';
+        },
+        deleteRecord(){
+            let itemSelected = Object.values(this.recordSelected);
+            let ids = itemSelected.reduce((arr,obj)=>{
+                arr.push(obj.document_object_id);
+                return arr;
+            },[]);
+            let thisCpn = this;
+            documentApi
+            .deleteDocumentObject({objectIds:JSON.stringify(ids)})
+            .then(res => {
+                if (res.status == 200) {
+                    thisCpn.$snotify({
+                        type: "success",
+                        title: "Delete document Object success!"
+                    });  
+                    thisCpn.$refs.listObject.refreshList();
+                }
+                else{
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: res.messagr
+                    });  
+                }
+            })
+            .catch(err => {
+            })
+            .always(() => {});
+        },
+        closePanelFormulas(){
+            this.formulasInput.formula.value = "";
+            this.isDeleteMultiple = false;
+            this.$refs.listObject.removeCheckBoxColumn();
+            this.actionPanelWidth = 800;
+            this.$refs.listObject.closeactionPanel();
+            setTimeout((self) => {
+                self.$refs.listObject.refreshList(); 
+            }, 200,this);
+        },
+        runFormulas(){
+            this.$refs.listObject.refreshList();
+        },
         afterGetData(data){
-            this.dataTable = data
-            console.log("dsdasd",data);
+            if(this.isDeleteMultiple){
+                this.$refs.listObject.addCheckBoxColumn();
+            }
+            this.dataTable = data;
         },
         nextRecord(){
             if(this.dataTable.length > this.currentDocObjectActiveIndex+1){
@@ -226,7 +434,7 @@ export default {
             }
         },
         submitDocument(){
-            this.$router.push('/documents/'+this.docId+'submit');
+            this.$router.push('/documents/'+this.docId+'/submit');
         },
      
         calcContainerHeight() {
@@ -265,19 +473,93 @@ export default {
             document.execCommand('copy',false);
             inp.remove();
         },
+        /**
+         * Ẩn view side by side
+         */
+        hidePanel(){
+            this.$refs.listObject.closeactionPanel();
+        },
         afterRowSelected(data){
-            let documentObject = data.row;
-            let event = data.event;
-            if(['ArrowDown','ArrowUp'].includes(event.key) || event.buttons == 1){
-                if(this.docObjInfo.docObjId == parseInt(documentObject.document_object_id)){
-                    return
+            if(this.$refs.listObject.isShowSidebar()){
+                let documentObject = data.rowData;
+                let cell = data.cell;
+                let event = data.event;
+                if(cell.col == 0 && this.$refs.listObject.isShowCheckedRow()){
+                    return;
                 }
-                this.currentDocObjectActiveIndex = this.dataTable.findIndex(obj => obj.document_object_id == documentObject.document_object_id);
-                this.$refs.listObject.openactionPanel();
-                this.dataClipboard = window.location.origin+ '/#/documents/objects/'+documentObject.document_object_id;
-                this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
+                if(['ArrowDown','ArrowUp'].includes(event.key) || event.buttons == 1){
+                    if(this.docObjInfo.docObjId == parseInt(documentObject.document_object_id)){
+                        return
+                    }
+                    this.currentDocObjectActiveIndex = this.dataTable.findIndex(obj => obj.document_object_id == documentObject.document_object_id);
+                    this.$refs.listObject.openactionPanel();
+                    this.dataClipboard = window.location.origin+ '/#/documents/objects/'+documentObject.document_object_id;
+                    this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
+                }
             }
+            
            
+        },
+        /**
+         * Hàm gọi sang compon bottom sheet để hiển thị
+         */
+        showBottomSheet(){
+            this.$refs.bottomSheetView.toggle();
+        },
+        hideBottomSheet(){
+            this.$refs.bottomSheetView.toggle();
+            this.$refs.listObject.removeCheckBoxColumn();
+        },
+        /**
+         * Hàm hiển thị cột checkbox trong compon listItem
+         */
+        toggleCheckBoxListItem(isShowBottomSheet = true){
+            if(!this.$refs.listObject.isShowCheckedRow()){
+                if(isShowBottomSheet){
+                    this.showBottomSheet();
+                }
+                this.$refs.listObject.addCheckBoxColumn();
+            }
+        },
+        afterSelectedRow(dataSelected){
+            this.countRecordSelected = Object.keys(dataSelected).length;
+            this.recordSelected = dataSelected; 
+        },
+        /**
+         * Ấn để in các bản ghi đã chọn
+         */
+        printSelected(){
+            if(Object.keys(this.recordSelected).length == 0){
+                this.$snotify({
+                            type: "info",
+                            title: "Vui lòng chọn bản ghi để in"
+                        }); 
+                return;
+            }
+            this.hideBottomSheet();
+            this.$goToPage('/documents/print-multiple',"In",false,true,{listObject:this.recordSelected});
+        },
+        // chọn mẫu trước khi in
+        selectPrintConfig(){
+            this.$refs.listPrintView.show();
+            this.recordPreview = this.recordSelected
+
+        },
+        /**
+         * xử lí sau khi click vào 1 item bên sidebar của view table
+         */
+        afterSelectedItem(item){
+            if(item){
+                this.curentFormActive = parseInt(item.formId);
+                this.allObjectPrint = [{document_object_id:parseInt(this.currentRowData.document_object_id),formId:parseInt(item.formId)}]
+            }
+        },
+        /**
+         * Sự kiện khi selection vào cell
+         */
+        afterCellSelection(rowData){
+            this.actionOnRightSidebar = 'detail';
+            this.currentRowData = rowData;
         }
     }
 }
@@ -288,6 +570,7 @@ export default {
         height: 30px;
         display: flex;
         color: #757575;
+        margin-top: -3px;
     }
     .panel-header .mdi:hover{
         color: rgba(0,0,0 / 0.6);
@@ -305,21 +588,57 @@ export default {
     .panel-header .mdi {
         cursor: pointer;
         margin-right: 12px;
+        font-size: 16px;
         transition: all ease-in-out 250ms;
     }
-    .left-action .mdi{
+    .left-action .mdi:not(.mdi-close){
         font-size: 24px;
+        line-height: 1;
+    }
+    .left-action .mdi-close{
+        font-size: 20px;
         line-height: 1;
     }
     .document-title{
         font-size: 13px;
-        vertical-align: super;
+        display: inline-block;
+        vertical-align: middle;
     }
 
     .copyed {
         margin-right: 12px;
         font-size: 12px;
     }
+    .sheet-action{
+        margin-left: auto;
+    }
     
+    .sheet-action >>> button{
+        margin: 6px 8px !important;
+        border-radius: 4px;
+        box-shadow: none;
+    }
+    .sheet-action >>> button:last-child{
+        color: red;
+    }
+    .count-selection span{
+        display: inline-block;
+        padding: 12px;
+        height: 100%;
+    }
+    .formulas-input{
+        position: relative;
+    }
+    .run-formulas-btn{
+        position: absolute;
+        right: 4px;
+        bottom: 14px;
+        font-size: 18px;
+    }
+    .delete-record-btn{
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
+    }
 
 </style>

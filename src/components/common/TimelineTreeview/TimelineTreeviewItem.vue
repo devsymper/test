@@ -6,14 +6,27 @@
         <div class="milestone-marker" :style="{
             top: ((minItemHeight-8)/2)+'px'
         }"></div>
-        <div :class="{bold: isFolder}" @click="toggle" @dblclick="makeFolder" class="tree-item-content"
-        :style="{
-            'height': minItemHeight+'px',
-            'line-height': minItemHeight+'px',
+        <div :class="{
+                        bold: isFolder,
+                        'single-row': true ,
+                    }" 
+            @click="toggle" @dblclick="makeFolder" class="tree-item-content"
+            :style="{
+                'height': minItemHeight+'px',
+                'line-height': minItemHeight+'px',
             }"
+            
         >
             <slot name="item-content" :itemData="item">
-                <span>{{item.name}}</span>
+                 <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                    <div  @click="selectedItem(item)" v-on="on" class="text-ellipsis">
+                        <v-icon style="font-size:16px">{{item.icon}}</v-icon> 
+                        <span class="pl-1">{{item.name}}</span>
+                    </div>
+                    </template>
+                    <span>{{item.name}}</span>
+                </v-tooltip>
             </slot>
         </div>
         <div v-show="isOpen" v-if="isFolder" :style="{
@@ -36,6 +49,7 @@
 </template>
 
 <script>
+
 export default {
     name: 'TimelineTreeviewItem',
     props: {
@@ -70,6 +84,9 @@ export default {
                 this.$emit("make-folder", this.item);
                 this.isOpen = true;
             }
+        },
+        selectedItem(item){
+            this.$evtBus.$emit("selected-item-audit-trail", item);
         }
     }
 };
@@ -94,5 +111,12 @@ export default {
 
     .tree-item-content{
         font-size: 14px;
+    }
+    .text-ellipsis:hover{
+        cursor: pointer;
+    }
+    .single-row:hover {
+        background: #f5f5f5;
+        cursor: pointer;
     }
 </style>

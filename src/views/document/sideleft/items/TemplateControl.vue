@@ -17,7 +17,34 @@
                 <div v-for="(item,index) in allControlTemplate" :key="index" class="control-template-item" :control-id="item.id" draggable="true">
                     <div class="title-control">
                         <span>{{item.title}}</span>
-                        <button><span class="mdi mdi-dots-horizontal"></span></button>
+                            <v-menu offset-y>
+                            <template v-slot:activator="{ on, attrs }">
+                                <v-btn
+                                class="btn-action"
+                                dark
+                                v-bind="attrs"
+                                v-on="on"
+                                >
+                                <v-icon>mdi-dots-horizontal</v-icon>
+                                </v-btn>
+                            </template>
+                            <v-list class="menu-list">
+                                <v-list-item
+                                @click="deleteControlTemplate(item)">
+                                    <v-list-item-title>Xóa</v-list-item-title>
+                                </v-list-item>
+
+
+                                <v-list-item
+                                @click="editControlTemplate(item)">
+                                    <v-list-item-title>Sửa</v-list-item-title>
+                                </v-list-item>
+                                <v-list-item
+                                @click="previewControlTemplate(item)">
+                                    <v-list-item-title>Xem trước</v-list-item-title>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
                     </div>
                     <div class="info-control">
                         <div>
@@ -33,13 +60,29 @@
             </VuePerfectScrollbar>
             
         </div>
-        
+        <symper-drag-panel
+            :showPanel="false"
+            :dragPanelWidth="800"
+            :dragPanelHeight="500"
+            :actionTitle="'Xem trước control template'"
+            ref="dragPanel">
+            <template slot="drag-panel-content">
+                
+                <PreviewEditor
+                v-if="isShowPreview"
+                    :instance="instance"
+                    :content="contentPreview"
+                ></PreviewEditor>
+            </template>
+        </symper-drag-panel>
     </div>
 </template>
 <script>
 import Control from './../../items/Control.vue';
+import PreviewEditor from './PreviewEditor';
 import getControlElement from './../../../../components/document/controlPropsFactory.js';
 import Loader from './../../../../components/common/Loader';
+import SymperDragPanel from '@/components/common/SymperDragPanel';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../../../api/Document';
 
@@ -54,6 +97,12 @@ export default {
             default:""
         }
     },
+    data(){
+        return {
+            contentPreview:null,
+            isShowPreview:false
+        }
+    },
     computed:{
         allControlTemplate(){  
             return this.$store.state.document.editor[this.instance].allControlTemplate;
@@ -62,7 +111,9 @@ export default {
     components:{
         'control' : Control,
         VuePerfectScrollbar,
-        Loader
+        Loader,
+        PreviewEditor,
+        SymperDragPanel
     },
  
     methods:{
@@ -79,6 +130,29 @@ export default {
                 self.$refs.skeletonView.hide();
             })
         },
+        editControlTemplate(control){
+            this.$goToPage('/documents/control-template/'+control.id,control.title);
+        },
+        previewControlTemplate(control){
+            this.contentPreview = control.content;
+            this.isShowPreview = true;
+            this.$refs.dragPanel.show();
+        },  
+        deleteControlTemplate(control){
+            let thisCpn = this;
+            documentApi.deleteControlTemplate(control.id).then(res=>{
+                let allControlTemplate = thisCpn.allControlTemplate;
+                let controlTemplate = allControlTemplate.filter(c=>{
+                    return c.id == control.id
+                });
+                delete allControlTemplate[allControlTemplate.indexOf(controlTemplate[0])]
+                thisCpn.$store.commit(
+                    "document/addToDocumentEditorStore",{key:'allControlTemplate',value:allControlTemplate,instance:thisCpn.instance}
+                );
+            }).catch(err => {
+            })
+            .always(() => {});
+        }
     },
     mounted(){
         $.expr[":"].Contains = jQuery.expr.createPseudo(function(arg) {
@@ -126,14 +200,29 @@ export default {
         display: flex;
         font-weight: 500;
     }
-    .control-template-item .title-control button{
+    .control-template-item .title-control .btn-action{
+        height: 18px;
+        width: 20px;
+        min-width: 20px;
+        background-color:var(--symper-background-default) !important;
+        box-shadow: none;
+        color: #344750;
         margin-left: auto;
-        padding: 0 3px;
     }
-    .control-template-item .title-control button:focus{
+    .control-template-item .title-control .btn-action:focus{
         outline: none;
+    }
+    .control-template-item .title-control .btn-action >>> .mdi{
+        font-size: 16px;
     }
     .control-template-item .info-control{
         font-size: 12px;
+    }
+    .menu-list >>> .v-list-item{
+        min-height: 28px;
+        
+    }
+    .menu-list >>> .v-list-item .v-list-item__title{
+        font-size: 13px;
     }
 </style>

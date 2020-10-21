@@ -1,6 +1,35 @@
 import { allNodesAttrs } from "./../allAttrsOfNodes";
 import attrToXMLMethods from "./attrToXMLMethods";
 import { util } from "../../../plugins/util";
+import serviceTaskDefinitions from "./serviceTaskDefinitions";
+
+function translateServiceTaskToHTTPTask(el, attrs, bpmnModeler) {
+    let moddle = bpmnModeler.get('moddle');
+    let modeling = bpmnModeler.get('modeling');
+    let bizEl = el.businessObject;
+    let extensionElements = bizEl.extensionElements;
+
+
+    extensionElements = moddle.create('bpmn:ExtensionElements');
+    extensionElements.values = [];
+    let items = serviceTaskDefinitions[attrs.serviceTaskType.value].params;
+    serviceTaskDefinitions[attrs.serviceTaskType.value].makeRequestBody(attrs);
+    for (let name in items) {
+        let subEl = moddle.create('symper:symper_symper_field_tag');
+        subEl.name = name;
+        let value = String(items[name]).replace(/\n/g, '');
+        if (String(value)) {
+            subEl.text = `<symper:symper_symper_string_tag>
+                <![CDATA[${value}]]>
+            </symper:symper_symper_string_tag>`;
+            extensionElements.values.push(subEl);
+        }
+    }
+    modeling.updateProperties(el, {
+        extensionElements
+    });
+}
+
 
 /**
  * 
@@ -16,8 +45,8 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
         if (bizVizEl.$type == 'bpmn:Process' || bizVizEl.$type == 'bpmn:Collaboration') {
             elKey = 'rootElements';
             vizEl = bizVizEl.$parent;
-        } else if (bizVizEl) {
-
+        } else if (bizVizEl.$type == 'bpmn:ServiceTask') {
+            translateServiceTaskToHTTPTask(vizEl, attrs, bpmnModeler);
         }
 
         if (elKey) {
@@ -72,9 +101,11 @@ function checkAndAddTimeDefifinitonForNode(el, elKey, attrs, bpmnModeler) {
         let timeCycle = moddle.create("bpmn:Expression");
         timeCycle.body = attrs.timercycledefinition.value.trim();
 
-        let endDate = attrs.timerenddatedefinition.value.trim();
-        if (endDate != '') {
-            timeCycle.$attrs['symper:endDate'] = endDate;
+        if (attrs.timerenddatedefinition) {
+            let endDate = attrs.timerenddatedefinition.value.trim();
+            if (endDate != '') {
+                timeCycle.$attrs['symper:endDate'] = endDate;
+            }
         }
         bizObj.eventDefinitions[0].timeCycle = timeCycle;
 
@@ -169,6 +200,7 @@ export const defaultTaskDescription = {
     extraValue: '',
     approvalActions: '',
     targetElement: '',
+    editableControlOnApproval: []
 }
 
 function filterValue(rows) {
@@ -194,23 +226,47 @@ export const collectInfoForTaskDescription = function(allVizEls, allSymEls, bpmn
     for (let idEl in allSymEls) {
         let el = allSymEls[idEl];
         if (el.type == 'UserTask' || el.type == 'Task') {
-            let elDocumentation = util.cloneDeep(defaultTaskDescription);
-            elDocumentation.action.action = el.attrs.taskAction.value;
-            elDocumentation.action.parameter.activityId = el.id;
-
-            elDocumentation.content = el.attrs.notificationContent.value;
-            elDocumentation.extraLabel = el.attrs.extraInfoLabel.value;
-            elDocumentation.extraValue = el.attrs.extraInfoValue.value;
-
-            if (el.attrs.taskAction.value == 'submit') {
-                elDocumentation.action.parameter.documentId = el.attrs.formreference.value;
-            } else if (el.attrs.taskAction.value == 'approval') {
-                elDocumentation.targetElement = el.attrs.approvalForElement.value;
-                elDocumentation.approvalActions = JSON.stringify(filterValue(el.attrs.approvalActions.value));
-            } else if (el.attrs.taskAction.value == 'update') {
-                elDocumentation.targetElement = el.attrs.updateForElement.value;
-            }
-            el.attrs.documentation.value = JSON.stringify(elDocumentation);
+            setInfoForTaskDescription(el);
         }
+        // else if(el.type == 'ServiceTask'){
+        //     setInfoForServicesTask(el);
+        // }
     }
 }
+
+function setInfoForTaskDescription(el){
+    let elDocumentation = util.cloneDeep(defaultTaskDescription);
+    elDocumentation.action.action = el.attrs.taskAction.value;
+    elDocumentation.action.parameter.activityId = el.id;
+
+    elDocumentation.content = el.attrs.notificationContent.value;
+    elDocumentation.extraLabel = el.attrs.extraInfoLabel.value;
+    elDocumentation.extraValue = el.attrs.extraInfoValue.value;
+    elDocumentation.approvalEditableControls = el.attrs.approvalEditableControls.value;
+    elDocumentation.selectDefaultControlDocument = el.attrs.selectDefaultControlDocument.value;
+
+    if (el.attrs.taskAction.value == 'submit') {
+        elDocumentation.action.parameter.documentId = el.attrs.formreference.value;
+    } else if (el.attrs.taskAction.value == 'approval') {
+        elDocumentation.targetElement = el.attrs.approvalForElement.value;
+        elDocumentation.approvalActions = JSON.stringify(filterValue(el.attrs.approvalActions.value));
+    } else if (el.attrs.taskAction.value == 'update') {
+        elDocumentation.targetElement = el.attrs.updateForElement.value;
+    }
+    el.attrs.documentation.value = JSON.stringify(elDocumentation);
+}
+// function setInfoForServicesTask(el){
+//     let elDocumentation = util.cloneDeep(defaultTaskDescription);
+//     elDocumentation.action.module = "workflow";
+//     elDocumentation.action.resource = "workflow";
+//     elDocumentation.action.scope = "workflow";
+//     elDocumentation.action.action = el.attrs.serviceTaskType.value;
+//     elDocumentation.action.parameter.activityId = el.id;
+
+//     elDocumentation.receiver = el.attrs.serviceNotificationReceiver.value;
+//     elDocumentation.extraLabel = el.attrs.serviceNotificationTitle.value;
+//     elDocumentation.extraValue = el.attrs.serviceNotificationDescription.value;
+//     elDocumentation.targetElement = el.attrs.serviceNotificationActionForElement.value;
+
+//     el.attrs.documentation.value = JSON.stringify(elDocumentation);
+// }

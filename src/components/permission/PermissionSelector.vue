@@ -59,7 +59,7 @@
             </v-tooltip>
         </div>
         
-        <v-list dense  >
+        <v-list dense>
             <v-list-item-group class="mt-1">
                 <v-list-item
                     v-for="(item, i) in filterLazyValue"
@@ -166,6 +166,8 @@ export default {
             deep: true,
             immediate: true,
             handler: function(after){
+                 this.lazyValue = []
+                 this.selectedPermission = []
                 this.lazyValue = after;
                 this.selectedPermission = after;
             }

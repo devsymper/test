@@ -56,7 +56,10 @@
           </v-list-item>
         </v-list>
       </v-menu>
+
+    
       <!-- Bộ lọc cho  task -->
+
       <v-menu
         offset-y
         light
@@ -75,7 +78,8 @@
           <TaskListFilter @filter-change-value="handleChangeFilterValue"></TaskListFilter>
         </div>
       </v-menu>
-
+      
+    
       <!-- Bộ lọc loại đối tượng -->
       <v-menu
         offset-y
@@ -120,7 +124,10 @@
           </v-list-item-group>
         </v-list>
       </v-menu>
-
+      <!-- duyệt theo lô -->
+      <v-btn v-show="!sideBySideMode" small class="mr-2" :class="{'color-orange':changeStatusMoreApproval==true}" depressed @click="handleMoreApproval">
+        <v-icon size="18">mdi-format-list-checks</v-icon>
+      </v-btn>
       <!-- Dãn nở dòng -->
       <v-btn small solo depressed class="mr-2" @click="refreshTaskList" v-show="!sideBySideMode">
         <v-icon size="18">mdi-refresh</v-icon>
@@ -239,6 +246,10 @@ export default {
     "symper-document-selec": SymperDocSelect
   },
   props: {
+    changeStatusMoreApproval:{
+      type:Boolean,
+      default:false,
+    },
     isSmallRow: {
       type: Boolean,
       default: true
@@ -349,35 +360,37 @@ export default {
     clickOutside: vClickOutside.directive
   },
   mounted() {
-    //this.getProcessInstance();
   },
   methods: {
     changeObjectType(index) {
         this.$emit("changeObjectType", index);
     },
+    handleMoreApproval(){
+        this.$emit("goToPageApproval");
+    },
     inputAssignee(data) {
-      console.log("userId", data);
-      this.taskObject.assignee = data;
+        console.log("userId", data);
+        this.taskObject.assignee = data;
     },
     refreshTaskList() {
-      this.$emit("refresh-task-list");
+        this.$emit("refresh-task-list");
     },
     handleChangeFilterValue(data = {}) {
-      if ($.isEmptyObject(data)) {
-        if (this.orderBy !== null) {
-          this.filterList.order = this.orderOption[this.orderBy].value;
+        if ($.isEmptyObject(data)) {
+            if (this.orderBy !== null) {
+            this.filterList.order = this.orderOption[this.orderBy].value;
+            }
+            if (this.sortBy !== null) {
+            this.filterList.sort = this.sortOption[this.sortBy].value;
+            }
+        } else {
+            this.filterList = Object.assign(this.filterList, data);
         }
-        if (this.sortBy !== null) {
-          this.filterList.sort = this.sortOption[this.sortBy].value;
+        this.filterList.nameLike = `%${this.searchTaskKey}%`;
+        this.$emit("filter-change-value", this.filterList);
+        if (data.status) {
+            this.taskStatus = data.status;
         }
-      } else {
-        this.filterList = Object.assign(this.filterList, data);
-      }
-      this.filterList.nameLike = `%${this.searchTaskKey}%`;
-      this.$emit("filter-change-value", this.filterList);
-      if (data.status) {
-        this.taskStatus = data.status;
-      }
     },
     openCreateTaskDialog() {
       this.dialog = true;
@@ -385,88 +398,60 @@ export default {
     changeDensity() {
       this.$emit("change-density");
     },
-    getProcessInstance() {
-      BPMNEngine.getProcessInstance()
-        .then(res => {
-          if (res.total > 0) {
-            let listProccess = [];
-            let objects = [];
-            res.data.forEach(item => {
-              if (listProccess.indexOf(item.processDefinitionId) < 0) {
-                listProccess.push(item.processDefinitionId);
-              }
-              let index = listProccess.indexOf(item.processDefinitionId);
-              item.tasks = [];
-              if (objects[index] != undefined) {
-                objects[index].objects.push(item);
-              } else {
-                objects.push({
-                  processDefinitionId: item.processDefinitionId,
-                  processDefinitionName: item.processDefinitionName,
-                  objects: [item]
-                });
-              }
-            });
-            this.listProrcessInstances = objects;
-            this.$emit("get-list-process-instance", objects);
-          }
-        })
-        .catch(err => {});
-    },
     selectProcess(process) {
-      this.selectedProcess = process;
-      this.openCreateTaskDialog();
+        this.selectedProcess = process;
+        this.openCreateTaskDialog();
     },
     showError() {
-      this.$snotify({
-        type: "error",
-        title: this.$t("notification.errorTitle"),
-        text: this.$t("notification.error")
-      });
+        this.$snotify({
+            type: "error",
+            title: this.$t("notification.errorTitle"),
+            text: this.$t("notification.error")
+        });
     },
     async saveTask() {
-      if (!this.taskObject.assignee) {
-        this.$snotifyError(
-          {},
-          this.$t("tasks.error.canNotCreateTask"),
-          this.$t("tasks.error.emptyAssignee")
-        );
-        return;
-      }
-      let data = {
-        ...this.taskObject,
-        assignee: this.taskObject.assignee,
-        parentTaskId: this.parentTaskId ? this.parentTaskId : "",
-        owner: this.$store.state.app.endUserInfo.id
-      };
-      let description = util.cloneDeep(defaultTaskDescription);
-      if (this.taskObject.docId) {
-        description.action.action = "submit";
-        description.action.parameter.documentId = this.taskObject.docId;
-      }
+        if (!this.taskObject.assignee) {
+            this.$snotifyError(
+            {},
+            this.$t("tasks.error.canNotCreateTask"),
+            this.$t("tasks.error.emptyAssignee")
+            );
+            return;
+        }
+        let data = {
+            ...this.taskObject,
+            assignee: this.taskObject.assignee,
+            parentTaskId: this.parentTaskId ? this.parentTaskId : "",
+            owner: this.$store.state.app.endUserInfo.id+":"+this.$store.state.app.endUserInfo.currentRole.id
+        };
+        let description = util.cloneDeep(defaultTaskDescription);
+        if (this.taskObject.docId) {
+            description.action.action = "submit";
+            description.action.parameter.documentId = this.taskObject.docId;
+        }
 
-      description.content = this.taskObject.name;
+        description.content = this.taskObject.name;
 
-      if (
-        this.taskObject.description == "" ||
-        this.taskObject.description == null
-      ) {
-        description.extraLabel = this.$t("tasks.header.alertDescription");
-      } else {
-        description.extraLabel = this.taskObject.description;
-      }
-      data.description = JSON.stringify(description);
-      let res = await BPMNEngine.addTask(JSON.stringify(data));
-      if (res.id != undefined) {
-        this.selectedProcess = null;
-        this.dialog = false;
-        this.$emit("create-task", res);
-        this.$snotifySuccess(this.$t("tasks.created"));
-      } else {
-        this.showError();
-      }
+        if (
+            this.taskObject.description == "" ||
+            this.taskObject.description == null
+        ) {
+            description.extraLabel = this.$t("tasks.header.alertDescription");
+        } else {
+            description.extraLabel = this.taskObject.description;
+        }
+        data.description = JSON.stringify(description);
+        let res = await BPMNEngine.addTask(JSON.stringify(data));
+            if (res.id != undefined) {
+            this.selectedProcess = null;
+            this.dialog = false;
+            this.$emit("create-task", res);
+            this.$snotifySuccess(this.$t("tasks.created"));
+            } else {
+                this.showError();
+            }
+        }
     }
-  }
 };
 </script>
 
@@ -476,5 +461,11 @@ export default {
 }
 .v-list-item:hover {
   background-color: #f5f5f5 !important                                                                                ;
+}
+.v-text-field>>>.v-input--dense:not(.v-text-field--outlined) >>>input {
+    padding: 10px 0 11px!important;
+}
+.color-orange{
+    background-color: orange!important;
 }
 </style>

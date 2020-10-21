@@ -467,11 +467,11 @@ button:hover {
 
 .table-print td {
     border: 1px solid #ddd;
-    padding: 8px;
+    padding: 3px;
 }
 
 .table-print th {
-    padding: 2px;
+    padding: 3px;
     text-align: left;
     border: 1px solid #ddd;
 }
@@ -500,4 +500,12 @@ button:hover {
 .trace-current-control {
     background: rgb(7 96 217 / 0.5) !important;
     color: white !important;
+}
+
+.s-control-data-flow {
+    display: inline-block;
+    font-size: 11px;
+    width: 100%;
+    max-width: 100%;
+    position: relative;
 }
