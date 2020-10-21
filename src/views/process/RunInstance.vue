@@ -13,6 +13,7 @@
                 :isInitInstance="true" 
                 @task-submited="handleTaskSubmited" 
                 :taskInfo="taskInfo"
+                :originData="originTaskData"
                 :parentHeight="thisHeight"
                 @close-detail="closeDetail">
             </taskDetail>
@@ -39,6 +40,11 @@ export default {
     },
     data(){
         return {
+            originTaskData: {
+                assigneeInfo: {
+                    id: 0
+                }
+            },
             startWorkflowStatus: 'init', // init | started
             taskInfo: {
                 action: {
@@ -63,6 +69,7 @@ export default {
         }).catch((err) => {
 
         });
+        this.originTaskData.assigneeInfo.id = this.$store.state.app.endUserInfo.id;
     },
     methods: {
         async getFirstNodeData(){

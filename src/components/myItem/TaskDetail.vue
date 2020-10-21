@@ -144,9 +144,10 @@ export default {
         originData: {
             type: Object,
             default: () => {
+                let self = this;
                 return {
                     assigneeInfo: {
-                        id: this.$store.state.app.endUserInfo.id
+                        id: 0
                     }
                 }
             }
@@ -277,6 +278,7 @@ export default {
             }
         },
         checkRole(assigneeId){
+            
             if (assigneeId==this.$store.state.app.endUserInfo.id) {
                 return true;
             }else{
