@@ -137,7 +137,11 @@ export default {
         originData: {
             type: Object,
             default: () => {
-                return {}
+                return {
+                    assigneeInfo: {
+                        id: this.$store.state.app.endUserInfo.id
+                    }
+                }
             }
         },
         isInitInstance: {

@@ -131,8 +131,7 @@ export default {
         };
         this.autoGroupColumnDef = { minWidth: 100 };
         this.gridOptions = {};
-        // this.gridOptions.rowStyle = { height: '21px', background: "#f7f7f7" ,padding: "unset",marginBottom:"-10px" }  
-        this.gridOptions.rowHeight = 20;
+        this.gridOptions.rowHeight = 20.5;
         this.columns = this.allColumns;
         this.rowDataTable = this.rowData;
         this.autoGroupColumnDef = {
@@ -233,7 +232,7 @@ export default {
     }
      .like-handson-table >>> .ag-header{
         min-height:unset !important;
-        height: 26px !important;
+        height: 28px !important;
     }
      .like-handson-table >>> .ag-header .ag-header-cell-text,
      .like-handson-table >>> .ag-header .ag-header-icon{

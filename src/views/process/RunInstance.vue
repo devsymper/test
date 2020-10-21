@@ -68,7 +68,6 @@ export default {
         async getFirstNodeData(){
             let self=this;
             let idDefinition = this.$route.params.id;
-            debugger
             let definitionModel = await BPMNEApi.getDefinitionModel(idDefinition);
             this.definitionModel = definitionModel;
             let documentToStart = this.getStartDocId(definitionModel);
