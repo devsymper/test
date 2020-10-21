@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex w-100 h-100">
+    <div :class="{'d-flex w-100 h-100': true, 'diagram-hortical': typeView== 'B','diagram-vertical': typeView== 'R'   } ">
         <div class="h-100 flex-grow-1">
             <div class="border-bottom-1 pt-1 pl-2">
                 <v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
@@ -954,5 +954,11 @@ export default {
 
 .symper-orgchart-active-editor .symper-orgchart-paper .symper-orgchart-node:hover .orgchart-action {
     display: block!important;
+}
+.diagram-hortical .btn-collapse-expand-ver{
+    display: none;
+}
+.diagram-vertical .btn-collapse-expand-hor{
+    display: none;
 }
 </style>

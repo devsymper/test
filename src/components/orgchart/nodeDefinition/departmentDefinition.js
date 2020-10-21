@@ -122,20 +122,42 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 		y: shapeSize.height
 	},
 
-	'.btn-collapse-expand': {
-		'ref-dx': 0,
-		'ref-y': shapeSize.height + CEConfig.stickHeight - 20,
+	'.btn-collapse-expand-hor': {
+		'ref-dx': -shapeSize.width/2,
+		'ref-y':shapeSize.height,
 		'ref': '.card',
 		event: 'element:collapse',
 		cursor: 'pointer'
 	},
-	'.btn-collapse-expand>circle': {
+	'.btn-collapse-expand-hor>circle': {
 		r: 7,
-		fill: 'yellow',
-		stroke: 'yellow',
+		fill: 'blue',
+		stroke: 'blue',
 		'stroke-width': 0
 	},
-	'.btn-collapse-expand>text': {
+	'.btn-collapse-expand-hor>text': {
+		fill: 'white',
+		'font-size': 15,
+		'font-weight': 400,
+		stroke: 'white',
+		x: -4,
+		y: 5,
+		'font-family': 'Roboto'
+	},
+	'.btn-collapse-expand-ver': {
+		'ref-dx': 0,
+		'ref-y':shapeSize.height/2,
+		'ref': '.card',
+		event: 'element:collapse',
+		cursor: 'pointer'
+	},
+	'.btn-collapse-expand-ver>circle': {
+		r: 7,
+		fill: 'blue',
+		stroke: 'blue',
+		'stroke-width': 0
+	},
+	'.btn-collapse-expand-ver>text': {
 		fill: 'white',
 		'font-size': 15,
 		'font-weight': 400,
@@ -207,7 +229,11 @@ export const departmentMarkup =
                 <circle class="add"/>
                 <text class="add">+</text>
             </g>
-			<g class="btn-collapse-expand">
+			<g class="btn-collapse-expand-hor">
+				<circle class="collapse-expand-circle"/>
+				<text class="expand-text">+</text>
+			</g>
+			<g class="btn-collapse-expand-ver">
 				<circle class="collapse-expand-circle"/>
 				<text class="expand-text">+</text>
 			</g>
