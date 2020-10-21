@@ -59,6 +59,7 @@
                     </v-list-item>
                 </div>
             </div>
+            <TreeSqlConfig />
         </v-card>
             <ListColumnAutoComplete 
                 ref="listColumnn"
@@ -72,6 +73,7 @@
 <script>
 import ListColumnAutoComplete from './ListColumnAutoComplete'
 import {documentApi} from "@/api/Document.js"
+import TreeSqlConfig from "./TreeSqlConfig.vue"
 export default {
     data(){
         return{
@@ -110,7 +112,8 @@ export default {
         }
     },
     components:{
-        ListColumnAutoComplete
+        ListColumnAutoComplete,
+        TreeSqlConfig
     }
 }
 </script>
