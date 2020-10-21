@@ -70,6 +70,7 @@ export default {
           chunkSize:100*1024*1024,
           query: {
             key: "",
+            objType: 'document',
             total: 0,
             documentId:0,
           },
@@ -92,6 +93,7 @@ export default {
         handleFileUploaded(rootFile, file, response, chunk) {
             this.$refs.upload.uploader.resume();
             response = JSON.parse(response);
+            
             this.$emit('dataExcel', response);
             this.$emit('keyUpload', this.options.query.key);
         },
@@ -102,6 +104,8 @@ export default {
             this.options.query.key = util.str.randomString(6)+Date.now();
             this.options.query.typeImport = this.selectType;
             this.options.query.documentId = this.documentId;
+            this.options.query.objType ='document';
+            
             this.$emit('clearFiles');
         },
         handleChange(event) {
@@ -111,6 +115,9 @@ export default {
             this.options.query.key = util.str.randomString(6)+Date.now();
             this.options.query.typeImport = this.selectType;
             this.options.query.documentId = this.documentId;
+            this.options.query.objType ='document';
+
+
             this.$emit('clearFiles');
         },
     }

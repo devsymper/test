@@ -1,4 +1,5 @@
 <template>
+<!-- <div class="w-100"> -->
     <list-items
         ref="listUser"
         @after-open-add-panel="addUser"
@@ -12,6 +13,7 @@
         :getDataUrl="getListUrl+'users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
         :commonActionProps="commonActionProps"
+        @import-excel="importExcel()"
     >
         <div slot="right-panel-content" class="h-100">
             <action-panel
@@ -23,9 +25,33 @@
             :isSettingPasswordView="isSettingPasswordView"
             />
         </div>
-    </list-items>
+          <!-- <v-navigation-drawer 
+            v-model="drawerImportExelPanel" 
+            absolute
+            class="d-none d-sm-none d-md-flex"
+            temporary
+            style="height: 100vh"
+            right>
+
+            asdnajsdkalsdjklasdjklasjdkl
+            <!-- <ImportExcelPanel 
+                @cancel="closeImportExcelPanel" 
+              
+                @showValidate="showValidateComponent"
+                :drawerImportExelPanel="drawerImportExelPanel" /> -->
+        <!-- </v-navigation-drawer> -->
+        </list-items>
+         <!-- <v-navigation-drawer
+            v-model="drawer"
+            absolute
+            right
+            temporary
+        >
+        </v-navigation-drawer> -->
+    <!-- </div> -->
 </template>
 <script>
+import ImportExcelPanel from "./../../components/document/ImportExelPanel";
 import { userApi } from "./../../api/user.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import ActionPanel from "./../../views/users/ActionPanel.vue";
@@ -37,9 +63,15 @@ export default {
     components: {
         "list-items": ListItems,
         "action-panel": ActionPanel,
+        ImportExcelPanel: ImportExcelPanel,
+
     },
     data(){
         return {
+            showValidate:false,
+            drawer:false,
+            drawerImportExelPanel: null,
+           
             customAPIResult: {
                 reformatData(res){
                     let data = res.data;
@@ -106,6 +138,16 @@ export default {
         
     },
     methods:{
+        closeImportExcelPanel(){
+            this.drawerImportExelPanel = false;
+        },
+        showValidateComponent(data){
+            this.showValidate = data;
+        },
+        importExcel(){
+            debugger
+           this.drawer = true
+        },
         refreshListUser(){
             this.$refs.listUser.refreshList();
         },

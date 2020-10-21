@@ -15,18 +15,18 @@
     <v-list dense>
         <v-row class="ml-5 mt-1 mr-6">
             <span class="font "><b class="color-grey fw-500 fs-13">
-                Import dữ liệu cho chứng từ: {{nameDocument}}</b>
+                Import dữ liệu cho: {{nameDocument}}</b>
             </span>
         </v-row>
         <v-row class="ml-0 mt-1" style="height:32px">
             <v-col class="col-md-4" style="margin-left:-5px; margin-top:-5px">
-           <span class="font ml-3 "> Chọn kiểu import:</span>
+           <span class="font ml-3 fs-13"> Chọn kiểu import:</span>
             </v-col>
              <v-col class="col-md-4 ml-9" style="margin-top:-25px">
                   <v-select 
                     class="select-type ml-3 pr-3 w-100" 
                     v-model="selectType"
-                    :menu-props="{'nudge-top':-40,'fixed':false}" 
+                    :menu-props="{'nudge-top':-40}" 
                     :items="selectTypeImport" 
                     item-color="white" 
                     label="--- Chọn ---" 
@@ -295,7 +295,7 @@ export default {
                 key: this.key,
                 documentId: this.documentId,
                 typeImport: this.selectType,
-                objType: 'documnent',
+                objType: 'document',
                 mode: 'full',
                 mapping: {
                     general: general[0],
@@ -312,10 +312,10 @@ export default {
                 });
                 // kiểm tra key rỗng của table chung
                    let check = true;
-                    if (this.tables[0].keyColumn==undefined||this.tables[0].keyColumn.index==-1) {
-                        this.errorMessage = '* Bạn chưa chọn khóa cho thông tin chung';
-                        check = false;
-                    };
+                    // if (this.tables[0].keyColumn==undefined||this.tables[0].keyColumn.index==-1) {
+                    //     this.errorMessage = '* Bạn chưa chọn khóa cho thông tin chung';
+                    //     check = false;
+                    // };
                     if (this.tables[0].sheetMap == '') {
                         this.errorMessage = '* Điền thiếu trường thông tin chung';
                         check = false;
