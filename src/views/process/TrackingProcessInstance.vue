@@ -309,7 +309,6 @@ export default {
                         infoAssignee.assignee={};
                         infoAssignee.role={};
                         let taskInfo=nodeInfo.instancesMap;
-                        
                         Object.keys(taskInfo).forEach(item => {
                             let task=taskInfo[item];
                             let assigneeId=task.assignee;

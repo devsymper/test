@@ -6,16 +6,16 @@
             class="mx-auto"
             width="100%" height="100%" 
         ></v-skeleton-loader>
-        <v-row class="ml-0 mr-0 justify-space-between task-header" style="line-height: 36px;">
+        <v-row class="ml-0 mr-0 justify-space-between task-header" id="taskHeader" style="line-height: 36px;">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                    <div v-on="on" class="fs-13 pl-2 pt-1 float-left text-ellipsis" style="width:330px"> 
+                    <div v-on="on" class="fs-13 pl-2 pt-1 float-left text-ellipsis" :style="{'width':widthInfoTask+'px'}"> 
                         {{taskBreadcrumb}}
                     </div>
                 </template>
                 <span>{{taskBreadcrumb}}</span>
             </v-tooltip>
-            <div class="text-right pt-1 pb-1 pr-0 float-right">
+            <div id="action-task" class="text-right pt-1 pb-1 pr-0 float-right">
                 <span v-if="!originData.endTime && !hideActionTask ">
                     <span v-if="checkRole(originData.assigneeInfo.id)==true">
                         <v-btn small depressed  v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
@@ -30,7 +30,6 @@
                     </span>
                   
                 </span>
-             
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
                         <v-btn  
@@ -43,7 +42,6 @@
                     </template>
                     <span>Xem chi tiết</span>
                 </v-tooltip>
-
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
                         <v-btn  
@@ -57,8 +55,6 @@
                     </template>
                     <span>Sao chép đường dẫn</span>
                 </v-tooltip>
-
-                
                 <v-tooltip bottom v-if="checkShowEditRecord()">
                     <template v-slot:activator="{ on }">
                         <v-btn  
@@ -71,13 +67,10 @@
                     </template>
                     <span>Sửa nội dung văn bản</span>
                 </v-tooltip>
-
                 <!-- <button @click="getTaskTest">Click</button> -->
-
                 <v-btn small tile icon text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
                 </v-btn>
-
             </div>
         </v-row>
         <v-divider style="border-color: #dedede;"></v-divider>
@@ -161,7 +154,9 @@ export default {
         },
         allVariableProcess:{
             type:Array,
-            default:[]
+            default: () => {
+                return []
+            }
         },
         appId:{
             type:String,
@@ -177,6 +172,9 @@ export default {
                 this.setCustomDocControls();
             }
         },
+        taskBreadcrumb:function(){
+            this.getWidthHeaderTask();
+        }
 
     },
     components: {
@@ -188,7 +186,7 @@ export default {
         return {
             showDialogAlert:false,
             isRole:false, //value =falses khi assignee = userId, =true khi assignee = userId:role
-          
+            widthInfoTask:330,
             isShowSidebar:false,
             loadingActionTask:false,
             breadcrumb: {
@@ -261,6 +259,12 @@ export default {
         this.checkAndSwitchToTab();
     },
     methods: {
+        getWidthHeaderTask(){
+            console.log("aaaaxxx",$("#taskHeader").width());
+            console.log("aaaaxxx",$("#action-task").width());
+            this.widthInfoTask=$("#taskHeader").width()-$("#action-task").width()-20;
+       
+        },
         checkShowEditRecord(){
             let taskInfo = this.taskInfo;
             if(this.originData){

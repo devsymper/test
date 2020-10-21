@@ -90,7 +90,7 @@
                     <v-col
                        @click="selectObject(obj, idx)"
                         v-if="!sideBySideMode"
-                        style="line-height: 42px;flex: 0 0 10.666667%;"
+                        style="line-height: 42px;flex: 0 0 11.666667%;"
                         cols="2"
                         class="fs-13  pl-3 px-1 py-0"
                     >
