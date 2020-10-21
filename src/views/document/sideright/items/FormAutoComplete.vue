@@ -59,7 +59,7 @@
                     </v-list-item>
                 </div>
             </div>
-            <TreeSqlConfig />
+            <TreeSqlConfig @tree-renderer="handleSqlRenderer" />
         </v-card>
             <ListColumnAutoComplete 
                 ref="listColumnn"
@@ -109,6 +109,8 @@ export default {
         },
         removeItem(item){
             this.listColumnSelected.splice(this.listColumnSelected.indexOf(item),1)
+        },
+        handleSqlRenderer(data){
         }
     },
     components:{
