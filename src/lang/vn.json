@@ -584,6 +584,7 @@
             "userUpdate": "Người cập nhật",
             "countRecord": "Số lượng bản ghi",
             "history": {
+                "id": "STT",
                 "name": "Tên văn bản",
                 "title": "Tiêu đề văn bản",
                 "countDelete": "Số lượng đã xóa",

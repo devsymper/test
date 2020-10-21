@@ -1,7 +1,8 @@
 <template>
-    <list-items
+    <div class="w-100">
+        <list-items
         class="history-document"
-        ref="listDocument"
+        ref="listItem"
         :getDataUrl="'https://trash.symper.vn/items?type=document_instance'"   
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
@@ -13,6 +14,36 @@
         :customAPIResult="customAPIResult"
     >
     </list-items>
+     <v-dialog
+            v-model="dialog"
+            max-width="290">
+            <v-card>
+                <v-card-title class="headline">Xác nhận khôi phục</v-card-title>
+                <v-card-text>
+                Xác nhận khôi phục {{countRestore}} bản ghi
+                </v-card-text>
+
+                <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <v-btn
+                    color="darken-1"
+                    text
+                    @click="dialog = false"
+                >
+                    {{$t('common.close')}}
+                </v-btn>
+
+                <v-btn
+                    color="green"
+                    text
+                    @click="restoreDocumentObject">
+                    {{$t('common.restore')}}
+                </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
+    </div>
 </template>
 <script>
 import { documentApi } from "./../../../api/Document.js";
@@ -25,6 +56,11 @@ export default {
     },
     data(){
         return {
+            dialog:false,
+            dataRestore:null,
+            countRestore:null,
+            allIds:null,
+            documentIdSelected:null,
             commonActionProps: {
                 "module": "document",
                 "resource": "document_definition",
@@ -53,11 +89,27 @@ export default {
                             continue
                         }
                         let documentObject = JSON.parse(rowData[0].data);
+                        
                         let newRowTable = {};
-                        newRowTable['id'] = rowId;
+                        newRowTable['id'] = rowId + 1;
                         newRowTable['documentName'] = documentObject['documentName'];
                         newRowTable['documentTitle'] = documentObject['documentTitle'];
+                        newRowTable['field'] = documentObject['field'];
                         newRowTable['countDelete'] = rowData.length;
+                        let allDataObject = [];
+                        let allIds = [];
+                        for (let index = 0; index < rowData.length; index++) {
+                            let objectData = rowData[index].data;
+                            objectData = JSON.parse(objectData);
+                            delete objectData.documentName;
+                            delete objectData.documentTitle;
+                            delete objectData.field;
+                            objectData['idTrash'] = rowData[index].id;
+                            allDataObject.push(objectData);
+                            allIds.push(rowData[index].id);
+                        }
+                        newRowTable['dataObject'] = allDataObject;
+                        newRowTable['allIds'] = allIds;
                         let user = allUser.filter(u=>{
                             return u.id == rowData[0]['userDeleted'];
                         })
@@ -73,7 +125,7 @@ export default {
                     }
                     return{
                         columns:[
-                            {name: "id", title: "table.id", type: "numeric"},
+                            {name: "id", title: "table.history.id", type: "numeric"},
                             {name: "documentName", title: "table.history.name", type: "text"},
                             {name: "documentTitle", title: "table.history.title", type: "text"},
                             {name: "countDelete", title: "table.history.countDelete", type: "text"},
@@ -89,34 +141,26 @@ export default {
             actionPanelWidth:830,
             containerHeight: 200,
             tableContextMenu:{
+                list: {
+                    name: "listObject",
+                    text: function() {
+                        return " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Danh sách";
+                    },
+                    callback: (document, callback) => {
+                        this.$goToPage('/documents/delete-history/objects',"Danh sách bản ghi",false,true,{allData:document.dataObject,field:document.field});
+                    },
+                },
                 restore: {
                     name: "restore",
                     text: function() {
                         return " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Khôi phục";
                     },
                     callback: (document, callback) => {
-                        let thisCpn = this;
-                        documentApi
-                        .restoreDocument({id:document.id})
-                        .then(res => {
-                            if (res.status == 200) {
-                                thisCpn.$snotify({
-                                    type: "success",
-                                    title: "restore document success!"
-                                });  
-                                thisCpn.$refs.listDocument.refreshList();
-                            }
-                            else{
-                                thisCpn.$snotify({
-                                    type: "error",
-                                    title: res.messagr
-                                });  
-                            }
-                        })
-                        .catch(err => {
-                            console.log("error from delete document api!!!", err);
-                        })
-                        .always(() => {});
+                        this.allIds = document.allIds;
+                        this.dialog = true;
+                        this.countRestore = document.countDelete;
+                        this.dataRestore = document.dataObject;
+                        
                     },
                 },
                 
@@ -139,7 +183,7 @@ export default {
                                     type: "success",
                                     title: "Delete document success!"
                                 });  
-                                thisCpn.$refs.listDocument.refreshList();
+                                thisCpn.$refs.listItem.refreshList();
                             }
                             else{
                                 thisCpn.$snotify({
@@ -174,8 +218,34 @@ export default {
         calcContainerHeight() {
             this.containerHeight = util.getComponentSize(this).h;
         },
-        aftersubmitDocument(){
-            this.$refs.listDocument.closeactionPanel();
+        restoreDocumentObject(){
+            this.dialog = false;
+            let thisCpn = this;
+            let objectIds = this.dataRestore.reduce((arr,obj)=>{
+                arr.push(obj.document_object_id);
+                return arr;
+            },[])
+            documentApi
+            .restoreDocumentObject({dataObject:JSON.stringify(this.dataRestore),objectIds:JSON.stringify(objectIds), ids:JSON.stringify(this.allIds)})
+            .then(res => {
+                if (res.status == 200) {
+                    thisCpn.$snotify({
+                        type: "success",
+                        title: "restore document success!"
+                    });  
+                    thisCpn.$refs.listItem.refreshList();
+                }
+                else{
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: res.messagr
+                    });  
+                }
+            })
+            .catch(err => {
+                console.log("error from delete document api!!!", err);
+            })
+            .always(() => {});
         }
     }
 }

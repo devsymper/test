@@ -419,6 +419,7 @@
             "userUpdate": "BA update",
             "countRecord": "count record",
             "history": {
+                "id": "Index",
                 "name": "Document name",
                 "title": "Document title",
                 "countDelete": "Count record",

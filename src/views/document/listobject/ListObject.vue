@@ -37,6 +37,12 @@
                         :allInputs="formulasInput"/>
                     <v-icon @click="runFormulas" class="run-formulas-btn">mdi-send</v-icon>
                 </div>
+                <v-progress-linear
+                    v-if="showProgress"
+                    indeterminate
+                    color="orange"
+                    ></v-progress-linear>
+                    <br>
                 <v-btn small @click="deleteRecord" class="delete-record-btn">
                     <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
                 </v-btn>
@@ -195,6 +201,7 @@ export default {
     },
     data(){
         return {
+            showProgress:false,
             actionOnRightSidebar: 'detail',
             commonActionProps: {
                 "module": "document",
@@ -283,7 +290,7 @@ export default {
                     name: "detail",
                     text: this.$t('common.detail'),
                     callback: (documentObject, callback) => {
-                        this.$goToPage('/documents/objects/'+documentObject.document_object_id,"Danh sách bản ghi");
+                        this.$goToPage('/documents/objects/'+documentObject.document_object_id,"Chi tiết");
                     },
                 },
                 
@@ -401,9 +408,11 @@ export default {
             }, 200,this);
         },
         runFormulas(){
+            this.showProgress = true;
             this.$refs.listObject.refreshList();
         },
         afterGetData(data){
+            this.showProgress = false;
             if(this.isDeleteMultiple){
                 this.$refs.listObject.addCheckBoxColumn();
             }

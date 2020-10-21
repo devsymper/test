@@ -19,6 +19,12 @@ export default [
             import ('../../views/document/trash/History.vue'),
     },
     {
+        path: "/documents/delete-history/objects",
+        name: "documentObjectHistory",
+        component: () =>
+            import ('../../views/document/trash/ListObjectDeleted.vue'),
+    },
+    {
         path: "/documents/:id?/print-config",
         name: "prinConfigDocument",
         component: () =>
