@@ -144,7 +144,11 @@ export default {
         originData: {
             type: Object,
             default: () => {
-                return {}
+                return {
+                    assigneeInfo: {
+                        id: this.$store.state.app.endUserInfo.id
+                    }
+                }
             }
         },
         isInitInstance: {
@@ -161,7 +165,9 @@ export default {
         },
         allVariableProcess:{
             type:Array,
-            default:[]
+            default(){
+                return []
+            }
         },
         appId:{
             type:String,
