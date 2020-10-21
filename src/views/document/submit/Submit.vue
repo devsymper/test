@@ -1287,8 +1287,7 @@ export default {
                 let controlType = $(allInputControl[index]).attr('s-control-type');
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let field = this.sDocumentEditor.allControl[id];
-                    console.log('fieldfieldfield',field);
-                    let controlName = allControlNotSetData.includes(controlType) ? field.type : field.properties.name.value;
+                    let controlName = (allControlNotSetData.includes(controlType) || controlType == 'tabPage') ? field.type : field.properties.name.value;
                     this.checkEditableControl(controlName,field);
                     this.checkOverrideFormulas(controlName,field);
                     let idField = field.id;
