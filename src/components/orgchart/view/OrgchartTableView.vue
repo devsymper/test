@@ -64,7 +64,7 @@
                                      <h2 style="font:17px roboto ;font-weight:500" >Sơ đồ tổ chức</h2>
                                </div>
                                 <AgDataTable
-                                    :tableHeight="'calc(100% - 100px)'"
+                                    :tableHeight="'calc(100% - 150px)'"
                                     :likeHandsonTable="true"
                                     :rowData="dataTable"
                                     :editable="false"
@@ -479,6 +479,10 @@ export default {
     height:45px !important;
     border-bottom:1px solid lightgray;
     border-left:1px solid lightgray
+}
+.orgchart-table-view >>> .v-toolbar .v-toolbar__title{
+    font-size:17px !important;
+    font-weight: 500;
 }
 .orgchart-table-view >>> .v-toolbar .v-toolbar__content{
     height:unset !important;
