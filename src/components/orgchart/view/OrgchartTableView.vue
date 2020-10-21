@@ -64,7 +64,7 @@
                                      <h2 style="font:17px roboto ;font-weight:500" >Sơ đồ tổ chức</h2>
                                </div>
                                 <AgDataTable
-                                    :tableHeight="'calc(100% - 100px)'"
+                                    :tableHeight="'calc(100% - 150px)'"
                                     :likeHandsonTable="true"
                                     :rowData="dataTable"
                                     :editable="false"
@@ -353,7 +353,7 @@ export default {
     data(){
         let self = this
         return {
-            currentTab: 2,
+            currentTab: 1,
             agApi:null,
             currentSize: {},
             customAgComponents: {
@@ -381,17 +381,17 @@ export default {
             menuPickTab:[
                 {
                     icon: "mdi-grid",
-                    title:"SDDTC dạng bảng",
+                    title:"SĐTC dạng bảng",
                     action:"tableView"
                 },
                 {
                     icon: "mdi-account-multiple",
-                    title:"SDDTC dạng cây",
+                    title:"SĐTC dạng cây",
                     action:"tableSideBySideView"
                 },
                 {
                     icon: "mdi-share-variant",
-                    title:"SDDTC dạng lưu đồ",
+                    title:"SĐTC dạng lưu đồ",
                     action:"diagramView"
                 },
 
@@ -479,6 +479,10 @@ export default {
     height:45px !important;
     border-bottom:1px solid lightgray;
     border-left:1px solid lightgray
+}
+.orgchart-table-view >>> .v-toolbar .v-toolbar__title{
+    font-size:17px !important;
+    font-weight: 500;
 }
 .orgchart-table-view >>> .v-toolbar .v-toolbar__content{
     height:unset !important;
