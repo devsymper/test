@@ -1,6 +1,14 @@
 <template>
-    <div v-show="showListColumn" class="popup-list-column">
-        <v-card>
+    <div  class="popup-list-column">
+        <v-menu
+            v-model="showListColumn"
+            :position-x="x"
+            :position-y="y"
+            absolute
+            offset-x
+            class="menu-list-column"
+            z-index="333333333333333333"
+        >
              <v-list-item
                 v-for="(item,i) in listColumn"
                 :key="i"
@@ -19,7 +27,7 @@
             </v-list-item-content>
                 <v-icon v-if="listColumnSelected.includes(item)" color="green lighten-1">mdi-check-outline</v-icon>
         </v-list-item>
-        </v-card>
+        </v-menu>
     </div>
 </template>
 
@@ -27,6 +35,8 @@
 export default {
     data(){
         return {
+            x:null,
+            y:null,
              listColumn:[
                 {
                     id:1,
@@ -72,7 +82,8 @@ export default {
         },
         show(e){
             this.showListColumn = !this.showListColumn
-            $(".popup-list-column").css("left", e.clientX).css("top",300)
+            this.x = e.clientX
+            this.y = e.clientY+20
         }
     },
     watch:{
@@ -83,22 +94,25 @@ export default {
 </script>
 
 <style scoped>
-.popup-list-column >>> .v-icon{
+.portrait.v-menu__content{
+    background-color: #ffffff !important;
+}
+.portrait.v-menu__content  .v-icon{
     font-size: 10px !important;
 }
-.popup-list-column >>> .v-avatar{
+.portrait.v-menu__content  .v-avatar{
     height: 12px !important;
     width: 12px !important;
     min-width: unset !important;
 }
-.popup-list-column >>> .v-list-item__content .v-list-item__title{
+.portrait.v-menu__content .v-list-item__content .v-list-item__title{
     font:13px roboto;
 }
-.popup-list-column >>> .v-list-item__action .v-btn{
+.portrait.v-menu__content  .v-list-item__action .v-btn{
     width: 12px;
     height: 12px;
 }
-.popup-list-column >>> .v-list-item{
+.portrait.v-menu__content  .v-list-item{
     min-height: unset;
     height: 30px;
     padding:0px 4px;

@@ -9,6 +9,8 @@
                 <div class="row-autocomplete">
                     <div class="title-row-autocomplete">Document</div>
                      <v-autocomplete
+                        :items="listDocument"
+                        item-text="title"
                         dense
                         solo
                     ></v-autocomplete>
@@ -69,21 +71,31 @@
 </template>
 <script>
 import ListColumnAutoComplete from './ListColumnAutoComplete'
+import {documentApi} from "@/api/Document.js"
 export default {
     data(){
         return{
             searchKey:"",
             showListColumn:false,
+            listDocument:[],
+
             listColumnSelected:[
             ]
         }
+    },
+    created(){
+        let self = this
+        documentApi.getListDocument().then(res=>{
+            self.listDocument = res.data.listObject
+        }).catch(err=>{
+
+        })
     },
     methods:{
         pinnedItem(item){
             item.pinned = !item.pinned;
         },
         showColumn(e){
-            this.showListColumn = !this.showListColumn
             this.$refs.listColumnn.show(e)
         },
         handleItemClick(item){
@@ -185,6 +197,7 @@ export default {
     min-height: unset;
     height: 30px;
     padding:0px 4px;
+    margin-left:4px !important;
 }
 .form-autocomplete >>> .list-columm-selected .v-list-item .icon-remove{
     display: none;
@@ -195,8 +208,8 @@ export default {
 .form-autocomplete >>> .list-columm-selected .v-list-item:hover .icon-default-column{
     display: none;
 }
-.form-autocomplete >>> .list-columm-selected .v-list-item:hover .v-list-item{
-    background-color: #F2F2F2;
+.form-autocomplete >>> .list-columm-selected .v-list-item:hover {
+    background-color: #F2F2F2 !important;
 }
 
 </style>
