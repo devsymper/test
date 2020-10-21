@@ -131,6 +131,8 @@
             "documents": "Documents",
             "orgchart": "Organization chart",
             "myItem": "My item",
+            "listApps": "List application",
+            "listTrashApps": "List trash application",
             "listOrgchart": "List orgchart",
             "listTrashOrgchart": "List trash orgchart",
             "viewOrgchart": "View orgchart default"

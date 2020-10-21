@@ -76,10 +76,15 @@ export default {
             viewport(view) {
                 var modelS = view.model;
                 // Hide elements and links which are currently collapsed
-                console.log(modelS,'modelmodelmodelmodelmodel');
+                if(modelS.attributes.type != 'Symper.Department' && modelS.attributes.type != 'Symper.Position'){
+                    var targetElement = modelS.getTargetElement();
+                    let flag = !targetElement || targetElement.get('hidden');
+                    if(flag){
+                        return false
+                    }
+                }
                 
                 if (modelS.get('hidden')) {
-                    debugger
                     return false
                 };
                 // Hide elements and links which are not in the viewport

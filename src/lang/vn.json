@@ -131,6 +131,8 @@
             "documents": "Văn bản",
             "orgchart": "Sơ đồ tổ chức",
             "myItem": "My item",
+            "listApps": "Danh sách ứng dụng",
+            "listTrashApps": "Danh sách ứng dụng đã xóa",
             "listOrgchart": "Danh sách SĐTC",
             "listTrashOrgchart": "Danh sách SĐTC đã xóa",
             "viewOrgchart": "Xem SĐTC mặc định"
