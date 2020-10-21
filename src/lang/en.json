@@ -17,7 +17,12 @@
         "cancel": "Cancel",
         "update": "Update",
         "delete": "Delete",
+        "restore": "Restore",
         "refresh": "Refresh",
+        "userDeletedName": "User deleted",
+        "roleDeleted": "Role deleted",
+        "userAgent": "Agent deleted",
+        "deletedAt": "Time deleted",
         "export_excel": "Export Excel",
         "list": "List",
         "search": "Search",
@@ -90,6 +95,8 @@
         "entries": "Entries",
         "always_show_sidebar": "Always show sidebar",
         "import_excel": "Import excel",
+        "isDefault": "Default orgchart",
+        "restore": "Restore",
         "sidebar": {
             "Setting": "Setting",
             "Notification": "Notification",
@@ -126,7 +133,10 @@
             "orgchart": "Organization chart",
             "myItem": "My item",
             "listApps": "List application",
-            "listTrashApps": "List trash application"
+            "listTrashApps": "List trash application",
+            "listOrgchart": "List orgchart",
+            "listTrashOrgchart": "List trash orgchart",
+            "viewOrgchart": "View orgchart default"
         },
         "system": "System",
         "copy": "Copy"
@@ -377,6 +387,7 @@
                 "printRecord": "Print record",
                 "selectPrintConfig": "Select print config",
                 "printMultiple": "Print Multiple",
+                "deleteMultiple": "Delete Multiple",
                 "listPrintConfig": "List print config",
                 "print": "Print",
                 "copied": "copied",
@@ -660,7 +671,9 @@
         }
     },
     "apps": {
-        "titleMyApplication": "Danh sách công việc của tôi",
+        "titleMyApplication": "My application",
+        "titleApplication": "Applications",
+        "titleTrashApplication": "List trash applications",
         "header": {
             "id": "ID",
             "name": "Name",
@@ -669,7 +682,10 @@
             "price": "Price",
             "status": "Status",
             "created_at": "Date create",
-            "updated_at": "Last update"
+            "userDeletedName": "User deleted name",
+            "userAgent": "User agent",
+            "roleDeleted": "Role deleted",
+            "deletedAt": "Deleted At"
         },
         "emptyApp": "List application epmty",
         "emptyFavorite": " List favorite empty",
@@ -1028,7 +1044,8 @@
     },
     "orgchart": {
         "list": {
-            "title": "List orgchart"
+            "title": "List orgchart",
+            "titleTrash": "List trash orgchart"
         },
         "create": {
             "title": " Create orgchart"

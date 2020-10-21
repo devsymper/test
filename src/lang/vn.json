@@ -19,6 +19,10 @@
         "update": "Cập nhật",
         "delete": "Xóa",
         "refresh": "Làm mới",
+        "userDeletedName": "Họ và tên người xóa",
+        "roleDeleted": "Role người xóa",
+        "userAgent": "Trình duyệt xóa",
+        "deletedAt": "Thời gian xóa",
         "export_excel": "Xuất excel",
         "list": "Danh sách",
         "search": "Tìm kiếm",
@@ -90,6 +94,8 @@
         "entries": "bản ghi",
         "always_show_sidebar": "Luôn hiển thị sidebar",
         "import_excel": "Nhập bằng excel",
+        "isDefault": "SĐTC mặc định",
+        "restore": "Khôi phục",
         "sidebar": {
             "Setting": "Cài đặt",
             "Notification": "Thông báo",
@@ -126,7 +132,10 @@
             "orgchart": "Sơ đồ tổ chức",
             "myItem": "My item",
             "listApps": "Danh sách ứng dụng",
-            "listTrashApps": "Danh sách ứng dụng đã xóa"
+            "listTrashApps": "Danh sách ứng dụng đã xóa",
+            "listOrgchart": "Danh sách SĐTC",
+            "listTrashOrgchart": "Danh sách SĐTC đã xóa",
+            "viewOrgchart": "Xem SĐTC mặc định"
         },
         "system": "Hệ thống",
         "copy": "Sao chép"
@@ -543,6 +552,7 @@
                 "printRecord": "In bản ghi",
                 "selectPrintConfig": "Chọn mẫu in",
                 "printMultiple": "In nhiều bản ghi",
+                "deleteMultiple": "Xóa nhiều bản ghi",
                 "listPrintConfig": "Danh sách mẫu in",
                 "print": "In nhanh",
                 "copied": "Đã sao chép",
@@ -776,6 +786,8 @@
     },
     "apps": {
         "titleMyApplication": "Danh sách công việc của tôi",
+        "titleApplication": "Danh sách ứng dụng",
+        "titleTrashApplication": "Danh sách ứng dụng đã xóa",
         "header": {
             "id": "ID",
             "name": "Tên",
@@ -784,7 +796,11 @@
             "price": "Giá",
             "status": "Kích hoạt",
             "created_at": "Ngày tạo",
-            "updated_at": "Cập nhật lần cuối"
+            "updated_at": "Cập nhật lần cuối",
+            "userDeletedName": "Tên người xóa ",
+            "userAgent": "Trình duyệt xóa ",
+            "roleDeleted": "Role người xóa ",
+            "deletedAt": "Thời gian xóa"
         },
 
         "listType": {
@@ -1181,7 +1197,8 @@
     },
     "orgchart": {
         "list": {
-            "title": "Danh sách sơ đồ tổ chức"
+            "title": "Danh sách sơ đồ tổ chức",
+            "titleTrash": "Danh sách sơ đồ tổ chức đã xóa"
         },
         "create": {
             "title": " Tạo sơ đồ tổ chức"

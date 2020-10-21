@@ -65,13 +65,24 @@ export default {
 			model: this.graph,
 			width: this.width,
 			height: this.height,
-			background: '#ffffff',
+            background: '#ffffff',
+            async: true,
+            defaultAnchor: { name: 'modelCenter' },
+            defaultConnectionPoint: { name: 'boundary' },
+            defaultConnector: { name: 'normal' },
             interactive: !this.readonly,
             sorting: joint.dia.Paper.sorting.APPROX,
             // dung na them 
-            viewport: function(view) {
+            viewport(view) {
                 var modelS = view.model;
                 // Hide elements and links which are currently collapsed
+                if(modelS.attributes.type != 'Symper.Department' && modelS.attributes.type != 'Symper.Position'){
+                    var targetElement = modelS.getTargetElement();
+                    let flag = !targetElement || targetElement.get('hidden');
+                    if(flag){
+                        return false
+                    }
+                }
                 
                 if (modelS.get('hidden')) {
                     return false

@@ -335,6 +335,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import UserRoleSelector from "@/components/app/UserRoleSelector.vue";
 import { appConfigs } from '../../configs.js';
 import SymperAvatar from "@/components/common/SymperAvatar";
+import { orgchartApi } from '../../api/orgchart.js';
 
 export default {
     created(){
@@ -465,16 +466,32 @@ export default {
             );
         },
         gotoPage(item, subItem = false , parent){
+            console.log(item,'menu');
+            if(item.title == 'viewOrgchart'){
+                this.viewOrgchartAction()
+                this.setActive(item,subItem, parent)
+            }
             if(item.action){
                  this.$evtBus.$emit('symper-app-call-action-handler', item.action, this, {});
             }else{
                 let path = 'common.sidebar.'+item.title;
                 let title = this.$t(path);
-                
                 this.$goToPage(item.link, title, false, false);
             }
             this.setActive(item,subItem, parent)
             
+        },
+        viewOrgchartAction(){
+            orgchartApi.getIdOrgchartDefault().then(res=>{
+                let id = res.data.id
+                this.$goToPage(
+                    `/orgchart/${id}/view`,
+                    this.$t("common.detail") + "  " + res.data.name,
+                    false,
+                    false
+                );
+                
+            }).catch(err=>{})
         },
         setActive(item, subItem, parent){
             let self = this
