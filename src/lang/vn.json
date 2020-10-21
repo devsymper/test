@@ -629,6 +629,10 @@
                 "quickInfoControl": {
                     "heading": "Thông tin control"
                 }
+            },
+            "sidebarLeft": {
+                "document" : "Document",
+                "column" : "Trường"
             }
         },
         "submit": {

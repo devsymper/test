@@ -529,8 +529,7 @@ x				}
 .view-side-by-side-apps >>> .favorite-area-item .child-item-active{
 	background-color: #E9E9E9
 }
-.view-side-by-side-apps >>> .favorite-area-item li:hover{
-}
+
 .view-side-by-side-apps >>> .favorite-area-item .title-item-favorite{
    	white-space: nowrap; 
 	font:13px roboto;
