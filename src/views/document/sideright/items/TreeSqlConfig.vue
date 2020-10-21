@@ -280,6 +280,9 @@ export default {
 .tree-sql-config >>> .tree-group-slot .v-icon{
     font-size:13px !important;
 }
+.tree-sql-config >>> .tree-item-slot .v-icon{
+    font-size:13px !important;
+}
 .tree-sql-config >>> .v-treeview-node__label{
     height: 20px !important;
 }
@@ -290,6 +293,11 @@ export default {
     margin-left:-35px !important;
 }
 .tree-sql-config >>> .tree-group-slot .v-btn{
+    height: 13px !important;
+    width: 13px !important;
+    margin:0px 8px;
+}
+.tree-sql-config >>> .tree-item-slot .v-btn{
     height: 13px !important;
     width: 13px !important;
     margin:0px 8px;
