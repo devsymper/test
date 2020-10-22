@@ -131,6 +131,7 @@
             "documents": "Văn bản",
             "orgchart": "Sơ đồ tổ chức",
             "myItem": "My item",
+            "deleteHistory": "Lịch sử xóa",
             "listApps": "Danh sách ứng dụng",
             "listTrashApps": "Danh sách ứng dụng đã xóa",
             "listOrgchart": "Danh sách SĐTC",
@@ -581,7 +582,15 @@
             "updateAt": "Thời gian update",
             "userCreate": "Người tạo",
             "userUpdate": "Người cập nhật",
-            "countRecord": "Số lượng bản ghi"
+            "countRecord": "Số lượng bản ghi",
+            "history": {
+                "id": "STT",
+                "name": "Tên văn bản",
+                "title": "Tiêu đề văn bản",
+                "countDelete": "Số lượng đã xóa",
+                "userDelete": "Người xóa",
+                "timeDelete": "Thời gian xóa"
+            }
         },
         "editor": {
             "dialog": {
@@ -1131,7 +1140,7 @@
             "showMoreTask": "Xem thêm các task liên quan",
             "showLess": "Thu gọn",
             "showMoreFile": "Xem thêm các tệp",
-            "quickView":"Xem nhanh",
+            "quickView": "Xem nhanh",
             "openTask": "Mở công việc"
         },
         "alert": {

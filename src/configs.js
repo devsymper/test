@@ -28,6 +28,7 @@ export const appConfigs = {
         documents: 'https://v2hoangnd.dev.symper.vn/document',
         nofitication: 'https://notifi.symper.vn/',
         formulasService: 'https://syql.symper.vn/',
+        trashService: 'https://trash.symper.vn/',
         documentService: 'https://sdocument.symper.vn/',
         sdocumentManagement: 'https://sdocument-management.symper.vn/',
         orgchart: 'https://orgchart.symper.vn/',

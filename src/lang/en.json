@@ -132,6 +132,7 @@
             "documents": "Documents",
             "orgchart": "Organization chart",
             "myItem": "My item",
+            "deleteHistory": "History",
             "listApps": "List application",
             "listTrashApps": "List trash application",
             "listOrgchart": "List orgchart",
@@ -416,7 +417,15 @@
             "updateAt": "Update at",
             "userCreate": "BA Create",
             "userUpdate": "BA update",
-            "countRecord": "count record"
+            "countRecord": "count record",
+            "history": {
+                "id": "Index",
+                "name": "Document name",
+                "title": "Document title",
+                "countDelete": "Count record",
+                "userDelete": "User delete",
+                "timeDelete": "Time"
+            }
         },
         "editor": {
             "dialog": {
@@ -977,7 +986,7 @@
             "showMoreTask": "Show more task related",
             "showLess": "Show less task related",
             "showMoreFile": "Show more file",
-            "quickView":"Quick view",
+            "quickView": "Quick view",
             "openTask": "Open task"
         },
         "alert": {
