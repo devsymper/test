@@ -11,7 +11,8 @@
             :close-on-content-click="false"
             class="menu-list-column"
         >
-             <v-list-item
+           <div style="margin:12px 6px">
+                 <v-list-item
                 v-for="(item,i) in listColumn"
                 :key="i"
                 @click="chooseItem(item)"
@@ -29,6 +30,7 @@
             </v-list-item-content>
                 <v-icon v-if="listColumnSelected.includes(item)" color="green lighten-1">mdi-check-outline</v-icon>
         </v-list-item>
+           </div>
         </v-menu>
     </div>
 </template>
@@ -42,23 +44,23 @@ export default {
              listColumn:[
                 {
                     id:1,
-                    icon: "mdi-folder",
-                    title:"Hello",
-                    subTitle:"Subtitle1",
+                    icon: "mdi-lan",
+                    title:"Số chứng từ ",
+                    subTitle:"got_2",
                     selected:false,
                 },
                 {
                     id:2,
                     icon: "mdi-folder",
-                    title:"Hello2",
-                    subTitle:"Subtitle2",
+                    title:"Tên bộ phận",
+                    subTitle:"sd_23",
                     selected:false,
                 },
                 {
                     id:3,
-                    icon: "mdi-folder",
-                    title:"Hello2",
-                    subTitle:"Subtitle3",
+                    icon: "mdi-widgets",
+                    title:"Mã bộ phân",
+                    subTitle:"sd_234",
                     selected:false,
                 },
             ]
@@ -83,7 +85,7 @@ export default {
             this.$emit('item-clicked', item)
         },
         show(e){
-            this.showListColumn = !this.showListColumn
+            // this.showListColumn = !this.showListColumn
             this.x = e.clientX+40
             this.y = e.clientY+20
         }
@@ -119,6 +121,9 @@ export default {
     min-height: unset;
     height: 30px;
     padding:0px 4px;
+}
+.v-menu__content {
+    margin-bottom:20px
 }
 
 </style>

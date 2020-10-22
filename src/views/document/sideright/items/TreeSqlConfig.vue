@@ -338,4 +338,10 @@ export default {
  .v-list-item .v-list-item__title{
     font:13px roboto !important;
 }
+.tree-sql-config >>>.v-icon{
+    font-size:13px;
+}
+.tree-sql-config >>>.v-treeview-node__toggle{
+    width:unset;
+}
 </style>

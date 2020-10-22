@@ -16,7 +16,7 @@
                     ></v-autocomplete>
                 </div>
                 <div class="row-autocomplete">
-                    <div  class="title-row-autocomplete">Trường</div>
+                    <div  class="title-row-autocomplete column-autocomplete">Trường</div>
                     <v-text-field
                         :label="$t('apps.search')"
                         single-line
@@ -34,27 +34,30 @@
                         :key="i"
                     >
                         <v-list-item-avatar>
-                        <v-icon
-                            class="grey lighten-1 icon-default-column"
-                            dark
-                        >
-                            {{item.icon}}
-                        </v-icon>
-                        <v-icon
-                            class="red lighten-1 icon-remove"
-                            dark
-                            @click="removeItem(item)"
-                        >
-                            mdi-close
-                        </v-icon>
+                            <v-icon
+                                class="grey lighten-1 icon-default-column"
+                                dark
+                            >
+                                {{item.icon}}
+                            </v-icon>
+                            <v-icon
+                                class="red lighten-1 icon-remove"
+                                dark
+                                @click="removeItem(item)"
+                            >
+                                mdi-close
+                            </v-icon>
                         </v-list-item-avatar>
                         <v-list-item-content>
-                        <v-list-item-title > <span>{{item.title}}</span> <span style="font:11px roboto;font-weight:200;padding-left:4px">{{item.subTitle}}</span></v-list-item-title>
+                            <v-list-item-title >
+                                <span>{{item.title}}</span>
+                                <span style="font:11px roboto;font-weight:200;padding-left:4px">{{item.subTitle}}</span>
+                            </v-list-item-title>
                         </v-list-item-content>
                         <v-list-item-action>
-                        <v-btn icon tile @click="pinnedItem(item)">
-                            <v-icon color="green lighten-1">mdi-key-outline</v-icon>
-                        </v-btn>
+                            <v-btn icon tile @click="pinnedItem(item)">
+                                <v-icon :class="{'item-pinned': item.pinned == true}" color="lighten-1">mdi-key-outline</v-icon>
+                            </v-btn>
                         </v-list-item-action>
                     </v-list-item>
                 </div>
@@ -95,9 +98,10 @@ export default {
     },
     methods:{
         pinnedItem(item){
-            item.pinned = !item.pinned;
+            this.listColumnSelected[this.listColumnSelected.indexOf(item)].pinned = !this.listColumnSelected[this.listColumnSelected.indexOf(item)].pinned
         },
         showColumn(e){
+            this.showListColumn = !this.showListColumn
             this.$refs.listColumnn.show(e)
         },
         handleItemClick(item){
@@ -126,6 +130,9 @@ export default {
 .form-autocomplete >>> .v-input__control{
     min-height: unset;
     height: 30px;
+}
+.form-autocomplete >>> .item-pinned{
+    color:green;
 }
 .form-autocomplete >>> .v-input{
     margin:6px;
@@ -182,6 +189,9 @@ export default {
 }
 .wrapper-form .row-autocomplete .title-row-autocomplete{
     width: 60px;
+}
+.wrapper-form .row-autocomplete .column-autocomplete{
+    margin-right:10px
 }
 .form-autocomplete >>> .list-columm-selected .v-icon{
     font-size: 10px !important;
