@@ -44,6 +44,7 @@
                     @grid-ready="onGridReady"
                     class="ag-theme-balham mt-2"
                     :columnDefs="columnDefs"
+                    
                     :rowData="rowData">
                 </AgGridVue>
                 
@@ -315,7 +316,7 @@ export default {
                     self.totalRecord = values.length;
                     for (let index = 0; index < columns.length; index++) {
                         let col = columns[index];
-                        self.columnDefs.push( {headerName: col, field: col});
+                        self.columnDefs.push( {headerName: col, field: col, resizable: true });
                     }
                     for (let k = 0; k < values.length; k++) {
                         let rowVal = values[k];
@@ -342,7 +343,7 @@ export default {
         handleDataToTable(data){
             let firstRow = data[0];
             for(let column in firstRow){
-                this.columnDefs.push( {headerName: column, field: column});
+                this.columnDefs.push( {headerName: column, field: column, resizable: true});
             }
             this.rowData = data;
             this.totalRecord = this.rowData.length;

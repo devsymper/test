@@ -172,7 +172,6 @@ export const jointLinkNode = function(source, target) {
         isHidden: function() {
             // If the target element is collapsed, we don't want to
             // show the link either
-            debugger
             // var targetElement = this.getTargetElement();
             // return !targetElement || targetElement.isHidden();
         }

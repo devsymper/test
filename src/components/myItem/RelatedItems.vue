@@ -20,7 +20,8 @@
                             <span style=" font-size:13px">{{displayContent(item.description)}}</span>
                         </div>
                         <div  @dblclick="goDoTask(item.id)">
-                            <v-icon v-if="item.createTime" style="font-size:11px; color:blue;margin-left: 3px;">mdi-circle</v-icon>
+                            <v-icon v-if="item.createTime && checkTimeDueDate(item)" style="font-size:11px; color:red;margin-left: 3px;">mdi-circle</v-icon>
+                            <v-icon v-else-if="item.createTime && !checkTimeDueDate(item)" style="font-size:11px; color:blue;margin-left: 3px;">mdi-circle</v-icon>
                             <v-icon v-else style="font-size:11px ; color:green;margin-left: 3px;">mdi-circle</v-icon>
                             {{displayDescription(item.description)}}
                         </div>
@@ -118,6 +119,18 @@ export default {
         }
     },
     methods:{
+        checkTimeDueDate(item){
+            if (item.dueDate) {
+                let dueDate=new Date(item.dueDate).getTime();
+                if (dueDate<Date.now()) {
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        },
         closeInfoTaskRelated(){
             this.statusQuickView=false;
         },

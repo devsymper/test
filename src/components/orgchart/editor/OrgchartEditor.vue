@@ -1,6 +1,5 @@
 <template>
-    <div :class="{'d-flex': true ,'w-100':true ,'h-100':true, 'diagram-hortical':typeView =='B','diagram-vertical':typeView =='R' }">
-
+    <div :class="{'d-flex w-100 h-100': true, 'diagram-hortical': typeView == 'B','diagram-vertical': typeView == 'R'   } ">
         <div class="h-100 flex-grow-1">
             <div class="border-bottom-1 pt-1 pl-2">
                 <v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
@@ -207,6 +206,7 @@ export default {
     },
     activated(){
         this.centerDiagram();
+        this.$refs.positionDiagram.centerDiagram();
     },
     watch: {
         positionEditor(after){
@@ -456,11 +456,13 @@ export default {
                         self.$refs.positionDiagram.loadDiagramFromJson(self.selectingNode.positionDiagramCells.cells);
 						let allNodes = self.$refs.positionDiagram.getAllNode()
 						let firstNode = allNodes[0]
-						this.$store.commit('orgchart/changeSelectingNode', {
+						self.$store.commit('orgchart/changeSelectingNode', {
 							instanceKey: self.selectingNode.positionDiagramCells.instanceKey,
 							nodeId: firstNode.id,
-						});
-						self.$refs.positionDiagram.$refs.editorWorkspace.changeUserDisplayInNode(this.listUserIds);
+                        });
+                        if(self.listUserIds != null){
+					    	self.$refs.positionDiagram.$refs.editorWorkspace.changeUserDisplayInNode(self.listUserIds);
+                        }
 						self.$store.commit('orgchart/updateFirstChildNodeId', firstNode.id)
                         self.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode.id)
                     }else{
@@ -472,7 +474,7 @@ export default {
                     self.$refs.positionDiagram.$refs.editorWorkspace.scrollPaperToTop(200);
                     self.$refs.positionDiagram.showOrgchartConfig();
                     self.$refs.positionDiagram.$refs.editorWorkspace.changeTypeView(self.typeView);
-
+                    
                 }, 200, this);
             }
         },
@@ -682,7 +684,6 @@ export default {
 
             if(passed){
                 let orgchartData = this.getDataToSave();
-                debugger
                 this.$emit('save-orgchart-data', orgchartData);    
             }
         },
@@ -822,6 +823,7 @@ export default {
             }
         },
         async handleHeaderAction(action){
+            let self = this
             if(action == 'home'){
                 this.showOrgchartConfig()
             }else if(action == 'saveSVG'){
@@ -840,8 +842,8 @@ export default {
                     this.$snotifySuccess("Validate passed!");  
                 }
             }else if(action == "changeTypeView"){
-                let type = this.typeView == "B" ? "R" : "B"
-                this.typeView = type
+                let type = self.typeView == "B" ? "R" : "B"
+                self.typeView = type
                 this.$refs.editorWorkspace.changeTypeView(type);
                 // this.$refs.positionDiagram.$refs.editorWorkspace.changeTypeView(type);
             }else{
@@ -953,6 +955,7 @@ export default {
 .symper-orgchart-active-editor .symper-orgchart-paper .symper-orgchart-node:hover .orgchart-action {
     display: block!important;
 }
+<<<<<<< HEAD
 .diagram-hortical .btn-collapse-expand-ver,.btn-collapse-expand-hor{
     display: none;
 }
@@ -964,6 +967,12 @@ export default {
 }
 
 .diagram-vertical .btn-collapse-expand-ver,.btn-collapse-expand-hor{
+=======
+.diagram-hortical .btn-collapse-expand-ver{
+    display: none !important ;
+}
+.diagram-vertical .btn-collapse-expand-hor{
+>>>>>>> 5a49ba06191c8806eb55dd8d05ff6346769f9bf3
     display: none;
 }
 </style>

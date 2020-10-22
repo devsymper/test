@@ -70,7 +70,7 @@
                         }"
                         style="border-bottom: 1px solid #eeeeee!important;"
                     >
-                    <span style="color:#FF8003; font-size:13px;margin-left:16px;margin-top:6px">{{ showTime(workGroup.date)}}</span>
+                    <span style="color:#FF8003; font-size:13px;margin-left:16px;margin-top:6px">{{ workGroup.fromNow}}</span>
                     </v-row>
                     <v-row
                         v-for="(obj, idx) in workGroup.works"
@@ -224,22 +224,22 @@ export default {
     groupAllProcessInstance() {
         let allUserById = this.$store.getters['app/mapIdToUser'];
         let allPrcess = this.allFlatWorks;
-
-        // allPrcess.sort(function(a, b) {
-        //         if (a.endTime) {
-        //             var keyA = new Date(a.endTime);
-        //         }else{
-        //             var keyA = new Date(a.startTime);
-        //         }
-        //         if (b.endTime) {
-        //             var keyB = new Date(b.endTime);
-        //         }else{
-        //             var keyB = new Date(b.startTime);
-        //         }
-        //         if (keyA > keyB) return -1;
-        //         if (keyA < keyB) return 1;
-        //         return 0;
-        // });
+        console.log("allPrcessallPrcessallPrcess",allPrcess);
+        allPrcess.sort(function(a, b) {
+                if (a.endTime) {
+                    var keyA = new Date(a.endTime);
+                }else{
+                    var keyA = new Date(a.startTime);
+                }
+                if (b.endTime) {
+                    var keyB = new Date(b.endTime);
+                }else{
+                    var keyB = new Date(b.startTime);
+                }
+                if (keyA > keyB) return -1;
+                if (keyA < keyB) return 1;
+                return 0;
+        });
 
         const groups = allPrcess.reduce((groups, work) => {
             let date;
@@ -263,22 +263,23 @@ export default {
                 work.roleInfo = roleInfo;
             }
 
-            if ( work.startTime) {
-                date = work.startTime.split("T")[0];
-            }else{
+            if ( work.endTime) {
                 date = work.endTime.split("T")[0];
+            }else{
+                date = work.startTime.split("T")[0];
             }
-            if (!groups[date]) {
-                groups[date] = [];
+            let fromNow = this.getDateFormNow(date);
+            if (!groups[fromNow]) {
+                groups[fromNow] = [];
             }
-            groups[date].push(work);
+            groups[fromNow].push(work);
             return groups;
         }, {});
         // Edit: to add it in the array format instead
-        const groupArrayWork = Object.keys(groups).map(date => {
+        const groupArrayWork = Object.keys(groups).map(fromNow => {
             return {
-            date,
-            works: groups[date]
+            fromNow,
+            works: groups[fromNow]
             };
         });
         return groupArrayWork;
@@ -403,7 +404,7 @@ export default {
     changeUpdateAsignee(){
       this.handleTaskSubmited();
     },
-    showTime(time){
+    getDateFormNow(time){
         var today = this.$moment().format('YYYY-MM-DD');
         if (time===today) {
             return this.$t('myItem.today');

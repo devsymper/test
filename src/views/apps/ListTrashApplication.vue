@@ -9,6 +9,7 @@
             :tableContextMenu="tableContextMenu"
             :useDefaultContext="false"
             :customAPIResult="customAPIResult"
+            :showActionPanelInDisplayConfig="false"
         >
         </ListItems>
     </v-container>

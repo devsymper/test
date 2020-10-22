@@ -381,7 +381,7 @@ export default {
 	height:32px;
 }
 .symper-comment >>> .v-slide-group__wrapper{
-	margin-left:20px !important;
+	/* margin-left:20px !important; */
 	height: 32px;
 }
 .symper-comment >>> .v-toolbar__extension{

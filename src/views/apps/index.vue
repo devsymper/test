@@ -11,7 +11,7 @@
             :actionPanelWidth="600" 
             @after-open-add-panel="showAddModal"
             :customAPIResult="customAPIResult"
-            :showActionPanelInDisplayConfig="true"
+            :showActionPanelInDisplayConfig="false"
             :commonActionProps="commonActionProps"
             @row-selected="onRowSelected"
         >

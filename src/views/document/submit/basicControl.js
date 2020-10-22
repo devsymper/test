@@ -203,11 +203,11 @@ export default class BasicControl extends Control {
                     e.curTarget = e.target
                     SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
                 }
-                if (thisObj.type == 'percent') {
-                    if (e.target.value > 100) {
-                        $(e.target).val(100)
-                    }
-                }
+                // if (thisObj.type == 'percent') {
+                //     if (e.target.value > 100) {
+                //         $(e.target).val(100)
+                //     }
+                // }
                 if (thisObj.type == 'department') {
                     e['controlName'] = thisObj.name;
                     SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
