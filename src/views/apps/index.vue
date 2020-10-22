@@ -11,7 +11,7 @@
             :actionPanelWidth="600" 
             @after-open-add-panel="showAddModal"
             :customAPIResult="customAPIResult"
-            :showActionPanelInDisplayConfig="false"
+            :showActionPanelInDisplayConfig="true"
             :commonActionProps="commonActionProps"
             @row-selected="onRowSelected"
         >
@@ -255,12 +255,7 @@ export default {
         },
         updateApp(res) {
             if (res.status == 200) {
-                this.editCallback({
-                    ...res,
-                    data: {
-                        ...this.currentApp,
-                    },
-                });
+				this.$refs.listApp.refreshList()
                 this.closeSidebar();
                 this.$snotify({
                     type: 'success',

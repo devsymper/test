@@ -279,7 +279,6 @@ export const departmentMarkup =
 		},
 
 		toggleButtonSign: function (plus) {
-			debugger
 			if (plus) {
 				this.attr('.buttonSign', { text: "+" });
 			} else {
