@@ -626,7 +626,6 @@ export default {
         //phần mapping --- hàm tìm index mới cho cột
          getIndexColumnMapping(value, nameSheet){
             let index = -1;
-           
             let arr = this.nameColumnDetail[nameSheet];
             for(let j = 0; j<arr.length; j++){
                 if(arr[j].name==value){
