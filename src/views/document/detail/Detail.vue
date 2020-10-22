@@ -288,10 +288,7 @@ export default {
             this.contentDocument = ""
             try {
                 this.$refs.preLoaderView.show();
-                
-            } catch (error) {
-                
-            }
+            } catch (error) {}
             let thisCpn = this;
             let res = await documentApi
                 .detailDocumentObject(this.docObjId);
@@ -314,10 +311,10 @@ export default {
                 thisCpn.loadDocumentStruct(res.data.documentId,isPrint);
             }
             else{
-                    this.$snotify({
-                        type: "error",
-                        title: res.message,
-                    });
+                this.$snotify({
+                    type: "error",
+                    title: res.message,
+                });
             }
         },
         togglePageSize() {
