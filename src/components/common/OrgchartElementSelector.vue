@@ -1,24 +1,24 @@
 <template>
-<div class="orgchart-element-selector">
-    <v-treeview
-        class="fs-13"
-        activatable
-        :items="treeData"
-        dense>
-         <template v-slot:label="{ item }">
-            <v-checkbox
-                @change="handleChangeSelectedNode(item)"
-                v-if="item.type == 'position'"
-                v-model="item.selected"
-                :label="item.name"
-                dense
-            ></v-checkbox>
-            <span v-else>
-                {{item.name}}
-            </span>
-        </template>
-    </v-treeview>
-</div>
+    <div class="orgchart-element-selector">
+        <v-treeview
+            class="fs-13"
+            activatable
+            :items="treeData"
+            dense>
+            <template v-slot:label="{ item }">
+                <v-checkbox
+                    @change="handleChangeSelectedNode(item)"
+                    v-if="item.type == 'position'"
+                    v-model="item.selected"
+                    :label="item.name"
+                    dense
+                ></v-checkbox>
+                <span v-else>
+                    {{item.name}}
+                </span>
+            </template>
+        </v-treeview>
+    </div>
 </template>
 
 <script>
@@ -52,7 +52,6 @@ export default {
     },
     watch: {
         value(){
-            
             let mapNode = this.$store.state.orgchart.allOrgchartStruct.map;
             for(let item of this.value){
                 if(mapNode[item]){

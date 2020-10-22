@@ -79,11 +79,13 @@ export const DEFAULT_POSITION_ATTRS = {
         'font-weight': 300,
         'font-family': 'Roboto',
     },
-    '.btn.add': { 'ref-dx': 0,
-                  'ref-y': 0,
-                   'ref': '.card',
-                    event: 'element:add',
-                     cursor: 'pointer' },
+    '.btn.add': { 
+        'ref-dx': 0,
+        'ref-y': 0,
+        'ref': '.card',
+        event: 'element:add',
+        cursor: 'pointer'
+    },
     '.btn.add>circle': { r: 7, fill: 'green', stroke: 'green', 'stroke-width': 0 },
     '.btn>rect': { height: 20, width: 45, rx: 2, ry: 2, fill: 'transparent', 'stroke-width': 1 },
     '.btn.add>text': { fill: 'white', 'font-size': 15, 'font-weight': 400, stroke: 'white', x: -4, y: 5, 'font-family': 'Roboto' },
@@ -115,18 +117,54 @@ export const DEFAULT_POSITION_ATTRS = {
         y: 4,
         'font-family': 'Roboto'
     },
-    '.btn-collapse-expand': {
-		'ref-dx': -shapeSize.width / 2 ,
-		'ref-y': shapeSize.height + CEConfig.stickHeight - 20,
+    '.btn-collapse-expand-hor': {
+		'ref-dx': -shapeSize.width / 2, 
+		'ref-y': 0,
 		'ref': '.card',
 		event: 'element:collapse',
 		cursor: 'pointer'
+	},
+	'.btn-collapse-expand-ver': {
+		'ref-dx': 0, 
+		'ref-y': shapeSize.height/2,
+		'ref': '.card',
+		event: 'element:collapse',
+		cursor: 'pointer'
+	},
+	'.btn-collapse-expand-hor>circle': {
+		r: 7,
+		fill: 'blue',
+		stroke: 'blue',
+		'stroke-width': 0
+	},
+	'.btn-collapse-expand-ver>circle': {
+		r: 7,
+		fill: 'blue',
+		stroke: 'blue',
+		'stroke-width': 0
+	},
+	'.btn-collapse-expand-hor>text': {
+		fill: 'white',
+		'font-size': 15,
+		'font-weight': 400,
+		stroke: 'white',
+		x: -4,
+		y: 5,
+		'font-family': 'Roboto'
+	},
+	'.btn-collapse-expand-ver>text': {
+		fill: 'white',
+		'font-size': 15,
+		'font-weight': 400,
+		stroke: 'white',
+		x: -4,
+		y: 5,
+		'font-family': 'Roboto'
 	},
 	'.collapse-expand-circle': {
 		r: CEConfig.radius,
 		fill: '#848484',
 		event: 'element:collapse',
-
 		// x: shapeSize.width / 2,
 		// y: shapeSize.height + CEConfig.stickHeight
 	},
@@ -188,17 +226,23 @@ export const positionMarkup = `<g class="rotatable symper-orgchart-node">
         <circle class="add"/>
         <text class="add">+</text>
     </g>
-   
+
+    <g class="btn-collapse-expand-hor">
+        <circle class="collapse-expand-circle"/>
+        <text class="expand-text">+</text>
+    </g>
+    <g class="btn-collapse-expand-ver">
+        <circle class="collapse-expand-circle"/>
+        <text class="expand-text">+</text>
+    </g>
+
     <g class="btn remove orgchart-action">
         <circle class="remove"/>
         <text class="remove">X</text>
     </g>
 
 </g>`.replace(/\n/g, '').replace(/\s+/g, ' ');
-{/* <g class="btn-collapse-expand">
-<circle class="collapse-expand-circle"/>
-<text class="expand-text">+</text>
-</g> */}
+
 export const definePosition = function() {
     SymperPosition = joint.shapes.org.Member.define('Symper.Position', {
         size: {
