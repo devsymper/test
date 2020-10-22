@@ -174,7 +174,6 @@ export default {
 			this.getRolesByUser(this.detailInfo.id);
 		 },
 		 showDetailView(){
-			 debugger
 			 this.isViewUserRole=false
 		 }
     },

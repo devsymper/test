@@ -255,7 +255,6 @@ export default {
         },
         updateApp(res) {
             if (res.status == 200) {
-				debugger
                 this.editCallback({
                     ...res,
                     data: {
