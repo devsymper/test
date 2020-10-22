@@ -334,7 +334,6 @@ export default {
                     return rsl;
                 },
                 updateAttributes: function(_, model) {
-                    debugger
                     // Update some presentation attributes during the layout
                     model.toggleButtonVisibility(!graph.isSink(model));
                     model.toggleButtonSign(!model.isCollapsed());

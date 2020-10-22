@@ -138,7 +138,6 @@ export default {
       }
     },
     watch: {
-       
     },
     data(){
         return{
@@ -191,7 +190,6 @@ export default {
                     title:"Column 1",
                     
                 },
-             
             ],
             listType:[
                 {
@@ -202,7 +200,6 @@ export default {
                     title: "Item",
                     value:"item"
                 },
-
             ],
         }
     },

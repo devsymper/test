@@ -211,7 +211,7 @@ export default {
 .form-autocomplete >>> .list-columm-selected .v-list-item{
     min-height: unset;
     height: 30px;
-    padding:0px 4px;
+    padding:0px 2px 0px 10px;
     margin-left:4px !important;
 }
 .form-autocomplete >>> .list-columm-selected .v-list-item .icon-remove{
