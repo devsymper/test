@@ -1,5 +1,5 @@
 <template>
-    <div :class="{'d-flex w-100 h-100': true, 'diagram-hortical': typeView== 'B','diagram-vertical': typeView== 'R'   } ">
+    <div :class="{'d-flex w-100 h-100': true, 'diagram-hortical': typeView == 'B','diagram-vertical': typeView == 'R'   } ">
         <div class="h-100 flex-grow-1">
             <div class="border-bottom-1 pt-1 pl-2">
                 <v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
@@ -684,7 +684,6 @@ export default {
 
             if(passed){
                 let orgchartData = this.getDataToSave();
-                debugger
                 this.$emit('save-orgchart-data', orgchartData);    
             }
         },
@@ -824,6 +823,7 @@ export default {
             }
         },
         async handleHeaderAction(action){
+            let self = this
             if(action == 'home'){
                 this.showOrgchartConfig()
             }else if(action == 'saveSVG'){
@@ -842,8 +842,8 @@ export default {
                     this.$snotifySuccess("Validate passed!");  
                 }
             }else if(action == "changeTypeView"){
-                let type = this.typeView == "B" ? "R" : "B"
-                this.typeView = type
+                let type = self.typeView == "B" ? "R" : "B"
+                self.typeView = type
                 this.$refs.editorWorkspace.changeTypeView(type);
                 // this.$refs.positionDiagram.$refs.editorWorkspace.changeTypeView(type);
             }else{
@@ -956,7 +956,7 @@ export default {
     display: block!important;
 }
 .diagram-hortical .btn-collapse-expand-ver{
-    display: none;
+    display: none !important ;
 }
 .diagram-vertical .btn-collapse-expand-hor{
     display: none;
