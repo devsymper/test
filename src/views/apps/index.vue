@@ -143,7 +143,6 @@ export default {
                     name: "edit",
                     text: this.$t("apps.contextMenu.edit"),
                     callback: (app, callback) => {
-						debugger
                         this.editCallback = callback;
                         self.openUpdateApp(app);
                     },
@@ -257,12 +256,6 @@ export default {
         updateApp(res) {
             if (res.status == 200) {
 				this.$refs.listApp.refreshList()
-                // this.editCallback({
-                //     ...res,
-                //     data: {
-                //         ...this.currentApp,
-                //     },
-                // });
                 this.closeSidebar();
                 this.$snotify({
                     type: 'success',

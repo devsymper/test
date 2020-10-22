@@ -746,6 +746,9 @@ export default {
         }
     },
     methods: {
+         rerenderTable(){
+            this.$refs.dataTable.hotInstance.render();
+        },
         importExcel(){
             this.$emit('import-excel');
         },

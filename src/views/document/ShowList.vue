@@ -238,6 +238,7 @@ export default {
                    self.options.objId =self.documentId;
                    self.options.objType = 'document';
                    self.options.subObjType = res.data.document.type;
+                  
                    self.options.nameObj = res.data.document.title;
                    self.propertyDocument = Object.values(res.data.fields);
                     // lưu tên của các property từ API document vào mảng  

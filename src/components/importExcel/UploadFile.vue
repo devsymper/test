@@ -153,6 +153,7 @@ export default {
           chunkSize:100*1024*1024,
           query: {
             key: "",
+            objType: 'document',
             total: 0,
             objId:0,
             objType: '',
@@ -193,6 +194,7 @@ export default {
         handleFileUploaded(rootFile, file, response, chunk) {
             //this.$refs.upload.uploader.resume();
             response = JSON.parse(response);
+            
             this.$emit('dataExcel', response);
             this.$emit('keyUpload', this.options.query.key);
         },
