@@ -63,7 +63,8 @@ export default {
 				startEvent:"mdi-play-outline",
 				userTask:"mdi-file-document-edit-outline",
 				callActivity:"mdi-cog-outline",
-				endEvent:"mdi-record"
+				endEvent:"mdi-record",
+				httpServiceTask:"mdi-email-send-outline"
 			}
 		}
     },

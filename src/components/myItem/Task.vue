@@ -16,6 +16,7 @@
             @submit-document-success="onSubmitDone">
         </DocumentSubmit>
         <Detail 
+            class="doc-detail"
             :showCommentInDoc="false"
             v-else-if="(showDetailDocument && showDoTaskComponent && (action == 'approval')) || filter=='done'"
             :docObjInfo="docObjInfo">

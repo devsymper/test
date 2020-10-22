@@ -18,7 +18,7 @@ export default {
             saveResponseParameters: false,
             resultVariablePrefix: '',
             saveResponseParametersTransient: false,
-            saveResponseVariableAsJson: false,
+            saveResponseVariableAsJson: true,
         },
         makeRequestBody(nodeAttr) {
             let formula = nodeAttr.serviceTaskScriptValue.value;
@@ -41,12 +41,13 @@ export default {
             responseVariableName: '',
             ignoreException: true,
             saveRequestVariables: false,
-            saveResponseParameters: false,
+            saveResponseParameters: true,
             resultVariablePrefix: '',
             saveResponseParametersTransient: false,
-            saveResponseVariableAsJson: false,
+            saveResponseVariableAsJson: true,
         },
         makeRequestBody(nodeAttr) {
+            this.params.responseVariableName = 'symper_'+nodeAttr.idNode+'_api_response';
             let title = nodeAttr.serviceNotificationTitle.value;
             let description = nodeAttr.serviceNotificationDescription.value;
             let receiver =userAssignmentToXMLValue(nodeAttr.serviceNotificationReceiver.value);

@@ -940,7 +940,7 @@ export default {
 }
 </script>
 
-<style>
+<style >
 .symper-orgchart-paper .marker-arrowheads, 
 .symper-orgchart-paper .link-tools,
 .symper-orgchart-paper .marker-vertex-group,

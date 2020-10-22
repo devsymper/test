@@ -12,8 +12,11 @@ function translateServiceTaskToHTTPTask(el, attrs, bpmnModeler) {
 
     extensionElements = moddle.create('bpmn:ExtensionElements');
     extensionElements.values = [];
-    let items = serviceTaskDefinitions[attrs.serviceTaskType.value].params;
+    attrs.idNode=el.id;
     serviceTaskDefinitions[attrs.serviceTaskType.value].makeRequestBody(attrs);
+    let items = serviceTaskDefinitions[attrs.serviceTaskType.value].params;
+    debugger
+
     for (let name in items) {
         let subEl = moddle.create('symper:symper_symper_field_tag');
         subEl.name = name;

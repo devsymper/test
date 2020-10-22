@@ -21,7 +21,7 @@
 										<span style="font:13px roboto">{{childItem.title}}</span> 
 										<span style="font:8px;opacity:0.4">{{childItem.name}}</span>
 									</v-tooltip>
-									<div v-else >{{childItem.name}}</div>
+									<div v-else  class="title-document-enduser"  >{{childItem.name}}</div>
 									<v-icon  @click="changeFavorite(childItem,itemT.name)" :class="{'icon-star-active' : childItem.favorite==true, 'icon-star': true}" >mdi-star</v-icon>	
 								</div>
 							</li>
@@ -39,7 +39,7 @@
 										<span style="font:13px roboto">{{childItem.title}}</span> 
 										<span style="font:8px;opacity:0.4">{{childItem.name}}</span>
 									</v-tooltip>
-									<div v-else>{{childItem.name}}</div>
+									<div v-else class="title-document" >{{childItem.name}}</div>
 									<v-icon  class="icon-remove"  @click="removeItem(childItem,itemT.name)">mdi-delete-empty-outline</v-icon>
 								</div>
 							</li>

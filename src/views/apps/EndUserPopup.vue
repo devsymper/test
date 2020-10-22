@@ -29,7 +29,8 @@
 						<ul style="margin:0 10px;" v-else-if="loadingFavorite == false && sFavorite.length > 0">
 							<VuePerfectScrollbar style="max-height:200px"  >
 								<li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
-									<div style="position:relative">
+									<div style="position:relative; display:flex">
+										<v-icon style="font-size:13px;margin-right:8px">{{listIcon[item.type]}}</v-icon>
 										<div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
 										<div v-else  class="title-item-favorite">{{item.name}}</div> 
 										<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:0px;right:0px">mdi-star</v-icon>
@@ -130,6 +131,12 @@ export default {
 		 tab: 'tab-1',
 		 isEndUserCpn:true,
 		 searchKey:"",
+		 listIcon:{
+			 document_definition: 'mdi-file-document-outline',
+			 workflow_definition: 'mdi-lan',
+			 orgchart: 'mdi-widgets-outline',
+			 dashboard: 'mdi-view-dashboard'
+		 },
 		 apps:{},
 		 listFavorite:[],
 		 testListFavorite:[],
@@ -198,6 +205,7 @@ export default {
 			return this.$store.state.appConfig.listItemSelected
 		},
 		sFavorite(){
+			console.log(this.$store.state.appConfig.listFavorite);
 			return this.$store.state.appConfig.listFavorite
 		},
 		listApp(){

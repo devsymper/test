@@ -168,11 +168,8 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 	},
 	'.collapse-expand-circle': {
 		r: CEConfig.radius,
-		fill: '#848484',
+		fill: 'blue',
 		event: 'element:collapse',
-
-		// x: shapeSize.width / 2,
-		// y: shapeSize.height + CEConfig.stickHeight
 	},
 	'.buttonSign': {
 		stroke: '#FFFFFF',
@@ -217,7 +214,6 @@ export const DEPARTMENT_NODE_DATA = {
 	"name": "Phòng ban 1",
 	"attrs": DEFAULT_DEPARTMENT_ATTRS
 };
-
 export const departmentMarkup =
 	`<g class="rotatable ">
         <g class="symper-orgchart-node">
@@ -279,7 +275,6 @@ export const departmentMarkup =
 		},
 
 		toggleButtonSign: function (plus) {
-			debugger
 			if (plus) {
 				this.attr('.buttonSign', { text: "+" });
 			} else {
