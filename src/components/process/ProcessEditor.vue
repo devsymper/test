@@ -192,9 +192,11 @@ export default {
                     }
                 }
             }
-
-            approvalNodeData.attrs.approvalEditableControls.options = null;
-            approvalNodeData.attrs.approvalEditableControls.options = ctrls;
+            if (approvalNodeData.type!="ServiceTask") {
+                approvalNodeData.attrs.approvalEditableControls.options = null;
+                approvalNodeData.attrs.approvalEditableControls.options = ctrls;
+            }
+         
         },
         resetAttrPanelHeight(){
             this.attrPannelHeight = (util.getComponentSize(this).h - 50)+'px';
@@ -417,10 +419,13 @@ export default {
             for(let elName in allSymEls){
                 jsonConfig[elName] = {};
                 for(let attrName in allSymEls[elName].attrs){
-                    let attr = allSymEls[elName].attrs[attrName];
-                    if(attr){
-                        jsonConfig[elName][attrName] = attr.getValue(attr.value);
+                    if (attrName!="idNode") {
+                        let attr = allSymEls[elName].attrs[attrName];
+                        if(attr){
+                            jsonConfig[elName][attrName] = attr.getValue(attr.value);
+                        }
                     }
+                   
                 }
             }
             let modelDataAsFlowable = this.getModelData();
