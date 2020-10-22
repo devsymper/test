@@ -955,24 +955,10 @@ export default {
 .symper-orgchart-active-editor .symper-orgchart-paper .symper-orgchart-node:hover .orgchart-action {
     display: block!important;
 }
-<<<<<<< HEAD
-.diagram-hortical .btn-collapse-expand-ver,.btn-collapse-expand-hor{
-    display: none;
-}
-.diagram-hortical .symper-orgchart-node:hover .btn-collapse-expand-hor{
-    display: block;
-}
-.diagram-vertical .symper-orgchart-node:hover .btn-collapse-expand-ver{
-    display: block;
-}
-
-.diagram-vertical .btn-collapse-expand-ver,.btn-collapse-expand-hor{
-=======
 .diagram-hortical .btn-collapse-expand-ver{
     display: none !important ;
 }
 .diagram-vertical .btn-collapse-expand-hor{
->>>>>>> 5a49ba06191c8806eb55dd8d05ff6346769f9bf3
     display: none;
 }
 </style>
