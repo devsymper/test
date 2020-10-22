@@ -70,7 +70,9 @@ export default {
             this.$refs.jointPaper.actionOnToolbar(action);
         },
         loadDiagramFromJson(cells){
+             let treeLayout = this.$refs.jointPaper.treeLayout;
             this.$refs.jointPaper.graph.fromJSON(cells);
+            treeLayout.layout();
         },
         getAllDiagramCells(){
             return this.$refs.jointPaper.graph.toJSON();
@@ -332,6 +334,7 @@ export default {
                     return rsl;
                 },
                 updateAttributes: function(_, model) {
+                    debugger
                     // Update some presentation attributes during the layout
                     model.toggleButtonVisibility(!graph.isSink(model));
                     model.toggleButtonSign(!model.isCollapsed());

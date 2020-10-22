@@ -174,6 +174,12 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 		// x: shapeSize.width / 2,
 		// y: shapeSize.height + CEConfig.stickHeight
 	},
+	'.buttonSign': {
+		stroke: '#FFFFFF',
+		strokeWidth: 1.6,
+		event:"visiblePainted",
+		text: '+'
+	},
 	'.expand-text': {
 		x: shapeSize.width / 2 - CEConfig.fontSize / 2 + 2,
 		y: shapeSize.height + CEConfig.stickHeight + CEConfig.fontSize / 2 - 1,
@@ -196,7 +202,8 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 	}
 	
 };
-
+export const PLUS_SIGN =  'M 1 5 9 5 M 5 1 5 9'
+export const MINUS_SIGN =  'M 2 5 8 5'
 export const DEPARTMENT_NODE_DATA = {
 	"type": "org.Member",
 	"size": {
@@ -230,12 +237,12 @@ export const departmentMarkup =
                 <text class="add">+</text>
             </g>
 			<g class="btn-collapse-expand-hor">
-				<circle class="collapse-expand-circle"/>
-				<text class="expand-text">+</text>
+				<circle class="buttonSign"/>
+				<text class="buttonSign"></text>
 			</g>
 			<g class="btn-collapse-expand-ver">
-				<circle class="collapse-expand-circle"/>
-				<text class="expand-text">+</text>
+				<circle class="buttonSign"/>
+				<text class="buttonSign"></text>
 			</g>
             <g class="btn remove orgchart-action">
                 <circle class="remove"/>
@@ -253,6 +260,8 @@ export const departmentMarkup =
 		},
 		hidden: false,
 		attrs: DEFAULT_DEPARTMENT_ATTRS,
+		PLUS_SIGN:PLUS_SIGN,
+		MINUS_SIGN:MINUS_SIGN ,
 		markup: departmentMarkup,
 	}, {
 		hidden:false,
@@ -265,11 +274,17 @@ export const departmentMarkup =
 		},
 
 		toggleButtonVisibility: function (visible) {
-
+			this.attr('.btn-collapse-expand-hor', { display: visible ? 'block' : 'none' });
+			this.attr('.btn-collapse-expand-ver', { display: visible ? 'block' : 'none' });
 		},
 
 		toggleButtonSign: function (plus) {
-
+			debugger
+			if (plus) {
+				this.attr('.buttonSign', { text: "+" });
+			} else {
+				this.attr('.buttonSign', { text: "-" });
+			}
 		}
 	});
 }
