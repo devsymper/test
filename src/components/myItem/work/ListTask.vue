@@ -76,6 +76,7 @@
                                 </div>
                                 <div >
                                     <v-icon v-if="obj.endTime !=null" style="font-size:10px; color:green;">mdi-circle</v-icon>
+                                    <v-icon v-else-if="obj.dueDate && checkTimeDueDate(obj)" style="font-size:10px ; color:red;">mdi-circle</v-icon>
                                     <v-icon v-else style="font-size:10px ; color:blue;">mdi-circle</v-icon>
                                 </div>
                             </div>
@@ -229,6 +230,18 @@ export default {
         }
     },
     methods:{
+        checkTimeDueDate(item){
+            if (item.dueDate) {
+                let dueDate=new Date(item.dueDate).getTime();
+                if (dueDate<Date.now()) {
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        },
         handleReachEndList(){},
         selectNameApp(variables){
             const symperAppId = variables.find(element => element.name=='symper_application_id');
