@@ -314,16 +314,12 @@ export default {
                 ed.on('SelectionChange',function (e) {
                     self.handleHighlightControlSelection(e)
                 });
-               
-                
             },
             init_instance_callback : function(editor) {
                 self.editorCore = editor;
                 self.initEditor()
             },
         });
-                          
-
     },
     created() {
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
@@ -1797,7 +1793,7 @@ export default {
                     })
                     let fields = res.data.fields;
                     this.setDataForPropsControl(fields);
-                    this.wrapTableElement();
+                    this.removeWrapTableElement();
                 }
             }
         },
@@ -1807,6 +1803,14 @@ export default {
             if(listTable.length > 0 && !listTable.parent().is('.wrap-s-control-table')){
                 listTable.wrap('<div class="wrap-s-control-table"></div>')
             }
+        },
+        removeWrapTableElement(){
+            let listTable = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.s-control-table');
+            $.each(listTable,function(k,v){
+                if($(v).parent().is('.wrap-s-control-table')){
+                    $(v).unwrap();
+                }
+            })
         },
 
         setDocumentProperties(documentProp){
@@ -2654,7 +2658,7 @@ export default {
             try {
                 $("#document-editor-"+this.keyInstance+"_ifr").contents().find(".selection-highlight").removeClass('selection-highlight');
                 let contentSelection = this.editorCore.selection.getContent();
-                if($(contentSelection).is('.s-control-table')){
+                if($(contentSelection).is('.s-control-table') || $(contentSelection).is('.s-control-tab-page')){
                     return;
                 }
                 let allControlInForm = $(contentSelection).find('.s-control');
