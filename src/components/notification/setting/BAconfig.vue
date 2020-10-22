@@ -4,24 +4,30 @@
             <h4 >Cài đặt thông báo</h4>
       
         </div>
-        <v-row class="pt-0" style="margin-bottom:-35px">
-            <v-col class="fs-13 col-md-5" style="margin-top:-5px">Module phát sinh</v-col>
+        <v-row class="pt-0" style="margin-bottom:-10px">
+            <v-col class="fs-13 col-md-5" style="margin-top:5px">Module phát sinh</v-col>
             <v-col class="col-md-7">  
                 <v-autocomplete
                     outlined
+                     class="sym-small-size"
+                   
                     :items="listModule"
                     v-model="objectType"
                     dense
+                    clearable
                     label="Chọn"
                 >
                 </v-autocomplete>
             </v-col>
         </v-row>
-         <v-row class="pt-0" style="margin-bottom:-35px">
-            <v-col class="fs-13 col-md-5" style="margin-top:-5px">Hành động sinh ra notification</v-col>
+         <v-row class="pt-0" style="margin-bottom:-10px">
+            <v-col class="fs-13 col-md-5" style="margin-top:5px">Hành động sinh ra notification</v-col>
             <v-col class="col-md-7">  
                  <v-autocomplete
                     outlined
+                     class="sym-small-size"
+                   
+                    clearable
                     :items="listAction"
                     v-model="action"
                     dense
@@ -30,12 +36,16 @@
                 </v-autocomplete>
             </v-col>
         </v-row>
-          <v-row class="pt-0" style="margin-bottom:-35px">
-            <v-col class="fs-13 col-md-5" style="margin-top:-5px">Đối tượng nhận notification</v-col>
+          <v-row class="pt-0" style="margin-bottom:-10px" >
+            <v-col class="fs-13 col-md-5" style="margin-top:5px">Đối tượng nhận notification</v-col>
             <v-col class="col-md-7">  
                 <v-autocomplete
-                    outlined
+                    class="sym-small-size"
+                   
                     dense
+                   
+                    outlined
+                    clearable
                     return-object
                     v-model="receiver"
                     :items="listReceiver"
@@ -46,11 +56,14 @@
                 </v-autocomplete>
             </v-col>
         </v-row>
-          <v-row class="pt-0" style="margin-bottom:-35px">
-            <v-col class="fs-13 col-md-5" style="margin-top:-5px">Hành động khi click notification</v-col>
+          <v-row class="pt-0" style="margin-bottom:-10px">
+            <v-col class="fs-13 col-md-5" style="margin-top:5px">Hành động khi click notification</v-col>
             <v-col class="col-md-7">  
                 <v-autocomplete
+                     class="sym-small-size"
+                   
                     outlined
+                    clearable
                     dense
                     item-value="value"
                     item-text="text"
@@ -69,7 +82,7 @@
                 Tham số
             </v-col>
         </v-row>
-        <v-row>
+        <v-row tyle="margin-bottom:-20px">
             <v-col class="col-md-7">
                 <v-textarea
                     label="Message"
@@ -84,17 +97,27 @@
                 ></v-chip></v-textarea>
             </v-col>
             <v-col class="col-md-5">
-                 <v-textarea
-                    label="Message"
-                    counter
-                    maxlength="120"
-                    full-width
-                    single-line
-                ></v-textarea>
+                <div class="mt-4" style="width:180px;height:143px!important; border:1px solid grey">
+                
+                </div>
             </v-col>
         </v-row>
-        <v-row class="pt-0" style="margin-bottom:-5px">
-            <v-col class="fs-13 col-md-5" style="margin-top:-5px">Hình đại diện</v-col>
+         <v-row class="pt-0" style="margin-bottom:-10px">
+            <v-col class="fs-13 col-md-5" style="margin-top:5px">Hình đại diện</v-col>
+            <v-col class="col-md-7">  
+                 <v-select
+                    outlined
+                     class="sym-small-size"
+                   
+                    :items="typeSelected"
+                    v-model="typePictureSelected"
+                    dense
+                >
+                </v-select>
+            </v-col>
+        </v-row>
+        <v-row class="pt-0" v-if="typeSelected[0]==typePictureSelected" style="margin-bottom:-20px">
+            <v-col class="fs-13 col-md-5" style="margin-top:-5px">Ảnh</v-col>
             <v-col class="col-md-7" style="margin-top:-10px">
                 <v-avatar :size="60">
                     <img v-if="avatarUrl != ''"
@@ -108,19 +131,22 @@
                     ref="uploadAvatar"
                     :fileName="avatarFileName"
                     :autoUpload="false"
+                    @click="handleAvatarSelected"
                     :iconName="'mdi mdi-plus-circle'"
                     @selected-file="handleAvatarSelected"
                         />
             </v-col>
         </v-row>
-         <v-row class="pt-0" style="margin-bottom:-15px">
+         <v-row class="pt-0" style="margin-bottom:-15px" v-if="typeSelected[1]==typePictureSelected">
             <v-col class="fs-13 col-md-5 " style="margin-top:-10px">Icon</v-col>
             <v-col class="col-md-6" style="margin-top:-10px">  
-                <v-icon>mdi mdi-home</v-icon>
-            </v-col>
+                 <v-icon class="display-3 pt-0">{{iconName.iconName}}</v-icon>
+             <iconPicker style="margin-left:-10px" ref="iconPicker" :icon="'mdi mdi-plus-box'" @selected="pickIcon"></iconPicker>
+            </v-col >
+              
         </v-row>
-         <v-row class="pt-0" style="margin-bottom:-35px">
-            <v-col class="fs-13 col-md-5 " style="margin-top:-5px">Trạng thái</v-col>
+         <v-row class="pt-0" style="margin-bottom:-25px">
+            <v-col class="fs-13 col-md-5 " style="margin-top:5px">Trạng thái</v-col>
             <v-col class="col-md-6">  
                <v-checkbox
                 v-model="state" 
@@ -134,13 +160,15 @@
     </div>
 </template>
 <script>
+import iconPicker from "../../../components/common/pickIcon";
 import { util } from '../../../plugins/util';
 import UploadFile from "./../../../components/common/UploadFile";
 import {userApi} from "./../../../api/user";
 import notification from "./../../../api/settingNotification"
 export default {
 components:{
-    UploadFile
+    UploadFile,
+    iconPicker
     },
   watch: {
       objectType(){
@@ -180,6 +208,11 @@ components:{
         })
 
     },
+      pickIcon(data) {
+          debugger
+            this.$set(this.iconName, 'iconName', data.icon.trim() )
+            this.$set(this.iconName, 'iconType' , data.type)
+		},
     refreshSelected(){
          this.listActionClickNotifi = [];
           this.listAction = [];
@@ -216,6 +249,18 @@ components:{
   },
     data(){
         return{
+            typeSelected:[
+                "Avatar đối tượng gây ra",
+                "Tùy chọn icon"
+            ],
+            typePictureSelected:'Avatar đối tượng gây ra',
+            iconName:{
+                icon: "",
+                iconName: "mdi-account",
+                name: "",
+                note: "",
+                status: false
+            },
             avatarUrl:'',
             avatarFileName:'',
             allListObj:{},

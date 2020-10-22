@@ -7,8 +7,11 @@ export default {
     showAllModuleConfig() {
         return api.get('sources')
     },
-    showListsSubcribed() {
+    showAllLists() {
         return api.get('channels')
+    },
+    showListsSubcribed(data) {
+        return api.get('channels', data)
     },
     addChanel(data) {
         return api.post('channels', data)

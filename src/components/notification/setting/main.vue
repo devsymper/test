@@ -15,13 +15,15 @@
                 >
                  <template v-slot:prependIcon>
                     <v-icon class="ml-1 icon-group">
-                        {{ $i('input.'+item.title) }}
+                        {{ $i('input.'+item.icon) }}
                     </v-icon>
                 </template>
                 <template v-slot:activator>
                     <v-list-item-content class="mb-2"  style="margin-left:-17px">
-                    <v-list-item-title >{{$t('objects.'+item.title)}}</v-list-item-title>
-                    <v-list-item-subtitle class="fw-400 fs-11">{{$t('objects.'+item.title)}}</v-list-item-subtitle>
+                    <v-list-item-title v-if="type=='main'">{{$t('objects.'+item.title)}}</v-list-item-title>
+                    <v-list-item-title v-else>{{item.title}}</v-list-item-title>
+                    <v-list-item-subtitle v-if="type=='main'" class="fw-400 fs-11">{{$t('objects.'+item.title)}}</v-list-item-subtitle>
+                    <v-list-item-subtitle v-else class="fw-400 fs-11">{{item.title}}</v-list-item-subtitle>
                     </v-list-item-content>
                 </template>
                 <div class="mb-3 ml-10">

@@ -4,10 +4,13 @@
         ref="listUser"
         :headerPrefixKeypath="'notificationConfig'"
         :useDefaultContext="false"
+        :showExportButton="false"
+        :showImportHistory="false"
         :pageTitle="'Thông báo'"
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
         :customAPIResult="customAPIResult"
+        :showImportButton="false"
         :getDataUrl="'https://notifi.symper.vn/channels'"
         :actionPanelWidth="actionPanelWidth"
         :commonActionProps="commonActionProps">
@@ -55,13 +58,40 @@ export default {
                        name:'defaultUser',
                        title:'table.defaultUser',
                        type:"text"
-                   },{
+                   },
+                   {
                        name:'description',
                        title:'table.description',
                        type:"text"
-                   },{
+                   },
+                   {
                        name:'subscribed',
                        title:'table.subscribed',
+                       type:"text"
+                   },
+                   {
+                       name:'userCreate',
+                       title:'table.userCreate',
+                       type:"text"
+                   },
+                   {
+                       name:'createAt',
+                       title:'table.createAt',
+                       type:"text"
+                   },
+                    {
+                       name:'userUpdate',
+                       title:'table.userUpdate',
+                       type:"text"
+                   },
+                    {
+                       name:'updateAt',
+                       title:'table.updateAt',
+                       type:"text"
+                   },
+                   {
+                       name:'subscribedAt',
+                       title:'table.subscribedAt',
                        type:"text"
                    },
                    )

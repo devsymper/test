@@ -510,21 +510,17 @@ export default {
             type: Boolean,
             default: false
         },
+        showImportHistory:{
+            type: Boolean,
+            default: false
+        },
         exportLink: {
             type: String,
             default: ''
         },
-        showExportButton: {
-            type: Boolean,
-            default: false
-        },
         widgetIdentifier: {
             type: String,
             default: ''
-        },
-        showImportButton: {
-            type: Boolean,
-            default: true
         },
         showExportButton: {
             type: Boolean,

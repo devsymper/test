@@ -93,7 +93,7 @@
         "sidebar": {
             "Notification Config BA": "Cài đặt thông báo",
             "Setting": "Cài đặt",
-            "Notification": "Thông báo",
+            "Notification": "Quản lý thông báo",
             "account_trash": "Tài khoản đã xóa",
             "Lists trash": "Danh sách bản xóa",
             "myApplication": "Ứng dụng của tôi",
@@ -1059,8 +1059,12 @@
             "event": "Hành động sinh thông báo",
             "defaultUser": "Đối tượng nhận",
             "description": "Nội dung thông báo",
-            "subscribed": "Trạng thái"
-
+            "subscribed": "Trạng thái",
+            "userCreate": "Người tạo",
+            "userUpdate": "Người cập nhật",
+            "createAt": "Ngày tạo",
+            "updateAt": "Ngày cập nhật",
+            "subscribedAt": "Ngày theo dõi"
         }
     },
     "virtualdoc": {
