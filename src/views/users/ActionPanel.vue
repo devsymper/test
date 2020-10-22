@@ -59,6 +59,7 @@
 									<v-col >
 										<span class="fs-13 st-icon-pandora">
 											{{ $t('user.general.personalInfo.userName')}}
+												<span style="color:red">*</span>
 										</span>
 									</v-col>
 								</v-row>
@@ -78,6 +79,7 @@
 									<v-col >
 										<span class="fs-13 st-icon-pandora">
 											{{ $t('user.general.personalInfo.displayName')}}
+												<span style="color:red">*</span>
 										</span>
 									</v-col>
 								</v-row>
@@ -98,6 +100,7 @@
 									<v-col >
 										<span class="fs-13 st-icon-pandora">
 											{{ $t('user.general.personalInfo.email')}}
+											<span style="color:red">*</span>
 										</span>
 									</v-col>
 								</v-row>
@@ -294,7 +297,7 @@ export default {
 				lastName:'', 
 				displayName:'', 
 				userName:' ', 
-				email:' ', 
+				email:'', 
 				password:null, 
 				phone:'', 
 				active:true

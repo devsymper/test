@@ -186,21 +186,10 @@ export default {
         link: '/setting-notification',
         group: "Setting"
     },
-    // settingNoticationBA: {
-    //     title: 'Notification',
-    //     icon: 'mdi-bell-check-outline',
-    //     link: '/setting-notificationBA',
-    //     group: "Setting"
-    // },
-    // comment: {
-    // 	title: 'tesstsdádasdad',
-    // 	icon: 'mdi-file-edit-outline',
-    // 	link: '/comment',
-    // },
-    // { title: "reports", icon: "mdi-view-dashboard", link: "/reports" },
-    // { title: "virtualdocs", icon: "mdi-table", link: "/virtualdocs" },
-    // { title: "methods", icon: "mdi-function", link: "/methods" },
-    // { title: "virtual_doc", icon: "mdi-table-sync", link: "/virtual-doc" },
-    // { title: "service", icon: "mdi-cogs", link: "/service" },
-    // { title: "snippets", icon: "mdi-contain", link: "/snippets" },
+    settingNoticationBA: {
+        title: 'Notification Config BA',
+        icon: 'mdi-bell-plus-outline',
+        link: '/setting-notificationBA',
+        group: "Setting"
+    },
 };

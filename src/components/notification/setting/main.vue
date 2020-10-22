@@ -61,16 +61,14 @@ export default {
         immediate: true,
         handler(newValue){
             for(let j = 0; j<newValue[0].items.length;j++){
-        // check 1 lượt nếu chọn subcribed
+            // check 1 lượt nếu chọn subcribed
                 if(newValue[0].items[j].active){
-                            // nếu chưa tồn tại gọi api
+                    // nếu chưa tồn tại gọi api
                     this.subcribedChanel(newValue[0].items[j].id) 
-                
                 // nếu không chọn subcribed
                 }else{
                     /// chuyển state false
                     //nếu đã có trong list
-                    
                 }
             }
         }
@@ -80,7 +78,6 @@ export default {
   props: ['type','listItems','listSubcribed'],
     methods: {
         subcribedChanel(id){
-            debugger
             notification.subscribeChanel(id).then(res=>{
                 if(res.status==200){}
             })
@@ -91,9 +88,7 @@ export default {
             items:this.listItems,
             listModuleStates:[]
         }
-        
     }
-    
 }
 </script>
 <style scoped>

@@ -1,74 +1,68 @@
 -<template>
-    <div class="ml-6 mt-2 config-notification">
+    <div class="ml-4 config-notification">
         <div  class="mb-3">
             <h4 >Cài đặt thông báo</h4>
+      
         </div>
         <v-row class="pt-0" style="margin-bottom:-35px">
             <v-col class="fs-13 col-md-5" style="margin-top:-5px">Module phát sinh</v-col>
-            <v-col class="col-md-6">  
+            <v-col class="col-md-7">  
                 <v-autocomplete
                     outlined
+                    :items="listModule"
+                    v-model="objectType"
                     dense
-                    chips
-                    small-chips
                     label="Chọn"
-                    multiple
                 >
                 </v-autocomplete>
             </v-col>
         </v-row>
          <v-row class="pt-0" style="margin-bottom:-35px">
             <v-col class="fs-13 col-md-5" style="margin-top:-5px">Hành động sinh ra notification</v-col>
-            <v-col class="col-md-6">  
-                <v-autocomplete
-                   
-                    
+            <v-col class="col-md-7">  
+                 <v-autocomplete
                     outlined
+                    :items="listAction"
+                    v-model="action"
                     dense
-                    chips
-                    small-chips
                     label="Chọn"
-                    multiple
                 >
                 </v-autocomplete>
             </v-col>
         </v-row>
           <v-row class="pt-0" style="margin-bottom:-35px">
             <v-col class="fs-13 col-md-5" style="margin-top:-5px">Đối tượng nhận notification</v-col>
-            <v-col class="col-md-6">  
+            <v-col class="col-md-7">  
                 <v-autocomplete
-                   
-                    
                     outlined
                     dense
-                    chips
-                    small-chips
+                    return-object
+                    v-model="receiver"
+                    :items="listReceiver"
+                    item-value="value"
+                    item-text="text"
                     label="Chọn"
-                    multiple
                 >
                 </v-autocomplete>
             </v-col>
         </v-row>
           <v-row class="pt-0" style="margin-bottom:-35px">
             <v-col class="fs-13 col-md-5" style="margin-top:-5px">Hành động khi click notification</v-col>
-            <v-col class="col-md-6">  
+            <v-col class="col-md-7">  
                 <v-autocomplete
-                   
-                    
                     outlined
                     dense
-                    chips
-                    small-chips
+                    item-value="value"
+                    item-text="text"
+                    v-model="actionClickNotifi"
+                    :items="listActionClickNotifi"
                     label="Chọn"
-                    multiple
                 >
                 </v-autocomplete>
             </v-col>
         </v-row>
-         
-        
           <v-row class="pt-0" style="margin-bottom:-35px">
-            <v-col class="fs-13 col-md-6">
+            <v-col class="fs-13 col-md-7">
                 Nội dung notification
             </v-col>
             <v-col class="fs-13 col-md-5">  
@@ -76,7 +70,7 @@
             </v-col>
         </v-row>
         <v-row>
-            <v-col class="col-md-6">
+            <v-col class="col-md-7">
                 <v-textarea
                     label="Message"
                     counter
@@ -89,8 +83,7 @@
                     color="primary"
                 ></v-chip></v-textarea>
             </v-col>
-            
-            <v-col class="col-md-5 mr-3">
+            <v-col class="col-md-5">
                  <v-textarea
                     label="Message"
                     counter
@@ -100,18 +93,24 @@
                 ></v-textarea>
             </v-col>
         </v-row>
-        <v-row class="pt-0" style="margin-bottom:-35px">
+        <v-row class="pt-0" style="margin-bottom:-5px">
             <v-col class="fs-13 col-md-5" style="margin-top:-5px">Hình đại diện</v-col>
-            <v-col class="col-md-6">  
-                <v-autocomplete
-                    outlined
-                    dense
-                    chips
-                    small-chips
-                    label="Chọn"
-                    multiple
-                >
-                </v-autocomplete>
+            <v-col class="col-md-7" style="margin-top:-10px">
+                <v-avatar :size="60">
+                    <img v-if="avatarUrl != ''"
+                        :src="avatarUrl"
+                    >
+                    <img v-if="avatarUrl== ''"
+                        :src="require('./../../../assets/image/avatar_default.jpg')"
+                    >
+                </v-avatar>
+               <UploadFile 
+                    ref="uploadAvatar"
+                    :fileName="avatarFileName"
+                    :autoUpload="false"
+                    :iconName="'mdi mdi-plus-circle'"
+                    @selected-file="handleAvatarSelected"
+                        />
             </v-col>
         </v-row>
          <v-row class="pt-0" style="margin-bottom:-15px">
@@ -123,34 +122,116 @@
          <v-row class="pt-0" style="margin-bottom:-35px">
             <v-col class="fs-13 col-md-5 " style="margin-top:-5px">Trạng thái</v-col>
             <v-col class="col-md-6">  
-               <v-checkbox style="margin-top:0px">
-                
+               <v-checkbox
+                v-model="state" 
+                style="margin-top:0px">
                </v-checkbox>
             </v-col>
         </v-row>
         <v-row class="mr-8 mt-5 d-flex justify-end">
-            <v-btn text color="green"> Lưu</v-btn>
+            <v-btn text color="green" @click="save()">Lưu</v-btn>
         </v-row>
     </div>
 </template>
 <script>
+import { util } from '../../../plugins/util';
+import UploadFile from "./../../../components/common/UploadFile";
+import {userApi} from "./../../../api/user";
+import notification from "./../../../api/settingNotification"
 export default {
+components:{
+    UploadFile
+    },
   watch: {
-      isShow(){
-          if(isShow){
-              debugger
-              this.drawer =true;
-          }
+      objectType(){
+         this.refreshSelected();
+          this.getAction(this.objectType);
+          this.getSource(this.objectType);
       }
   },
   created () {
+      this.getNameModule();
+    
   },
-  props: ['isShow'],
   methods: {
+     handleAvatarSelected(tempUrl){
+         debugger
+           this.avatarUrl = tempUrl;
+            this.avatarFileName = 'user_avatar_'+util.str.randomString(6)+Date.now();
+            this.$refs.uploadAvatar.uploadFile();
+        },
+    save(){
+        debugger
+        let data={
+            event: this.action,
+            source:this.objectType,
+            state:this.state,
+            objectIdentifier:this.objectType,
+            objectType:this.objectType,
+            receiver:this.receiver.value,
+            action:this.actionClickNotifi,
+            icon:this.icon,
+        };
+       const self = this;
+        notification.addChanel(data).then(res=>{
+            if(res.status==200){
+                debugger
+            }
+        })
+
+    },
+    refreshSelected(){
+         this.listActionClickNotifi = [];
+          this.listAction = [];
+          this.listReceiver=[];
+    },
+    getAction(nameModule){
+        this.listAction = this.allListObj[nameModule].action.map(x=>x)
+    },
+    getNameModule(){
+        const self = this;
+        userApi.getAllListObj()
+        .then(res=>{
+            if(res.status==200){
+                self.allListObj = res.data
+                self.listModule = Object.keys(res.data);
+            }
+        })
+    },
+     getSource(nameModule){
+        const self = this;
+        notification.showAllModuleConfig().then(res=>{
+            if(res.status==200){
+                self.listSource = res.data;
+                for(let i = 0; i<res.data[nameModule].receiver.length;i++){
+                    self.listReceiver.push(res.data[nameModule].receiver[i])
+                };
+                 for(let i = 0; i<res.data[nameModule].action.length;i++){
+                    self.listActionClickNotifi.push(res.data[nameModule].action[i])
+                }
+
+            }
+        })
+    },
   },
     data(){
         return{
-            
+            avatarUrl:'',
+            avatarFileName:'',
+            allListObj:{},
+            listModule:[],
+            objectType:'',
+            listAction:[],
+            action:'',
+            listReceiver:[],
+            listActionClickNotifi:[],
+            receiver:'',
+            actionClickNotifi:'',
+            listSource:[],
+            state:false,
+            avatar:'',
+            icon:''
+  
         }
     }
 }
@@ -165,4 +246,8 @@ export default {
     .config-notification ::v-deep .v-text-field__slot{
         border:1px solid grey
      }
+    .config-notification >>>.symper-upload-file{
+        margin-top:-28px;
+        margin-left:12px;
+	}
 </style>

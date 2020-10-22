@@ -132,6 +132,7 @@ export default {
 					self.uploadFile()
 				})
 			}else{
+				debugger
 				this.selectedFile = e.target.files[0]
 				formData.append('user',this.$store.state.app.endUserInfo.displayName)
 				formData.append('objectType',this.objectType)
@@ -142,10 +143,12 @@ export default {
 						this.previewImg = window.URL.createObjectURL(e.target.files[0])
 					}
 				}else{
+					debugger
 					formData.append('file',this.selectedFile)
 					this.formDatas = formData;
 					this.$emit('selected-file', window.URL.createObjectURL(e.target.files[0]))
-					if(this.autoUpload == true){
+					if(this.autoUpload ){
+						debugger
 						this.uploadFile()
 					}
 				}
@@ -179,6 +182,7 @@ export default {
 			return new Blob([ab], {type: mimeString});
 		},
 		uploadFile(){
+			debugger
             if(this.fileName != ''){
 				this.formDatas.append('fileName',this.fileName)
             }

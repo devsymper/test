@@ -611,6 +611,16 @@
         "Department": "Department",
         "Timesheet": "Timesheet"
     },
+    "notificationConfig": {
+        "table": {
+            "id": "ID",
+            "objectType": "Module",
+            "event": "Event",
+            "defaultUser": "Đối tượng nhận",
+            "description": "Description",
+            "subscribed": "State"
+        }
+    },
     "objects": {
         "document_instance": "Document instance",
         "user": "User",

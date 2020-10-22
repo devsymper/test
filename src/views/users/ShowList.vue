@@ -2,6 +2,7 @@
 <div class="w-100">
      <list-items
         ref="listUser"
+        :actionPanelType="'modal'"
         @after-open-add-panel="addUser"
         :headerPrefixKeypath="'user.table'"
         :useDefaultContext="false"

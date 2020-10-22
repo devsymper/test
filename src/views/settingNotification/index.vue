@@ -2,7 +2,7 @@
     <div class="w-100 mr-10">
         <v-row class="header ml-3">
             <v-col class="col-md-9 col-sm-9 ">
-                <span class="fs-15 fw-430" v-if="showMain">Cài đặt thông báo</span>
+                 <span class="fs-15 fw-430" v-if="showMain">Cài đặt thông báo</span>      
                 <span class="fs-15 fw-430" v-if="showFollow">Danh sách đối tượng đang theo dõi</span>
                 <span class="fs-15 fw-430" v-if="showUnfollow">Danh sách đối tượng không theo dõi</span>
             </v-col >
@@ -16,7 +16,7 @@
             </v-col >
         </v-row>
         <SettingNotification v-if="showMain" :type="type" :listItems="items" :listSubcribed="listSubcribed"/>
-        <SettingNotification v-if="showFollow" :type="type" :listItems ="items1"/>
+        <SettingNotification v-if="showFollow" :type="type" :listItems ="items"/>
         <SettingNotification v-if="showUnfollow" :type="type" :listItems ="items"/>
     </div>
 </template>
@@ -102,7 +102,6 @@ export default {
         const self = this;
         notification.showAllModuleConfig().then(res=>{
             if(res.status==200){
-                debugger
                 self.listSource = res.data;
             }
         })
@@ -110,17 +109,24 @@ export default {
     rename(){
 
     },
+    getListFollowed(){
+        this.items=[];
+
+    },
     isShowUnFollow(){
         this.type="unfollow";
         this.showFollow=false;
         this.showUnfollow=true;
         this.showMain=false;
+        this.items=[]
     },
     isShowFollow(){
         this.type="follow";
         this.showFollow=true;
         this.showUnfollow=false;
         this.showMain=false;
+        
+        this.getListFollowed();
     }
   },
 }

@@ -114,6 +114,8 @@ export default {
                                     }
                                 }
                             }
+                            self.$refs.listImport.rerenderTable();
+                            debugger
                         }
                     })
                     .catch(console.log);
