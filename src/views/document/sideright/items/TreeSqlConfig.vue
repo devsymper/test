@@ -85,7 +85,57 @@ export default {
     created(){
     },
     props: {
-      
+      treeData:{
+          type: Array,
+          default(){
+              return [
+               {
+                    id: 1,
+                    type:"group",
+                    value: "and",
+                    children: [
+                        { 
+                            id: 2,
+                            type:"item",
+                            column:"Abc",
+                            operator:"notBlank",
+                            value:'10001'
+                        },
+                        { 
+                            id: 3,
+                            type:"item",
+                            column:1,
+                            operator:"notBlank",
+                            value:'10001sdds'
+                        },
+                    ],
+                },
+                {
+                id: 4,
+                type:"group",
+                value: "or",
+                children: [
+                    {
+                    id: 5,
+                    type:"group",
+                    value: "and",
+                    children: [
+                        {
+                        id: 6,
+                        type:"group",
+                        value: "and",
+                        children: [
+                        ],
+                        },
+                    ],
+                    },
+                   
+                ],
+                },
+               
+          ]
+          } 
+      }
     },
     watch: {
        
@@ -154,50 +204,6 @@ export default {
                 },
 
             ],
-            treeData: [
-                {
-                    id: 1,
-                    type:"group",
-                    value: "and",
-                    children: [
-                        { 
-                            id: 2,
-                            type:"item",
-                            column:"Abc",
-                            operator:"notBlank",
-                            value:'10001'
-                        },
-                        { 
-                            id: 3,
-                            type:"item",
-                            column:1,
-                            operator:"notBlank",
-                            value:'10001sdds'
-                        },
-                    ],
-                },
-                {
-                id: 4,
-                type:"group",
-                value: "or",
-                children: [
-                    {
-                    id: 5,
-                    type:"group",
-                    value: "and",
-                    children: [
-                        {
-                        id: 6,
-                        type:"group",
-                        value: "and",
-                        },
-                    ],
-                    },
-                   
-                ],
-                },
-               
-            ],
         }
     },
     computed: {
@@ -230,7 +236,8 @@ export default {
                             e.children.push({
                                 id: Math.floor(Math.random() * 10000),
                                 type:"group",
-                                value:"and"
+                                value:"and",
+                                children:[]
                             })
                         }else{
                              e.children.push({

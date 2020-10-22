@@ -45,8 +45,9 @@
               <h4>Danh sách yêu thích</h4>
 					<VuePerfectScrollbar :style="{height:heightListFavorite}"  >
 						<ul style="margin:0px 0px 0px -24px" v-if="sFavorite.length > 0">
-							<li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer" :class="{'child-item-active': item.objectIdentifier == activeIndexChild}" > 
-								<div style="position:relative" >
+							<li  v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer" :class="{'child-item-active': item.objectIdentifier == activeIndexChild}" > 
+								<div style="position:relative;display:flex" >
+									<v-icon style="font-size:13px;margin-right:8px">{{listIcon[item.type]}}</v-icon>
 									<div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
 									<div v-else  class="title-item-favorite">{{item.name}}</div> 
 									<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:4px;right:4px">mdi-star</v-icon>
@@ -386,6 +387,12 @@ x				}
 			heightListApp: 'calc(100vh - 130px)',
 			widthActionArea:null,
 			widthActionArea: '',
+			listIcon:{
+				document_definition: 'mdi-file-document-outline',
+				workflow_definition: 'mdi-lan',
+				orgchart: 'mdi-widgets-outline',
+				dashboard: 'mdi-view-dashboard'
+			},
             arrType:{
                 document_definition:[],
                 orgchart:[],
