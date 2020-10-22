@@ -74,7 +74,7 @@
             </div>
         </v-row>
         <v-divider style="border-color: #dedede;"></v-divider>
-        <v-row class="ma-0 detail-task">
+        <v-row class="ma-0 detail-task h-100">
             <!-- <VuePerfectScrollbar :style="{height: parentHeight +'px'}" > -->
                 <task 
                     @task-submited="handleTaskSubmited" 

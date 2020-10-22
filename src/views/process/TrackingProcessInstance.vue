@@ -225,10 +225,14 @@ export default {
                     infoAssignee.assignee = mapUser[assigneeId];
                     infoAssignee.role = roleInfo;
                 }
-                symBpmn.updateElementProperties(this.flowElementMap[index].id, {
-                    infoAssignee: infoAssignee,
-                    setColor:nodeStatusColors.notStart
-                });
+                if (this.flowElementMap[index].id) {
+                    console.log("elll",this.flowElementMap[index].id);
+                    symBpmn.updateElementProperties(this.flowElementMap[index].id, {
+                        infoAssignee: infoAssignee,
+                        setColor:nodeStatusColors.notStart
+                    });
+                }
+              
             }
         },
         // Lấy ra thông tin chạy của các node của instance

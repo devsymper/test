@@ -419,6 +419,11 @@ export default {
     top:48px!important;
     padding:12px;
 }
+.approval-taskDetail >>>.doc-detail .s-drawer{
+    top:0px!important;
+    padding:12px;
+
+}
 
 .approval-taskDetail >>>.task-header{
     line-height: 39px!important;
