@@ -624,16 +624,15 @@ export default {
             })
         },
         //phần mapping --- hàm tìm index mới cho cột
-         getIndexColumnMapping(value){
+         getIndexColumnMapping(value, nameSheet){
             let index = -1;
-            for(let i = 0; i<this.nameSheets.length; i++){
-                 let arr = this.nameColumnDetail[this.nameSheets[i].name];
-                for(let j = 0; j<arr.length; j++){
-                    if(arr[j].name==value){
-                        this.nameColumnDetail[this.nameSheets[i].name][j].enable=false;
-                         return index = arr[j].index;
-                    }
-                }
+            let arr = this.nameColumnDetail[nameSheet];
+            for(let j = 0; j<arr.length; j++){
+                if(arr[j].name==value){
+                    this.nameColumnDetail[nameSheet][j].enable=false;
+                        return index = arr[j].index;
+        
+            }
             }
         },
         //checkSheet có tồn tại
@@ -651,7 +650,7 @@ export default {
             if(this.tables[0].sheetMap.name==this.lastTable[0].nameSheet&&this.checkNameSheetExist(this.lastTable[0].nameSheet)){
                 this.tables[0].keyColumn.name=this.lastKey[0].name;
                 this.tables[0].keyColumn.enable= true;
-                this.tables[0].keyColumn.index= this.getIndexColumnMapping(this.lastKey[0].name);
+                this.tables[0].keyColumn.index= this.getIndexColumnMapping(this.lastKey[0].name,this.tables[0].sheetMap.name);
             }
         },
         // hàm xử lý key từng bảng con, so sánh với dòng trong excel nếu trùng thì set sheetMap
@@ -710,7 +709,8 @@ export default {
                                     this.tables[i].controls[k].dataColumn = {name: '',index: 0, enable:false};
                                     this.tables[i].sheetMap.name = this.lastTable[j].nameSheet;
                                     this.tables[i].controls[k].dataColumn.name= this.lastTable[j].dataColumn;
-                                    this.tables[i].controls[k].dataColumn.index = this.getIndexColumnMapping(this.lastTable[j].dataColumn);
+                                   
+                                    this.tables[i].controls[k].dataColumn.index = this.getIndexColumnMapping(this.lastTable[j].dataColumn,this.tables[i].sheetMap.name);
                                }
                             }
                         }
