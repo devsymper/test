@@ -11,7 +11,7 @@
             :actionPanelWidth="600" 
             @after-open-add-panel="showAddModal"
             :customAPIResult="customAPIResult"
-            :showActionPanelInDisplayConfig="false"
+            :showActionPanelInDisplayConfig="true"
             :commonActionProps="commonActionProps"
             @row-selected="onRowSelected"
         >
@@ -143,6 +143,7 @@ export default {
                     name: "edit",
                     text: this.$t("apps.contextMenu.edit"),
                     callback: (app, callback) => {
+						debugger
                         this.editCallback = callback;
                         self.openUpdateApp(app);
                     },
@@ -255,13 +256,13 @@ export default {
         },
         updateApp(res) {
             if (res.status == 200) {
-				debugger
-                this.editCallback({
-                    ...res,
-                    data: {
-                        ...this.currentApp,
-                    },
-                });
+				this.$refs.listApp.refreshList()
+                // this.editCallback({
+                //     ...res,
+                //     data: {
+                //         ...this.currentApp,
+                //     },
+                // });
                 this.closeSidebar();
                 this.$snotify({
                     type: 'success',
