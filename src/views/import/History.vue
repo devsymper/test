@@ -39,6 +39,7 @@ export default {
         "action-panel": ActionPanel,
     },
     data(){
+        const self = this;
         return {
             showDetailView:false,
             listRowUser:[],
@@ -113,6 +114,7 @@ export default {
                                     }
                                 }
                             }
+                              self.$refs.listImport.rerenderTable();
                         }
                     })
                     .catch(console.log);
