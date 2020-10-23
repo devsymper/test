@@ -62,7 +62,6 @@ export default {
         deep: true,
         immediate: true,
         handler(newValue){
-            debugger
             for(let i = 0; i<newValue.length;i++){
                 for(let j = 0; j<newValue[i].items.length;j++){
                 // check 1 lượt nếu chọn subcribed
@@ -71,15 +70,14 @@ export default {
                         this.subcribedChanel(newValue[i].title, newValue[i].items[j].title) 
                     // nếu không chọn subcribed
                     }else{
-                        debugger
                         this.unsubcribedChanel(newValue[i].title, newValue[i].items[j].title) 
                         /// chuyển state false
                         //nếu đã có trong list
                     }
                 }
+            }
         }
-      }
-  },
+    },
   },
   props: ['type','listItems','listSubcribed','allListChanel'],
     methods: {
@@ -87,7 +85,6 @@ export default {
         subcribedChanel(objectType,event){
             for(let i=0;i<this.allListChanel.length;i++){
                 if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&!this.allListChanel[i].subscribed){
-                    debugger
                        notification.subscribeChanel(this.allListChanel[i].id).then(res=>{
                         if(res.status==200){}
                     })
@@ -98,9 +95,7 @@ export default {
             let data={state:false};
             for(let i=0;i<this.allListChanel.length;i++){
                 if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&this.allListChanel[i].subscribed){
-                    debugger
                        notification.subscribeChanel(this.allListChanel[i].id,data).then(res=>{
-                           debugger
                         if(res.status==200){}
                     })
                 }

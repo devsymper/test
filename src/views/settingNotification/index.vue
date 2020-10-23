@@ -47,7 +47,8 @@ export default {
     },
   created () {
       this.getSource();
-      this.getAllListChanel()
+      this.getAllListChanel();
+      //this.getListFollowed();
   },
   data () {
     return {
@@ -190,83 +191,57 @@ export default {
         let isSubcribed = true;
         notification.showListsSubcribed({subscribed:isSubcribed}).then(res=>{
             if(res.status==200){
-            let format = [];
-             let listModules = res.data;
-             for(let i = 0; i<listModules.length;i++){
-                 if(listModules[i].objectType){
-                     format.push(listModules[i])
-                 }
-             }
-             let formatListModules = _.groupBy(format, 'objectIdentifier');
-             let name = Object.keys(formatListModules);
-             for(let i=0;i<name.length;i++){
-                 let a = name[i];
-                  self.listSubcribed.push({
-                        title: name[i],
-                        items: [],
-                    })      
-                 for(let j=0; j<formatListModules[name[i]].length;j++){
-                      self.listSubcribed[i].items.push({
-                            title: formatListModules[name[i]][j].event,
-                            id:formatListModules[name[i]][j].id,
-                            // event: formatListModules[name[i]][j].event[j],
-                            // source:name[i],
-                            // receiver:formatListModules[name[i]][j].receiver[0].value,
-                            // action:formatListModules[name[i]][j].action[0].value,
-                            // name: 'default',
-                            active:formatListModules[name[i]][j].subscribed
+             let listSubcribed = res.data;
+              let grouplistByObjId = _.groupBy(listSubcribed, 'objectIdentifier');
+              let objId = Object.keys(grouplistByObjId);
+                for(let j = 0; j<objId.length;j++){
+                    // if(objId[j]){
+                        self.listSubcribed.push({
+                            items:[],
+                            title: objId[j],
+                            icon:objId[j]
+                        })
+                        for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
+                            debugger
+                            self.listSubcribed[j].items.push({
+                                title: grouplistByObjId[objId[j]][i].event,
+                                active: true
 
-                        });
-                 }
-             }
-
-           }
-
-            }
-        );
-         
-
+                            })
+                        // }
+                     }
+                }
+        }
+        })
     },
       getListUnFollowed(){
         debugger
         this.listUnsubcribed = []
         const self= this;
-        notification.showListsSubcribed({subscribed:false}).then(res=>{
+        let isSubcribed = false;
+        notification.showListsSubcribed({subscribed:isSubcribed}).then(res=>{
             if(res.status==200){
-            let format = [];
-             let listModules = res.data;
-             for(let i = 0; i<listModules.length;i++){
-                 if(listModules[i].objectType){
-                     format.push(listModules[i])
-                 }
-             }
-             let formatListModules = _.groupBy(format, 'objectIdentifier');
-             let name = Object.keys(formatListModules);
-             for(let i=0;i<name.length;i++){
-                 let a = name[i];
-                  self.listUnsubcribed.push({
-                        title: name[i],
-                        items: [],
-                    })      
-                 for(let j=0; j<formatListModules[name[i]].length;j++){
-                      self.listUnsubcribed[i].items.push({
-                            title: formatListModules[name[i]][j].event,
-                            id:formatListModules[name[i]][j].id,
-                            // event: formatListModules[name[i]][j].event[j],
-                            // source:name[i],
-                            // receiver:formatListModules[name[i]][j].receiver[0].value,
-                            // action:formatListModules[name[i]][j].action[0].value,
-                            // name: 'default',
-                            active:formatListModules[name[i]][j].subscribed
+             let listUnsubcribed = res.data;
+              let grouplistByObjId = _.groupBy(listUnsubcribed, 'objectIdentifier');
+              let objId = Object.keys(grouplistByObjId);
+                for(let j = 0; j<objId.length;j++){
+                    // if(objId[j]){
+                        self.listUnsubcribed.push({
+                            items:[],
+                            title: objId[j],
+                            icon:objId[j]
+                        })
+                        for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
+                            debugger
+                            self.listUnsubcribed[j].items.push({
+                                title: grouplistByObjId[objId[j]][i].event,
+                                active: false
 
-                        });
-                 }
-             }
-
-           }
-
+                            })
+                     }
+                }
             }
-        );
+        })
          
 
     },
@@ -275,7 +250,7 @@ export default {
         this.showFollow=false;
         this.showUnfollow=true;
         this.showMain=false;
-        this.getListUnfollowed();
+        this.getListUnFollowed();
     },
     isShowFollow(){
         this.type="follow";
