@@ -47,7 +47,7 @@ export default {
             saveResponseVariableAsJson: true,
         },
         makeRequestBody(nodeAttr) {
-            this.params.responseVariableName = 'symper_'+nodeAttr.idNode+'_api_response';
+            this.params.responseVariableName = 'symper_'+nodeAttr.idNode+'_notification_response';
             let title = nodeAttr.serviceNotificationTitle.value;
             let description = nodeAttr.serviceNotificationDescription.value;
             let receiver =userAssignmentToXMLValue(nodeAttr.serviceNotificationReceiver.value);

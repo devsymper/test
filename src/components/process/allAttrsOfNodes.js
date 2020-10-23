@@ -2041,7 +2041,7 @@ let allAttrs = {
                         "green": "#4CAF50",
                         "blue": "#2196F3",
                         "purple": "#9C27B0",
-                        "gray": "#9E9E9E",
+                        "grey": "#9E9E9E",
                         "pink": "#E91E63",
                         "black": "#000000",
                         "white": "#FFFFFF"
@@ -2068,7 +2068,7 @@ let allAttrs = {
                 title: 'Color',
                 name: 'color',
                 type: 'autocomplete',
-                source: ["yellow", "red", "orange", "green", "blue", "gray", "black", "white"]
+                source: ["yellow", "red", "orange", "green", "blue", "grey", "black", "white"]
             },
         ],
         dg: 'taskAction',

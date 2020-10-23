@@ -1,5 +1,5 @@
 <template>
-    <div class="h-100 w-100">
+    <div class="w-100" style="height: 100%">
         <v-skeleton-loader
             v-if="loadingActionTask"
             :type="'table-tbody'"
@@ -74,7 +74,7 @@
             </div>
         </v-row>
         <v-divider style="border-color: #dedede;"></v-divider>
-        <v-row class="ma-0 detail-task h-100">
+        <v-row class="ma-0 detail-task" style="height: calc(100% - 44px);">
             <!-- <VuePerfectScrollbar :style="{height: parentHeight +'px'}" > -->
                 <task 
                     @task-submited="handleTaskSubmited" 
