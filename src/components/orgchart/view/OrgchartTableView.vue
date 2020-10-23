@@ -60,7 +60,7 @@
                     <!-- <TableSideBySildeView /> -->
                         <VueResizable :width="500" :max-width="600" :min-width="300" :active ="['r']">
                            <div style="display:flex;flex-direction:column" class="h-100 w-100">
-                               <div style="height:52px;display:flex;align-items:center">
+                               <div style="height:51px;display:flex;align-items:center">
                                    <span style="font:17px roboto;font-weight:500">{{titleToolbar}}</span>
                                     <v-menu
                                         :max-width="500"
@@ -103,6 +103,7 @@
                                     :rowData="dataTable"
                                     :editable="false"
                                     :customComponents="customAgComponents"  
+                                    :hideRowBorderCss="true"
                                     @on-cell-dbl-click="onCellDblClick"
                                     :minWidth="500"
                                     :cellRendererParams="{
@@ -140,6 +141,7 @@
                 <OrgchartEditor
                     :action="'view'"
                     @current-tab="changeTab"
+                    :currentTab="currentTab"
                     :id="$route.params.id">
                 </OrgchartEditor>
             </v-tab-item>
@@ -303,7 +305,7 @@ export default {
         }
     },
     methods: {
-         onGridReady(params) {
+        onGridReady(params) {
             this.agApi = params.api; 
         },
         changeTab(val){
@@ -500,7 +502,7 @@ export default {
             this.titleToolbar = this.listTitle[val]
             if(val == 0 ){
                 this.showToolbar = true
-                this.agApi.sizeColumnsToFit()
+               this.agApi.sizeColumnsToFit()
             }else{
                   this.showToolbar = false
             }
@@ -531,8 +533,6 @@ export default {
     padding-top:6px;
 }
 .orgchart-table-view >>> .v-toolbar .v-toolbar__content button{
-    height:32px;
-    width:32px;
 }
 .orgchart-table-view >>> .v-menu__content .v-list-item .v-list-item__icon{
     min-width: unset;

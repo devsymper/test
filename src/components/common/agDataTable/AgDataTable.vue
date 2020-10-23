@@ -3,7 +3,7 @@
          width: '100%',
          height: tableHeight
      }"
-                 :class="{'ag-theme-balham': true, 'like-handson-table': likeHandsonTable == true}"
+                 :class="{'ag-theme-balham': true, 'like-handson-table': likeHandsonTable == true, 'hide-row-border': hideRowBorderCss == true}"
                  :gridOptions="gridOptions"
                  :defaultColDef="defaultColDef"
                  :autoGroupColumnDef="autoGroupColumnDef"
@@ -84,6 +84,10 @@ export default {
         likeHandsonTable:{
             type: Boolean,
             default: false
+        },
+        hideRowBorderCss:{
+            type:Boolean,
+            default:false
         }
     },
     data(){
@@ -117,10 +121,11 @@ export default {
             filter: true,
             sortable: true,
             resizable: true,
-            // cellStyle: (params) => {
+            // if(hideRowBorderCss){
+            //     cellStyle: (params) => {
             //     const { level } = params.node;
             //     const groupCell = params.value === params.node.key;
-            //     const indent = 22; // change this value to your liking
+            //     const indent = 0; // change this value to your liking
             //     if (!groupCell) {
             //         return {
             //             paddingLeft: (level + 1) * indent + "px",
@@ -128,6 +133,8 @@ export default {
             //         };
             //     }
             // }
+            //    }
+           
         };
         this.autoGroupColumnDef = { minWidth: 100 };
         this.gridOptions = {};
@@ -265,6 +272,9 @@ export default {
     .like-handson-table >>> .ag-group-expanded,
     .like-handson-table >>> .ag-group-contracted{
         height: unset !important;
+    }
+    .hide-row-border >>> .ag-row{
+        border-top-style:unset !important;
     }
    
 </style>

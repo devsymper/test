@@ -186,6 +186,10 @@ export default {
         },
         id: {
             default: ''
+        },
+        currentTab:{
+            type:Number,
+            default:2
         }
     },
     data(){
@@ -195,7 +199,6 @@ export default {
 			positionEditor: false,
 			checkPageEmpty: false,
             listUserIds:null,
-            currentTab : 2,
             menuPickTab:[
                 {
                     icon: "mdi-grid",
@@ -272,6 +275,7 @@ export default {
             }
         },
         currentTab(val){
+            debugger
             if(val == 0 || val == 1){
                 this.$emit('current-tab' , val)
             }
