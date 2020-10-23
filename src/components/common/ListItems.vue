@@ -73,7 +73,7 @@
                             small
                             @click="showImportHistory()"
                             class="mr-2"
-                            v-if="showImportHistory && !actionPanel"
+                            v-if="showImportHistoryBtn && !actionPanel"
                         >
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel_history')}}</span>
@@ -526,6 +526,10 @@ export default {
         showExportButton: {
             type: Boolean,
             default: false
+        },
+        showImportHistoryBtn:{
+            type: Boolean,
+            default: true
         },
         widgetIdentifier: {
             type: String,

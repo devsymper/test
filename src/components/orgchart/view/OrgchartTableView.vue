@@ -127,6 +127,7 @@
                             :showButtonAdd="false"
                             :showExportButton="false"
                             :showImportButton="false"
+                            :showImportHistoryBtn="false"
                             :showActionPanelInDisplayConfig="false"
                         >
                             <template slot="right-panel-content" slot-scope="{}">  
