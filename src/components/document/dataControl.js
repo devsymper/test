@@ -25,7 +25,8 @@ export const setDataForPropsControl = function(fields, instance, from) {
         let prepareData = fields[controlId].dataPrepareSubmit;
         $.each(properties, function(k, v) {
             if (type == 'checkbox') {
-                properties[k].value = (fields[controlId]['properties'][k] == 0 || fields[controlId]['properties'][k] == '0' || fields[controlId]['properties'][k] == '') ? false : true
+                let valueControl = fields[controlId]['properties'][k];
+                properties[k].value = valueControl;
             } else {
                 let valueControl = fields[controlId]['properties'][k];
                 if (type == "number" && k == 'defaultValue' && valueControl == "") {

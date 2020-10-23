@@ -103,7 +103,8 @@ export default {
         contentHeight:{
             type:String,
             default:"calc(100% - 30px);"
-        }
+        },
+        
     },   
     components:{
         'side-bar-detail':SideBarDetail,
@@ -155,6 +156,7 @@ export default {
             printConfigActive:null,
             formSize:{},
             wrapFormCss:{},
+            defaultData:{}
 
         };
     },
@@ -166,7 +168,9 @@ export default {
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
-        
+        if(this.$route.params.extraData && this.$route.params.extraData.defaultData){
+            this.defaultData = this.$route.params.extraData.defaultData;
+        }
         let thisCpn = this;
         this.$store.commit("document/changeViewType", {
             key: thisCpn.keyInstance,
@@ -194,6 +198,8 @@ export default {
             }
             
         })
+        
+       
     },
     watch:{
         docObjInfo:{
@@ -282,10 +288,7 @@ export default {
             this.contentDocument = ""
             try {
                 this.$refs.preLoaderView.show();
-                
-            } catch (error) {
-                
-            }
+            } catch (error) {}
             let thisCpn = this;
             let res = await documentApi
                 .detailDocumentObject(this.docObjId);
@@ -295,18 +298,23 @@ export default {
                 thisCpn.createTime = res.data.document_object_create_time
                 thisCpn.workflowId = res.data.document_object_workflow_id;
                 thisCpn.documentId = res.data.documentId;
+                let dataToStore = res.data;
+                if(Object.keys(thisCpn.defaultData).length > 0){
+                    dataToStore = thisCpn.defaultData;
+                    dataToStore.documentId = res.data.documentId;
+                }
                 thisCpn.$store.commit('document/addToDocumentDetailStore',{
                     key: 'allData',
-                    value: res.data,
+                    value: dataToStore,
                     instance:thisCpn.keyInstance
                 }) 
                 thisCpn.loadDocumentStruct(res.data.documentId,isPrint);
             }
             else{
-                    this.$snotify({
-                        type: "error",
-                        title: res.message,
-                    });
+                this.$snotify({
+                    type: "error",
+                    title: res.message,
+                });
             }
         },
         togglePageSize() {

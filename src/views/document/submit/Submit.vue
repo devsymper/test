@@ -5,6 +5,13 @@
 
     }">
     <VuePerfectScrollbar class="scroll-content h-100">
+         <date-picker
+            :keyInstance="keyInstance"
+            @clickDateCell="selectedDate"
+            :title="'Chọn ngày'"
+            :isTime="false"
+            ref="datePicker"
+        />
         <Preloader ref="preLoaderView"/>
         <div
             :key="keyInstance"
@@ -39,13 +46,7 @@
             <input type="file" :id="'file-upload-alter-'+keyInstance" class="hidden d-none" />
             <user-select :keyInstance="keyInstance" @after-select-user="afterSelectUser" ref="userInput" />
             <validate :keyInstance="keyInstance" :message="messageValidate" ref="validate" />
-            <date-picker
-                :keyInstance="keyInstance"
-                @clickDateCell="selectedDate"
-                :title="'Chọn ngày'"
-                :isTime="false"
-                ref="datePicker"
-            />
+           
             <time-input 
             :keyInstance="keyInstance"  
             @apply-time-selected="applyTimePicker" 
@@ -489,12 +490,12 @@ export default {
             
         });
         /**
-         * Hàm gọi mở sub form submit
+         * Hàm gọi mở upload file
          */
         this.$evtBus.$on("document-submit-image-click", data => {
-            this.currentImageControl = {el:$(data.target).closest('.s-control-image'),controlName:data.controlName}
+            if(thisCpn._inactive == true) return;
+            this.currentImageControl = {el:$(data.e.target).closest('.s-control-image'),controlName:data.e.controlName, controlIns:data.controlIns};
             this.$refs.fileUploadView.onButtonClick();
-            
         });
 
         // hàm nhận sự kiện thay đổi của input
@@ -1287,8 +1288,7 @@ export default {
                 let controlType = $(allInputControl[index]).attr('s-control-type');
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let field = this.sDocumentEditor.allControl[id];
-                    console.log('fieldfieldfield',field);
-                    let controlName = allControlNotSetData.includes(controlType) ? field.type : field.properties.name.value;
+                    let controlName = (allControlNotSetData.includes(controlType) || controlType == 'tabPage') ? field.type : field.properties.name.value;
                     this.checkEditableControl(controlName,field);
                     this.checkOverrideFormulas(controlName,field);
                     let idField = field.id;
@@ -1557,7 +1557,7 @@ export default {
         },
         handlerSubmitDocumentClick(isContinueSubmit = false){
             this.isContinueSubmit = isContinueSubmit;
-            if($('.wrap-content-submit .validate-icon').length == 0 && $('.wrap-content-submit .error').length == 0){
+            if($('#sym-submit-'+this.keyInstance+' .validate-icon').length == 0 && $('#sym-submit-'+this.keyInstance+' .error').length == 0){
                 if(this.viewType == 'submit'){
                     this.handleRefreshDataBeforeSubmit();
                 }
@@ -1566,8 +1566,8 @@ export default {
                 }
             }
             else{
-                let controlNotValid = $('.wrap-content-submit .validate-icon');
-                let controlError = $('.wrap-content-submit .error');
+                let controlNotValid = $('#sym-submit-'+this.keyInstance+' .validate-icon');
+                let controlError = $('#sym-submit-'+this.keyInstance+' .error');
                 let listErr = []
                 $.each(controlNotValid,function(k,v){
                     let message = $(v).attr('title');
@@ -2350,8 +2350,7 @@ export default {
         },
         afterFileUpload(data){
             let url = data.serverPath;
-            let image = '<img height="70" src="'+url+'">';
-            this.currentImageControl.el.html(image);
+            this.currentImageControl.controlIns.setValueControl(url);
             this.updateListInputInDocument(
                 this.currentImageControl.controlName,
                 "value",
@@ -2365,6 +2364,7 @@ export default {
 </script>
 <style  scoped>
 .sym-form-submit {
+    position: unset;
     width: 21cm;
     padding: 16px;
     margin: auto;
@@ -2424,6 +2424,7 @@ export default {
     background: white;
 }
 .wrap-content-submit .scroll-content{
+    position: relative;
     overflow-x: hidden;
 }
 .wrap-content-submit .icon{

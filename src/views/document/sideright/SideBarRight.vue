@@ -84,6 +84,7 @@
             :singleLine="false" 
             @input-value-changed="handleChangeInput" 
             :allInputs="sCurrentDocument.formulas"/>
+            <FormAutocomplete/>
         </VuePerfectScrollbar>
         </v-tab-item>
 
@@ -96,6 +97,7 @@ import {checkInTable,checkNameControl,checkTitleControl} from "./../common/commo
 import { formulasApi } from "./../../../api/Formulas.js";
 import { util } from '../../../plugins/util';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import FormAutocomplete  from './items/FormAutoComplete'
 
 export default {
     props:{
@@ -110,7 +112,8 @@ export default {
     },
     components:{
         'control-props-config' : FormTpl,
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
+        FormAutocomplete
     },
     computed: {
         sCurrentDocument(){

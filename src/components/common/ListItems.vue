@@ -333,6 +333,15 @@ export default {
             }else{
                 this.closeactionPanel();
             }
+        },
+        defaultData:{
+            deep:true,
+            immediate:true,
+            handler:function(vl){
+                if(vl.listObject.length > 0){
+                    this.getData()
+                }
+            }
         }
     },
     data() {
@@ -654,12 +663,29 @@ export default {
                 return {}
             }
         },
+        // biến đánh dấu table đươc quyền edit hay ko
         isTablereadOnly:{
             type:Boolean,
             default:true
         },
+        /**
+         * Thêm điều kiện để quy vấn qua api
+         */
         conditionByFormula:{
             type:String
+        },
+        /**
+         * Dữ liệu mặc định cho table
+         */
+        defaultData:{
+            type: Object,
+            default(){
+                return {
+                    listObject:{},
+                    columns:{},
+                    total:0
+                }
+            }
         }
     },
     mounted() {},
@@ -1137,6 +1163,10 @@ export default {
          * Lấy ra cấu hình cho việc sort
          */
         prepareFilterAndCallApi(columns = false, cache = false, applyFilter = false, success, configs = {}){
+            if(Object.keys(this.defaultData.listObject).length > 0){
+                success({data:this.defaultData});
+                return;
+            }
             let url = this.getDataUrl;
             let method = 'GET';
             if (url != "") {
