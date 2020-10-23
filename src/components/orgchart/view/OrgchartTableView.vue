@@ -1,6 +1,6 @@
 <template>
     <div class="h-100 w-100 orgchart-table-view">
-        <v-toolbar>
+        <v-toolbar v-show="showToolbar">
             <v-toolbar-title>{{titleToolbar}}</v-toolbar-title>
              <v-menu
                 :max-width="500"
@@ -9,8 +9,8 @@
                 offset-y
                 >
                 <template v-slot:activator="{ on }">
-                    <v-btn icon tile v-on="on">
-                        <v-icon>mdi-menu-down-outline</v-icon>
+                    <v-btn icon tile x-small v-on="on">
+                        <v-icon>mdi-chevron-down</v-icon>
                     </v-btn>
                 </template>
                   <v-list
@@ -61,7 +61,41 @@
                         <VueResizable :width="500" :max-width="600" :min-width="300" :active ="['r']">
                            <div style="display:flex;flex-direction:column" class="h-100 w-100">
                                <div style="height:52px;display:flex;align-items:center">
-                                     <h2 style="font:17px roboto ;font-weight:500" >Sơ đồ tổ chức</h2>
+                                   <span style="font:17px roboto;font-weight:500">{{titleToolbar}}</span>
+                                    <v-menu
+                                        :max-width="500"
+                                        :max-height="700"
+                                        :nudge-width="200"
+                                        offset-y
+                                        >
+                                        <template v-slot:activator="{ on }">
+                                            <v-btn icon tile x-small v-on="on">
+                                                <v-icon>mdi-chevron-down</v-icon>
+                                            </v-btn>
+                                        </template>
+                                        <v-list
+                                                nav
+                                                dense
+                                            >
+                                                <v-list-item-group
+                                                    v-model="currentTab"
+                                                    color="primary"
+                                                    >
+                                                    <v-list-item
+                                                        v-for="(item, i) in menuPickTab"
+                                                        :key="i"
+                                                    >
+                                                        <v-list-item-icon>
+                                                        <v-icon v-text="item.icon"></v-icon>
+                                                        </v-list-item-icon>
+
+                                                        <v-list-item-content>
+                                                        <v-list-item-title v-text="item.title"></v-list-item-title>
+                                                        </v-list-item-content>
+                                                    </v-list-item>
+                                                </v-list-item-group>
+                                        </v-list>
+                                    </v-menu>
                                </div>
                                 <AgDataTable
                                     :tableHeight="'calc(100% - 150px)'"
@@ -105,6 +139,7 @@
                
                 <OrgchartEditor
                     :action="'view'"
+                    @current-tab="changeTab"
                     :id="$route.params.id">
                 </OrgchartEditor>
             </v-tab-item>
@@ -271,6 +306,9 @@ export default {
          onGridReady(params) {
             this.agApi = params.api; 
         },
+        changeTab(val){
+            this.currentTab = val  
+        },
         addDynamicValue(row, node){
             if(node.dynamicAttributes){
                 for(let attr of node.dynamicAttributes){
@@ -355,6 +393,7 @@ export default {
         return {
             currentTab: 1,
             agApi:null,
+            showToolbar:false,
             currentSize: {},
             customAgComponents: {
                 nodeName: NodeNameInTable,
@@ -459,8 +498,11 @@ export default {
         },
         currentTab(val){
             this.titleToolbar = this.listTitle[val]
-            if(val == 0){
+            if(val == 0 ){
+                this.showToolbar = true
                 this.agApi.sizeColumnsToFit()
+            }else{
+                  this.showToolbar = false
             }
         }
     }
