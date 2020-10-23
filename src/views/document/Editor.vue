@@ -325,6 +325,7 @@ export default {
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
         this.isConfigPrint = false;
         if(this.routeName == 'printConfigDocument'){
+            this.documentId = this.$route.params.id;
             this.isConfigPrint = true;
             this.printConfigId = this.$route.params.printConfigId;
         }
@@ -1764,6 +1765,7 @@ export default {
         // hàm gọi request lấy thông tin của document khi vào edit doc
         async getContentDocument(){
             if(this.documentId != 0){
+                debugger
                 let res = await documentApi.detailDocument(this.documentId)
                 if (res.status == 200) {
                     if(this.routeName == "editDocument"){
