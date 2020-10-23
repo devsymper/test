@@ -86,7 +86,7 @@
 					<!--  -->
                     </div>
                 </div>
-                <v-layout style="height:calc(100% - 41px)" class="w-100 h-100" justify-center>
+                <v-layout style="height:calc(100% - 41px)" class="w-100" justify-center>
                     <slot>
 					</slot>
                 </v-layout>

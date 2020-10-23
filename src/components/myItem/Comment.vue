@@ -58,7 +58,11 @@ export default {
 		cursor: pointer;
 		margin-right: 8px;
 	}
+	.wraper-comment >>> .comment-task .v-window{
+	    height: calc(100% - 110px);
+	}
 	.wraper-comment >>> .comment-task .input-comment{
-		bottom: 95px!important;
+		position: unset;
+		bottom: unset;
 	}
 </style>

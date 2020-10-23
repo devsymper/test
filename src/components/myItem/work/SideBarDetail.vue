@@ -15,7 +15,7 @@
 
 		<v-divider></v-divider>
 
-		<VuePerfectScrollbar style="height:calc(100% - 110px);">
+		<VuePerfectScrollbar style="height:calc(100% - 65px);">
 			<v-expansion-panels
 			v-model="panel"
 			multiple
@@ -166,7 +166,7 @@
 		</VuePerfectScrollbar>
 	</div>
 	<Comment 
-	style="height:100%" 
+	style="height:calc(100% - 40px)" 
 	:objectIdentifier="workInfo.id"
 	:objectType="'work'"
 	ref="commentTaskView"

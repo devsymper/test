@@ -1,6 +1,6 @@
 <template>
-    <div class="list-objects" style="overflow: hidden;">
-        <v-row class="mr-0 ml-0">
+    <div class="list-objects h-100" style="overflow: hidden;">
+        <v-row class="mr-0 ml-0 h-100">
             <v-col
                 :cols="!sideBySideMode ? 12 : 4"
                 :md="!sideBySideMode ? 12 : 3"
@@ -21,7 +21,7 @@
                 @goToPageApproval="goToPageApproval"
                 ></listHeader>
                 <v-divider v-if="!sideBySideMode"></v-divider>
-                <div v-if="!changeStatusMoreApproval">
+                <div class="h-100" v-if="!changeStatusMoreApproval">
                     <v-row class="ml-0 mr-0" v-if="!sideBySideMode">
                             <v-col cols="12" class="list-tasks pt-0 pb-0">
                                 <v-row>
@@ -486,7 +486,7 @@ export default {
     },
     reCalcListTaskHeight() {
       this.listTaskHeight =
-        util.getComponentSize(this.$el.parentElement).h - 125;
+        util.getComponentSize(this.$el.parentElement).h - 85;
     },
     selectObject(obj, idx,idex) {
         console.log("avsvsv",obj);

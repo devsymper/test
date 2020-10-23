@@ -341,12 +341,16 @@ export default {
 <style scoped>
 .task-style{
     overflow: hidden!important;
+    position: relative;
 }
 .task-style >>> .wrap-content-submit{
     width:96%!important;
 }
 ::v-deep .dialog-edit-doc{
     overflow: hidden;
+}
+.doc-detail {
+    height:100%!important;
 }
 
 

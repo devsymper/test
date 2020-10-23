@@ -78,10 +78,7 @@ export default {
                     if (task.processInstanceId && task.processInstanceId!=null) {
                         await self.getVariablesProcess(task.processInstanceId)
                     }
-                }else{
-                    this.$snotifyError("","Error when get info task!!!");
                 }
-              
             }
         },
         async getVariablesProcess(processInstanceId){
