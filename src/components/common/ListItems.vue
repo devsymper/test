@@ -185,7 +185,7 @@
                     ></hot-table>
                 </v-col>
             </v-row>
-            <v-row no-gutters ref="bottomBar" class="pt-3">
+            <v-row v-show="showPagination" no-gutters ref="bottomBar" class="pt-3">
                 <Pagination
                     :total="totalObject"
                     :totalVisible="7"
@@ -690,6 +690,10 @@ export default {
                     total:0
                 }
             }
+        },
+        showPagination:{
+            type: Boolean,
+            default:true
         }
     },
     mounted() {},

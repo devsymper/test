@@ -58,9 +58,9 @@
               <v-tab-item :key="'tableSideBySideView'" class="px-2 pt-2 h-100">
                 <div class="h-100 symper-orgchart-table-side-by-side-view">
                     <!-- <TableSideBySildeView /> -->
-                        <VueResizable :width="500" :max-width="600" :min-width="300" :active ="['r']">
+                        <VueResizable :width="500" :max-width="800" :min-width="300" :active ="['r']" @resize:end="resizeEnd">
                            <div style="display:flex;flex-direction:column" class="h-100 w-100">
-                               <div style="height:51px;display:flex;align-items:center">
+                               <div style="height:31px;display:flex;align-items:center;margin-bottom:8px">
                                    <span style="font:17px roboto;font-weight:500">{{titleToolbar}}</span>
                                     <v-menu
                                         :max-width="500"
@@ -98,7 +98,7 @@
                                     </v-menu>
                                </div>
                                 <AgDataTable
-                                    :tableHeight="'calc(100% - 150px)'"
+                                    :tableHeight="'calc(100% - 100px)'"
                                     :likeHandsonTable="true"
                                     :rowData="dataTable"
                                     :editable="false"
@@ -129,6 +129,7 @@
                             :showImportButton="false"
                             :showImportHistoryBtn="false"
                             :showActionPanelInDisplayConfig="false"
+                            :showPagination="false"
                         >
                             <template slot="right-panel-content" slot-scope="{}">  
                                 <Detail :quickView="true" :docObjInfo="docObjInfo" />
@@ -189,7 +190,7 @@ export default {
         Detail
     },
     mounted(){
-        this.containerHeight = util.getComponentSize(this).h - 50
+        this.containerHeight = util.getComponentSize(this).h
         this.currentSize =  util.getComponentSize(this)
     },
     computed: {
@@ -253,7 +254,9 @@ export default {
             }
 
             setTimeout((self) => {
-                self.$refs.orgStructureView.reDrawDiagram();
+                if(self.$refs.orgStructureView){
+                  self.$refs.orgStructureView.reDrawDiagram();
+                }
             }, 1000, this);
             return data;
         },
@@ -308,6 +311,9 @@ export default {
     methods: {
         onGridReady(params) {
             this.agApi = params.api; 
+        },
+        resizeEnd(){
+            this.$refs.listUser.refreshList()
         },
         changeTab(val){
             this.currentTab = val  
@@ -503,7 +509,9 @@ export default {
             this.titleToolbar = this.listTitle[val]
             if(val == 0 ){
                 this.showToolbar = true
-               this.agApi.sizeColumnsToFit()
+                if(this.agApi){
+                    this.agApi.sizeColumnsToFit()
+                }
             }else{
                   this.showToolbar = false
             }
@@ -523,7 +531,9 @@ export default {
 .orgchart-table-view >>> .v-toolbar{
     height:45px !important;
     border-bottom:1px solid lightgray;
-    border-left:1px solid lightgray
+}
+.orgchart-table-view >>> .row.pb-2{
+    margin-top:-12px;
 }
 .orgchart-table-view >>> .v-toolbar .v-toolbar__title{
     font-size:17px !important;
