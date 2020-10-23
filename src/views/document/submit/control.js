@@ -406,26 +406,53 @@ export default class Control {
      */
 
     checkValidValueLength(rowIndex) {
-        if (this.type != "textInput") {
-            return true;
-        }
-        let rs = true;
-        if (this.inTable != false) {
-            let table = getListInputInDocument(this.curParentInstance)[this.inTable];
-            let colIndex = table.tableInstance.getColumnIndexFromControlName(this.name);
-            let dataAtCol = table.tableInstance.tableInstance.getDataAtCol(colIndex);
-            if (rowIndex == "all") {
-                for (let index = 0; index < dataAtCol.length; index++) {
+            if (this.type != "textInput") {
+                return true;
+            }
+            let rs = true;
+            if (this.inTable != false) {
+                let table = getListInputInDocument(this.curParentInstance)[this.inTable];
+                let colIndex = table.tableInstance.getColumnIndexFromControlName(this.name);
+                let dataAtCol = table.tableInstance.tableInstance.getDataAtCol(colIndex);
+                if (rowIndex == "all") {
+                    for (let index = 0; index < dataAtCol.length; index++) {
+                        table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
+                            validate: false
+                        }
+                        let row = dataAtCol[index];
+                        if (row == null) {
+                            row = "";
+                        }
+                        if (this.controlProperties.maxValue.value != "") {
+                            if (row.length > this.controlProperties.maxValue.value) {
+                                table.tableInstance.validateValueMap[index + "_" + colIndex] = {
+                                    validate: true,
+                                    msg: 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự"
+                                };
+                                rs = false;
+                            }
+                        }
+                        if (this.controlProperties.minValue.value != "") {
+                            if (row.length < this.controlProperties.minValue.value) {
+                                table.tableInstance.validateValueMap[index + "_" + colIndex] = {
+                                    validate: true,
+                                    msg: 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự"
+                                };
+                                rs = false;
+                            }
+                        }
+                    }
+                } else {
+                    let value = dataAtCol[rowIndex];
+                    if (value == null) {
+                        value = "";
+                    }
                     table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
                         validate: false
                     }
-                    let row = dataAtCol[index];
-                    if (row == null) {
-                        row = "";
-                    }
                     if (this.controlProperties.maxValue.value != "") {
-                        if (row.length > this.controlProperties.maxValue.value) {
-                            table.tableInstance.validateValueMap[index + "_" + colIndex] = {
+                        if (value.length > this.controlProperties.maxValue.value) {
+                            table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
                                 validate: true,
                                 msg: 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự"
                             };
@@ -433,8 +460,8 @@ export default class Control {
                         }
                     }
                     if (this.controlProperties.minValue.value != "") {
-                        if (row.length < this.controlProperties.minValue.value) {
-                            table.tableInstance.validateValueMap[index + "_" + colIndex] = {
+                        if (value.length < this.controlProperties.minValue.value) {
+                            table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
                                 validate: true,
                                 msg: 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự"
                             };
@@ -442,70 +469,51 @@ export default class Control {
                         }
                     }
                 }
+                table.tableInstance.tableInstance.render()
             } else {
-                let value = dataAtCol[rowIndex];
-                if (value == null) {
-                    value = "";
-                }
-                table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
-                    validate: false
-                }
+                let checkMax = false;
                 if (this.controlProperties.maxValue.value != "") {
-                    if (value.length > this.controlProperties.maxValue.value) {
-                        table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
-                            validate: true,
-                            msg: 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự"
-                        };
+                    this.removeValidateIcon()
+                    if (this.value.length >= this.controlProperties.maxValue.value) {
+                        checkMax = true;
+                        this.renderValidateIcon('Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự");
                         rs = false;
                     }
                 }
-                if (this.controlProperties.minValue.value != "") {
-                    if (value.length < this.controlProperties.minValue.value) {
-                        table.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
-                            validate: true,
-                            msg: 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự"
-                        };
+                if (this.controlProperties.minValue.value != "" && !checkMax) {
+                    this.removeValidateIcon()
+                    if (this.value.length <= this.controlProperties.minValue.value) {
+                        this.renderValidateIcon('Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự");
                         rs = false;
                     }
                 }
             }
-            table.tableInstance.tableInstance.render()
-        } else {
-            let checkMax = false;
-            if (this.controlProperties.maxValue.value != "") {
-                this.removeValidateIcon()
-                if (this.value.length >= this.controlProperties.maxValue.value) {
-                    checkMax = true;
-                    this.renderValidateIcon('Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự");
-                    rs = false;
-                }
-            }
-            if (this.controlProperties.minValue.value != "" && !checkMax) {
-                this.removeValidateIcon()
-                if (this.value.length <= this.controlProperties.minValue.value) {
-                    this.renderValidateIcon('Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự");
-                    rs = false;
-                }
-            }
-        }
 
-        return rs
-    }
+            return rs
+        }
+        /**
+         * thêm màu đánh dấu control là đầu vào của control đang được kiểm tra với F2
+         */
     renderInputTraceControlColor() {
-        console.log("áddsadsad", this.name);
-        if (this.inTable) {
-            this.traceInputTable();
-        } else {
-            this.ele.addClass('trace-input-control');
+            if (this.inTable) {
+                this.traceInputTable();
+            } else {
+                this.ele.addClass('trace-input-control');
+            }
         }
-    }
+        /**
+         * thêm màu đánh dấu control là đầu ra của control đang được kiểm tra với F2
+         */
     renderOutputTraceControlColor() {
-        if (this.inTable) {
-            this.traceInputTable('trace-output-control');
-        } else {
-            this.ele.addClass('trace-output-control');
+            if (this.inTable) {
+                this.traceInputTable('trace-output-control');
+            } else {
+                this.ele.addClass('trace-output-control');
+            }
         }
-    }
+        /**
+         * thêm màu đánh dấu control đang được kiểm tra với F2
+         */
     renderCurrentTraceControlColor() {
         if (this.inTable) {
             this.traceInputTable('trace-current-control');
