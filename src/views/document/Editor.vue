@@ -325,6 +325,7 @@ export default {
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
         this.isConfigPrint = false;
         if(this.routeName == 'printConfigDocument'){
+            this.documentId = this.$route.params.id;
             this.isConfigPrint = true;
             this.printConfigId = this.$route.params.printConfigId;
         }
