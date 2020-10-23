@@ -62,27 +62,49 @@ export default {
         deep: true,
         immediate: true,
         handler(newValue){
-            for(let j = 0; j<newValue[0].items.length;j++){
-            // check 1 lượt nếu chọn subcribed
-                if(newValue[0].items[j].active){
-                    // nếu chưa tồn tại gọi api
-                    this.subcribedChanel(newValue[0].items[j].id) 
-                // nếu không chọn subcribed
-                }else{
-                    /// chuyển state false
-                    //nếu đã có trong list
+            debugger
+            for(let i = 0; i<newValue.length;i++){
+                for(let j = 0; j<newValue[i].items.length;j++){
+                // check 1 lượt nếu chọn subcribed
+                    if(newValue[i].items[j].active){
+                        // nếu chưa tồn tại gọi api
+                        this.subcribedChanel(newValue[i].title, newValue[i].items[j].title) 
+                    // nếu không chọn subcribed
+                    }else{
+                        debugger
+                        this.unsubcribedChanel(newValue[i].title, newValue[i].items[j].title) 
+                        /// chuyển state false
+                        //nếu đã có trong list
+                    }
                 }
-            }
         }
       }
   },
-  
-  props: ['type','listItems','listSubcribed'],
+  },
+  props: ['type','listItems','listSubcribed','allListChanel'],
     methods: {
-        subcribedChanel(id){
-            notification.subscribeChanel(id).then(res=>{
-                if(res.status==200){}
-            })
+        //subcribed all
+        subcribedChanel(objectType,event){
+            for(let i=0;i<this.allListChanel.length;i++){
+                if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&!this.allListChanel[i].subscribed){
+                    debugger
+                       notification.subscribeChanel(this.allListChanel[i].id).then(res=>{
+                        if(res.status==200){}
+                    })
+                }
+            }
+        },
+        unsubcribedChanel(objectType,event){
+            let data={state:false};
+            for(let i=0;i<this.allListChanel.length;i++){
+                if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&this.allListChanel[i].subscribed){
+                    debugger
+                       notification.subscribeChanel(this.allListChanel[i].id,data).then(res=>{
+                           debugger
+                        if(res.status==200){}
+                    })
+                }
+            }
         }
      },
     data(){

@@ -26,7 +26,7 @@
                     
             </v-col >
         </v-row>
-        <SettingNotification v-if="showMain" :type="type" :listItems="items" />
+        <SettingNotification v-if="showMain" :type="type" :listItems="items" :allListChanel="allListChanel" />
         <SettingNotification v-if="showFollow" :type="type" :listItems ="listSubcribed"/>
         <SettingNotification v-if="showUnfollow" :type="type" :listItems ="listUnsubcribed"/>
     </div>
@@ -59,6 +59,7 @@ export default {
         listUnsubcribed:[],
         listModules:[],
         listSource:[],
+        allListChanel:[],
         listNameModules:[],
         showUnfollow:false,
         showFollow:false,
@@ -129,36 +130,47 @@ export default {
            if(res.status==200){
             let format = [];
              let listModules = res.data;
+             self.allListChanel = res.data;
              for(let i = 0; i<listModules.length;i++){
                  if(listModules[i].objectType){
                      format.push(listModules[i])
                  }
              }
              let formatListModules = _.groupBy(format, 'objectType');
+          
              let name = Object.keys(formatListModules);
              for(let i=0;i<name.length;i++){
                  let a = name[i];
-                  self.items.push({
-                        title: name[i],
-                        items: [],
-                        icon:name[i]
-                    })      
-                 for(let j=0; j<formatListModules[name[i]].length;j++){
-                      self.items[i].items.push({
-                            title: formatListModules[name[i]][j].event,
-                            id:formatListModules[name[i]][j].id,
-                            // event: formatListModules[name[i]][j].event[j],
-                            // source:name[i],
-                            // receiver:formatListModules[name[i]][j].receiver[0].value,
-                            // action:formatListModules[name[i]][j].action[0].value,
-                            // name: 'default',
-                            active:formatListModules[name[i]][j].subscribed
+                self.items.push({
+                title: name[i],
+                items: [],
+                icon:name[i]
+            })      
+            let groupByEvent= Object.keys(_.groupBy(formatListModules[name[i]], 'event'));
+                for(let k=0;k<groupByEvent.length;k++){
+                    self.items[i].items.push({
+                    title: groupByEvent[k],
+                    // event: formatListModules[name[i]][j].event[j],
+                    // source:name[i],
+                    // receiver:formatListModules[name[i]][j].receiver[0].value,
+                    // action:formatListModules[name[i]][j].action[0].value,
+                    // name: 'default',
+                    active: self.checkSubcribe(name[i],groupByEvent[k])
 
-                        });
+                });
+            // }
                  }
              }
-
            }
+    },
+    checkSubcribe(objectType,event){
+        let check=false;
+        for(let i=0; i<this.allListChanel.length;i++){
+            if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&this.allListChanel[i].subscribed){
+                check=true
+            }
+        }
+        return check;
     },
     getSource(){
         const self = this;

@@ -1,8 +1,7 @@
--<template>
-    <div class="ml-4 config-notification">
+<template>
+  <div class="ml-4 config-notification">
         <div  class="mb-3">
             <h4 >Cài đặt thông báo</h4>
-      
         </div>
         <v-row class="pt-0" style="margin-bottom:-10px">
             <v-col class="fs-13 col-md-5" style="margin-top:5px">Module phát sinh</v-col>
@@ -60,8 +59,7 @@
             <v-col class="fs-13 col-md-5" style="margin-top:5px">Hành động khi click notification</v-col>
             <v-col class="col-md-7">  
                 <v-autocomplete
-                     class="sym-small-size"
-                   
+                     class="sym-small-size" 
                     outlined
                     clearable
                     dense
@@ -75,34 +73,36 @@
             </v-col>
         </v-row>
           <v-row class="pt-0" style="margin-bottom:-35px">
-            <v-col class="fs-13 col-md-7">
+            <v-col class="fs-13 col-md-5">
                 Nội dung notification
             </v-col>
-            <v-col class="fs-13 col-md-5">  
+            <v-col class="fs-13 col-md-2 ml-15">  
                 Tham số
             </v-col>
         </v-row>
-        <v-row tyle="margin-bottom:-20px">
-            <v-col class="col-md-7">
+        <div class="col-12">
+          <draggable tag="ul"
+            style="height: 180px!important; border:1px solid white"
+            :list="list" class="list-group" handle=".handle">
+          <v-row>
+            <v-col class="col-md-8" style="margin-top:-12px; margin-left:-40px">
                 <v-textarea
-                    label="Message"
-                    counter
-                    maxlength="120"
-                    full-width
-                    single-line
-                >
-                  <v-chip
-                    class="ma-2"
-                    color="primary"
-                ></v-chip></v-textarea>
+                :rows="5" type="text" class="form-control mt-1" 
+                  style="width:260px" v-model="description"
+              />
             </v-col>
-            <v-col class="col-md-5">
-                <div class="mt-4" style="width:180px;height:143px!important; border:1px solid grey">
-                
-                </div>
+            <v-col class="col-md-4" >
+              <div style="border:1px solid grey; margin-top:3px;border: 1px solid grey; height: 143px; margin-top: 4px; margin-left:-30px; margin-right:-49px">
+                <i class="fa fa-align-justify handle"></i>
+              <v-chip  color="primary" class="text"  
+                 v-for="(element, idx) in parameter"  
+                 @change="log" style="margin-top:2px; margin-bottom:2px; margin-left:5px; margin-right:2px"
+                  :key="element.value">{{ element.text }}</v-chip>
+                </div>        
             </v-col>
-        </v-row>
-         <v-row class="pt-0" style="margin-bottom:-10px">
+          </v-row>
+          </draggable>
+            <v-row class="pt-0" style="margin-bottom:-10px">
             <v-col class="fs-13 col-md-5" style="margin-top:5px">Hình đại diện</v-col>
             <v-col class="col-md-7">  
                  <v-select
@@ -137,6 +137,7 @@
                         />
             </v-col>
         </v-row>
+       
          <v-row class="pt-0" style="margin-bottom:-15px" v-if="typeSelected[1]==typePictureSelected">
             <v-col class="fs-13 col-md-5 " style="margin-top:-10px">Icon</v-col>
             <v-col class="col-md-6" style="margin-top:-10px">  
@@ -158,19 +159,19 @@
             <v-btn text color="green" @click="save()">Lưu</v-btn>
         </v-row>
     </div>
+    </div>
 </template>
 <script>
+  import draggable from 'vuedraggable';
 import iconPicker from "../../../components/common/pickIcon";
 import { util } from '../../../plugins/util';
 import UploadFile from "./../../../components/common/UploadFile";
 import {userApi} from "./../../../api/user";
-import notification from "./../../../api/settingNotification"
+import notification from "./../../../api/settingNotification";
 export default {
-components:{
-    UploadFile,
-    iconPicker
-    },
-  watch: {
+  props: {
+  },
+   watch: {
       objectType(){
          this.refreshSelected();
           this.getAction(this.objectType);
@@ -181,8 +182,55 @@ components:{
       this.getNameModule();
     
   },
+
+  components:{
+    UploadFile,
+    iconPicker,
+    draggable
+    },
+  data() {
+    return {
+       typeSelected:[
+                "Avatar đối tượng gây ra",
+                "Tùy chọn icon"
+            ],
+            typePictureSelected:'Avatar đối tượng gây ra',
+            iconName:{
+                icon: "",
+                iconName: "mdi-account",
+                name: "",
+                note: "",
+                status: false
+            },
+            avatarUrl:'',
+            parameter:[],
+            avatarFileName:'',
+            allListObj:{},
+            listModule:[],
+            objectType:'',
+            listAction:[],
+            action:'',
+            listReceiver:[],
+            listActionClickNotifi:[],
+            receiver:'',
+            actionClickNotifi:'',
+            listSource:[],
+            state:false,
+            avatar:'',
+            icon:'',
+  
+      list: [
+        { name: "John", text: "3234234", id: 0 },
+         { name: "Johnádasd", text: "", id: 0 },
+      ],
+      dragging: false,
+      description:''
+    };
+  },
+  computed: {
+  },
   methods: {
-     handleAvatarSelected(tempUrl){
+    handleAvatarSelected(tempUrl){
          debugger
            this.avatarUrl = tempUrl;
             this.avatarFileName = 'user_avatar_'+util.str.randomString(6)+Date.now();
@@ -198,7 +246,8 @@ components:{
             objectType:this.objectType,
             receiver:this.receiver.value,
             action:this.actionClickNotifi,
-            icon:this.icon,
+            icon:this.iconName.iconName?this.iconName.iconName:this.avatarFileName,
+            description:this.description
         };
        const self = this;
         notification.addChanel(data).then(res=>{
@@ -241,46 +290,58 @@ components:{
                 };
                  for(let i = 0; i<res.data[nameModule].action.length;i++){
                     self.listActionClickNotifi.push(res.data[nameModule].action[i])
+                };
+                for(let i = 0; i<res.data[nameModule].parameter.length;i++){
+                    self.parameter.push({
+                      text:res.data[nameModule].parameter[i].text,
+                      value: res.data[nameModule].parameter[i].value
+                      })
                 }
 
             }
         })
     },
-  },
-    data(){
-        return{
-            typeSelected:[
-                "Avatar đối tượng gây ra",
-                "Tùy chọn icon"
-            ],
-            typePictureSelected:'Avatar đối tượng gây ra',
-            iconName:{
-                icon: "",
-                iconName: "mdi-account",
-                name: "",
-                note: "",
-                status: false
-            },
-            avatarUrl:'',
-            avatarFileName:'',
-            allListObj:{},
-            listModule:[],
-            objectType:'',
-            listAction:[],
-            action:'',
-            listReceiver:[],
-            listActionClickNotifi:[],
-            receiver:'',
-            actionClickNotifi:'',
-            listSource:[],
-            state:false,
-            avatar:'',
-            icon:''
-  
-        }
-    }
-}
+     log: function(evt) {
+      window.console.log(evt);
+    },
+      replace: function() {
+      this.list = [{ name: "Edgard" }];
+    },
+    clone: function(el) {
+      return {
+        name: el.name + " cloned"
+      };
+    },
+  }
+};
 </script>
+<style scoped>
+.list-group{
+  height:60px;
+  text-decoration: none
+
+}
+.button {
+  margin-top: 35px;
+}
+.handle {
+  float: left;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+.close {
+  float: right;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+input {
+  display: inline-block;
+  width: 50%;
+}
+.text {
+  margin: 20px;
+}
+</style>
 <style scoped>
     .config-notification ::v-deep fieldset{
         height:35px!important;
