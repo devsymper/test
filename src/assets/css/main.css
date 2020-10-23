@@ -2,13 +2,12 @@ html {
     /* overflow-x: hidden;
     overflow-y: hidden!important;
     overflow: hidden; */
-    overflow-y: unset;
+    overflow-y: auto;
     height: 100vh;
     width: 100vw;
 }
 body {
     height: 100%;
-    overflow: hidden;
 }
 
 :root {
