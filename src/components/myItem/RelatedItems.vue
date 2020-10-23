@@ -12,7 +12,7 @@
                     }"
                     v-if="checkShowTotalTask(idex)"
                 >
-                    <v-col cols="8" >
+                    <v-col cols="8" class="pa-1">
                         <div style="white-space: nowrap;
                             overflow: hidden;
                             text-overflow: ellipsis;"  @dblclick="goDoTask(item.id)">
@@ -26,7 +26,7 @@
                             {{displayDescription(item.description)}}
                         </div>
                     </v-col>
-                    <v-col cols="4" style="padding-top:15px">
+                    <v-col class="pa-1" cols="4">
                         <v-icon x-small >mdi-clock-time-nine-outline</v-icon>
                         {{item.createTime ? $moment(item.createTime).format('DD/MM/YY HH:mm'):$moment(item.endTime).format('DD/MM/YY HH:mm')}}
                         <div class="quickView" @click="showInfoTask($event,item)">{{$t("myItem.sidebar.quickView")}}</div>

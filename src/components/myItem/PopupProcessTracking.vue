@@ -24,6 +24,7 @@
 					<v-row class="ma-0"  style="height:40%;border-top:1px solid #cecece">
 						<detailItemAuditTrail
 							:infoItem="itemAuditTrail"
+							:listInstanceRuntime="listInstanceRuntime"
 						/>
 					</v-row>
 				</v-col>
@@ -47,6 +48,7 @@ import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue
 import bpmneApi from "@/api/BPMNEngine";
 import timeLineAuditTrail from "@/components/common/TimelineTreeview/index.vue";
 import detailItemAuditTrail from "./DetailItemAuditTrail.vue";
+import { taskApi } from "@/api/task.js";
 
 export default {
     components:{
@@ -65,7 +67,12 @@ export default {
 				callActivity:"mdi-cog-outline",
 				endEvent:"mdi-record",
 				httpServiceTask:"mdi-email-send-outline"
-			}
+			},
+			filterVariables:{
+				names:"",
+				page:1,
+				processInstanceIds:[]
+			},
 		}
     },
     props:{
@@ -95,9 +102,17 @@ export default {
                     if(nodeInfo.activityType.includes('Flow') || nodeInfo.activityType.includes('Gateway')){
 						arrIndexRemove.push(Number(index));
 					}else{
-						data[index].name=data[index].activityName;
-						data[index].time=data[index].startTime;
-						data[index].icon=this.icon[data[index].activityType];
+						if (nodeInfo.activityType.includes('httpServiceTask')) {
+							this.checkServiceTask(data[index]);
+							data[index].name=data[index].activityName;
+							data[index].time=data[index].startTime;
+							data[index].icon=this.icon[data[index].activityType];
+						}else{
+							data[index].name=data[index].activityName;
+							data[index].time=data[index].startTime;
+							data[index].icon=this.icon[data[index].activityType];
+						}
+						
 					}
 				}
 			}
@@ -125,12 +140,15 @@ export default {
 							if (res.total>0) {
 								let child=self.dataInstanceRuntime(res.data,true);
 								data[index]['children']=child;
-								data[index]['name']=detailProcess.data[0].name;
+								data[index]['name']=nodeInfo.activityName;
 								data[index]['time']=detailProcess.data[0].startTime;
 								data[index]['icon']=self.icon.callActivity;
 							}
 						}
 					}
+					// if (nodeInfo.activityType.includes('httpServiceTask')) {
+						
+					// }
 				}
 			}
 			await self.getNameProcessInstance(data);
@@ -148,6 +166,19 @@ export default {
 			this.$set(this.listInstanceRuntime,"time",treeData.time);
 			this.$set(this.listInstanceRuntime,"children",treeData.children);
 			console.log("InstanceRuntime",this.listInstanceRuntime);
+		},
+		async checkServiceTask(nodeId){
+			let self=this;
+			self.filterVariables.names='symper_'+nodeId.activityId+'_notification_response';
+			self.filterVariables.processInstanceIds=JSON.stringify([nodeId.processInstanceId]);
+			let res={};
+			res = await taskApi.getVariableWorkflow(self.filterVariables);
+			if (res.data.length>0) {
+				let value=JSON.parse(res.data[0].value);
+				nodeId.assignee=String(value.data.userId);
+				nodeId.type="symper_service_notification";
+				nodeId.dataType=value.data;
+			}
 		}
 
 	},

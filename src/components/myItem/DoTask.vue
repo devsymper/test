@@ -60,19 +60,28 @@ export default {
         async setTaskInfo(){
             let self=this;
             if(self.$route.params.id){
-                let task = await BPMNEngine.getATaskInfo(self.$route.params.id);
-                if (task.endTime && task.endTime!=null) {
-                    self.$store.commit("task/setFilter", 'done');
+                let filter={};
+                filter.taskId=self.$route.params.id;
+                // let task = await BPMNEngine.getATaskInfo(self.$route.params.id);
+                let res = await BPMNEngine.postTaskHistory(filter);
+                if (res.total>0) {
+                    let task=res.data[0];
+                    if (task.endTime && task.endTime!=null) {
+                        self.$store.commit("task/setFilter", 'done');
+                    }else{
+                        self.$store.commit("task/setFilter", 'notDone');
+                    }
+                    let taskInfo = extractTaskInfoFromObject(task);
+                    task = addMoreInfoToTask(task);
+                    self.$set(self.data, 'taskInfo', taskInfo);
+                    self.$set(self.data, 'originData', task);
+                    if (task.processInstanceId && task.processInstanceId!=null) {
+                        await self.getVariablesProcess(task.processInstanceId)
+                    }
                 }else{
-                    self.$store.commit("task/setFilter", 'notDone');
+                    this.$snotifyError("","Error when get info task!!!");
                 }
-                let taskInfo = extractTaskInfoFromObject(task);
-                task = addMoreInfoToTask(task);
-                self.$set(self.data, 'taskInfo', taskInfo);
-                self.$set(self.data, 'originData', task);
-                if (task.processInstanceId && task.processInstanceId!=null) {
-                    await self.getVariablesProcess(task.processInstanceId)
-                }
+              
             }
         },
         async getVariablesProcess(processInstanceId){
