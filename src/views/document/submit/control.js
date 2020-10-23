@@ -471,17 +471,18 @@ export default class Control {
             }
             table.tableInstance.tableInstance.render()
         } else {
+            let checkMax = false;
             if (this.controlProperties.maxValue.value != "") {
                 this.removeValidateIcon()
-                if (this.value.length > this.controlProperties.maxValue.value) {
+                if (this.value.length >= this.controlProperties.maxValue.value) {
+                    checkMax = true;
                     this.renderValidateIcon('Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự");
                     rs = false;
-
                 }
             }
-            if (this.controlProperties.minValue.value != "") {
+            if (this.controlProperties.minValue.value != "" && !checkMax) {
                 this.removeValidateIcon()
-                if (this.value.length < this.controlProperties.minValue.value) {
+                if (this.value.length <= this.controlProperties.minValue.value) {
                     this.renderValidateIcon('Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự");
                     rs = false;
                 }
