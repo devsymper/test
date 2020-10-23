@@ -169,7 +169,8 @@
                             'compact-row':  tableDisplayConfig.value.densityMode == 2,
                         }"
                 >
-                    <hot-table
+                   <div class="table-list-item">
+                        <hot-table
                         :height="tableHeight"
                         :settings="tableSettings"
                         :data="data"
@@ -183,6 +184,7 @@
                         ref="dataTable"
                         :fixedColumnsLeft="fixedColumnsCount"
                     ></hot-table>
+                   </div>
                 </v-col>
             </v-row>
             <v-row v-show="showPagination" no-gutters ref="bottomBar" class="pt-3">
@@ -236,7 +238,7 @@
                 </slot>
             </template>
         </symper-drag-panel>
-
+ 
         <display-config
             ref="tableDisplayConfig"
             @drag-columns-stopped="handleStopDragColumn"
@@ -513,8 +515,14 @@ export default {
                 thisCpn.closeactionPanel();
             }
         });
+        $('.table-list-item').scroll(function(e){
+        })
     },
     props: {
+        widthListUser:{
+            type: Number,
+            default:0
+        },
         showImportButton: {
             type: Boolean,
             default: false
@@ -696,7 +704,11 @@ export default {
             default:true
         }
     },
-    mounted() {},
+    mounted() {
+        $('.table-list-item').scroll(function(e){
+            // debugger
+        })
+    },
     computed: {
         alwaysShowActionPanel(){
             return this.tableDisplayConfig.value.alwaysShowSidebar;
@@ -713,7 +725,13 @@ export default {
                 return "calc(100% - " + this.actionPanelWidth + "px)";
             } else if (this.tableDisplayConfig.show) {
                 return "calc(100% - " + this.tableDisplayConfig.width + "px)";
-            } else {
+            } else if(this.showPagination == false) {
+                if( this.widthListUser > 0){
+                   return this.widthListUser+"px"
+                }else{
+                    return "100%";
+                }
+            }else{
                 return "100%";
             }
         },
@@ -780,8 +798,13 @@ export default {
         }
     },
     methods: {
-         rerenderTable(){
+        handleScroll(e){
+            debugger
+        },
+        rerenderTable(){
             this.$refs.dataTable.hotInstance.render();
+        },
+        myFunctionScroll(e){
         },
         importExcel(){
             this.$emit('import-excel');
@@ -1142,11 +1165,11 @@ export default {
                 thisCpn.handleStopDragColumn();
                 //AnhTger config show description
                 (data.listObject).forEach(element => {
-                    let processKey=element.processKey;
+                    let processKey = element.processKey;
                     if (processKey) {
-                        let configVale=JSON.parse(element.configValue)[processKey];
+                        let configVale = JSON.parse(element.configValue)[processKey];
                         if (configVale.description) {
-                            element.description=configVale.description;
+                            element.description = configVale.description;
                         }
                     }
                    
@@ -1181,6 +1204,9 @@ export default {
                 let thisCpn = this;
                 thisCpn.loadingData = true;
                 let options = this.getOptionForGetList(configs, columns);
+                if(this.showPagination == false){
+                    options.pageSize = 1000
+                }
                 let header = {};
                 let routeName = this.$getRouteName();
                 if(routeName == "deployHistory" || routeName == "listProcessInstances"){

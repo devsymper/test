@@ -58,9 +58,8 @@
               <v-tab-item :key="'tableSideBySideView'" class="px-2 pt-2 h-100">
                 <div class="h-100 symper-orgchart-table-side-by-side-view">
                     <!-- <TableSideBySildeView /> -->
-                        <VueResizable :width="500" :max-width="800" :min-width="300" :active ="['r']" @resize:end="resizeEnd">
-                           <div style="display:flex;flex-direction:column" class="h-100 w-100">
-                               <div style="height:31px;display:flex;align-items:center;margin-bottom:8px">
+                           <div style="" class="h-100 ">
+                               <div style="height:31px;display:flex;align-items:center;margin-bottom:8px" class=" tree-orgchart">
                                    <span style="font:17px roboto;font-weight:500">{{titleToolbar}}</span>
                                     <v-menu
                                         :max-width="500"
@@ -97,6 +96,8 @@
                                         </v-list>
                                     </v-menu>
                                </div>
+                        <VueResizable :width="400" :max-width="500" :min-width="300" :active ="['r']" @resize:end="resizeEnd">
+
                                 <AgDataTable
                                     :tableHeight="'calc(100% - 100px)'"
                                     :likeHandsonTable="true"
@@ -111,14 +112,16 @@
                                         suppressDoubleClickExpand: true,
                                     }">
                                 </AgDataTable>
-                           </div>
                         </VueResizable>
+
+                           </div>
                        <ListItems 
                              ref="listUser"
                             :pageTitle="'Danh sách người dùng'"
                             :getDataUrl="apiUrl"
                             :containerHeight="containerHeight"
                             :tableContextMenu="tableContextMenu"
+                            :widthListUser="widthListUser"
                             :useDefaultContext="false"
                             :useActionPanel="true"
                             :actionPanelWidth="850"
@@ -312,8 +315,16 @@ export default {
         onGridReady(params) {
             this.agApi = params.api; 
         },
-        resizeEnd(){
-            this.$refs.listUser.refreshList()
+        resizeEnd(params){
+            let value = params.width - this.currentwidthListUser
+            if(value < 0 ){
+                this.widthListUser = 0
+                this.$refs.listUser.refreshList()
+            }else{
+                this.widthListUser = $(window).width() - $(".resizable-component").width()  - 100
+                debugger
+            }
+            this.currentwidthListUser =  params.width 
         },
         changeTab(val){
             this.currentTab = val  
@@ -402,6 +413,8 @@ export default {
         return {
             currentTab: 1,
             agApi:null,
+            widthListUser:0,
+            currentwidthListUser:400,
             showToolbar:false,
             currentSize: {},
             customAgComponents: {
@@ -456,7 +469,8 @@ export default {
                             {name: "createAt", title: "createAt", type: "text"},
                             {name: "updateAt", title: "updateAt", type: "text"},
                        ],
-                       listObject:res.data.listObject
+                       listObject:res.data.listObject,
+                       total:res.data.listObject.length,
                          
 
                    }
