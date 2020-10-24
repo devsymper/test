@@ -207,7 +207,9 @@ export default {
 			this.$refs.contextMenu.hide()
 		},	
 		changeFavorite(item,type){
-			 event.stopPropagation()
+			let	appId = this.$store.state.appConfig.currentAppId
+			debugger
+			event.stopPropagation()
 			if(type == "document_major" || type == "document_category"){
 				type = "document_definition"
 			}
@@ -225,14 +227,14 @@ export default {
 				item.id = item.objectIdentifier.replace("workflow_definition:","")
 			}
 			if(item.favorite == false){
-				appManagementApi.addFavoriteItem(userId,item.id,type,1).then(res => {
+				appManagementApi.addFavoriteItem(userId,item.id,type,1,appId).then(res => {
 					if (res.status == 200) {
 						this.$store.commit('appConfig/insertFavorite',item)
 						item.favorite = true;
 					}
 				});
 			}else{
-				appManagementApi.addFavoriteItem(userId,item.id,type,0).then(res => {
+				appManagementApi.addFavoriteItem(userId,item.id,type,0,appId).then(res => {
 					if (res.status == 200) {
 						item.type = type;
 						this.$store.commit('appConfig/delFavorite',item)

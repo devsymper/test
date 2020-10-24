@@ -316,14 +316,14 @@ export default {
 				item.id = item.objectIdentifier.replace("workflow_definition:","")
 			}
 			if(item.favorite == false){
-				appManagementApi.addFavoriteItem(userId,item.id,type,1).then(res => {
+				appManagementApi.addFavoriteItem(userId,item.id,type,1,app.id).then(res => {
 					if (res.status == 200){
                         self.$store.commit('appConfig/insertFavorite',item)
                         self.$store.commit('appConfig/updateFavoriteMyAppItem',{appId:app.id,itemId:item.objectIdentifier,value:true})
 					}
 				});
 			}else{
-				appManagementApi.addFavoriteItem(userId,item.id,type,0).then(res => {
+				appManagementApi.addFavoriteItem(userId,item.id,type,0,app.id).then(res => {
 					if (res.status == 200) {
 						item.type = type;
                         self.$store.commit('appConfig/delFavorite',item)
