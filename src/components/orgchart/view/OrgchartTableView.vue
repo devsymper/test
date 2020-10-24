@@ -121,7 +121,7 @@
                             :getDataUrl="apiUrl"
                             :containerHeight="containerHeight"
                             :tableContextMenu="tableContextMenu"
-                            :widthListUser="widthListUser"
+                            :widthContentCustom="widthContentCustom"
                             :useDefaultContext="false"
                             :useActionPanel="true"
                             :actionPanelWidth="850"
@@ -316,15 +316,15 @@ export default {
             this.agApi = params.api; 
         },
         resizeEnd(params){
-            let value = params.width - this.currentwidthListUser
+            let value = params.width - this.currentWidthContentCustom
             if(value < 0 ){
-                this.widthListUser = 0
+                this.widthContentCustom = 0
                 this.$refs.listUser.refreshList()
             }else{
-                this.widthListUser = $(window).width() - $(".resizable-component").width()  - 100
+                this.widthContentCustom = $(window).width() - $(".resizable-component").width()  - 100
                 debugger
             }
-            this.currentwidthListUser =  params.width 
+            this.currentWidthContentCustom =  params.width 
         },
         changeTab(val){
             this.currentTab = val  
@@ -413,8 +413,8 @@ export default {
         return {
             currentTab: 1,
             agApi:null,
-            widthListUser:0,
-            currentwidthListUser:400,
+            widthContentCustom:0,
+            currentWidthContentCustom:400,
             showToolbar:false,
             currentSize: {},
             customAgComponents: {

@@ -519,7 +519,7 @@ export default {
         })
     },
     props: {
-        widthListUser:{
+        widthContentCustom:{
             type: Number,
             default:0
         },
@@ -726,8 +726,8 @@ export default {
             } else if (this.tableDisplayConfig.show) {
                 return "calc(100% - " + this.tableDisplayConfig.width + "px)";
             } else if(this.showPagination == false) {
-                if( this.widthListUser > 0){
-                   return this.widthListUser+"px"
+                if( this.widthContentCustom > 0){
+                   return this.widthContentCustom+"px"
                 }else{
                     return "100%";
                 }
