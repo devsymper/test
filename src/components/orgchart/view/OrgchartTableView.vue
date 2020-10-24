@@ -133,6 +133,7 @@
                             :showImportHistoryBtn="false"
                             :showActionPanelInDisplayConfig="false"
                             :showPagination="false"
+                            :lazyLoad="true"
                         >
                             <template slot="right-panel-content" slot-scope="{}">  
                                 <Detail :quickView="true" :docObjInfo="docObjInfo" />

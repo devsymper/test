@@ -408,6 +408,20 @@ export default {
                         self.$emit('row-selected', self.data[row]);
                     }, time);
                 },
+                afterScrollVertically(){
+                    let count = 2;
+                    let delayTimer
+                    clearTimeout(delayTimer);
+                    let value = event
+                    delayTimer = setTimeout(function() {
+                        if(value.target.scrollTop > $(value.target).height()/6*0.7){
+                            if(count * 50 != self.pageSize){
+                               self.changePageSize({ pageSize: count * 50})
+                               count++;
+                            }
+                        }
+                    },1000); 
+                },
                 beforeContextMenuSetItems: () => {
                 },
                 beforeOnCellMouseOver: (event, coords, TD, controller) => {
@@ -582,6 +596,10 @@ export default {
         containerHeight: {
             type: Number,
             default: 200
+        },
+        lazyLoad:{
+            type:Boolean,
+            default:false
         },
         /**
          * * Các contextmenu cho các item trong list, có dạng:
@@ -792,9 +810,6 @@ export default {
         }
     },
     methods: {
-        handleScroll(e){
-            debugger
-        },
         rerenderTable(){
             this.$refs.dataTable.hotInstance.render();
         },
@@ -1572,7 +1587,7 @@ export default {
             // Phát sự kiện khi người dùng gõ vào ô tìm kiếm
             this.$emit("search-all", {});
         },
-        changePageSize(vl) {
+        changePageSize(vl){
             this.pageSize = vl.pageSize
             this.getData();
             // Phát sự kiện khi người dùng thay đổi số bản ghi ở mỗi page
