@@ -123,6 +123,9 @@ const updateSelectingItemType = (state, data) => {
 const updateActiveChildItem = (state, data) => {
     state.activeChildItem  = data
 }
+const updateCurrentAppName = (state , data) =>{
+    state.currentAppName = data
+}
 export {
     updateListItemSelected,
     removeItemSelected,
@@ -139,5 +142,6 @@ export {
     setListApps,
     updateFavoriteMyAppItem,
     updateSelectingItemType,    
-    updateActiveChildItem
+    updateActiveChildItem,
+    updateCurrentAppName
 };

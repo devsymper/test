@@ -48,15 +48,13 @@
 							<li  v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer" :class="{'child-item-active': item.objectIdentifier == activeIndexChild}" > 
 								<div style="position:relative;display:flex" >
 									<v-icon style="font-size:13px;margin-right:8px">{{listIcon[item.type]}}</v-icon>
-									<div v-if="item.type == 'document_definition'" class="title-item-favorite d-flex flex-column">
-										{{item.title}}
-										<span style="font:12px roboto; font-weight:300">sub-title</span>
+									<div class=" d-flex flex-column">
+										<div class="title-item-favorite">
+											{{item.type == 'document_definition' ? item.title : item.name}}
+											</div>
+										<span style="font:12px roboto; font-weight:300"> {{item.appName}}</span>
 									</div>
-									<div v-else  class="title-item-favorite d-flex flex-column">
-										{{item.name}}
-										<span style="font:12px roboto; font-weight:300">sub-title</span>
-									</div> 
-									<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:4px;right:4px">mdi-star</v-icon>
+									<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:10px;right:4px">mdi-star</v-icon>
 								</div>
 							</li>
 						</ul>
@@ -250,6 +248,7 @@ x				}
 					if(item.objectIdentifier == key){
 						item.favorite = 1
 						item.actions = value.actions
+						item.appName = value.appName
 						item.type = type
 					} 
 				})
@@ -278,7 +277,8 @@ x				}
         clickDetails(item){
             this.activeIndex = item.id
             this.showFavorite = false
-            this.$store.commit("appConfig/updateCurrentAppId",item.id);
+			this.$store.commit("appConfig/updateCurrentAppId",item.id);
+			this.$store.commit("appConfig/updateCurrentAppName",item.name);
 			// this.showDetailDiv = true
 			this.$store.commit('appConfig/showDetailAppArea')
 			this.$store.commit('appConfig/emptyItemSelected')
@@ -546,7 +546,7 @@ x				}
 .view-side-by-side-apps >>> .favorite-area-item .title-item-favorite{
    	white-space: nowrap; 
 	font:13px roboto;
-	width: 90%; 
+	width: 220px; 
 	overflow: hidden;
 	text-overflow: ellipsis; 
 	padding:4px 0px;

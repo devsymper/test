@@ -2,7 +2,7 @@
    <div class="view-details-all-app h-100" style="display:flex">
        <div class="header-view-details-all-app">
             <h4 style="flex-grow:1;font:15px roboto"> Danh sách công việc của tôi </h4>
-            <div style="width:470px;display:flex">
+            <div style="width:500px;display:flex">
                 <v-btn
                     class="button-add-task"
                     style="backgound-color:#F7F7F7;margin-8px"
@@ -25,6 +25,9 @@
                         </v-btn>
                         <v-btn icon tile  style="width:32px;height:32px;margin:0px 4px">
                             <v-icon @click="changeView">mdi-page-previous-outline</v-icon>  
+                        </v-btn>
+                        <v-btn icon tile  style="width:32px;height:32px;margin:0px 4px">
+                            <v-icon>mdi-dip-switch</v-icon>  
                         </v-btn>
                    </div>
             </div>
