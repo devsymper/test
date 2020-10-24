@@ -15,7 +15,6 @@
         :actionPanelWidth="actionPanelWidth"
         @import-excel="importExcel()"
         @row-selected="onRowSelected"
-        :lazyLoad="true"
         :commonActionProps="commonActionProps">
         <div slot="right-panel-content" class="h-100">
             <action-panel
