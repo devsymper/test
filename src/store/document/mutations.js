@@ -320,6 +320,7 @@ const addToDocumentEditorStore = (state, params) => {
     let key = params.key
     let instance = params.instance
     let value = params.value
+    debugger
     Vue.set(state.editor[instance], key, value);
 }
 const setDefaultSubmitStore = (state, params) => {
@@ -465,6 +466,14 @@ const addSqlLiteDb = (state, params) => {
     Vue.set(state['clientSqlLite'], instance, db);
 }
 
+const deleteControlTemplate = (state, params) => {
+    let instance = params.instance;
+    let index = params.index;
+    let x = state.editor[instance].allControlTemplate;
+    x.splice(index, 1);
+    Vue.set(state.editor[instance], 'allControlTemplate', x);
+}
+
 
 
 
@@ -497,6 +506,7 @@ export {
     updateAllControlDeleted,
     deleteControlInAllControlDeleted,
     updateDataToTableControlRoot,
-    addSqlLiteDb
+    addSqlLiteDb,
+    deleteControlTemplate
 
 };

@@ -146,7 +146,7 @@
         </div>
         </VuePerfectScrollbar>
         <v-navigation-drawer
-            v-if="parrentInstance == 0" 
+            v-if="parrentInstance == 0 && drawer" 
             :width="(isShowTraceControlSidebar) ? 300 : 830"
             v-model="drawer"
             class="pa-3"

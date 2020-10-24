@@ -1,5 +1,5 @@
 <template>
-    <v-container fluid>
+    <div class="h-100 w-100">
         <ListItems
             ref="listPermission"
             :getDataUrl="getDataUrl"
@@ -26,7 +26,7 @@
                 </PermissionForm>
             </template>
         </ListItems>
-    </v-container>
+    </div>
 </template>
 
 <script>
@@ -164,7 +164,7 @@ export default {
         };
     },
     mounted() {
-        this.tableHeight = document.body.clientHeight - 0;
+		this.tableHeight = util.getComponentSize(this).h;
     },
     methods: {
         closeForm(){
