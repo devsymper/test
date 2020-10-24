@@ -420,7 +420,7 @@ export default {
                                count++;
                             }
                         }
-                    },1000); 
+                    },500); 
                 },
                 beforeContextMenuSetItems: () => {
                 },
