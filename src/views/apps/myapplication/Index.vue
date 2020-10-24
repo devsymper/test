@@ -1,13 +1,14 @@
 <template>
   <div class="view-applications-wrapper h-100 w-100">
-        <ViewDetailsAllApp ref="ViewDetailsAllApp" v-if="viewSideBySide == false" />
-        <ViewSideBySideApp ref="ViewSideBySideApp" v-else />
+        <ViewDetailsAllApp ref="ViewDetailsAllApp" v-if="viewSideBySide == false" @change-type="changeType" :currentType="currentType" />
+        <ViewSideBySideApp ref="ViewSideBySideApp" v-else  @change-type="changeType" />
   </div>
 </template>
 
 <script>
 import ViewDetailsAllApp from './ViewDetailsAllApp.vue'
 import ViewSideBySideApp from './ViewSideBySideApp.vue'
+import {uiConfigApi} from "@/api/uiConfig";
 export default {
     components:{
         ViewDetailsAllApp,
@@ -15,7 +16,22 @@ export default {
     },
     computed:{
         viewSideBySide(){
-            return this.$store.state.appConfig.viewSideBySide
+            if(this.typeDefault){
+                if(this.typeDefault == 0){
+                    return false
+                }else{
+                    return true
+                }
+            }else{
+                return this.$store.state.appConfig.viewSideBySide
+            }
+        }
+    },
+    data(){
+        return {
+            typeDefault:null,
+            currentType: null,
+            
         }
     },
     mounted(){
@@ -35,18 +51,21 @@ export default {
 				}
 			})
     },
-    watch:{
-        // viewSideBySide(val){
-        //     if(val == true ){
-        //          if(this.$refs.ViewDetailsAllApp){
-        //                     this.$refs.ViewDetailsAllApp.hideContextMenu()		
-        //         }
-        //     }else{
-        //          if(this.$refs.ViewSideBySideApp){
-        //                     this.$refs.ViewSideBySideApp.hideContextMenu()		
-        //         }
-        //     }
-        // }
+    beforeCreate(){
+        let self = this
+        uiConfigApi.getUiConfig('myApplication').then(res=>{
+            if(res.status == 200){
+                let value = JSON.parse(res.data.detail)
+                self.typeDefault = value.typeView
+                self.currentType = value.typeView
+            }
+        })
+    },
+    methods:{
+        changeType(){
+            this.typeDefault = null
+            debugger
+        }
     }
 }
 </script>

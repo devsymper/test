@@ -1,10 +1,13 @@
 <template>
    <div class="view-side-by-side-apps h-100">
        <div class="list-apps h-100">
-				 <h4>Ứng dụng</h4>
-				<v-btn icon tile style="position:absolute;top:2px;right:6px;font-size:13px" >
+				<div class="d-flex">
+					 <h4>Ứng dụng</h4>
+				<v-btn icon tile style="position:absolute;top:2px;right:12px;font-size:13px" >
 					<v-icon @click="changeView" style="font-size:13px" >mdi-page-previous-outline</v-icon>  
 				</v-btn>
+				 <!-- <MenuConfigTypeView   :currentTypeView="1" :titleTypeView="'hellooo'" /> -->
+				</div>
             <div style="margin:20px 0px 0px 0px">
                 <div :class="{'favorite-area': true , 'active': showFavorite == true}" @click="showListFavorite">
                     <v-icon style="font-size:16px" color="#F6BE4F"> mdi-star</v-icon>
@@ -75,6 +78,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue'
 import SymperActionView from '@/action/SymperActionView.vue'
 import {util} from './../../../plugins/util'
+import MenuConfigTypeView from './MenuConfigTypeView'
     export default {
     created(){
         this.getFavorite()
@@ -83,7 +87,8 @@ import {util} from './../../../plugins/util'
         AppDetail,
         VuePerfectScrollbar,
         ContextMenu,
-        SymperActionView
+		SymperActionView,
+		MenuConfigTypeView
 	},
 	mounted(){
 		this.widthActionArea = "calc(100% - 520px)"
@@ -256,7 +261,8 @@ x				}
 			return array
 		},
         changeView(){
-            this.$store.commit('appConfig/changeTypeView')
+			this.$store.commit('appConfig/changeTypeView')
+			this.$emit('change-type')
         },
         hideContextMenu(){
             if(this.$refs.appDetail){

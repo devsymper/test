@@ -26,9 +26,7 @@
                         <v-btn icon tile  style="width:32px;height:32px;margin:0px 4px">
                             <v-icon @click="changeView">mdi-page-previous-outline</v-icon>  
                         </v-btn>
-                        <v-btn icon tile  style="width:32px;height:32px;margin:0px 4px">
-                            <v-icon>mdi-dip-switch</v-icon>  
-                        </v-btn>
+                        <MenuConfigTypeView :currentTypeView="currentType" :titleTypeView="'hellooo'" />
                    </div>
             </div>
         </div>
@@ -139,11 +137,13 @@ import {util} from './../../../plugins/util'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue';
 import DialogCreateTask from '@/components/myItem/work/DialogCreateTask.vue'
+import MenuConfigTypeView from './MenuConfigTypeView'
 export default {
     components:{
         VuePerfectScrollbar,
         ContextMenu,
-        DialogCreateTask
+        DialogCreateTask,
+        MenuConfigTypeView
     },
     computed:{
         listApp(){
@@ -155,6 +155,11 @@ export default {
                 rsl[i%2][appArr[i].id] = appArr[i];
             }
             return rsl;
+        }
+    },
+    props:{
+        currentType:{
+            type: Number,
         }
     },
     methods:{
@@ -181,6 +186,7 @@ export default {
 		},	
         changeView(){
             this.hideContextMenu()
+            this.$emit('change-type')
             this.$store.commit('appConfig/changeTypeView')
         },
         collapse(){

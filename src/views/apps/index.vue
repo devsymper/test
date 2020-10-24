@@ -129,7 +129,7 @@ export default {
 											Handsontable.dom.empty(td);
 											span = document.createElement('span')
 											let newValue = value.slice(0,value.length-3)
-												$(span).text(newValue)
+											$(span).text(newValue)
 											td.appendChild(span);
 											return td
 										},
