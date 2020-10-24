@@ -1,5 +1,5 @@
 <template>
-  <vue-resizable  @resize:end="resizeSidebar" :width="skh.widthSideBar">
+  <vue-resizable  @resize:end="resizeSidebar" :width="skh.widthSideBar" style="height: calc(100% - 10px);">
     <v-navigation-drawer class="khSidebar resizable-content" v-show="!skh.subCollapseSideBar">
       <div>
         <v-text-field
@@ -14,8 +14,9 @@
           label="Search"
           :placeholder="$t('common.search')"
         ></v-text-field>
+        
         <div class="kh-side-bar">
-          <v-container style="height: calc(100vh - 65px);overflow: auto;">
+          <v-container style="height: calc(100% - 65px);overflow: auto;">
             <div class="workspace">
               <div class="symper-title">WORKSPACE</div>
               <div class="icon-add">
@@ -519,7 +520,7 @@ export default {
   methods: {
     resizeSidebar(e){
         console.log("aaaaa",e.width);
-        this.$emit("resize-sidebar",e.width);
+        this.$evtBus.$emit("kh-resize-sidebar",e.width);
     },
     dbclickDoc(path, id, hash) {
       $(".favorite .v-list-item").removeClass("v-item--active");
@@ -949,13 +950,13 @@ export default {
 </script>
 
 <style scoped>
-.resizable-component{
+/* .resizable-component{
   height: 100%!important;
-}
-.resizable-content {
+} */
+/* .resizable-content {
   height: 100%;
   width: 100%;
-}
+} */
 .collapse-sidebar-btn {
   position: absolute;
   bottom: 20px;

@@ -1,7 +1,7 @@
 <template>
-  <div class="h-100 kh-sidebar-right" :class="{'d-none' : skh.statusRightBar==-1}">
-    <div class="kh-sbr-all ml-4" v-if="skh.statusRightBar==1">
-      <div class="row sb-top" style="height:33px;">
+  <div class="kh-sidebar-right" style="height:calc(100% - 74px)" :class="{'d-none' : skh.statusRightBar==-1}">
+    <div class="kh-sbr-all w-100 h-100" v-if="skh.statusRightBar==1">
+      <div class="row w-100 sb-top" style="height:33px;">
         <div class="symper-title col h-100 pt-1 pl-1">Tệp đính kèm</div>
         <div class="r-right col h-100">
           <v-icon class="fs-16" @click="invertStatusRightBar(-1)">mdi-close</v-icon>
@@ -16,13 +16,13 @@
           <!-- <v-icon class="fs-16">mdi-plus</v-icon> -->
         </div>
       </div>
-      <div class="row sb-top">
+      <div class="row w-100 sb-top">
         <div class="symper-title col pt-1 pl-1">Tên file</div>
         <div class="r-right col-md-5" style="padding-top:4px;">
           <div class="symper-title">Ngày đăng</div>
         </div>
       </div>
-      <div class="list-item">
+      <div class="list-item w-100">
         <v-container
           class="scroll-bar-right"
           max-height="498"
@@ -737,5 +737,7 @@ export default {
 .upload-file >>> i{
   font-size: 19px!important;
 }
-
+.row {
+  margin:0px!important;
+}
 </style>

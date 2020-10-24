@@ -2506,7 +2506,6 @@ for (let name in allAttrs) {
             return value;
         }
     }
-
     if (!attr.toXML) {
         attr.toXML = {
             "symper_position": "attr",
