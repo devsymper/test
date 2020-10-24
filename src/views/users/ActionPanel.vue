@@ -15,12 +15,12 @@
 						<v-stepper-step class="fs-13 font-normal" editable step="1">
 							{{ $t('user.general.title')}}
 						</v-stepper-step>
-						<v-stepper-step :editable="editStep" @click="loadPermission()" step="2">
+						<v-stepper-step :editable="editStep" v-if="actionType=='add'" @click="loadPermission()" step="2">
 							{{ $t('user.permission.title')}}
 						</v-stepper-step>
 					</v-stepper-header>
-				<v-stepper-items style="overflow:auto;overflow-y:scroll" class="stepper-items">
-					<v-stepper-content step="1">
+				<v-stepper-items style="overflow:auto;overflow-y:scroll;flex-grow: 1" class="stepper-items">
+					<v-stepper-content step="2" >
 						<h4>{{ $t('user.general.personalInfo.title')}}</h4>
 						<v-row style="margin-bottom:-30px" >
 							<!-- thong tin -->
@@ -156,67 +156,68 @@
 							</v-col>	
 							<!-- ket thuc anh -->
 						</v-row>
-							<div v-if="actionType == 'edit'">
-								<v-checkbox dense 
-									class="sym-small-size " 
-									v-model="user.status" 
-									:label="$t('user.general.passwordSetting.activeAccount')">
-								</v-checkbox>
-							</div>
-							<div v-if="actionType == 'add'">
-								<h4 class="setting-password">{{ $t('user.general.passwordSetting.title')}}</h4>
-								<v-checkbox dense class="sym-small-size" 
-									v-model="autoRenPassword" 
-									@click="enabledPassword = !enabledPassword" 
-									:label="$t('user.general.passwordSetting.autoGeneratePassword')">
-								</v-checkbox>
-								<v-row>
-									<v-col cols="4">
-										<v-checkbox 
-											dense 
-											class="sym-small-size" 
-											v-model="enabledPassword" 
-											@click="autoRenPassword = !autoRenPassword" 
-											:label="$t('user.general.passwordSetting.yourPassword')">
-										</v-checkbox>
-									</v-col>
-									<v-col cols="8 input-password">
-										<v-text-field
-											class="fs-13"
-											ref="password"
-											v-model="user.password"
-											:disabled="!enabledPassword"
-											dense
-											:append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
-											:rules="[rules.required, rules.min, rules.max,rules.password]"
-											:type="showPass ? 'text' : 'password'"
-											counter
-											@click:append="showPass = !showPass"
-										></v-text-field>
-									</v-col>
-								</v-row>
-								<v-checkbox 
-									dense 
-									class="sym-small-size" 
-									v-model="needChangePassword" 
-									:label="$t('user.general.passwordSetting.requireChangePassFirstLogin')">
-								</v-checkbox>
-								<v-checkbox 
-									dense 
-									class="sym-small-size" 
-									v-model="sendMailAfterChange" 
-									:label="$t('user.general.passwordSetting.sendEmailAfterDone')">
-								</v-checkbox>
-							</div>	
-							<div class="w-100 d-flex justify-end" >
+						<div v-if="actionType == 'edit'">
+							<v-checkbox dense 
+								class="sym-small-size " 
+								v-model="user.status" 
+								:label="$t('user.general.passwordSetting.activeAccount')">
+							</v-checkbox>
+						</div>
+						<div v-if="actionType == 'add'">
+							<h4 class="setting-password">{{ $t('user.general.passwordSetting.title')}}</h4>
+							<v-checkbox dense class="sym-small-size" 
+								v-model="autoRenPassword" 
+								@click="enabledPassword = !enabledPassword" 
+								:label="$t('user.general.passwordSetting.autoGeneratePassword')">
+							</v-checkbox>
+							<v-row>
+								<v-col cols="4">
+									<v-checkbox 
+										dense 
+										class="sym-small-size" 
+										v-model="enabledPassword" 
+										@click="autoRenPassword = !autoRenPassword" 
+										:label="$t('user.general.passwordSetting.yourPassword')">
+									</v-checkbox>
+								</v-col>
+								<v-col cols="8 input-password">
+									<v-text-field
+										class="fs-13"
+										ref="password"
+										v-model="user.password"
+										:disabled="!enabledPassword"
+										dense
+										:append-icon="showPass ? 'mdi-eye' : 'mdi-eye-off'"
+										:rules="[rules.required, rules.min, rules.max,rules.password]"
+										:type="showPass ? 'text' : 'password'"
+										counter
+										@click:append="showPass = !showPass"
+									></v-text-field>
+								</v-col>
+							</v-row>
+							<v-checkbox 
+								dense 
+								class="sym-small-size" 
+								v-model="needChangePassword" 
+								:label="$t('user.general.passwordSetting.requireChangePassFirstLogin')">
+							</v-checkbox>
+							<v-checkbox 
+								dense 
+								class="sym-small-size" 
+								v-model="sendMailAfterChange" 
+								:label="$t('user.general.passwordSetting.sendEmailAfterDone')">
+							</v-checkbox>
+						</div>	
+							<div class="w-100 d-flex justify-end" style="margin-top:160px!important" >
 								<v-btn class="btn-next-step"
 								ref="addUserBtn"
 								@click="validateForm()">
 								{{actionType=='add'?actionPanel="Tạo tài khoản":"Cập nhật tài khoản"}}
 								</v-btn>
 							</div>
+						
 					</v-stepper-content>
-					<v-stepper-content step="2">
+					<v-stepper-content step="2" v-if="actionType=='add'">
 						<Permission :userId="user.id" />
 					</v-stepper-content>
 				</v-stepper-items>
@@ -968,7 +969,6 @@ export default {
 	
   	}
 }
-
 </script>
 <style scoped>
 	.font-normal{
@@ -1041,7 +1041,6 @@ export default {
 		height: 500px;
 		overflow-y: auto;
 	}
-
 	.input-file{
 		width: 0;
 		height: 0;
@@ -1053,11 +1052,10 @@ export default {
 		width: 80px;
 		height: 75px;
 	}
-
-  #preview img {
-	max-width: 100%;
-	max-height: 500px;
-  }
+	#preview img {
+		max-width: 100%;
+		max-height: 500px;
+	}
   	.treeCheckBox{
 		margin-top: 0px;
 		max-height: 30px;
@@ -1065,7 +1063,6 @@ export default {
 	.sym-stepper-content .v-tab{
 		font-size: 13px;
 	}
-
 	.sym-stepper-content{
 		padding-top: 0;
 	}

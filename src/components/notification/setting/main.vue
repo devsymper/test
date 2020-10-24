@@ -14,7 +14,10 @@
                     style="border-bottom:1px solid rgba(0,0,0,0.07)"
                 >
                  <template v-slot:prependIcon>
-                    <v-icon class="ml-1 icon-group">
+                    <v-icon  v-if="type=='main'" class="ml-1 icon-group">
+                        {{ $i('input.'+item.icon) }}
+                    </v-icon>
+                    <v-icon  v-else class="ml-1 icon-group">
                         {{ $i('input.'+item.icon) }}
                     </v-icon>
                 </template>

@@ -196,6 +196,29 @@
             "filter_by_condition": "Filter by condition"
         }
     },
+    "import": {
+        "import_history": "Import History",
+        "table": {
+            "history-import": {
+                "id": "ID",
+                "timeStartAt": "Start time",
+                "timeSuccessAt": "Success Time",
+                "userEmail": "Email ",
+                "subObjType": "Object type",
+                "objId": " Object name",
+                "description": "Description",
+                "userId": "User import",
+                "createdAt": "Date create",
+                "status": "Status",
+                "fileName": "File name",
+                "nameImport": "Name import"
+            },
+            "contextMenu": {
+                "viewDetail": "Detail",
+                "download": "Download Excel"
+            }
+        }
+    },
     "user": {
         "notification": {
             "email_already_exist!": "Email already exist!",

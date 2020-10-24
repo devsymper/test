@@ -201,6 +201,8 @@
         "table": {
             "history-import": {
                 "id": "ID",
+                "timeStartAt": "Thời gian tạo",
+                "timeSuccessAt": "Thời gian import thành công",
                 "userEmail": "Email người dùng",
                 "subObjType": "Loại đối tượng",
                 "objId": " Tên đối tượng",
@@ -210,11 +212,10 @@
                 "status": "Trạng thái",
                 "fileName": "Tên tệp",
                 "nameImport": "Nội dung"
-
-
             },
             "contextMenu": {
-                "viewDetail": "Xem chi tiết"
+                "viewDetail": "Xem chi tiết",
+                "download": "Tải file Excel"
             }
         }
     },

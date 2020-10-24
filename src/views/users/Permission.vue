@@ -1,5 +1,5 @@
 <template>
-    <div class="h-100 permission">
+    <div class="h-100 permission d-flex flex-column flex-grow-1">
         <v-row>
             <v-col class="md-5">
                 <v-btn 
@@ -28,8 +28,14 @@
                 </div>
             </v-col>
         </v-row>
+       
          <div v-if="showOrgchart">
             <OrgchartElementSelector v-model="data"/>
+        </div>
+         <div class=" flex-grow-1 d-flex justify-end align-end">
+            <v-btn @click="saveOrgchart()">
+                Lưu
+            </v-btn>
         </div>
         <div class="w-100" v-if="showUser">
              <v-data-table
@@ -52,6 +58,13 @@
 import { userApi } from "./../../api/user.js";
 import OrgchartElementSelector from "./../..//components/common/OrgchartElementSelector.vue";
 export default {
+  watch: {
+      data(){
+          debugger
+          let data = this.data
+
+      }
+    },
     components:{
         OrgchartElementSelector
     },
@@ -93,6 +106,23 @@ export default {
         this.getUserRole();
     },
     methods:{
+        saveOrgchart(){
+             let data= [{"userId": this.userId, "roles": this.data}];
+            userApi.updateRole({items:JSON.stringify(data)}).then(res=>{
+                  if(res.status==200){
+                     this.$snotify({
+                        type: "success",
+                        title: res.message
+                    });
+                }else{
+                     this.$snotify({
+                        type: "error",
+                        title: res.message
+                    });
+                }
+            }).catch(console.log);
+
+        },
         showPermissionUser(){
             this.showOrgchart=false;
             this.showUser=true;
