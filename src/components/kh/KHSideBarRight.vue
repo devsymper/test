@@ -2,7 +2,7 @@
   <div class="kh-sidebar-right" style="height:calc(100% - 74px)" :class="{'d-none' : skh.statusRightBar==-1}">
     <div class="kh-sbr-all w-100 h-100" v-if="skh.statusRightBar==1">
       <div class="row w-100 sb-top" style="height:33px;">
-        <div class="symper-title col h-100 pt-1 pl-1">Tệp đính kèm</div>
+        <div class="symper-title col h-100 pt-1 pl-2">Tệp đính kèm</div>
         <div class="r-right col h-100">
           <v-icon class="fs-16" @click="invertStatusRightBar(-1)">mdi-close</v-icon>
            <UploadFile
@@ -17,16 +17,16 @@
         </div>
       </div>
       <div class="row w-100 sb-top">
-        <div class="symper-title col pt-1 pl-1">Tên file</div>
+        <div class="symper-title col pt-1 pl-2">Tên file</div>
         <div class="r-right col-md-5" style="padding-top:4px;">
           <div class="symper-title">Ngày đăng</div>
         </div>
       </div>
-      <div class="list-item w-100">
+      <div class="list-item w-100" style="height: calc(100% - 63px);">
         <v-container
-          class="scroll-bar-right"
+          class="scroll-bar-right h-100"
           max-height="498"
-          style="height: calc(100vh - 65px);overflow: auto;"
+          style="overflow: auto;"
         >
           <v-list dense>
             <v-list-item-group class>
@@ -61,40 +61,34 @@
         </v-container>
       </div>
     </div>
-    <div class="kh-table-content kh-sbr-all ml-4" v-if="skh.statusRightBar==2">
-      <div class="row sb-top" style="height:33px;">
-        <div class="symper-title col pt-1 pl-1">Mục lục</div>
-        <div class="r-right col">
+    <div class="kh-table-content kh-sbr-all w-100 h-100" v-if="skh.statusRightBar==2">
+      <div class="row w-100 sb-top" style="height:33px;">
+        <div class="symper-title col pt-1 pl-2">Mục lục</div>
+        <div class="r-right h-100 col">
           <v-icon class="fs-16" @click="invertStatusRightBar(-1)">mdi-close</v-icon>
         </div>
       </div>
-      <div class="kh-toc">
+      <div class="kh-toc w-100">
         <ul id="toc"></ul>
       </div>
     </div>
-
-    <div class="kh-comment kh-sbr-all" v-if="skh.statusRightBar==3">
-      <!-- <div class="row sb-top" style="height:33px;">
-        <div class="symper-title col pt-1 pl-1">Bình luận</div>
-        <div class="r-right col">
-          <v-icon class="fs-16" @click="invertStatusRightBar(-1)">mdi-close</v-icon>
-        </div>
-      </div> -->
+     <!-- comment -->
+    <div class="kh-comment kh-sbr-all " v-if="skh.statusRightBar==3">
       <Comment :showComment="true" :height="'100%'" :objectIdentifier="hash" :objectType="`knowledge`"/>
     </div>
-
-    <div class="kh-history kh-sbr-all ml-4" v-if="skh.statusRightBar==4">
-      <div class="row sb-top" style="height:33px;">
-        <div class="symper-title col pt-1 pl-1">Lịch sử</div>
+    <!-- history -->
+    <div class="kh-history kh-sbr-all w-100 h-100" v-if="skh.statusRightBar==4">
+      <div class="row w-100 sb-top" style="height:33px;">
+        <div class="symper-title col pt-1 pl-2">Lịch sử</div>
         <div class="r-right col">
           <v-icon class="fs-16" @click="invertStatusRightBar(-1)">mdi-close</v-icon>
         </div>
       </div>
-      <div class="row sb-top">
+      <div class="row w-100 sb-top">
         <table>
           <tr>
             <td
-              class="symper-title"
+              class="symper-title pl-1"
               @click="showHistory(0)"
               :class="{'td-active' :history_active==0}"
             >Tất cả</td>
@@ -106,12 +100,10 @@
           </tr>
         </table>
       </div>
-      <div v-if="history_active==0">
-        <!-- <v-sheet id="scrolling-techniques" class="overflow-y-auto" max-height="498"> -->
+      <div class="w-100" v-if="history_active==0" style="height: calc(100% - 63px);">
         <v-container
-          class="scroll-bar-right"
-          max-height="498"
-          style="height: calc(100vh - 65px);overflow: auto;"
+          class="scroll-bar-right h-100"
+          style="overflow: auto;"
         >
           <v-list dense class="list-log">
             <v-list-item-group>
@@ -138,12 +130,11 @@
         </v-container>
         <!-- </v-sheet> -->
       </div>
-      <div v-if="history_active==1">
+      <div class="w-100" v-if="history_active==1" style="height: calc(100% - 63px);">
         <!-- <v-sheet id="scrolling-techniques" class="overflow-y-auto" max-height="498"> -->
         <v-container
-          class="scroll-bar-right"
-          max-height="498"
-          style="height: calc(100vh - 65px);overflow: auto;"
+          class="scroll-bar-right h-100"
+          style="overflow: auto;"
         >
           <v-list dense class="list-log">
             <v-list-item-group>
@@ -166,27 +157,28 @@
         <!-- </v-sheet> -->
       </div>
     </div>
-
-    <div class="kh-history kh-sbr-all ml-4" v-if="skh.statusRightBar==5">
-      <div class="row sb-top" style="height:33px;">
-        <div class="symper-title col pt-1 pl-1">Backup</div>
+    <!-- backup -->
+    <div class="kh-history kh-sbr-all w-100 h-100" v-if="skh.statusRightBar==5">
+      <div class="row w-100  sb-top" style="height:33px;">
+        <div class="symper-title col pt-1 pl-2">Backup</div>
         <div class="r-right col">
           <v-icon class="fs-16" @click="invertStatusRightBar(-1)">mdi-close</v-icon>
         </div>
       </div>
-      <div class="row sb-top">
-        <div class="symper-title col pt-1 pl-1">Phiên bản</div>
+      <div class="row w-100 sb-top">
+        <div class="symper-title col pt-1 pl-2">Phiên bản</div>
         <div class="r-right col-md-6" style="padding-top:4px;">
           <div class="symper-title">Ngày tạo</div>
         </div>
       </div>
-      <div class="list-item">
-        <v-list dense :flat="true">
-          <v-list-item-group class>
+      <div class="w-100" style="height: calc(100% - 63px);">
+        <v-list class="h-100 " dense :flat="true">
+          <v-list-item-group class="pl-2">
             <v-list-item
-              v-for="(item, i) in listBackupDocument"
-              :key="i"
-              @contextmenu="showMenuBackup($event,item.id,item.docName,item.docContent)"
+                style="padding-left: 0px!important;"
+                v-for="(item, i) in listBackupDocument"
+                :key="i"
+                @contextmenu="showMenuBackup($event,item.id,item.docName,item.docContent)"
             >
               <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
@@ -728,7 +720,7 @@ export default {
   background-color: white;
 }
 .scroll-bar-right {
-  padding-left: 0px;
+  padding-left: 8px;
   padding-top: 0px;
 }
 .upload-file >>>.v-btn--icon{
