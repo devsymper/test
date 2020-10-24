@@ -2,10 +2,17 @@
   <div class="h-100 kh-sidebar-right" :class="{'d-none' : skh.statusRightBar==-1}">
     <div class="kh-sbr-all ml-4" v-if="skh.statusRightBar==1">
       <div class="row sb-top" style="height:33px;">
-        <div class="symper-title col pt-1 pl-1">Tệp đính kèm</div>
-        <div class="r-right col">
+        <div class="symper-title col h-100 pt-1 pl-1">Tệp đính kèm</div>
+        <div class="r-right col h-100">
           <v-icon class="fs-16" @click="invertStatusRightBar(-1)">mdi-close</v-icon>
-          <UploadFile @uploaded-file="uploaded" />
+           <UploadFile
+							@uploaded-file="uploaded"
+							:objectIdentifier="hash"
+							:objectType="`knowledge`"
+							:iconName="`mdi-plus`"
+              class="upload-file h-100"
+              style="float:right"
+							/>
           <!-- <v-icon class="fs-16">mdi-plus</v-icon> -->
         </div>
       </div>
@@ -258,7 +265,8 @@
 
 <script>
 import { knowledgeApi } from "./../../api/kh.js";
-import UploadFile from "./../../components/kh/uploadfile";
+//import UploadFile from "./../../components/kh/uploadfile";
+import UploadFile from "@/components/common/UploadFile.vue";
 import KHShowImage from "./../../components/kh/KHShowImage";
 import Comment from '@/components/common/comment/Comment.vue';
 import { SYMPER_APP } from "./../../main.js";
@@ -437,30 +445,34 @@ export default {
      * bắt sự kiện upload file
      */
     uploaded(dataObj) {
-      if (dataObj.status == 200) {
-        let hash = this.skh.currentDocument;
-        if (hash == "" || hash.length == 0) {
-          hash = this.$route.params.hash;
-        }
-        let file = dataObj.data;
-        let data = {};
-        data.hash = hash;
-        data.fileId = file.id;
-        knowledgeApi
-          .uploadFileDocument(data)
-          .then(res => {
-            if (res.status == 200) {
-              this.$store.dispatch("kh/addToListAttachStore", dataObj.data);
-            }
-          })
-          .catch(err => {
-            console.log("error from Add doc to treee!!!", err);
-          })
-          .always(() => {});
-      } else {
-        SYMPER_APP.$snotifyError(error, dataObj.message);
-      }
-    },
+      debugger
+			this.$store.commit("kh/addToListAttachStore", dataObj);
+		},
+    // uploaded(dataObj) {
+    //   if (dataObj.status == 200) {
+    //     let hash = this.skh.currentDocument;
+    //     if (hash == "" || hash.length == 0) {
+    //       hash = this.$route.params.hash;
+    //     }
+    //     let file = dataObj.data;
+    //     let data = {};
+    //     data.hash = hash;
+    //     data.fileId = file.id;
+    //     knowledgeApi
+    //       .uploadFileDocument(data)
+    //       .then(res => {
+    //         if (res.status == 200) {
+    //           this.$store.dispatch("kh/addToListAttachStore", dataObj.data);
+    //         }
+    //       })
+    //       .catch(err => {
+    //         console.log("error from Add doc to treee!!!", err);
+    //       })
+    //       .always(() => {});
+    //   } else {
+    //     SYMPER_APP.$snotifyError(error, dataObj.message);
+    //   }
+    // },
     downloadOrBackupFile(data) {
       if (data.type == "document_backup") {
         this.backupDocument(data.id);
@@ -718,6 +730,12 @@ export default {
 .scroll-bar-right {
   padding-left: 0px;
   padding-top: 0px;
+}
+.upload-file >>>.v-btn--icon{
+  height: 100%;
+}
+.upload-file >>> i{
+  font-size: 19px!important;
 }
 
 </style>

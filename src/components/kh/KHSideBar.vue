@@ -1,5 +1,5 @@
 <template>
-  <vue-resizable :maxWidth="500" :width="skh.widthSideBar">
+  <vue-resizable  @resize:end="resizeSidebar" :width="skh.widthSideBar">
     <v-navigation-drawer class="khSidebar resizable-content" v-show="!skh.subCollapseSideBar">
       <div>
         <v-text-field
@@ -517,6 +517,10 @@ export default {
     }
   },
   methods: {
+    resizeSidebar(e){
+        console.log("aaaaa",e.width);
+        this.$emit("resize-sidebar",e.width);
+    },
     dbclickDoc(path, id, hash) {
       $(".favorite .v-list-item").removeClass("v-item--active");
       if (!this.skh.statusEdit) {
@@ -542,14 +546,14 @@ export default {
      * Thay đổi trạng thái doc để lưu doc
      */
     saveDocument() {
-      this.$store.commit("kh/changeStatusEdit", !this.skh.statusEdit);
-      this.dialogSave = false;
-      let hash = this.hash;
-      this.$store.commit("kh/setCurrentDocument", hash);
-      const state = {};
-      const title = "SYMPER APP";
-      const url = "/#/knowledge/document/" + hash;
-      history.pushState(state, title, url);
+        this.$store.commit("kh/changeStatusEdit", !this.skh.statusEdit);
+        this.dialogSave = false;
+        let hash = this.hash;
+        this.$store.commit("kh/setCurrentDocument", hash);
+        const state = {};
+        const title = "SYMPER APP";
+        const url = "/#/knowledge/document/" + hash;
+        history.pushState(state, title, url);
     },
     /**
      * Show div input thêm node và focus vào input
