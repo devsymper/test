@@ -8,6 +8,7 @@
             :containerHeight="containerHeight"
             :getDataUrl="getListUrl"
             :useActionPanel="true"
+            :showActionPanelInDisplayConfig="true"
             :headerPrefixKeypath="'common'"
             :currentItemData="currentItemData"
             :customAPIResult="customAPIResult"

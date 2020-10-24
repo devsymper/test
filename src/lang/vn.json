@@ -211,7 +211,9 @@
                 "createdAt": "Ngày tạo",
                 "status": "Trạng thái",
                 "fileName": "Tên tệp",
-                "nameImport": "Nội dung"
+                "nameImport": "Tên lần import",
+                "rowCount": "Tổng số dòng",
+                "colCount": "Tổng số cột"
             },
             "contextMenu": {
                 "viewDetail": "Xem chi tiết",

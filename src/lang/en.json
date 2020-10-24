@@ -211,7 +211,9 @@
                 "createdAt": "Date create",
                 "status": "Status",
                 "fileName": "File name",
-                "nameImport": "Name import"
+                "nameImport": "Name import",
+                "rowCount": "Total row",
+                "colCount": "Total column"
             },
             "contextMenu": {
                 "viewDetail": "Detail",
