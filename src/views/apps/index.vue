@@ -1,5 +1,5 @@
 <template>
-    <v-container fluid>
+    <div class="h-100 w-100">
         <ListItems
             ref="listApp"
             :getDataUrl="apiUrl"
@@ -25,7 +25,7 @@
                 ></updateApp>
             </div>
         </ListItems>
-    </v-container>
+    </div>
 </template>
 <script>
 import Api from "./../../api/api.js";
@@ -37,6 +37,7 @@ import {documentApi} from './../../api/Document';
 import {dashboardApi} from './../../api/dashboard';
 import BpmnEngine from './../../api/BPMNEngine';
 import Handsontable from 'handsontable';
+import { util } from '../../plugins/util.js';
 export default {
     name: "listApps",
     components: {
@@ -170,7 +171,7 @@ export default {
         };
     },
     mounted() {
-        this.tableHeight = document.body.clientHeight - 0;
+		this.tableHeight = util.getComponentSize(this).h;
     },
     methods: {
 		closeAppForm(){

@@ -1758,7 +1758,25 @@ export default {
             if(this.routeName == 'editControlTemplate' && this.controlTemplateId != 0){
                 let res = await documentApi.getDetailControlTemplate(this.controlTemplateId);
                 this.editorCore.setContent(res.data.form);
-                this.setDataForPropsControl(JSON.parse(res.data.controlProps));
+                let allProps = JSON.parse(res.data.controlProps);
+                for(let id in allProps){
+                    let properties = allProps[id].properties;
+                    for(let prop in properties){
+                        properties[prop] = properties[prop].value;
+                    }
+                    let formulas = allProps[id].formulas;
+                    for(let formula in formulas){
+                        if(formulas[formula].formulasId){
+                            let item = {};
+                            item[formulas[formula].formulasId] = formulas[formula].value;
+                            formulas[formula] = item;
+                        }
+                        else{
+                            formulas[formula] = "";
+                        }
+                    }
+                }
+                this.setDataForPropsControl(allProps);
                 this.inputSaveControlTemplate.title.value = res.data.title;
             }
         },
@@ -2448,13 +2466,21 @@ export default {
             let self = this;
             let contentEl = $(control.content);
             let controlInEL = contentEl.find('.s-control:not(.s-control-table .s-control)');
+            if(Number(control.is_single_control) == 1){
+                controlInEL = contentEl;
+            }
             let allControlProp = JSON.parse(control.control_props);
             for (let index = 0; index < controlInEL.length; index++) {
                 let controlEl = $(controlInEL[index]);
                 setTimeout(() => {
                     let newId = 's-control-id-' + Date.now();
                     let controlProp = allControlProp[controlEl.attr('id')];
-                    contentEl.find('#'+controlEl.attr('id')).attr('id',newId);
+                    if(Number(control.is_single_control) == 1){
+                        contentEl.attr('id',newId);
+                    }
+                    else{
+                        contentEl.find('#'+controlEl.attr('id')).attr('id',newId);
+                    }
                     let controlType = controlProp.type;
                     self.addToAllControlInDoc(newId,{properties: controlProp.properties, formulas : controlProp.formulas,type:controlType});
                     if(controlType == 'table'){

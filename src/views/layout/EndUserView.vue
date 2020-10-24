@@ -97,6 +97,7 @@
             v-bind:class="[isExpand==true?'width-1200':'width-500']"
             right
             v-model="showMyInfo"
+            v-show="showMyInfo"
             absolute
             temporary>
             <DetailUser 

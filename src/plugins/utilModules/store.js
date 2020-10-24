@@ -19,10 +19,14 @@ export const store = {
         }
 
         if (dom && dom.getBoundingClientRect) {
-            let rect = dom.getBoundingClientRect();
+            // let rect = dom.getBoundingClientRect();
+            // return {
+            //     h: rect.height,
+            //     w: rect.width,
+            // }
             return {
-                h: rect.height,
-                w: rect.width,
+                h: $(dom).innerHeight(),
+                w: $(dom).innerWidth(),
             }
         } else {
             return {

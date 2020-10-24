@@ -1,12 +1,17 @@
 <template>
     <v-navigation-drawer
         v-model="showImportPanel"
+        v-show="showImportPanel"
         absolute
-        class="d-none d-sm-none d-md-flex navigation"
+        :class="{
+            'navigation': true,
+            'd-md-flex': showImportPanel,
+            'manage-import-1020': showValidate,
+            'manage-import-600': !showValidate,
+        }"
         temporary
         right
-        style="height: 100vh"
-        v-bind:class="[showValidate==true?'manage-import-1020':'manage-import-600']"  >
+        style="height: 100vh">
         <v-row class="h-100">
             <v-dialog v-model="dialog"
                 width="500">
