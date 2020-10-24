@@ -4,6 +4,7 @@
 	absolute
 	permanent
 	right
+	v-show="isShow"
 	:width="400"
 	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)','display':displaySidebar}"
 	>

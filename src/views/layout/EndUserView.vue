@@ -86,7 +86,7 @@
 					<!--  -->
                     </div>
                 </div>
-                <v-layout style="height:calc(100% - 41px)" class="w-100 h-100" justify-center>
+                <v-layout style="height:calc(100% - 41px)" class="w-100" justify-center>
                     <slot>
 					</slot>
                 </v-layout>
@@ -97,6 +97,7 @@
             v-bind:class="[isExpand==true?'width-1200':'width-500']"
             right
             v-model="showMyInfo"
+            v-show="showMyInfo"
             absolute
             temporary>
             <DetailUser 

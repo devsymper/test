@@ -132,14 +132,14 @@ export default {
                         self.$goToPage(`/workflow/process-instances/${row.id}/tracking`);
                     }
                 },
-                {
-                    name: "works",
-                    text: this.$t("common.works"),
-                    callback: (row, callback) => {
-                        this.selectedInstance = row;
-                        self.showInstanceWorkDetail();
-                    }
-                },
+                // {
+                //     name: "works",
+                //     text: this.$t("common.works"),
+                //     callback: (row, callback) => {
+                //         this.selectedInstance = row;
+                //         self.showInstanceWorkDetail();
+                //     }
+                // },
             ]
         };
     },
