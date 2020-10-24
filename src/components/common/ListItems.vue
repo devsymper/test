@@ -1,5 +1,5 @@
 <template>
-    <div class="pl-2 w-100 pr-3 pt-3 list-item-common-symper" >
+    <div class="ml-2 w-100 pr-3 pt-3 list-item-common-symper" >
         <div :style="{width:contentWidth, display: 'inline-block'}">
             <v-row no-gutters class="pb-2" ref="topBar">
                 <v-col>
@@ -169,8 +169,7 @@
                             'compact-row':  tableDisplayConfig.value.densityMode == 2,
                         }"
                 >
-                   <div class="table-list-item">
-                        <hot-table
+                    <hot-table
                         :height="tableHeight"
                         :settings="tableSettings"
                         :data="data"
@@ -184,7 +183,6 @@
                         ref="dataTable"
                         :fixedColumnsLeft="fixedColumnsCount"
                     ></hot-table>
-                   </div>
                 </v-col>
             </v-row>
             <v-row v-show="showPagination" no-gutters ref="bottomBar" class="pt-3">
@@ -205,7 +203,6 @@
             class="pa-3"
             absolute
             right
-            v-show="actionPanel"
             v-if="reComputeActionPanelType != 'drag'"
             :temporary="reComputeActionPanelType == 'temporary'"
         >
@@ -516,8 +513,7 @@ export default {
                 thisCpn.closeactionPanel();
             }
         });
-        $('.table-list-item').scroll(function(e){
-        })
+       
     },
     props: {
         widthContentCustom:{
@@ -706,9 +702,6 @@ export default {
         }
     },
     mounted() {
-        $('.table-list-item').scroll(function(e){
-            // debugger
-        })
     },
     computed: {
         alwaysShowActionPanel(){
@@ -747,7 +740,7 @@ export default {
                     util.getComponentSize(ref.topBar).h +
                     util.getComponentSize(ref.bottomBar).h + 14;
             }
-            return tbHeight - 15;
+            return tbHeight - 60;
         },
         /**
          * Tạo cấu hình cho hiển thị header của table
