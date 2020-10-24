@@ -1213,9 +1213,6 @@ export default {
                 let thisCpn = this;
                 thisCpn.loadingData = true;
                 let options = this.getOptionForGetList(configs, columns);
-                if(this.showPagination == false){
-                    options.pageSize = 1000
-                }
                 let header = {};
                 let routeName = this.$getRouteName();
                 if(routeName == "deployHistory" || routeName == "listProcessInstances"){
