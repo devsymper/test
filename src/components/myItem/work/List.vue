@@ -1,6 +1,6 @@
 <template>
-  <div class="list-objects">
-    <v-row class="mr-0 ml-0">
+  <div class="list-objects h-100">
+    <v-row class="mr-0 ml-0 h-100">
         <v-col
             :cols="!sideBySideMode ? 12 : 4"
             :md="!sideBySideMode ? 12 : 3"
@@ -187,6 +187,7 @@
             style="border-left: 1px solid #e0e0e0;"
         >
         <workDetail
+          class="workDetail"
           :parentHeight="listTaskHeight"
           :workInfo="selectedWork.workInfo"
           @close-detail="closeDetail"
@@ -459,7 +460,7 @@ export default {
         this.getWorks();
     },
     reCalcListTaskHeight() {
-        this.listTaskHeight =util.getComponentSize(this.$el.parentElement).h - 125;
+        this.listTaskHeight =util.getComponentSize(this.$el.parentElement).h - 85;
     },
     getUser(id) {
         this.$refs.user.getUser(id);

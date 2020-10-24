@@ -84,6 +84,9 @@ export default {
         instanceId(){
             this.setInstanceXML();
            // this.getInstanceRuntimeData();
+        },
+        elementId(){
+            this.setInstanceXML();
         }
     },
     created() {
@@ -156,6 +159,7 @@ export default {
                 bpmneApi
                 .getDefinitionModel(this.processDefinitionId)
                 .then(res => {
+
                     let data=res.mainProcess.flowElementMap;
                     for (const key in data) {
                         if (data[key].assignee && !self.runtimeNodeMap[key]) {
@@ -163,7 +167,7 @@ export default {
                         }
                     }
                     self.getVariableProcessInstance(self.instanceId);
-                    console.log("aaaax",self.flowElementMap);
+                    console.log("aaaax",res);
                 })
                 .catch(err => {
                     self.$snotifyError(
@@ -232,7 +236,7 @@ export default {
                         setColor:nodeStatusColors.notStart
                     });
                 }
-              
+
             }
         },
         // Lấy ra thông tin chạy của các node của instance

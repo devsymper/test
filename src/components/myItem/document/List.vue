@@ -1,6 +1,6 @@
 <template>
-  <div class="list-objects">
-    <v-row class="mr-0 ml-0">
+  <div class="list-objects h-100">
+    <v-row class="mr-0 ml-0 h-100">
       <v-col
         :cols="!sideBySideMode ? 12 : 4"
         :md="!sideBySideMode ? 12 : 3"
@@ -402,7 +402,7 @@ export default {
         },
         reCalcListTaskHeight() {
         this.listTaskHeight =
-            util.getComponentSize(this.$el.parentElement).h - 125;
+            util.getComponentSize(this.$el.parentElement).h - 85;
         },
         getUser(id) {
             this.$refs.user.getUser(id);

@@ -2,7 +2,7 @@
 <div style=' width: 100%; padding-left: 10px; position: relative;' class="overflow-hidden">
     <v-row class="submit-view">
         <!-- period selector -->
-        <v-navigation-drawer v-model="drawer" absolute temporary right style="width: 450px" class="manage-timesheet">
+        <v-navigation-drawer v-show="drawer" v-model="drawer" absolute temporary right style="width: 450px" class="manage-timesheet">
              <Config @cancel="cancel()"/>
              </v-navigation-drawer>
         <div style="width:63%;float:left; color: black!important">

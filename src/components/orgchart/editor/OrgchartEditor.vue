@@ -127,7 +127,7 @@
         </div>
 
         <v-navigation-drawer
-            v-if="context == 'department'"
+            v-show="context == 'department' && positionEditor"
             v-model="positionEditor"
             right
             absolute
