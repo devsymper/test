@@ -14,6 +14,7 @@
      <v-navigation-drawer
         width="500"
         v-model="drawer"
+        v-show="drawer"
         absolute
         temporary
         right
