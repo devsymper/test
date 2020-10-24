@@ -84,6 +84,9 @@ const delFavorite = (state, data) => {
 const changeTypeView = (state) => {
     state.viewSideBySide = !state.viewSideBySide
 }
+const setTypeView = (state, data) => {
+    state.viewSideBySide = data
+}
 const updateCurrentAppId = (state, data) => {
     state.currentAppId = data
 }
@@ -108,14 +111,6 @@ const updateFavoriteMyAppItem = (state, data) => {
             break;
         }
     }
-    // state.listApps[data.appId].childrenAppReduce[state.selectingItemType].item.forEach(function(e){
-    //     if(e.objectIdentifier == data.itemId){
-    //         Vue.set(e, "favorite" , data.value)
-    //         // e.favorite = data.value
-    //         // Vue.set(e)
-    //     }
-    // })
-
 }
 const updateSelectingItemType = (state, data) => {
     state.selectingItemType = data
@@ -143,5 +138,6 @@ export {
     updateFavoriteMyAppItem,
     updateSelectingItemType,    
     updateActiveChildItem,
-    updateCurrentAppName
+    updateCurrentAppName,
+    setTypeView
 };

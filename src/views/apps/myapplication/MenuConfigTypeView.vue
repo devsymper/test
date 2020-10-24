@@ -86,6 +86,7 @@ export default {
     props:{
         currentTypeView:{
             type: Number, 
+            default:0
         },
         titleTypeView:{
             type: String, 

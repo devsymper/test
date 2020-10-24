@@ -262,7 +262,6 @@ x				}
 		},
         changeView(){
 			this.$store.commit('appConfig/changeTypeView')
-			this.$emit('change-type')
         },
         hideContextMenu(){
             if(this.$refs.appDetail){

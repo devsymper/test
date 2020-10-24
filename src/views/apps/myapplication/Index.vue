@@ -1,7 +1,7 @@
 <template>
   <div class="view-applications-wrapper h-100 w-100">
-        <ViewDetailsAllApp ref="ViewDetailsAllApp" v-if="viewSideBySide == false" @change-type="changeType" :currentType="currentType" />
-        <ViewSideBySideApp ref="ViewSideBySideApp" v-else  @change-type="changeType" />
+        <ViewDetailsAllApp ref="ViewDetailsAllApp" v-if="viewSideBySide == false"  :currentType="currentType" />
+        <ViewSideBySideApp ref="ViewSideBySideApp" v-else  />
   </div>
 </template>
 
@@ -16,22 +16,12 @@ export default {
     },
     computed:{
         viewSideBySide(){
-            if(this.typeDefault){
-                if(this.typeDefault == 0){
-                    return false
-                }else{
-                    return true
-                }
-            }else{
-                return this.$store.state.appConfig.viewSideBySide
-            }
+            return this.$store.state.appConfig.viewSideBySide
         }
     },
     data(){
         return {
-            typeDefault:null,
-            currentType: null,
-            
+            currentType: 0,
         }
     },
     mounted(){
@@ -56,17 +46,15 @@ export default {
         uiConfigApi.getUiConfig('myApplication').then(res=>{
             if(res.status == 200){
                 let value = JSON.parse(res.data.detail)
-                self.typeDefault = value.typeView
+                if(value.typeView == 0){
+		        	this.$store.commit('appConfig/setTypeView', false)
+                }else{
+		        	this.$store.commit('appConfig/setTypeView', true)
+                }
                 self.currentType = value.typeView
             }
         })
     },
-    methods:{
-        changeType(){
-            this.typeDefault = null
-            debugger
-        }
-    }
 }
 </script>
 
