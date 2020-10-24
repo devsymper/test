@@ -31,14 +31,13 @@
 								<li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
 									<div style="position:relative; display:flex">
 										<v-icon style="font-size:13px;margin-right:8px">{{listIcon[item.type]}}</v-icon>
-										<div v-if="item.type == 'document_definition'" class="title-item-favorite d-flex flex-column">
-											{{item.title}}
+										<div  class="d-flex flex-column">
+											<div class="title-item-favorite ">
+												{{item.type == 'document_definition' ? item.title : item.name}}
+											</div>
 											<span style="font:12px roboto; font-weight:300">{{item.appName}}</span>
 										</div>
-										<div v-else  class="title-item-favorite d-flex flex-column">
-											{{item.name}}
-											<span style="font:12px roboto; font-weight:300">{{item.appName}}</span>
-										</div> 
+									
 										<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:6px;right:0px">mdi-star</v-icon>
 									</div>
 								</li>
