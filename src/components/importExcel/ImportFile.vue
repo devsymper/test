@@ -14,7 +14,7 @@
         <v-row class="h-100 mt-1 ml-0">
             <v-col cols="3" style="border-right:1px solid rgba(0,0,0,0.2)">
                 <v-list style="margin-top:-25px">
-                    <v-stepper-header class="stepper-header" >
+                    <v-stepper-header >
 						<v-stepper-step class="fs-13" editable step="1" @click="showImportInfo()">
 					 Thông tin
 						</v-stepper-step>
@@ -113,7 +113,9 @@
                         <v-col  class="col-md-5 pb-5 d-flex justify-content ml-2" >
                             <v-icon style=" margin-top:-19px; font-size:13px " class="pr-4" size="18">mdi mdi-key</v-icon>
                             <div class="color-normal" style="float:left; margin-top:-13px">Khoá
-                                <span style="color:red">*</span>
+                                <span v-if="tableIdx!=0&&checkKeyRequired(table,tableIdx)" style="color:red">*</span>
+                                <span v-if="tableIdx==0" style="color:red">*</span>
+
                             </div>
                         </v-col>
                         <v-col class="col-md-6 py-0" >
@@ -248,6 +250,17 @@ export default {
         this.errorMessage =" "
     },
     methods: {
+        checkKeyRequired(tables, tableIdx){
+            let check = false;
+            for(let i=0; i<tables.controls.length;i++){
+                if(!tables.controls[i].isNull){
+                    check = true;
+                }
+            }
+            return check
+            debugger
+
+        },
         nextToImport(dataUpload){
             let check = true;
             if(dataUpload.data.key==''){
@@ -425,6 +438,7 @@ export default {
         },
         //
         checkValidate(){
+            this.errorMessage="";
             let check=true;
               // kiểm tra key rỗng của table chung
             if (this.tables[0].keyColumn==undefined||this.tables[0].keyColumn.index==-1) {
@@ -436,15 +450,23 @@ export default {
             if (this.tables[0].sheetMap == '') {
                 this.errorMessage = '* Điền thiếu trường thông tin chung';
                 check = false;
+                 // nếu có sheetMap thì phải chọn khóa 
             };
             // kiểm tra bảng con
                 if(this.options.objType=='document'){
-                for (let i = 0; i < this.tables.length; i++) {
-                    if(this.tables[i].keyColumn==undefined||this.tables[i].keyColumn.index==-1){
-                        this.errorMessage = '* Bạn chưa chọn khóa cho bảng '+this.tables[i].name;
-                        check = false;
-                    };
-                }
+                    for (let i = 0; i < this.tables.length; i++) {
+                        if(this.tables[i].keyColumn==undefined||this.tables[i].keyColumn.index==-1&&!this.tables[i].keyColumn){
+                            this.errorMessage = '* Bạn chưa chọn khóa cho bảng '+this.tables[i].name;
+                            check = false;
+                        };
+                        for(let j=0; j<this.tables[i].controls.length;j++){
+                            debugger
+                             if(!this.tables[i].controls[j].isNull&&this.tables[i].controls[j].dataColumn==null){
+                                check = false;
+                                  this.errorMessage = '* Bạn chưa điền trường bắt buộc cho bảng '+this.tables[i].name;
+                             }
+                        }
+                    }
             }
             return check;
 
@@ -493,7 +515,6 @@ export default {
    
         //Sự kiện xảy ra khi thay đổi tên Sheet
         onChangeSheet(tableIdx, value) {
-            debugger
             // 1. Khi select sheet 
             if (value) {
                 // chuyển giá trị được chọn thành false
@@ -525,7 +546,6 @@ export default {
                         this.nameColumnDetail[name][j].enable = true;
 
                     }
-                    
                 }
             }
             this.tables[tableIdx].controls.forEach(c => {
