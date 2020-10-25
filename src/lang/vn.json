@@ -240,7 +240,8 @@
             "update_success": "Cập nhật tài khoản thành công!",
             "user_name_already_exist": "Tên tài khoản đã tồn tại",
             "Old password incorrect": "Mật khẩu cũ không đúng",
-            "successChangePass": "Đổi mật khẩu thành công"
+            "successChangePass": "Đổi mật khẩu thành công",
+            "invalid email!": "Email không hợp lệ"
 
         },
         "title": "Danh sách User",

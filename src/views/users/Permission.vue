@@ -17,6 +17,7 @@
             <v-col class="md-5">
                 <div>
                     <v-text-field
+                        v-if="showUser"
                         class="pt-0 search-input "
                         style="height:30px!important"
                         v-model="search"
@@ -28,14 +29,8 @@
                 </div>
             </v-col>
         </v-row>
-       
          <div v-if="showOrgchart">
             <OrgchartElementSelector v-model="data"/>
-        </div>
-         <div class=" flex-grow-1 d-flex justify-end align-end">
-            <v-btn @click="saveOrgchart()">
-                Lưu
-            </v-btn>
         </div>
         <div class="w-100" v-if="showUser">
              <v-data-table
@@ -51,6 +46,15 @@
             >
             </v-data-table>
         </div>
+            <div class=" flex-grow-1 d-flex justify-end align-end">
+            <v-btn v-if="showOrgchart" @click="saveOrgchart()">
+                Lưu
+            </v-btn>
+             <v-btn v-if="!showOrgchart" @click="insertRole()">
+                Lưu
+            </v-btn>
+           
+        </div>
     </div>
 </template>
 <script>
@@ -60,9 +64,7 @@ import OrgchartElementSelector from "./../..//components/common/OrgchartElementS
 export default {
   watch: {
       data(){
-          debugger
           let data = this.data
-
       }
     },
     components:{
@@ -137,9 +139,7 @@ export default {
             }else{
                 this.listSelected.pop()
             }
-
-            let test = this.listSelected;
-            this.insertRole();
+           
         },
         insertRole(){
             let data= [{"userId": this.userId, "roles": this.listSelected}];

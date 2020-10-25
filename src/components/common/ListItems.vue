@@ -539,7 +539,7 @@ export default {
             type: Boolean,
             default: false
         },
-        showImportHistory:{
+        showImportHistoryBtn:{
             type: Boolean,
             default: false
         },
