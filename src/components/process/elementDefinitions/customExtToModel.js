@@ -57,7 +57,7 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
 
         for (let attrName in attrs) {
             let attrDef = allNodesAttrs[attrName];
-            if (!attrDef) {
+            if (!attrDef || (!attrs.name.value && vizEl.type=="bpmn:SequenceFlow")) {
                 continue;
             }
             if (typeof attrDef.pushToXML == 'function') {

@@ -392,6 +392,7 @@ export default {
                             nodeData.attrs.process_id.value;
                     }
                 }
+
             }
 
             // Loại bỏ data của các node mà ko có trong diagram
