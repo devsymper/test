@@ -97,9 +97,10 @@ export default {
 			obj.active = !obj.active
 			this.$store.commit('appConfig/updateListItemSelected',{obj:obj,type:type});
 		},
-		doSearch(val,time) {
+		doSearch(val,time){
 			clearTimeout(delayTimer);
 			let self = this;
+			debugger
 			delayTimer = setTimeout(function() {
 				self.getListSearch(val)
 			}, time); 

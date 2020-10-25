@@ -1,7 +1,45 @@
 <template>
     <div :class="{'d-flex w-100 h-100': true, 'diagram-hortical': typeView == 'B','diagram-vertical': typeView == 'R'   } ">
         <div class="h-100 flex-grow-1">
-            <div class="border-bottom-1 pt-1 pl-2">
+            <div class="border-bottom-1 pt-1 pl-2 d-flex justify-content-center">
+                <div style="margin-right:8px;margin-top:4px">
+                     <span style="font:17px roboto;font-weight:500">SĐTC dạng lưu đồ</span>
+                    <v-menu
+                        :max-width="500"
+                        :max-height="700"
+                        :nudge-width="200"
+                        offset-y
+                        >
+                        <template v-slot:activator="{ on }" class="float-right">
+                            <v-btn icon tile x-small v-on="on">
+                                <v-icon>mdi-chevron-down</v-icon>
+                            </v-btn>
+                        </template>
+                        <v-list
+                                nav
+                                dense
+                            >
+                                <v-list-item-group
+                                    v-model="currentTab"
+                                    color="primary"
+                                    >
+                                    <v-list-item
+                                        v-for="(item, i) in menuPickTab"
+                                        :key="i"
+                                    >
+                                        <v-list-item-icon>
+                                        <v-icon v-text="item.icon"></v-icon>
+                                        </v-list-item-icon>
+
+                                        <v-list-item-content>
+                                        <v-list-item-title v-text="item.title"></v-list-item-title>
+                                        </v-list-item-content>
+                                    </v-list-item>
+                                </v-list-item-group>
+                        </v-list>
+                    </v-menu>
+                </div>
+
                 <v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
                     <template v-slot:activator="{ on }">
                         <v-btn
@@ -148,6 +186,10 @@ export default {
         },
         id: {
             default: ''
+        },
+        currentTab:{
+            type:Number,
+            default:2
         }
     },
     data(){
@@ -156,7 +198,25 @@ export default {
             typeView: "B",
 			positionEditor: false,
 			checkPageEmpty: false,
-			listUserIds:null,
+            listUserIds:null,
+            menuPickTab:[
+                {
+                    icon: "mdi-grid",
+                    title:"SĐTC dạng bảng",
+                    action:"tableView"
+                },
+                {
+                    icon: "mdi-account-multiple",
+                    title:"SĐTC dạng cây",
+                    action:"tableSideBySideView"
+                },
+                {
+                    icon: "mdi-share-variant",
+                    title:"SĐTC dạng lưu đồ",
+                    action:"diagramView"
+                },
+
+            ],
             headerActions: {
                 zoomIn: {
                     icon: "mdi-plus-circle-outline",
@@ -212,6 +272,11 @@ export default {
         positionEditor(after){
             if(after === false){
                 this.storeDepartmentPositionCells();
+            }
+        },
+        currentTab(val){
+            if(val == 0 || val == 1){
+                this.$emit('current-tab' , val)
             }
         }
     },
