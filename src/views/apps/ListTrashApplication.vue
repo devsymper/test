@@ -35,20 +35,18 @@ export default {
             apiUrl: appConfigs.apiDomain.trash+'/items?type=application_definition',
             customAPIResult: {
                 reformatData(res){
-                     let mapIdToUser = self.$store.getters['app/mapIdToUser'];
                      res.data.forEach(function(e){
                          if(e.data != ""){
                             let newData = JSON.parse(e.data)
                             e.appId = newData.id
                             e.appName = newData.name
-                            e.userDeletedName = mapIdToUser[e.userDeleted].displayName
                          }
                      })
                    return{
                        columns:[
                             {name: "appId", title: "id", type: "numeric", noFilter: true},
                             {name: "appName", title: "name", type: "text", noFilter: true},
-                            {name: "userDeletedName", title: "userDeletedName", type: "text", noFilter: true,},
+                            {name: "userDeleted", title: "userDeletedName", type: "text", noFilter: true,},
                             {name: "userAgent", title: "userAgent", type: "text",noFilter: true},
                             {name: "roleDeleted", title: "roleDeleted", type: "date",noFilter: true},
                             {name: "deletedAt", title: "deletedAt", type: "date",noFilter: true}

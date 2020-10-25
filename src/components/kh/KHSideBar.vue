@@ -1,5 +1,5 @@
 <template>
-  <vue-resizable :maxWidth="500" :width="skh.widthSideBar">
+  <vue-resizable  @resize:end="resizeSidebar" :width="skh.widthSideBar" style="height: calc(100% - 10px);">
     <v-navigation-drawer class="khSidebar resizable-content" v-show="!skh.subCollapseSideBar">
       <div>
         <v-text-field
@@ -14,8 +14,9 @@
           label="Search"
           :placeholder="$t('common.search')"
         ></v-text-field>
+        
         <div class="kh-side-bar">
-          <v-container style="height: calc(100vh - 65px);overflow: auto;">
+          <v-container style="height: calc(100% - 65px);overflow: auto;">
             <div class="workspace">
               <div class="symper-title">WORKSPACE</div>
               <div class="icon-add">
@@ -517,6 +518,10 @@ export default {
     }
   },
   methods: {
+    resizeSidebar(e){
+        console.log("aaaaa",e.width);
+        this.$evtBus.$emit("kh-resize-sidebar",e.width);
+    },
     dbclickDoc(path, id, hash) {
       $(".favorite .v-list-item").removeClass("v-item--active");
       if (!this.skh.statusEdit) {
@@ -542,14 +547,14 @@ export default {
      * Thay đổi trạng thái doc để lưu doc
      */
     saveDocument() {
-      this.$store.commit("kh/changeStatusEdit", !this.skh.statusEdit);
-      this.dialogSave = false;
-      let hash = this.hash;
-      this.$store.commit("kh/setCurrentDocument", hash);
-      const state = {};
-      const title = "SYMPER APP";
-      const url = "/#/knowledge/document/" + hash;
-      history.pushState(state, title, url);
+        this.$store.commit("kh/changeStatusEdit", !this.skh.statusEdit);
+        this.dialogSave = false;
+        let hash = this.hash;
+        this.$store.commit("kh/setCurrentDocument", hash);
+        const state = {};
+        const title = "SYMPER APP";
+        const url = "/#/knowledge/document/" + hash;
+        history.pushState(state, title, url);
     },
     /**
      * Show div input thêm node và focus vào input
@@ -945,13 +950,13 @@ export default {
 </script>
 
 <style scoped>
-.resizable-component{
+/* .resizable-component{
   height: 100%!important;
-}
-.resizable-content {
+} */
+/* .resizable-content {
   height: 100%;
   width: 100%;
-}
+} */
 .collapse-sidebar-btn {
   position: absolute;
   bottom: 20px;

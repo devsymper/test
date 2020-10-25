@@ -19,7 +19,7 @@
         "update": "Cập nhật",
         "delete": "Xóa",
         "refresh": "Làm mới",
-        "userDeletedName": "Họ và tên người xóa",
+        "userDeletedName": "Email người xóa",
         "roleDeleted": "Role người xóa",
         "userAgent": "Trình duyệt xóa",
         "deletedAt": "Thời gian xóa",
@@ -816,7 +816,7 @@
             "status": "Kích hoạt",
             "created_at": "Ngày tạo",
             "updated_at": "Cập nhật lần cuối",
-            "userDeletedName": "Tên người xóa ",
+            "userDeletedName": "Email người xóa ",
             "userAgent": "Trình duyệt xóa ",
             "roleDeleted": "Role người xóa ",
             "deletedAt": "Thời gian xóa"

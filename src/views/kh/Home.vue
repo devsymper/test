@@ -4,7 +4,6 @@
     <side-bar />
     <home-page />
   </div>
- 
 </template>
 
 <script>

@@ -465,6 +465,7 @@ export default {
          * Hàm xử lí khi drag control
          */
         handleDragControlInEditor(e){
+            this.editorCore.undoManager.add();
             this.currentDragging = $(e.target);
             let idControl = this.currentDragging.attr('id');
             let currentLocation =  $("#document-editor-"+this.keyInstance+"_ifr").contents().find('#'+idControl);
@@ -479,12 +480,18 @@ export default {
             setTimeout((self) => {
                 let idControl = self.currentDragging.attr('id');
                 let currentLocation =  $("#document-editor-"+self.keyInstance+"_ifr").contents().find('#'+idControl);
-                let newTableId = false;
-                if(!currentLocation.is('.s-control-table') && currentLocation.closest('.s-control-table')){
-                    let tableContain = currentLocation.closest('.s-control-table');
-                    newTableId = tableContain.attr('id');
+                if(currentLocation.parent().is('.ephox-snooker-resizer-bar')){ // th nếu kéo phải control vào chỗ resize table nên bị mất control, thì undo lại
+                    e.target.undoManager.undo(); 
                 }
-                self.handleMoveDataControl(idControl,newTableId)
+                else{
+                    let newTableId = false;
+                    if(!currentLocation.is('.s-control-table') && currentLocation.closest('.s-control-table')){
+                        let tableContain = currentLocation.closest('.s-control-table');
+                        newTableId = tableContain.attr('id');
+                    }
+                    self.handleMoveDataControl(idControl,newTableId)
+                }
+                
             }, 100,this);
             
         },

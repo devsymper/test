@@ -31,9 +31,14 @@
 								<li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
 									<div style="position:relative; display:flex">
 										<v-icon style="font-size:13px;margin-right:8px">{{listIcon[item.type]}}</v-icon>
-										<div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
-										<div v-else  class="title-item-favorite">{{item.name}}</div> 
-										<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:0px;right:0px">mdi-star</v-icon>
+										<div  class="d-flex flex-column">
+											<div class="title-item-favorite ">
+												{{item.type == 'document_definition' ? item.title : item.name}}
+											</div>
+											<span style="font:12px roboto; font-weight:300">{{item.appName}}</span>
+										</div>
+									
+										<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:6px;right:0px">mdi-star</v-icon>
 									</div>
 								</li>
 							</VuePerfectScrollbar>
@@ -247,7 +252,8 @@ export default {
 						}  
 					})
 					this.checkTypeFavorite(res.data.listObject)
-					this.$store.commit('appConfig/updateListFavorite',this.listFavorite)
+					this.$store.commit('appConfig/updateListFavorite',self.listFavorite)
+					debugger
 					this.loadingFavorite = false
 				}
 			}).catch((err) => {
@@ -260,6 +266,7 @@ export default {
 			this.title.iconType = item.iconType;
 			this.title.name = item.name;
 			this.$store.commit("appConfig/updateCurrentAppId",item.id);
+			this.$store.commit("appConfig/updateCurrentAppName",item.name);
 			appManagementApi.getAppDetails(item.id).then(res => {
 				if (res.status == 200) {
 					if(Object.keys(res.data.listObject.childrenApp).length > 0){
@@ -332,6 +339,7 @@ export default {
 						item.favorite = 1
 						item.actions = value.actions
 						item.type = type
+						item.appName = value.appName
 					} 
 				})
 			}
