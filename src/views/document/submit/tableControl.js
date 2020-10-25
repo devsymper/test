@@ -42,6 +42,9 @@ export default class TableControl extends Control {
          * @param {*} data 
          */
     setData(data) {
+        if (Object.keys(data).length == 0) {
+            return;
+        }
         if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1) {
             if (this.tableInstance.tableInstance) {
                 this.tableInstance.tableInstance.updateSettings({
@@ -103,13 +106,14 @@ export default class TableControl extends Control {
                 dataTable.push(rowData)
 
             }
+
+            if (this.tableInstance.tableHasRowSum) { // trường hợp có dòng tính tổng thì thêm dòng ở cuối hiển thị tổng cột
+                dataTable.push({})
+            }
             this.tableInstance.tableInstance.loadData(dataTable);
             setTimeout((self) => {
                 self.tableInstance.tableInstance.render();
             }, 100, this);
-            if (this.tableInstance.tableHasRowSum) { // trường hợp có dòng tính tổng thì thêm dòng ở cuối hiển thị tổng cột
-                this.tableInstance.tableInstance.alter('insert_row', Object.keys(data).length, 1);
-            }
             if (this.currentDataStore.docStatus == 'init') {
                 this.defaultValue = data;
             }

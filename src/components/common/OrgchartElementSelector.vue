@@ -1,23 +1,24 @@
 <template>
-<div>
-    <v-treeview
-        class="fs-13"
-        activatable
-        :items="treeData"
-        dense>
-         <template v-slot:label="{ item }">
-            <v-checkbox
-                @change="handleChangeSelectedNode(item)"
-                v-if="item.type == 'position'"
-                v-model="item.selected"
-                :label="item.name"
-            ></v-checkbox>
-            <span v-else>
-                {{item.name}}
-            </span>
-        </template>
-    </v-treeview>
-</div>
+    <div class="orgchart-element-selector">
+        <v-treeview
+            class="fs-13"
+            activatable
+            :items="treeData"
+            dense>
+            <template v-slot:label="{ item }">
+                <v-checkbox
+                    @change="handleChangeSelectedNode(item)"
+                    v-if="item.type == 'position'"
+                    v-model="item.selected"
+                    :label="item.name"
+                    dense
+                ></v-checkbox>
+                <span v-else>
+                    {{item.name}}
+                </span>
+            </template>
+        </v-treeview>
+    </div>
 </template>
 
 <script>
@@ -43,11 +44,14 @@ export default {
         checkboxMode: {
             type: String,
             default: 'position' // Hiển thị ô check ở những loại node nào: position, department, all
+        },
+        searchKey:{
+            type:String,
+            default:""
         }
     },
     watch: {
         value(){
-            
             let mapNode = this.$store.state.orgchart.allOrgchartStruct.map;
             for(let item of this.value){
                 if(mapNode[item]){
@@ -56,7 +60,11 @@ export default {
             }
         }
     },
-
+    data(){
+        return{
+            res: []
+        }
+    },
     computed: {
         mapSelectedNode(){
             return this.value.reduce((map, el) => {
@@ -65,7 +73,14 @@ export default {
             }, {});
         },
         treeData(){
-            return this.$store.state.orgchart.allOrgchartStruct.tree;
+            let tree = this.$store.state.orgchart.allOrgchartStruct.tree;
+            if(this.searchKey == ""){
+                  return tree;
+            }else{
+                this.res = []
+                let res = this.searchItem(tree,this.searchKey)
+                return res;
+            }
         }
     },
 
@@ -87,11 +102,36 @@ export default {
 
             this.$emit('input', vl);
             this.$emit('change-node-selected', node);
-        }
+        },
+        searchItem(data,keyWord){
+            let self = this
+            if(data.length > 0){
+                data.forEach(function(e){
+                    if(e.name.toLowerCase().includes(keyWord.toLowerCase())){
+                        if(self.res.includes(e) == false){
+                             self.res.push(e)
+                        }
+                    }
+                    if(e.hasOwnProperty("children")){
+                          self.searchItem(e.children,keyWord)
+                    }
+                })
+            }
+            return self.res
+        },
+      
     }
 }
 </script>
 
-<style>
-
+<style scoped>
+.orgchart-element-selector>>> .v-treeview-node__label .v-messages{
+    display: none;
+}
+.orgchart-element-selector>>> .v-treeview-node__label .v-input{
+    margin-top: unset;  
+}
+.orgchart-element-selector>>> .v-treeview-node__label .v-input__slot label{
+    font:13px roboto;
+}
 </style>

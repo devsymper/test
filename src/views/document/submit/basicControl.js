@@ -105,6 +105,8 @@ export default class BasicControl extends Control {
             this.renderFileControl();
         } else if (this.ele.hasClass('s-control-user')) {
             this.renderUserControl();
+        } else if (this.ele.hasClass('s-control-checkbox')) {
+            this.renderCheckboxControl();
 
         } else if (this.ele.hasClass('s-control-select')) {
             this.renderSelectControl();
@@ -183,6 +185,8 @@ export default class BasicControl extends Control {
                 let valueChange = $(e.target).val();
                 if (thisObj.type == 'label') {
                     valueChange = $(e.target).text();
+                } else if (thisObj.type == 'checkbox') {
+                    valueChange = $(e.target).prop("checked");
                 }
                 thisObj.value = valueChange;
                 SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.name, val: valueChange })
@@ -203,11 +207,11 @@ export default class BasicControl extends Control {
                     e.curTarget = e.target
                     SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
                 }
-                if (thisObj.type == 'percent') {
-                    if (e.target.value > 100) {
-                        $(e.target).val(100)
-                    }
-                }
+                // if (thisObj.type == 'percent') {
+                //     if (e.target.value > 100) {
+                //         $(e.target).val(100)
+                //     }
+                // }
                 if (thisObj.type == 'department') {
                     e['controlName'] = thisObj.name;
                     SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
@@ -268,7 +272,7 @@ export default class BasicControl extends Control {
                     e.curTarget = e.target
                     SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', e)
                 } else if (thisObj.type == 'image') {
-                    SYMPER_APP.$evtBus.$emit('document-submit-image-click', e)
+                    SYMPER_APP.$evtBus.$emit('document-submit-image-click', { e: e, controlIns: thisObj })
                 }
 
             });
@@ -291,6 +295,12 @@ export default class BasicControl extends Control {
                 $('#' + this.id).text(value);
             } else if (this.type == 'date') {
                 $('#' + this.id).val(moment(value).format(this.formatDate));
+            } else if (this.type == 'checkbox') {
+                if (value)
+                    $('#' + this.id).attr('checked', 'checked');
+                else {
+                    $('#' + this.id).removeAttr('checked');
+                }
             } else if (this.type == 'number') {
                 let v = parseInt(value);
                 if (!isNaN(v))
@@ -313,8 +323,11 @@ export default class BasicControl extends Control {
     }
 
 
-    setValueControl() {
-        let value = this.value
+    setValueControl(vl = undefined) {
+        let value = vl;
+        if (vl == undefined) {
+            value = this.value;
+        }
         if (!value) {
             value = "";
         }
@@ -331,7 +344,15 @@ export default class BasicControl extends Control {
             this.ele.text(value)
         } else if (this.type == 'image') {
             this.ele.empty();
-            let image = '<img height="70" src="' + value + '">';
+            let w = this.controlProperties.width.value;
+            let h = this.controlProperties.height.value;
+            if (!w) {
+                w = 'auto';
+            }
+            if (!h) {
+                h = '70';
+            }
+            let image = '<img height="' + h + '" width="' + w + '" src="' + value + '">';
             this.ele.append(image);
         } else {
             this.ele.val(value)
@@ -589,6 +610,9 @@ export default class BasicControl extends Control {
     }
     renderLabelControl() {
         this.ele.text('').css({ border: 'none' })
+    }
+    renderCheckboxControl() {
+        this.ele.parent().css({ 'vertical-align': 'middle' })
     }
     renderSelectControl(isReadOnly = true) {
         let thisObj = this;

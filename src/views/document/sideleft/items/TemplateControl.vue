@@ -60,13 +60,29 @@
             </VuePerfectScrollbar>
             
         </div>
-        
+        <symper-drag-panel
+            :showPanel="false"
+            :dragPanelWidth="800"
+            :dragPanelHeight="500"
+            :actionTitle="'Xem trước control template'"
+            ref="dragPanel">
+            <template slot="drag-panel-content">
+                
+                <PreviewEditor
+                v-if="isShowPreview"
+                    :instance="instance"
+                    :content="contentPreview"
+                ></PreviewEditor>
+            </template>
+        </symper-drag-panel>
     </div>
 </template>
 <script>
 import Control from './../../items/Control.vue';
+import PreviewEditor from './PreviewEditor';
 import getControlElement from './../../../../components/document/controlPropsFactory.js';
 import Loader from './../../../../components/common/Loader';
+import SymperDragPanel from '@/components/common/SymperDragPanel';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../../../api/Document';
 
@@ -83,7 +99,8 @@ export default {
     },
     data(){
         return {
-           
+            contentPreview:null,
+            isShowPreview:false
         }
     },
     computed:{
@@ -94,7 +111,9 @@ export default {
     components:{
         'control' : Control,
         VuePerfectScrollbar,
-        Loader
+        Loader,
+        PreviewEditor,
+        SymperDragPanel
     },
  
     methods:{
@@ -115,22 +134,24 @@ export default {
             this.$goToPage('/documents/control-template/'+control.id,control.title);
         },
         previewControlTemplate(control){
-
+            this.contentPreview = control.content;
+            this.isShowPreview = true;
+            this.$refs.dragPanel.show();
         },  
         deleteControlTemplate(control){
             let thisCpn = this;
-                        documentApi.deleteControlTemplate(id).then(res=>{
-                            // let allControlTemplate = thisCpn.allControlTemplate;
-                            // let controlTemplate = allControlTemplate.filter(c=>{
-                            //     return c.id == id
-                            // });
-                            // delete allControlTemplate[allControlTemplate.indexOf(controlTemplate[0])]
-                            // thisCpn.$store.commit(
-                            //     "document/addToDocumentEditorStore",{key:'allControlTemplate',value:allControlTemplate,instance:thisCpn.instance}
-                            // );
-                        }).catch(err => {
-                        })
-                        .always(() => {});
+            documentApi.deleteControlTemplate(control.id).then(res=>{
+                let allControlTemplate = thisCpn.allControlTemplate;
+                let controlTemplate = allControlTemplate.filter(c=>{
+                    return c.id == control.id
+                });
+                let index = allControlTemplate.indexOf(controlTemplate[0]);
+                thisCpn.$store.commit(
+                    "document/deleteControlTemplate",{index:index,instance:thisCpn.instance}
+                );
+            }).catch(err => {
+            })
+            .always(() => {});
         }
     },
     mounted(){

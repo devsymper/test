@@ -7,12 +7,15 @@
         :headerPrefixKeypath="'user.table'"
         :useDefaultContext="false"
         :pageTitle="$t('user.title')"
+        :debounceRowSelectTime="200"
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
+        :showActionPanelInDisplayConfig="true"
         :customAPIResult="customAPIResult"
         :getDataUrl="getListUrl+'users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
         @import-excel="importExcel()"
+        @row-selected="onRowSelected"
         :commonActionProps="commonActionProps">
         <div slot="right-panel-content" class="h-100">
             <action-panel
@@ -21,6 +24,7 @@
                 @refresh-data="refreshListUser"
                 @refresh-new-user="setNewUserItem"
                 @close-panel="closePanel"
+                @edit-user-info="handleEditUserInfo"
                 :actionType="actionType"
                 :isSettingPasswordView="isSettingPasswordView"
                 :showViewInfo="showViewInfo"
@@ -154,6 +158,15 @@ export default {
         
     },
     methods:{
+        handleEditUserInfo(info){
+            this.editUser(info);  
+        },
+        onRowSelected(row){
+            this.focusingUser = row;
+            if(this.$refs.listUser.alwaysShowActionPanel){
+                this.showViewDetailInfo(row);
+            }
+        },
          getListFieldUser(){
              this.listRowUser =  [{
                 sheetMap: '',

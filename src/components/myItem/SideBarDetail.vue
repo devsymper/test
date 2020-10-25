@@ -5,6 +5,7 @@
 	permanent
 	right
 	:width="sidebarWidth"
+	v-show="isShow"
 	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)'}"
 	>
 	<div class="main-info">
@@ -15,7 +16,7 @@
 
 		<v-divider></v-divider>
 
-		<VuePerfectScrollbar style="height:calc(100% - 110px);">
+		<VuePerfectScrollbar style="height:calc(100% - 20px);">
 			<v-expansion-panels
 			v-model="panel"
 			multiple
@@ -720,9 +721,10 @@ export default {
 		margin-top: 0px !important;
 	}
 	.s-drawer{
+		height: 100%;
 		z-index: 160;
 		padding: 12px 6px 6px 12px;
-		top:86px!important;
+		top: 0;
 	}
 
 	::v-deep .v-expansion-panel:not(:first-child)::after{

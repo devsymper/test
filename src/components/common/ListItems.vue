@@ -1,5 +1,5 @@
 <template>
-    <div class="ml-2 w-100 pr-3 pt-3 list-item-common-symper" >
+    <div class="pl-2 w-100 pr-3 pt-3 list-item-common-symper" >
         <div :style="{width:contentWidth, display: 'inline-block'}">
             <v-row no-gutters class="pb-2" ref="topBar">
                 <v-col>
@@ -203,6 +203,7 @@
             class="pa-3"
             absolute
             right
+            v-show="actionPanel"
             v-if="reComputeActionPanelType != 'drag'"
             :temporary="reComputeActionPanelType == 'temporary'"
         >
@@ -328,10 +329,19 @@ export default {
            this.refreshList();
         },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
-            if(value && !$.isEmptyObject(this.currentItemDataClone)){
+            if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
                 this.openactionPanel();
             }else{
                 this.closeactionPanel();
+            }
+        },
+        defaultData:{
+            deep:true,
+            immediate:true,
+            handler:function(vl){
+                if(vl.listObject.length > 0){
+                    this.getData()
+                }
             }
         }
     },
@@ -380,7 +390,7 @@ export default {
                 manualColumnResize: true,
                 renderAllRows: false,
                 manualRowResize: true,
-                readOnly: true,
+                readOnly: this.isTablereadOnly,
                 contextMenu: {},
                 viewportRowRenderingOffset: 20,
                 viewportColumnRenderingOffset: 20,
@@ -657,6 +667,30 @@ export default {
             default(){
                 return {}
             }
+        },
+        // biến đánh dấu table đươc quyền edit hay ko
+        isTablereadOnly:{
+            type:Boolean,
+            default:true
+        },
+        /**
+         * Thêm điều kiện để quy vấn qua api
+         */
+        conditionByFormula:{
+            type:String
+        },
+        /**
+         * Dữ liệu mặc định cho table
+         */
+        defaultData:{
+            type: Object,
+            default(){
+                return {
+                    listObject:{},
+                    columns:{},
+                    total:0
+                }
+            }
         }
     },
     mounted() {},
@@ -691,7 +725,7 @@ export default {
                     util.getComponentSize(ref.topBar).h +
                     util.getComponentSize(ref.bottomBar).h + 14;
             }
-            return tbHeight - 60;
+            return tbHeight - 15;
         },
         /**
          * Tạo cấu hình cho hiển thị header của table
@@ -1126,13 +1160,18 @@ export default {
                 page: this.page,
                 pageSize: configs.pageSize ? configs.pageSize : this.pageSize,
                 columns: columns ? columns : [],
-                distinct: configs.distinct ? configs.distinct : false
+                distinct: configs.distinct ? configs.distinct : false,
+                formulaCondition:this.conditionByFormula
             };
         },
         /**
          * Lấy ra cấu hình cho việc sort
          */
         prepareFilterAndCallApi(columns = false, cache = false, applyFilter = false, success, configs = {}){
+            if(Object.keys(this.defaultData.listObject).length > 0){
+                success({data:this.defaultData});
+                return;
+            }
             let url = this.getDataUrl;
             let method = 'GET';
             if (url != "") {

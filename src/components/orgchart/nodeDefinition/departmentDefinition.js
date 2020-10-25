@@ -122,21 +122,60 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 		y: shapeSize.height
 	},
 
-	'.btn-collapse-expand': {
-		'ref-dx': -shapeSize.width / 2 ,
-		'ref-y': shapeSize.height + CEConfig.stickHeight - 20,
+	'.btn-collapse-expand-hor': {
+		'ref-dx': -shapeSize.width/2,
+		'ref-y':shapeSize.height,
 		'ref': '.card',
 		event: 'element:collapse',
 		cursor: 'pointer'
 	},
-	
+	'.btn-collapse-expand-hor>circle': {
+		r: 7,
+		fill: 'blue',
+		stroke: 'blue',
+		'stroke-width': 0
+	},
+	'.btn-collapse-expand-hor>text': {
+		fill: 'white',
+		'font-size': 15,
+		'font-weight': 400,
+		stroke: 'white',
+		x: -4,
+		y: 5,
+		'font-family': 'Roboto'
+	},
+	'.btn-collapse-expand-ver': {
+		'ref-dx': 0,
+		'ref-y':shapeSize.height/2,
+		'ref': '.card',
+		event: 'element:collapse',
+		cursor: 'pointer'
+	},
+	'.btn-collapse-expand-ver>circle': {
+		r: 7,
+		fill: 'blue',
+		stroke: 'blue',
+		'stroke-width': 0
+	},
+	'.btn-collapse-expand-ver>text': {
+		fill: 'white',
+		'font-size': 15,
+		'font-weight': 400,
+		stroke: 'white',
+		x: -4,
+		y: 5,
+		'font-family': 'Roboto'
+	},
 	'.collapse-expand-circle': {
 		r: CEConfig.radius,
-		fill: '#848484',
+		fill: 'blue',
 		event: 'element:collapse',
-
-		// x: shapeSize.width / 2,
-		// y: shapeSize.height + CEConfig.stickHeight
+	},
+	'.buttonSign': {
+		stroke: '#FFFFFF',
+		strokeWidth: 1.6,
+		event:"visiblePainted",
+		text: '+'
 	},
 	'.expand-text': {
 		x: shapeSize.width / 2 - CEConfig.fontSize / 2 + 2,
@@ -160,7 +199,8 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 	}
 	
 };
-
+export const PLUS_SIGN =  'M 1 5 9 5 M 5 1 5 9'
+export const MINUS_SIGN =  'M 2 5 8 5'
 export const DEPARTMENT_NODE_DATA = {
 	"type": "org.Member",
 	"size": {
@@ -174,7 +214,6 @@ export const DEPARTMENT_NODE_DATA = {
 	"name": "Phòng ban 1",
 	"attrs": DEFAULT_DEPARTMENT_ATTRS
 };
-
 export const departmentMarkup =
 	`<g class="rotatable ">
         <g class="symper-orgchart-node">
@@ -193,7 +232,14 @@ export const departmentMarkup =
                 <circle class="add"/>
                 <text class="add">+</text>
             </g>
-		
+			<g class="btn-collapse-expand-hor">
+				<circle class="buttonSign"/>
+				<text class="buttonSign"></text>
+			</g>
+			<g class="btn-collapse-expand-ver">
+				<circle class="buttonSign"/>
+				<text class="buttonSign"></text>
+			</g>
             <g class="btn remove orgchart-action">
                 <circle class="remove"/>
                 <text class="remove">X</text>
@@ -201,10 +247,7 @@ export const departmentMarkup =
            
         </g>
     </g>`.replace(/\n/g, '').replace(/\s+/g, ' ');
-	// <g class="btn-collapse-expand">
-			// 	<circle class="collapse-expand-circle"/>
-			// 	<text class="expand-text">+</text>
-			// </g>
+	
 	export const defineDepartment = function () {
 	SymperDepartment = joint.shapes.org.Member.define('Symper.Department', {
 		size: {
@@ -213,9 +256,11 @@ export const departmentMarkup =
 		},
 		hidden: false,
 		attrs: DEFAULT_DEPARTMENT_ATTRS,
+		PLUS_SIGN:PLUS_SIGN,
+		MINUS_SIGN:MINUS_SIGN ,
 		markup: departmentMarkup,
 	}, {
-		hidden: false,
+		hidden:false,
 		isHidden: function () {
 			return !!this.get('hidden');
 		},
@@ -225,11 +270,16 @@ export const departmentMarkup =
 		},
 
 		toggleButtonVisibility: function (visible) {
-
+			this.attr('.btn-collapse-expand-hor', { display: visible ? 'block' : 'none' });
+			this.attr('.btn-collapse-expand-ver', { display: visible ? 'block' : 'none' });
 		},
 
 		toggleButtonSign: function (plus) {
-
+			if (plus) {
+				this.attr('.buttonSign', { text: "+" });
+			} else {
+				this.attr('.buttonSign', { text: "-" });
+			}
 		}
 	});
 }

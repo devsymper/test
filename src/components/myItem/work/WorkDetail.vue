@@ -268,7 +268,7 @@
                 </v-expansion-panels>
             </VuePerfectScrollbar>
         </div>
-        <div v-else-if="filterObject==1 && statusDetailWork==false">
+        <div class="list-task" style="height:calc(100% - 44px)" v-else-if="filterObject==1 && statusDetailWork==false">
             <listTask 
                 :listTask="listTaskCurrent"
                 :appName="workInfo.appName"
@@ -282,6 +282,8 @@
             />
         </div>
         <SideBarDetail
+            style="height: calc(100% - 44px);"
+            class="side-bar"
             :sidebarWidth="sidebarWidth"  
             :isShowSidebar="isShowSidebar"
             :objSideBar="`work`"
@@ -369,7 +371,7 @@ export default {
 			name: "",
 			type: "",
             sidebarWidth:400,
-            filterObject:0,
+            filterObject:1,
             indexObj:null,
             indexSub:null,
             panel: [0, 1, 2, 3, 4],

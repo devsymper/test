@@ -19,6 +19,10 @@
         "update": "Cập nhật",
         "delete": "Xóa",
         "refresh": "Làm mới",
+        "userDeletedName": "Họ và tên người xóa",
+        "roleDeleted": "Role người xóa",
+        "userAgent": "Trình duyệt xóa",
+        "deletedAt": "Thời gian xóa",
         "export_excel": "Xuất excel",
         "list": "Danh sách",
         "search": "Tìm kiếm",
@@ -90,6 +94,8 @@
         "entries": "bản ghi",
         "always_show_sidebar": "Luôn hiển thị sidebar",
         "import_excel": "Nhập bằng excel",
+        "isDefault": "SĐTC mặc định",
+        "restore": "Khôi phục",
         "sidebar": {
             "Notification Config BA": "Cài đặt thông báo",
             "Setting": "Cài đặt",
@@ -125,7 +131,13 @@
             "workflows": "Quy trình",
             "documents": "Văn bản",
             "orgchart": "Sơ đồ tổ chức",
-            "myItem": "My item"
+            "myItem": "My item",
+            "deleteHistory": "Lịch sử xóa",
+            "listApps": "Danh sách ứng dụng",
+            "listTrashApps": "Danh sách ứng dụng đã xóa",
+            "listOrgchart": "Danh sách SĐTC",
+            "listTrashOrgchart": "Danh sách SĐTC đã xóa",
+            "viewOrgchart": "Xem SĐTC mặc định"
         },
         "system": "Hệ thống",
         "copy": "Sao chép"
@@ -547,6 +559,7 @@
                 "printRecord": "In bản ghi",
                 "selectPrintConfig": "Chọn mẫu in",
                 "printMultiple": "In nhiều bản ghi",
+                "deleteMultiple": "Xóa nhiều bản ghi",
                 "listPrintConfig": "Danh sách mẫu in",
                 "print": "In nhanh",
                 "copied": "Đã sao chép",
@@ -554,7 +567,8 @@
                 "prev": "Trước đó",
                 "copyLink": "Sao chép đường dẫn",
                 "download": "Tải xuống",
-                "info": "Thông tin bản ghi"
+                "info": "Thông tin bản ghi",
+                "update": "Sửa bản ghi của văn bản "
             }
         },
         "create": "Tạo mới văn bản",
@@ -574,7 +588,15 @@
             "updateAt": "Thời gian update",
             "userCreate": "Người tạo",
             "userUpdate": "Người cập nhật",
-            "countRecord": "Số lượng bản ghi"
+            "countRecord": "Số lượng bản ghi",
+            "history": {
+                "id": "STT",
+                "name": "Tên văn bản",
+                "title": "Tiêu đề văn bản",
+                "countDelete": "Số lượng đã xóa",
+                "userDelete": "Người xóa",
+                "timeDelete": "Thời gian xóa"
+            }
         },
         "editor": {
             "dialog": {
@@ -603,7 +625,14 @@
                     "type": "Loại văn bản",
                     "note": "Ghi chú (Phục vụ cho việc tìm kiếm)",
                     "titleObject": "Tiêu đề bản ghi (Phục vụ cho việc hiển thị trên MyItem, công thức chạy trên server)",
-                    "titlePrint": "Tiêu đề bản In"
+                    "titlePrint": "Tiêu đề bản In",
+                    "systemMapping": {
+                        "title": "Liên kết Doc và đối tượng hệ thống",
+                        "itemTitle": "Chọn đối tượng để liên kết (Có thể mở được bản ghi của Doc ngay trong đối tượng hệ thống)",
+                        "condition": "Liên kết theo điều kiện",
+                        "conditionDoc": "Điều kiện liên kết trên Doc",
+                        "conditionSystem": "Điều kiện liên kết ở đối tượng"
+                    }
                 },
                 "swapType": {
                     "heading": "Chuyển đổi kiểu control",
@@ -615,6 +644,10 @@
                 "quickInfoControl": {
                     "heading": "Thông tin control"
                 }
+            },
+            "sidebarLeft": {
+                "document" : "Document",
+                "column" : "Trường"
             }
         },
         "submit": {
@@ -772,6 +805,8 @@
     },
     "apps": {
         "titleMyApplication": "Danh sách công việc của tôi",
+        "titleApplication": "Danh sách ứng dụng",
+        "titleTrashApplication": "Danh sách ứng dụng đã xóa",
         "header": {
             "id": "ID",
             "name": "Tên",
@@ -780,7 +815,11 @@
             "price": "Giá",
             "status": "Kích hoạt",
             "created_at": "Ngày tạo",
-            "updated_at": "Cập nhật lần cuối"
+            "updated_at": "Cập nhật lần cuối",
+            "userDeletedName": "Tên người xóa ",
+            "userAgent": "Trình duyệt xóa ",
+            "roleDeleted": "Role người xóa ",
+            "deletedAt": "Thời gian xóa"
         },
 
         "listType": {
@@ -1126,8 +1165,8 @@
             "showMoreTask": "Xem thêm các task liên quan",
             "showLess": "Thu gọn",
             "showMoreFile": "Xem thêm các tệp",
-            "quickView": "Xem nhanh"
-
+            "quickView": "Xem nhanh",
+            "openTask": "Mở công việc"
         },
         "alert": {
             "title_aproval": "Thực thi công việc",
@@ -1158,6 +1197,9 @@
             "assignee": "Người được giao",
             "watcher": "Người theo dõi",
             "participant": "Người tham gia",
+            "proposer": "Người đề nghị",
+            "approver": "Người phê duyệt",
+            "reciver": "Người nhận",
             "id": "Số đơn",
             "list": "Danh sách công việc",
             "submitForm": "Form nhập liệu",
@@ -1192,7 +1234,8 @@
     },
     "orgchart": {
         "list": {
-            "title": "Danh sách sơ đồ tổ chức"
+            "title": "Danh sách sơ đồ tổ chức",
+            "titleTrash": "Danh sách sơ đồ tổ chức đã xóa"
         },
         "create": {
             "title": " Tạo sơ đồ tổ chức"

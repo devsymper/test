@@ -1,6 +1,7 @@
 <template>
     <v-navigation-drawer
         v-model="tableDisplayConfig.show"
+        v-show="tableDisplayConfig.show"
         absolute
         class="pa-2 pl-4"
         right

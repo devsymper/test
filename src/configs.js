@@ -28,6 +28,7 @@ export const appConfigs = {
         documents: 'https://v2hoangnd.dev.symper.vn/document',
         nofitication: 'https://notifi.symper.vn/',
         formulasService: 'https://syql.symper.vn/',
+        trashService: 'https://trash.symper.vn/',
         documentService: 'https://sdocument.symper.vn/',
         sdocumentManagement: 'https://sdocument-management.symper.vn/',
         orgchart: 'https://orgchart.symper.vn/',
@@ -49,7 +50,8 @@ export const appConfigs = {
         search: "https://search.symper.vn/",
         importExcel: 'https://io.dev.symper.vn/',
         uiConfig: "https://ui.symper.vn",
-        workflowExtend: "https://workflow-extend.symper.vn/"
+        workflowExtend: "https://workflow-extend.symper.vn/",
+        trash: "https://trash.symper.vn/"
     },
     notificationTimeout: {
         success: 3000,

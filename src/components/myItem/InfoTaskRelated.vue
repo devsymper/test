@@ -82,7 +82,7 @@
                 small
                 @click="goDoTask(taskSelected.id)"
                 >
-                Mở  công việc
+                {{$t("myItem.sidebar.openTask")}}
                 </v-btn>
             </v-card-actions>
         </v-card>

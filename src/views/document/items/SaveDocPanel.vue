@@ -17,13 +17,14 @@
             <h4 class="headline">{{$t('document.editor.dialog.saveDoc.heading')}}</h4>
             <v-divider></v-divider>
             <v-card-text style="height: calc(100% - 84px);    overflow: auto;">
-                <div id="setting-control-table" class="setting-control-table">
-                    <div class="content-setting-control-table">
+                <div>
+                    <div>
                         <form-save-doc 
                         @append-icon-click="checkNameDocument"
                         @input-value-changed="handleChangeInput" 
                          :allInputs="documentProps"/>
                     </div>
+                    <SystemDataMapping ref="systemDataMapping" :instance="instance"/>
                 </div>
             </v-card-text>
                 <v-divider></v-divider>
@@ -68,12 +69,13 @@ import { util } from "./../../../plugins/util.js";
 import { documentApi } from "./../../../api/Document.js";
 import { formulasApi } from "./../../../api/Formulas.js";
 import Validate from "./../common/Validate";
-
+import SystemDataMapping from "./../editor/SystemDataMapping"
 export default {
     
     components:{
         'form-save-doc' : FormTpl,
         "validate": Validate,
+        SystemDataMapping
     },
     props:{
         instance:{
@@ -198,6 +200,10 @@ export default {
         },
 
         async saveFormulasForRecord(){
+            
+            if(this.$getRouteName() == 'editDocument'){
+                this.$refs.systemDataMapping.editMapping(this.$route.params.id);
+            }
             if(this.documentProps.titleObjectFormulas.formulasId != 0){
                 let formulas = {};
                 formulas['syql'] = this.documentProps.titleObjectFormulas.value;

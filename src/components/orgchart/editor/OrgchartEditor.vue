@@ -1,5 +1,5 @@
 <template>
-    <div class="d-flex w-100 h-100">
+    <div :class="{'d-flex w-100 h-100': true, 'diagram-hortical': typeView == 'B','diagram-vertical': typeView == 'R'   } ">
         <div class="h-100 flex-grow-1">
             <div class="border-bottom-1 pt-1 pl-2">
                 <v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
@@ -89,7 +89,7 @@
         </div>
 
         <v-navigation-drawer
-            v-if="context == 'department'"
+            v-show="context == 'department' && positionEditor"
             v-model="positionEditor"
             right
             absolute
@@ -158,7 +158,6 @@ export default {
 			checkPageEmpty: false,
 			listUserIds:null,
             headerActions: {
-              
                 zoomIn: {
                     icon: "mdi-plus-circle-outline",
                     text: "process.header_bar.zoom_out",
@@ -207,6 +206,7 @@ export default {
     },
     activated(){
         this.centerDiagram();
+        this.$refs.positionDiagram.centerDiagram();
     },
     watch: {
         positionEditor(after){
@@ -310,6 +310,7 @@ export default {
             homeConfig.commonAttrs.name.value = config.name;
             homeConfig.commonAttrs.description.value = config.description;
             homeConfig.commonAttrs.code.value = config.code;
+            homeConfig.commonAttrs.isDefault.value = config.isDefault == "1" ? true : false;
             homeConfig.customAttributes = config.dynamicAttributes;
         },
         correctDiagramDisplay(content){
@@ -455,11 +456,13 @@ export default {
                         self.$refs.positionDiagram.loadDiagramFromJson(self.selectingNode.positionDiagramCells.cells);
 						let allNodes = self.$refs.positionDiagram.getAllNode()
 						let firstNode = allNodes[0]
-						this.$store.commit('orgchart/changeSelectingNode', {
+						self.$store.commit('orgchart/changeSelectingNode', {
 							instanceKey: self.selectingNode.positionDiagramCells.instanceKey,
 							nodeId: firstNode.id,
-						});
-						self.$refs.positionDiagram.$refs.editorWorkspace.changeUserDisplayInNode(this.listUserIds);
+                        });
+                        if(self.listUserIds != null){
+					    	self.$refs.positionDiagram.$refs.editorWorkspace.changeUserDisplayInNode(self.listUserIds);
+                        }
 						self.$store.commit('orgchart/updateFirstChildNodeId', firstNode.id)
                         self.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode.id)
                     }else{
@@ -471,7 +474,7 @@ export default {
                     self.$refs.positionDiagram.$refs.editorWorkspace.scrollPaperToTop(200);
                     self.$refs.positionDiagram.showOrgchartConfig();
                     self.$refs.positionDiagram.$refs.editorWorkspace.changeTypeView(self.typeView);
-
+                    
                 }, 200, this);
             }
         },
@@ -487,6 +490,7 @@ export default {
 				this.$refs.positionDiagram.initOrgchartData();
             }
             this.$store.state.orgchart.editor[subInstanceKey].homeConfig = this.selectingNode;
+            
         },
         storeDepartmentPositionCells(){
             let cells = this.$refs.positionDiagram.$refs.editorWorkspace.getAllDiagramCells();
@@ -693,7 +697,8 @@ export default {
                 description: orgchartAttr.commonAttrs.description.value,
                 dynamicAttrs: JSON.stringify(orgchartAttr.customAttributes),
                 name: orgchartAttr.commonAttrs.name.value,
-                code: orgchartAttr.commonAttrs.code.value
+                code: orgchartAttr.commonAttrs.code.value,
+                isDefault: orgchartAttr.commonAttrs.isDefault.value == true ? 1 : 0
 			};
             return data;
         },
@@ -818,6 +823,7 @@ export default {
             }
         },
         async handleHeaderAction(action){
+            let self = this
             if(action == 'home'){
                 this.showOrgchartConfig()
             }else if(action == 'saveSVG'){
@@ -836,8 +842,8 @@ export default {
                     this.$snotifySuccess("Validate passed!");  
                 }
             }else if(action == "changeTypeView"){
-                let type = this.typeView == "B" ? "R" : "B"
-                this.typeView = type
+                let type = self.typeView == "B" ? "R" : "B"
+                self.typeView = type
                 this.$refs.editorWorkspace.changeTypeView(type);
                 // this.$refs.positionDiagram.$refs.editorWorkspace.changeTypeView(type);
             }else{
@@ -934,7 +940,7 @@ export default {
 }
 </script>
 
-<style>
+<style >
 .symper-orgchart-paper .marker-arrowheads, 
 .symper-orgchart-paper .link-tools,
 .symper-orgchart-paper .marker-vertex-group,
@@ -948,5 +954,11 @@ export default {
 
 .symper-orgchart-active-editor .symper-orgchart-paper .symper-orgchart-node:hover .orgchart-action {
     display: block!important;
+}
+.diagram-hortical .btn-collapse-expand-ver{
+    display: none !important ;
+}
+.diagram-vertical .btn-collapse-expand-hor{
+    display: none;
 }
 </style>

@@ -5,6 +5,13 @@
 
     }">
     <VuePerfectScrollbar class="scroll-content h-100">
+         <date-picker
+            :keyInstance="keyInstance"
+            @clickDateCell="selectedDate"
+            :title="'Chọn ngày'"
+            :isTime="false"
+            ref="datePicker"
+        />
         <Preloader ref="preLoaderView"/>
         <div
             :key="keyInstance"
@@ -39,13 +46,7 @@
             <input type="file" :id="'file-upload-alter-'+keyInstance" class="hidden d-none" />
             <user-select :keyInstance="keyInstance" @after-select-user="afterSelectUser" ref="userInput" />
             <validate :keyInstance="keyInstance" :message="messageValidate" ref="validate" />
-            <date-picker
-                :keyInstance="keyInstance"
-                @clickDateCell="selectedDate"
-                :title="'Chọn ngày'"
-                :isTime="false"
-                ref="datePicker"
-            />
+           
             <time-input 
             :keyInstance="keyInstance"  
             @apply-time-selected="applyTimePicker" 
@@ -145,7 +146,7 @@
         </div>
         </VuePerfectScrollbar>
         <v-navigation-drawer
-            v-if="parrentInstance == 0" 
+            v-if="parrentInstance == 0 && drawer" 
             :width="(isShowTraceControlSidebar) ? 300 : 830"
             v-model="drawer"
             class="pa-3"
@@ -161,6 +162,7 @@
             @submit-document-success="submitSubFormSuccess"
             ref="subSubmitView" :isQickSubmit="true" :action="'submit'" :docId="docSubFormId"/>
             <SidebarTraceFormulas 
+            :documentInfo="documentInfo"
             :controlTrace="controlTrace"
             :keyInstance="keyInstance"
             :listFormulasTrace="listFormulasTrace"
@@ -338,6 +340,7 @@ export default {
     data() {
         return {
             contentDocument: null,
+            documentInfo:null,
             documentId: null,
             documentName: null,
             docSize: null,
@@ -487,12 +490,12 @@ export default {
             
         });
         /**
-         * Hàm gọi mở sub form submit
+         * Hàm gọi mở upload file
          */
         this.$evtBus.$on("document-submit-image-click", data => {
-            this.currentImageControl = {el:$(data.target).closest('.s-control-image'),controlName:data.controlName}
+            if(thisCpn._inactive == true) return;
+            this.currentImageControl = {el:$(data.e.target).closest('.s-control-image'),controlName:data.e.controlName, controlIns:data.controlIns};
             this.$refs.fileUploadView.onButtonClick();
-            
         });
 
         // hàm nhận sự kiện thay đổi của input
@@ -1178,6 +1181,7 @@ export default {
                         if (res.status == 200) {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
+                            thisCpn.documentInfo = res.data.document;
                             thisCpn.getTitleObjectFormulas(res.data.document.titleObjectFormulasId)
                             thisCpn.docSize = (parseInt(res.data.document.isFullSize) == 1) ? "100%":"21cm";
                             thisCpn.contentDocument = content;
@@ -1284,7 +1288,7 @@ export default {
                 let controlType = $(allInputControl[index]).attr('s-control-type');
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let field = this.sDocumentEditor.allControl[id];
-                    let controlName = allControlNotSetData.includes(controlType) ? field.type : field.properties.name.value;
+                    let controlName = (allControlNotSetData.includes(controlType) || controlType == 'tabPage') ? field.type : field.properties.name.value;
                     this.checkEditableControl(controlName,field);
                     this.checkOverrideFormulas(controlName,field);
                     let idField = field.id;
@@ -1553,7 +1557,7 @@ export default {
         },
         handlerSubmitDocumentClick(isContinueSubmit = false){
             this.isContinueSubmit = isContinueSubmit;
-            if($('.wrap-content-submit .validate-icon').length == 0 && $('.wrap-content-submit .error').length == 0){
+            if($('#sym-submit-'+this.keyInstance+' .validate-icon').length == 0 && $('#sym-submit-'+this.keyInstance+' .error').length == 0){
                 if(this.viewType == 'submit'){
                     this.handleRefreshDataBeforeSubmit();
                 }
@@ -1562,8 +1566,8 @@ export default {
                 }
             }
             else{
-                let controlNotValid = $('.wrap-content-submit .validate-icon');
-                let controlError = $('.wrap-content-submit .error');
+                let controlNotValid = $('#sym-submit-'+this.keyInstance+' .validate-icon');
+                let controlError = $('#sym-submit-'+this.keyInstance+' .error');
                 let listErr = []
                 $.each(controlNotValid,function(k,v){
                     let message = $(v).attr('title');
@@ -1698,10 +1702,10 @@ export default {
                     else{
                         thisCpn.resetDataSubmit();
                     }
+                    // nếu có công thức nút submit
                     if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
                         let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
-                        thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{
-                        });
+                        thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
                     }
                 }
                 else{
@@ -2331,14 +2335,22 @@ export default {
          */
         checkOverrideFormulas(controlName, field){
             if(Object.keys(this.overrideControls).length > 0 && Object.keys(this.overrideControls).includes(controlName)){
-                field.formulas.formulas.value[Object.keys(field.formulas.formulas.value)[0]] = this.overrideControls[controlName]['formulas'];
+                this.preDataSubmit.rootControl.push(controlName)
+
+                if(!field.formulas.formulas){
+                    field.formulas['formulas'] = {
+                        value:{}
+                    }
+                    field.formulas['formulas']['value'][Date.now()] = this.overrideControls[controlName]['formulas'];
+                }
+                else{
+                    field.formulas.formulas.value[Object.keys(field.formulas.formulas.value)[0]] = this.overrideControls[controlName]['formulas'];
+                }
             }
         },
         afterFileUpload(data){
             let url = data.serverPath;
-            let image = '<img height="70" src="'+url+'">';
-            this.currentImageControl.el.html(image);
-            
+            this.currentImageControl.controlIns.setValueControl(url);
             this.updateListInputInDocument(
                 this.currentImageControl.controlName,
                 "value",
@@ -2352,6 +2364,7 @@ export default {
 </script>
 <style  scoped>
 .sym-form-submit {
+    position: unset;
     width: 21cm;
     padding: 16px;
     margin: auto;
@@ -2411,6 +2424,7 @@ export default {
     background: white;
 }
 .wrap-content-submit .scroll-content{
+    position: relative;
     overflow-x: hidden;
 }
 .wrap-content-submit .icon{

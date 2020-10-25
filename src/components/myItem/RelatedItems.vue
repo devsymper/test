@@ -12,7 +12,7 @@
                     }"
                     v-if="checkShowTotalTask(idex)"
                 >
-                    <v-col cols="8" >
+                    <v-col cols="8" class="pa-1">
                         <div style="white-space: nowrap;
                             overflow: hidden;
                             text-overflow: ellipsis;"  @dblclick="goDoTask(item.id)">
@@ -20,12 +20,13 @@
                             <span style=" font-size:13px">{{displayContent(item.description)}}</span>
                         </div>
                         <div  @dblclick="goDoTask(item.id)">
-                            <v-icon v-if="item.createTime" style="font-size:11px; color:blue;margin-left: 3px;">mdi-circle</v-icon>
+                            <v-icon v-if="item.createTime && checkTimeDueDate(item)" style="font-size:11px; color:red;margin-left: 3px;">mdi-circle</v-icon>
+                            <v-icon v-else-if="item.createTime && !checkTimeDueDate(item)" style="font-size:11px; color:blue;margin-left: 3px;">mdi-circle</v-icon>
                             <v-icon v-else style="font-size:11px ; color:green;margin-left: 3px;">mdi-circle</v-icon>
                             {{displayDescription(item.description)}}
                         </div>
                     </v-col>
-                    <v-col cols="4" style="padding-top:15px">
+                    <v-col class="pa-1" cols="4">
                         <v-icon x-small >mdi-clock-time-nine-outline</v-icon>
                         {{item.createTime ? $moment(item.createTime).format('DD/MM/YY HH:mm'):$moment(item.endTime).format('DD/MM/YY HH:mm')}}
                         <div class="quickView" @click="showInfoTask($event,item)">{{$t("myItem.sidebar.quickView")}}</div>
@@ -118,6 +119,18 @@ export default {
         }
     },
     methods:{
+        checkTimeDueDate(item){
+            if (item.dueDate) {
+                let dueDate=new Date(item.dueDate).getTime();
+                if (dueDate<Date.now()) {
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        },
         closeInfoTaskRelated(){
             this.statusQuickView=false;
         },
@@ -199,8 +212,6 @@ export default {
                 let filter={};
                 if (isCheckProcess=='') {
                     filter.processInstanceId=processInstanceId;
-                    filter.assigneeLike= String(self.$store.state.app.endUserInfo.id);
-                    filter.assignee=self.tabsData.assignee.length>0 ? self.tabsData.assignee[0].id: '';
                     filter.size=100;
                     filter.sort= 'createTime';
                     filter.order= 'desc';

@@ -1,7 +1,6 @@
 <template>
     <div class="pa-2 h-100">
         <FormTpl
-         
             ref="comonAttr"
             :viewOnly="action == 'detail'"
             :singleLine="false"
@@ -51,6 +50,7 @@
             @app-detail-get="translateAppObjectIdToTableData" />
 
         <DocumentInstanceOperation 
+            @change-data="handleChangeDocumentInstanceOperation"
             v-if="allInputs.objectType.value == 'document_definition'"
             :tableDataDefinition="multipleLevelObjects.document_definition"
             :commonTableSetting="commonTableSetting"
@@ -111,6 +111,29 @@ export default {
         this.genAllInputForFormTpl();
     },
     methods: { 
+        handleChangeDocumentInstanceOperation(info){
+            let operationForInstancesOfDocDef = this.multipleLevelObjects.document_definition.savedOpsForAllInstancesDocDef;
+            
+            let tableData = this.multipleLevelObjects.document_definition.tableData;
+            let docId = tableData[info.rowIndex]['object'];
+            docId = docId.split('-')[0].trim();
+            let action = info.action;
+
+            if(info.after){
+                operationForInstancesOfDocDef.push({
+                    documentId: docId,
+                    action: action
+                });
+            }else{
+                for(let i =  0; i < operationForInstancesOfDocDef.length; i++){
+                    let item = operationForInstancesOfDocDef[i];
+                    if(item.documentId == docId && item.action == action){
+                        operationForInstancesOfDocDef.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        },
         genAllInputForFormTpl(){
             this.allInputs = null;
             this.allInputs = {
@@ -150,7 +173,7 @@ export default {
             for(let op of operationForInstancesOfDocDef){
                 dataTable[op.documentId][op.action] = true;
             }
-            this.multipleLevelObjects.document_definition.tableData = Object.values(dataTable);
+            this.multipleLevelObjects.document_definition.tableData = util.cloneDeep(Object.values(dataTable));
         },
         setRowsForAllInstancesDocDef(operationForInstancesOfDocDef, rowsOfDocDefs){
             this.multipleLevelObjects.document_definition.savedOpsForAllInstancesDocDef = operationForInstancesOfDocDef;
@@ -735,7 +758,9 @@ export default {
             commonTableSetting : commonTableSetting,
             tableSettings: {
                 ...commonTableSetting,
+
                 afterChange: function(changes, source) {
+                    
                     if(!changes){
                         return;
                     }
@@ -754,7 +779,7 @@ export default {
                         }
                     }, 0);
                 },
-                afterSelectionEnd(rowNum	, column, row2 , column2 , preventScrolling, selectionLayerLevel){
+                afterSelectionEnd(rowNum, column, row2 , column2 , preventScrolling, selectionLayerLevel){
                     let objectType = self.allInputs.objectType.value;
                     if(objectType == 'application_definition'){
                         let object = this.getDataAtRow(rowNum)[0];
@@ -779,6 +804,9 @@ export default {
                         self.itemData.mapActionForAllObjects[self.itemData.objectType] = htIst.getSourceData();
                     }, 0);
                 },
+                 afterSelectionEnd(rowNum	, column, row2 , column2 , preventScrolling, selectionLayerLevel){
+                     alert('ok')
+                 }
             },
 
             // cấu trúc data giành cho các loại đối tượng có nhiều tầng object settings

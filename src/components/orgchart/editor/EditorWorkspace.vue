@@ -70,7 +70,9 @@ export default {
             this.$refs.jointPaper.actionOnToolbar(action);
         },
         loadDiagramFromJson(cells){
+             let treeLayout = this.$refs.jointPaper.treeLayout;
             this.$refs.jointPaper.graph.fromJSON(cells);
+            treeLayout.layout();
         },
         getAllDiagramCells(){
             return this.$refs.jointPaper.graph.toJSON();
@@ -187,7 +189,6 @@ export default {
             });
         },
         toggleBranch(root){
-            
             let self = this
             var shouldHide = !root.isCollapsed();
             root.set({ collapsed: shouldHide });
@@ -197,12 +198,12 @@ export default {
                     collapsed: false
                 });
             });
-            this.layoutAndFocus(self.viewportRect.center());
+            this.layoutAndFocus(this.viewportRect.center());
         },
         layoutAndFocus(focusPoint) {
             let treeLayout = this.$refs.jointPaper.treeLayout;
             treeLayout.layout();
-            var center = focusPoint || treeLayout.getLayoutBBox().center();
+            var center = treeLayout.getLayoutBBox().center();
             this.resizePaper();
             this.paperScroller.center(center.x, center.y);
         },
@@ -312,7 +313,6 @@ export default {
             }
         },
         setupGraph(graph, paper, paperScroller,viewportRect){
-            //dung them dong nay 
             this.viewportRect = viewportRect
             this.paper = paper
             this.paperScroller = paperScroller

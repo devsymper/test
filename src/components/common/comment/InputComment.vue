@@ -437,7 +437,7 @@ export default {
 }
 .content-comment >>> .content-comment-img{
 	display:flex;	
-	width:90%;
+	width:85%;
 	margin-bottom:20px;
 	margin-top:4px;
 }
@@ -455,7 +455,7 @@ export default {
 	right: 0;
 }
 .content-comment >>> .splide__arrow svg{
-width: 0.6em;
+	width: 0.6em;
     height: 0.6em;
 }
 .content-comment >>> .content-comment-file{
@@ -493,6 +493,14 @@ width: 0.6em;
 	width:94%;
 	font:13px roboto
 }
+.content-comment >>>  .v-tab{
+	padding:0px 4px !important;	
+}
+.content-comment >>>  .v-slide-group__prev,
+.content-comment >>>  .v-slide-group__next{
+	min-width: unset;
+}
+
 .content-comment >>> .content-comment-file .v-icon{
 	font-size: 13px;
 }

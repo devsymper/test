@@ -13,6 +13,7 @@
                 :isInitInstance="true" 
                 @task-submited="handleTaskSubmited" 
                 :taskInfo="taskInfo"
+                :originData="originTaskData"
                 :parentHeight="thisHeight"
                 @close-detail="closeDetail">
             </taskDetail>
@@ -39,6 +40,11 @@ export default {
     },
     data(){
         return {
+            originTaskData: {
+                assigneeInfo: {
+                    id: 0
+                }
+            },
             startWorkflowStatus: 'init', // init | started
             taskInfo: {
                 action: {
@@ -63,12 +69,12 @@ export default {
         }).catch((err) => {
 
         });
+        this.originTaskData.assigneeInfo.id = this.$store.state.app.endUserInfo.id;
     },
     methods: {
         async getFirstNodeData(){
             let self=this;
             let idDefinition = this.$route.params.id;
-            
             let definitionModel = await BPMNEApi.getDefinitionModel(idDefinition);
             this.definitionModel = definitionModel;
             let documentToStart = this.getStartDocId(definitionModel);
@@ -77,9 +83,9 @@ export default {
             }else{
                 let processDef = await BPMNEApi.getDefinitionData(this.$route.params.id);
                 try {
-                    let instanceName = await this.getInstanceName([]);
+                    let instanceName = await self.getInstanceName([]);
                     let newProcessInstance = await runProcessDefinition(this, processDef, [], instanceName);
-                    this.checkAndGotoMyTask(newProcessInstance);
+                    await self.checkAndGotoMyTask(newProcessInstance);
                     this.$snotifySuccess("Workfow started successfully!");
                 } catch (error) {
                     this.$snotifyError(error ,"Error on run process definition ");
@@ -113,9 +119,12 @@ export default {
                     }
                 }
             }
-            
             for(let task of arrTask){
-                if (task.assignee == this.$store.state.app.endUserInfo.id) {
+                let assignee=task.assignee;
+                if (assignee.indexOf(":")>0) {
+                    assignee=assignee.split(":")[0];
+                }
+                if (assignee == this.$store.state.app.endUserInfo.id) {
                     if(this.$route.name == 'my-applications'){
                         this.$evtBus.$emit('symper-change-action-view-url', {
                             link: "/myitem/tasks/"+task.id

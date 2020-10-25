@@ -68,6 +68,11 @@ p {
     padding: 5px 8px;
 }
 
+.sym-form-submit .s-control-checkbox {
+    min-width: unset !important;
+    height: unset !important;
+}
+
 .sym-form-submit .s-control-user,
 .sym-form-submit .s-control-select,
 .sym-form-submit .s-control-document {
@@ -109,7 +114,7 @@ p {
     border-bottom: 1px solid rgb(230, 230, 230);
 }
 
-.s-control:not(.s-control-tab-page):not(button):not(.page-item):not(.s-control-approval-history):not(.s-control-label):not(.s-control-submit):not(.s-control-draft):not(.s-control-reset):not(.s-control-file-upload):not(.s-control-table):not(.s-control-data-flow):not(.s-control-panel) {
+.s-control:not(.s-control-tab-page):not(.s-control-image):not(button):not(.page-item):not(.s-control-approval-history):not(.s-control-label):not(.s-control-submit):not(.s-control-draft):not(.s-control-reset):not(.s-control-file-upload):not(.s-control-table):not(.s-control-data-flow):not(.s-control-panel) {
     padding: 0 5px !important;
     background: transparent;
     box-shadow: none !important;
@@ -198,6 +203,17 @@ input.s-control {
     color: red;
     display: none;
     box-shadow: 0px 3px 1px -2px rgba(0, 0, 0, 0.2), 0px 2px 2px 0px rgba(0, 0, 0, 0.14), 0px 1px 5px 0px rgba(0, 0, 0, 0.12);
+}
+
+.s-control-image {
+    position: relative;
+}
+
+.s-control-image .mdi {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
 }
 
 .wrap-s-control-table {
