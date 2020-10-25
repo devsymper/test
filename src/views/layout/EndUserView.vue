@@ -156,13 +156,31 @@ export default {
 		},
 		
         closeTab(idx){            
-            let urlKey = Object.keys(this.$store.state.app.urlToTabTitleMap)[idx];
+            let urlToTabArr = Object.keys(this.$store.state.app.urlToTabTitleMap);
+            let urlKey = urlToTabArr[idx];
             let urlInfo = this.tabUrlItems[urlKey];
 
             this.$store.commit("app/removeTab", urlKey);
-            this.$evtBus.$emit('symper-close-app-tab', {
-                pageInstanceKey: urlInfo.pageInstanceKey
-            });
+            if(urlInfo){
+                // this.$evtBus.$emit('symper-close-app-tab', {
+                //     pageInstanceKey: urlInfo.pageInstanceKey
+                // });
+            }
+
+            setTimeout((self) => {
+                let arr = Object.keys(self.$store.state.app.urlToTabTitleMap);
+                if(arr.length == 0){
+                    self.$goToPage("/", "Trang chủ");
+                }else{
+                    let currentTabIndex = self.$store.state.app.currentTabIndex;
+                    if(currentTabIndex == idx){
+                        self.handleChangeTab(currentTabIndex);
+                    }else if(idx < currentTabIndex ){
+                        self.$store.state.app.currentTabIndex = currentTabIndex - 1;
+                        self.handleChangeTab(currentTabIndex - 1);
+                    }
+                }
+            }, 100, this);
         },
         updateCountUnreadNotification(){
             let req = new Api(appConfigs.apiDomain.nofitication);
