@@ -501,8 +501,8 @@
                 }
             },
             "sidebarLeft": {
-                "document" : "Document",
-                "column" : "Column"
+                "document": "Document",
+                "column": "Column"
             }
         },
         "submit": {
@@ -833,7 +833,8 @@
             "application_definition": {
                 "update": "Update",
                 "view": "View",
-                "remove": "Remove"
+                "remove": "Remove",
+                "create": "Create"
             }
         },
         "iconListActions": {
