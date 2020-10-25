@@ -1,5 +1,5 @@
 <template>
-    <div class="pl-2 w-100 pr-3 pt-3 list-item-common-symper" >
+    <div class="ml-2 w-100 pr-3 pt-3 list-item-common-symper" >
         <div :style="{width:contentWidth, display: 'inline-block'}">
             <v-row no-gutters class="pb-2" ref="topBar">
                 <v-col>
@@ -73,7 +73,7 @@
                             small
                             @click="showImportHistory()"
                             class="mr-2"
-                            v-if="showImportHistory && !actionPanel"
+                            v-if="showImportHistoryBtn && !actionPanel"
                         >
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel_history')}}</span>
@@ -185,7 +185,7 @@
                     ></hot-table>
                 </v-col>
             </v-row>
-            <v-row no-gutters ref="bottomBar" class="pt-3">
+            <v-row v-show="showPagination" no-gutters ref="bottomBar" class="pt-3">
                 <Pagination
                     :total="totalObject"
                     :totalVisible="7"
@@ -203,7 +203,6 @@
             class="pa-3"
             absolute
             right
-            v-show="actionPanel"
             v-if="reComputeActionPanelType != 'drag'"
             :temporary="reComputeActionPanelType == 'temporary'"
         >
@@ -237,7 +236,7 @@
                 </slot>
             </template>
         </symper-drag-panel>
-
+ 
         <display-config
             ref="tableDisplayConfig"
             @drag-columns-stopped="handleStopDragColumn"
@@ -409,6 +408,20 @@ export default {
                         self.$emit('row-selected', self.data[row]);
                     }, time);
                 },
+                afterScrollVertically(){
+                    let count = 2;
+                    let delayTimer
+                    clearTimeout(delayTimer);
+                    let value = event
+                    delayTimer = setTimeout(function() {
+                        if(value.target.scrollTop > $(value.target).height()/6*0.7){
+                            if(count * 50 != self.pageSize){
+                               self.changePageSize({ pageSize: count * 50})
+                               count++;
+                            }
+                        }
+                    },500); 
+                },
                 beforeContextMenuSetItems: () => {
                 },
                 beforeOnCellMouseOver: (event, coords, TD, controller) => {
@@ -514,8 +527,13 @@ export default {
                 thisCpn.closeactionPanel();
             }
         });
+       
     },
     props: {
+        widthContentCustom:{
+            type: Number,
+            default:0
+        },
         showImportButton: {
             type: Boolean,
             default: false
@@ -527,6 +545,10 @@ export default {
         showExportButton: {
             type: Boolean,
             default: false
+        },
+        showImportHistoryBtn:{
+            type: Boolean,
+            default: true
         },
         widgetIdentifier: {
             type: String,
@@ -574,6 +596,10 @@ export default {
         containerHeight: {
             type: Number,
             default: 200
+        },
+        lazyLoad:{
+            type:Boolean,
+            default:false
         },
         /**
          * * Các contextmenu cho các item trong list, có dạng:
@@ -687,9 +713,14 @@ export default {
                     total:0
                 }
             }
+        },
+        showPagination:{
+            type: Boolean,
+            default:true
         }
     },
-    mounted() {},
+    mounted() {
+    },
     computed: {
         alwaysShowActionPanel(){
             return this.tableDisplayConfig.value.alwaysShowSidebar;
@@ -706,7 +737,13 @@ export default {
                 return "calc(100% - " + this.actionPanelWidth + "px)";
             } else if (this.tableDisplayConfig.show) {
                 return "calc(100% - " + this.tableDisplayConfig.width + "px)";
-            } else {
+            } else if(this.showPagination == false) {
+                if( this.widthContentCustom > 0){
+                   return this.widthContentCustom+"px"
+                }else{
+                    return "100%";
+                }
+            }else{
                 return "100%";
             }
         },
@@ -721,7 +758,7 @@ export default {
                     util.getComponentSize(ref.topBar).h +
                     util.getComponentSize(ref.bottomBar).h + 14;
             }
-            return tbHeight - 15;
+            return tbHeight - 60;
         },
         /**
          * Tạo cấu hình cho hiển thị header của table
@@ -773,8 +810,10 @@ export default {
         }
     },
     methods: {
-         rerenderTable(){
+        rerenderTable(){
             this.$refs.dataTable.hotInstance.render();
+        },
+        myFunctionScroll(e){
         },
         importExcel(){
             this.$emit('import-excel');
@@ -1136,11 +1175,11 @@ export default {
                 thisCpn.handleStopDragColumn();
                 //AnhTger config show description
                 (data.listObject).forEach(element => {
-                    let processKey=element.processKey;
+                    let processKey = element.processKey;
                     if (processKey) {
-                        let configVale=JSON.parse(element.configValue)[processKey];
+                        let configVale = JSON.parse(element.configValue)[processKey];
                         if (configVale.description) {
-                            element.description=configVale.description;
+                            element.description = configVale.description;
                         }
                     }
                    
@@ -1546,7 +1585,7 @@ export default {
             // Phát sự kiện khi người dùng gõ vào ô tìm kiếm
             this.$emit("search-all", {});
         },
-        changePageSize(vl) {
+        changePageSize(vl){
             this.pageSize = vl.pageSize
             this.getData();
             // Phát sự kiện khi người dùng thay đổi số bản ghi ở mỗi page
