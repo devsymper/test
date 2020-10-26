@@ -1,5 +1,5 @@
 <template>
-    <div class="ml-2 w-100 pr-3 pt-3 list-item-common-symper" >
+    <div class="pl-2 w-100 pr-3 pt-3 list-item-common-symper" >
         <div :style="{width:contentWidth, display: 'inline-block'}">
             <v-row no-gutters class="pb-2" ref="topBar">
                 <v-col>
@@ -203,6 +203,7 @@
             class="pa-3"
             absolute
             right
+            v-show="actionPanel"
             v-if="reComputeActionPanelType != 'drag'"
             :temporary="reComputeActionPanelType == 'temporary'"
         >
@@ -760,7 +761,7 @@ export default {
                     util.getComponentSize(ref.topBar).h +
                     util.getComponentSize(ref.bottomBar).h + 14;
             }
-            return tbHeight - 60;
+            return tbHeight - 15;
         },
         /**
          * Tạo cấu hình cho hiển thị header của table
@@ -1068,6 +1069,7 @@ export default {
             this.savingConfigs = true;
             let thisCpn = this;
             let dataToSave = this.getTableDisplayConfigData();
+            debugger
             uiConfigApi
             .saveUiConfig(dataToSave)
             .then(() => {

@@ -320,7 +320,6 @@ const addToDocumentEditorStore = (state, params) => {
     let key = params.key
     let instance = params.instance
     let value = params.value
-    debugger
     Vue.set(state.editor[instance], key, value);
 }
 const setDefaultSubmitStore = (state, params) => {

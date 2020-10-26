@@ -8,7 +8,7 @@
 	:width="400"
 	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)','display':displaySidebar}"
 	>
-	<div class="main-info">
+	<div v-show="showMainInfo" class="main-info">
 		<div style="display:flex;">
 			<span style="font-size:15px;">{{$t('document.detail.sidebar.heading')}}</span>
 			<span class="mdi mdi-close" @click="hide"></span>
@@ -94,7 +94,9 @@
 			</v-expansion-panels>
 		</VuePerfectScrollbar>
 	</div>
-	<div class="history-info" style="transform:translateX(400px)">
+	<div 
+	v-show="showHistoryInfo"
+	class="history-info" style="transform:translateX(400px)">
 		<div style="display:flex;">
 			<span class="mdi mdi-keyboard-backspace" @click="hideHistory"></span>
 			<span style="font-size:15px;">LỊCH SỬ CHỈNH SỬA</span>
@@ -131,8 +133,10 @@
 			</div>
 		</VuePerfectScrollbar>
 	</div>
-	<Comment v-if="showCommentInDoc" 
+	<Comment v-show="showCommentInfo" 
+	v-if="showCommentInDoc" 
 	style="height:95%" ref="commentView" 
+	@close-comment="hideComment"
 	:objectIdentifier="String(documentObjectId)" />
 
 	</v-navigation-drawer>
@@ -166,7 +170,10 @@ export default {
                 {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:2, controls:[{id:'s-control-id-1596780634836',data:[]},{id:'s-control-id-1596780602772',data:[]},{id:'s-control-id-1596780611212',data:[]}]},
                 {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:1, controls:[{id:'s-control-id-1596780602772',data:[]}]},
 			],
-			displaySidebar:'none'
+			displaySidebar:'none',
+			showMainInfo:false,
+			showHistoryInfo:false,
+			showCommentInfo:false
 		}
 	},
 	props:{
@@ -213,7 +220,6 @@ export default {
 					self.workflowName = res.data[0].processDefinitionName
 				});
 			}
-			
 		},
 		taskId(after){
 			let self = this
@@ -222,12 +228,10 @@ export default {
                    self.taskName = res.name == null ? "" : res.name
                 });
 			}
-			
 		},
 		createTime(after){
 			this.createdDate = after
 		},
-		
 	},
 	computed:{
 		allUsers(){
@@ -252,12 +256,10 @@ export default {
 							user.displayName = userInfo[0].displayName
 							thisCpn.listApprovalUser.push(user);
 						}
-						
 					}
 				}
 			})
 			.catch(err => {
-
 			})
 			.always(() => {});
 	},
@@ -266,11 +268,13 @@ export default {
 			this.isShow = false;
 			setTimeout((self) => {
 					self.displaySidebar = 'none';
+					self.showMainInfo = false;
 				}, 250, this);
 			this.$emit('after-hide-sidebar');
 		},
 		show(){
 			this.displaySidebar = '';
+			this.showMainInfo = true;
 			setTimeout((self) => {
 				self.isShow = true;
 			}, 10, this);
@@ -281,16 +285,38 @@ export default {
 				const control = history.controls[index];
 				$("#"+control.id).addClass('highlight-history');
 			}
-			
-		},
-		hideHistory(){
-			$('.history-info').css({transform:'translateX(400px)'})
-		},
-		showHistory(){
-			$('.history-info').css({transform:'translateX(0px)'})
 		},
 		showComment(){
-			this.$refs.commentView.show()
+			this.showCommentInfo = true;
+			setTimeout((self) => {
+				self.$refs.commentView.show();
+			}, 10, this);
+			setTimeout((self) => {
+				self.showMainInfo = false;
+			}, 250, this);
+		},
+		hideComment(){
+			this.showMainInfo = true;
+			setTimeout((self) => {
+				self.showCommentInfo = false;
+			}, 250, this);
+		},
+		showHistory(){
+			this.showHistoryInfo = true;
+			setTimeout((self) => {
+				$('.history-info').css({transform:'translateX(0px)'});
+			}, 10, this);
+			
+			setTimeout((self) => {
+				self.showMainInfo = false;
+			}, 250, this);
+		},
+		hideHistory(){
+			this.showMainInfo = true;
+			$('.history-info').css({transform:'translateX(400px)'});
+			setTimeout((self) => {
+				self.showHistoryInfo = false;
+			}, 250, this);
 		}
 	},
 

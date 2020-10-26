@@ -1,5 +1,5 @@
 <template>
-  <div class="w-100">
+  <div class="editor" :style="{'width':widthEditor+'px'}" >
     <v-skeleton-loader v-if="loading" class="mx-auto" width="100%" height="100%" type="table"></v-skeleton-loader>
     <k-h-header />
     <div v-show="skh.statusEdit" class="kh-editor-view" v-html="content"></div>
@@ -69,13 +69,14 @@ export default {
   data() {
     let self = this;
     return {
-      loading: true,
-      id: "",
-      hash: "",
-      name: "",
-      parentPath: "",
-      content: "",
-      previewImage: null
+        widthEditor:650,
+        loading: true,
+        id: "",
+        hash: "",
+        name: "",
+        parentPath: "",
+        content: "",
+        previewImage: null
     };
   },
   components: {
@@ -207,6 +208,9 @@ export default {
     }
   },
   methods: {
+    setWidthViewEditor(sizeBar=250){
+        this.widthEditor=$(".layout").width() - sizeBar;
+    },
     create_UUID() {
       var dt = new Date().getTime();
       var uuid = "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(
@@ -289,55 +293,63 @@ export default {
       this.previewImage = await this.$html2canvas(el, options);
     }
   },
-  computed: {
-    sapp() {
-      return this.$store.state.app;
-    },
-    skh() {
-      return this.$store.state.kh;
-    }
-  },
-  mounted() {
-    let self = this;
-    $(".kh-editor").on("dblclick", "table", function(event) {
-      console.log($(this));
-      var p = $(this);
-      var idTable = p.attr("id");
-      self.$store.commit("kh/setIdTable", idTable);
-      var result = [].reduce.call(
-        p[0].rows,
-        function(result, row) {
-          result.push(
-            [].reduce.call(
-              row.cells,
-              function(res, cell) {
-                res.push(cell.textContent);
-                return res;
-              },
-              []
-            )
-          );
-          return result;
+    computed: {
+        sapp() {
+        return this.$store.state.app;
         },
-        []
-      );
-      self.$store.commit("kh/setDataTable", result);
-      self.$store.commit("kh/changeStatusHansonTable", true);
-    });
-    $(".kh-editor").on("click", "table", function(event) {
-      var p = $(this);
-      var position = p.position();
-      console.log(position);
-      document.getElementById("mceResizeHandlenw").style.left = position.left;
-      document.getElementById("mceResizeHandlene").style.left = p.width();
-    });
-    $(".kh-editor").on("click", "img", function(event) {
-      var p = $(this);
-      var position = p.position();
-      document.getElementById("mceResizeHandlenw").style.left = position.left;
-      document.getElementById("mceResizeHandlene").style.left = p.width();
-    });
-  }
+        skh() {
+        return this.$store.state.kh;
+        }
+    },
+    created(){
+        this.setWidthViewEditor();
+        this.$evtBus.$on('kh-resize-sidebar', (sizeBar) =>{
+            console.log("ssss",$(".layout").width());
+            this.setWidthViewEditor(sizeBar);
+        });
+    },
+    mounted() {
+        this.setWidthViewEditor();
+        let self = this;
+        $(".kh-editor").on("dblclick", "table", function(event) {
+        console.log($(this));
+        var p = $(this);
+        var idTable = p.attr("id");
+        self.$store.commit("kh/setIdTable", idTable);
+        var result = [].reduce.call(
+            p[0].rows,
+            function(result, row) {
+            result.push(
+                [].reduce.call(
+                row.cells,
+                function(res, cell) {
+                    res.push(cell.textContent);
+                    return res;
+                },
+                []
+                )
+            );
+            return result;
+            },
+            []
+        );
+        self.$store.commit("kh/setDataTable", result);
+        self.$store.commit("kh/changeStatusHansonTable", true);
+        });
+        $(".kh-editor").on("click", "table", function(event) {
+        var p = $(this);
+        var position = p.position();
+        console.log(position);
+        document.getElementById("mceResizeHandlenw").style.left = position.left;
+        document.getElementById("mceResizeHandlene").style.left = p.width();
+        });
+        $(".kh-editor").on("click", "img", function(event) {
+        var p = $(this);
+        var position = p.position();
+        document.getElementById("mceResizeHandlenw").style.left = position.left;
+        document.getElementById("mceResizeHandlene").style.left = p.width();
+        });
+    }
 };
 </script>
 
