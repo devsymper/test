@@ -1,6 +1,6 @@
 <template>
     <div class="h-100 w-100 orgchart-table-view">
-        <v-toolbar>
+        <v-toolbar v-show="showToolbar">
             <v-toolbar-title>{{titleToolbar}}</v-toolbar-title>
              <v-menu
                 :max-width="500"
@@ -9,8 +9,8 @@
                 offset-y
                 >
                 <template v-slot:activator="{ on }">
-                    <v-btn icon tile v-on="on">
-                        <v-icon>mdi-menu-down-outline</v-icon>
+                    <v-btn icon tile x-small v-on="on">
+                        <v-icon>mdi-chevron-down</v-icon>
                     </v-btn>
                 </template>
                   <v-list
@@ -58,17 +58,53 @@
               <v-tab-item :key="'tableSideBySideView'" class="px-2 pt-2 h-100">
                 <div class="h-100 symper-orgchart-table-side-by-side-view">
                     <!-- <TableSideBySildeView /> -->
-                        <VueResizable :width="500" :max-width="600" :min-width="300" :active ="['r']">
-                           <div style="display:flex;flex-direction:column" class="h-100 w-100">
-                               <div style="height:52px;display:flex;align-items:center">
-                                     <h2 style="font:17px roboto ;font-weight:500" >Sơ đồ tổ chức</h2>
+                           <div style="" class="h-100 ">
+                               <div style="height:31px;display:flex;align-items:center;margin-bottom:8px" class=" tree-orgchart">
+                                   <span style="font:17px roboto;font-weight:500">{{titleToolbar}}</span>
+                                    <v-menu
+                                        :max-width="500"
+                                        :max-height="700"
+                                        :nudge-width="200"
+                                        offset-y
+                                        >
+                                        <template v-slot:activator="{ on }">
+                                            <v-btn icon tile x-small v-on="on">
+                                                <v-icon>mdi-chevron-down</v-icon>
+                                            </v-btn>
+                                        </template>
+                                        <v-list
+                                                nav
+                                                dense
+                                            >
+                                                <v-list-item-group
+                                                    v-model="currentTab"
+                                                    color="primary"
+                                                    >
+                                                    <v-list-item
+                                                        v-for="(item, i) in menuPickTab"
+                                                        :key="i"
+                                                    >
+                                                        <v-list-item-icon>
+                                                        <v-icon v-text="item.icon"></v-icon>
+                                                        </v-list-item-icon>
+
+                                                        <v-list-item-content>
+                                                        <v-list-item-title v-text="item.title"></v-list-item-title>
+                                                        </v-list-item-content>
+                                                    </v-list-item>
+                                                </v-list-item-group>
+                                        </v-list>
+                                    </v-menu>
                                </div>
+                        <VueResizable :width="400" :max-width="500" :min-width="300" :active ="['r']" @resize:end="resizeEnd">
+
                                 <AgDataTable
-                                    :tableHeight="'calc(100% - 150px)'"
+                                    :tableHeight="'calc(100% - 100px)'"
                                     :likeHandsonTable="true"
                                     :rowData="dataTable"
                                     :editable="false"
                                     :customComponents="customAgComponents"  
+                                    :hideRowBorderCss="true"
                                     @on-cell-dbl-click="onCellDblClick"
                                     :minWidth="500"
                                     :cellRendererParams="{
@@ -76,14 +112,16 @@
                                         suppressDoubleClickExpand: true,
                                     }">
                                 </AgDataTable>
-                           </div>
                         </VueResizable>
+
+                           </div>
                        <ListItems 
                              ref="listUser"
                             :pageTitle="'Danh sách người dùng'"
                             :getDataUrl="apiUrl"
                             :containerHeight="containerHeight"
                             :tableContextMenu="tableContextMenu"
+                            :widthContentCustom="widthContentCustom"
                             :useDefaultContext="false"
                             :useActionPanel="true"
                             :actionPanelWidth="850"
@@ -92,7 +130,10 @@
                             :showButtonAdd="false"
                             :showExportButton="false"
                             :showImportButton="false"
+                            :showImportHistoryBtn="false"
                             :showActionPanelInDisplayConfig="false"
+                            :showPagination="false"
+                            :lazyLoad="true"
                         >
                             <template slot="right-panel-content" slot-scope="{}">  
                                 <Detail :quickView="true" :docObjInfo="docObjInfo" />
@@ -105,6 +146,8 @@
                
                 <OrgchartEditor
                     :action="'view'"
+                    @current-tab="changeTab"
+                    :currentTab="currentTab"
                     :id="$route.params.id">
                 </OrgchartEditor>
             </v-tab-item>
@@ -151,7 +194,7 @@ export default {
         Detail
     },
     mounted(){
-        this.containerHeight = util.getComponentSize(this).h - 50
+        this.containerHeight = util.getComponentSize(this).h
         this.currentSize =  util.getComponentSize(this)
     },
     computed: {
@@ -215,7 +258,9 @@ export default {
             }
 
             setTimeout((self) => {
-                self.$refs.orgStructureView.reDrawDiagram();
+                if(self.$refs.orgStructureView){
+                  self.$refs.orgStructureView.reDrawDiagram();
+                }
             }, 1000, this);
             return data;
         },
@@ -268,8 +313,22 @@ export default {
         }
     },
     methods: {
-         onGridReady(params) {
+        onGridReady(params) {
             this.agApi = params.api; 
+        },
+        resizeEnd(params){
+            let value = params.width - this.currentWidthContentCustom
+            if(value < 0 ){
+                this.widthContentCustom = 0
+                this.$refs.listUser.refreshList()
+            }else{
+                this.widthContentCustom = $(window).width() - $(".resizable-component").width()  - 100
+                debugger
+            }
+            this.currentWidthContentCustom =  params.width 
+        },
+        changeTab(val){
+            this.currentTab = val  
         },
         addDynamicValue(row, node){
             if(node.dynamicAttributes){
@@ -355,6 +414,9 @@ export default {
         return {
             currentTab: 1,
             agApi:null,
+            widthContentCustom:0,
+            currentWidthContentCustom:400,
+            showToolbar:false,
             currentSize: {},
             customAgComponents: {
                 nodeName: NodeNameInTable,
@@ -408,7 +470,8 @@ export default {
                             {name: "createAt", title: "createAt", type: "text"},
                             {name: "updateAt", title: "updateAt", type: "text"},
                        ],
-                       listObject:res.data.listObject
+                       listObject:res.data.listObject,
+                       total:res.data.listObject.length,
                          
 
                    }
@@ -459,8 +522,13 @@ export default {
         },
         currentTab(val){
             this.titleToolbar = this.listTitle[val]
-            if(val == 0){
-                this.agApi.sizeColumnsToFit()
+            if(val == 0 ){
+                this.showToolbar = true
+                if(this.agApi){
+                    this.agApi.sizeColumnsToFit()
+                }
+            }else{
+                  this.showToolbar = false
             }
         }
     }
@@ -478,7 +546,9 @@ export default {
 .orgchart-table-view >>> .v-toolbar{
     height:45px !important;
     border-bottom:1px solid lightgray;
-    border-left:1px solid lightgray
+}
+.orgchart-table-view >>> .row.pb-2{
+    margin-top:-12px;
 }
 .orgchart-table-view >>> .v-toolbar .v-toolbar__title{
     font-size:17px !important;
@@ -489,8 +559,6 @@ export default {
     padding-top:6px;
 }
 .orgchart-table-view >>> .v-toolbar .v-toolbar__content button{
-    height:32px;
-    width:32px;
 }
 .orgchart-table-view >>> .v-menu__content .v-list-item .v-list-item__icon{
     min-width: unset;
