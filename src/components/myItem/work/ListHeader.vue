@@ -122,76 +122,13 @@
       </v-menu>
 
       <!-- Dãn nở dòng -->
-      <v-btn small solo depressed class="mr-2" @click="refreshTaskList" v-show="!sideBySideMode">
-        <v-icon size="18">mdi-refresh</v-icon>
-      </v-btn>
-      <v-btn small solo depressed class="mr-2" @click="changeDensity" v-show="!sideBySideMode">
-        <v-icon size="18">{{isSmallRow ? 'mdi-view-headline' : 'mdi-menu'}}</v-icon>
-      </v-btn>
+        <v-btn small solo depressed class="mr-2" @click="refreshTaskList" v-show="!sideBySideMode">
+            <v-icon size="18">mdi-refresh</v-icon>
+        </v-btn>
+        <v-btn small solo depressed class="mr-2" @click="changeDensity" v-show="!sideBySideMode">
+            <v-icon size="18">{{isSmallRow ? 'mdi-view-headline' : 'mdi-menu'}}</v-icon>
+        </v-btn>
     </div>
-    <!-- <v-dialog v-model="dialog" width="400">
-      <v-card>
-        <v-card-title>{{$t("tasks.createTask.title")}}</v-card-title>
-        <div class="mr-0 ml-0 pl-6 pr-6">
-          <div class="label pt-2">{{$t("tasks.header.name")}}</div>
-          <div>
-            <v-text-field
-              class="sym-small-size"
-              dense
-              solo
-              flat
-              background-color=" grey lighten-3"
-              v-model="taskObject.name"
-            ></v-text-field>
-          </div>
-          <div class="label pt-2">{{$t("tasks.header.assignee")}}</div>
-          <div>
-            <userSelector
-              ref="userSelector"
-              :isMulti="false"
-              :compactChip="true"
-              :color="'transparent'"
-              :textColor="''"
-              :flat="true"
-              @input="inputAssignee"
-            ></userSelector>
-          </div>
-          <div class="label pt-2">{{$t("tasks.header.dueDate")}}</div>
-          <div>
-            <datePicker v-model="taskObject.dueDate"></datePicker>
-          </div>
-
-          <div class="label pt-2">{{$t("tasks.header.submitForm")}}</div>
-          <div>
-            <symper-document-selec v-model="taskObject.docId"></symper-document-selec>
-          </div>
-          <div class="label pt-2">{{$t("tasks.header.description")}}</div>
-          <div>
-            <v-textarea
-              class="sym-small-size sym-small-lineheight"
-              dense
-              solo
-              flat
-              background-color="grey lighten-3"
-              v-model="taskObject.description"
-            ></v-textarea>
-          </div>
-        </div>
-        <v-card-actions class="pt-4">
-          <v-spacer></v-spacer>
-          <v-btn
-            color="primary"
-            text
-            small
-            :disabled="taskObject.name.length == 0 ||
-                                    taskObject.dueDate.length == 0 ||
-                                    taskObject.assignee.length == 0"
-            @click="saveTask"
-          >{{$t('common.add')}}</v-btn>
-          <v-btn text small @click="dialog = false" class="mr-2">{{$t('common.close')}}</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
     <DialogCreateTask :showCreateTask="showCreateTask" @create-task="createdTask" @close-dialog="closeDialog"/>
   </div>
 </template>
@@ -416,46 +353,48 @@ export default {
       });
     },
     async saveTask() {
-      if (!this.taskObject.assignee) {
-        this.$snotifyError(
-          {},
-          this.$t("tasks.error.canNotCreateTask"),
-          this.$t("tasks.error.emptyAssignee")
-        );
-        return;
-      }
-      let data = {
-        ...this.taskObject,
-        assignee: this.taskObject.assignee,
-        parentTaskId: this.parentTaskId ? this.parentTaskId : "",
-        owner: this.$store.state.app.endUserInfo.id
-      };
-      let description = util.cloneDeep(defaultTaskDescription);
-      if (this.taskObject.docId) {
-        description.action.action = "submit";
-        description.action.parameter.documentId = this.taskObject.docId;
-      }
+        if (!this.taskObject.assignee) {
+            this.$snotifyError(
+            {},
+            this.$t("tasks.error.canNotCreateTask"),
+            this.$t("tasks.error.emptyAssignee")
+            );
+            return;
+        }
+        let data = {
+            ...this.taskObject,
+            assignee: this.taskObject.assignee,
+            parentTaskId: this.parentTaskId ? this.parentTaskId : "",
+            owner: this.$store.state.app.endUserInfo.id
+        };
+        let description = util.cloneDeep(defaultTaskDescription);
+        if (this.taskObject.docId) {
+            description.action.action = "submit";
+            description.action.parameter.documentId = this.taskObject.docId;
+        }else{
+            description.action.action = "submitAdhocTask";
+        }
 
-      description.content = this.taskObject.name;
+        description.content = this.taskObject.name;
 
-      if (
-        this.taskObject.description == "" ||
-        this.taskObject.description == null
-      ) {
-        description.extraLabel = this.$t("tasks.header.alertDescription");
-      } else {
-        description.extraLabel = this.taskObject.description;
-      }
-      data.description = JSON.stringify(description);
-      let res = await BPMNEngine.addTask(JSON.stringify(data));
-      if (res.id != undefined) {
-        this.selectedProcess = null;
-        this.dialog = false;
-        this.$emit("create-task", res);
-        this.$snotifySuccess(this.$t("tasks.created"));
-      } else {
-        this.showError();
-      }
+        if (
+            this.taskObject.description == "" ||
+            this.taskObject.description == null
+        ) {
+            description.extraLabel = this.$t("tasks.header.alertDescription");
+        } else {
+            description.extraLabel = this.taskObject.description;
+        }
+        data.description = JSON.stringify(description);
+        let res = await BPMNEngine.addTask(JSON.stringify(data));
+        if (res.id != undefined) {
+            this.selectedProcess = null;
+            this.dialog = false;
+            this.$emit("create-task", res);
+            this.$snotifySuccess(this.$t("tasks.created"));
+        } else {
+            this.showError();
+        }
     }
   }
 };
