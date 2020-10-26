@@ -88,7 +88,8 @@ export default {
             instance:Date.now(),
             totalRecord:0,
             debugStatus:null,
-            timeRequest:0
+            timeRequest:0,
+            cacheDataInput:{}
         }
     },
     beforeMount() {
@@ -272,9 +273,11 @@ export default {
             }
             if(selectionText.length > 0){
                 let dataInput = selectionText.match(/(?<={)[A-Za-z0-9_]+(?=})/gi);
+                let self = this;
                 if(dataInput){
                     this.allInput = dataInput.reduce(function(obj, cur, i) {
-                        obj[cur] = {value:""};
+                        let value = (self.cacheDataInput[cur]) ?self.cacheDataInput[cur] : ""
+                        obj[cur] = {value:value};
                         return obj;
                     }, {});
                 }
@@ -295,6 +298,7 @@ export default {
             let self = this;
             for(let input in this.allInput){
                 dataInput[input] = this.allInput[input].value;
+                this.cacheDataInput[input] = this.allInput[input].value;
             }
             let start = Date.now();
             formulas.handleBeforeRunFormulas(dataInput).then(rs=>{

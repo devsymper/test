@@ -3,6 +3,7 @@ const defaultState = {
 	viewSideBySide:false,
 	showDetailArea: false,
 	currentAppId: 0,
+	currentAppName: "",
 	listApps:{},
 	selectingItemType: '',
 	activeChildItem: '',

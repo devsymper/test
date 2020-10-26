@@ -262,7 +262,6 @@ export default {
         addItem(item , type){
             let data = this.searchItemInTree(this.treeData, item.id,type)
             this.$set(this, 'treeData' , data)
-            debugger
         },
     },
     watch:{

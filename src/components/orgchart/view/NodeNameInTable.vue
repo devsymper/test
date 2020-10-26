@@ -1,13 +1,13 @@
 <template>
     <span margin-left:-2px style="margin-top:-4px">
-        <i :class="'mdi mr-2 fs-16 '+icon"></i>
-        <span style="padding-right:8px;margin-top:-4px;font:12px roboto">{{text}}</span>
+        <i :class="'mdi mr-2 fs-12 '+icon"></i>
+        <span style="padding-right:8px;margin-top:-4px;font:12px roboto; color:#212529 !important">{{text}}</span>
     </span>
 </template>
 <script>
 let mapNodeTypeIcon = {
     position: 'mdi-briefcase-outline',
-    department: 'mdi-office-building',
+    department: 'mdi-office-building-outline',
     none: 'mdi-book-multiple-outline'
 };
 export default {
