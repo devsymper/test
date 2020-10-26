@@ -3,40 +3,40 @@
     <v-navigation-drawer class="khSidebar resizable-content" v-show="!skh.subCollapseSideBar">
       <div>
         <v-text-field
-          v-model="search"
-          background-color="#F7F7F7"
-          class="d-inline-block mr-2 sym-small-size pa-1 w-100"
-          single-line
-          append-icon="mdi-magnify"
-          dense
-          @keyup="changeValueOpenAll"
-          solo
-          label="Search"
-          :placeholder="$t('common.search')"
+            v-model="search"
+            background-color="#F7F7F7"
+            class="d-inline-block mr-2 sym-small-size pa-1 w-100"
+            single-line
+            append-icon="mdi-magnify"
+            dense
+            @keyup="changeValueOpenAll"
+            solo
+            label="Search"
+            :placeholder="$t('common.search')"
         ></v-text-field>
         
         <div class="kh-side-bar">
-          <v-container style="height: calc(100% - 65px);overflow: auto;">
-            <div class="workspace">
-              <div class="symper-title">WORKSPACE</div>
-              <div class="icon-add">
-                <v-icon v-on:click="addNode()" class="fs-16 add-folder">mdi-plus</v-icon>
-              </div>
-            </div>
-            <div class="kh-add-node-parent" v-bind:class="{'d-none' : !showAddNode}">
-              <v-list-item-group class="favorite">
-                <v-list-item>
-                  <v-icon class="fs-14">mdi-folder</v-icon>
-                  <v-text-field
-                    v-model="txtNode"
-                    v-on:keyup="validateAddNode"
-                    ref="newFolderInput"
-                    @blur="handleBlur"
-                    class="fs-13"
-                  ></v-text-field>
-                </v-list-item>
-              </v-list-item-group>
-            </div>
+            <v-container style="height: calc(100% - 65px);overflow: auto;">
+                <div class="workspace">
+                    <div class="symper-title">WORKSPACE</div>
+                    <div class="icon-add">
+                        <v-icon v-on:click="addNode()" class="fs-16 add-folder">mdi-plus</v-icon>
+                    </div>
+                </div>
+                <div class="kh-add-node-parent" v-bind:class="{'d-none' : !showAddNode}">
+                    <v-list-item-group class="favorite">
+                        <v-list-item>
+                            <v-icon class="fs-14">mdi-folder</v-icon>
+                            <v-text-field
+                                v-model="txtNode"
+                                v-on:keyup="validateAddNode"
+                                ref="newFolderInput"
+                                @blur="handleBlur"
+                                class="fs-13"
+                            ></v-text-field>
+                        </v-list-item>
+                    </v-list-item-group>
+                </div>
             <template>
               <v-treeview
                 v-model="tree"
