@@ -35,9 +35,23 @@ export default {
     data(){
         return {
             customAPIResult: {
+                renameStatus(status){
+                    let nameStatus = '';
+                    switch(status){
+                        case false:
+                            nameStatus = "Bỏ theo dõi";
+                            break;
+                      
+                         case true:
+                            nameStatus = "Theo dõi";
+                            break;
+                    }
+                    return nameStatus;
+                },
                 reformatData(res){
                     let data={listObject:[],columns:[]};
                     data.listObject = res.data;
+
                    data.columns.push(
                     {
                        name:'id',
@@ -95,6 +109,10 @@ export default {
                        type:"text"
                    },
                    )
+                     for(let i = 0; i<data.listObject.length; i++){
+                        data.listObject[i].subscribed = this.renameStatus(data.listObject[i].subscribed);
+                    }
+                   
                     return  data;
                 } 
             },

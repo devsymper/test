@@ -1,26 +1,28 @@
 <template>
     <div class="w-100 mr-10">
         <v-row class="header ml-3">
-            <v-col class="col-md-9 col-sm-9 ">
-                 <span class="fs-15 fw-430" v-if="showMain">Cài đặt thông báo</span>      
+            <v-col class="col-md-8 col-sm-8 ">
+                <span class="fs-15 fw-430" v-if="showMain">Cài đặt thông báo</span>      
                 <span class="fs-15 fw-430" v-if="showFollow">Danh sách đối tượng đang theo dõi</span>
                 <span class="fs-15 fw-430" v-if="showUnfollow">Danh sách đối tượng không theo dõi</span>
-                 <v-text-field  v-if="!showMain"
-                 style="width:30%!important; float:right; margin-right:-70px; margin-top:5px"
+               
+            </v-col >
+            <v-col class="col-md-4 col-sm-4 d-flex justify-end" style="margin-right:-10px">
+                  <v-text-field  v-if="!showMain"
                         solo
                         flat
                         hide-details
-                        class="sym-small-size sym-style-input"
+                        class=" sym-small-size sym-style-input"
                         single-line
                         v-model="search">
                     </v-text-field>
-                    
-            </v-col >
-            <v-col class="col-md-3 col-sm-3 d-flex justify-end">
-                <v-btn @click="isShowUnFollow()" text class="fw-400 font-normal color-red">
+                 <v-btn @click="isShowMain()" v-if="!showMain" text class="ml-3 fw-400 font-normal color-red">
+                   <i class="mdi-24px mdi mdi-home-outline mdi-dark"></i>
+                </v-btn>
+                <v-btn @click="isShowUnFollow()" v-if="!showUnfollow" text class="fw-400 font-normal color-red">
                     Không theo dõi
                 </v-btn>
-                <v-btn @click="isShowFollow()" text class="fw-400 font-normal color-green">
+                <v-btn @click="isShowFollow()" v-if="!showFollow" text class="fw-400 font-normal color-green">
                     Theo dõi
                 </v-btn>
                     
@@ -38,7 +40,6 @@ import SettingNotification from "./../../components/notification/setting/main.vu
 export default {
   watch: {
       search(){
-          debugger
           this.searchList();
       }
   },
@@ -79,13 +80,14 @@ export default {
   },
   methods: {
       searchList(){
-          
-        this.listSubcribed = []
-        const self= this;
-        let dataSend={
-            subcribed:true,
-            keyword:this.search,
+        debugger
+        this.listSubcribed = [];
 
+        const self= this;
+        let subscribe = this.showFollow?true:false;
+        let dataSend={
+            subcribed:subscribe,
+            keyword:this.search,
         }
         notification.showListsSubcribed(dataSend).then(res=>{
             if(res.status==200){
@@ -107,25 +109,18 @@ export default {
                  for(let j=0; j<formatListModules[name[i]].length;j++){
                       self.listSubcribed[i].items.push({
                             title: formatListModules[name[i]][j].event,
+                            name: formatListModules[name[i]][j].event,
                             id:formatListModules[name[i]][j].id,
-                            // event: formatListModules[name[i]][j].event[j],
-                            // source:name[i],
-                            // receiver:formatListModules[name[i]][j].receiver[0].value,
-                            // action:formatListModules[name[i]][j].action[0].value,
-                            // name: 'default',
                             active:formatListModules[name[i]][j].subscribed
-
                         });
                  }
-             }
-
+            }
            }
-
             }
         );
-
       },
      async getAllListChanel(){
+         this.items=[];
         const self= this;
         let res = await notification.showAllLists();
            if(res.status==200){
@@ -151,6 +146,7 @@ export default {
                 for(let k=0;k<groupByEvent.length;k++){
                     self.items[i].items.push({
                     title: groupByEvent[k],
+                    name:self.rename(name[i],groupByEvent[k]),
                     // event: formatListModules[name[i]][j].event[j],
                     // source:name[i],
                     // receiver:formatListModules[name[i]][j].receiver[0].value,
@@ -181,11 +177,17 @@ export default {
             }
         })
     },
-    rename(){
+    rename(nameModule,event){
+        let name = event;
+        for(let i = 0; i<this.listSource[nameModule].event.length;i++){
+            if(this.listSource[nameModule].event[i].value==event){
+               name = this.listSource[nameModule].event[i].text;
+            }
+        }
+        return name
 
     },
     getListFollowed(){
-        debugger
         this.listSubcribed = []
         const self= this;
         let isSubcribed = true;
@@ -202,9 +204,9 @@ export default {
                             icon:objId[j]
                         })
                         for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
-                            debugger
                             self.listSubcribed[j].items.push({
                                 title: grouplistByObjId[objId[j]][i].event,
+                                name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
                                 active: true
 
                             })
@@ -215,7 +217,6 @@ export default {
         })
     },
       getListUnFollowed(){
-        debugger
         this.listUnsubcribed = []
         const self= this;
         let isSubcribed = false;
@@ -232,9 +233,9 @@ export default {
                             icon:objId[j]
                         })
                         for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
-                            debugger
                             self.listUnsubcribed[j].items.push({
                                 title: grouplistByObjId[objId[j]][i].event,
+                                name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
                                 active: false
 
                             })
@@ -244,6 +245,13 @@ export default {
         })
          
 
+    },
+    isShowMain(){
+        this.type="main";
+        this.showFollow=false;
+        this.showUnfollow=false;
+        this.showMain=true;
+        this.getAllListChanel();
     },
     isShowUnFollow(){
         this.type="unfollow";

@@ -1,7 +1,7 @@
 <template>
     <div class="h-100 permission d-flex flex-column flex-grow-1">
         <v-row>
-            <v-col class="md-5">
+            <v-col class="col-md-7">
                 <v-btn 
                     outlined 
                     class="fs-13 mr-2 button" 
@@ -14,7 +14,7 @@
                     :style="{'background-color':showUser?'#E6E5E5':''}"
                     @click="showPermissionUser()">Loại user</v-btn>
             </v-col>
-            <v-col class="md-5">
+            <v-col class="col-md-5">
                 <div>
                     <v-text-field
                         v-if="showUser"

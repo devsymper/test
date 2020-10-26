@@ -194,7 +194,6 @@
                 ></Pagination>
             </v-row>
         </div>
-    
         <component
             :is="actionPanelWrapper"
             :width="actionPanelWidth"
@@ -218,7 +217,6 @@
                 </v-card>
             </slot>
         </component>
-
         <symper-drag-panel
             v-else
             @before-close="handleCloseDragPanel"

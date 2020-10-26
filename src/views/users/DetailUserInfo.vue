@@ -1,11 +1,19 @@
 <template>
 	<div class="h-100 w-100">
+			<div>
+				<h4 class="fw-430 header-title">
+					<div style="width:15px; float:right">
+						<i class='mdi mdi-close' @click="close()"></i>
+					</div>
+					<span class="ml-0">
+						Xem chi tiết
+					</span>
+				</h4>
+			</div>	
 		<v-stepper class="w-100 d-flex stepper-create-user">
-			<div class="w-100 ml-4" v-if="!isViewUserRole">
+			<div class="w-100 ml-1 mt-2" v-if="!isViewUserRole">
 				<h4>{{ $t('user.general.personalInfo.title')}}
-						<div style="width:15px; float:right">
-							<i class='mdi mdi-close' @click="close()"></i>
-						</div>
+				
 				</h4>
 				<v-row class="mt-1" >
 					<!-- thong tin -->

@@ -13,15 +13,15 @@
         :tableContextMenu="tableContextMenu"
         :getDataUrl="'https://io.dev.symper.vn/history/document'">
     </list-items>
-     <v-navigation-drawer
-        width="500"
-        v-model="drawer"
-        absolute
-        temporary
-        right
-      >
-       <action-panel :importInfo="importInfo" />
-      </v-navigation-drawer>
+        <v-navigation-drawer
+            :style="{'width':(drawer)?'500px':'0'}"
+            v-model="drawer"
+            absolute
+            temporary
+            right
+        >
+        <action-panel :importInfo="importInfo" />
+        </v-navigation-drawer>
     </div>
 </template>
 <script>
@@ -181,6 +181,7 @@ export default {
             window.location.href = "https://io.dev.symper.vn/download/"+fileName
         },
         showDetail(importEx){
+            debugger
              this.importInfo = importEx;
              this.drawer =!this.drawer
         },

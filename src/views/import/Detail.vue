@@ -38,7 +38,7 @@
         </div>
         <div class="mb-1">
               <div v-if="importInfo.status=='Đang xử lý'">
-               <v-btn small   color="primary" class="mt-4 ml-3" @click="stopImport()">Stop</v-btn>
+               <v-btn small  color="primary" class="mt-4 ml-3" @click="stopImport()">Stop</v-btn>
            </div>
         <v-data-table 
              v-if="errorImport&&errorImport.validating.errors.length>0"

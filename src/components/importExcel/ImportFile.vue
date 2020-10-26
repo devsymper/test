@@ -14,7 +14,7 @@
         <v-row class="h-100 mt-1 ml-0">
             <v-col cols="3" style="border-right:1px solid rgba(0,0,0,0.2)">
                 <v-list style="margin-top:-25px">
-                    <v-stepper-header >
+                    <v-stepper-header class="stepper-header">
 						<v-stepper-step class="fs-13" editable step="1" @click="showImportInfo()">
 					 Thông tin
 						</v-stepper-step>

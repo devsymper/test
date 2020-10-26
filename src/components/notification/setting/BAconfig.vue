@@ -1,7 +1,7 @@
 <template>
   <div class="ml-4 config-notification">
-        <div  class="mb-3">
-            <h4 >Cài đặt thông báo</h4>
+        <div class="mb-3">
+            <h4>Cài đặt thông báo</h4>
         </div>
         <v-row class="pt-0" style="margin-bottom:-10px">
             <v-col class="fs-13 col-md-5" style="margin-top:5px">Module phát sinh</v-col>
@@ -9,7 +9,6 @@
                 <v-autocomplete
                     outlined
                      class="sym-small-size"
-                   
                     :items="listModule"
                     v-model="objectType"
                     dense
@@ -24,8 +23,7 @@
             <v-col class="col-md-7">  
                  <v-autocomplete
                     outlined
-                     class="sym-small-size"
-                   
+                    class="sym-small-size"
                     clearable
                     :items="listAction"
                     v-model="action"
@@ -40,9 +38,7 @@
             <v-col class="col-md-7">  
                 <v-autocomplete
                     class="sym-small-size"
-                   
                     dense
-                   
                     outlined
                     clearable
                     return-object
