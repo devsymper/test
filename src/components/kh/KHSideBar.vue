@@ -71,6 +71,7 @@
                           :id="item.id ? item.id: item.path"
                           @click="dbclickDoc(item.path,item.id,item.hash)"
                           class="objTitle"
+                          style="width:80%"
                         >{{item.name}}</p>
                       </template>
                       <span>{{ item.name }}</span>
@@ -970,4 +971,8 @@ export default {
 .khSidebar hr {
   display: none;
 }
+.side-bar-item >>>.v-btn__content{
+  width: 100%;
+}
+
 </style>
