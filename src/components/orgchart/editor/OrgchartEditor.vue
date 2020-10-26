@@ -528,8 +528,10 @@ export default {
 						this.$store.commit('orgchart/changeSelectingNode', {
 							instanceKey: self.selectingNode.positionDiagramCells.instanceKey,
 							nodeId: firstNode.id,
-						});
-						self.$refs.positionDiagram.$refs.editorWorkspace.changeUserDisplayInNode(this.listUserIds);
+                        });
+                        if(self.listUserIds != null){
+					    	self.$refs.positionDiagram.$refs.editorWorkspace.changeUserDisplayInNode(self.listUserIds);
+                        }
 						self.$store.commit('orgchart/updateFirstChildNodeId', firstNode.id)
                         self.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode.id)
                     }else{
@@ -751,7 +753,6 @@ export default {
 
             if(passed){
                 let orgchartData = this.getDataToSave();
-                debugger
                 this.$emit('save-orgchart-data', orgchartData);    
             }
         },
