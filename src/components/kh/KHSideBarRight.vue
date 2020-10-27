@@ -437,7 +437,6 @@ export default {
      * bắt sự kiện upload file
      */
     uploaded(dataObj) {
-      debugger
 			this.$store.commit("kh/addToListAttachStore", dataObj);
 		},
     // uploaded(dataObj) {

@@ -2,7 +2,7 @@
     <div class="h-100 w-100 orgchart-table-view">
         <v-toolbar v-show="showToolbar">
             <v-toolbar-title>{{titleToolbar}}</v-toolbar-title>
-             <!-- <v-menu
+             <v-menu
                 :max-width="500"
                 :max-height="700"
                 :nudge-width="200"
@@ -35,7 +35,7 @@
                             </v-list-item>
                         </v-list-item-group>
                 </v-list>
-            </v-menu> -->
+            </v-menu>
         </v-toolbar>
         <v-tabs-items v-model="currentTab" class="h-100">
             <v-tab-item :key="'tableView'" class="px-2 pt-2 h-100">
@@ -324,7 +324,6 @@ export default {
                 this.$refs.listUser.refreshList()
             }else{
                 this.widthContentCustom = $(window).width() - $(".resizable-component").width()  - 100
-                debugger
             }
             this.currentWidthContentCustom =  params.width 
         },
