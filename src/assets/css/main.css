@@ -743,3 +743,8 @@ body {
 .color-normal {
     color: #707070!important
 }
+
+
+.v-navigation-drawer--fixed{
+    z-index: 7!important;
+}
