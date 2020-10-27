@@ -18,7 +18,6 @@
         </v-menu>
     </div>
 </template>
-
 <script>
 import avatarDefault from "@/assets/image/avatar_default.jpg";
 import symperAvatar from "@/components/common/SymperAvatar.vue";
