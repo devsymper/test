@@ -16,9 +16,7 @@
                 </span>
             </div>
             <div class="pl-7 justify-space-between user-show">
-                <symperAvatar :size="20"  :userId="userStart.userId" />
-                <span class="ml-1">{{userStart.userName}}</span>
-                <div class="fs-11 ml-5 grey--text" v-if="userStart.roleInfo">{{userStart.roleInfo.name}}</div>
+                <infoUser class="userInfo" style="width:300px" :userId="userStart.userId" :roleInfo="userStart.roleInfo?userStart.roleInfo:{}" />
             </div>
         </div>
         <div v-else-if="(activityType=='submitTask'|| activityType=='updateTask') && taskCurrent.id">
@@ -52,9 +50,7 @@
                             <span mt-1>{{$t("tasks.header.assignee")}}</span>
                         </div>
                         <div class="ml-7 mt-1">
-                            <symperAvatar :size="20"  :userId="taskCurrent.assigneeInfo.id" />
-                            <span class="ml-1">{{taskCurrent.assigneeInfo.displayName}}</span>
-                            <div class="fs-11 ml-5 grey--text" v-if="taskCurrent.assigneeRole">{{taskCurrent.assigneeRole.name}}</div>
+                            <infoUser class="userInfo" style="width:300px" :userId="taskCurrent.assigneeInfo.id" :roleInfo="taskCurrent.assigneeRole?taskCurrent.assigneeRole:{}" />
                         </div>
                     </div>
                     <!-- người sở hữu -->
@@ -64,10 +60,8 @@
                             <span mt-1>{{$t("tasks.header.owner")}}</span>
                         </div>
                         <div class="ml-7 mt-1">
-                            <symperAvatar v-if="taskCurrent.ownerInfo.id" :size="20" :userId="taskCurrent.ownerInfo.id" />
-                            <symperAvatar v-else :size="20" :userId="taskCurrent.assigneeInfo.id" />
-                            <span>{{taskCurrent.ownerInfo.id ? taskCurrent.ownerInfo.displayName: taskCurrent.assigneeInfo.displayName }}</span>
-                            <div class="fs-11 ml-5 grey--text" v-if="taskCurrent.ownerRole">{{taskCurrent.ownerRole.name}}</div>
+                            <infoUser v-if="taskCurrent.ownerInfo.id" class="userInfo" :userId="taskCurrent.ownerInfo.id" :roleInfo="taskCurrent.ownerRole ? taskCurrent.ownerRole:{}" />
+                            <infoUser v-else class="userInfo" :userId="taskCurrent.assigneeInfo.id" :roleInfo="taskCurrent.assigneeRole" />
                         </div>
                   </div>
                 </div>
@@ -91,9 +85,7 @@
                             <span mt-1>{{$t("tasks.header.proposer")}}</span>
                         </div>
                         <div class="ml-7 mt-1">
-                            <symperAvatar :size="20"  :userId="proposer.userId" />
-                            <span class="ml-1">{{proposer.userName}}</span>
-                            <div class="fs-11 ml-5 grey--text" v-if="proposer.roleInfo">{{proposer.roleInfo.name}}</div>
+                            <infoUser class="userInfo" style="width:300px" :userId="proposer.userId" :roleInfo="proposer.roleInfo?proposer.roleInfo:{}" />
                         </div>
                     </div>
                     <!-- người sở hữu -->
@@ -103,9 +95,7 @@
                             <span mt-1>{{$t("tasks.header.approver")}}</span>
                         </div>
                         <div class="ml-7 mt-1">
-                            <symperAvatar :size="20"  :userId="taskCurrent.assigneeInfo.id" />
-                            <span class="ml-1">{{taskCurrent.assigneeInfo.displayName}}</span>
-                            <div class="fs-11 ml-5 grey--text" v-if="taskCurrent.assigneeRole">{{taskCurrent.assigneeRole.name}}</div>
+                            <infoUser class="userInfo" style="width:300px" :userId="taskCurrent.assigneeInfo.id" :roleInfo="taskCurrent.assigneeRole?taskCurrent.assigneeRole:{}" />
                         </div>
                   </div>
                 </div>
@@ -124,9 +114,7 @@
                             <span mt-1>{{$t("tasks.header.reciver")}}</span>
                         </div>
                         <div class="ml-7 mt-1">
-                            <symperAvatar :size="20"  :userId="reciver.userId" />
-                            <span class="ml-1">{{reciver.userName}}</span>
-                            <div class="fs-11 ml-5 grey--text" v-if="reciver.roleInfo">{{reciver.roleInfo.name}}</div>
+                            <infoUser class="userInfo" style="width:300px" :userId="reciver.userId" :roleInfo="reciver.roleInfo?reciver.roleInfo:{}" />
                         </div>
                     </div>
                     <!-- người sở hữu -->
@@ -139,14 +127,15 @@
 <script>
 import BPMNEngine from "@/api/BPMNEngine";
 import { taskApi } from "@/api/task.js";
-import symperAvatar from "@/components/common/SymperAvatar.vue";
+import infoUser from "./InfoUser";
+
 import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
 } from "@/components/process/processAction";
 export default {
     components:{
-        symperAvatar
+        infoUser
     },
     computed:{
         fileCountPerTask(){

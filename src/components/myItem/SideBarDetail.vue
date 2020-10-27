@@ -84,14 +84,15 @@
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.userRelated.title')}}</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
 				   		<div class="w-100 pl-2" v-for="(users, role) in dataTask" :key="role" >
-							<div v-if="users.length>0 " style="height: 30px" class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
+							<div v-if="users.length>0 "  class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
 								<span>
 									<v-icon class="mr-3" size="18">mdi-account</v-icon> 
 									<span mt-1>{{$t("tasks.header."+role)}}</span>
 								</span>
 							</div>
 							<div class="pl-7 d-flex justify-space-between user-show" v-for="userItem in tabsData[role]" :key="userItem.id" >
-								<user :user="userItem" class="float-left"></user>
+								<!-- <user :user="userItem" class="float-left"></user> -->
+                                <infoUser class="userInfo" :userId="userItem.id" />
 								<div class="float-right action-for-role d-flex"  >
 									<div v-for="(btn, idx) in actionsForRole[role]" :key="idx" class="d-flex" >
 										<v-menu v-if="btn.showUserSelect==true" 
@@ -124,7 +125,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="pl-15" v-if="users.length>0 && originData[role+'Role'] " style="clear:both">{{originData[role+'Role'].name}}</div>
+							<div class="pl-13" v-if="users.length>0 && originData[role+'Role'] " style="clear:both">{{originData[role+'Role'].name}}</div>
 						</div>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
@@ -272,6 +273,7 @@
 </template>
 <script>
 import user from "./User";
+
 import { taskApi } from "@/api/task.js";
 import { userApi } from "@/api/user.js";
 import { documentApi } from "@/api/Document";
@@ -283,6 +285,8 @@ import Comment from './Comment'
 import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue";
 import UploadFile from "@/components/common/UploadFile.vue";
 import RelatedItems from "./RelatedItems.vue";
+import infoUser from "./InfoUser";
+
 export default {
 	components:{
 		VuePerfectScrollbar,
@@ -290,7 +294,8 @@ export default {
 		user,
 		trackingProcessInstance,
 		UploadFile,
-		RelatedItems
+		RelatedItems,
+		infoUser
 	},
 	data () {
 		return {
