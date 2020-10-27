@@ -205,16 +205,24 @@ export default {
 
         }
     },
-    // settingNotication: {
-    //     title: 'Notification',
-    //     icon: 'mdi-bell-check-outline',
-    //     link: '/setting-notification',
-    //     group: "Setting"
-    // },
-    // settingNoticationBA: {
-    //     title: 'Notification Config BA',
-    //     icon: 'mdi-bell-plus-outline',
-    //     link: '/setting-notification-Ba',
-    //     group: "Setting"
-    // },
+    settingNotication: {
+        title: 'Notification',
+        icon: 'mdi-bell-check-outline',
+        group: "Setting",
+        children: {
+            settingNotificationUser: {
+                title: "Notification User",
+                icon: "mdi-folder-account",
+                link: "/setting-notification",
+            },
+            settingNoticationBa: {
+                icon: 'mdi-bell-plus-outline',
+                title: "Notification Config BA",
+                icon: "mdi-access-point-network",
+                link: '/setting-notification-Ba',
+            },
+
+        }
+    },
+
 };

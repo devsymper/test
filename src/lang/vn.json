@@ -99,7 +99,8 @@
         "sidebar": {
             "Notification Config BA": "Cài đặt thông báo",
             "Setting": "Cài đặt",
-            "Notification": "Quản lý thông báo",
+            "Notification": "Thông báo",
+            "Notification User": "Quản lý thông báo",
             "account_trash": "Tài khoản đã xóa",
             "Lists trash": "Danh sách bản xóa",
             "myApplication": "Ứng dụng của tôi",

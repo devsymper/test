@@ -34,6 +34,7 @@
 </template>
 <script>
 import _ from 'lodash';
+import { documentApi } from "./../../api/Document.js";
 import UserPopUp from "./../../components/user/UserPopUp";
 import notification from "./../../api/settingNotification";
 import SettingNotification from "./../../components/notification/setting/main.vue"
@@ -183,6 +184,26 @@ export default {
         return name
 
     },
+    // findName(objId){
+    //     let name = ' ';
+    //     if(objId.indexOf(':')>0){
+    //            debugger
+    //           let nameModule = objId.split(':')[0];
+    //           let id = objId.split(':')[1];
+    //          if(nameModule=='document_definition'){
+    //           documentApi.getBatchDocument({ids:JSON.stringify(id)}).then(res => {
+    //                 if(res.status==200){
+    //                     name="Có kq"
+    //                 }else{
+    //                     name = "Lỗi"
+    //                 }
+    //           })
+    //         }   
+    //     }else{
+    //       name=objId
+    //     }
+    //     return name
+    // },
     getListFollowed(){
         this.listSubcribed = []
         const self= this;
@@ -196,7 +217,7 @@ export default {
                     self.listSubcribed.push({
                         items:[],
                         title: objId[j],
-                        icon:objId[j]
+                        icon:objId[j].indexOf(':')>0?objId[j].split(':')[0]:objId[j]
                     })
                     for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
                         self.listSubcribed[j].items.push({
@@ -214,7 +235,7 @@ export default {
         this.listUnsubcribed = []
         const self= this;
         let isSubcribed = false;
-        notification.showListsSubcribed({subscribed:isSubcribed}).then(res=>{
+        notification.showListsSubcribed({subscribed:isSubcribed}). then(res=>{
             if(res.status==200){
              let listSubcribed = res.data;
               let grouplistByObjId = _.groupBy(listSubcribed, 'objectIdentifier');
@@ -222,7 +243,7 @@ export default {
                 for(let j = 0; j<objId.length;j++){
                     self.listUnsubcribed.push({
                         items:[],
-                        title: objId[j],
+                        title: self.findName(objId[j]),
                         icon:objId[j].indexOf(':')>0?objId[j].split(':')[0]:objId[j]
                     })
                     for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
@@ -262,3 +283,9 @@ export default {
   },
 }
 </script>
+<style scoped>
+    .sym-small-size{
+        border:none!important;
+        margin-top:3px
+    }
+</style>
