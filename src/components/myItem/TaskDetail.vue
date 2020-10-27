@@ -466,7 +466,7 @@ export default {
                         let res = await this.submitTask(taskData);
                         this.saveApprovalHistory(value);
                         this.$emit('task-submited', res);
-                    }else if(this.taskAction == '' ||this.taskAction==undefined ||this.taskAction == 'submitAdhoc'){
+                    }else if(this.taskAction == '' ||this.taskAction==undefined ||this.taskAction == 'submitAdhocTask'){
                         let taskData = {
                             "action": "complete",
                             "outcome": value,
@@ -600,7 +600,7 @@ export default {
             self.taskAction = self.taskInfo.action.action;
             if(self.taskAction == 'approval'){
                 self.showApprovalOutcomes(JSON.parse(self.taskInfo.approvalActions));
-            }else if(self.taskAction == 'submit' || self.taskAction == 'submitAdhoc'){
+            }else if(self.taskAction == 'submit' || self.taskAction == 'submitAdhocTask'){
                 self.taskActionBtns = [
                     {
                     text:"Submit",

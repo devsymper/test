@@ -94,9 +94,6 @@ const setLogAll = (state, listLogAll) => {
     Vue.set(state, 'listLogAll', listLogAll);
 }
 
-const setArrIdFileAttach = (state, arrIdFileAttach) => {
-    Vue.set(state, 'arrIdFileAttach', arrIdFileAttach);
-}
 
 const setArrFileAttach = (state, arrFileAttach) => {
     Vue.set(state, 'arrFileAttach', arrFileAttach);
@@ -338,7 +335,6 @@ export {
     setDataTable,
     setIdTable,
     setCurrentDocument,
-    setArrIdFileAttach,
     setArrFileAttach,
     addToListAttachStore,
     changeStatusShowImage,
