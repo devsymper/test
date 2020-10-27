@@ -72,9 +72,8 @@
                         cols="2"
                         class="fs-12 pl-3 px-1 py-0 mt-2"
                     >
-                    <symperAvatar :size="20" :userId="obj.assigneeInfo.id" />
-                    {{obj.assigneeInfo.displayName}}
-                    <div class="fs-11 ml-5 grey--text" v-if="obj.assigneeRole">{{obj.assigneeRole.name}}</div>
+                        <infoUser class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole?obj.assigneeRole:{}" />
+                    
                     </v-col>
                     <v-col
                         @click="selectObject(obj, idx)"
@@ -82,10 +81,8 @@
                         cols="2"
                         class="fs-12 pl-3 px-1 py-0 mt-2"
                         >
-                    <symperAvatar v-if="obj.ownerInfo.id" :size="20" :userId="obj.ownerInfo.id" />
-                    <symperAvatar v-else :size="20" :userId="obj.assigneeInfo.id" />
-                    {{obj.ownerInfo.id ? obj.ownerInfo.displayName: obj.assigneeInfo.displayName }}
-                    <div class="fs-11 ml-5 grey--text" v-if="obj.ownerRole">{{obj.ownerRole.name}}</div>
+                        <infoUser v-if="obj.ownerInfo.id" class="userInfo" :userId="obj.ownerInfo.id" :roleInfo="obj.ownerRole ? obj.ownerRole:{}" />
+                        <infoUser v-else class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole" />
                     </v-col>
                     <v-col
                        @click="selectObject(obj, idx)"
@@ -229,9 +226,9 @@
 <script>
 import BPMNEngine from "@/api/BPMNEngine";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import symperAvatar from "@/components/common/SymperAvatar.vue";
 import detailDocument from '@/views/document/detail/Detail';
 import taskDetail from "../TaskDetail";
+import infoUser from "./../InfoUser";
 
 import {
   extractTaskInfoFromObject,
@@ -256,9 +253,9 @@ export default {
     },
     components: {
         VuePerfectScrollbar: VuePerfectScrollbar,
-        symperAvatar: symperAvatar,
         detailDocument,
-        taskDetail
+        taskDetail,
+        infoUser
 
     },
     watch:{

@@ -179,8 +179,10 @@ export default {
         },
         taskBreadcrumb:function(){
             this.getWidthHeaderTask();
+        },
+        "sapp.collapseSideBar": function(newVl) {
+            this.getWidthHeaderTask();
         }
-
     },
     components: {
         icon: icon,
@@ -265,10 +267,10 @@ export default {
     },
     methods: {
         getWidthHeaderTask(){
-            console.log("aaaaxxx",$("#taskHeader").width());
-            console.log("aaaaxxx",$("#action-task").width());
-            this.widthInfoTask=$("#taskHeader").width()-$("#action-task").width()-20;
-       
+            setTimeout((self) => {
+                let width=$("#taskHeader").width()-$("#action-task").width()-40;
+                self.widthInfoTask=width;
+            }, 210,this);
         },
         checkShowEditRecord(){
             let taskInfo = this.taskInfo;
@@ -629,6 +631,13 @@ export default {
     border-width: 20px!important;
     text-transform: none !important;
 
+}
+.task-header{
+    position: relative;
+}
+.task-header #action-task{
+    position: absolute;
+    right: 10px;
 }
 
 </style>
