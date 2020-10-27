@@ -253,7 +253,6 @@ export default {
 					})
 					this.checkTypeFavorite(res.data.listObject)
 					this.$store.commit('appConfig/updateListFavorite',self.listFavorite)
-					debugger
 					this.loadingFavorite = false
 				}
 			}).catch((err) => {

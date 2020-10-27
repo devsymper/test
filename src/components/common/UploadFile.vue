@@ -143,12 +143,10 @@ export default {
 						this.previewImg = window.URL.createObjectURL(e.target.files[0])
 					}
 				}else{
-					debugger
 					formData.append('file',this.selectedFile)
 					this.formDatas = formData;
 					this.$emit('selected-file', window.URL.createObjectURL(e.target.files[0]))
 					if(this.autoUpload ){
-						debugger
 						this.uploadFile()
 					}
 				}

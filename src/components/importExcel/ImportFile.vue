@@ -258,7 +258,6 @@ export default {
                 }
             }
             return check
-            debugger
 
         },
         nextToImport(dataUpload){
@@ -460,7 +459,6 @@ export default {
                             check = false;
                         };
                         for(let j=0; j<this.tables[i].controls.length;j++){
-                            debugger
                              if(!this.tables[i].controls[j].isNull&&this.tables[i].controls[j].dataColumn==null){
                                 check = false;
                                   this.errorMessage = '* Bạn chưa điền trường bắt buộc cho bảng '+this.tables[i].name;

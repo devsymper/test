@@ -20,7 +20,6 @@ export default {
         return api.post('channels/' + id, data)
     },
     deleteNotification(id) {
-        debugger
         return api.delete('channels/' + id)
     }
 }

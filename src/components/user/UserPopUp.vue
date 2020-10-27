@@ -85,7 +85,6 @@ props:['userId'],
         const self= this;
         let res = await userApi.getDetailUser(this.userId);
             if(res.status==200){
-                debugger
                 self.detailUser = res.data.user;
                 self.detailUser.createAt = dayjs(self.detailUser.createAt).format('DD/MM/YYYY');
                 self.detailUser.status= self.reNameStatus(self.detailUser.status);

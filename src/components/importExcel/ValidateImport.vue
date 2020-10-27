@@ -268,7 +268,6 @@ export default {
     props:['fileName','setInterval','importFile'],
     methods: {
         stopImport(){
-            debugger
              importApi.cancelImport(this.fileName)
               .then(res => {
                     if (res.status === 200) {

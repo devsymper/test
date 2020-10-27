@@ -323,7 +323,6 @@ export default {
                 this.$refs.listUser.refreshList()
             }else{
                 this.widthContentCustom = $(window).width() - $(".resizable-component").width()  - 100
-                debugger
             }
             this.currentWidthContentCustom =  params.width 
         },

@@ -181,7 +181,6 @@ export default {
             window.location.href = "https://io.dev.symper.vn/download/"+fileName
         },
         showDetail(importEx){
-            debugger
              this.importInfo = importEx;
              this.drawer =!this.drawer
         },

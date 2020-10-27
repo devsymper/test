@@ -171,7 +171,6 @@ export default {
             this.$refs.listNotification.refreshList();
         },
         deleteNotification(notification){
-            debugger
             const self = this;
             notificationApi.deleteNotification(notification[0].id).then(res=>{
                 if(res.status==200){

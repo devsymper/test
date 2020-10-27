@@ -276,13 +276,11 @@ export default {
   },
   methods: {
     handleAvatarSelected(tempUrl){
-         debugger
            this.avatarUrl = tempUrl;
             this.avatarFileName = 'user_avatar_'+util.str.randomString(6)+Date.now();
             this.$refs.uploadAvatar.uploadFile();
         },
     save(){
-        debugger
         let data={
             event: this.action,
             source:this.objectType,

@@ -209,7 +209,6 @@ export default {
 		changeFavorite(item,type){
 			let	appId = this.$store.state.appConfig.currentAppId
 			let	appName = this.$store.state.appConfig.currentAppName
-			debugger
 			event.stopPropagation()
 			if(type == "document_major" || type == "document_category"){
 				type = "document_definition"

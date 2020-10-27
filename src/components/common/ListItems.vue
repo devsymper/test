@@ -1065,7 +1065,6 @@ export default {
             this.savingConfigs = true;
             let thisCpn = this;
             let dataToSave = this.getTableDisplayConfigData();
-            debugger
             uiConfigApi
             .saveUiConfig(dataToSave)
             .then(() => {
