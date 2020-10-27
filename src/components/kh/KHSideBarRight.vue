@@ -110,11 +110,7 @@
             <v-list dense class="list-log">
                 <v-list-item-group>
                 <v-list-item v-for="(item, i) in listLogAll" :key="i">
-                    <v-avatar>
-                    <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John" />
-                    </v-avatar>
-                    <!-- <v-list-item-title class="fs-13"><b>{{item.userName}}</b> Đã {{item.action}} văn bản <b>{{item.name}}</b></v-list-item-title> -->
-                    <p class="fs-13">
+                    <symperAvatar :size="20" :userId="item.userId" /> <p class="fs-13">
                     <b>{{item.userName}}</b>
                     Đã {{convertAction(item.action)}}
                     <span
@@ -141,9 +137,7 @@
             <v-list dense class="list-log">
                 <v-list-item-group>
                 <v-list-item v-for="(item, i) in listLogDoc" :key="i">
-                    <v-avatar>
-                    <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John" />
-                    </v-avatar>
+                    <symperAvatar :size="20" :userId="item.userId" />
                     <p class="fs-13">
                     <b>{{item.userName}}</b>
                     Đã {{convertAction(item.action)}}
@@ -264,11 +258,13 @@ import UploadFile from "@/components/common/UploadFile.vue";
 import KHShowImage from "./../../components/kh/KHShowImage";
 import Comment from '@/components/common/comment/Comment.vue';
 import { SYMPER_APP } from "./../../main.js";
+import symperAvatar from "@/components/common/SymperAvatar.vue";
 export default {
     components: {
         UploadFile,
         KHShowImage,
-        Comment
+        Comment,
+        symperAvatar
     },
     data() {
         return {
