@@ -982,7 +982,9 @@
                 "execute": "Khởi tạo",
                 "list": "Danh sách",
                 "favorite": "Thêm vào yêu thích",
-                "unfavorite": "Loại bỏ yêu thích"
+                "unfavorite": "Loại bỏ yêu thích",
+                "drop": "Xóa",
+                "update": "Cập nhật"
             },
             "orgchart": {
                 "create": "Tạo mới ",
@@ -1035,6 +1037,18 @@
                 "execute": "Thực thi"
             },
             "application_definition": {
+                "update": "Sửa",
+                "view": "Xem",
+                "remove": "Xóa",
+                "create": "Tạo"
+            },
+            "knowledge": {
+                "update": "Sửa",
+                "view": "Xem",
+                "remove": "Xóa",
+                "create": "Tạo"
+            },
+            "file": {
                 "update": "Sửa",
                 "view": "Xem",
                 "remove": "Xóa",

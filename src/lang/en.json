@@ -834,6 +834,18 @@
                 "view": "View",
                 "remove": "Remove",
                 "create": "Create"
+            },
+            "knowledge": {
+                "update": "update",
+                "view": "view",
+                "remove": "remove",
+                "create": "create"
+            },
+            "file": {
+                "update": "update",
+                "view": "view",
+                "remove": "remove",
+                "create": "create"
             }
         },
         "iconListActions": {
