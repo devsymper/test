@@ -35,6 +35,10 @@
 									<td style="width:70px">{{$t('document.detail.sidebar.body.general.userCreate')}}</td>
 									<td>{{userCreate}}</td>
 								</tr>
+								<tr v-if="userRoleInfo">
+									<td style="width:70px">{{$t('document.detail.sidebar.body.general.userRole')}}</td>
+									<td>{{userRoleInfo}}</td>
+								</tr>
 								<tr>
 
 									<td>{{$t('document.detail.sidebar.body.general.history')}}</td>
@@ -143,10 +147,11 @@
 </template>
 <script>
 
-import { userApi } from "./../../../api/user.js";
-import { documentApi } from "./../../../api/Document";
-import bpmnApi from "./../../../api/BPMNEngine.js";
-import { util } from "./../../../plugins/util.js";
+import { userApi } from "@/api/user.js";
+import { documentApi } from "@/api/Document";
+import { orgchartApi } from "@/api/orgchart";
+import bpmnApi from "@/api/BPMNEngine.js";
+import { util } from "@/plugins/util.js";
 import { data } from 'jquery'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import Comment from './Comment'
@@ -162,6 +167,7 @@ export default {
 			userCreate:"",
 			createdDate:"",
 			workflowName:"",
+			userRoleInfo:"",
 			showPanelWorkflow:true,
 			taskName:"",
 			listApprovalUser:[],
@@ -173,7 +179,7 @@ export default {
 			displaySidebar:'none',
 			showMainInfo:false,
 			showHistoryInfo:false,
-			showCommentInfo:false
+			showCommentInfo:false,
 		}
 	},
 	props:{
@@ -204,18 +210,36 @@ export default {
 		documentObjectId:{
 			type:Number,
 			default:0
+		},
+		userRole:{			// role của user submit doc
+			type:String
 		}
 	},
 	watch:{
 		userId(after){
-			userApi.getDetailUser(after).then(res=>{
-				if(res.status == 200)
-				this.userCreate = res.data.user.displayName
+			if(!after){
+				return;
+			}
+			let user = this.allUsers.filter(u=>{
+				return u.id == after;
 			});
+			this.userCreate = user[0].displayName;
+			let self = this;
+			if(self.userRole){
+				orgchartApi.getRolesByUser([{idUser: after}]).then(res=>{
+					let listRole = res.data[0].roles;
+					if(listRole.length > 0){
+						let curRole = listRole.filter(role=>{
+							return role.id == self.userRole;
+						})
+						self.userRoleInfo = curRole[0].name;
+					}
+				});
+			}
 		},
 		workflowId(after){
 			let self = this
-			if(after != ""){
+			if(after != "" && after != "0"){
 				bpmnApi.getProcessInstanceData(this.workflowId).then(res=>{
 					self.workflowName = res.data[0].processDefinitionName
 				});
@@ -223,7 +247,7 @@ export default {
 		},
 		taskId(after){
 			let self = this
-			if(after != ""){
+			if(after != "" && after != "0"){
 				bpmnApi.getATaskInfo(this.taskId).then(res=>{
                    self.taskName = res.name == null ? "" : res.name
                 });

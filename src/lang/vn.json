@@ -640,8 +640,8 @@
                 }
             },
             "sidebarLeft": {
-                "document" : "Document",
-                "column" : "Trường"
+                "document": "Document",
+                "column": "Trường"
             }
         },
         "submit": {
@@ -680,6 +680,7 @@
                         "title": "THÔNG TIN CHUNG",
                         "dateCreate": "Ngày tạo",
                         "userCreate": "Người tạo",
+                        "userRole": "Vai trò",
                         "history": "Lịch sử",
                         "comment": "Bình luận",
                         "has": "Có",
