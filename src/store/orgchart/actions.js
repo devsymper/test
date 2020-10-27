@@ -31,6 +31,19 @@ const updateUserInNode = (context, params) => {
     }
     context.commit('updateListChildrenNode', params)
 }
+const getUserByVizId = (context, params) => {
+    params.data = []
+    let data = context.state.orgChartData[params.orgchartId]
+    if (params.nodeType = 'department') {
+        params.data = data.departments.concat(data.positions)
+    } else {
+        params.data = data.positions
+    }
+    params.listUser = []
+    params.list = []
+    context.commit('emptyListChildInCurrentNode')
+    context.commit('getUserByVizId', params)
+}
 
 const getAllOrgchartStruct = async(context, params) => {
     if (!context.state.getStructFlag) {
@@ -101,4 +114,4 @@ const getAllOrgchartStruct = async(context, params) => {
 }
 
 
-export { getAllStyleNode, updateUserInNode, getAllOrgchartStruct };
+export { getAllStyleNode, updateUserInNode, getAllOrgchartStruct ,getUserByVizId};
