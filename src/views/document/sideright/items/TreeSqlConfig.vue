@@ -1,344 +1,332 @@
 <template>
-    <div class="tree-sql-config">
+    <div>
         <v-treeview
-            class="fs-13"
-            activatable
+            dense
+            open-all
             :items="treeData"
-            dense>
-            <template v-slot:label="{ item }">
-                <div  v-if="item.type == 'group'"  class="text-uppercase tree-group-slot">
-                    <span>
-                         {{item.value}}
-                    </span>
-                   <div class="action-group-slot">
-                        <v-btn icon tile @click="removeItem(item)">
-                            <v-icon>
-                                mdi-close
-                            </v-icon>
-                        </v-btn>
-                        <v-btn icon tile @click="switchOperator(item)">
-                            <v-icon>
-                            mdi-sort  
-                            </v-icon>
-                        </v-btn>
-                       
-                          <v-menu
-                                bottom
-                                left
+            class="tree-view"
+            ref="tree"
+            style="
+            overflow:hidden;padding-bottom:8px"
+        >
+                <template v-slot:append="{ item }">
+                    <div v-if="!item.condition" class="tree-item-slot">
+                        <v-icon class="btn-delete-item-condition" @click="deleteConditionItem(item)">mdi mdi-close</v-icon>
+                        <v-autocomplete
+                            :items="listColumn"
+                            item-text="title"
+                            item-value="name"
+                            v-model="item.column"
+                            class="tree__list-columns"
+                            @change="onChangeConfig"
+                            dense
+                            solo
+                        ></v-autocomplete>
+                        <v-autocomplete
+                            :items="listOperator"
+                            @change="onChangeConfig"
+                             class="tree__list-operations"
+                            item-text="title"
+                            :menu-props="{minWidth:60}"
+                            v-model="item.operator"
+                            dense
+                            solo
+                        ></v-autocomplete>
+                        <v-text-field
+                            v-model="item.value"
+                            @change="onChangeConfig"
+                            solo
+                        ></v-text-field>
+                    </div>
+                    <!-- <input v-model="item.formulas" v-on:change="handleChangeInput" class="input-validate" v-if="!item.condition" type="text"> -->
+                    <div v-else type="text">
+                    
+                        <v-btn
+                            light
+                            icon
+                            style="height: 28px;width: 28px;"
+                            v-if="!item.root"
+                            @click="deleteCondition(item)"
                             >
-                                <template v-slot:activator="{ on, attrs }">
-                                    <v-btn
-                                        dark
-                                        icon
-                                        tile 
-                                        v-bind="attrs"
-                                        v-on="on"
-                                    >
-                                        <v-icon> mdi-plus-circle </v-icon>
-                                    </v-btn>
-                                </template>
-                                <v-list>
-                                <v-list-item
-                                    v-for="(type, i) in listType"
-                                    :key="i"
-                                    @click="addItem(item, type.value)"
-                                >
-                                    <v-list-item-title>{{ type.title }}</v-list-item-title>
-                                </v-list-item>
-                                </v-list>
-                            </v-menu>
-                   </div>
-                </div>
-                <div v-else class="tree-item-slot">
-                     <v-btn icon tile @click="removeItem(item)">
-                            <v-icon>
-                                mdi-close
-                            </v-icon>
-                    </v-btn>
-                     <v-autocomplete
-                        :items="listColumn"
-                        item-text="title"
-                        v-model="item.column"
-                        dense
-                        solo
-                    ></v-autocomplete>
-                    <v-autocomplete
-                        :items="listOperator"
-                        item-text="title"
-                        v-model="item.operator"
-                        dense
-                        solo
-                    ></v-autocomplete>
-                     <v-text-field
-                        v-model="item.value"
-                        solo
-                    ></v-text-field>
-                </div>
-            </template>
+                            <v-icon style="font-size:16px;">mdi mdi-close</v-icon>
+                            </v-btn>
+                        <v-btn
+                            light
+                            icon
+                            style="height: 28px;width: 28px;"
+                            @click="swapCondition(item)"
+                            >
+                            <v-icon style="font-size:16px;">mdi mdi-swap-vertical-bold</v-icon>
+                            </v-btn>
+                            
+                        <v-menu 
+                        bottom 
+                        left
+                        offset-y
+                        transition="slide-y-transition"
+                        >
+                        <template v-slot:activator="{ on }">
+                            <v-btn
+                            light
+                            icon
+                            v-on="on"
+                            style="height: 28px;width: 28px;"
+                            >
+                            <v-icon style="font-size:16px;">mdi mdi-plus</v-icon>
+                            </v-btn>
+                        </template>
+
+                        <v-list>
+                            <v-list-item
+                            v-for="(node, i) in allNode"
+                            :key="i"
+                            style="cursor:pointer; min-height:25px;"
+                            @click="addNode(node,item,i)"
+                            >
+                            <v-list-item-title style="font-size:13px;">{{ node.title }}</v-list-item-title>
+                            </v-list-item>
+                        </v-list>
+                        </v-menu>
+                    </div>
+                </template>
         </v-treeview>
+        
     </div>
 </template>
 
 <script>
 import { util } from '@/plugins/util';
 export default {
-    created(){
-    },
     props: {
-      treeData:{
-          type: Array,
-          default(){
-              return [
-               {
-                    id: 1,
-                    type:"group",
-                    value: "and",
-                    children: [
-                        { 
-                            id: 2,
-                            type:"item",
-                            column:"Abc",
-                            operator:"notBlank",
-                            value:'10001'
-                        },
-                        { 
-                            id: 3,
-                            type:"item",
-                            column:1,
-                            operator:"notBlank",
-                            value:'10001sdds'
-                        },
-                    ],
-                },
-                {
-                id: 4,
-                type:"group",
-                value: "or",
-                children: [
-                    {
-                    id: 5,
-                    type:"group",
-                    value: "and",
-                    children: [
-                        {
-                        id: 6,
-                        type:"group",
-                        value: "and",
-                        children: [
-                        ],
-                        },
-                    ],
-                    },
-                   
-                ],
-                },
-               
-          ]
-          } 
-      }
-    },
+        listColumn:{
+            type:Array
+        },
+        defaultData:{
+            type:Array
+        }
+        
+    },  
     watch: {
+        defaultData:{
+            deep:true,
+            immediate:true,
+            handler:function(vl){
+                if(vl){
+                    this.treeData = vl
+                }
+            }
+        }
     },
     data(){
         return{
-            listOperator:[
-                {
-                    title:"<",
-                    value:"lessThan"
-                },
-                {
-                    title:"<=",
-                    value:"lessThanOrEqual"
-                },
-                {
-                    title:">",
-                    value:"greaterThan"
-                },
-                {
-                    title:">=",
-                    value:"greaterThanOrEqual"
-                },
-                {
-                    title:"=",
-                    value:"isNot"
-                },
-                {
-                    title:"!= ",
-                    value:"isNot"
-                },
-                {
-                    title:"Is blank ",
-                    value:"isBlank"
-                },
-                {
-                    title:"In",
-                    value:"in"
-                },
-                {
-                    title:"Not blank",
-                    value:"notBlank"
-                },
-
-            ],
-            listColumn:[
+            listOperator : ['>','>=','<','<=','=','!=','<>','!>','!<','ILIKE'],
+            treeData: [
                 {
                     id:1,
-                    title:"Column 2",
-                },
-                {
-                    id:2,
-                    title:"Column 1",
-                    
-                },
+                    name: 'AND',
+                    root: true,
+                    condition:true,
+                    children: [
+                        
+                    ],
+                
+                }
             ],
-            listType:[
-                {
-                    title: "Group",
-                    value:"group"
-                },
-                {
-                    title: "Item",
-                    value:"item"
-                },
-            ],
+            allNode:[{title:'item',type:'item'},{title:'group',type:'group'}],
         }
-    },
-    computed: {
     },
     methods: {
-        removeItem(item){
-            let data = this.searchItemInTree(this.treeData, item.id)
-            this.treeData = data
+
+        addNode(node,item,i){
+            if(node.type == 'item'){
+                item.children.push({id:Date.now(),condition:false,name:'',parent:item.id,formulas:''});
+            }
+            else{
+                item.children.push({id:Date.now(),condition:true,name:'AND',parent:item.id,children:[]});
+            }
+            this.$refs.tree.updateAll(true);
         },
-        searchItemInTree(data ,id , type = ''){
-            let self = this
-            if(type == ''){
-                data.forEach(function(e){
-                     if(e.id == id){
-                        data.splice(data.indexOf(e),1);
-                    }else{
-                        if(e.children){
-                            self.searchItemInTree(e.children, id);
+        setValueForNode(){
+            
+        },
+        /**
+         * Thay đổi điều kiện
+         */
+        swapCondition(item){
+            item.name = (item.name == 'OR') ? 'AND' : 'OR';
+            this.onChangeConfig()
+        },
+        /**
+         * Hàm xóa 1 điều kiện con trong 1 node
+         */
+        deleteConditionItem(item){
+            this.deleteCondition(item)
+        },
+        /**
+         * Xóa node
+         */
+        deleteCondition(item){
+            let parentId = item.parent;
+            let parentNode = this.bfs(this.treeData, parentId)
+            for(let i = 0; i < parentNode.children.length; i++){
+                if(parentNode.children[i].id == item.id ){
+                    parentNode.children.splice(i,1);
+                }
+            }
+       
+        },
+        
+        bfs(tree, id) {
+            var queue = []
+            
+            queue.push(tree[0])
+            
+            while (queue.length !== 0) {
+                for (let i = 0; i < queue.length; i++) {
+                    var node = queue.shift()
+                    if (node.id === id) {
+                        return node
+                    }
+                    if (node.children) {
+                        queue = queue.concat(node.children)
+                    }
+                    
+                }
+            }
+            return null
+        },
+        /**
+         * Hàm lấy công thức từ tree validate
+         */
+
+        getData(item){
+            let where = "";
+            let name = item.name;
+            let children = item.children;
+            if(children.length == 0){
+                where = "true";
+            }
+            else if(children.length == 1){
+                let value = (children[0].value) ? "'"+children[0].value+"'" : "''"
+                where = "("+children[0].column+" "+children[0].operator+" "+value+")";
+            }
+            else{
+                for (let index = 0; index < children.length; index++) {
+                    const childItem = children[index];
+                    let childSql = "";
+                    if(childItem.condition){
+                        childSql = "("+this.getData(childItem)+")";
+                    }
+                    else{
+                        if(childItem.column && childItem.operator){
+                            let childValue = (childItem.value) ? "'"+childItem.value+"'" : "''";
+                            childSql = "("+childItem.column+" "+childItem.operator+" "+childValue+")";
+                        }
+                        else{
+                            childSql = "true"
                         }
                     }
-                })
-                return data;
-            }else{
-                data.forEach(function(e){
-                    if(e.id == id){
-                        if(!e.children){
-                            e.children = []
-                        }
-                        if(type == "group"){
-                            e.children.push({
-                                id: Math.floor(Math.random() * 10000),
-                                type:"group",
-                                value:"and",
-                                children:[]
-                            })
-                        }else{
-                             e.children.push({
-                                id: Math.floor(Math.random() * 10000),
-                                type:"item",
-                                column:1,
-                                operator:"notBlank",
-                                value:''
-                            })
-                        }
-                        }else{
-                            if(e.children && e.children.length > 0){
-                                self.searchItemInTree(e.children, id, type);
-                            }
+                    if(index == children.length -1){
+                        where += childSql;
                     }
-                })
-                return data;
+                    else{
+                        where += childSql + " "+name+" ";
+                    }
+                }
+            }
+            return where;
+        },
+        getDataChildRen(children,data,currentCondition){
+            let dataCondition = "";
+            for(let i = 0; i < children.length; i++){
+                let child = children[i];
+                if(child.condition){
+                    if(child.children.length > 0){
+                        this.getDataChildRen(child.children,dataCondition,)
+                    }
+                }
+                else{
+                    dataCondition += child.formulas + " " + currentCondition;
+                }
             }
         },
-        switchOperator(item){
-            let newValue = item.value == "or" ? "and" : "or" 
-            item.value = newValue
+        getTreeData(){
+            let where = this.getData(this.treeData[0]);
+            return {where:where,treeData:this.treeData};
         },
-     
-        addItem(item , type){
-            let data = this.searchItemInTree(this.treeData, item.id,type)
-            this.$set(this, 'treeData' , data)
-            debugger
-        },
-    },
-    watch:{
-        treeData:{
-            immediate: true,
-            deep: true,
-            handler(arr){
-                this.$emit('tree-renderer', arr)
-            }
+        onChangeConfig(){
+            let where = this.getData(this.treeData[0]);
+            this.$emit('change-config',{where:where,treeData:this.treeData});
         }
-    }
+    },
 }
 </script>
 
 <style scoped>
-.tree-sql-config .tree-group-slot{
-    display: flex;
+.fs-11{
+    font-size: 11px;
 }
-.tree-sql-config >>> .tree-group-slot .v-icon{
-    font-size:13px !important;
-}
-.tree-sql-config >>> .tree-item-slot .v-icon{
-    font-size:13px !important;
-}
-.tree-sql-config >>> .v-treeview-node__label{
-    height: 20px !important;
-}
-.tree-sql-config >>> .v-treeview-node__root .v-treeview-node__label .tree-group-slot{
-    margin-left:35px !important;
-}
-.tree-sql-config >>> .v-treeview-node__root .v-treeview-node__content{
-    margin-left:-35px !important;
-}
-.tree-sql-config >>> .tree-group-slot .v-btn{
-    height: 13px !important;
-    width: 13px !important;
-    margin:0px 8px;
-}
-.tree-sql-config >>> .tree-item-slot .v-btn{
-    height: 13px !important;
-    width: 13px !important;
-    margin:0px 8px;
-}
-.tree-sql-config >>>  .tree-group-slot{
-    height: 13px !important;
-    width: 13px !important;
-    margin:0px 8px;
-}
-.tree-sql-config >>>  .tree-group-slot .action-group-slot{
-    margin-top: -1px;
-    display: none;
-}
-.tree-sql-config >>>  .v-treeview-node__root:hover .action-group-slot{
-    display: block;
-}
-
-.tree-sql-config .tree-item-slot{
-    display: flex;
-    margin-top:-8px;
-    margin-left:-40px;
-}
-.tree-sql-config >>> .tree-item-slot .v-input{
-    margin: unset;
-}
-
  .v-list-item{
     min-height: unset !important;
     padding:4px 12px;
 }
  .v-list-item .v-list-item__title{
-    font:13px roboto !important;
+    font:11px !important;
 }
-.tree-sql-config >>>.v-icon{
-    font-size:13px;
+.tree-view >>> .v-treeview-node__level{
+    display: none;
 }
-.tree-sql-config >>>.v-treeview-node__toggle{
-    width:unset;
+.tree-view >>> .v-treeview-node__label{
+    flex: unset;
 }
+.tree-view >>> .v-treeview-node__toggle{
+    display: none;
+}
+.tree-view >>> .tree-item-slot{
+    display: flex;
+    margin-top:-8px;
+}
+.tree-view >>> .tree-item-slot .v-input{
+    margin: unset;
+}
+.tree-view >>> .tree-item-slot .v-input__control{
+    min-height: unset !important;
+}
+.tree-view >>> .tree-item-slot .v-input__control .v-input__slot{
+    height: 25px;
+    font-size: 11px;
+}
+.tree__list-columns >>> .v-input__icon, .tree__list-operations >>> .v-input__icon{
+    display: none;
+}
+.tree__list-columns{
+    margin-left: -7px !important;
+}
+.tree__list-operations{
+    width: 70px;
+}
+::v-deep .v-treeview-node__root{
+    padding-right: 0 !important;
+}
+
+::v-deep .v-treeview-node__children > .v-treeview-node:not(.v-treeview-node--leaf) {
+    border: var(--symper-border);
+    margin: 0px 2px 8px 12px;
+
+}
+::v-deep .v-treeview-node__children > .v-treeview-node:not(.v-treeview-node--leaf) .v-treeview-node__root{
+    padding-left: 0 !important;
+}
+.btn-delete-item-condition{
+    font-size: 14px;
+    margin-left: -8px;
+    margin-right: 8px;
+    padding-bottom: 4px;
+    cursor: pointer;
+    opacity: 0;
+}
+.tree-item-slot:hover .btn-delete-item-condition{
+    opacity: 1;
+}
+
 </style>

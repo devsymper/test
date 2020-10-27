@@ -354,12 +354,26 @@ let commonFormulas = {
         type: "script",
         groupType: "formulas"
     },
+    // autocomplete: {
+    //     title: "Công thức autocomplete",
+    //     value: "",
+    //     formulasId: 0,
+    //     type: "script",
+    //     groupType: "formulas"
+    // },
     autocomplete: {
-        title: "Công thức autocomplete",
+        title: "Cấu hình autocomplete",
         value: "",
         formulasId: 0,
         type: "script",
-        groupType: "formulas"
+        isConfigCustom: true,
+        isConfigAutocomplete: false,
+        groupType: "formulas",
+        configData: {
+            treeData: [],
+            documentSelected: {},
+            columnSelected: []
+        }
     },
     validate: {
         title: "Công thức xác thực",

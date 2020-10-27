@@ -1850,6 +1850,7 @@ export default {
                     continue;
                 }
                 let control = GetControlProps(fields[controlId].type);
+                let autocompleteConfig = fields[controlId].autocompleteConfig
                 let properties = control.properties
                 let formulas = control.formulas
                 let type = fields[controlId].type
@@ -1878,6 +1879,9 @@ export default {
                             formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0];
                             formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
                         }
+                        if(k == 'autocomplete'){
+                            formulas[k]['configData']= (autocompleteConfig == false) ? {} : autocompleteConfig;
+                        }
                     })
                 }
                 if(fields[controlId].type != "table"){
@@ -1891,6 +1895,7 @@ export default {
                         let childProperties = childControl.properties
                         let childFormulas = childControl.formulas
                         let childType = listField[childFieldId].type
+                        let childAutocompleteConfig = listField[childFieldId].autocompleteConfig
                         
                         $.each(childProperties,function(k,v){
                             if(childProperties[k].type == 'checkbox'){
@@ -1909,6 +1914,9 @@ export default {
                                 if(listField[childFieldId]['formulas'][k]){
                                     childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0]
                                     childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
+                                }
+                                if(k == 'autocomplete'){
+                                    childFormulas[k]['configData']= (childAutocompleteConfig == false) ? {} : childAutocompleteConfig;
                                 }
                             })
                         }

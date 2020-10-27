@@ -61,8 +61,8 @@ export const documentApi = {
     getBatchFieldInfoInDoc(data) {
         return coreApi.post("documents/fields/batch", data);
     },
-    getFieldByDocId(id) {
-        return coreApi.post("documents/" + id + "/fields");
+    getFieldByDocId(name) {
+        return coreApi.get("documents/" + name + "/fields");
     },
     getDetailDocumentByName(data) {
         return coreApi.get("documents/by-name", data);
