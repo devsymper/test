@@ -5,12 +5,21 @@ let commonProps = {
 };
 
 export default [{
-    ...commonProps,
-    "scope": "comment",
-    "action": "view_comment",
-    "handler": function(param) {
-        this.$goToPage('/tasks/' + param.id, 'Do task', false, true, {
-            subAction: 'view_comment'
-        });
-    }
-}]
+        ...commonProps,
+        "scope": "comment",
+        "action": "view_comment",
+        "handler": function(param) {
+            this.$goToPage('/tasks/' + param.id, 'Do task', false, true, {
+                subAction: 'view_comment'
+            });
+        }
+    },
+    {
+        ...commonProps,
+        "action": "submitAdhocTask",
+        "scope": "workflow",
+        "handler": function(param) {
+            this.$goToPage('myitem/tasks/' + param.taskId, 'Do task' );
+        }
+    },
+    ]
