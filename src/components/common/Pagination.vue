@@ -163,4 +163,6 @@ export default {
     .s-pagination ::v-deep li > .v-pagination__item--active{
         background: rgb(0 0 0 / 0.05) !important;
     }
+
+    
 </style>
