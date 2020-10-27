@@ -470,7 +470,7 @@ export default class Formulas {
         let listTable = []
         for (let index = 0; index < table.length; index++) {
             let fromTable = table[index];
-            let tableItem = fromTable.trim().replace("from ", "");
+            let tableItem = fromTable.trim().replace(/(from |FROM )/, "");
             listTable.push(tableItem);
         }
         return listTable;
