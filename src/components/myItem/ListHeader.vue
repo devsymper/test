@@ -425,11 +425,14 @@ export default {
             owner: this.$store.state.app.endUserInfo.id+":"+this.$store.state.app.endUserInfo.currentRole.id
         };
         let description = util.cloneDeep(defaultTaskDescription);
+        description.action.module = "task";
+        description.action.resource = "task";
         if (this.taskObject.docId) {
             description.action.action = "submit";
             description.action.parameter.documentId = this.taskObject.docId;
         }else{
             description.action.action = "submitAdhocTask";
+          
         }
 
         description.content = this.taskObject.name;
