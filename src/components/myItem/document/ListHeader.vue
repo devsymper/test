@@ -416,6 +416,8 @@ export default {
         if (this.taskObject.docId) {
             description.action.action = "submit";
             description.action.parameter.documentId = this.taskObject.docId;
+        }else{
+            description.action.action = "submitAdhocTask";
         }
 
         description.content = this.taskObject.name;

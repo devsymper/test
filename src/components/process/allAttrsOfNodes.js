@@ -1577,7 +1577,7 @@ let allAttrs = {
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.CONDITIONALEVENTPACKAGE.CONDITION.DESCRIPTION",
-        "dg": "formula"
+        "dg": "detail"
     },
     "initiator": {
         "title": "Initiator",
