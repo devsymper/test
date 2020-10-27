@@ -44,9 +44,8 @@
                         
                     </div>
                     <div class="fs-11 py-0  text-ellipsis" style="width:160px">
-                        <symperAvatar v-if="taskSelected.ownerInfo.id" :size="20" :userId="taskSelected.ownerInfo.id" />
-                        <symperAvatar v-else :size="20" :userId="taskSelected.assigneeInfo.id" />
-                        {{taskSelected.ownerInfo.id ? taskSelected.ownerInfo.displayName: taskSelected.assigneeInfo.displayName }}
+                        <infoUser v-if="taskSelected.ownerInfo.id" class="userInfo" :userId="taskSelected.ownerInfo.id" :roleInfo="taskSelected.ownerRole ? taskSelected.ownerRole:{}" />
+                        <infoUser v-else class="userInfo" :userId="taskSelected.assigneeInfo.id" :roleInfo="taskSelected.assigneeRole?taskSelected.assigneeRole:{}" />
                     </div>
                 </div>
             </div>
@@ -59,9 +58,7 @@
                         <span >{{$t("tasks.header.assignee")}}</span>
                     </div>
                     <div class="fs-11 py-0 text-ellipsis" style="width:160px">
-                        <symperAvatar :size="20" :userId="taskSelected.assigneeInfo.id" />
-                        {{taskSelected.assigneeInfo.displayName}}
-                        <div class="pl-6 grey--text fs-11 text-ellipsis" v-if="taskSelected.assigneeRole">{{taskSelected.assigneeRole.name}}</div>
+                        <infoUser class="userInfo" :userId="taskSelected.assigneeInfo.id" :roleInfo="taskSelected.assigneeRole?taskSelected.assigneeRole:{}" />
                     </div>
                 </div>
             </div>
@@ -90,7 +87,7 @@
 </template>
 
 <script>
-import symperAvatar from "@/components/common/SymperAvatar.vue";
+import infoUser from "./InfoUser";
 
 import {
   extractTaskInfoFromObject,
@@ -98,7 +95,7 @@ import {
 } from "@/components/process/processAction";
 export default {
     components:{
-        symperAvatar
+        infoUser
     },
     computed:{
         fileCountPerTask(){

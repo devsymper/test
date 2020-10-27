@@ -21,10 +21,17 @@ function translateServiceTaskToHTTPTask(el, attrs, bpmnModeler) {
         subEl.name = name;
         let value = String(items[name]).replace(/\n/g, '');
         if (String(value)) {
-            subEl.text = `<symper:symper_symper_string_tag>
-                <![CDATA[${value}]]>
-            </symper:symper_symper_string_tag>`;
-            extensionElements.values.push(subEl);
+            if(name != 'requestBody'){
+                subEl.text = `<symper:symper_symper_string_tag>
+                    <![CDATA[${value}]]>
+                </symper:symper_symper_string_tag>`;
+                extensionElements.values.push(subEl);
+            }else{
+                subEl.text = `<symper:symper_symper_expression_tag>
+                    <![CDATA[${value}]]>
+                </symper:symper_symper_expression_tag>`;
+                extensionElements.values.push(subEl);
+            }
         }
     }
     modeling.updateProperties(el, {
@@ -57,7 +64,7 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
 
         for (let attrName in attrs) {
             let attrDef = allNodesAttrs[attrName];
-            if (!attrDef) {
+            if (!attrDef || (!attrs.name.value && vizEl.type=="bpmn:SequenceFlow")) {
                 continue;
             }
             if (typeof attrDef.pushToXML == 'function') {

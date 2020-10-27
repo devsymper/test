@@ -37,14 +37,15 @@ export default {
             getListUrl: appConfigs.apiDomain.trash+'/items?type=orgchart',
             customAPIResult:{
                  reformatData(res){
-                     let mapIdToUser = self.$store.getters['app/mapIdToUser'];
+                     debugger
+                    //  let mapIdToUser = self.$store.getters['app/mapIdToUser'];
                      res.data.forEach(function(e){
                          if(e.data != ""){
                             let newData = JSON.parse(e.data)
                             e.orgchartId = newData.orgchart.id
                             e.orgchartCode = newData.orgchart.code
                             e.orgchartName = newData.orgchart.name
-                            e.userDeletedName = mapIdToUser[e.userDeleted].displayName
+                            // e.userDeletedEmail = newData.orgchart.email
                          }
                      })
                    return{
@@ -52,7 +53,7 @@ export default {
                             {name: "orgchartId", title: "id", type: "numeric", noFilter: true},
                             {name: "orgchartCode", title: "code", type: "text", noFilter: true},
                             {name: "orgchartName", title: "name", type: "text", noFilter: true},
-                            {name: "userDeletedName", title: "userDeletedName", type: "text", noFilter: true,},
+                            {name: "userDeleted", title: "userDeletedName", type: "text", noFilter: true,},
                             {name: "userAgent", title: "userAgent", type: "text",noFilter: true},
                             {name: "roleDeleted", title: "roleDeleted", type: "date",noFilter: true},
                             {name: "deletedAt", title: "deletedAt", type: "date",noFilter: true}

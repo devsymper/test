@@ -73,7 +73,7 @@
                 @click="selectObject(obj,idx)"
                 style="border-bottom: 1px solid #eeeeee!important;margin-left:0px!important"
             >
-                <v-col :cols="sideBySideMode ? 10 : compackMode ? 6: 4"  class="pl-3 pr-1 pb-1 pt-2">
+                <v-col :cols="sideBySideMode ? 10 : compackMode ? 6: 4"  class="pl-3 pr-1 pb-1 pt-1">
                     <div>
                         <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
@@ -107,8 +107,9 @@
                     class="pl-3 fs-12 px-1 py-0"
                     v-if="!sideBySideMode"
                 >
-                    <symperAvatar v-if="obj.userId &&obj.userId >0" :size="20" :userId="obj.userId" />
-                    {{obj.displayName}}
+                    <!-- <symperAvatar v-if="obj.userId &&obj.userId >0" :size="20" :userId="obj.userId" />
+                    {{obj.displayName}} -->
+					<infoUser v-if="obj.userId &&obj.userId >0" class="userInfo" :userId="obj.userId" :roleInfo="{}" />
                 </v-col>
                
                 <v-col
@@ -210,56 +211,58 @@ import {
 import symperAvatar from "@/components/common/SymperAvatar.vue";
 import detailDocument from '@/views/document/detail/Detail';
 import { taskApi } from '@/api/task';
+import infoUser from "./../InfoUser";
+
 export default {
-  computed: {
-    fileCountPerTask(){
-        return this.$store.state.file.fileCountPerObj.list;
-    },
-    commentCountPerTask(){
-        return this.$store.state.comment.commentCountPerObj.list;
-    },
-    listAllDocumentObjectId() {
-        let listObjRelated=this.stask.listDocumentObjId;
-        let listObjUserSubmit=this.stask.listDocumentObjIdWithUserSubmit;
-        let arrDocument=listObjRelated.concat(listObjUserSubmit);
-        let mapIdToDocObj = {};
-        let rsl = [];
-        arrDocument.forEach(element => {
-            if(!mapIdToDocObj[element.id]){
-                mapIdToDocObj[element.id] = true;
-                if (element.userCreate && element.userCreate!= null) {
-                    let arrUser = this.sapp.allUsers;
-                    let user = arrUser.find(data => data.email === element.userCreate);
-                    if (user) {
-                    element.displayName=user.displayName;
-                    element.userId=user.id;
-                    } else {
+    computed: {
+        fileCountPerTask(){
+            return this.$store.state.file.fileCountPerObj.list;
+        },
+        commentCountPerTask(){
+            return this.$store.state.comment.commentCountPerObj.list;
+        },
+        listAllDocumentObjectId() {
+            let listObjRelated=this.stask.listDocumentObjId;
+            let listObjUserSubmit=this.stask.listDocumentObjIdWithUserSubmit;
+            let arrDocument=listObjRelated.concat(listObjUserSubmit);
+            let mapIdToDocObj = {};
+            let rsl = [];
+            arrDocument.forEach(element => {
+                if(!mapIdToDocObj[element.id]){
+                    mapIdToDocObj[element.id] = true;
+                    if (element.userCreate && element.userCreate!= null) {
+                        let arrUser = this.sapp.allUsers;
+                        let user = arrUser.find(data => data.email === element.userCreate);
+                        if (user) {
+                        element.displayName=user.displayName;
+                        element.userId=user.id;
+                        } else {
+                            element.displayName="";
+                        }
+                    
+                    }else{
                         element.displayName="";
                     }
-                
-                }else{
-                    element.displayName="";
+                    rsl.push(element);
                 }
-                rsl.push(element);
-            }
-        });
-        rsl.sort(function(a, b) {
-            var keyA = new Date(a.createAt),
-            keyB = new Date(b.createAt);
-            if (keyA > keyB) return -1;
-            if (keyA < keyB) return 1;
-            return 0;
-        });
+            });
+            rsl.sort(function(a, b) {
+                var keyA = new Date(a.createAt),
+                keyB = new Date(b.createAt);
+                if (keyA > keyB) return -1;
+                if (keyA < keyB) return 1;
+                return 0;
+            });
 
-        return rsl;
+            return rsl;
+        },
+        stask() {
+            return this.$store.state.task;
+        },
+        sapp() {
+            return this.$store.state.app;
+        }
     },
-    stask() {
-      return this.$store.state.task;
-    },
-    sapp() {
-      return this.$store.state.app;
-    }
-  },
     name: "listDocument",
     components: {
         icon: icon,
@@ -267,7 +270,8 @@ export default {
         userSelector: userSelector,
         VuePerfectScrollbar: VuePerfectScrollbar,
         symperAvatar: symperAvatar,
-        detailDocument
+        detailDocument,
+        infoUser
     },
     watch:{
        sideBySideMode(vl){

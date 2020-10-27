@@ -49,4 +49,13 @@ export default [{
             // this.$goToPage('/documents', tabName);
         }
     },
+    {
+        ...commonProps,
+        "action": "submitAdhocTask",
+        "resource": "document_object",
+        "scope": "workflow",
+        "handler": function(param) {
+            this.$goToPage('myitem/tasks/' + param.taskId, 'Do task' );
+        }
+    },
 ]

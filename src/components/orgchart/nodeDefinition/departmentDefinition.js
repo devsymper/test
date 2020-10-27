@@ -52,6 +52,11 @@ export const DEFAULT_DEPARTMENT_ATTRS = {
 		'font-weight': 300,
 		'font-family': 'Roboto',
 	},
+	'.img-manager':{
+		'height':30,
+		'width':30,
+		'object-fit': 'cover',
+	},
 	'.btn.add': {
 		'ref-dx': 0,
 		'ref-y': 0,
@@ -220,7 +225,7 @@ export const departmentMarkup =
             <g class="scalable">
                 <rect class="card"/>
             </g>
-            <image />
+            <image class="img-manager" />
             <text class="name"/>
             <text class="manager-name"/>
 

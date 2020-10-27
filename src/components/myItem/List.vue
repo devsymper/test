@@ -100,7 +100,7 @@
                                         }"
                                         @click="selectObject(obj, idx,idex)"
                                         style="border-bottom: 1px solid #eeeeee!important;"
-                                            
+
                                     >
                                         <v-col
                                         style="line-height: 42px; flex:0!important"
@@ -139,20 +139,15 @@
                                         cols="2"
                                         class="fs-12 px-1 py-0 mt-2"
                                         >
-                                            <symperAvatar :size="20" :userId="obj.assigneeInfo.id" />
-                                            {{obj.assigneeInfo.displayName}}
-                                            <div class="fs-11 ml-5 grey--text" v-if="obj.assigneeRole">{{obj.assigneeRole.name}}</div>
+                                            <infoUser class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole?obj.assigneeRole:{}" />
                                         </v-col>
                                         <v-col
                                         v-if="!sideBySideMode"
                                         cols="2"
                                         class="fs-12 px-1 py-0 mt-2"
                                         >
-                                        <symperAvatar v-if="obj.ownerInfo.id" :size="20" :userId="obj.ownerInfo.id" />
-                                        <symperAvatar v-else :size="20" :userId="obj.assigneeInfo.id" />
-                                            {{obj.ownerInfo.id ? obj.ownerInfo.displayName: obj.assigneeInfo.displayName }}
-                                            <div class="fs-11 ml-5 grey--text" v-if="obj.ownerRole">{{obj.ownerRole.name}}</div>
-
+                                            <infoUser v-if="obj.ownerInfo.id" class="userInfo" :userId="obj.ownerInfo.id" :roleInfo="obj.ownerRole ? obj.ownerRole:{}" />
+                                            <infoUser v-else class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole" />
                                         </v-col>
                                         <v-col
                                             v-if="!sideBySideMode"
@@ -185,7 +180,7 @@
                                                     >{{selectNameApp(obj.processInstanceId)}}</div>
                                                 </div>
                                             </div>
-                                            
+
                                         </v-col>
                                         <v-col
                                             v-if="!sideBySideMode"
@@ -195,9 +190,9 @@
                                             <div class="pl-1 pt-1">
                                                 <div style="width:55px">
                                                     {{commentCountPerTask['task:' + obj.id]}}
-                                                    <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon> 
+                                                    <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-comment-processing-outline</v-icon>
                                                 </div>
-                                                <div style="width:55px"> 
+                                                <div style="width:55px">
                                                     {{fileCountPerTask['task:' + obj.id]}}
                                                     <v-icon class="fs-14" style="float:right;margin-top:4px;margin-right:12px">mdi-attachment</v-icon>
                                                 </div>
@@ -253,12 +248,12 @@ import { util } from "../../plugins/util";
 import { appConfigs } from "../../configs";
 import listTaskApproval from "./featureApproval/List";
 import { taskApi } from "./../../api/task.js";
+import infoUser from "./InfoUser";
 
 import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
 } from "@/components/process/processAction";
-import symperAvatar from "@/components/common/SymperAvatar.vue";
 
 export default {
     computed: {
@@ -268,7 +263,7 @@ export default {
         commentCountPerTask(){
             return this.$store.state.comment.commentCountPerObj.list;
         },
-       
+
         groupFlatTasks() {
             let allTask = this.allFlatTasks;
             allTask.sort(function(a, b) {
@@ -338,8 +333,8 @@ export default {
         listHeader: listHeader,
         userSelector: userSelector,
         VuePerfectScrollbar: VuePerfectScrollbar,
-        symperAvatar: symperAvatar,
-        listTaskApproval
+        listTaskApproval,
+        infoUser
     },
     props: {
         compackMode: {
@@ -590,7 +585,7 @@ export default {
         this.$store.commit('comment/setWaitingCommentCountPerObj', taskIden);
         this.$store.dispatch('file/getWaitingFileCountPerObj');
         this.$store.dispatch('comment/getWaitingCommentCountPerObj');
-     
+
         console.log(listTasks, "listTassk");
         this.loadingTaskList = false;
         this.loadingMoreTask = false;

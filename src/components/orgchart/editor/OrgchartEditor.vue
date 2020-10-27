@@ -1,8 +1,45 @@
 <template>
     <div :class="{'d-flex w-100 h-100': true, 'diagram-hortical': typeView == 'B','diagram-vertical': typeView == 'R'   } ">
         <div class="h-100 flex-grow-1">
-            <div class="border-bottom-1 pt-1 pl-2">
+            <div class="border-bottom-1 pt-1 pl-2 w-100 d-flex">
+                  <div style="margin-right:8px;margin-top:4px" v-if="showMenuPickTab">
+                       <span style="font:17px roboto;font-weight:500">SĐTC dạng lưu đồ</span>
+                        <v-menu
+                            :max-width="500"
+                            :max-height="700"
+                            :nudge-width="200"
+                            offset-y
+                            >
+                            <template v-slot:activator="{ on }" class="float-right">
+                                <v-btn icon tile x-small v-on="on">
+                                    <v-icon>mdi-chevron-down</v-icon>
+                                </v-btn>
+                            </template>
+                            <v-list
+                                    nav
+                                    dense
+                                >
+                                    <v-list-item-group
+                                        v-model="currentTab"
+                                        color="primary"
+                                        >
+                                        <v-list-item
+                                            v-for="(item, i) in menuPickTab"
+                                            :key="i"
+                                        >
+                                            <v-list-item-icon>
+                                            <v-icon v-text="item.icon"></v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-content>
+                                            <v-list-item-title v-text="item.title"></v-list-item-title>
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </v-list-item-group>
+                            </v-list>
+                        </v-menu>
+                    </div>
                 <v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
+                   
                     <template v-slot:activator="{ on }">
                         <v-btn
                             @click="handleHeaderAction(key)"
@@ -28,9 +65,11 @@
                     </template>
                     <span>thêm node moi </span>
                 </v-tooltip>
-                <v-btn
+              <div style="flex-grow:1">
+                    <v-btn
                     v-if="action != 'view' && context == 'department'"
                     class="float-right mr-1"
+                    style=""
                     @click="saveOrgchart"
                     small
                     depressed
@@ -39,6 +78,7 @@
                     <v-icon class="mr-2" primary>mdi-content-save</v-icon>
                     {{$t('common.save')}}
                 </v-btn>
+              </div>
             </div>
             <div v-if="loadingDiagramView" style="
                 position: absolute;
@@ -89,7 +129,7 @@
         </div>
 
         <v-navigation-drawer
-            v-show="context == 'department' && positionEditor"
+            v-if="context == 'department'"
             v-model="positionEditor"
             right
             absolute
@@ -148,6 +188,14 @@ export default {
         },
         id: {
             default: ''
+        },
+        currentTab:{
+            type:Number,
+            default:2
+        },
+        showMenuPickTab:{
+            type: Boolean,
+            default: false
         }
     },
     data(){
@@ -155,7 +203,24 @@ export default {
             loadingDiagramView: true,
             typeView: "B",
 			positionEditor: false,
-			checkPageEmpty: false,
+            checkPageEmpty: false,
+            menuPickTab:[
+                {
+                    icon: "mdi-grid",
+                    title:"SĐTC dạng bảng",
+                    action:"tableView"
+                },
+                {
+                    icon: "mdi-account-multiple",
+                    title:"SĐTC dạng cây",
+                    action:"tableSideBySideView"
+                },
+                {
+                    icon: "mdi-share-variant",
+                    title:"SĐTC dạng lưu đồ",
+                    action:"diagramView"
+                },
+            ],
 			listUserIds:null,
             headerActions: {
                 zoomIn: {
@@ -206,12 +271,16 @@ export default {
     },
     activated(){
         this.centerDiagram();
-        this.$refs.positionDiagram.centerDiagram();
     },
     watch: {
         positionEditor(after){
             if(after === false){
                 this.storeDepartmentPositionCells();
+            }
+        },
+        currentTab(val){
+            if(val == 0 || val == 1){
+                this.$emit('current-tab' , val)
             }
         }
     },
@@ -456,7 +525,7 @@ export default {
                         self.$refs.positionDiagram.loadDiagramFromJson(self.selectingNode.positionDiagramCells.cells);
 						let allNodes = self.$refs.positionDiagram.getAllNode()
 						let firstNode = allNodes[0]
-						self.$store.commit('orgchart/changeSelectingNode', {
+						this.$store.commit('orgchart/changeSelectingNode', {
 							instanceKey: self.selectingNode.positionDiagramCells.instanceKey,
 							nodeId: firstNode.id,
                         });
@@ -474,7 +543,7 @@ export default {
                     self.$refs.positionDiagram.$refs.editorWorkspace.scrollPaperToTop(200);
                     self.$refs.positionDiagram.showOrgchartConfig();
                     self.$refs.positionDiagram.$refs.editorWorkspace.changeTypeView(self.typeView);
-                    
+
                 }, 200, this);
             }
         },
@@ -823,7 +892,6 @@ export default {
             }
         },
         async handleHeaderAction(action){
-            let self = this
             if(action == 'home'){
                 this.showOrgchartConfig()
             }else if(action == 'saveSVG'){
@@ -842,8 +910,8 @@ export default {
                     this.$snotifySuccess("Validate passed!");  
                 }
             }else if(action == "changeTypeView"){
-                let type = self.typeView == "B" ? "R" : "B"
-                self.typeView = type
+                let type = this.typeView == "B" ? "R" : "B"
+                this.typeView = type
                 this.$refs.editorWorkspace.changeTypeView(type);
                 // this.$refs.positionDiagram.$refs.editorWorkspace.changeTypeView(type);
             }else{
@@ -940,7 +1008,7 @@ export default {
 }
 </script>
 
-<style >
+<style>
 .symper-orgchart-paper .marker-arrowheads, 
 .symper-orgchart-paper .link-tools,
 .symper-orgchart-paper .marker-vertex-group,
@@ -955,9 +1023,12 @@ export default {
 .symper-orgchart-active-editor .symper-orgchart-paper .symper-orgchart-node:hover .orgchart-action {
     display: block!important;
 }
+
+
 .diagram-hortical .btn-collapse-expand-ver{
     display: none !important ;
 }
+
 .diagram-vertical .btn-collapse-expand-hor{
     display: none;
 }

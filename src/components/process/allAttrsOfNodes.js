@@ -4,7 +4,7 @@ import attrToXMLMethods from "./elementDefinitions/attrToXMLMethods";
 
 
 
-export const userAssignmentToXMLValue = function (config) {
+export const userAssignmentToXMLValue = function (config,returnString=false) {
     let rsl = {
         formula: config.formula,
         users: [
@@ -35,7 +35,11 @@ export const userAssignmentToXMLValue = function (config) {
     }
 
     if (rsl.formula != '' || rsl.roles.length > 0) {
-        return JSON.stringify(rsl);
+        if (returnString) { // return string
+            return rsl.formula;
+        }else{
+            return JSON.stringify(rsl);
+        }
     } else {
         rsl = rsl.users.reduce((arr, el) => {
             if (el && el.userId) {
@@ -1577,7 +1581,7 @@ let allAttrs = {
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.CONDITIONALEVENTPACKAGE.CONDITION.DESCRIPTION",
-        "dg": "formula"
+        "dg": "detail"
     },
     "initiator": {
         "title": "Initiator",
@@ -2409,9 +2413,9 @@ let allAttrs = {
             formula: '',
             orgchartSelectorValue: [] // dạng value của orgchartselector để hiển thị lên
         },
-        getValueForXML(value) {
-            return userAssignmentToXMLValue(value);
-        },
+        // getValueForXML(value) {
+        //     return userAssignmentToXMLValue(value);
+        // },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'detail',
         hidden:false,
@@ -2506,7 +2510,6 @@ for (let name in allAttrs) {
             return value;
         }
     }
-
     if (!attr.toXML) {
         attr.toXML = {
             "symper_position": "attr",

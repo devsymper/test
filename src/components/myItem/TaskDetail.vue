@@ -179,8 +179,10 @@ export default {
         },
         taskBreadcrumb:function(){
             this.getWidthHeaderTask();
+        },
+        "sapp.collapseSideBar": function(newVl) {
+            this.getWidthHeaderTask();
         }
-
     },
     components: {
         icon: icon,
@@ -265,10 +267,10 @@ export default {
     },
     methods: {
         getWidthHeaderTask(){
-            console.log("aaaaxxx",$("#taskHeader").width());
-            console.log("aaaaxxx",$("#action-task").width());
-            this.widthInfoTask=$("#taskHeader").width()-$("#action-task").width()-20;
-       
+            setTimeout((self) => {
+                let width=$("#taskHeader").width()-$("#action-task").width()-40;
+                self.widthInfoTask=width;
+            }, 210,this);
         },
         checkShowEditRecord(){
             let taskInfo = this.taskInfo;
@@ -466,7 +468,7 @@ export default {
                         let res = await this.submitTask(taskData);
                         this.saveApprovalHistory(value);
                         this.$emit('task-submited', res);
-                    }else if(this.taskAction == '' ||this.taskAction==undefined){
+                    }else if(this.taskAction == '' ||this.taskAction==undefined ||this.taskAction == 'submitAdhocTask'){
                         let taskData = {
                             "action": "complete",
                             "outcome": value,
@@ -600,7 +602,7 @@ export default {
             self.taskAction = self.taskInfo.action.action;
             if(self.taskAction == 'approval'){
                 self.showApprovalOutcomes(JSON.parse(self.taskInfo.approvalActions));
-            }else if(self.taskAction == 'submit'){
+            }else if(self.taskAction == 'submit' || self.taskAction == 'submitAdhocTask'){
                 self.taskActionBtns = [
                     {
                     text:"Submit",
@@ -608,7 +610,7 @@ export default {
                     color:"blue"
                     }
                 ]
-            }else if(self.taskAction == 'undefined'){
+            }else if(self.taskAction == 'undefined' ){
                 self.taskActionBtns = [
                     {
                         text:"Complete",
@@ -629,6 +631,13 @@ export default {
     border-width: 20px!important;
     text-transform: none !important;
 
+}
+.task-header{
+    position: relative;
+}
+.task-header #action-task{
+    position: absolute;
+    right: 10px;
 }
 
 </style>

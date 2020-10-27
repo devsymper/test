@@ -392,6 +392,7 @@ export default {
                             nodeData.attrs.process_id.value;
                     }
                 }
+
             }
 
             // Loại bỏ data của các node mà ko có trong diagram
@@ -444,6 +445,8 @@ export default {
             xml = xml.replace(/\]\]\&gt;/g, ']]>');
             xml = xml.replace(/&lt;symper:symper_symper_string_tag&gt;/g,'<symper:symper_symper_string_tag>');
             xml = xml.replace(/&lt;\/symper:symper_symper_string_tag&gt;/g,'</symper:symper_symper_string_tag>');
+            xml = xml.replace(/&lt;symper:symper_symper_expression_tag&gt;/g,'<symper:symper_symper_expression_tag>');
+            xml = xml.replace(/&lt;\/symper:symper_symper_expression_tag&gt;/g,'</symper:symper_symper_expression_tag>');
             return xml;
         },
         /**
