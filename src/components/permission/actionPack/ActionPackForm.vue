@@ -58,6 +58,18 @@
 
         <div class="mt-2" v-if="action != 'view' ">
             <v-btn
+                v-if="action == 'detail'"
+                class="float-right mr-1"
+                small
+                depressed
+                color="primary"
+                text
+                @click="switchToUpdateForm">
+                <v-icon size="15" class="mr-2" >mdi-pencil</v-icon>
+                {{$t('common.edit')}} {{$t('common.actions')}}
+            </v-btn>
+            <v-btn
+                v-else
                 class="float-right mr-1"
                 small
                 depressed
@@ -607,6 +619,9 @@ export default {
                 }
             }
             return newOperations;
+        },
+        switchToUpdateForm(){
+            this.$emit('trigger-update-action-pack', this.itemData);
         },
         async saveActionPack(){
             let listNewOperations = await this.createNewOperations();

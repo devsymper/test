@@ -227,7 +227,7 @@ export const nodeAttrsDefinition = {
         },
     },
     'StartConditionalEvent': {
-        attrs: ["executionlisteners", "conditionalevent", "interrupting"],
+        attrs: ["executionlisteners", "conditionalevent","conditionaleventcondition", "interrupting"],
         validate: function(attrs) {
 
         },

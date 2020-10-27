@@ -96,53 +96,57 @@ import { knowledgeApi } from "./../../api/kh.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 export default {
-  data() {
-    return {
-      widthHome:700,
-      idRowTable: -1,
-      nameNode: "",
-      path: "",
-      listQuickAccess: null,
-      showMenu: false,
-      x: 0,
-      y: 0,
-      dialog_remove: false,
-      contextMenu: [
-        {
-          title: "Đổi tên",
-          menuAction: action => {
-            this.rename(this.path, this.nameNode, this.parentPath);
-          },
-          icon: "mdi-border-color"
-        },
-        {
-          title: "Xóa",
-          menuAction: action => {
-            this.dialog_remove = true;
-          },
-          icon: "mdi-delete-forever"
-        }
-      ],
-      headers: [
-        {
-          text: this.$t("document.table.title"),
-          align: "start",
-          value: "name"
-        },
-        { text: this.$t("common.created_by"), value: "displayName" },
-        { text: this.$t("common.last_updated_by"), value: "displayNameEdit" },
-        { text: this.$t("user.table.createAt"), value: "created_at" },
-        { text: this.$t("user.table.updateAt"), value: "updated_at" },
+    data() {
+        return {
+        widthHome:700,
+        idRowTable: -1,
+        nameNode: "",
+        path: "",
+        listQuickAccess: null,
+        showMenu: false,
+        x: 0,
+        y: 0,
+        dialog_remove: false,
+        contextMenu: [
+            {
+            title: "Đổi tên",
+            menuAction: action => {
+                this.rename(this.path, this.nameNode, this.parentPath);
+            },
+            icon: "mdi-border-color"
+            },
+            {
+            title: "Xóa",
+            menuAction: action => {
+                this.dialog_remove = true;
+            },
+            icon: "mdi-delete-forever"
+            }
+        ],
+        headers: [
+            {
+            text: this.$t("document.table.title"),
+            align: "start",
+            value: "name"
+            },
+            { text: this.$t("common.created_by"), value: "displayName" },
+            { text: this.$t("common.last_updated_by"), value: "displayNameEdit" },
+            { text: this.$t("user.table.createAt"), value: "created_at" },
+            { text: this.$t("user.table.updateAt"), value: "updated_at" },
 
-        { text: this.$t("kh.table.totalDoc"), value: "total_document" }
-      ]
-    };
-  },
-  components: {
-    "k-h-header": KHHeader,
-     VuePerfectScrollbar
-  },
-  watch: {},
+            { text: this.$t("kh.table.totalDoc"), value: "total_document" }
+        ]
+        };
+    },
+    components: {
+        "k-h-header": KHHeader,
+        VuePerfectScrollbar
+    },
+    watch: {
+        "sapp.collapseSideBar": function(newVl) {
+            this.setWidthQuickView();
+        }
+    },
   computed: {
     sapp() {
       return this.$store.state.app;
@@ -150,7 +154,6 @@ export default {
     skh() {
       return this.$store.state.kh;
     },
-
     listRoot() {
       let root = this.skh.listDataTableRoot;
       root = this.listToTable(this.skh.listDataTableRoot, this.sapp.allUsers);
@@ -161,7 +164,7 @@ export default {
     setWidthQuickView(sizeBar=0){
         let width=$('.kh-recentAccess').width();
         if (sizeBar>0) {
-            this.widthHome=$( document ).width() - sizeBar;
+            this.widthHome=$(".layout").width() - sizeBar;
         }else{
             this.widthHome=width-50;
         }
