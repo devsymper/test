@@ -45,6 +45,7 @@ function cleanContent(content, configValue) {
         .replace(/symper_symper_in_tag/g, 'symper:in')
         .replace(/symper_symper_out_tag/g, 'symper:out')
         .replace(/symper_symper_string_tag/g, 'symper:string')
+        .replace(/symper_symper_expression_tag/g, 'symper:expression')
         .replace(/symper_symper_field_tag/g, 'symper:field')
         .replace(/symper_symper_value_tag/g, 'symper:value');
 
