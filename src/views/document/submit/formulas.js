@@ -451,13 +451,13 @@ export default class Formulas {
         if (selectColumn == null) {
             return 'column1';
         }
-        let control = selectColumn[0].match(/([a-zA-Z0-9_]+)\s+as\s+(([a-zA-Z0-9_]+))/gi);
+        let control = selectColumn[0].match(/([a-zA-Z0-9_]+)\s+(as|AS)\s+(([a-zA-Z0-9_]+))/gi);
         if (control == null) {
             return "column1";
         }
-        let controlAlias = control[0].split('as');
+        let controlAlias = control[0].split(/(as|AS)/);
         if (alias && controlAlias.length > 1) {
-            return controlAlias[1].trim();
+            return controlAlias[2].trim();
         } else {
             return controlAlias[0].trim();
         }
