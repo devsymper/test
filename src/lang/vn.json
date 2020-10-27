@@ -1104,6 +1104,7 @@
             "defaultUser": "Đối tượng nhận",
             "description": "Nội dung thông báo",
             "subscribed": "Trạng thái",
+            "state": "Trạng thái",
             "userCreate": "Người tạo",
             "userUpdate": "Người cập nhật",
             "createAt": "Ngày tạo",

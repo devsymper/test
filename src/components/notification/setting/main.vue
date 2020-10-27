@@ -41,7 +41,7 @@
                     <v-list-item-title class="fs-13 font-normal" style="color:rgba(0,0,0,0.8)">{{child.name}} </v-list-item-title>
                     </v-list-item-content>
                     <v-list-item-action>
-                        <v-switch x-small style="font-size:10px"
+                        <v-switch
                             v-model="child.active"
                             dense
                             color="success"
@@ -65,7 +65,6 @@ export default {
         deep: true,
         immediate: true,
         handler(newValue){
-            debugger
             for(let i = 0; i<newValue.length;i++){
                 for(let j = 0; j<newValue[i].items.length;j++){
                 // check 1 lượt nếu chọn subcribed
@@ -87,25 +86,21 @@ export default {
     methods: {
         //subcribed all
         subcribedChanel(objectType,event){
-            debugger
             for(let i=0;i<this.allListChanel.length;i++){
                 if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&!this.allListChanel[i].subscribed){
                        notification.subscribeChanel(this.allListChanel[i].id).then(res=>{
                         if(res.status==200){
-                            debugger
                         }
                     })
                 }
             }
         },
         unsubcribedChanel(objectType,event){
-            debugger
             let data={state:false};
             for(let i=0;i<this.allListChanel.length;i++){
                 if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&this.allListChanel[i].subscribed){
                        notification.subscribeChanel(this.allListChanel[i].id,data).then(res=>{
                         if(res.status==200){
-                            debugger
                         }
                     })
                 }

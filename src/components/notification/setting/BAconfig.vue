@@ -1,8 +1,87 @@
 <template>
-  <div class="ml-4 config-notification">
+  <div class="ml-4 config-notification choose-picture">
         <div class="mb-3">
             <h4>Cài đặt thông báo</h4>
         </div>
+        <!-- test -->
+         <!-- <div class="row"> -->
+    <!-- <div class="col-3">
+      <h3>Draggable 1</h3>
+      <draggable
+        :list="list1"
+        :group="{ name: 'people', pull: 'clone', put: false }"
+        :clone="cloneDog"
+        @change="log"
+      >
+        <div class="list-group-item"   
+          style="background-color:green" 
+          v-for="element in list1" :key="element.id">
+            {{ element.name }}
+        </div>
+      </draggable>
+    </div>
+
+    <div class="col-3">
+      <h3>Draggable 2</h3>
+      <draggable
+        class="dragArea list-group"
+        :list="list2"
+        group="people"
+        @change="log"
+      >
+        <div class="list-group-item" v-for="element in list2" style="background-color:blue" :key="element.id">
+          {{ element.name }}
+        </div>
+      </draggable>
+    </div> -->
+
+    <!-- <rawDisplayer class="col-3" :value="list1" title="List 1" />
+
+    <rawDisplayer class="col-3" :value="list2" title="List 2" />
+  </div> -->
+        <!-- test -->
+        <v-row class="pt-0" style="margin-top:-10px">
+            <v-col class="fs-13 col-md-5" style="margin-top:5px">Hình đại diện</v-col>
+            <v-col class="col-md-7">  
+                 <v-select
+                    outlined
+                     class="sym-small-size"
+                    :items="typeSelected"
+                    v-model="typePictureSelected"
+                    dense
+                >
+                </v-select>
+            </v-col>
+          </v-row>
+               <v-row class="pt-0 " v-if="typeSelected[0]==typePictureSelected" style="margin-bottom:-20px; margin-top:-10px">
+            <v-col class="fs-13 col-md-5" style="margin-top:-5px">Ảnh</v-col>
+            <v-col class="col-md-7" style="margin-top:-10px">
+                <v-avatar :size="60">
+                    <img v-if="avatarUrl != ''"
+                        :src="avatarUrl"
+                    >
+                    <img v-if="avatarUrl== ''"
+                        :src="require('./../../../assets/image/avatar_default.jpg')"
+                    >
+                </v-avatar>
+               <UploadFile 
+                    ref="uploadAvatar"
+                    :fileName="avatarFileName"
+                    :autoUpload="false"
+                    @click="handleAvatarSelected"
+                    :iconName="'mdi mdi-plus-circle'"
+                    @selected-file="handleAvatarSelected"
+                        />
+            </v-col>
+        </v-row>
+         <v-row class="pt-0" style="margin-bottom:-15px" v-if="typeSelected[1]==typePictureSelected">
+            <v-col class="fs-13 col-md-5 " style="margin-top:-10px">Icon</v-col>
+            <v-col class="col-md-6 ml-2" style="margin-top:-10px">  
+                 <v-icon class="display-3 pt-0">{{iconName.iconName}}</v-icon>
+             <iconPicker style="margin-left:-10px" ref="iconPicker" :icon="'mdi mdi-plus-box'" @selected="pickIcon"></iconPicker>
+            </v-col >
+              
+        </v-row>
         <v-row class="pt-0" style="margin-bottom:-10px">
             <v-col class="fs-13 col-md-5" style="margin-top:5px">Module phát sinh</v-col>
             <v-col class="col-md-7">  
@@ -67,7 +146,7 @@
                 >
                 </v-autocomplete>
             </v-col>
-        </v-row>
+        </v-row>   
           <v-row class="pt-0" style="margin-bottom:-35px">
             <v-col class="fs-13 col-md-5">
                 Nội dung notification
@@ -92,56 +171,14 @@
                 <i class="fa fa-align-justify handle"></i>
               <v-chip  color="primary" class="text"  
                  v-for="(element, idx) in parameter"  
-                 @change="log" style="margin-top:2px; margin-bottom:2px; margin-left:5px; margin-right:2px"
+                 @change="log" style="margin-top:2px; margin-bottom:2px; margin-left:5px; margin-right:2px; background-color:pink"
                   :key="element.value">{{ element.text }}</v-chip>
                 </div>        
             </v-col>
           </v-row>
           </draggable>
-            <v-row class="pt-0" style="margin-bottom:-10px">
-            <v-col class="fs-13 col-md-5" style="margin-top:5px">Hình đại diện</v-col>
-            <v-col class="col-md-7">  
-                 <v-select
-                    outlined
-                     class="sym-small-size"
-                   
-                    :items="typeSelected"
-                    v-model="typePictureSelected"
-                    dense
-                >
-                </v-select>
-            </v-col>
-        </v-row>
-        <v-row class="pt-0" v-if="typeSelected[0]==typePictureSelected" style="margin-bottom:-20px">
-            <v-col class="fs-13 col-md-5" style="margin-top:-5px">Ảnh</v-col>
-            <v-col class="col-md-7" style="margin-top:-10px">
-                <v-avatar :size="60">
-                    <img v-if="avatarUrl != ''"
-                        :src="avatarUrl"
-                    >
-                    <img v-if="avatarUrl== ''"
-                        :src="require('./../../../assets/image/avatar_default.jpg')"
-                    >
-                </v-avatar>
-               <UploadFile 
-                    ref="uploadAvatar"
-                    :fileName="avatarFileName"
-                    :autoUpload="false"
-                    @click="handleAvatarSelected"
-                    :iconName="'mdi mdi-plus-circle'"
-                    @selected-file="handleAvatarSelected"
-                        />
-            </v-col>
-        </v-row>
-       
-         <v-row class="pt-0" style="margin-bottom:-15px" v-if="typeSelected[1]==typePictureSelected">
-            <v-col class="fs-13 col-md-5 " style="margin-top:-10px">Icon</v-col>
-            <v-col class="col-md-6" style="margin-top:-10px">  
-                 <v-icon class="display-3 pt-0">{{iconName.iconName}}</v-icon>
-             <iconPicker style="margin-left:-10px" ref="iconPicker" :icon="'mdi mdi-plus-box'" @selected="pickIcon"></iconPicker>
-            </v-col >
-              
-        </v-row>
+         
+   
          <v-row class="pt-0" style="margin-bottom:-25px">
             <v-col class="fs-13 col-md-5 " style="margin-top:5px">Trạng thái</v-col>
             <v-col class="col-md-6">  
@@ -151,7 +188,7 @@
                </v-checkbox>
             </v-col>
         </v-row>
-        <v-row class="mr-8 mt-5 d-flex justify-end">
+        <v-row class="mt-5 d-flex justify-end" style="margin-top:-20px!important">
             <v-btn text color="green" @click="save()">Lưu</v-btn>
         </v-row>
     </div>
@@ -159,6 +196,7 @@
 </template>
 <script>
   import draggable from 'vuedraggable';
+  let idGlobal = 8;
 import iconPicker from "../../../components/common/pickIcon";
 import { util } from '../../../plugins/util';
 import UploadFile from "./../../../components/common/UploadFile";
@@ -186,6 +224,17 @@ export default {
     },
   data() {
     return {
+       list1: [
+        { name: "dog 1", id: 1 },
+        { name: "dog 2", id: 2 },
+        { name: "dog 3", id: 3 },
+        { name: "dog 4", id: 4 }
+      ],
+      list2: [
+        { name: "cat 5", id: 5 },
+        { name: "cat 6", id: 6 },
+        { name: "cat 7", id: 7 }
+      ],
        typeSelected:[
                 "Avatar đối tượng gây ra",
                 "Tùy chọn icon"
@@ -193,7 +242,7 @@ export default {
             typePictureSelected:'Avatar đối tượng gây ra',
             iconName:{
                 icon: "",
-                iconName: "mdi-account",
+                iconName: "",
                 name: "",
                 note: "",
                 status: false
@@ -237,7 +286,7 @@ export default {
         let data={
             event: this.action,
             source:this.objectType,
-            state:this.state,
+            state:this.state?1:0,
             objectIdentifier:this.objectType,
             objectType:this.objectType,
             receiver:this.receiver.value,
@@ -248,13 +297,21 @@ export default {
        const self = this;
         notification.addChanel(data).then(res=>{
             if(res.status==200){
-                debugger
-            }
-        })
-
+                self.$snotify({
+                      type: "success",
+                      title: "Thêm thông báo thành công",
+                  });
+                self.refreshAll();
+                self.$emit("refreshList")
+            }else{
+                self.$snotify({
+                    type: "error",
+                    title: "Thêm thông báo thất bại",
+                });
+              }
+          })
     },
       pickIcon(data) {
-          debugger
             this.$set(this.iconName, 'iconName', data.icon.trim() )
             this.$set(this.iconName, 'iconType' , data.type)
 		},
@@ -262,6 +319,19 @@ export default {
          this.listActionClickNotifi = [];
           this.listAction = [];
           this.listReceiver=[];
+    },
+    refreshAll(){
+      this.objectType='';
+      this.state=false;
+      this.objectType='';
+      this.objectType='';
+      this.receiver.value='';
+      this.actionClickNotifi='';
+      this.iconName.iconName='';
+      this.avatarUrl='';
+      this.parameter='';
+      this.avatarFileName='';
+      this.description=''
     },
     getAction(nameModule){
         this.listAction = this.allListObj[nameModule].action.map(x=>x)
@@ -303,11 +373,12 @@ export default {
       replace: function() {
       this.list = [{ name: "Edgard" }];
     },
-    clone: function(el) {
+    cloneDog({ id }) {
       return {
-        name: el.name + " cloned"
+        id: idGlobal++,
+        name: `cat ${id}`
       };
-    },
+    }
   }
 };
 </script>
@@ -337,19 +408,20 @@ input {
 .text {
   margin: 20px;
 }
-</style>
-<style scoped>
-    .config-notification ::v-deep fieldset{
-        height:35px!important;
+  .config-notification ::v-deep fieldset{
+      height:35px!important;
+  }
+  .config-notification ::v-deep .v-label{
+      display:none;
+  }
+  .config-notification ::v-deep .v-text-field__slot{
+      border:1px solid grey
     }
-    .config-notification ::v-deep .v-label{
-        display:none;
-    }
-    .config-notification ::v-deep .v-text-field__slot{
-        border:1px solid grey
-     }
-    .config-notification >>>.symper-upload-file{
-        margin-top:-28px;
-        margin-left:12px;
-	}
+  .config-notification >>>.symper-upload-file{
+      margin-top:-28px;
+      margin-left:12px;
+}
+.choose-picture ::v-deep .v-select__slot{
+  margin-top:-5px!important
+}
 </style>

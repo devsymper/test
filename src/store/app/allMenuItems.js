@@ -61,7 +61,7 @@ export default {
         title: "orgchart",
         icon: "mdi-office-building-outline",
         group: "My work",
-        children:{
+        children: {
             list: {
                 title: "listOrgchart",
                 link: "/orgchart"
@@ -202,19 +202,19 @@ export default {
                 icon: "mdi-access-point-network",
                 link: "/apps/trash"
             },
-           
+
         }
     },
-    settingNotication: {
-        title: 'Notification',
-        icon: 'mdi-bell-check-outline',
-        link: '/setting-notification',
-        group: "Setting"
-    },
-    settingNoticationBA: {
-        title: 'Notification Config BA',
-        icon: 'mdi-bell-plus-outline',
-        link: '/setting-notificationBA',
-        group: "Setting"
-    },
+    // settingNotication: {
+    //     title: 'Notification',
+    //     icon: 'mdi-bell-check-outline',
+    //     link: '/setting-notification',
+    //     group: "Setting"
+    // },
+    // settingNoticationBA: {
+    //     title: 'Notification Config BA',
+    //     icon: 'mdi-bell-plus-outline',
+    //     link: '/setting-notification-Ba',
+    //     group: "Setting"
+    // },
 };

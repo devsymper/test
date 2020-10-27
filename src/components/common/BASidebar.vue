@@ -395,7 +395,8 @@ export default {
     },
     methods: {
         isBorderTop(titleGroup){
-            if(titleGroup=='Administrator'||titleGroup=='Applications'||titleGroup=='Setting'){
+            //||titleGroup=='Setting'
+            if(titleGroup=='Administrator'||titleGroup=='Applications'){
                 return true
             }else{
                 return false

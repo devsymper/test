@@ -18,5 +18,9 @@ export default {
     },
     subscribeChanel(id, data) {
         return api.post('channels/' + id, data)
+    },
+    deleteNotification(id) {
+        debugger
+        return api.delete('channels/' + id)
     }
 }

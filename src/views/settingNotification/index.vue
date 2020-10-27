@@ -2,10 +2,9 @@
     <div class="w-100 mr-10">
         <v-row class="header ml-3">
             <v-col class="col-md-8 col-sm-8 ">
-                <span class="fs-15 fw-430" v-if="showMain">Cài đặt thông báo</span>      
+             <span class="fs-15 fw-430" v-if="showMain" >Cài đặt thông báo</span>
                 <span class="fs-15 fw-430" v-if="showFollow">Danh sách đối tượng đang theo dõi</span>
                 <span class="fs-15 fw-430" v-if="showUnfollow">Danh sách đối tượng không theo dõi</span>
-               
             </v-col >
             <v-col class="col-md-4 col-sm-4 d-flex justify-end" style="margin-right:-10px">
                   <v-text-field  v-if="!showMain"
@@ -35,6 +34,7 @@
 </template>
 <script>
 import _ from 'lodash';
+import UserPopUp from "./../../components/user/UserPopUp";
 import notification from "./../../api/settingNotification";
 import SettingNotification from "./../../components/notification/setting/main.vue"
 export default {
@@ -45,6 +45,7 @@ export default {
   },
     components:{
         SettingNotification,
+        UserPopUp
     },
   created () {
       this.getSource();
@@ -66,23 +67,12 @@ export default {
         showUnfollow:false,
         showFollow:false,
         items: [],
-        items1: [
-            {
-                icon: 'mdi-ticket',
-                action: 'mdi-ticket',
-                items: [
-                    { title: 'List Item' }
-                ],
-                title: 'Bình luận test bỏ theo dõi',
-            },
-        ],
     }
   },
   methods: {
       searchList(){
-        debugger
         this.listSubcribed = [];
-
+        this.listUnsubcribed=[];
         const self= this;
         let subscribe = this.showFollow?true:false;
         let dataSend={
@@ -93,34 +83,48 @@ export default {
             if(res.status==200){
             let format = [];
              let listModules = res.data;
-             for(let i = 0; i<listModules.length;i++){
-                 if(listModules[i].objectType){
-                     format.push(listModules[i])
-                 }
+                for(let i = 0; i<listModules.length;i++){
+                    if(listModules[i].objectType){
+                        format.push(listModules[i])
+                    }
+                }
+                let formatListModules = _.groupBy(format, 'objectIdentifier');
+                let name = Object.keys(formatListModules);
+                for(let i=0;i<name.length;i++){
+                    if(subscribe){
+                        self.listSubcribed.push({
+                            title: name[i],
+                            items: [],
+                        })  
+                    }else{
+                        self.listUnsubcribed.push({
+                            title: name[i],
+                            items: [],
+                        })  
+                    }
+                    for(let j=0; j<formatListModules[name[i]].length;j++){
+                        if(subscribe){
+                            self.listSubcribed[i].items.push({
+                                title: formatListModules[name[i]][j].event,
+                                name: formatListModules[name[i]][j].event,
+                                id:formatListModules[name[i]][j].id,
+                                active:formatListModules[name[i]][j].subscribed
+                            });
+                        }else{listUnsubcribed
+                            self.listUnsubcribed[i].items.push({
+                                title: formatListModules[name[i]][j].event,
+                                name: formatListModules[name[i]][j].event,
+                                id:formatListModules[name[i]][j].id,
+                                active:formatListModules[name[i]][j].subscribed
+                            });
+                        }
+                    }
+                }
              }
-             let formatListModules = _.groupBy(format, 'objectIdentifier');
-             let name = Object.keys(formatListModules);
-             for(let i=0;i<name.length;i++){
-                 let a = name[i];
-                  self.listSubcribed.push({
-                        title: name[i],
-                        items: [],
-                    })      
-                 for(let j=0; j<formatListModules[name[i]].length;j++){
-                      self.listSubcribed[i].items.push({
-                            title: formatListModules[name[i]][j].event,
-                            name: formatListModules[name[i]][j].event,
-                            id:formatListModules[name[i]][j].id,
-                            active:formatListModules[name[i]][j].subscribed
-                        });
-                 }
-            }
-           }
-            }
-        );
+            });
       },
      async getAllListChanel(){
-         this.items=[];
+        this.items=[];
         const self= this;
         let res = await notification.showAllLists();
            if(res.status==200){
@@ -133,7 +137,6 @@ export default {
                  }
              }
              let formatListModules = _.groupBy(format, 'objectType');
-          
              let name = Object.keys(formatListModules);
              for(let i=0;i<name.length;i++){
                  let a = name[i];
@@ -145,20 +148,13 @@ export default {
             let groupByEvent= Object.keys(_.groupBy(formatListModules[name[i]], 'event'));
                 for(let k=0;k<groupByEvent.length;k++){
                     self.items[i].items.push({
-                    title: groupByEvent[k],
-                    name:self.rename(name[i],groupByEvent[k]),
-                    // event: formatListModules[name[i]][j].event[j],
-                    // source:name[i],
-                    // receiver:formatListModules[name[i]][j].receiver[0].value,
-                    // action:formatListModules[name[i]][j].action[0].value,
-                    // name: 'default',
-                    active: self.checkSubcribe(name[i],groupByEvent[k])
-
-                });
-            // }
-                 }
-             }
-           }
+                        title: groupByEvent[k],
+                        name:self.rename(name[i],groupByEvent[k]),
+                        active: self.checkSubcribe(name[i],groupByEvent[k])
+                    });
+                }
+            }
+        }
     },
     checkSubcribe(objectType,event){
         let check=false;
@@ -197,23 +193,21 @@ export default {
               let grouplistByObjId = _.groupBy(listSubcribed, 'objectIdentifier');
               let objId = Object.keys(grouplistByObjId);
                 for(let j = 0; j<objId.length;j++){
-                    // if(objId[j]){
-                        self.listSubcribed.push({
-                            items:[],
-                            title: objId[j],
-                            icon:objId[j]
-                        })
-                        for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
-                            self.listSubcribed[j].items.push({
-                                title: grouplistByObjId[objId[j]][i].event,
-                                name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
-                                active: true
+                    self.listSubcribed.push({
+                        items:[],
+                        title: objId[j],
+                        icon:objId[j]
+                    })
+                    for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
+                        self.listSubcribed[j].items.push({
+                            title: grouplistByObjId[objId[j]][i].event,
+                            name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
+                            active: true
 
-                            })
-                        // }
+                        })
                      }
                 }
-        }
+            }
         })
     },
       getListUnFollowed(){
@@ -222,23 +216,21 @@ export default {
         let isSubcribed = false;
         notification.showListsSubcribed({subscribed:isSubcribed}).then(res=>{
             if(res.status==200){
-             let listUnsubcribed = res.data;
-              let grouplistByObjId = _.groupBy(listUnsubcribed, 'objectIdentifier');
-              let objId = Object.keys(grouplistByObjId);
+             let listSubcribed = res.data;
+              let grouplistByObjId = _.groupBy(listSubcribed, 'objectIdentifier');
+              let objId = Object.keys(grouplistByObjId).filter(x=>x!=''&&x!='null');
                 for(let j = 0; j<objId.length;j++){
-                    // if(objId[j]){
-                        self.listUnsubcribed.push({
-                            items:[],
-                            title: objId[j],
-                            icon:objId[j]
+                    self.listUnsubcribed.push({
+                        items:[],
+                        title: objId[j],
+                        icon:objId[j].indexOf(':')>0?objId[j].split(':')[0]:objId[j]
+                    })
+                    for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
+                        self.listUnsubcribed[j].items.push({
+                            title: grouplistByObjId[objId[j]][i].event,
+                            name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
+                            active: true
                         })
-                        for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
-                            self.listUnsubcribed[j].items.push({
-                                title: grouplistByObjId[objId[j]][i].event,
-                                name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
-                                active: false
-
-                            })
                      }
                 }
             }
@@ -265,7 +257,6 @@ export default {
         this.showFollow=true;
         this.showUnfollow=false;
         this.showMain=false;
-        
         this.getListFollowed();
     }
   },

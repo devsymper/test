@@ -133,7 +133,6 @@ export default {
 					self.uploadFile()
 				})
 			}else{
-				debugger
 				this.selectedFile = e.target.files[0]
 				formData.append('user',this.$store.state.app.endUserInfo.displayName)
 				formData.append('objectType',this.objectType)
@@ -183,7 +182,6 @@ export default {
 			return new Blob([ab], {type: mimeString});
 		},
 		uploadFile(){
-			debugger
             if(this.fileName != ''){
 				this.formDatas.append('fileName',this.fileName)
             }
