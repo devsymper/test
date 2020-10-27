@@ -1,7 +1,7 @@
 <template>
-    <div class="h-100 permission">
+    <div class="h-100 permission d-flex flex-column flex-grow-1">
         <v-row>
-            <v-col class="md-5">
+            <v-col class="col-md-7">
                 <v-btn 
                     outlined 
                     class="fs-13 mr-2 button" 
@@ -14,9 +14,10 @@
                     :style="{'background-color':showUser?'#E6E5E5':''}"
                     @click="showPermissionUser()">Loại user</v-btn>
             </v-col>
-            <v-col class="md-5">
+            <v-col class="col-md-5">
                 <div>
                     <v-text-field
+                        v-if="showUser"
                         class="pt-0 search-input "
                         style="height:30px!important"
                         v-model="search"
@@ -45,6 +46,15 @@
             >
             </v-data-table>
         </div>
+            <div class=" flex-grow-1 d-flex justify-end align-end">
+            <v-btn v-if="showOrgchart" @click="saveOrgchart()">
+                Lưu
+            </v-btn>
+             <v-btn v-if="!showOrgchart" @click="insertRole()">
+                Lưu
+            </v-btn>
+           
+        </div>
     </div>
 </template>
 <script>
@@ -52,6 +62,11 @@
 import { userApi } from "./../../api/user.js";
 import OrgchartElementSelector from "./../..//components/common/OrgchartElementSelector.vue";
 export default {
+  watch: {
+      data(){
+          let data = this.data
+      }
+    },
     components:{
         OrgchartElementSelector
     },
@@ -93,6 +108,23 @@ export default {
         this.getUserRole();
     },
     methods:{
+        saveOrgchart(){
+             let data= [{"userId": this.userId, "roles": this.data}];
+            userApi.updateRole({items:JSON.stringify(data)}).then(res=>{
+                  if(res.status==200){
+                     this.$snotify({
+                        type: "success",
+                        title: res.message
+                    });
+                }else{
+                     this.$snotify({
+                        type: "error",
+                        title: res.message
+                    });
+                }
+            }).catch(console.log);
+
+        },
         showPermissionUser(){
             this.showOrgchart=false;
             this.showUser=true;
@@ -107,9 +139,7 @@ export default {
             }else{
                 this.listSelected.pop()
             }
-
-            let test = this.listSelected;
-            this.insertRole();
+           
         },
         insertRole(){
             let data= [{"userId": this.userId, "roles": this.listSelected}];

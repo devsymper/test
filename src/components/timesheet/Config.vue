@@ -89,7 +89,9 @@
                     </div>
                 </v-row>
                 <v-row class="flex-grow-1">
-                    <button @click="onSavePeriod" type="button" class="font v-btn v-btn--depressed theme--light v-size--small primary" 
+                    <button @click="onSavePeriod" 
+                    type="button"
+                     class="font v-btn v-btn--depressed theme--light v-size--small primary" 
                     style="margin-left: 350px; align-self: flex-end">
                         <span>
                             <i class="v-icon  mr-2 mdi mdi-content-save"></i>

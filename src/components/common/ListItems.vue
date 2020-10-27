@@ -194,7 +194,6 @@
                 ></Pagination>
             </v-row>
         </div>
-    
         <component
             :is="actionPanelWrapper"
             :width="actionPanelWidth"
@@ -218,7 +217,6 @@
                 </v-card>
             </slot>
         </component>
-
         <symper-drag-panel
             v-else
             @before-close="handleCloseDragPanel"
@@ -541,21 +539,21 @@ export default {
             type: Boolean,
             default: false
         },
+        showImportHistoryBtn:{
+            type: Boolean,
+            default: false
+        },
         exportLink: {
+            type: String,
+            default: ''
+        },
+        widgetIdentifier: {
             type: String,
             default: ''
         },
         showExportButton: {
             type: Boolean,
-            default: false
-        },
-        showImportHistoryBtn:{
-            type: Boolean,
-            default: false
-        },
-        widgetIdentifier: {
-            type: String,
-            default: ''
+            default: true
         },
         debounceRowSelectTime: {
             type: Number,

@@ -12,6 +12,7 @@ export default {
         knowledge: 'mdi-file-certificate-outline',
         file: 'mdi-upload-outline',
         userManager: "mdi-account-cog-outline",
+        user: "mdi-account-cog-outline",
         accessManager: "mdi-shield-key-outline",
         application_definition: "mdi mdi-widgets-outline",
         account: 'mdi-account-multiple-outline',
@@ -21,7 +22,9 @@ export default {
         dataflow: "mdi mdi-arrange-send-to-back",
         comment: "mdi-comment-outline",
         file: "mdi mdi-file-upload-outline",
-        dashboard: "mdi mdi-view-dashboard"
+        dashboard: "mdi mdi-view-dashboard",
+        action_pack: " mdi mdi-package-variant-closed",
+
 
 
     }

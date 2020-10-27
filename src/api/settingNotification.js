@@ -7,7 +7,19 @@ export default {
     showAllModuleConfig() {
         return api.get('sources')
     },
-    showListsSubcribed() {
-        return apiSyql.post('channels')
+    showAllLists() {
+        return api.get('channels')
+    },
+    showListsSubcribed(data) {
+        return api.get('channels', data)
+    },
+    addChanel(data) {
+        return api.post('channels', data)
+    },
+    subscribeChanel(id, data) {
+        return api.post('channels/' + id, data)
+    },
+    deleteNotification(id) {
+        return api.delete('channels/' + id)
     }
 }

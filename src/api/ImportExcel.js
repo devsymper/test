@@ -15,4 +15,7 @@ export default {
     cancelImport(fileName) {
         return api.get('stop-process/' + fileName)
     },
+    downloadExcel(fileName) {
+        return api.get('download/' + fileName)
+    }
 }

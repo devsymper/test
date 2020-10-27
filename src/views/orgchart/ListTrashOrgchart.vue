@@ -37,7 +37,6 @@ export default {
             getListUrl: appConfigs.apiDomain.trash+'/items?type=orgchart',
             customAPIResult:{
                  reformatData(res){
-                     debugger
                     //  let mapIdToUser = self.$store.getters['app/mapIdToUser'];
                      res.data.forEach(function(e){
                          if(e.data != ""){
