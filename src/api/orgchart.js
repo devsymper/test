@@ -92,6 +92,9 @@ export const orgchartApi = {
     getDocumentByUserId(data){
         return documentApi.post("documents/map-query", data)
     },
+    getDescriptionNode(data){
+        return documentApi.post("documents/map-query", data)
+    },
     getIdOrgchartDefault(){
         return orgchart.get('get-orgchart-default')
     },

@@ -397,7 +397,13 @@
             "list": "Danh sách action pack ",
             "objectType": "Loại đối tượng",
             "operation": "Thao tác với từng đối tượng",
-            "allOperation": "Thao tác với toàn bộ đối tượng"
+            "allOperation": "Thao tác với toàn bộ đối tượng",
+            "orgchart":{
+                "viewAll":"Xem tất cả phòng ban của SĐTC" ,
+                "viewItself": "Chỉ xem phòng ban của chính user đó",
+                "viewItselfAndChild": "Xem phòng ban của user đó và phòng ban con",
+                "viewOther": "Xem các phòng ban khác"
+            }
         }
     },
     "timesheet": {

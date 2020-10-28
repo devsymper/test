@@ -12,7 +12,10 @@
                  @cell-editing-started="cellEditingStarted"
                  @cell-value-changed="cellValueChanged"
                  @cell-double-clicked="cellDoubleClick"
+                 @cell-mouse-over="cellMouseOver"
+                 @cell-mouse-out="cellMouseOut"
                  :rowData="rowDataTable"
+                 :getContextMenuItems="getContextMenuItems"
                  :treeData="true"
                  :animateRows="true"
                  :groupDefaultExpanded="groupDefaultExpanded"
@@ -25,6 +28,7 @@
 </template>
 <script>
 import {AgGridVue} from "ag-grid-vue";
+import { MenuModule } from '@ag-grid-enterprise/menu';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
@@ -95,6 +99,7 @@ export default {
             gridOptions:null,
             modules: [
                 RowGroupingModule,
+                MenuModule
             ],
             defaultColDef: null,
             autoGroupColumnDef: null,
@@ -121,20 +126,6 @@ export default {
             filter: true,
             sortable: true,
             resizable: true,
-            // if(hideRowBorderCss){
-            //     cellStyle: (params) => {
-            //     const { level } = params.node;
-            //     const groupCell = params.value === params.node.key;
-            //     const indent = 0; // change this value to your liking
-            //     if (!groupCell) {
-            //         return {
-            //             paddingLeft: (level + 1) * indent + "px",
-            //             marginBottom: 10+"px",
-            //         };
-            //     }
-            // }
-            //    }
-           
         };
         this.autoGroupColumnDef = { minWidth: 100 };
         this.gridOptions = {};
@@ -177,6 +168,140 @@ export default {
     mounted(){
     },  
     methods:{
+        getContextMenuItems(params){
+            debugger
+            var result = [
+                {
+                name: 'Alert ' + params.value,
+                action: function () {
+                    window.alert('Alerting about ' + params.value);
+                },
+                cssClasses: ['redFont', 'bold'],
+                },
+                {
+                name: 'Always Disabled',
+                disabled: true,
+                tooltip:
+                    'Very long tooltip, did I mention that I am very long, well I am! Long!  Very Long!',
+                },
+                {
+                name: 'Country',
+                subMenu: [
+                    {
+                    name: 'Ireland',
+                    action: function () {
+                        console.log('Ireland was pressed');
+                    },
+                    icon: createFlagImg('ie'),
+                    },
+                    {
+                    name: 'UK',
+                    action: function () {
+                        console.log('UK was pressed');
+                    },
+                    icon: createFlagImg('gb'),
+                    },
+                    {
+                    name: 'France',
+                    action: function () {
+                        console.log('France was pressed');
+                    },
+                    icon: createFlagImg('fr'),
+                    },
+                ],
+                },
+                {
+                name: 'Person',
+                subMenu: [
+                    {
+                    name: 'Niall',
+                    action: function () {
+                        console.log('Niall was pressed');
+                    },
+                    },
+                    {
+                    name: 'Sean',
+                    action: function () {
+                        console.log('Sean was pressed');
+                    },
+                    },
+                    {
+                    name: 'John',
+                    action: function () {
+                        console.log('John was pressed');
+                    },
+                    },
+                    {
+                    name: 'Alberto',
+                    action: function () {
+                        console.log('Alberto was pressed');
+                    },
+                    },
+                    {
+                    name: 'Tony',
+                    action: function () {
+                        console.log('Tony was pressed');
+                    },
+                    },
+                    {
+                    name: 'Andrew',
+                    action: function () {
+                        console.log('Andrew was pressed');
+                    },
+                    },
+                    {
+                    name: 'Kev',
+                    action: function () {
+                        console.log('Kev was pressed');
+                    },
+                    },
+                    {
+                    name: 'Will',
+                    action: function () {
+                        console.log('Will was pressed');
+                    },
+                    },
+                    {
+                    name: 'Armaan',
+                    action: function () {
+                        console.log('Armaan was pressed');
+                    },
+                    },
+                ],
+                },
+                'separator',
+                {
+                name: 'Windows',
+                shortcut: 'Alt + W',
+                action: function () {
+                    console.log('Windows Item Selected');
+                },
+                icon: '<img src="../images/skills/windows.png"/>',
+                },
+                {
+                name: 'Mac',
+                shortcut: 'Alt + M',
+                action: function () {
+                    console.log('Mac Item Selected');
+                },
+                icon: '<img src="../images/skills/mac.png"/>',
+                },
+                'separator',
+                {
+                name: 'Checked',
+                checked: true,
+                action: function () {
+                    console.log('Checked Selected');
+                },
+                icon: '<img src="../images/skills/mac.png"/>',
+                },
+                'copy',
+                'separator',
+                'chartRange',
+            ];
+            return result;
+
+        },
         refreshData(columns){
             this.gridOptions.api.clearFocusedCell()
             this.columns = columns;
@@ -207,6 +332,12 @@ export default {
         },
         cellDoubleClick(params){
             this.$emit('on-cell-dbl-click',params)
+        },
+        cellMouseOver(params){
+            this.$emit('on-cell-mouse-over',params)
+        },
+        cellMouseOut(params){
+            this.$emit('on-cell-mouse-out',params)
         },
         onGridReady(param){
             this.$emit('grid-ready', param)

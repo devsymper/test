@@ -1,17 +1,23 @@
 <template>
     <span margin-left:-2px style="margin-top:-4px">
-        <i :class="'mdi mr-2 fs-12 '+icon"></i>
-        <span style="padding-right:8px;margin-top:-4px;font:12px roboto; color:#212529 !important">{{text}}</span>
+        <i :class="'mdi mr-2 fs-12 '+icon" ></i>
+        <span style="padding-right:8px;margin-top:-4px;font:12px roboto; color:#212529 !important" >{{text}}</span>
         <span v-if="count !=0" style="padding-right:8px;margin-top:-6px;font:12px roboto; color:#212529 !important">{{'('+count+')'}}</span>
     </span>
 </template>
 <script>
+import { orgchartApi } from "@/api/orgchart.js";
+import Detail from '@/views/document/detail/Detail.vue'
+
 let mapNodeTypeIcon = {
     position: 'mdi-briefcase-outline',
     department: 'mdi-office-building-outline',
     none: 'mdi-book-multiple-outline'
 };
 export default {
+    components:{
+        Detail
+    },
     data(){
         return {
             icon: null,

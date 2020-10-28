@@ -106,6 +106,8 @@
                                     :customComponents="customAgComponents"  
                                     :hideRowBorderCss="true"
                                     @on-cell-dbl-click="onCellDblClick"
+                                    @on-cell-mouse-over="onCellMouseOver"
+                                    @on-cell-mouse-out="onCellMouseOut"
                                     :minWidth="500"
                                     :cellRendererParams="{
                                         innerRenderer:'nodeName',
@@ -154,7 +156,9 @@
             </v-tab-item>
 
         </v-tabs-items>
-
+        <div class="description-department" v-show="showDescriptionDepartment">
+            <Detail :quickView="true" :docObjInfo="docObjDescriptionInfo"  />
+        </div>
     </div>
 </template>
 
@@ -404,6 +408,18 @@ export default {
                 listUsers: this.listUserInNode
             })
         },
+        onCellMouseOver: _.debounce(function(params){
+            let self = this
+            let objId = "orgchart:"+this.$route.params.id+params.data.vizId
+                orgchartApi.getDescriptionNode({object_identifier:objId}).then(res=>{
+                    self.docObjInfo = {docObjId:5100681,docSize:'21cm'}
+                    self.$refs.listUser.actionPanel = true;
+                }).catch(err=>{
+                })
+        },500),
+        onCellMouseOut: _.debounce(function(params){
+           this.showDescriptionDepartment = false
+        },200),
         onTabClicked(data){
             this.currentTab = data.action
             this.titleToolbar = data.title
@@ -413,6 +429,7 @@ export default {
         let self = this
         return {
             currentTab: 1,
+            showDescriptionDepartment: false,
             agApi:null,
             widthContentCustom:0,
             currentWidthContentCustom:400,
@@ -436,6 +453,7 @@ export default {
             showNavigation:false,
             listUserInNode:[],
             docObjInfo:{},
+            docObjDescriptionInfo:{docObjId:5100681,docSize:'21cm'},
             apiUrl: '',
             mapNameToDynamicAttr: null,
             titleToolbar:"SĐTC dạng cây",
@@ -484,7 +502,6 @@ export default {
                     text: "Xem chi tiết",
                     callback: (user, callback) => {
                         let data = {
-                            // object_identifier: "account:971"
                             object_identifier: "account:"+user.id
                         }
                         let self = this
@@ -536,6 +553,17 @@ export default {
 </script>
 
 <style scoped>
+.description-department{
+    position: fixed;
+	z-index: 10000;
+    width: 200px;
+    height: 200px;
+	font:13px roboto;
+	background-color: #fff;
+	-webkit-box-shadow: 2px 0px 24px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 2px 0px 24px 0px rgba(0,0,0,0.75);
+	box-shadow: 2px 0px 24px 0px rgba(0,0,0,0.75);
+}
 .symper-orgchart-table-view .ag-group-child-count{
     position: absolute;
     right: 5px;
