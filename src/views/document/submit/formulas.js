@@ -60,8 +60,7 @@ export default class Formulas {
         if (listSyql != null && listSyql.length > 0) {
             for (let i = 0; i < listSyql.length; i++) {
                 let syql = listSyql[i].trim();
-                syql = syql.replace('ref(', '');
-                syql = syql.replace('REF(', '');
+                syql = syql.replace(/(REF|ref)\s*\(/g, '');
                 syql = syql.substring(0, syql.length - 1);
                 let res = await this.runSyql(syql, dataInput);
                 let beforeStr = this.checkBeforeReferenceFormulas(formulas, listSyql[i].trim());
@@ -98,8 +97,7 @@ export default class Formulas {
         if (listLocal != null && listLocal.length > 0) {
             for (let index = 0; index < listLocal.length; index++) {
                 let sql = listLocal[index];
-                sql = sql.replace('local(', '');
-                sql = sql.replace('LOCAL(', '');
+                syql = syql.replace(/(local|LOCAL)\s*\(/g, '');
                 sql = sql.substring(0, sql.length - 1);
                 sql = sql.replace(/\r?\n|\r/g, ' ');
                 if (Object.keys(dataInput).length == 0) {
@@ -162,8 +160,7 @@ export default class Formulas {
         if (listLocal != null && listLocal.length > 0) {
             for (let index = 0; index < listLocal.length; index++) {
                 let sql = listLocal[index];
-                sql = sql.replace('local(', '');
-                sql = sql.replace('LOCAL(', '');
+                syql = syql.replace(/(local|LOCAL)\s*\(/g, '');
                 sql = sql.substring(0, sql.length - 1);
                 sql = sql.replace(/\r?\n|\r/g, ' ');
                 let res = await this.runSQLLiteFormulas(sql);
@@ -190,8 +187,7 @@ export default class Formulas {
                 // return { data: dataRespone, from: 'local' }
             } else if (listSyql.length == 1) {
                 let syql = listSyql[0];
-                syql = syql.replace('ref(', '');
-                syql = syql.replace('REF(', '');
+                syql = syql.replace(/(REF|ref)\s*\(/g, '');
                 syql = syql.substring(0, syql.length - 1);
                 syql = syql.replace(/\r?\n|\r/g, ' ');
                 let dataPost = {
@@ -221,8 +217,7 @@ export default class Formulas {
         if (listLocal != null && listLocal.length > 0) {
             for (let i = 0; i < listLocal.length; i++) {
                 let sql = listLocal[i].trim();
-                sql = sql.replace('local(', '');
-                sql = sql.replace('LOCAL(', '');
+                syql = syql.replace(/(local|LOCAL)\s*\(/g, '');
                 sql = sql.substring(0, sql.length - 1);
                 if (Object.keys(dataInput).length == 0) {
                     dataInput = false;
@@ -435,9 +430,7 @@ export default class Formulas {
             let listSyql = this.refFormulas;
             if (listSyql != null && listSyql.length > 0) {
                 let syql = listSyql[0].trim();
-                syql = syql.replace('ref(', '');
-                syql = syql.replace('REF(', '');
-
+                syql = syql.replace(/(REF|ref)\s*\(/g, '');
                 syql = syql.substring(0, syql.length - 1);
                 return this.runSyql(syql, dataInput);
             } else {
@@ -518,7 +511,7 @@ export default class Formulas {
         if (formulas == false) {
             formulas = this.formulas
         }
-        let listSyql = formulas.match(/(REF|ref)\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
+        let listSyql = formulas.match(/(REF|ref)\s*\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
         return listSyql;
     }
 
@@ -526,14 +519,14 @@ export default class Formulas {
      * Hàm tách các công thức local (công thức chạy owr client)
      */
     getLocalFormulas() {
-            let listSqlite = this.formulas.match(/(LOCAL|local)\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
+            let listSqlite = this.formulas.match(/(LOCAL|local)\s*\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
             return listSqlite;
         }
         /**
          * Hàm tách các công thức local (công thức chạy owr client)
          */
     getOrgChartFormulas() {
-        let listSqlite = this.formulas.match(/(ORGCHART|orgchart)\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
+        let listSqlite = this.formulas.match(/(ORGCHART|orgchart)\s*\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
         return listSqlite;
     }
 
@@ -642,6 +635,9 @@ export default class Formulas {
         return false;
     }
     getDatasetEffectedFormula() {
+        if (!this.type) {
+            return {};
+        }
         let inputDatasets = {};
         let allMappingDatasets = sDocument.state.submit[this.keyInstance].listControlMappingDatasets;
         let table = this.detectTableQuery();
@@ -686,7 +682,7 @@ export default class Formulas {
      * @param {*} listInputInDocument 
      */
     detectControlInTable(mapControlEffected, name, script, listInputInDocument) {
-        let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm, "");
+        let s = script.replace(/(REF|ref)\s*\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm, "");
         s = s.replace(/{.}/gm, "");
         let listWord = s.match(/[A-Za-z0-9_]+/g);
         for (let controlName in listInputInDocument) {
