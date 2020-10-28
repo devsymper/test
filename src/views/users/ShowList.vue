@@ -239,29 +239,13 @@ export default {
                         dataColumn:null,
                         dataType:"text",
                         isKeyControl:false,
-                        name:"password",
-                        title:"Mật khẩu",
-                        isNull:true
-                    },
-                    {
-                        dataColumn:null,
-                        dataType:"text",
-                        isKeyControl:false,
-                        name:"password",
-                        title:"Mật khẩu",
-                        isNull:true
-                    },
-                    {
-                        dataColumn:null,
-                        dataType:"number",
-                        isKeyControl:false,
                         name:"orgchart_id",
                         title:"Mã sơ đồ tổ chức",
                         isNull:true
                     },
                     {
                         dataColumn:null,
-                        dataType:"number",
+                        dataType:"text",
                         isKeyControl:false,
                         name:"position_id",
                         title:"Vị trí",

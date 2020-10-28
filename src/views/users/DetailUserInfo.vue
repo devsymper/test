@@ -13,7 +13,6 @@
 		<v-stepper class="w-100 d-flex stepper-create-user">
 			<div class="w-100 ml-1 mt-2 fs-15" v-if="!isViewUserRole">
 				<h4 style="font-weight:430!important">{{ $t('user.general.personalInfo.title')}}
-				
 				</h4>
 				<v-row class="mt-1" >
 					<!-- thong tin -->

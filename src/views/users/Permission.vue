@@ -1,25 +1,27 @@
 <template>
     <div class="h-100 permission d-flex flex-column flex-grow-1">
-        <v-row>
-            <v-col class="col-md-7">
+        <v-row>{{stepper}}
+            <v-col class="col-md-8">
                 <v-btn 
+                    small
                     outlined 
                     class="fs-13 mr-2 button" 
                     :style="{'background-color':showOrgchart?'#E6E5E5':''}"
                     @click="showPermissionOrgchart()">
                     Vị trí orgchart
                 </v-btn>
-                <v-btn  
+                <v-btn 
+                    small
                     outlined class="fs-13 mr-2" 
                     :style="{'background-color':showUser?'#E6E5E5':''}"
                     @click="showPermissionUser()">Loại user</v-btn>
             </v-col>
-            <v-col class="col-md-5">
+            <v-col class="col-md-4">
                 <div>
                     <v-text-field
                         v-if="showUser"
                         class="pt-0 search-input "
-                        style="height:30px!important"
+                        style=" margin-top:-2px"
                         v-model="search"
                         append-icon="mdi-magnify"
                         label="Search"
@@ -29,8 +31,10 @@
                 </div>
             </v-col>
         </v-row>
-         <div v-if="showOrgchart">
-            <OrgchartElementSelector v-model="data"/>
+         <div >
+            <OrgchartElementSelector 
+                ref="orgchartSelector"
+                v-model="data"/>
         </div>
         <div class="w-100" v-if="showUser">
              <v-data-table
@@ -63,6 +67,11 @@ import { userApi } from "./../../api/user.js";
 import OrgchartElementSelector from "./../..//components/common/OrgchartElementSelector.vue";
 export default {
   watch: {
+      stepper(){
+          if(this.stepper==2){
+              let treeData = this.$refs.orgchartSelector.treeData;
+          }
+      },
       data(){
           let data = this.data
       }
@@ -70,7 +79,7 @@ export default {
     components:{
         OrgchartElementSelector
     },
-    props:['userId'],
+    props:['userId','stepper'],
     computed: {
         headers () {
             return [
@@ -106,8 +115,14 @@ export default {
     },
     created(){
         this.getUserRole();
+        this.updateUserRole();
     },
     methods:{
+        updateUserRole(){
+            if(this.actionType=='edit'){
+           
+            }
+        },
         saveOrgchart(){
              let data= [{"userId": this.userId, "roles": this.data}];
             userApi.updateRole({items:JSON.stringify(data)}).then(res=>{
