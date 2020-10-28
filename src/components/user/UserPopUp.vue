@@ -112,5 +112,6 @@ export default {
     }
     .color-blue:hover{
         cursor: pointer;
+        text-decoration-line:underline;
     }
 </style>
