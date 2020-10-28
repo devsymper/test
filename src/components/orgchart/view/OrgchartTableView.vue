@@ -106,7 +106,7 @@
                                     :customComponents="customAgComponents"  
                                     :hideRowBorderCss="true"
                                     @on-cell-dbl-click="onCellDblClick"
-                                    @on-cell-mouse-over="onCellMouseOver"
+                                  
                                     @on-cell-mouse-out="onCellMouseOut"
                                     :minWidth="500"
                                     :cellRendererParams="{
@@ -115,7 +115,7 @@
                                     }">
                                 </AgDataTable>
                         </VueResizable>
-
+          <!-- @on-cell-mouse-over="onCellMouseOver" -->
                            </div>
                        <ListItems 
                              ref="listUser"
