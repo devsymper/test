@@ -22,15 +22,6 @@
 import { HotTable, HotColumn } from "@handsontable/vue";
 import { util } from '../../../plugins/util';
 export default {
-    watch: {
-        tableDataDefinition: {
-            deep:true,
-            immediate: true,
-            handler(){
-                console.trace()
-            }
-        }
-    },
     components: {
         HotTable
     },

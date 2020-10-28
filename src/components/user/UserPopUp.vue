@@ -1,11 +1,10 @@
 <template>
-    <div style="width: 300px" class="user-popup">
-        <div class="mt-3 ml-4 fs-15 fw-430">
-            
+    <div style="width: 300px;background-color:white;" class="user-popup">
+        <div class="pt-3 pl-4 fs-15 fw-430" style="background-color:white;">
             {{detailUser.firstName?detailUser.firstName:' '+' '+ detailUser.lastName?detailUser.lastName:' '}}
-            <div v-if="rolesOgchart.length>0" class="fs-13 fw-430"  >
+            <div  v-if="rolesOgchart.length>0" class="fs-13 fw-430"  >
                 <v-menu :nudge-left="194">
-                    <template v-slot:activator="{ on}">
+                    <template  v-slot:activator="{ on}">
                         <span  v-on="on" class='fm fw-400'>
                             {{rolesOgchart[0].name}} 
                             <span class="color-blue">
@@ -54,25 +53,25 @@ import symperAvatar from './../../components/common/SymperAvatar';
 import dayjs from 'dayjs';
 import {userApi} from './../../api/user'
 export default {
-props:['userId'],
-  watch: {
-      userId(){
+    props:['userId'],
+    watch: {
+        userId(){
+            this.getDetailUser();
+            this.getRoleOrgchartByUser();
+        }
+    },
+    components:{
+        symperAvatar
+    },
+    created () {
         this.getDetailUser();
         this.getRoleOrgchartByUser();
-      }
-  },
-  components:{
-    symperAvatar
-  },
-  computed:{
-      currentRole(){
-            return this.$store.state.app.endUserInfo.currentRole;
-        }
-  },
-  created () {
-      this.getDetailUser();
-      this.getRoleOrgchartByUser();
-  },
+      },
+    computed:{
+        currentRole(){
+                return this.$store.state.app.endUserInfo.currentRole;
+            }
+    },
   methods: {
       reNameStatus(status){
           if(status==1){
@@ -100,18 +99,25 @@ props:['userId'],
             }               
         }
   
-  },
-  data () {
-    return {
-        detailUser:{},
-        rolesOgchart:[]
-    }
-  },
+    },
+    data () {
+        return {
+            detailUser:{},
+            rolesOgchart:[]
+        }
+    },
     
 }
 </script>
 <style scoped>
     .user-popup ::v-deep .v-menu__content{
         background-color: white!important
+    }
+    .color-blue{
+        color:blue;
+    }
+    .color-blue:hover{
+        cursor: pointer;
+        text-decoration-line:underline;
     }
 </style>

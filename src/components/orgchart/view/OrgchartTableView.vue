@@ -148,6 +148,7 @@
                     :action="'view'"
                     @current-tab="changeTab"
                     :currentTab="currentTab"
+                    :showMenuPickTab="true"
                     :id="$route.params.id">
                 </OrgchartEditor>
             </v-tab-item>

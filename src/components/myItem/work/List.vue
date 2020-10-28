@@ -118,9 +118,8 @@
                             cols="2"
                             class="fs-12 px-1 py-0 mt-2"
                         >
-                            <symperAvatar :size="20"  :userId="obj.startUserId" />
-                            <span class="ml-1">{{obj.startUserName}}</span>
-                            <div class="fs-11 ml-5 grey--text" v-if="obj.roleInfo">{{obj.roleInfo.name}}</div>
+                            <infoUser class="userInfo" :userId="String(obj.startUserId)" :roleInfo="obj.roleInfo" />
+                        
                         </v-col> 
                         <v-col
                             v-if="!sideBySideMode"
@@ -212,8 +211,7 @@ import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
 } from "@/components/process/processAction";
-import symperAvatar from "@/components/common/SymperAvatar.vue";
-
+import infoUser from "./../InfoUser";
 export default {
   computed: {
     fileCountPerTask(){
@@ -298,8 +296,8 @@ export default {
         listHeader: listHeader,
         userSelector: userSelector,
         VuePerfectScrollbar: VuePerfectScrollbar,
-        symperAvatar: symperAvatar,
-        workDetail
+        workDetail,
+        infoUser
     },
     watch:{
         sideBySideMode(vl){

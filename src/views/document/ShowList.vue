@@ -4,7 +4,6 @@
         ref="listDocument"
         :getDataUrl="'https://sdocument-management.symper.vn/documents'"  
         :useDefaultContext="false"
-        :showImportHistoryBtn="true"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('document.title')"
         :containerHeight="containerHeight"

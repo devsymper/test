@@ -1,37 +1,28 @@
 <template>
-    <div  class="popup-list-column">
-        <v-menu
-            v-model="showListColumn"
-            :position-x="x"
-            :position-y="y"
-            absolute
-            offset-x
-             :max-height="200"
-            :nudge-width="220"
-            :close-on-content-click="false"
-            class="menu-list-column"
+    <div
+        v-show="isShow"
+        :position-x="x"
+        :position-y="y"
+        absolute
+        offset-x
+        :max-height="200"
+        :nudge-width="220"
+        :close-on-content-click="false"
+        class="menu-list-column"
+    >
+        <div style="margin:12px 6px">
+                <v-list-item
+            v-for="(item,i) in listColumn"
+            :key="i"
+            @click="chooseItem(item)"
         >
-           <div style="margin:12px 6px">
-                 <v-list-item
-                v-for="(item,i) in listColumn"
-                :key="i"
-                @click="chooseItem(item)"
-            >
-            <v-list-item-avatar>
-            <v-icon
-                class="grey lighten-1"
-                dark
-            >
-                {{item.icon}}
-            </v-icon>
-            </v-list-item-avatar>
-            <v-list-item-content>
-            <v-list-item-title > <span>{{item.title}}</span> <span style="font:11px roboto;font-weight:200;padđing-left:4px">{{item.subTitle}}</span></v-list-item-title>
-            </v-list-item-content>
-                <v-icon v-if="listColumnSelected.includes(item)" color="green lighten-1">mdi-check-outline</v-icon>
-        </v-list-item>
-           </div>
-        </v-menu>
+        <img class="icon-control" :src="`https://hoangnd.dev.symper.vn/`+item.icon">
+        <v-list-item-content>
+        <v-list-item-title > <span>{{item.title}}</span> <span style="font:10px roboto;font-weight:400;padđing-left:4px">{{item.name}}</span></v-list-item-title>
+        </v-list-item-content>
+            <v-icon v-if="listColumnSelected.includes(item)" color="green lighten-1">mdi-check-outline</v-icon>
+    </v-list-item>
+        </div>
     </div>
 </template>
 
@@ -41,42 +32,19 @@ export default {
         return {
             x:null,
             y:null,
-             listColumn:[
-                {
-                    id:1,
-                    icon: "mdi-lan",
-                    title:"Số chứng từ ",
-                    subTitle:"got_2",
-                    selected:false,
-                },
-                {
-                    id:2,
-                    icon: "mdi-folder",
-                    title:"Tên bộ phận",
-                    subTitle:"sd_23",
-                    selected:false,
-                },
-                {
-                    id:3,
-                    icon: "mdi-widgets",
-                    title:"Mã bộ phân",
-                    subTitle:"sd_234",
-                    selected:false,
-                },
-            ]
+            isShow:false
         }
     },
     props:{
-        showListColumn:{
-            type:Boolean,
-            default:false
-        },
         listColumnSelected:{
             type: Array,
         },
         searchKey:{
             type:String,
             default:""
+        },
+        listColumn:{
+            type:Array
         }
         
     },
@@ -85,7 +53,7 @@ export default {
             this.$emit('item-clicked', item)
         },
         show(e){
-            // this.showListColumn = !this.showListColumn
+            this.isShow = true;
             this.x = e.clientX+40
             this.y = e.clientY+20
         }
@@ -98,6 +66,9 @@ export default {
 </script>
 
 <style scoped>
+.menu-list-column{
+    box-shadow: 0px 5px 5px -3px rgba(0, 0, 0, 0.2), 0px 8px 10px 1px rgba(0, 0, 0, 0.14), 0px 3px 14px 2px rgba(0, 0, 0, 0.12);
+}
 .v-menu__content{
     background-color: #ffffff !important;
 }
@@ -125,5 +96,9 @@ export default {
 .v-menu__content {
     margin-bottom:20px
 }
-
+.icon-control{
+    height: 12px;
+    width: 12px;
+    margin-right: 8px;
+}
 </style>

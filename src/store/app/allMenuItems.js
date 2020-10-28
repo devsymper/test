@@ -56,6 +56,12 @@ export default {
         title: "Report",
         icon: "mdi-view-dashboard-outline",
         group: "My work",
+        action: {
+            "module": "dashboard",
+            "resource": "dashboard",
+            "scope": "dashboard",
+            "action": "list"
+        },
     },
     orgchart: {
         title: "orgchart",
@@ -141,7 +147,13 @@ export default {
         title: 'File',
         icon: 'mdi-upload-outline',
         link: '/file-management',
-        group: "Applications"
+        group: "Applications",
+        action: {
+            "module": "file",
+            "resource": "file",
+            "scope": "file",
+            "action": "list"
+        },
     },
     userManager: {
         title: "Account management",

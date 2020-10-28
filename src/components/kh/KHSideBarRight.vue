@@ -42,9 +42,6 @@
                         <v-icon class="fs-14" v-else>mdi-file-document-outline</v-icon>
                         <v-tooltip bottom>
                         <template v-slot:activator="{ on }">
-                            <!-- <p  :id="`file-`+item.id"
-                            v-on="on"
-                            v-text="item.name+'.'+item.type"></p> -->
                             <v-list-item-title
                             :id="`file-`+item.id"
                             v-on="on"
@@ -62,7 +59,7 @@
             </div>
         </div>
         <!-- toc -->
-        <div class="kh-table-content kh-sbr-all w-100 h-100" v-if="skh.statusRightBar==2">
+        <div class="kh-table-content kh-sbr-all w-100 h-100" @click="onClickSidebarRight($event)" v-if="skh.statusRightBar==2">
         <div class="row w-100 sb-top" style="height:33px;">
             <div class="symper-title col pt-1 pl-2">Mục lục</div>
             <div class="r-right h-100 col">
@@ -110,11 +107,7 @@
             <v-list dense class="list-log">
                 <v-list-item-group>
                 <v-list-item v-for="(item, i) in listLogAll" :key="i">
-                    <v-avatar>
-                    <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John" />
-                    </v-avatar>
-                    <!-- <v-list-item-title class="fs-13"><b>{{item.userName}}</b> Đã {{item.action}} văn bản <b>{{item.name}}</b></v-list-item-title> -->
-                    <p class="fs-13">
+                    <symperAvatar :size="20" :userId="item.userId" /> <p class="fs-13">
                     <b>{{item.userName}}</b>
                     Đã {{convertAction(item.action)}}
                     <span
@@ -141,9 +134,7 @@
             <v-list dense class="list-log">
                 <v-list-item-group>
                 <v-list-item v-for="(item, i) in listLogDoc" :key="i">
-                    <v-avatar>
-                    <img src="https://cdn.vuetifyjs.com/images/john.jpg" alt="John" />
-                    </v-avatar>
+                    <symperAvatar :size="20" :userId="item.userId" />
                     <p class="fs-13">
                     <b>{{item.userName}}</b>
                     Đã {{convertAction(item.action)}}
@@ -264,11 +255,13 @@ import UploadFile from "@/components/common/UploadFile.vue";
 import KHShowImage from "./../../components/kh/KHShowImage";
 import Comment from '@/components/common/comment/Comment.vue';
 import { SYMPER_APP } from "./../../main.js";
+import symperAvatar from "@/components/common/SymperAvatar.vue";
 export default {
     components: {
         UploadFile,
         KHShowImage,
-        Comment
+        Comment,
+        symperAvatar
     },
     data() {
         return {
@@ -340,6 +333,7 @@ export default {
                             .val(name)
                             .select();
                         }, 200);
+                        
                         $("#file-" + id).keyup(function(e) {
                         if (e.keyCode === 13) {
                             var text = $("#file-" + id)
@@ -514,7 +508,7 @@ export default {
             $("#toc").empty();
             $("#toc").toc({
                 content: "#myeditablediv",
-                headings: "h1,h2,h3,h4,h5,h6"
+                headings: "h1,h2,h3,h4,h5,h6",
             });
         },
         getData(hash = false) {
@@ -603,6 +597,17 @@ export default {
                 })
                 .always(() => {});
             this.dialogAlert = false;
+        },
+        onClickSidebarRight(e){
+            if($(e.target).is('a')){
+                e.preventDefault();
+                e.stopPropagation();
+                let ele = $('.kh-editor-view '+$(e.target).attr('href'));
+                ele[0].scrollIntoView({
+                    behavior: "smooth", // or "auto" or "instant"
+                    block: "start" // or "end"
+                });
+            }
         }
     },
     watch: {
@@ -672,25 +677,12 @@ export default {
             let root = this.skh.arrFileAttach;
             console.log(root);
             return root;
-        }
+        },
+        
     },
     created() {
         this.getData();
     },
-    mounted() {
-        $(".kh-toc").on("click", "a", function(event) {
-        // var p = $(this);
-        // var pos = p.offset();
-        // //console.log(p[0].offsetLeft);
-        // console.log(pos);
-        //alert($(this).attr("href"));
-        //  var oldHref=$(this).attr("href");
-        //  var url=window.location.href;
-        //  var newUrl=url+oldHref;
-        //  alert(newUrl);
-        //$(this).attr("href",newUrl);
-        });
-    }
 };
 </script>
 

@@ -1,5 +1,5 @@
 <template>
-    <div class="w-100 h-100 mt-4 ml-6">
+    <div class="w-100  mt-4 ml-6">
         <div class="body" style='margin-top:-25px'>
              <v-list :expand="true" dense class=" notification" >
                 <v-list-group

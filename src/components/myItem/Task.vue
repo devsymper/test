@@ -21,8 +21,8 @@
             v-else-if="(showDetailDocument && showDoTaskComponent && (action == 'approval')) || filter=='done'"
             :docObjInfo="docObjInfo">
         </Detail>
-        <div style="width:100%" v-else-if="filter=='done-noneObj'">
-            <h3 style="text-align:left; margin-top:20px; color:#4e4e4e">Mô tả: {{taskInfo.extraLabel}} </h3>
+        <div style="width:100%" v-else-if="filter=='done-noneObj' || action=='submitAdhocTask'">
+            <h3 class="pl-2" style="text-align:left; margin-top:20px; color:#4e4e4e">Mô tả: {{taskInfo.extraLabel}} </h3>
         </div>
         <div v-else-if="action == 'undefined'">
             <div class="text-md-center mt-6">

@@ -102,10 +102,8 @@ export default {
 									renderer:  function(instance, td, row, col, prop, value, cellProperties) {
 										let span;
 										Handsontable.dom.empty(td);
-										let div = document.createElement('div')
 										span = document.createElement('span')
 										if(value === "1"){
-											$(div).css("color",'red')
 											$(span).text('Kích hoạt')
 										}else{
 												$(span).text('Không kich hoạt')

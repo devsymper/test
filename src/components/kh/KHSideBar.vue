@@ -1,7 +1,7 @@
 <template>
   <vue-resizable  @resize:end="resizeSidebar" :width="skh.widthSideBar" style="height: calc(100% - 10px);">
     <v-navigation-drawer class="khSidebar resizable-content" v-show="!skh.subCollapseSideBar">
-      <div>
+      <div class="sideBar h-100">
         <v-text-field
             v-model="search"
             background-color="#F7F7F7"
@@ -15,8 +15,8 @@
             :placeholder="$t('common.search')"
         ></v-text-field>
         
-        <div class="kh-side-bar">
-            <v-container style="height: calc(100% - 65px);overflow: auto;">
+        <div class="kh-side-bar" style="height: calc(100% - 36px);">
+            <v-container style="height: 100%;overflow: auto;">
                 <div class="workspace">
                     <div class="symper-title">WORKSPACE</div>
                     <div class="icon-add">

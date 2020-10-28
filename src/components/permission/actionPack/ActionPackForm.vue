@@ -1,5 +1,12 @@
 <template>
-    <div class="pa-2 h-100">
+    <div class="pl-2 pr-2 h-100">
+        <div class="title mb-2">
+            {{$t('common.'+action) }} {{$t('common.actionPack')}}
+            <v-icon
+                class="close-btn float-right"
+                @click="closeActionPackForm"
+            >mdi-close</v-icon>
+        </div>
         <FormTpl
             ref="comonAttr"
             :viewOnly="action == 'detail'"
@@ -123,6 +130,9 @@ export default {
         this.genAllInputForFormTpl();
     },
     methods: { 
+        closeActionPackForm(){
+            this.$emit('close-form');
+        },
         handleChangeDocumentInstanceOperation(info){
             let operationForInstancesOfDocDef = this.multipleLevelObjects.document_definition.savedOpsForAllInstancesDocDef;
             
@@ -818,10 +828,7 @@ export default {
                     setTimeout(function() {
                         self.itemData.mapActionForAllObjects[self.itemData.objectType] = htIst.getSourceData();
                     }, 0);
-                },
-                 afterSelectionEnd(rowNum	, column, row2 , column2 , preventScrolling, selectionLayerLevel){
-                     alert('ok')
-                 }
+                }
             },
 
             // cấu trúc data giành cho các loại đối tượng có nhiều tầng object settings

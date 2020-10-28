@@ -5,7 +5,7 @@
 	permanent
 	right
 	:width="sidebarWidth"
-	v-show="isShow"
+	v-if="isShow"
 	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)'}"
 	>
 	<div class="main-info">
@@ -84,14 +84,15 @@
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.userRelated.title')}}</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
 				   		<div class="w-100 pl-2" v-for="(users, role) in dataTask" :key="role" >
-							<div v-if="users.length>0 " style="height: 30px" class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
+							<div v-if="users.length>0 "  class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
 								<span>
 									<v-icon class="mr-3" size="18">mdi-account</v-icon> 
 									<span mt-1>{{$t("tasks.header."+role)}}</span>
 								</span>
 							</div>
 							<div class="pl-7 d-flex justify-space-between user-show" v-for="userItem in tabsData[role]" :key="userItem.id" >
-								<user :user="userItem" class="float-left"></user>
+								<!-- <user :user="userItem" class="float-left"></user> -->
+                                <infoUser class="userInfo" :userId="userItem.id" />
 								<div class="float-right action-for-role d-flex"  >
 									<div v-for="(btn, idx) in actionsForRole[role]" :key="idx" class="d-flex" >
 										<v-menu v-if="btn.showUserSelect==true" 
@@ -124,7 +125,7 @@
 									</div>
 								</div>
 							</div>
-							<div class="pl-15" v-if="users.length>0 && originData[role+'Role'] " style="clear:both">{{originData[role+'Role'].name}}</div>
+							<div class="pl-13" v-if="users.length>0 && originData[role+'Role'] " style="clear:both">{{originData[role+'Role'].name}}</div>
 						</div>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
@@ -179,13 +180,20 @@
 														white-space: nowrap;
 														overflow: hidden;
 														text-overflow: ellipsis;
-														width: 140px;">
+														display:flex;
+													">
 											<v-icon v-if="item.type=='doc' ||item.type=='docx' " style="font-size:15px">mdi-file-word</v-icon>
 											<v-icon v-else-if="item.type=='pdf'" style="font-size:15px">mdi-file-pdf</v-icon>
 											<v-icon v-else-if="item.type=='jpg' ||item.type=='jpeg'||item.type=='png'" style="font-size:15px">mdi-file-image-outline</v-icon>
 											<v-icon v-else-if="item.type=='xlsx' ||item.type=='xls' " style="font-size:15px">mdi-file-excel</v-icon>
 											<v-icon v-else style="font-size:15px">mdi-file-document-outline</v-icon>
-											{{item.name}}</div>
+											 <v-list-item-title
+												:id="`file-`+item.id"
+												v-on="on"
+												class="fs-13 "
+												v-text="item.name"
+												></v-list-item-title>
+											</div>
 										</template>
 										<span>{{ item.name }}</span>
 									</v-tooltip>
@@ -195,7 +203,7 @@
 									style="font-size:12px;padding:0px;padding-top:3px!important">
 									<span>{{item.createAt}}</span>
 								</v-col>
-								<v-col class="pull-right" style="padding:0px;padding-top:3px!important">
+								<v-col style="padding:0px;padding-top:3px!important">
 									<v-icon  @click="downLoadFile(item.id)"  v-show="showByIndex === idex" style="font-size:18px;margin-left:40px">mdi-download</v-icon>
 									<v-icon  @click="actionFileAttachment($event,item.serverPath,item.name,item.type,item.id)"  v-show="showByIndex === idex" style="font-size:18px; margin-left:8px">mdi-dots-horizontal</v-icon>
 								</v-col> 
@@ -272,6 +280,7 @@
 </template>
 <script>
 import user from "./User";
+
 import { taskApi } from "@/api/task.js";
 import { userApi } from "@/api/user.js";
 import { documentApi } from "@/api/Document";
@@ -283,6 +292,8 @@ import Comment from './Comment'
 import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue";
 import UploadFile from "@/components/common/UploadFile.vue";
 import RelatedItems from "./RelatedItems.vue";
+import infoUser from "./InfoUser";
+
 export default {
 	components:{
 		VuePerfectScrollbar,
@@ -290,7 +301,8 @@ export default {
 		user,
 		trackingProcessInstance,
 		UploadFile,
-		RelatedItems
+		RelatedItems,
+		infoUser
 	},
 	data () {
 		return {
@@ -326,7 +338,68 @@ export default {
 				{
 					title: this.$t("kh.contextmenu.rename"),
 						menuAction: action => {
-							alert("Đổi tên");
+							let id = this.fileId;
+							let name=this.name;
+							var renameInput = $("<input id="+"file-" + id + " value=" + name + " >");
+							$("#file-" + id).replaceWith(renameInput);
+							$("#file-" + id).val(name);
+							renameInput.on("blur", function(evt) {
+								$(this).replaceWith(
+									"<div id="+"file-" +
+									id +
+									" class='v-list-item__title fs-13'>"+
+									name +
+									" </div>"
+								);
+							});
+
+							setTimeout(function() {
+								$("#file-" + id)
+									.focus()
+									.val(name)
+									.select();
+							}, 200);
+							$("#file-" + id).keyup(function(e) {
+								if (e.keyCode === 13) {
+									var text = $("#file-" + id)
+									.val()
+									.trim();
+
+									if (text != "" && text != name) {
+									let data = {};
+									data.id = id;
+									data.newName = text;
+									taskApi
+										.renameFile(data)
+										.then(res => {
+										if (res.status == 200) {
+											$(this).replaceWith(
+												"<div id="+"file-" +
+												id +
+												" class='v-list-item__title fs-13'>" +
+												text +
+												" </div>"
+											);
+										} else if (res.status == 403) {
+											SYMPER_APP.$snotifyError("Error", res.message);
+										}
+										})
+										.catch(err => {
+										console.log("error from rename file !!!", err);
+										})
+										.always(() => {});
+									} else {
+									$(this).replaceWith(
+										"<div id="+"file-" +
+										id +
+										" class='v-list-item__title fs-13'>" +
+										name +
+										" </div>"
+									);
+									}
+								}
+								}
+							);
 						},
 					icon: "mdi-pencil"
 				},
