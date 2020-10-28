@@ -2,6 +2,9 @@
 <div class="w-100">
      <list-items
         ref="listUser"
+        :showImportButton="true"
+        :showExportButton="false"
+        :actionPanelType="'modal'"
         @after-open-add-panel="addUser"
         :headerPrefixKeypath="'user.table'"
         :useDefaultContext="false"
@@ -19,6 +22,7 @@
         <div slot="right-panel-content" class="h-100">
             <action-panel
                 ref="panel"
+                @change-width-panel="changeWidth()"
                 :showDetailView="showDetailView"
                 @refresh-data="refreshListUser"
                 @refresh-new-user="setNewUserItem"
@@ -95,7 +99,7 @@ export default {
                 "scope": "account",
             },
             getListUrl: {},
-            actionPanelWidth:800,
+            actionPanelWidth:650,
             containerHeight: 200,
             tableContextMenu:{
                 change_pass: {
@@ -157,6 +161,9 @@ export default {
         
     },
     methods:{
+        changeWidth(){
+            this.actionPanelWidth=900;
+        },
         handleEditUserInfo(info){
             this.editUser(info);  
         },
@@ -276,12 +283,14 @@ export default {
             this.$refs.panel.resetPermissionPosittionOrgChart();
         },
         showViewSetingPassword(user){
+            this.actionPanelWidth=500;
             this.isSettingPasswordView = true;
             this.showViewInfo = false;
             this.$refs.panel.setDetailInfo(user);
             this.$refs.listUser.openactionPanel();
         },
         showViewDetailInfo(user){
+            this.actionPanelWidth=550;
             this.showDetailView=!this.showDetailView;
             this.showViewInfo = true;
             this.$refs.panel.setDetailInfo(user);
@@ -293,12 +302,14 @@ export default {
             this.$refs.listUser.closeactionPanel();
         },
         addUser(){
+            this.actionPanelWidth=650;
             this.isSettingPasswordView = false;
             this.showViewInfo = false;
             this.actionType = 'add';
             this.$refs.listUser.openactionPanel();
         },
         editUser(user){
+            this.actionPanelWidth=650;
             this.isSettingPasswordView = false;
             this.showViewInfo = false;
             this.actionType = 'edit';

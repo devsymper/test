@@ -138,13 +138,6 @@ export default {
     },
     mounted() {
         this.calcContainerHeight();
-        // setTimeout(
-        //     self => {
-        //         self.$refs.listActionPack.addItem();
-        //     },
-        //     500,
-        //     this
-        // );
     },
     created() {
         this.$store.dispatch("actionPack/getAllActionByObjectType");
@@ -175,9 +168,11 @@ export default {
             self.$refs.actionPackForm.objectTypeToDocumentDefinition();
         },
         onRowSelected(row){
+               let self = this;
             this.focusingUser = row;
             if(this.$refs.listActionPack.alwaysShowActionPanel){
-                this.detailActionPack(row);
+                self.$refs.listActionPack.actionPanel = true;
+                this.updateActionPack(row);
             }
         },
         makeOperationMapByObjectType(idActionPack, operations){

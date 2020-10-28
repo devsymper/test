@@ -99,8 +99,10 @@
             v-model="showMyInfo"
             v-show="showMyInfo"
             absolute
+            style="z-index:999!important"
             temporary>
             <DetailUser 
+            
                 :userInfo="sapp.endUserInfo"
                 @expand-panel="isExpand=true"
                 :close="isExpand"

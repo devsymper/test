@@ -83,8 +83,8 @@
             @input-blur="handleInputBlur"
             :singleLine="false" 
             @input-value-changed="handleChangeInput" 
+            :instance="instance"
             :allInputs="sCurrentDocument.formulas"/>
-            <FormAutocomplete/>
         </VuePerfectScrollbar>
         </v-tab-item>
 
@@ -97,7 +97,6 @@ import {checkInTable,checkNameControl,checkTitleControl} from "./../common/commo
 import { formulasApi } from "./../../../api/Formulas.js";
 import { util } from '../../../plugins/util';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import FormAutocomplete  from './items/FormAutoComplete'
 
 export default {
     props:{
@@ -113,7 +112,6 @@ export default {
     components:{
         'control-props-config' : FormTpl,
         VuePerfectScrollbar,
-        FormAutocomplete
     },
     computed: {
         sCurrentDocument(){
@@ -186,10 +184,21 @@ export default {
         },
         handleChangeInput(name, input, data){
             if(input.groupType == "formulas"){
+                if(name == "autocomplete" && typeof data == 'object'){
+                    this.$set(input.configData,'treeData',data.treeData);
+                    this.$set(input.configData,'documentSelected',data.documentSelected);
+                    this.$set(input.configData,'columnSelected',data.columnSelected);
+                    this.$set(input.configData,'rejectInput',data.rejectInput);
+                    this.$set(input,'value',data.sql);
+                    let tableId = this.getTableWrapControl();
+                    this.$store.commit(
+                        "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:input.configData,tableId:tableId,type:'configData',instance:this.instance}
+                    );  
+                }
                 this.handleValidateControl(name, input, data);
             }
             if(['numberFormat','checkbox','dateFormat'].includes(input.type)){
-                input.value = data
+                input.value = data;
                 this.handleValidateControl(name, input, data);
             }
             else if(name == 'dataFlowId'){
@@ -197,25 +206,38 @@ export default {
                 this.handleValidateControl(name, input, data);
             }
         },
+        /**
+         * Hàm lấy id của table chứa control
+         */
+        getTableWrapControl(){
+            let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
+            let tableId = checkInTable(elements);
+            if( tableId == this.sCurrentDocument.id){
+                tableId = '0';
+            }
+            return tableId
+        },
+        /**
+         * Hàm xử lí các thuộc tính của control trước khi đẩy lên store
+         */
         handleValidateControl(name, input, data){
             let value = input.value
             let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
             if(name == "width"){
                 elements.css({width:value});
-                elements.attr('data-mce-style',elements.attr('style'))
+                elements.attr('data-mce-style',elements.attr('style'));
             }
             if(name == "height"){
                 elements.css({height:value});
-                elements.attr('data-mce-style',elements.attr('style'))
+                elements.attr('data-mce-style',elements.attr('style'));
             }
-            let tableId = checkInTable(elements);
-            if( tableId == this.sCurrentDocument.id)
-            tableId = '0';
+            let tableId = this.getTableWrapControl();
             if(name === "dataFlowId"){
                 this.setMappingForParamsDataFlow(data.value,tableId)
             }
+            let propType = "value";
             this.$store.commit(
-                "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value",instance:this.instance}
+                "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:propType,instance:this.instance}
             );   
             if((name == 'name' || name == 'title') && !this.isConfigPrint){
                 checkNameControl(this.instance);

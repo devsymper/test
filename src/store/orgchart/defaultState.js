@@ -27,9 +27,9 @@ const defaultState = {
     allUserInOrgChart: {},
     userInActiveNode: {},
     orgChartData: {},
+    listChildInCurrentNode: [],
     userInNode: {},
     listChildrenOfNode: {},
-
     getStructFlag: false,
     allOrgchartStruct: []
 };

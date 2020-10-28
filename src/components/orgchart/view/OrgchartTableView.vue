@@ -148,6 +148,7 @@
                     :action="'view'"
                     @current-tab="changeTab"
                     :currentTab="currentTab"
+                    :showMenuPickTab="true"
                     :id="$route.params.id">
                 </OrgchartEditor>
             </v-tab-item>
@@ -323,7 +324,6 @@ export default {
                 this.$refs.listUser.refreshList()
             }else{
                 this.widthContentCustom = $(window).width() - $(".resizable-component").width()  - 100
-                debugger
             }
             this.currentWidthContentCustom =  params.width 
         },

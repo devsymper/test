@@ -1,5 +1,5 @@
 <template>
-	<div class=" ml-4 mr-3 mt-3">
+	<div class=" ml-4 mr-3 mt-3 show-error-import">
         <div class="mb-1"><span class="ml-3 mt-3 fs-15" style="font-weight:430px">
              Import: 
             <span style="color:orange" v-if="importInfo.status=='Chưa import'">
@@ -14,8 +14,6 @@
              <span style="color:red" v-if="importInfo.status=='Lỗi'">
                 {{importInfo.status}}
             </span>
-    
-         
          </span></div>
         <div class="mb-1">
             <span class="ml-3 mt-3 fs-13">Tên đối tượng: </span>
@@ -40,15 +38,13 @@
         </div>
         <div class="mb-1">
               <div v-if="importInfo.status=='Đang xử lý'">
-               <v-btn small   color="primary" class="mt-4 ml-3" @click="stopImport()">Stop</v-btn>
+               <v-btn small  color="primary" class="mt-4 ml-3" @click="stopImport()">Stop</v-btn>
            </div>
         <v-data-table 
              v-if="errorImport&&errorImport.validating.errors.length>0"
             dense
-            style="font-size:13px!important"
             :headers="headers"
             :items="dataImport"
-            class="import-table"
         >
       </v-data-table>
         </div>
@@ -92,7 +88,7 @@ export default {
 	data(){
 		return {
             nameDocument:'',
-             dataImport: [],
+            dataImport: [],
         }
      },
      created(){
@@ -121,11 +117,6 @@ export default {
                     this.nameDocument = docInfo.name;
                 }
         },
-        // getValue(index){
-        //      for(let i=0; i<dataImport[index].length; i++){
-
-        //      }
-        // },
         pushImportDataToTable(){
             this.dataImport = [];
             let dataImport = JSON.parse( this.importInfo.infoImport).validating?JSON.parse( this.importInfo.infoImport).validating.errors:'';
@@ -135,24 +126,21 @@ export default {
                     for(let k = 0; k<dataImport[i].errors[j].info.length; k++){
                         this.dataImport.push({
                         stt: dem+1,
-                       // value: this.getValue(i),
                         row: dataImport[i].errors[j].info[k].row,
                         sheet: dataImport[i].sheet,
-                        status:dataImport[i].errors[j].type,
+                        status:dataImport[i].errors[j].type=="invalidDataType"?'Sai kiểu dữ liệu':dataImport[i].errors[j].type,
                         value:dataImport[i].errors[j].info[k].value
-                        // status: dataImport[i].status,
                     })
                     dem++;
                     } 
                 }
             }
-
         }
     }
 }
 </script>
-<style>
-    .v-data-table{
+<style scoped>
+    .show-error-import ::v-deep .text-start{
         font-size:13px!important
     }
 </style>

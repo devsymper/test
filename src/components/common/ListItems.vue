@@ -194,7 +194,6 @@
                 ></Pagination>
             </v-row>
         </div>
-    
         <component
             :is="actionPanelWrapper"
             :width="actionPanelWidth"
@@ -218,7 +217,6 @@
                 </v-card>
             </slot>
         </component>
-
         <symper-drag-panel
             v-else
             @before-close="handleCloseDragPanel"
@@ -410,18 +408,20 @@ export default {
                     }, time);
                 },
                 afterScrollVertically(){
-                    let count = 2;
-                    let delayTimer
-                    clearTimeout(delayTimer);
-                    let value = event
-                    delayTimer = setTimeout(function() {
-                        if(value.target.scrollTop > $(value.target).height()/6*0.7){
-                            if(count * 50 != self.pageSize){
-                               self.changePageSize({ pageSize: count * 50})
-                               count++;
+                    if(self.lazyLoad){
+                        let count = 2;
+                        let delayTimer
+                        clearTimeout(delayTimer);
+                        let value = event
+                        delayTimer = setTimeout(function() {
+                            if(value.target.scrollTop > $(value.target).height()/6*0.7){
+                                if(count != self.page){
+                                    self.nextPage(true)
+                                    count++;
+                                }
                             }
-                        }
-                    },500); 
+                        },500); 
+                    }
                 },
                 beforeContextMenuSetItems: () => {
                 },
@@ -539,21 +539,21 @@ export default {
             type: Boolean,
             default: false
         },
+        showImportHistoryBtn:{
+            type: Boolean,
+            default: false
+        },
         exportLink: {
+            type: String,
+            default: ''
+        },
+        widgetIdentifier: {
             type: String,
             default: ''
         },
         showExportButton: {
             type: Boolean,
-            default: false
-        },
-        showImportHistoryBtn:{
-            type: Boolean,
             default: true
-        },
-        widgetIdentifier: {
-            type: String,
-            default: ''
         },
         debounceRowSelectTime: {
             type: Number,
@@ -1067,7 +1067,6 @@ export default {
             this.savingConfigs = true;
             let thisCpn = this;
             let dataToSave = this.getTableDisplayConfigData();
-            debugger
             uiConfigApi
             .saveUiConfig(dataToSave)
             .then(() => {
@@ -1159,7 +1158,7 @@ export default {
          * @param {Boolean} cache có ưu tiên dữ liệu từ cache hay ko
          *
          */
-        getData(columns = false, cache = false, applyFilter = true) {
+        getData(columns = false, cache = false, applyFilter = true, lazyLoad = false ) {
             let thisCpn = this;
             let handler = (data) => {
                 if(thisCpn.customAPIResult.reformatData){
@@ -1172,7 +1171,15 @@ export default {
                 thisCpn.tableColumns = thisCpn.getTableColumns(
                     data.columns
                 );
-                thisCpn.data = data.listObject ? data.listObject : [];
+                let resData = data.listObject ? data.listObject : []
+                if(lazyLoad){
+                    resData.forEach(function(e){
+                        thisCpn.data.push(e)
+                    })
+                    // thisCpn.data.concat(resData)
+                }else{
+                    thisCpn.data = resData;
+                }
                 thisCpn.handleStopDragColumn();
                 //AnhTger config show description
                 (data.listObject).forEach(element => {
@@ -1597,9 +1604,9 @@ export default {
             this.getData();
             this.$emit("change-page", vl.page);
         },
-        nextPage(){
+        nextPage(lazyLoad = false){
             this.page += 1
-            this.getData();
+            this.getData(false , false , true ,lazyLoad);
             this.$emit("change-page", this.page);
         },
         prevPage(){
