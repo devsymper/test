@@ -1,5 +1,5 @@
 <template>
-    <div class="wraper-tracking pa-0" :class="{'d-none':stask.statusPopupTracking==false}" >
+    <div v-if="stask.statusPopupTracking" class="wraper-tracking pa-0" >
         <div class="tracking-process" style="height:100%" v-if="showType=='work'">
 			<v-row class="ma-0 pl-2 pt-2 fs-13" style="height:5%; border-bottom:1px solid #cecece">
 				{{definitionName}}
@@ -14,7 +14,6 @@
 				<v-col cols="8" class="h-100 pa-0 ma-0">
 					<v-row class="ma-0" style="height:60%">
 						<trackingProcessInstance
-							:needFocus="false"
 							v-if="workInfo.id"
 							:instanceId="workInfo.id"
 							@dataInstanceRuntime="dataInstanceRuntime"
@@ -32,7 +31,6 @@
         </div>
 		<div class="tracking-process" style="height:100%" v-else-if="showType==''">
             <trackingProcessInstance
-                :needFocus="false"
                 v-if="taskInfo.action.parameter.processInstanceId"
                 :instanceId="taskInfo.action.parameter.processInstanceId"
                 :elementId="taskInfo.action.parameter.activityId"
@@ -213,7 +211,8 @@ export default {
 		padding: 12px 6px 6px 11px;
 		transition: all ease-in-out 250ms;
 		border: 1px solid #dedede;
-    	box-shadow: 1px 1px  #e0d9d9;
+    	/* box-shadow: 2px 2px #bdb9b9; */
+		box-shadow: 1px 1px 3px 3px #dedede;
 		border-radius: 4px;
 	}
 </style>>

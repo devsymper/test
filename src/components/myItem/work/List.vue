@@ -118,7 +118,7 @@
                             cols="2"
                             class="fs-12 px-1 py-0 mt-2"
                         >
-                            <infoUser class="userInfo" :userId="obj.startUserId" :roleInfo="obj.roleInfo" />
+                            <infoUser class="userInfo" :userId="String(obj.startUserId)" :roleInfo="obj.roleInfo" />
                         
                         </v-col> 
                         <v-col

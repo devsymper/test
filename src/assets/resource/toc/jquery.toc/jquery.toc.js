@@ -94,6 +94,12 @@
                     $("<li/>").appendTo(stack[0]).append(
                         $("<a/>").text(elem.text()).attr("href", "#" + elem.attr("id")).attr("title", elem.text())
                     );
+                    
+                    /**Tger edit chèn link */
+                    // $("<li/>").appendTo(stack[0]).append(
+                    //     $("<a/>").text(elem.text()).attr("href","#/knowledge/document/"+options.hash+"/#" + elem.attr("id")).attr("title", elem.text())
+                    // );
+                    
 
                     currentLevel = level;
                 });

@@ -5,7 +5,7 @@
 	permanent
 	right
 	:width="sidebarWidth"
-	v-show="isShow"
+	v-if="isShow"
 	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)'}"
 	>
 	<div class="main-info">
