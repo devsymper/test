@@ -56,6 +56,12 @@ export default class Formulas {
         var formulas = this.formulas;
         formulas = await this.handleRunLocalFormulas(formulas, dataInput);
         formulas = await this.handleRunOrgChartFormulas(formulas, dataInput);
+        if (typeof formulas == 'object' && formulas.isStop) {
+            return {
+                server: true,
+                data: { data: formulas.data }
+            };
+        }
         let listSyql = this.getReferenceFormulas(formulas);
         if (listSyql != null && listSyql.length > 0) {
             for (let i = 0; i < listSyql.length; i++) {
@@ -117,11 +123,13 @@ export default class Formulas {
             if (listOrgChartFormulas != null && listOrgChartFormulas.length > 0) {
                 let item = {};
                 for (let i = 0; i < listOrgChartFormulas.length; i++) {
-                    let reverseData = sDocument.state.submit[this.keyInstance].orgchartTableSqlName[listOrgChartFormulas[i].trim()];
+                    let reverseData = undefined
+                    if (sDocument.state.submit[this.keyInstance]) {
+                        reverseData = sDocument.state.submit[this.keyInstance].orgchartTableSqlName[listOrgChartFormulas[i].trim()];
+                    }
                     if (reverseData == undefined) {
                         let orgChartFormulas = listOrgChartFormulas[i].trim();
-                        orgChartFormulas = orgChartFormulas.replace('orgchart(', '');
-                        orgChartFormulas = orgChartFormulas.replace('ORGCHART(', '');
+                        orgChartFormulas = orgChartFormulas.replace(/(orgchart|ORGCHART)\s*\(/g, '');
                         orgChartFormulas = orgChartFormulas.substring(0, orgChartFormulas.length - 1);
                         if (Object.keys(dataInput).length == 0) {
                             dataInput = false;
@@ -130,7 +138,7 @@ export default class Formulas {
                         let res = await this.queryOrgchart(orgChartFormulas);
                         let beforeStr = this.checkBeforeReferenceFormulas(formulas, listOrgChartFormulas[i].trim());
                         if (!beforeStr) {
-                            return res.data;
+                            return { isStop: true, data: res.data.fullInfo };
                         } else {
                             reverseData = await this.reverseDataToFormulas(res.data.fullInfo, beforeStr.trim().toLowerCase());
                             item[listOrgChartFormulas[i].trim()] = reverseData;
