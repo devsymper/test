@@ -5,14 +5,14 @@
 					<div style="width:15px; float:right">
 						<i class='mdi mdi-close' @click="close()"></i>
 					</div>
-					<span class="ml-0">
+					<span class="ml-0 fs-15">
 						Xem chi tiết
 					</span>
 				</h4>
 			</div>	
 		<v-stepper class="w-100 d-flex stepper-create-user">
-			<div class="w-100 ml-1 mt-2" v-if="!isViewUserRole">
-				<h4>{{ $t('user.general.personalInfo.title')}}
+			<div class="w-100 ml-1 mt-2 fs-15" v-if="!isViewUserRole">
+				<h4 style="font-weight:430!important">{{ $t('user.general.personalInfo.title')}}
 				
 				</h4>
 				<v-row class="mt-1" >
@@ -97,7 +97,7 @@
 					</v-col>	
 					<!-- ket thuc anh -->
 				</v-row>
-				<h4 class="mb-2">Phân quyền</h4>
+				<h4 class="mb-2 fs-15 fw-430">Phân quyền</h4>
 				<v-row  v-if="rolesOgchart.length>0" class="ml-5 fs-13 fw-430" >Vị trí</v-row>
 				<v-row class="ml-6" v-for="(rolesOg,index) in rolesOgchart" :key='index'>
 					<v-icon  class="icon-check mr-0 mt-2">mdi mdi-check</v-icon>
