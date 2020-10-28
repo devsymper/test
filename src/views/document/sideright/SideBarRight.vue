@@ -187,14 +187,21 @@ export default {
             }
         },
         handleChangeInput(name, input, data){
+            
             if(input.groupType == "formulas"){
+                let tableId = this.getTableWrapControl();
                 if(name == "autocomplete" && typeof data == 'object'){
                     this.$set(input.configData,'treeData',data.treeData);
                     this.$set(input.configData,'documentSelected',data.documentSelected);
                     this.$set(input.configData,'columnSelected',data.columnSelected);
                     this.$set(input.configData,'rejectInput',data.rejectInput);
                     this.$set(input,'value',data.sql);
-                    let tableId = this.getTableWrapControl();
+                    this.$store.commit(
+                        "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:input.configData,tableId:tableId,type:'configData',instance:this.instance}
+                    );  
+                }
+                else if(name == "linkConfig"){
+                    this.$set(input,'configData',data);
                     this.$store.commit(
                         "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:input.configData,tableId:tableId,type:'configData',instance:this.instance}
                     );  

@@ -434,6 +434,7 @@ let commonFormulas = {
     linkConfig: {
         title: "Link đến đối tượng hệ thống",
         value: "",
+        configData: [],
         formulasId: 0,
         type: "linkConfig",
         groupType: "formulas"

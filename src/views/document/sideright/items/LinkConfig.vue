@@ -10,6 +10,7 @@
                     item-text="title"
                     return-object
                     item-value="name"
+                    @change="saveConfig"
                     dense
                     solo
                 ></v-autocomplete>
@@ -20,7 +21,8 @@
                     ref="edtFormula"
                     class="sym-small-size"
                     :simpleMode="true"
-                    :value="item.formula.value"
+                    v-model="item.formula.value"
+                    @change="saveConfig"
                     :height="'80px'"
                 ></FormulaEditor>
             </div>
@@ -29,6 +31,7 @@
                     <v-text-field
                     v-model="item.title"
                     dense
+                    @change="saveConfig"
                     solo
                 ></v-text-field>
             </div>
@@ -46,11 +49,29 @@ export default {
     components:{
         FormulaEditor
     },
+    props:{
+        dataConfig:{
+            type:Array
+        }
+    },
+    watch:{
+        dataConfig:{
+            deep:true,
+            immediate:true,
+            handler:function(vl){
+                if(vl && vl.length > 0){
+                    this.listConfig = vl;
+                }
+                else{
+                    this.listConfig = [{objectType:null,formula:{id:0,value:""},title:""}]
+                }
+            }
+        }
+    },
     data(){
         return {
             listObject:[{type:'document',title:"Văn bản"},{type:'report',title:"Báo cáo"}],
-            titleDisplay:"",
-            listConfig:[{objectType:{type:'document',title:"Văn bản"},formula:{id:1245,value:"select x"},title:"hoang test"}]
+            listConfig:[{objectType:null,formula:{id:0,value:""},title:""}]
         }
     },
     methods:{
@@ -58,7 +79,7 @@ export default {
             this.listConfig.push({objectType:null,formula:{id:0,value:""},title:""})
         },
         saveConfig(){
-            // this.$emit('change',)
+            this.$emit('change',this.listConfig)
         }
     }
 }

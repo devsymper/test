@@ -249,7 +249,7 @@ const inputTypeConfigs = {
         tag: "v-tree-validate",
         props(config) {
             return {
-                label: config.title
+                label: config.title,
             };
         }
     },
@@ -258,7 +258,8 @@ const inputTypeConfigs = {
         tag: "s-link-config",
         props(config) {
             return {
-                label: config.title
+                label: config.title,
+                dataConfig:config.configData
             };
         }
     },
