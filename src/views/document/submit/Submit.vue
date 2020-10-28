@@ -894,7 +894,7 @@ export default {
             this.runFormulasControlEffected(controlIns.name,controlEffected);
         },
         getDataOrgchart(e){
-            let thisCpn = this
+            let thisCpn = this;
             let aliasControl = e.formulasInstance.autocompleteDetectAliasControl();
             let dataFromCache = this.getDataAutocompleteFromCache(e.e.target.value, aliasControl);
             if(dataFromCache == false){
@@ -908,9 +908,6 @@ export default {
                 this.$refs.autocompleteInput.setAliasControl(aliasControl);
                 this.$refs.autocompleteInput.setData(dataFromCache);
             }
-            // e.formulasInstance.handleBeforeRunFormulas(dataInput).then(res=>{
-            //     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val())
-            // });
         },
         /**
          * Hàm chạy công thức autocomplete để đổ dữ liệu vào box autucomplete, control select cũng dùng trường hợp này
