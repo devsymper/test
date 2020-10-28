@@ -118,7 +118,8 @@
                         :fileName="avatarFileName"
 						@selected-file="handleAvatarSelected"
                         ref="uploadAvatar"
-                        />
+                        :pickAvatar="true"  
+                    />
                 </div>
             </div>
             
