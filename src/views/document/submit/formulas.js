@@ -29,6 +29,7 @@ export default class Formulas {
              */
             this.type = type;
             this.inputControl = this.setInputControl();
+            this.inputFromDatasets = this.getDatasetEffectedFormula();
             this.refFormulas = this.getReferenceFormulas();
             this.orgChartFormulas = this.getOrgChartFormulas();
             this.localFormulas = this.getLocalFormulas();
@@ -431,38 +432,45 @@ export default class Formulas {
 
     // Hàm chạy công thức cho autocomplete
     handleRunAutoCompleteFormulas(dataInput = false) {
-        let listSyql = this.refFormulas;
-        if (listSyql != null && listSyql.length > 0) {
-            let syql = listSyql[0].trim();
-            syql = syql.replace('ref(', '');
-            syql = syql.replace('REF(', '');
+            let listSyql = this.refFormulas;
+            if (listSyql != null && listSyql.length > 0) {
+                let syql = listSyql[0].trim();
+                syql = syql.replace('ref(', '');
+                syql = syql.replace('REF(', '');
 
-            syql = syql.substring(0, syql.length - 1);
-            return this.runSyql(syql, dataInput);
-        } else {
-            let formulas = this.replaceParamsToData(dataInput, this.formulas);
-            return this.runSQLLiteFormulas(formulas, true);
+                syql = syql.substring(0, syql.length - 1);
+                return this.runSyql(syql, dataInput);
+            } else {
+                let formulas = this.replaceParamsToData(dataInput, this.formulas);
+                return this.runSQLLiteFormulas(formulas, true);
+            }
         }
-    }
+        /**
+         * Hàm chỉ ra control nào được alias để binding vào giá trị control sau khi chọn từ autocomplete
+         * @param {*} alias 
+         */
     autocompleteDetectAliasControl(alias = true) {
-        let formulas = this.getFormulas();
-        formulas = formulas.replace(/\r?\n|\r/g, ' ');
-        let selectColumn = formulas.match(/(?<=select|SELECT).*(?=from|FROM)/gi);
-        if (selectColumn == null) {
-            return 'column1';
+            let formulas = this.getFormulas();
+            formulas = formulas.replace(/\r?\n|\r/g, ' ');
+            let selectColumn = formulas.match(/(?<=select|SELECT).*(?=from|FROM)/gi);
+            if (selectColumn == null) {
+                return 'column1';
+            }
+            let control = selectColumn[0].match(/([a-zA-Z0-9_]+)\s+(as|AS)\s+(([a-zA-Z0-9_]+))/gi);
+            if (control == null) {
+                return "column1";
+            }
+            let controlAlias = control[0].split(/(as|AS)/);
+            if (alias && controlAlias.length > 1) {
+                return controlAlias[2].trim();
+            } else {
+                return controlAlias[0].trim();
+            }
         }
-        let control = selectColumn[0].match(/([a-zA-Z0-9_]+)\s+(as|AS)\s+(([a-zA-Z0-9_]+))/gi);
-        if (control == null) {
-            return "column1";
-        }
-        let controlAlias = control[0].split(/(as|AS)/);
-        if (alias && controlAlias.length > 1) {
-            return controlAlias[2].trim();
-        } else {
-            return controlAlias[0].trim();
-        }
-    }
-    autocompleteDetectTableQuery() {
+        /**
+         * Hàm chỉ ra table trong công thức
+         */
+    detectTableQuery() {
         let table = this.formulas.match(/(from|FROM)\s+(\w+\.)?(\w+)(?=\s+as)?(\s+\w+\n+)?/gim);
         if (table == null) {
             return false;
@@ -632,6 +640,20 @@ export default class Formulas {
             return true;
         }
         return false;
+    }
+    getDatasetEffectedFormula() {
+        let inputDatasets = {};
+        let allMappingDatasets = sDocument.state.submit[this.keyInstance].listControlMappingDatasets;
+        let table = this.detectTableQuery();
+        for (let index = 0; index < table.length; index++) {
+            const tableName = table[index];
+            for (let dataflowName in allMappingDatasets) {
+                if (allMappingDatasets[dataflowName].includes(tableName)) {
+                    inputDatasets[dataflowName] = true;
+                }
+            }
+        }
+        return inputDatasets;
     }
     getInputControl() {
             return this.inputControl;

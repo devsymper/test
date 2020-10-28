@@ -172,11 +172,15 @@ export default {
             })
             try {
                 let params = JSON.parse(currentDataflow[0].params);
+                let datasets = currentDataflow[0].datasets;
                 this.$store.commit(
                     "document/updateCurrentControlProps",{instance:this.instance,group:'table',prop:'mapParamsDataflow',typeProp:'value',value:params}
                 );  
-                 this.$store.commit(
+                this.$store.commit(
                     "document/updateProp",{id:this.sCurrentDocument.id,name:'mapParamsDataflow',value:params,tableId:tableId,type:"value",instance:this.instance}
+                );   
+                this.$store.commit(
+                    "document/updateProp",{id:this.sCurrentDocument.id,name:'mapParamsDataflow',value:datasets,tableId:tableId,type:"datasets",instance:this.instance}
                 );   
             } catch (error) {
                 
