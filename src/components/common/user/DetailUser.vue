@@ -120,7 +120,7 @@
                         ref="uploadAvatar"
                         :pickAvatar="true"
                         :autoUpload="false"
-                            />
+                    />
                 </div>
             </div>
             
