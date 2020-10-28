@@ -1,6 +1,6 @@
 <template>
     <div class="h-100 permission d-flex flex-column flex-grow-1">
-        <v-row>{{stepper}}
+        <v-row>
             <v-col class="col-md-8">
                 <v-btn 
                     small
