@@ -104,7 +104,6 @@ export default {
 										Handsontable.dom.empty(td);
 										span = document.createElement('span')
 										if(value === "1"){
-											
 											$(span).text('Kích hoạt')
 										}else{
 												$(span).text('Không kich hoạt')

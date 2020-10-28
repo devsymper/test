@@ -2,27 +2,38 @@
 	<div class="h-100">
 		<div class="h-100" v-if="!isSettingPasswordView&&!showViewInfo" >
 			<div class="h-100">
-				<h3 class="header-title fs-16" 
-					style="font-weight:430!important" 
-					v-if="actionType == 'add'">
-					{{ $t('user.other.createUser')}}
-				</h3>
-				<h3 class="header-title" v-if="actionType == 'edit'">
-					{{ $t('user.other.updateUser')}}
+				<h3 class="fw-430 header-title fs-16">
+					<div style="width:15px; float:right">
+						<i class='mdi mdi-close' @click="close()"></i>
+					</div>
+					<span v-if="actionType == 'add'">
+						{{ $t('user.other.createUser')}}
+					</span>
+					<span v-if="actionType == 'edit'">
+						{{ $t('user.other.updateUser')}}
+					</span>
 				</h3>
 				<v-stepper v-model="stepper" class="d-flex stepper-create-user">
 					<v-stepper-header class="stepper-header" >
-						<v-stepper-step class="fs-13 font-normal" editable step="1">
+						<v-stepper-step 
+							class="fs-13" 
+							editable 
+							step="1">
 							{{ $t('user.general.title')}}
 						</v-stepper-step>
-						<v-stepper-step :editable="editStep" @click="loadPermission()" step="2">
+						<v-stepper-step 
+							v-if="actionType == 'add'" 
+							:editable="editStep" 
+							@click="loadPermission()" 
+							step="2"
+						>
 							{{ $t('user.permission.title')}}
 						</v-stepper-step>
 					</v-stepper-header>
 				<v-stepper-items style="overflow:auto;overflow-y:scroll" class="stepper-items">
 					<v-stepper-content step="1">
 						<h4>{{ $t('user.general.personalInfo.title')}}</h4>
-						<v-row style="margin-bottom:-30px" >
+						<v-row style="margin-bottom:-10px" >
 							<!-- thong tin -->
 							<v-col cols="8" >
 								<v-row >
@@ -37,11 +48,11 @@
 										</span>
 									</v-col>
 								</v-row>
-								<v-row  style="margin-bottom:-15px">
+								<v-row class="mb-1" >
 									<v-col cols="6">
 										<v-text-field
 											outlined	
-											class="fs-13 font-normal"
+											class="fs-13 font-normal sym-small-size"
 											v-model="user.lastName"
 											dense
 										></v-text-field>
@@ -49,7 +60,7 @@
 									<v-col cols="6" >
 										<v-text-field
 											outlined	
-											class="fs-13 font-normal"
+											class="fs-13 font-normal sym-small-size"
 											v-model="user.firstName"
 											dense
 										></v-text-field>
@@ -60,13 +71,14 @@
 										<span class="fs-13 st-icon-pandora">
 											{{ $t('user.general.personalInfo.userName')}}
 										</span>
+										<span style="color:red">*</span>
 									</v-col>
 								</v-row>
-								<v-row  style="margin-bottom:-15px" >
+								<v-row class="mb-1" >
 									<v-col cols="12">
 										<v-text-field
 											outlined	
-											class="fs-13"
+											class="fs-13 sym-small-size"
 											ref="userName"
 											required
 											v-model="user.userName"
@@ -79,13 +91,14 @@
 										<span class="fs-13 st-icon-pandora">
 											{{ $t('user.general.personalInfo.displayName')}}
 										</span>
+										<span style="color:red">*</span>
 									</v-col>
 								</v-row>
-								<v-row  style="margin-bottom:-15px">
+								<v-row  class="mb-1">
 									<v-col cols="12">
 										<v-text-field
 											outlined	
-											class="fs-13"
+											class="fs-13 sym-small-size"
 											ref="displayName"
 											required
 											:rules="[rules.required]"
@@ -99,13 +112,14 @@
 										<span class="fs-13 st-icon-pandora">
 											{{ $t('user.general.personalInfo.email')}}
 										</span>
+										<span style="color:red">*</span>
 									</v-col>
 								</v-row>
-								<v-row  style="margin-bottom:-15px" >
+								<v-row class="mb-1" >
 									<v-col cols="12">
 										<v-text-field
 										outlined	
-										class="fs-13"
+										class="fs-13 sym-small-size"
 										ref="email"
 										v-model="user.email"
 										:rules="[rules.required, rules.email]"
@@ -124,7 +138,7 @@
 									<v-col cols="12">
 										<v-text-field
 											outlined
-											class="fs-13"
+											class="fs-13 sym-small-size"
 											v-model="user.phone"
 											dense
 										></v-text-field>
@@ -209,12 +223,14 @@
 								<v-btn class="btn-next-step"
 								ref="addUserBtn"
 								@click="validateForm()">
-								{{actionType=='add'?actionPanel="Tạo tài khoản":"Cập nhật tài khoản"}}
+								{{actionType=='add'?actionPanel="Lưu":"Cập nhật"}}
 								</v-btn>
 							</div>
 					</v-stepper-content>
 					<v-stepper-content step="2">
-						<Permission :userId="user.id" />
+						<Permission @change-width="changeWidth()"
+						:userId="user.id"
+						/>
 					</v-stepper-content>
 				</v-stepper-items>
 				</v-stepper>
@@ -223,16 +239,17 @@
 		<div class="h-100" v-if="isSettingPasswordView&&!showViewInfo">
 			<v-change-password
 				:user="detailInfoUser"
+				@close-panel="close()"
 				ref="changePass"
 				:resetPass="showPassPanel"
 			>
 			</v-change-password>
 		</div>
 			<DetailUserInfo 
-				class="h-100"
-				@edit-user-info="triggerEditUser" 
+				class="h-100" 
+				@change-width="changeWidth()"
+				@close-panel="close()"
 				v-if="showViewInfo"
-				:showUpdateBtn="true"
 				:showDetailView="showDetailView"
 				:detailInfo="detailInfoUser"
 			/>
@@ -296,7 +313,7 @@ export default {
 				lastName:'', 
 				displayName:'', 
 				userName:' ', 
-				email:' ', 
+				email:'', 
 				password:null, 
 				phone:'', 
 				active:true
@@ -384,8 +401,11 @@ export default {
   	},
   
   	methods:{
-		triggerEditUser(detailInfo){
-			this.$emit('edit-user-info', detailInfo);
+		changeWidth(){
+			this.$emit('change-width-panel')
+		},
+		close(){
+			this.$emit('close-panel')
 		},
         getAvatarUrl(){
               return appConfigs.apiDomain.fileManagement+'readFile/user_avatar_'+this.user.id;
@@ -978,22 +998,22 @@ export default {
 		font-size: 13px;
 	}
 	.stepper-header{
-		width: 200px;
+		width: 180px;
 		height: auto;
 		display: block;
 		border-right: 1px solid #eaeaea;
 		box-shadow: none;
 	}
 	.stepper-items{
-		width: calc(100% - 200px);
+		width:90%;
 	}
 	.stepper-items .row .col{
 		padding: 0 3px;
 	}
 	.stepper-header .v-stepper__step{
-		height: 30px;
-		margin: 10px;
-		padding: 20px;
+		height: 34px;
+		margin: 5px;
+		padding: 5px;
 		font-size: 14px;
 	}
 	.stepper-header .v-stepper__step--active{

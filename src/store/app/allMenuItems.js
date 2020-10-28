@@ -56,12 +56,18 @@ export default {
         title: "Report",
         icon: "mdi-view-dashboard-outline",
         group: "My work",
+        action: {
+            "module": "dashboard",
+            "resource": "dashboard",
+            "scope": "dashboard",
+            "action": "list"
+        },
     },
     orgchart: {
         title: "orgchart",
         icon: "mdi-office-building-outline",
         group: "My work",
-        children:{
+        children: {
             list: {
                 title: "listOrgchart",
                 link: "/orgchart"
@@ -141,7 +147,13 @@ export default {
         title: 'File',
         icon: 'mdi-upload-outline',
         link: '/file-management',
-        group: "Applications"
+        group: "Applications",
+        action: {
+            "module": "file",
+            "resource": "file",
+            "scope": "file",
+            "action": "list"
+        },
     },
     userManager: {
         title: "Account management",
@@ -202,24 +214,27 @@ export default {
                 icon: "mdi-access-point-network",
                 link: "/apps/trash"
             },
-           
+
         }
     },
     settingNotication: {
         title: 'Notification',
         icon: 'mdi-bell-check-outline',
-        link: '/setting-notification',
-        group: "Setting"
+        group: "Setting",
+        children: {
+            settingNotificationUser: {
+                title: "Notification User",
+                icon: "mdi-folder-account",
+                link: "/setting-notification",
+            },
+            settingNoticationBa: {
+                icon: 'mdi-bell-plus-outline',
+                title: "Notification Config BA",
+                icon: "mdi-access-point-network",
+                link: '/setting-notification-Ba',
+            },
+
+        }
     },
-    // comment: {
-    // 	title: 'tesstsdádasdad',
-    // 	icon: 'mdi-file-edit-outline',
-    // 	link: '/comment',
-    // },
-    // { title: "reports", icon: "mdi-view-dashboard", link: "/reports" },
-    // { title: "virtualdocs", icon: "mdi-table", link: "/virtualdocs" },
-    // { title: "methods", icon: "mdi-function", link: "/methods" },
-    // { title: "virtual_doc", icon: "mdi-table-sync", link: "/virtual-doc" },
-    // { title: "service", icon: "mdi-cogs", link: "/service" },
-    // { title: "snippets", icon: "mdi-contain", link: "/snippets" },
+
 };

@@ -97,8 +97,10 @@
         "isDefault": "SĐTC mặc định",
         "restore": "Khôi phục",
         "sidebar": {
+            "Notification Config BA": "Cài đặt thông báo",
             "Setting": "Cài đặt",
             "Notification": "Thông báo",
+            "Notification User": "Quản lý thông báo",
             "account_trash": "Tài khoản đã xóa",
             "Lists trash": "Danh sách bản xóa",
             "myApplication": "Ứng dụng của tôi",
@@ -212,6 +214,8 @@
         "table": {
             "history-import": {
                 "id": "ID",
+                "timeStartAt": "Thời gian tạo",
+                "timeSuccessAt": "Thời gian import thành công",
                 "userEmail": "Email người dùng",
                 "subObjType": "Loại đối tượng",
                 "objId": " Tên đối tượng",
@@ -220,12 +224,13 @@
                 "createdAt": "Ngày tạo",
                 "status": "Trạng thái",
                 "fileName": "Tên tệp",
-                "nameImport": "Nội dung"
-
-
+                "nameImport": "Tên lần import",
+                "rowCount": "Tổng số dòng",
+                "colCount": "Tổng số cột"
             },
             "contextMenu": {
-                "viewDetail": "Xem chi tiết"
+                "viewDetail": "Xem chi tiết",
+                "download": "Tải file Excel"
             }
         }
     },
@@ -236,7 +241,8 @@
             "update_success": "Cập nhật tài khoản thành công!",
             "user_name_already_exist": "Tên tài khoản đã tồn tại",
             "Old password incorrect": "Mật khẩu cũ không đúng",
-            "successChangePass": "Đổi mật khẩu thành công"
+            "successChangePass": "Đổi mật khẩu thành công",
+            "invalid email!": "Email không hợp lệ"
 
         },
         "title": "Danh sách User",
@@ -493,8 +499,10 @@
         "Timesheet": "Thời gian biểu"
     },
     "objects": {
+        "user": "Tài khoản người dùng",
         "document_instance": "Bản ghi dữ liệu",
         "account": "Nhân viên",
+        "action_pack": "Action Pack",
         "document_definition": "Loại văn bản",
         "document": "Văn bản",
         "workflow_definition": "Workflow",
@@ -975,7 +983,9 @@
                 "execute": "Khởi tạo",
                 "list": "Danh sách",
                 "favorite": "Thêm vào yêu thích",
-                "unfavorite": "Loại bỏ yêu thích"
+                "unfavorite": "Loại bỏ yêu thích",
+                "drop": "Xóa",
+                "update": "Cập nhật"
             },
             "orgchart": {
                 "create": "Tạo mới ",
@@ -1030,7 +1040,20 @@
             "application_definition": {
                 "update": "Sửa",
                 "view": "Xem",
-                "remove": "Xóa"
+                "remove": "Xóa",
+                "create": "Tạo"
+            },
+            "knowledge": {
+                "update": "Sửa",
+                "view": "Xem",
+                "remove": "Xóa",
+                "create": "Tạo"
+            },
+            "file": {
+                "update": "Sửa",
+                "view": "Xem",
+                "remove": "Xóa",
+                "create": "Tạo"
             }
         },
         "iconListActions": {
@@ -1088,6 +1111,22 @@
         "successTitle": "Thành công",
         "older": "Cũ hơn",
         "today": "Hôm nay"
+    },
+    "notificationConfig": {
+        "table": {
+            "id": "ID",
+            "objectType": "Module phát sinh",
+            "event": "Hành động sinh thông báo",
+            "defaultUser": "Đối tượng nhận",
+            "description": "Nội dung thông báo",
+            "subscribed": "Trạng thái",
+            "state": "Trạng thái",
+            "userCreate": "Người tạo",
+            "userUpdate": "Người cập nhật",
+            "createAt": "Ngày tạo",
+            "updateAt": "Ngày cập nhật",
+            "subscribedAt": "Ngày theo dõi"
+        }
     },
     "virtualdoc": {
         "header": {

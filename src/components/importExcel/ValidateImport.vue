@@ -25,6 +25,9 @@
                 {{processing.preprocessing.processed?processing.preprocessing.processed:0}}</span></v-row>
             <BeatLoader class="justify-center d-flex custom-class" :size="10" color="orange" />
         </v-list>
+        <v-list>
+            <v-btn small  color="primary" class="mt-4 ml-7" @click="stopImport()">Stop</v-btn>
+        </v-list>
         <!-- kiểm tra dữ liêu -->
         <v-list 
             dense 
@@ -172,7 +175,9 @@
                     Email
                 </v-col>
             </v-row>
-           <div v-if="existEmail.length>0" class="ml-0 mr-4" v-for="(error, errorIdxUser) in existEmail" :key="errorIdxUser"  >
+           <div v-if="existEmail.length>0" 
+               class="ml-0 mr-4" 
+               v-for="(error, errorIdxUser) in existEmail" :key="errorIdxUser"  >
                         <!-- xử lý trường hợp không đúng định dạng dữ liệu -->
                 <div>
                     <v-row class="ml-0 mr-1" style="background-color:#F5F5F5 ">
@@ -262,6 +267,18 @@ export default {
     },
     props:['fileName','setInterval','importFile'],
     methods: {
+        stopImport(){
+             importApi.cancelImport(this.fileName)
+              .then(res => {
+                    if (res.status === 200) {
+                         this.$snotify({
+                            type: "success",
+                            title: res.message
+                    });  
+                        }
+                    })
+                   .catch(console.log);
+        },
         getPercentage(process, total){
             let result = (process/total).toFixed(4)*1000/10;
             result = String(result);

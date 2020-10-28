@@ -30,7 +30,7 @@ export default [{
         ...commonProps,
         "action": "list",
         "handler": function(param) {
-
+            window.open('https://bi.symper.vn', '_blank');
         }
     },
     {
