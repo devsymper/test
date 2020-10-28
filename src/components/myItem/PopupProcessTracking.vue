@@ -61,7 +61,9 @@ export default {
 			icon:{
 				processName:"mdi-progress-check	",
 				startEvent:"mdi-play-outline",
-				userTask:"mdi-file-document-edit-outline",
+				submitTask:"mdi-file-document-edit-outline",
+				approvalTask:"mdi-check",
+				updateTask:"mdi-file-document-edit-outline",
 				callActivity:"mdi-cog-outline",
 				endEvent:"mdi-record",
 				httpServiceTask:"mdi-email-send-outline"
@@ -92,7 +94,7 @@ export default {
 		}
     },
     methods:{
-		dataInstanceRuntime(data,isCheck=false){
+		async dataInstanceRuntime(data,isCheck=false){
 			let arrIndexRemove=[];
 			for(let index in data){
 				let nodeInfo = data[index];
@@ -106,9 +108,13 @@ export default {
 							data[index].time=data[index].startTime;
 							data[index].icon=this.icon[data[index].activityType];
 						}else{
+							let typeTask="startEvent";
+							if (data[index].taskId) {
+								typeTask=await this.checkTypeTask(data[index].taskId); // kiểm tra task là task submit or duyệt or update
+							}
 							data[index].name=data[index].activityName;
 							data[index].time=data[index].startTime;
-							data[index].icon=this.icon[data[index].activityType];
+							data[index].icon=this.icon[typeTask];
 						}
 						
 					}
@@ -144,9 +150,6 @@ export default {
 							}
 						}
 					}
-					// if (nodeInfo.activityType.includes('httpServiceTask')) {
-						
-					// }
 				}
 			}
 			await self.getNameProcessInstance(data);
@@ -176,6 +179,23 @@ export default {
 				nodeId.assignee=String(value.data.userId);
 				nodeId.type="symper_service_notification";
 				nodeId.dataType=value.data;
+			}
+		},
+		async checkTypeTask(taskId){
+			let filter={};
+			filter.taskId=taskId;
+			let res= await bpmneApi.postTaskHistory(filter);
+			if (res.total>0) {
+                let desc=JSON.parse(res.data[0].description);
+                if (desc.action.action=="submit") {
+                   	return "submitTask";
+                }else if(desc.action.action=="approval"){
+                  	return "approvalTask";
+                }else if(desc.action.action=="update"){
+                   	return "updateTask";
+                }
+            }else{
+				return "submitTask";
 			}
 		}
 

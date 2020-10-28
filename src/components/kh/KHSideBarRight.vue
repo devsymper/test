@@ -683,22 +683,6 @@ export default {
     created() {
         this.getData();
     },
-    mounted() {
-        $("#toc").on("click", function(event) {
-            
-           
-        // var p = $(this);
-        // var pos = p.offset();
-        // //console.log(p[0].offsetLeft);
-        // console.log(pos);
-        //alert($(this).attr("href"));
-        //  var oldHref=$(this).attr("href");
-        //  var url=window.location.href;
-        //  var newUrl=url+oldHref;
-        //  alert(newUrl);
-        //$(this).attr("href",newUrl);
-        });
-    }
 };
 </script>
 
