@@ -18,10 +18,10 @@ export const userApi = {
         };
         return api.post(appConfigs.apiDomain.account + "auth/login", data);
     },
-    changePassUser(pass) {
+    changePassUser(oldPass, newPass) {
         let data = {
-            oldPassword: pass,
-            newPassword: pass
+            oldPassword: oldPass,
+            newPassword: newPass
         };
         return api.post('user/change-password', data)
     },

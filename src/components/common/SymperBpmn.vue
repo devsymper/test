@@ -78,10 +78,12 @@ export default {
                     if (err) {
                         console.error(err, "errror on import XML");
                     }else{
-                        self.$emit('after-render-diagram-from-xml', {})
+                        self.$emit('after-render-diagram-from-xml', {});
                     }
+                    self.$emit('after-render-diagram-from-xml', {});
+
                 });
-            }, 100);
+            }, 200);
      
         }
     },

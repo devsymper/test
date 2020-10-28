@@ -94,7 +94,7 @@
                     $("<li/>").appendTo(stack[0]).append(
                         $("<a/>").text(elem.text()).attr("href", "#" + elem.attr("id")).attr("title", elem.text())
                     );
-
+                    
                     currentLevel = level;
                 });
             });
