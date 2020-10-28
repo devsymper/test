@@ -1,6 +1,7 @@
 <template>
     <div style="width: 300px" class="user-popup">
         <div class="mt-3 ml-4 fs-15 fw-430">
+            
             {{detailUser.firstName?detailUser.firstName:' '+' '+ detailUser.lastName?detailUser.lastName:' '}}
             <div v-if="rolesOgchart.length>0" class="fs-13 fw-430"  >
                 <v-menu :nudge-left="194">
@@ -14,6 +15,9 @@
                         </template>
                         <v-row class="ml-2 mt-2 fs-13" style=" width:180px!important; background-color:white!important" v-for="(rolesOg,index) in rolesOgchart" :key='index'>
                             {{rolesOg.name}}
+                              <v-icon  color="green" v-if="currentRole.id == rolesOgchart.id">
+                            mdi-check
+                        </v-icon>
                         </v-row>
                 </v-menu>	
             </div>
@@ -59,6 +63,11 @@ props:['userId'],
   },
   components:{
     symperAvatar
+  },
+  computed:{
+      currentRole(){
+            return this.$store.state.app.endUserInfo.currentRole;
+        }
   },
   created () {
       this.getDetailUser();

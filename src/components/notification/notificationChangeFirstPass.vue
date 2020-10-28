@@ -131,7 +131,6 @@ export default {
                         type: "success",
                         title: this.$t("user.notification.successChangePass")
                     });
-                    debugger
                     self.$emit('cancel');
                    
                 } else {
