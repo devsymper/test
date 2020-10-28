@@ -108,7 +108,7 @@ export default {
 							data[index].time=data[index].startTime;
 							data[index].icon=this.icon[data[index].activityType];
 						}else{
-							let typeTask="startEvent";
+							let typeTask=data[index].activityType;
 							if (data[index].taskId) {
 								typeTask=await this.checkTypeTask(data[index].taskId); // kiểm tra task là task submit or duyệt or update
 							}
@@ -124,7 +124,7 @@ export default {
 				data.splice(arrIndexRemove[i],1);
 			}
 			if (isCheck==false) {
-				this.getChildrenCallActivity(data);
+				await this.getChildrenCallActivity(data);
 			}else{
 				return data;
 			}
@@ -142,7 +142,7 @@ export default {
 							res=await bpmneApi.getProcessInstanceRuntimeHistory(idInstance);
 							detailProcess=await bpmneApi.getProcessInstanceHistory({processInstanceId:idInstance});
 							if (res.total>0) {
-								let child=self.dataInstanceRuntime(res.data,true);
+								let child=await self.dataInstanceRuntime(res.data,true);
 								data[index]['children']=child;
 								data[index]['name']=nodeInfo.activityName;
 								data[index]['time']=detailProcess.data[0].startTime;
