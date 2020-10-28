@@ -115,19 +115,6 @@ const getBackupDocument = async(context, hash) => {
         SYMPER_APP.$snotifyError(error, "Can not get backup document !");
     }
 }
-const getFileAttachment = async(context, hash) => {
-    try {
-        let res = await knowledgeApi.getListFileDocument(hash);
-        if (res.status == 200) {
-            if (res.data != null) {
-                context.commit('setArrIdFileAttach', res.data);
-
-            }
-        }
-    } catch (error) {
-        SYMPER_APP.$snotifyError(error, "Can not get file attachment document !");
-    }
-}
 const getArrFileAttachment = async(context, data) => {
     try {
         let res = await knowledgeApi.getFileByList(data);
@@ -235,7 +222,6 @@ export {
     removeDirToListChildTableStore,
     removeDirToTableRootStore,
     addToTableChildStore,
-    getFileAttachment,
     getArrFileAttachment,
     addToListAttachStore,
     removeFileAttachToStore,

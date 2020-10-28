@@ -100,7 +100,6 @@ export default {
 		doSearch(val,time){
 			clearTimeout(delayTimer);
 			let self = this;
-			debugger
 			delayTimer = setTimeout(function() {
 				self.getListSearch(val)
 			}, time); 

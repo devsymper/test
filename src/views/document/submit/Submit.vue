@@ -309,19 +309,6 @@ export default {
         UploadFile,
         SidebarTraceFormulas,
         VuePerfectScrollbar,
-        VBoilerplate: {
-            functional: true,
-            render (h, { data, props, children }) {
-            return h('v-skeleton-loader', {
-                ...data,
-                props: {
-                boilerplate: true,
-                elevation: 2,
-                ...props,
-                },
-            }, children)
-        },
-        },
     },
     computed: {
         sDocumentEditor() {
@@ -2195,7 +2182,7 @@ export default {
 					let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
 					let controlFormulas = controlInstance.controlFormulas;
 					for(let formulasType in controlFormulas){
-						if(formulasType != 'autocomplete' && formulasType != 'list'){
+						if(!['autocomplete','list','autocompleteAuto'].includes(formulasType)){
                             let formulasInstance = controlFormulas[formulasType].instance;
 							this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
 						}
@@ -2211,7 +2198,7 @@ export default {
 						if(Object.keys(controlInstance.controlFormulas).length > 0){
 							let controlFormulas = controlInstance.controlFormulas;
 							for(let formulasType in controlFormulas){
-								if(formulasType != 'autocomplete' && formulasType != 'list'){
+								if(!['autocomplete','list','autocompleteAuto'].includes(formulasType)){
 									if(controlFormulas[formulasType].hasOwnProperty('instance')){
                                         let formulasInstance = controlFormulas[formulasType].instance;
                                         let controlRootInTable = this.checkControlOutSideTable(controlInstance,formulasInstance.getInputControl());

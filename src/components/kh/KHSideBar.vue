@@ -1,42 +1,42 @@
 <template>
   <vue-resizable  @resize:end="resizeSidebar" :width="skh.widthSideBar" style="height: calc(100% - 10px);">
     <v-navigation-drawer class="khSidebar resizable-content" v-show="!skh.subCollapseSideBar">
-      <div>
+      <div class="sideBar h-100">
         <v-text-field
-          v-model="search"
-          background-color="#F7F7F7"
-          class="d-inline-block mr-2 sym-small-size pa-1 w-100"
-          single-line
-          append-icon="mdi-magnify"
-          dense
-          @keyup="changeValueOpenAll"
-          solo
-          label="Search"
-          :placeholder="$t('common.search')"
+            v-model="search"
+            background-color="#F7F7F7"
+            class="d-inline-block mr-2 sym-small-size pa-1 w-100"
+            single-line
+            append-icon="mdi-magnify"
+            dense
+            @keyup="changeValueOpenAll"
+            solo
+            label="Search"
+            :placeholder="$t('common.search')"
         ></v-text-field>
         
-        <div class="kh-side-bar">
-          <v-container style="height: calc(100% - 65px);overflow: auto;">
-            <div class="workspace">
-              <div class="symper-title">WORKSPACE</div>
-              <div class="icon-add">
-                <v-icon v-on:click="addNode()" class="fs-16 add-folder">mdi-plus</v-icon>
-              </div>
-            </div>
-            <div class="kh-add-node-parent" v-bind:class="{'d-none' : !showAddNode}">
-              <v-list-item-group class="favorite">
-                <v-list-item>
-                  <v-icon class="fs-14">mdi-folder</v-icon>
-                  <v-text-field
-                    v-model="txtNode"
-                    v-on:keyup="validateAddNode"
-                    ref="newFolderInput"
-                    @blur="handleBlur"
-                    class="fs-13"
-                  ></v-text-field>
-                </v-list-item>
-              </v-list-item-group>
-            </div>
+        <div class="kh-side-bar" style="height: calc(100% - 36px);">
+            <v-container style="height: 100%;overflow: auto;">
+                <div class="workspace">
+                    <div class="symper-title">WORKSPACE</div>
+                    <div class="icon-add">
+                        <v-icon v-on:click="addNode()" class="fs-16 add-folder">mdi-plus</v-icon>
+                    </div>
+                </div>
+                <div class="kh-add-node-parent" v-bind:class="{'d-none' : !showAddNode}">
+                    <v-list-item-group class="favorite">
+                        <v-list-item>
+                            <v-icon class="fs-14">mdi-folder</v-icon>
+                            <v-text-field
+                                v-model="txtNode"
+                                v-on:keyup="validateAddNode"
+                                ref="newFolderInput"
+                                @blur="handleBlur"
+                                class="fs-13"
+                            ></v-text-field>
+                        </v-list-item>
+                    </v-list-item-group>
+                </div>
             <template>
               <v-treeview
                 v-model="tree"
@@ -71,6 +71,7 @@
                           :id="item.id ? item.id: item.path"
                           @click="dbclickDoc(item.path,item.id,item.hash)"
                           class="objTitle"
+                          style="width:80%"
                         >{{item.name}}</p>
                       </template>
                       <span>{{ item.name }}</span>
@@ -970,4 +971,8 @@ export default {
 .khSidebar hr {
   display: none;
 }
+.side-bar-item >>>.v-btn__content{
+  width: 100%;
+}
+
 </style>

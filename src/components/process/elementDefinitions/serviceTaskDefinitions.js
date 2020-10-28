@@ -50,7 +50,7 @@ export default {
             this.params.responseVariableName = 'symper_'+nodeAttr.idNode+'_notification_response';
             let title = nodeAttr.serviceNotificationTitle.value;
             let description = nodeAttr.serviceNotificationDescription.value;
-            let receiver =userAssignmentToXMLValue(nodeAttr.serviceNotificationReceiver.value);
+            let receiver =userAssignmentToXMLValue(nodeAttr.serviceNotificationReceiver.value,true);
             let nodeAction=nodeAttr.serviceNotificationActionForElement.value;
             let action={
                 module:'workflow',

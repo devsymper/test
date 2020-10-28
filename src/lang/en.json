@@ -98,6 +98,7 @@
         "restore": "Restore",
         "sidebar": {
             "Setting": "Setting",
+            "action_pack": "Action Pack",
             "Notification": "Notification",
             "account_trash": "Account trash",
             "myApplication": "My Application",
@@ -205,6 +206,31 @@
             "clear_filter": "Clear filter",
             "filter_by_value": "Filter by value",
             "filter_by_condition": "Filter by condition"
+        }
+    },
+    "import": {
+        "import_history": "Import History",
+        "table": {
+            "history-import": {
+                "id": "ID",
+                "timeStartAt": "Start time",
+                "timeSuccessAt": "Success Time",
+                "userEmail": "Email ",
+                "subObjType": "Object type",
+                "objId": " Object name",
+                "description": "Description",
+                "userId": "User import",
+                "createdAt": "Date create",
+                "status": "Status",
+                "fileName": "File name",
+                "nameImport": "Name import",
+                "rowCount": "Total row",
+                "colCount": "Total column"
+            },
+            "contextMenu": {
+                "viewDetail": "Detail",
+                "download": "Download Excel"
+            }
         }
     },
     "user": {
@@ -474,8 +500,8 @@
                 }
             },
             "sidebarLeft": {
-                "document" : "Document",
-                "column" : "Column"
+                "document": "Document",
+                "column": "Column"
             }
         },
         "submit": {
@@ -640,9 +666,19 @@
         "Department": "Department",
         "Timesheet": "Timesheet"
     },
+    "notificationConfig": {
+        "table": {
+            "id": "ID",
+            "objectType": "Module",
+            "event": "Event",
+            "defaultUser": "Đối tượng nhận",
+            "description": "Description",
+            "subscribed": "State"
+        }
+    },
     "objects": {
         "document_instance": "Document instance",
-        "user": "Nhân viên",
+        "user": "User",
         "document_definition": "Loại văn bản",
         "document": "Văn bản",
         "workflow_definition": "Workflow",
@@ -796,7 +832,20 @@
             "application_definition": {
                 "update": "Update",
                 "view": "View",
-                "remove": "Remove"
+                "remove": "Remove",
+                "create": "Create"
+            },
+            "knowledge": {
+                "update": "update",
+                "view": "view",
+                "remove": "remove",
+                "create": "create"
+            },
+            "file": {
+                "update": "update",
+                "view": "view",
+                "remove": "remove",
+                "create": "create"
             }
         },
         "iconListActions": {

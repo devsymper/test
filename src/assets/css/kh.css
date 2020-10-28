@@ -75,7 +75,6 @@
     padding-bottom: 2px;
     margin: 0px;
     overflow: hidden;
-    width: 108px;
     text-align: left;
 }
 
@@ -514,16 +513,14 @@
 .kh-comment .v-toolbar__content {
     border-bottom: 1px solid #cccccc;
     padding: 0px;
-    padding-left: 4px;
+    padding-left: 8px;
     height: 33px!important;
 }
 
 .kh-comment .v-toolbar__extension {
     border-bottom: 1px solid #cccccc!important;
     padding: 0px!important;
-    padding-right: 10px!important;
 }
-
 .kh-comment .v-toolbar__extension .v-item-group .v-slide-group__wrapper .v-slide-group__content .v-tab {
     padding: 0px!important;
     padding-right: 16px!important;
@@ -532,11 +529,6 @@
 .kh-comment .v-toolbar__content .v-toolbar__title {
     font-weight: 500!important;
 }
-
-.kh-comment {
-    margin-left: 1px;
-}
-
 
 /* Handson table */
 

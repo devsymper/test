@@ -78,7 +78,7 @@ export default {
                 "scope": "account",
             },
             getListUrl: {},
-            actionPanelWidth:800,
+            actionPanelWidth:600,
             containerHeight: 200,
             userInfo:{},
             tableContextMenu:{           
@@ -99,7 +99,6 @@ export default {
             },
             columns: [],
             data: [],
-            totalPage: 6,
             actionType:'',
             isSettingPasswordView : false,
             showViewInfo: false

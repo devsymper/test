@@ -120,8 +120,8 @@
                                     cols="2"
                                     class="fs-13 "
                                 >  
-                                    <symperAvatar :size="20" :userId="workInfo.startUserId" />
-                                    {{workInfo.startUserName}}
+							        <infoUser class="userInfo " :userId="workInfo.startUserId" :roleInfo="workInfo.roleInfo" />
+
                                 </v-col>
                                 <v-col
                                     cols="2"
@@ -181,8 +181,8 @@
                                         cols="2"
                                         class="fs-13 "
                                     >  
-                                        <symperAvatar :size="20" :userId="workInfo.startUserId" />
-                                         {{workInfo.startUserName}}
+							            <infoUser class="userInfo " :userId="workInfo.startUserId" :roleInfo="workInfo.roleInfo" />
+
                                     </v-col>
                                     <v-col
                                         cols="2"
@@ -243,8 +243,8 @@
                                         cols="2"
                                         class="fs-13 "
                                     >  
-                                        <symperAvatar :size="20" :userId="workInfo.startUserId" />
-                                        {{workInfo.startUserName}}
+							            <infoUser class="userInfo " :userId="workInfo.startUserId" :roleInfo="workInfo.roleInfo" />
+
                                     </v-col>
                                     <v-col
                                         cols="2"
@@ -312,7 +312,6 @@ import icon from "@/components/common/SymperIcon";
 import BPMNEngine from "@/api/BPMNEngine.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { appManagementApi } from '@/api/AppManagement';
-import symperAvatar from "@/components/common/SymperAvatar.vue";
 import listTask from "./ListTask";
 import workDetailSub from "./WorkDetailSub";
 import SideBarDetail from "./SideBarDetail";
@@ -324,6 +323,7 @@ import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
 } from "@/components/process/processAction";
+import infoUser from "./../InfoUser";
 
 export default {
     name: "WorkDetail",
@@ -358,11 +358,11 @@ export default {
         icon: icon,
         listTask,
         VuePerfectScrollbar,
-        symperAvatar,
         workDetailSub,
         SideBarDetail,
         KHShowFile,
-        PopupProcessTracking
+        PopupProcessTracking,
+        infoUser
     },
     data: function() {
         return {
