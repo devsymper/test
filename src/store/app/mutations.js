@@ -85,6 +85,11 @@ const setUserActionsForObjects = (state, data) => {
     Vue.set(state, 'userOperations', data)
 }
 
+const setAccountType = (state, data) =>{
+    // state.accountType = data
+    debugger
+    Vue.set(state, 'accountType', data)
+}
 export {
     changeCollapseSidebar,
     increaseUnreadNotification,
@@ -100,5 +105,6 @@ export {
     setUserRoleByType,
     setUserActionsForObjects,
     setAllSymperRoles,
-    changeStatus
+    changeStatus,
+    setAccountType
 };
