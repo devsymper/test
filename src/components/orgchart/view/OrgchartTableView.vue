@@ -114,7 +114,6 @@
                                     }">
                                 </AgDataTable>
                         </VueResizable>
-          <!-- @on-cell-mouse-over="onCellMouseOver" -->
                            </div>
                        <ListItems 
                              ref="listUser"
@@ -200,14 +199,6 @@ export default {
     mounted(){
         this.containerHeight = util.getComponentSize(this).h
         this.currentSize =  util.getComponentSize(this)
-        $('.item-no-permission').on('click',function(e){
-            e.preventDefault()
-            e.stopPropagation()
-            this.$snotify({
-                type: 'error',
-                title: "Ban khong co quyen"
-            })
-        })
     },
     computed: {
         allUserInOrgchart(){
@@ -406,34 +397,25 @@ export default {
             }
         },
         onCellDblClick(params){
-            params.data.orgchartId =  this.$route.params.id;
-            this.$store.commit('orgchart/emptyListChildrenNode',this.$route.params.id)
-            this.$store.dispatch('orgchart/updateUserInNode',params.data)
-            this.listUserInNode = this.$store.getters['orgchart/listUserInChildrenNode'](this.$route.params.id);
-            this.$store.commit('orgchart/setAllUserInOrgchart',{
-                orgchartId:  this.$route.params.id,
-                listUsers: this.listUserInNode
-            })
+            let active = params.event.target.parentNode.outerHTML.includes('item-no-permission') ?  false : true
+            if(active){
+                params.data.orgchartId =  this.$route.params.id;
+                this.$store.commit('orgchart/emptyListChildrenNode',this.$route.params.id)
+                this.$store.dispatch('orgchart/updateUserInNode',params.data)
+                this.listUserInNode = this.$store.getters['orgchart/listUserInChildrenNode'](this.$route.params.id);
+                this.$store.commit('orgchart/setAllUserInOrgchart',{
+                    orgchartId:  this.$route.params.id,
+                    listUsers: this.listUserInNode
+                })
+            }else{
+                this.$snotify({
+                    type: 'error',
+                    title:'Bạn không có quyền xem danh sách user của phòng ban này'
+                })
+            }
+           
         },
-        // onCellClick(params){
-        //     let self = this
-        //     let objId = "orgchart:"+this.$route.params.id+':'+params.data.vizId
-        //         orgchartApi.getDescriptionNode({object_identifier:objId}).then(res=>{
-        //              if(res.data.length > 0){
-        //                 let idDoc = res.data[0].documentObjectId
-        //                 self.docObjInfo = {docObjId:idDoc,docSize:'21cm'}
-        //                 self.$refs.listUser.actionPanel = true;
-        //             }else{
-        //                 self.$snotify({
-        //                     type: "error",
-        //                     title: "Không tìm thấy hồ sơ nhân sự",
-        //                 });
-        //             }
-        //             // self.docObjInfo = {docObjId:objId,docSize:'21cm'}
-        //             // self.$refs.listUser.actionPanel = true;
-        //         }).catch(err=>{
-        //         })
-        // },
+      
         onCellContextMenu(params){
              let self = this
              let objId = "orgchart:"+this.$route.params.id+':'+params.data.vizId
@@ -451,15 +433,6 @@ export default {
                 }).catch(err=>{
                 })
         },
-        // onCellMouseOver: _.debounce(function(params){
-        //     let self = this
-        //     let objId = "orgchart:"+this.$route.params.id+':'+params.data.vizId
-        //         orgchartApi.getDescriptionNode({object_identifier:objId}).then(res=>{
-        //             self.docObjInfo = {docObjId:objId,docSize:'21cm'}
-        //             self.$refs.listUser.actionPanel = true;
-        //         }).catch(err=>{
-        //         })
-        // },500),
         onTabClicked(data){
             this.currentTab = data.action
             this.titleToolbar = data.title
@@ -530,8 +503,6 @@ export default {
                        ],
                        listObject:res.data.listObject,
                        total:res.data.listObject.length,
-                         
-
                    }
                 }
             },

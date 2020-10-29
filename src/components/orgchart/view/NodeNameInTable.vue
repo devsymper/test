@@ -54,45 +54,44 @@ export default {
         checkPermission(){
             debugger
             let self = this
-            console.log(this.$store.state.app.accountType ,'this.$store.state.app.accountType ');
-            if(this.$store.state.app.accountType == "ba"){
+            if(this.$store.state.app.baInfo.email != ""){
                 return true
             }else{
                 let idCurrentUser = this.$store.state.app.endUserInfo.id
                 let viewOnlySub = this.$store.state.orgchart.viewOnlySub
                 let data = this.params.data
-
-
-                if(viewOnlySub == false){
-                    if(data.users.includes(idCurrentUser)){
-                        this.$store.commit('orgchart/changeViewOnlySub')
+                if(this.$store.state.app.userOperations.department){
+                    let permission = this.$store.state.app.userOperations.department[0]
+                    if(permission.view_all){
                         return true
-                    }else{
-                        return false
                     }
-                }else{
-                    let listUser = this.$store.getters['orgchart/listUserInCurrentNode']
-                    if(listUser.includes(idCurrentUser)){
-                        return true
-                    }else{
-                        return false
+                    if(permission.view_only_owner){
+                        if(data.users.includes(idCurrentUser)){
+                            return true
+                        }else{
+                            return false
+                        }
+                    }    
+                    else if(permission.view_only_sub){
+                        if(viewOnlySub == false){
+                            if(data.users.includes(idCurrentUser)){
+                                this.$store.commit('orgchart/changeViewOnlySub')
+                                    return true
+                            }else{
+                                return false
+                            }
+                        }else{
+                            let listUser = this.$store.getters['orgchart/listUserInCurrentNode']
+                            if(listUser.includes(idCurrentUser)){
+                                return true
+                            }else{
+                                return false
+                            }
+                        }
                     }
-                }
-                // if(this.$store.state.app.userOperations.department[0]){
-                //     let permission = this.$store.state.app.userOperations.department[0]
-                // }
-                //if(permission.view_only_owner){
-                    // if(data.users.includes(idCurrentUser)){
-                    //     return true
-                    // }else{
-                    //     return false
-                    // }
-                // }    
-                // if(permission.view_all){
-                //     // return true
-                // }else if(permission.view_only_sub){
-
-            //    }
+               }else{
+                   return false
+               }
             }
            
         }
