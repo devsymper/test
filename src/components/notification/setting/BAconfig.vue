@@ -4,41 +4,7 @@
             <h4>Cài đặt thông báo</h4>
         </div>
         <!-- test -->
-         <!-- <div class="row"> -->
-    <!-- <div class="col-3">
-      <h3>Draggable 1</h3>
-      <draggable
-        :list="list1"
-        :group="{ name: 'people', pull: 'clone', put: false }"
-        :clone="cloneDog"
-        @change="log"
-      >
-        <div class="list-group-item"   
-          style="background-color:green" 
-          v-for="element in list1" :key="element.id">
-            {{ element.name }}
-        </div>
-      </draggable>
-    </div>
-
-    <div class="col-3">
-      <h3>Draggable 2</h3>
-      <draggable
-        class="dragArea list-group"
-        :list="list2"
-        group="people"
-        @change="log"
-      >
-        <div class="list-group-item" v-for="element in list2" style="background-color:blue" :key="element.id">
-          {{ element.name }}
-        </div>
-      </draggable>
-    </div> -->
-
-    <!-- <rawDisplayer class="col-3" :value="list1" title="List 1" />
-
-    <rawDisplayer class="col-3" :value="list2" title="List 2" />
-  </div> -->
+        
         <!-- test -->
         <v-row class="pt-0" style="margin-top:-10px">
             <v-col class="fs-13 col-md-5" style="margin-top:5px">Hình đại diện</v-col>
@@ -94,6 +60,7 @@
                     clearable
                     label="Chọn"
                 >
+                
                 </v-autocomplete>
             </v-col>
         </v-row>
@@ -104,6 +71,9 @@
                     outlined
                     class="sym-small-size"
                     clearable
+                    return-object
+                    item-value="value"
+                    item-text="text"
                     :items="listAction"
                     v-model="action"
                     dense
@@ -155,42 +125,52 @@
                 Tham số
             </v-col>
         </v-row>
-        <div class="col-12">
-          <draggable tag="ul"
-            style="height: 180px!important; border:1px solid white"
-            :list="list" class="list-group" handle=".handle">
-          <v-row>
-            <v-col class="col-md-8" style="margin-top:-12px; margin-left:-40px">
-                <v-textarea
-                :rows="5" type="text" class="form-control mt-1" 
-                  style="width:260px" v-model="description"
+          <v-row class="col-12" style="margin-bottom:-35px">
+           <draggable
+              :list="list2"
+              group="des"
+              @change="log"
+              style="height: 180px!important"
+              handle=".handle"
+            >
+            <v-textarea
+                :rows="5" type="text"
+                style="width:250px" v-model="description"
               />
-            </v-col>
-            <v-col class="col-md-4" >
-              <div style="border:1px solid grey; margin-top:3px;border: 1px solid grey; height: 143px; margin-top: 4px; margin-left:-30px; margin-right:-49px">
-                <i class="fa fa-align-justify handle"></i>
-              <v-chip  color="primary" class="text"  
-                 v-for="(element, idx) in parameter"  
-                 @change="log" style="margin-top:2px; margin-bottom:2px; margin-left:5px; margin-right:2px; background-color:pink"
-                  :key="element.value">{{ element.text }}</v-chip>
-                </div>        
-            </v-col>
+            </draggable>
+          <div class="col-md-4 ml-8" > 
+              <div 
+                class="mt-1 mt-1" 
+                style="border:1px solid grey;height: 143px; margin-left:-30px; margin-right:-49px">
+                <draggable
+                style="height: 180px!important; border:1px solid white"
+                  :list="parameter"
+                  :group="{ name: 'des', pull: 'clone', put: false }"
+                  :clone="cloneValue"
+                  @change="log"
+                >
+                  <v-chip class="list-group-item"   
+                  color="primary"
+                    v-for="element in parameter" :key="element.value">
+                      {{ element.text }}
+                  </v-chip>
+              </draggable>
+            </div>
+          </div>
+        </v-row>
+        <div class="col-12">
+          <v-row class="pt-0" style="margin-bottom:-25px">
+              <v-col class="fs-13 col-md-5 " style="margin-top:5px">Trạng thái</v-col>
+              <v-col class="col-md-6">  
+                <v-checkbox
+                  v-model="state" 
+                  style="margin-top:0px">
+                </v-checkbox>
+              </v-col>
           </v-row>
-          </draggable>
-         
-   
-         <v-row class="pt-0" style="margin-bottom:-25px">
-            <v-col class="fs-13 col-md-5 " style="margin-top:5px">Trạng thái</v-col>
-            <v-col class="col-md-6">  
-               <v-checkbox
-                v-model="state" 
-                style="margin-top:0px">
-               </v-checkbox>
-            </v-col>
-        </v-row>
-        <v-row class="mt-5 d-flex justify-end" style="margin-top:-20px!important">
-            <v-btn text color="green" @click="save()">Lưu</v-btn>
-        </v-row>
+          <v-row class="mt-5 d-flex justify-end" style="margin-top:-20px!important">
+              <v-btn text color="green" @click="save()">Lưu</v-btn>
+          </v-row>
     </div>
     </div>
 </template>
@@ -208,7 +188,6 @@ export default {
    watch: {
       objectType(){
          this.refreshSelected();
-          this.getAction(this.objectType);
           this.getSource(this.objectType);
       }
   },
@@ -224,16 +203,8 @@ export default {
     },
   data() {
     return {
-       list1: [
-        { name: "dog 1", id: 1 },
-        { name: "dog 2", id: 2 },
-        { name: "dog 3", id: 3 },
-        { name: "dog 4", id: 4 }
-      ],
       list2: [
-        { name: "cat 5", id: 5 },
-        { name: "cat 6", id: 6 },
-        { name: "cat 7", id: 7 }
+        { name: "test", id: 5 },
       ],
        typeSelected:[
                 "Avatar đối tượng gây ra",
@@ -263,11 +234,6 @@ export default {
             state:false,
             avatar:'',
             icon:'',
-  
-      list: [
-        { name: "John", text: "3234234", id: 0 },
-         { name: "Johnádasd", text: "", id: 0 },
-      ],
       dragging: false,
       description:''
     };
@@ -279,7 +245,19 @@ export default {
            this.avatarUrl = tempUrl;
             this.avatarFileName = 'user_avatar_'+util.str.randomString(6)+Date.now();
             this.$refs.uploadAvatar.uploadFile();
-        },
+    },
+    replaceDescription(){
+      debugger
+      let description = this.description;
+      for(let i = 0; i<this.parameter.length;i++){
+        let oldValue= new RegExp('<'+this.parameter[i].text+'>');
+        let newValue = this.parameter[i].value;
+        description= description.replace(oldValue,newValue);
+      }
+      debugger
+     // description = this.description;
+      return description;
+    },
     save(){
         let data={
             event: this.action,
@@ -290,7 +268,7 @@ export default {
             receiver:this.receiver.value,
             action:this.actionClickNotifi,
             icon:this.iconName.iconName?this.iconName.iconName:this.avatarFileName,
-            description:this.description
+            description:this.replaceDescription()
         };
        const self = this;
         notification.addChanel(data).then(res=>{
@@ -331,12 +309,9 @@ export default {
       this.avatarFileName='';
       this.description=''
     },
-    getAction(nameModule){
-        this.listAction = this.allListObj[nameModule].action.map(x=>x)
-    },
     getNameModule(){
         const self = this;
-        userApi.getAllListObj()
+        notification.showAllModuleConfig()
         .then(res=>{
             if(res.status==200){
                 self.allListObj = res.data
@@ -345,36 +320,40 @@ export default {
         })
     },
      getSource(nameModule){
-        const self = this;
-        notification.showAllModuleConfig().then(res=>{
-            if(res.status==200){
-                self.listSource = res.data;
-                for(let i = 0; i<res.data[nameModule].receiver.length;i++){
-                    self.listReceiver.push(res.data[nameModule].receiver[i])
-                };
-                 for(let i = 0; i<res.data[nameModule].action.length;i++){
-                    self.listActionClickNotifi.push(res.data[nameModule].action[i])
-                };
-                for(let i = 0; i<res.data[nameModule].parameter.length;i++){
-                    self.parameter.push({
-                      text:res.data[nameModule].parameter[i].text,
-                      value: res.data[nameModule].parameter[i].value
-                      })
-                }
+        this.listReceiver=[];
+        this.listActionClickNotifi =[];
+        this.parameter = [];
+                //self.listModule = Object.keys(res.data);
+        for(let i = 0; i<this.allListObj[nameModule].receiver.length;i++){
+            this.listReceiver.push(this.allListObj[nameModule].receiver[i])
+        };
+          for(let i = 0; i<this.allListObj[nameModule].action.length;i++){
+            this.listActionClickNotifi.push(this.allListObj[nameModule].action[i])
+        };
+        for(let i = 0; i<this.allListObj[nameModule].event.length;i++){
+          this.listAction.push({
+            text:this.allListObj[nameModule].event[i].text,
+            value:this.allListObj[nameModule].event[i].value
 
-            }
-        })
+          })
+        };
+        for(let i = 0; i<this.allListObj[nameModule].parameter.length;i++){
+            this.parameter.push({
+              text:this.allListObj[nameModule].parameter[i].text,
+              value: this.allListObj[nameModule].parameter[i].value
+              })
+        }
+
+          
+     
     },
      log: function(evt) {
-      window.console.log(evt);
+       this.description+=evt.added.element.name;
     },
-      replace: function() {
-      this.list = [{ name: "Edgard" }];
-    },
-    cloneDog({ id }) {
+    cloneValue(value) {
       return {
-        id: idGlobal++,
-        name: `cat ${id}`
+        value: value.value,
+        name: `<${value.text}>`
       };
     }
   }

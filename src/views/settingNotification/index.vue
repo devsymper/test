@@ -2,7 +2,19 @@
     <div class="w-100 mr-10">
         <v-row class="header ml-3">
             <v-col class="col-md-8 col-sm-8 ">
-             <span class="fs-15 fw-430" v-if="showMain" >Cài đặt thông báo</span>
+                  <!-- <v-menu offset-y>
+                    <template v-slot:activator="{ on, attrs }">
+                    <v-btn
+                        color="primary"
+                        dark
+                        v-bind="attrs"
+                        v-on="on"
+                    >
+                        Dropdown
+                    </v-btn>
+                    </template> -->
+               <!-- <NotificationPopUp :objId="483" :objType="'document_definition'" style="background:white" /> -->
+                <!-- </v-menu> -->
                 <span class="fs-15 fw-430" v-if="showFollow">Danh sách đối tượng đang theo dõi</span>
                 <span class="fs-15 fw-430" v-if="showUnfollow">Danh sách đối tượng không theo dõi</span>
             </v-col >
@@ -34,6 +46,7 @@
 </template>
 <script>
 import _ from 'lodash';
+import NotificationPopUp from "./../../components/notification/DetailPopPup.vue"
 import { documentApi } from "./../../api/Document.js";
 import UserPopUp from "./../../components/user/UserPopUp";
 import notification from "./../../api/settingNotification";
@@ -46,7 +59,8 @@ export default {
   },
     components:{
         SettingNotification,
-        UserPopUp
+        UserPopUp,
+        NotificationPopUp
     },
   created () {
       this.getSource();
