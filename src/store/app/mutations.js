@@ -87,7 +87,6 @@ const setUserActionsForObjects = (state, data) => {
 
 const setAccountType = (state, data) =>{
     // state.accountType = data
-    debugger
     Vue.set(state, 'accountType', data)
 }
 export {

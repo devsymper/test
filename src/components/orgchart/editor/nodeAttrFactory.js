@@ -65,6 +65,7 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
         let mappingDoc = {
             "title": "Document sử dụng",
             "type": "autocomplete",
+            "value": '',
             "options": [
                 {
                     title: 'test',
@@ -89,12 +90,13 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
                     title: 'Control',
                     name: 'control',
                     type: 'autocomplete',
-                    option:[],
+                    source:[],
                 },
                 {
                     title: 'Trường của node',
                     name: 'nodeColumn',
-                    type: 'autocomplete'
+                    type: 'autocomplete',
+                    source:['image', 'name'],
                 },
             ],
         }

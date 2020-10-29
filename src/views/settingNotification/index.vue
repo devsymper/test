@@ -187,7 +187,6 @@ export default {
     // findName(objId){
     //     let name = ' ';
     //     if(objId.indexOf(':')>0){
-    //            debugger
     //           let nameModule = objId.split(':')[0];
     //           let id = objId.split(':')[1];
     //          if(nameModule=='document_definition'){

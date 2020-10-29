@@ -176,7 +176,6 @@ export default {
                 arr.push(newObj);
                 return arr;
             },[])
-            debugger
             return listDoc;
         },
 
@@ -779,6 +778,7 @@ export default {
         },
         getDataToSave(){
             let orgchartAttr = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
+                debugger
             let allVizCell = this.$refs.editorWorkspace.getAllDiagramCells();
             allVizCell = this.normalizeDiagramNodeDisplay(allVizCell);
             let data = {
@@ -1025,8 +1025,6 @@ export default {
                         }
                     let homeConfig = self.$store.state.orgchart.editor[self.instanceKey].homeConfig;
                     this.$set(homeConfig.commonAttrs.tableMapping.columns[0], 'source',self.listFieldInSelectedDoc )
-                    // homeConfig.commonAttrs.tableMapping.columns[0].source = self.listFieldInSelectedDoc
-                    debugger
                     }
                  
                 }).catch(err=>{
