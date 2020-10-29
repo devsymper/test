@@ -594,8 +594,23 @@ export default class Formulas {
      * Đồng thời đẩy vào thông tin về việc control nào thay đổi dẫn đến các control khác thay đổi theo
      */
     setInputControl() {
+            let allInput = {}
             if (this.checkExistFormulas()) {
                 let allRelateName = this.formulas.match(/{[A-Za-z0-9_]+}/gi);
+                let colSelect = this.getColumnsSelect(this.formulas);
+                if (colSelect) {
+                    let colFromOtherTable = colSelect[0].match(/\([a-zA-Z0-9_]*\)/gm);
+                    if (colFromOtherTable) {
+                        for (let index = 0; index < colFromOtherTable.length; index++) {
+                            let col = colFromOtherTable[index];
+                            col = col.replace(/\)/g, "");
+                            col = col.replace(/\(/g, "");
+                            col = col.trim();
+                            allInput[col] = true;
+                        }
+                    }
+
+                }
                 if (!allRelateName) {
                     return {};
                 }
@@ -607,8 +622,8 @@ export default class Formulas {
                     return obj;
                 }, {});
 
-
-                return names;
+                Object.assign(allInput, names);
+                return allInput;
             }
             return {}
         }
@@ -715,6 +730,12 @@ export default class Formulas {
             return refFormulas;
         }
         // hàm lấy các column được query sau select và trước from
+
+    getColumnsSelect(syql) {
+        syql = syql.replace(/[\s\r]+/gm, " ");
+        return syql.match(/(?<=SELECT|select).*(?=FROM|from)/gm);
+
+    }
     getColumnsQuery(syql) {
         let columns = [];
         syql = syql.replace(/[\s\r]+/gm, " ");

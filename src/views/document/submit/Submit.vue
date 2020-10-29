@@ -454,9 +454,8 @@ export default {
                 let controlInstance = thisCpn.sDocumentSubmit.listInputInDocument[controlName];
                 let controlId = controlInstance.id
                 let dataInput = this.getDataInputFormulas(formulasInstance);
-                formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
-                    thisCpn.handlerAfterRunFormulas(rs,controlId,controlName,'formulas',false)
-                });
+
+                this.handlerBeforeRunFormulasValue(formulasInstance, controlId, controlName, 'formulas');
             } catch (error) {
                 
             }
