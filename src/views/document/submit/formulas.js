@@ -129,7 +129,7 @@ export default class Formulas {
                     }
                     if (reverseData == undefined) {
                         let orgChartFormulas = listOrgChartFormulas[i].trim();
-                        orgChartFormulas = orgChartFormulas.replace(/(orgchart|ORGCHART)\s*\(/g, '');
+                        orgChartFormulas = orgChartFormulas.replace(/(role|ROLE)\s*\(/g, '');
                         orgChartFormulas = orgChartFormulas.substring(0, orgChartFormulas.length - 1);
                         if (Object.keys(dataInput).length == 0) {
                             dataInput = false;
@@ -534,7 +534,7 @@ export default class Formulas {
          * Hàm tách các công thức local (công thức chạy owr client)
          */
     getOrgChartFormulas() {
-        let listSqlite = this.formulas.match(/(ORGCHART|orgchart)\s*\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
+        let listSqlite = this.formulas.match(/(role|ROLE)\s*\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
         return listSqlite;
     }
 
