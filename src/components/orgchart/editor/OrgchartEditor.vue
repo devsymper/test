@@ -161,7 +161,6 @@ import { orgchartApi } from "@/api/orgchart.js";
 import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY, departmentMarkup } from '../nodeDefinition/departmentDefinition';
 import { permissionApi } from '../../../api/permissionPack';
 import {documentApi} from "@/api/Document.js"
-import { getControlElement } from '@/components/document/controlPropsFactory';
 
 
 export default {
@@ -177,6 +176,7 @@ export default {
                 arr.push(newObj);
                 return arr;
             },[])
+            debugger
             return listDoc;
         },
 
@@ -1021,10 +1021,12 @@ export default {
                             let obj = {}
                             obj.name = data[i].properties.name
                             obj.title = data[i].properties.title
-                            self.listFieldInSelectedDoc.push(obj)
+                            self.listFieldInSelectedDoc.push(obj.name)
                         }
-                        console.log(self.listFieldInSelectedDoc);
-                        debugger
+                    let homeConfig = self.$store.state.orgchart.editor[self.instanceKey].homeConfig;
+                    this.$set(homeConfig.commonAttrs.tableMapping.columns[0], 'source',self.listFieldInSelectedDoc )
+                    // homeConfig.commonAttrs.tableMapping.columns[0].source = self.listFieldInSelectedDoc
+                    debugger
                     }
                  
                 }).catch(err=>{

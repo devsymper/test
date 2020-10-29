@@ -81,7 +81,7 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
             "type": "script",       
             "value": '',
         }
-        let table = {
+        let tableMapping = {
             "title": "Khớp thông tin từ doc sang các node ",
             "type": "table",
             "value": [{}],
@@ -89,29 +89,19 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
                     title: 'Control',
                     name: 'control',
                     type: 'autocomplete',
+                    option:[],
                 },
                 {
                     title: 'Trường của node',
                     name: 'nodeColumn',
                     type: 'autocomplete'
                 },
-                // {
-                //     // title: 'Type',
-                    // // name: 'type',
-                    // // type: 'autocomplete',
-                //     // source: ["string", "boolean", "datetime", "int", "long"]
-                // // },
-                // // {
-                //     // title: 'Default value',
-                    // // name: 'defaultValue',
-                //     // type: 'text'
-                // },
             ],
         }
         config.commonAttrs.isDefault = isDefault
         config.commonAttrs.mappingDoc = mappingDoc
         config.commonAttrs.scriptMapping = scriptMapping
-        config.commonAttrs.table = table
+        config.commonAttrs.tableMapping = tableMapping
     }
     if (isDepartment) {
         config.positionDiagramCells = {
