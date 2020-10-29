@@ -1,5 +1,5 @@
 <template>
-    <div class="wraper-tracking pa-0" :class="{'d-none':stask.statusPopupTracking==false}" >
+    <div v-if="stask.statusPopupTracking" class="wraper-tracking pa-0" >
         <div class="tracking-process" style="height:100%" v-if="showType=='work'">
 			<v-row class="ma-0 pl-2 pt-2 fs-13" style="height:5%; border-bottom:1px solid #cecece">
 				{{definitionName}}
@@ -14,7 +14,6 @@
 				<v-col cols="8" class="h-100 pa-0 ma-0">
 					<v-row class="ma-0" style="height:60%">
 						<trackingProcessInstance
-							:needFocus="false"
 							v-if="workInfo.id"
 							:instanceId="workInfo.id"
 							@dataInstanceRuntime="dataInstanceRuntime"
@@ -32,7 +31,6 @@
         </div>
 		<div class="tracking-process" style="height:100%" v-else-if="showType==''">
             <trackingProcessInstance
-                :needFocus="false"
                 v-if="taskInfo.action.parameter.processInstanceId"
                 :instanceId="taskInfo.action.parameter.processInstanceId"
                 :elementId="taskInfo.action.parameter.activityId"
@@ -63,7 +61,9 @@ export default {
 			icon:{
 				processName:"mdi-progress-check	",
 				startEvent:"mdi-play-outline",
-				userTask:"mdi-file-document-edit-outline",
+				submitTask:"mdi-file-document-edit-outline",
+				approvalTask:"mdi-check",
+				updateTask:"mdi-file-document-edit-outline",
 				callActivity:"mdi-cog-outline",
 				endEvent:"mdi-record",
 				httpServiceTask:"mdi-email-send-outline"
@@ -94,7 +94,7 @@ export default {
 		}
     },
     methods:{
-		dataInstanceRuntime(data,isCheck=false){
+		async dataInstanceRuntime(data,isCheck=false){
 			let arrIndexRemove=[];
 			for(let index in data){
 				let nodeInfo = data[index];
@@ -108,9 +108,13 @@ export default {
 							data[index].time=data[index].startTime;
 							data[index].icon=this.icon[data[index].activityType];
 						}else{
+							let typeTask=data[index].activityType;
+							if (data[index].taskId) {
+								typeTask=await this.checkTypeTask(data[index].taskId); // kiểm tra task là task submit or duyệt or update
+							}
 							data[index].name=data[index].activityName;
 							data[index].time=data[index].startTime;
-							data[index].icon=this.icon[data[index].activityType];
+							data[index].icon=this.icon[typeTask];
 						}
 						
 					}
@@ -120,7 +124,7 @@ export default {
 				data.splice(arrIndexRemove[i],1);
 			}
 			if (isCheck==false) {
-				this.getChildrenCallActivity(data);
+				await this.getChildrenCallActivity(data);
 			}else{
 				return data;
 			}
@@ -138,7 +142,7 @@ export default {
 							res=await bpmneApi.getProcessInstanceRuntimeHistory(idInstance);
 							detailProcess=await bpmneApi.getProcessInstanceHistory({processInstanceId:idInstance});
 							if (res.total>0) {
-								let child=self.dataInstanceRuntime(res.data,true);
+								let child=await self.dataInstanceRuntime(res.data,true);
 								data[index]['children']=child;
 								data[index]['name']=nodeInfo.activityName;
 								data[index]['time']=detailProcess.data[0].startTime;
@@ -146,9 +150,6 @@ export default {
 							}
 						}
 					}
-					// if (nodeInfo.activityType.includes('httpServiceTask')) {
-						
-					// }
 				}
 			}
 			await self.getNameProcessInstance(data);
@@ -178,6 +179,23 @@ export default {
 				nodeId.assignee=String(value.data.userId);
 				nodeId.type="symper_service_notification";
 				nodeId.dataType=value.data;
+			}
+		},
+		async checkTypeTask(taskId){
+			let filter={};
+			filter.taskId=taskId;
+			let res= await bpmneApi.postTaskHistory(filter);
+			if (res.total>0) {
+                let desc=JSON.parse(res.data[0].description);
+                if (desc.action.action=="submit") {
+                   	return "submitTask";
+                }else if(desc.action.action=="approval"){
+                  	return "approvalTask";
+                }else if(desc.action.action=="update"){
+                   	return "updateTask";
+                }
+            }else{
+				return "submitTask";
 			}
 		}
 
@@ -213,7 +231,8 @@ export default {
 		padding: 12px 6px 6px 11px;
 		transition: all ease-in-out 250ms;
 		border: 1px solid #dedede;
-    	box-shadow: 1px 1px  #e0d9d9;
+    	/* box-shadow: 2px 2px #bdb9b9; */
+		box-shadow: 1px 1px 3px 3px #dedede;
 		border-radius: 4px;
 	}
 </style>>

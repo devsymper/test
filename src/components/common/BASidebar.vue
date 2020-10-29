@@ -105,7 +105,6 @@
                                             <span class="fs-13">{{$t('common.search')}}</span>
                                         </template>
                                         <template v-slot:item="data">
-                                        
                                             <div class="fs-13 py-1" >
                                                  <SymperAvatar
                                                     style="height:25px!important; width:25px!important; margin-left:-5px"  

@@ -15,6 +15,9 @@ export const taskApi = {
         return fileManagement.put('changeStatusSymperFile', data);
 
     },
+    renameFile(data) {
+        return fileManagement.put('renameFile', data);
+    },
     getDocumentObjIds(data) {
         return document.post('documents/object/batch', data);
     },
@@ -33,7 +36,8 @@ export const taskApi = {
     },
     getDocumentInVariables(filter){
         return workfloweExtend.get("variables/documents",{page:filter.page,pageSize:filter.pageSize});
-    }
+    },
+   
 
     
 

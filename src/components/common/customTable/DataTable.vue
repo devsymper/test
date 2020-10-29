@@ -24,7 +24,7 @@ export default {
     methods: {
         resetTbWrapperHeight(){
             let tbWrapper = this.$refs.tableWrapper;
-            let h = $(tbWrapper).find('.ht_master .htCore').height() + 5;
+            let h = $(tbWrapper).find('.ht_master .htCore').height() + 20;
             $(tbWrapper).height(h);
             $(tbWrapper).find('.ht_master.handsontable .wtHolder').height(h);
         },
