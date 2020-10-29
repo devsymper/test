@@ -200,6 +200,14 @@ export default {
     mounted(){
         this.containerHeight = util.getComponentSize(this).h
         this.currentSize =  util.getComponentSize(this)
+        $('.item-no-permission').on('click',function(e){
+            e.preventDefault()
+            e.stopPropagation()
+            this.$snotify({
+                type: 'error',
+                title: "Ban khong co quyen"
+            })
+        })
     },
     computed: {
         allUserInOrgchart(){
@@ -407,36 +415,51 @@ export default {
                 listUsers: this.listUserInNode
             })
         },
-        onCellClick(params){
-            let self = this
-            let objId = "orgchart:"+this.$route.params.id+':'+params.data.vizId
-                orgchartApi.getDescriptionNode({object_identifier:objId}).then(res=>{
-                    self.docObjInfo = {docObjId:objId,docSize:'21cm'}
-                    self.$refs.listUser.actionPanel = true;
-                }).catch(err=>{
-                })
-        },
+        // onCellClick(params){
+        //     let self = this
+        //     let objId = "orgchart:"+this.$route.params.id+':'+params.data.vizId
+        //         orgchartApi.getDescriptionNode({object_identifier:objId}).then(res=>{
+        //              if(res.data.length > 0){
+        //                 let idDoc = res.data[0].documentObjectId
+        //                 self.docObjInfo = {docObjId:idDoc,docSize:'21cm'}
+        //                 self.$refs.listUser.actionPanel = true;
+        //             }else{
+        //                 self.$snotify({
+        //                     type: "error",
+        //                     title: "Không tìm thấy hồ sơ nhân sự",
+        //                 });
+        //             }
+        //             // self.docObjInfo = {docObjId:objId,docSize:'21cm'}
+        //             // self.$refs.listUser.actionPanel = true;
+        //         }).catch(err=>{
+        //         })
+        // },
         onCellContextMenu(params){
              let self = this
              let objId = "orgchart:"+this.$route.params.id+':'+params.data.vizId
                 orgchartApi.getDescriptionNode({object_identifier:objId}).then(res=>{
-                    self.docObjInfo = {docObjId:objId,docSize:'21cm'}
-                    self.$refs.listUser.actionPanel = true;
+                    if(res.data.length > 0){
+                        let idDoc = res.data[0].documentObjectId
+                        self.docObjInfo = {docObjId:idDoc,docSize:'21cm'}
+                        self.$refs.listUser.actionPanel = true;
+                    }else{
+                        self.$snotify({
+                            type: "error",
+                            title: "Không tìm thấy document mô tả ",
+                        });
+                    }
                 }).catch(err=>{
                 })
         },
-        onCellMouseOver: _.debounce(function(params){
-            let self = this
-            let objId = "orgchart:"+this.$route.params.id+':'+params.data.vizId
-                orgchartApi.getDescriptionNode({object_identifier:objId}).then(res=>{
-                    self.docObjInfo = {docObjId:objId,docSize:'21cm'}
-                    self.$refs.listUser.actionPanel = true;
-                }).catch(err=>{
-                })
-        },500),
-        // onCellMouseOut: _.debounce(function(params){
-        //    this.showDescriptionDepartment = false
-        // },200),
+        // onCellMouseOver: _.debounce(function(params){
+        //     let self = this
+        //     let objId = "orgchart:"+this.$route.params.id+':'+params.data.vizId
+        //         orgchartApi.getDescriptionNode({object_identifier:objId}).then(res=>{
+        //             self.docObjInfo = {docObjId:objId,docSize:'21cm'}
+        //             self.$refs.listUser.actionPanel = true;
+        //         }).catch(err=>{
+        //         })
+        // },500),
         onTabClicked(data){
             this.currentTab = data.action
             this.titleToolbar = data.title

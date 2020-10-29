@@ -1,8 +1,8 @@
 <template>
-    <span margin-left:-2px style="margin-top:-4px">
+    <span margin-left:-2px style="margin-top:-4px" :class="{'item-no-permission': permission == false, 'title-department-active': permission == true}">
         <i :class="'mdi mr-2 fs-12 '+icon" ></i>
-        <span style="padding-right:8px;margin-top:-4px;font:12px roboto; color:#212529 !important" >{{text}}</span>
-        <span v-if="count !=0" style="padding-right:8px;margin-top:-6px;font:12px roboto; color:#212529 !important">{{'('+count+')'}}</span>
+        <span  style="padding-right:8px;margin-top:-4px;font:12px roboto; " >{{text}}</span>
+        <span  v-if="count !=0" style="padding-right:8px;margin-top:-6px;font:12px roboto; ">{{'('+count+')'}}</span>
     </span>
 </template>
 <script>
@@ -23,6 +23,8 @@ export default {
             icon: null,
             text:'',
             count: 0 ,
+            parentId: null,
+            permission: true,
         };
     },
     beforeMount() {},
@@ -34,6 +36,8 @@ export default {
         this.$store.dispatch('orgchart/getUserByVizId', this.params.data)
         let listUser = this.$store.getters['orgchart/listUserInCurrentNode']
         this.count = listUser.length
+        this.permission = this.checkPermission()
+        // this.permission = false
     },
     methods: {
         getIcon() {
@@ -47,10 +51,54 @@ export default {
                 return vls[vls.length - 1];
             }
         },
+        checkPermission(){
+            debugger
+            let self = this
+            let idCurrentUser = this.$store.state.app.endUserInfo.id
+            let viewOnlySub = this.$store.state.orgchart.viewOnlySub
+            let data = this.params.data
+
+
+            if(viewOnlySub == false){
+                if(data.users.includes(idCurrentUser)){
+                    this.$store.commit('orgchart/changeViewOnlySub')
+                    return true
+                }else{
+                    return false
+                }
+            }else{
+                let listUser = this.$store.getters['orgchart/listUserInCurrentNode']
+                if(listUser.includes(idCurrentUser)){
+                    return true
+                }else{
+                    return false
+                }
+            }
+            // if(this.$store.state.app.userOperations.department[0]){
+            //     let permission = this.$store.state.app.userOperations.department[0]
+            // }
+            //if(permission.view_only_owner){
+                // if(data.users.includes(idCurrentUser)){
+                //     return true
+                // }else{
+                //     return false
+                // }
+            // }    
+            // if(permission.view_all){
+            //     // return true
+            // }else if(permission.view_only_sub){
+
+        //    }
+        }
     },
    
 }
 </script>
 <style scoped>
-
+.item-no-permission{
+    color:#C1C1C1 !important;
+}
+.title-department-active{
+    color:#212529 !important
+}
 </style>

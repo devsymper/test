@@ -82,6 +82,7 @@ export default {
                     .login(this.email.trim(), this.password.trim())
                     .then(res => {
                         if (res.status == 200) {
+                            debugger
                             this.$store.dispatch('app/setUserInfo', res.data);
                             thisCpn.$router.push('/');
                         } else {
