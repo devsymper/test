@@ -1,4 +1,5 @@
 <template>
+
 <v-card class="w-100 h-100">
     <v-row class="w-100 h-100">
          <v-row class="fs-14 ml-4 mt-2 w-100">
@@ -84,6 +85,7 @@ export default {
         }
     },
     created() {
+      
     },
     computed: {
         sapp() {
@@ -110,20 +112,34 @@ export default {
                 console.log("error from change pass user api!!!", err);
             })
         },
-        changePassUser(pass){
-            userApi.changePassUser(pass).then(res => {
+        refreshAll(){
+            this.newPassword ='';
+            this.oldPassword = "";
+            this.reNewPassword = "";
+            this.rules.required="";
+            this.rules.min="";
+            this.rules.max="";
+            this.rules.notMatch="";
+            this.rules.match=""
+
+        },
+        changePassUser(oldPass,newPass){
+            const self = this;
+            userApi.changePassUser(oldPass,newPass).then(res => {
                 if (res.status == 200) {
                     this.$snotify({
                         type: "success",
                         title: this.$t("user.notification.successChangePass")
                     });
-                    this.$emit('cancel');
+                    self.$emit('cancel');
+                   
                 } else {
                     this.$snotify({
                         type: "error",
                         title: this.$t("user.notification."+res.message)
                     });
                 }
+               
             })
             .catch(err => {
                 console.log("error from change pass user api!!!", err);
@@ -141,7 +157,7 @@ export default {
                 if(this.$store.state.app.allBA.length>0){
                     this.updateBaPass(this.sapp.endUserInfo.id);
                 }else{
-                     this.changePassUser(this.oldPassword);
+                     this.changePassUser(this.oldPassword,this.newPassword);
                 }
             }
         },

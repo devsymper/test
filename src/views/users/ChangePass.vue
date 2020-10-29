@@ -151,7 +151,6 @@ export default {
             userApi.updateUser(this.user.id, data).then(res => {
 				if (res.status == 200) {
                     this.loader = "";
-        
                     this.loading = false;
                     this.$snotify({
 					type: "success",
