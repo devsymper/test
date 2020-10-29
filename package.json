@@ -20,6 +20,7 @@
         "@types/rappid": "^1.5.32",
         "ace-builds": "^1.4.11",
         "ag-grid-community": "^23.1.0",
+        "ag-grid-enterprise": "^24.1.0",
         "ag-grid-react": "^23.1.0",
         "ag-grid-vue": "^23.1.0",
         "backbone": "^1.4.0",

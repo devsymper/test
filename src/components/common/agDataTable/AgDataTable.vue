@@ -12,13 +12,15 @@
                  @cell-editing-started="cellEditingStarted"
                  @cell-value-changed="cellValueChanged"
                  @cell-double-clicked="cellDoubleClick"
+                 @cell-clicked="cellClicked"
+                 @cell-context-menu="cellContextMenu($event)"
                  @cell-mouse-over="cellMouseOver"
                  @cell-mouse-out="cellMouseOut"
                  :rowData="rowDataTable"
-                 :getContextMenuItems="getContextMenuItems"
                  :treeData="true"
-                  :allowContextMenuWithControlKey="true"
                  :animateRows="true"
+                 :enableRangeSelection="true"
+                 :allowContextMenuWithControlKey="true"
                  :groupDefaultExpanded="groupDefaultExpanded"
                  :frameworkComponents="frameworkComponents"
                  :modules="modules"
@@ -34,10 +36,12 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
+import 'ag-grid-enterprise';
 import { util } from '../../../plugins/util';
 import ImageRenderer from './ImageRenderer';
 import CheckBoxRenderer from './CheckBoxRenderer';
 import Vue from "vue";
+import { param } from 'jquery';
 
 
 export default {
@@ -99,8 +103,8 @@ export default {
         return {
             gridOptions:null,
             modules: [
-                RowGroupingModule,
                 MenuModule,
+                RowGroupingModule,
                 ClientSideRowModelModule,
                 RowGroupingModule
             ],
@@ -112,20 +116,7 @@ export default {
             groupDefaultExpanded: null,
             getDataPath: null,
             frameworkComponents: null,
-            getContextMenuItems(params){
-                var result = [
-                    {
-                    name: 'Alert ' + params.value,
-                    action: function () {
-                        window.alert('Alerting about ' + params.value);
-                    },
-                    cssClasses: ['redFont', 'bold'],
-                    },
-                
-                ];
-                return result;
-
-            },
+           
         }
     },
     components: {
@@ -184,6 +175,11 @@ export default {
     mounted(){
     },  
     methods:{
+        cellContextMenu(params,x){
+             params.event.preventDefault()
+            params.event.stopPropagation()
+            this.$emit('on-cell-context-menu', params)
+        },
         refreshData(columns){
             this.gridOptions.api.clearFocusedCell()
             this.columns = columns;
@@ -213,7 +209,12 @@ export default {
             this.$emit('on-cell-change',params)
         },
         cellDoubleClick(params){
+            params.event.preventDefault()
+            params.event.stopPropagation()
             this.$emit('on-cell-dbl-click',params)
+        },
+        cellClicked(params){
+            this.$emit('on-cell-click',params)
         },
         cellMouseOver(params){
             this.$emit('on-cell-mouse-over',params)

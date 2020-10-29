@@ -106,8 +106,7 @@
                                     :customComponents="customAgComponents"  
                                     :hideRowBorderCss="true"
                                     @on-cell-dbl-click="onCellDblClick"
-                                  
-                                    @on-cell-mouse-out="onCellMouseOut"
+                                    @on-cell-context-menu="onCellContextMenu"
                                     :minWidth="500"
                                     :cellRendererParams="{
                                         innerRenderer:'nodeName',
@@ -408,18 +407,36 @@ export default {
                 listUsers: this.listUserInNode
             })
         },
+        onCellClick(params){
+            let self = this
+            let objId = "orgchart:"+this.$route.params.id+':'+params.data.vizId
+                orgchartApi.getDescriptionNode({object_identifier:objId}).then(res=>{
+                    self.docObjInfo = {docObjId:objId,docSize:'21cm'}
+                    self.$refs.listUser.actionPanel = true;
+                }).catch(err=>{
+                })
+        },
+        onCellContextMenu(params){
+             let self = this
+             let objId = "orgchart:"+this.$route.params.id+':'+params.data.vizId
+                orgchartApi.getDescriptionNode({object_identifier:objId}).then(res=>{
+                    self.docObjInfo = {docObjId:objId,docSize:'21cm'}
+                    self.$refs.listUser.actionPanel = true;
+                }).catch(err=>{
+                })
+        },
         onCellMouseOver: _.debounce(function(params){
             let self = this
-            let objId = "orgchart:"+this.$route.params.id+params.data.vizId
+            let objId = "orgchart:"+this.$route.params.id+':'+params.data.vizId
                 orgchartApi.getDescriptionNode({object_identifier:objId}).then(res=>{
-                    self.docObjInfo = {docObjId:5100681,docSize:'21cm'}
+                    self.docObjInfo = {docObjId:objId,docSize:'21cm'}
                     self.$refs.listUser.actionPanel = true;
                 }).catch(err=>{
                 })
         },500),
-        onCellMouseOut: _.debounce(function(params){
-           this.showDescriptionDepartment = false
-        },200),
+        // onCellMouseOut: _.debounce(function(params){
+        //    this.showDescriptionDepartment = false
+        // },200),
         onTabClicked(data){
             this.currentTab = data.action
             this.titleToolbar = data.title
