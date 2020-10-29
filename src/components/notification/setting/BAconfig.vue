@@ -53,8 +53,11 @@
             <v-col class="col-md-7">  
                 <v-autocomplete
                     outlined
+                      return-object
+                    item-value="value"
+                    item-text="name"
                      class="sym-small-size"
-                    :items="listModule"
+                    :items="listModuleObj"
                     v-model="objectType"
                     dense
                     clearable
@@ -223,6 +226,7 @@ export default {
             avatarFileName:'',
             allListObj:{},
             listModule:[],
+            listModuleObj:[],
             objectType:'',
             listAction:[],
             action:'',
@@ -242,9 +246,9 @@ export default {
   },
   methods: {
     handleAvatarSelected(tempUrl){
-           this.avatarUrl = tempUrl;
-            this.avatarFileName = 'user_avatar_'+util.str.randomString(6)+Date.now();
-            this.$refs.uploadAvatar.uploadFile();
+        this.avatarUrl = tempUrl;
+        this.avatarFileName = 'user_avatar_'+util.str.randomString(6)+Date.now();
+        this.$refs.uploadAvatar.uploadFile();
     },
     replaceDescription(){
       debugger
@@ -316,6 +320,12 @@ export default {
             if(res.status==200){
                 self.allListObj = res.data
                 self.listModule = Object.keys(res.data);
+                for(let i = 0;i<self.listModule.length;i++){
+                  self.listModuleObj.push({
+                    name:self.$t('objects.'+self.listModule[i]),
+                    value:self.listModule[i]
+                  })
+                }
             }
         })
     },
