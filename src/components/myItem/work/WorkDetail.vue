@@ -6,7 +6,7 @@
             class="mx-auto"
             width="100%" height="100%" 
         ></v-skeleton-loader>
-        <v-row class="ml-0 mr-0 justify-space-between task-header" id="taskHeader" style="line-height: 36px;">
+        <v-row class="ml-0 mr-0 justify-space-between task-header" id="taskHeader" style="line-height: 36px;height:44px">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <div v-on="on" class="fs-13 pl-2 pt-1 text-ellipsis" :style="{'width':widthInfoWork+'px'}">
@@ -54,7 +54,7 @@
 
             </div>
         </v-row>
-        <v-divider style="border-color: #bebebe;"></v-divider>
+        <v-divider style="border-color: #dedede;"></v-divider>
         <div class="detail-work" style="height:100%" v-if="filterObject==0 && statusDetailWork==false">
             <v-row class="ma-0">
                 <v-col cols="12" class="list-tasks pt-0 pb-0">
@@ -123,7 +123,7 @@
                                 </v-col>
                                 <v-col
                                     cols="2"
-                                    class="fs-13 "
+                                    class="fs-13 user-create"
                                 >  
 							        <infoUser class="userInfo " :userId="workInfo.startUserId" :roleInfo="workInfo.roleInfo" />
 
@@ -183,7 +183,7 @@
                                         </div>
                                     </v-col>
                                     <v-col
-                                        cols="2"
+                                        cols="2 user-create"
                                         class="fs-13 "
                                     >  
 							            <infoUser class="userInfo " :userId="workInfo.startUserId" :roleInfo="workInfo.roleInfo" />
@@ -245,7 +245,7 @@
                                         </div>
                                     </v-col>
                                     <v-col
-                                        cols="2"
+                                        cols="2 user-create"
                                         class="fs-13 "
                                     >  
 							            <infoUser class="userInfo " :userId="workInfo.startUserId" :roleInfo="workInfo.roleInfo" />
@@ -286,7 +286,7 @@
             />
         </div>
         <SideBarDetail
-            style="top:41px;height: calc(100% - 44px);"
+            style="top:45px!important;height: calc(100% - 44px);"
             class="side-bar"
             :sidebarWidth="sidebarWidth"  
             :isShowSidebar="isShowSidebar"
@@ -688,6 +688,18 @@ export default {
   display: -webkit-box !important;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
+}
+.col-4{
+    flex: 0 0 32.3333333333%;
+    max-width: 32.3333333333%;
+}
+.user-create {
+    flex: 0 0 17.6666666667%;
+    max-width: 17.6666666667%;
+    padding: 4px;
+}
+.col{
+    padding:4px;
 }
 
 </style>
