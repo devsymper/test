@@ -50,11 +50,14 @@
                 <span class="fs-15 font-weight-medium">{{$t('orgchart.editor.generalAttributes')}}</span>
                 <form-tpl
                     :viewOnly="action == 'view'"
-                    :singleLine="true"
+                    :singleLine="(context == 'department' && selectingNode.id == SYMPER_HOME_ORGCHART) ? false : true"
                     :labelWidth="'60px'"
                     @input-value="handleAttrValueInput"
                     :allInputs="selectingNode.commonAttrs"
                 ></form-tpl>
+                <!-- <div v-if="(context == 'department' && selectingNode.id == SYMPER_HOME_ORGCHART)">
+                   hellooo
+                </div> -->
                 <div v-if="!(context == 'department' && selectingNode.id == SYMPER_HOME_ORGCHART)">
                     <span
                         class="fs-12"
@@ -99,9 +102,9 @@
                                 <span
                                     class="fs-15 pl-4 font-weight-medium"
                                     :style="{
-                                            position: 'relative',
-                                            top: '5px'
-                                        }"
+                                        position: 'relative',
+                                        top: '5px'
+                                    }"
                                 >{{$t('orgchart.editor.listDynamicAttributes')}}</span>
                                 <v-btn
                                     class="dynamic-attr-form-activator float-right"
@@ -110,6 +113,7 @@
                                     v-if="action != 'view'"
                                     icon
                                     v-bind="attrs"
+                                    v-on="on"
                                     @click="actionBeforeAddAttr"
                                 >
                                     <v-icon size="21">mdi-plus</v-icon>

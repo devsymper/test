@@ -160,13 +160,26 @@ import jointjs from "jointjs";
 import { orgchartApi } from "@/api/orgchart.js";
 import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY, departmentMarkup } from '../nodeDefinition/departmentDefinition';
 import { permissionApi } from '../../../api/permissionPack';
+import {documentApi} from "@/api/Document.js"
+import { getControlElement } from '@/components/document/controlPropsFactory';
+
 
 export default {
     name: 'OrgchartEditor',
     computed: {
         selectingNode(){
             return this.$store.state.orgchart.editor[this.instanceKey].selectingNode;
-        }
+        },
+        listDocument() {
+            let listDoc = Object.values(this.$store.state.document.listAllDocument);
+            listDoc = listDoc.reduce((arr,obj)=>{
+                let newObj = {id:obj.id, name:obj.name, title:obj.title};
+                arr.push(newObj);
+                return arr;
+            },[])
+            return listDoc;
+        },
+
     },
     components: {
         ConfigPanel,
@@ -202,7 +215,9 @@ export default {
         return {
             loadingDiagramView: true,
             typeView: "B",
-			positionEditor: false,
+            positionEditor: false,
+            selectedDoc: null,
+            listFieldInSelectedDoc: [],
             checkPageEmpty: false,
             menuPickTab:[
                 {
@@ -282,7 +297,12 @@ export default {
             if(val == 0 || val == 1){
                 this.$emit('current-tab' , val)
             }
-        }
+        },
+       selectedDoc(val){
+           if(val){
+              this.getFieldsInDoc(val)
+           }
+       }
     },
     methods: {
 		handlerDeleteNode(){
@@ -380,6 +400,7 @@ export default {
             homeConfig.commonAttrs.description.value = config.description;
             homeConfig.commonAttrs.code.value = config.code;
             homeConfig.commonAttrs.isDefault.value = config.isDefault == "1" ? true : false;
+            homeConfig.commonAttrs.mappingDoc.options = this.listDocument
             homeConfig.customAttributes = config.dynamicAttributes;
         },
         correctDiagramDisplay(content){
@@ -869,6 +890,9 @@ export default {
             }
         },
         handleConfigValueChange(data){
+            if(data.name = "mappingDoc"){
+                this.selectedDoc = data.data
+            }
             let cellId = this.selectingNode.id;
             if(data.name == 'name' && cellId != SYMPER_HOME_ORGCHART){
                 this.$refs.editorWorkspace.updateCellAttrs(cellId, 'name', data.data);
@@ -985,6 +1009,29 @@ export default {
                 this.showPermissionsOfNode();
             }       
         },
+        /**
+         * ham lay cac field cua doc duoc chon
+         */
+         getFieldsInDoc(id){
+            let self = this
+                documentApi.getFieldByDocId(id).then(res=>{
+                    if(res.status == 200){
+                        let data = res.data
+                        for(let i in data){
+                            let obj = {}
+                            obj.name = data[i].properties.name
+                            obj.title = data[i].properties.title
+                            self.listFieldInSelectedDoc.push(obj)
+                        }
+                        console.log(self.listFieldInSelectedDoc);
+                        debugger
+                    }
+                 
+                }).catch(err=>{
+
+                })
+            
+        },
 
         async showPermissionsOfNode(){
             if(this.selectingNode.permissions.length > 0 || this.action == 'create'){
@@ -1009,6 +1056,9 @@ export default {
 </script>
 
 <style>
+.v-menu__content {
+    z-index:10000 !important
+}
 .symper-orgchart-paper .marker-arrowheads, 
 .symper-orgchart-paper .link-tools,
 .symper-orgchart-paper .marker-vertex-group,

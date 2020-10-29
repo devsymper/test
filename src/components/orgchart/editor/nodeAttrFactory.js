@@ -62,7 +62,56 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
             "type": "checkbox",
             "value": false,
         }
+        let mappingDoc = {
+            "title": "Document sử dụng",
+            "type": "autocomplete",
+            "options": [
+                {
+                    title: 'test',
+                    value:'test'
+                },
+                {
+                    title: 'test2',
+                    value:'test2'
+                },
+            ],
+        }
+        let scriptMapping = {
+            "title": "Điều kiện chọn bản ghi hiển thị",
+            "type": "script",       
+            "value": '',
+        }
+        let table = {
+            "title": "Khớp thông tin từ doc sang các node ",
+            "type": "table",
+            "value": [{}],
+            "columns": [{
+                    title: 'Control',
+                    name: 'control',
+                    type: 'autocomplete',
+                },
+                {
+                    title: 'Trường của node',
+                    name: 'nodeColumn',
+                    type: 'autocomplete'
+                },
+                // {
+                //     // title: 'Type',
+                    // // name: 'type',
+                    // // type: 'autocomplete',
+                //     // source: ["string", "boolean", "datetime", "int", "long"]
+                // // },
+                // // {
+                //     // title: 'Default value',
+                    // // name: 'defaultValue',
+                //     // type: 'text'
+                // },
+            ],
+        }
         config.commonAttrs.isDefault = isDefault
+        config.commonAttrs.mappingDoc = mappingDoc
+        config.commonAttrs.scriptMapping = scriptMapping
+        config.commonAttrs.table = table
     }
     if (isDepartment) {
         config.positionDiagramCells = {
