@@ -225,7 +225,7 @@ export default {
 		left:50%;
 		transform: translate(-50%,-50%);
 		width: 70%;
-		height: 80%;
+		height: 85%;
 		background: white;
 		z-index: 9999;
 		padding: 12px 6px 6px 11px;

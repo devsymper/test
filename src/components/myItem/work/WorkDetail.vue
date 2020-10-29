@@ -1,17 +1,22 @@
 <template>
-    <div class="h-100 w-100">
+    <div class="h-100 w-100" style="position: relative">
         <v-skeleton-loader
             v-if="loadingAction"
             :type="'table-tbody'"
             class="mx-auto"
             width="100%" height="100%" 
         ></v-skeleton-loader>
-        <v-row class="ml-0 mr-0 justify-space-between" style="line-height: 36px;">
-            <div class="fs-13 pl-2 pt-1 float-left">
-                <v-icon v-if="statusDetailWork" @click="backToListWork">mdi-chevron-left</v-icon> 
-                {{taskBreadcrumb}}
-            </div>
-            <div class="text-right pt-1 pb-1 pr-0 float-right">
+        <v-row class="ml-0 mr-0 justify-space-between task-header" id="taskHeader" style="line-height: 36px;">
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <div v-on="on" class="fs-13 pl-2 pt-1 text-ellipsis" :style="{'width':widthInfoWork+'px'}">
+                        <v-icon v-if="statusDetailWork" @click="backToListWork">mdi-chevron-left</v-icon> 
+                        {{taskBreadcrumb}}
+                    </div>
+                </template>
+                <span>{{taskBreadcrumb}}</span>
+            </v-tooltip>
+            <div id="action-task" class="text-right pt-1 pb-1 pr-0">
                 <v-menu
                     :close-on-content-click="false"
                     :close-on-click="closeOnClick"
@@ -272,7 +277,6 @@
             <listTask 
                 :listTask="listTaskCurrent"
                 :appName="workInfo.appName"
-
             />
         </div>
         <div v-if="statusDetailWork">
@@ -282,7 +286,7 @@
             />
         </div>
         <SideBarDetail
-            style="height: calc(100% - 44px);"
+            style="top:41px;height: calc(100% - 44px);"
             class="side-bar"
             :sidebarWidth="sidebarWidth"  
             :isShowSidebar="isShowSidebar"
@@ -352,6 +356,12 @@ export default {
                 this.changeWorkDetail();
             }
         },
+        taskBreadcrumb:function(){
+            this.getWidthHeaderWork();
+        },
+        "sapp.collapseSideBar": function(newVl) {
+            this.getWidthHeaderWork();
+        }
 
     },
     components: {
@@ -366,6 +376,7 @@ export default {
     },
     data: function() {
         return {
+            widthInfoWork:330,
             fileId: "",
 			serverPath: "",
 			name: "",
@@ -455,6 +466,12 @@ export default {
     created(){
     },
     methods: {
+        getWidthHeaderWork(){
+            setTimeout((self) => {
+                let width=$("#taskHeader").width()-$("#action-task").width()-40;
+                self.widthInfoWork=width;
+            }, 210,this);
+        },
         showContentFile(data){
             this.serverPath = data.serverPath;
 			this.name = data.name;
@@ -632,6 +649,13 @@ export default {
 </script>
 
 <style scoped>
+.task-header{
+    position: relative;
+}
+.task-header #action-task{
+    position: absolute;
+    right: 10px;
+}
 .v-tab{
     padding: 0px!important;
     border-width: 20px!important;

@@ -217,11 +217,16 @@ export default {
     },
     "sapp.collapseSideBar": function(newVl) {
         this.setWidthViewEditor();
-    }
+    },
+     "skh.subCollapseSideBar": function(newVl) {
+        this.setWidthViewEditor();
+    },
   },
   methods: {
-    setWidthViewEditor(sizeBar=250){
-        this.widthEditor=$(".layout").width() - sizeBar;
+    setWidthViewEditor(){
+        setTimeout((self) => {
+            self.widthEditor=$(".layout").width() -$(".khSidebar").width();
+        }, 150,this);
     },
     create_UUID() {
       var dt = new Date().getTime();
@@ -316,8 +321,7 @@ export default {
     created(){
         this.setWidthViewEditor();
         this.$evtBus.$on('kh-resize-sidebar', (sizeBar) =>{
-            console.log("ssss",$(".layout").width());
-            this.setWidthViewEditor(sizeBar);
+            this.setWidthViewEditor();
         });
     },
     mounted() {

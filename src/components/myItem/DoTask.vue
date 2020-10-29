@@ -62,7 +62,6 @@ export default {
             if(self.$route.params.id){
                 let filter={};
                 filter.taskId=self.$route.params.id;
-                // let task = await BPMNEngine.getATaskInfo(self.$route.params.id);
                 let res = await BPMNEngine.postTaskHistory(filter);
                 if (res.total>0) {
                     let task=res.data[0];

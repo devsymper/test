@@ -31,11 +31,12 @@
                         :items="listRoot"
                         :items-per-page="5"
                         :search="skh.search"
-                        class="elevation-1 kh-table"
+                        class="elevation-1 khTable"
                     >
                         <template v-slot:[`item.name`]="{ item }">
                         <v-list-item-group>
                             <v-list-item
+                            class="pa-0"
                             active-class="v-item--active"
                             dense
                             @click="doubleClick(item.hash)"
@@ -351,5 +352,12 @@ export default {
 <style scoped>
 .v-item--active {
   color: white;
+}
+.khTable ::v-deep th{
+    padding:2px 4px!important;
+}
+.khTable ::v-deep td{
+    padding:2px 4px!important;
+
 }
 </style>
