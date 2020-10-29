@@ -52,11 +52,12 @@ export default {
             }
         },
         checkPermission(){
-            debugger
             let self = this
             if(this.$store.state.app.baInfo.email != ""){
+                // day la tai khoan BA
                 return true
             }else{
+                // day la tai khoan End user 
                 let idCurrentUser = this.$store.state.app.endUserInfo.id
                 let viewOnlySub = this.$store.state.orgchart.viewOnlySub
                 let data = this.params.data
@@ -65,7 +66,7 @@ export default {
                     if(permission.view_all){
                         return true
                     }
-                    if(permission.view_only_owner){
+                    else if(permission.view_only_owner){
                         if(data.users.includes(idCurrentUser)){
                             return true
                         }else{
@@ -76,7 +77,7 @@ export default {
                         if(viewOnlySub == false){
                             if(data.users.includes(idCurrentUser)){
                                 this.$store.commit('orgchart/changeViewOnlySub')
-                                    return true
+                                return true
                             }else{
                                 return false
                             }
