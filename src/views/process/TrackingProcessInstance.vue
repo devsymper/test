@@ -196,6 +196,7 @@ export default {
                 });
         },
         async updateDrawDataInDiagram(variables){
+            let self=this;
             let symBpmn = this.$refs.symperBpmn;
             let mapUser = this.$store.getters['app/mapIdToUser'];
             for (let index = 0; index < this.flowElementMap.length; index++) {
@@ -209,21 +210,21 @@ export default {
                     data.data=this.flowElementMap[index].assignee;
                     data.type="multiple";
                     let res=await orgchartApi.getUserIdentifiFromProcessModeler(data);
-                    this.flowElementMap[index].assignee=res;
+                    self.flowElementMap[index].assignee=res;
                 }
 
                 let infoAssignee={};
                 let roleInfo={};
                 infoAssignee.assignee={};
                 infoAssignee.role={};
-                let task=this.flowElementMap[index];
+                let task=self.flowElementMap[index];
                 let assigneeId=task.assignee;
                 if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
                     let arrDataAssignee=task.assignee.split(":");
                     assigneeId=arrDataAssignee[0];
                     if (arrDataAssignee.length>3) { // loại trừ trường hợp role=0
                         let roleIdentify=task.assignee.slice(assigneeId.length+1);
-                        roleInfo=this.getRoleUser(roleIdentify);
+                        roleInfo=self.getRoleUser(roleIdentify);
                     }
                 }
                 if (mapUser[assigneeId]) {
@@ -231,16 +232,14 @@ export default {
                     infoAssignee.role = roleInfo;
                 }
 
-                if (this.flowElementMap[index].id) {
+                if (self.flowElementMap[index].id) {
                     setTimeout((self) => {
                         symBpmn.updateElementProperties(self.flowElementMap[index].id, {
                             infoAssignee: infoAssignee,
                             setColor:nodeStatusColors.notStart
                         });
                     }, 200,this);
-                  
                 }
-
             }
         },
         // Lấy ra thông tin chạy của các node của instance
