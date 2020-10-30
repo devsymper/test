@@ -136,7 +136,7 @@
         class="d-none"
         @uploaded-file="afterFileUpload"
         :objectIdentifier="docId+''" />
-        
+        <LinkControl :instance="keyInstance" ref="linkControlView"/>
         <!-- v-for="dataFlow in listDataFlow" :key="dataFlow.id"  -->
         
          
@@ -185,6 +185,7 @@ import ActionControl from "./actionControl";
 import LayoutControl from "./layoutControl";
 import PageControl from "./pageControl";
 import TabControl from "./tabControl";
+import LinkControl from "./../common/LinkControl";
 import DatePicker from "./../../../components/common/DateTimePicker";
 import TimeInput from "./../../../components/common/TimeInput";
 import UploadFile from "@/components/common/UploadFile.vue";
@@ -310,6 +311,7 @@ export default {
         UploadFile,
         SidebarTraceFormulas,
         VuePerfectScrollbar,
+        LinkControl
     },
     computed: {
         sDocumentEditor() {
@@ -402,7 +404,11 @@ export default {
             thisCpn.currentControlDataflow = control;
             let dataParams = thisCpn.getParamsForRunDataFlow(control.properties);
             let element = thisCpn.$refs['dataFlow'+control.properties.dataFlowId.value][0].runDataflow(dataParams);
-        })
+        });
+        $(document).find('#sym-submit-'+this.keyInstance).off('click','.info-control-btn')
+        $(document).find('#sym-submit-'+this.keyInstance).on('click','.info-control-btn',function(e){
+            thisCpn.$refs.linkControlView.show(e)
+        });
     },
 
     async created() {
@@ -683,6 +689,12 @@ export default {
                     $(evt.target).closest(".card-list-user").length == 0
                 ) {
                     thisCpn.$refs.userInput.hide();
+                }
+                if (
+                     !$(evt.target).hasClass("info-control-btn") &&  
+                    $(evt.target).closest(".card-link-config").length == 0
+                ) {
+                    thisCpn.$refs.linkControlView.hide();
                 }
                 if (
                     !$(evt.target).hasClass("s-control-date") &&
@@ -1289,8 +1301,8 @@ export default {
                     this.checkEditableControl(controlName,field);
                     this.checkOverrideFormulas(controlName,field);
                     let idField = field.id;
-                    let valueInput = field.value
-                    let prepareData = field.prepareData
+                    let valueInput = field.value;
+                    let prepareData = field.prepareData;
                     if(prepareData != null && prepareData != ""){
                         isSetEffectedControl = true;
                     }
@@ -1503,33 +1515,54 @@ export default {
                         if(!mapControlEffected.hasOwnProperty(formulasType)){
                             mapControlEffected[formulasType] = {}
                         }
-                        if(formulas[formulasType].hasOwnProperty('instance')){
-							let inputControl = formulas[formulasType].instance.inputControl;
-							let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
-							let inputFromDatasets = formulas[formulasType].instance.inputFromDatasets;
-                            for (let controlEffect in inputControl) {
-                                if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
-                                    mapControlEffected[formulasType][controlEffect] = {};
+                        if(formulasType == 'linkConfig'){
+                            let allConfig = formulas[formulasType].configData;
+                            for (let index = 0; index < allConfig.length; index++) {
+                                let config = allConfig[index];
+                                if(config.instance){
+                                    let inputControl = config.instance.inputControl;
+                                    for (let controlEffect in inputControl) {
+                                        if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
+                                            mapControlEffected[formulasType][controlEffect] = {};
+                                        }
+                                        mapControlEffected[formulasType][controlEffect][name] = true;
+                                    }
                                 }
-                                mapControlEffected[formulasType][controlEffect][name] = true;
+                                
                             }
-                            for (let controlEffect in inputFromDatasets) {
-                                if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
-                                    mapControlEffected[formulasType][controlEffect] = {};
-                                }
-                                mapControlEffected[formulasType][controlEffect][name] = true;
-                            }
-                            for (let controlEffect in inputLocalFormulas) {
-                                if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
-                                    mapControlEffected[formulasType][controlEffect] = {};
-                                }
-                                mapControlEffected[formulasType][controlEffect][name] = true;
-                            }
-                            this.detectControlEffectedInTableInDoc(mapControlEffected[formulasType], name, formulas[formulasType].instance);
                         }
+                        else{
+                            if(formulas[formulasType].hasOwnProperty('instance')){
+                                let inputControl = formulas[formulasType].instance.inputControl;
+                                    let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
+                                    let inputFromDatasets = formulas[formulasType].instance.inputFromDatasets;
+                                    for (let controlEffect in inputControl) {
+                                        if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
+                                            mapControlEffected[formulasType][controlEffect] = {};
+                                        }
+                                        mapControlEffected[formulasType][controlEffect][name] = true;
+                                    }
+                                    for (let controlEffect in inputFromDatasets) {
+                                        if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
+                                            mapControlEffected[formulasType][controlEffect] = {};
+                                        }
+                                        mapControlEffected[formulasType][controlEffect][name] = true;
+                                    }
+                                    for (let controlEffect in inputLocalFormulas) {
+                                        if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
+                                            mapControlEffected[formulasType][controlEffect] = {};
+                                        }
+                                        mapControlEffected[formulasType][controlEffect][name] = true;
+                                    }
+                                
+                                this.detectControlEffectedInTableInDoc(mapControlEffected[formulasType], name, formulas[formulasType].instance);
+                            }
+                        }
+                        
                     }
                 }
             }
+
             this.updateEffectedControlToStore(mapControlEffected);
         },
        
@@ -1949,13 +1982,11 @@ export default {
          */
         handleControlInputChange(controlName){
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
-            debugger
             if(controlInstance.checkValidValueLength()){
                 let controlUnique = checkDbOnly(this.keyInstance,controlName);
                 if(controlUnique != false){
                     this.handlerBeforeRunFormulasValue(controlUnique.controlFormulas.uniqueDB.instance,controlUnique.id,controlUnique.name,'uniqueDB');
                 }
-                
                 let controlEffected = controlInstance.getEffectedControl();
                 let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
                 let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
@@ -2004,8 +2035,8 @@ export default {
                     if(allFormulas.hasOwnProperty(formulasType)){
                         if(formulasType == 'linkConfig'){ // nếu có cấu hình công thức link thì cũng chạy các công thức của nó
                             let configData = allFormulas[formulasType].configData;
-                            for (let i = 0; i < configData.length; i++) {
-                                let config = configData[i];
+                            for (let ind = 0; ind < configData.length; ind++) {
+                                let config = configData[ind];
                                 let formulasInstance = config.instance;
                                 let fType = formulasType+"_"+config.formula.instance;
                                 this.handlerBeforeRunFormulasValue(formulasInstance,controlId,i,fType,'root')
@@ -2042,7 +2073,6 @@ export default {
          * rowIndex là lấy cell ở row hiện tại nếu là trong table
          */
         getDataInputFormulas(formulasInstance, e = false){
-            console.trace("sadas");
             let inputControl = formulasInstance.getInputControl();
             let dataInput = {};
             for(let inputControlName in inputControl){
@@ -2159,6 +2189,18 @@ export default {
         handlerDataAfterRunFormulasLink(link,controlName, formulasType){
             let configInstance = formulasType.split('_')[1]
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
+            let linkFormulas = controlInstance.controlFormulas.linkConfig.configData;
+            let title = "";
+            let source = "";
+            for (let index = 0; index < linkFormulas.length; index++) {
+                let config = linkFormulas[index];
+                let formulaIns = config.formula.instance;
+                if(Number(formulaIns) == Number(configInstance)){
+                    title = config.title;
+                    source = config.objectType.type;
+                }
+            }
+            this.$refs.linkControlView.setData({key:formulasType,value:link, title:title, source:source});
             controlInstance.renderLinkToControl(link, configInstance);
         },
         handlerDataAfterRunFormulasRequire(isRequire,controlName){
@@ -2217,7 +2259,7 @@ export default {
             let impactedFieldsListWhenStart = {}
             let listTableRootControl = {};
             let listRootControl = [];
-			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
+			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0 && false){
 				impactedFieldsList = this.preDataSubmit.impactedFieldsList;
 				impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
 				listRootControl = this.preDataSubmit.rootControl;
@@ -2244,7 +2286,8 @@ export default {
 				}
 			}
 			else{
-				let listInput = getListInputInDocument(this.keyInstance);
+                let listInput = getListInputInDocument(this.keyInstance);
+                debugger
 				for(let controlName in listInput){
 					this.setAllImpactedFieldsList(controlName);
                     let controlInstance = listInput[controlName];
@@ -2253,23 +2296,36 @@ export default {
 							let controlFormulas = controlInstance.controlFormulas;
 							for(let formulasType in controlFormulas){
 								if(!['autocomplete','list','autocompleteAuto'].includes(formulasType)){
-									if(controlFormulas[formulasType].hasOwnProperty('instance')){
-                                        let formulasInstance = controlFormulas[formulasType].instance;
-                                        let controlRootInTable = this.checkControlOutSideTable(controlInstance,formulasInstance.getInputControl());
-                                        if(controlRootInTable != false){
-                                            if(listTableRootControl.hasOwnProperty(controlInstance.inTable) == false){
-                                                listTableRootControl[controlInstance.inTable] = {};
-                                            }
-                                            listTableRootControl[controlInstance.inTable][controlRootInTable] = false;
+                                    if(formulasType == 'linkConfig'){ // nếu có cấu hình công thức link thì cũng chạy các công thức của nó
+                                        let configData = controlFormulas[formulasType].configData;
+                                        for (let i = 0; i < configData.length; i++) {
+                                            let config = configData[i];
+                                            let formulasInstance = config.instance;
+                                            let fType = formulasType+"_"+config.formula.instance;
+                                            this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,fType,'root')
                                         }
-										if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
-                                            impactedFieldsListWhenStart[controlName] = false;
-                                            if(!listRootControl.includes(controlName)){
-                                                listRootControl.push(controlName);
+                                    }
+                                    else{
+                                        if(controlFormulas[formulasType].hasOwnProperty('instance')){
+                                            let formulasInstance = controlFormulas[formulasType].instance;
+                                            let controlRootInTable = this.checkControlOutSideTable(controlInstance,formulasInstance.getInputControl());
+                                            if(controlRootInTable != false){
+                                                if(listTableRootControl.hasOwnProperty(controlInstance.inTable) == false){
+                                                    listTableRootControl[controlInstance.inTable] = {};
+                                                }
+                                                listTableRootControl[controlInstance.inTable][controlRootInTable] = false;
                                             }
-											this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
-										}
-									}
+                                            
+                                            if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
+                                                impactedFieldsListWhenStart[controlName] = false;
+                                                if(!listRootControl.includes(controlName)){
+                                                    listRootControl.push(controlName);
+                                                }
+                                                this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
+                                            }
+                                        }
+                                    }
+									
 								}
 							}
 						}

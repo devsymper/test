@@ -1919,7 +1919,9 @@ export default {
                 if(fields[controlId]['formulas'] != false){
                     $.each(formulas,function(k,v){
                         if(k == 'linkConfig'){
-                            formulas[k]['configData'] = fields[controlId]['formulas'][k]['configData']
+                            if(fields[controlId]['formulas'][k]){
+                                formulas[k]['configData'] = fields[controlId]['formulas'][k]['configData'];
+                            }
                         }
                         else{
                             if(fields[controlId]['formulas'][k]){

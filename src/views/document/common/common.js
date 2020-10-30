@@ -55,7 +55,7 @@ const getListInputInDocument = function(instance) {
     return getSDocumentSubmitStore(instance).listInputInDocument;
 }
 const mapTypeToEffectedControl = {
-    link: "effectedLinkControl",
+    linkConfig: "effectedLinkControl",
     formulas: "effectedControl",
     readOnly: "effectedReadonlyControl",
     hidden: "effectedHiddenControl",

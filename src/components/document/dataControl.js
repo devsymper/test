@@ -47,8 +47,10 @@ export const setDataForPropsControl = function(fields, instance, from) {
                     if (fields[controlId]['formulas'][k] == "") {
                         delete control.formulas[k];
                     } else {
-                        if (k == 'linkConfig' && fields[controlId]['formulas'][k] && fields[controlId]['formulas'][k]['configData'].length > 0) {
-                            formulas[k].configData = fields[controlId]['formulas'][k]['configData'];
+                        if (k == 'linkConfig') {
+                            if (fields[controlId]['formulas'][k] && fields[controlId]['formulas'][k]['configData'].length > 0) {
+                                formulas[k].configData = fields[controlId]['formulas'][k]['configData'];
+                            }
                         } else {
                             formulas[k].value = fields[controlId]['formulas'][k]
                         }

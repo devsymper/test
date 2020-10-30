@@ -123,7 +123,8 @@ export default class Control {
             return;
         }
         try {
-            effected = JSON.parse(effected)
+            effected = JSON.parse(effected);
+
             for (let type in effected) {
                 if (type == "effectedControl") {
                     this.effectedControl = effected[type];
@@ -158,8 +159,11 @@ export default class Control {
                     for (let index = 0; index < configs.length; index++) {
                         let config = configs[index];
                         let formulas = config.formula.value;
-                        formulas = formulas.replace(/\r?\n|\r/g, ' ');
-                        this.controlFormulas[key].configData[index]['instance'] = new Formulas(this.curParentInstance, formulas, key);
+                        if (formulas) {
+                            formulas = formulas.replace(/\r?\n|\r/g, ' ');
+                            this.controlFormulas[key].configData[index]['instance'] = new Formulas(this.curParentInstance, formulas, key);
+                        }
+
                     }
                 }
                 if (this.controlFormulas[key].value && Object.values(this.controlFormulas[key].value).length > 0) {
