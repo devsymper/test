@@ -293,6 +293,8 @@ export default class BasicControl extends Control {
         if (this.inTable === false) {
             if (this.type == 'label') {
                 $('#' + this.id).text(value);
+            } else if (this.type == 'richText') {
+                $('#' + this.id).html(value);
             } else if (this.type == 'date') {
                 $('#' + this.id).val(moment(value).format(this.formatDate));
             } else if (this.type == 'checkbox') {
@@ -342,6 +344,8 @@ export default class BasicControl extends Control {
         }
         if (this.type == 'label') {
             this.ele.text(value)
+        } else if (this.type == 'richText') {
+            $('#' + this.id).html(value);
         } else if (this.type == 'image') {
             this.ele.empty();
             let w = this.controlProperties.width.value;
@@ -676,11 +680,9 @@ export default class BasicControl extends Control {
         }
         return false;
     }
-    renderLinkToControl(link) {
-        let icon = `<span class="mdi mdi-information link-icon" title="` + link + `"></span>`
+    renderLinkToControl(link, configInstance) {
+        debugger
+        let icon = `<span class="mdi mdi-information info-control-btn"></span>`
         this.ele.parent().append(icon);
-        this.ele.parent().find('.link-icon').on('click', function(e) {
-            window.open(link);
-        })
     }
 }
