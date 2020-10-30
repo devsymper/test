@@ -46,7 +46,6 @@ export default class CustomRenderer extends BaseRenderer {
             let currentNode=element.businessObject.$attrs.currentNode;
             let infoAssignee=element.businessObject.$attrs.infoAssignee;
             let colorSet=element.businessObject.$attrs.setColor;
-            
             let runner = 0;
             let r = 8;
             let color;

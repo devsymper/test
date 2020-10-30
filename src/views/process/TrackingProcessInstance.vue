@@ -183,7 +183,7 @@ export default {
             let filter={};
             filter.includeProcessVariables=true;
             filter.processInstanceId=instanceId;
-            await bpmneApi
+            bpmneApi
                 .getProcessInstanceHistory(filter)
                 .then(res => {
                     self.updateDrawDataInDiagram(res.data[0].variables);
@@ -230,12 +230,15 @@ export default {
                     infoAssignee.assignee = mapUser[assigneeId];
                     infoAssignee.role = roleInfo;
                 }
+
                 if (this.flowElementMap[index].id) {
-                    console.log("elll",this.flowElementMap[index].id);
-                    symBpmn.updateElementProperties(this.flowElementMap[index].id, {
-                        infoAssignee: infoAssignee,
-                        setColor:nodeStatusColors.notStart
-                    });
+                    setTimeout((self) => {
+                        symBpmn.updateElementProperties(self.flowElementMap[index].id, {
+                            infoAssignee: infoAssignee,
+                            setColor:nodeStatusColors.notStart
+                        });
+                    }, 200,this);
+                  
                 }
 
             }
