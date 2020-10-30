@@ -180,7 +180,20 @@ const updateFormulasId = (state, params) => {
     let tableId = params.tableId
     if (tableId != 0 && tableId != '0') {
         if (state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name]) {
-            state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name]['formulasId'] = value
+            if (name == 'linkConfig') {
+                debugger
+                let linkInstance = params.linkInstance;
+                let allConfig = state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name]['configData'];
+                for (let index = 0; index < allConfig.length; index++) {
+                    let config = allConfig[index];
+                    if (Number(config.formula.instance) == Number(linkInstance)) {
+                        state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name]['configData'][index]['formula']['id'] = value;
+                        break;
+                    }
+                }
+            } else {
+                state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name]['formulasId'] = value
+            }
         }
     } else {
         if (state.editor[instance].allControl[id]['formulas'][name]) {

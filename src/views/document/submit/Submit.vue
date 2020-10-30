@@ -2259,7 +2259,7 @@ export default {
             let impactedFieldsListWhenStart = {}
             let listTableRootControl = {};
             let listRootControl = [];
-			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0 && false){
+			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
 				impactedFieldsList = this.preDataSubmit.impactedFieldsList;
 				impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
 				listRootControl = this.preDataSubmit.rootControl;
@@ -2287,7 +2287,6 @@ export default {
 			}
 			else{
                 let listInput = getListInputInDocument(this.keyInstance);
-                debugger
 				for(let controlName in listInput){
 					this.setAllImpactedFieldsList(controlName);
                     let controlInstance = listInput[controlName];
@@ -2300,29 +2299,17 @@ export default {
                                         let configData = controlFormulas[formulasType].configData;
                                         for (let i = 0; i < configData.length; i++) {
                                             let config = configData[i];
-                                            let formulasInstance = config.instance;
-                                            let fType = formulasType+"_"+config.formula.instance;
-                                            this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,fType,'root')
+                                            if(config.formula.value){
+                                                let formulasInstance = config.instance;
+                                                let fType = formulasType+"_"+config.formula.instance;
+                                                this.getRootControlData(controlInstance, formulasInstance, listTableRootControl, listRootControl, impactedFieldsListWhenStart, fType);
+                                            }
                                         }
                                     }
                                     else{
                                         if(controlFormulas[formulasType].hasOwnProperty('instance')){
                                             let formulasInstance = controlFormulas[formulasType].instance;
-                                            let controlRootInTable = this.checkControlOutSideTable(controlInstance,formulasInstance.getInputControl());
-                                            if(controlRootInTable != false){
-                                                if(listTableRootControl.hasOwnProperty(controlInstance.inTable) == false){
-                                                    listTableRootControl[controlInstance.inTable] = {};
-                                                }
-                                                listTableRootControl[controlInstance.inTable][controlRootInTable] = false;
-                                            }
-                                            
-                                            if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
-                                                impactedFieldsListWhenStart[controlName] = false;
-                                                if(!listRootControl.includes(controlName)){
-                                                    listRootControl.push(controlName);
-                                                }
-                                                this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
-                                            }
+                                            this.getRootControlData(controlInstance, formulasInstance, listTableRootControl, listRootControl, impactedFieldsListWhenStart, formulasType);
                                         }
                                     }
 									
@@ -2341,6 +2328,27 @@ export default {
             this.pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl)
         },
 
+
+        /**
+         * Hàm kiểm tra xem control có phải là root hay ko(cả trong table), nếu có đưa vào biến và lưu lại trên db
+         */
+        getRootControlData(controlInstance, formulasInstance, listTableRootControl, listRootControl, impactedFieldsListWhenStart, formulasType){
+            let controlName = controlInstance.name;
+            let controlRootInTable = this.checkControlOutSideTable(controlInstance,formulasInstance.getInputControl());
+            if(controlRootInTable != false){
+                if(listTableRootControl.hasOwnProperty(controlInstance.inTable) == false){
+                    listTableRootControl[controlInstance.inTable] = {};
+                }
+                listTableRootControl[controlInstance.inTable][controlRootInTable] = false;
+            }
+            if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
+                impactedFieldsListWhenStart[controlName] = false;
+                if(!listRootControl.includes(controlName)){
+                    listRootControl.push(controlName);
+                }
+                this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
+            }
+        },
         /**
          * Hàm kiểm tra các input của 1 control có nằm trong cùng table đó hay không
          */

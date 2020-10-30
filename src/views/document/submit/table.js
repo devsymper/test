@@ -715,6 +715,7 @@ export default class Table {
                 return
             }
             let controlInstance = this.getControlInstance(controlName);
+            debugger
             if (controlInstance.checkValidValueLength(rowIndex)) {
                 if (controlInstance == null || controlInstance == undefined) {
                     return;
@@ -729,7 +730,7 @@ export default class Table {
                 this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
                 this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readonly');
                 this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
-                this.handlerRunOtherFormulasControl(controlLinkEffected, 'link');
+                this.handlerRunOtherFormulasControl(controlLinkEffected, 'linkConfig');
                 this.handlerRunOtherFormulasControl(controlValidateEffected, 'validate');
                 if (Object.keys(controlEffected).length > 0) {
                     for (let i in controlEffected) {

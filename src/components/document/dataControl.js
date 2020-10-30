@@ -16,6 +16,7 @@ import {
 export const allControlNotSetData = ['approvalHistory', 'submit', 'draft', 'reset']
 export const setDataForPropsControl = function(fields, instance, from) {
     let controlMapDatasetDataflow = {};
+    let viewType = sDocument.state.viewType[instance];
     for (let controlId in fields) {
         let control = GetControlProps(fields[controlId].type);
         let userUpdate = fields[controlId].userUpdate
@@ -41,10 +42,9 @@ export const setDataForPropsControl = function(fields, instance, from) {
             }
         })
         if (fields[controlId]['formulas'] != false && fields[controlId]['formulas'] != "[]") {
-            let viewType = sDocument.state.viewType[instance];
             if (viewType != 'detail') {
                 $.each(formulas, function(k, v) {
-                    if (fields[controlId]['formulas'][k] == "") {
+                    if (fields[controlId]['formulas'][k]) {
                         delete control.formulas[k];
                     } else {
                         if (k == 'linkConfig') {
@@ -99,13 +99,21 @@ export const setDataForPropsControl = function(fields, instance, from) {
                     }
                 })
                 if (listField[childFieldId]['formulas'] != false && listField[childFieldId]['formulas'] != "[]") {
-                    $.each(childFormulas, function(k, v) {
-                        if (listField[childFieldId]['formulas'][k] == "") {
-                            delete childControl.formulas[k];
-                        } else {
-                            childFormulas[k].value = listField[childFieldId]['formulas'][k]
-                        }
-                    })
+                    if (viewType != 'detail') {
+                        $.each(childFormulas, function(k, v) {
+                            if (!listField[childFieldId]['formulas'][k]) {
+                                delete control.formulas[k];
+                            } else {
+                                if (k == 'linkConfig') {
+                                    if (listField[childFieldId]['formulas'][k] && listField[childFieldId]['formulas'][k]['configData'].length > 0) {
+                                        childFormulas[k].configData = listField[childFieldId]['formulas'][k]['configData'];
+                                    }
+                                } else {
+                                    childFormulas[k].value = listField[childFieldId]['formulas'][k];
+                                }
+                            }
+                        })
+                    }
                 }
                 if (childProperties.hasOwnProperty('name') && sDocument.state.detail[instance].allData != null) {
                     let controlName = childProperties['name'].value;

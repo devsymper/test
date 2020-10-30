@@ -1043,7 +1043,6 @@ export default {
             let dataPost = this.getDataToSaveMultiFormulas(allControl);
             let thisCpn = this;
             try {
-                debugger
                 if(Object.keys(dataPost.update).length > 0)
                 await formulasApi.updateMultiFormulas({formulas:JSON.stringify(dataPost.update)})
                 if(Object.keys(dataPost.insert).length > 0){

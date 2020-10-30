@@ -3,7 +3,13 @@
     :style="position"
     v-show="isShow" >
        <div class="item-link" v-for="(link,index) in listLink" :key="index" @click="openLink(link)">
-           {{link.title}}
+           <v-tooltip top>
+                <template v-slot:activator="{ on }">
+                    <p v-on="on" class="m-0">{{link.title}}</p>
+                </template>
+                <span>{{link.link}}</span>
+            </v-tooltip>
+           
        </div>
     </v-card>
 </template>
@@ -46,11 +52,13 @@ export default {
             this.calculatorPositionBox(e);
         },
         setData(data){
+            let link = (data.source == 'document') ? '/documents/objects/'+data.value : data.source+":"+data.value;
             if(this.listLink.hasOwnProperty(data.key)){
                 this.listLink[data.key].value = data.value;
+                this.listLink[data.key].link = link;
             }
             else{
-                this.listLink[data.key] = {title:data.title,value:data.value,source:data.source};
+                this.listLink[data.key] = {title:data.title,value:data.value,source:data.source, link:link};
             }
         },
         calculatorPositionBox(e){
