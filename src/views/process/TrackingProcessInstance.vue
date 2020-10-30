@@ -157,7 +157,7 @@ export default {
         async getDefinitionModel(){
             let self=this;
             if (this.processDefinitionId) {
-               await bpmneApi
+                bpmneApi
                 .getDefinitionModel(this.processDefinitionId)
                 .then(res => {
 
