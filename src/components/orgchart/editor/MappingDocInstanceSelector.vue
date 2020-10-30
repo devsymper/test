@@ -8,8 +8,8 @@
         solo
         flat
         chips
-        item-text="displayName"
-        item-value="id"
+        item-text="name"
+        item-value="code"
         background-color="#fbfbfb"
         :placeholder="$t('common.search')"
         class="sym-small-size sym-pad-0 sym-style-input"
@@ -24,21 +24,24 @@
                 small
                 @click:close="remove(data.item)"
             > 
-                <symperAvatar :size="20" :userId="data.item.id" />
-                <span class="fs-11">{{ data.item.displayName }}</span>
+                  <v-list-item-avatar height="20" width="20" size="20" class="mt-1 mb-1">
+                    <v-img :src="data.item.image ? data.item.image :avatarDefault">
+                    </v-img>
+                </v-list-item-avatar>
+                <span class="fs-11">{{ data.item.name }}</span>
             </v-chip>
         </template>
         <template v-slot:item="data">
             <template>
                 <v-list-item-avatar height="20" width="20" size="20" class="mt-1 mb-1">
-                    <symperAvatar :size="20" :userId="data.item.id" />
+                    <v-img :src="data.item.image ? data.item.image :avatarDefault">
+                    </v-img>
                 </v-list-item-avatar>
                 <v-list-item-content class="pt-0 pb-0">
-                    <v-list-item-title v-html="data.item.displayName"></v-list-item-title>
-                    <v-list-item-subtitle class="caption" style="font-size:10px !important" v-html="data.item.role"></v-list-item-subtitle>
+                    <v-list-item-title v-html="data.item.name"></v-list-item-title>
                 </v-list-item-content>
                 <v-list-item-action class="mt-0 mb-0">
-                    <v-icon v-if="typeof(selected.indexOf) != 'undefined' && selected.indexOf(data.item.id) >= 0" color="success" small>mdi-check</v-icon>
+                    <v-icon v-if="typeof(selected.indexOf) != 'undefined' && selected.indexOf(data.item.code) >= 0" color="success" small>mdi-check</v-icon>
                 </v-list-item-action>
             </template>
         </template>
@@ -48,7 +51,7 @@
 <script>
 import avatarDefault from "@/assets/image/avatar_default.jpg";
 import symperAvatar from "@/components/common/SymperAvatar.vue";
-
+import { orgchartApi } from "@/api/orgchart";
 export default {
     components:{
         symperAvatar
@@ -93,8 +96,23 @@ export default {
             deep: true,
             immediate: true,
             handler(obj){
+                let self = this
                 if(obj.mappingDoc.value != ""){
-                    debugger
+                    if(!obj.scriptMapping.value){
+                        obj.scriptMapping.value = ""
+                    }
+                        debugger
+                    orgchartApi.getDocInstance({id:obj.mappingDoc.value, script:obj.scriptMapping.value}).then(res=>{
+                        res.data.listObject.forEach(function(e){
+                            let item = {}
+                            obj.tableMapping.value.forEach(function(k){
+                                if(k.control != "" && k.control){
+                                    item[k.nodeColumn] = e[k.control]
+                                }
+                            })
+                            self.allUser.push(item)
+                        })
+                    })
                 }
             }
         },
@@ -109,6 +127,7 @@ export default {
             autoUpdate: true,
             isUpdating: false,
             selected: null,
+            allUser: [],
         }
     },
     methods: {
@@ -126,11 +145,7 @@ export default {
             this.$emit("input", userToInput);
         },
     },
-    computed: {
-        allUser(){
-            return this.$store.state.app.allUsers;
-        }
-    }
+  
 }
 </script>
 
