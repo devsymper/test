@@ -148,9 +148,21 @@ export default class Control {
      * Khởi tạo các formulas của từng control
      */
     initFormulas() {
+        if (this.checkDetailView()) {
+            return;
+        }
         if (Object.keys(this.controlFormulas).length > 0) {
             for (let key in this.controlFormulas) {
-                if (this.controlFormulas[key].value != "" && this.controlFormulas[key].value != undefined && Object.values(this.controlFormulas[key].value).length > 0) {
+                if (key == 'linkConfig') {
+                    let configs = this.controlFormulas[key].configData;
+                    for (let index = 0; index < configs.length; index++) {
+                        let config = configs[index];
+                        let formulas = config.formula.value;
+                        formulas = formulas.replace(/\r?\n|\r/g, ' ');
+                        this.controlFormulas[key].configData[index]['instance'] = new Formulas(this.curParentInstance, formulas, key);
+                    }
+                }
+                if (this.controlFormulas[key].value && Object.values(this.controlFormulas[key].value).length > 0) {
                     let formulas = Object.values(this.controlFormulas[key].value)[0];
                     formulas = formulas.replace(/\r?\n|\r/g, ' ');
                     this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, formulas, key);
@@ -162,7 +174,6 @@ export default class Control {
                             instance: this.curParentInstance
                         });
                     }
-
                 }
             }
         }
