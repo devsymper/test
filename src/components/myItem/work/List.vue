@@ -502,6 +502,7 @@ export default {
                 processIdUserStart.push(item.processInstanceId);
                 processId.push(item.processInstanceId);
                 processIden.push('work:'+item.processInstanceId);
+                self.listIdProcessInstance.push(item.processInstanceId);
             }
         }
         await this.getProcessInstanceUserStart(processIdUserStart);
@@ -511,9 +512,8 @@ export default {
         res = await BPMNEngine.getProcessInstanceHistory(filter);
         listWork = res.data;
         this.totalWork = Number(res.total);
-       
         for (let work of listWork) {
-            if (self.listIdProcessInstance.indexOf(work.processInstanceId) === -1) {
+            if (self.listIdProcessInstance.indexOf(work.id) === -1) {
                 self.allFlatWorks.push(work);
                 processIden.push('work:'+work.id);
                 processId.push(work.id);
@@ -521,7 +521,6 @@ export default {
             }
         }
        
-        
         self.filterVariables.pageSize=(processId.length)*2;
         self.filterVariables.processInstanceIds=JSON.stringify(processId);
         
@@ -551,7 +550,8 @@ export default {
             let res={};
             res = await BPMNEngine.getProcessInstanceHistory(filter);
             for (let work of res.data) {
-                if (!self.allFlatWorks[work.id]) {
+                const item = self.allFlatWorks.find(element => element.id == work.id);
+                if (!item) {
                     self.allFlatWorks.push(work);
                 }
             }

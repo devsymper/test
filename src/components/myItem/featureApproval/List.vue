@@ -450,7 +450,6 @@ export default {
         })
         .catch(err => {});
         self.reCalcListTaskHeight();
-       // self.$refs.bottomSheetView.toggle();
     },
     activated(){
         this.selectAll=false;

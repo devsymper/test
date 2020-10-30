@@ -345,7 +345,7 @@ export default {
         async getData(){
             let self=this;
              if (self.nodeInfo.process_definition_id) {
-                 let filter={};
+                let filter={};
                 filter.sort= "createTime";
                 filter.order= "desc";
                 filter.processDefinitionId=self.nodeInfo.process_definition_id;
@@ -413,15 +413,13 @@ export default {
     margin-right: 20px!important;
 }
 .approval-taskDetail >>>.detail-task .s-drawer{
-    top:48px!important;
+    top:0px!important;
     padding:12px;
 }
 .approval-taskDetail >>>.doc-detail .s-drawer{
     top:0px!important;
     padding:12px;
-
 }
-
 .approval-taskDetail >>>.task-header{
     line-height: 39px!important;
 }
