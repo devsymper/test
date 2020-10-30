@@ -18,7 +18,7 @@
             @create-task="getWorks({})"
             @refresh-task-list="getWorks()"
             ></listHeader>
-            <v-divider v-if="!sideBySideMode"></v-divider>
+            <v-divider v-if="!sideBySideMode" ></v-divider>
             <v-row class="ml-0 mr-0" v-if="!sideBySideMode">
             <v-col cols="12" class="list-tasks pt-0 pb-0">
                 <v-row>
