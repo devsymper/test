@@ -4,7 +4,7 @@
             open-on-hover
             top
             offset-y
-            open-delay="500"
+            open-delay="1000"
             z-index="9999"
             >
             <template v-slot:activator="{ on }">
