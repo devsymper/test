@@ -126,7 +126,7 @@ export default class BasicControl extends Control {
         this.setDefaultValue();
         this.setEvent();
         if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete')) {
-            let allTable = this.controlFormulas.autocomplete.instance.autocompleteDetectTableQuery();
+            let allTable = this.controlFormulas.autocomplete.instance.detectTableQuery();
             let columnBinding = this.controlFormulas.autocomplete.instance.autocompleteDetectAliasControl(false);
             this.columnBindingSubForm = columnBinding;
             if (allTable !== false) {

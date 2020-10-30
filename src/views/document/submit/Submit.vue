@@ -123,6 +123,7 @@
         </div>
         <EmbedDataflow 
         @after-mounted="afterDataFlowMounted" 
+        @dataflow-finished-running="afterRunDataflow"
         v-for="dataFlow in listDataFlow" 
         :key="dataFlow.id"  
         :dataflowId="dataFlow.id" 
@@ -368,7 +369,8 @@ export default {
             listFormulasTrace:{},
             controlTrace:null,
             listFileControl:[],
-            currentImageControl:null
+            currentImageControl:null,
+            currentControlDataflow:null
         };
 
     },
@@ -397,6 +399,7 @@ export default {
         $(document).find('#sym-submit-'+this.keyInstance).on('click','.run-dataflow',function(e){
             let idControl = $(this).closest('.s-control-data-flow').attr('id');
             let control = thisCpn.sDocumentEditor.allControl[idControl];
+            thisCpn.currentControlDataflow = control;
             let dataParams = thisCpn.getParamsForRunDataFlow(control.properties);
             let element = thisCpn.$refs['dataFlow'+control.properties.dataFlowId.value][0].runDataflow(dataParams);
         })
@@ -451,9 +454,8 @@ export default {
                 let controlInstance = thisCpn.sDocumentSubmit.listInputInDocument[controlName];
                 let controlId = controlInstance.id
                 let dataInput = this.getDataInputFormulas(formulasInstance);
-                formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
-                    thisCpn.handlerAfterRunFormulas(rs,controlId,controlName,'formulas',false)
-                });
+
+                this.handlerBeforeRunFormulasValue(formulasInstance, controlId, controlName, 'formulas');
             } catch (error) {
                 
             }
@@ -838,14 +840,16 @@ export default {
         getParamsForRunDataFlow(properties){
             let mapControlToParams = properties.mapParamsDataflow.value;
             let dataParams = {}
-            for (let index = 0; index < mapControlToParams.length; index++) {
-                let item = mapControlToParams[index];
-                let param = item.name
-                let controlName = item.controlName;
-                let listInputInDocument = getListInputInDocument(this.keyInstance);
-                if(param != null && param != "" && controlName != null && controlName !="")
-                dataParams[param] = listInputInDocument[controlName].value;
-            } 
+            if(mapControlToParams){
+                for (let index = 0; index < mapControlToParams.length; index++) {
+                    let item = mapControlToParams[index];
+                    let param = item.name
+                    let controlName = item.controlName;
+                    let listInputInDocument = getListInputInDocument(this.keyInstance);
+                    if(param != null && param != "" && controlName != null && controlName !="")
+                    dataParams[param] = listInputInDocument[controlName].value;
+                } 
+            }
             return dataParams
         },
         setWorkflowVariableToStore(after){
@@ -879,8 +883,17 @@ export default {
                 
             }
         },
+        /**
+         * Hàm callback sau khi chạy xong dataflow
+         */
+        afterRunDataflow(){
+            let controlName = this.currentControlDataflow.properties.name.value;
+            let controlIns = getControlInstanceFromStore(this.keyInstance,controlName);
+            let controlEffected = controlIns.getEffectedControl();
+            this.runFormulasControlEffected(controlIns.name,controlEffected);
+        },
         getDataOrgchart(e){
-            let thisCpn = this
+            let thisCpn = this;
             let aliasControl = e.formulasInstance.autocompleteDetectAliasControl();
             let dataFromCache = this.getDataAutocompleteFromCache(e.e.target.value, aliasControl);
             if(dataFromCache == false){
@@ -894,9 +907,6 @@ export default {
                 this.$refs.autocompleteInput.setAliasControl(aliasControl);
                 this.$refs.autocompleteInput.setData(dataFromCache);
             }
-            // e.formulasInstance.handleBeforeRunFormulas(dataInput).then(res=>{
-            //     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle, $(e.e.target).val())
-            // });
         },
         /**
          * Hàm chạy công thức autocomplete để đổ dữ liệu vào box autucomplete, control select cũng dùng trường hợp này
@@ -1325,6 +1335,15 @@ export default {
                                 let mapParamsDataflow = field.properties.mapParamsDataflow.value;
                                 $(allInputControl[index]).find('.run-dataflow').removeClass('d-none')
                                 listDataFlow.push({id:id,controlName:controlName,el:$(allInputControl[index]),mapParamsDataflow:mapParamsDataflow});
+                                let control = new LayoutControl(
+                                    idField,
+                                    $(allInputControl[index]),
+                                    field,
+                                    thisCpn.keyInstance
+                                );
+                                control.init();
+                                control.setEffectedData(prepareData);
+                                this.addToListInputInDocument(controlName,control);
                             }
                             else{
                                 let control = new BasicControl(
@@ -1336,7 +1355,7 @@ export default {
                                 );
                                 control.init();
                                 control.setEffectedData(prepareData);
-                                this.addToListInputInDocument(controlName,control)
+                                this.addToListInputInDocument(controlName,control);
                                 control.render();
                             }
                             
@@ -1426,8 +1445,9 @@ export default {
                    
                     
                 }
-                this.hidePreloader();
             }
+                this.hidePreloader();
+
 
         },
 
@@ -1486,7 +1506,14 @@ export default {
                         if(formulas[formulasType].hasOwnProperty('instance')){
 							let inputControl = formulas[formulasType].instance.inputControl;
 							let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
+							let inputFromDatasets = formulas[formulasType].instance.inputFromDatasets;
                             for (let controlEffect in inputControl) {
+                                if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
+                                    mapControlEffected[formulasType][controlEffect] = {};
+                                }
+                                mapControlEffected[formulasType][controlEffect][name] = true;
+                            }
+                            for (let controlEffect in inputFromDatasets) {
                                 if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
                                     mapControlEffected[formulasType][controlEffect] = {};
                                 }

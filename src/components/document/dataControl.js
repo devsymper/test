@@ -15,12 +15,17 @@ import {
  */
 export const allControlNotSetData = ['approvalHistory', 'submit', 'draft', 'reset']
 export const setDataForPropsControl = function(fields, instance, from) {
+    let controlMapDatasetDataflow = {};
     for (let controlId in fields) {
         let control = GetControlProps(fields[controlId].type);
         let userUpdate = fields[controlId].userUpdate
         let properties = control.properties;
         let formulas = control.formulas
-        let type = fields[controlId].type
+        let type = fields[controlId].type;
+        if (type == 'dataFlow') {
+            controlMapDatasetDataflow[fields[controlId].properties['name']] = fields[controlId].properties['datasets'];
+
+        }
         let id = fields[controlId]['properties'].id;
         let prepareData = fields[controlId].dataPrepareSubmit;
         $.each(properties, function(k, v) {
@@ -136,6 +141,9 @@ export const setDataForPropsControl = function(fields, instance, from) {
                 instance, from);
         }
     }
+    store.commit(
+        "document/addToDocumentSubmitStore", { key: 'listControlMappingDatasets', value: controlMapDatasetDataflow, instance: instance }
+    );
 }
 
 function addToAllControlInDoc(controlId, control, instance, from) {
