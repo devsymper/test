@@ -245,7 +245,6 @@ export default {
             work.startUserId = 0;
             work.startUserName = '';
             let roleInfo={};
-
             const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===work.id && element.name==="symper_user_id_start_workflow" );
             if (dataVariable) {
                 let userIdStart=dataVariable.value;
@@ -523,7 +522,6 @@ export default {
        
         self.filterVariables.pageSize=(processId.length)*2;
         self.filterVariables.processInstanceIds=JSON.stringify(processId);
-        
         let resVariable = {};
         resVariable = await taskApi.getVariableWorkflow(self.filterVariables);
         for (let item of resVariable.data) {
@@ -531,7 +529,7 @@ export default {
                 self.allVariableProcess.push(item);
             }
         }
-
+  
         this.$store.commit('file/setWaitingFileCountPerObj', processIden);
         this.$store.commit('comment/setWaitingCommentCountPerObj', processIden);
         this.$store.dispatch('file/getWaitingFileCountPerObj');
