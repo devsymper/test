@@ -2633,16 +2633,21 @@ export default {
                 if($(tbody[0].innerHTML).length > 0){
                     for(let i = 0; i< thead.length; i++){
                         let style = $(thead[i]).attr('style');
-                        let width = style.match(/(?<=width:\s)\s*([^;"]*)(?=\;)/gmi);
-                        if(width){
-                            let row = {title: $(thead[i]).text(),colWidth:width[0],colIndex:i}
-                            listData.push(row)
+                        if(style){
+                            let width = style.match(/(?<=width:\s)\s*([^;"]*)(?=\;)/gmi);
+                            if(width){
+                                let row = {title: $(thead[i]).text(),colWidth:width[0],colIndex:i}
+                                listData.push(row)
+                            }
+                            else{
+                                let row = {title: $(thead[i]).text(),colWidth:'auto',colIndex:i}
+                                listData.push(row)
+                            }
                         }
                         else{
                             let row = {title: $(thead[i]).text(),colWidth:'auto',colIndex:i}
                             listData.push(row)
                         }
-                        
                     }
                 }
                 this.$refs.printTableConfig.showDialog();
