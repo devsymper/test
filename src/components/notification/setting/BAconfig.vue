@@ -3,9 +3,6 @@
         <div class="mb-3">
             <h4>Cài đặt thông báo</h4>
         </div>
-        <!-- test -->
-        
-        <!-- test -->
         <v-row class="pt-0" style="margin-top:-10px">
             <v-col class="fs-13 col-md-5" style="margin-top:5px">Hình đại diện</v-col>
             <v-col class="col-md-7">  
@@ -191,18 +188,17 @@ export default {
    watch: {
       objectType(){
          this.refreshSelected();
-          this.getSource(this.objectType);
+          this.getSource(this.objectType.value);
       }
   },
   created () {
       this.getNameModule();
     
   },
-
   components:{
-    UploadFile,
-    iconPicker,
-    draggable
+      UploadFile,
+      iconPicker,
+      draggable
     },
   data() {
     return {
@@ -251,21 +247,20 @@ export default {
         this.$refs.uploadAvatar.uploadFile();
     },
     replaceDescription(){
-      debugger
+    //  debugger
       let description = this.description;
       for(let i = 0; i<this.parameter.length;i++){
         let oldValue= new RegExp('<'+this.parameter[i].text+'>');
         let newValue = this.parameter[i].value;
         description= description.replace(oldValue,newValue);
       }
-      debugger
      // description = this.description;
       return description;
     },
     save(){
         let data={
-            event: this.action,
-            source:this.objectType,
+            event: this.action.value,
+            source:this.objectType.value,
             state:this.state?1:0,
             objectIdentifier:this.objectType,
             objectType:this.objectType,

@@ -2,7 +2,7 @@
     <div class="w-100 mr-10">
         <v-row class="header ml-3">
             <v-col class="col-md-8 col-sm-8 ">
-                  <!-- <v-menu offset-y>
+                  <!-- <v-menu offset-y  :close-on-content-click="false">
                     <template v-slot:activator="{ on, attrs }">
                     <v-btn
                         color="primary"
@@ -12,9 +12,10 @@
                     >
                         Dropdown
                     </v-btn>
-                    </template> -->
-               <!-- <NotificationPopUp :objId="483" :objType="'document_definition'" style="background:white" /> -->
-                <!-- </v-menu> -->
+                    </template>
+               <NotificationPopUp :name="'Đơn bán hàng'" :objType="'comment'" style="background:white" />
+                </v-menu> -->
+                    <span class="fs-15 fw-430" v-if="showMain">Cài đặt thông báo</span>
                 <span class="fs-15 fw-430" v-if="showFollow">Danh sách đối tượng đang theo dõi</span>
                 <span class="fs-15 fw-430" v-if="showUnfollow">Danh sách đối tượng không theo dõi</span>
             </v-col >
@@ -39,7 +40,9 @@
                     
             </v-col >
         </v-row>
-        <SettingNotification v-if="showMain" :type="type" :listItems="items" :allListChanel="allListChanel" />
+        <SettingNotification 
+            v-if="showMain" :type="type" @update-listChanel="updateListChanel()"
+            :listItems="items" :allListChanel="allListChanel" />
         <SettingNotification v-if="showFollow" :type="type" :listItems ="listSubcribed"/>
         <SettingNotification v-if="showUnfollow" :type="type" :listItems ="listUnsubcribed"/>
     </div>
@@ -85,6 +88,10 @@ export default {
     }
   },
   methods: {
+      updateListChanel(){
+          
+         ;
+      },
       searchList(){
         this.listSubcribed = [];
         this.listUnsubcribed=[];
@@ -103,7 +110,7 @@ export default {
                         format.push(listModules[i])
                     }
                 }
-                let formatListModules = _.groupBy(format, 'objectIdentifier');
+                let formatListModules = _.groupBy(format, 'objectType');
                 let name = Object.keys(formatListModules);
                 for(let i=0;i<name.length;i++){
                     if(subscribe){
@@ -165,7 +172,7 @@ export default {
                     self.items[i].items.push({
                         title: groupByEvent[k],
                         name:self.rename(name[i],groupByEvent[k]),
-                        active: self.checkSubcribe(name[i],groupByEvent[k])
+                        active:  self.checkSubcribe(name[i],groupByEvent[k])
                     });
                 }
             }
@@ -219,13 +226,15 @@ export default {
     //     return name
     // },
     getListFollowed(){
+      //  debugger
         this.listSubcribed = []
         const self= this;
         let isSubcribed = true;
         notification.showListsSubcribed({subscribed:isSubcribed}).then(res=>{
             if(res.status==200){
              let listSubcribed = res.data;
-              let grouplistByObjId = _.groupBy(listSubcribed, 'objectIdentifier');
+             // let grouplistByObjId = _.groupBy(listSubcribed, 'objectIdentifier');
+             let grouplistByObjId = _.groupBy(listSubcribed, 'objectType');
               let objId = Object.keys(grouplistByObjId);
                 for(let j = 0; j<objId.length;j++){
                     self.listSubcribed.push({
@@ -234,10 +243,12 @@ export default {
                         icon:objId[j].indexOf(':')>0?objId[j].split(':')[0]:objId[j]
                     })
                     for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
+
                         self.listSubcribed[j].items.push({
                             title: grouplistByObjId[objId[j]][i].event,
                             name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
-                            active: true
+                             active:  self.checkSubcribe(objId[i],grouplistByObjId[objId[j]][i].event),
+                            id:grouplistByObjId[objId[j]][i].id
 
                         })
                      }
@@ -249,22 +260,25 @@ export default {
         this.listUnsubcribed = []
         const self= this;
         let isSubcribed = false;
-        notification.showListsSubcribed({subscribed:isSubcribed}). then(res=>{
+        notification.showListsSubcribed({subscribed:isSubcribed}).then(res=>{
             if(res.status==200){
              let listSubcribed = res.data;
-              let grouplistByObjId = _.groupBy(listSubcribed, 'objectIdentifier');
+             //debugger
+              let grouplistByObjId = _.groupBy(listSubcribed, 'objectType');
               let objId = Object.keys(grouplistByObjId).filter(x=>x!=''&&x!='null');
                 for(let j = 0; j<objId.length;j++){
                     self.listUnsubcribed.push({
                         items:[],
-                        title: self.findName(objId[j]),
+                        title: objId[j],
                         icon:objId[j].indexOf(':')>0?objId[j].split(':')[0]:objId[j]
                     })
                     for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
                         self.listUnsubcribed[j].items.push({
                             title: grouplistByObjId[objId[j]][i].event,
                             name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
-                            active: true
+                             active:  self.checkSubcribe(objId[j],grouplistByObjId[objId[j]][i].event),
+                            id:grouplistByObjId[objId[j]][i].id
+
                         })
                      }
                 }

@@ -26,7 +26,7 @@
                     <v-list-item-title v-if="type=='main'">{{$t('objects.'+item.title)}}</v-list-item-title>
                     <v-list-item-title v-else>{{item.title}}</v-list-item-title>
                     <v-list-item-subtitle v-if="type=='main'" class="fw-400 fs-11">{{$t('objects.'+item.title)}}</v-list-item-subtitle>
-                    <v-list-item-subtitle v-else class="fw-400 fs-11">{{item.title}}</v-list-item-subtitle>
+                    <v-list-item-subtitle v-else class="fw-400 fs-11">{{$t('objects.'+item.title)}}</v-list-item-subtitle>
                     </v-list-item-content>
                 </template>
                 <div class="mb-3 ml-10">
@@ -65,15 +65,24 @@ export default {
         deep: true,
         immediate: true,
         handler(newValue){
+           // debugger
+            //debugger
             for(let i = 0; i<newValue.length;i++){
                 for(let j = 0; j<newValue[i].items.length;j++){
                 // check 1 lượt nếu chọn subcribed
                     if(newValue[i].items[j].active){
                         // nếu chưa tồn tại gọi api
-                        this.subcribedChanel(newValue[i].title, newValue[i].items[j].title) 
+                        // if(this.type=='main'){
+                                this.subcribedAllChanel(newValue[i].title, newValue[i].items[j].title) 
+                        // }else{
+                        //     //this.subscribedOneChanel(newValue[i].items[j].id);
+                        // }
                     // nếu không chọn subcribed
                     }else{
-                        this.unsubcribedChanel(newValue[i].title, newValue[i].items[j].title) 
+                        //  if(this.type=='main'){
+                            //  debugger
+                            this.unsubcribedAllChanel(newValue[i].title, newValue[i].items[j].title) 
+                        //  }
                         /// chuyển state false
                         //nếu đã có trong list
                     }
@@ -84,23 +93,34 @@ export default {
   },
   props: ['type','listItems','listSubcribed','allListChanel'],
     methods: {
+        subscribedOneChanel(id){
+            //debugger
+             notification.subscribeChanel(id).then(res=>{
+                if(res.status==200){}
+            })
+        },
         //subcribed all
-        subcribedChanel(objectType,event){
+        subcribedAllChanel(objectType,event){
+            //debugger
             for(let i=0;i<this.allListChanel.length;i++){
                 if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&!this.allListChanel[i].subscribed){
                        notification.subscribeChanel(this.allListChanel[i].id).then(res=>{
                         if(res.status==200){
+                          // self.$emit('update-listChanel')
                         }
                     })
                 }
             }
         },
-        unsubcribedChanel(objectType,event){
+        unsubcribedAllChanel(objectType,event){
+           // debugger
+            const self = this;
             let data={state:false};
             for(let i=0;i<this.allListChanel.length;i++){
                 if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&this.allListChanel[i].subscribed){
                        notification.subscribeChanel(this.allListChanel[i].id,data).then(res=>{
                         if(res.status==200){
+                            //self.$emit('update-listChanel')
                         }
                     })
                 }
