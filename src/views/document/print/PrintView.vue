@@ -90,6 +90,9 @@ export default {
                             .wrap-print-multiple{
                                 width:100%;
                             }
+                            .sym-form-Detail{
+                                overflow:hidden;
+                            }
                     </style>`
                      stylesHtml += cstyle;
             // Open the print window
@@ -124,10 +127,13 @@ export default {
 <style scoped>
     .wrap-print-multiple{
         overflow: auto;
-        height: calc(100vh);
+        height: calc(100%);
         width: 100%;
     }
     .wrap-print-multiple >>> .wrap-s-control-table table{
         width: 100% !important;
+    }
+    .wrap-print-multiple >>> .wrap-content-detail{
+        overflow-y: hidden !important;
     }
 </style>
