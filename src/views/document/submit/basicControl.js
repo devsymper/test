@@ -293,6 +293,8 @@ export default class BasicControl extends Control {
         if (this.inTable === false) {
             if (this.type == 'label') {
                 $('#' + this.id).text(value);
+            } else if (this.type == 'richText') {
+                $('#' + this.id).html(value);
             } else if (this.type == 'date') {
                 $('#' + this.id).val(moment(value).format(this.formatDate));
             } else if (this.type == 'checkbox') {
@@ -342,6 +344,8 @@ export default class BasicControl extends Control {
         }
         if (this.type == 'label') {
             this.ele.text(value)
+        } else if (this.type == 'richText') {
+            $('#' + this.id).html(value);
         } else if (this.type == 'image') {
             this.ele.empty();
             let w = this.controlProperties.width.value;

@@ -148,6 +148,9 @@ export default class Control {
      * Khởi tạo các formulas của từng control
      */
     initFormulas() {
+        if (this.checkDetailView()) {
+            return;
+        }
         if (Object.keys(this.controlFormulas).length > 0) {
             for (let key in this.controlFormulas) {
                 if (key == 'linkConfig') {

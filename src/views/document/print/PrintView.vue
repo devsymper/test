@@ -113,7 +113,7 @@ export default {
 
             setTimeout(() => {
                 WinPrint.print();
-                // WinPrint.close();
+                WinPrint.close();
             }, 1000);
            
             
