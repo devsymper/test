@@ -101,8 +101,8 @@
             <EditorWorkspace 
                 :class="{
                     'w-100': true,
-                    'symper-orgchart-view': action == 'view',
-                    'symper-orgchart-active-editor': action != 'view'
+                    'symper-orgchart-view': action == 'view' || action == 'structureManagement',
+                    'symper-orgchart-active-editor': action != 'view' && action != 'structureManagement'
                 }"
                 style="height: calc(100% - 41px)"
                 @new-viz-cell-added="handleNewNodeAdded"
@@ -271,8 +271,17 @@ export default {
             },
         }
     },
-    created(){
+    created(){  
         this.initOrgchartData();
+        // this.$store.dispatch('document/setListDocuments')
+        documentApi.getListDocument().then(res=>{
+            if(res.status == 200){
+                let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
+               homeConfig.commonAttrs.mappingDoc.options = res.data.listObject
+            }
+            
+        })
+       
         if(this.action != 'create'){
             this.restoreOrgchartView(this.id)
         }else{
@@ -394,12 +403,15 @@ export default {
 				})
         },
         restoreMainOrgchartConfig(config){
+            let mappingDocInfo = JSON.parse(config.mappingDocInfo)
             let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
             homeConfig.commonAttrs.name.value = config.name;
             homeConfig.commonAttrs.description.value = config.description;
             homeConfig.commonAttrs.code.value = config.code;
             homeConfig.commonAttrs.isDefault.value = config.isDefault == "1" ? true : false;
-            homeConfig.commonAttrs.mappingDoc.options = this.listDocument
+            homeConfig.commonAttrs.mappingDoc.value = mappingDocInfo.docId
+            homeConfig.commonAttrs.scriptMapping.value = mappingDocInfo.script
+            homeConfig.commonAttrs.tableMapping.value = mappingDocInfo.fieldMapping
             homeConfig.customAttributes = config.dynamicAttributes;
         },
         correctDiagramDisplay(content){
@@ -778,7 +790,6 @@ export default {
         },
         getDataToSave(){
             let orgchartAttr = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
-                debugger
             let allVizCell = this.$refs.editorWorkspace.getAllDiagramCells();
             allVizCell = this.normalizeDiagramNodeDisplay(allVizCell);
             let data = {
@@ -788,7 +799,12 @@ export default {
                 dynamicAttrs: JSON.stringify(orgchartAttr.customAttributes),
                 name: orgchartAttr.commonAttrs.name.value,
                 code: orgchartAttr.commonAttrs.code.value,
-                isDefault: orgchartAttr.commonAttrs.isDefault.value == true ? 1 : 0
+                isDefault: orgchartAttr.commonAttrs.isDefault.value == true ? 1 : 0,
+                mappingDocInfo:{
+                    docId: orgchartAttr.commonAttrs.mappingDoc.value,
+                    script: orgchartAttr.commonAttrs.scriptMapping.value,
+                    fieldMapping: orgchartAttr.commonAttrs.tableMapping.value,
+                }
 			};
             return data;
         },

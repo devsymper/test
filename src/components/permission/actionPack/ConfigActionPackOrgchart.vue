@@ -66,7 +66,6 @@ export default {
     },
     methods:{
         handleChangeNodeSelected(data){
-            debugger
         },
         handleChange(){
             this.$emit('permission-selected', this.selectedPermission)

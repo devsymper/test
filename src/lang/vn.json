@@ -3,6 +3,7 @@
         "id": "Id",
         "select_lang": "Thay đổi ngôn ngữ",
         "KH": "Knowledge Management",
+        "structureManagement": "Quản lí cơ cấu ",
         "reports": "Báo cáo",
         "workflows": "Quy trình",
         "documents": "Văn bản",

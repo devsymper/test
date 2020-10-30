@@ -3,6 +3,7 @@
         "id": "Id",
         "select_lang": "Select language",
         "KH": "Knowledge Management",
+        "structureManagement": "Structure management",
         "reports": "Reports",
         "workflows": "Workflows",
         "documents": "Documents",

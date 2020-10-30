@@ -67,14 +67,7 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
             "type": "autocomplete",
             "value": '',
             "options": [
-                {
-                    title: 'test',
-                    value:'test'
-                },
-                {
-                    title: 'test2',
-                    value:'test2'
-                },
+              
             ],
         }
         let scriptMapping = {
@@ -96,14 +89,14 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
                     title: 'Trường của node',
                     name: 'nodeColumn',
                     type: 'autocomplete',
-                    source:['image', 'name'],
+                    source:['image', 'name', 'code'],
                 },
             ],
         }
-        config.commonAttrs.isDefault = isDefault
         config.commonAttrs.mappingDoc = mappingDoc
         config.commonAttrs.scriptMapping = scriptMapping
         config.commonAttrs.tableMapping = tableMapping
+        config.commonAttrs.isDefault = isDefault
     }
     if (isDepartment) {
         config.positionDiagramCells = {
