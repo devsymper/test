@@ -715,7 +715,6 @@ export default class Table {
                 return
             }
             let controlInstance = this.getControlInstance(controlName);
-            debugger
             if (controlInstance.checkValidValueLength(rowIndex)) {
                 if (controlInstance == null || controlInstance == undefined) {
                     return;
@@ -751,12 +750,23 @@ export default class Table {
                     let controlEffectedInstance = this.getControlInstance(i);
                     let allFormulas = controlEffectedInstance.controlFormulas;
                     if (allFormulas.hasOwnProperty(formulasType)) {
-                        if (allFormulas[formulasType].hasOwnProperty('instance')) {
-                            let formulasInstance = allFormulas[formulasType].instance;
-                            let dataInput = this.getDataInputForFormulas(formulasInstance, controlEffectedInstance.inTable);
-                            if (controlEffectedInstance.hasOwnProperty('inTable')) {
-                                if (controlEffectedInstance.inTable == this.tableName) {
-                                    this.handlerRunFormulasForControlInTable(formulasType, controlEffectedInstance, dataInput, formulasInstance);
+                        if (formulasType == 'linkConfig') { // nếu có cấu hình công thức link thì cũng chạy các công thức của nó
+                            let configData = allFormulas[formulasType].configData;
+                            for (let ind = 0; ind < configData.length; ind++) {
+                                let config = configData[ind];
+                                let formulasInstance = config.instance;
+                                let dataInput = this.getDataInputForFormulas(formulasInstance, controlEffectedInstance.inTable);
+                                let fType = formulasType + "_" + config.formula.instance;
+                                this.handlerRunFormulasForControlInTable(fType, controlEffectedInstance, dataInput, formulasInstance)
+                            }
+                        } else {
+                            if (allFormulas[formulasType].hasOwnProperty('instance')) {
+                                let formulasInstance = allFormulas[formulasType].instance;
+                                let dataInput = this.getDataInputForFormulas(formulasInstance, controlEffectedInstance.inTable);
+                                if (controlEffectedInstance.hasOwnProperty('inTable')) {
+                                    if (controlEffectedInstance.inTable == this.tableName) {
+                                        this.handlerRunFormulasForControlInTable(formulasType, controlEffectedInstance, dataInput, formulasInstance);
+                                    }
                                 }
                             }
                         }
@@ -958,12 +968,12 @@ export default class Table {
          * @param {String} controlEffectedName 
          */
     handlerDataAfterRunFormulas(data, controlInstance, formulasType, dataInput = false) {
+        if (formulasType.includes('linkConfig')) {
+            controlInstance.handlerDataAfterRunFormulasLink(data, formulasType);
+        }
         switch (formulasType) {
             case "formulas":
                 controlInstance.handlerDataAfterRunFormulasValue(data);
-                break;
-            case "link":
-                controlInstance.handlerDataAfterRunFormulasLink(data);
                 break;
             case "validate":
                 controlInstance.handlerDataAfterRunFormulasValidate(data);
@@ -1516,7 +1526,13 @@ export default class Table {
         if (map) {
             let sign = prop + '____' + row;
             let ele = $(td);
-
+            if (map.type === 'linkControl') {
+                ele.css({ 'position': 'relative' }).append(Util.renderInfoBtn());
+                ele.off('click', '.info-control-btn')
+                ele.on('click', '.info-control-btn', function(e) {
+                    SYMPER_APP.$evtBus.$emit('on-info-btn-in-table-click', { e: e, data: map })
+                })
+            }
             if (map.vld === true) {
                 ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
             }

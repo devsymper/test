@@ -526,6 +526,11 @@ button:hover {
     position: relative;
 }
 
+.wrap-table .info-control-btn {
+    right: 4px !important;
+    top: 0!important;
+}
+
 .info-control-btn {
     right: 0;
     color: blue;

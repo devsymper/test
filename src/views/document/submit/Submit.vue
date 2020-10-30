@@ -407,7 +407,7 @@ export default {
         });
         $(document).find('#sym-submit-'+this.keyInstance).off('click','.info-control-btn')
         $(document).find('#sym-submit-'+this.keyInstance).on('click','.info-control-btn',function(e){
-            thisCpn.$refs.linkControlView.show(e)
+            thisCpn.$refs.linkControlView.show(e);
         });
     },
 
@@ -451,6 +451,14 @@ export default {
         if(this.docObjId != null){
             this.loadDocumentObject();
         }
+
+        this.$evtBus.$on("on-info-btn-in-table-click", locate => {
+            if(thisCpn._inactive == true) return;
+            let e = locate.e;
+            let data = locate.data
+            this.setDataForLinkControl(data.type, data.value, data.title, data.source);
+            this.$refs.linkControlView.show(e)
+        });
 
         this.$evtBus.$on("run-formulas-control-outside-table", e => {
             if(thisCpn._inactive == true) return;
@@ -2039,7 +2047,7 @@ export default {
                                 let config = configData[ind];
                                 let formulasInstance = config.instance;
                                 let fType = formulasType+"_"+config.formula.instance;
-                                this.handlerBeforeRunFormulasValue(formulasInstance,controlId,i,fType,'root')
+                                this.handlerBeforeRunFormulasValue(formulasInstance,controlId,i,fType)
                             }
                         }
                         else{
@@ -2200,9 +2208,17 @@ export default {
                     source = config.objectType.type;
                 }
             }
-            this.$refs.linkControlView.setData({key:formulasType,value:link, title:title, source:source});
+            this.setDataForLinkControl(formulasType, link, title, source);
             controlInstance.renderLinkToControl(link, configInstance);
         },
+        setDataForLinkControl(formulasType, link, title, source){
+            this.$refs.linkControlView.setData({key:formulasType,value:link, title:title, source:source});
+
+        },
+
+        /**
+         * Xử lí hiển thị sau khi chạy công thức require
+         */
         handlerDataAfterRunFormulasRequire(isRequire,controlName){
             if(Array.isArray(isRequire)){
                 isRequire=isRequire[0]

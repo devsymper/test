@@ -219,12 +219,38 @@ export default class Control {
         return this.effectedValidateControl;
     }
 
-    handlerDataAfterRunFormulasLink(values) {
-        if (Array.isArray(values)) {
-            values = values[0]
-        }
+    handlerDataAfterRunFormulasLink(values, formulasType) {
         if (this.inTable != false) {
+            let configInstance = formulasType.split('_')[1]
+            let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
+            let dataTable = tableControlInstance.tableInstance.tableInstance.getData();
+            let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
 
+            let linkFormulas = this.controlFormulas.linkConfig.configData;
+            let title = "";
+            let source = "";
+            for (let index = 0; index < linkFormulas.length; index++) {
+                let config = linkFormulas[index];
+                let formulaIns = config.formula.instance;
+                if (Number(formulaIns) == Number(configInstance)) {
+                    title = config.title;
+                    source = config.objectType.type;
+                }
+            }
+
+            for (let rowId in values) {
+                let value = values[rowId];
+                let rowIndex = this.findIndexByRowId(dataTable, rowId);
+                tableControlInstance.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
+                    type: 'linkControl',
+                    key: formulasType,
+                    value: value,
+                    title: title,
+                    source: source,
+                };
+
+            }
+            tableControlInstance.tableInstance.tableInstance.render()
         }
     }
     handlerDataAfterRunFormulasValidate(values) {
@@ -242,7 +268,6 @@ export default class Control {
 
             }
             tableControlInstance.tableInstance.tableInstance.render()
-
         }
     }
     findIndexByRowId(dataTable, rowId) {
