@@ -6,7 +6,7 @@
             class="mx-auto"
             width="100%" height="100%" 
         ></v-skeleton-loader>
-        <v-row class="ml-0 mr-0 justify-space-between task-header" id="taskHeader" style="line-height: 36px;">
+        <v-row class="ml-0 mr-0 justify-space-between task-header" id="taskHeader" style="line-height: 36px;height:44px">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <div v-on="on" class="fs-13 pl-2 pt-1 float-left text-ellipsis" :style="{'width':widthInfoTask+'px'}"> 
@@ -74,7 +74,7 @@
             </div>
         </v-row>
         <v-divider style="border-color: #dedede;"></v-divider>
-        <v-row class="ma-0 detail-task" style="height: calc(100% - 44px);">
+        <v-row class="ma-0 detail-task" style="height: calc(100% - 45px);">
             <!-- <VuePerfectScrollbar :style="{height: parentHeight +'px'}" > -->
                 <task 
                     @task-submited="handleTaskSubmited" 

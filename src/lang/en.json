@@ -547,6 +547,7 @@
                         "title": "General",
                         "dateCreate": "Date created",
                         "userCreate": "User created",
+                        "userRole": "User role",
                         "history": "History",
                         "comment": "Comment",
                         "has": "Has",

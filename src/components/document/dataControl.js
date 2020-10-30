@@ -15,12 +15,17 @@ import {
  */
 export const allControlNotSetData = ['approvalHistory', 'submit', 'draft', 'reset']
 export const setDataForPropsControl = function(fields, instance, from) {
+    let controlMapDatasetDataflow = {};
     for (let controlId in fields) {
         let control = GetControlProps(fields[controlId].type);
         let userUpdate = fields[controlId].userUpdate
         let properties = control.properties;
         let formulas = control.formulas
-        let type = fields[controlId].type
+        let type = fields[controlId].type;
+        if (type == 'dataFlow') {
+            controlMapDatasetDataflow[fields[controlId].properties['name']] = fields[controlId].properties['datasets'];
+
+        }
         let id = fields[controlId]['properties'].id;
         let prepareData = fields[controlId].dataPrepareSubmit;
         $.each(properties, function(k, v) {
@@ -36,14 +41,20 @@ export const setDataForPropsControl = function(fields, instance, from) {
             }
         })
         if (fields[controlId]['formulas'] != false && fields[controlId]['formulas'] != "[]") {
-
-            $.each(formulas, function(k, v) {
-                if (fields[controlId]['formulas'][k] == "") {
-                    delete control.formulas[k];
-                } else {
-                    formulas[k].value = fields[controlId]['formulas'][k]
-                }
-            })
+            let viewType = sDocument.state.viewType[instance];
+            if (viewType != 'detail') {
+                $.each(formulas, function(k, v) {
+                    if (fields[controlId]['formulas'][k] == "") {
+                        delete control.formulas[k];
+                    } else {
+                        if (k == 'linkConfig' && fields[controlId]['formulas'][k] && fields[controlId]['formulas'][k]['configData'].length > 0) {
+                            formulas[k].configData = fields[controlId]['formulas'][k]['configData'];
+                        } else {
+                            formulas[k].value = fields[controlId]['formulas'][k]
+                        }
+                    }
+                })
+            }
         }
         if (fields[controlId].type != "table" && sDocument.state.detail[instance].allData != null) {
             let value = ""
@@ -136,6 +147,9 @@ export const setDataForPropsControl = function(fields, instance, from) {
                 instance, from);
         }
     }
+    store.commit(
+        "document/addToDocumentSubmitStore", { key: 'listControlMappingDatasets', value: controlMapDatasetDataflow, instance: instance }
+    );
 }
 
 function addToAllControlInDoc(controlId, control, instance, from) {

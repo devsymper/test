@@ -1,5 +1,5 @@
 <template>
-  <div class="kh-homepage">
+  <div class="kh-homepage" :style="{'width':widthFolder+'px'}">
     <k-h-header />
     <div class="kh-table kh-sub-table">
       <template>
@@ -8,12 +8,13 @@
           :items="listChildren"
           :items-per-page="5"
           :search="skh.search"
-          class="elevation-1 kh-table"
+          class="elevation-1 kh-sub-table"
           
         >
           <template v-slot:[`item.name`]="{ item }">
             <v-list-item-group >
               <v-list-item
+                class="kh-list pa-0"
                 dense
                 active-class="v-item--active"
                 @click="doubleClick(item.path,item.id,item.hash)"
@@ -27,16 +28,16 @@
                     <p
                       v-on="on"
                       v-if="item.id!=undefined"
-                      class="fs-13"
-                      style="margin:0px;padding-left:5px; color:#757575"
+                      class="fs-13 text-ellipsis"
+                      style="margin:0px;padding-left:5px; color:#757575;width: auto;"
                       :id="'tb'+item.id"
                       v-text="item.name"
                     ></p>
                     <p
                       v-on="on"
                       v-if="item.id==undefined"
-                      class="fs-13"
-                      style="margin:0px;padding-left:5px; color:#757575"
+                      class="fs-13 text-ellipsis"
+                      style="margin:0px;padding-left:5px; color:#757575;width: auto;"
                       :id="'tb'+item.path"
                       v-text="item.name"
                     ></p>
@@ -85,6 +86,7 @@ import { knowledgeApi } from "./../../api/kh.js";
 export default {
   data() {
     return {
+      widthFolder:650,
       path: "",
       hash: "",
       content: "",
@@ -142,7 +144,15 @@ export default {
     },
     hash: function(nevVL) {
       this.$store.dispatch("kh/getDirectoryChildren", nevVL);
-    }
+    },
+    "sapp.collapseSideBar": function(newVl) {
+        this.setWidthViewFolder();
+    },
+    "skh.subCollapseSideBar": function(newVl) {
+        this.setWidthViewFolder();
+    },
+    
+
   },
   computed: {
     sapp() {
@@ -161,6 +171,11 @@ export default {
     }
   },
   methods: {
+      setWidthViewFolder(){
+        setTimeout((self) => {
+            self.widthFolder=$(".layout").width() -$(".khSidebar").width();
+        }, 150,this);
+    },
     rename(path, id, name, parentPath) {
       let self = this;
       if (id > 0) {
@@ -400,9 +415,13 @@ export default {
       return [year, month, day].join("-") + " " + [h, i].join(":");
     }
   },
-  created() {
-    this.getData();
-  }
+    created() {
+        this.setWidthViewFolder();
+        this.$evtBus.$on('kh-resize-sidebar', (sizeBar) =>{
+            this.setWidthViewFolder();
+        });
+        this.getData();
+    }
 };
 </script>
 
@@ -413,5 +432,12 @@ export default {
 }
 .v-item--active{
   color:white;
+}
+.kh-sub-table ::v-deep th{
+    padding:2px 4px!important;
+}
+.kh-sub-table ::v-deep td{
+    padding:2px 4px!important;
+
 }
 </style>

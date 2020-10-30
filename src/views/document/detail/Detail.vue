@@ -42,6 +42,7 @@
         :taskId="taskId"
         :createTime="createTime"
         :documentObjectId="docObjId"
+        :userRole="userCreateInfo.role"
         :workflowId="workflowId"
         :showCommentInDoc="showCommentInDoc"
         @after-hide-sidebar="afterHideSidebar"
@@ -142,6 +143,7 @@ export default {
             sidebarWidth:400,
             workflowId:"",
             taskId:"",
+            userCreateInfo:"",
             createTime:"",
             userId:"",
             direction: "top",
@@ -298,6 +300,7 @@ export default {
                 thisCpn.createTime = res.data.document_object_create_time
                 thisCpn.workflowId = res.data.document_object_workflow_id;
                 thisCpn.documentId = res.data.documentId;
+                thisCpn.userCreateInfo = res.data.userCreateInfo;
                 let dataToStore = res.data;
                 if(Object.keys(thisCpn.defaultData).length > 0){
                     dataToStore = thisCpn.defaultData;

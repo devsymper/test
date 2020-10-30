@@ -201,9 +201,9 @@
 								<v-col 	
 									cols="4" 
 									style="font-size:12px;padding:0px;padding-top:3px!important">
-									<span>{{item.createAt}}</span>
+									<span class=" text-ellipsis w-100">{{item.createAt}}</span>
 								</v-col>
-								<v-col style="padding:0px;padding-top:3px!important">
+								<v-col style="padding:0px;padding-top:4px!important">
 									<v-icon  @click="downLoadFile(item.id)"  v-show="showByIndex === idex" style="font-size:18px;margin-left:40px">mdi-download</v-icon>
 									<v-icon  @click="actionFileAttachment($event,item.serverPath,item.name,item.type,item.id)"  v-show="showByIndex === idex" style="font-size:18px; margin-left:8px">mdi-dots-horizontal</v-icon>
 								</v-col> 
