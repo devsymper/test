@@ -18,7 +18,7 @@
             @create-task="getWorks({})"
             @refresh-task-list="getWorks()"
             ></listHeader>
-            <v-divider v-if="!sideBySideMode"></v-divider>
+            <v-divider v-if="!sideBySideMode" ></v-divider>
             <v-row class="ml-0 mr-0" v-if="!sideBySideMode">
             <v-col cols="12" class="list-tasks pt-0 pb-0">
                 <v-row>
@@ -118,7 +118,7 @@
                             cols="2"
                             class="fs-12 px-1 py-0 mt-2"
                         >
-                            <infoUser class="userInfo" :userId="obj.startUserId" :roleInfo="obj.roleInfo" />
+                            <infoUser class="userInfo" :userId="String(obj.startUserId)" :roleInfo="obj.roleInfo" />
                         
                         </v-col> 
                         <v-col

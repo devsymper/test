@@ -2,14 +2,14 @@
   <div class="kh-header">
     <div class="kh-header-slug h-100">
       <v-icon
-        class="fs-16"
-        style="float:left; margin-left:10px; margin-right:0px;margin-top: 8px;"
+        class="fs-16 pa-1"
+        style="float:left;"
         v-if="skh.subCollapseSideBar==true"
         @click.stop="invertSubSidebarShow()"
       >mdi-chevron-double-right</v-icon>
       <v-icon
-        class="fs-16"
-        style="float:left; margin-left:10px; margin-right:0px;padding-top: 8px;"
+        class="fs-16 pa-1"
+        style="float:left;"
         v-if="skh.subCollapseSideBar==false"
         @click.stop="invertSubSidebarShow()"
       >mdi-chevron-double-left</v-icon>
@@ -237,12 +237,12 @@ export default {
 </script>
 <style scoped>
 .kh-header {
-  display: flex;
-  height: 33px;
-  border-bottom: 1px solid #cccccc;
+    display: flex;
+    height: 33px;
+    border-bottom: 1px solid #cccccc;
 }
 .kh-header-slug {
-  width: 700px;
+    display: flex;
 }
 
 .kh-slug #slug {

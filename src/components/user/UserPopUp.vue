@@ -12,11 +12,12 @@
                             </span>
                         </span>
                         </template>
-                        <div class="pb-2" style="background-color:white">
-                            <v-row  class="ml-2 pt-2 fs-13" style="width:180px!important; background-color:white!important" v-for="(rolesOg,index) in rolesOgchart" :key='index'>
-                                {{rolesOg.name}}
-                            </v-row>
-                        </div>
+                        <v-row class="ml-2 mt-2 fs-13" style=" width:180px!important; background-color:white!important" v-for="(rolesOg,index) in rolesOgchart" :key='index'>
+                            {{rolesOg.name}}
+                              <v-icon  color="green" v-if="currentRole.id == rolesOgchart.id">
+                            mdi-check
+                        </v-icon>
+                        </v-row>
                 </v-menu>	
             </div>
             <div v-else>
@@ -65,32 +66,37 @@ export default {
     created () {
         this.getDetailUser();
         this.getRoleOrgchartByUser();
-    },
-    methods: {
-        reNameStatus(status){
-            if(status==1){
-                return "<span class='color-green'> Hoạt động</span> "
-            }else if(status==0){
-                return "<span class='color-yellow'> Khóa</span> "
-            }else{
-                return "<span class='color-red'> Tạo mới</span> "
+      },
+    computed:{
+        currentRole(){
+                return this.$store.state.app.endUserInfo.currentRole;
             }
-        },
-        async getRoleOrgchartByUser(){
-            const self = this;
-            let res = await orgchartApi.getRolesByUser([{idUser: this.userId}])
-            if (res.status === 200) {
-                self.rolesOgchart = res.data[0].roles
-            }	
-        },
-        async getDetailUser(){
-            const self= this;
-            let res = await userApi.getDetailUser(this.userId);
-                if(res.status==200){
-                    self.detailUser = res.data.user;
-                    self.detailUser.createAt = dayjs(self.detailUser.createAt).format('DD/MM/YYYY');
-                    self.detailUser.status= self.reNameStatus(self.detailUser.status);
-                }               
+    },
+  methods: {
+      reNameStatus(status){
+          if(status==1){
+              return "<span class='color-green'> Hoạt động</span> "
+          }else if(status==0){
+              return "<span class='color-yellow'> Khóa</span> "
+          }else{
+              return "<span class='color-red'> Tạo mới</span> "
+          }
+      },
+    async getRoleOrgchartByUser(){
+        const self = this;
+        let res = await orgchartApi.getRolesByUser([{idUser: this.userId}])
+        if (res.status === 200) {
+            self.rolesOgchart = res.data[0].roles
+        }	
+	},
+     async getDetailUser(){
+        const self= this;
+        let res = await userApi.getDetailUser(this.userId);
+            if(res.status==200){
+                self.detailUser = res.data.user;
+                self.detailUser.createAt = dayjs(self.detailUser.createAt).format('DD/MM/YYYY');
+                self.detailUser.status= self.reNameStatus(self.detailUser.status);
+            }               
         }
   
     },
@@ -112,5 +118,6 @@ export default {
     }
     .color-blue:hover{
         cursor: pointer;
+        text-decoration-line:underline;
     }
 </style>

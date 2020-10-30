@@ -98,7 +98,7 @@
                                 v-model="openChangePassForm"
                                 width="397"
                                 >
-                            <NotificationChangePass @cancel="cancelDialog()"/>
+                            <NotificationChangePass ref = "changePass" @cancel="cancelDialog()"/>
                         </v-dialog>
                     </div>
                 </div>
@@ -237,6 +237,10 @@ export default {
         }
     },
     methods: {
+        cancelDialog(){
+            this.openChangePassForm=false;
+            //this.$refs.changePass.refreshAll();
+        },
         changePass(){
             this.openChangePassForm=!this.openChangePassForm;
         },
@@ -300,6 +304,9 @@ export default {
             if(this.close==false){
                 this.isViewUserRole=false
             }
+        },
+        openChangePassForm(){
+            //this.$refs.changePass.refreshAll();
         },
         userInfo: {
             deep: true,

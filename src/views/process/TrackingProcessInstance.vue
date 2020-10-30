@@ -87,6 +87,7 @@ export default {
         },
         elementId(){
             this.setInstanceXML();
+            this.eventAfterRender();
         }
     },
     created() {
@@ -131,7 +132,7 @@ export default {
             if(this.needFocus){
                 setTimeout((self) => {
                     self.$refs.symperBpmn.focus();
-                }, 100,this);
+                }, 200,this);
             }
         },
         handleClosePopup(){
@@ -294,8 +295,10 @@ export default {
             let arrDataRole=roleIdentify.split(":");
             let allSymperRole=this.$store.state.app.allSymperRoles;
             if (Object.keys(allSymperRole).length>0) {
-                let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
-                return role;
+                if (allSymperRole[arrDataRole[0]]) {
+                    let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+                    return role;
+                }
             }
             return {}
         },
@@ -335,7 +338,6 @@ export default {
                                 }
                             }
                         });
-                        //console.log(taskInfo,"aaaaaxx");
                         symBpmn.updateElementProperties(eleId, {
                             statusCount: nodeInfo.instancesStatusCount,
                             currentNode: currentNode,
@@ -360,7 +362,9 @@ export default {
                         let allNode = symBpmn.getAllNodes();
                         let nodeStatus = "";
                         if(self.elementId){
-                            self.runtimeNodeMap[self.elementId].currentNode = true;
+                            if (self.runtimeNodeMap[self.elementId]) {
+                                self.runtimeNodeMap[self.elementId].currentNode = true;
+                            }
                         }
                         for (let node of allNode) {
                             if (node.$type != "bpmn:Process") {
@@ -470,7 +474,8 @@ export default {
             this.nodeDetailPanel.titleIcon = 'mdi-account';
             this.nodeDetailPanel.show = true;
         },
-    }
+    },
+   
 
 };
 </script>
