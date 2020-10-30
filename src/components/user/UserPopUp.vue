@@ -26,13 +26,19 @@
         <v-row class="ml-4">
             <v-col class="col-md-7">
                 <v-row class="fs-13 mb-1">
-                   <i class="mdi-20px mdi mdi-account-circle mr-1"></i>{{detailUser.userName}}
+                    <i class="mdi-20px mdi mdi-account-circle mr-1"></i>{{detailUser.userName}}
                 </v-row>
                 <v-row class="fs-13 mb-1" v-if="detailUser.phone">
                     <i class="mdi-20px mdi mdi-phone mr-1"></i>{{detailUser.phone}}
                 </v-row>
                 <v-row class="fs-13 mb-1"  v-if="detailUser.email">
-                   <i class="mdi-20px mdi mdi-email mr-1"></i>  {{detailUser.email}}
+                   <i class="mdi-20px mdi mdi-email mr-1"></i>
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <span v-on="on" style="width:90%" class="text-ellipsis">{{detailUser.email}}</span>
+                        </template>
+                        <span>{{ detailUser.email }}</span>
+                    </v-tooltip>
                 </v-row>
                 <v-row class="fs-13 mb-1">
                    <i class="mdi-20px mdi mdi-border-color mr-1"></i> Ngày tạo: {{detailUser.createAt}}
