@@ -2546,13 +2546,17 @@ export default {
                 $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected');
                 el.addClass('on-selected');
             }
+            
             let controlId = el.attr('id');
-            $('.editor-tree-active').removeClass('editor-tree-active')
-            $('.tree-'+controlId).addClass('editor-tree-active')
+            $('.editor-tree-active').removeClass('editor-tree-active');
+            $('.tree-'+controlId).addClass('editor-tree-active');
             let table = el.closest('.s-control-table');
             if(table.length > 0 && controlId != table.attr('id')){
                 if(!fromTreeView)
                 tinyMCE.activeEditor.selection.setNode($(e.target).closest('.s-control'));
+                if(this.routeName == 'printConfigDocument'){
+                    return;
+                }
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
                 if(!control){
@@ -2562,6 +2566,9 @@ export default {
                 this.selectControl(control.properties, control.formulas,controlId,type);
             }
             else{
+                if(this.routeName == 'printConfigDocument'){
+                    return;
+                }
                 let control = this.editorStore.allControl[controlId];
                 if(!control){
                     this.showDialogEditor("",this.$t('document.validate.controlNotExist'));
@@ -2570,8 +2577,6 @@ export default {
                 this.selectControl(control.properties, control.formulas,controlId,type);
             }
         },
-
-
         checkSelectedTabPageControl(e,control,controlId){
             if($(e.target).closest('.page-item').length > 0){
                 let pageId = $(e.target).closest('.page-item').attr('id');
@@ -2629,8 +2634,15 @@ export default {
                     for(let i = 0; i< thead.length; i++){
                         let style = $(thead[i]).attr('style');
                         let width = style.match(/(?<=width:\s)\s*([^;"]*)(?=\;)/gmi);
-                        let row = {title: $(thead[i]).text(),colWidth:width[0],colIndex:i}
-                        listData.push(row)
+                        if(width){
+                            let row = {title: $(thead[i]).text(),colWidth:width[0],colIndex:i}
+                            listData.push(row)
+                        }
+                        else{
+                            let row = {title: $(thead[i]).text(),colWidth:'auto',colIndex:i}
+                            listData.push(row)
+                        }
+                        
                     }
                 }
                 this.$refs.printTableConfig.showDialog();
