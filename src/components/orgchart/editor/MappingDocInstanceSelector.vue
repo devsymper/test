@@ -101,7 +101,6 @@ export default {
                     if(!obj.scriptMapping.value){
                         obj.scriptMapping.value = ""
                     }
-                        debugger
                     orgchartApi.getDocInstance({id:obj.mappingDoc.value, script:obj.scriptMapping.value}).then(res=>{
                         res.data.listObject.forEach(function(e){
                             let item = {}
@@ -153,6 +152,17 @@ export default {
 div#symper-app >>> .v-application >>> .v-list-item--active:hover::before,
 div#symper-app >>> .v-application >>> .v-list-item--active::before{
     opacity: 0;
+}
+.v-avatar{
+    margin-left:unset !important;
+    margin-right:8px !important;
+    padding:4px 2px;
+}
+.v-chip{
+    margin:2px 0px !important;
+}
+.v-icon{
+    opacity: 0.8;
 }
 #listUser {
     overflow: auto;

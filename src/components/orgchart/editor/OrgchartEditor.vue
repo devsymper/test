@@ -444,7 +444,7 @@ export default {
                     }
                     this.restoreMainOrgchartConfig(savedData.orgchart);
                     let mapIdToDpm = {};
-
+                  
                     for(let node of savedData.departments){
                         let users = self.getListUserAsArr(node.users)
                         let nodeData = {
@@ -453,6 +453,9 @@ export default {
                             description: node.description,
                             code: node.code,
                             users: users,
+                            dataFromDoc:{
+                                users: JSON.parse(node.usersFromDoc)
+                            }
                         };
                         if(node.content && node.content !== 'false'){ 
                             nodeData.positionDiagram = {
@@ -863,7 +866,8 @@ export default {
                 vizParentId: '',
                 dynamicAttrs: node.customAttributes,
                 style: JSON.stringify(nodeStyle),
-                users: JSON.stringify(node.users)
+                users: JSON.stringify(node.users),
+                usersFromDoc: JSON.stringify(node.dataFromDoc.users),
             };
             
             if(nodeType == 'department'){
@@ -996,6 +1000,11 @@ export default {
 
             if(nodeData.users){
                 defaultConfig.users = nodeData.users;
+            }
+            if(nodeData.dataFromDoc){
+                console.log(defaultConfig.dataFromDoc.users,'defaultConfig.dataFromDoc.users');
+                console.log(nodeData.dataFromDoc.users,'nodeData.dataFromDoc.users');
+                defaultConfig.dataFromDoc.users = nodeData.dataFromDoc.users 
             }
             this.$store.commit('orgchart/setNodeConfig', {
                 instanceKey: instanceKey,

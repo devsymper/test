@@ -70,7 +70,8 @@
                         @input="handleChangeUser"
                         v-model="selectingNode.users"
                     ></UserSelector>
-                      <span
+                   <div v-if="action != 'create'">
+                          <span
                         class="mt-3p fs-12">
                        Select user from document
                     </span>
@@ -79,6 +80,7 @@
                      :homeConfig="homeConfig.commonAttrs"
                      v-model="selectingNode.dataFromDoc.users"
                       />
+                   </div>
                 </div>
 
                 <div class="mt-3" v-if="context == 'position' && selectingNode.id != SYMPER_HOME_ORGCHART">
@@ -306,8 +308,13 @@ export default {
     },
     computed: {
         selectingNode() {
-            return this.$store.state.orgchart.editor[this.instanceKey]
-                .selectingNode;
+            let selectingNode = this.$store.state.orgchart.editor[this.instanceKey].selectingNode
+            if(!selectingNode.dataFromDoc){
+                selectingNode.dataFromDoc = {
+                    users:[]
+                }
+            }
+            return selectingNode;
         },
         homeConfig(){
             return this.$store.state.orgchart.editor[this.instanceKey].homeConfig
