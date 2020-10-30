@@ -682,6 +682,7 @@ export default {
         },
         // ham tạo dialog của tinymce để cấu hình padding doc
         showPaddingPageConfig(ed){
+            let self = this;
                 var left = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-left').slice(0, -2);
                 var right = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-right').slice(0, -2);
                 var top = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-top').slice(0, -2);
@@ -736,13 +737,20 @@ export default {
                         var right = data.right;
                         var top = data.top;
                         var bottom = data.bottom;
-                        $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css({
+                        $("#document-editor-"+self.keyInstance+"_ifr").contents().find('body').css({
                             'padding-left': left + 'cm',
                             'padding-right': right + 'cm',
                             'padding-top': top + 'cm',
                             'padding-bottom': bottom + 'cm',
                             'margin':'0',
                         });
+                        self.sizePrint = Object.assign(self.sizePrint,{
+                            'padding-left': left + 'cm',
+                            'padding-right': right + 'cm',
+                            'padding-top': top + 'cm',
+                            'padding-bottom': bottom + 'cm',
+                        })
+                        ed.windowManager.close()
                     }
                 }
                 );
@@ -1327,7 +1335,9 @@ export default {
         setPageSize(w,h,type){
             $('#document-editor-'+this.keyInstance+'_ifr').css({width:w ,height:h});
             $('.tox-sidebar-wrap').css({width:w ,height:h});
-            this.sizePrint = {width:w ,height:h,type:type};
+            this.sizePrint.width = w;
+            this.sizePrint.height = h;
+            this.sizePrint.type = type;
         },
         
         //hoangnd: hàm mở modal tablesetting của control table
@@ -2536,13 +2546,17 @@ export default {
                 $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected');
                 el.addClass('on-selected');
             }
+            
             let controlId = el.attr('id');
-            $('.editor-tree-active').removeClass('editor-tree-active')
-            $('.tree-'+controlId).addClass('editor-tree-active')
+            $('.editor-tree-active').removeClass('editor-tree-active');
+            $('.tree-'+controlId).addClass('editor-tree-active');
             let table = el.closest('.s-control-table');
             if(table.length > 0 && controlId != table.attr('id')){
                 if(!fromTreeView)
                 tinyMCE.activeEditor.selection.setNode($(e.target).closest('.s-control'));
+                if(this.routeName == 'printConfigDocument'){
+                    return;
+                }
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
                 if(!control){
@@ -2552,6 +2566,9 @@ export default {
                 this.selectControl(control.properties, control.formulas,controlId,type);
             }
             else{
+                if(this.routeName == 'printConfigDocument'){
+                    return;
+                }
                 let control = this.editorStore.allControl[controlId];
                 if(!control){
                     this.showDialogEditor("",this.$t('document.validate.controlNotExist'));
@@ -2560,8 +2577,6 @@ export default {
                 this.selectControl(control.properties, control.formulas,controlId,type);
             }
         },
-
-
         checkSelectedTabPageControl(e,control,controlId){
             if($(e.target).closest('.page-item').length > 0){
                 let pageId = $(e.target).closest('.page-item').attr('id');
@@ -2618,9 +2633,21 @@ export default {
                 if($(tbody[0].innerHTML).length > 0){
                     for(let i = 0; i< thead.length; i++){
                         let style = $(thead[i]).attr('style');
-                        let width = style.match(/(?<=width:\s)\s*([^;"]*)(?=\;)/gmi);
-                        let row = {title: $(thead[i]).text(),colWidth:width[0],colIndex:i}
-                        listData.push(row)
+                        if(style){
+                            let width = style.match(/(?<=width:\s)\s*([^;"]*)(?=\;)/gmi);
+                            if(width){
+                                let row = {title: $(thead[i]).text(),colWidth:width[0],colIndex:i}
+                                listData.push(row)
+                            }
+                            else{
+                                let row = {title: $(thead[i]).text(),colWidth:'auto',colIndex:i}
+                                listData.push(row)
+                            }
+                        }
+                        else{
+                            let row = {title: $(thead[i]).text(),colWidth:'auto',colIndex:i}
+                            listData.push(row)
+                        }
                     }
                 }
                 this.$refs.printTableConfig.showDialog();
