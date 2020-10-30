@@ -430,6 +430,14 @@ let commonFormulas = {
         formulasId: 0,
         type: "script",
         groupType: "formulas"
+    },
+    linkConfig: {
+        title: "Link đến đối tượng hệ thống",
+        value: "",
+        configData: [],
+        formulasId: 0,
+        type: "linkConfig",
+        groupType: "formulas"
     }
 }
 
@@ -488,7 +496,7 @@ const controlTypes = {
         html: `<input class="s-control s-control-text mdi" contenteditable="false" s-control-type="textInput" type="text" title="Text Input">&nbsp;&nbsp;`,
         title: "Text input",
         notInProps: ['autoHeight', 'dataFlowId', 'formatNumber', 'formatDate', 'isSumTable', 'isAllowUpdate'],
-        formulas: ['link', 'formulas', 'hidden', 'readOnly', 'autocomplete', 'require', 'validate']
+        formulas: ['link', 'linkConfig', 'formulas', 'hidden', 'readOnly', 'autocomplete', 'require', 'validate']
     },
     department: {
         icon: "/icon/ic_textinput.png",

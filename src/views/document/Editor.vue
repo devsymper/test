@@ -442,7 +442,7 @@ export default {
                 if(res.status == 200 && res.data.length>0){
                     for (let index = 0; index < res.data.length; index++) {
                         let dataflow = res.data[index];
-                        thisCpn.listDataFlow.push({id:dataflow.id,name:dataflow.name,title:"",params:dataflow.params})
+                        thisCpn.listDataFlow.push({id:dataflow.id,name:dataflow.name,title:"",params:dataflow.params, datasets:dataflow.datasets})
                     }
                     thisCpn.$store.commit("document/addToDocumentEditorStore",{key:"listDataFlow",value:thisCpn.listDataFlow,instance:thisCpn.keyInstance});  
                 }
@@ -1861,6 +1861,10 @@ export default {
                     else{
                         if(type == 'dataFlow' && k == 'dataFlowId'){
                             properties[k].value = {id:fields[controlId]['properties'][k]};
+                        }
+                        else if(k == 'mapParamsDataflow'){
+                            properties[k]['datasets'] = fields[controlId]['properties']['datasets'];
+                            properties[k]['value'] = fields[controlId]['properties']['value'];
                         }
                         else{
                             if(typeof fields[controlId]['properties'][k] != "object"){

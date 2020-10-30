@@ -172,25 +172,36 @@ export default {
             })
             try {
                 let params = JSON.parse(currentDataflow[0].params);
+                let datasets = currentDataflow[0].datasets;
                 this.$store.commit(
                     "document/updateCurrentControlProps",{instance:this.instance,group:'table',prop:'mapParamsDataflow',typeProp:'value',value:params}
                 );  
-                 this.$store.commit(
+                this.$store.commit(
                     "document/updateProp",{id:this.sCurrentDocument.id,name:'mapParamsDataflow',value:params,tableId:tableId,type:"value",instance:this.instance}
+                );   
+                this.$store.commit(
+                    "document/updateProp",{id:this.sCurrentDocument.id,name:'mapParamsDataflow',value:datasets,tableId:tableId,type:"datasets",instance:this.instance}
                 );   
             } catch (error) {
                 
             }
         },
         handleChangeInput(name, input, data){
+            
             if(input.groupType == "formulas"){
+                let tableId = this.getTableWrapControl();
                 if(name == "autocomplete" && typeof data == 'object'){
                     this.$set(input.configData,'treeData',data.treeData);
                     this.$set(input.configData,'documentSelected',data.documentSelected);
                     this.$set(input.configData,'columnSelected',data.columnSelected);
                     this.$set(input.configData,'rejectInput',data.rejectInput);
                     this.$set(input,'value',data.sql);
-                    let tableId = this.getTableWrapControl();
+                    this.$store.commit(
+                        "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:input.configData,tableId:tableId,type:'configData',instance:this.instance}
+                    );  
+                }
+                else if(name == "linkConfig"){
+                    this.$set(input,'configData',data);
                     this.$store.commit(
                         "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:input.configData,tableId:tableId,type:'configData',instance:this.instance}
                     );  
