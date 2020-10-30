@@ -84,6 +84,12 @@ export default {
                                 width:100%;
                                 }
                             }
+                            .wrap-print-multiple table{
+                                width:100% !important;
+                            }
+                            .wrap-print-multiple{
+                                width:100%;
+                            }
                     </style>`
                      stylesHtml += cstyle;
             // Open the print window
@@ -104,7 +110,7 @@ export default {
 
             setTimeout(() => {
                 WinPrint.print();
-                WinPrint.close();
+                // WinPrint.close();
             }, 1000);
            
             
@@ -119,5 +125,9 @@ export default {
     .wrap-print-multiple{
         overflow: auto;
         height: calc(100vh);
+        width: 100%;
+    }
+    .wrap-print-multiple >>> .wrap-s-control-table table{
+        width: 100% !important;
     }
 </style>

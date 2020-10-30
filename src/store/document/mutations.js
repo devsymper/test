@@ -184,7 +184,19 @@ const updateFormulasId = (state, params) => {
         }
     } else {
         if (state.editor[instance].allControl[id]['formulas'][name]) {
-            state.editor[instance].allControl[id]['formulas'][name]['formulasId'] = value
+            if (name == 'linkConfig') {
+                let linkInstance = params.linkInstance;
+                let allConfig = state.editor[instance].allControl[id]['formulas'][name]['configData'];
+                for (let index = 0; index < allConfig.length; index++) {
+                    let config = allConfig[index];
+                    if (Number(config.formula.instance) == Number(linkInstance)) {
+                        state.editor[instance].allControl[id]['formulas'][name]['configData'][index]['formula']['id'] = value;
+                        break;
+                    }
+                }
+            } else {
+                state.editor[instance].allControl[id]['formulas'][name]['formulasId'] = value;
+            }
         }
     }
 }

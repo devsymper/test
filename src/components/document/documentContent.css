@@ -477,7 +477,7 @@ button:hover {
 
 .table-print {
     border-collapse: collapse;
-    width: 100%;
+    width: 100% !important;
     margin-top: 16px;
 }
 
@@ -524,4 +524,11 @@ button:hover {
     width: 100%;
     max-width: 100%;
     position: relative;
+}
+
+.info-control-btn {
+    right: 0;
+    color: blue;
+    position: absolute;
+    top: 4px;
 }

@@ -49,7 +49,7 @@
         />
         <HistoryControl ref="historyView" />
        
-
+        <FloattingPopup v-show="isShowPopupView" ref="floattingPopup"/>
     </div>
 </template>
 <script>
@@ -67,6 +67,7 @@ import './../submit/customControl.css'
 import { getSDocumentSubmitStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
+import FloattingPopup from './FloattingPopup'
 import Preloader from './../../../components/common/Preloader';
 
 import { util } from '../../../plugins/util.js';
@@ -110,7 +111,8 @@ export default {
     components:{
         'side-bar-detail':SideBarDetail,
         HistoryControl,
-        Preloader
+        Preloader,
+        FloattingPopup
     },
     computed: {
         routeName(){
@@ -158,12 +160,21 @@ export default {
             printConfigActive:null,
             formSize:{},
             wrapFormCss:{},
-            defaultData:{}
+            defaultData:{},
+            isShowPopupView:false
 
         };
     },
     beforeMount() {
         this.documentSize = "21cm";
+    },
+    mounted(){
+        let self = this;
+        $(document).on('click','#sym-Detail-'+this.keyInstance+' .info-control-btn',function(e){
+            self.isShowPopupView = true;
+            console.log("sdasdasd",e);
+            self.$refs.floattingPopup.setPosition({left:e.parentNode.offsetX+"px", top:e.parentNode.offsetY+"px"});
+        })
     },
     
     created(){

@@ -76,7 +76,7 @@
                 <v-tooltip left>
                     <template v-slot:activator="{ on }">
                         <div v-on="on">
-                            <v-btn fab dark small color="green" @click="handlerSubmitDocumentClick">
+                            <v-btn fab dark small :disabled="isSubmitting" color="green" @click="handlerSubmitDocumentClick">
                                 <v-icon>mdi-content-save</v-icon>
                             </v-btn>
                         </div>
@@ -1949,6 +1949,7 @@ export default {
          */
         handleControlInputChange(controlName){
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
+            debugger
             if(controlInstance.checkValidValueLength()){
                 let controlUnique = checkDbOnly(this.keyInstance,controlName);
                 if(controlUnique != false){
@@ -1965,7 +1966,7 @@ export default {
                 this.runOtherFormulasEffected(controlName,controlHiddenEffected,'hidden');
                 this.runOtherFormulasEffected(controlName,controlReadonlyEffected,'readonly');
                 this.runOtherFormulasEffected(controlName,controlRequireEffected,'require');
-                this.runOtherFormulasEffected(controlName,controlLinkEffected,'link');
+                this.runOtherFormulasEffected(controlName,controlLinkEffected,'linkConfig');
                 this.runOtherFormulasEffected(controlName,controlValidateEffected,'validate');
             }
         },
@@ -2001,10 +2002,21 @@ export default {
                     let controlId = controlEffectedInstance.id
                     let allFormulas = controlEffectedInstance.controlFormulas;
                     if(allFormulas.hasOwnProperty(formulasType)){
-                        if(allFormulas[formulasType].hasOwnProperty('instance')){
-                            let formulasInstance = allFormulas[formulasType].instance;
-                            if(formulasInstance.getFormulas() != ""){
-                                this.handlerBeforeRunFormulasValue(formulasInstance,controlId,i,formulasType)
+                        if(formulasType == 'linkConfig'){ // nếu có cấu hình công thức link thì cũng chạy các công thức của nó
+                            let configData = allFormulas[formulasType].configData;
+                            for (let i = 0; i < configData.length; i++) {
+                                let config = configData[i];
+                                let formulasInstance = config.instance;
+                                let fType = formulasType+"_"+config.formula.instance;
+                                this.handlerBeforeRunFormulasValue(formulasInstance,controlId,i,fType,'root')
+                            }
+                        }
+                        else{
+                            if(allFormulas[formulasType].hasOwnProperty('instance')){
+                                let formulasInstance = allFormulas[formulasType].instance;
+                                if(formulasInstance.getFormulas() != ""){
+                                    this.handlerBeforeRunFormulasValue(formulasInstance,controlId,i,formulasType)
+                                }
                             }
                         }
                     }
@@ -2030,6 +2042,7 @@ export default {
          * rowIndex là lấy cell ở row hiện tại nếu là trong table
          */
         getDataInputFormulas(formulasInstance, e = false){
+            console.trace("sadas");
             let inputControl = formulasInstance.getInputControl();
             let dataInput = {};
             for(let inputControlName in inputControl){
@@ -2087,33 +2100,37 @@ export default {
                 }
                 else{
                     let value = this.getValueFromDataResponse(rs);
-                    switch (formulasType) {
-                        case "formulas":
-                            this.handleInputChangeBySystem(controlName,value);
-                            break;
-                        case "link":
-                            this.handlerDataAfterRunFormulasLink(value,controlName);
-                            break;
-                        case "validate":
-                            this.handlerDataAfterRunFormulasValidate(value,controlName);
-                            break;
-                        case "require":
-                            this.handlerDataAfterRunFormulasRequire(value,controlName);
-                            break;
-                        case "hidden":
-                            this.handlerDataAfterRunFormulasHidden(controlInstance,value,controlId);
-                            break;
-                        case "readOnly":
-                            this.handlerDataAfterRunFormulasReadonly(value,controlId);
-                            break;
-                        case "uniqueDB":
-                            controlInstance.handlerDataAfterRunFormulasUniqueDB(value);
-                            break;
-                        case "uniqueTable":
-                            break;
-                        default:
-                            break;
+                    if(formulasType.includes('linkConfig')){
+                        this.handlerDataAfterRunFormulasLink(value,controlName,formulasType);
                     }
+                    else{
+                        switch (formulasType) {
+                            case "formulas":
+                                this.handleInputChangeBySystem(controlName,value);
+                                break;
+                            
+                            case "validate":
+                                this.handlerDataAfterRunFormulasValidate(value,controlName);
+                                break;
+                            case "require":
+                                this.handlerDataAfterRunFormulasRequire(value,controlName);
+                                break;
+                            case "hidden":
+                                this.handlerDataAfterRunFormulasHidden(controlInstance,value,controlId);
+                                break;
+                            case "readOnly":
+                                this.handlerDataAfterRunFormulasReadonly(value,controlId);
+                                break;
+                            case "uniqueDB":
+                                controlInstance.handlerDataAfterRunFormulasUniqueDB(value);
+                                break;
+                            case "uniqueTable":
+                                break;
+                            default:
+                                break;
+                        }
+                    }
+                    
                     
                 }
 
@@ -2139,9 +2156,10 @@ export default {
         /**
          * Hàm bind link vào control sau khi chạy công thức link
          */
-        handlerDataAfterRunFormulasLink(link,controlName){
+        handlerDataAfterRunFormulasLink(link,controlName, formulasType){
+            let configInstance = formulasType.split('_')[1]
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
-            controlInstance.renderLinkToControl(link);
+            controlInstance.renderLinkToControl(link, configInstance);
         },
         handlerDataAfterRunFormulasRequire(isRequire,controlName){
             if(Array.isArray(isRequire)){
@@ -2209,7 +2227,16 @@ export default {
 					let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
 					let controlFormulas = controlInstance.controlFormulas;
 					for(let formulasType in controlFormulas){
-						if(!['autocomplete','list','autocompleteAuto'].includes(formulasType)){
+                        if(formulasType == 'linkConfig'){ // nếu có cấu hình công thức link thì cũng chạy các công thức của nó
+                            let configData = controlFormulas[formulasType].configData;
+                            for (let i = 0; i < configData.length; i++) {
+                                let config = configData[i];
+                                let formulasInstance = config.instance;
+                                let fType = formulasType+"_"+config.formula.instance;
+                                this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,fType,'root')
+                            }
+                        }
+						else if(!['autocomplete','list','autocompleteAuto'].includes(formulasType)){
                             let formulasInstance = controlFormulas[formulasType].instance;
 							this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
 						}
@@ -2236,8 +2263,10 @@ export default {
                                             listTableRootControl[controlInstance.inTable][controlRootInTable] = false;
                                         }
 										if(formulasInstance.getFormulas() !== "" && Object.keys(formulasInstance.getInputControl()).length == 0){
-											impactedFieldsListWhenStart[controlName] = false;
-                                            listRootControl.push(controlName);
+                                            impactedFieldsListWhenStart[controlName] = false;
+                                            if(!listRootControl.includes(controlName)){
+                                                listRootControl.push(controlName);
+                                            }
 											this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
 										}
 									}

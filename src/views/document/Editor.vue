@@ -682,6 +682,7 @@ export default {
         },
         // ham tạo dialog của tinymce để cấu hình padding doc
         showPaddingPageConfig(ed){
+            let self = this;
                 var left = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-left').slice(0, -2);
                 var right = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-right').slice(0, -2);
                 var top = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-top').slice(0, -2);
@@ -736,13 +737,20 @@ export default {
                         var right = data.right;
                         var top = data.top;
                         var bottom = data.bottom;
-                        $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css({
+                        $("#document-editor-"+self.keyInstance+"_ifr").contents().find('body').css({
                             'padding-left': left + 'cm',
                             'padding-right': right + 'cm',
                             'padding-top': top + 'cm',
                             'padding-bottom': bottom + 'cm',
                             'margin':'0',
                         });
+                        self.sizePrint = Object.assign(self.sizePrint,{
+                            'padding-left': left + 'cm',
+                            'padding-right': right + 'cm',
+                            'padding-top': top + 'cm',
+                            'padding-bottom': bottom + 'cm',
+                        })
+                        ed.windowManager.close()
                     }
                 }
                 );
@@ -924,25 +932,27 @@ export default {
                     listControlFormulas.insert = Object.assign(listFormulasControlInTable.insert,listControlFormulas.insert);
                     listControlFormulas.update = Object.assign(listFormulasControlInTable.update,listControlFormulas.update);
                 }
+                let controlName = (control.properties.hasOwnProperty('name')) ? control.properties.name.value : control.name;
                 for (let f in formulas){
-                    if(formulas[f].value != ""){
-                        if(formulas[f].formulasId != 0){
-                            let item = {};
-                            item[f] = {};
-                            item[f]['syql'] = formulas[f].value;
-                            item[f]['id'] = formulas[f].formulasId;
-                            listFormulasUpdate.push(item);
-                        }
-                        else{
-                            let item = {};
-                            item[f] = {};
-                            item[f]['formulas'] = formulas[f].value;
-                            item[f]['objectType'] = "field";
-                            item[f]['objectIdentifier'] = (control.properties.hasOwnProperty('name')) ? control.properties.name.value : control.name;
-                            item[f]['context'] = this.sDocumentProp.name.value
-                            listFormulas.push(item);
+                    if(f == 'linkConfig'){
+                        let configs = formulas[f]['configData'];
+                        if(configs.length > 0){
+                            for (let index = 0; index < configs.length; index++) {
+                                let config = configs[index];
+                                let instance = config.formula.instance
+                                let formulaType = f+"_"+instance;
+                                if(config.formula.value != ""){
+                                    this.setFormulasDataPost(listFormulasUpdate, listFormulas, config.formula.id, config.formula.value, controlName, formulaType);
+                                }
+                            }
                         }
                     }
+                    else{
+                        if(formulas[f].value != ""){
+                            this.setFormulasDataPost(listFormulasUpdate, listFormulas, formulas[f].formulasId, formulas[f].value, controlName, f);
+                        }
+                    }
+                    
                 }
                 if(Object.keys(listFormulas).length > 0){
                     listControlFormulas['insert'][controlId] = listFormulas;
@@ -953,6 +963,26 @@ export default {
             }
            return listControlFormulas;
             
+        },
+
+
+        setFormulasDataPost(listFormulasUpdate, listFormulas, formulaId, formulaValue, controlName, formulaType){
+             if(formulaId != 0){
+                let item = {};
+                item[formulaType] = {};
+                item[formulaType]['syql'] = formulaValue;
+                item[formulaType]['id'] = formulaId;
+                listFormulasUpdate.push(item);
+            }
+            else{
+                let item = {};
+                item[formulaType] = {};
+                item[formulaType]['formulas'] = formulaValue;
+                item[formulaType]['objectType'] = "field";
+                item[formulaType]['objectIdentifier'] = controlName;
+                item[formulaType]['context'] = this.sDocumentProp.name.value
+                listFormulas.push(item);
+            }
         },
        
         /**
@@ -1013,6 +1043,7 @@ export default {
             let dataPost = this.getDataToSaveMultiFormulas(allControl);
             let thisCpn = this;
             try {
+                debugger
                 if(Object.keys(dataPost.update).length > 0)
                 await formulasApi.updateMultiFormulas({formulas:JSON.stringify(dataPost.update)})
                 if(Object.keys(dataPost.insert).length > 0){
@@ -1022,13 +1053,19 @@ export default {
                         for(let controlId in data){
                             for(let i = 0; i < data[controlId].length; i++){ 
                                 let key = Object.keys(data[controlId][i])[0];
+                                let fValue = data[controlId][i][key];
+                                let linkInstance = false;
+                                if(key.includes('linkConfig')){
+                                    linkInstance = key.split('_')[1];
+                                    key = 'linkConfig';
+                                }
                                 let controlEl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('#'+controlId);
                                 let tableId = 0;
                                 if(!controlEl.is('.s-control-table') && controlEl.closest(".s-control-table").length > 0){
                                     tableId = controlEl.closest(".s-control-table").attr('id');
                                 }
                                 thisCpn.$store.commit(
-                                    "document/updateFormulasId",{id:controlId,name:key,value:data[controlId][i][key],tableId:tableId,instance:this.keyInstance}
+                                    "document/updateFormulasId",{id:controlId,name:key,value:fValue,tableId:tableId,instance:this.keyInstance,linkInstance:linkInstance}
                                 );   
                             }
                         } 
@@ -1327,7 +1364,9 @@ export default {
         setPageSize(w,h,type){
             $('#document-editor-'+this.keyInstance+'_ifr').css({width:w ,height:h});
             $('.tox-sidebar-wrap').css({width:w ,height:h});
-            this.sizePrint = {width:w ,height:h,type:type};
+            this.sizePrint.width = w;
+            this.sizePrint.height = h;
+            this.sizePrint.type = type;
         },
         
         //hoangnd: hàm mở modal tablesetting của control table
@@ -1879,12 +1918,17 @@ export default {
                 }) 
                 if(fields[controlId]['formulas'] != false){
                     $.each(formulas,function(k,v){
-                        if(fields[controlId]['formulas'][k]){
-                            formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0];
-                            formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                        if(k == 'linkConfig'){
+                            formulas[k]['configData'] = fields[controlId]['formulas'][k]['configData']
                         }
-                        if(k == 'autocomplete'){
-                            formulas[k]['configData']= (autocompleteConfig == false) ? {} : autocompleteConfig;
+                        else{
+                            if(fields[controlId]['formulas'][k]){
+                                formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0];
+                                formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                            }
+                            if(k == 'autocomplete'){
+                                formulas[k]['configData']= (autocompleteConfig == false) ? {} : autocompleteConfig;
+                            }
                         }
                     })
                 }

@@ -150,7 +150,16 @@ export default class Control {
     initFormulas() {
         if (Object.keys(this.controlFormulas).length > 0) {
             for (let key in this.controlFormulas) {
-                if (this.controlFormulas[key].value != "" && this.controlFormulas[key].value != undefined && Object.values(this.controlFormulas[key].value).length > 0) {
+                if (key == 'linkConfig') {
+                    let configs = this.controlFormulas[key].configData;
+                    for (let index = 0; index < configs.length; index++) {
+                        let config = configs[index];
+                        let formulas = config.formula.value;
+                        formulas = formulas.replace(/\r?\n|\r/g, ' ');
+                        this.controlFormulas[key].configData[index]['instance'] = new Formulas(this.curParentInstance, formulas, key);
+                    }
+                }
+                if (this.controlFormulas[key].value && Object.values(this.controlFormulas[key].value).length > 0) {
                     let formulas = Object.values(this.controlFormulas[key].value)[0];
                     formulas = formulas.replace(/\r?\n|\r/g, ' ');
                     this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, formulas, key);
@@ -162,7 +171,6 @@ export default class Control {
                             instance: this.curParentInstance
                         });
                     }
-
                 }
             }
         }
@@ -170,11 +178,7 @@ export default class Control {
 
     }
     checkDBOnly() {
-        if (!this.checkDetailView() &&
-            this.controlProperties['isDBOnly'] != undefined &&
-            (this.controlProperties['isDBOnly'].value == "1" ||
-                this.controlProperties['isDBOnly'].value == true ||
-                this.controlProperties['isDBOnly'].value == 1)) {
+        if (!this.checkDetailView() && this.checkProps('isDBOnly')) {
             let fromTable = (this.inTable == false) ? "document_" + this.docName : "document_child_" + this.docName + "_" + this.inTable;
             let formulas = "ref(SELECT count(" + this.name + ") > 0 AS " + this.name + " from " + fromTable + " where " + this.name + " = '{" + this.name + "}')"
                 // this.controlFormulas.uniqueDB = new Formulas(this.curParentInstance, formulas, 'uniqueDB');

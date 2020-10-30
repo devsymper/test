@@ -63,7 +63,7 @@ export default {
                     this.listConfig = vl;
                 }
                 else{
-                    this.listConfig = [{objectType:null,formula:{id:0,value:""},title:""}]
+                    this.listConfig = [{objectType:null,formula:{id:0, value:"", instance:Date.now()},title:""}]
                 }
             }
         }
@@ -71,12 +71,12 @@ export default {
     data(){
         return {
             listObject:[{type:'document',title:"Văn bản"},{type:'report',title:"Báo cáo"}],
-            listConfig:[{objectType:null,formula:{id:0,value:""},title:""}]
+            listConfig:[{objectType:null,formula:{id:0, value:"", instance:Date.now()},title:""}]
         }
     },
     methods:{
         addItem(){
-            this.listConfig.push({objectType:null,formula:{id:0,value:""},title:""})
+            this.listConfig.push({objectType:null,formula:{id:0, value:"", instance:Date.now()},title:""})
         },
         saveConfig(){
             this.$emit('change',this.listConfig)
