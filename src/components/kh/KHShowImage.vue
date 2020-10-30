@@ -2,8 +2,7 @@
   <div id="modalImage" class="modal kh-handson">
     <div class="modal-content">
       <div class="kh-handson-header kh-showFile">
-        <h2 style="width:95%" v-if="type!='document_backup'">{{name}}</h2>
-        <h2 style="width:95%" v-else>{{name}}</h2>
+        <h2 style="width:95%" >{{name}}</h2>
         <v-tooltip bottom>
           <template v-slot:activator="{ on }">
             <v-icon
