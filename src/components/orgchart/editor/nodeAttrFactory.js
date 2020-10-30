@@ -108,6 +108,9 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
         config.permissions = [];
         config.isSetPermissions = false;
     }
+    config.dataFromDoc ={
+        users:['928']
+    } 
     return config;
 }
 

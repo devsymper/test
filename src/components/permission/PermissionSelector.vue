@@ -20,6 +20,7 @@
                 :items="allPermission"
                 filled
                 dense
+                :disabled="disabled"
                 solo
                 flat
                 outlined
@@ -160,6 +161,10 @@ export default {
                 return []
             }
         },
+        disabled:{
+            type: Boolean,
+            default: false
+        }
     },
     watch: {
         value: {

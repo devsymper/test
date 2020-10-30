@@ -49,15 +49,12 @@
             <v-tab-item :key="'main'" class="px-2 pt-2">
                 <span class="fs-15 font-weight-medium">{{$t('orgchart.editor.generalAttributes')}}</span>
                 <form-tpl
-                    :viewOnly="action == 'view'"
+                    :viewOnly="action == 'view' || action == 'structureManagement'"
                     :singleLine="(context == 'department' && selectingNode.id == SYMPER_HOME_ORGCHART) ? false : true"
                     :labelWidth="'60px'"
                     @input-value="handleAttrValueInput"
                     :allInputs="selectingNode.commonAttrs"
                 ></form-tpl>
-                <!-- <div v-if="(context == 'department' && selectingNode.id == SYMPER_HOME_ORGCHART)">
-                   hellooo
-                </div> -->
                 <div v-if="!(context == 'department' && selectingNode.id == SYMPER_HOME_ORGCHART)">
                     <span
                         class="fs-12"
@@ -65,7 +62,7 @@
                     <UserSelector
                         ref="userSelector"
                         :isMulti="true"
-                        :disabled="action == 'view'"
+                        :disabled="action == 'view' || action == 'structureManagement'"
                         :compactChip="true"
                         :color="'grey lighten-3'"
                         :textColor="''"
@@ -73,18 +70,30 @@
                         @input="handleChangeUser"
                         v-model="selectingNode.users"
                     ></UserSelector>
+                      <span
+                        class="mt-3p fs-12">
+                       Select user from document
+                    </span>
+                    <MappingDocInstanceSelector
+                     :disabled="action != 'structureManagement'"
+                     :homeConfig="homeConfig.commonAttrs"
+                     v-model="selectingNode.dataFromDoc.users"
+                      />
                 </div>
 
                 <div class="mt-3" v-if="context == 'position' && selectingNode.id != SYMPER_HOME_ORGCHART">
+                    
                     <span
                         class="fs-12">
                     Select permissions
                     </span>
                     <PermissionSelector
+                        :disabled="action == 'view' || action == 'structureManagement'"
                         :value="selectingNode.permissions"
                         @input="selectedPermissions"
                         >
                     </PermissionSelector>
+                  
                 </div>
             </v-tab-item>
 
@@ -182,7 +191,7 @@
                 <span class="fs-15 font-weight-medium">{{$t('orgchart.editor.style')}}</span>
                 <SearchNodeStyle class="mt-2 mb-4" @change-style-template="changeNodeStyle" :change="Math.floor(Math.random() * 1000)"></SearchNodeStyle>
                 <form-tpl
-                    :viewOnly="action == 'view'"
+                    :viewOnly="action == 'view' || action == 'structureManagement'"
                     :singleLine="false"
                     :labelWidth="'60px'"
                     :allInputs="nodeStyleConfig"
@@ -271,6 +280,7 @@ import { orgchartApi } from "../../../api/orgchart";
 import { elementTools } from "jointjs";
 import SearchNodeStyle from "@/components/orgchart/editor/SearchNodeStyle";
 import PermissionSelector from "@/components/permission/PermissionSelector.vue";
+import MappingDocInstanceSelector from './MappingDocInstanceSelector'
 
 export default {
     created() {
@@ -291,12 +301,16 @@ export default {
         "form-tpl": FormTpl,
         UserSelector,
         SearchNodeStyle,
-        PermissionSelector
+        PermissionSelector,
+        MappingDocInstanceSelector
     },
     computed: {
         selectingNode() {
             return this.$store.state.orgchart.editor[this.instanceKey]
                 .selectingNode;
+        },
+        homeConfig(){
+            return this.$store.state.orgchart.editor[this.instanceKey].homeConfig
         }
     },
     props: {

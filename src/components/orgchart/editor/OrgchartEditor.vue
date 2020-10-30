@@ -426,6 +426,7 @@ export default {
             return content;
         },
         async restoreOrgchartView(id){
+            let self = this
             if(!id){
                 return
             }
@@ -445,14 +446,14 @@ export default {
                     let mapIdToDpm = {};
 
                     for(let node of savedData.departments){
+                        let users = self.getListUserAsArr(node.users)
                         let nodeData = {
                             id: node.vizId,
                             name: node.name,
                             description: node.description,
                             code: node.code,
-                            users: this.getListUserAsArr(node.users)
+                            users: users,
                         };
-
                         if(node.content && node.content !== 'false'){ 
                             nodeData.positionDiagram = {
                                 cells: JSON.parse(node.content)
@@ -513,6 +514,7 @@ export default {
             }
             return users;
         },
+      
         restoreNodeStyle(savedStyle){
             if(typeof savedStyle != 'object'){
                 savedStyle = JSON.parse(savedStyle);
@@ -995,7 +997,6 @@ export default {
             if(nodeData.users){
                 defaultConfig.users = nodeData.users;
             }
-            
             this.$store.commit('orgchart/setNodeConfig', {
                 instanceKey: instanceKey,
                 nodeId: nodeData.id,
