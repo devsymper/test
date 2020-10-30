@@ -3,7 +3,7 @@
         <div class="pt-3 pl-4 fs-15 fw-430" style="background-color:white;">
             {{detailUser.firstName?detailUser.firstName:' '+' '+ detailUser.lastName?detailUser.lastName:' '}}
             <div  v-if="rolesOgchart.length>0" class="fs-13 fw-430"  >
-                <v-menu :nudge-left="194">
+                <v-menu :nudge-left="175">
                     <template  v-slot:activator="{ on}">
                         <span  v-on="on" class='fm fw-400'>
                             {{rolesOgchart[0].name}} 
@@ -12,9 +12,9 @@
                             </span>
                         </span>
                         </template>
-                        <v-row class="ml-2 mt-2 fs-13" style=" width:180px!important; background-color:white!important" v-for="(rolesOg,index) in rolesOgchart" :key='index'>
+                        <v-row class="pl-4 pt-2 fs-13" style=" width:180px!important; background-color:white!important" v-for="(rolesOg,index) in rolesOgchart" :key='index'>
                             {{rolesOg.name}}
-                              <v-icon  color="green" v-if="currentRole.id == rolesOgchart.id">
+                              <v-icon  color="green" v-if="currentRole.id == rolesOg.id">
                             mdi-check
                         </v-icon>
                         </v-row>
