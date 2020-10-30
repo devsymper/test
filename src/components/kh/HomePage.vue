@@ -31,7 +31,7 @@
                         :items="listRoot"
                         :items-per-page="5"
                         :search="skh.search"
-                        class="elevation-1 khTable"
+                        class="elevation-1 kh-sub-table"
                     >
                         <template v-slot:[`item.name`]="{ item }">
                         <v-list-item-group>
@@ -353,10 +353,10 @@ export default {
 .v-item--active {
   color: white;
 }
-.khTable ::v-deep th{
+.kh-sub-table ::v-deep th{
     padding:2px 4px!important;
 }
-.khTable ::v-deep td{
+.kh-sub-table ::v-deep td{
     padding:2px 4px!important;
 
 }
