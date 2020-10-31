@@ -366,7 +366,7 @@ export default {
             isConfigPrint:false,
             listDocument:[],
             inputSaveControlTemplate:{},
-            sizePrint:{},
+            contentStyle:{},
             currentDragging:null,
             oldTableId:null,
             dataPreviewSubmit:null,
@@ -744,7 +744,7 @@ export default {
                             'padding-bottom': bottom + 'cm',
                             'margin':'0',
                         });
-                        self.sizePrint = Object.assign(self.sizePrint,{
+                        self.contentStyle = Object.assign(self.contentStyle,{
                             'padding-left': left + 'cm',
                             'padding-right': right + 'cm',
                             'padding-top': top + 'cm',
@@ -1363,8 +1363,8 @@ export default {
             let w = $('#document-editor-'+this.keyInstance+'_ifr').height();
             $('#document-editor-'+this.keyInstance+'_ifr').css({width:w ,height:h});
             $('.tox-sidebar-wrap').css({width:w ,height:h});
-            this.sizePrint.width = w;
-            this.sizePrint.height = h;
+            this.contentStyle.width = w;
+            this.contentStyle.height = h;
         },
         /**
          * Hàm đặt kích thước cho trang A3 A4 A5
@@ -1372,9 +1372,9 @@ export default {
         setPageSize(w,h,type){
             $('#document-editor-'+this.keyInstance+'_ifr').css({width:w ,height:h});
             $('.tox-sidebar-wrap').css({width:w ,height:h});
-            this.sizePrint.width = w;
-            this.sizePrint.height = h;
-            this.sizePrint.type = type;
+            this.contentStyle.width = w;
+            this.contentStyle.height = h;
+            this.contentStyle.type = type;
         },
         
         //hoangnd: hàm mở modal tablesetting của control table
@@ -1834,6 +1834,30 @@ export default {
                 this.inputSaveControlTemplate.title.value = res.data.title;
             }
         },
+
+
+        /**
+         * Hàm set style cho form th lưu trên db
+         */
+        setDefaultStyle(defaultStyle){
+            if(defaultStyle){
+                try {
+                    this.contentStyle = JSON.parse(defaultStyle);
+                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css({
+                        'padding-left': this.contentStyle['padding-left'],
+                        'padding-right': this.contentStyle['padding-right'],
+                        'padding-top': this.contentStyle['padding-top'],
+                        'padding-bottom': this.contentStyle['padding-bottom'],
+                    });
+                    this.setPageSize(this.contentStyle.width, this.contentStyle.height, this.contentStyle.type)
+                } catch (error) {
+                    
+                }
+                
+            }
+            
+
+        },
         // hàm gọi request lấy thông tin của document khi vào edit doc
         async getContentDocument(){
             if(this.documentId != 0){
@@ -1847,6 +1871,7 @@ export default {
                         let res1 = await documentApi.getDetailPrintConfig(this.documentId,this.printConfigId);
                         content = res1.data.content;
                         this.setDocumentProperties({title:res1.data.title});
+                        this.setDefaultStyle(res1.data.formStyle);
                     }
                     this.editorCore.setContent(content);
                     $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body select').each(function(e){
@@ -2702,7 +2727,7 @@ export default {
         saveFormPrint(docProps){
             if(this.printConfigId != 0 && this.printConfigId != undefined && this.printConfigId != null){
                 let dataPost = {documentId:this.documentId,title:docProps.title.value,
-                                content:this.editorCore.getContent(),printConfigId:this.printConfigId, size:JSON.stringify(this.sizePrint)}
+                                content:this.editorCore.getContent(),printConfigId:this.printConfigId, size:JSON.stringify(this.contentStyle)}
                 let thisCpn = this;
                 documentApi.updatePrintConfig(dataPost).then(res => {
                     this.$evtBus.$emit('document-editor-save-doc-callback')
@@ -2733,7 +2758,7 @@ export default {
                 });
             }
             else{
-                let dataPost = {documentId:this.documentId,title:docProps.title.value,content:this.editorCore.getContent(),size:JSON.stringify(this.sizePrint)}
+                let dataPost = {documentId:this.documentId,title:docProps.title.value,content:this.editorCore.getContent(),size:JSON.stringify(this.contentStyle)}
                 let thisCpn = this;
                 documentApi.savePrintConfig(dataPost).then(res => {
                     if (res.status == 200) {
