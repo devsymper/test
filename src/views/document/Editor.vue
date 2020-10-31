@@ -836,6 +836,7 @@ export default {
                     let allControl = this.editorStore.allControl;
                     let controlPrimaryKey = this.validateControlBeforeSave(allControl,'0');
                     if(Object.keys(controlPrimaryKey).length > 1){
+                        this.$evtBus.$emit('document-editor-save-doc-callback')
                         let allKey = Object.keys(controlPrimaryKey);
                         this.$snotify({
                                         type: "error",
@@ -871,6 +872,7 @@ export default {
                                 
                                 listName.push(name);
                             })
+                            this.$evtBus.$emit('document-editor-save-doc-callback');
                             this.$snotify({
                                             type: "error",
                                             title: "Tên một số control chưa hợp lệ",
@@ -932,25 +934,27 @@ export default {
                     listControlFormulas.insert = Object.assign(listFormulasControlInTable.insert,listControlFormulas.insert);
                     listControlFormulas.update = Object.assign(listFormulasControlInTable.update,listControlFormulas.update);
                 }
+                let controlName = (control.properties.hasOwnProperty('name')) ? control.properties.name.value : control.name;
                 for (let f in formulas){
-                    if(formulas[f].value != ""){
-                        if(formulas[f].formulasId != 0){
-                            let item = {};
-                            item[f] = {};
-                            item[f]['syql'] = formulas[f].value;
-                            item[f]['id'] = formulas[f].formulasId;
-                            listFormulasUpdate.push(item);
-                        }
-                        else{
-                            let item = {};
-                            item[f] = {};
-                            item[f]['formulas'] = formulas[f].value;
-                            item[f]['objectType'] = "field";
-                            item[f]['objectIdentifier'] = (control.properties.hasOwnProperty('name')) ? control.properties.name.value : control.name;
-                            item[f]['context'] = this.sDocumentProp.name.value
-                            listFormulas.push(item);
+                    if(f == 'linkConfig'){
+                        let configs = formulas[f]['configData'];
+                        if(configs.length > 0){
+                            for (let index = 0; index < configs.length; index++) {
+                                let config = configs[index];
+                                let instance = config.formula.instance
+                                let formulaType = f+"_"+instance;
+                                if(config.formula.value != ""){
+                                    this.setFormulasDataPost(listFormulasUpdate, listFormulas, config.formula.id, config.formula.value, controlName, formulaType);
+                                }
+                            }
                         }
                     }
+                    else{
+                        if(formulas[f].value != ""){
+                            this.setFormulasDataPost(listFormulasUpdate, listFormulas, formulas[f].formulasId, formulas[f].value, controlName, f);
+                        }
+                    }
+                    
                 }
                 if(Object.keys(listFormulas).length > 0){
                     listControlFormulas['insert'][controlId] = listFormulas;
@@ -961,6 +965,26 @@ export default {
             }
            return listControlFormulas;
             
+        },
+
+
+        setFormulasDataPost(listFormulasUpdate, listFormulas, formulaId, formulaValue, controlName, formulaType){
+             if(formulaId != 0){
+                let item = {};
+                item[formulaType] = {};
+                item[formulaType]['syql'] = formulaValue;
+                item[formulaType]['id'] = formulaId;
+                listFormulasUpdate.push(item);
+            }
+            else{
+                let item = {};
+                item[formulaType] = {};
+                item[formulaType]['formulas'] = formulaValue;
+                item[formulaType]['objectType'] = "field";
+                item[formulaType]['objectIdentifier'] = controlName;
+                item[formulaType]['context'] = this.sDocumentProp.name.value
+                listFormulas.push(item);
+            }
         },
        
         /**
@@ -1030,13 +1054,19 @@ export default {
                         for(let controlId in data){
                             for(let i = 0; i < data[controlId].length; i++){ 
                                 let key = Object.keys(data[controlId][i])[0];
+                                let fValue = data[controlId][i][key];
+                                let linkInstance = false;
+                                if(key.includes('linkConfig')){
+                                    linkInstance = key.split('_')[1];
+                                    key = 'linkConfig';
+                                }
                                 let controlEl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('#'+controlId);
                                 let tableId = 0;
                                 if(!controlEl.is('.s-control-table') && controlEl.closest(".s-control-table").length > 0){
                                     tableId = controlEl.closest(".s-control-table").attr('id');
                                 }
                                 thisCpn.$store.commit(
-                                    "document/updateFormulasId",{id:controlId,name:key,value:data[controlId][i][key],tableId:tableId,instance:this.keyInstance}
+                                    "document/updateFormulasId",{id:controlId,name:key,value:fValue,tableId:tableId,instance:this.keyInstance,linkInstance:linkInstance}
                                 );   
                             }
                         } 
@@ -1048,6 +1078,7 @@ export default {
                         }
                     }
                     else{
+                        this.$evtBus.$emit('document-editor-save-doc-callback')
                         this.$snotify({
                                 type: "error",
                                 title: "error from formulas serice, can't not save into formulas service!!!",
@@ -1065,6 +1096,7 @@ export default {
                 }
                 
             } catch (error) {
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 this.$snotify({
                             type: "error",
                             title: "error from formulas serice, can't not save into formulas service!!!",
@@ -1078,6 +1110,7 @@ export default {
         createDocument(dataPost){
             let thisCpn = this;
             documentApi.saveDocument(dataPost).then(res => {
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 if (res.status == 200) {
                     thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
@@ -1096,6 +1129,7 @@ export default {
                 }
             })
             .catch(err => {
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 thisCpn.$snotify({
                         type: "error",
                         title: "can not save document",
@@ -1110,6 +1144,7 @@ export default {
         editDocument(dataPost){
             let thisCpn = this;
             documentApi.editDocument(dataPost).then(res => {
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 if (res.status == 200) {
                     thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
@@ -1128,6 +1163,7 @@ export default {
                 
             })
             .catch(err => {
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 thisCpn.$snotify({
                     type: "error",
                     title: "error from edit document api",
@@ -1150,6 +1186,7 @@ export default {
                 this.saveDocument();
             }
             else{
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 this.$snotify({
                                 type: "error",
                                 title: "Thông tin control chưa hợp lệ",
@@ -1889,12 +1926,19 @@ export default {
                 }) 
                 if(fields[controlId]['formulas'] != false){
                     $.each(formulas,function(k,v){
-                        if(fields[controlId]['formulas'][k]){
-                            formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0];
-                            formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                        if(k == 'linkConfig'){
+                            if(fields[controlId]['formulas'][k]){
+                                formulas[k]['configData'] = fields[controlId]['formulas'][k]['configData'];
+                            }
                         }
-                        if(k == 'autocomplete'){
-                            formulas[k]['configData']= (autocompleteConfig == false) ? {} : autocompleteConfig;
+                        else{
+                            if(fields[controlId]['formulas'][k]){
+                                formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0];
+                                formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                            }
+                            if(k == 'autocomplete'){
+                                formulas[k]['configData']= (autocompleteConfig == false) ? {} : autocompleteConfig;
+                            }
                         }
                     })
                 }
@@ -2661,6 +2705,7 @@ export default {
                                 content:this.editorCore.getContent(),printConfigId:this.printConfigId, size:JSON.stringify(this.sizePrint)}
                 let thisCpn = this;
                 documentApi.updatePrintConfig(dataPost).then(res => {
+                    this.$evtBus.$emit('document-editor-save-doc-callback')
                     if (res.status == 200) {
                         thisCpn.editorCore.remove();
                         thisCpn.$router.push('/documents');
@@ -2678,6 +2723,7 @@ export default {
                     }
                 })
                 .catch(err => {
+                    this.$evtBus.$emit('document-editor-save-doc-callback')
                     thisCpn.$snotify({
                             type: "error",
                             title: "can not save form print document",

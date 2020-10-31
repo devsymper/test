@@ -244,6 +244,9 @@ export default class Util {
     static makeErrNoti = function(msg, sign, controlTitle) {
         return '<span class="mdi mdi-checkbox-blank-circle validate-icon" control-title="' + controlTitle + '" title="' + msg + '"></span>'
     }
+    static renderInfoBtn = function() {
+        return '<span class="mdi mdi-information info-control-btn"></span>'
+    }
     static generateString = function(length) {
             var result = '';
             var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';

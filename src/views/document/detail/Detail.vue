@@ -32,6 +32,7 @@
             :style="{'width':documentSize, 'height':contentHeight,'margin':contentMargin}">
             <div class="content-document" v-html="contentDocument"></div>
             <div class="content-print-document" :style="formSize" v-html="contentPrintDocument"></div>
+            <FloattingPopup ref="floattingPopup" :instance="keyInstance"/>
         </div>
       
         <side-bar-detail 
@@ -49,7 +50,6 @@
         />
         <HistoryControl ref="historyView" />
        
-
     </div>
 </template>
 <script>
@@ -67,6 +67,7 @@ import './../submit/customControl.css'
 import { getSDocumentSubmitStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
+import FloattingPopup from './FloattingPopup'
 import Preloader from './../../../components/common/Preloader';
 
 import { util } from '../../../plugins/util.js';
@@ -110,7 +111,8 @@ export default {
     components:{
         'side-bar-detail':SideBarDetail,
         HistoryControl,
-        Preloader
+        Preloader,
+        FloattingPopup
     },
     computed: {
         routeName(){
@@ -158,12 +160,19 @@ export default {
             printConfigActive:null,
             formSize:{},
             wrapFormCss:{},
-            defaultData:{}
+            defaultData:{},
+            listLinkControl:{}
 
         };
     },
     beforeMount() {
         this.documentSize = "21cm";
+    },
+    mounted(){
+        let self = this;
+        $(document).on('click','#sym-Detail-'+this.keyInstance+' .info-control-btn',function(e){
+            self.$refs.floattingPopup.show(e);
+        })
     },
     
     created(){
@@ -301,6 +310,7 @@ export default {
                 thisCpn.workflowId = res.data.document_object_workflow_id;
                 thisCpn.documentId = res.data.documentId;
                 thisCpn.userCreateInfo = res.data.userCreateInfo;
+                thisCpn.listLinkControl = res.data.otherInfo;
                 let dataToStore = res.data;
                 if(Object.keys(thisCpn.defaultData).length > 0){
                     dataToStore = thisCpn.defaultData;
@@ -407,6 +417,7 @@ export default {
                             control.init();
                             this.addToListInputInDocument(controlName,control)
                             control.render();
+                            control.checkHasInfoControl(this.listLinkControl);
                         }
                         //truong hop la control table
                         else {
@@ -484,7 +495,6 @@ export default {
     .sym-form-Detail {
         width: 21cm;
         padding: 16px;
-        position: relative;
     }
     .wrap-content-detail{
         position: relative;

@@ -123,7 +123,8 @@ export default class Control {
             return;
         }
         try {
-            effected = JSON.parse(effected)
+            effected = JSON.parse(effected);
+
             for (let type in effected) {
                 if (type == "effectedControl") {
                     this.effectedControl = effected[type];
@@ -158,8 +159,11 @@ export default class Control {
                     for (let index = 0; index < configs.length; index++) {
                         let config = configs[index];
                         let formulas = config.formula.value;
-                        formulas = formulas.replace(/\r?\n|\r/g, ' ');
-                        this.controlFormulas[key].configData[index]['instance'] = new Formulas(this.curParentInstance, formulas, key);
+                        if (formulas) {
+                            formulas = formulas.replace(/\r?\n|\r/g, ' ');
+                            this.controlFormulas[key].configData[index]['instance'] = new Formulas(this.curParentInstance, formulas, key);
+                        }
+
                     }
                 }
                 if (this.controlFormulas[key].value && Object.values(this.controlFormulas[key].value).length > 0) {
@@ -181,11 +185,7 @@ export default class Control {
 
     }
     checkDBOnly() {
-        if (!this.checkDetailView() &&
-            this.controlProperties['isDBOnly'] != undefined &&
-            (this.controlProperties['isDBOnly'].value == "1" ||
-                this.controlProperties['isDBOnly'].value == true ||
-                this.controlProperties['isDBOnly'].value == 1)) {
+        if (!this.checkDetailView() && this.checkProps('isDBOnly')) {
             let fromTable = (this.inTable == false) ? "document_" + this.docName : "document_child_" + this.docName + "_" + this.inTable;
             let formulas = "ref(SELECT count(" + this.name + ") > 0 AS " + this.name + " from " + fromTable + " where " + this.name + " = '{" + this.name + "}')"
                 // this.controlFormulas.uniqueDB = new Formulas(this.curParentInstance, formulas, 'uniqueDB');
@@ -219,12 +219,41 @@ export default class Control {
         return this.effectedValidateControl;
     }
 
-    handlerDataAfterRunFormulasLink(values) {
-        if (Array.isArray(values)) {
-            values = values[0]
-        }
+    handlerDataAfterRunFormulasLink(values, formulasType) {
         if (this.inTable != false) {
+            let configInstance = formulasType.split('_')[1]
+            let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
+            let dataTable = tableControlInstance.tableInstance.tableInstance.getData();
+            let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
 
+            let linkFormulas = this.controlFormulas.linkConfig.configData;
+            let title = "";
+            let source = "";
+            for (let index = 0; index < linkFormulas.length; index++) {
+                let config = linkFormulas[index];
+                let formulaIns = config.formula.instance;
+                if (Number(formulaIns) == Number(configInstance)) {
+                    title = config.title;
+                    source = config.objectType.type;
+                }
+            }
+
+            for (let rowId in values) {
+                let value = values[rowId];
+                if (value == 0) {
+                    continue;
+                }
+                let rowIndex = this.findIndexByRowId(dataTable, rowId);
+                tableControlInstance.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
+                    type: 'linkControl',
+                    key: formulasType,
+                    value: value,
+                    title: title,
+                    source: source,
+                };
+
+            }
+            tableControlInstance.tableInstance.tableInstance.render()
         }
     }
     handlerDataAfterRunFormulasValidate(values) {
@@ -242,7 +271,6 @@ export default class Control {
 
             }
             tableControlInstance.tableInstance.tableInstance.render()
-
         }
     }
     findIndexByRowId(dataTable, rowId) {

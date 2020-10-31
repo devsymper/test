@@ -36,12 +36,10 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
-import 'ag-grid-enterprise';
 import { util } from '../../../plugins/util';
 import ImageRenderer from './ImageRenderer';
 import CheckBoxRenderer from './CheckBoxRenderer';
 import Vue from "vue";
-import { param } from 'jquery';
 
 
 export default {
