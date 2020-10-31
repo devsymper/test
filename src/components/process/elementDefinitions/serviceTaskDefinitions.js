@@ -15,16 +15,18 @@ export default {
             responseVariableName: '',
             ignoreException: true,
             saveRequestVariables: false,
-            saveResponseParameters: false,
+            saveResponseParameters: true,
             resultVariablePrefix: '',
             saveResponseParametersTransient: false,
             saveResponseVariableAsJson: true,
         },
         makeRequestBody(nodeAttr) {
+            this.params.responseVariableName = 'symper_'+nodeAttr.idNode+'_formula_response';
             let formula = nodeAttr.serviceTaskScriptValue.value;
             this.params.requestBody = `{
                 "formula": "${formula}"
             }`;
+            this.params.requestBody = this.params.requestBody.replace(/\n/g,' ');
         }
     },
     notification:{
