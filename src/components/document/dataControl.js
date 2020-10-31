@@ -43,8 +43,9 @@ export const setDataForPropsControl = function(fields, instance, from) {
         })
         if (fields[controlId]['formulas'] != false && fields[controlId]['formulas'] != "[]") {
             if (viewType != 'detail') {
+
                 $.each(formulas, function(k, v) {
-                    if (fields[controlId]['formulas'][k]) {
+                    if (!fields[controlId]['formulas'][k]) {
                         delete control.formulas[k];
                     } else {
                         if (k == 'linkConfig') {

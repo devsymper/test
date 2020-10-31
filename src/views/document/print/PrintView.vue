@@ -15,7 +15,6 @@
 <script>
 import Detail from './../detail/Detail'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-
 export default {
     components:{
         'detail-view' : Detail,
@@ -53,7 +52,6 @@ export default {
         }
     },
     methods:{
-
         afterLoaded(){
             if(!this.isAlwaysPrint){
                 return;
@@ -97,7 +95,6 @@ export default {
                      stylesHtml += cstyle;
             // Open the print window
             const WinPrint = window.open('', 'Print', 'width=800,height=900,toolbar=0,scrollbars=0,status=0');
-
             WinPrint.document.write(`<!DOCTYPE html>
             <html>
             <head>
@@ -107,10 +104,8 @@ export default {
                 ${prtHtml}
             </body>
             </html>`);
-
             WinPrint.document.close(); // necessary for IE >= 10
             WinPrint.focus(); // necessary for IE >= 10*/
-
             setTimeout(() => {
                 WinPrint.print();
                 WinPrint.close();

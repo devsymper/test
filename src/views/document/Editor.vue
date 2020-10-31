@@ -1046,7 +1046,6 @@ export default {
                 if(Object.keys(dataPost.update).length > 0)
                 await formulasApi.updateMultiFormulas({formulas:JSON.stringify(dataPost.update)})
                 if(Object.keys(dataPost.insert).length > 0){
-                    debugger
                     let res = await formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost.insert)})
                     if(res.status == 200){ 
                         let data = res.data;
@@ -2613,8 +2612,6 @@ export default {
                 this.selectControl(control.properties, control.formulas,controlId,type);
             }
         },
-
-
         checkSelectedTabPageControl(e,control,controlId){
             if($(e.target).closest('.page-item').length > 0){
                 let pageId = $(e.target).closest('.page-item').attr('id');
@@ -2671,16 +2668,21 @@ export default {
                 if($(tbody[0].innerHTML).length > 0){
                     for(let i = 0; i< thead.length; i++){
                         let style = $(thead[i]).attr('style');
-                        let width = style.match(/(?<=width:\s)\s*([^;"]*)(?=\;)/gmi);
-                        if(width){
-                            let row = {title: $(thead[i]).text(),colWidth:width[0],colIndex:i}
-                            listData.push(row)
+                        if(style){
+                            let width = style.match(/(?<=width:\s)\s*([^;"]*)(?=\;)/gmi);
+                            if(width){
+                                let row = {title: $(thead[i]).text(),colWidth:width[0],colIndex:i}
+                                listData.push(row)
+                            }
+                            else{
+                                let row = {title: $(thead[i]).text(),colWidth:'auto',colIndex:i}
+                                listData.push(row)
+                            }
                         }
                         else{
                             let row = {title: $(thead[i]).text(),colWidth:'auto',colIndex:i}
                             listData.push(row)
                         }
-                        
                     }
                 }
                 this.$refs.printTableConfig.showDialog();

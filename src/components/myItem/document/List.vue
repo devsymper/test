@@ -186,6 +186,7 @@
             </div>
         </v-row>
         <detailDocument 
+            class="detail-doc"
             :showCommentInDoc="true"
             :docObjInfo="docObjInfo">
         </detailDocument>
@@ -566,5 +567,8 @@ export default {
 .col-10 {
     flex: 0 0 94.333333%;
     max-width: 94.333333%;
+}
+.detail-doc{
+    height: calc(100vh - 88px)!important;
 }
 </style>

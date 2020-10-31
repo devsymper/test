@@ -15,7 +15,11 @@
             @input-value-changed="handleInputValueChange"
         >
         </FormTpl> 
-
+        <ConfigActionPackOrgchart 
+            v-if="allInputs.objectType.value == 'orgchart'"
+            @permission-selected="handlePermissionSelected"
+            :checkboxes="checkboxes"
+        />
         <div class="w-100">
             <div class="my-2 fs-12">
                 {{$t('permissions.actionPack.allOperation')}}
@@ -48,14 +52,14 @@
 
             </hot-table>
         </div>
-
+     
         <ObjectInApplication 
             v-if="allInputs.objectType.value == 'application_definition'"
             :tableDataDefinition="multipleLevelObjects.application_definition"
             :commonTableSetting="commonTableSetting"
             :idApplication="focusingIdApplication"
             @app-detail-get="translateAppObjectIdToTableData" />
-
+          
         <DocumentInstanceOperation 
             @change-data="handleChangeDocumentInstanceOperation"
             v-if="allInputs.objectType.value == 'document_definition'"
@@ -87,6 +91,7 @@
                 {{action == 'create' ? $t('common.save') : $t('common.update')}}
             </v-btn>
         </div>
+      
     </div>
 </template>
 
@@ -99,6 +104,7 @@ import { permissionApi } from '../../../api/permissionPack';
 import { permissionPackageApi } from '../../../api/PermissionPackage';
 import ObjectInApplication from "./ObjectInApplication";
 import DocumentInstanceOperation from "./DocumentInstanceOperation";
+import ConfigActionPackOrgchart from "./ConfigActionPackOrgchart.vue" ;
 
 let defaultTabConfig = {
     tableData: [],
@@ -132,6 +138,9 @@ export default {
     methods: { 
         closeActionPackForm(){
             this.$emit('close-form');
+        },
+        handlePermissionSelected(data){
+            this.checkboxes = data           
         },
         handleChangeDocumentInstanceOperation(info){
             let operationForInstancesOfDocDef = this.multipleLevelObjects.document_definition.savedOpsForAllInstancesDocDef;
@@ -752,7 +761,6 @@ export default {
                         let nameAction  = el.title.toLowerCase();
                         arr.push(this.$t('actions.listActions.document.'+ nameAction));
                        // arr.push(this.$t(nameAction));
-
                     }
                 }
             }
@@ -773,6 +781,7 @@ export default {
     data(){
         let self = this;
         return {
+            checkboxes:["viewOther"],
             tableHeight: 200,
             isEditingCell : false,
             tableColumnsForObjectType: [],
@@ -854,7 +863,8 @@ export default {
         CustomSelect,
         HotColumn,
         ObjectInApplication,
-        DocumentInstanceOperation
+        DocumentInstanceOperation,
+        ConfigActionPackOrgchart
     },
     props: {
         itemData: {

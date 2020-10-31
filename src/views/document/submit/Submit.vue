@@ -1965,6 +1965,7 @@ export default {
 
 
         runInputFilterFormulas(controlName,search=""){
+            debugger
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
             let controlId = controlInstance.id
             let allFormulas = controlInstance.controlFormulas;

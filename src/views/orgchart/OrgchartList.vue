@@ -64,6 +64,16 @@ export default {
                 }
             },
             tableContextMenu: {
+                structureManagement: {
+                    name: "structureManagement",
+                    text: this.$t("common.structureManagement"),
+                    callback: (row, callback) => {
+                        self.$goToPage(
+                            "/orgchart/"+row.id+"/structureManagement",
+                            " Edit " + (row.name ? row.name : row.key)
+                        );
+                    }
+                },
                 update: {
                     name: "edit",
                     text: this.$t("common.edit"),

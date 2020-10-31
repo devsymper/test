@@ -8,7 +8,7 @@
             <template v-slot:label="{ item }">
                 <v-checkbox
                     @change="handleChangeSelectedNode(item)"
-                    v-if="item.type == 'position'"
+                    v-if="checkboxMode.includes(item.type)"
                     v-model="item.selected"
                     :label="item.name"
                     dense
@@ -37,13 +37,12 @@ export default {
                 return []
             }
         },
-
         /**
          * Hiển thị checkbox ở loại node nào trong orgchart: position, department hoặc all (cả hai loại node trên)
          */
         checkboxMode: {
-            type: String,
-            default: 'position' // Hiển thị ô check ở những loại node nào: position, department, all
+            type: Array,
+            default: ['position'] // Hiển thị ô check ở những loại node nào: position, department
         },
         searchKey:{
             type:String,

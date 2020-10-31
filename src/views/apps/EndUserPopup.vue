@@ -210,7 +210,6 @@ export default {
 			return this.$store.state.appConfig.listItemSelected
 		},
 		sFavorite(){
-			console.log(this.$store.state.appConfig.listFavorite);
 			return this.$store.state.appConfig.listFavorite
 		},
 		listApp(){
@@ -253,10 +252,12 @@ export default {
 					})
 					this.checkTypeFavorite(res.data.listObject)
 					this.$store.commit('appConfig/updateListFavorite',self.listFavorite)
-					this.loadingFavorite = false
+					
 				}
 			}).catch((err) => {
 			});
+			this.loadingFavorite = false
+
 		},
 		clickDetails(item){
 			this.$refs.contextMenu.hide()
