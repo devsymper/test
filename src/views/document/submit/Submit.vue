@@ -1458,7 +1458,9 @@ export default {
                             if(controlFormulas.hasOwnProperty('formulas')){
                                 let formulasInstance = controlFormulas['formulas'].instance;
                                 // chạy công thức để lấy giá trị dòng mặc định trong table(phục vụ cho việc shift enter xuống dòng phải có dữ liệu mặc định)
-                                this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+                                if(formulasInstance){
+                                    this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+                                }
                             }
                             
                         }
@@ -1739,6 +1741,11 @@ export default {
                 }
             }
             dataPost['dataInputFormulas'] = JSON.stringify(dataPost['dataInputFormulas']);
+            // nếu có giá trị công thức link trong doc thì lưu lại để dùng trong form detail
+            let linkData = thisCpn.$refs.linkControlView.getData();
+            if(Object.keys(linkData).length > 0){
+                dataPost['linkData'] = JSON.stringify(linkData);
+            }
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
                 dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;
@@ -1750,18 +1757,6 @@ export default {
                         type: "success",
                         title: "Submit document success!"
                     });        
-                    // nếu có giá trị công thức link trong doc thì lưu lại để dùng trong form detail
-                    let linkData = thisCpn.$refs.linkControlView.getData();
-                    if(Object.keys(linkData).length > 0){
-                        let listIdControl = [];
-                        for(let controlName in linkData){
-                            let controlIns = getControlInstanceFromStore(controlName);
-                            if(controlIns){
-                                listIdControl.push(controlIns.idField);
-                            }
-                        }
-                        documentApi.updateFields({ids:listIdControl.join(','),data:JSOn.stringify(linkData)});   
-                    }
                     // nếu submit từ form sub submit thì ko rediect trang
                     // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
                     
@@ -1804,6 +1799,11 @@ export default {
             dataPost['documentId'] = this.documentId;
             if(this.isDraft == 1){
                 dataPost['isDraft'] = true;
+            }
+            // nếu có giá trị công thức link trong doc thì lưu lại để dùng trong form detail
+            let linkData = thisCpn.$refs.linkControlView.getData();
+            if(Object.keys(linkData).length > 0){
+                dataPost['linkData'] = JSON.stringify(linkData);
             }
             documentApi.updateDocument(this.docObjId,dataPost).then(res => {
                 thisCpn.$emit('submit-document-success',res.data);

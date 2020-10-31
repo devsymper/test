@@ -39,6 +39,9 @@ export const documentApi = {
     submitDocument(data) {
         return coreApi.post("documents/objects", data);
     },
+    updateInfoDocumentObj(id, data) {
+        return coreApi.put("documents/objects-info/" + id, data);
+    },
     updateDocument(objId, data) {
         return coreApi.put("documents/objects/" + objId, data);
     },
@@ -65,7 +68,7 @@ export const documentApi = {
         return coreApi.get("documents/" + name + "/fields");
     },
     updateFields(data) {
-        return coreApi.put("fieldfields/batch", data);
+        return coreApi.put("fields/batch", data);
     },
     getDetailDocumentByName(data) {
         return coreApi.get("documents/by-name", data);
