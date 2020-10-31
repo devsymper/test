@@ -836,6 +836,7 @@ export default {
                     let allControl = this.editorStore.allControl;
                     let controlPrimaryKey = this.validateControlBeforeSave(allControl,'0');
                     if(Object.keys(controlPrimaryKey).length > 1){
+                        this.$evtBus.$emit('document-editor-save-doc-callback')
                         let allKey = Object.keys(controlPrimaryKey);
                         this.$snotify({
                                         type: "error",
@@ -871,6 +872,7 @@ export default {
                                 
                                 listName.push(name);
                             })
+                            this.$evtBus.$emit('document-editor-save-doc-callback');
                             this.$snotify({
                                             type: "error",
                                             title: "Tên một số control chưa hợp lệ",
@@ -1076,6 +1078,7 @@ export default {
                         }
                     }
                     else{
+                        this.$evtBus.$emit('document-editor-save-doc-callback')
                         this.$snotify({
                                 type: "error",
                                 title: "error from formulas serice, can't not save into formulas service!!!",
@@ -1093,6 +1096,7 @@ export default {
                 }
                 
             } catch (error) {
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 this.$snotify({
                             type: "error",
                             title: "error from formulas serice, can't not save into formulas service!!!",
@@ -1106,6 +1110,7 @@ export default {
         createDocument(dataPost){
             let thisCpn = this;
             documentApi.saveDocument(dataPost).then(res => {
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 if (res.status == 200) {
                     thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
@@ -1124,6 +1129,7 @@ export default {
                 }
             })
             .catch(err => {
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 thisCpn.$snotify({
                         type: "error",
                         title: "can not save document",
@@ -1138,6 +1144,7 @@ export default {
         editDocument(dataPost){
             let thisCpn = this;
             documentApi.editDocument(dataPost).then(res => {
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 if (res.status == 200) {
                     thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
@@ -1156,6 +1163,7 @@ export default {
                 
             })
             .catch(err => {
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 thisCpn.$snotify({
                     type: "error",
                     title: "error from edit document api",
@@ -1178,6 +1186,7 @@ export default {
                 this.saveDocument();
             }
             else{
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 this.$snotify({
                                 type: "error",
                                 title: "Thông tin control chưa hợp lệ",
@@ -2696,6 +2705,7 @@ export default {
                                 content:this.editorCore.getContent(),printConfigId:this.printConfigId, size:JSON.stringify(this.sizePrint)}
                 let thisCpn = this;
                 documentApi.updatePrintConfig(dataPost).then(res => {
+                    this.$evtBus.$emit('document-editor-save-doc-callback')
                     if (res.status == 200) {
                         thisCpn.editorCore.remove();
                         thisCpn.$router.push('/documents');
@@ -2713,6 +2723,7 @@ export default {
                     }
                 })
                 .catch(err => {
+                    this.$evtBus.$emit('document-editor-save-doc-callback')
                     thisCpn.$snotify({
                             type: "error",
                             title: "can not save form print document",

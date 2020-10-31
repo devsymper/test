@@ -161,7 +161,8 @@ export default {
             formSize:{},
             wrapFormCss:{},
             defaultData:{},
-            isShowPopupView:false
+            isShowPopupView:false,
+            listLinkControl:{}
 
         };
     },
@@ -312,6 +313,7 @@ export default {
                 thisCpn.workflowId = res.data.document_object_workflow_id;
                 thisCpn.documentId = res.data.documentId;
                 thisCpn.userCreateInfo = res.data.userCreateInfo;
+                thisCpn.listLinkControl = res.data.otherInfo;
                 let dataToStore = res.data;
                 if(Object.keys(thisCpn.defaultData).length > 0){
                     dataToStore = thisCpn.defaultData;

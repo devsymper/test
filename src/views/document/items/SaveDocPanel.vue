@@ -156,7 +156,8 @@ export default {
             this.isShowModelSaveDoc = true
         },
         hideDialog(){
-            this.isShowModelSaveDoc = false
+            this.isShowModelSaveDoc = false;
+            this.$evtBus.$emit('document-editor-save-doc-callback');
         },
         // Hàm kiểm tra tên document
         checkValidateNameDocument(value){
