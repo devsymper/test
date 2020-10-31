@@ -16,6 +16,7 @@
       </div>
          <OrgchartElementSelector 
           v-if="showTreeOrgchart"
+          :value="departmentSelected"
           :checkboxMode="checkboxMode"
           @change-node-selected="handleChangeNodeSelected"
         />

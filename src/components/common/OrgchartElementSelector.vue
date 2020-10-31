@@ -23,6 +23,7 @@
 
 <script>
 import { util } from '../../plugins/util';
+import { orgchartApi } from '@/api/orgchart.js';
 export default {
     created(){
         this.$store.dispatch('orgchart/getAllOrgchartStruct');
@@ -50,13 +51,18 @@ export default {
         }
     },
     watch: {
-        value(){
-            let mapNode = this.$store.state.orgchart.allOrgchartStruct.map;
-            for(let item of this.value){
-                if(mapNode[item]){
-                    mapNode[item].selected = true;
+        value:{
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                let mapNode = this.$store.state.orgchart.allOrgchartStruct.map;
+                for(let item of newValue){
+                    if(mapNode[item]){
+                        mapNode[item].selected = true;
+                    }
                 }
             }
+           
         }
     },
     data(){

@@ -284,12 +284,11 @@ export default {
                             actionByObject[objectId] = util.cloneDeep(
                                 rowSchemaByObjectType[objectType]
                             );
-
                             if(allResource[objectType][objectId]){
                                 actionByObject[objectId].object =
                                     allResource[objectType][objectId].fullText;
                             }else{
-                                actionByObject[objectId].object = '';
+                                actionByObject[objectId].object = objectType== "department" ? objectId : '';
                             }
                         }
                         if(op.action){
@@ -302,7 +301,6 @@ export default {
             this.createRowsForAllInstancesDocDef(operationForInstancesOfDocDef, mapActionAndObjects['document_definition']);
             // chế biến về cho đúng định dạng hiển thị của bảng
             for(let objectType in mapActionAndObjects){
-                if(objectType != "department"){
                     mapActionAndObjects[objectType] = Object.values(mapActionAndObjects[objectType]);
     
                     let lastEmptyRow = util.cloneDeep(rowSchemaByObjectType[objectType]);
@@ -312,8 +310,6 @@ export default {
                         }
                     }
                     mapActionAndObjects[objectType].push(lastEmptyRow);
-                }
-               
             }
             return {
                 mapActionAndObjects,

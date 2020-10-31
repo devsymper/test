@@ -20,7 +20,7 @@
             @permission-selected="handlePermissionSelected"
             @department-selected="handleDepartmentSelected"
             :checkboxes="permissionDepartment"
-            :departmentSelected="departmentSelected"
+            :departmentSelected="departmentSelectedProps"
         />
         <div class="w-100">
             <div class="my-2 fs-12">
@@ -456,12 +456,13 @@ export default {
         },
         handleInputValueChange(name, inputInfo, data){
             let self = this
-
+            self.departmentSelected
             if(name == 'objectType'){
                 if(data == "department"){
                     let objectType = this.allInputs.objectType.value;
                     let rows = this.itemData.mapActionForAllObjects[objectType];
                     let rowsItem = this.itemData.mapActionAndObjects[objectType];
+
                     if(rows){
                         for(let i in rows[0]){
                             if(rows[0][i] == true){
@@ -470,9 +471,16 @@ export default {
                         }
                     }
                     if(rowsItem){
-                        for(let i in rowsItem){
-                            self.departmentSelected.push(i)
-                        }
+                        self.permissionDepartment.push('view_other')
+                        self.$store.dispatch('orgchart/getAllOrgchartStruct');
+                        setTimeout(function(){
+                            rowsItem.forEach(function(e){
+                                if(e.object != ""){
+                                    self.departmentSelected.push('department:'+e.object);
+                                    self.departmentSelectedProps.push(e.object)
+                                }
+                             })
+                        },1000)
                     }
                 }else{
                     this.handleChangeObjectType();
@@ -664,7 +672,6 @@ export default {
                 let dataTable = this.itemData.mapActionAndObjects[objectType];
                 newOperations = newOperations.concat(this.getOperationToSaveFromDataTable(dataTable, allResource, objectType));
             }
-            
             for(let objectType in this.multipleLevelObjects.application_definition){
                 let dataTable = this.multipleLevelObjects.application_definition[objectType].tableData;
                 newOperations = newOperations.concat(this.getOperationToSaveFromDataTable(dataTable, allResource, objectType));
@@ -839,6 +846,7 @@ export default {
         return {
             permissionDepartment:[],
             departmentSelected:[],
+            departmentSelectedProps: [],
             tableHeight: 200,
             isEditingCell : false,
             tableColumnsForObjectType: [],
