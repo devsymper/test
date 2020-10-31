@@ -55,10 +55,10 @@
             </div>
         </v-row>
         <v-divider style="border-color: #dedede;"></v-divider>
-        <div class="detail-work" style="height:100%" v-if="filterObject==0 && statusDetailWork==false">
+        <div class="detail-work" style="height:auto" v-if="filterObject==0 && statusDetailWork==false">
             <v-row class="ma-0">
                 <v-col cols="12" class="list-tasks pt-0 pb-0">
-                    <v-row>
+                    <v-row class="ma-0 w-100">
                         <v-col
                             cols=4
                             class="pl-3 fs-13 font-weight-medium"
@@ -273,7 +273,7 @@
                 </v-expansion-panels>
             </VuePerfectScrollbar>
         </div>
-        <div class="list-task" style="height:calc(100% - 44px)" v-else-if="filterObject==1 && statusDetailWork==false">
+        <div class="list-task" style="height:calc(100% - 45px)" v-else-if="filterObject==1 && statusDetailWork==false">
             <listTask 
                 :listTask="listTaskCurrent"
                 :appName="workInfo.appName"
@@ -286,7 +286,7 @@
             />
         </div>
         <SideBarDetail
-            style="top:45px!important;height: calc(100% - 44px);"
+            style="top:45px!important;height: calc(100% - 45px);"
             class="side-bar"
             :sidebarWidth="sidebarWidth"  
             :isShowSidebar="isShowSidebar"

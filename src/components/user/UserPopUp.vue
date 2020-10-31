@@ -3,7 +3,7 @@
         <div class="pt-3 pl-4 fs-15 fw-430" style="background-color:white;">
             {{detailUser.firstName?detailUser.firstName:' '+' '+ detailUser.lastName?detailUser.lastName:' '}}
             <div  v-if="rolesOgchart.length>0" class="fs-13 fw-430"  >
-                <v-menu :nudge-left="194">
+                <v-menu :nudge-left="175">
                     <template  v-slot:activator="{ on}">
                         <span  v-on="on" class='fm fw-400'>
                             {{rolesOgchart[0].name}} 
@@ -12,9 +12,9 @@
                             </span>
                         </span>
                         </template>
-                        <v-row class="ml-2 mt-2 fs-13" style=" width:180px!important; background-color:white!important" v-for="(rolesOg,index) in rolesOgchart" :key='index'>
+                        <v-row class="pl-4 pt-2 fs-13" style=" width:180px!important; background-color:white!important" v-for="(rolesOg,index) in rolesOgchart" :key='index'>
                             {{rolesOg.name}}
-                              <v-icon  color="green" v-if="currentRole.id == rolesOgchart.id">
+                              <v-icon  color="green" v-if="currentRole.id == rolesOg.id">
                             mdi-check
                         </v-icon>
                         </v-row>
@@ -26,13 +26,19 @@
         <v-row class="ml-4">
             <v-col class="col-md-7">
                 <v-row class="fs-13 mb-1">
-                   <i class="mdi-20px mdi mdi-account-circle mr-1"></i>{{detailUser.userName}}
+                    <i class="mdi-20px mdi mdi-account-circle mr-1"></i>{{detailUser.userName}}
                 </v-row>
                 <v-row class="fs-13 mb-1" v-if="detailUser.phone">
                     <i class="mdi-20px mdi mdi-phone mr-1"></i>{{detailUser.phone}}
                 </v-row>
                 <v-row class="fs-13 mb-1"  v-if="detailUser.email">
-                   <i class="mdi-20px mdi mdi-email mr-1"></i>  {{detailUser.email}}
+                   <i class="mdi-20px mdi mdi-email mr-1"></i>
+                    <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                            <span v-on="on" style="width:90%" class="text-ellipsis">{{detailUser.email}}</span>
+                        </template>
+                        <span>{{ detailUser.email }}</span>
+                    </v-tooltip>
                 </v-row>
                 <v-row class="fs-13 mb-1">
                    <i class="mdi-20px mdi mdi-border-color mr-1"></i> Ngày tạo: {{detailUser.createAt}}
