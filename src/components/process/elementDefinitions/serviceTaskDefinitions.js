@@ -26,7 +26,7 @@ export default {
             this.params.requestBody = `{
                 "formula": "${formula}"
             }`;
-            this.params.requestBody = this.params.requestBody.replace(/\n/g,' ');
+            this.params.requestBody = this.params.requestBody.replace(/\n/g,' ').replace(/\s+/g,' ');
         }
     },
     notification:{
