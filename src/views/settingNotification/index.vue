@@ -237,16 +237,17 @@ export default {
                         items:[],
                         subTitle:[],
                         title: objId[j],
+                        subscribedAt:'123',
                         icon:objId[j].indexOf(':')>0?objId[j].split(':')[0]:objId[j]
                     })
                     for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
-
                         self.listSubcribed[j].items.push({
                             title: grouplistByObjId[objId[j]][i].event,
                             active:true,
                             name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
                            // active:  self.checkSubcribe(objId[i],grouplistByObjId[objId[j]][i].event),
-                            id:grouplistByObjId[objId[j]][i].id
+                            id:grouplistByObjId[objId[j]][i].id,
+                           
 
                         })
                      }
@@ -269,6 +270,7 @@ export default {
                         items:[],
                         title: objId[j],
                         subTitle: [],
+                        subscribedAt:'123',
                         icon:objId[j].indexOf(':')>0?objId[j].split(':')[0]:objId[j]
                     })
                     for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
@@ -276,7 +278,8 @@ export default {
                             title: grouplistByObjId[objId[j]][i].event,
                             name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
                             active:  self.checkSubcribe(objId[j],grouplistByObjId[objId[j]][i].event),
-                            id:grouplistByObjId[objId[j]][i].id
+                            id:grouplistByObjId[objId[j]][i].id,
+                            
 
                         })
                      }

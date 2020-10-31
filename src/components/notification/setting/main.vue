@@ -24,7 +24,18 @@
                 <template v-slot:activator>
                     <v-list-item-content class="mb-2"  style="margin-left:-17px">
                     <v-list-item-title v-if="type=='main'">{{$t('objects.'+item.title)}}</v-list-item-title>
-                    <v-list-item-title v-else>{{$t('objects.'+item.title)}}</v-list-item-title>
+                    <v-list-item-title v-else>
+                       
+                        {{$t('objects.'+item.title)}}
+                         <v-list-action style="float:right">
+                             <span class="fs-13 fw-400 color-grey" v-if="type=='unfollow'">
+                                  <!-- Bỏ theo dõi -->
+                             </span>
+                              <span class="fs-13 fw-400 color-grey" style="margin-top:10px" v-if="type=='follow'">
+                                  <!-- Ngày theo dõi -->
+                             </span>
+                            </v-list-action>
+                    </v-list-item-title>
                     <v-list-item-subtitle v-if="type=='main'" class="fw-400 fs-11">
                         <span v-for="sub in item.subTitle" :key="sub">
                             {{sub}}
@@ -35,6 +46,14 @@
                          <!-- <span v-for="sub in item.subTitle" :key="sub">
                             {{sub}}
                         </span> -->
+                          <v-list-action style="float:right">
+                             <span class="fs-13 fw-400 color-grey" v-if="type=='unfollow'">
+                                  <!-- {{item.subscribedAt}}1234 -->
+                             </span>
+                              <span class="fs-13 fw-400 color-grey" style="margin-top:10px" v-if="type=='follow'">
+                                  <!-- {{item.subscribedAt}}1234 -->
+                             </span>
+                            </v-list-action>
                     </v-list-item-subtitle>
                     </v-list-item-content>
                 </template>
