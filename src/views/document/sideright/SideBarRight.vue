@@ -123,7 +123,6 @@ export default {
 
         controlPropsGroup(){
             return this.$store.state.document.editor[this.instance].currentSelectedControl.properties;
-            // return this.sCurrentDocument.properties;
         }
     },
     watch:{

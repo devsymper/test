@@ -7,6 +7,7 @@ let orgchart = new Api(appConfigs.apiDomain.orgchart);
 let coreApi = new Api(appConfigs.apiDomain.core);
 let accessControlApi = new Api(appConfigs.apiDomain.permission);
 let documentApi = new Api(appConfigs.apiDomain.documentService);
+let sdocumentManagementApi = new Api(appConfigs.apiDomain.sdocumentManagement);
 let trashApi = new Api(appConfigs.apiDomain.trash);
 import Vue from "vue";
 
@@ -92,8 +93,14 @@ export const orgchartApi = {
     getDocumentByUserId(data){
         return documentApi.post("documents/map-query", data)
     },
+    getDescriptionNode(data){
+        return documentApi.post("documents/map-query", data)
+    },
     getIdOrgchartDefault(){
         return orgchart.get('get-orgchart-default')
+    },
+    getDocInstance(params){
+        return sdocumentManagementApi.get('documents/'+params.id+'/objects?search=&page=1&pageSize=50&distinct=false&formulaCondition='+params.script)
     },
     getListTrash(){
         return trashApi.get('items', {type: "orgchart"})

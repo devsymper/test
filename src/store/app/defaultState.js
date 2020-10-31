@@ -1,5 +1,5 @@
 const defaultState = {
-    accountType: 'ba', // loại tài khoản đang đăng nhập: ba hoặc enduser
+    accountType: "", // loại tài khoản đang đăng nhập: ba hoặc enduser
     baInfo: {
         email: '', // email của BA
         name: '', // tên của BA,

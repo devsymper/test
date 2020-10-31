@@ -3,6 +3,7 @@
         "id": "Id",
         "select_lang": "Select language",
         "KH": "Knowledge Management",
+        "structureManagement": "Structure management",
         "reports": "Reports",
         "workflows": "Workflows",
         "documents": "Documents",
@@ -394,7 +395,13 @@
             "list": "List action pack ",
             "objectType": "Object type",
             "operation": "Operation",
-            "allOperation": "Operation for all object"
+            "allOperation": "Operation for all object",
+            "orgchart":{
+                "viewAll":"View all department in Orgchart" ,
+                "viewItself": "Only view that user's department",
+                "viewItselfAndChild": "View that user's department and its children ",
+                "viewOther": "View orther departments"
+            }
         }
     },
     "formulasEditor": {

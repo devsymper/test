@@ -30,6 +30,7 @@ const defaultState = {
     listChildInCurrentNode: [],
     userInNode: {},
     listChildrenOfNode: {},
+    viewOnlySub: false,
     getStructFlag: false,
     allOrgchartStruct: []
 };
