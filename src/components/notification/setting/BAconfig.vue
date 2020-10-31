@@ -258,6 +258,7 @@ export default {
       return description;
     },
     save(){
+      this.$refs.uploadAvatar.uploadFile();
         let data={
             event: this.action.value,
             source:this.objectType.value,

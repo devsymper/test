@@ -43,8 +43,8 @@
         <SettingNotification 
             v-if="showMain" :type="type" @update-listChanel="updateListChanel()"
             :listItems="items" :allListChanel="allListChanel" />
-        <SettingNotification v-if="showFollow" :type="type" :listItems ="listSubcribed"/>
-        <SettingNotification v-if="showUnfollow" :type="type" :listItems ="listUnsubcribed"/>
+        <SettingNotification v-if="showFollow" :allListChanel="allListChanel" :type="type" :listItems ="listSubcribed"/>
+        <SettingNotification v-if="showUnfollow" :allListChanel="allListChanel" :type="type" :listItems ="listUnsubcribed"/>
     </div>
 </template>
 <script>
@@ -88,17 +88,15 @@ export default {
     }
   },
   methods: {
-      updateListChanel(){
-          
-         ;
-      },
       searchList(){
         this.listSubcribed = [];
         this.listUnsubcribed=[];
         const self= this;
-        let subscribe = this.showFollow?true:false;
+        // debugger
+        if(this.search){
+             let subscribe = this.showFollow?true:false;
         let dataSend={
-            subcribed:subscribe,
+            subscribed:subscribe,
             keyword:this.search,
         }
         notification.showListsSubcribed(dataSend).then(res=>{
@@ -116,11 +114,15 @@ export default {
                     if(subscribe){
                         self.listSubcribed.push({
                             title: name[i],
+                            subTitle: [],
                             items: [],
+                            icon:name[i]
                         })  
                     }else{
                         self.listUnsubcribed.push({
                             title: name[i],
+                            subTitle:[],
+                            icon:name[i],
                             items: [],
                         })  
                     }
@@ -128,22 +130,26 @@ export default {
                         if(subscribe){
                             self.listSubcribed[i].items.push({
                                 title: formatListModules[name[i]][j].event,
-                                name: formatListModules[name[i]][j].event,
+                                name:self.rename(name[i],formatListModules[name[i]][j].event),
                                 id:formatListModules[name[i]][j].id,
-                                active:formatListModules[name[i]][j].subscribed
+                                active: self.checkSubcribe(name[i],formatListModules[name[i]][j].event)
+
                             });
-                        }else{listUnsubcribed
+                        }else{
                             self.listUnsubcribed[i].items.push({
                                 title: formatListModules[name[i]][j].event,
-                                name: formatListModules[name[i]][j].event,
+                                name:self.rename(name[i],formatListModules[name[i]][j].event),
                                 id:formatListModules[name[i]][j].id,
-                                active:formatListModules[name[i]][j].subscribed
+                                active: self.checkSubcribe(name[i],formatListModules[name[i]][j].event)
                             });
                         }
+                    self.items[i].subTitle.pop();
+
                     }
                 }
              }
-            });
+            })
+        }
       },
      async getAllListChanel(){
         this.items=[];
@@ -161,9 +167,10 @@ export default {
              let formatListModules = _.groupBy(format, 'objectType');
              let name = Object.keys(formatListModules);
              for(let i=0;i<name.length;i++){
-                 let a = name[i];
+                 //let a = name[i];
                 self.items.push({
                 title: name[i],
+                subTitle: [],
                 items: [],
                 icon:name[i]
             })      
@@ -175,6 +182,7 @@ export default {
                         active:  self.checkSubcribe(name[i],groupByEvent[k])
                     });
                 }
+                self.items[i].subTitle.pop();
             }
         }
     },
@@ -182,7 +190,14 @@ export default {
         let check=false;
         for(let i=0; i<this.allListChanel.length;i++){
             if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&this.allListChanel[i].subscribed){
-                check=true
+                check=true;
+                for(let j=0;j<this.items.length;j++){
+                    if(this.items[j].title==objectType){
+                        this.items[j].subTitle.push(this.rename(objectType,event));
+                        this.items[j].subTitle.push(',');
+                
+                    }
+                }       
             }
         }
         return check;
@@ -205,26 +220,7 @@ export default {
         return name
 
     },
-    // findName(objId){
-    //     let name = ' ';
-    //     if(objId.indexOf(':')>0){
-    //            debugger
-    //           let nameModule = objId.split(':')[0];
-    //           let id = objId.split(':')[1];
-    //          if(nameModule=='document_definition'){
-    //           documentApi.getBatchDocument({ids:JSON.stringify(id)}).then(res => {
-    //                 if(res.status==200){
-    //                     name="Có kq"
-    //                 }else{
-    //                     name = "Lỗi"
-    //                 }
-    //           })
-    //         }   
-    //     }else{
-    //       name=objId
-    //     }
-    //     return name
-    // },
+    
     getListFollowed(){
       //  debugger
         this.listSubcribed = []
@@ -239,6 +235,7 @@ export default {
                 for(let j = 0; j<objId.length;j++){
                     self.listSubcribed.push({
                         items:[],
+                        subTitle:[],
                         title: objId[j],
                         icon:objId[j].indexOf(':')>0?objId[j].split(':')[0]:objId[j]
                     })
@@ -246,8 +243,9 @@ export default {
 
                         self.listSubcribed[j].items.push({
                             title: grouplistByObjId[objId[j]][i].event,
+                            active:true,
                             name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
-                             active:  self.checkSubcribe(objId[i],grouplistByObjId[objId[j]][i].event),
+                           // active:  self.checkSubcribe(objId[i],grouplistByObjId[objId[j]][i].event),
                             id:grouplistByObjId[objId[j]][i].id
 
                         })
@@ -270,13 +268,14 @@ export default {
                     self.listUnsubcribed.push({
                         items:[],
                         title: objId[j],
+                        subTitle: [],
                         icon:objId[j].indexOf(':')>0?objId[j].split(':')[0]:objId[j]
                     })
                     for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
                         self.listUnsubcribed[j].items.push({
                             title: grouplistByObjId[objId[j]][i].event,
                             name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
-                             active:  self.checkSubcribe(objId[j],grouplistByObjId[objId[j]][i].event),
+                            active:  self.checkSubcribe(objId[j],grouplistByObjId[objId[j]][i].event),
                             id:grouplistByObjId[objId[j]][i].id
 
                         })
@@ -284,8 +283,6 @@ export default {
                 }
             }
         })
-         
-
     },
     isShowMain(){
         this.type="main";
@@ -300,6 +297,7 @@ export default {
         this.showUnfollow=true;
         this.showMain=false;
         this.getListUnFollowed();
+        this.search='';
     },
     isShowFollow(){
         this.type="follow";
@@ -307,6 +305,8 @@ export default {
         this.showUnfollow=false;
         this.showMain=false;
         this.getListFollowed();
+        this.search='';
+
     }
   },
 }
