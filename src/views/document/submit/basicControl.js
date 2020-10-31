@@ -680,8 +680,11 @@ export default class BasicControl extends Control {
         }
         return false;
     }
-    renderLinkToControl(link, configInstance) {
-        let icon = `<span class="mdi mdi-information info-control-btn"></span>`
-        this.ele.parent().append(icon);
+    renderLinkToControl(controlName) {
+        if (this.ele.parent().find('.info-control-btn').length == 0) {
+            let icon = `<span class="mdi mdi-information info-control-btn" data-control="` + controlName + `"></span>`
+            this.ele.parent().append(icon);
+        }
+
     }
 }

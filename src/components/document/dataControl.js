@@ -25,7 +25,6 @@ export const setDataForPropsControl = function(fields, instance, from) {
         let type = fields[controlId].type;
         if (type == 'dataFlow') {
             controlMapDatasetDataflow[fields[controlId].properties['name']] = fields[controlId].properties['datasets'];
-
         }
         let id = fields[controlId]['properties'].id;
         let prepareData = fields[controlId].dataPrepareSubmit;
@@ -43,7 +42,6 @@ export const setDataForPropsControl = function(fields, instance, from) {
         })
         if (fields[controlId]['formulas'] != false && fields[controlId]['formulas'] != "[]") {
             if (viewType != 'detail') {
-
                 $.each(formulas, function(k, v) {
                     if (!fields[controlId]['formulas'][k]) {
                         delete control.formulas[k];

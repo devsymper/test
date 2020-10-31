@@ -407,7 +407,8 @@ export default {
         });
         $(document).find('#sym-submit-'+this.keyInstance).off('click','.info-control-btn')
         $(document).find('#sym-submit-'+this.keyInstance).on('click','.info-control-btn',function(e){
-            thisCpn.$refs.linkControlView.show(e);
+            let controlName = $(this).attr('data-control');
+            thisCpn.$refs.linkControlView.show(e, controlName);
         });
     },
 
@@ -1965,7 +1966,6 @@ export default {
 
 
         runInputFilterFormulas(controlName,search=""){
-            debugger
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
             let controlId = controlInstance.id
             let allFormulas = controlInstance.controlFormulas;
@@ -2140,7 +2140,7 @@ export default {
                 else{
                     let value = this.getValueFromDataResponse(rs);
                     if(formulasType.includes('linkConfig')){
-                        this.handlerDataAfterRunFormulasLink(value,controlName,formulasType);
+                        this.handlerDataAfterRunFormulasLink(rs,controlName,formulasType);
                     }
                     else{
                         switch (formulasType) {
@@ -2195,7 +2195,7 @@ export default {
         /**
          * Hàm bind link vào control sau khi chạy công thức link
          */
-        handlerDataAfterRunFormulasLink(link,controlName, formulasType){
+        handlerDataAfterRunFormulasLink(rs, controlName, formulasType){
             let configInstance = formulasType.split('_')[1]
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
             let linkFormulas = controlInstance.controlFormulas.linkConfig.configData;
@@ -2209,12 +2209,32 @@ export default {
                     source = config.objectType.type;
                 }
             }
-            this.setDataForLinkControl(formulasType, link, title, source);
-            controlInstance.renderLinkToControl(link, configInstance);
+            let value = "";
+            if(!rs.server){
+                let data = rs.data; 
+                let values = data[0].values;
+                if(values.length > 0){
+                    for (let index = 0; index < values.length; index++) {
+                        let dataItem = values[index][0];
+                        let fType = formulasType+"_"+dataItem;
+                        this.setDataForLinkControl(fType, dataItem, title, source, controlName);
+                    }
+                }
+            }
+            else{
+                let data = rs.data.data;
+                if(data.length > 0){
+                    for (let index = 0; index < data.length; index++) {
+                        let dataItem = data[index][Object.keys(data[index])[0]];
+                        let fType = formulasType+"_"+row;
+                        this.setDataForLinkControl(fType, dataItem, title, source, controlName);
+                    }
+                }
+            }
+            controlInstance.renderLinkToControl(controlName);
         },
-        setDataForLinkControl(formulasType, link, title, source){
-            this.$refs.linkControlView.setData({key:formulasType,value:link, title:title, source:source});
-
+        setDataForLinkControl(formulasType, link, title, source, controlName){
+            this.$refs.linkControlView.setData(controlName,{key:formulasType,value:link, title:title, source:source});
         },
 
         /**

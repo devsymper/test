@@ -2,7 +2,7 @@
     <v-card class="card-link-config"
     :style="position"
     v-show="isShow" >
-       <div class="item-link" v-for="(link,index) in listLink" :key="index" @click="openLink(link)">
+       <div class="item-link" v-for="(link,index) in listLinkDisplay" :key="index" @click="openLink(link)">
            <v-tooltip top>
                 <template v-slot:activator="{ on }">
                     <p v-on="on" class="m-0">{{link.title}}</p>
@@ -28,7 +28,8 @@ export default {
             date:null,
             isShow:false,
             position:null,
-            listLink:{}
+            listLink:{},
+            listLinkDisplay:{}
         }
     },
     beforeMount(){
@@ -47,18 +48,22 @@ export default {
         hide() {
             this.isShow = false;
         },
-        show(e){
+        show(e, controlName){
             this.isShow = true;
             this.calculatorPositionBox(e);
+            this.listLinkDisplay = this.listLink[controlName]
         },
-        setData(data){
+        setData(controlName, data){
             let link = (data.source == 'document') ? '/documents/objects/'+data.value : data.source+":"+data.value;
-            if(this.listLink.hasOwnProperty(data.key)){
-                this.listLink[data.key].value = data.value;
-                this.listLink[data.key].link = link;
+            if(!this.listLink.hasOwnProperty(controlName)){
+                this.listLink[controlName] = {};
+            }
+            if(this.listLink[controlName].hasOwnProperty(data.key)){
+                this.listLink[controlName][data.key].value = data.value;
+                this.listLink[controlName][data.key].link = link;
             }
             else{
-                this.listLink[data.key] = {title:data.title,value:data.value,source:data.source, link:link};
+                this.listLink[controlName][data.key] = {title:data.title,value:data.value,source:data.source, link:link};
             }
         },
         calculatorPositionBox(e){
