@@ -63,37 +63,28 @@ export default {
         },
         calculatorPositionBox(e){
             // nếu autocomplete từ cell của handsontable  
-            if($(e.target).closest('.handsontable').length > 0 ){
-                let autoEL = $(this.$el).detach();
-                $(e.target).closest('.wrap-table').append(autoEL);
-                let edtos = $(e.target).offset();
-                if(!$(e.target).is('.handsontableInput')){
-                    edtos = $(e.target).closest('td.htAutocomplete.current.highlight').offset();
-                }
-                if($(e.target).is('div.htAutocompleteArrow')){
-                    edtos = $(e.target).parent().offset();;
-                }
-                let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
-                this.position = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
+            let inputOffset = {};
+            if($(e.target).closest('.handsontable').length > 0){
+                inputOffset = $(e.delegateTarget).offset();
             }
             //nêu là ngoài bảng
             else{
-                let inputOffset = $(e.target).offset();
-                let submitFormOffset = $('#sym-submit-'+this.instance).offset();
-                let submitFormWidth = $('#sym-submit-'+this.instance).width();
-                let leftDiff = inputOffset.left - submitFormOffset.left;
-                let cardWidth = $('.card-link-config').width();
-                let cardHeight = $('.card-link-config').height();
-                let inputWidth = $(e.target).width();
-                if(cardWidth + leftDiff > submitFormWidth){
-                    this.position = {'top':inputOffset.top - submitFormOffset.top + 26 +'px','left':leftDiff + 10 + inputWidth - cardWidth+'px'};
-                }
-                else{
-                    this.position = {'top':inputOffset.top - submitFormOffset.top + 26 +'px','left':inputOffset.left - submitFormOffset.left+'px'};
-                }
-                if(window.innerHeight < inputOffset.top + $('.card-link-config').height() + 40){
-                    this.position.top = inputOffset.top - submitFormOffset.top - cardHeight + 'px'
-                }
+                inputOffset = $(e.target).offset();
+            }
+            let submitFormOffset = $('#sym-submit-'+this.instance).offset();
+            let submitFormWidth = $('#sym-submit-'+this.instance).width();
+            let leftDiff = inputOffset.left - submitFormOffset.left;
+            let cardWidth = $('.card-link-config').width();
+            let cardHeight = $('.card-link-config').height();
+            let inputWidth = $(e.target).width();
+            if(cardWidth + leftDiff > submitFormWidth){
+                this.position = {'top':inputOffset.top - submitFormOffset.top + 26 +'px','left':leftDiff + 10 + inputWidth - cardWidth+'px'};
+            }
+            else{
+                this.position = {'top':inputOffset.top - submitFormOffset.top + 26 +'px','left':inputOffset.left - submitFormOffset.left+'px'};
+            }
+            if(window.innerHeight < inputOffset.top + $('.card-link-config').height() + 40){
+                this.position.top = inputOffset.top - submitFormOffset.top - cardHeight + 'px'
             }
         },
     }

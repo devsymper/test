@@ -1046,6 +1046,7 @@ export default {
                 if(Object.keys(dataPost.update).length > 0)
                 await formulasApi.updateMultiFormulas({formulas:JSON.stringify(dataPost.update)})
                 if(Object.keys(dataPost.insert).length > 0){
+                    debugger
                     let res = await formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost.insert)})
                     if(res.status == 200){ 
                         let data = res.data;

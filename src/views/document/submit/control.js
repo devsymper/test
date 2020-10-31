@@ -240,6 +240,9 @@ export default class Control {
 
             for (let rowId in values) {
                 let value = values[rowId];
+                if (value == 0) {
+                    continue;
+                }
                 let rowIndex = this.findIndexByRowId(dataTable, rowId);
                 tableControlInstance.tableInstance.validateValueMap[rowIndex + "_" + colIndex] = {
                     type: 'linkControl',

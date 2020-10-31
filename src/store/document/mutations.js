@@ -181,7 +181,6 @@ const updateFormulasId = (state, params) => {
     if (tableId != 0 && tableId != '0') {
         if (state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name]) {
             if (name == 'linkConfig') {
-                debugger
                 let linkInstance = params.linkInstance;
                 let allConfig = state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name]['configData'];
                 for (let index = 0; index < allConfig.length; index++) {

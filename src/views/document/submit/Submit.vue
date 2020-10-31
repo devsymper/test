@@ -457,7 +457,7 @@ export default {
             let e = locate.e;
             let data = locate.data
             this.setDataForLinkControl(data.type, data.value, data.title, data.source);
-            this.$refs.linkControlView.show(e)
+            this.$refs.linkControlView.show(e);
         });
 
         this.$evtBus.$on("run-formulas-control-outside-table", e => {
@@ -2283,7 +2283,7 @@ export default {
 				for (let index = 0; index < listRootControl.length; index++) {
 					const controlName = listRootControl[index];
 					let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
-					let controlFormulas = controlInstance.controlFormulas;
+                    let controlFormulas = controlInstance.controlFormulas;
 					for(let formulasType in controlFormulas){
                         if(formulasType == 'linkConfig'){ // nếu có cấu hình công thức link thì cũng chạy các công thức của nó
                             let configData = controlFormulas[formulasType].configData;
@@ -2291,12 +2291,16 @@ export default {
                                 let config = configData[i];
                                 let formulasInstance = config.instance;
                                 let fType = formulasType+"_"+config.formula.instance;
-                                this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,fType,'root')
+                                if(formulasInstance){
+                                    this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,fType,'root')
+                                }
                             }
                         }
 						else if(!['autocomplete','list','autocompleteAuto'].includes(formulasType)){
                             let formulasInstance = controlFormulas[formulasType].instance;
-							this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
+                            if(formulasInstance){
+                                this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
+                            }
 						}
 					}
 				}
