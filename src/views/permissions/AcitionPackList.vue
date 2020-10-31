@@ -205,85 +205,6 @@ export default {
             let tableDatas = this.getTableDataFromOperations(operations);
             let mapActionAndObjects = tableDatas.mapActionAndObjects;
             let mapActionForAllObjects = tableDatas.mapActionForAllObjects;
-
-            // let mapActionAndObjectTypes = this.mapObjectTypesAndAction;
-            // let allResource = this.$store.state.actionPack.allResource;
-
-            // /**
-            //  * Map giữa object type và action , có dạng
-            //  * {
-            //  *      document_definition: {
-            //  *          id_doc: [
-            //  *              'display text', true, true, false ....
-            //  *          ]
-            //  *      }
-            //  * }
-            //  */
-            // let mapActionAndObjects = {};
-            // let mapActionForAllObjects = {};
-
-
-            // /**
-            //  * Schema cho row mới của từng object type, có dạng:
-            //  * {
-            //  *      document_definition: ['', false, false, ...]
-            //  * }
-            //  */
-            // let rowSchemaByObjectType = {};
-            // for (let key in mapActionAndObjectTypes) {
-            //     mapActionAndObjects[key] = {};
-            //     rowSchemaByObjectType[key] = {
-            //         object: '',
-            //     };
-            //     mapActionForAllObjects[key] = [{}];
-            //     for (let actionName in mapActionAndObjectTypes[key]) {
-            //         rowSchemaByObjectType[key][actionName] = false;
-            //         mapActionForAllObjects[key][0][actionName] = false;
-            //     }
-            // }
-            
-            // // khởi tạo các operation ứng với các objectType
-            // let sections, objectType, objectId, actionName;
-            // for (let op of operations) {
-            //     sections = op.objectIdentifier.split(":");
-            //     objectType = sections[0];
-            //     objectId = sections[1] ? sections[1] : 0;
-
-            //     if(!objectId){
-            //         // Nếu các action áp dụng cho toàn bộ object của object type
-            //         mapActionForAllObjects[objectType][0][op.action] = true;
-            //     }else{
-            //         // Nếu áp dụng cho các object cụ thể
-            //         let actionByObject = mapActionAndObjects[objectType];
-            //         if (actionByObject) {
-            //             if (!actionByObject[objectId]) {
-            //                 actionByObject[objectId] = util.cloneDeep(
-            //                     rowSchemaByObjectType[objectType]
-            //                 );
-
-            //                 if(allResource[objectType][objectId]){
-            //                     actionByObject[objectId].object =
-            //                         allResource[objectType][objectId].fullText;
-            //                 }else{
-            //                     actionByObject[objectId].object = '';
-            //                 }
-            //             }
-            //             actionByObject[objectId][op.action] = true;
-            //         }
-            //     }
-            // }
-            // // chế biến về cho đúng định dạng hiển thị của bảng
-            // for(let objectType in mapActionAndObjects){
-            //     mapActionAndObjects[objectType] = Object.values(mapActionAndObjects[objectType]);
-
-            //     let lastEmptyRow = util.cloneDeep(rowSchemaByObjectType[objectType]);
-            //     for(let actionName in lastEmptyRow){
-            //         if(actionName != 'object'){
-            //             lastEmptyRow[actionName] = true;
-            //         }
-            //     }
-            //     mapActionAndObjects[objectType].push(lastEmptyRow);
-            // }
             
             this.$set(this.currentItemData, 'mapActionAndObjects', mapActionAndObjects);
             this.$set(this.currentItemData, 'mapActionForAllObjects', mapActionForAllObjects);
@@ -338,7 +259,13 @@ export default {
             for (let op of operations) {
                 sections = op.objectIdentifier.split(":");
                 objectType = op.objectType;
-                objectId = sections[1] ? sections[1] : 0;
+                if(objectType == "department"){
+                    if(sections[1] != '0'){
+                        objectId = sections[1]+':'+sections[2]+':'+sections[3]
+                    }
+                }else{
+                    objectId = sections[1] ? sections[1] : 0;
+                }
 
                 if(objectType == 'document_instance' && (sections[2] === 0 || sections[2] === '0')){
                     op.documentId = objectId;
@@ -373,21 +300,21 @@ export default {
             }
 
             this.createRowsForAllInstancesDocDef(operationForInstancesOfDocDef, mapActionAndObjects['document_definition']);
-
-
             // chế biến về cho đúng định dạng hiển thị của bảng
             for(let objectType in mapActionAndObjects){
-                mapActionAndObjects[objectType] = Object.values(mapActionAndObjects[objectType]);
-
-                let lastEmptyRow = util.cloneDeep(rowSchemaByObjectType[objectType]);
-                for(let actionName in lastEmptyRow){
-                    if(actionName != 'object'){
-                        lastEmptyRow[actionName] = true;
+                if(objectType != "department"){
+                    mapActionAndObjects[objectType] = Object.values(mapActionAndObjects[objectType]);
+    
+                    let lastEmptyRow = util.cloneDeep(rowSchemaByObjectType[objectType]);
+                    for(let actionName in lastEmptyRow){
+                        if(actionName != 'object'){
+                            lastEmptyRow[actionName] = true;
+                        }
                     }
+                    mapActionAndObjects[objectType].push(lastEmptyRow);
                 }
-                mapActionAndObjects[objectType].push(lastEmptyRow);
+               
             }
-            
             return {
                 mapActionAndObjects,
                 mapActionForAllObjects
