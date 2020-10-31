@@ -507,39 +507,39 @@ export default {
          * Hàm xử lí khi paste nội dung vào editor
          */
         handlePasteContent(e){
+            e.preventDefault();
             var content = ((e.originalEvent || e).clipboardData || window.clipboardData).getData("text/html");
-
             content = content.replace(/((<|(<\/))html>)|((<|(<\/))body>)/g,"");
+            content = content.replace(/<!--[^>]*-->/g,"");
+            content = '<div class="content-wrap">'+content+'</div>';
             let contentEl = $(content);
             let listControls = contentEl.find('.s-control:not(.s-control-table .s-control)');
             if(listControls.length > 0){
-                setTimeout((self) => {
-                    for (let index = 0; index < listControls.length; index++) {
-                        const controlEl = listControls[index];
-                        let controlId = $(controlEl).attr('id');
-                        var inputId = 's-control-id-' + Date.now();
-                        let controlType = $(controlEl).attr('s-control-type');
-                        let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
-                        elements.attr('id',inputId);
-                        let control = GetControlProps(controlType);
-                        this.addToAllControlInDoc(inputId,{properties: control.properties, formulas : control.formulas,type:controlType});
-                        if(controlType == 'table'){ // nếu là table thì xử lí các control trong table
-                            let allControlInTable = elements.find('.s-control');
-                            for (let i = 0; i < allControlInTable.length; i++) {
-                                const childControlEl = allControlInTable[i];
-                                let childControlId = $(childControlEl).attr('id');
-                                var childInputId = 's-control-id-' + Date.now();
-                                let childControlType = $(childControlEl).attr('s-control-type');
-                                let childElements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+childControlId);
-                                childElements.attr('id',childInputId);
-                                let childControl = GetControlProps(childControlType);
-                                this.addToAllControlInTable(childInputId,{properties: childControl.properties, formulas : childControl.formulas,type:childControlType},inputId);
-                            }
+                for (let index = 0; index < listControls.length; index++) {
+                    const controlEl = listControls[index];
+                    let controlId = $(controlEl).attr('id');
+                    var inputId = 's-control-id-' + Date.now() + Math.floor(Math.random() * 100);
+                    let controlType = $(controlEl).attr('s-control-type');
+                    contentEl.find('#'+controlId).attr('id',inputId).css({background:'rgba(0 0 0 / 0.05)'}).removeClass('on-selected');
+                    let control = GetControlProps(controlType);
+                    this.addToAllControlInDoc(inputId,{properties: control.properties, formulas : control.formulas,type:controlType});
+                    if(controlType == 'table'){ // nếu là table thì xử lí các control trong table
+                        let allControlInTable = elements.find('.s-control');
+                        for (let i = 0; i < allControlInTable.length; i++) {
+                            const childControlEl = allControlInTable[i];
+                            let childControlId = $(childControlEl).attr('id');
+                            var childInputId = 's-control-id-' + Date.now() + Math.floor(Math.random() * 100);
+                            let childControlType = $(childControlEl).attr('s-control-type');
+                            contentEl.find('#'+childControlId).attr('id',childInputId).css({background:'rgba(0 0 0 / 0.05)'}).removeClass('on-selected');
+                            let childControl = GetControlProps(childControlType);
+                            this.addToAllControlInTable(childInputId,{properties: childControl.properties, formulas : childControl.formulas,type:childControlType},inputId);
                         }
                     }
-                }, 300,this);
-                
+                }
+                content = contentEl.html();
+                this.editorCore.execCommand('mceInsertContent', false, content);
             }
+            
             else{   // trường hợp copy từ dekko
                 if(contentEl.find('.bkerp-input').length > 0){
                     setTimeout((self) => {
