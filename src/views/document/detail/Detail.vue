@@ -32,6 +32,7 @@
             :style="{'width':documentSize, 'height':contentHeight,'margin':contentMargin}">
             <div class="content-document" v-html="contentDocument"></div>
             <div class="content-print-document" :style="formSize" v-html="contentPrintDocument"></div>
+            <FloattingPopup ref="floattingPopup" :instance="keyInstance"/>
         </div>
       
         <side-bar-detail 
@@ -49,7 +50,6 @@
         />
         <HistoryControl ref="historyView" />
        
-        <FloattingPopup v-show="isShowPopupView" ref="floattingPopup"/>
     </div>
 </template>
 <script>
@@ -161,7 +161,6 @@ export default {
             formSize:{},
             wrapFormCss:{},
             defaultData:{},
-            isShowPopupView:false,
             listLinkControl:{}
 
         };
@@ -172,9 +171,7 @@ export default {
     mounted(){
         let self = this;
         $(document).on('click','#sym-Detail-'+this.keyInstance+' .info-control-btn',function(e){
-            self.isShowPopupView = true;
-            console.log("sdasdasd",e);
-            self.$refs.floattingPopup.setPosition({left:e.parentNode.offsetX+"px", top:e.parentNode.offsetY+"px"});
+            self.$refs.floattingPopup.show(e);
         })
     },
     
@@ -420,6 +417,7 @@ export default {
                             control.init();
                             this.addToListInputInDocument(controlName,control)
                             control.render();
+                            control.checkHasInfoControl(this.listLinkControl);
                         }
                         //truong hop la control table
                         else {
@@ -497,7 +495,6 @@ export default {
     .sym-form-Detail {
         width: 21cm;
         padding: 16px;
-        position: relative;
     }
     .wrap-content-detail{
         position: relative;

@@ -571,30 +571,29 @@ export default {
          * Sự kiện bắn ra từ click vào input filter để mở popup
          */
         this.$evtBus.$on("document-submit-filter-input-click", e => {
-            if(thisCpn._inactive == true) return;
+            if(this._inactive == true) return;
             if($(document).height() - $(e.target).offset().top > 420){
-                thisCpn.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
+                this.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
             }
             else{
-                thisCpn.topPositionDragPanel = $(e.target).offset().top  - 400 
+                this.topPositionDragPanel = $(e.target).offset().top  - 400 
             }
             if(e.screenX - e.offsetX > 600){
-                thisCpn.leftPositionDragPanel = e.screenX - e.offsetX ;
+                this.leftPositionDragPanel = e.screenX - e.offsetX ;
             }
             else{
-                thisCpn.leftPositionDragPanel = e.screenX - e.offsetX - 300;
+                this.leftPositionDragPanel = e.screenX - e.offsetX - 300;
             }
+            this.titleDragPanel = "Tìm kiếm thông tin";
+            this.titleDragPanelIcon = "mdi-file-search";
+            this.$refs.inputFilter.setControlName(e.controlName);
+            this.runInputFilterFormulas(e.controlName);
+            this.$refs.symDragPanel.show();
+            this.$refs.inputFilter.setFormulas(e.formulas,e.controlName);
             
-            thisCpn.$refs.inputFilter.setControlName(e.controlName);
-            thisCpn.runInputFilterFormulas(e.controlName);
-            thisCpn.$refs.symDragPanel.show();
-            thisCpn.$refs.inputFilter.setFormulas(e.formulas,e.controlName);
-            thisCpn.titleDragPanel = "Tìm kiếm thông tin";
-            thisCpn.titleDragPanelIcon = "mdi-file-search";
         }); 
         // hàm nhận sự thay đổi của input autocomplete gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-autocomplete-key-event", e => {
-
             if(thisCpn._inactive == true) return;
             try {
                 if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||

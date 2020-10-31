@@ -50,104 +50,112 @@ export default class BasicControl extends Control {
 
 
     render() {
-        this.ele.wrap('<span style="position:relative;display:inline-block">');
-        this.ele.attr('key-instance', this.curParentInstance);
+            this.ele.wrap('<span style="position:relative;display:inline-block">');
+            this.ele.attr('key-instance', this.curParentInstance);
+            // if (this.checkDetailView() &&
+            //     this.controlProperties['isSaveToDB'] !== undefined &&
+            //     (this.controlProperties['isSaveToDB'].value !== "1" ||
+            //         this.controlProperties['isSaveToDB'].value !== 1)) {
+            //     this.ele.css({ display: 'none' })
+            // }
+            if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
+                this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
+            }
+            if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
+                this.ele.attr('disabled', 'disabled');
+            }
 
-        // if (this.checkDetailView() &&
-        //     this.controlProperties['isSaveToDB'] !== undefined &&
-        //     (this.controlProperties['isSaveToDB'].value !== "1" ||
-        //         this.controlProperties['isSaveToDB'].value !== 1)) {
-        //     this.ele.css({ display: 'none' })
-        // }
-        if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
-            this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
+            if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
+                this.ele.css({ 'display': 'none' })
+            }
+
+            if (this.ele.hasClass('s-control-number')) {
+
+                this.renderNumberControl();
+
+            } else if (this.ele.hasClass('s-control-table')) {
+
+            } else if (this.ele.hasClass('s-control-hidden') || this.ele.hasClass('s-control-tracking-value')) {
+                this.ele.css('display', 'none');
+
+            } else if (this.ele.hasClass('s-control-filter')) {
+                this.renderFilterControl();
+
+            } else if (this.ele.hasClass('s-control-panel')) {
+                // presetPanel(this.ele);
+
+            } else if (this.ele.hasClass('s-control-report')) {
+                this.ele.removeClass('on-property');
+                // getReportTemplate(this.ele, {}, thisObj.name);
+
+            } else if (this.ele.hasClass('s-control-time')) {
+                this.ele.attr('type', 'text');
+                this.renderTimeControl();
+
+            } else if (this.ele.hasClass('s-control-percent')) {
+                this.renderPercentControl()
+
+            } else if (this.ele.hasClass('s-control-date')) {
+                this.renderDateControl();
+
+            } else if (this.ele.hasClass('s-control-datetime')) {
+                this.renderDateTimeControl();
+            } else if (this.ele.hasClass('s-control-file-upload')) {
+                this.renderFileControl();
+            } else if (this.ele.hasClass('s-control-user')) {
+                this.renderUserControl();
+            } else if (this.ele.hasClass('s-control-checkbox')) {
+                this.renderCheckboxControl();
+
+            } else if (this.ele.hasClass('s-control-select')) {
+                this.renderSelectControl();
+            } else if (this.ele.hasClass('s-control-combobox')) {
+                this.renderSelectControl(false);
+            } else if (this.ele.hasClass('s-control-label')) {
+                this.renderLabelControl();
+            }
+
+            if (this.checkDetailView()) {
+                // this.ele.addClass('detail-view');
+                this.ele.attr('disabled', 'disabled');
+            }
+            if (sDocument.state.viewType[this.curParentInstance] != 'submit') {
+                this.setValueControl();
+            }
+            this.setDefaultValue();
+            this.setEvent();
+            if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete')) {
+                let allTable = this.controlFormulas.autocomplete.instance.detectTableQuery();
+                let columnBinding = this.controlFormulas.autocomplete.instance.autocompleteDetectAliasControl(false);
+                this.columnBindingSubForm = columnBinding;
+                if (allTable !== false) {
+                    let table = allTable[0];
+                    documentApi.getDetailDocumentByName({ name: table }).then(res => {
+                            if (res.status == 200) {
+                                let documentId = res.data.id;
+                                this.renderSubformButton(documentId);
+                            }
+
+                        }).catch(err => {
+
+                        })
+                        .always(() => {});
+                }
+            }
+
         }
-        if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
-            this.ele.attr('disabled', 'disabled');
-        }
-
-        if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
-            this.ele.css({ 'display': 'none' })
-        }
-
-        if (this.ele.hasClass('s-control-number')) {
-
-            this.renderNumberControl();
-
-        } else if (this.ele.hasClass('s-control-table')) {
-
-        } else if (this.ele.hasClass('s-control-hidden') || this.ele.hasClass('s-control-tracking-value')) {
-            this.ele.css('display', 'none');
-
-        } else if (this.ele.hasClass('s-control-filter')) {
-            this.renderFilterControl();
-
-        } else if (this.ele.hasClass('s-control-panel')) {
-            // presetPanel(this.ele);
-
-        } else if (this.ele.hasClass('s-control-report')) {
-            this.ele.removeClass('on-property');
-            // getReportTemplate(this.ele, {}, thisObj.name);
-
-        } else if (this.ele.hasClass('s-control-time')) {
-            this.ele.attr('type', 'text');
-            this.renderTimeControl();
-
-        } else if (this.ele.hasClass('s-control-percent')) {
-            this.renderPercentControl()
-
-        } else if (this.ele.hasClass('s-control-date')) {
-            this.renderDateControl();
-
-        } else if (this.ele.hasClass('s-control-datetime')) {
-            this.renderDateTimeControl();
-        } else if (this.ele.hasClass('s-control-file-upload')) {
-            this.renderFileControl();
-        } else if (this.ele.hasClass('s-control-user')) {
-            this.renderUserControl();
-        } else if (this.ele.hasClass('s-control-checkbox')) {
-            this.renderCheckboxControl();
-
-        } else if (this.ele.hasClass('s-control-select')) {
-            this.renderSelectControl();
-        } else if (this.ele.hasClass('s-control-combobox')) {
-            this.renderSelectControl(false);
-        } else if (this.ele.hasClass('s-control-label')) {
-            this.renderLabelControl();
-        }
-
-        if (this.checkDetailView()) {
-            // this.ele.addClass('detail-view');
-            this.ele.attr('disabled', 'disabled');
-        }
-        if (sDocument.state.viewType[this.curParentInstance] != 'submit') {
-            this.setValueControl();
-        }
-        this.setDefaultValue();
-        this.setEvent();
-        if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete')) {
-            let allTable = this.controlFormulas.autocomplete.instance.detectTableQuery();
-            let columnBinding = this.controlFormulas.autocomplete.instance.autocompleteDetectAliasControl(false);
-            this.columnBindingSubForm = columnBinding;
-            if (allTable !== false) {
-                let table = allTable[0];
-                documentApi.getDetailDocumentByName({ name: table }).then(res => {
-                        if (res.status == 200) {
-                            let documentId = res.data.id;
-                            this.renderSubformButton(documentId);
-                        }
-
-                    }).catch(err => {
-
-                    })
-                    .always(() => {});
+        /**
+         * Ham kiểm tra có các thông tin khác của control như  (comment, history, link) trên control hay không
+         * nếu có thì thêm icon info
+         */
+    checkHasInfoControl(dataLink) {
+            if (Object.keys(dataLink).includes(this.name)) {
+                this.renderLinkToControl(this.name);
             }
         }
-    }
-
-    /**
-     * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
-     */
+        /**
+         * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
+         */
     setDefaultValue() {
         if (['submit'].includes(sDocument.state.viewType[this.curParentInstance]) &&
             this.controlProperties['defaultValue'] != undefined) {
