@@ -128,6 +128,13 @@ export default {
                     callback: (notification, callback) => {
                         this.deleteNotification(notification);
                     }
+                },
+                 update: {
+                    name:"update",
+                    text:this.$t('user.table.contextMenu.update'), 
+                    callback: (notification, callback) => {
+                        this.updateNotification(notification);
+                    }
                 }
             },
             containerHeight: 100,
@@ -150,6 +157,10 @@ export default {
                 name = name.replace(oldValue,newValue);
             }
             return name
+
+        },
+        updateNotification(des){
+            debugger
 
         },
         renameReceiver(nameModule,receiver){

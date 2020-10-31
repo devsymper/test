@@ -77,10 +77,12 @@ export default {
             for(let i = 0; i<newValue.length;i++){
                 for(let j = 0; j<newValue[i].items.length;j++){
                     if(newValue[i].items[j].active){
+                          //newValue[i].active=false;
                         this.subcribedAllChanel(newValue[i].title, newValue[i].items[j].title) 
                     }else{
                         this.unsubcribedAllChanel(newValue[i].title, newValue[i].items[j].title) 
                     }
+                    //
                 }
             }
         }

@@ -1,24 +1,29 @@
 <template>
-    <div class="pl-3 mr-2" >
-        <v-row>
-            <v-col>
-                <i class="mdi mdi-eye-check-outline"></i> Theo dõi<i class="mdi mdi-information-outline"></i>
+    <div class="pl-3 pr-1" >
+        <v-row style="margin-top:-5px">
+            <v-col class="col-md-10">
+                <i class="mdi mdi-eye-check-outline">
+                    </i> Theo dõi<i class="ml-1 mdi mdi-information-outline" 
+                    style="font-size:13px;margin-top:-15px"></i>
             </v-col>
-            <v-col>
+            <v-col class="col-md-1" > 
+                 <i @click="close()" 
+                    class="ml-1 mdi mdi-close">
+                    </i>
             </v-col>
         </v-row>
-            <div class="fs-13">
+            <div style="margin-top:-10px" class="fs-13">
             Theo dõi thay đổi: {{name}}
         </div>
-        <div class="color-grey fs-11">
-            Sẽ nhận thông báo khi một trong các hành động sau được thực hiện 
+        <div class="color-grey fs-11 mt-1 mb-1">
+            Sẽ nhận thông báo khi một trong các hành động sau được thực 
             <br/>
-            đối với bản ghi của đối tượng bạn theo dõi
+            hiện đối với bản ghi của đối tượng bạn theo dõi
         </div>
-        <div class="mt-2 ">
-            <v-row style="margin-top:-10px; margin-bottom:-40px" v-for="(item, key) in items" :key="key">
+        <div class="mb-4">
+            <v-row style="margin-top:-10px; margin-bottom:-49px" v-for="(item, key) in items" :key="key">
                 <v-col class="col-md-10 fs-13">
-                    {{item.actionName}}
+                    {{rename(objType,item.actionName)}}
                 </v-col>
                 <v-col style="margin-top:-20px" class="col-md-2">
                     <v-checkbox color="success"
@@ -27,9 +32,10 @@
                 </v-col>
             </v-row>
         </div>
+         <v-divider style="width:97%" class="mt-3"></v-divider>
         <div>
-            <div>Nhóm đối tượng sẽ theo dõi</div>
-            <v-row style="margin-top:-10px; margin-bottom:-40px" >
+            <div class="fs-13 color-grey mt-2">Nhóm đối tượng sẽ theo dõi</div>
+            <v-row style="margin-top:-10px;margin-bottom:-25px" >
                 <v-col class="col-md-10 fs-13">
                    Theo dõi bản ghi cá nhân
                 </v-col>
@@ -39,7 +45,7 @@
                     ></v-checkbox>
                 </v-col>
             </v-row>
-            <v-row style="margin-top:-10px; margin-bottom:-40px" >
+            <v-row style="margin-top:-10px; margin-top: -50px;" >
                 <v-col class="col-md-10 fs-13">
                    Theo dõi toàn bộ bản ghi
                 </v-col>
@@ -61,11 +67,15 @@ export default {
             return {
                 items:[],
                 isPersonal:false,
-                isAll:false
+                isAll:false,
+                listSource:{},
+
             }
     },
     created () {
+         this.getSource();
       this.getAllListChanel(); 
+     
      },
      watch:{
           items:{ 
@@ -92,6 +102,7 @@ export default {
 
               }
           },
+
           isPersonal(){
               if(this.isPersonal){
                    const self = this;
@@ -104,6 +115,29 @@ export default {
 
      },
   methods: {
+      close(){
+          this.$emit('close');
+      },
+       getSource(){
+        const self = this;
+        notification.showAllModuleConfig().then(res=>{
+            if(res.status==200){
+                debugger
+                self.listSource = res.data;
+            }
+        })
+        },
+        rename(nameModule,event){
+            debugger
+            let name = event;
+            for(let i = 0; i<this.listSource[nameModule].event.length;i++){
+                if(this.listSource[nameModule].event[i].value==event){
+                name = this.listSource[nameModule].event[i].text;
+                }
+            }
+            return name
+
+        },
       unsubcribedAllChanel(id){
         const self = this;
         let data={state:false};
@@ -132,9 +166,9 @@ export default {
             let name = Object.keys(formatListModules);
             for(let i=0;i<formatListModules[self.objType].length;i++){
                 self.items.push({
-                actionName: formatListModules[self.objType][i].event,
-                id:formatListModules[self.objType][i].id,
-                subscribed:formatListModules[self.objType][i].subscribed})
+                    actionName: formatListModules[self.objType][i].event,
+                    id:formatListModules[self.objType][i].id,
+                    subscribed:formatListModules[self.objType][i].subscribed})
             }
         }   
         });

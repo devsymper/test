@@ -2,7 +2,7 @@
     <div class="w-100 mr-10">
         <v-row class="header ml-3">
             <v-col class="col-md-8 col-sm-8 ">
-                  <!-- <v-menu offset-y  :close-on-content-click="false">
+                  <!-- <v-menu style="height:350px!important" offset-y  :close-on-content-click="false">
                     <template v-slot:activator="{ on, attrs }">
                     <v-btn
                         color="primary"
@@ -13,7 +13,7 @@
                         Dropdown
                     </v-btn>
                     </template>
-               <NotificationPopUp :name="'Đơn bán hàng'" :objType="'comment'" style="background:white" />
+               <NotificationPopUp @close="close" style="background:white" :name="'Đơn bán hàng'" :objType="'comment'" />
                 </v-menu> -->
                     <span class="fs-15 fw-430" v-if="showMain">Cài đặt thông báo</span>
                 <span class="fs-15 fw-430" v-if="showFollow">Danh sách đối tượng đang theo dõi</span>
@@ -41,7 +41,7 @@
             </v-col >
         </v-row>
         <SettingNotification 
-            v-if="showMain" :type="type" @update-listChanel="updateListChanel()"
+            v-if="showMain" :type="type" 
             :listItems="items" :allListChanel="allListChanel" />
         <SettingNotification v-if="showFollow" :allListChanel="allListChanel" :type="type" :listItems ="listSubcribed"/>
         <SettingNotification v-if="showUnfollow" :allListChanel="allListChanel" :type="type" :listItems ="listUnsubcribed"/>
