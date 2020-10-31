@@ -1750,8 +1750,21 @@ export default {
                         type: "success",
                         title: "Submit document success!"
                     });        
+                    // nếu có giá trị công thức link trong doc thì lưu lại để dùng trong form detail
+                    let linkData = thisCpn.$refs.linkControlView.getData();
+                    if(Object.keys(linkData).length > 0){
+                        let listIdControl = [];
+                        for(let controlName in linkData){
+                            let controlIns = getControlInstanceFromStore(controlName);
+                            if(controlIns){
+                                listIdControl.push(controlIns.idField);
+                            }
+                        }
+                        documentApi.updateFields({ids:listIdControl.join(','),data:JSOn.stringify(linkData)});   
+                    }
                     // nếu submit từ form sub submit thì ko rediect trang
                     // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
+                    
                     if(this.$getRouteName() == 'submitDocument' && this.$route.params.id == this.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                     }

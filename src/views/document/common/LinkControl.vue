@@ -45,6 +45,9 @@ export default {
                 this.$goToPage('/documents/objects/'+link.value,"Chi tiết");
             }
         },
+        getData(){
+            return this.listLink;
+        },
         hide() {
             this.isShow = false;
         },

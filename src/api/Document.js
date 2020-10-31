@@ -64,6 +64,9 @@ export const documentApi = {
     getFieldByDocId(name) {
         return coreApi.get("documents/" + name + "/fields");
     },
+    updateFields(data) {
+        return coreApi.put("fieldfields/batch", data);
+    },
     getDetailDocumentByName(data) {
         return coreApi.get("documents/by-name", data);
     },
