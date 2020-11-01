@@ -187,7 +187,9 @@ export default class BasicControl extends Control {
         return false;
     }
     setEvent() {
-
+            // biến check xem control có đang autocomplete hay ko
+            // nếu đang autocomplete thì ko nhận sự kiện thay đổi khi giá trị đang được gõ
+            let isAutocompleting = false;
             let thisObj = this;
             this.ele.on('change', function(e) {
                 let valueChange = $(e.target).val();
@@ -197,7 +199,10 @@ export default class BasicControl extends Control {
                     valueChange = $(e.target).prop("checked");
                 }
                 thisObj.value = valueChange;
-                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.name, val: valueChange })
+                if (!isAutocompleting) {
+                    SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.name, val: valueChange });
+                }
+                isAutocompleting = false;
             })
             this.ele.on('focus', function(e) {
                 store.commit("document/addToDocumentSubmitStore", {
@@ -234,6 +239,7 @@ export default class BasicControl extends Control {
                     let fromSelect = false;
                     let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
                     e['controlName'] = thisObj.controlProperties.name.value;
+                    isAutocompleting = true;
                     SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                         e: e,
                         autocompleteFormulasInstance: formulasInstance,

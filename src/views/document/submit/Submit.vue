@@ -1096,13 +1096,14 @@ export default {
             if(this.sDocumentSubmit.currentTableInteractive == null){
                 let fromAutoComplete = true;
                 if(!data.fromEnterKey){
-                    fromAutoComplete = false
+                    fromAutoComplete = false;
                 }
                 this.handleInputChangeBySystem(this.sDocumentSubmit.currentControlAutoComplete,data.value,fromAutoComplete);
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
                 let cellActive = currentTableInteractive.tableInstance.getActiveEditor();
+                currentTableInteractive.isAutoCompleting = false;
                 currentTableInteractive.tableInstance.setDataAtCell(cellActive.row,cellActive.col,data.value,'edit')
             }
         },

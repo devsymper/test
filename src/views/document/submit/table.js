@@ -236,7 +236,6 @@ export default class Table {
             this.reRendered = false;
             /**Danh sách các celltpye trong table */
             this.listCellType = {};
-            /**CHỉ ra  vị trí của cell được click */
             this.isAutoCompleting = false;
             /**Chỉ ra tên của control nào đang setdata để callback sau khi setdata */
             this.controlNameAfterChange = "";
@@ -450,7 +449,9 @@ export default class Table {
                  * @param {*} source 
                  */
                 afterChange: function(changes, source) {
-
+                    if (thisObj.isAutoCompleting) {
+                        return;
+                    }
                     if (!changes) {
                         return
                     }
@@ -511,7 +512,6 @@ export default class Table {
                             });
 
                         }
-                        console.log("sadsadsadf", source, changes);
                         if (source == "edit") {
                             thisObj.handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName);
                         } else {
@@ -523,6 +523,8 @@ export default class Table {
                             dataInput[controlName] = [changes[0][3]]
                             thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB.instance);
                         }
+                        thisObj.isAutoCompleting = false;
+
                     }
 
                 }
@@ -1141,8 +1143,6 @@ export default class Table {
                     setTimeout((self) => {
                         self.render()
                     }, 500, this);
-                } else {
-                    thisObj.isAutoCompleting = false;
                 }
 
             },
