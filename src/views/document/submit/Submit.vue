@@ -136,9 +136,10 @@
         class="d-none"
         @uploaded-file="afterFileUpload"
         :objectIdentifier="docId+''" />
-        <LinkControl :instance="keyInstance" ref="linkControlView"/>
-        <!-- v-for="dataFlow in listDataFlow" :key="dataFlow.id"  -->
-        
+        <FloattingPopup 
+                ref="floattingPopup" 
+                :focusingControlName="focusingControlName"
+                :instance="keyInstance"/>
          
         <div class="sub-form-action" v-if="parrentInstance != 0">
             <button @click="goToListDocument()" class=subfom-action__item>{{$t('document.submit.goToList')}}</button>
@@ -185,7 +186,6 @@ import ActionControl from "./actionControl";
 import LayoutControl from "./layoutControl";
 import PageControl from "./pageControl";
 import TabControl from "./tabControl";
-import LinkControl from "./../common/LinkControl";
 import DatePicker from "./../../../components/common/DateTimePicker";
 import TimeInput from "./../../../components/common/TimeInput";
 import UploadFile from "@/components/common/UploadFile.vue";
@@ -207,6 +207,7 @@ import EmbedDataflow from "@/components/dataflow/EmbedDataflow";
 import Preloader from './../../../components/common/Preloader';
 import {listControlNotNameProp} from "./../../../components/document/controlPropsFactory.js"
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import FloattingPopup from './../common/FloattingPopup'
 
 
 
@@ -311,7 +312,7 @@ export default {
         UploadFile,
         SidebarTraceFormulas,
         VuePerfectScrollbar,
-        LinkControl
+        FloattingPopup
     },
     computed: {
         sDocumentEditor() {
@@ -325,10 +326,14 @@ export default {
         },
         viewType(){
             return this.$store.state.document.viewType[this.keyInstance]
+        },
+        linkControl(){
+            return this.$store.state.document.linkControl[this.keyInstance]
         }
     },
     data() {
         return {
+            focusingControlName: '',
             contentDocument: null,
             documentInfo:null,
             documentId: null,
@@ -407,8 +412,8 @@ export default {
         });
         $(document).find('#sym-submit-'+this.keyInstance).off('click','.info-control-btn')
         $(document).find('#sym-submit-'+this.keyInstance).on('click','.info-control-btn',function(e){
-            let controlName = $(this).attr('data-control');
-            thisCpn.$refs.linkControlView.show(e, controlName);
+            thisCpn.focusingControlName = $(e.target).attr('data-control');
+            thisCpn.$refs.floattingPopup.show(e, $('#sym-submit-'+thisCpn.keyInstance));
         });
     },
 
@@ -456,9 +461,10 @@ export default {
         this.$evtBus.$on("on-info-btn-in-table-click", locate => {
             if(thisCpn._inactive == true) return;
             let e = locate.e;
-            let data = locate.data
-            this.setDataForLinkControl(data.type, data.value, data.title, data.source);
-            this.$refs.linkControlView.show(e);
+            let row = locate.row;
+            let controlName = locate.controlName;
+            this.focusingControlName = controlName;
+            this.$refs.floattingPopup.show(e, $('#sym-submit-'+this.keyInstance), row);
         });
 
         this.$evtBus.$on("run-formulas-control-outside-table", e => {
@@ -698,11 +704,10 @@ export default {
                 ) {
                     thisCpn.$refs.userInput.hide();
                 }
-                if (
-                     !$(evt.target).hasClass("info-control-btn") &&  
-                    $(evt.target).closest(".card-link-config").length == 0
-                ) {
-                    thisCpn.$refs.linkControlView.hide();
+                if( !$(evt.target).hasClass("info-control-btn") &&
+                    !$(evt.target).hasClass("s-floatting-popup") &&
+                    $(evt.target).closest(".s-floatting-popup").length == 0){
+                    this.$refs.floattingPopup.hide();
                 }
                 if (
                     !$(evt.target).hasClass("s-control-date") &&
@@ -1256,6 +1261,10 @@ export default {
                             value: res.data,
                             instance: this.keyInstance
                         })
+                        thisCpn.$store.commit('document/updateListLinkControl',{
+                            key: thisCpn.keyInstance,
+                            value: res.data.otherInfo,
+                        }); 
                         thisCpn.documentId = res.data.documentId;
                         thisCpn.isDraft = res.data.isDraft;
                         thisCpn.loadDocumentData();
@@ -1377,6 +1386,7 @@ export default {
                                 control.setEffectedData(prepareData);
                                 this.addToListInputInDocument(controlName,control);
                                 control.render();
+                                control.checkHasInfoControl(this.linkControl);
                             }
                             
                         }
@@ -1432,7 +1442,8 @@ export default {
                             if(this.viewType !== 'submit'){
                                 tableControl.setData(valueInput);
                             }
-                            this.addToListInputInDocument(controlName,tableControl)
+                            this.addToListInputInDocument(controlName,tableControl);
+                            tableControl.renderInfoButtonInRow(this.linkControl);
                         }
                     }
                 }
@@ -1741,9 +1752,8 @@ export default {
             }
             dataPost['dataInputFormulas'] = JSON.stringify(dataPost['dataInputFormulas']);
             // nếu có giá trị công thức link trong doc thì lưu lại để dùng trong form detail
-            let linkData = thisCpn.$refs.linkControlView.getData();
-            if(Object.keys(linkData).length > 0){
-                dataPost['linkData'] = JSON.stringify(linkData);
+            if(Object.keys(this.linkControl).length > 0){
+                dataPost['linkData'] = JSON.stringify(this.linkControl);
             }
             documentApi.submitDocument(dataPost).then(res => {
                 let dataResponSubmit = res.data;
@@ -1800,9 +1810,8 @@ export default {
                 dataPost['isDraft'] = true;
             }
             // nếu có giá trị công thức link trong doc thì lưu lại để dùng trong form detail
-            let linkData = thisCpn.$refs.linkControlView.getData();
-            if(Object.keys(linkData).length > 0){
-                dataPost['linkData'] = JSON.stringify(linkData);
+            if(Object.keys(this.linkControl).length > 0){
+                dataPost['linkData'] = JSON.stringify(this.linkControl);
             }
             documentApi.updateDocument(this.docObjId,dataPost).then(res => {
                 thisCpn.$emit('submit-document-success',res.data);
@@ -2243,10 +2252,13 @@ export default {
                     }
                 }
             }
-            controlInstance.renderLinkToControl(controlName);
+            controlInstance.renderInfoIconToControl(controlName);
         },
         setDataForLinkControl(formulasType, link, title, source, controlName){
-            this.$refs.linkControlView.setData(controlName,{key:formulasType,value:link, title:title, source:source});
+            this.$store.commit(
+                "document/updateDataForLinkControl",
+                {formulasType:formulasType,link:link, title:title, source:source,instance: this.keyInstance, controlName: controlName}
+            );
         },
 
         /**

@@ -144,18 +144,18 @@ export default class BasicControl extends Control {
             }
 
         }
-    /**
-     * Ham kiểm tra có các thông tin khác của control như  (comment, history, link) trên control hay không
-     * nếu có thì thêm icon info
-     */
+        /**
+         * Ham kiểm tra có các thông tin khác của control như  (comment, history, link) trên control hay không
+         * nếu có thì thêm icon info
+         */
     checkHasInfoControl(dataLink) {
             if (Object.keys(dataLink).includes(this.name)) {
-                this.renderLinkToControl(this.name);
+                this.renderInfoIconToControl(this.name);
             }
         }
-    /**
-     * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
-     */
+        /**
+         * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
+         */
     setDefaultValue() {
         if (['submit'].includes(sDocument.state.viewType[this.curParentInstance]) &&
             this.controlProperties['defaultValue'] != undefined) {
@@ -688,7 +688,7 @@ export default class BasicControl extends Control {
         }
         return false;
     }
-    renderLinkToControl(controlName) {
+    renderInfoIconToControl(controlName) {
         if (this.ele.parent().find('.info-control-btn').length == 0) {
             let icon = `<span class="mdi mdi-information info-control-btn" data-control="` + controlName + `"></span>`
             this.ele.parent().append(icon);

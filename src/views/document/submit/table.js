@@ -1530,7 +1530,7 @@ export default class Table {
                 ele.css({ 'position': 'relative' }).append(Util.renderInfoBtn());
                 ele.off('click', '.info-control-btn')
                 ele.on('click', '.info-control-btn', function(e) {
-                    SYMPER_APP.$evtBus.$emit('on-info-btn-in-table-click', { e: e, data: map })
+                    SYMPER_APP.$evtBus.$emit('on-info-btn-in-table-click', { e: e, row: row, controlName: control.name })
                 })
             }
             if (map.vld === true) {
