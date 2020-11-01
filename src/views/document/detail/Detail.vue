@@ -32,21 +32,25 @@
             :style="{'width':documentSize, 'height':contentHeight,'margin':contentMargin}">
             <div class="content-document" v-html="contentDocument"></div>
             <div class="content-print-document" :style="formSize" v-html="contentPrintDocument"></div>
-            <FloattingPopup ref="floattingPopup" :instance="keyInstance"/>
+            <FloattingPopup 
+                ref="floattingPopup" 
+                :focusingControlName="focusingControlName"
+                :instance="keyInstance"/>
         </div>
       
         <side-bar-detail 
-        v-if="!isPrint"
-        ref="sidebarView"
-        :sidebarWidth="sidebarWidth"  
-        :userId="userId"
-        :taskId="taskId"
-        :createTime="createTime"
-        :documentObjectId="docObjId"
-        :userRole="userCreateInfo.role"
-        :workflowId="workflowId"
-        :showCommentInDoc="showCommentInDoc"
-        @after-hide-sidebar="afterHideSidebar"
+            v-if="!isPrint"
+            ref="sidebarView"
+            :keyInstance="keyInstance"
+            :sidebarWidth="sidebarWidth"  
+            :userId="userId"
+            :taskId="taskId"
+            :createTime="createTime"
+            :documentObjectId="docObjId"
+            :userRole="userCreateInfo.role"
+            :workflowId="workflowId"
+            :showCommentInDoc="showCommentInDoc"
+            @after-hide-sidebar="afterHideSidebar"
         />
         <HistoryControl ref="historyView" />
        
@@ -135,6 +139,7 @@ export default {
     },
     data() {
         return {
+            focusingControlName: '',
             contentDocument: null,
             contentPrintDocument:null,
             docObjId: null,
@@ -172,6 +177,7 @@ export default {
         let self = this;
         $(document).on('click','#sym-Detail-'+this.keyInstance+' .info-control-btn',function(e){
             self.$refs.floattingPopup.show(e);
+            self.focusingControlName = $(e.target).attr('data-control');
         })
     },
     

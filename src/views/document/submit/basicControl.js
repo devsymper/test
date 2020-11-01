@@ -693,6 +693,5 @@ export default class BasicControl extends Control {
             let icon = `<span class="mdi mdi-information info-control-btn" data-control="` + controlName + `"></span>`
             this.ele.parent().append(icon);
         }
-
     }
 }

@@ -84,9 +84,10 @@ const defaultState = {
         }
     },
     detail: {
-        detail_123: {
-            allData: null
-        }
+        // detail_123: {
+        //     allData: null,
+        //     trackChange: [] // lịch sử chỉnh sửa của các control
+        // }
     },
     documentProps: {
         instance: {}

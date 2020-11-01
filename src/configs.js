@@ -51,7 +51,8 @@ export const appConfigs = {
         importExcel: 'https://io.dev.symper.vn/',
         uiConfig: "https://ui.symper.vn",
         workflowExtend: "https://workflow-extend.symper.vn/",
-        trash: "https://trash.symper.vn/"
+        trash: "https://trash.symper.vn/",
+        log: "https://log.symper.vn"
     },
     notificationTimeout: {
         success: 3000,

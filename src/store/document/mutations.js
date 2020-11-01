@@ -413,6 +413,7 @@ const setDefaultDetailStore = (state, params) => {
         allData: {
 
         },
+        trackChange: []
     }
     let instance = params.instance;
     Vue.set(state.detail, instance, value);
@@ -498,6 +499,9 @@ const deleteControlTemplate = (state, params) => {
     Vue.set(state.editor[instance], 'allControlTemplate', x);
 }
 
+const setDetailTrackChange = (state, params)=>{
+    Vue.set(state.detail[params.instance], 'trackChange', params.data);
+}
 
 
 
@@ -531,6 +535,7 @@ export {
     deleteControlInAllControlDeleted,
     updateDataToTableControlRoot,
     addSqlLiteDb,
-    deleteControlTemplate
+    deleteControlTemplate,
+    setDetailTrackChange
 
 };

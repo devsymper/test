@@ -108,7 +108,7 @@
 
 		<v-divider></v-divider>
 
-		<VuePerfectScrollbar style="calc(100% - 62px);">
+		<VuePerfectScrollbar style="height: calc(100% - 25px);">
 			<div v-for="history in listHistoryControl" 
 			:key="history.id" 
 			@click="showHistoryControl(history)"
@@ -117,10 +117,7 @@
 					<div class="date-update">
 						{{history.date}}
 					</div>
-					<div>
-						<img src="https://randomuser.me/api/portraits/men/81.jpg" height="14px" alt="">
-						<span>{{history.userUpdate}}</span>
-					</div>
+					<InfoUser :userId="history.userUpdate"/>
 				</div>
 				<div class="history-item__action">
 					<v-tooltip left>
@@ -155,10 +152,15 @@ import { util } from "@/plugins/util.js";
 import { data } from 'jquery'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import Comment from './Comment'
+import {logServiceApi} from "@/api/log.js";
+import { getControlInstanceFromStore } from '../common/common';
+import InfoUser from "@/components/myItem/InfoUser.vue";
+
 export default {
 	components:{
-		 VuePerfectScrollbar,
-		 Comment
+		VuePerfectScrollbar,
+		Comment,
+		InfoUser
 	},
 	data () {
 		return {
@@ -183,6 +185,9 @@ export default {
 		}
 	},
 	props:{
+		keyInstance: {
+			default: null
+		},
 		sidebarWidth:{
 			type:Number,
 			default:400
@@ -287,7 +292,152 @@ export default {
 			})
 			.always(() => {});
 	},
+	mounted() {
+		setTimeout((self) => {
+			self.setDocUpdateHistory();
+		}, 2000, this);
+	},
 	methods:{
+		async setDocUpdateHistory(){
+			let res = await logServiceApi.query({
+				"query": {
+					"bool": {
+					"must": [
+							{
+								"term": {
+									"logObjectType": "document_instance"
+								}
+							},{
+								"term": {
+									"logAction": "update"
+								}
+							},{
+								"term": {
+									"logObjectId": this.documentObjectId
+								}
+							}
+						]
+					}
+				}
+			});
+			if(res.status == 200){
+				let list = [];
+				this.listHistoryControl = this.getFormattedUpdateHistory(res.data);
+				let param = {
+					instance: this.keyInstance, 
+					data: this.listHistoryControl
+				};
+        		this.$store.commit("document/setDetailTrackChange",param);
+			}else{
+				this.$snotifyError(res, "Can not get document update history!");
+			}
+		},
+		getFormattedUpdateHistory(list){
+			let rsl = [];
+			
+			for(let item of list){
+				let newValue = typeof item.new == 'string' ? JSON.parse(item.new) : item.new;
+				let oldValue = typeof item.old == 'string' ? JSON.parse(item.old) : item.old;
+
+				rsl.push({
+					old: oldValue,
+					new: newValue,
+					date: newValue.document_object_update_time, 
+					userUpdate: item.user_update_id, 
+					// historyid:2, 
+					controls: this.getAllControlValueChange(oldValue, newValue)
+				});
+			}
+			return rsl;
+		},
+		getAllControlValueChange(oldObj, newObj){
+			let controlValueIndoc = {};
+			let controlValueInTables = {};
+
+			let changedControls = {
+				doc: this.compareTwoRows(oldObj, newObj),
+				tables: []
+			};
+
+			let mapTableAndControls = {};
+			for(let name in newObj){
+				if($.isArray(newObj[name])){
+					mapTableAndControls[name] = {
+						new: {},
+						old: {}
+					};
+
+					if($.isArray(newObj[name])){
+						for(let row of newObj[name]){
+							mapTableAndControls[name].new[row.document_object_id] = row;
+						}
+					}
+
+					if($.isArray(oldObj[name])){
+						for(let row of oldObj[name]){
+							mapTableAndControls[name].old[row.document_object_id] = row;
+						}
+					}
+				}
+			}
+
+			for(let tbName in mapTableAndControls){
+				let tbChange = {};
+				for(let idRow in mapTableAndControls[tbName].new){
+					if(mapTableAndControls[tbName].old[idRow]){
+						let oldObj = mapTableAndControls[tbName].old[idRow];
+						let newObj = mapTableAndControls[tbName].new[idRow];
+						tbChange[idRow] = this.compareTwoRows(oldObj, newObj);
+					}
+				}
+
+				if(!$.isEmptyObject(tbChange)){
+					let mapDocControl = this.$store.state.document.submit[this.keyInstance].listInputInDocument;
+					let table = mapDocControl[tbName];
+					
+					changedControls.tables.push({
+						id: table.id,
+						data: tbChange,
+						name: tbName,
+						isTable: true
+					});
+				}
+			}
+
+			let rsl = changedControls.doc.concat(changedControls.tables);
+			return rsl;
+		},
+		compareTwoRows(oldObj, newObj){
+			let mapDocControl = this.$store.state.document.submit[this.keyInstance].listInputInDocument;
+			let rsl = [];
+
+			for(let name in newObj){
+				let ctrl = mapDocControl[name];
+				// [{id:'s-control-id-1596780602772',data:[]}]
+				if(	ctrl
+					&& oldObj.hasOwnProperty(name) && !$.isArray(oldObj[name])
+					&& newObj.hasOwnProperty(name) && !$.isArray(newObj[name])
+					&& oldObj[name] !== newObj[name] // nếu khác giá trị
+				){
+					let item = {
+						id: ctrl.id,
+						data: {
+							new: newObj[name],
+							old: oldObj[name],
+						},
+						name: name,
+						isTable: false
+					};	
+					rsl.push(item);	
+					let ctrlObj = getControlInstanceFromStore(this.keyInstance, name);
+					if(!ctrlObj.valueChanged){
+						ctrlObj.valueChanged = true;
+						ctrlObj.renderLinkToControl(name);
+					}
+				}
+			}
+			return rsl;
+		},
 		hide(){
 			this.isShow = false;
 			setTimeout((self) => {
