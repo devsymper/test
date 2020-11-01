@@ -86,9 +86,9 @@ export default {
                     if(ctrl.name == ctrlName){
                         info.beforeValue = ctrl.data.old;
                         info.afterValue = ctrl.data.new;
+                        data.push(info);
                     }
                 }
-                data.push(info);
             }
             this.dataTable = data;
         },

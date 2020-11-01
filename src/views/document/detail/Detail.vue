@@ -208,8 +208,14 @@ export default {
                 }
                 else{
                     if(!$(evt.target).hasClass("v-data-table") &&
-                    $(evt.target).closest(".v-data-table").length == 0){
+                        $(evt.target).closest(".v-data-table").length == 0){
                         this.$refs.historyView.hide() 
+                    }
+
+                    
+                    if(!$(evt.target).hasClass("s-floatting-popup") &&
+                        $(evt.target).closest(".s-floatting-popup").length == 0){
+                        this.$refs.floattingPopup.hide() 
                     }
                 }
             }
