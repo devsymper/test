@@ -93,13 +93,14 @@ export default {
         deep: true,
         immediate: true,
         handler(newValue){
+            debugger
             for(let i = 0; i<newValue.length;i++){
                 for(let j = 0; j<newValue[i].items.length;j++){
                     if(newValue[i].items[j].active){
                           //newValue[i].active=false;
-                        this.subcribedAllChanel(newValue[i].title, newValue[i].items[j].title) 
+                        this.subcribedAllChanel(newValue[i].title, newValue[i].items[j].title,i,j) 
                     }else{
-                        this.unsubcribedAllChanel(newValue[i].title, newValue[i].items[j].title) 
+                        this.unsubcribedAllChanel(newValue[i].title, newValue[i].items[j].title,i,j) 
                     }
                     //
                 }
@@ -115,23 +116,30 @@ export default {
             })
         },
         //subcribed all
-        subcribedAllChanel(objectType,event){
+        subcribedAllChanel(objectType,event,k,h){
             for(let i=0;i<this.allListChanel.length;i++){
                 if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&!this.allListChanel[i].subscribed){
                        notification.subscribeChanel(this.allListChanel[i].id).then(res=>{
                         if(res.status==200){
+                            debugger
+                            if(self.type!="main"){
+                                //self.listItems[k].items.splice(h,1)
+                            }
                         }
                     })
                 }
             }
         },
-        unsubcribedAllChanel(objectType,event){
+        unsubcribedAllChanel(objectType,event,k,h){
             const self = this;
             let data={state:false};
             for(let i=0;i<this.allListChanel.length;i++){
                 if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&this.allListChanel[i].subscribed){
                        notification.subscribeChanel(this.allListChanel[i].id,data).then(res=>{
                         if(res.status==200){
+                            if(self.type!="main"){
+                               // self.listItems[k].items.splice(h,1)
+                            }
                         }
                     })
                 }

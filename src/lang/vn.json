@@ -1117,6 +1117,7 @@
     "notificationConfig": {
         "table": {
             "id": "ID",
+            "content": "Nội dung",
             "objectType": "Module phát sinh",
             "event": "Hành động sinh thông báo",
             "defaultUser": "Đối tượng nhận",
@@ -1127,7 +1128,7 @@
             "userUpdate": "Người cập nhật",
             "createAt": "Ngày tạo",
             "updateAt": "Ngày cập nhật",
-            "subscribedAt": "Ngày theo dõi"
+            "userFilterAt": "Ngày theo dõi"
         }
     },
     "virtualdoc": {
