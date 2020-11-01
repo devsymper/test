@@ -200,7 +200,6 @@ export default {
         this.containerHeight = util.getComponentSize(this).h
         this.currentSize =  util.getComponentSize(this)
         $('.ag-cell').on('contextmenu',function(e){
-            debugger
             e.stopPropagation()
             e.preventDefault()
         })

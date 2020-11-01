@@ -16,9 +16,11 @@
         >
         </FormTpl> 
         <ConfigActionPackOrgchart 
-            v-if="allInputs.objectType.value == 'orgchart'"
+            v-if="allInputs.objectType.value == 'department'"
             @permission-selected="handlePermissionSelected"
-            :checkboxes="checkboxes"
+            @department-selected="handleDepartmentSelected"
+            :checkboxes="permissionDepartment"
+            :departmentSelected="departmentSelectedProps"
         />
         <div class="w-100">
             <div class="my-2 fs-12">
@@ -140,7 +142,14 @@ export default {
             this.$emit('close-form');
         },
         handlePermissionSelected(data){
-            this.checkboxes = data           
+            this.permissionDepartment = data           
+        },
+        handleDepartmentSelected(data){
+            if(this.departmentSelected.includes(data)){
+                this.departmentSelected.splice(this.departmentSelected.indexOf(data),1)
+            }else{
+                this.departmentSelected.push(data)
+            }
         },
         handleChangeDocumentInstanceOperation(info){
             let operationForInstancesOfDocDef = this.multipleLevelObjects.document_definition.savedOpsForAllInstancesDocDef;
@@ -446,9 +455,38 @@ export default {
             return cols;
         },
         handleInputValueChange(name, inputInfo, data){
+            let self = this
+            self.departmentSelected
             if(name == 'objectType'){
-                this.handleChangeObjectType();
+                if(data == "department"){
+                    let objectType = this.allInputs.objectType.value;
+                    let rows = this.itemData.mapActionForAllObjects[objectType];
+                    let rowsItem = this.itemData.mapActionAndObjects[objectType];
+
+                    if(rows){
+                        for(let i in rows[0]){
+                            if(rows[0][i] == true){
+                                self.permissionDepartment.push(i)
+                            }
+                        }
+                    }
+                    if(rowsItem){
+                        self.permissionDepartment.push('view_other')
+                        self.$store.dispatch('orgchart/getAllOrgchartStruct');
+                        setTimeout(function(){
+                            rowsItem.forEach(function(e){
+                                if(e.object != ""){
+                                    self.departmentSelected.push('department:'+e.object);
+                                    self.departmentSelectedProps.push(e.object)
+                                }
+                             })
+                        },1000)
+                    }
+                }else{
+                    this.handleChangeObjectType();
+                }
             }
+            
         },
         handleChangeObjectType(){
             this.dataSchema = this.getDataSchema();
@@ -516,14 +554,37 @@ export default {
             });
         },
         getOperationToSaveFromDataTable(dataTable, allResource, objectType){
+            let self = this
             let newOperations = [];
+            
             for (let row of dataTable) {
                 let key = row['object'];
                 let id = '';
                 if(key){
                     id = key.slice(0, key.indexOf(' -'));
                 }
-                
+                if(objectType == "department"){
+                    self.permissionDepartment.forEach(function(e){
+                        if(e == 'view_other'){
+                            self.departmentSelected.forEach(function(k){
+                                 newOperations.push({
+                                    objectType: objectType,
+                                    action: 'view',
+                                    objectIdentifier: k,
+                                    name: k
+                                });
+                            })
+                        }else{
+                            newOperations.push({
+                                objectType: objectType,
+                                action: e,
+                                objectIdentifier: 'department:0',
+                                name: e
+                            });
+                        }
+                        
+                    }) 
+                }
                 if(allResource.hasOwnProperty(objectType) ){
                     if(allResource[objectType][id]){
                         for(let actionName in row){
@@ -544,6 +605,7 @@ export default {
                             if(actionName == 'object'){
                                 continue
                             }
+                            
                             if(row[actionName]){
                                 newOperations.push({
                                     objectType: objectType,
@@ -610,7 +672,6 @@ export default {
                 let dataTable = this.itemData.mapActionAndObjects[objectType];
                 newOperations = newOperations.concat(this.getOperationToSaveFromDataTable(dataTable, allResource, objectType));
             }
-            
             for(let objectType in this.multipleLevelObjects.application_definition){
                 let dataTable = this.multipleLevelObjects.application_definition[objectType].tableData;
                 newOperations = newOperations.concat(this.getOperationToSaveFromDataTable(dataTable, allResource, objectType));
@@ -620,19 +681,21 @@ export default {
             newOperations = this.removeDuplicateOperations(newOperations);
 
             for(let objectType in this.itemData.mapActionForAllObjects){
-                let dataTable = this.itemData.mapActionForAllObjects[objectType];
-                let row = dataTable[0];
+                if(objectType != 'department'){
+                     let dataTable = this.itemData.mapActionForAllObjects[objectType];
+                    let row = dataTable[0];
 
-                if(allResource.hasOwnProperty(objectType)){
-                    for(let actionName in row){
-                        let objectIdentifier = actionForObjectType[actionName] ? objectType : (objectType + ':0' );
-                        if(row[actionName]){
-                            newOperations.push({
-                                objectType: objectType,
-                                action: actionName,
-                                objectIdentifier: objectIdentifier,
-                                name: actionName.replace(/_/g, ' ') + ' '+ objectType.replace(/_/g, ' ')
-                            });
+                    if(allResource.hasOwnProperty(objectType)){
+                        for(let actionName in row){
+                            let objectIdentifier = actionForObjectType[actionName] ? objectType : (objectType + ':0' );
+                            if(row[actionName]){
+                                newOperations.push({
+                                    objectType: objectType,
+                                    action: actionName,
+                                    objectIdentifier: objectIdentifier,
+                                    name: actionName.replace(/_/g, ' ') + ' '+ objectType.replace(/_/g, ' ')
+                                });
+                            }
                         }
                     }
                 }
@@ -654,7 +717,6 @@ export default {
                 description: this.allInputs.description.value,
                 listOperations: JSON.stringify(operationsIds)
             };
-
             let res;
             try {
                 if(this.action == 'update'){
@@ -693,6 +755,7 @@ export default {
                 });
 
                 if(res.status == 200){
+
                     let dataToStore = this.translateDataToStore(res.data, objectType);
                     this.$store.commit('actionPack/cacheAllResourceItem',{
                         type: objectType,
@@ -781,7 +844,9 @@ export default {
     data(){
         let self = this;
         return {
-            checkboxes:["viewOther"],
+            permissionDepartment:[],
+            departmentSelected:[],
+            departmentSelectedProps: [],
             tableHeight: 200,
             isEditingCell : false,
             tableColumnsForObjectType: [],
