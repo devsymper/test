@@ -213,7 +213,7 @@ export default class BasicControl extends Control {
             })
 
             this.ele.on('keyup', function(e) {
-                if (e.key == 'F2' && store.state.app.accountType == 'ba') {
+                if (e.key == 'F2' && store.state.app.baInfo && Object.keys(store.state.app.baInfo).length > 0) {
                     thisObj.traceControl();
                 }
                 if (thisObj.type == 'user') {

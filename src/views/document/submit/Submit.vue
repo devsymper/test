@@ -168,7 +168,8 @@
             :controlTrace="controlTrace"
             :keyInstance="keyInstance"
             :listFormulasTrace="listFormulasTrace"
-            ref="traceControlView" v-show="isShowTraceControlSidebar" />
+            ref="traceControlView" 
+            v-show="isShowTraceControlSidebar" />
         </v-navigation-drawer>
 
     </div>
@@ -743,11 +744,11 @@ export default {
          */
         this.$evtBus.$on('document-submit-show-trace-control',data=>{
             data.control.renderCurrentTraceControlColor();
-            this.controlTrace = data.control.name;
+            thisCpn.controlTrace = data.control.name;
             let controlFormulas = data.control.controlFormulas;
-            this.listFormulasTrace = controlFormulas;
-            this.isShowTraceControlSidebar = true;
-            this.drawer = true;
+            thisCpn.listFormulasTrace = controlFormulas;
+            thisCpn.isShowTraceControlSidebar = true;
+            thisCpn.drawer = true;
         })
     },
     watch: {

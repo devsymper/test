@@ -266,7 +266,7 @@ export default class Table {
                     }
                     thisObj.checkEnterInsertRowEvent(event, cellMeta);
                     // ấn f2 vào cell thì trace control đó
-                    if (event.key == 'F2' && store.state.app.accountType == 'ba') {
+                    if (event.key == 'F2' && store.state.app.baInfo && Object.keys(store.state.app.baInfo).length > 0) {
                         let control = thisObj.getControlInstance(thisObj.currentControlSelected);
                         SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { control: control });
                         return;
