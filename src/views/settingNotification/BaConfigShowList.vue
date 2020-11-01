@@ -22,6 +22,7 @@
     </div>
 </template>
 <script>
+
 import { userApi } from "./../../api/user.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import configNotification from "./../../components/notification/setting/BAconfig";
@@ -101,16 +102,24 @@ export default {
                             type:"text"
                         },
                    )
+                   let listBA= self.$store.state.app.allBA;
                      for(let i = 0; i<data.listObject.length; i++){
                         data.listObject[i].state = self.renameStatus(data.listObject[i].state);
+                        data.listObject[i].description = self.reNameParam(data.listObject[i].objectType,data.listObject[i].description);
+                        data.listObject[i].defaultUser = self.renameReceiver(data.listObject[i].objectType,data.listObject[i].defaultUser);
+                        data.listObject[i].event = self.renameAction(data.listObject[i].objectType,data.listObject[i].event);
                         data.listObject[i].objectType = self.$t('objects.'+data.listObject[i].objectType);
-                        
+                        data.listObject[i].userUpdate= self.getBAName(listBA,data.listObject[i].userCreate.split(':')[1]);
+                        data.listObject[i].userCreate = self.getBAName(listBA,data.listObject[i].userCreate.split(':')[1]);
+                        debugger
+
+                        //data.listObject[i].event = '123';
                     }
                     return  data;
                 } 
             },
-            getListUrl: {},
             listSource:{},
+            getListUrl: {},
             actionPanelWidth:520,
             tableContextMenu:{
                 delete: {
@@ -118,6 +127,13 @@ export default {
                     text:this.$t('user.table.contextMenu.delete'), 
                     callback: (notification, callback) => {
                         this.deleteNotification(notification);
+                    }
+                },
+                 update: {
+                    name:"update",
+                    text:this.$t('user.table.contextMenu.update'), 
+                    callback: (notification, callback) => {
+                        this.updateNotification(notification);
                     }
                 }
             },
@@ -128,9 +144,51 @@ export default {
         this.calcContainerHeight();
     },
     created(){
+        this.$store.dispatch("app/getAllBA");
         this.getSource();
     },
     methods:{
+        reNameParam(nameModule,des){
+            debugger
+             let name = des;
+            for(let i = 0; i<this.listSource[nameModule].parameter.length;i++){
+                  let oldValue= new RegExp(this.listSource[nameModule].parameter[i].value);
+                let newValue ="<"+this.listSource[nameModule].parameter[i].text+'>';
+                name = name.replace(oldValue,newValue);
+            }
+            return name
+
+        },
+        updateNotification(des){
+            debugger
+
+        },
+        renameReceiver(nameModule,receiver){
+            let name = event;
+            for(let i = 0; i<this.listSource[nameModule].receiver.length;i++){
+                if(this.listSource[nameModule].receiver[i].value==receiver){
+                name = this.listSource[nameModule].receiver[i].text;
+                }
+            }
+            return name
+        },
+        renameAction(nameModule,event){
+            let name = event;
+            for(let i = 0; i<this.listSource[nameModule].event.length;i++){
+                if(this.listSource[nameModule].event[i].value==event){
+                name = this.listSource[nameModule].event[i].text;
+                }
+            }
+            return name
+
+         },
+        getBAName(list, id){
+            for(let i = 0; i<list.length;i++){
+                if(list[i].id==id){
+                    return list[i].name;
+                }
+            }
+        },
         getSource(){
             const self = this;
             notificationApi.showAllModuleConfig().then(res=>{

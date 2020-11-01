@@ -24,9 +24,37 @@
                 <template v-slot:activator>
                     <v-list-item-content class="mb-2"  style="margin-left:-17px">
                     <v-list-item-title v-if="type=='main'">{{$t('objects.'+item.title)}}</v-list-item-title>
-                    <v-list-item-title v-else>{{item.title}}</v-list-item-title>
-                    <v-list-item-subtitle v-if="type=='main'" class="fw-400 fs-11">{{$t('objects.'+item.title)}}</v-list-item-subtitle>
-                    <v-list-item-subtitle v-else class="fw-400 fs-11">{{item.title}}</v-list-item-subtitle>
+                    <v-list-item-title v-else>
+                       
+                        {{$t('objects.'+item.title)}}
+                         <v-list-action style="float:right">
+                             <span class="fs-13 fw-400 color-grey" v-if="type=='unfollow'">
+                                  <!-- Bỏ theo dõi -->
+                             </span>
+                              <span class="fs-13 fw-400 color-grey" style="margin-top:10px" v-if="type=='follow'">
+                                  <!-- Ngày theo dõi -->
+                             </span>
+                            </v-list-action>
+                    </v-list-item-title>
+                    <v-list-item-subtitle v-if="type=='main'" class="fw-400 fs-11">
+                        <span v-for="sub in item.subTitle" :key="sub">
+                            {{sub}}
+                        </span>
+                    </v-list-item-subtitle>
+                    <v-list-item-subtitle v-else class="fw-400 fs-11">
+                       {{$t('objects.'+item.title)}}
+                         <!-- <span v-for="sub in item.subTitle" :key="sub">
+                            {{sub}}
+                        </span> -->
+                          <v-list-action style="float:right">
+                             <span class="fs-13 fw-400 color-grey" v-if="type=='unfollow'">
+                                  <!-- {{item.subscribedAt}}1234 -->
+                             </span>
+                              <span class="fs-13 fw-400 color-grey" style="margin-top:10px" v-if="type=='follow'">
+                                  <!-- {{item.subscribedAt}}1234 -->
+                             </span>
+                            </v-list-action>
+                    </v-list-item-subtitle>
                     </v-list-item-content>
                 </template>
                 <div class="mb-3 ml-10">
@@ -67,16 +95,13 @@ export default {
         handler(newValue){
             for(let i = 0; i<newValue.length;i++){
                 for(let j = 0; j<newValue[i].items.length;j++){
-                // check 1 lượt nếu chọn subcribed
                     if(newValue[i].items[j].active){
-                        // nếu chưa tồn tại gọi api
-                        this.subcribedChanel(newValue[i].title, newValue[i].items[j].title) 
-                    // nếu không chọn subcribed
+                          //newValue[i].active=false;
+                        this.subcribedAllChanel(newValue[i].title, newValue[i].items[j].title) 
                     }else{
-                        this.unsubcribedChanel(newValue[i].title, newValue[i].items[j].title) 
-                        /// chuyển state false
-                        //nếu đã có trong list
+                        this.unsubcribedAllChanel(newValue[i].title, newValue[i].items[j].title) 
                     }
+                    //
                 }
             }
         }
@@ -84,8 +109,13 @@ export default {
   },
   props: ['type','listItems','listSubcribed','allListChanel'],
     methods: {
+        subscribedOneChanel(id){
+             notification.subscribeChanel(id).then(res=>{
+                if(res.status==200){}
+            })
+        },
         //subcribed all
-        subcribedChanel(objectType,event){
+        subcribedAllChanel(objectType,event){
             for(let i=0;i<this.allListChanel.length;i++){
                 if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&!this.allListChanel[i].subscribed){
                        notification.subscribeChanel(this.allListChanel[i].id).then(res=>{
@@ -95,7 +125,8 @@ export default {
                 }
             }
         },
-        unsubcribedChanel(objectType,event){
+        unsubcribedAllChanel(objectType,event){
+            const self = this;
             let data={state:false};
             for(let i=0;i<this.allListChanel.length;i++){
                 if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&this.allListChanel[i].subscribed){
@@ -116,9 +147,6 @@ export default {
 }
 </script>
 <style scoped>
-    /* .v-list-group__header{
-        margin-bottom:8px!important
-    } */
     .notification ::v-deep .v-list-item{
         padding:0px!important
     }

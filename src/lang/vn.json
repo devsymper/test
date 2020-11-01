@@ -506,6 +506,9 @@
         "Timesheet": "Thời gian biểu"
     },
     "objects": {
+        "import": "Import",
+        "task": "Task",
+        "role": "Role",
         "user": "Tài khoản người dùng",
         "document_instance": "Bản ghi dữ liệu",
         "account": "Nhân viên",

@@ -159,6 +159,7 @@
 									<UploadFile 
 										style="margin-top:-30px; margin-left:50px"
 										ref="uploadAvatar"
+										:pickAvatar="true"
 										:autoUpload="false"
 										:fileName="avatarFileName"
 										@selected-file="handleAvatarSelected" />

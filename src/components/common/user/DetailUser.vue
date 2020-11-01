@@ -115,6 +115,7 @@
                      </v-avatar>
                     <!-- <SymperAvatar :userId="lazyUserInfo.id" :size="100" /> -->
                     <UploadFile 
+                        :pickAvatar="true"
                         :fileName="avatarFileName"
 						@selected-file="handleAvatarSelected"
                         ref="uploadAvatar"

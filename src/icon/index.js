@@ -24,6 +24,8 @@ export default {
         file: "mdi mdi-file-upload-outline",
         dashboard: "mdi mdi-view-dashboard",
         action_pack: " mdi mdi-package-variant-closed",
+        import: "mdi mdi-import",
+        task: "mdi-office-building-outline"
 
 
 
