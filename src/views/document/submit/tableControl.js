@@ -24,21 +24,22 @@ export default class TableControl extends Control {
 
     }
     renderInfoButtonInRow(linkControl) {
-        let allControlHasLink = Object.keys(linkControl);
-        for (let index = 0; index < allControlHasLink.length; index++) {
-            let controlLink = allControlHasLink[index];
-            if (Object.keys(this.listInsideControls).includes(controlLink)) {
-                let listLinkInCol = linkControl[controlLink];
-                let curColIndex = this.tableInstance.colName2Idx[controlLink];
-                for (let key in listLinkInCol) {
-                    let rowIdx = key.replace(/linkConfig_(.+)_/g, "");
-                    rowIdx = Number(rowIdx)
-                    this.tableInstance.validateValueMap[rowIdx + "_" + curColIndex] = {
-                        type: 'linkControl',
-                    };
+        if (linkControl) {
+            let allControlHasLink = Object.keys(linkControl);
+            for (let index = 0; index < allControlHasLink.length; index++) {
+                let controlLink = allControlHasLink[index];
+                if (Object.keys(this.listInsideControls).includes(controlLink)) {
+                    let listLinkInCol = linkControl[controlLink];
+                    let curColIndex = this.tableInstance.colName2Idx[controlLink];
+                    for (let key in listLinkInCol) {
+                        let rowIdx = key.replace(/linkConfig_(.+)_/g, "");
+                        rowIdx = Number(rowIdx)
+                        this.tableInstance.validateValueMap[rowIdx + "_" + curColIndex] = {
+                            type: 'linkControl',
+                        };
+                    }
                 }
             }
-
         }
     }
     renderTable() {

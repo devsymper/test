@@ -149,7 +149,7 @@ export default class BasicControl extends Control {
          * nếu có thì thêm icon info
          */
     checkHasInfoControl(dataLink) {
-            if (Object.keys(dataLink).includes(this.name)) {
+            if (dataLink && Object.keys(dataLink).includes(this.name)) {
                 this.renderInfoIconToControl(this.name);
             }
         }
