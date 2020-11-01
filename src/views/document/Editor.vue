@@ -366,7 +366,7 @@ export default {
             isConfigPrint:false,
             listDocument:[],
             inputSaveControlTemplate:{},
-            sizePrint:{},
+            contentStyle:{},
             currentDragging:null,
             oldTableId:null,
             dataPreviewSubmit:null,
@@ -507,39 +507,39 @@ export default {
          * Hàm xử lí khi paste nội dung vào editor
          */
         handlePasteContent(e){
+            e.preventDefault();
             var content = ((e.originalEvent || e).clipboardData || window.clipboardData).getData("text/html");
-
             content = content.replace(/((<|(<\/))html>)|((<|(<\/))body>)/g,"");
+            content = content.replace(/<!--[^>]*-->/g,"");
+            content = '<div class="content-wrap">'+content+'</div>';
             let contentEl = $(content);
             let listControls = contentEl.find('.s-control:not(.s-control-table .s-control)');
             if(listControls.length > 0){
-                setTimeout((self) => {
-                    for (let index = 0; index < listControls.length; index++) {
-                        const controlEl = listControls[index];
-                        let controlId = $(controlEl).attr('id');
-                        var inputId = 's-control-id-' + Date.now();
-                        let controlType = $(controlEl).attr('s-control-type');
-                        let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
-                        elements.attr('id',inputId);
-                        let control = GetControlProps(controlType);
-                        this.addToAllControlInDoc(inputId,{properties: control.properties, formulas : control.formulas,type:controlType});
-                        if(controlType == 'table'){ // nếu là table thì xử lí các control trong table
-                            let allControlInTable = elements.find('.s-control');
-                            for (let i = 0; i < allControlInTable.length; i++) {
-                                const childControlEl = allControlInTable[i];
-                                let childControlId = $(childControlEl).attr('id');
-                                var childInputId = 's-control-id-' + Date.now();
-                                let childControlType = $(childControlEl).attr('s-control-type');
-                                let childElements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+childControlId);
-                                childElements.attr('id',childInputId);
-                                let childControl = GetControlProps(childControlType);
-                                this.addToAllControlInTable(childInputId,{properties: childControl.properties, formulas : childControl.formulas,type:childControlType},inputId);
-                            }
+                for (let index = 0; index < listControls.length; index++) {
+                    const controlEl = listControls[index];
+                    let controlId = $(controlEl).attr('id');
+                    var inputId = 's-control-id-' + Date.now() + Math.floor(Math.random() * 100);
+                    let controlType = $(controlEl).attr('s-control-type');
+                    contentEl.find('#'+controlId).attr('id',inputId).css({background:'rgba(0 0 0 / 0.05)'}).removeClass('on-selected');
+                    let control = GetControlProps(controlType);
+                    this.addToAllControlInDoc(inputId,{properties: control.properties, formulas : control.formulas,type:controlType});
+                    if(controlType == 'table'){ // nếu là table thì xử lí các control trong table
+                        let allControlInTable = elements.find('.s-control');
+                        for (let i = 0; i < allControlInTable.length; i++) {
+                            const childControlEl = allControlInTable[i];
+                            let childControlId = $(childControlEl).attr('id');
+                            var childInputId = 's-control-id-' + Date.now() + Math.floor(Math.random() * 100);
+                            let childControlType = $(childControlEl).attr('s-control-type');
+                            contentEl.find('#'+childControlId).attr('id',childInputId).css({background:'rgba(0 0 0 / 0.05)'}).removeClass('on-selected');
+                            let childControl = GetControlProps(childControlType);
+                            this.addToAllControlInTable(childInputId,{properties: childControl.properties, formulas : childControl.formulas,type:childControlType},inputId);
                         }
                     }
-                }, 300,this);
-                
+                }
+                content = contentEl.html();
+                this.editorCore.execCommand('mceInsertContent', false, content);
             }
+            
             else{   // trường hợp copy từ dekko
                 if(contentEl.find('.bkerp-input').length > 0){
                     setTimeout((self) => {
@@ -744,7 +744,7 @@ export default {
                             'padding-bottom': bottom + 'cm',
                             'margin':'0',
                         });
-                        self.sizePrint = Object.assign(self.sizePrint,{
+                        self.contentStyle = Object.assign(self.contentStyle,{
                             'padding-left': left + 'cm',
                             'padding-right': right + 'cm',
                             'padding-top': top + 'cm',
@@ -1363,8 +1363,8 @@ export default {
             let w = $('#document-editor-'+this.keyInstance+'_ifr').height();
             $('#document-editor-'+this.keyInstance+'_ifr').css({width:w ,height:h});
             $('.tox-sidebar-wrap').css({width:w ,height:h});
-            this.sizePrint.width = w;
-            this.sizePrint.height = h;
+            this.contentStyle.width = w;
+            this.contentStyle.height = h;
         },
         /**
          * Hàm đặt kích thước cho trang A3 A4 A5
@@ -1372,9 +1372,9 @@ export default {
         setPageSize(w,h,type){
             $('#document-editor-'+this.keyInstance+'_ifr').css({width:w ,height:h});
             $('.tox-sidebar-wrap').css({width:w ,height:h});
-            this.sizePrint.width = w;
-            this.sizePrint.height = h;
-            this.sizePrint.type = type;
+            this.contentStyle.width = w;
+            this.contentStyle.height = h;
+            this.contentStyle.type = type;
         },
         
         //hoangnd: hàm mở modal tablesetting của control table
@@ -1834,6 +1834,30 @@ export default {
                 this.inputSaveControlTemplate.title.value = res.data.title;
             }
         },
+
+
+        /**
+         * Hàm set style cho form th lưu trên db
+         */
+        setDefaultStyle(defaultStyle){
+            if(defaultStyle){
+                try {
+                    this.contentStyle = JSON.parse(defaultStyle);
+                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css({
+                        'padding-left': this.contentStyle['padding-left'],
+                        'padding-right': this.contentStyle['padding-right'],
+                        'padding-top': this.contentStyle['padding-top'],
+                        'padding-bottom': this.contentStyle['padding-bottom'],
+                    });
+                    this.setPageSize(this.contentStyle.width, this.contentStyle.height, this.contentStyle.type)
+                } catch (error) {
+                    
+                }
+                
+            }
+            
+
+        },
         // hàm gọi request lấy thông tin của document khi vào edit doc
         async getContentDocument(){
             if(this.documentId != 0){
@@ -1847,6 +1871,7 @@ export default {
                         let res1 = await documentApi.getDetailPrintConfig(this.documentId,this.printConfigId);
                         content = res1.data.content;
                         this.setDocumentProperties({title:res1.data.title});
+                        this.setDefaultStyle(res1.data.formStyle);
                     }
                     this.editorCore.setContent(content);
                     $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body select').each(function(e){
@@ -2702,7 +2727,7 @@ export default {
         saveFormPrint(docProps){
             if(this.printConfigId != 0 && this.printConfigId != undefined && this.printConfigId != null){
                 let dataPost = {documentId:this.documentId,title:docProps.title.value,
-                                content:this.editorCore.getContent(),printConfigId:this.printConfigId, size:JSON.stringify(this.sizePrint)}
+                                content:this.editorCore.getContent(),printConfigId:this.printConfigId, size:JSON.stringify(this.contentStyle)}
                 let thisCpn = this;
                 documentApi.updatePrintConfig(dataPost).then(res => {
                     this.$evtBus.$emit('document-editor-save-doc-callback')
@@ -2733,7 +2758,7 @@ export default {
                 });
             }
             else{
-                let dataPost = {documentId:this.documentId,title:docProps.title.value,content:this.editorCore.getContent(),size:JSON.stringify(this.sizePrint)}
+                let dataPost = {documentId:this.documentId,title:docProps.title.value,content:this.editorCore.getContent(),size:JSON.stringify(this.contentStyle)}
                 let thisCpn = this;
                 documentApi.savePrintConfig(dataPost).then(res => {
                     if (res.status == 200) {
