@@ -4,18 +4,27 @@ import { util } from "../../../plugins/util";
 import serviceTaskDefinitions from "./serviceTaskDefinitions";
 
 function translateServiceTaskToHTTPTask(el, attrs, bpmnModeler) {
-    let moddle = bpmnModeler.get('moddle');
-    let modeling = bpmnModeler.get('modeling');
+    let httpTaskType = attrs.serviceTaskType.value;
+    setHttpTaskFromType(el, attrs, bpmnModeler, httpTaskType);
+}
+
+
+function translateScriptTaskToHTTPTask(el, attrs, bpmnModeler) {
+    let httpTaskType = 'script';
+    attrs.serviceTaskScriptValue = attrs.scripttext;
+    setHttpTaskFromType(el, attrs, bpmnModeler, httpTaskType);
+}
+
+function setHttpTaskFromType(el, attrs, bpmnModeler, httpTaskType) {
     let bizEl = el.businessObject;
     let extensionElements = bizEl.extensionElements;
-
-
+    attrs.idNode=el.id;
+    let moddle = bpmnModeler.get('moddle');
     extensionElements = moddle.create('bpmn:ExtensionElements');
     extensionElements.values = [];
-    attrs.idNode=el.id;
-    serviceTaskDefinitions[attrs.serviceTaskType.value].makeRequestBody(attrs);
-    let items = serviceTaskDefinitions[attrs.serviceTaskType.value].params;
-
+    let modeling = bpmnModeler.get('modeling');
+    serviceTaskDefinitions[httpTaskType].makeRequestBody(attrs);
+    let items = serviceTaskDefinitions[httpTaskType].params;
     for (let name in items) {
         let subEl = moddle.create('symper:symper_symper_field_tag');
         subEl.name = name;
@@ -56,6 +65,8 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
             vizEl = bizVizEl.$parent;
         } else if (bizVizEl.$type == 'bpmn:ServiceTask') {
             translateServiceTaskToHTTPTask(vizEl, attrs, bpmnModeler);
+        } else if (bizVizEl.$type == 'bpmn:ScriptTask') {
+            translateScriptTaskToHTTPTask(vizEl, attrs, bpmnModeler);
         }
 
         if (elKey) {

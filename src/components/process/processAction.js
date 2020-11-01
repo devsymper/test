@@ -37,6 +37,8 @@ function cleanContent(content, configValue) {
         .replace(/↵+/, ' ')
         .replace(/\bbpmn:/g, '')
         .replace(/<di:/g, '<omgdi:')
+        .replace(/<scriptTask /g, '<serviceTask ')
+        .replace(/<\/scriptTask>/g, '<\/serviceTask>')
         .replace(/<dc:/g, '<omgdc:')
         .replace(/symper_prefix_chars_/g, 'symper:')
         .replace(/symper:symper:/g, 'symper:')
