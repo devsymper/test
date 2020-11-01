@@ -25,6 +25,7 @@ export default {
             count: 0 ,
             parentId: null,
             permission: true,
+            listVizidValid:[]
         };
     },
     beforeMount() {},
@@ -37,7 +38,6 @@ export default {
         let listUser = this.$store.getters['orgchart/listUserInCurrentNode']
         this.count = listUser.length
         this.permission = this.checkPermission()
-        // this.permission = false
     },
     methods: {
         getIcon() {
@@ -62,24 +62,61 @@ export default {
                 let viewOnlySub = this.$store.state.orgchart.viewOnlySub
                 let data = this.params.data
                 if(this.$store.state.app.userOperations.department){
-                    let permission = this.$store.state.app.userOperations.department[0]
-                    if(permission.view_all){
+                    let permission = this.$store.state.app.userOperations.department
+                    if(permission[0].view_all){
                         return true
                     }
-                    else if(permission.view_only_owner){
+                    else if(permission[0].view_only_owner){
                         if(data.users.includes(idCurrentUser)){
                             return true
-                        }else{
-                            return false
+                        }
+                        if(permission[0].view_only_sub){
+                            if(viewOnlySub == false){
+                                if(data.users.includes(idCurrentUser)){
+                                    this.$store.commit('orgchart/changeViewOnlySub')
+                                    return true
+                                }else{
+                                    return false
+                                }
+                            }else{
+                                let listUser = this.$store.getters['orgchart/listUserInCurrentNode']
+                                if(listUser.includes(idCurrentUser)){
+                                    return true
+                                }else{
+                                    return false
+                                }
+                            }
+                        }
+                        if(Object.keys(permission).length > 1){
+                            for(let i in permission){
+                                if(i != '0'){
+                                    self.listVizidValid.push(i)
+                                }
+                            }
+                            if(self.listVizidValid.includes('orgchart:'+data.orgchartId+':'+data.vizId)){
+                                return true
+                            }else{
+                                return false
+                            }
                         }
                     }    
-                    else if(permission.view_only_sub){
+                    else if(permission[0].view_only_sub){
                         if(viewOnlySub == false){
                             if(data.users.includes(idCurrentUser)){
                                 this.$store.commit('orgchart/changeViewOnlySub')
                                 return true
-                            }else{
-                                return false
+                            }
+                             if(Object.keys(permission).length > 1){
+                                for(let i in permission){
+                                    if(i != '0'){
+                                        self.listVizidValid.push(i)
+                                    }
+                                }
+                                if(self.listVizidValid.includes('orgchart:'+data.orgchartId+':'+data.vizId)){
+                                    return true
+                                }else{
+                                    return false
+                                }
                             }
                         }else{
                             let listUser = this.$store.getters['orgchart/listUserInCurrentNode']
@@ -88,6 +125,30 @@ export default {
                             }else{
                                 return false
                             }
+                        }
+                        if(Object.keys(permission).length > 1){
+                            for(let i in permission){
+                                if(i != '0'){
+                                    self.listVizidValid.push(i)
+                                }
+                            }
+                            if(self.listVizidValid.includes('orgchart:'+data.orgchartId+':'+data.vizId)){
+                                return true
+                            }else{
+                                return false
+                            }
+                        }
+                    }
+                    if(Object.keys(permission).length > 1){
+                        for(let i in permission){
+                            if(i != '0'){
+                                self.listVizidValid.push(i)
+                            }
+                        }
+                        if(self.listVizidValid.includes('orgchart:'+data.orgchartId+':'+data.vizId)){
+                            return true
+                        }else{
+                            return false
                         }
                     }
                }else{

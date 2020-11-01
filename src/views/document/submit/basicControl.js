@@ -681,7 +681,6 @@ export default class BasicControl extends Control {
         return false;
     }
     renderLinkToControl(link, configInstance) {
-        debugger
         let icon = `<span class="mdi mdi-information info-control-btn"></span>`
         this.ele.parent().append(icon);
     }

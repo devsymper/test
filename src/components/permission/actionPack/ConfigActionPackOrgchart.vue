@@ -16,6 +16,7 @@
       </div>
          <OrgchartElementSelector 
           v-if="showTreeOrgchart"
+          :value="departmentSelected"
           :checkboxMode="checkboxMode"
           @change-node-selected="handleChangeNodeSelected"
         />
@@ -36,19 +37,19 @@ export default {
             permissions: [
                 {
                     title: this.$t('permissions.actionPack.orgchart.viewAll'),
-                    value:'viewAll'
+                    value:'view_all'
                 },
                 {
                     title: this.$t('permissions.actionPack.orgchart.viewItself'),
-                    value:'viewItself'
+                    value:'view_only_owner'
                 },
                 {
                     title: this.$t('permissions.actionPack.orgchart.viewItselfAndChild'),
-                    value:'viewItselfAndChild'
+                    value:'view_only_sub'
                 },
                 {
                     title: this.$t('permissions.actionPack.orgchart.viewOther'),
-                    value:'viewOther'
+                    value:'view_other'
                 },
                 
             ]
@@ -57,15 +58,15 @@ export default {
     props:{
         checkboxes:{
             type: Array,
-            default(){
-                return [
-                    'viewOther'
-                ]
-            }
+        },
+        departmentSelected:{
+            type: Array,
         }
     },
     methods:{
         handleChangeNodeSelected(data){
+            let departmentId = 'department:orgchart:'+data.orgchartId+':'+data.vizId
+            this.$emit('department-selected', departmentId)
         },
         handleChange(){
             this.$emit('permission-selected', this.selectedPermission)
@@ -77,7 +78,7 @@ export default {
             immediate:true,
             handler(arr){
                 this.selectedPermission = arr
-                if(arr.includes('viewOther')){
+                if(arr.includes('view_other')){
                     this.showTreeOrgchart = true
                 }else{
                     this.showTreeOrgchart = false
