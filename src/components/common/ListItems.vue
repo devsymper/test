@@ -811,6 +811,9 @@ export default {
         }
     },
     methods: {
+        getHotInstance(){
+            return this.$refs.dataTable.hotInstance;
+        },  
         rerenderTable(){
             this.$refs.dataTable.hotInstance.render();
         },
@@ -1618,6 +1621,9 @@ export default {
         // Hàm trả về các dòng được selected
         getAllRowChecked(){
             return this.allRowChecked;
+        },
+        removeAllRowChecked(){
+            this.allRowChecked = []
         },
         isShowCheckedRow(){
             return this.hasColumnsChecked

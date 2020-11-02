@@ -42,19 +42,19 @@ export const setDataForPropsControl = function(fields, instance, from) {
         })
         if (fields[controlId]['formulas'] != false && fields[controlId]['formulas'] != "[]") {
             if (viewType != 'detail') {
-                $.each(formulas, function(k, v) {
-                    if (!fields[controlId]['formulas'][k]) {
-                        delete control.formulas[k];
+                for (let fType in formulas) {
+                    if (!fields[controlId]['formulas'][fType]) {
+                        delete control.formulas[fType];
                     } else {
-                        if (k == 'linkConfig') {
-                            if (fields[controlId]['formulas'][k] && fields[controlId]['formulas'][k]['configData'].length > 0) {
-                                formulas[k].configData = fields[controlId]['formulas'][k]['configData'];
+                        if (fType == 'linkConfig') {
+                            if (fields[controlId]['formulas'][fType] && fields[controlId]['formulas'][fType]['configData'].length > 0) {
+                                formulas[fType].configData = fields[controlId]['formulas'][fType]['configData'];
                             }
                         } else {
-                            formulas[k].value = fields[controlId]['formulas'][k]
+                            formulas[fType].value = fields[controlId]['formulas'][fType]
                         }
                     }
-                })
+                }
             }
         }
         if (fields[controlId].type != "table" && sDocument.state.detail[instance].allData != null) {
@@ -76,7 +76,6 @@ export const setDataForPropsControl = function(fields, instance, from) {
         } else {
             let listField = fields[controlId].listFields
             let listChildField = {};
-            let i = 0;
             let colValue = {};
             let childObjectId = [];
             for (let childFieldId in listField) {
@@ -101,7 +100,7 @@ export const setDataForPropsControl = function(fields, instance, from) {
                     if (viewType != 'detail') {
                         $.each(childFormulas, function(k, v) {
                             if (!listField[childFieldId]['formulas'][k]) {
-                                delete control.formulas[k];
+                                delete childFormulas.formulas[k];
                             } else {
                                 if (k == 'linkConfig') {
                                     if (listField[childFieldId]['formulas'][k] && listField[childFieldId]['formulas'][k]['configData'].length > 0) {
@@ -140,7 +139,6 @@ export const setDataForPropsControl = function(fields, instance, from) {
                     }
                 }
 
-                i++;
             }
             colValue['childObjectId'] = childObjectId;
             addToAllControlInDoc(controlId, {

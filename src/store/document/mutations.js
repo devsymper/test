@@ -430,7 +430,6 @@ const setDefaultDetailStore = (state, params) => {
 
         },
         trackChange: [],
-        listLinkControl: {},
     }
     let instance = params.instance;
     Vue.set(state.detail, instance, value);
