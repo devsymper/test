@@ -32,7 +32,8 @@ const defaultState = {
     listChildrenOfNode: {},
     viewOnlySub: false,
     getStructFlag: false,
-    allOrgchartStruct: []
+    allOrgchartStruct: [],
+    listVizParentId: []
 };
 
 export default defaultState;

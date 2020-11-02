@@ -95,7 +95,8 @@ export default {
             immediate: true,
             handler(obj){
                 let self = this
-                if(obj.mappingDoc.value != ""){
+                if(obj.mappingDoc){
+                    if(obj.mappingDoc.value != ""){
                     if(!obj.scriptMapping.value){
                         obj.scriptMapping.value = ""
                     }
@@ -111,6 +112,8 @@ export default {
                         })
                     })
                 }
+                }
+                
             }
         },
     },

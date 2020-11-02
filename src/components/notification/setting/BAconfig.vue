@@ -247,7 +247,6 @@ export default {
         this.$refs.uploadAvatar.uploadFile();
     },
     replaceDescription(){
-    //  debugger
       let description = this.description;
       for(let i = 0; i<this.parameter.length;i++){
         let oldValue= new RegExp('<'+this.parameter[i].text+'>');
@@ -272,7 +271,6 @@ export default {
             icon:this.iconName.iconName?"mdi "+this.iconName.iconName:this.avatarFileName,
             content:this.replaceDescription()
         };
-        debugger
        const self = this;
         notification.addChanel(data).then(res=>{
             if(res.status==200){

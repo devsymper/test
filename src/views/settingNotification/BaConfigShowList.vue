@@ -148,7 +148,6 @@ export default {
     },
     methods:{
         reNameParam(nameModule,des){
-            //if(des){
              let name = des;
             for(let i = 0; i<this.listSource[nameModule].parameter.length;i++){
                 let oldValue= new RegExp(this.listSource[nameModule].parameter[i].value);
@@ -163,17 +162,7 @@ export default {
             
         },
         updateNotification(des){
-            // this.$refs.config.typePictureSelected="abc"
-           // debugger
-            // if(des.state=="Theo dõi"){
-            //      notificationApi.showAllModuleConfig().then(res=>{
-            //     if(res.status==200){
-            //         self.listSource = res.data
-            //     }
-            // })
-            // }else{
-            // }
-        },
+            },
         renameReceiver(nameModule,receiver){
             let name = receiver;
             for(let i = 0; i<this.listSource[nameModule].receiver.length;i++){

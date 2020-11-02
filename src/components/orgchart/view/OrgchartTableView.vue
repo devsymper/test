@@ -148,7 +148,6 @@
                     :action="'view'"
                     @current-tab="changeTab"
                     :currentTab="currentTab"
-                    :readonly="true"
                     :showMenuPickTab="true"
                     :id="$route.params.id">
                 </OrgchartEditor>
