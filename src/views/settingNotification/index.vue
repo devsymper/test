@@ -93,7 +93,6 @@ export default {
         this.listSubcribed = [];
         this.listUnsubcribed=[];
         const self= this;
-        // debugger
         if(this.search){
              let subscribe = this.showFollow?true:false;
         let dataSend={
@@ -223,7 +222,6 @@ export default {
     },
     
     getListFollowed(){
-      //  debugger
         this.listSubcribed = []
         const self= this;
         let isSubcribed = true;
@@ -274,7 +272,6 @@ export default {
         notification.showListsSubcribed({subscribed:isSubcribed}).then(res=>{
             if(res.status==200){
              let listSubcribed = res.data;
-             //debugger
               let grouplistByObjId = _.groupBy(listSubcribed, 'objectType');
               let objId = Object.keys(grouplistByObjId).filter(x=>x!=''&&x!='null');
                 for(let j = 0; j<objId.length;j++){
