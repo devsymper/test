@@ -59,16 +59,25 @@
                 class="text-left notification-item  pt-0 pb-0"
             >
                 <v-col cols="2">
-                    <v-row>
-                         <v-list-item-avatar>
-                            <SymperAvatar :userId="item.userRelatedId"/>
+                    <v-row> 
+                         <v-list-item-avatar v-if="!item.icon">
+                            <SymperAvatar  :userId="item.userRelatedId"/>
+                        </v-list-item-avatar>
+                        <v-list-item-avatar v-else>
+                            <SymperAvatar  v-if="item.icon=='default.png'" />
+                            <v-avatar v-else>
+                                <!-- {{item.icon}} -->
+                                <img v-if="!checkIcon(item.icon)" :src="setAvaOrIcon(item.icon)">
+                            
+                                 <v-icon v-else >{{item.icon}}</v-icon>
+                            </v-avatar>
                         </v-list-item-avatar>
                     </v-row>
                 </v-col>
                 <v-col cols="10" style="padding:6px!important" @click="openNotification(item)">
                     <v-row>
                         <span class="notification-item-title">
-                            {{item.title}}
+                            {{reNameContent(item.title)}}
                         </span>
                     </v-row>
                     <v-row class="notification-item-info mt-1">
@@ -121,8 +130,16 @@
             >
                 <v-col cols="2">
                     <v-row>
-                         <v-list-item-avatar>
-                            <SymperAvatar :userId="item.userRelatedId"/>
+                         <v-list-item-avatar v-if="!item.icon">
+                            <SymperAvatar  :userId="item.userRelatedId"/>
+                        </v-list-item-avatar>
+                        <v-list-item-avatar v-else>
+                            <SymperAvatar  v-if="item.icon=='default.png'" />
+                            <v-avatar v-else>
+                                <!-- {{item.icon}} -->
+                                <img v-if="!checkIcon(item.icon)" :src="setAvaOrIcon(item.icon)">
+                                 <v-icon v-else >{{item.icon}}</v-icon>
+                            </v-avatar>
                         </v-list-item-avatar>
                     </v-row>
                 </v-col>
@@ -272,6 +289,7 @@
 </template>
 
 <script>
+import notificationApi from '../../api/settingNotification'
 import Api from "../../api/api.js";
 import icon from "../common/SymperIcon";
 import listObject from "../../views/apps/singleObject";
@@ -288,6 +306,8 @@ export default {
     },
     data: function() {
         return {
+            img:'',
+            listSource:{},
             overlay: true,
             checkToday: false,
             listNotification: [],
@@ -303,6 +323,8 @@ export default {
     created() {
         this.$store.dispatch("app/getAllUsers");
         this.getListNoticication();
+        this.getSource();
+        //this.getAvatar();
       
     },
     mounted(){
@@ -311,9 +333,43 @@ export default {
         })
     },
     computed:{
-        today:()=> dayjs().format('DD/MM/YYYY')
+        today:()=> dayjs().format('DD/MM/YYYY'),
     },
     methods: {
+        checkIcon(icon){
+            let check = true;
+            if(icon.indexOf('user_avatar_')>-1){
+                check = false;
+            }
+            return check
+        },
+        setAvaOrIcon(icon){
+            if(icon){
+                debugger
+                if(icon.indexOf('user_avatar_')>-1||icon=='default.png'){
+                    return appConfigs.apiDomain.fileManagement+'readFile/'+icon ;}
+            }       
+        },
+         reNameContent(des){
+             let name = des;
+             let nameModule = Object.keys(this.listSource);
+             for(let j = 0;j<nameModule.length;j++){
+                 for(let i = 0; i<this.listSource[nameModule[j]].parameter.length;i++){
+                        let oldValue= new RegExp(this.listSource[nameModule[j]].parameter[i].value);
+                        let newValue =this.listSource[nameModule[j]].parameter[i].text;
+                    name = name.replace(oldValue,newValue);
+                    }
+             }
+            return name
+        },
+        getSource(){
+            const self = this;
+            notificationApi.showAllModuleConfig().then(res=>{
+                if(res.status==200){
+                    self.listSource = res.data
+                }
+            })
+        },
          getName(id){
             this.listUser = this.$store.state.app.allUsers;
             for(let i = 0; i<this.listUser.length;i++){

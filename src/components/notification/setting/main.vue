@@ -27,13 +27,17 @@
                     <v-list-item-title v-else>
                        
                         {{$t('objects.'+item.title)}}
-                         <v-list-action style="float:right">
-                             <span class="fs-13 fw-400 color-grey" v-if="type=='unfollow'">
-                                  <!-- Bỏ theo dõi -->
-                             </span>
-                              <span class="fs-13 fw-400 color-grey" style="margin-top:10px" v-if="type=='follow'">
-                                  <!-- Ngày theo dõi -->
-                             </span>
+                         <v-list-action style="float:right" >
+                            <v-btn small text @click.stop="tickAll(item.title, true)"  v-if="type=='unfollow'">
+                                <span class="fs-13 fw-400 light-grey">
+                                  Bỏ theo dõi
+                                </span>
+                             </v-btn>
+                              <v-btn small text @click.stop="tickAll(item.title, false)"  v-if="type=='follow'">
+                                <span class="fs-13 fw-400 light-grey">
+                                  Ngày theo dõi
+                                </span>
+                             </v-btn>
                             </v-list-action>
                     </v-list-item-title>
                     <v-list-item-subtitle v-if="type=='main'" class="fw-400 fs-11">
@@ -47,11 +51,11 @@
                             {{sub}}
                         </span> -->
                           <v-list-action style="float:right">
-                             <span class="fs-13 fw-400 color-grey" v-if="type=='unfollow'">
-                                  <!-- {{item.subscribedAt}}1234 -->
+                             <span class="fs-13 fw-400 light-grey" v-if="type=='unfollow'">
+                                  {{item.userFilterAt}}
                              </span>
-                              <span class="fs-13 fw-400 color-grey" style="margin-top:10px" v-if="type=='follow'">
-                                  <!-- {{item.subscribedAt}}1234 -->
+                              <span class="fs-13 fw-400 light-grey" style="margin-top:10px; margin-left:-20px" v-if="type=='follow'">
+                                  {{item.userFilterAt}}
                              </span>
                             </v-list-action>
                     </v-list-item-subtitle>
@@ -93,31 +97,63 @@ export default {
         deep: true,
         immediate: true,
         handler(newValue){
-            for(let i = 0; i<newValue.length;i++){
+            debugger
+        for(let i = 0; i<newValue.length;i++){
+            if(newValue[i].active){
                 for(let j = 0; j<newValue[i].items.length;j++){
                     if(newValue[i].items[j].active){
                           //newValue[i].active=false;
-                        this.subcribedAllChanel(newValue[i].title, newValue[i].items[j].title) 
+                        this.subcribedAllChanel(newValue[i].title, newValue[i].items[j].title,i,j) 
                     }else{
-                        this.unsubcribedAllChanel(newValue[i].title, newValue[i].items[j].title) 
+                        this.unsubcribedAllChanel(newValue[i].title, newValue[i].items[j].title,i,j) 
                     }
                     //
                 }
             }
+            }
+            
         }
     },
   },
   props: ['type','listItems','listSubcribed','allListChanel'],
     methods: {
+        tickAll(objectType, isFollow){
+            debugger
+            let data={state:false};
+            for(let i=0;i<this.allListChanel.length;i++){
+                if(this.allListChanel[i].objectType==objectType){
+                    if(!isFollow){
+                        for(let j=0;j< this.listItems.length;j++){
+                            // this.listItems[i].active=false;
+                            if(this.listItems[j].title==objectType){
+                               
+                                this.listItems[j].items.map(x=>x.active=false)
+                            }
+                        }
+                        notification.subscribeChanel(this.allListChanel[i].id).then(res=>{
+                            if(res.status==200){}})
+                    }else{
+                        for(let j=0;j< this.listItems.length;j++){
+                            //    this.listItems[i].active=false;
+                            if(this.listItems[j].title==objectType){
+                                this.listItems[j].items.map(x=>x.active=true)
+                            }
+                        }
+                        notification.subscribeChanel(this.allListChanel[i].id,data).then(res=>{
+                            if(res.status==200){} })
+                    }
+                };
+            }
+        },
         subscribedOneChanel(id){
              notification.subscribeChanel(id).then(res=>{
                 if(res.status==200){}
             })
         },
         //subcribed all
-        subcribedAllChanel(objectType,event){
+        subcribedAllChanel(objectType,event,k,h){
             for(let i=0;i<this.allListChanel.length;i++){
-                if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&!this.allListChanel[i].subscribed){
+                if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&!this.allListChanel[i].userFilterState){
                        notification.subscribeChanel(this.allListChanel[i].id).then(res=>{
                         if(res.status==200){
                         }
@@ -125,11 +161,11 @@ export default {
                 }
             }
         },
-        unsubcribedAllChanel(objectType,event){
+        unsubcribedAllChanel(objectType,event,k,h){
             const self = this;
             let data={state:false};
             for(let i=0;i<this.allListChanel.length;i++){
-                if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&this.allListChanel[i].subscribed){
+                if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&this.allListChanel[i].userFilterState){
                        notification.subscribeChanel(this.allListChanel[i].id,data).then(res=>{
                         if(res.status==200){
                         }
@@ -149,5 +185,9 @@ export default {
 <style scoped>
     .notification ::v-deep .v-list-item{
         padding:0px!important
+    }
+    .light-grey{
+        font-family:Roboto;
+        color:rgba(0,0,0,0.4)
     }
 </style>

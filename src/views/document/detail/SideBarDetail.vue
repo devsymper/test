@@ -432,7 +432,7 @@ export default {
 					let ctrlObj = getControlInstanceFromStore(this.keyInstance, name);
 					if(!ctrlObj.valueChanged){
 						ctrlObj.valueChanged = true;
-						ctrlObj.renderLinkToControl(name);
+						ctrlObj.renderInfoIconToControl(name);
 					}
 				}
 			}

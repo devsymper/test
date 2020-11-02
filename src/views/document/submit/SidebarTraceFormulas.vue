@@ -166,42 +166,53 @@ export default {
         }
     },
     watch:{
-        controlTrace(name){
-            this.controlNameTrace = name;
-            let curControl = this.listInputInDocument[this.controlNameTrace];
-            this.controlInfo.name = curControl.name;
-            this.controlInfo.title = curControl.title;
-            this.controlInfo.userUpdate = curControl.lastUserUpdate;
+        controlTrace:{
+            deep:true,
+            immediate:true,
+            handler:function(vl){
+                this.controlNameTrace = vl;
+                let curControl = this.listInputInDocument[this.controlNameTrace];
+                this.controlInfo.name = curControl.name;
+                this.controlInfo.title = curControl.title;
+                this.controlInfo.userUpdate = curControl.lastUserUpdate;
+            }
         },
+        
         /**
          * Hàm xử lí data trước khi đưa vào sidebar
          */
-        listFormulasTrace(after){
-            let data = {};
-            let index = 0;
-            this.panel = [];
-            for(let formulasType in after){
-                if(!after[formulasType].instance){
-                    continue;
-                }
-                let formItem = {};
-                let input = {};
-                formItem[formulasType] = {
-                    title: after[formulasType].title,
-                    value: after[formulasType].instance.formulas,
-                    type: "script",
-                    isShowTitle:true
-                }
-                input['title'] = after[formulasType].title
-                input['input'] = formItem
-                input['instance'] = after[formulasType].instance
-                data[formulasType] = input;
-                this.panel.push(index);
-                index++;
+        listFormulasTrace:{
+            deep:true,
+            immediate:true,
+            handler:function(after){
+                let data = {};
+                let index = 0;
+                this.panel = [];
+                for(let formulasType in after){
+                    if(!after[formulasType].instance){
+                        continue;
+                    }
+                    let formItem = {};
+                    let input = {};
+                    formItem[formulasType] = {
+                        title: after[formulasType].title,
+                        value: after[formulasType].instance.formulas,
+                        type: "script",
+                        isShowTitle:true
+                    }
+                    input['title'] = after[formulasType].title
+                    input['input'] = formItem
+                    input['instance'] = after[formulasType].instance
+                    data[formulasType] = input;
+                    this.panel.push(index);
+                    index++;
 
-            }
-            this.listFormulas = data;
-        },
+                }
+                this.listFormulas = data;
+            },
+        }
+        
+        
         
     }
 }

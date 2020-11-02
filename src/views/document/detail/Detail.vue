@@ -71,7 +71,7 @@ import './../submit/customControl.css'
 import { getSDocumentSubmitStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
-import FloattingPopup from './FloattingPopup'
+import FloattingPopup from './../common/FloattingPopup'
 import Preloader from './../../../components/common/Preloader';
 
 import { util } from '../../../plugins/util.js';
@@ -128,6 +128,9 @@ export default {
         sDocumentSubmit() {
             return this.$store.state.document.submit[this.keyInstance];
         },
+        listLinkControl() {
+            return this.$store.state.document.linkControl[this.keyInstance];
+        },
         allUsers(){
             let allUser = this.$store.state.app.allUsers
             thisCpn.$store.commit("document/addToDocumentSubmitStore", {
@@ -166,7 +169,6 @@ export default {
             formSize:{},
             wrapFormCss:{},
             defaultData:{},
-            listLinkControl:{}
 
         };
     },
@@ -176,7 +178,7 @@ export default {
     mounted(){
         let self = this;
         $(document).on('click','#sym-Detail-'+this.keyInstance+' .info-control-btn',function(e){
-            self.$refs.floattingPopup.show(e);
+            self.$refs.floattingPopup.show(e, $('#sym-Detail-'+self.keyInstance));
             self.focusingControlName = $(e.target).attr('data-control');
         })
     },
@@ -221,6 +223,14 @@ export default {
             }
             
         })
+        this.$evtBus.$on("on-info-btn-in-table-click", locate => {
+            if(thisCpn._inactive == true) return;
+            let e = locate.e;
+            let row = locate.row;
+            let controlName = locate.controlName;
+            this.focusingControlName = controlName;
+            this.$refs.floattingPopup.show(e, $('#sym-Detail-'+this.keyInstance), row);
+        });
         
        
     },
@@ -322,7 +332,6 @@ export default {
                 thisCpn.workflowId = res.data.document_object_workflow_id;
                 thisCpn.documentId = res.data.documentId;
                 thisCpn.userCreateInfo = res.data.userCreateInfo;
-                thisCpn.listLinkControl = res.data.otherInfo;
                 let dataToStore = res.data;
                 if(Object.keys(thisCpn.defaultData).length > 0){
                     dataToStore = thisCpn.defaultData;
@@ -333,6 +342,10 @@ export default {
                     value: dataToStore,
                     instance:thisCpn.keyInstance
                 }) 
+                thisCpn.$store.commit('document/updateListLinkControl',{
+                    key: thisCpn.keyInstance,
+                    value: res.data.otherInfo,
+                }); 
                 thisCpn.loadDocumentStruct(res.data.documentId,isPrint);
             }
             else{
@@ -481,6 +494,7 @@ export default {
                             this.addToListInputInDocument(controlName,tableControl)
                             tableControl.renderTable();
                             tableControl.setData(valueInput);
+                            tableControl.renderInfoButtonInRow(this.listLinkControl);
                         }
                     }
                 }

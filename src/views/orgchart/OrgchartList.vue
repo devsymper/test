@@ -69,7 +69,7 @@ export default {
                     text: this.$t("common.structureManagement"),
                     callback: (row, callback) => {
                         self.$goToPage(
-                            "/orgchart/"+row.id+"/structureManagement",
+                            "/orgchart/"+row.id+"/structure-management",
                             " Edit " + (row.name ? row.name : row.key)
                         );
                     }
