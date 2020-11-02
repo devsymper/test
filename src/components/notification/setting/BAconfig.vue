@@ -231,7 +231,7 @@ export default {
             receiver:'',
             actionClickNotifi:'',
             listSource:[],
-            state:false,
+            state:true,
             avatar:'',
             icon:'',
       dragging: false,

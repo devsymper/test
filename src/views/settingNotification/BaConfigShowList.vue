@@ -15,6 +15,7 @@
         :actionPanelWidth="actionPanelWidth">
         <div slot="right-panel-content" class="h-100" style="overflow:hidden!important">
            <configNotification 
+           ref="config"
             @refreshList="refreshListNotification()"
            />
         </div>
@@ -127,13 +128,13 @@ export default {
                         this.deleteNotification(notification);
                     }
                 },
-                 update: {
-                    name:"update",
-                    text:this.$t('user.table.contextMenu.update'), 
-                    callback: (notification, callback) => {
-                        this.updateNotification(notification);
-                    }
-                }
+                //  update: {
+                //     name:"update",
+                //     text:this.$t('user.table.contextMenu.update'), 
+                //     callback: (notification, callback) => {
+                //         this.updateNotification(notification);
+                //     }
+                // }
             },
             containerHeight: 100,
         }
@@ -162,15 +163,16 @@ export default {
             
         },
         updateNotification(des){
+            // this.$refs.config.typePictureSelected="abc"
            // debugger
-            if(des.state=="Theo dõi"){
-                 notificationApi.showAllModuleConfig().then(res=>{
-                if(res.status==200){
-                    self.listSource = res.data
-                }
-            })
-            }else{
-            }
+            // if(des.state=="Theo dõi"){
+            //      notificationApi.showAllModuleConfig().then(res=>{
+            //     if(res.status==200){
+            //         self.listSource = res.data
+            //     }
+            // })
+            // }else{
+            // }
         },
         renameReceiver(nameModule,receiver){
             let name = receiver;

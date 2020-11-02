@@ -138,7 +138,6 @@
                             <v-avatar v-else>
                                 <!-- {{item.icon}} -->
                                 <img v-if="!checkIcon(item.icon)" :src="setAvaOrIcon(item.icon)">
-                            
                                  <v-icon v-else >{{item.icon}}</v-icon>
                             </v-avatar>
                         </v-list-item-avatar>
