@@ -23,7 +23,7 @@ export default [{
             import ('../../views/orgchart/EditOrgchart.vue'),
     },
     {
-        path: "/orgchart/:id/structureManagement",
+        path: "/orgchart/:id/structure-management",
         name: "orgchartStructureManagement",
         component: () =>
             import ('../../views/orgchart/OrgchartStructureManagement.vue'),
