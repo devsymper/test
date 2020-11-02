@@ -247,7 +247,6 @@ export default {
         this.$refs.uploadAvatar.uploadFile();
     },
     replaceDescription(){
-    //  debugger
       let description = this.description;
       for(let i = 0; i<this.parameter.length;i++){
         let oldValue= new RegExp('<'+this.parameter[i].text+'>');

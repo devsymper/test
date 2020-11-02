@@ -122,13 +122,11 @@ export default {
         const self = this;
         notification.showAllModuleConfig().then(res=>{
             if(res.status==200){
-                debugger
                 self.listSource = res.data;
             }
         })
         },
         rename(nameModule,event){
-            debugger
             let name = event;
             for(let i = 0; i<this.listSource[nameModule].event.length;i++){
                 if(this.listSource[nameModule].event[i].value==event){

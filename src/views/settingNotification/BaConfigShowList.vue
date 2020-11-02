@@ -111,7 +111,6 @@ export default {
                         data.listObject[i].objectType = self.$t('objects.'+data.listObject[i].objectType);
                         data.listObject[i].userUpdate= self.getBAName(listBA,data.listObject[i].userCreate.split(':')[1]);
                         data.listObject[i].userCreate = self.getBAName(listBA,data.listObject[i].userCreate.split(':')[1]);
-                        debugger
 
                         //data.listObject[i].event = '123';
                     }
@@ -149,7 +148,6 @@ export default {
     },
     methods:{
         reNameParam(nameModule,des){
-            debugger
              let name = des;
             for(let i = 0; i<this.listSource[nameModule].parameter.length;i++){
                   let oldValue= new RegExp(this.listSource[nameModule].parameter[i].value);
@@ -160,7 +158,6 @@ export default {
 
         },
         updateNotification(des){
-            debugger
 
         },
         renameReceiver(nameModule,receiver){

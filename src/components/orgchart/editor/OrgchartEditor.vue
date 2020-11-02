@@ -210,10 +210,7 @@ export default {
             type: Boolean,
             default: false
         },
-        readonly:{
-            type:Boolean, 
-            default:false
-        }
+       
     },
     data(){
         return {
@@ -316,9 +313,6 @@ export default {
               this.getFieldsInDoc(val)
            }
        },
-       readonly(val){
-           debugger
-       }
     },
     methods: {
 		handlerDeleteNode(){
@@ -412,7 +406,6 @@ export default {
         },
         restoreMainOrgchartConfig(config){
             let mappingDocInfo = JSON.parse(config.mappingDocInfo)
-            debugger
             let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
             homeConfig.commonAttrs.name.value = config.name;
             homeConfig.commonAttrs.description.value = config.description;
