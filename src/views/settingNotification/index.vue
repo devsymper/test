@@ -49,7 +49,8 @@
 </template>
 <script>
 import _ from 'lodash';
-import NotificationPopUp from "./../../components/notification/DetailPopPup.vue"
+import dayjs from 'dayjs';
+import NotificationPopUp from "./../../components/notification/DetailPopPup.vue";
 import { documentApi } from "./../../api/Document.js";
 import UserPopUp from "./../../components/user/UserPopUp";
 import notification from "./../../api/settingNotification";
@@ -188,7 +189,7 @@ export default {
     checkSubcribe(objectType,event){
         let check=false;
         for(let i=0; i<this.allListChanel.length;i++){
-            if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&this.allListChanel[i].subscribed){
+            if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&this.allListChanel[i].userFilterState){
                 check=true;
                 for(let j=0;j<this.items.length;j++){
                     if(this.items[j].title==objectType){
@@ -235,7 +236,7 @@ export default {
                         items:[],
                         subTitle:[],
                         title: objId[j],
-                        subscribedAt:'123',
+                        userFilterAt:'',
                         icon:objId[j].indexOf(':')>0?objId[j].split(':')[0]:objId[j]
                     })
                     for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
@@ -243,15 +244,26 @@ export default {
                             title: grouplistByObjId[objId[j]][i].event,
                             active:true,
                             name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
-                           // active:  self.checkSubcribe(objId[i],grouplistByObjId[objId[j]][i].event),
                             id:grouplistByObjId[objId[j]][i].id,
-                           
-
                         })
+                         self.listSubcribed[j].userFilterAt= self.getDateFollow(objId[j],grouplistByObjId[objId[j]][i].event, true)
                      }
                 }
             }
         })
+    },
+    getDateFollow(nameModule,event,isFollow){
+        let date = '';
+        for(let i = 0; i<this.allListChanel.length;i++){
+            if(this.allListChanel[i].event==event&&this.allListChanel[i].objectType==nameModule){
+               if(isFollow){
+                   date =  dayjs(this.allListChanel[i].createAt).format('DD/MM/YYYY hh:mm');
+               }else{
+                   date = dayjs(this.allListChanel[i].userFilterAt).format('DD/MM/YYYY hh:mm');
+               }
+            }
+        }
+        return date
     },
       getListUnFollowed(){
         this.listUnsubcribed = []
@@ -267,18 +279,17 @@ export default {
                         items:[],
                         title: objId[j],
                         subTitle: [],
-                        subscribedAt:'123',
+                        userFilterAt:'',
                         icon:objId[j].indexOf(':')>0?objId[j].split(':')[0]:objId[j]
                     })
                     for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
                         self.listUnsubcribed[j].items.push({
                             title: grouplistByObjId[objId[j]][i].event,
                             name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
-                            active:  self.checkSubcribe(objId[j],grouplistByObjId[objId[j]][i].event),
+                            active:  false,
                             id:grouplistByObjId[objId[j]][i].id,
-                            
-
-                        })
+                        });
+                        self.listUnsubcribed[j].userFilterAt= self.getDateFollow(objId[j],grouplistByObjId[objId[j]][i].event, false)
                      }
                 }
             }

@@ -99,6 +99,9 @@ const defaultState = {
     }, // chỉ định là submit, detail, hay update,
     clientSqlLite: {
 
+    },
+    linkControl: {
+
     }
 };
 

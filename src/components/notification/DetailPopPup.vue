@@ -66,14 +66,14 @@ export default {
       data () {
             return {
                 items:[],
-                isPersonal:false,
+                isPersonal:true,
                 isAll:false,
                 listSource:{},
 
             }
     },
     created () {
-         this.getSource();
+    this.getSource();
       this.getAllListChanel(); 
      
      },

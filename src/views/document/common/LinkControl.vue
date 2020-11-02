@@ -1,7 +1,5 @@
 <template>
-    <v-card class="card-link-config"
-    :style="position"
-    v-show="isShow" >
+    <div class="card-link-config">
        <div class="item-link" v-for="(link,index) in listLinkDisplay" :key="index" @click="openLink(link)">
            <v-tooltip top>
                 <template v-slot:activator="{ on }">
@@ -11,34 +9,44 @@
             </v-tooltip>
            
        </div>
-    </v-card>
+    </div>
 </template>
 <script>
+import {getControlInstanceFromStore} from './common'
 export default {
     props:{
-        
         instance:{
             type:Number,
             default:0
         },
+        focusingControlName: {
+            type: String,
+            default: ''
+        },
+        rowIndex:{
+            type:Number
+        }
         
+    },
+    watch:{
+        focusingControlName(vl){
+            this.show(vl);
+        },
+        rowIndex(vl){
+            this.show(this.focusingControlName);
+        }
     },
     data(){
         return {
-            date:null,
-            isShow:false,
-            position:null,
             listLink:{},
             listLinkDisplay:{}
         }
     },
-    beforeMount(){
-        this.position = {
-                        top:'26px',
-                        left:'0px'
-                    }
+    computed:{
+        listLinkControl() {
+            return this.$store.state.document.linkControl[this.instance];
+        },
     },
-  
     methods:{
         openLink(link){
             if(link.source == "document"){
@@ -48,13 +56,25 @@ export default {
         getData(){
             return this.listLink;
         },
-        hide() {
-            this.isShow = false;
-        },
-        show(e, controlName){
-            this.isShow = true;
-            this.calculatorPositionBox(e);
-            this.listLinkDisplay = this.listLink[controlName]
+        show(controlName){
+            if(!controlName){
+                return
+            }
+            let controlIns = getControlInstanceFromStore(this.instance,this.focusingControlName);
+            if(this.rowIndex != undefined && controlIns.inTable != false){
+                let linkInTable = {};
+                let allLinkInCol = this.listLinkControl[this.focusingControlName];
+                for(let key in allLinkInCol){
+                    let reg = new RegExp('linkConfig_(.*)_'+this.rowIndex+'$');
+                    if(reg.test(key)){
+                        linkInTable[key] = allLinkInCol[key];
+                    }
+                }
+                this.listLinkDisplay = linkInTable
+            }
+            else{
+                this.listLinkDisplay = this.listLinkControl[this.focusingControlName]
+            }
         },
         setData(controlName, data){
             let link = (data.source == 'document') ? '/documents/objects/'+data.value : data.source+":"+data.value;
@@ -69,48 +89,16 @@ export default {
                 this.listLink[controlName][data.key] = {title:data.title,value:data.value,source:data.source, link:link};
             }
         },
-        calculatorPositionBox(e){
-            // nếu autocomplete từ cell của handsontable  
-            let inputOffset = {};
-            if($(e.target).closest('.handsontable').length > 0){
-                inputOffset = $(e.delegateTarget).offset();
-            }
-            //nêu là ngoài bảng
-            else{
-                inputOffset = $(e.target).offset();
-            }
-            let submitFormOffset = $('#sym-submit-'+this.instance).offset();
-            let submitFormWidth = $('#sym-submit-'+this.instance).width();
-            let leftDiff = inputOffset.left - submitFormOffset.left;
-            let cardWidth = $('.card-link-config').width();
-            let cardHeight = $('.card-link-config').height();
-            let inputWidth = $(e.target).width();
-            if(cardWidth + leftDiff > submitFormWidth){
-                this.position = {'top':inputOffset.top - submitFormOffset.top + 26 +'px','left':leftDiff + 10 + inputWidth - cardWidth+'px'};
-            }
-            else{
-                this.position = {'top':inputOffset.top - submitFormOffset.top + 26 +'px','left':inputOffset.left - submitFormOffset.left+'px'};
-            }
-            if(window.innerHeight < inputOffset.top + $('.card-link-config').height() + 40){
-                this.position.top = inputOffset.top - submitFormOffset.top - cardHeight + 'px'
-            }
-        },
     }
 }
 
 </script>
 <style scoped>
-    .card-link-config{
-        position: absolute;
-        z-index: 9999;
-        max-width: unset !important;
-        width: 200px;
-        height: auto;
-    }
     .item-link{
         cursor: pointer;
         transition: background ease-in-out 250ms;
         padding: 4px;
+        font-size: 13px;
     }
     .item-link:hover{
         background: var(--symper-background-hover);
