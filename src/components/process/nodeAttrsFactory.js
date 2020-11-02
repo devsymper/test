@@ -93,7 +93,7 @@ export const nodeAttrsDefinition = {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
         attrs: [
             'httptaskrequesturl', 'httptaskrequestheaders', 'httptaskrequestbody', 'httptaskrequestbodyencoding', 'httptaskrequesttimeout', 'httptaskdisallowredirects', 'httptaskfailstatuscodes', 'httptaskhandlestatuscodes', 'httptaskignoreexception', 'httptasksaveresponseparameterstransient', 'httptasksaveresponseasjson', 'httptaskresponsevariablename', 'httptasksaverequestvariables', 'httptasksaveresponseparameters', 'httptaskresultvariableprefix',
-            "scriptformat", "scripttext", "scriptautostorevariables"],
+            "scripttext", "serviceTaskTypeHTTP"],
         validate: function(attrs) {
 
         },
