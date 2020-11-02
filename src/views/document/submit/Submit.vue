@@ -1450,7 +1450,7 @@ export default {
                 }
             }
             this.listDataFlow = listDataFlow;
-            // if(!isSetEffectedControl);
+            if(!isSetEffectedControl);
             this.getEffectedControl();
             if(this.docObjId == null){
                 thisCpn.findRootControl();
@@ -1585,7 +1585,7 @@ export default {
                 }
             }
             console.log('mapControlEffected',mapControlEffected);
-            // this.updateEffectedControlToStore(mapControlEffected);
+            this.updateEffectedControlToStore(mapControlEffected);
         },
        
         detectControlEffectedInTableInDoc(mapControlEffected,name,formulasInstance){
