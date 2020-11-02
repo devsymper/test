@@ -23,6 +23,10 @@ export default {
         },
         context: {
             default: 'department'
+        },
+        readonly:{
+            type: Boolean,
+            default: false
         }
     },
     created(){
@@ -382,7 +386,12 @@ export default {
         initDiagramView(){
             
         }
-	}
+    },
+    watch:{
+        readonly(val){
+            debugger
+        }
+    }
 }
 </script>
 

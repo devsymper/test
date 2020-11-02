@@ -111,6 +111,7 @@
                 @cell-clicked="selectNode"
 				@delete-node="handlerDeleteNode"
                 :instanceKey="instanceKey"
+                :readonly="action == 'view' || action == 'structureManagement' ? true : false "
                 :context="context"
                 ref="editorWorkspace"/>
         </div>
@@ -208,6 +209,10 @@ export default {
         showMenuPickTab:{
             type: Boolean,
             default: false
+        },
+        readonly:{
+            type:Boolean, 
+            default:false
         }
     },
     data(){
@@ -310,6 +315,9 @@ export default {
            if(val){
               this.getFieldsInDoc(val)
            }
+       },
+       readonly(val){
+           debugger
        }
     },
     methods: {
@@ -404,14 +412,15 @@ export default {
         },
         restoreMainOrgchartConfig(config){
             let mappingDocInfo = JSON.parse(config.mappingDocInfo)
+            debugger
             let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
             homeConfig.commonAttrs.name.value = config.name;
             homeConfig.commonAttrs.description.value = config.description;
             homeConfig.commonAttrs.code.value = config.code;
             homeConfig.commonAttrs.isDefault.value = config.isDefault == "1" ? true : false;
-            homeConfig.commonAttrs.mappingDoc.value = mappingDocInfo.docId
-            homeConfig.commonAttrs.scriptMapping.value = mappingDocInfo.script
-            homeConfig.commonAttrs.tableMapping.value = mappingDocInfo.fieldMapping
+            homeConfig.commonAttrs.mappingDoc.value = mappingDocInfo ? mappingDocInfo.docId : ""
+            homeConfig.commonAttrs.scriptMapping.value = mappingDocInfo ? mappingDocInfo.script : ""
+            homeConfig.commonAttrs.tableMapping.value = mappingDocInfo ? mappingDocInfo.fieldMapping : [{}]
             homeConfig.customAttributes = config.dynamicAttributes;
         },
         correctDiagramDisplay(content){
