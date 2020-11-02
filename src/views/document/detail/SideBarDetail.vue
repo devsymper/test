@@ -394,7 +394,26 @@ export default {
 				if(!$.isEmptyObject(tbChange)){
 					let mapDocControl = this.$store.state.document.submit[this.keyInstance].listInputInDocument;
 					let table = mapDocControl[tbName];
+					let mapControlToIndex = table.mapControlToIndex;
+					let allColumnId = table.tableInstance.tableInstance.getDataAtProp('childObjectId');
 					
+					for(let rowId in tbChange){
+						let dataChange = tbChange[rowId];
+						let curRowIndex = allColumnId.indexOf(rowId);
+						for (let index = 0; index < dataChange.length; index++) {
+							let cellChange = dataChange[index];
+							if(cellChange.data.new !== cellChange.data.old){
+								table.tableInstance.validateValueMap[curRowIndex + "_" + mapControlToIndex[cellChange.name]] = {
+									type: 'linkControl',
+								};
+							}
+						}
+						
+						
+					}
+					setTimeout(() => {
+						table.tableInstance.tableInstance.render()
+					}, 50);
 					changedControls.tables.push({
 						id: table.id,
 						data: tbChange,
