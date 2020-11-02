@@ -280,7 +280,7 @@ export default class BasicControl extends Control {
                 if (thisObj.type == 'date') {
                     SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)
                 } else if (thisObj.type == 'inputFilter') {
-                    e.formulas = thisObj.controlFormulas.formulas;
+                    e.formulas = thisObj.controlFormulas.list;
                     SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
                 } else if (thisObj.type == 'time') {
                     e.curTarget = e.target
