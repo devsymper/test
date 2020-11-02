@@ -358,8 +358,13 @@ export const extractTaskInfoFromObject = function(obj) {
 function getRoleUser(roleIdentify){
     let arrDataRole=roleIdentify.split(":");
     let allSymperRole=SYMPER_APP.$store.state.app.allSymperRoles;
-    let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
-    return role;
+    if (allSymperRole[arrDataRole[0]]) {
+        let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+        return role;
+    }else{
+        return {};
+    }
+  
 }
 
 export const addMoreInfoToTask = function(task) {
