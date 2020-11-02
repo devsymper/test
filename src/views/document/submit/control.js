@@ -122,7 +122,6 @@ export default class Control {
         }
         try {
             effected = JSON.parse(effected);
-
             for (let type in effected) {
                 if (type == "effectedControl") {
                     this.effectedControl = effected[type];
