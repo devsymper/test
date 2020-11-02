@@ -236,7 +236,6 @@ export default class Table {
             this.reRendered = false;
             /**Danh sách các celltpye trong table */
             this.listCellType = {};
-            /**CHỉ ra  vị trí của cell được click */
             this.isAutoCompleting = false;
             /**Chỉ ra tên của control nào đang setdata để callback sau khi setdata */
             this.controlNameAfterChange = "";
@@ -267,7 +266,7 @@ export default class Table {
                     }
                     thisObj.checkEnterInsertRowEvent(event, cellMeta);
                     // ấn f2 vào cell thì trace control đó
-                    if (event.key == 'F2' && store.state.app.accountType == 'ba') {
+                    if (event.key == 'F2' && store.state.app.baInfo && Object.keys(store.state.app.baInfo).length > 0) {
                         let control = thisObj.getControlInstance(thisObj.currentControlSelected);
                         SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { control: control });
                         return;
@@ -450,7 +449,9 @@ export default class Table {
                  * @param {*} source 
                  */
                 afterChange: function(changes, source) {
-
+                    if (thisObj.isAutoCompleting) {
+                        return;
+                    }
                     if (!changes) {
                         return
                     }
@@ -511,7 +512,6 @@ export default class Table {
                             });
 
                         }
-                        console.log("sadsadsadf", source, changes);
                         if (source == "edit") {
                             thisObj.handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName);
                         } else {
@@ -523,6 +523,8 @@ export default class Table {
                             dataInput[controlName] = [changes[0][3]]
                             thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB.instance);
                         }
+                        thisObj.isAutoCompleting = false;
+
                     }
 
                 }
@@ -1141,8 +1143,6 @@ export default class Table {
                     setTimeout((self) => {
                         self.render()
                     }, 500, this);
-                } else {
-                    thisObj.isAutoCompleting = false;
                 }
 
             },
@@ -1530,7 +1530,7 @@ export default class Table {
                 ele.css({ 'position': 'relative' }).append(Util.renderInfoBtn());
                 ele.off('click', '.info-control-btn')
                 ele.on('click', '.info-control-btn', function(e) {
-                    SYMPER_APP.$evtBus.$emit('on-info-btn-in-table-click', { e: e, data: map })
+                    SYMPER_APP.$evtBus.$emit('on-info-btn-in-table-click', { e: e, row: row, controlName: control.name })
                 })
             }
             if (map.vld === true) {

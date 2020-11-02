@@ -225,7 +225,6 @@ export default class Control {
             let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
             let dataTable = tableControlInstance.tableInstance.tableInstance.getData();
             let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
-
             let linkFormulas = this.controlFormulas.linkConfig.configData;
             let title = "";
             let source = "";
@@ -237,7 +236,6 @@ export default class Control {
                     source = config.objectType.type;
                 }
             }
-
             for (let rowId in values) {
                 let value = values[rowId];
                 if (value == 0) {
@@ -251,7 +249,9 @@ export default class Control {
                     title: title,
                     source: source,
                 };
-
+                store.commit(
+                    "document/updateDataForLinkControl", { formulasType: formulasType + "_" + rowIndex, link: value, title: title, source: source, instance: this.curParentInstance, controlName: this.name }
+                );
             }
             tableControlInstance.tableInstance.tableInstance.render()
         }
@@ -575,4 +575,5 @@ export default class Control {
         let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
         tableControl.tableInstance.traceInputTable(this.name, className, isRemove)
     }
+
 }

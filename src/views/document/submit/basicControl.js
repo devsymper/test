@@ -144,18 +144,18 @@ export default class BasicControl extends Control {
             }
 
         }
-    /**
-     * Ham kiểm tra có các thông tin khác của control như  (comment, history, link) trên control hay không
-     * nếu có thì thêm icon info
-     */
+        /**
+         * Ham kiểm tra có các thông tin khác của control như  (comment, history, link) trên control hay không
+         * nếu có thì thêm icon info
+         */
     checkHasInfoControl(dataLink) {
-            if (Object.keys(dataLink).includes(this.name)) {
-                this.renderLinkToControl(this.name);
+            if (dataLink && Object.keys(dataLink).includes(this.name)) {
+                this.renderInfoIconToControl(this.name);
             }
         }
-    /**
-     * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
-     */
+        /**
+         * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
+         */
     setDefaultValue() {
         if (['submit'].includes(sDocument.state.viewType[this.curParentInstance]) &&
             this.controlProperties['defaultValue'] != undefined) {
@@ -187,7 +187,9 @@ export default class BasicControl extends Control {
         return false;
     }
     setEvent() {
-
+            // biến check xem control có đang autocomplete hay ko
+            // nếu đang autocomplete thì ko nhận sự kiện thay đổi khi giá trị đang được gõ
+            let isAutocompleting = false;
             let thisObj = this;
             this.ele.on('change', function(e) {
                 let valueChange = $(e.target).val();
@@ -197,7 +199,10 @@ export default class BasicControl extends Control {
                     valueChange = $(e.target).prop("checked");
                 }
                 thisObj.value = valueChange;
-                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.name, val: valueChange })
+                if (!isAutocompleting) {
+                    SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.name, val: valueChange });
+                }
+                isAutocompleting = false;
             })
             this.ele.on('focus', function(e) {
                 store.commit("document/addToDocumentSubmitStore", {
@@ -208,7 +213,7 @@ export default class BasicControl extends Control {
             })
 
             this.ele.on('keyup', function(e) {
-                if (e.key == 'F2' && store.state.app.accountType == 'ba') {
+                if (e.key == 'F2' && store.state.app.baInfo && Object.keys(store.state.app.baInfo).length > 0) {
                     thisObj.traceControl();
                 }
                 if (thisObj.type == 'user') {
@@ -234,6 +239,7 @@ export default class BasicControl extends Control {
                     let fromSelect = false;
                     let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
                     e['controlName'] = thisObj.controlProperties.name.value;
+                    isAutocompleting = true;
                     SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                         e: e,
                         autocompleteFormulasInstance: formulasInstance,
@@ -688,7 +694,7 @@ export default class BasicControl extends Control {
         }
         return false;
     }
-    renderLinkToControl(controlName) {
+    renderInfoIconToControl(controlName) {
         if (this.ele.parent().find('.info-control-btn').length == 0) {
             let icon = `<span class="mdi mdi-information info-control-btn" data-control="` + controlName + `"></span>`
             this.ele.parent().append(icon);

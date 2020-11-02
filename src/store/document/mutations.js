@@ -325,15 +325,31 @@ const addToDocumentSubmitStore = (state, params) => {
     }
 }
 const addToDocumentDetailStore = (state, params) => {
-    let key = params.key
-    let value = params.value
-    let instance = params.instance
-    Vue.set(state.detail[instance], key, value);
-}
+        let key = params.key
+        let value = params.value
+        let instance = params.instance
+        Vue.set(state.detail[instance], key, value);
+    }
+    /**
+     * Hàm đặt  kiểu view (submit,detail,update)
+     * @param {*} state 
+     * @param {*} params 
+     */
 const changeViewType = (state, params) => {
+        let key = params.key
+        let value = params.value
+        Vue.set(state.viewType, key, value);
+    }
+    /**
+     * Hàm đặt danh sách control có link liên kết với hệ thống
+     * mục đích hiển thị lại lúc view detail và update
+     * @param {*} state 
+     * @param {*} params 
+     */
+const updateListLinkControl = (state, params) => {
     let key = params.key
     let value = params.value
-    Vue.set(state.viewType, key, value);
+    Vue.set(state.linkControl, key, value);
 }
 const addToDocumentPropsEditor = (state, params) => {
     let key = params.key
@@ -413,15 +429,43 @@ const setDefaultDetailStore = (state, params) => {
         allData: {
 
         },
-        trackChange: []
+        trackChange: [],
+        listLinkControl: {},
     }
     let instance = params.instance;
     Vue.set(state.detail, instance, value);
 };
+/**
+ * Hàm đẩy dữ liệu link cua control nếu có vào store sau khi chạy công thức link
+ * @param {*} state 
+ * @param {*} params 
+ */
+const updateDataForLinkControl = (state, params) => {
+    let formulasType = params.formulasType;
+    let link = params.link;
+    let title = params.title;
+    let source = params.source;
+    let controlName = params.controlName;
+    let instance = params.instance;
+    if (!state.linkControl[instance]) {
+        Vue.set(state.linkControl, instance, {});
+    }
+    let listLink = state.linkControl[instance];
+    let fullLink = (source == 'document') ? '/documents/objects/' + link : source + ":" + link;
+    if (!listLink.hasOwnProperty(controlName)) {
+        listLink[controlName] = {};
+    }
+    if (listLink[controlName].hasOwnProperty(formulasType)) {
+        listLink[controlName][formulasType].value = link;
+        listLink[controlName][formulasType].link = fullLink;
+    } else {
+        listLink[controlName][formulasType] = { title: title, value: link, source: source, link: fullLink };
+    }
+    Vue.set(state.linkControl, instance, listLink);
+}
 const updateCurrentControlEditByUser = (state, params) => {
     let currentControl = params.currentControl;
     let instance = params.instance;
-    console.log(state.submit);
     Vue.set(state.submit[instance], 'currentControlEditByUser', currentControl);
 };
 const addToRelatedLocalFormulas = (state, params) => {
@@ -499,7 +543,7 @@ const deleteControlTemplate = (state, params) => {
     Vue.set(state.editor[instance], 'allControlTemplate', x);
 }
 
-const setDetailTrackChange = (state, params)=>{
+const setDetailTrackChange = (state, params) => {
     Vue.set(state.detail[params.instance], 'trackChange', params.data);
 }
 
@@ -519,6 +563,7 @@ export {
     addToDocumentSubmitStore,
     addToDocumentDetailStore,
     changeViewType,
+    updateListLinkControl,
     addToDocumentPropsEditor,
     addToDocumentEditorStore,
     setAllDocuments,
@@ -536,6 +581,7 @@ export {
     updateDataToTableControlRoot,
     addSqlLiteDb,
     deleteControlTemplate,
-    setDetailTrackChange
+    setDetailTrackChange,
+    updateDataForLinkControl
 
 };
