@@ -1450,7 +1450,7 @@ export default {
                 }
             }
             this.listDataFlow = listDataFlow;
-            if(!isSetEffectedControl);
+            // if(!isSetEffectedControl);
             this.getEffectedControl();
             if(this.docObjId == null){
                 thisCpn.findRootControl();
@@ -1534,6 +1534,9 @@ export default {
                 if (type != "submit" && type != "reset" && type != "draft") {
                     let formulas = allControl[name].controlFormulas;
                     for (let formulasType in formulas) {
+                        if(formulasType == 'autocomplete'){
+                            continue
+                        }
                         if(!mapControlEffected.hasOwnProperty(formulasType)){
                             mapControlEffected[formulasType] = {}
                         }
@@ -1584,7 +1587,6 @@ export default {
                     }
                 }
             }
-            console.log('mapControlEffected',mapControlEffected);
             this.updateEffectedControlToStore(mapControlEffected);
         },
        
@@ -1953,11 +1955,14 @@ export default {
                             mapTypeToEffectedControl[type],
                             mapControlEffected[type][controlName]
                         );
-                        let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName)
-                        if(!dataToPreProcessControl.hasOwnProperty(controlInstance.idField)){
-                            dataToPreProcessControl[controlInstance.idField] = {};
+                        let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
+                        if(controlInstance != false){
+                            if(!dataToPreProcessControl.hasOwnProperty(controlInstance.idField)){
+                                dataToPreProcessControl[controlInstance.idField] = {};
+                            }
+                            dataToPreProcessControl[controlInstance.idField][mapTypeToEffectedControl[type]] = mapControlEffected[type][controlName];
                         }
-                        dataToPreProcessControl[controlInstance.idField][mapTypeToEffectedControl[type]] = mapControlEffected[type][controlName];
+                        
                     }
                 }
                 
