@@ -91,7 +91,9 @@ export const nodeAttrsDefinition = {
     },
     'ScriptTask': {
         group: 'task', // nhóm thuộc tính mà node này thuộc về, giá trị là một hoặc nhiều key trong "groupsAttrs"
-        attrs: ["scriptformat", "scripttext", , "scriptautostorevariables"],
+        attrs: [
+            'httptaskrequesturl', 'httptaskrequestheaders', 'httptaskrequestbody', 'httptaskrequestbodyencoding', 'httptaskrequesttimeout', 'httptaskdisallowredirects', 'httptaskfailstatuscodes', 'httptaskhandlestatuscodes', 'httptaskignoreexception', 'httptasksaveresponseparameterstransient', 'httptasksaveresponseasjson', 'httptaskresponsevariablename', 'httptasksaverequestvariables', 'httptasksaveresponseparameters', 'httptaskresultvariableprefix',
+            "scripttext", "serviceTaskTypeHTTP"],
         validate: function(attrs) {
 
         },

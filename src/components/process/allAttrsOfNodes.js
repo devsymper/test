@@ -664,17 +664,18 @@ let allAttrs = {
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.SCRIPTTEXTPACKAGE.SCRIPTTEXT.DESCRIPTION",
         "dg": "formula",
-        toXML: {
-            "symper_position": "el",
-            "name": "symperScriptTagPlacehoder",
-            "superClass": ["Element"],
-            "properties": [{
-                "name": "text",
-                "isBody": true,
-                "type": "String"
-            }]
-        },
-        pushToXML: attrToXMLMethods.scriptTextForScriptNodeMethod,
+        // toXML: {
+        //     "symper_position": "el",
+        //     "name": "symperScriptTagPlacehoder",
+        //     "superClass": ["Element"],
+        //     "properties": [{
+        //         "name": "text",
+        //         "isBody": true,
+        //         "type": "String"
+        //     }]
+        // },
+        // pushToXML: attrToXMLMethods.scriptTextForScriptNodeMethod,
+        pushToXML: attrToXMLMethods.notPushToXML,
     },
     "scriptautostorevariables": {
         "title": "Auto Store Variables",

@@ -20,9 +20,7 @@
         <template v-slot:selection="data">
             <v-chip
                 :input-value="data.selected"
-                :close="!compactChip"
                 small
-                @click:close="remove(data.item)"
             > 
                   <v-list-item-avatar height="20" width="20" size="20" class="mt-1 mb-1">
                     <v-img :src="data.item.image ? data.item.image :avatarDefault">
@@ -97,7 +95,8 @@ export default {
             immediate: true,
             handler(obj){
                 let self = this
-                if(obj.mappingDoc.value != ""){
+                if(obj.mappingDoc){
+                    if(obj.mappingDoc.value != ""){
                     if(!obj.scriptMapping.value){
                         obj.scriptMapping.value = ""
                     }
@@ -113,6 +112,8 @@ export default {
                         })
                     })
                 }
+                }
+                
             }
         },
     },

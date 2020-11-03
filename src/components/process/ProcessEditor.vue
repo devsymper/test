@@ -549,9 +549,12 @@ export default {
                 });
         },
 
-        fillValueForHiddenServiceTaskAttr(nodeId){
+        fillValueForHiddenServiceTaskAttr(nodeId, serviceTaskType = ''){
             let sNodeAttrs = this.stateAllElements[nodeId];
-            let seletedType = serviceTaskDefinitions[sNodeAttrs.attrs.serviceTaskType.value];
+            if(!serviceTaskType){
+                serviceTaskType = sNodeAttrs.attrs.serviceTaskType.value;
+            }
+            let seletedType = serviceTaskDefinitions[serviceTaskType];
             for (let key in seletedType.params) {
                 let attr = sNodeAttrs.attrs['httptask'+key.toLowerCase()];
                 if(attr){
@@ -596,9 +599,10 @@ export default {
                         nodeData.dockers = [];
                         nodeData.outgoing = [];
 
-                        
                         if(nodeType == "ServiceTask"){
                             this.fillValueForHiddenServiceTaskAttr(bnode.id);
+                        }else if(nodeType == "ScriptTask"){
+                            this.fillValueForHiddenServiceTaskAttr(bnode.id, 'script');
                         }
                     }
 
@@ -607,7 +611,7 @@ export default {
                 nodeData.properties = this.getNodeProperties(bnode.id, false);
                 nodeData.stencil.id = nodeType; // flowable quy định loại node nằm trong nodeData.stencil.id
 
-                if(nodeData.stencil.id == 'ServiceTask'){
+                if(nodeData.stencil.id == 'ServiceTask' || nodeData.stencil.id == 'ScriptTask' ){
                     nodeData.stencil.id = 'HttpTask';
                 }
                 mapSaveNodes[bnode.id] = nodeData;

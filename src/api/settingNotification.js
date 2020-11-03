@@ -17,7 +17,7 @@ export default {
         return api.post('channels', data)
     },
     subscribeChanel(id, data) {
-        return api.post('channels/' + id, data)
+        return api.post('channels/' + id + '/filter', data)
     },
     deleteNotification(id) {
         return api.delete('channels/' + id)

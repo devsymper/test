@@ -231,7 +231,7 @@ export default {
             receiver:'',
             actionClickNotifi:'',
             listSource:[],
-            state:false,
+            state:true,
             avatar:'',
             icon:'',
       dragging: false,
@@ -247,7 +247,6 @@ export default {
         this.$refs.uploadAvatar.uploadFile();
     },
     replaceDescription(){
-    //  debugger
       let description = this.description;
       for(let i = 0; i<this.parameter.length;i++){
         let oldValue= new RegExp('<'+this.parameter[i].text+'>');
@@ -258,7 +257,9 @@ export default {
       return description;
     },
     save(){
-      this.$refs.uploadAvatar.uploadFile();
+      if(this.avatarFileName){
+        this.$refs.uploadAvatar.uploadFile();
+      }
         let data={
             event: this.action.value,
             source:this.objectType.value,
@@ -267,8 +268,8 @@ export default {
             objectType:this.objectType,
             receiver:this.receiver.value,
             action:this.actionClickNotifi,
-            icon:this.iconName.iconName?this.iconName.iconName:this.avatarFileName,
-            description:this.replaceDescription()
+            icon:this.iconName.iconName?"mdi "+this.iconName.iconName:this.avatarFileName,
+            content:this.replaceDescription()
         };
        const self = this;
         notification.addChanel(data).then(res=>{

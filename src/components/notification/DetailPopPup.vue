@@ -66,14 +66,14 @@ export default {
       data () {
             return {
                 items:[],
-                isPersonal:false,
+                isPersonal:true,
                 isAll:false,
                 listSource:{},
 
             }
     },
     created () {
-         this.getSource();
+    this.getSource();
       this.getAllListChanel(); 
      
      },
@@ -122,13 +122,11 @@ export default {
         const self = this;
         notification.showAllModuleConfig().then(res=>{
             if(res.status==200){
-                debugger
                 self.listSource = res.data;
             }
         })
         },
         rename(nameModule,event){
-            debugger
             let name = event;
             for(let i = 0; i<this.listSource[nameModule].event.length;i++){
                 if(this.listSource[nameModule].event[i].value==event){

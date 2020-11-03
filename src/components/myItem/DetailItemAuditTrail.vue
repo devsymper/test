@@ -257,8 +257,13 @@ export default {
         getRoleUser(roleIdentify){
             let arrDataRole=roleIdentify.split(":");
             let allSymperRole=this.$store.state.app.allSymperRoles;
-            let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
-            return role;
+            if (allSymperRole[arrDataRole[0]]) {
+                let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+                return role;
+            }else{
+                return {};
+            }
+          
         },  
         getProposer(nodeId){
             this.proposer={};

@@ -18,7 +18,7 @@ export default {
             saveResponseParameters: true,
             resultVariablePrefix: '',
             saveResponseParametersTransient: false,
-            saveResponseVariableAsJson: true,
+            saveResponseVariableAsJson: false,
         },
         makeRequestBody(nodeAttr) {
             this.params.responseVariableName = 'symper_'+nodeAttr.idNode+'_formula_response';

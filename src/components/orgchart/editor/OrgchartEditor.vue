@@ -111,6 +111,7 @@
                 @cell-clicked="selectNode"
 				@delete-node="handlerDeleteNode"
                 :instanceKey="instanceKey"
+                :readonly="action == 'view' || action == 'structureManagement' ? true : false "
                 :context="context"
                 ref="editorWorkspace"/>
         </div>
@@ -208,7 +209,8 @@ export default {
         showMenuPickTab:{
             type: Boolean,
             default: false
-        }
+        },
+       
     },
     data(){
         return {
@@ -310,7 +312,7 @@ export default {
            if(val){
               this.getFieldsInDoc(val)
            }
-       }
+       },
     },
     methods: {
 		handlerDeleteNode(){
@@ -409,9 +411,9 @@ export default {
             homeConfig.commonAttrs.description.value = config.description;
             homeConfig.commonAttrs.code.value = config.code;
             homeConfig.commonAttrs.isDefault.value = config.isDefault == "1" ? true : false;
-            homeConfig.commonAttrs.mappingDoc.value = mappingDocInfo.docId
-            homeConfig.commonAttrs.scriptMapping.value = mappingDocInfo.script
-            homeConfig.commonAttrs.tableMapping.value = mappingDocInfo.fieldMapping
+            homeConfig.commonAttrs.mappingDoc.value = mappingDocInfo ? mappingDocInfo.docId : ""
+            homeConfig.commonAttrs.scriptMapping.value = mappingDocInfo ? mappingDocInfo.script : ""
+            homeConfig.commonAttrs.tableMapping.value = mappingDocInfo ? mappingDocInfo.fieldMapping : [{}]
             homeConfig.customAttributes = config.dynamicAttributes;
         },
         correctDiagramDisplay(content){
@@ -444,7 +446,6 @@ export default {
                     }
                     this.restoreMainOrgchartConfig(savedData.orgchart);
                     let mapIdToDpm = {};
-                  
                     for(let node of savedData.departments){
                         let users = self.getListUserAsArr(node.users)
                         let nodeData = {
@@ -471,6 +472,7 @@ export default {
                     }
                     savedData.positions.forEach(function(e){
                         e.users = JSON.parse(e.users)
+                        e.usersFromDoc = JSON.parse(e.usersFromDoc)
                     })
                     let allPositionInADpm = getMapDpmIdToPosition(savedData.positions);
                     for(let dpmId in allPositionInADpm){
@@ -483,7 +485,10 @@ export default {
                                 name: position.name,
                                 description: position.description,
                                 code: position.code,
-                                users: userSelected
+                                users: userSelected,
+                                dataFromDoc:{
+                                    users: position.usersFromDoc
+                                }
                             };
                             let newPosition = this.createNodeConfigData('position', nodeData, dpmInstanceKey);
                             newPosition.style = this.restoreNodeStyle(position.style);
@@ -1002,9 +1007,9 @@ export default {
                 defaultConfig.users = nodeData.users;
             }
             if(nodeData.dataFromDoc){
-                console.log(defaultConfig.dataFromDoc.users,'defaultConfig.dataFromDoc.users');
-                console.log(nodeData.dataFromDoc.users,'nodeData.dataFromDoc.users');
                 defaultConfig.dataFromDoc.users = nodeData.dataFromDoc.users 
+            }else{
+                defaultConfig.dataFromDoc.users = []
             }
             this.$store.commit('orgchart/setNodeConfig', {
                 instanceKey: instanceKey,

@@ -64,7 +64,6 @@ export default {
             if(this.rowIndex != undefined && controlIns.inTable != false){
                 let linkInTable = {};
                 let allLinkInCol = this.listLinkControl[this.focusingControlName];
-                debugger
                 for(let key in allLinkInCol){
                     let reg = new RegExp('linkConfig_(.*)_'+this.rowIndex+'$');
                     if(reg.test(key)){
