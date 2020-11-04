@@ -647,7 +647,7 @@ export default {
                 thisCpn.$refs.autocompleteInput.show(e.e);
                 thisCpn.$store.commit("document/addToDocumentSubmitStore", {
                             key: 'currentControlAutoComplete',
-                            value: e.alias,
+                            value: e.alias + ":"+e.cellActive[0][0]+":"+e.cellActive[0][1],
                             instance: thisCpn.keyInstance
                         });
                 thisCpn.$refs.autocompleteInput.setTypeInput(e.type);
@@ -1083,10 +1083,13 @@ export default {
                 }
             }
             else{
+            
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
-                let cellActive = currentTableInteractive.tableInstance.getActiveEditor();
+                let cellActive = this.sDocumentSubmit.currentControlAutoComplete.split(':');
+                let row = cellActive[1];
+                let col = cellActive[2];
                 currentTableInteractive.isAutoCompleting = false;
-                currentTableInteractive.tableInstance.setDataAtCell(cellActive.row,cellActive.col,data.value,'edit')
+                currentTableInteractive.tableInstance.setDataAtCell(Number(row),Number(col),data.value,'edit')
             }
         },
 
