@@ -168,8 +168,8 @@ export default {
             self.$refs.actionPackForm.objectTypeToDocumentDefinition();
         },
         onRowSelected(row){
-               let self = this;
-            this.focusingUser = row;
+            let self = this;
+        	this.focusingUser = row;
             if(this.$refs.listActionPack.alwaysShowActionPanel){
                 self.$refs.listActionPack.actionPanel = true;
                 this.updateActionPack(row);
