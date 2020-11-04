@@ -7,18 +7,18 @@
                 class="pt-0 pl-0 pr-0 pb-0"
             >
                 <listHeader
-                :isSmallRow="isSmallRow"
-                :headerTitle="headerTitle"
-                :sideBySideMode="sideBySideMode"
-                :compackMode="compackMode"
-                :parentTaskId="filterFromParent.parentTaskId"
-                :changeStatusMoreApproval="changeStatusMoreApproval"
-                @change-density="isSmallRow = !isSmallRow"
-                @changeObjectType="changeObjectType"
-                @filter-change-value="handleChangeFilterValue"
-                @create-task="getTasks({})"
-                @refresh-task-list="getTasks()"
-                @goToPageApproval="goToPageApproval"
+                    :isSmallRow="isSmallRow"
+                    :headerTitle="headerTitle"
+                    :sideBySideMode="sideBySideMode"
+                    :compackMode="compackMode"
+                    :parentTaskId="filterFromParent.parentTaskId"
+                    :changeStatusMoreApproval="changeStatusMoreApproval"
+                    @change-density="isSmallRow = !isSmallRow"
+                    @changeObjectType="changeObjectType"
+                    @filter-change-value="handleChangeFilterValue"
+                    @create-task="getTasks({})"
+                    @refresh-task-list="getTasks()"
+                    @goToPageApproval="goToPageApproval"
                 ></listHeader>
                 <v-divider v-if="!sideBySideMode"></v-divider>
                 <div class="h-100" v-if="!changeStatusMoreApproval">
@@ -231,13 +231,13 @@
             style="border-left: 1px solid #e0e0e0;"
         >
             <taskDetail
-            :parentHeight="listTaskHeight"
-            :taskInfo="selectedTask.taskInfo"
-            :originData="selectedTask.originData"
-            :allVariableProcess="allVariableProcess"
-            @close-detail="closeDetail"
-            @task-submited="handleTaskSubmited"
-            @changeUpdateAsignee="changeUpdateAsignee"
+                :parentHeight="listTaskHeight"
+                :taskInfo="selectedTask.taskInfo"
+                :originData="selectedTask.originData"
+                :allVariableProcess="allVariableProcess"
+                @close-detail="closeDetail"
+                @task-submited="handleTaskSubmited"
+                @changeUpdateAsignee="changeUpdateAsignee"
             ></taskDetail>
         </v-col>
         </v-row>
@@ -475,32 +475,32 @@ export default {
             }
         },
         changeObjectType(index) {
-        this.$emit("changeObjectType", index);
+            this.$emit("changeObjectType", index);
         },
         handleReachEndList() {
-        if (
-            this.allFlatTasks.length < this.totalTask &&
-            this.allFlatTasks.length > 0 && !this.loadingTaskList && !this.loadingMoreTask
-        ) {
-            this.myOwnFilter.page += 1;
-            if ((this.myOwnFilter.page-1)*this.myOwnFilter.size <this.totalTask) {
-                this.getTasks();
+            if (
+                this.allFlatTasks.length < this.totalTask &&
+                this.allFlatTasks.length > 0 && !this.loadingTaskList && !this.loadingMoreTask
+            ) {
+                this.myOwnFilter.page += 1;
+                if ((this.myOwnFilter.page-1)*this.myOwnFilter.size <this.totalTask) {
+                    this.getTasks();
+                }
             }
-        }
         },
         handleTaskSubmited() {
-        this.sideBySideMode = false;
-        this.getTasks();
+            this.sideBySideMode = false;
+            this.getTasks();
         },
         handleChangeFilterValue(data) {
-        for (let key in data) {
-            this.$set(this.myOwnFilter, key, data[key]);
-        }
-        this.getTasks();
+            for (let key in data) {
+                this.$set(this.myOwnFilter, key, data[key]);
+            }
+            this.getTasks();
         },
         reCalcListTaskHeight() {
-        this.listTaskHeight =
-            util.getComponentSize(this.$el.parentElement).h - 85;
+            this.listTaskHeight =
+                util.getComponentSize(this.$el.parentElement).h - 85;
         },
         selectObject(obj, idx,idex) {
             console.log("avsvsv",obj);

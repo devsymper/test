@@ -54,10 +54,10 @@
                 <template v-slot:activator="{ on:onTooltip }">
                     <v-btn v-on="{...onMenu, ...onTooltip}"  depressed class="mr-2" small>
                         <v-icon size="18">mdi-filter-menu</v-icon>
-                        <span v-if="!sideBySideMode" class="ml-2">{{$t('myItem.objType')}}</span>
+                        <span v-if="!sideBySideMode" class="ml-2">{{listObjectType[0].title}}</span>
                     </v-btn>
                 </template>
-                <span>{{$t('myItem.objType')}}</span>
+                <span>{{listObjectType[0].title}}</span>
             </v-tooltip>
         </template>
         <v-list>
