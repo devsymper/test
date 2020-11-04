@@ -1010,10 +1010,12 @@ export default class Table {
                 if (controlFormulas.hasOwnProperty('list')) {
                     let formulasInstance = controlFormulas['list'].instance;
                     event.curTarget = event.target;
+                    let cellActive = this.tableInstance.getSelected();
                     SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
                         e: event,
                         selectFormulasInstance: formulasInstance,
                         alias: this.currentControlSelected,
+                        cellActive: cellActive,
                         controlTitle: controlInstance.title,
                         type: controlInstance.type,
                         isSingleSelect: controlInstance.checkProps('isSingleSelect')
@@ -1297,7 +1299,6 @@ export default class Table {
                             dataToStore[controlName].push(data[index][controlName]);
                     }
                     dataToSqlLite.push('(' + rowData.join() + ')');
-
                 }
                 ClientSQLManager.insertDataToTable(this.keyInstance, this.tableName, columnInsert.join(), dataToSqlLite.join())
                 for (let controlName in dataToStore) {
@@ -1309,7 +1310,7 @@ export default class Table {
                     });
                 }
                 // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
-                if (this.tableHasRowSum && sDocument.state.viewType[this.keyInstance] == 'submit') {
+                if (this.tableHasRowSum && ['submit', 'update'].includes(sDocument.state.viewType[this.keyInstance])) {
                     data.push({})
                 }
 
@@ -1470,7 +1471,7 @@ export default class Table {
             rsl.numericFormat = {
                 pattern: ctrl.controlProperties.formatNumber.value
             };
-        } else if (type == 'label') {
+        } else if (type == 'label' || type == 'select') {
             rsl.readOnly = true;
 
         } else if (type == 'time') {

@@ -515,7 +515,6 @@ export default {
                 if(thisCpn._inactive == true) return;
                 let valueControl = locale.val;
                 let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
-                
                 if(controlInstance.checkAutoCompleteControl()){
                     clearTimeout(delayTimer);
                     delayTimer = setTimeout(function() {
@@ -647,7 +646,7 @@ export default {
                 thisCpn.$refs.autocompleteInput.show(e.e);
                 thisCpn.$store.commit("document/addToDocumentSubmitStore", {
                             key: 'currentControlAutoComplete',
-                            value: e.alias,
+                            value: e.alias + ":"+e.cellActive[0][0]+":"+e.cellActive[0][1],
                             instance: thisCpn.keyInstance
                         });
                 thisCpn.$refs.autocompleteInput.setTypeInput(e.type);
@@ -1084,9 +1083,17 @@ export default {
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
-                let cellActive = currentTableInteractive.tableInstance.getActiveEditor();
+                let cellActive = this.sDocumentSubmit.currentControlAutoComplete.split(':');
                 currentTableInteractive.isAutoCompleting = false;
-                currentTableInteractive.tableInstance.setDataAtCell(cellActive.row,cellActive.col,data.value,'edit')
+                if(cellActive.length == 1){
+                    cellActive = currentTableInteractive.tableInstance.getActiveEditor();
+                    currentTableInteractive.tableInstance.setDataAtCell(cellActive.row,cellActive.col,data.value,'edit')
+                }
+                else if(cellActive.length == 3){
+                    let row = cellActive[1];
+                    let col = cellActive[2];
+                    currentTableInteractive.tableInstance.setDataAtCell(Number(row),Number(col),data.value,'edit')
+                }
             }
         },
 
@@ -2523,8 +2530,12 @@ export default {
             );
         },
         handleInputChangeByUser(locale, controlInstance, valueControl){
-            if(controlInstance.type == 'number' && !/^[-0-9,.]+$/.test(valueControl)){
-                return;
+            if(controlInstance.type == 'number'){
+                valueControl = valueControl.replace(/=/g,"");
+                valueControl = eval(valueControl);
+                if(!/^[-0-9,.]+$/.test(valueControl)){
+                    return;
+                }
             }
             if($('#'+controlInstance.id).attr('data-autocomplete') != "" && $('#'+controlInstance.id).attr('data-autocomplete') != undefined){
                 $('#'+controlInstance.id).attr('data-autocomplete',"");
