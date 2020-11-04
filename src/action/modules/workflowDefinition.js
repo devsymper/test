@@ -60,7 +60,7 @@ export default [{
         ...commonProps,
         "action": "list_instance",
         "handler": async function(param) {
-            this.$goToPage(this.$getActionLink(param), this.$t('process.instance.listModelInstance') + param.name)
+            this.$goToPage(this.$getActionLink(param), this.$t('process.instance.listModelInstance'))
         },
         $getActionLink(param) {
             return '/myitem/work';

@@ -789,7 +789,7 @@
             "start_time": "Thời gian bắt đầu",
             "tracking": "Theo dấu quy trình",
             "startSuccessfully": "Quy trình khởi tạo thành công",
-            "listModelInstance": "Danh sách bản chạy gần nhất của "
+            "listModelInstance": "Danh sách công việc"
         },
         "deployment": {
             "list": "Danh sách deploy",
