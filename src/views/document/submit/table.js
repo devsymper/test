@@ -1299,7 +1299,6 @@ export default class Table {
                             dataToStore[controlName].push(data[index][controlName]);
                     }
                     dataToSqlLite.push('(' + rowData.join() + ')');
-
                 }
                 ClientSQLManager.insertDataToTable(this.keyInstance, this.tableName, columnInsert.join(), dataToSqlLite.join())
                 for (let controlName in dataToStore) {
@@ -1311,7 +1310,7 @@ export default class Table {
                     });
                 }
                 // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
-                if (this.tableHasRowSum && sDocument.state.viewType[this.keyInstance] == 'submit') {
+                if (this.tableHasRowSum && ['submit', 'update'].includes(sDocument.state.viewType[this.keyInstance])) {
                     data.push({})
                 }
 

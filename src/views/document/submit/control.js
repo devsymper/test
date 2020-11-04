@@ -563,7 +563,9 @@ export default class Control {
         }
     }
     removeTraceControlColor() {
-
+        if (this.type == 'number' && this.formulaValue && this.ele.hasClass('trace-current-control')) {
+            this.ele.focus();
+        }
         if (this.inTable) {
             this.traceInputTable('', true);
         } else {
@@ -571,6 +573,7 @@ export default class Control {
                 return c.replace(/trace-.*-control/g, '');
             });
         }
+
     }
 
     traceInputTable(className, isRemove = false) {

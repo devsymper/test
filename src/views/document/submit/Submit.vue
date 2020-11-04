@@ -515,7 +515,6 @@ export default {
                 if(thisCpn._inactive == true) return;
                 let valueControl = locale.val;
                 let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
-                
                 if(controlInstance.checkAutoCompleteControl()){
                     clearTimeout(delayTimer);
                     delayTimer = setTimeout(function() {
@@ -2526,8 +2525,12 @@ export default {
             );
         },
         handleInputChangeByUser(locale, controlInstance, valueControl){
-            if(controlInstance.type == 'number' && !/^[-0-9,.]+$/.test(valueControl)){
-                return;
+            if(controlInstance.type == 'number'){
+                valueControl = valueControl.replace(/=/g,"");
+                valueControl = eval(valueControl);
+                if(!/^[-0-9,.]+$/.test(valueControl)){
+                    return;
+                }
             }
             if($('#'+controlInstance.id).attr('data-autocomplete') != "" && $('#'+controlInstance.id).attr('data-autocomplete') != undefined){
                 $('#'+controlInstance.id).attr('data-autocomplete',"");

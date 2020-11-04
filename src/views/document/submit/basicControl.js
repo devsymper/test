@@ -70,7 +70,7 @@ export default class BasicControl extends Control {
             }
 
             if (this.ele.hasClass('s-control-number')) {
-
+                this.formulaValue = "";
                 this.renderNumberControl();
 
             } else if (this.ele.hasClass('s-control-table')) {
@@ -213,6 +213,9 @@ export default class BasicControl extends Control {
 
             this.ele.on('keyup', function(e) {
                 if (e.key == 'F2' && store.state.app.baInfo && Object.keys(store.state.app.baInfo).length > 0) {
+                    if (thisObj.type == 'number' && thisObj.formulaValue) {
+                        thisObj.ele.val(thisObj.formulaValue);
+                    }
                     thisObj.traceControl();
                 }
                 if (thisObj.type == 'user') {
@@ -560,30 +563,44 @@ export default class BasicControl extends Control {
         this.ele.attr('type', 'text');
         this.numberFormat = this.getNumberFormat();
         this.ele.on('blur', function(e) {
-            if ($(this).val() == "") {
+            if ($(this).hasClass('trace-current-control')) {
+                return;
+            }
+            let currentInputValue = $(this).val();
+            if (currentInputValue == "") {
                 thisObj.ele.removeClass('error');
                 thisObj.ele.removeAttr('valid');
             } else {
-                if (/^[-0-9,.]+$/.test($(this).val())) {
+                if (/^=/.test(currentInputValue)) {
+                    thisObj.formulaValue = currentInputValue;
+                    currentInputValue = currentInputValue.replace(/=/g, "");
                     thisObj.ele.removeClass('error')
                     thisObj.ele.removeAttr('valid');
                     if (thisObj.numberFormat) {
-                        $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
+                        $(this).val(numbro(eval(currentInputValue)).format(thisObj.numberFormat));
                     } else {
-                        if (/,|\.$/.test($(this).val())) {
+                        $(this).val(eval(currentInputValue));
+                    }
+                } else if (/[-0-9,.]*[0-9]$/.test(currentInputValue)) {
+                    thisObj.ele.removeClass('error')
+                    thisObj.ele.removeAttr('valid');
+                    if (thisObj.numberFormat) {
+                        $(this).val(numbro(currentInputValue).format(thisObj.numberFormat))
+                    } else {
+                        if (/,|\.$/.test(currentInputValue)) {
                             thisObj.ele.addClass('error');
                             let controlTitle = (thisObj.title == "") ? thisObj.name : thisObj.title;
                             let valid = "Giá trị trường " + controlTitle + " không đúng định dạng số"
                             thisObj.ele.attr('valid', valid);
                         }
                     }
-
                 } else {
                     thisObj.ele.addClass('error');
                     let controlTitle = (thisObj.title == "") ? thisObj.name : thisObj.title;
                     let valid = "Giá trị trường " + controlTitle + " phải là số"
                     thisObj.ele.attr('valid', valid);
                 }
+
             }
         })
         this.ele.on('focus', function(e) {
