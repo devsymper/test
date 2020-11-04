@@ -115,7 +115,15 @@ export default {
             tasks=tasks.concat(this.stask.listTaskDoneInProcessParent);
             tasks=tasks.concat(this.stask.listTaskInProcessSub);
             tasks=tasks.concat(this.stask.listTaskInProcessSibling);
-            return tasks;
+            let set = new Set();
+            let uniqueTask = tasks.filter(item => {
+                if (!set.has(item.id)) {
+                    set.add(item.id);
+                    return true;
+                }
+                return false;
+            }, set);
+            return uniqueTask;
         }
     },
     methods:{

@@ -18,7 +18,7 @@
             @create-task="getWorks({})"
             @refresh-task-list="getWorks()"
             ></listHeader>
-            <v-divider v-if="!sideBySideMode"></v-divider>
+            <v-divider v-if="!sideBySideMode" ></v-divider>
             <v-row class="ml-0 mr-0" v-if="!sideBySideMode">
             <v-col cols="12" class="list-tasks pt-0 pb-0">
                 <v-row>
@@ -118,7 +118,7 @@
                             cols="2"
                             class="fs-12 px-1 py-0 mt-2"
                         >
-                            <infoUser class="userInfo" :userId="obj.startUserId" :roleInfo="obj.roleInfo" />
+                            <infoUser class="userInfo" :userId="String(obj.startUserId)" :roleInfo="obj.roleInfo" />
                         
                         </v-col> 
                         <v-col
@@ -245,7 +245,6 @@ export default {
             work.startUserId = 0;
             work.startUserName = '';
             let roleInfo={};
-
             const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===work.id && element.name==="symper_user_id_start_workflow" );
             if (dataVariable) {
                 let userIdStart=dataVariable.value;
@@ -397,8 +396,12 @@ export default {
     getRoleUser(roleIdentify){
         let arrDataRole=roleIdentify.split(":");
         let allSymperRole=this.$store.state.app.allSymperRoles;
-        let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
-        return role;
+        if (allSymperRole[arrDataRole[0]]) {
+            let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+            return role;
+        }else{
+            return {};
+        }
     },  
     changeUpdateAsignee(){
       this.handleTaskSubmited();
@@ -502,6 +505,7 @@ export default {
                 processIdUserStart.push(item.processInstanceId);
                 processId.push(item.processInstanceId);
                 processIden.push('work:'+item.processInstanceId);
+                self.listIdProcessInstance.push(item.processInstanceId);
             }
         }
         await this.getProcessInstanceUserStart(processIdUserStart);
@@ -511,9 +515,8 @@ export default {
         res = await BPMNEngine.getProcessInstanceHistory(filter);
         listWork = res.data;
         this.totalWork = Number(res.total);
-       
         for (let work of listWork) {
-            if (self.listIdProcessInstance.indexOf(work.processInstanceId) === -1) {
+            if (self.listIdProcessInstance.indexOf(work.id) === -1) {
                 self.allFlatWorks.push(work);
                 processIden.push('work:'+work.id);
                 processId.push(work.id);
@@ -521,10 +524,8 @@ export default {
             }
         }
        
-        
         self.filterVariables.pageSize=(processId.length)*2;
         self.filterVariables.processInstanceIds=JSON.stringify(processId);
-        
         let resVariable = {};
         resVariable = await taskApi.getVariableWorkflow(self.filterVariables);
         for (let item of resVariable.data) {
@@ -532,7 +533,7 @@ export default {
                 self.allVariableProcess.push(item);
             }
         }
-
+  
         this.$store.commit('file/setWaitingFileCountPerObj', processIden);
         this.$store.commit('comment/setWaitingCommentCountPerObj', processIden);
         this.$store.dispatch('file/getWaitingFileCountPerObj');
@@ -551,7 +552,8 @@ export default {
             let res={};
             res = await BPMNEngine.getProcessInstanceHistory(filter);
             for (let work of res.data) {
-                if (!self.allFlatWorks[work.id]) {
+                const item = self.allFlatWorks.find(element => element.id == work.id);
+                if (!item) {
                     self.allFlatWorks.push(work);
                 }
             }

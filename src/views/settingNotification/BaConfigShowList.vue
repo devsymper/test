@@ -15,6 +15,7 @@
         :actionPanelWidth="actionPanelWidth">
         <div slot="right-panel-content" class="h-100" style="overflow:hidden!important">
            <configNotification 
+           ref="config"
             @refreshList="refreshListNotification()"
            />
         </div>
@@ -22,6 +23,7 @@
     </div>
 </template>
 <script>
+
 import { userApi } from "./../../api/user.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import configNotification from "./../../components/notification/setting/BAconfig";
@@ -66,8 +68,8 @@ export default {
                             type:"text"
                         },
                         {
-                            name:'description',
-                            title:'table.description',
+                            name:'content',
+                            title:'table.content',
                             type:"text"
                         },
                         {
@@ -96,21 +98,27 @@ export default {
                             type:"text"
                         },
                         {
-                            name:'subscribedAt',
-                            title:'table.subscribedAt',
+                            name:'userFilterAt',
+                            title:'table.userFilterAt',
                             type:"text"
                         },
                    )
+                   let listBA= self.$store.state.app.allBA;
                      for(let i = 0; i<data.listObject.length; i++){
                         data.listObject[i].state = self.renameStatus(data.listObject[i].state);
+                        data.listObject[i].content = self.reNameParam(data.listObject[i].objectType,data.listObject[i].content);
+                        data.listObject[i].defaultUser = self.renameReceiver(data.listObject[i].objectType,data.listObject[i].defaultUser);
+                        data.listObject[i].event = self.renameAction(data.listObject[i].objectType,data.listObject[i].event);
                         data.listObject[i].objectType = self.$t('objects.'+data.listObject[i].objectType);
-                        
+                        data.listObject[i].userUpdate= self.getBAName(listBA,data.listObject[i].userCreate.split(':')[1]);
+                        data.listObject[i].userCreate = self.getBAName(listBA,data.listObject[i].userCreate.split(':')[1]);
+               
                     }
                     return  data;
                 } 
             },
-            getListUrl: {},
             listSource:{},
+            getListUrl: {},
             actionPanelWidth:520,
             tableContextMenu:{
                 delete: {
@@ -119,7 +127,14 @@ export default {
                     callback: (notification, callback) => {
                         this.deleteNotification(notification);
                     }
-                }
+                },
+                //  update: {
+                //     name:"update",
+                //     text:this.$t('user.table.contextMenu.update'), 
+                //     callback: (notification, callback) => {
+                //         this.updateNotification(notification);
+                //     }
+                // }
             },
             containerHeight: 100,
         }
@@ -128,9 +143,52 @@ export default {
         this.calcContainerHeight();
     },
     created(){
+        this.$store.dispatch("app/getAllBA");
         this.getSource();
     },
     methods:{
+        reNameParam(nameModule,des){
+             let name = des;
+            for(let i = 0; i<this.listSource[nameModule].parameter.length;i++){
+                let oldValue= new RegExp(this.listSource[nameModule].parameter[i].value);
+                let newValue ="<"+this.listSource[nameModule].parameter[i].text+'>';
+               name = name.replace(oldValue,newValue);
+              // name='123'
+            }
+            return name
+
+
+          //  }
+            
+        },
+        updateNotification(des){
+            },
+        renameReceiver(nameModule,receiver){
+            let name = receiver;
+            for(let i = 0; i<this.listSource[nameModule].receiver.length;i++){
+                if(this.listSource[nameModule].receiver[i].value==receiver){
+                name = this.listSource[nameModule].receiver[i].text;
+                }
+            }
+            return name
+        },
+        renameAction(nameModule,event){
+            let name = event;
+            for(let i = 0; i<this.listSource[nameModule].event.length;i++){
+                if(this.listSource[nameModule].event[i].value==event){
+                name = this.listSource[nameModule].event[i].text;
+                }
+            }
+            return name
+
+         },
+        getBAName(list, id){
+            for(let i = 0; i<list.length;i++){
+                if(list[i].id==id){
+                    return list[i].name;
+                }
+            }
+        },
         getSource(){
             const self = this;
             notificationApi.showAllModuleConfig().then(res=>{

@@ -37,6 +37,8 @@ function cleanContent(content, configValue) {
         .replace(/↵+/, ' ')
         .replace(/\bbpmn:/g, '')
         .replace(/<di:/g, '<omgdi:')
+        .replace(/<scriptTask /g, '<serviceTask ')
+        .replace(/<\/scriptTask>/g, '<\/serviceTask>')
         .replace(/<dc:/g, '<omgdc:')
         .replace(/symper_prefix_chars_/g, 'symper:')
         .replace(/symper:symper:/g, 'symper:')
@@ -356,8 +358,13 @@ export const extractTaskInfoFromObject = function(obj) {
 function getRoleUser(roleIdentify){
     let arrDataRole=roleIdentify.split(":");
     let allSymperRole=SYMPER_APP.$store.state.app.allSymperRoles;
-    let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
-    return role;
+    if (allSymperRole[arrDataRole[0]]) {
+        let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+        return role;
+    }else{
+        return {};
+    }
+  
 }
 
 export const addMoreInfoToTask = function(task) {

@@ -12,9 +12,15 @@
                  @cell-editing-started="cellEditingStarted"
                  @cell-value-changed="cellValueChanged"
                  @cell-double-clicked="cellDoubleClick"
+                 @cell-clicked="cellClicked"
+                 @cell-context-menu="cellContextMenu($event)"
+                 @cell-mouse-over="cellMouseOver"
+                 @cell-mouse-out="cellMouseOut"
                  :rowData="rowDataTable"
                  :treeData="true"
                  :animateRows="true"
+                 :enableRangeSelection="true"
+                 :allowContextMenuWithControlKey="true"
                  :groupDefaultExpanded="groupDefaultExpanded"
                  :frameworkComponents="frameworkComponents"
                  :modules="modules"
@@ -25,6 +31,7 @@
 </template>
 <script>
 import {AgGridVue} from "ag-grid-vue";
+import { MenuModule } from '@ag-grid-enterprise/menu';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
@@ -94,17 +101,20 @@ export default {
         return {
             gridOptions:null,
             modules: [
+                MenuModule,
                 RowGroupingModule,
+                ClientSideRowModelModule,
+                RowGroupingModule
             ],
             defaultColDef: null,
             autoGroupColumnDef: null,
             columns:[],
             rowDataTable:[],
-            modules: [ClientSideRowModelModule, RowGroupingModule],
             autoGroupColumnDef: null,
             groupDefaultExpanded: null,
             getDataPath: null,
             frameworkComponents: null,
+           
         }
     },
     components: {
@@ -121,20 +131,6 @@ export default {
             filter: true,
             sortable: true,
             resizable: true,
-            // if(hideRowBorderCss){
-            //     cellStyle: (params) => {
-            //     const { level } = params.node;
-            //     const groupCell = params.value === params.node.key;
-            //     const indent = 0; // change this value to your liking
-            //     if (!groupCell) {
-            //         return {
-            //             paddingLeft: (level + 1) * indent + "px",
-            //             marginBottom: 10+"px",
-            //         };
-            //     }
-            // }
-            //    }
-           
         };
         this.autoGroupColumnDef = { minWidth: 100 };
         this.gridOptions = {};
@@ -177,6 +173,11 @@ export default {
     mounted(){
     },  
     methods:{
+        cellContextMenu(params,x){
+             params.event.preventDefault()
+            params.event.stopPropagation()
+            this.$emit('on-cell-context-menu', params)
+        },
         refreshData(columns){
             this.gridOptions.api.clearFocusedCell()
             this.columns = columns;
@@ -206,7 +207,18 @@ export default {
             this.$emit('on-cell-change',params)
         },
         cellDoubleClick(params){
+            params.event.preventDefault()
+            params.event.stopPropagation()
             this.$emit('on-cell-dbl-click',params)
+        },
+        cellClicked(params){
+            this.$emit('on-cell-click',params)
+        },
+        cellMouseOver(params){
+            this.$emit('on-cell-mouse-over',params)
+        },
+        cellMouseOut(params){
+            this.$emit('on-cell-mouse-out',params)
         },
         onGridReady(param){
             this.$emit('grid-ready', param)

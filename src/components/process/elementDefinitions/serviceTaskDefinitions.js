@@ -4,7 +4,7 @@ export default {
     script: {
         params: {
             requestMethod: 'POST',
-            requestUrl: 'https://syql.symper.vn/formulas/get-data',
+            requestUrl: 'https://syql.symper.vn/formulas/compileClient',
             requestHeaders: 'Accept: application/json',
             requestBody: '',
             requestBodyEncoding: 'UTF8',
@@ -15,16 +15,18 @@ export default {
             responseVariableName: '',
             ignoreException: true,
             saveRequestVariables: false,
-            saveResponseParameters: false,
+            saveResponseParameters: true,
             resultVariablePrefix: '',
             saveResponseParametersTransient: false,
-            saveResponseVariableAsJson: true,
+            saveResponseVariableAsJson: false,
         },
         makeRequestBody(nodeAttr) {
+            this.params.responseVariableName = 'symper_'+nodeAttr.idNode+'_formula_response';
             let formula = nodeAttr.serviceTaskScriptValue.value;
             this.params.requestBody = `{
-                "formula": "${formula}"
+                "formulas": "${formula}"
             }`;
+            this.params.requestBody = this.params.requestBody.replace(/\n/g,' ').replace(/\s+/g,' ');
         }
     },
     notification:{

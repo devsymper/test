@@ -22,7 +22,6 @@
 							{{ $t('user.general.title')}}
 						</v-stepper-step>
 						<v-stepper-step 
-							v-if="actionType == 'add'" 
 							:editable="editStep" 
 							@click="loadPermission()" 
 							step="2"
@@ -160,6 +159,7 @@
 									<UploadFile 
 										style="margin-top:-30px; margin-left:50px"
 										ref="uploadAvatar"
+										:pickAvatar="true"
 										:autoUpload="false"
 										:fileName="avatarFileName"
 										@selected-file="handleAvatarSelected" />
@@ -228,8 +228,10 @@
 							</div>
 					</v-stepper-content>
 					<v-stepper-content step="2">
-						<Permission @change-width="changeWidth()"
-						:userId="user.id"
+						<Permission 
+							@change-width="changeWidth()"
+							:userId="user.id"
+							:stepper="stepper"
 						/>
 					</v-stepper-content>
 				</v-stepper-items>

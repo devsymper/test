@@ -50,104 +50,112 @@ export default class BasicControl extends Control {
 
 
     render() {
-        this.ele.wrap('<span style="position:relative;display:inline-block">');
-        this.ele.attr('key-instance', this.curParentInstance);
+            this.ele.wrap('<span style="position:relative;display:inline-block">');
+            this.ele.attr('key-instance', this.curParentInstance);
+            // if (this.checkDetailView() &&
+            //     this.controlProperties['isSaveToDB'] !== undefined &&
+            //     (this.controlProperties['isSaveToDB'].value !== "1" ||
+            //         this.controlProperties['isSaveToDB'].value !== 1)) {
+            //     this.ele.css({ display: 'none' })
+            // }
+            if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
+                this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
+            }
+            if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
+                this.ele.attr('disabled', 'disabled');
+            }
 
-        // if (this.checkDetailView() &&
-        //     this.controlProperties['isSaveToDB'] !== undefined &&
-        //     (this.controlProperties['isSaveToDB'].value !== "1" ||
-        //         this.controlProperties['isSaveToDB'].value !== 1)) {
-        //     this.ele.css({ display: 'none' })
-        // }
-        if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
-            this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
+            if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
+                this.ele.css({ 'display': 'none' })
+            }
+
+            if (this.ele.hasClass('s-control-number')) {
+
+                this.renderNumberControl();
+
+            } else if (this.ele.hasClass('s-control-table')) {
+
+            } else if (this.ele.hasClass('s-control-hidden') || this.ele.hasClass('s-control-tracking-value')) {
+                this.ele.css('display', 'none');
+
+            } else if (this.ele.hasClass('s-control-filter')) {
+                this.renderFilterControl();
+
+            } else if (this.ele.hasClass('s-control-panel')) {
+                // presetPanel(this.ele);
+
+            } else if (this.ele.hasClass('s-control-report')) {
+                this.ele.removeClass('on-property');
+                // getReportTemplate(this.ele, {}, thisObj.name);
+
+            } else if (this.ele.hasClass('s-control-time')) {
+                this.ele.attr('type', 'text');
+                this.renderTimeControl();
+
+            } else if (this.ele.hasClass('s-control-percent')) {
+                this.renderPercentControl()
+
+            } else if (this.ele.hasClass('s-control-date')) {
+                this.renderDateControl();
+
+            } else if (this.ele.hasClass('s-control-datetime')) {
+                this.renderDateTimeControl();
+            } else if (this.ele.hasClass('s-control-file-upload')) {
+                this.renderFileControl();
+            } else if (this.ele.hasClass('s-control-user')) {
+                this.renderUserControl();
+            } else if (this.ele.hasClass('s-control-checkbox')) {
+                this.renderCheckboxControl();
+
+            } else if (this.ele.hasClass('s-control-select')) {
+                this.renderSelectControl();
+            } else if (this.ele.hasClass('s-control-combobox')) {
+                this.renderSelectControl(false);
+            } else if (this.ele.hasClass('s-control-label')) {
+                this.renderLabelControl();
+            }
+
+            if (this.checkDetailView()) {
+                // this.ele.addClass('detail-view');
+                this.ele.attr('disabled', 'disabled');
+            }
+            if (sDocument.state.viewType[this.curParentInstance] != 'submit') {
+                this.setValueControl();
+            }
+            this.setDefaultValue();
+            this.setEvent();
+            if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete')) {
+                let allTable = this.controlFormulas.autocomplete.instance.detectTableQuery();
+                let columnBinding = this.controlFormulas.autocomplete.instance.autocompleteDetectAliasControl(false);
+                this.columnBindingSubForm = columnBinding;
+                if (allTable !== false) {
+                    let table = allTable[0];
+                    documentApi.getDetailDocumentByName({ name: table }).then(res => {
+                            if (res.status == 200) {
+                                let documentId = res.data.id;
+                                this.renderSubformButton(documentId);
+                            }
+
+                        }).catch(err => {
+
+                        })
+                        .always(() => {});
+                }
+            }
+
         }
-        if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
-            this.ele.attr('disabled', 'disabled');
-        }
-
-        if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
-            this.ele.css({ 'display': 'none' })
-        }
-
-        if (this.ele.hasClass('s-control-number')) {
-
-            this.renderNumberControl();
-
-        } else if (this.ele.hasClass('s-control-table')) {
-
-        } else if (this.ele.hasClass('s-control-hidden') || this.ele.hasClass('s-control-tracking-value')) {
-            this.ele.css('display', 'none');
-
-        } else if (this.ele.hasClass('s-control-filter')) {
-            this.renderFilterControl();
-
-        } else if (this.ele.hasClass('s-control-panel')) {
-            // presetPanel(this.ele);
-
-        } else if (this.ele.hasClass('s-control-report')) {
-            this.ele.removeClass('on-property');
-            // getReportTemplate(this.ele, {}, thisObj.name);
-
-        } else if (this.ele.hasClass('s-control-time')) {
-            this.ele.attr('type', 'text');
-            this.renderTimeControl();
-
-        } else if (this.ele.hasClass('s-control-percent')) {
-            this.renderPercentControl()
-
-        } else if (this.ele.hasClass('s-control-date')) {
-            this.renderDateControl();
-
-        } else if (this.ele.hasClass('s-control-datetime')) {
-            this.renderDateTimeControl();
-        } else if (this.ele.hasClass('s-control-file-upload')) {
-            this.renderFileControl();
-        } else if (this.ele.hasClass('s-control-user')) {
-            this.renderUserControl();
-        } else if (this.ele.hasClass('s-control-checkbox')) {
-            this.renderCheckboxControl();
-
-        } else if (this.ele.hasClass('s-control-select')) {
-            this.renderSelectControl();
-        } else if (this.ele.hasClass('s-control-combobox')) {
-            this.renderSelectControl(false);
-        } else if (this.ele.hasClass('s-control-label')) {
-            this.renderLabelControl();
-        }
-
-        if (this.checkDetailView()) {
-            // this.ele.addClass('detail-view');
-            this.ele.attr('disabled', 'disabled');
-        }
-        if (sDocument.state.viewType[this.curParentInstance] != 'submit') {
-            this.setValueControl();
-        }
-        this.setDefaultValue();
-        this.setEvent();
-        if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete')) {
-            let allTable = this.controlFormulas.autocomplete.instance.autocompleteDetectTableQuery();
-            let columnBinding = this.controlFormulas.autocomplete.instance.autocompleteDetectAliasControl(false);
-            this.columnBindingSubForm = columnBinding;
-            if (allTable !== false) {
-                let table = allTable[0];
-                documentApi.getDetailDocumentByName({ name: table }).then(res => {
-                        if (res.status == 200) {
-                            let documentId = res.data.id;
-                            this.renderSubformButton(documentId);
-                        }
-
-                    }).catch(err => {
-
-                    })
-                    .always(() => {});
+        /**
+         * Ham kiểm tra có các thông tin khác của control như  (comment, history, link) trên control hay không
+         * nếu có thì thêm icon info
+         */
+    checkHasInfoControl(dataLink) {
+            if (dataLink && Object.keys(dataLink).includes(this.name)) {
+                this.renderInfoIconToControl(this.name);
             }
         }
-    }
-
-    /**
-     * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
-     */
+        /**
+         * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
+         */
     setDefaultValue() {
         if (['submit'].includes(sDocument.state.viewType[this.curParentInstance]) &&
             this.controlProperties['defaultValue'] != undefined) {
@@ -179,7 +187,9 @@ export default class BasicControl extends Control {
         return false;
     }
     setEvent() {
-
+            // biến check xem control có đang autocomplete hay ko
+            // nếu đang autocomplete thì ko nhận sự kiện thay đổi khi giá trị đang được gõ
+            let isAutocompleting = false;
             let thisObj = this;
             this.ele.on('change', function(e) {
                 let valueChange = $(e.target).val();
@@ -189,7 +199,10 @@ export default class BasicControl extends Control {
                     valueChange = $(e.target).prop("checked");
                 }
                 thisObj.value = valueChange;
-                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.name, val: valueChange })
+                if (!isAutocompleting) {
+                    SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.name, val: valueChange });
+                }
+                isAutocompleting = false;
             })
             this.ele.on('focus', function(e) {
                 store.commit("document/addToDocumentSubmitStore", {
@@ -200,7 +213,7 @@ export default class BasicControl extends Control {
             })
 
             this.ele.on('keyup', function(e) {
-                if (e.key == 'F2' && store.state.app.accountType == 'ba') {
+                if (e.key == 'F2' && store.state.app.baInfo && Object.keys(store.state.app.baInfo).length > 0) {
                     thisObj.traceControl();
                 }
                 if (thisObj.type == 'user') {
@@ -226,6 +239,7 @@ export default class BasicControl extends Control {
                     let fromSelect = false;
                     let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
                     e['controlName'] = thisObj.controlProperties.name.value;
+                    isAutocompleting = true;
                     SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                         e: e,
                         autocompleteFormulasInstance: formulasInstance,
@@ -266,7 +280,7 @@ export default class BasicControl extends Control {
                 if (thisObj.type == 'date') {
                     SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)
                 } else if (thisObj.type == 'inputFilter') {
-                    e.formulas = thisObj.controlFormulas.formulas;
+                    e.formulas = thisObj.controlFormulas.list;
                     SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
                 } else if (thisObj.type == 'time') {
                     e.curTarget = e.target
@@ -293,6 +307,8 @@ export default class BasicControl extends Control {
         if (this.inTable === false) {
             if (this.type == 'label') {
                 $('#' + this.id).text(value);
+            } else if (this.type == 'richText') {
+                $('#' + this.id).html(value);
             } else if (this.type == 'date') {
                 $('#' + this.id).val(moment(value).format(this.formatDate));
             } else if (this.type == 'checkbox') {
@@ -342,6 +358,8 @@ export default class BasicControl extends Control {
         }
         if (this.type == 'label') {
             this.ele.text(value)
+        } else if (this.type == 'richText') {
+            $('#' + this.id).html(value);
         } else if (this.type == 'image') {
             this.ele.empty();
             let w = this.controlProperties.width.value;
@@ -676,11 +694,10 @@ export default class BasicControl extends Control {
         }
         return false;
     }
-    renderLinkToControl(link) {
-        let icon = `<span class="mdi mdi-information link-icon" title="` + link + `"></span>`
-        this.ele.parent().append(icon);
-        this.ele.parent().find('.link-icon').on('click', function(e) {
-            window.open(link);
-        })
+    renderInfoIconToControl(controlName) {
+        if (this.ele.parent().find('.info-control-btn').length == 0) {
+            let icon = `<span class="mdi mdi-information info-control-btn" data-control="` + controlName + `"></span>`
+            this.ele.parent().append(icon);
+        }
     }
 }

@@ -60,8 +60,8 @@
                             <span mt-1>{{$t("tasks.header.owner")}}</span>
                         </div>
                         <div class="ml-7 mt-1">
-                            <infoUser v-if="taskCurrent.ownerInfo.id" class="userInfo" :userId="taskCurrent.ownerInfo.id" :roleInfo="taskCurrent.ownerRole ? taskCurrent.ownerRole:{}" />
-                            <infoUser v-else class="userInfo" :userId="taskCurrent.assigneeInfo.id" :roleInfo="taskCurrent.assigneeRole" />
+                            <infoUser v-if="taskCurrent.ownerInfo.id" style="width:300px" class="userInfo" :userId="taskCurrent.ownerInfo.id" :roleInfo="taskCurrent.ownerRole ? taskCurrent.ownerRole:{}" />
+                            <infoUser v-else class="userInfo" style="width:300px" :userId="taskCurrent.assigneeInfo.id" :roleInfo="taskCurrent.assigneeRole" />
                         </div>
                   </div>
                 </div>
@@ -257,8 +257,13 @@ export default {
         getRoleUser(roleIdentify){
             let arrDataRole=roleIdentify.split(":");
             let allSymperRole=this.$store.state.app.allSymperRoles;
-            let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
-            return role;
+            if (allSymperRole[arrDataRole[0]]) {
+                let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+                return role;
+            }else{
+                return {};
+            }
+          
         },  
         getProposer(nodeId){
             this.proposer={};

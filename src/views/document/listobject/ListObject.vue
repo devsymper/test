@@ -1,6 +1,6 @@
 <template>
     
-    <div class="h-100 w-100">
+    <div class="h-100 w-100 list-object-component">
         <list-items
         :getDataUrl="'https://sdocument-management.symper.vn/documents/'+docId+'/objects'"
         :exportLink="'https://sdocument-management.symper.vn/documents/'+docId+'/export-excel'" 
@@ -22,6 +22,7 @@
         @after-selected-row="afterSelectedRow"
         @row-selected="afterCellSelection"
         :commonActionProps="commonActionProps"
+        :customAPIResult="customAPIResult"
         ref="listObject"
     >
         <div slot="right-panel-content" class="h-100">
@@ -43,7 +44,7 @@
                     color="orange"
                     ></v-progress-linear>
                     <br>
-                <v-btn small @click="deleteRecord" class="delete-record-btn">
+                <v-btn small @click="showDialog" class="delete-record-btn">
                     <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
                 </v-btn>
             </div>
@@ -98,7 +99,7 @@
                             <span>{{$t('document.instance.showlist.update')}}</span>
                         </v-tooltip>
                     </div>
-                    <v-btn small @click="deleteRecord" class="delete-record-btn">
+                    <v-btn small @click="showDialog" class="delete-record-btn">
                         <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
                     </v-btn>
                 </div>
@@ -173,6 +174,35 @@
                 </div>
             </div>
         </BottomSheet>
+        <v-dialog
+            v-model="dialog"
+            max-width="290">
+            <v-card>
+                <v-card-title class="headline">Xác nhận Xóa</v-card-title>
+                <v-card-text>
+                Xác nhận xóa {{countRecordSelected}} bản ghi
+                </v-card-text>
+
+                <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <v-btn
+                    color="darken-1"
+                    text
+                    @click="dialog = false"
+                >
+                    {{$t('common.close')}}
+                </v-btn>
+
+                <v-btn
+                    color="green"
+                    text
+                    @click="deleteSelectedRecord">
+                    {{$t('common.delete')}}
+                </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 <script>
@@ -201,6 +231,7 @@ export default {
     },
     data(){
         return {
+            dialog:false,
             showProgress:false,
             actionOnRightSidebar: 'detail',
             commonActionProps: {
@@ -208,6 +239,30 @@ export default {
                 "resource": "document_instance",
                 "scope": "document",
                 "parentId": this.$route.params.id
+            },
+            customAPIResult:{
+                reformatData(res){
+                    let thisCpn = util.getClosestVueInstanceFromDom(document.querySelector('.list-object-component'));
+                    let listObject = res.data.listObject;
+                    if(Object.keys(thisCpn.recordSelected).length > 0){
+                        for (let index = 0; index < listObject.length; index++) {
+                            let row = listObject[index];
+                            debugger
+                            let rowChecked = Object.values(thisCpn.recordSelected).filter(r=>{
+                                return r.document_object_id == row.document_object_id
+                            })
+                            if(rowChecked.length > 0){
+                                debugger
+                                listObject[index]['checkbox_select_item'] = true;
+                            }
+                        }
+                    }
+                    return{
+                        columns:res.data.columns,
+                        listObject:res.data.listObject,
+                        total:res.data.listObject.length,
+                    }
+                }
             },
             docId:parseInt(this.$route.params.id),
             currentDocObjectActiveIndex:'',
@@ -359,7 +414,14 @@ export default {
     },
     activated(){
         if(this.$refs.listObject.isShowCheckedRow()){
-            this.showBottomSheet();
+            if(this.isDeleteMultiple){
+                // for(let row in this.recordSelected){
+                //     this.$refs.listObject.getHotInstance().setDataAtCell(row,0,true,'edit');
+                // }
+            }
+            else{
+                this.showBottomSheet();
+            }
         }
     },
     methods:{
@@ -369,13 +431,14 @@ export default {
         updateCurrentRecord(){
             this.actionOnRightSidebar = 'update';
         },
-        deleteRecord(){
+        deleteSelectedRecord(){
             let itemSelected = Object.values(this.recordSelected);
             let ids = itemSelected.reduce((arr,obj)=>{
                 arr.push(obj.document_object_id);
                 return arr;
             },[]);
             let thisCpn = this;
+            this.dialog = false;
             documentApi
             .deleteDocumentObject({objectIds:JSON.stringify(ids)})
             .then(res => {
@@ -384,6 +447,7 @@ export default {
                         type: "success",
                         title: "Delete document Object success!"
                     });  
+                    thisCpn.$refs.listObject.removeAllRowChecked();
                     thisCpn.$refs.listObject.refreshList();
                 }
                 else{
@@ -396,6 +460,9 @@ export default {
             .catch(err => {
             })
             .always(() => {});
+        },
+        showDialog(){
+            this.dialog = true;
         },
         closePanelFormulas(){
             this.formulasInput.formula.value = "";

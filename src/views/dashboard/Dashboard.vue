@@ -1,5 +1,5 @@
 <template>
-    <div class="w-100 " style="height: calc(100% - 81px)">
+    <div class="w-100 " style="height: calc(100% - 42px)">
         
         <v-tabs-items v-model="dashboardTab" class="w-100 h-100" >
             <v-tab-item

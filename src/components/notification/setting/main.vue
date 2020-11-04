@@ -24,9 +24,41 @@
                 <template v-slot:activator>
                     <v-list-item-content class="mb-2"  style="margin-left:-17px">
                     <v-list-item-title v-if="type=='main'">{{$t('objects.'+item.title)}}</v-list-item-title>
-                    <v-list-item-title v-else>{{item.title}}</v-list-item-title>
-                    <v-list-item-subtitle v-if="type=='main'" class="fw-400 fs-11">{{$t('objects.'+item.title)}}</v-list-item-subtitle>
-                    <v-list-item-subtitle v-else class="fw-400 fs-11">{{item.title}}</v-list-item-subtitle>
+                    <v-list-item-title v-else>
+                       
+                        {{$t('objects.'+item.title)}}
+                         <v-list-action style="float:right" >
+                            <v-btn small text @click.stop="tickAll(item.title, true)"  v-if="type=='unfollow'">
+                                <span class="fs-13 fw-400 light-grey">
+                                  Bỏ theo dõi
+                                </span>
+                             </v-btn>
+                              <v-btn small text @click.stop="tickAll(item.title, false)"  v-if="type=='follow'">
+                                <span class="fs-13 fw-400 light-grey">
+                                  Ngày theo dõi
+                                </span>
+                             </v-btn>
+                            </v-list-action>
+                    </v-list-item-title>
+                    <v-list-item-subtitle v-if="type=='main'" class="fw-400 fs-11">
+                        <span v-for="sub in item.subTitle" :key="sub">
+                            {{sub}}
+                        </span>
+                    </v-list-item-subtitle>
+                    <v-list-item-subtitle v-else class="fw-400 fs-11">
+                       {{$t('objects.'+item.title)}}
+                         <!-- <span v-for="sub in item.subTitle" :key="sub">
+                            {{sub}}
+                        </span> -->
+                          <v-list-action style="float:right">
+                             <span class="fs-13 fw-400 light-grey" v-if="type=='unfollow'">
+                                  {{item.userFilterAt}}
+                             </span>
+                              <span class="fs-13 fw-400 light-grey" style="margin-top:10px; margin-left:-20px" v-if="type=='follow'">
+                                  {{item.userFilterAt}}
+                             </span>
+                            </v-list-action>
+                    </v-list-item-subtitle>
                     </v-list-item-content>
                 </template>
                 <div class="mb-3 ml-10">
@@ -65,29 +97,61 @@ export default {
         deep: true,
         immediate: true,
         handler(newValue){
-            for(let i = 0; i<newValue.length;i++){
+        for(let i = 0; i<newValue.length;i++){
+            if(newValue[i].active){
                 for(let j = 0; j<newValue[i].items.length;j++){
-                // check 1 lượt nếu chọn subcribed
                     if(newValue[i].items[j].active){
-                        // nếu chưa tồn tại gọi api
-                        this.subcribedChanel(newValue[i].title, newValue[i].items[j].title) 
-                    // nếu không chọn subcribed
+                          //newValue[i].active=false;
+                        this.subcribedAllChanel(newValue[i].title, newValue[i].items[j].title,i,j) 
                     }else{
-                        this.unsubcribedChanel(newValue[i].title, newValue[i].items[j].title) 
-                        /// chuyển state false
-                        //nếu đã có trong list
+                        this.unsubcribedAllChanel(newValue[i].title, newValue[i].items[j].title,i,j) 
                     }
+                    //
                 }
             }
+            }
+            
         }
     },
   },
   props: ['type','listItems','listSubcribed','allListChanel'],
     methods: {
-        //subcribed all
-        subcribedChanel(objectType,event){
+        tickAll(objectType, isFollow){
+            let data={state:false};
             for(let i=0;i<this.allListChanel.length;i++){
-                if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&!this.allListChanel[i].subscribed){
+                if(this.allListChanel[i].objectType==objectType){
+                    if(!isFollow){
+                        for(let j=0;j< this.listItems.length;j++){
+                            // this.listItems[i].active=false;
+                            if(this.listItems[j].title==objectType){
+                               
+                                this.listItems[j].items.map(x=>x.active=false)
+                            }
+                        }
+                        notification.subscribeChanel(this.allListChanel[i].id).then(res=>{
+                            if(res.status==200){}})
+                    }else{
+                        for(let j=0;j< this.listItems.length;j++){
+                            //    this.listItems[i].active=false;
+                            if(this.listItems[j].title==objectType){
+                                this.listItems[j].items.map(x=>x.active=true)
+                            }
+                        }
+                        notification.subscribeChanel(this.allListChanel[i].id,data).then(res=>{
+                            if(res.status==200){} })
+                    }
+                };
+            }
+        },
+        subscribedOneChanel(id){
+             notification.subscribeChanel(id).then(res=>{
+                if(res.status==200){}
+            })
+        },
+        //subcribed all
+        subcribedAllChanel(objectType,event,k,h){
+            for(let i=0;i<this.allListChanel.length;i++){
+                if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&!this.allListChanel[i].userFilterState){
                        notification.subscribeChanel(this.allListChanel[i].id).then(res=>{
                         if(res.status==200){
                         }
@@ -95,10 +159,11 @@ export default {
                 }
             }
         },
-        unsubcribedChanel(objectType,event){
+        unsubcribedAllChanel(objectType,event,k,h){
+            const self = this;
             let data={state:false};
             for(let i=0;i<this.allListChanel.length;i++){
-                if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&this.allListChanel[i].subscribed){
+                if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&this.allListChanel[i].userFilterState){
                        notification.subscribeChanel(this.allListChanel[i].id,data).then(res=>{
                         if(res.status==200){
                         }
@@ -116,10 +181,11 @@ export default {
 }
 </script>
 <style scoped>
-    /* .v-list-group__header{
-        margin-bottom:8px!important
-    } */
     .notification ::v-deep .v-list-item{
         padding:0px!important
+    }
+    .light-grey{
+        font-family:Roboto;
+        color:rgba(0,0,0,0.4)
     }
 </style>

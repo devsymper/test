@@ -87,6 +87,7 @@ export default {
         },
         elementId(){
             this.setInstanceXML();
+            this.eventAfterRender();
         }
     },
     created() {
@@ -131,7 +132,7 @@ export default {
             if(this.needFocus){
                 setTimeout((self) => {
                     self.$refs.symperBpmn.focus();
-                }, 100,this);
+                }, 200,this);
             }
         },
         handleClosePopup(){
@@ -182,7 +183,7 @@ export default {
             let filter={};
             filter.includeProcessVariables=true;
             filter.processInstanceId=instanceId;
-            await bpmneApi
+            bpmneApi
                 .getProcessInstanceHistory(filter)
                 .then(res => {
                     self.updateDrawDataInDiagram(res.data[0].variables);
@@ -195,6 +196,7 @@ export default {
                 });
         },
         async updateDrawDataInDiagram(variables){
+            let self=this;
             let symBpmn = this.$refs.symperBpmn;
             let mapUser = this.$store.getters['app/mapIdToUser'];
             for (let index = 0; index < this.flowElementMap.length; index++) {
@@ -208,35 +210,36 @@ export default {
                     data.data=this.flowElementMap[index].assignee;
                     data.type="multiple";
                     let res=await orgchartApi.getUserIdentifiFromProcessModeler(data);
-                    this.flowElementMap[index].assignee=res;
+                    self.flowElementMap[index].assignee=res;
                 }
 
                 let infoAssignee={};
                 let roleInfo={};
                 infoAssignee.assignee={};
                 infoAssignee.role={};
-                let task=this.flowElementMap[index];
+                let task=self.flowElementMap[index];
                 let assigneeId=task.assignee;
                 if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
                     let arrDataAssignee=task.assignee.split(":");
                     assigneeId=arrDataAssignee[0];
                     if (arrDataAssignee.length>3) { // loại trừ trường hợp role=0
                         let roleIdentify=task.assignee.slice(assigneeId.length+1);
-                        roleInfo=this.getRoleUser(roleIdentify);
+                        roleInfo=self.getRoleUser(roleIdentify);
                     }
                 }
                 if (mapUser[assigneeId]) {
                     infoAssignee.assignee = mapUser[assigneeId];
                     infoAssignee.role = roleInfo;
                 }
-                if (this.flowElementMap[index].id) {
-                    console.log("elll",this.flowElementMap[index].id);
-                    symBpmn.updateElementProperties(this.flowElementMap[index].id, {
-                        infoAssignee: infoAssignee,
-                        setColor:nodeStatusColors.notStart
-                    });
-                }
 
+                if (self.flowElementMap[index].id) {
+                    setTimeout((self) => {
+                        symBpmn.updateElementProperties(self.flowElementMap[index].id, {
+                            infoAssignee: infoAssignee,
+                            setColor:nodeStatusColors.notStart
+                        });
+                    }, 200,this);
+                }
             }
         },
         // Lấy ra thông tin chạy của các node của instance
@@ -294,8 +297,10 @@ export default {
             let arrDataRole=roleIdentify.split(":");
             let allSymperRole=this.$store.state.app.allSymperRoles;
             if (Object.keys(allSymperRole).length>0) {
-                let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
-                return role;
+                if (allSymperRole[arrDataRole[0]]) {
+                    let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+                    return role;
+                }
             }
             return {}
         },
@@ -335,7 +340,6 @@ export default {
                                 }
                             }
                         });
-                        //console.log(taskInfo,"aaaaaxx");
                         symBpmn.updateElementProperties(eleId, {
                             statusCount: nodeInfo.instancesStatusCount,
                             currentNode: currentNode,
@@ -360,7 +364,9 @@ export default {
                         let allNode = symBpmn.getAllNodes();
                         let nodeStatus = "";
                         if(self.elementId){
-                            self.runtimeNodeMap[self.elementId].currentNode = true;
+                            if (self.runtimeNodeMap[self.elementId]) {
+                                self.runtimeNodeMap[self.elementId].currentNode = true;
+                            }
                         }
                         for (let node of allNode) {
                             if (node.$type != "bpmn:Process") {
@@ -470,7 +476,8 @@ export default {
             this.nodeDetailPanel.titleIcon = 'mdi-account';
             this.nodeDetailPanel.show = true;
         },
-    }
+    },
+   
 
 };
 </script>

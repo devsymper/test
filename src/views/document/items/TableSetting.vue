@@ -24,7 +24,7 @@
                                         <th></th>
                                     </tr>
                                 </thead>
-                                <tbody id="tableDrag">
+                                <tbody id="table-body-drag">
                                     <s-row-table-setting
                                     v-for="row in listRows"
                                     :key="row.key"
@@ -43,6 +43,22 @@
             <v-card-actions>
             <v-spacer></v-spacer>
 
+
+
+            <input 
+                class="prefix-name-control"
+                v-model="prefixName"
+                type="text" 
+                placeholder="Tiền tố tên control" 
+                >
+            <v-btn
+                color="green darken-1"
+                text
+                left
+                @click="autoGenerateName"
+            >
+                Tên tự động
+            </v-btn>
             <v-btn
                 color="green darken-1"
                 text
@@ -76,21 +92,44 @@
 </template>
 <script>
 import TableSettingRow  from "./TableSettingRow.vue";
+import { str } from "./../../../plugins/utilModules/str.js"
 import Sortable from 'sortablejs';
 let sortable = null;
 export default {
     components:{
         's-row-table-setting' : TableSettingRow
     },
-    
+    props:{
+        defaultRow:{
+            type:Array
+        },
+    },
+    watch:{
+        defaultRow:{
+            deep:true,
+            immediate:true,
+            handler:function(vl){
+                this.listRows = vl;
+            }
+        }
+    },
     data(){
         return {
             listRows:[],
-            isShowTableSetting:false
+            isShowTableSetting:false,
+            prefixName:""
         }
     },
    
     methods:{
+        autoGenerateName(){
+            console.log('listRowslistRows',this.listRows);
+            for (let index = 0; index < this.listRows.length; index++) {
+                let rowData = this.listRows[index];
+                let engText = this.prefixName+"_"+str.nonAccentVietnamese(rowData.columnName);
+                this.listRows[index].name = engText;
+            }
+        },
         setListRow(listRows){
             this.listRows = listRows;
             this.setOnDrag();
@@ -132,31 +171,33 @@ export default {
         },
         // drag row
         setOnDrag(){
-            let thisCpn = this;
-            var el = document.getElementById('tableDrag');
-            if(this.sortable == null)
-            this.sortable = Sortable.create(
-                el,
-                {
-                    draggable: "#rowDrag",
-                    handle: '.sortHandle',
-                    animation: 150,
-                    easing: "cubic-bezier(1, 0, 0, 1)",
-                    sort: true,  // sorting inside list
-                    delay: 0,
-                    onEnd: function (/**Event*/evt) {
-                        var itemEl = evt.item;  // dragged HTMLElement
-                        thisCpn.dragReorder(evt.oldIndex,evt.newIndex);
-                    },
-                }
-            )
+            setTimeout((self) => {
+                var el = $('#table-body-drag')[0];
+                if(self.sortable == null)
+                self.sortable = Sortable.create(
+                    el,
+                    {
+                        draggable: "#setting-control-table #rowDrag",
+                        handle: '#setting-control-table .sortHandle',
+                        animation: 150,
+                        easing: "cubic-bezier(1, 0, 0, 1)",
+                        sort: true,  // sorting inside list
+                        delay: 0,
+                        onEnd: function (/**Event*/evt) {
+                            var itemEl = evt.item;  // dragged HTMLElement
+                            self.dragReorder(evt.oldIndex,evt.newIndex);
+                        },
+                    }
+                ) 
+            }, 500, this);
         }
     },
-    mounted(){
-        
-    }
 }
 </script>
 <style  scoped>
-    
+    .prefix-name-control{
+        padding: 4px 8px;
+        background: var(--symper-background-default);
+        border-radius: 4px;
+    }
 </style>

@@ -182,12 +182,12 @@ export default {
          * Thay đổi kiểu đối tượng thì gọi lại api lấy dánh sách các column của object hệ thống
          */
         onChangeSelectedObject(mappingItem){
-            if(mappingItem.objectType.name != 'account'){
+            if(!['account','department'].includes(mappingItem.objectType.name)){
                 mappingItem.systemObjectIdentifier.options = [];
                 return;
             }
             if(this.cacheDataObject[mappingItem.objectType.name]){ // nếu có dữ liệu trong cache rồi thì lấy ra
-               mappingItem.systemObjectIdentifier.options = this.cacheDataObject[mappingItem.objectType.name];
+                mappingItem.systemObjectIdentifier.options = this.cacheDataObject[mappingItem.objectType.name];
                 return
             }
             let self = this;

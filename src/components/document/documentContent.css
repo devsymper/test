@@ -477,7 +477,7 @@ button:hover {
 
 .table-print {
     border-collapse: collapse;
-    width: 100%;
+    width: 100% !important;
     margin-top: 16px;
 }
 
@@ -524,4 +524,16 @@ button:hover {
     width: 100%;
     max-width: 100%;
     position: relative;
+}
+
+.wrap-table .info-control-btn {
+    right: 4px !important;
+    top: 0!important;
+}
+
+.info-control-btn {
+    right: 0;
+    color: blue;
+    position: absolute;
+    top: 4px;
 }

@@ -101,8 +101,8 @@
             <EditorWorkspace 
                 :class="{
                     'w-100': true,
-                    'symper-orgchart-view': action == 'view',
-                    'symper-orgchart-active-editor': action != 'view'
+                    'symper-orgchart-view': action == 'view' || action == 'structureManagement',
+                    'symper-orgchart-active-editor': action != 'view' && action != 'structureManagement'
                 }"
                 style="height: calc(100% - 41px)"
                 @new-viz-cell-added="handleNewNodeAdded"
@@ -111,6 +111,7 @@
                 @cell-clicked="selectNode"
 				@delete-node="handlerDeleteNode"
                 :instanceKey="instanceKey"
+                :readonly="action == 'view' || action == 'structureManagement' ? true : false "
                 :context="context"
                 ref="editorWorkspace"/>
         </div>
@@ -160,13 +161,25 @@ import jointjs from "jointjs";
 import { orgchartApi } from "@/api/orgchart.js";
 import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY, departmentMarkup } from '../nodeDefinition/departmentDefinition';
 import { permissionApi } from '../../../api/permissionPack';
+import {documentApi} from "@/api/Document.js"
+
 
 export default {
     name: 'OrgchartEditor',
     computed: {
         selectingNode(){
             return this.$store.state.orgchart.editor[this.instanceKey].selectingNode;
-        }
+        },
+        listDocument() {
+            let listDoc = Object.values(this.$store.state.document.listAllDocument);
+            listDoc = listDoc.reduce((arr,obj)=>{
+                let newObj = {id:obj.id, name:obj.name, title:obj.title};
+                arr.push(newObj);
+                return arr;
+            },[])
+            return listDoc;
+        },
+
     },
     components: {
         ConfigPanel,
@@ -196,13 +209,16 @@ export default {
         showMenuPickTab:{
             type: Boolean,
             default: false
-        }
+        },
+       
     },
     data(){
         return {
             loadingDiagramView: true,
             typeView: "B",
-			positionEditor: false,
+            positionEditor: false,
+            selectedDoc: null,
+            listFieldInSelectedDoc: [],
             checkPageEmpty: false,
             menuPickTab:[
                 {
@@ -257,8 +273,17 @@ export default {
             },
         }
     },
-    created(){
+    created(){  
         this.initOrgchartData();
+        // this.$store.dispatch('document/setListDocuments')
+        documentApi.getListDocument().then(res=>{
+            if(res.status == 200){
+                let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
+               homeConfig.commonAttrs.mappingDoc.options = res.data.listObject
+            }
+            
+        })
+       
         if(this.action != 'create'){
             this.restoreOrgchartView(this.id)
         }else{
@@ -282,7 +307,12 @@ export default {
             if(val == 0 || val == 1){
                 this.$emit('current-tab' , val)
             }
-        }
+        },
+       selectedDoc(val){
+           if(val){
+              this.getFieldsInDoc(val)
+           }
+       },
     },
     methods: {
 		handlerDeleteNode(){
@@ -375,11 +405,15 @@ export default {
 				})
         },
         restoreMainOrgchartConfig(config){
+            let mappingDocInfo = JSON.parse(config.mappingDocInfo)
             let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
             homeConfig.commonAttrs.name.value = config.name;
             homeConfig.commonAttrs.description.value = config.description;
             homeConfig.commonAttrs.code.value = config.code;
             homeConfig.commonAttrs.isDefault.value = config.isDefault == "1" ? true : false;
+            homeConfig.commonAttrs.mappingDoc.value = mappingDocInfo ? mappingDocInfo.docId : ""
+            homeConfig.commonAttrs.scriptMapping.value = mappingDocInfo ? mappingDocInfo.script : ""
+            homeConfig.commonAttrs.tableMapping.value = mappingDocInfo ? mappingDocInfo.fieldMapping : [{}]
             homeConfig.customAttributes = config.dynamicAttributes;
         },
         correctDiagramDisplay(content){
@@ -394,6 +428,7 @@ export default {
             return content;
         },
         async restoreOrgchartView(id){
+            let self = this
             if(!id){
                 return
             }
@@ -411,16 +446,18 @@ export default {
                     }
                     this.restoreMainOrgchartConfig(savedData.orgchart);
                     let mapIdToDpm = {};
-
                     for(let node of savedData.departments){
+                        let users = self.getListUserAsArr(node.users)
                         let nodeData = {
                             id: node.vizId,
                             name: node.name,
                             description: node.description,
                             code: node.code,
-                            users: this.getListUserAsArr(node.users)
+                            users: users,
+                            dataFromDoc:{
+                                users: JSON.parse(node.usersFromDoc)
+                            }
                         };
-
                         if(node.content && node.content !== 'false'){ 
                             nodeData.positionDiagram = {
                                 cells: JSON.parse(node.content)
@@ -435,6 +472,7 @@ export default {
                     }
                     savedData.positions.forEach(function(e){
                         e.users = JSON.parse(e.users)
+                        e.usersFromDoc = JSON.parse(e.usersFromDoc)
                     })
                     let allPositionInADpm = getMapDpmIdToPosition(savedData.positions);
                     for(let dpmId in allPositionInADpm){
@@ -447,7 +485,10 @@ export default {
                                 name: position.name,
                                 description: position.description,
                                 code: position.code,
-                                users: userSelected
+                                users: userSelected,
+                                dataFromDoc:{
+                                    users: position.usersFromDoc
+                                }
                             };
                             let newPosition = this.createNodeConfigData('position', nodeData, dpmInstanceKey);
                             newPosition.style = this.restoreNodeStyle(position.style);
@@ -481,6 +522,7 @@ export default {
             }
             return users;
         },
+      
         restoreNodeStyle(savedStyle){
             if(typeof savedStyle != 'object'){
                 savedStyle = JSON.parse(savedStyle);
@@ -767,7 +809,12 @@ export default {
                 dynamicAttrs: JSON.stringify(orgchartAttr.customAttributes),
                 name: orgchartAttr.commonAttrs.name.value,
                 code: orgchartAttr.commonAttrs.code.value,
-                isDefault: orgchartAttr.commonAttrs.isDefault.value == true ? 1 : 0
+                isDefault: orgchartAttr.commonAttrs.isDefault.value == true ? 1 : 0,
+                mappingDocInfo:{
+                    docId: orgchartAttr.commonAttrs.mappingDoc.value,
+                    script: orgchartAttr.commonAttrs.scriptMapping.value,
+                    fieldMapping: orgchartAttr.commonAttrs.tableMapping.value,
+                }
 			};
             return data;
         },
@@ -824,7 +871,8 @@ export default {
                 vizParentId: '',
                 dynamicAttrs: node.customAttributes,
                 style: JSON.stringify(nodeStyle),
-                users: JSON.stringify(node.users)
+                users: JSON.stringify(node.users),
+                usersFromDoc: JSON.stringify(node.dataFromDoc.users),
             };
             
             if(nodeType == 'department'){
@@ -869,6 +917,9 @@ export default {
             }
         },
         handleConfigValueChange(data){
+            if(data.name = "mappingDoc"){
+                this.selectedDoc = data.data
+            }
             let cellId = this.selectingNode.id;
             if(data.name == 'name' && cellId != SYMPER_HOME_ORGCHART){
                 this.$refs.editorWorkspace.updateCellAttrs(cellId, 'name', data.data);
@@ -955,7 +1006,11 @@ export default {
             if(nodeData.users){
                 defaultConfig.users = nodeData.users;
             }
-            
+            if(nodeData.dataFromDoc){
+                defaultConfig.dataFromDoc.users = nodeData.dataFromDoc.users 
+            }else{
+                defaultConfig.dataFromDoc.users = []
+            }
             this.$store.commit('orgchart/setNodeConfig', {
                 instanceKey: instanceKey,
                 nodeId: nodeData.id,
@@ -985,6 +1040,29 @@ export default {
                 this.showPermissionsOfNode();
             }       
         },
+        /**
+         * ham lay cac field cua doc duoc chon
+         */
+         getFieldsInDoc(id){
+            let self = this
+                documentApi.getFieldByDocId(id).then(res=>{
+                    if(res.status == 200){
+                        let data = res.data
+                        for(let i in data){
+                            let obj = {}
+                            obj.name = data[i].properties.name
+                            obj.title = data[i].properties.title
+                            self.listFieldInSelectedDoc.push(obj.name)
+                        }
+                    let homeConfig = self.$store.state.orgchart.editor[self.instanceKey].homeConfig;
+                    this.$set(homeConfig.commonAttrs.tableMapping.columns[0], 'source',self.listFieldInSelectedDoc )
+                    }
+                 
+                }).catch(err=>{
+
+                })
+            
+        },
 
         async showPermissionsOfNode(){
             if(this.selectingNode.permissions.length > 0 || this.action == 'create'){
@@ -1009,6 +1087,9 @@ export default {
 </script>
 
 <style>
+.v-menu__content {
+    z-index:10000 !important
+}
 .symper-orgchart-paper .marker-arrowheads, 
 .symper-orgchart-paper .link-tools,
 .symper-orgchart-paper .marker-vertex-group,

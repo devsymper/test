@@ -5,7 +5,7 @@
 	permanent
 	right
 	:width="sidebarWidth"
-	v-show="isShow"
+	v-if="isShow"
 	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)'}"
 	>
 	<div class="main-info">
@@ -180,13 +180,20 @@
 														white-space: nowrap;
 														overflow: hidden;
 														text-overflow: ellipsis;
-														width: 140px;">
+														display:flex;
+													">
 											<v-icon v-if="item.type=='doc' ||item.type=='docx' " style="font-size:15px">mdi-file-word</v-icon>
 											<v-icon v-else-if="item.type=='pdf'" style="font-size:15px">mdi-file-pdf</v-icon>
 											<v-icon v-else-if="item.type=='jpg' ||item.type=='jpeg'||item.type=='png'" style="font-size:15px">mdi-file-image-outline</v-icon>
 											<v-icon v-else-if="item.type=='xlsx' ||item.type=='xls' " style="font-size:15px">mdi-file-excel</v-icon>
 											<v-icon v-else style="font-size:15px">mdi-file-document-outline</v-icon>
-											{{item.name}}</div>
+											 <v-list-item-title
+												:id="`file-`+item.id"
+												v-on="on"
+												class="fs-13 "
+												v-text="item.name"
+												></v-list-item-title>
+											</div>
 										</template>
 										<span>{{ item.name }}</span>
 									</v-tooltip>
@@ -194,9 +201,9 @@
 								<v-col 	
 									cols="4" 
 									style="font-size:12px;padding:0px;padding-top:3px!important">
-									<span>{{item.createAt}}</span>
+									<span class=" text-ellipsis w-100">{{item.createAt}}</span>
 								</v-col>
-								<v-col class="pull-right" style="padding:0px;padding-top:3px!important">
+								<v-col style="padding:0px;padding-top:4px!important">
 									<v-icon  @click="downLoadFile(item.id)"  v-show="showByIndex === idex" style="font-size:18px;margin-left:40px">mdi-download</v-icon>
 									<v-icon  @click="actionFileAttachment($event,item.serverPath,item.name,item.type,item.id)"  v-show="showByIndex === idex" style="font-size:18px; margin-left:8px">mdi-dots-horizontal</v-icon>
 								</v-col> 
@@ -331,7 +338,68 @@ export default {
 				{
 					title: this.$t("kh.contextmenu.rename"),
 						menuAction: action => {
-							alert("Đổi tên");
+							let id = this.fileId;
+							let name=this.name;
+							var renameInput = $("<input id="+"file-" + id + " value=" + name + " >");
+							$("#file-" + id).replaceWith(renameInput);
+							$("#file-" + id).val(name);
+							renameInput.on("blur", function(evt) {
+								$(this).replaceWith(
+									"<div id="+"file-" +
+									id +
+									" class='v-list-item__title fs-13'>"+
+									name +
+									" </div>"
+								);
+							});
+
+							setTimeout(function() {
+								$("#file-" + id)
+									.focus()
+									.val(name)
+									.select();
+							}, 200);
+							$("#file-" + id).keyup(function(e) {
+								if (e.keyCode === 13) {
+									var text = $("#file-" + id)
+									.val()
+									.trim();
+
+									if (text != "" && text != name) {
+									let data = {};
+									data.id = id;
+									data.newName = text;
+									taskApi
+										.renameFile(data)
+										.then(res => {
+										if (res.status == 200) {
+											$(this).replaceWith(
+												"<div id="+"file-" +
+												id +
+												" class='v-list-item__title fs-13'>" +
+												text +
+												" </div>"
+											);
+										} else if (res.status == 403) {
+											SYMPER_APP.$snotifyError("Error", res.message);
+										}
+										})
+										.catch(err => {
+										console.log("error from rename file !!!", err);
+										})
+										.always(() => {});
+									} else {
+									$(this).replaceWith(
+										"<div id="+"file-" +
+										id +
+										" class='v-list-item__title fs-13'>" +
+										name +
+										" </div>"
+									);
+									}
+								}
+								}
+							);
 						},
 					icon: "mdi-pencil"
 				},

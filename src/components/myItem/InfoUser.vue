@@ -1,20 +1,21 @@
 <template>
-    <div class="user-info">
+    <div class="user-info" v-if="userInfo">
         <v-menu
             open-on-hover
             top
             offset-y
-            open-delay="500"
+            open-delay="1000"
+            z-index="9999"
             >
             <template v-slot:activator="{ on }">
                 <div  
                     v-on="on">
-                        <symperAvatar :size="20" :userId="userInfo.id" />
-                        {{userInfo.displayName}}
+                        <symperAvatar :size="20"  :userId="userInfo.id" />
+                        <span class="pl-1 user-name">{{userInfo.displayName}}</span>
                         <div class="fs-11 ml-5 grey--text" v-if="Object.keys(roleInfo).length>0">{{roleInfo.name}}</div>
                 </div>
             </template>
-           <userPopup  :userId="userInfo.id" />
+           <userPopup style="min-height:190px" :userId="userInfo.id" />
         </v-menu>
     </div>
 </template>
@@ -59,6 +60,12 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+.user-name{
+    color: rgb(27, 27, 48);
+}
+.user-name:hover{
+    text-decoration-line: underline;
+    cursor: pointer;
+}
 </style>

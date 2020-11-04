@@ -811,6 +811,9 @@ export default {
         }
     },
     methods: {
+        getHotInstance(){
+            return this.$refs.dataTable.hotInstance;
+        },  
         rerenderTable(){
             this.$refs.dataTable.hotInstance.render();
         },
@@ -1181,17 +1184,6 @@ export default {
                     thisCpn.data = resData;
                 }
                 thisCpn.handleStopDragColumn();
-                //AnhTger config show description
-                (data.listObject).forEach(element => {
-                    let processKey = element.processKey;
-                    if (processKey) {
-                        let configVale = JSON.parse(element.configValue)[processKey];
-                        if (configVale.description) {
-                            element.description = configVale.description;
-                        }
-                    }
-                   
-                });
                 thisCpn.$emit('data-get', data.listObject);
             }
             this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
@@ -1629,6 +1621,9 @@ export default {
         // Hàm trả về các dòng được selected
         getAllRowChecked(){
             return this.allRowChecked;
+        },
+        removeAllRowChecked(){
+            this.allRowChecked = []
         },
         isShowCheckedRow(){
             return this.hasColumnsChecked
