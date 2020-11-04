@@ -57,9 +57,11 @@ export default {
 	
 	},
 	mounted() {
+        let self = this
         let thisSize = util.getComponentSize(this);
         this.wrapper.height = (thisSize.h - 80)+'px';
         this.wrapper.width = thisSize.w+'px';
+
 		this.paper = new joint.dia.Paper({
 			cellViewNamespace: joint.shapes,
 			model: this.graph,
@@ -70,7 +72,7 @@ export default {
             defaultAnchor: { name: 'modelCenter' },
             defaultConnectionPoint: { name: 'boundary' },
             defaultConnector: { name: 'normal' },
-            interactive: !this.readonly,
+            interactive: true,
             sorting: joint.dia.Paper.sorting.APPROX,
             // dung na them 
             viewport(view) {
@@ -84,7 +86,7 @@ export default {
                         return false
                     }
                 }
-                
+              
                 if (modelS.get('hidden')) {
                     return false
                 };
@@ -97,6 +99,7 @@ export default {
                 return viewportRect.intersect(bbox);
             }
         });
+       
         var paperScroller = new joint.ui.PaperScroller({
             paper: this.paper,
             autoResizePaper: true
@@ -151,6 +154,8 @@ export default {
             });
             $(this.$refs.symperPaperToolbar).append(toolbar.render().el);
         }
+    },
+    watch:{
     }
 };
 </script>

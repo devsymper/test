@@ -37,7 +37,7 @@ export default class Control {
         this.idField = idField;
         this.value = value;
         this.defaultValue = "";
-        console.log('controlProps', controlProps);
+
         this.lastUserUpdate = controlProps.userUpdate
 
 
@@ -69,8 +69,6 @@ export default class Control {
          * Loại control
          */
         this.type = this.ele.attr('s-control-type');
-
-
         /**
          * Danh sách các control bị thay đổi giá trị, hoặc hiển thị... khi control này thay đổi giá trị
          */
@@ -124,7 +122,6 @@ export default class Control {
         }
         try {
             effected = JSON.parse(effected);
-
             for (let type in effected) {
                 if (type == "effectedControl") {
                     this.effectedControl = effected[type];
@@ -160,6 +157,7 @@ export default class Control {
                         let config = configs[index];
                         let formulas = config.formula.value;
                         if (formulas) {
+                            formulas = formulas.trim();
                             formulas = formulas.replace(/\r?\n|\r/g, ' ');
                             this.controlFormulas[key].configData[index]['instance'] = new Formulas(this.curParentInstance, formulas, key);
                         }
@@ -169,15 +167,19 @@ export default class Control {
                 if (this.controlFormulas[key].value && Object.values(this.controlFormulas[key].value).length > 0) {
                     let formulas = Object.values(this.controlFormulas[key].value)[0];
                     formulas = formulas.replace(/\r?\n|\r/g, ' ');
-                    this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, formulas, key);
-                    let table = this.controlFormulas[key]['instance'].detectTableRelateLocalFormulas();
-                    if (table.length > 0) {
-                        store.commit("document/addToRelatedLocalFormulas", {
-                            key: this.name,
-                            value: table,
-                            instance: this.curParentInstance
-                        });
+                    if (formulas) {
+                        formulas = formulas.trim();
+                        this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, formulas, key);
+                        let table = this.controlFormulas[key]['instance'].detectTableRelateLocalFormulas();
+                        if (table.length > 0) {
+                            store.commit("document/addToRelatedLocalFormulas", {
+                                key: this.name,
+                                value: table,
+                                instance: this.curParentInstance
+                            });
+                        }
                     }
+
                 }
             }
         }

@@ -75,7 +75,6 @@ export default {
             let ctrlName = this.focusingControlName;
             let ctrlObj = getControlInstanceFromStore(this.instance, ctrlName);
             let trackChange = this.$store.state.document.detail[this.instance].trackChange;
-            
             let data = [];
             for(let item of trackChange){
                 let info = {

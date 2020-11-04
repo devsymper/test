@@ -886,8 +886,8 @@ export default {
                 }); 
         },
         saveInputFilter(data){
-            this.handleInputChangeBySystem(data.controlName,data.value)
-            this.$refs.symDragPanel.hide()
+            this.handleInputChangeBySystem(data.controlName,data.value);
+            this.$refs.symDragPanel.hide();
         },
         searchDataFilter(data){
             if(this._inactive == false) return;
@@ -1128,7 +1128,6 @@ export default {
                 valueControl = $('#'+controlInstance.id).attr('user-id');
                 if(valueControl == undefined) valueControl = 0;
             }
-
             // cần format lại giá trị date về năm tháng ngày để lưu vào store, tránh lỗi khi submit
             if(controlInstance.type == 'date'){
                 valueControl = moment(valueControl).format('YYYY-MM-DD');
@@ -1451,7 +1450,7 @@ export default {
                 }
             }
             this.listDataFlow = listDataFlow;
-            if(!isSetEffectedControl);
+            // if(!isSetEffectedControl);
             this.getEffectedControl();
             if(this.docObjId == null){
                 thisCpn.findRootControl();
@@ -1535,6 +1534,9 @@ export default {
                 if (type != "submit" && type != "reset" && type != "draft") {
                     let formulas = allControl[name].controlFormulas;
                     for (let formulasType in formulas) {
+                        if(formulasType == 'autocomplete'){
+                            continue
+                        }
                         if(!mapControlEffected.hasOwnProperty(formulasType)){
                             mapControlEffected[formulasType] = {}
                         }
@@ -1557,26 +1559,26 @@ export default {
                         else{
                             if(formulas[formulasType].hasOwnProperty('instance')){
                                 let inputControl = formulas[formulasType].instance.inputControl;
-                                    let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
-                                    let inputFromDatasets = formulas[formulasType].instance.inputFromDatasets;
-                                    for (let controlEffect in inputControl) {
-                                        if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
-                                            mapControlEffected[formulasType][controlEffect] = {};
-                                        }
-                                        mapControlEffected[formulasType][controlEffect][name] = true;
+                                let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
+                                let inputFromDatasets = formulas[formulasType].instance.inputFromDatasets;
+                                for (let controlEffect in inputControl) {
+                                    if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
+                                        mapControlEffected[formulasType][controlEffect] = {};
                                     }
-                                    for (let controlEffect in inputFromDatasets) {
-                                        if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
-                                            mapControlEffected[formulasType][controlEffect] = {};
-                                        }
-                                        mapControlEffected[formulasType][controlEffect][name] = true;
+                                    mapControlEffected[formulasType][controlEffect][name] = true;
+                                }
+                                for (let controlEffect in inputFromDatasets) {
+                                    if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
+                                        mapControlEffected[formulasType][controlEffect] = {};
                                     }
-                                    for (let controlEffect in inputLocalFormulas) {
-                                        if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
-                                            mapControlEffected[formulasType][controlEffect] = {};
-                                        }
-                                        mapControlEffected[formulasType][controlEffect][name] = true;
+                                    mapControlEffected[formulasType][controlEffect][name] = true;
+                                }
+                                for (let controlEffect in inputLocalFormulas) {
+                                    if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
+                                        mapControlEffected[formulasType][controlEffect] = {};
                                     }
+                                    mapControlEffected[formulasType][controlEffect][name] = true;
+                                }
                                 
                                 this.detectControlEffectedInTableInDoc(mapControlEffected[formulasType], name, formulas[formulasType].instance);
                             }
@@ -1585,7 +1587,6 @@ export default {
                     }
                 }
             }
-
             this.updateEffectedControlToStore(mapControlEffected);
         },
        
@@ -1754,7 +1755,7 @@ export default {
             }
             dataPost['dataInputFormulas'] = JSON.stringify(dataPost['dataInputFormulas']);
             // nếu có giá trị công thức link trong doc thì lưu lại để dùng trong form detail
-            if(Object.keys(this.linkControl).length > 0){
+            if(this.linkControl && Object.keys(this.linkControl).length > 0){
                 dataPost['linkData'] = JSON.stringify(this.linkControl);
             }
             documentApi.submitDocument(dataPost).then(res => {
@@ -1812,7 +1813,7 @@ export default {
                 dataPost['isDraft'] = true;
             }
             // nếu có giá trị công thức link trong doc thì lưu lại để dùng trong form detail
-            if(Object.keys(this.linkControl).length > 0){
+            if(this.linkControl && Object.keys(this.linkControl).length > 0){
                 dataPost['linkData'] = JSON.stringify(this.linkControl);
             }
             documentApi.updateDocument(this.docObjId,dataPost).then(res => {
@@ -1954,11 +1955,14 @@ export default {
                             mapTypeToEffectedControl[type],
                             mapControlEffected[type][controlName]
                         );
-                        let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName)
-                        if(!dataToPreProcessControl.hasOwnProperty(controlInstance.idField)){
-                            dataToPreProcessControl[controlInstance.idField] = {};
+                        let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
+                        if(controlInstance != false){
+                            if(!dataToPreProcessControl.hasOwnProperty(controlInstance.idField)){
+                                dataToPreProcessControl[controlInstance.idField] = {};
+                            }
+                            dataToPreProcessControl[controlInstance.idField][mapTypeToEffectedControl[type]] = mapControlEffected[type][controlName];
                         }
-                        dataToPreProcessControl[controlInstance.idField][mapTypeToEffectedControl[type]] = mapControlEffected[type][controlName];
+                        
                     }
                 }
                 
@@ -2443,7 +2447,7 @@ export default {
         },
         
         getAllImpactedInput(sourceName) {
-            let sourceControlInstance = getControlInstanceFromStore(this.keyInstance,sourceName)
+            let sourceControlInstance = getControlInstanceFromStore(this.keyInstance,sourceName);
             var arr = [];
             if (sourceControlInstance != false) {
                 for (var i in sourceControlInstance['effectedControl']) {

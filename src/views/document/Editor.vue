@@ -1885,9 +1885,8 @@ export default {
                     $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body .s-control-select').each(function(e){
                         let id = $(this).attr('id')
                         let parentNode = $(this).closest('td');
-                        let input = '<input class="s-control h s-control-select" s-control-type="select" type="text" title="Select" contenteditable="false" id="' + id + '">&#65279;';
-                        parentNode.empty();
-                        parentNode.append(input)
+                        let input = '<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" contenteditable="false" id="' + id + '">&#65279;';
+                        $(this).replaceWith(input)
                     })
                     let fields = res.data.fields;
                     this.setDataForPropsControl(fields);

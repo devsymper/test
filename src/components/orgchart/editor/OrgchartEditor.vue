@@ -210,10 +210,7 @@ export default {
             type: Boolean,
             default: false
         },
-        readonly:{
-            type:Boolean, 
-            default:false
-        }
+       
     },
     data(){
         return {
@@ -316,9 +313,6 @@ export default {
               this.getFieldsInDoc(val)
            }
        },
-       readonly(val){
-           debugger
-       }
     },
     methods: {
 		handlerDeleteNode(){
@@ -412,7 +406,6 @@ export default {
         },
         restoreMainOrgchartConfig(config){
             let mappingDocInfo = JSON.parse(config.mappingDocInfo)
-            debugger
             let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
             homeConfig.commonAttrs.name.value = config.name;
             homeConfig.commonAttrs.description.value = config.description;
@@ -453,7 +446,6 @@ export default {
                     }
                     this.restoreMainOrgchartConfig(savedData.orgchart);
                     let mapIdToDpm = {};
-                  
                     for(let node of savedData.departments){
                         let users = self.getListUserAsArr(node.users)
                         let nodeData = {
@@ -480,6 +472,7 @@ export default {
                     }
                     savedData.positions.forEach(function(e){
                         e.users = JSON.parse(e.users)
+                        e.usersFromDoc = JSON.parse(e.usersFromDoc)
                     })
                     let allPositionInADpm = getMapDpmIdToPosition(savedData.positions);
                     for(let dpmId in allPositionInADpm){
@@ -492,7 +485,10 @@ export default {
                                 name: position.name,
                                 description: position.description,
                                 code: position.code,
-                                users: userSelected
+                                users: userSelected,
+                                dataFromDoc:{
+                                    users: position.usersFromDoc
+                                }
                             };
                             let newPosition = this.createNodeConfigData('position', nodeData, dpmInstanceKey);
                             newPosition.style = this.restoreNodeStyle(position.style);
@@ -1011,9 +1007,9 @@ export default {
                 defaultConfig.users = nodeData.users;
             }
             if(nodeData.dataFromDoc){
-                console.log(defaultConfig.dataFromDoc.users,'defaultConfig.dataFromDoc.users');
-                console.log(nodeData.dataFromDoc.users,'nodeData.dataFromDoc.users');
                 defaultConfig.dataFromDoc.users = nodeData.dataFromDoc.users 
+            }else{
+                defaultConfig.dataFromDoc.users = []
             }
             this.$store.commit('orgchart/setNodeConfig', {
                 instanceKey: instanceKey,

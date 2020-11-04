@@ -25,7 +25,8 @@ export default {
             count: 0 ,
             parentId: null,
             permission: true,
-            listVizidValid:[]
+            listVizidValid:[],
+            listParentVizId:[]
         };
     },
     beforeMount() {},
@@ -60,84 +61,38 @@ export default {
                 // day la tai khoan End user 
                 let idCurrentUser = this.$store.state.app.endUserInfo.id
                 let viewOnlySub = this.$store.state.orgchart.viewOnlySub
+                let listVizParentId = this.$store.state.orgchart.listVizParentId
+                let self = this
                 let data = this.params.data
                 if(this.$store.state.app.userOperations.department){
                     let permission = this.$store.state.app.userOperations.department
                     if(permission[0].view_all){
                         return true
                     }
-                    else if(permission[0].view_only_owner){
+                    if(permission[0].view_only_owner){
                         if(data.users.includes(idCurrentUser)){
                             return true
                         }
-                        if(permission[0].view_only_sub){
-                            if(viewOnlySub == false){
-                                if(data.users.includes(idCurrentUser)){
-                                    this.$store.commit('orgchart/changeViewOnlySub')
-                                    return true
-                                }else{
-                                    return false
-                                }
-                            }else{
-                                let listUser = this.$store.getters['orgchart/listUserInCurrentNode']
-                                if(listUser.includes(idCurrentUser)){
-                                    return true
-                                }else{
-                                    return false
-                                }
-                            }
-                        }
-                        if(Object.keys(permission).length > 1){
-                            for(let i in permission){
-                                if(i != '0'){
-                                    self.listVizidValid.push(i)
-                                }
-                            }
-                            if(self.listVizidValid.includes('orgchart:'+data.orgchartId+':'+data.vizId)){
-                                return true
-                            }else{
-                                return false
-                            }
-                        }
                     }    
-                    else if(permission[0].view_only_sub){
-                        if(viewOnlySub == false){
-                            if(data.users.includes(idCurrentUser)){
-                                this.$store.commit('orgchart/changeViewOnlySub')
-                                return true
-                            }
-                             if(Object.keys(permission).length > 1){
-                                for(let i in permission){
-                                    if(i != '0'){
-                                        self.listVizidValid.push(i)
-                                    }
+                    if(permission[0].view_only_sub){
+                        if(data.users.includes(idCurrentUser)){
+                            this.$store.commit('orgchart/updateListVizParentId', data.vizId)
+                            return true
+                        }
+                        if(listVizParentId.length > 0){
+                            data.data.forEach(function(e){
+                                if(listVizParentId.includes(e.vizParentId)){
+                                    self.$store.commit('orgchart/updateListVizParentId', e.vizId)
+                                    self.listVizidValid.push(e.vizId)
                                 }
-                                if(self.listVizidValid.includes('orgchart:'+data.orgchartId+':'+data.vizId)){
-                                    return true
-                                }else{
-                                    return false
-                                }
-                            }
-                        }else{
-                            let listUser = this.$store.getters['orgchart/listUserInCurrentNode']
-                            if(listUser.includes(idCurrentUser)){
+                            })
+                            if(self.listVizidValid.includes(data.vizId)){
                                 return true
                             }else{
                                 return false
                             }
-                        }
-                        if(Object.keys(permission).length > 1){
-                            for(let i in permission){
-                                if(i != '0'){
-                                    self.listVizidValid.push(i)
-                                }
-                            }
-                            if(self.listVizidValid.includes('orgchart:'+data.orgchartId+':'+data.vizId)){
-                                return true
-                            }else{
-                                return false
-                            }
-                        }
+                        }    
+                       
                     }
                     if(Object.keys(permission).length > 1){
                         for(let i in permission){
