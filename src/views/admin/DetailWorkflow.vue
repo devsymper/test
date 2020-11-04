@@ -2,7 +2,7 @@
 	<div class="detail-workflow w-100  h-100 d-flex flex-column">
 		<div class="d-flex" style="height:50%">
 			<div class="modeler-workflow">
-				modeler-workflow
+				<ModelerDetail />
 			</div>
 			<div class="summary-workflow d-flex flex-column">
 				<div class="d-flex pt-2">
@@ -10,7 +10,7 @@
 						ID
 					</span>
 					<span class="value-summary">
-						value id
+						{{processDefination.id}}
 					</span>
 				</div>
 				<div class="d-flex pt-2">
@@ -18,7 +18,7 @@
 						Tên quy trình 
 					</span>
 					<span class="value-summary">
-						value id2
+						{{processDefination.name ? processDefination.name : ""}}
 					</span>
 				</div>
 				<div class="d-flex pt-2">
@@ -26,7 +26,7 @@
 						Tiêu đề quy trình
 					</span>
 					<span class="value-summary">
-						value id3
+						{{processDefination.key ?processDefination.key : ""}}
 					</span>
 				</div>
 				<div class="d-flex pt-2">
@@ -34,7 +34,7 @@
 						Ghi chú 
 					</span>
 					<span class="value-summary">
-						value id34
+						{{processDefination.description ? processDefination.description  : ""}}
 					</span>
 				</div>
 				<div class="d-flex pt-2">
@@ -58,21 +58,87 @@
 						Phiên bản
 					</span>
 					<span class="value-summary">
-						value id36
+						2
 					</span>
 				</div>
-				<canvas id="canvas" width=200 height=200></canvas>
+				<div class="d-flex" style="margin-top:16px">	
+					<div style="width:150px; height:150px" >
+						<canvas id="canvas" width=300 height=300></canvas>
+					</div>
+					<div class="description-summary d-flex flex-column">
+						<div>
+							 <v-chip
+								class="ma-2"
+								small
+								color="primary"
+								text-color="white"
+								>
+								n
+							</v-chip>
+							<span>Chưa hoàn thành</span>
+						</div>
+						<div>
+							 <v-chip
+								class="ma-2"
+								color="green"
+								text-color="white"
+								small
+								>
+								n
+							</v-chip>
+							<span>Hoàn thành</span>
+						</div>
+						<div>
+							 <v-chip
+								class="ma-2"
+								color="red"
+								text-color="white"
+								small
+								>
+								n
+							</v-chip>
+							<span>Lỗi</span>
+						</div>
+					</div>
+				</div>
+				
 			</div>
 		</div>
-		<div class="list-workflow-instance">
+		<div class="list-workflow-instance d-flex flex-column">
+			<div class="d-flex">
+				<div style="flex-grow:1">
+					Danh sách các quy trình con
+				</div>
+				<v-btn
+					class="mr-2 white--text"
+					depressed
+					color="orange"
+					small
+					mr-1
+				>
+					Tạm dừng
+				</v-btn>
+				<v-btn
+					depressed
+					class="mr-3 white--text"
+					small
+					color="success"
+				>
+					Hoàn thành
+				</v-btn>
+			</div>
 			<ListItems 
 				ref="listWorkFlow"
 				:pageTitle="'Danh sách các quy trình con'"
 				:showButtonAdd="false"
+				:getDataUrl="apiUrl"
 				:showExportButton="false"
 				:showImportButton="false"
 				:useDefaultContext="false"
+				:useWorkFlowHeader="true"
+				:customAPIresult="customAPIresult"
 				:containerHeight="containerHeight"
+				:showToolbar="false"
 				:showImportHistoryBtn="false"
 				:showActionPanelInDisplayConfig="false"
 			/>
@@ -83,15 +149,23 @@
 <script>
 import ListItems from "@/components/common/ListItems.vue"
 import { util } from "@/plugins/util.js";
+import {adminApi} from '@/api/Admin.js'
+import { appConfigs } from "./../../configs.js";
+import { reformatGetListInstances } from "@/components/process/reformatGetListData.js";
+import ModelerDetail from "./ModelerDetail"
 export default {
 	components:{
-		ListItems
+		ListItems,
+		ModelerDetail
 	},
 	data(){
 		return {
 			containerHeight:null,
-			colors:['blue','green','red'],
+			colors:['#1976D2','#53B257','#F44A3E'],
 			values: [60,30,10],
+			customAPIresult:{
+				reformatData: reformatGetListInstances
+			}
 			
 		}
 	},
@@ -104,19 +178,21 @@ export default {
 		}
 	},
 	mounted(){
-		this.containerHeight = util.getComponentSize(this).h /2
-		this.dmbChart(60,60,40,10,this.values,this.colors);
+		this.containerHeight = util.getComponentSize(this).h /2 - 50
+		this.dmbChart(85,85,70,20,this.values,this.colors,0);
 	},
-	watch:{
-		itemData:{
-			deep:true,
-            immediate:true,
-            handler:function(obj){
-            }
+	computed:{
+		processDefination(){
+			return this.$store.state.admin.processDefination
+		},
+		apiUrl(){
+			let processKey = this.$store.state.admin.processKey
+			return appConfigs.apiDomain.bpmne.instances+'?size=100&sort=startTime&order=desc&processDefinitionKey='+processKey;
 		}
 	},
+	
 	methods:{
-		dmbChart(cx,cy,radius,arcwidth,values,colors){
+		dmbChart(cx,cy,radius,arcwidth,values,colors,selectedValue){
 			var canvas = document.getElementById("canvas");
 			var ctx = canvas.getContext("2d");
 			var tot = 0;
@@ -140,6 +216,7 @@ export default {
 			}
 			var innerRadius=radius-arcwidth;
 			ctx.beginPath();
+			ctx.fillStyle=colors[selectedValue];
 			ctx.textAlign='center';
 			ctx.font="30px  roboto";
 			ctx.fillText("3,5k",cx,cy+innerRadius*.9);
@@ -149,6 +226,9 @@ export default {
 </script>
 
 <style scoped>
+.detail-workflow{
+	font:13px roboto
+}
 .modeler-workflow{
 	width: 650px;
 }
@@ -156,14 +236,23 @@ export default {
 	width: 340px;
 	margin-top:10px
 }
+.summary-workflow .value-summary{
+	white-space: nowrap;
+  	overflow: hidden;
+  	text-overflow: ellipsis;	
+  	width: 200px;
+}
 .summary-workflow .title-summary{
 	width:120px;
 	font:13px;
 	font-weight: 500;
 }
 .summary-workflow .value-summary-status{
-	margin-top:-8px;
-	margin-left:-8px;
+	margin: -8px 
+}
+.description-summary{
+	margin-top:24px;
+	margin-left:16px;
 }
 /* canvas{
 	height: 200px !important;

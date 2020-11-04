@@ -28,6 +28,7 @@
 import ListItems from "@/components/common/ListItems.vue"
 import DetailWorkflow from "./DetailWorkflow"
 import { util } from "@/plugins/util.js";
+import {adminApi} from '@/api/Admin.js'
 export default {
 	components:{
 		ListItems,
@@ -41,7 +42,6 @@ export default {
 			apiUrl:'https://workflow-modeler.symper.vn/',
 			customAPIResult: {
                 reformatData(res){
-					debugger
                    return{
 						 listObject: res.data.listObject,
 						 total: res.data.listObject.length,
@@ -59,8 +59,16 @@ export default {
                viewDetails: {
                     name: "View details",
                     text: "Xem chi tiết",
-                    callback: (user, callback) => {
-						 self.$refs.listWorkFlow.actionPanel = true;
+                    callback: (obj, callback) => {
+						self.$store.commit('admin/setProcessKey', obj.processKey)
+						self.$refs.listWorkFlow.actionPanel = true;
+						adminApi.getLatestWD(obj.processKey).then(res=>{
+							if(res.data[0]){
+								self.$store.commit('admin/setProcessDefination', res.data[0])
+							}
+						}).catch(err=>{
+
+						})
                     },
                 },
                stopProcess: {
