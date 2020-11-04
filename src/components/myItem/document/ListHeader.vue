@@ -23,10 +23,15 @@
         :placeholder="$t('common.search')"
       ></v-text-field>
       <!-- Add task -->
-      <v-btn v-show="!sideBySideMode" small class="mr-2" depressed @click="openCreateTaskDialog">
-        <v-icon size="18">mdi-plus</v-icon>
-        <span class="ml-2">{{$t('tasks.createTask.title')}}</span>
-      </v-btn>
+        <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+                <v-btn v-on="on" v-show="!sideBySideMode" small class="mr-2" depressed @click="openCreateTaskDialog">
+                    <v-icon size="18">mdi-plus</v-icon>
+                    <span class="ml-2">{{$t('tasks.createTask.title')}}</span>
+                </v-btn>
+            </template>
+            <span>{{$t('tasks.createTask.title')}}</span>
+        </v-tooltip> 
       <!-- Bo loc cho  loai doi tuong -->
       <v-menu
         :close-on-content-click="false"
@@ -35,11 +40,16 @@
         class="mr-2"
         style="z-index:1000!important"
       >
-        <template v-slot:activator="{ on }">
-         <v-btn v-on="on"  depressed class="mr-2" small>
-            <v-icon size="18">mdi-filter-menu</v-icon>
-            <span v-if="!sideBySideMode" class="ml-2">{{$t('myItem.objType')}}</span>
-          </v-btn>
+        <template v-slot:activator="{ on: onMenu }">
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on:onTooltip }">
+                    <v-btn v-on="{...onMenu, ...onTooltip}"  depressed class="mr-2" small>
+                        <v-icon size="18">mdi-filter-menu</v-icon>
+                        <span v-if="!sideBySideMode" class="ml-2">{{$t('myItem.objType')}}</span>
+                    </v-btn>
+                </template>
+                <span>{{$t('myItem.objType')}}</span>
+            </v-tooltip>
         </template>
         <v-list>
           <v-list-item v-for="(item, index) in listObjectType" :key="index" @click="changeObjectType(index)">
@@ -76,11 +86,16 @@
             class="mr-2"
             style="z-index:1000!important"
         >
-            <template v-slot:activator="{ on }">
-            <v-btn small class="mr-2" v-on="on" depressed>
-                <v-icon size="18">mdi-swap-vertical</v-icon>
-                <span v-show="!sideBySideMode" class="ml-2">{{$t('common.sort')}}</span>
-            </v-btn>
+           <template v-slot:activator="{ on: onMenu }">
+                <v-tooltip bottom>
+                    <template v-slot:activator="{ on:onTooltip }">
+                        <v-btn  v-on="{...onMenu, ...onTooltip}" depressed class="mr-2" small>
+                            <v-icon size="18">mdi-swap-vertical</v-icon>
+                            <span v-show="!sideBySideMode" class="ml-2">{{$t('common.sort')}}</span>
+                        </v-btn>
+                        </template>
+                    <span>{{$t('common.sort')}}</span>
+                </v-tooltip> 
             </template>
             <v-list dense light nav>
             <v-subheader class="font-weight-bold fs-14" style="height: 25px">{{this.$t("sortBy")}}</v-subheader>
