@@ -123,7 +123,6 @@ export default {
    
     methods:{
         autoGenerateName(){
-            console.log('listRowslistRows',this.listRows);
             for (let index = 0; index < this.listRows.length; index++) {
                 let rowData = this.listRows[index];
                 let engText = this.prefixName+"_"+str.nonAccentVietnamese(rowData.columnName);
