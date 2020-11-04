@@ -12,7 +12,7 @@
                     v-on="on">
                         <symperAvatar :size="20"  :userId="userInfo.id" />
                         <span class="pl-1 user-name">{{userInfo.displayName}}</span>
-                        <div class="fs-11 ml-5 grey--text" v-if="Object.keys(roleInfo).length>0">{{roleInfo.name}}</div>
+                        <div class="fs-11 pl-6 grey--text" v-if="Object.keys(roleInfo).length>0">{{roleInfo.name}}</div>
                 </div>
             </template>
            <userPopup style="min-height:190px" :userId="userInfo.id" />

@@ -52,6 +52,27 @@ export default {
             customAPIResult: {
                 reformatData(res) {
                     if (res.status == 200) {
+                         let listBA = self.$store.state.app.allBA;
+                        res.data.forEach(function(e){
+                           if(!e.userCreate){
+                             e.userCreateName = ""  
+                           }else{
+                               listBA.forEach(function(k){
+                                    if(k.id == e.userCreate){
+                                        e.userCreateName =  k.name
+                                    }
+                                })
+                           }
+                           if(!e.userUpdate){
+                                e.userUpdateName =""
+                           }else{
+                               listBA.forEach(function(k){
+                                    if(k.id == e.userUpdate){
+                                        e.userUpdateName =  k.name
+                                    }
+                                })
+                           }
+                        })
                         return {
                             listObject: res.data,
                             columns: [
@@ -69,7 +90,28 @@ export default {
                                     name: "description",
                                     title: "description",
                                     type: "text"
-                                }
+                                },
+                                {
+                                    name: "userCreateName",
+                                    title: "userCreateName",
+                                    type: "text"
+                                },
+                                {
+                                    name: "userUpdateName",
+                                    title: "userUpdateName",
+                                    type: "text"
+                                },
+                                {
+                                    name: "createAt",
+                                    title: "createAt",
+                                    type: "text"
+                                },
+                                {
+                                    name: "updateAt",
+                                    title: "updateAt",
+                                    type: "text"
+                                },
+
                             ]
                         };
                     } else {
@@ -140,6 +182,7 @@ export default {
         this.calcContainerHeight();
     },
     created() {
+         this.$store.dispatch("app/getAllBA");
         this.$store.dispatch("actionPack/getAllActionByObjectType");
     },
     watch: {},
@@ -149,6 +192,9 @@ export default {
         }
     },
     methods: {
+        mapIdToBa(id){
+             
+        },
         closeForm(){
             this.$refs.listActionPack.closeactionPanel();
         },

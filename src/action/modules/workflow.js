@@ -1,3 +1,4 @@
+import BPMNEngine from "../../api/BPMNEngine";
 export default [{
 		"module": "document",
 		"resource": "document_object",
@@ -31,6 +32,28 @@ export default [{
 			console.log(this, param);
 			if (param.openInNewTab) {
 				this.$goToPage('/tasks/' + param.taskId, 'Do task');
+			}
+		}
+	},
+	{
+		"module": "workflow",
+		"resource": "workflow",
+		"scope": "workflow",
+		"action": "notification",
+		"handler":async function (param) {
+			console.log(this, param);
+			if (param.openInNewTab && param.processInstanceId) {
+				let res = await BPMNEngine.getProcessInstanceRuntimeHistory(param.processInstanceId);
+				if (res.total>0) {
+					let data=res.data;
+					for (let index = 0; index < data.length; index++) {
+						if (data[index].activityId==param.nodeId) {
+							if (data[index].taskId) {
+								this.$goToPage('myitem/tasks/' + data[index].taskId, 'Do task' );
+							}
+						}
+					}
+				}
 			}
 		}
 	},

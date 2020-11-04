@@ -57,6 +57,7 @@
         "last_updated": "Cập nhật lúc",
         "last_updated_by": "Người cập nhật",
         "statistics": "Thống kê",
+        "view": "Chi tiết",
         "detail": "Chi tiết",
         "tracking": "Theo dấu",
         "works": "Công việc",
@@ -790,7 +791,7 @@
             "start_time": "Thời gian bắt đầu",
             "tracking": "Theo dấu quy trình",
             "startSuccessfully": "Quy trình khởi tạo thành công",
-            "listModelInstance": "Danh sách bản chạy gần nhất của "
+            "listModelInstance": "Danh sách công việc"
         },
         "deployment": {
             "list": "Danh sách deploy",
@@ -1018,6 +1019,7 @@
                 "unfavorite": "Bỏ yêu thích"
             },
             "workflow_definition": {
+                "view": "Chi tiết",
                 "list": "Danh sách",
                 "create": "Tạo mới",
                 "deploy": "Triển khai",
@@ -1088,6 +1090,7 @@
                 "unfavorite": "mdi-star-off"
             },
             "workflow_definition": {
+                "view": "mdi-clipboard-list-outline",
                 "list": "mdi-clipboard-list-outline",
                 "create": "mdi-folder-plus-outline",
                 "deploy": "mdi-rocket",
