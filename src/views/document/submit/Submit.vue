@@ -585,6 +585,7 @@ export default {
                     (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
                     (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [189,16,8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
                     if(!thisCpn.$refs.autocompleteInput.isShow()){
+                        thisCpn.$refs.autocompleteInput.setTypeInput('autocomplete');
                         thisCpn.$refs.autocompleteInput.show(e.e);
                         let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
                         if(currentTableInteractive != null && currentTableInteractive != undefined)
@@ -642,11 +643,12 @@ export default {
         // hàm nhận sự thay đổi của input select gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-select-input", e => {
             if(thisCpn._inactive == true) return;
-            try {
+            try { 
                 thisCpn.$refs.autocompleteInput.show(e.e);
+                let controlName = (e.cellActive) ? e.alias + ":"+e.cellActive[0][0]+":"+e.cellActive[0][1] : e.alias;
                 thisCpn.$store.commit("document/addToDocumentSubmitStore", {
                             key: 'currentControlAutoComplete',
-                            value: e.alias + ":"+e.cellActive[0][0]+":"+e.cellActive[0][1],
+                            value: controlName,
                             instance: thisCpn.keyInstance
                         });
                 thisCpn.$refs.autocompleteInput.setTypeInput(e.type);
@@ -655,7 +657,7 @@ export default {
                 }
                 thisCpn.getDataForAutocomplete(e,e.type,e.alias);
             } catch (error) {
-                
+                console.log('errorerrorerror',error);
             }
            
         });
