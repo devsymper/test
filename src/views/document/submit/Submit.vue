@@ -508,46 +508,25 @@ export default {
             this.currentImageControl = {el:$(data.e.target).closest('.s-control-image'),controlName:data.e.controlName, controlIns:data.controlIns};
             this.$refs.fileUploadView.onButtonClick();
         });
-
+        var delayTimer;
         // hàm nhận sự kiện thay đổi của input
         this.$evtBus.$on("document-submit-input-change", locale => {
             try {
                 if(thisCpn._inactive == true) return;
                 let valueControl = locale.val;
                 let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
-                if(controlInstance.type == 'number' && !/^[-0-9,.]+$/.test(valueControl)){
-                    return;
-                }
-                if($('#'+controlInstance.id).attr('data-autocomplete') != "" && $('#'+controlInstance.id).attr('data-autocomplete') != undefined){
-                    $('#'+controlInstance.id).attr('data-autocomplete',"");
-                    return;
-                }
-                if(controlInstance.type == 'user'){
-                    valueControl = $('#'+controlInstance.id).attr('user-id');
-                    if(valueControl == undefined) valueControl = 0;
-                }
-                if(controlInstance.type == 'date'){
-                    valueControl = moment(valueControl,'DD-MM-YYYY').format('YYYY-MM-DD');
-                }
-                thisCpn.updateListInputInDocument(
-                    locale.controlName,
-                    "value",
-                    valueControl
-                );
                 
-                // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
-                if(controlInstance.isRequiredControl()){
-                    if(controlInstance.isEmpty()){
-                        controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+locale.controlName)
-                    }
-                    else{
-                        controlInstance.removeValidateIcon();
-                    }
+                if(controlInstance.checkAutoCompleteControl()){
+                    clearTimeout(delayTimer);
+                    delayTimer = setTimeout(function() {
+                        thisCpn.handleInputChangeByUser(locale, controlInstance, valueControl);
+                    }, 300);
                 }
-                resetImpactedFieldsList(thisCpn.keyInstance);
-                thisCpn.handleControlInputChange(locale.controlName);
+                else{
+                    thisCpn.handleInputChangeByUser(locale, controlInstance, valueControl);
+                }
             } catch (error) {
-                
+                console.warn(error);
             }
             
             
@@ -852,6 +831,7 @@ export default {
     
     methods: {
         
+        
         /**
          * Hàm ẩn loader
          */
@@ -1095,11 +1075,12 @@ export default {
         afterSelectRowAutoComplete(data){
             // th này không phải trong table      
             if(this.sDocumentSubmit.currentTableInteractive == null){
-                let fromAutoComplete = true;
-                if(!data.fromEnterKey){
-                    fromAutoComplete = false;
+                if(data.fromEnterKey){
+                    this.handleInputChangeBySystem(this.sDocumentSubmit.currentControlAutoComplete,data.value,true);
                 }
-                this.handleInputChangeBySystem(this.sDocumentSubmit.currentControlAutoComplete,data.value,fromAutoComplete);
+                else{
+                    this.handleInputChangeBySystem(this.sDocumentSubmit.currentControlAutoComplete,data.value,false,false);
+                }
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
@@ -1114,12 +1095,16 @@ export default {
         /**
          * Hàm xử lí sau khi chạy công thức được điền dữ liệu vào input bởi hệ thống
          */
-        handleInputChangeBySystem(controlName,valueControl, fromAutocomplete = false){
+        handleInputChangeBySystem(controlName,valueControl, fromAutocomplete = false, isRunChange = true){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
             if(controlInstance.getValue() == valueControl && this.sDocumentSubmit.docStatus != 'beforeSubmit'){ // kiểm tra ko có sự thay đổi giá trị của control thì return
                 return;
             }
-            controlInstance.setValue(valueControl)
+            controlInstance.setValue(valueControl);
+            if(!isRunChange){
+                controlInstance.triggerOnChange()
+            }
+            
             if(fromAutocomplete){
                 $('#'+controlInstance.id).attr('data-autocomplete',valueControl);
             }
@@ -1149,7 +1134,9 @@ export default {
                 }
             }
             // resetImpactedFieldsList(this.keyInstance);
-            this.handleControlInputChange(controlName);
+            if(isRunChange){
+                this.handleControlInputChange(controlName);
+            }
         },
         /**
          * Hàm  xử lí data sau khi query công thức autocomplete,
@@ -2534,7 +2521,40 @@ export default {
                 "value",
                 url
             );
-        }
+        },
+        handleInputChangeByUser(locale, controlInstance, valueControl){
+            if(controlInstance.type == 'number' && !/^[-0-9,.]+$/.test(valueControl)){
+                return;
+            }
+            if($('#'+controlInstance.id).attr('data-autocomplete') != "" && $('#'+controlInstance.id).attr('data-autocomplete') != undefined){
+                $('#'+controlInstance.id).attr('data-autocomplete',"");
+                return;
+            }
+            if(controlInstance.type == 'user'){
+                valueControl = $('#'+controlInstance.id).attr('user-id');
+                if(valueControl == undefined) valueControl = 0;
+            }
+            if(controlInstance.type == 'date'){
+                valueControl = moment(valueControl,'DD-MM-YYYY').format('YYYY-MM-DD');
+            }
+            this.updateListInputInDocument(
+                locale.controlName,
+                "value",
+                valueControl
+            );
+            
+            // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
+            if(controlInstance.isRequiredControl()){
+                if(controlInstance.isEmpty()){
+                    controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+locale.controlName)
+                }
+                else{
+                    controlInstance.removeValidateIcon();
+                }
+            }
+            resetImpactedFieldsList(this.keyInstance);
+            this.handleControlInputChange(locale.controlName);
+        },
     }
     
     
