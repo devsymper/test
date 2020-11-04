@@ -1082,13 +1082,18 @@ export default {
                 }
             }
             else{
-            
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
                 let cellActive = this.sDocumentSubmit.currentControlAutoComplete.split(':');
-                let row = cellActive[1];
-                let col = cellActive[2];
                 currentTableInteractive.isAutoCompleting = false;
-                currentTableInteractive.tableInstance.setDataAtCell(Number(row),Number(col),data.value,'edit')
+                if(cellActive.length == 1){
+                    cellActive = currentTableInteractive.tableInstance.getActiveEditor();
+                    currentTableInteractive.tableInstance.setDataAtCell(cellActive.row,cellActive.col,data.value,'edit')
+                }
+                else if(cellActive.length == 3){
+                    let row = cellActive[1];
+                    let col = cellActive[2];
+                    currentTableInteractive.tableInstance.setDataAtCell(Number(row),Number(col),data.value,'edit')
+                }
             }
         },
 
