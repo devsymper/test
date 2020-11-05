@@ -24,7 +24,6 @@ export default {
     mounted() {
     },
     data: function() {
-
         return {
             apiUrl: "https://v2hoangnd.dev.symper.vn/",
             virtualdocUrl: "virtualdocs",
@@ -39,6 +38,15 @@ export default {
         changeObjectType(index){
             this.objecType=index;
         }
+    },
+    created(){
+        if (this.$route.params.type) {
+            if (this.$route.params.type=="work") {
+                this.objecType=1;
+            }
+        }
+       
     }
+    
 }
 </script>
