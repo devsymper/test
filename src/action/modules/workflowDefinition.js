@@ -47,7 +47,7 @@ export default [{
         ...commonProps,
         "action": "update",
         "handler": function(param) {
-            self.$goToPage(
+            this.$goToPage(
                 $getActionLink(param),
                 this.$t("common.edit") + " " + (param.name ? param.name : param.key)
             );
@@ -60,14 +60,23 @@ export default [{
         ...commonProps,
         "action": "list_instance",
         "handler": async function(param) {
-            if (!param.processKey && param.id) {
-                let res = await BPMNEngine.getModelData(param.id);
-                param.processKey = res.data.processKey;
-            }
-            this.$goToPage(this.$getActionLink(param), this.$t('process.instance.listModelInstance') + param.name)
+            this.$goToPage(this.$getActionLink(param), this.$t('process.instance.listModelInstance'))
         },
         $getActionLink(param) {
-            return '/workflow/process-key/' + param.processKey + '/instances';
+            return '/myitem/work';
+        }
+    },
+    {
+        ...commonProps,
+        "action": "view",
+        "handler": async function(param) {
+                this.$goToPage(
+                    this.$getActionLink(param),
+                    this.$t("common.view") + " " + (param.name ? param.name : param.key)
+                );
+        },
+        $getActionLink(param) {
+            return '/workflow/' + param.id + '/view';
         }
     },
     {

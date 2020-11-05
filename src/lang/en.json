@@ -13,6 +13,7 @@
         "service": "Service",
         "menu": "Menu",
         "users": "Users",
+        "view": "Detail",
         "add": "Add",
         "edit": "Edit",
         "cancel": "Cancel",
