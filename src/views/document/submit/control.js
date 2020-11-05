@@ -441,6 +441,13 @@ export default class Control {
             return false;
         }
     }
+    checkViewType(type) {
+        if (sDocument.state.viewType[this.curParentInstance] == type) {
+            return true;
+        } else {
+            return false;
+        }
+    }
 
     /**
      * Hàm kiểm tra độ dài giá tri nhập vào với control TextInput

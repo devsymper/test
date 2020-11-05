@@ -34,7 +34,7 @@
             </div>
         </vue-resizable>
         <div  class="sym-document__side-bar-right">
-            <sidebar-right ref="sidebarRight" :isConfigPrint="isConfigPrint" :instance="keyInstance"/>
+            <sidebar-right ref="sidebarRight" :isConfigPrint="isConfigPrint" :styles="contentStyle" :instance="keyInstance"/>
         </div>
         <s-table-setting v-if="!isConfigPrint" ref="tableSetting" @add-columns-table="addColumnTable"/>
         <PrintTableConfig v-if="isConfigPrint" ref="printTableConfig" @config-column-table-print="configColumnTablePrint"/>
@@ -749,7 +749,10 @@ export default {
                             'padding-right': right + 'cm',
                             'padding-top': top + 'cm',
                             'padding-bottom': bottom + 'cm',
-                        })
+                        });
+                        self.$store.commit(
+                            "document/updateDocumentState",{instance:self.keyInstance,state:'documentStyle',value:self.contentStyle}
+                        );
                         ed.windowManager.close()
                     }
                 }
@@ -1363,8 +1366,17 @@ export default {
             let w = $('#document-editor-'+this.keyInstance+'_ifr').height();
             $('#document-editor-'+this.keyInstance+'_ifr').css({width:w ,height:h});
             $('.tox-sidebar-wrap').css({width:w ,height:h});
-            this.contentStyle.width = w;
-            this.contentStyle.height = h;
+            this.contentStyle.width = Math.round((w * 2.54 / 96) * 10) / 10 + 'cm';
+            this.contentStyle.height = Math.round((h * 2.54 / 96) * 10) / 10 + 'cm';
+            if(w > h){
+                this.contentStyle.page = 'landscape';
+            }
+            else{
+                this.contentStyle.page = 'portrait';
+            }
+            this.$store.commit(
+                "document/updateDocumentState",{instance:this.keyInstance,state:'documentStyle',value:this.contentStyle}
+            );
         },
         /**
          * Hàm đặt kích thước cho trang A3 A4 A5
@@ -1375,6 +1387,9 @@ export default {
             this.contentStyle.width = w;
             this.contentStyle.height = h;
             this.contentStyle.type = type;
+            this.$store.commit(
+                "document/updateDocumentState",{instance:this.keyInstance,state:'documentStyle',value:this.contentStyle}
+            );
         },
         
         //hoangnd: hàm mở modal tablesetting của control table
@@ -1843,6 +1858,9 @@ export default {
             if(defaultStyle){
                 try {
                     this.contentStyle = JSON.parse(defaultStyle);
+                    this.$store.commit(
+                        "document/updateDocumentState",{instance:this.keyInstance,state:'documentStyle',value:this.contentStyle}
+                    );
                     $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css({
                         'padding-left': this.contentStyle['padding-left'],
                         'padding-right': this.contentStyle['padding-right'],
@@ -2622,9 +2640,7 @@ export default {
             if(table.length > 0 && controlId != table.attr('id')){
                 if(!fromTreeView)
                 tinyMCE.activeEditor.selection.setNode($(e.target).closest('.s-control'));
-                if(this.routeName == 'printConfigDocument'){
-                    return;
-                }
+               
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
                 if(!control){
@@ -2634,9 +2650,7 @@ export default {
                 this.selectControl(control.properties, control.formulas,controlId,type);
             }
             else{
-                if(this.routeName == 'printConfigDocument'){
-                    return;
-                }
+                
                 let control = this.editorStore.allControl[controlId];
                 if(!control){
                     this.showDialogEditor("",this.$t('document.validate.controlNotExist'));

@@ -12,7 +12,7 @@
         <v-tab
             v-for="tab in sideRightTabs"
             :key="tab.id"
-            style="margin-bottom: 4px;"
+            style="margin-bottom: 4px;width:30px;min-width:unset;"
         >
              <v-tooltip right>
                 <template v-slot:activator="{ on }">
@@ -77,15 +77,28 @@
         </v-tab-item>
         <v-tab-item
             class="h-100 formulas-control-tab"
-        >
-        <VuePerfectScrollbar style="height:calc(100vh - 90px);">
-            <control-props-config 
-            @input-blur="handleInputBlur"
-            :singleLine="false" 
-            @input-value-changed="handleChangeInput" 
-            :instance="instance"
-            :allInputs="sCurrentDocument.formulas"/>
-        </VuePerfectScrollbar>
+            >
+            <VuePerfectScrollbar style="height:calc(100vh - 90px);">
+                <control-props-config 
+                @input-blur="handleInputBlur"
+                :singleLine="false" 
+                @input-value-changed="handleChangeInput" 
+                :instance="instance"
+                :allInputs="sCurrentDocument.formulas"/>
+            </VuePerfectScrollbar>
+        </v-tab-item>
+         <v-tab-item
+            class="h-100 style-form-tab"
+            >
+            <VuePerfectScrollbar style="height:calc(100vh - 90px);">
+                <h3 class="pl-2">Thông tin định dạng</h3>
+                <table class="general-info">
+                    <tr v-for="(value,key) in listStyle" :key="key">
+                        <td class="p-2">{{key}}:</td>
+                        <td class="pl-2">{{value}}</td>
+                    </tr>
+                </table>
+            </VuePerfectScrollbar>
         </v-tab-item>
 
         
@@ -123,6 +136,9 @@ export default {
 
         controlPropsGroup(){
             return this.$store.state.document.editor[this.instance].currentSelectedControl.properties;
+        },
+        listStyle(){
+            return this.$store.state.document.documentStyle[this.instance];   
         }
     },
     watch:{
@@ -135,21 +151,21 @@ export default {
             setTimeout(() => {
                 // $('.sym-v-expand-content input').first().focus();
             }, 200);
-        }
-        
+        },
+     
     },
     data () {
         return {
             panel: [0, 1, 2],
             sideRightTab: null,
             sideRightTabs: [
-            {id:'element', tab: 'Thuộc tính' ,icon:'mdi-hammer-screwdriver'},
-            {id:'formulas', tab: 'Công thức' ,icon:'mdi-function-variant'},
-            
+                {id:'element', tab: 'Thuộc tính' ,icon:'mdi-hammer-screwdriver'},
+                {id:'formulas', tab: 'Công thức' ,icon:'mdi-function-variant'},
+                {id:'style', tab: 'Trình bày' ,icon:'mdi-format-line-style'},
             ],
             listNameValueControl:{},    
-            delayTimer:null
-        
+            delayTimer:null,
+            styles:null
         }
     },
     methods:{
