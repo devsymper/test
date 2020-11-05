@@ -116,7 +116,6 @@
 					depressed
 					color="primary"
 					small
-					mr-1
 				>
 					Xem chi tiết
 				</v-btn>
@@ -125,7 +124,6 @@
 					depressed
 					color="orange"
 					small
-					mr-1
 				>
 					Tạm dừng
 				</v-btn>
@@ -134,6 +132,7 @@
 					class="mr-3 white--text"
 					small
 					color="success"
+
 				>
 					Hoàn thành
 				</v-btn>
@@ -149,10 +148,10 @@
 				:useWorkFlowHeader="true"
 				:customAPIResult="customAPIResult"
 				:containerHeight="containerHeight"
+				:headerPrefixKeypath="'admin.table'"
 				:showToolbar="false"
 				:showImportHistoryBtn="false"
 				:showActionPanelInDisplayConfig="false"
-				:showPagination="false"
 			/>
 		</div>
 	</div>
@@ -177,11 +176,12 @@ export default {
 			values: [60,30,10],
 			customAPIResult:{
 				reformatData(res){
+					debugger
 					return{
 						 listObject: res.data,
                          columns: [
                             {name: "id", title: "id", type: "numeric"},
-							{name: "name", title: "name", type: "text"},
+							// {name: "name", title: "name", type: "text"},
 							{name: "startUserId", title: "startUserId", type: "text"},
 							{name: "startTime", title: "startTime", type: "date"},
                          ],
