@@ -243,6 +243,7 @@ export default class Table {
             this.showPopupTime = false;
             this.dataInsertRows = []; // mảng lưu lại các dòng dữ liệu sau khi ấn enter
             this.currentControlSelected = null;
+            this.cellSelected = null;
             this.listAutoCompleteColumns = {};
             this.event = {
                 afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
@@ -291,6 +292,7 @@ export default class Table {
                     let controlName = columns[columnIndex].data;
 
                     if (thisObj.checkControlType('time', columnIndex)) {
+                        debugger
                         if (event.keyCode == 13 && thisObj.showPopupTime) {
                             thisObj.showPopupTime = false;
                             event.stopImmediatePropagation();
@@ -411,22 +413,25 @@ export default class Table {
                  */
                 afterOnCellMouseDown: function(event, coords, TD) {
                     let columns = thisObj.columnsInfo.columns;
-                    if (columns[coords.col] != undefined)
-                        thisObj.currentControlSelected = columns[coords.col].data;
-                    // nếu type cell là time thì emit qua submit mở timepicker
-                    if (thisObj.getCellSelectedType(coords.col) == 'time') {
-                        setTimeout((self) => {
-                            var activeEditor = self.getActiveEditor();
-                            self.selectCell(coords.row, coords.col);
-                            activeEditor.beginEditing();
-                            activeEditor.TEXTAREA.value = (activeEditor.originalValue == undefined) ? "" : activeEditor.originalValue
-                            thisObj.showPopupTime = true;
-                            event.controlName = columns[coords.col].data
-                            event.curTarget = activeEditor.TEXTAREA
-                            SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', event);
-                        }, 50, this);
-                        // activeEditor.enableFullEditoMode();
-                    };
+                    if (columns[coords.col] && thisObj.cellSelected == columns[coords.col].data) {
+                        // nếu type cell là time thì emit qua submit mở timepicker
+                        if (thisObj.getCellSelectedType(coords.col) == 'time') {
+                            setTimeout((self) => {
+                                var activeEditor = self.getActiveEditor();
+                                self.selectCell(coords.row, coords.col);
+                                activeEditor.beginEditing();
+                                activeEditor.TEXTAREA.value = (activeEditor.originalValue == undefined) ? "" : activeEditor.originalValue
+                                thisObj.showPopupTime = true;
+                                event.controlName = columns[coords.col].data
+                                event.curTarget = activeEditor.TEXTAREA
+                                SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', event);
+                            }, 50, this);
+                            // activeEditor.enableFullEditoMode();
+                        };
+                    }
+                    if (columns[coords.col]) {
+                        thisObj.cellSelected = columns[coords.col].data;
+                    }
                     SYMPER_APP.$evtBus.$emit("symper-app-wrapper-clicked", event);
 
                 },
