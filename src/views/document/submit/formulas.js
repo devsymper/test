@@ -598,6 +598,8 @@ export default class Formulas {
             if (this.checkExistFormulas()) {
                 let allRelateName = this.formulas.match(/{[A-Za-z0-9_]+}/gi);
                 let colSelect = this.getColumnsSelect(this.formulas);
+                let listInput = this.getDataSubmitInStore();
+
                 if (colSelect) {
                     let colFromOtherTable = colSelect[0].match(/\([a-zA-Z0-9_]*\)/gm);
                     if (colFromOtherTable) {
@@ -606,7 +608,9 @@ export default class Formulas {
                             col = col.replace(/\)/g, "");
                             col = col.replace(/\(/g, "");
                             col = col.trim();
-                            allInput[col] = true;
+                            if (Object.keys(listInput).includes(col)) {
+                                allInput[col] = true;
+                            }
                         }
                     }
 

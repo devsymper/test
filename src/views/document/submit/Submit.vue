@@ -1446,7 +1446,7 @@ export default {
                 }
             }
             this.listDataFlow = listDataFlow;
-            // if(!isSetEffectedControl);
+            if(!isSetEffectedControl);
             this.getEffectedControl();
             if(this.docObjId == null){
                 thisCpn.findRootControl();
@@ -1476,9 +1476,7 @@ export default {
                     
                 }
             }
-                this.hidePreloader();
-
-
+            this.hidePreloader();
         },
 
         pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl){
@@ -1549,12 +1547,14 @@ export default {
                                         mapControlEffected[formulasType][controlEffect][name] = true;
                                     }
                                 }
-                                
                             }
                         }
                         else{
                             if(formulas[formulasType].hasOwnProperty('instance')){
                                 let inputControl = formulas[formulasType].instance.inputControl;
+                                if(formulasType == 'formulas'){
+                                    debugger
+                                }
                                 let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
                                 let inputFromDatasets = formulas[formulasType].instance.inputFromDatasets;
                                 for (let controlEffect in inputControl) {
@@ -1575,7 +1575,6 @@ export default {
                                     }
                                     mapControlEffected[formulasType][controlEffect][name] = true;
                                 }
-                                
                                 this.detectControlEffectedInTableInDoc(mapControlEffected[formulasType], name, formulas[formulasType].instance);
                             }
                         }
@@ -1583,6 +1582,7 @@ export default {
                     }
                 }
             }
+            debugger
             this.updateEffectedControlToStore(mapControlEffected);
         },
        
