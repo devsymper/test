@@ -1235,7 +1235,8 @@
             "submitForm": "Form nhập liệu",
             "alertDescription": "Không có mô tả",
             "relatedTask": "CÁC TASK LIÊN QUAN",
-            "attachment": "TỆP ĐÍNH KÈM"
+            "attachment": "TỆP ĐÍNH KÈM",
+            "status":"Trạng thái"
         },
         "filterOptions": {
             "all": "Toàn bộ task",

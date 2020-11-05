@@ -25,24 +25,40 @@
                 <v-col
                     :cols="sideBySideMode ? 12 : compackMode ? 6 : 4"
                     class="pl-3 fs-13 font-weight-medium"
-                >{{$t("tasks.header.name")}}</v-col>
+                >{{$t("tasks.header.name")}}
+                    <v-icon @click="showFilterColumn($event,'name')" class="fs-15 float-right pr-1" style="padding-top:3px">mdi-filter-variant</v-icon>
+                </v-col>
                 <v-col
                     cols="2"
                     v-if="!sideBySideMode"
                     class="fs-13 font-weight-medium"
-                >{{$t("tasks.header.userCreate")}}</v-col>
+                >{{$t("tasks.header.userCreate")}}
+                    <!-- <v-icon @click="showFilterColumn($event,'startTime')" class="fs-15 float-right" style="padding-top:3px">mdi-filter-variant</v-icon> -->
+                </v-col>
                 <v-col
                     cols="2"
                     v-if="!sideBySideMode"
                     class="fs-13 font-weight-medium"
-                >{{$t("tasks.header.createDate")}}</v-col>
+                >
+                    {{$t("tasks.header.createDate")}}
+                    <v-icon @click="showFilterColumn($event,'startTime')" class="fs-15 float-right" style="padding-top:3px">mdi-filter-variant</v-icon>
+                </v-col>
                 <v-col
                     cols="2"
                     v-if="!sideBySideMode && !compackMode && !smallComponentMode"
                     class="fs-13 font-weight-medium"
-                >{{$t("tasks.header.app")}}</v-col>
+                >{{$t("tasks.header.app")}}
+                    <v-icon @click="showFilterColumn($event,'processDefinitionName')" class="fs-15 float-right" style="padding-top:3px">mdi-filter-variant</v-icon>
+                </v-col>
                 <v-col
-                    cols="2"
+                    cols="1"
+                    v-if="!sideBySideMode && !compackMode && !smallComponentMode"
+                    class="fs-13 font-weight-medium"
+                >{{$t("tasks.header.status")}}
+                    <v-icon @click="showFilterColumn($event,'status')" class="fs-15 float-right" style="padding-top:3px">mdi-filter-variant</v-icon>
+                </v-col>
+                <v-col
+                    cols="1"
                     v-if="!sideBySideMode && !compackMode && !smallComponentMode"
                     class="fs-13 font-weight-medium"
                 >{{$t("common.add")}}</v-col>
@@ -107,12 +123,10 @@
                                     <div class="fs-11 py-0 " style="width:200px;margin-top:3px">
                                         {{obj.startTime ? $moment(obj.startTime).format('DD/MM/YY HH:mm:ss'):$moment(obj.endTime).format('DD/MM/YY HH:mm:ss')}}
                                         <v-icon class="grey--text " x-small>mdi-clock-time-nine-outline</v-icon>
-                                    
                                     </div>
                                 </div>
                             </div>
                         </v-col>
-                    
                         <v-col
                             v-if="!sideBySideMode"
                             cols="2"
@@ -154,7 +168,17 @@
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
-                            cols="2"
+                            cols="1"
+                            class="fs-13 px-1 py-0"
+                        >
+                            <div class="pl-1 pt-1">
+                                <span v-if="obj.endTime">Done</span>
+                                <span v-else>Pendding</span>
+                            </div>
+                        </v-col>
+                        <v-col
+                            v-if="!sideBySideMode"
+                            cols="1"
                             class="fs-13 px-1 py-0"
                         >
                             <div class="pl-1 pt-1">
@@ -193,6 +217,11 @@
         ></workDetail>
       </v-col>
     </v-row>
+
+    <table-filter
+        ref="tableFilter"
+    ></table-filter>
+
   </div>
 </template>
 
@@ -206,6 +235,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../../plugins/util";
 import { appConfigs } from "../../../configs";
 import { taskApi } from "@/api/task.js";
+import TableFilter from "@/components/common/customTable/TableFilter.vue";
 
 import {
   extractTaskInfoFromObject,
@@ -213,82 +243,82 @@ import {
 } from "@/components/process/processAction";
 import infoUser from "./../InfoUser";
 export default {
-  computed: {
-    fileCountPerTask(){
-        return this.$store.state.file.fileCountPerObj.list;
-    },
-    commentCountPerTask(){
-        return this.$store.state.comment.commentCountPerObj.list;
-    },
-    groupAllProcessInstance() {
-        let allUserById = this.$store.getters['app/mapIdToUser'];
-        let allPrcess = this.allFlatWorks;
-        console.log("allPrcessallPrcessallPrcess",allPrcess);
-        allPrcess.sort(function(a, b) {
-                if (a.endTime) {
-                    var keyA = new Date(a.endTime);
-                }else{
-                    var keyA = new Date(a.startTime);
-                }
-                if (b.endTime) {
-                    var keyB = new Date(b.endTime);
-                }else{
-                    var keyB = new Date(b.startTime);
-                }
-                if (keyA > keyB) return -1;
-                if (keyA < keyB) return 1;
-                return 0;
-        });
-
-        const groups = allPrcess.reduce((groups, work) => {
-            let date;
-            work.startUserId = 0;
-            work.startUserName = '';
-            let roleInfo={};
-            const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===work.id && element.name==="symper_user_id_start_workflow" );
-            if (dataVariable) {
-                let userIdStart=dataVariable.value;
-                if (dataVariable.value.indexOf(":")>0) {  //check là userId hay userId:role
-                    let arrDataUserIden=dataVariable.value.split(":");
-                    userIdStart=arrDataUserIden[0];
-                    if (arrDataUserIden.length>3) { // loại trừ trường hợp role=0
-                        let roleIdentify=dataVariable.value.slice(userIdStart.length+1);
-                        roleInfo=this.getRoleUser(roleIdentify);
+    computed: {
+        fileCountPerTask(){
+            return this.$store.state.file.fileCountPerObj.list;
+        },
+        commentCountPerTask(){
+            return this.$store.state.comment.commentCountPerObj.list;
+        },
+        groupAllProcessInstance() {
+            let allUserById = this.$store.getters['app/mapIdToUser'];
+            let allPrcess = this.allFlatWorks;
+            console.log("allPrcessallPrcessallPrcess",allPrcess);
+            allPrcess.sort(function(a, b) {
+                    if (a.endTime) {
+                        var keyA = new Date(a.endTime);
+                    }else{
+                        var keyA = new Date(a.startTime);
                     }
-                }
-                work.startUserId = userIdStart;
-                work.startUserName = allUserById[work.startUserId] ? allUserById[work.startUserId].displayName : '';
-                work.roleInfo = roleInfo;
-            }
+                    if (b.endTime) {
+                        var keyB = new Date(b.endTime);
+                    }else{
+                        var keyB = new Date(b.startTime);
+                    }
+                    if (keyA > keyB) return -1;
+                    if (keyA < keyB) return 1;
+                    return 0;
+            });
 
-            if ( work.endTime) {
-                date = work.endTime.split("T")[0];
-            }else{
-                date = work.startTime.split("T")[0];
-            }
-            let fromNow = this.getDateFormNow(date);
-            if (!groups[fromNow]) {
-                groups[fromNow] = [];
-            }
-            groups[fromNow].push(work);
-            return groups;
-        }, {});
-        // Edit: to add it in the array format instead
-        const groupArrayWork = Object.keys(groups).map(fromNow => {
-            return {
-            fromNow,
-            works: groups[fromNow]
-            };
-        });
-        return groupArrayWork;
+            const groups = allPrcess.reduce((groups, work) => {
+                let date;
+                work.startUserId = 0;
+                work.startUserName = '';
+                let roleInfo={};
+                const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===work.id && element.name==="symper_user_id_start_workflow" );
+                if (dataVariable) {
+                    let userIdStart=dataVariable.value;
+                    if (dataVariable.value.indexOf(":")>0) {  //check là userId hay userId:role
+                        let arrDataUserIden=dataVariable.value.split(":");
+                        userIdStart=arrDataUserIden[0];
+                        if (arrDataUserIden.length>3) { // loại trừ trường hợp role=0
+                            let roleIdentify=dataVariable.value.slice(userIdStart.length+1);
+                            roleInfo=this.getRoleUser(roleIdentify);
+                        }
+                    }
+                    work.startUserId = userIdStart;
+                    work.startUserName = allUserById[work.startUserId] ? allUserById[work.startUserId].displayName : '';
+                    work.roleInfo = roleInfo;
+                }
+
+                if ( work.endTime) {
+                    date = work.endTime.split("T")[0];
+                }else{
+                    date = work.startTime.split("T")[0];
+                }
+                let fromNow = this.getDateFormNow(date);
+                if (!groups[fromNow]) {
+                    groups[fromNow] = [];
+                }
+                groups[fromNow].push(work);
+                return groups;
+            }, {});
+            // Edit: to add it in the array format instead
+            const groupArrayWork = Object.keys(groups).map(fromNow => {
+                return {
+                fromNow,
+                works: groups[fromNow]
+                };
+            });
+            return groupArrayWork;
+        },
+        stask() {
+        return this.$store.state.task;
+        },
+        sapp() {
+        return this.$store.state.app;
+        }
     },
-    stask() {
-      return this.$store.state.task;
-    },
-    sapp() {
-      return this.$store.state.app;
-    }
-  },
     name: "listWork",
     components: {
         icon: icon,
@@ -296,7 +326,8 @@ export default {
         userSelector: userSelector,
         VuePerfectScrollbar: VuePerfectScrollbar,
         workDetail,
-        infoUser
+        infoUser,
+        TableFilter,
     },
     watch:{
         sideBySideMode(vl){
@@ -306,260 +337,274 @@ export default {
             }
         }
     },
-  props: {
-    compackMode: {
-      type: Boolean,
-      default: false
-    },
-    height: {
-      type: String,
-      default: "calc(100vh - 120px)"
-    },
-    // component này có ở chế độ là component con của một component khác hay ko, false nếu component này là view
-    smallComponentMode: {
-      type: Boolean,
-      default: false
-    },
-    filterFromParent: {
-      type: Object,
-      default() {
-        return {};
-      }
-    },
-    headerTitle: {
-      type: String,
-      default() {
-        return this.$t("myItem.header");
-      }
-    },
-    filterTaskAction: {
-      type: String,
-      default: "getList"
-    }
-  },
-  data: function() {
-    return {
-        index: -1,
-        dataIndex:-1,
-        loadingTaskList: false,
-        loadingMoreTask: false,
-        listTaskHeight: 300,
-        totalWork: 0,
-        selectedTask: {
-            taskInfo: {},
-            idx: -1,
-            originData: null
+    props: {
+        compackMode: {
+            type: Boolean,
+            default: false
         },
-        selectedWork:{
-            workInfo: {},
-            idx: -1,
+        height: {
+            type: String,
+            default: "calc(100vh - 120px)"
         },
-        isSmallRow: false,
-        sideBySideMode: false,
-        allFlatWorks: [],
-        allWorkIdUserStart:[],
-        allVariableProcess:[],
-        myOwnFilter: {
-            size: 50,
-            sort: "startTime",
-            order: "desc",
-            page: 1,
-            involvedUser: this.$store.state.app.endUserInfo.id+"%"
+        // component này có ở chế độ là component con của một component khác hay ko, false nếu component này là view
+        smallComponentMode: {
+            type: Boolean,
+            default: false
         },
-        filterVariables:{
-            names:"symper_application_id,symper_user_id_start_workflow",
-            page:1,
-            processInstanceIds:[]
+        filterFromParent: {
+            type: Object,
+            default() {
+                return {};
+            }
         },
-        filterListProcessUserStartWork:{
-            names:"symper_user_id_start_workflow",
-            page:1,
-            valueLike:this.$store.state.app.endUserInfo.id+"%"
+        headerTitle: {
+            type: String,
+            default() {
+                return this.$t("myItem.header");
+            }
         },
-        defaultAvatar: appConfigs.defaultAvatar,
-        listIdProcessInstance:[],
-    };
-  },
-  created() {
-  },
-  mounted() {
-    let self = this;
-    this.$store
-      .dispatch("process/getAllDefinitions")
-      .then(res => {
-        self.getWorks();
-      })
-      .catch(err => {});
-    self.reCalcListTaskHeight();
-  },
-  methods: {
-    getRoleUser(roleIdentify){
-        let arrDataRole=roleIdentify.split(":");
-        let allSymperRole=this.$store.state.app.allSymperRoles;
-        if (allSymperRole[arrDataRole[0]]) {
-            let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
-            return role;
-        }else{
-            return {};
-        }
-    },  
-    changeUpdateAsignee(){
-      this.handleTaskSubmited();
-    },
-    getDateFormNow(time){
-        var today = this.$moment().format('YYYY-MM-DD');
-        if (time===today) {
-            return this.$t('myItem.today');
-        }
-        else{
-            return this.$moment(time).fromNow();
+        filterTaskAction: {
+            type: String,
+            default: "getList"
         }
     },
-    changeObjectType(index) {
-      this.$emit("changeObjectType", index);
+    data: function() {
+        return {
+            index: -1,
+            dataIndex:-1,
+            loadingTaskList: false,
+            loadingMoreTask: false,
+            listTaskHeight: 300,
+            totalWork: 0,
+            selectedTask: {
+                taskInfo: {},
+                idx: -1,
+                originData: null
+            },
+            selectedWork:{
+                workInfo: {},
+                idx: -1,
+            },
+            isSmallRow: false,
+            sideBySideMode: false,
+            allFlatWorks: [],
+            allWorkIdUserStart:[],
+            allVariableProcess:[],
+            myOwnFilter: {
+                size: 50,
+                sort: "startTime",
+                order: "desc",
+                page: 1,
+                involvedUser: this.$store.state.app.endUserInfo.id+"%"
+            },
+            filterVariables:{
+                names:"symper_application_id,symper_user_id_start_workflow",
+                page:1,
+                processInstanceIds:[]
+            },
+            filterListProcessUserStartWork:{
+                names:"symper_user_id_start_workflow",
+                page:1,
+                valueLike:this.$store.state.app.endUserInfo.id+"%"
+            },
+            defaultAvatar: appConfigs.defaultAvatar,
+            listIdProcessInstance:[],
+        };
     },
-    selectValueInVariables(processInstanceId){
-        if (processInstanceId!=null) {
-            const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===processInstanceId && element.name=="symper_application_id");
-            if (dataVariable) {
-                let appId=dataVariable.value;
-                let allApp = this.$store.state.task.allAppActive;
-                let app=allApp.find(element => element.id==appId);
-                if (app) {
-                    return app.name;
+    created() {
+    },
+    mounted() {
+        let self = this;
+        this.$store
+            .dispatch("process/getAllDefinitions")
+            .then(res => {
+                self.getWorks();
+            })
+            .catch(err => {});
+        self.reCalcListTaskHeight();
+    },
+    methods: {
+        showFilterColumn(event,column){
+            let x=event.clientX;
+            let y=event.clientY;
+            var windowWidth = $(window).width()/1.1;
+            if( event.clientX > windowWidth){
+                x-= 190;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            let filterDom = $(this.$refs.tableFilter.$el);
+            filterDom.css("left", x + "px").css("top", y + 20 + "px");
+            this.$refs.tableFilter.show();
+
+        },
+        getRoleUser(roleIdentify){
+            let arrDataRole=roleIdentify.split(":");
+            let allSymperRole=this.$store.state.app.allSymperRoles;
+            if (allSymperRole[arrDataRole[0]]) {
+                let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+                return role;
+            }else{
+                return {};
+            }
+        },  
+        changeUpdateAsignee(){
+            this.handleTaskSubmited();
+        },
+        getDateFormNow(time){
+            var today = this.$moment().format('YYYY-MM-DD');
+            if (time===today) {
+                return this.$t('myItem.today');
+            }
+            else{
+                return this.$moment(time).fromNow();
+            }
+        },
+        changeObjectType(index) {
+            this.$emit("changeObjectType", index);
+        },
+        selectValueInVariables(processInstanceId){
+            if (processInstanceId!=null) {
+                const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===processInstanceId && element.name=="symper_application_id");
+                if (dataVariable) {
+                    let appId=dataVariable.value;
+                    let allApp = this.$store.state.task.allAppActive;
+                    let app=allApp.find(element => element.id==appId);
+                    if (app) {
+                        return app.name;
+                    }else{
+                        return "";
+                    }
                 }else{
                     return "";
                 }
             }else{
                 return "";
             }
-        }else{
-            return "";
-        }
-    },
-    handleReachEndList() {
-        if (
-            this.allFlatWorks.length < this.totalWork &&
-            this.allFlatWorks.length > 0  && !this.loadingTaskList && !this.loadingMoreTask
-        ) {
-            this.myOwnFilter.page += 1;
-            this.filterListProcessUserStartWork.page +=1;
+        },
+        handleReachEndList() {
+            if (
+                this.allFlatWorks.length < this.totalWork &&
+                this.allFlatWorks.length > 0  && !this.loadingTaskList && !this.loadingMoreTask
+            ) {
+                this.myOwnFilter.page += 1;
+                this.filterListProcessUserStartWork.page +=1;
 
-            if ((this.myOwnFilter.page-1)*this.myOwnFilter.size <this.totalWork) {
-                this.getWorks();
+                if ((this.myOwnFilter.page-1)*this.myOwnFilter.size <this.totalWork) {
+                    this.getWorks();
+                }
             }
-        }
-    },
-    handleTaskSubmited() {
-        this.sideBySideMode = false;
-        this.getWorks();
-    },
-    handleChangeFilterValue(data) {
-        for (let key in data) {
-            this.$set(this.myOwnFilter, key, data[key]);
-        }
-        this.getWorks();
-    },
-    reCalcListTaskHeight() {
-        this.listTaskHeight =util.getComponentSize(this.$el.parentElement).h - 85;
-    },
-    getUser(id) {
-        this.$refs.user.getUser(id);
-    },
-    selectObject(obj, idx,idex) {
-        this.index = idx;
-        this.dataIndex = idex;
-        this.$set(this.selectedWork, "workInfo", obj);
-        this.selectedWork.workInfo.appName=this.selectValueInVariables(obj.id);
-        this.selectedWork.idx = idx;
-        if (!this.compackMode) {
-            this.sideBySideMode = true;
-            this.$emit("change-height", "calc(100vh - 88px)");
-        }
-    },
-    closeDetail() {
-      this.sideBySideMode = false;
-      this.$emit("change-height", "calc(100vh - 120px)");
-    },
+        },
+        handleTaskSubmited() {
+            this.sideBySideMode = false;
+            this.getWorks();
+        },
+        handleChangeFilterValue(data) {
+            for (let key in data) {
+                this.$set(this.myOwnFilter, key, data[key]);
+            }
+            this.getWorks();
+        },
+        reCalcListTaskHeight() {
+            this.listTaskHeight =util.getComponentSize(this.$el.parentElement).h - 85;
+        },
+        getUser(id) {
+            this.$refs.user.getUser(id);
+        },
+        selectObject(obj, idx,idex) {
+            this.index = idx;
+            this.dataIndex = idex;
+            this.$set(this.selectedWork, "workInfo", obj);
+            this.selectedWork.workInfo.appName=this.selectValueInVariables(obj.id);
+            this.selectedWork.idx = idx;
+            if (!this.compackMode) {
+                this.sideBySideMode = true;
+                this.$emit("change-height", "calc(100vh - 88px)");
+            }
+        },
+        closeDetail() {
+            this.sideBySideMode = false;
+            this.$emit("change-height", "calc(100vh - 120px)");
+        },
 
-    async getWorks(filter = {}) { // đây là get processInstance chứ k phải get Task
-        if (this.loadingTaskList || this.loadingMoreTask) {
-            return;
-        }
-        let self = this;
-        if (this.myOwnFilter.page == 1) {
-            this.allFlatWorks = [];
-            this.loadingTaskList = true;
-        } else {
-            this.loadingMoreTask = true;
-        }
-        filter = Object.assign(filter, this.filterFromParent);
-        filter = Object.assign(filter, this.myOwnFilter);
-        let processIden = [],processId=[];
-        // get variable process mà user start
-        let res2 = {};
-        res2 = await taskApi.getVariableWorkflow(self.filterListProcessUserStartWork);
-        let processIdUserStart=[];
-        for (let item of res2.data) {
-            if (self.listIdProcessInstance.indexOf(item.processInstanceId) === -1) {
-                processIdUserStart.push(item.processInstanceId);
-                processId.push(item.processInstanceId);
-                processIden.push('work:'+item.processInstanceId);
-                self.listIdProcessInstance.push(item.processInstanceId);
+        async getWorks(filter = {}) { 
+            if (this.loadingTaskList || this.loadingMoreTask) {
+                return;
             }
-        }
-        await this.getProcessInstanceUserStart(processIdUserStart);
-        // get processInstance theo involvedUser
-        let res = {};
-        let listWork = [];
-        res = await BPMNEngine.getProcessInstanceHistory(filter);
-        listWork = res.data;
-        this.totalWork = Number(res.total);
-        for (let work of listWork) {
-            if (self.listIdProcessInstance.indexOf(work.id) === -1) {
-                self.allFlatWorks.push(work);
-                processIden.push('work:'+work.id);
-                processId.push(work.id);
-                self.listIdProcessInstance.push(work.id);
+            let self = this;
+            if (this.myOwnFilter.page == 1) {
+                this.allFlatWorks = [];
+                this.loadingTaskList = true;
+            } else {
+                this.loadingMoreTask = true;
             }
-        }
-       
-        self.filterVariables.pageSize=(processId.length)*2;
-        self.filterVariables.processInstanceIds=JSON.stringify(processId);
-        let resVariable = {};
-        resVariable = await taskApi.getVariableWorkflow(self.filterVariables);
-        for (let item of resVariable.data) {
-            if (self.allVariableProcess.indexOf(item.id) === -1) {
-                self.allVariableProcess.push(item);
+            filter = Object.assign(filter, this.filterFromParent);
+            filter = Object.assign(filter, this.myOwnFilter);
+            let processIden = [],processId=[];
+            // get variable process mà user start
+            let res2 = {};
+            res2 = await taskApi.getVariableWorkflow(self.filterListProcessUserStartWork);
+            let processIdUserStart=[];
+            for (let item of res2.data) {
+                if (self.listIdProcessInstance.indexOf(item.processInstanceId) === -1) {
+                    processIdUserStart.push(item.processInstanceId);
+                    processId.push(item.processInstanceId);
+                    processIden.push('work:'+item.processInstanceId);
+                    self.listIdProcessInstance.push(item.processInstanceId);
+                }
             }
-        }
-  
-        this.$store.commit('file/setWaitingFileCountPerObj', processIden);
-        this.$store.commit('comment/setWaitingCommentCountPerObj', processIden);
-        this.$store.dispatch('file/getWaitingFileCountPerObj');
-        this.$store.dispatch('comment/getWaitingCommentCountPerObj');
-        self.loadingTaskList = false;
-        self.loadingMoreTask = false;
-    },
-    async getProcessInstanceUserStart(processIdUserStart){
-        if (processIdUserStart.length>0) {
-            let self=this;
-            let filter={};
-            filter.size= processIdUserStart.length+1;
-            filter.sort= "startTime";
-            filter.order= "desc";
-            filter.processInstanceIds=processIdUserStart;
-            let res={};
+            await this.getProcessInstanceUserStart(processIdUserStart);
+            // get processInstance theo involvedUser
+            let res = {};
+            let listWork = [];
             res = await BPMNEngine.getProcessInstanceHistory(filter);
-            for (let work of res.data) {
-                const item = self.allFlatWorks.find(element => element.id == work.id);
-                if (!item) {
+            listWork = res.data;
+            this.totalWork = Number(res.total);
+            for (let work of listWork) {
+                if (self.listIdProcessInstance.indexOf(work.id) === -1) {
                     self.allFlatWorks.push(work);
+                    processIden.push('work:'+work.id);
+                    processId.push(work.id);
+                    self.listIdProcessInstance.push(work.id);
+                }
+            }
+        
+            self.filterVariables.pageSize=(processId.length)*2;
+            self.filterVariables.processInstanceIds=JSON.stringify(processId);
+            let resVariable = {};
+            resVariable = await taskApi.getVariableWorkflow(self.filterVariables);
+            for (let item of resVariable.data) {
+                if (self.allVariableProcess.indexOf(item.id) === -1) {
+                    self.allVariableProcess.push(item);
+                }
+            }
+    
+            this.$store.commit('file/setWaitingFileCountPerObj', processIden);
+            this.$store.commit('comment/setWaitingCommentCountPerObj', processIden);
+            this.$store.dispatch('file/getWaitingFileCountPerObj');
+            this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+            self.loadingTaskList = false;
+            self.loadingMoreTask = false;
+        },
+        async getProcessInstanceUserStart(processIdUserStart){
+            if (processIdUserStart.length>0) {
+                let self=this;
+                let filter={};
+                filter.size= processIdUserStart.length+1;
+                filter.sort= "startTime";
+                filter.order= "desc";
+                filter.processInstanceIds=processIdUserStart;
+                let res={};
+                res = await BPMNEngine.getProcessInstanceHistory(filter);
+                for (let work of res.data) {
+                    const item = self.allFlatWorks.find(element => element.id == work.id);
+                    if (!item) {
+                        self.allFlatWorks.push(work);
+                    }
                 }
             }
         }
     }
-  }
 };
 </script>
 
