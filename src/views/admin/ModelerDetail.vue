@@ -4,7 +4,7 @@
 		<h3 class="text-uppercase ml-2 mt-2">
 			Thông tin chi tiết 
 		</h3>
-		<div class="ml-16 mt-16">
+		<div class="h-100 d-flex align-center">
 
 		<h1 class="center ml-16 mt-16">
 			modeler right here

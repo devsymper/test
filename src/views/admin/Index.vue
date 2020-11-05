@@ -19,6 +19,7 @@
 	> 
 		<template slot="right-panel-content">  
 			<DetailWorkflow 
+				v-if="showPanel"
 				:itemData="selectedItem"
 			/>
 		</template>
@@ -39,6 +40,7 @@ export default {
 		let self = this
 		return {
 			containerHeight:null,
+			showPanel:false,
 			selectedItem: null,
 			apiUrl:'https://workflow-modeler.symper.vn/',
 			customAPIResult: {
@@ -65,7 +67,8 @@ export default {
 						self.$refs.listWorkFlow.actionPanel = true;
 						adminApi.getLatestWD(obj.processKey).then(res=>{
 							if(res.data[0]){
-								self.$store.commit('admin/setProcessDefination', res.data[0])
+								self.$store.commit('admin/setProcessDefination', res.data[0]);
+								self.showPanel = true;
 							}
 						}).catch(err=>{
 

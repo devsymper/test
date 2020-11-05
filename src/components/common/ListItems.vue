@@ -1632,9 +1632,7 @@ export default {
             this.hasColumnsChecked = true;
             this.tableColumns.unshift({name:"checkbox_select_item",data:"checkbox_select_item",title:"Chọn",type:"checkbox"});
 		},
-		checkedPermission(){
-			this.hasColumnsChecked = true
-		},
+	
         removeCheckBoxColumn(){
             this.hasColumnsChecked = false;
             this.tableColumns.shift();

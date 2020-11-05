@@ -111,31 +111,46 @@
 						Danh sách các quy trình con
 					</h3>
 				</div>
-				<v-btn
-					class="mr-2 white--text"
-					depressed
-					color="primary"
-					small
-				>
-					Xem chi tiết
-				</v-btn>
+			
 				<v-btn
 					class="mr-2 white--text"
 					depressed
 					color="orange"
 					small
+					:disabled="disableBtn"
+					@click="stopProcessInstance"
 				>
 					Tạm dừng
 				</v-btn>
 				<v-btn
 					depressed
-					class="mr-3 white--text"
+					class="mr-2 white--text"
 					small
 					color="success"
-
+					:disabled=" disableBtn"
+					@click="finishProcessInstance"
 				>
 					Hoàn thành
 				</v-btn>
+				 <v-tooltip bottom>
+     				 <template v-slot:activator="{ on, attrs }">
+						<v-btn 
+							icon 
+							tile  
+							v-bind="attrs"
+          					v-on="on"
+							class="mr-3 white--text"
+							color="primary"
+							small
+							@click="switchFullScreen"
+							>
+							<v-icon small>
+								mdi-monitor-share
+							</v-icon>
+						</v-btn>
+					</template>
+					<span>Xem toàn màn hình</span>
+				</v-tooltip>	
 			</div>
 			<ListItems 
 				ref="listWorkFlow"
@@ -150,7 +165,10 @@
 				:containerHeight="containerHeight"
 				:headerPrefixKeypath="'admin.table'"
 				:showToolbar="false"
+				:isTablereadOnly="false"
+				@after-selected-row="afterSelectedRow"
 				:showImportHistoryBtn="false"
+				:showPagination="false"
 				:showActionPanelInDisplayConfig="false"
 			/>
 		</div>
@@ -173,22 +191,23 @@ export default {
 		return {
 			containerHeight:null,
 			colors:['#1976D2','#53B257','#F44A3E'],
+			listItemSelected:[],
+			disableBtn: true,
 			values: [60,30,10],
 			customAPIResult:{
 				reformatData(res){
-					debugger
 					return{
-						 listObject: res.data,
                          columns: [
-                            {name: "id", title: "id", type: "numeric"},
-							// {name: "name", title: "name", type: "text"},
-							{name: "startUserId", title: "startUserId", type: "text"},
-							{name: "startTime", title: "startTime", type: "date"},
-                         ],
+							{name: "checkbox_select_item",data:"checkbox_select_item",title:"selected",type:"checkbox", noFilter:true},
+                            {name: "id", title: "id", type: "numeric", noFilter:true},
+							{name: "name", title: "name", type: "text", noFilter:true},
+							{name: "startUserId", title: "startUserId", type: "text", noFilter:true},
+							{name: "startTime", title: "startTime", type: "date", noFilter:true},
+						 ],
+						 listObject: res.data,
 					}
 				}
-			}
-			
+			},
 		}
 	},
 	props:{
@@ -210,6 +229,9 @@ export default {
 		apiUrl(){
 			let processKey = this.$store.state.admin.processKey
 			return appConfigs.apiDomain.bpmne.instances+'?size=100&sort=startTime&order=desc&processDefinitionKey='+processKey;
+		},
+		processKey(){
+			return this.$store.state.admin.processKey
 		}
 	},
 	
@@ -242,6 +264,40 @@ export default {
 			ctx.textAlign='center';
 			ctx.font="30px  roboto";
 			ctx.fillText("3,5k",cx,cy+innerRadius*.9);
+		},
+		afterSelectedRow(items){
+			this.$set(this, 'listItemSelected', items)
+			if(Object.keys(this.listItemSelected).length == 0){
+					this.disableBtn = true
+				}else{
+					this.disableBtn = false
+				}
+		},
+		switchFullScreen(){
+			let processKey = this.$store.state.admin.processKey
+			this.$goToPage('/workflow/process-key/'+processKey+'/instances', this.$t('process.instance.listModelInstance')+processKey)
+		},
+		stopProcessInstance(){
+
+		},
+		finishProcessInstance(){
+
+		}
+	},
+	watch:{
+		processKey(val){
+			this.listItemSelected = []
+		},
+		listItemSelected:{
+			deep: true,
+            immediate: true,
+            handler(obj){
+				if(Object.keys(obj).length == 0){
+					this.disableBtn = true
+				}else{
+					this.disableBtn = false
+				}
+            }
 		}
 	}
 }
@@ -256,7 +312,7 @@ export default {
 }
 .summary-workflow{
 	width: 340px;
-	margin-top:10px
+	/* margin-top:10px */
 }
 .summary-workflow .value-summary{
 	white-space: nowrap;
