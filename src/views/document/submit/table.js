@@ -243,6 +243,7 @@ export default class Table {
             this.showPopupTime = false;
             this.dataInsertRows = []; // mảng lưu lại các dòng dữ liệu sau khi ấn enter
             this.currentControlSelected = null;
+            this.cellSelected = null;
             this.listAutoCompleteColumns = {};
             this.event = {
                 afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
@@ -291,6 +292,7 @@ export default class Table {
                     let controlName = columns[columnIndex].data;
 
                     if (thisObj.checkControlType('time', columnIndex)) {
+                        debugger
                         if (event.keyCode == 13 && thisObj.showPopupTime) {
                             thisObj.showPopupTime = false;
                             event.stopImmediatePropagation();
@@ -411,22 +413,25 @@ export default class Table {
                  */
                 afterOnCellMouseDown: function(event, coords, TD) {
                     let columns = thisObj.columnsInfo.columns;
-                    if (columns[coords.col] != undefined)
-                        thisObj.currentControlSelected = columns[coords.col].data;
-                    // nếu type cell là time thì emit qua submit mở timepicker
-                    if (thisObj.getCellSelectedType(coords.col) == 'time') {
-                        setTimeout((self) => {
-                            var activeEditor = self.getActiveEditor();
-                            self.selectCell(coords.row, coords.col);
-                            activeEditor.beginEditing();
-                            activeEditor.TEXTAREA.value = (activeEditor.originalValue == undefined) ? "" : activeEditor.originalValue
-                            thisObj.showPopupTime = true;
-                            event.controlName = columns[coords.col].data
-                            event.curTarget = activeEditor.TEXTAREA
-                            SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', event);
-                        }, 50, this);
-                        // activeEditor.enableFullEditoMode();
-                    };
+                    if (columns[coords.col] && thisObj.cellSelected == columns[coords.col].data) {
+                        // nếu type cell là time thì emit qua submit mở timepicker
+                        if (thisObj.getCellSelectedType(coords.col) == 'time') {
+                            setTimeout((self) => {
+                                var activeEditor = self.getActiveEditor();
+                                self.selectCell(coords.row, coords.col);
+                                activeEditor.beginEditing();
+                                activeEditor.TEXTAREA.value = (activeEditor.originalValue == undefined) ? "" : activeEditor.originalValue
+                                thisObj.showPopupTime = true;
+                                event.controlName = columns[coords.col].data
+                                event.curTarget = activeEditor.TEXTAREA
+                                SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', event);
+                            }, 50, this);
+                            // activeEditor.enableFullEditoMode();
+                        };
+                    }
+                    if (columns[coords.col]) {
+                        thisObj.cellSelected = columns[coords.col].data;
+                    }
                     SYMPER_APP.$evtBus.$emit("symper-app-wrapper-clicked", event);
 
                 },
@@ -1010,10 +1015,12 @@ export default class Table {
                 if (controlFormulas.hasOwnProperty('list')) {
                     let formulasInstance = controlFormulas['list'].instance;
                     event.curTarget = event.target;
+                    let cellActive = this.tableInstance.getSelected();
                     SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
                         e: event,
                         selectFormulasInstance: formulasInstance,
                         alias: this.currentControlSelected,
+                        cellActive: cellActive,
                         controlTitle: controlInstance.title,
                         type: controlInstance.type,
                         isSingleSelect: controlInstance.checkProps('isSingleSelect')
@@ -1297,7 +1304,6 @@ export default class Table {
                             dataToStore[controlName].push(data[index][controlName]);
                     }
                     dataToSqlLite.push('(' + rowData.join() + ')');
-
                 }
                 ClientSQLManager.insertDataToTable(this.keyInstance, this.tableName, columnInsert.join(), dataToSqlLite.join())
                 for (let controlName in dataToStore) {
@@ -1309,7 +1315,7 @@ export default class Table {
                     });
                 }
                 // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
-                if (this.tableHasRowSum && sDocument.state.viewType[this.keyInstance] == 'submit') {
+                if (this.tableHasRowSum && ['submit', 'update'].includes(sDocument.state.viewType[this.keyInstance])) {
                     data.push({})
                 }
 
@@ -1470,7 +1476,7 @@ export default class Table {
             rsl.numericFormat = {
                 pattern: ctrl.controlProperties.formatNumber.value
             };
-        } else if (type == 'label') {
+        } else if (type == 'label' || type == 'select') {
             rsl.readOnly = true;
 
         } else if (type == 'time') {

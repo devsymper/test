@@ -1,6 +1,7 @@
 import { util } from "./../../plugins/util.js";
 
 import Vue from "vue";
+import { param } from "jquery";
 
 /**
  * thêm mới control ngoài table
@@ -347,9 +348,26 @@ const changeViewType = (state, params) => {
      * @param {*} params 
      */
 const updateListLinkControl = (state, params) => {
-    let key = params.key
-    let value = params.value
-    Vue.set(state.linkControl, key, value);
+        let key = params.key
+        let value = params.value
+        Vue.set(state.linkControl, key, value);
+    }
+    /**
+     * Cập nhật dữ liệu cho các state của document
+     * @param {*} state 
+     * @param {*} params 
+     */
+const updateDocumentState = (state, params) => {
+    let instance = params.instance
+    let docState = params.state;
+    let value = params.value;
+    if (!state[docState][instance]) {
+        Vue.set(state[docState], instance, {});
+    }
+    for (let key in value) {
+        Vue.set(state[docState][instance], key, value[key]);
+    }
+
 }
 const addToDocumentPropsEditor = (state, params) => {
     let key = params.key
@@ -581,6 +599,7 @@ export {
     addSqlLiteDb,
     deleteControlTemplate,
     setDetailTrackChange,
-    updateDataForLinkControl
+    updateDataForLinkControl,
+    updateDocumentState
 
 };
