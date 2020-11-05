@@ -195,6 +195,12 @@ export default {
             key: thisCpn.keyInstance,
             value: 'detail'
         });
+        if(this.isPrint || this.routeName == "printDocument"){
+            this.$store.commit("document/changeViewType", {
+                key: thisCpn.keyInstance,
+                value: 'print'
+            });
+        }
         if (this.documentObjectId != 0) {
             this.docObjId = Number(this.documentObjectId);
         } else if (this.routeName == "detailDocument" || this.routeName == "printDocument") {

@@ -100,7 +100,7 @@ export const setDataForPropsControl = function(fields, instance, from) {
                     if (viewType != 'detail') {
                         $.each(childFormulas, function(k, v) {
                             if (!listField[childFieldId]['formulas'][k]) {
-                                delete childFormulas.formulas[k];
+                                delete childControl.formulas[k];
                             } else {
                                 if (k == 'linkConfig') {
                                     if (listField[childFieldId]['formulas'][k] && listField[childFieldId]['formulas'][k]['configData'].length > 0) {

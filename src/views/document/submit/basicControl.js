@@ -64,6 +64,9 @@ export default class BasicControl extends Control {
             if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
                 this.ele.attr('disabled', 'disabled');
             }
+            // if (this.checkViewType('print') && this.checkProps('isBorderPrint')) {
+            //     this.ele.css('border-bottom', '0.5px solid rgb(230, 229, 229)')
+            // }
 
             if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
                 this.ele.css({ 'display': 'none' })
