@@ -55,7 +55,7 @@
 										<div class="title-item-favorite">
 											{{item.type == 'document_definition' ? item.title : item.name}}
 											</div>
-										<span style="font:12px roboto; font-weight:300"> {{item.appName}}</span>
+										<span style="font:12px roboto; font-weight:200"> {{item.appName}}</span>
 									</div>
 									<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:10px;right:4px">mdi-star</v-icon>
 								</div>
