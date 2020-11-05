@@ -506,7 +506,7 @@ export default {
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
             hotTableContextMenuItems: [],
             allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
-            hasColumnsChecked:false,
+            hasColumnsChecked:true,
         };
     },
     activated(){
@@ -1619,7 +1619,10 @@ export default {
         addCheckBoxColumn(){
             this.hasColumnsChecked = true;
             this.tableColumns.unshift({name:"checkbox_select_item",data:"checkbox_select_item",title:"Chọn",type:"checkbox"});
-        },
+		},
+		checkedPermission(){
+			this.hasColumnsChecked = true
+		},
         removeCheckBoxColumn(){
             this.hasColumnsChecked = false;
             this.tableColumns.shift();

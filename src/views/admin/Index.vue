@@ -9,6 +9,7 @@
 		:customAPIResult="customAPIResult"
 		:tableContextMenu="tableContextMenu"
 		:useDefaultContext="false"
+		:headerPrefixKeypath="'admin.table'"
 		:useActionPanel="true"
 		@row-selected="onRowSelected"
 		:actionPanelWidth="1000"

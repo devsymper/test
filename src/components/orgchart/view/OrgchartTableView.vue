@@ -470,7 +470,6 @@ export default {
             showNavigation:false,
             listUserInNode:[],
             docObjInfo:{},
-            // docObjDescriptionInfo:{docObjId:5100681,docSize:'21cm'},
             apiUrl: '',
             mapNameToDynamicAttr: null,
             titleToolbar:"SĐTC dạng cây",

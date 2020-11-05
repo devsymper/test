@@ -131,7 +131,7 @@
             "List workflows": "Danh sách quy trình",
             "List documents": "Danh sách văn bản",
             "File": "Quản lý tệp",
-		"admin": "Admin",
+			"admin": "Admin",
             "workflows": "Quy trình",
             "documents": "Văn bản",
             "orgchart": "Sơ đồ tổ chức",
@@ -203,7 +203,20 @@
             "filter_by_value": "Lọc bởi giá trị",
             "filter_by_condition": "Lọc bởi điều kiện"
         }
-    },
+	},
+	"admin":{
+		"table":{
+			"id":"ID",
+			"key":"Key",
+			"name":"Tên qui trình",
+			"description":"Ghi chú",
+			"last_update_at":"Thời gian cập nhật",
+			"selected":"Chọn",
+			"startUserId":"Người bắt đầu",
+			"startTime":"Thời gian bắt đầu",
+			"tenantId": "ID"
+		}
+	},
     "validate": {
         "required": "Không được bỏ trống",
         "min_8": "Yêu cầu mật khẩu lớn hơn 8 kí tự",

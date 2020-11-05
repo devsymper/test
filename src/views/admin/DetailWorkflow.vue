@@ -106,9 +106,20 @@
 		</div>
 		<div class="list-workflow-instance d-flex flex-column">
 			<div class="d-flex">
-				<div style="flex-grow:1">
-					Danh sách các quy trình con
+				<div class="ml-2 mt-2 " style="flex-grow:1">
+					<h3>	
+						Danh sách các quy trình con
+					</h3>
 				</div>
+				<v-btn
+					class="mr-2 white--text"
+					depressed
+					color="primary"
+					small
+					mr-1
+				>
+					Xem chi tiết
+				</v-btn>
 				<v-btn
 					class="mr-2 white--text"
 					depressed
@@ -136,11 +147,12 @@
 				:showImportButton="false"
 				:useDefaultContext="false"
 				:useWorkFlowHeader="true"
-				:customAPIresult="customAPIresult"
+				:customAPIResult="customAPIResult"
 				:containerHeight="containerHeight"
 				:showToolbar="false"
 				:showImportHistoryBtn="false"
 				:showActionPanelInDisplayConfig="false"
+				:showPagination="false"
 			/>
 		</div>
 	</div>
@@ -163,8 +175,18 @@ export default {
 			containerHeight:null,
 			colors:['#1976D2','#53B257','#F44A3E'],
 			values: [60,30,10],
-			customAPIresult:{
-				reformatData: reformatGetListInstances
+			customAPIResult:{
+				reformatData(res){
+					return{
+						 listObject: res.data,
+                         columns: [
+                            {name: "id", title: "id", type: "numeric"},
+							{name: "name", title: "name", type: "text"},
+							{name: "startUserId", title: "startUserId", type: "text"},
+							{name: "startTime", title: "startTime", type: "date"},
+                         ],
+					}
+				}
 			}
 			
 		}
