@@ -161,6 +161,9 @@ export default {
         },
         allUsers(){
             return this.$store.state.app.allUsers
+        },
+        baInfo(){
+            return this.$store.state.app.baInfo
         }
     }, 
     components: {
@@ -343,6 +346,7 @@ export default {
                     let docTitle = self.sDocumentProp.title.value;
                     self.titleDialog = "Document "+docTitle+" sẽ bị đóng do thời gian tương tác quá hạn!. Vui lòng quay lại sau";
                     self.typeDialog = "documentExpire";
+                    documentApi.setEdittingDocument({id:self.documentId,status:0});
                 }
             }, 10000,this);
         }
@@ -368,6 +372,9 @@ export default {
             if(this._inactive == true) return;
             let elControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body #'+locale.id);
             this.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
+        });
+        this.$evtBus.$on("close-current-app-tab", () => {
+            alert('ok')
         });
     },
     data(){
@@ -1913,7 +1920,7 @@ export default {
 
         },
         async checkAllowEditDocument(document){
-            if(Number(document.userEditting) != 0){
+            if(Number(document.userEditting) != 0  && this.baInfo && this.baInfo.id != document.userEditting){
                 try {
                     let baAcc = await accountApi.detailBa(document.userEditting);
                     if(baAcc.status == 200){
@@ -1940,6 +1947,9 @@ export default {
                 let checkEditting = await this.checkAllowEditDocument(res.data.document);
                 if(checkEditting == false){
                     return;
+                }
+                else{
+                    documentApi.setEdittingDocument({id:this.documentId});
                 }
                 if (res.status == 200) {
                     if(this.routeName == "editDocument"){

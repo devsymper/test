@@ -27,7 +27,6 @@ export default class Formulas {
             /**
              * Loại của công thức: validate, data, require, readonly..f
              */
-            this.isRefFormula = false;
             this.type = type;
             this.inputControl = this.setInputControl();
             this.inputFromDatasets = this.getDatasetEffectedFormula();
@@ -35,9 +34,6 @@ export default class Formulas {
             this.orgChartFormulas = this.getOrgChartFormulas();
             this.localFormulas = this.getLocalFormulas();
             this.inputForLocalFormulas = this.setInputLocal();
-            if (this.refFormulas && this.refFormulas.length > 0) {
-                this.isRefFormula = true;
-            }
         }
         /**
          * Hàm xử lí thay các giá trị của input đầu vào để thực hiện truy vấn
@@ -618,7 +614,7 @@ export default class Formulas {
                             col = col.replace(/\(/g, "");
                             col = col.trim();
                             if (listInput != false) {
-                                if (Object.keys(listInput).includes(col) && !this.isRefFormula) {
+                                if (Object.keys(listInput).includes(col)) {
                                     allInput[col] = true;
                                 }
                             } else {

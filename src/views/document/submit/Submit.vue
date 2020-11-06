@@ -1580,9 +1580,37 @@ export default {
                     }
                 }
             }
+            // debugger
+            // this.checkInfinityControl(mapControlEffected);
             this.updateEffectedControlToStore(mapControlEffected);
         },
-       
+        /**
+         * hoangnd: kiểm tra công thức chạy infinity hay ko 
+         *  
+        */       
+        checkInfinityControl(mapControlEffected){
+            let loopThisControl = {};
+            let loopOtherControl = {};
+            for(let controlName in mapControlEffected){
+                if(Object.keys(mapControlEffected[controlName]).includes(controlName)){
+                    loopThisControl[controlName] = true;
+                }
+                
+            }
+        },
+        checkLoopControl(currentControl, controlCheck, effectedControl, mapControlEffected){
+            for(let control in effectedControl){
+                if(mapControlEffected[effectedControl[control]]){
+                    let effectedControlInList = mapControlEffected[effectedControl[control]];
+                    if(Object.keys(effectedControlInList).includes(controlName)){
+
+                    }
+                }
+            }
+        },
+        /**
+         * Hàm lấy các control đầu vào là các cột của table sqllite
+         */
         detectControlEffectedInTableInDoc(mapControlEffected,name,formulasInstance){
             formulasInstance.detectControlInTable(mapControlEffected,name,formulasInstance.formulas,this.sDocumentSubmit.listInputInDocument)  
         },
