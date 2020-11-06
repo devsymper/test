@@ -27,6 +27,7 @@ export default class Formulas {
             /**
              * Loại của công thức: validate, data, require, readonly..f
              */
+            this.isRefFormula = false;
             this.type = type;
             this.inputControl = this.setInputControl();
             this.inputFromDatasets = this.getDatasetEffectedFormula();
@@ -34,6 +35,9 @@ export default class Formulas {
             this.orgChartFormulas = this.getOrgChartFormulas();
             this.localFormulas = this.getLocalFormulas();
             this.inputForLocalFormulas = this.setInputLocal();
+            if (this.refFormulas && this.refFormulas.length > 0) {
+                this.isRefFormula = true;
+            }
         }
         /**
          * Hàm xử lí thay các giá trị của input đầu vào để thực hiện truy vấn
@@ -585,7 +589,11 @@ export default class Formulas {
     }
 
     getDataSubmitInStore() {
-        return sDocument.state.submit[this.keyInstance].listInputInDocument;
+        if (sDocument.state.submit.hasOwnProperty(this.keyInstance)) {
+            return sDocument.state.submit[this.keyInstance].listInputInDocument;
+        } else {
+            return false
+        }
     }
 
 
@@ -599,18 +607,24 @@ export default class Formulas {
                 let allRelateName = this.formulas.match(/{[A-Za-z0-9_]+}/gi);
                 let colSelect = this.getColumnsSelect(this.formulas);
                 let listInput = this.getDataSubmitInStore();
-
-                if (colSelect) {
-                    let colFromOtherTable = colSelect[0].match(/\([a-zA-Z0-9_]*\)/gm);
+                if (colSelect && !/\*/.test(colSelect[0])) {
+                    let colFromOtherTable = colSelect[0];
+                    colFromOtherTable = colFromOtherTable.replace(/distinct|DISTINCT/, "");
+                    colFromOtherTable = colFromOtherTable.match(/\([a-zA-Z0-9_]*\)/gm);
                     if (colFromOtherTable) {
                         for (let index = 0; index < colFromOtherTable.length; index++) {
                             let col = colFromOtherTable[index];
                             col = col.replace(/\)/g, "");
                             col = col.replace(/\(/g, "");
                             col = col.trim();
-                            if (Object.keys(listInput).includes(col)) {
+                            if (listInput != false) {
+                                if (Object.keys(listInput).includes(col) && !this.isRefFormula) {
+                                    allInput[col] = true;
+                                }
+                            } else {
                                 allInput[col] = true;
                             }
+
                         }
                     }
 

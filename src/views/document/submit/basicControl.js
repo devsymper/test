@@ -625,11 +625,11 @@ export default class BasicControl extends Control {
     }
     renderUserControl() {
         let listUser = store.state.app.allUsers;
-        if (this.checkDetailView()) {
+        if (this.checkViewType('detail') || this.checkViewType('print')) {
             if (this.value != null && this.value != "" && !isNaN(this.value)) {
                 let user = listUser.filter(u => {
                     return u.id == this.value
-                })
+                });
                 if (user[0]) {
                     this.value = user[0].displayName;
                     this.ele.val(this.value)
@@ -637,11 +637,9 @@ export default class BasicControl extends Control {
                     this.ele.val(this.value)
                 }
             }
-
         } else {
             this.ele.attr('type', 'text');
             this.ele.parent().css({ display: 'block' })
-
         }
     }
     renderLabelControl() {

@@ -57,7 +57,6 @@
         "last_updated": "Cập nhật lúc",
         "last_updated_by": "Người cập nhật",
         "statistics": "Thống kê",
-        "view": "Chi tiết",
         "detail": "Chi tiết",
         "tracking": "Theo dấu",
         "works": "Công việc",
@@ -108,11 +107,11 @@
             "myApplication": "Ứng dụng của tôi",
             "tasks": "Tasks",
             "works": "Works",
-            "My work": "Công việc của tôi",
+            "My work": "Ghi công",
             "myWork": "Lịch làm việc",
             "Manage timesheet": "Quản lý  thời gian biểu",
             "Timesheet report": "Báo cáo thời gian biểu",
-            "Timesheet": "Thời gian biểu",
+            "Timesheet": "Bảng công",
             "App": "Ứng dụng",
             "Administrator": "Quản trị viên",
             "Account management": "Quản lý tài khoản",
@@ -415,8 +414,8 @@
             "objectType": "Loại đối tượng",
             "operation": "Thao tác với từng đối tượng",
             "allOperation": "Thao tác với toàn bộ đối tượng",
-            "orgchart":{
-                "viewAll":"Xem tất cả phòng ban của SĐTC" ,
+            "orgchart": {
+                "viewAll": "Xem tất cả phòng ban của SĐTC",
                 "viewItself": "Chỉ xem phòng ban của chính user đó",
                 "viewItselfAndChild": "Xem phòng ban của user đó và phòng ban con",
                 "viewOther": "Xem các phòng ban khác"
@@ -424,7 +423,20 @@
         }
     },
     "timesheet": {
+        "assignee": "Người được giao",
+        "fre_submit": "Tần suất submit",
+        "fow": "Ngày đầu tháng",
+        "fom": "Ngày đầu tuần",
+        "time": "Thời gian",
+        "daily_log": "Theo ngày",
+        "hour_required": "Số giờ làm việc/ngày",
+        "working_day": "Ngày làm việc",
+        "submit_timesheet_form": "Submit thời gian biểu",
         "submit_remind": "Tần suất nhắc gửi",
+        "period": "Thời gian",
+        "hours_logged": "Tổng số giờ",
+        "hours_required": "Số giờ yêu cầu",
+        "reviewer": "Người review",
         "date_submit": "Ngày nhắc gửi ",
         "week_remind": "Tuần nhắc",
         "remind": "Nhắc nhở",
@@ -436,7 +448,7 @@
         "last_day": "Ngày trước",
         "cur_day": "Hiện tại",
         "next_day": "Ngày tới",
-        "Manage timesheet": "Quản lý thời gian biểu",
+        "Manage timesheet": "Bảng công tuần",
         "cur_week": " Tuần này",
         "submit_timesheet": "Gửi t.gian biểu",
         "group_by": "Nhóm theo",
@@ -470,7 +482,7 @@
         "cancel": "Thoát",
         "submit": "Gửi",
         "date": "Ngày",
-        "task_form": "Việc",
+        "task_form": "Tạo task",
         "time_invalid": "Thời gian không hợp lệ",
         "required_value": "Không được để trống",
         "of": "từ",
@@ -481,7 +493,7 @@
         "end_time": "Kết thúc",
         "plan": "Kế hoạch",
         "log": "Đã làm",
-        "name": "Tên việc",
+        "name": "Tên công việc",
         "description": "Mô tả",
         "view_log_time": "Xem công việc",
         "save": "Lưu",
@@ -805,7 +817,7 @@
             "start_time": "Thời gian bắt đầu",
             "tracking": "Theo dấu quy trình",
             "startSuccessfully": "Quy trình khởi tạo thành công",
-            "listModelInstance": "Danh sách công việc"
+            "listModelInstance": "Danh sách bản chạy gần nhất của "
         },
         "deployment": {
             "list": "Danh sách deploy",
@@ -1033,7 +1045,6 @@
                 "unfavorite": "Bỏ yêu thích"
             },
             "workflow_definition": {
-                "view": "Chi tiết",
                 "list": "Danh sách",
                 "create": "Tạo mới",
                 "deploy": "Triển khai",
@@ -1104,7 +1115,6 @@
                 "unfavorite": "mdi-star-off"
             },
             "workflow_definition": {
-                "view": "mdi-clipboard-list-outline",
                 "list": "mdi-clipboard-list-outline",
                 "create": "mdi-folder-plus-outline",
                 "deploy": "mdi-rocket",
