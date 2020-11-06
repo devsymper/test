@@ -330,6 +330,9 @@ export default {
         },
         linkControl(){
             return this.$store.state.document.linkControl[this.keyInstance]
+        },
+        baInfo(){
+            return this.$store.state.app.baInfo
         }
     },
     data() {
@@ -1450,7 +1453,7 @@ export default {
             if(!isSetEffectedControl){
                 this.getEffectedControl();
             }
-            if(this.controlInfinity.length > 0){
+            if(this.controlInfinity.length > 0 && this.baInfo && this.baInfo.id){
                 this.listMessageErr = [];
                 this.listMessageErr.push("Mối quan hệ giữa các control sau dẫn đến vòng lặp vô hạn");
                 for (let index = 0; index < this.controlInfinity.length; index++) {
@@ -1596,7 +1599,9 @@ export default {
                     }
                 }
             }
-            this.checkInfinityControl(mapControlEffected);
+            if(this.baInfo && this.baInfo.id){
+                this.checkInfinityControl(mapControlEffected);
+            }
             if(this.controlInfinity.length == 0){
                 this.updateEffectedControlToStore(mapControlEffected);
             }
