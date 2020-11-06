@@ -346,13 +346,18 @@ export default {
         parentHeight: {
             type: Number,
             default: 300
-        },
+		},
+		showTitle:{
+			type:Boolean,
+			default:false
+		}
     },
     watch: {
         workInfo: {
             deep: true,
             immediate:true,
             handler(valueAfter){
+				debugger
                 this.changeWorkDetail();
             }
         },
@@ -454,7 +459,7 @@ export default {
         },
         listTaskComputed(){
             let self=this;
-            let arrListTask=this.listTaskCurrent;
+            let arrListTask = this.listTaskCurrent;
             arrListTask.forEach(task => {
                 task.taskData = self.getTaskData(task);
                 task = addMoreInfoToTask(task);
@@ -600,7 +605,8 @@ export default {
                 filter.processInstanceId=processInstanceId;
                 filter.sort= "startTime";
                 filter.order= "desc";
-                let res = await BPMNEngine.postTaskHistory(filter);
+				let res = await BPMNEngine.postTaskHistory(filter);
+				debugger
                 if (res.total>0) {
                     self.listTaskCurrent=res.data;
                 }else{

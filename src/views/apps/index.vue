@@ -85,7 +85,7 @@ export default {
 											icon.classList.add(value);
 											$(icon).css('font-size','16px')
 											td.appendChild(icon);
-                                       		 return td;
+											return td;
 										}else{
 											let img;
 											img = document.createElement('img');

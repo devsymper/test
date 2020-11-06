@@ -1,6 +1,8 @@
 const defaultState = {
 	processDefination:{},
-	processKey:""
+	processKey:"",
+	currentAggregateWorkflow: [],
+	sumProcess:0
 };
 
 export default defaultState;

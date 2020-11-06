@@ -71,6 +71,13 @@ export default {
 								self.showPanel = true;
 							}
 						}).catch(err=>{
+						})
+						let processDefinationId = self.$store.state.admin.processDefination.id
+						adminApi.aggregateWorkflow(processDefinationId).then(res=>{
+							if(res.status == 200){
+								self.$store.commit('admin/setCurrentAggregateWorkflow', res.data);
+							}
+						}).catch(err=>{
 
 						})
                     },
