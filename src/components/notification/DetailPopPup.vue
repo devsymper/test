@@ -62,15 +62,15 @@
 
 import notification from "./../../api/settingNotification";
 export default {
-    props:['name','objType','objId'],
+    props:['name','objType'],
       data () {
-        return {
-            items:[],
-            isPersonal:true,
-            isAll:false,
-            listSource:{},
-            allChanel:[]
-        }
+            return {
+                items:[],
+                isPersonal:true,
+                isAll:false,
+                listSource:{},
+                allChanel:[]
+            }
     },
     created () {
     this.getSource();
@@ -78,6 +78,21 @@ export default {
      
      },
      watch:{
+          items:{ 
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                debugger
+                for(let i= 0; i<newValue.length;i++){
+                    if(newValue[i].subscribed){
+                        this.subcribedAllChanel(newValue[i].id,newValue[i].actionName) 
+                    }else{
+                          this.unsubcribedAllChanel(newValue[i].id) 
+                    }
+
+                }
+            }
+          },
           isAll(){
               if(this.isAll){
                 const self = this;
@@ -88,6 +103,7 @@ export default {
 
               }
           },
+
           isPersonal(){
               if(this.isPersonal){
                    const self = this;
@@ -97,98 +113,23 @@ export default {
                     })
               }
           }
+
      },
   methods: {
       close(){
-         for(let i = 0; i<this.items.length;i++){
-             //nếu tích
-             if(this.items[i].subscribed){
-                 //nếu chưa tồn tại 
-                 if(this.checkExistChanel(this.objType,this.items[i].actionName)){
-                    this.updateChanel(this.objType,this.items[i].actionName)
-                 }else{
-                // nếu đã tồn tại 
-                    this.addChanel(this.objType,this.items[i].actionName)
-                 }
-            // nếu bỏ tích
-             }else{
-                //this.unfollowChanel(newValue[i].id,newValue[i].actionName)
-             }
-         }
           this.$emit('close');
-      },
-      addChanel(nameModule,action){
-          let generalChanel={};
-          for(let i = 0; i<this.allChanel.length;i++){
-              if(this.allChanel[i].event==action&&this.allChanel[i].objectType==nameModule){
-                  generalChanel.event=action;
-                  generalChanel.source= this.objType+':'+this.objId;
-                  generalChanel.objectType=nameModule;
-                  generalChanel.state=this.allChanel[i].state;
-                  generalChanel.receiver=this.allChanel[i].defaultUser;
-                  generalChanel.icon=this.allChanel[i].icon;
-                  generalChanel.action=this.allChanel[i].action;
-                  generalChanel.content=this.allChanel[i].content;
-              }
-            
-          }
-           const self = this;
-            notification.addChanel(generalChanel).then(res=>{
-                if(res.status==200){
-                    self.$snotify({
-                        type: "success",
-                        title: "Thêm thông báo thành công",
-                    });
-                    self.refreshAll();
-                    self.$emit("refreshList")
-                }else{
-                    self.$snotify({
-                        type: "error",
-                        title: "Thêm thông báo thất bại",
-                    });
-                }
-            })
-              //let test = generalChanel;
-      },
-      updateChanel(nameModule,action){
-          let generalChanel={};
-          for(let i = 0; i<this.allChanel.length;i++){
-              if(this.allChanel[i].event==action&&this.allChanel[i].objectType==nameModule){
-                  generalChanel.event=action;
-                  generalChanel.source= this.objType+':'+this.objId;
-                  generalChanel.objectType=nameModule;
-                  generalChanel.state=this.allChanel[i].state;
-                  generalChanel.receiver=this.allChanel[i].defaultUser;
-                  generalChanel.icon=this.allChanel[i].icon;
-                  generalChanel.action=this.allChanel[i].action;
-                  generalChanel.content=this.allChanel[i].content;
-              }
-            
-          }
-           const self = this;
-            notification.addChanel(this.objId, generalChanel).then(res=>{
-                if(res.status==200){
-                    self.$snotify({
-                        type: "success",
-                        title: "Thêm thông báo thành công",
-                    });
-                    
-                }else{
-                    self.$snotify({
-                        type: "error",
-                        title: "Thêm thông báo thất bại"});
-                }
-            })
-              //let test = generalChanel;
       },
        getSource(){
         const self = this;
         notification.showAllModuleConfig().then(res=>{
             if(res.status==200){
+                debugger
                 self.listSource = res.data;
-            }})
+            }
+        })
         },
         rename(nameModule,event){
+            debugger
             let name = event;
             for(let i = 0; i<this.listSource[nameModule].event.length;i++){
                 if(this.listSource[nameModule].event[i].value==event){
@@ -196,43 +137,62 @@ export default {
                 }
             }
             return name
+
         },
-        checkExistChanel(nameModule, action){
+      unsubcribedAllChanel(id){
+        const self = this;
+        let data={state:false};
+        notification.subscribeChanel(id,data).then(res=>{
+            if(res.status==200){}
+        })
+        },
+        checkExistChanel(action){
+            let userId= 973;
             let check = false;
-            let userId = 973;
             for(let i = 0; i<this.allChanel.length;i++){
-                if(this.allChanel[i].event==action&&this.allChanel[i].objectType==nameModule&&this.allChanel[i].userCreate.split(':')[1]==userId){
+                if(this.allChanel[i].event==action&&this.allChanel[i].objectType==this.objType&&this.allChanel[i].userCreate.split(':')[1]==userId){
                     check = true;
-                    debugger
                 }
             }
-        },
-      },
-        getAllListChanel(){
-            this.items=[];
-            const self= this;
-            let res = notification.showAllLists().then(res=>{
-            if(res.status==200){
-                let format = [];
-                let listModules = res.data;
-                this.allChanel=res.data;
-                for(let i = 0; i<listModules.length;i++){
-                    if(listModules[i].objectType==self.objType){
-                        format.push(listModules[i])
-                    }
-                }
-                let formatListModules = _.groupBy(format, 'objectType');
-                let name = Object.keys(formatListModules);
-                for(let i=0;i<formatListModules[self.objType].length;i++){
-                    self.items.push({
-                        actionName: formatListModules[self.objType][i].event,
-                        id:formatListModules[self.objType][i].id,
-                        subscribed:false})
-                }
-            }   
-        });
-        },
 
+
+        },
+      subcribedAllChanel(id,action){
+          if(this.checkExistChanel(action)){
+              //update
+               notification.subscribeChanel(id).then(res=>{
+                    if(res.status==200){}
+                })
+          }else{
+          //add
+          }
+       
+      },
+     getAllListChanel(){
+        this.items=[];
+        const self= this;
+        let res = notification.showAllLists().then(res=>{
+        if(res.status==200){
+            let format = [];
+            let listModules = res.data;
+            this.allChanel=res.data;
+            for(let i = 0; i<listModules.length;i++){
+                if(listModules[i].objectType==self.objType){
+                    format.push(listModules[i])
+                }
+            }
+            let formatListModules = _.groupBy(format, 'objectType');
+            let name = Object.keys(formatListModules);
+            for(let i=0;i<formatListModules[self.objType].length;i++){
+                self.items.push({
+                    actionName: formatListModules[self.objType][i].event,
+                    id:formatListModules[self.objType][i].id,
+                    subscribed:formatListModules[self.objType][i].subscribed})
+            }
+        }   
+        });
+    },
+  }
   
 }
 </script>
