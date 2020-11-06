@@ -105,6 +105,7 @@ import { GetControlProps,mappingOldVersionControlProps,
         mappingOldVersionControlFormulas,getAPropsControl,
         getIconFromType,listControlNotNameProp } from "./../../components/document/controlPropsFactory.js";
 import { documentApi } from "./../../api/Document.js";
+import accountApi from "./../../api/account";
 import { biApi } from "./../../api/bi.js";
 import { formulasApi } from "./../../api/Formulas.js";
 import { util } from "./../../plugins/util.js";
@@ -158,6 +159,9 @@ export default {
         allControlDeleted(){  
             return this.$store.state.document.editor[this.keyInstance].allControlDeleted;
         },
+        allUsers(){
+            return this.$store.state.app.allUsers
+        }
     }, 
     components: {
         'sidebar-left' : SideBarLeft,
@@ -308,6 +312,10 @@ export default {
                 ed.on('drop', function(e) {
                     self.handleDropControlInEditor(e);
                 });
+                ed.on('mouseover', function(e) {
+                    self.currentInteractTime = Date.now();
+                    console.log('currentInteractTime',self.currentInteractTime);
+                });
                 ed.on('ExecCommand', function(e) {
                     self.handleExecCommand(e);
                 });
@@ -322,6 +330,18 @@ export default {
         });
     },
     created() {
+        if(this.routeName == 'editDocument'){
+            this.currentInteractTime = Date.now();
+            this.intervalCheckExpired = setInterval((self) => {
+                let curTime = Date.now();
+                if(curTime - self.currentInteractTime > 300000){
+                    self.dialog = true;
+                    let docTitle = self.sDocumentProp.title.value;
+                    self.titleDialog = "Document "+docTitle+" sẽ bị đóng do thời gian tương tác quá hạn!. Vui lòng quay lại sau"
+                }
+            }, 10000,this);
+        }
+        
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
         this.isConfigPrint = false;
         if(this.routeName == 'printConfigDocument'){
@@ -371,7 +391,9 @@ export default {
             oldTableId:null,
             dataPreviewSubmit:null,
             isShowPreviewSubmit:false,
-            controlTemplateId:0
+            controlTemplateId:0,
+            currentInteractTime:Date.now(),
+            intervalCheckExpired:null
         }
     },
     
@@ -458,6 +480,13 @@ export default {
             this.dialog = false;
             if(this.typeDialog == 'deletePage'){
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
+            }
+            if(this.sDocumentProp == "documentExpire"){
+                clearInterval(this.intervalCheckExpired);
+                this.currentInteractTime = null;
+            }
+            if(this.sDocumentProp == "baEditting"){
+                
             }
         },
 
@@ -1876,10 +1905,26 @@ export default {
             
 
         },
+        async checkAllowEditDocument(document){
+            if(Number(document.userEditting) != 0){
+                let baAcc = await accountApi.detailBa(document.userEditting);
+                if(baAcc.status == 200){
+                    let data = baAcc.data.data;
+                    if(data.length > 0){
+                        let curBa = data[0];
+                        this.dialog = true;
+                        this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
+                        this.typeDialog = "baEditting";
+                    }
+                }
+            }
+        },
         // hàm gọi request lấy thông tin của document khi vào edit doc
         async getContentDocument(){
             if(this.documentId != 0){
-                let res = await documentApi.detailDocument(this.documentId)
+                let res = await documentApi.detailDocument(this.documentId);
+                let checkEditting = this.checkAllowEditDocument(res.data.document);
+              
                 if (res.status == 200) {
                     if(this.routeName == "editDocument"){
                         this.setDocumentProperties(res.data.document);
