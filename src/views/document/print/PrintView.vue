@@ -84,13 +84,26 @@ export default {
                             }
                             .wrap-print-multiple table{
                                 width:100% !important;
+                                 page-break-inside:avoid;
                             }
                             .wrap-print-multiple{
                                 width:100%;
+                                 page-break-inside:avoid;
                             }
                             .sym-form-Detail{
                                 overflow:hidden;
+                                page-break-inside:avoid;
+                                page-break-before: always;
+                                page-break-after: always;
                             }
+                           
+                            table { page-break-inside:auto }
+                            tr    { page-break-inside:avoid; page-break-after:auto }
+                            thead { display:table-header-group }
+                            tfoot { display:table-footer-group }
+                        }
+                        
+
                     </style>`
                      stylesHtml += cstyle;
             // Open the print window

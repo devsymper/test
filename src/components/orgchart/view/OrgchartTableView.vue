@@ -143,7 +143,6 @@
                 </div>
             </v-tab-item>
             <v-tab-item :key="'diagramView'" class="px-2 pt-2 h-100">
-               
                 <OrgchartEditor
                     :action="'view'"
                     @current-tab="changeTab"
@@ -154,9 +153,6 @@
             </v-tab-item>
 
         </v-tabs-items>
-        <!-- <div class="description-department" v-show="showDescriptionDepartment"> -->
-            <!-- <Detail :quickView="true" :docObjInfo="docObjDescriptionInfo"  /> -->
-        <!-- </div> -->
     </div>
 </template>
 
@@ -470,7 +466,6 @@ export default {
             showNavigation:false,
             listUserInNode:[],
             docObjInfo:{},
-            // docObjDescriptionInfo:{docObjId:5100681,docSize:'21cm'},
             apiUrl: '',
             mapNameToDynamicAttr: null,
             titleToolbar:"SĐTC dạng cây",

@@ -1552,9 +1552,7 @@ export default {
                         else{
                             if(formulas[formulasType].hasOwnProperty('instance')){
                                 let inputControl = formulas[formulasType].instance.inputControl;
-                                if(formulasType == 'formulas'){
-                                    debugger
-                                }
+                                // debugger
                                 let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
                                 let inputFromDatasets = formulas[formulasType].instance.inputFromDatasets;
                                 for (let controlEffect in inputControl) {
@@ -1582,7 +1580,6 @@ export default {
                     }
                 }
             }
-            debugger
             this.updateEffectedControlToStore(mapControlEffected);
         },
        
@@ -2446,9 +2443,13 @@ export default {
             let sourceControlInstance = getControlInstanceFromStore(this.keyInstance,sourceName);
             var arr = [];
             if (sourceControlInstance != false) {
+                if(Object.keys(sourceControlInstance).includes(sourceName))
                 for (var i in sourceControlInstance['effectedControl']) {
-                    arr.push(i);
-                    arr = arr.concat(this.getAllImpactedInput(i)); 
+                    if(i != sourceName){
+                        arr.push(i);
+                        arr = arr.concat(this.getAllImpactedInput(i)); 
+                    }
+                    
                 }
             }
             return arr;

@@ -10,8 +10,8 @@
         </v-hover> -->
         <v-dialog v-model="dialog" width="357">
             <template v-slot:activator="{on}">
-                <v-btn style="font-weight: normal;margin-left:-23px!important" depressed small class=" fs-13" color="success" v-on="on">
-                    Tạo task<v-icon>mdi-plus</v-icon>
+                <v-btn style="font-weight: normal;margin-left:-23px!important" depressed small class=" fs-13" v-on="on">
+                   <v-icon>mdi-plus</v-icon> <span class="fw-430"> Tạo task</span>
                 </v-btn>
                 <!-- <button  type="button" class="ml-1 v-btn theme--light v-size--small" 
                 style="margin-left:-40px!important"><span><i aria-hidden="true" class=" mr-4 v-icon notranslate mdi mdi-plus theme--light" 

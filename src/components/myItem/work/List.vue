@@ -134,7 +134,7 @@
                                                 class="fs-13 text-ellipsis w-100"
                                                 v-on="on"
                                             >
-                                                <v-icon v-if="obj.endTime && obj.endTime!=null" style="font-size:11px; color:green;margin-left: 3px;">mdi-circle</v-icon>
+                                                <v-icon v-if="obj.endTime && obj.endTime!=null" style="font-size:11px; color:#408137;margin-left: 3px;">mdi-circle</v-icon>
                                                 <v-icon v-else style="font-size:11px ; color:#0760D9;margin-left: 3px;">mdi-circle</v-icon>
                                             {{ obj.name}}
                                             </div>
@@ -202,7 +202,7 @@
                                     x-small
                                 >{{$t('myItem.unfinished')}}</v-chip>
 
-                                <v-chip class="px-2" style="border-radius:4px" v-else color="green" text-color="white" x-small>{{$t('common.done')}}</v-chip>
+                                <v-chip class="px-2" style="border-radius:4px" v-else color="#408137" text-color="white" x-small>{{$t('common.done')}}</v-chip>
                             </div>
                         </v-col>
                         <v-col
