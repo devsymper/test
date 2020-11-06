@@ -223,7 +223,6 @@ export default {
     groupAllProcessInstance() {
         let allUserById = this.$store.getters['app/mapIdToUser'];
         let allPrcess = this.allFlatWorks;
-        console.log("allPrcessallPrcessallPrcess",allPrcess);
         allPrcess.sort(function(a, b) {
                 if (a.endTime) {
                     var keyA = new Date(a.endTime);

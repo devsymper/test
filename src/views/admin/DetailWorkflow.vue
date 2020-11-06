@@ -209,6 +209,7 @@ export default {
 		ConfirmDelete
 	},
 	data(){
+		let self = this
 		return {
 			containerHeight:null,
 			colors:['#1976D2','#53B257'],
@@ -235,7 +236,9 @@ export default {
                     name: "View details",
                     text: "Xem chi tiết",
                     callback: (obj, callback) => {
-						
+						self.$goToPage( "/work/"+obj.id,
+                            " Chi tiết " + (obj.name ? obj.name : "")
+                        );
                     },
                 },
             },

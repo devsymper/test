@@ -11,12 +11,11 @@
         </v-card-title>
         <v-card-text>
 				<span>
-					1 vài mô tả right here
+					Xóa các công việc cũng đồng nghĩa với việc xóa các tác vụ của công việc đấy	
 				</span>
 				<v-checkbox
 					v-model="selected"
-					label="John"
-					value="John"
+					label="Xóa các bản ghi dữ liệu liên quan"
 				></v-checkbox>
 			 </v-card-text>
         <v-card-actions>
@@ -43,7 +42,9 @@
 <script>
 export default {
 	data(){
-		return {}
+		return {
+			selected: false,
+		}
 	},
 	props:{
 		showDialog:{
@@ -53,7 +54,7 @@ export default {
 	},
 	methods:{
 		confirmDelete(){
-			this.$emit('confirm')
+			this.$emit('confirm' , this.selected)
 		},	
 		cancel(){
 			this.$emit('cancel')
