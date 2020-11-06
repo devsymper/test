@@ -170,8 +170,7 @@
         height="30"
         style="border-left: 1px solid #e0e0e0; "
       >
-          
-        <v-row class="ml-0 mr-0 justify-space-between" style="line-height: 36px; border-bottom:1px solid #dedede; display:flex">
+        <v-row class="ma-0 justify-space-between" style="line-height: 36px; border-bottom:1px solid #dedede; display:flex">
             <div class="fs-13 pl-2 pt-1 float-left">
                 {{titleDocument}}
             </div>
@@ -187,6 +186,7 @@
             </div>
         </v-row>
         <detailDocument 
+            class="detail-doc"
             :showCommentInDoc="true"
             :docObjInfo="docObjInfo">
         </detailDocument>
@@ -567,5 +567,8 @@ export default {
 .col-10 {
     flex: 0 0 94.333333%;
     max-width: 94.333333%;
+}
+.detail-doc{
+    height: calc(100vh - 88px)!important;
 }
 </style>

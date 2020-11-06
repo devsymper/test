@@ -22,6 +22,12 @@ export default [{
         component: () =>
             import ('../../views/orgchart/EditOrgchart.vue'),
     },
+    {
+        path: "/orgchart/:id/structure-management",
+        name: "orgchartStructureManagement",
+        component: () =>
+            import ('../../views/orgchart/OrgchartStructureManagement.vue'),
+    },
 
     {
         path: "/orgchart/:id/view",

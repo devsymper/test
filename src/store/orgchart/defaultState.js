@@ -30,8 +30,10 @@ const defaultState = {
     listChildInCurrentNode: [],
     userInNode: {},
     listChildrenOfNode: {},
+    viewOnlySub: false,
     getStructFlag: false,
-    allOrgchartStruct: []
+    allOrgchartStruct: [],
+    listVizParentId: []
 };
 
 export default defaultState;

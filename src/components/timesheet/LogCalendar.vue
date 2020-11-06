@@ -475,7 +475,7 @@ export default {
                 if (this.extend) {
                     // truong hop 1.1: neu extend => update event
                     try {
-                        let duration = this.findDuration(this.createEvent.start, this.createEvent.end);
+                         let duration = this.findDuration(this.createEvent.start, this.createEvent.end);
                         let result = await updateEvent(this.createEvent, duration);
                         if (result) this.load();
                     } catch(e) {
@@ -786,18 +786,18 @@ export default {
     position: absolute;
     left: 0;
     right: 0;
-    bottom: 4px;
-    height: 4px;
+    margin-top:-5px;
+
     cursor: ns-resize;
     &::after {
-        display: none;
+        display: block;
         position: absolute;
         left: 50%;
         border-radius: 25px;
         height: 4px;
         border-top: 1px solid white;
         border-bottom: 1px solid white;
-        width: 16px;
+        width: 1px;
         margin-left: -8px;
         opacity: 0.8;
     }

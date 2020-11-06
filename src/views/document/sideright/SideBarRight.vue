@@ -12,7 +12,7 @@
         <v-tab
             v-for="tab in sideRightTabs"
             :key="tab.id"
-            style="margin-bottom: 4px;"
+            style="margin-bottom: 4px;width:30px;min-width:unset;"
         >
              <v-tooltip right>
                 <template v-slot:activator="{ on }">
@@ -77,15 +77,28 @@
         </v-tab-item>
         <v-tab-item
             class="h-100 formulas-control-tab"
-        >
-        <VuePerfectScrollbar style="height:calc(100vh - 90px);">
-            <control-props-config 
-            @input-blur="handleInputBlur"
-            :singleLine="false" 
-            @input-value-changed="handleChangeInput" 
-            :instance="instance"
-            :allInputs="sCurrentDocument.formulas"/>
-        </VuePerfectScrollbar>
+            >
+            <VuePerfectScrollbar style="height:calc(100vh - 90px);">
+                <control-props-config 
+                @input-blur="handleInputBlur"
+                :singleLine="false" 
+                @input-value-changed="handleChangeInput" 
+                :instance="instance"
+                :allInputs="sCurrentDocument.formulas"/>
+            </VuePerfectScrollbar>
+        </v-tab-item>
+         <v-tab-item
+            class="h-100 style-form-tab"
+            >
+            <VuePerfectScrollbar style="height:calc(100vh - 90px);">
+                <h3 class="pl-2">Thông tin định dạng</h3>
+                <table class="general-info">
+                    <tr v-for="(value,key) in listStyle" :key="key">
+                        <td class="p-2">{{key}}:</td>
+                        <td class="pl-2">{{value}}</td>
+                    </tr>
+                </table>
+            </VuePerfectScrollbar>
         </v-tab-item>
 
         
@@ -123,7 +136,9 @@ export default {
 
         controlPropsGroup(){
             return this.$store.state.document.editor[this.instance].currentSelectedControl.properties;
-            // return this.sCurrentDocument.properties;
+        },
+        listStyle(){
+            return this.$store.state.document.documentStyle[this.instance];   
         }
     },
     watch:{
@@ -136,21 +151,21 @@ export default {
             setTimeout(() => {
                 // $('.sym-v-expand-content input').first().focus();
             }, 200);
-        }
-        
+        },
+     
     },
     data () {
         return {
             panel: [0, 1, 2],
             sideRightTab: null,
             sideRightTabs: [
-            {id:'element', tab: 'Thuộc tính' ,icon:'mdi-hammer-screwdriver'},
-            {id:'formulas', tab: 'Công thức' ,icon:'mdi-function-variant'},
-            
+                {id:'element', tab: 'Thuộc tính' ,icon:'mdi-hammer-screwdriver'},
+                {id:'formulas', tab: 'Công thức' ,icon:'mdi-function-variant'},
+                {id:'style', tab: 'Trình bày' ,icon:'mdi-format-line-style'},
             ],
             listNameValueControl:{},    
-            delayTimer:null
-        
+            delayTimer:null,
+            styles:null
         }
     },
     methods:{
@@ -172,25 +187,36 @@ export default {
             })
             try {
                 let params = JSON.parse(currentDataflow[0].params);
+                let datasets = currentDataflow[0].datasets;
                 this.$store.commit(
                     "document/updateCurrentControlProps",{instance:this.instance,group:'table',prop:'mapParamsDataflow',typeProp:'value',value:params}
                 );  
-                 this.$store.commit(
+                this.$store.commit(
                     "document/updateProp",{id:this.sCurrentDocument.id,name:'mapParamsDataflow',value:params,tableId:tableId,type:"value",instance:this.instance}
+                );   
+                this.$store.commit(
+                    "document/updateProp",{id:this.sCurrentDocument.id,name:'mapParamsDataflow',value:datasets,tableId:tableId,type:"datasets",instance:this.instance}
                 );   
             } catch (error) {
                 
             }
         },
         handleChangeInput(name, input, data){
+            
             if(input.groupType == "formulas"){
+                let tableId = this.getTableWrapControl();
                 if(name == "autocomplete" && typeof data == 'object'){
                     this.$set(input.configData,'treeData',data.treeData);
                     this.$set(input.configData,'documentSelected',data.documentSelected);
                     this.$set(input.configData,'columnSelected',data.columnSelected);
                     this.$set(input.configData,'rejectInput',data.rejectInput);
                     this.$set(input,'value',data.sql);
-                    let tableId = this.getTableWrapControl();
+                    this.$store.commit(
+                        "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:input.configData,tableId:tableId,type:'configData',instance:this.instance}
+                    );  
+                }
+                else if(name == "linkConfig"){
+                    this.$set(input,'configData',data);
                     this.$store.commit(
                         "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:input.configData,tableId:tableId,type:'configData',instance:this.instance}
                     );  

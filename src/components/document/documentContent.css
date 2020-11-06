@@ -477,7 +477,7 @@ button:hover {
 
 .table-print {
     border-collapse: collapse;
-    width: 100%;
+    width: 100% !important;
     margin-top: 16px;
 }
 
@@ -505,17 +505,14 @@ button:hover {
 
 .trace-input-control {
     background: rgb(255 128 3 / 0.5) !important;
-    color: white !important;
 }
 
 .trace-output-control {
     background: rgb(64 129 55 / 0.5) !important;
-    color: white !important;
 }
 
 .trace-current-control {
     background: rgb(7 96 217 / 0.5) !important;
-    color: white !important;
 }
 
 .s-control-data-flow {
@@ -524,4 +521,21 @@ button:hover {
     width: 100%;
     max-width: 100%;
     position: relative;
+}
+
+.wrap-table .info-control-btn {
+    right: 4px !important;
+    top: 0!important;
+}
+
+.info-control-btn {
+    right: 0;
+    color: blue;
+    position: absolute;
+    top: 4px;
+}
+
+.s-control.s-control-image {
+    background: #f2f2f2;
+    border-radius: 4px;
 }

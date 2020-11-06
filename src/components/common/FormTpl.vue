@@ -170,6 +170,7 @@ import {
     VTextarea
 } from "vuetify/lib";
 import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl.vue";
+import LinkConfig from "./../../views/document/sideright/items/LinkConfig.vue";
 import FormAutoComplete from "./../../views/document/sideright/items/FormAutoComplete";
 import FormulaEditor from "./../formula/editor/FormulaEditor";
 import DateFormat from "./../common/DateFormat";
@@ -248,7 +249,17 @@ const inputTypeConfigs = {
         tag: "v-tree-validate",
         props(config) {
             return {
-                label: config.title
+                label: config.title,
+            };
+        }
+    },
+  
+    linkConfig: {
+        tag: "s-link-config",
+        props(config) {
+            return {
+                label: config.title,
+                dataConfig:config.configData
             };
         }
     },
@@ -651,6 +662,7 @@ export default {
         VSwitch,
         VTextarea,
         "v-tree-validate": TreeValidate,
+        "s-link-config": LinkConfig,
         "v-autocomplete-auto": FormAutoComplete,
         FormulaEditor,
         DataTable,

@@ -32,10 +32,10 @@
 									<div style="position:relative; display:flex">
 										<v-icon style="font-size:13px;margin-right:8px">{{listIcon[item.type]}}</v-icon>
 										<div  class="d-flex flex-column">
-											<div class="title-item-favorite ">
+											<div class="title-item-favorite">
 												{{item.type == 'document_definition' ? item.title : item.name}}
 											</div>
-											<span style="font:12px roboto; font-weight:300">{{item.appName}}</span>
+											<span style="font:12px roboto; font-weight:200">{{item.appName}}</span>
 										</div>
 									
 										<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:6px;right:0px">mdi-star</v-icon>
@@ -210,7 +210,6 @@ export default {
 			return this.$store.state.appConfig.listItemSelected
 		},
 		sFavorite(){
-			console.log(this.$store.state.appConfig.listFavorite);
 			return this.$store.state.appConfig.listFavorite
 		},
 		listApp(){
@@ -253,10 +252,12 @@ export default {
 					})
 					this.checkTypeFavorite(res.data.listObject)
 					this.$store.commit('appConfig/updateListFavorite',self.listFavorite)
-					this.loadingFavorite = false
+					
 				}
 			}).catch((err) => {
 			});
+			this.loadingFavorite = false
+
 		},
 		clickDetails(item){
 			this.$refs.contextMenu.hide()

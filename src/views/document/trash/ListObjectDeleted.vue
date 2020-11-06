@@ -107,6 +107,13 @@ export default {
                         documentApi
                         .deleteObjectInTrash({ids:ids.join()})
                         .then(res => {
+                            let listObject = thisCpn.defaultData.listObject;
+                            for (let index = 0; index < listObject.length; index++) {
+                                let object = listObject[index];
+                                if(ids.includes(object.idTrash)){
+                                    thisCpn.defaultData.listObject.splice(index,1)
+                                }
+                            }
                             if (res.status == 200) {
                                 thisCpn.$snotify({
                                     type: "success",

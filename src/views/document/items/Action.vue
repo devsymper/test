@@ -6,18 +6,37 @@
             :key="i"
             @click="action(item.action)"
         >
-            <!-- <v-list-item-icon class="sym-action__icon">
-                
-            </v-list-item-icon> -->
+            <v-btn
+                v-if="item.action == 'save-document'"
+                :loading="isLoadingSaveDoc"
+                :disabled="isLoadingSaveDoc"
+                color="success"
+                class="save-doc-btn"
+            >
+                <v-icon
+                right
+                dark
+                class="mr-2"
+                >
+                mdi-content-save
+                </v-icon>
+                {{item.text}}
+                <template v-slot:loader>
+                <span class="custom-loader">
+                    <v-icon light>mdi-cached</v-icon>
+                </span>
+                </template>
+            </v-btn>
 
-            <v-list-item-title>
+            <v-list-item-title v-else>
                 <v-tooltip top>
                     <template v-slot:activator="{ on }">
                         <v-icon v-on="on" small >{{item.icon}}</v-icon>
                     </template>
                     <span>{{item.text}}</span>
                 </v-tooltip>
-                <span class="title-save-doc" v-if="item.action == 'save-document'">{{item.text}}</span>
+                <!-- <span class="title-save-doc" v-if="item.action == 'save-document'">{{item.text}}</span> -->
+                 
             </v-list-item-title>
         </v-list-item>
     </v-list>
@@ -29,6 +48,10 @@ export default {
             let checkControlItem = { text: 'Kiểm tra Control', icon: 'mdi-puzzle-check' ,action:'check-control'};
             this.items.splice(5,0,checkControlItem);
         }
+        this.$evtBus.$on("document-editor-save-doc-callback", locale => {
+            if(this._inactive == true) return;
+            this.isLoadingSaveDoc = false;
+        });
         
     },
     data(){
@@ -44,15 +67,25 @@ export default {
                
                 { text: 'Tổng hợp control', icon: 'mdi-cog' ,action:'list-control-option'},
                 { text: 'Xem trước nhập liệu', icon: 'mdi-eye-settings-outline' ,action:'preview-submit'},
-                { text: 'Lưu document', icon: 'mdi-content-save' ,action:'save-document'},
+                { text: 'Lưu', icon: 'mdi-content-save' ,action:'save-document'},
             ],
+            isLoadingSaveDoc:false,
         }
     },
     methods:{
         action(type){
-            this.$emit('document-action-'+type)
+            if(type == 'save-document' && this.isLoadingSaveDoc == false){
+                this.isLoadingSaveDoc = true;
+                this.$emit('document-action-'+type);
+            }
+            else if(type != 'save-document'){
+                this.$emit('document-action-'+type);
+            }
+        },
+        hideLoading(){
+            this.isLoadingSaveDoc = false;
         }
-    }
+    },
 }
 </script>
 <style scoped>
@@ -96,5 +129,49 @@ export default {
         margin-left: 6px;
         display: inline-block;
         vertical-align: text-top;
+    }
+    .custom-loader {
+        animation: loader 1s infinite;
+        display: flex;
+        }
+        @-moz-keyframes loader {
+        from {
+            transform: rotate(0);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+        }
+        @-webkit-keyframes loader {
+        from {
+            transform: rotate(0);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+        }
+        @-o-keyframes loader {
+        from {
+            transform: rotate(0);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+        }
+        @keyframes loader {
+        from {
+            transform: rotate(0);
+        }
+        to {
+            transform: rotate(360deg);
+        }
+    }
+    .save-doc-btn{
+        height: 30px !important;
+        padding: 0 8px !important;
+        font-size: 13px;
+    }
+    .sym-document-list-action >>> .v-list-item:last-child:hover::before{
+        background: transparent !important;
     }
 </style>

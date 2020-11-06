@@ -4,6 +4,7 @@
         :grid-size="gridSize" 
         :draw-grid="drawGrid" 
         @init="setupGraph"
+        :readonly="readonly"
         ref="jointPaper" />
 </template>
 <script>
@@ -23,6 +24,10 @@ export default {
         },
         context: {
             default: 'department'
+        },
+        readonly:{
+            type: Boolean,
+            default: false
         }
     },
     created(){
@@ -382,7 +387,10 @@ export default {
         initDiagramView(){
             
         }
-	}
+    },
+    watch:{
+       
+    }
 }
 </script>
 

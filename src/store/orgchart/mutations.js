@@ -149,6 +149,12 @@ const updatePermissionsSelectingNode = (state, params) => {
 const setAllOrgchartStruct = (state, params) => {
     Vue.set(state, 'allOrgchartStruct', params)
 }
+const changeViewOnlySub = (state, data) => {
+    Vue.set(state, 'viewOnlySub', data)
+}
+const updateListVizParentId = (state, data) =>{
+    state.listVizParentId.push(data)
+}
 
 
 export {
@@ -172,5 +178,7 @@ export {
     emptyListChildrenNode,
     updateListChildrenNode,
     getUserByVizId,
-    updatePermissionsSelectingNode
+    updatePermissionsSelectingNode,
+    changeViewOnlySub,
+    updateListVizParentId
 };

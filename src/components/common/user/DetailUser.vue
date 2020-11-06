@@ -119,7 +119,7 @@
                         :fileName="avatarFileName"
 						@selected-file="handleAvatarSelected"
                         ref="uploadAvatar"
-                        />
+                    />
                 </div>
             </div>
             

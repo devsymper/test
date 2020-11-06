@@ -7,18 +7,18 @@
                 class="pt-0 pl-0 pr-0 pb-0"
             >
                 <listHeader
-                :isSmallRow="isSmallRow"
-                :headerTitle="headerTitle"
-                :sideBySideMode="sideBySideMode"
-                :compackMode="compackMode"
-                :parentTaskId="filterFromParent.parentTaskId"
-                :changeStatusMoreApproval="changeStatusMoreApproval"
-                @change-density="isSmallRow = !isSmallRow"
-                @changeObjectType="changeObjectType"
-                @filter-change-value="handleChangeFilterValue"
-                @create-task="getTasks({})"
-                @refresh-task-list="getTasks()"
-                @goToPageApproval="goToPageApproval"
+                    :isSmallRow="isSmallRow"
+                    :headerTitle="headerTitle"
+                    :sideBySideMode="sideBySideMode"
+                    :compackMode="compackMode"
+                    :parentTaskId="filterFromParent.parentTaskId"
+                    :changeStatusMoreApproval="changeStatusMoreApproval"
+                    @change-density="isSmallRow = !isSmallRow"
+                    @changeObjectType="changeObjectType"
+                    @filter-change-value="handleChangeFilterValue"
+                    @create-task="getTasks({})"
+                    @refresh-task-list="getTasks()"
+                    @goToPageApproval="goToPageApproval"
                 ></listHeader>
                 <v-divider v-if="!sideBySideMode"></v-divider>
                 <div class="h-100" v-if="!changeStatusMoreApproval">
@@ -103,14 +103,21 @@
 
                                     >
                                         <v-col
-                                        style="line-height: 42px; flex:0!important"
+                                        style="flex:0!important"
                                         cols="1"
                                         class="fs-12 px-1 py-0 pl-3"
                                         >
-                                        <v-icon class="fs-14"
-                                            v-if="obj.taskData.action"
-                                        >{{obj.taskData.action.action=='approval' ? 'mdi-seal-variant ': 'mdi-file-document-edit-outline'}}</v-icon>
-                                        <v-icon class="fs-14" v-else>mdi-checkbox-marked-circle-outline</v-icon>
+                                            <div class="pt-1">
+                                                <v-icon class="fs-14"
+                                                    v-if="obj.taskData.action"
+                                                >{{obj.taskData.action.action=='approval' ? 'mdi-seal-variant ': 'mdi-file-document-edit-outline'}}</v-icon>
+                                                <v-icon class="fs-14" v-else>mdi-checkbox-marked-circle-outline</v-icon>
+                                            </div>
+                                            <div>
+                                                <v-icon v-if="obj.createTime && checkTimeDueDate(obj)" style="font-size:11px ; color:red;padding-left: 1px;padding-top:4px">mdi-circle</v-icon>
+                                                <v-icon v-else-if="obj.createTime && !checkTimeDueDate(obj)" style="color:blue;font-size:11px ;padding-left: 1px;padding-top:4px">mdi-circle</v-icon>
+                                                <v-icon v-else style="font-size:11px ; color:green;padding-left: 1px;padding-top:4px">mdi-circle</v-icon>
+                                            </div>
                                         </v-col>
                                         <v-col :cols="sideBySideMode ? 10 : compackMode ? 5: 3" :class="{'colName':sideBySideMode==true}" class="pa-1">
                                             <div class="pl-1">
@@ -224,13 +231,13 @@
             style="border-left: 1px solid #e0e0e0;"
         >
             <taskDetail
-            :parentHeight="listTaskHeight"
-            :taskInfo="selectedTask.taskInfo"
-            :originData="selectedTask.originData"
-            :allVariableProcess="allVariableProcess"
-            @close-detail="closeDetail"
-            @task-submited="handleTaskSubmited"
-            @changeUpdateAsignee="changeUpdateAsignee"
+                :parentHeight="listTaskHeight"
+                :taskInfo="selectedTask.taskInfo"
+                :originData="selectedTask.originData"
+                :allVariableProcess="allVariableProcess"
+                @close-detail="closeDetail"
+                @task-submited="handleTaskSubmited"
+                @changeUpdateAsignee="changeUpdateAsignee"
             ></taskDetail>
         </v-col>
         </v-row>
@@ -421,176 +428,188 @@ export default {
         self.reCalcListTaskHeight();
     },
     methods: {
-    goToPageApproval(){
-        this.changeStatusMoreApproval=!this.changeStatusMoreApproval;
-    },
-    changeUpdateAsignee(){
-      this.handleTaskSubmited();
-    },
-    getDateFormNow(time){
-        var today = this.$moment().format('YYYY-MM-DD');
-        if (time===today) {
-            return this.$t('myItem.today');
-        }
-        else{
-            return this.$moment(time).fromNow();
-        }
-    },
-    selectNameApp(processInstanceId){
-        if (processInstanceId!=null) {
-            const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===processInstanceId);
-            if (dataVariable) {
-                let appId=dataVariable.value;
-                let allApp = this.$store.state.task.allAppActive;
-                let app=allApp.find(element => element.id==appId);
-                if (app) {
-                    return app.name;
+        checkTimeDueDate(item){
+            if (item.dueDate) {
+                let dueDate=new Date(item.dueDate).getTime();
+                if (dueDate<Date.now()) {
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        },
+        goToPageApproval(){
+            this.changeStatusMoreApproval=!this.changeStatusMoreApproval;
+        },
+        changeUpdateAsignee(){
+        this.handleTaskSubmited();
+        },
+        getDateFormNow(time){
+            var today = this.$moment().format('YYYY-MM-DD');
+            if (time===today) {
+                return this.$t('myItem.today');
+            }
+            else{
+                return this.$moment(time).fromNow();
+            }
+        },
+        selectNameApp(processInstanceId){
+            if (processInstanceId!=null) {
+                const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===processInstanceId);
+                if (dataVariable) {
+                    let appId=dataVariable.value;
+                    let allApp = this.$store.state.task.allAppActive;
+                    let app=allApp.find(element => element.id==appId);
+                    if (app) {
+                        return app.name;
+                    }else{
+                        return "";
+                    }
                 }else{
                     return "";
                 }
             }else{
                 return "";
             }
-        }else{
-            return "";
-        }
-    },
-    changeObjectType(index) {
-      this.$emit("changeObjectType", index);
-    },
-    handleReachEndList() {
-      if (
-        this.allFlatTasks.length < this.totalTask &&
-        this.allFlatTasks.length > 0 && !this.loadingTaskList && !this.loadingMoreTask
-      ) {
-        this.myOwnFilter.page += 1;
-        if ((this.myOwnFilter.page-1)*this.myOwnFilter.size <this.totalTask) {
-            this.getTasks();
-        }
-      }
-    },
-    handleTaskSubmited() {
-      this.sideBySideMode = false;
-      this.getTasks();
-    },
-    handleChangeFilterValue(data) {
-      for (let key in data) {
-        this.$set(this.myOwnFilter, key, data[key]);
-      }
-      this.getTasks();
-    },
-    reCalcListTaskHeight() {
-      this.listTaskHeight =
-        util.getComponentSize(this.$el.parentElement).h - 85;
-    },
-    selectObject(obj, idx,idex) {
-        console.log("avsvsv",obj);
-        this.index = idx;
-        this.dataIndex = idex;
-        this.$set(this.selectedTask, "originData", obj);
-        if (this.smallComponentMode) {
-            this.$goToPage("/tasks/" + obj.id, "Do task");
-        } else {
-            this.selectedTask.idx = idx;
-            if (!this.compackMode) {
-            this.sideBySideMode = true;
-            let taskInfo = extractTaskInfoFromObject(obj);
-            this.$set(this.selectedTask, "taskInfo", taskInfo);
-            this.$emit("change-height", "calc(100vh - 88px)");
-            }
-        }
-    },
-    closeDetail() {
-        this.sideBySideMode = false;
-        this.$emit("change-height", "calc(100vh - 120px)");
-    },
-    getTaskData(task) {
-        let rsl = {
-            content: "",
-            extraLabel: "",
-            extraValue: ""
-        };
-        try {
-            let taskData = JSON.parse(task.description);
-            if (taskData) {
-            rsl = taskData;
-            }
-        } catch (error) {
-            rsl.content = task.description;
-        }
-        return rsl;
-    },
-    async getTasks(filter = {}) {
-        if (this.loadingTaskList || this.loadingMoreTask) {
-            return;
-        }
-        let self = this;
-        if (this.myOwnFilter.page == 1) {
-            this.allFlatTasks = [];
-            this.loadingTaskList = true;
-        } else {
-            this.loadingMoreTask = true;
-        }
-        filter = Object.assign(filter, this.filterFromParent);
-        filter = Object.assign(filter, this.myOwnFilter);
-        let res = {};
-        let listTasks = [];
-        if (filter.status) {
-            this.$store.commit("task/setFilter", filter.status);
-        }
-        if (this.filterTaskAction == "subtasks") {
-            res = await BPMNEngine.getSubtasks(
-                this.filterFromParent.parentTaskId,
-                filter
-            );
-            if (filter.status == "done") {
-                listTasks = res.data;
-            } else {
-                listTasks = res;
-            }
-        } else {
-            res = await BPMNEngine.getTask(filter);
-            listTasks = res.data;
-        }
-        this.totalTask = Number(res.total);
-        this.$store.dispatch('task/getAllAppActive');
-        //Khadm: danh sách các task cần lấy tổng số comment và file đính kèm
-        let taskIden = [];
-        let allProcessId=[];
-        if (Object.keys(this.$store.state.process.allDefinitions).length === 0) { //ktra xem store đã có thông tin của các processDefinition chưa
-            await this.$store.dispatch("process/getAllDefinitions");
-        }
-
-        for (let task of listTasks) {
-            task.taskData = self.getTaskData(task);
-            addMoreInfoToTask(task);
-            self.allFlatTasks.push(task);
-            taskIden.push('task:'+task.id);
-            if (task.processInstanceId && task.processInstanceId!=null) {
-                if(allProcessId.indexOf(task.processInstanceId) === -1) {
-                    allProcessId.push(task.processInstanceId);
+        },
+        changeObjectType(index) {
+            this.$emit("changeObjectType", index);
+        },
+        handleReachEndList() {
+            if (
+                this.allFlatTasks.length < this.totalTask &&
+                this.allFlatTasks.length > 0 && !this.loadingTaskList && !this.loadingMoreTask
+            ) {
+                this.myOwnFilter.page += 1;
+                if ((this.myOwnFilter.page-1)*this.myOwnFilter.size <this.totalTask) {
+                    this.getTasks();
                 }
             }
-        }
-        self.filterVariables.pageSize=self.myOwnFilter.size;
-        self.filterVariables.processInstanceIds=JSON.stringify(allProcessId);
-        let resVariable = {};
-        resVariable = await taskApi.getVariableWorkflow(self.filterVariables);
-        for (let item of resVariable.data) {
-            if (self.allVariableProcess.indexOf(item.id) === -1) {
-                self.allVariableProcess.push(item);
+        },
+        handleTaskSubmited() {
+            this.sideBySideMode = false;
+            this.getTasks();
+        },
+        handleChangeFilterValue(data) {
+            for (let key in data) {
+                this.$set(this.myOwnFilter, key, data[key]);
             }
-        }
-        this.$store.commit('file/setWaitingFileCountPerObj', taskIden);
-        this.$store.commit('comment/setWaitingCommentCountPerObj', taskIden);
-        this.$store.dispatch('file/getWaitingFileCountPerObj');
-        this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+            this.getTasks();
+        },
+        reCalcListTaskHeight() {
+            this.listTaskHeight =
+                util.getComponentSize(this.$el.parentElement).h - 85;
+        },
+        selectObject(obj, idx,idex) {
+            console.log("avsvsv",obj);
+            this.index = idx;
+            this.dataIndex = idex;
+            this.$set(this.selectedTask, "originData", obj);
+            if (this.smallComponentMode) {
+                this.$goToPage("/tasks/" + obj.id, "Do task");
+            } else {
+                this.selectedTask.idx = idx;
+                if (!this.compackMode) {
+                this.sideBySideMode = true;
+                let taskInfo = extractTaskInfoFromObject(obj);
+                this.$set(this.selectedTask, "taskInfo", taskInfo);
+                this.$emit("change-height", "calc(100vh - 88px)");
+                }
+            }
+        },
+        closeDetail() {
+            this.sideBySideMode = false;
+            this.$emit("change-height", "calc(100vh - 120px)");
+        },
+        getTaskData(task) {
+            let rsl = {
+                content: "",
+                extraLabel: "",
+                extraValue: ""
+            };
+            try {
+                let taskData = JSON.parse(task.description);
+                if (taskData) {
+                rsl = taskData;
+                }
+            } catch (error) {
+                rsl.content = task.description;
+            }
+            return rsl;
+        },
+        async getTasks(filter = {}) {
+            if (this.loadingTaskList || this.loadingMoreTask) {
+                return;
+            }
+            let self = this;
+            if (this.myOwnFilter.page == 1) {
+                this.allFlatTasks = [];
+                this.loadingTaskList = true;
+            } else {
+                this.loadingMoreTask = true;
+            }
+            filter = Object.assign(filter, this.filterFromParent);
+            filter = Object.assign(filter, this.myOwnFilter);
+            let res = {};
+            let listTasks = [];
+            if (filter.status) {
+                this.$store.commit("task/setFilter", filter.status);
+            }
+            if (this.filterTaskAction == "subtasks") {
+                res = await BPMNEngine.getSubtasks(
+                    this.filterFromParent.parentTaskId,
+                    filter
+                );
+                if (filter.status == "done") {
+                    listTasks = res.data;
+                } else {
+                    listTasks = res;
+                }
+            } else {
+                res = await BPMNEngine.getTask(filter);
+                listTasks = res.data;
+            }
+            this.totalTask = Number(res.total);
+            this.$store.dispatch('task/getAllAppActive');
+            //Khadm: danh sách các task cần lấy tổng số comment và file đính kèm
+            let taskIden = [];
+            let allProcessId=[];
+            if (Object.keys(this.$store.state.process.allDefinitions).length === 0) { //ktra xem store đã có thông tin của các processDefinition chưa
+                await this.$store.dispatch("process/getAllDefinitions");
+            }
 
-        console.log(listTasks, "listTassk");
-        this.loadingTaskList = false;
-        this.loadingMoreTask = false;
-    },
-  }
+            for (let task of listTasks) {
+                task.taskData = self.getTaskData(task);
+                addMoreInfoToTask(task);
+                self.allFlatTasks.push(task);
+                taskIden.push('task:'+task.id);
+                if (task.processInstanceId && task.processInstanceId!=null) {
+                    if(allProcessId.indexOf(task.processInstanceId) === -1) {
+                        allProcessId.push(task.processInstanceId);
+                    }
+                }
+            }
+            self.filterVariables.pageSize=self.myOwnFilter.size;
+            self.filterVariables.processInstanceIds=JSON.stringify(allProcessId);
+            let resVariable = {};
+            resVariable = await taskApi.getVariableWorkflow(self.filterVariables);
+            for (let item of resVariable.data) {
+                if (self.allVariableProcess.indexOf(item.id) === -1) {
+                    self.allVariableProcess.push(item);
+                }
+            }
+            this.$store.commit('file/setWaitingFileCountPerObj', taskIden);
+            this.$store.commit('comment/setWaitingCommentCountPerObj', taskIden);
+            this.$store.dispatch('file/getWaitingFileCountPerObj');
+            this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+
+            console.log(listTasks, "listTassk");
+            this.loadingTaskList = false;
+            this.loadingMoreTask = false;
+        },
+    }
 };
 </script>
 

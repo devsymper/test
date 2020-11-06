@@ -34,7 +34,7 @@
             </div>
         </vue-resizable>
         <div  class="sym-document__side-bar-right">
-            <sidebar-right ref="sidebarRight" :isConfigPrint="isConfigPrint" :instance="keyInstance"/>
+            <sidebar-right ref="sidebarRight" :isConfigPrint="isConfigPrint" :styles="contentStyle" :instance="keyInstance"/>
         </div>
         <s-table-setting v-if="!isConfigPrint" ref="tableSetting" @add-columns-table="addColumnTable"/>
         <PrintTableConfig v-if="isConfigPrint" ref="printTableConfig" @config-column-table-print="configColumnTablePrint"/>
@@ -366,7 +366,7 @@ export default {
             isConfigPrint:false,
             listDocument:[],
             inputSaveControlTemplate:{},
-            sizePrint:{},
+            contentStyle:{},
             currentDragging:null,
             oldTableId:null,
             dataPreviewSubmit:null,
@@ -442,7 +442,7 @@ export default {
                 if(res.status == 200 && res.data.length>0){
                     for (let index = 0; index < res.data.length; index++) {
                         let dataflow = res.data[index];
-                        thisCpn.listDataFlow.push({id:dataflow.id,name:dataflow.name,title:"",params:dataflow.params})
+                        thisCpn.listDataFlow.push({id:dataflow.id,name:dataflow.name,title:"",params:dataflow.params, datasets:dataflow.datasets})
                     }
                     thisCpn.$store.commit("document/addToDocumentEditorStore",{key:"listDataFlow",value:thisCpn.listDataFlow,instance:thisCpn.keyInstance});  
                 }
@@ -507,39 +507,39 @@ export default {
          * Hàm xử lí khi paste nội dung vào editor
          */
         handlePasteContent(e){
+            e.preventDefault();
             var content = ((e.originalEvent || e).clipboardData || window.clipboardData).getData("text/html");
-
             content = content.replace(/((<|(<\/))html>)|((<|(<\/))body>)/g,"");
+            content = content.replace(/<!--[^>]*-->/g,"");
+            content = '<div class="content-wrap">'+content+'</div>';
             let contentEl = $(content);
             let listControls = contentEl.find('.s-control:not(.s-control-table .s-control)');
             if(listControls.length > 0){
-                setTimeout((self) => {
-                    for (let index = 0; index < listControls.length; index++) {
-                        const controlEl = listControls[index];
-                        let controlId = $(controlEl).attr('id');
-                        var inputId = 's-control-id-' + Date.now();
-                        let controlType = $(controlEl).attr('s-control-type');
-                        let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+controlId);
-                        elements.attr('id',inputId);
-                        let control = GetControlProps(controlType);
-                        this.addToAllControlInDoc(inputId,{properties: control.properties, formulas : control.formulas,type:controlType});
-                        if(controlType == 'table'){ // nếu là table thì xử lí các control trong table
-                            let allControlInTable = elements.find('.s-control');
-                            for (let i = 0; i < allControlInTable.length; i++) {
-                                const childControlEl = allControlInTable[i];
-                                let childControlId = $(childControlEl).attr('id');
-                                var childInputId = 's-control-id-' + Date.now();
-                                let childControlType = $(childControlEl).attr('s-control-type');
-                                let childElements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('#'+childControlId);
-                                childElements.attr('id',childInputId);
-                                let childControl = GetControlProps(childControlType);
-                                this.addToAllControlInTable(childInputId,{properties: childControl.properties, formulas : childControl.formulas,type:childControlType},inputId);
-                            }
+                for (let index = 0; index < listControls.length; index++) {
+                    const controlEl = listControls[index];
+                    let controlId = $(controlEl).attr('id');
+                    var inputId = 's-control-id-' + Date.now() + Math.floor(Math.random() * 100);
+                    let controlType = $(controlEl).attr('s-control-type');
+                    contentEl.find('#'+controlId).attr('id',inputId).css({background:'rgba(0 0 0 / 0.05)'}).removeClass('on-selected');
+                    let control = GetControlProps(controlType);
+                    this.addToAllControlInDoc(inputId,{properties: control.properties, formulas : control.formulas,type:controlType});
+                    if(controlType == 'table'){ // nếu là table thì xử lí các control trong table
+                        let allControlInTable = elements.find('.s-control');
+                        for (let i = 0; i < allControlInTable.length; i++) {
+                            const childControlEl = allControlInTable[i];
+                            let childControlId = $(childControlEl).attr('id');
+                            var childInputId = 's-control-id-' + Date.now() + Math.floor(Math.random() * 100);
+                            let childControlType = $(childControlEl).attr('s-control-type');
+                            contentEl.find('#'+childControlId).attr('id',childInputId).css({background:'rgba(0 0 0 / 0.05)'}).removeClass('on-selected');
+                            let childControl = GetControlProps(childControlType);
+                            this.addToAllControlInTable(childInputId,{properties: childControl.properties, formulas : childControl.formulas,type:childControlType},inputId);
                         }
                     }
-                }, 300,this);
-                
+                }
+                content = contentEl.html();
+                this.editorCore.execCommand('mceInsertContent', false, content);
             }
+            
             else{   // trường hợp copy từ dekko
                 if(contentEl.find('.bkerp-input').length > 0){
                     setTimeout((self) => {
@@ -682,6 +682,7 @@ export default {
         },
         // ham tạo dialog của tinymce để cấu hình padding doc
         showPaddingPageConfig(ed){
+            let self = this;
                 var left = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-left').slice(0, -2);
                 var right = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-right').slice(0, -2);
                 var top = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-top').slice(0, -2);
@@ -736,13 +737,23 @@ export default {
                         var right = data.right;
                         var top = data.top;
                         var bottom = data.bottom;
-                        $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css({
+                        $("#document-editor-"+self.keyInstance+"_ifr").contents().find('body').css({
                             'padding-left': left + 'cm',
                             'padding-right': right + 'cm',
                             'padding-top': top + 'cm',
                             'padding-bottom': bottom + 'cm',
                             'margin':'0',
                         });
+                        self.contentStyle = Object.assign(self.contentStyle,{
+                            'padding-left': left + 'cm',
+                            'padding-right': right + 'cm',
+                            'padding-top': top + 'cm',
+                            'padding-bottom': bottom + 'cm',
+                        });
+                        self.$store.commit(
+                            "document/updateDocumentState",{instance:self.keyInstance,state:'documentStyle',value:self.contentStyle}
+                        );
+                        ed.windowManager.close()
                     }
                 }
                 );
@@ -828,6 +839,7 @@ export default {
                     let allControl = this.editorStore.allControl;
                     let controlPrimaryKey = this.validateControlBeforeSave(allControl,'0');
                     if(Object.keys(controlPrimaryKey).length > 1){
+                        this.$evtBus.$emit('document-editor-save-doc-callback')
                         let allKey = Object.keys(controlPrimaryKey);
                         this.$snotify({
                                         type: "error",
@@ -863,6 +875,7 @@ export default {
                                 
                                 listName.push(name);
                             })
+                            this.$evtBus.$emit('document-editor-save-doc-callback');
                             this.$snotify({
                                             type: "error",
                                             title: "Tên một số control chưa hợp lệ",
@@ -924,25 +937,27 @@ export default {
                     listControlFormulas.insert = Object.assign(listFormulasControlInTable.insert,listControlFormulas.insert);
                     listControlFormulas.update = Object.assign(listFormulasControlInTable.update,listControlFormulas.update);
                 }
+                let controlName = (control.properties.hasOwnProperty('name')) ? control.properties.name.value : control.name;
                 for (let f in formulas){
-                    if(formulas[f].value != ""){
-                        if(formulas[f].formulasId != 0){
-                            let item = {};
-                            item[f] = {};
-                            item[f]['syql'] = formulas[f].value;
-                            item[f]['id'] = formulas[f].formulasId;
-                            listFormulasUpdate.push(item);
-                        }
-                        else{
-                            let item = {};
-                            item[f] = {};
-                            item[f]['formulas'] = formulas[f].value;
-                            item[f]['objectType'] = "field";
-                            item[f]['objectIdentifier'] = (control.properties.hasOwnProperty('name')) ? control.properties.name.value : control.name;
-                            item[f]['context'] = this.sDocumentProp.name.value
-                            listFormulas.push(item);
+                    if(f == 'linkConfig'){
+                        let configs = formulas[f]['configData'];
+                        if(configs.length > 0){
+                            for (let index = 0; index < configs.length; index++) {
+                                let config = configs[index];
+                                let instance = config.formula.instance
+                                let formulaType = f+"_"+instance;
+                                if(config.formula.value != ""){
+                                    this.setFormulasDataPost(listFormulasUpdate, listFormulas, config.formula.id, config.formula.value, controlName, formulaType);
+                                }
+                            }
                         }
                     }
+                    else{
+                        if(formulas[f].value != ""){
+                            this.setFormulasDataPost(listFormulasUpdate, listFormulas, formulas[f].formulasId, formulas[f].value, controlName, f);
+                        }
+                    }
+                    
                 }
                 if(Object.keys(listFormulas).length > 0){
                     listControlFormulas['insert'][controlId] = listFormulas;
@@ -953,6 +968,26 @@ export default {
             }
            return listControlFormulas;
             
+        },
+
+
+        setFormulasDataPost(listFormulasUpdate, listFormulas, formulaId, formulaValue, controlName, formulaType){
+             if(formulaId != 0){
+                let item = {};
+                item[formulaType] = {};
+                item[formulaType]['syql'] = formulaValue;
+                item[formulaType]['id'] = formulaId;
+                listFormulasUpdate.push(item);
+            }
+            else{
+                let item = {};
+                item[formulaType] = {};
+                item[formulaType]['formulas'] = formulaValue;
+                item[formulaType]['objectType'] = "field";
+                item[formulaType]['objectIdentifier'] = controlName;
+                item[formulaType]['context'] = this.sDocumentProp.name.value
+                listFormulas.push(item);
+            }
         },
        
         /**
@@ -1014,7 +1049,7 @@ export default {
             let thisCpn = this;
             try {
                 if(Object.keys(dataPost.update).length > 0)
-                await formulasApi.updateMultiFormulas({formulas:JSON.stringify(dataPost.update)})
+                await formulasApi.updateMultiFormulas({formulas:JSON.stringify(dataPost.update)});
                 if(Object.keys(dataPost.insert).length > 0){
                     let res = await formulasApi.saveMultiFormulas({formulas:JSON.stringify(dataPost.insert)})
                     if(res.status == 200){ 
@@ -1022,13 +1057,19 @@ export default {
                         for(let controlId in data){
                             for(let i = 0; i < data[controlId].length; i++){ 
                                 let key = Object.keys(data[controlId][i])[0];
+                                let fValue = data[controlId][i][key];
+                                let linkInstance = false;
+                                if(key.includes('linkConfig')){
+                                    linkInstance = key.split('_')[1];
+                                    key = 'linkConfig';
+                                }
                                 let controlEl = $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('#'+controlId);
                                 let tableId = 0;
                                 if(!controlEl.is('.s-control-table') && controlEl.closest(".s-control-table").length > 0){
                                     tableId = controlEl.closest(".s-control-table").attr('id');
                                 }
                                 thisCpn.$store.commit(
-                                    "document/updateFormulasId",{id:controlId,name:key,value:data[controlId][i][key],tableId:tableId,instance:this.keyInstance}
+                                    "document/updateFormulasId",{id:controlId,name:key,value:fValue,tableId:tableId,instance:this.keyInstance,linkInstance:linkInstance}
                                 );   
                             }
                         } 
@@ -1040,6 +1081,7 @@ export default {
                         }
                     }
                     else{
+                        this.$evtBus.$emit('document-editor-save-doc-callback')
                         this.$snotify({
                                 type: "error",
                                 title: "error from formulas serice, can't not save into formulas service!!!",
@@ -1057,6 +1099,7 @@ export default {
                 }
                 
             } catch (error) {
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 this.$snotify({
                             type: "error",
                             title: "error from formulas serice, can't not save into formulas service!!!",
@@ -1070,6 +1113,7 @@ export default {
         createDocument(dataPost){
             let thisCpn = this;
             documentApi.saveDocument(dataPost).then(res => {
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 if (res.status == 200) {
                     thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
@@ -1088,6 +1132,7 @@ export default {
                 }
             })
             .catch(err => {
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 thisCpn.$snotify({
                         type: "error",
                         title: "can not save document",
@@ -1102,6 +1147,7 @@ export default {
         editDocument(dataPost){
             let thisCpn = this;
             documentApi.editDocument(dataPost).then(res => {
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 if (res.status == 200) {
                     thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
@@ -1120,6 +1166,7 @@ export default {
                 
             })
             .catch(err => {
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 thisCpn.$snotify({
                     type: "error",
                     title: "error from edit document api",
@@ -1142,6 +1189,7 @@ export default {
                 this.saveDocument();
             }
             else{
+                this.$evtBus.$emit('document-editor-save-doc-callback')
                 this.$snotify({
                                 type: "error",
                                 title: "Thông tin control chưa hợp lệ",
@@ -1318,8 +1366,17 @@ export default {
             let w = $('#document-editor-'+this.keyInstance+'_ifr').height();
             $('#document-editor-'+this.keyInstance+'_ifr').css({width:w ,height:h});
             $('.tox-sidebar-wrap').css({width:w ,height:h});
-            this.sizePrint.width = w;
-            this.sizePrint.height = h;
+            this.contentStyle.width = Math.round((w * 2.54 / 96) * 10) / 10 + 'cm';
+            this.contentStyle.height = Math.round((h * 2.54 / 96) * 10) / 10 + 'cm';
+            if(w > h){
+                this.contentStyle.page = 'landscape';
+            }
+            else{
+                this.contentStyle.page = 'portrait';
+            }
+            this.$store.commit(
+                "document/updateDocumentState",{instance:this.keyInstance,state:'documentStyle',value:this.contentStyle}
+            );
         },
         /**
          * Hàm đặt kích thước cho trang A3 A4 A5
@@ -1327,7 +1384,12 @@ export default {
         setPageSize(w,h,type){
             $('#document-editor-'+this.keyInstance+'_ifr').css({width:w ,height:h});
             $('.tox-sidebar-wrap').css({width:w ,height:h});
-            this.sizePrint = {width:w ,height:h,type:type};
+            this.contentStyle.width = w;
+            this.contentStyle.height = h;
+            this.contentStyle.type = type;
+            this.$store.commit(
+                "document/updateDocumentState",{instance:this.keyInstance,state:'documentStyle',value:this.contentStyle}
+            );
         },
         
         //hoangnd: hàm mở modal tablesetting của control table
@@ -1787,6 +1849,33 @@ export default {
                 this.inputSaveControlTemplate.title.value = res.data.title;
             }
         },
+
+
+        /**
+         * Hàm set style cho form th lưu trên db
+         */
+        setDefaultStyle(defaultStyle){
+            if(defaultStyle){
+                try {
+                    this.contentStyle = JSON.parse(defaultStyle);
+                    this.$store.commit(
+                        "document/updateDocumentState",{instance:this.keyInstance,state:'documentStyle',value:this.contentStyle}
+                    );
+                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css({
+                        'padding-left': this.contentStyle['padding-left'],
+                        'padding-right': this.contentStyle['padding-right'],
+                        'padding-top': this.contentStyle['padding-top'],
+                        'padding-bottom': this.contentStyle['padding-bottom'],
+                    });
+                    this.setPageSize(this.contentStyle.width, this.contentStyle.height, this.contentStyle.type)
+                } catch (error) {
+                    
+                }
+                
+            }
+            
+
+        },
         // hàm gọi request lấy thông tin của document khi vào edit doc
         async getContentDocument(){
             if(this.documentId != 0){
@@ -1800,6 +1889,7 @@ export default {
                         let res1 = await documentApi.getDetailPrintConfig(this.documentId,this.printConfigId);
                         content = res1.data.content;
                         this.setDocumentProperties({title:res1.data.title});
+                        this.setDefaultStyle(res1.data.formStyle);
                     }
                     this.editorCore.setContent(content);
                     $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body select').each(function(e){
@@ -1813,9 +1903,8 @@ export default {
                     $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body .s-control-select').each(function(e){
                         let id = $(this).attr('id')
                         let parentNode = $(this).closest('td');
-                        let input = '<input class="s-control h s-control-select" s-control-type="select" type="text" title="Select" contenteditable="false" id="' + id + '">&#65279;';
-                        parentNode.empty();
-                        parentNode.append(input)
+                        let input = '<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" contenteditable="false" id="' + id + '">&#65279;';
+                        $(this).replaceWith(input)
                     })
                     let fields = res.data.fields;
                     this.setDataForPropsControl(fields);
@@ -1862,6 +1951,10 @@ export default {
                         if(type == 'dataFlow' && k == 'dataFlowId'){
                             properties[k].value = {id:fields[controlId]['properties'][k]};
                         }
+                        else if(k == 'mapParamsDataflow'){
+                            properties[k]['datasets'] = fields[controlId]['properties']['datasets'];
+                            properties[k]['value'] = fields[controlId]['properties']['value'];
+                        }
                         else{
                             if(typeof fields[controlId]['properties'][k] != "object"){
                                 properties[k].value = fields[controlId]['properties'][k];
@@ -1875,12 +1968,19 @@ export default {
                 }) 
                 if(fields[controlId]['formulas'] != false){
                     $.each(formulas,function(k,v){
-                        if(fields[controlId]['formulas'][k]){
-                            formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0];
-                            formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                        if(k == 'linkConfig'){
+                            if(fields[controlId]['formulas'][k]){
+                                formulas[k]['configData'] = fields[controlId]['formulas'][k]['configData'];
+                            }
                         }
-                        if(k == 'autocomplete'){
-                            formulas[k]['configData']= (autocompleteConfig == false) ? {} : autocompleteConfig;
+                        else{
+                            if(fields[controlId]['formulas'][k]){
+                                formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0];
+                                formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                            }
+                            if(k == 'autocomplete'){
+                                formulas[k]['configData']= (autocompleteConfig == false) ? {} : autocompleteConfig;
+                            }
                         }
                     })
                 }
@@ -2532,13 +2632,15 @@ export default {
                 $(clientFrameWindow.document).find('.on-selected').removeClass('on-selected');
                 el.addClass('on-selected');
             }
+            
             let controlId = el.attr('id');
-            $('.editor-tree-active').removeClass('editor-tree-active')
-            $('.tree-'+controlId).addClass('editor-tree-active')
+            $('.editor-tree-active').removeClass('editor-tree-active');
+            $('.tree-'+controlId).addClass('editor-tree-active');
             let table = el.closest('.s-control-table');
             if(table.length > 0 && controlId != table.attr('id')){
                 if(!fromTreeView)
                 tinyMCE.activeEditor.selection.setNode($(e.target).closest('.s-control'));
+               
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
                 if(!control){
@@ -2548,6 +2650,7 @@ export default {
                 this.selectControl(control.properties, control.formulas,controlId,type);
             }
             else{
+                
                 let control = this.editorStore.allControl[controlId];
                 if(!control){
                     this.showDialogEditor("",this.$t('document.validate.controlNotExist'));
@@ -2556,8 +2659,6 @@ export default {
                 this.selectControl(control.properties, control.formulas,controlId,type);
             }
         },
-
-
         checkSelectedTabPageControl(e,control,controlId){
             if($(e.target).closest('.page-item').length > 0){
                 let pageId = $(e.target).closest('.page-item').attr('id');
@@ -2614,9 +2715,21 @@ export default {
                 if($(tbody[0].innerHTML).length > 0){
                     for(let i = 0; i< thead.length; i++){
                         let style = $(thead[i]).attr('style');
-                        let width = style.match(/(?<=width:\s)\s*([^;"]*)(?=\;)/gmi);
-                        let row = {title: $(thead[i]).text(),colWidth:width[0],colIndex:i}
-                        listData.push(row)
+                        if(style){
+                            let width = style.match(/(?<=width:\s)\s*([^;"]*)(?=\;)/gmi);
+                            if(width){
+                                let row = {title: $(thead[i]).text(),colWidth:width[0],colIndex:i}
+                                listData.push(row)
+                            }
+                            else{
+                                let row = {title: $(thead[i]).text(),colWidth:'auto',colIndex:i}
+                                listData.push(row)
+                            }
+                        }
+                        else{
+                            let row = {title: $(thead[i]).text(),colWidth:'auto',colIndex:i}
+                            listData.push(row)
+                        }
                     }
                 }
                 this.$refs.printTableConfig.showDialog();
@@ -2627,9 +2740,10 @@ export default {
         saveFormPrint(docProps){
             if(this.printConfigId != 0 && this.printConfigId != undefined && this.printConfigId != null){
                 let dataPost = {documentId:this.documentId,title:docProps.title.value,
-                                content:this.editorCore.getContent(),printConfigId:this.printConfigId, size:JSON.stringify(this.sizePrint)}
+                                content:this.editorCore.getContent(),printConfigId:this.printConfigId, size:JSON.stringify(this.contentStyle)}
                 let thisCpn = this;
                 documentApi.updatePrintConfig(dataPost).then(res => {
+                    this.$evtBus.$emit('document-editor-save-doc-callback')
                     if (res.status == 200) {
                         thisCpn.editorCore.remove();
                         thisCpn.$router.push('/documents');
@@ -2647,6 +2761,7 @@ export default {
                     }
                 })
                 .catch(err => {
+                    this.$evtBus.$emit('document-editor-save-doc-callback')
                     thisCpn.$snotify({
                             type: "error",
                             title: "can not save form print document",
@@ -2656,7 +2771,7 @@ export default {
                 });
             }
             else{
-                let dataPost = {documentId:this.documentId,title:docProps.title.value,content:this.editorCore.getContent(),size:JSON.stringify(this.sizePrint)}
+                let dataPost = {documentId:this.documentId,title:docProps.title.value,content:this.editorCore.getContent(),size:JSON.stringify(this.contentStyle)}
                 let thisCpn = this;
                 documentApi.savePrintConfig(dataPost).then(res => {
                     if (res.status == 200) {

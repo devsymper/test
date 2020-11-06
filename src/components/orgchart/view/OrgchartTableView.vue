@@ -106,6 +106,7 @@
                                     :customComponents="customAgComponents"  
                                     :hideRowBorderCss="true"
                                     @on-cell-dbl-click="onCellDblClick"
+                                    @on-cell-context-menu="onCellContextMenu"
                                     :minWidth="500"
                                     :cellRendererParams="{
                                         innerRenderer:'nodeName',
@@ -113,7 +114,6 @@
                                     }">
                                 </AgDataTable>
                         </VueResizable>
-
                            </div>
                        <ListItems 
                              ref="listUser"
@@ -143,7 +143,6 @@
                 </div>
             </v-tab-item>
             <v-tab-item :key="'diagramView'" class="px-2 pt-2 h-100">
-               
                 <OrgchartEditor
                     :action="'view'"
                     @current-tab="changeTab"
@@ -154,7 +153,6 @@
             </v-tab-item>
 
         </v-tabs-items>
-
     </div>
 </template>
 
@@ -197,6 +195,10 @@ export default {
     mounted(){
         this.containerHeight = util.getComponentSize(this).h
         this.currentSize =  util.getComponentSize(this)
+        $('.ag-cell').on('contextmenu',function(e){
+            e.stopPropagation()
+            e.preventDefault()
+        })
     },
     computed: {
         allUserInOrgchart(){
@@ -395,14 +397,41 @@ export default {
             }
         },
         onCellDblClick(params){
-            params.data.orgchartId =  this.$route.params.id;
-            this.$store.commit('orgchart/emptyListChildrenNode',this.$route.params.id)
-            this.$store.dispatch('orgchart/updateUserInNode',params.data)
-            this.listUserInNode = this.$store.getters['orgchart/listUserInChildrenNode'](this.$route.params.id);
-            this.$store.commit('orgchart/setAllUserInOrgchart',{
-                orgchartId:  this.$route.params.id,
-                listUsers: this.listUserInNode
-            })
+            let active = params.event.target.parentNode.outerHTML.includes('item-no-permission') ?  false : true
+            if(active){
+                params.data.orgchartId =  this.$route.params.id;
+                this.$store.commit('orgchart/emptyListChildrenNode',this.$route.params.id)
+                this.$store.dispatch('orgchart/updateUserInNode',params.data)
+                this.listUserInNode = this.$store.getters['orgchart/listUserInChildrenNode'](this.$route.params.id);
+                this.$store.commit('orgchart/setAllUserInOrgchart',{
+                    orgchartId:  this.$route.params.id,
+                    listUsers: this.listUserInNode
+                })
+            }else{
+                this.$snotify({
+                    type: 'error',
+                    title:'Bạn không có quyền xem danh sách user của phòng ban này'
+                })
+            }
+           
+        },
+      
+        onCellContextMenu(params){
+             let self = this
+             let objId = "orgchart:"+this.$route.params.id+':'+params.data.vizId
+                orgchartApi.getDescriptionNode({object_identifier:objId}).then(res=>{
+                    if(res.data.length > 0){
+                        let idDoc = res.data[0].documentObjectId
+                        self.docObjInfo = {docObjId:idDoc,docSize:'21cm'}
+                        self.$refs.listUser.actionPanel = true;
+                    }else{
+                        self.$snotify({
+                            type: "error",
+                            title: "Không tìm thấy document mô tả ",
+                        });
+                    }
+                }).catch(err=>{
+                })
         },
         onTabClicked(data){
             this.currentTab = data.action
@@ -413,6 +442,7 @@ export default {
         let self = this
         return {
             currentTab: 1,
+            showDescriptionDepartment: false,
             agApi:null,
             widthContentCustom:0,
             currentWidthContentCustom:400,
@@ -472,8 +502,6 @@ export default {
                        ],
                        listObject:res.data.listObject,
                        total:res.data.listObject.length,
-                         
-
                    }
                 }
             },
@@ -484,7 +512,6 @@ export default {
                     text: "Xem chi tiết",
                     callback: (user, callback) => {
                         let data = {
-                            // object_identifier: "account:971"
                             object_identifier: "account:"+user.id
                         }
                         let self = this
@@ -536,6 +563,17 @@ export default {
 </script>
 
 <style scoped>
+.description-department{
+    position: fixed;
+	z-index: 10000;
+    width: 200px;
+    height: 200px;
+	font:13px roboto;
+	background-color: #fff;
+	-webkit-box-shadow: 2px 0px 24px 0px rgba(0,0,0,0.75);
+	-moz-box-shadow: 2px 0px 24px 0px rgba(0,0,0,0.75);
+	box-shadow: 2px 0px 24px 0px rgba(0,0,0,0.75);
+}
 .symper-orgchart-table-view .ag-group-child-count{
     position: absolute;
     right: 5px;

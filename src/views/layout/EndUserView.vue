@@ -3,7 +3,7 @@
         <ba-sidebar @show-user-detail="showMyInfo = true" />
         <v-content>
             <v-container fluid fill-height class="pa-0">
-                <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #e6e5e5">
+                <div class=" app-header-bg-color" style="border-bottom:1px solid #e6e5e5; width: calc(100% - 5px)">
                     <div style="width:calc(100% - 500px)" class="float-left">
                         <v-tabs
                             hide-slider
@@ -24,7 +24,7 @@
                                     <span>{{ item.title }} </span>
                                 </v-tooltip>
                                 
-                                <i class="mdi mdi-close float-right close-tab-btn" @click.stop="closeTab(idx)"></i>
+                                <i class="mdi mdi-close float-right close-tab-btn" @click.stop="handleCloseTabClick(idx)"></i>
                             </v-tab>
                         </v-tabs>
                     </div>
@@ -133,6 +133,10 @@ export default {
 
     },
     methods: {
+        handleCloseTab(idx){
+            this.$evtBus.$emit("before-close-app-tab", idx);
+            this.closeTab(idx);
+        },
         /**
          * Xử lý các tab
          */
@@ -156,7 +160,10 @@ export default {
                 }
             }
 		},
-		
+		closeCurrentTab(){
+            this.closeTab(this.$store.state.app.currentTabIndex);
+        },
+
         closeTab(idx){            
             let urlToTabArr = Object.keys(this.$store.state.app.urlToTabTitleMap);
             let urlKey = urlToTabArr[idx];
@@ -217,6 +224,14 @@ export default {
         this.$evtBus.$on("auto-active-tab", tabIndex => {
             self.$store.state.app.currentTabIndex = tabIndex;
             self.handleChangeTab(tabIndex);
+        });
+        
+        this.$evtBus.$on("close-current-app-tab", () => {
+            self.closeCurrentTab();
+        });
+
+        this.$evtBus.$on("close-app-tab", (idx) => {
+            self.closeTab(idx);
         });
     },
     computed: {

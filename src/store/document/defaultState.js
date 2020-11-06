@@ -80,12 +80,14 @@ const defaultState = {
             orgchartTableSqlName: {}, // biến lưu lại tên các bảng sqlite được tạo ra sau khi chạy công thức orgchart  
             readyLoaded: false, // biến đánh dấu công thức đã chạy xong mỗi lần thực thi hay chưa
             listTableRootControl: {}, // biến lưu lại các controk được coi là root trong trong table (trường hợp công thức ko có đầu vào thì là root)
+            listControlMappingDatasets: {}
         }
     },
     detail: {
-        detail_123: {
-            allData: null
-        }
+        // detail_123: {
+        //     allData: null,
+        //     trackChange: [] // lịch sử chỉnh sửa của các control
+        // }
     },
     documentProps: {
         instance: {}
@@ -96,6 +98,12 @@ const defaultState = {
         instance: null
     }, // chỉ định là submit, detail, hay update,
     clientSqlLite: {
+
+    },
+    linkControl: {
+
+    },
+    documentStyle: {
 
     }
 };

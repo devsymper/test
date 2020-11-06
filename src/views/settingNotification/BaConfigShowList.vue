@@ -180,7 +180,6 @@ export default {
             return name
         },
         reNameParam(nameModule,des){
-            //if(des){
              let name = des;
             for(let i = 0; i<this.listSource[nameModule].parameter.length;i++){
                 let oldValue= new RegExp(this.listSource[nameModule].parameter[i].value);

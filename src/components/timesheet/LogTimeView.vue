@@ -2,8 +2,9 @@
 <v-card>
     <v-card-title class=" pt-1 pb-2 headline lighten-2" primary-title>
         <div class="w-100 pb-1" style="border-bottom: 1px solid lightgrey">
-            <span v-if="event.type==1" style="font-size:16px; font-weight:450">{{$t('timesheet.view_log_time')}} {{event.name}}</span>
-             <span v-if="event.type==0" style="font-size:16px; font-weight:450">{{$t('timesheet.view_plan_time')}} {{event.name}}</span> 
+             <SymperAvatar :userId="sapp.endUserInfo.id" :size="25" class="mr-1" style="margin-bottom:-5px"/>
+            <span v-if="event.type==1" class="fs-16 fw-430 ">{{$t('timesheet.view_log_time')}} {{event.name}}</span>
+             <span v-if="event.type==0" class="fs-16 fw-430 ">{{$t('timesheet.view_plan_time')}} {{event.name}}</span> 
             <!-- <span style="font-size:16px; font-weight:bold" v-else>View plan time</span> -->
             </div>
     </v-card-title>
@@ -27,7 +28,8 @@
                 <span class="label pt-2">{{$t('timesheet.start_time')}}</span>
                 {{changeTime(event.start)}}
             </div>
-            <div style="width: 60px; float: left"> <span class="label pt-2">{{$t('timesheet.end_time')}}</span>
+            <div style="width: 60px; float: left"> 
+                <span class="label pt-2">{{$t('timesheet.end_time')}}</span>
               {{changeTime(event.end)}}
             </div>
         </div>
@@ -40,14 +42,24 @@
     </v-card-actions>
 </v-card>
 </template>
-
 <script>
 import dayjs from 'dayjs';
-
+import SymperAvatar from "./../../components/common/SymperAvatar";
 export default {
+  created () {
+    this.$store.dispatch("app/getAllUsers");
+  },
     data: () => ({
     }),
     props: ['event'],
+    components:{
+        SymperAvatar
+    },
+    computed:{
+        sapp() {
+            return this.$store.state.app;
+        },
+    },
       methods: {
           changeTime(time){
               return dayjs(time).format('HH:mm')

@@ -1,7 +1,7 @@
 <template>
     <div class="pl-2 w-100 pr-3 pt-3 list-item-common-symper" >
         <div :style="{width:contentWidth, display: 'inline-block'}">
-            <v-row no-gutters class="pb-2" ref="topBar">
+           <v-row v-if="showToolbar" no-gutters class="pb-2" ref="topBar"> 
                 <v-col>
                     <span class="symper-title float-left">{{pageTitle}}</span>
                     <div :class="{'float-right': true, 'overline' : true , 'show-panel-mode': actionPanel } ">
@@ -78,7 +78,6 @@
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel_history')}}</span>
                         </v-btn>
-                          <!-- show menu khi hien sidebar -->
                          <v-menu
                             
                             bottom
@@ -158,7 +157,7 @@
                         </v-tooltip>
                     </div>
                 </v-col>
-            </v-row>
+            </v-row> 
             <v-row no-gutters>
                 <v-col
                     :class="{
@@ -293,7 +292,7 @@ import Handsontable from 'handsontable';
 import FormTpl from "./FormTpl.vue";
 import { VDialog, VNavigationDrawer } from "vuetify/lib";
 import TableFilter from "./customTable/TableFilter.vue";
-import { getDefaultFilterConfig } from "./../common/customTable/defaultFilterConfig.js";
+import { getDataFromConfig, getDefaultFilterConfig } from "./../common/customTable/defaultFilterConfig.js";
 import Api from "./../../api/api.js";
 import { userApi } from "./../../api/user.js";
 import SymperDragPanel from "./SymperDragPanel.vue";
@@ -406,6 +405,7 @@ export default {
                     self.debounceEmitRowSelectEvt = setTimeout(() => {
                         self.$emit('row-selected', self.data[row]);
                     }, time);
+                    self.focusingRowIndex = row;
                 },
                 afterScrollVertically(){
                     if(self.lazyLoad){
@@ -507,7 +507,8 @@ export default {
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
             hotTableContextMenuItems: [],
             allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
-            hasColumnsChecked:false,
+            hasColumnsChecked:true,
+            focusingRowIndex: -1,
         };
     },
     activated(){
@@ -531,6 +532,14 @@ export default {
        
     },
     props: {
+		showToolbar:{
+			type:Boolean, 
+			default: true
+		},
+		useWorkFlowHeader:{
+			type: Boolean,
+			default:false
+		},
         widthContentCustom:{
             type: Number,
             default:0
@@ -811,6 +820,9 @@ export default {
         }
     },
     methods: {
+        getHotInstance(){
+            return this.$refs.dataTable.hotInstance;
+        },  
         rerenderTable(){
             this.$refs.dataTable.hotInstance.render();
         },
@@ -1181,33 +1193,22 @@ export default {
                     thisCpn.data = resData;
                 }
                 thisCpn.handleStopDragColumn();
-                //AnhTger config show description
-                (data.listObject).forEach(element => {
-                    let processKey = element.processKey;
-                    if (processKey) {
-                        let configVale = JSON.parse(element.configValue)[processKey];
-                        if (configVale.description) {
-                            element.description = configVale.description;
-                        }
-                    }
-                   
-                });
                 thisCpn.$emit('data-get', data.listObject);
             }
             this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
         },
-        getOptionForGetList(configs, columns){
-            return {
-                filter: this.getFilterConfigs(configs.getDataMode),
-                sort: this.getSortConfigs(),
-                search: this.searchKey,
-                page: this.page,
-                pageSize: configs.pageSize ? configs.pageSize : this.pageSize,
-                columns: columns ? columns : [],
-                distinct: configs.distinct ? configs.distinct : false,
-                formulaCondition:this.conditionByFormula
-            };
-        },
+        // getOptionForGetList(configs, columns){
+        //     return {
+        //         filter: this.getFilterConfigs(configs.getDataMode),
+        //         sort: this.getSortConfigs(),
+        //         search: this.searchKey,
+        //         page: this.page,
+        //         pageSize: configs.pageSize ? configs.pageSize : this.pageSize,
+        //         columns: columns ? columns : [],
+        //         distinct: configs.distinct ? configs.distinct : false,
+        //         formulaCondition:this.conditionByFormula
+        //     };
+        // },
         /**
          * Lấy ra cấu hình cho việc sort
          */
@@ -1221,111 +1222,123 @@ export default {
             if (url != "") {
                 let thisCpn = this;
                 thisCpn.loadingData = true;
-                let options = this.getOptionForGetList(configs, columns);
+                // let options = this.getOptionForGetList(configs, columns);
+                let emptyOption = false;
                 let header = {};
                 let routeName = this.$getRouteName();
-                if(routeName == "deployHistory" || routeName == "listProcessInstances"){
+                if(routeName == "deployHistory" || routeName == "listProcessInstances" || thisCpn.useWorkFlowHeader){
                     header = {
                         Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0'
                     };
-                    options = {};
+                    // options = {};
+                    emptyOption = true;
                 }
-                apiObj
-                    .callApi(method, url, options, header, {})
-                    .then(data => {
-                        success(data);
-                    })
-                    .catch(err => {
-                        console.warn(err);
-                        thisCpn.$snotify({
-                            type: "error",
-                            title: thisCpn.$t("table.error.cannot_get_data"),
-                            text: ""
-                        });
-                    });
+
+                configs.searchKey = this.searchKey;
+                configs.page = configs.page ? configs.page :  this.page ;
+                configs.pageSize = configs.pageSize ? configs.pageSize : this.pageSize;
+                configs.formulaCondition = this.conditionByFormula;
+                let tableFilter = this.tableFilter;
+                tableFilter.allColumnInTable = this.tableColumns;
+                configs.emptyOption = emptyOption;
+
+                getDataFromConfig(url, configs, columns, tableFilter, success, 'GET', header);
+                // apiObj
+                //     .callApi(method, url, options, header, {})
+                //     .then(data => {
+                //         success(data);
+                //     })
+                //     .catch(err => {
+                //         console.warn(err);
+                //         thisCpn.$snotify({
+                //             type: "error",
+                //             title: thisCpn.$t("table.error.cannot_get_data"),
+                //             text: ""
+                //         });
+                //     });
             }
         },
-        getSortConfigs() {
-            let columnMap = this.tableColumns.reduce((map, item) => {
-                map[item.data] = item;
-                return map;
-            }, {});
-            let sort = [];
-            for (let colName in this.tableFilter.allColumn) {
-                let filter = this.tableFilter.allColumn[colName];
-                if (filter.sort != "") {
-                    sort.push({
-                        column: columnMap[colName].data,
-                        type: filter.sort
-                    });
-                }
-            }
-            return sort;
-        },
+        // getSortConfigs() {
+        //     let columnMap = this.tableColumns.reduce((map, item) => {
+        //         map[item.data] = item;
+        //         return map;
+        //     }, {});
+        //     let sort = [];
+        //     for (let colName in this.tableFilter.allColumn) {
+        //         let filter = this.tableFilter.allColumn[colName];
+        //         if (filter.sort != "") {
+        //             sort.push({
+        //                 column: columnMap[colName].data,
+        //                 type: filter.sort
+        //             });
+        //         }
+        //     }
+        //     return sort;
+        // },
         /**
          * Chuyển đổi cấu hình filter của component này sang dạng api hiểu được
          */
-        getFilterConfigs(getDataMode = '') {
-            let configs = [];
-            for (let colName in this.tableFilter.allColumn) {
-                let filter = this.tableFilter.allColumn[colName];
-                let condition = filter.conditionFilter;
-                let option = {
-                    column: colName, // tên cột cần filter
-                    operation: condition.conjunction,
-                    conditions: []
-                };
-                if(getDataMode == 'autocomplete' && colName == this.tableFilter.currentColumn.name){
-                    option.conditions = [
-                        {
-                            name: 'contains',
-                            value: this.tableFilter.currentColumn.colFilter.searchKey ? this.tableFilter.currentColumn.colFilter.searchKey : ''
-                        }
-                    ];
-                    configs.push(option);
-                    continue;
-                }
-                if (condition.items[0].type != "none") {
-                    option.conditions = [
-                        {
-                            name: condition.items[0].type,
-                            value: condition.items[0].value
-                        }
-                    ];
-                    if (condition.items[1].type != "none") {
-                        option.conditions.push({
-                            name: condition.items[1].type,
-                            value: condition.items[1].value
-                        });
-                    }
-                }
-                if(filter.searchKey != '' && filter.clickedSelectAll){
-                    option.conditions = [
-                        {
-                            name: 'contains',
-                            value: filter.searchKey
-                        }
-                    ];
-                }
+        // getFilterConfigs(getDataMode = '') {
+        //     let configs = [];
+        //     for (let colName in this.tableFilter.allColumn) {
+        //         let filter = this.tableFilter.allColumn[colName];
+        //         let condition = filter.conditionFilter;
+        //         let option = {
+        //             column: colName, // tên cột cần filter
+        //             operation: condition.conjunction,
+        //             conditions: []
+        //         };
+        //         if(getDataMode == 'autocomplete' && colName == this.tableFilter.currentColumn.name){
+        //             option.conditions = [
+        //                 {
+        //                     name: 'contains',
+        //                     value: this.tableFilter.currentColumn.colFilter.searchKey ? this.tableFilter.currentColumn.colFilter.searchKey : ''
+        //                 }
+        //             ];
+        //             configs.push(option);
+        //             continue;
+        //         }
+        //         if (condition.items[0].type != "none") {
+        //             option.conditions = [
+        //                 {
+        //                     name: condition.items[0].type,
+        //                     value: condition.items[0].value
+        //                 }
+        //             ];
+        //             if (condition.items[1].type != "none") {
+        //                 option.conditions.push({
+        //                     name: condition.items[1].type,
+        //                     value: condition.items[1].value
+        //                 });
+        //             }
+        //         }
+        //         if(filter.searchKey != '' && filter.clickedSelectAll){
+        //             option.conditions = [
+        //                 {
+        //                     name: 'contains',
+        //                     value: filter.searchKey
+        //                 }
+        //             ];
+        //         }
 
-                if(filter.selectAll && !$.isEmptyObject(filter.valuesNotIn)){
-                    option.conditions.push({
-                        name: 'not_in',
-                        value: Object.keys(filter.valuesNotIn)
-                    });
-                }else if(!filter.selectAll && !$.isEmptyObject(filter.valuesIn)){
-                    option.conditions.push({
-                        name: 'in',
-                        value: Object.keys(filter.valuesIn)
-                    });
-                }
+        //         if(filter.selectAll && !$.isEmptyObject(filter.valuesNotIn)){
+        //             option.conditions.push({
+        //                 name: 'not_in',
+        //                 value: Object.keys(filter.valuesNotIn)
+        //             });
+        //         }else if(!filter.selectAll && !$.isEmptyObject(filter.valuesIn)){
+        //             option.conditions.push({
+        //                 name: 'in',
+        //                 value: Object.keys(filter.valuesIn)
+        //             });
+        //         }
                 
-                if(option.conditions.length > 0){
-                    configs.push(option);
-                }
-            }
-            return configs;
-        },
+        //         if(option.conditions.length > 0){
+        //             configs.push(option);
+        //         }
+        //     }
+        //     return configs;
+        // },
         /**
          * Xử lý việc sau khi kết thúc kéo thả các cột ở thanh cấu hình hiển thị danh sách
          */
@@ -1359,6 +1372,7 @@ export default {
         getTableColumns(columns, forcedReOrder = false) {
             let savedOrderCols = this.savedTableDisplayConfig;
             let colMap = {};
+            let self = this;
             if (forcedReOrder) {
                 for (let item of columns) {
                     colMap[item.data] = item;
@@ -1398,6 +1412,23 @@ export default {
                     
                     if(item.renderer){
                         colMap[item.name].renderer = item.renderer;
+                    }
+                    
+                    if(!colMap[item.name].renderer){
+                        colMap[item.name].renderer = function (instance, td, row, col, prop, value, cellProperties) {
+                            Handsontable.dom.empty(td);
+                            td.innerHTML = value ;
+                            return td;
+                        }
+                    }
+
+                    let renderer = colMap[item.name].renderer;
+                    colMap[item.name].renderer = function(instance, td, row, col, prop, value, cellProperties){
+                        td = renderer(instance, td, row, col, prop, value, cellProperties);
+                        if(self.focusingRowIndex > 0 && row == self.focusingRowIndex ){
+                            $(td).addClass('symper-list-item-current-row');
+                        }
+                        return td;
                     }
                 }
             }
@@ -1499,7 +1530,8 @@ export default {
             let options = {
                 pageSize: 300,
                 getDataMode: 'autocomplete',
-                distinct: true
+                distinct: true,
+                page: 1
             };
             let success = (data) => {
                 if(data.status == 200){
@@ -1510,7 +1542,6 @@ export default {
                     }, []);
                     self.tableFilter.currentColumn.colFilter.selectItems = self.createSelectableItems(items);
                 }
-                console.log(self.tableFilter.currentColumn.selectItems, 'datadatadatadatadata');
             }
             this.prepareFilterAndCallApi(columns , false, true, success, options);
         },
@@ -1621,7 +1652,8 @@ export default {
         addCheckBoxColumn(){
             this.hasColumnsChecked = true;
             this.tableColumns.unshift({name:"checkbox_select_item",data:"checkbox_select_item",title:"Chọn",type:"checkbox"});
-        },
+		},
+	
         removeCheckBoxColumn(){
             this.hasColumnsChecked = false;
             this.tableColumns.shift();
@@ -1629,6 +1661,9 @@ export default {
         // Hàm trả về các dòng được selected
         getAllRowChecked(){
             return this.allRowChecked;
+        },
+        removeAllRowChecked(){
+            this.allRowChecked = []
         },
         isShowCheckedRow(){
             return this.hasColumnsChecked

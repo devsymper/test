@@ -236,7 +236,6 @@ export default class Table {
             this.reRendered = false;
             /**Danh sách các celltpye trong table */
             this.listCellType = {};
-            /**CHỉ ra  vị trí của cell được click */
             this.isAutoCompleting = false;
             /**Chỉ ra tên của control nào đang setdata để callback sau khi setdata */
             this.controlNameAfterChange = "";
@@ -244,6 +243,7 @@ export default class Table {
             this.showPopupTime = false;
             this.dataInsertRows = []; // mảng lưu lại các dòng dữ liệu sau khi ấn enter
             this.currentControlSelected = null;
+            this.cellSelected = null;
             this.listAutoCompleteColumns = {};
             this.event = {
                 afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
@@ -267,7 +267,7 @@ export default class Table {
                     }
                     thisObj.checkEnterInsertRowEvent(event, cellMeta);
                     // ấn f2 vào cell thì trace control đó
-                    if (event.key == 'F2' && store.state.app.accountType == 'ba') {
+                    if (event.key == 'F2' && store.state.app.baInfo && Object.keys(store.state.app.baInfo).length > 0) {
                         let control = thisObj.getControlInstance(thisObj.currentControlSelected);
                         SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { control: control });
                         return;
@@ -412,22 +412,25 @@ export default class Table {
                  */
                 afterOnCellMouseDown: function(event, coords, TD) {
                     let columns = thisObj.columnsInfo.columns;
-                    if (columns[coords.col] != undefined)
-                        thisObj.currentControlSelected = columns[coords.col].data;
-                    // nếu type cell là time thì emit qua submit mở timepicker
-                    if (thisObj.getCellSelectedType(coords.col) == 'time') {
-                        setTimeout((self) => {
-                            var activeEditor = self.getActiveEditor();
-                            self.selectCell(coords.row, coords.col);
-                            activeEditor.beginEditing();
-                            activeEditor.TEXTAREA.value = (activeEditor.originalValue == undefined) ? "" : activeEditor.originalValue
-                            thisObj.showPopupTime = true;
-                            event.controlName = columns[coords.col].data
-                            event.curTarget = activeEditor.TEXTAREA
-                            SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', event);
-                        }, 50, this);
-                        // activeEditor.enableFullEditoMode();
-                    };
+                    if (columns[coords.col] && thisObj.cellSelected == columns[coords.col].data) {
+                        // nếu type cell là time thì emit qua submit mở timepicker
+                        if (thisObj.getCellSelectedType(coords.col) == 'time') {
+                            setTimeout((self) => {
+                                var activeEditor = self.getActiveEditor();
+                                self.selectCell(coords.row, coords.col);
+                                activeEditor.beginEditing();
+                                activeEditor.TEXTAREA.value = (activeEditor.originalValue == undefined) ? "" : activeEditor.originalValue
+                                thisObj.showPopupTime = true;
+                                event.controlName = columns[coords.col].data
+                                event.curTarget = activeEditor.TEXTAREA
+                                SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', event);
+                            }, 50, this);
+                            // activeEditor.enableFullEditoMode();
+                        };
+                    }
+                    if (columns[coords.col]) {
+                        thisObj.cellSelected = columns[coords.col].data;
+                    }
                     SYMPER_APP.$evtBus.$emit("symper-app-wrapper-clicked", event);
 
                 },
@@ -450,7 +453,9 @@ export default class Table {
                  * @param {*} source 
                  */
                 afterChange: function(changes, source) {
-
+                    if (thisObj.isAutoCompleting) {
+                        return;
+                    }
                     if (!changes) {
                         return
                     }
@@ -511,7 +516,6 @@ export default class Table {
                             });
 
                         }
-                        console.log("sadsadsadf", source, changes);
                         if (source == "edit") {
                             thisObj.handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName);
                         } else {
@@ -523,6 +527,8 @@ export default class Table {
                             dataInput[controlName] = [changes[0][3]]
                             thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB.instance);
                         }
+                        thisObj.isAutoCompleting = false;
+
                     }
 
                 }
@@ -729,7 +735,7 @@ export default class Table {
                 this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
                 this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readonly');
                 this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
-                this.handlerRunOtherFormulasControl(controlLinkEffected, 'link');
+                this.handlerRunOtherFormulasControl(controlLinkEffected, 'linkConfig');
                 this.handlerRunOtherFormulasControl(controlValidateEffected, 'validate');
                 if (Object.keys(controlEffected).length > 0) {
                     for (let i in controlEffected) {
@@ -750,12 +756,23 @@ export default class Table {
                     let controlEffectedInstance = this.getControlInstance(i);
                     let allFormulas = controlEffectedInstance.controlFormulas;
                     if (allFormulas.hasOwnProperty(formulasType)) {
-                        if (allFormulas[formulasType].hasOwnProperty('instance')) {
-                            let formulasInstance = allFormulas[formulasType].instance;
-                            let dataInput = this.getDataInputForFormulas(formulasInstance, controlEffectedInstance.inTable);
-                            if (controlEffectedInstance.hasOwnProperty('inTable')) {
-                                if (controlEffectedInstance.inTable == this.tableName) {
-                                    this.handlerRunFormulasForControlInTable(formulasType, controlEffectedInstance, dataInput, formulasInstance);
+                        if (formulasType == 'linkConfig') { // nếu có cấu hình công thức link thì cũng chạy các công thức của nó
+                            let configData = allFormulas[formulasType].configData;
+                            for (let ind = 0; ind < configData.length; ind++) {
+                                let config = configData[ind];
+                                let formulasInstance = config.instance;
+                                let dataInput = this.getDataInputForFormulas(formulasInstance, controlEffectedInstance.inTable);
+                                let fType = formulasType + "_" + config.formula.instance;
+                                this.handlerRunFormulasForControlInTable(fType, controlEffectedInstance, dataInput, formulasInstance)
+                            }
+                        } else {
+                            if (allFormulas[formulasType].hasOwnProperty('instance')) {
+                                let formulasInstance = allFormulas[formulasType].instance;
+                                let dataInput = this.getDataInputForFormulas(formulasInstance, controlEffectedInstance.inTable);
+                                if (controlEffectedInstance.hasOwnProperty('inTable')) {
+                                    if (controlEffectedInstance.inTable == this.tableName) {
+                                        this.handlerRunFormulasForControlInTable(formulasType, controlEffectedInstance, dataInput, formulasInstance);
+                                    }
                                 }
                             }
                         }
@@ -957,12 +974,12 @@ export default class Table {
          * @param {String} controlEffectedName 
          */
     handlerDataAfterRunFormulas(data, controlInstance, formulasType, dataInput = false) {
+        if (formulasType.includes('linkConfig')) {
+            controlInstance.handlerDataAfterRunFormulasLink(data, formulasType);
+        }
         switch (formulasType) {
             case "formulas":
                 controlInstance.handlerDataAfterRunFormulasValue(data);
-                break;
-            case "link":
-                controlInstance.handlerDataAfterRunFormulasLink(data);
                 break;
             case "validate":
                 controlInstance.handlerDataAfterRunFormulasValidate(data);
@@ -997,10 +1014,12 @@ export default class Table {
                 if (controlFormulas.hasOwnProperty('list')) {
                     let formulasInstance = controlFormulas['list'].instance;
                     event.curTarget = event.target;
+                    let cellActive = this.tableInstance.getSelected();
                     SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
                         e: event,
                         selectFormulasInstance: formulasInstance,
                         alias: this.currentControlSelected,
+                        cellActive: cellActive,
                         controlTitle: controlInstance.title,
                         type: controlInstance.type,
                         isSingleSelect: controlInstance.checkProps('isSingleSelect')
@@ -1130,8 +1149,6 @@ export default class Table {
                     setTimeout((self) => {
                         self.render()
                     }, 500, this);
-                } else {
-                    thisObj.isAutoCompleting = false;
                 }
 
             },
@@ -1286,7 +1303,6 @@ export default class Table {
                             dataToStore[controlName].push(data[index][controlName]);
                     }
                     dataToSqlLite.push('(' + rowData.join() + ')');
-
                 }
                 ClientSQLManager.insertDataToTable(this.keyInstance, this.tableName, columnInsert.join(), dataToSqlLite.join())
                 for (let controlName in dataToStore) {
@@ -1298,7 +1314,7 @@ export default class Table {
                     });
                 }
                 // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
-                if (this.tableHasRowSum && sDocument.state.viewType[this.keyInstance] == 'submit') {
+                if (this.tableHasRowSum && ['submit', 'update'].includes(sDocument.state.viewType[this.keyInstance])) {
                     data.push({})
                 }
 
@@ -1459,7 +1475,7 @@ export default class Table {
             rsl.numericFormat = {
                 pattern: ctrl.controlProperties.formatNumber.value
             };
-        } else if (type == 'label') {
+        } else if (type == 'label' || type == 'select') {
             rsl.readOnly = true;
 
         } else if (type == 'time') {
@@ -1515,7 +1531,13 @@ export default class Table {
         if (map) {
             let sign = prop + '____' + row;
             let ele = $(td);
-
+            if (map.type === 'linkControl') {
+                ele.css({ 'position': 'relative' }).append(Util.renderInfoBtn());
+                ele.off('click', '.info-control-btn')
+                ele.on('click', '.info-control-btn', function(e) {
+                    SYMPER_APP.$evtBus.$emit('on-info-btn-in-table-click', { e: e, row: row, controlName: control.name })
+                })
+            }
             if (map.vld === true) {
                 ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
             }
