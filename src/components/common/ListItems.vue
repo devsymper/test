@@ -1228,7 +1228,7 @@ export default {
                 configs.searchKey = this.searchKey;
                 configs.page = this.page;
                 configs.pageSize = this.pageSize;
-                configs.formulaCondition = this.formulaCondition;
+                configs.formulaCondition = this.conditionByFormula;
                 let tableFilter = this.tableFilter;
                 tableFilter.allColumnInTable = this.tableColumns;
                 configs.emptyOption = emptyOption;
