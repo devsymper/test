@@ -249,7 +249,6 @@ export default {
   },
   methods: {
     viewNotificationInfo(des){
-      debugger
     //  this.detailNotification.avatarUrl='123';
       this.detailNotification.icon=des.icon;
       this.detailNotification.objectType=des.objectType;
@@ -261,8 +260,7 @@ export default {
     },
     setNotificationInfo(des){
       //this.action.value,
-      debugger
-            this.state=des.state=="Theo dõi"?true:false;
+        this.state=des.state=="Theo dõi"?true:false;
            // this.objectType.value='Nhân viên';
             //this.objectType.name='account';
 
@@ -316,7 +314,6 @@ export default {
 
     },
     update(){
-      debugger
       const self = this;
       notification.updateChanel(this.updateData.id, this.updateData).then(res=>{
         if(res.status==200){
@@ -348,7 +345,6 @@ export default {
             icon:this.iconName.iconName?"mdi "+this.iconName.iconName:this.avatarFileName,
             content:this.replaceDescription()
         };
-        debugger
        const self = this;
         notification.addChanel(data).then(res=>{
             if(res.status==200){

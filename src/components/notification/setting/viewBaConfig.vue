@@ -4,10 +4,15 @@
             <h4>Cài đặt thông báo</h4>
         </div>
          <v-row class="pt-0" style="margin-bottom:-15px">
-            <v-col class="fs-13 col-md-5 fw-430" style="margin-top:-10px">{{!checkIcon(detail.icon)?'Ảnh':'Icon'}}</v-col>
+            <v-col class="fs-13 col-md-5 fw-430" style="margin-top:-10px">
+                {{!checkIcon(detail.icon)?'Ảnh':'Icon'}}
+            </v-col>
             <v-col class="col-md-6 ml-2" style="margin-top:-10px">  
-                <v-list-item-avatar style="height:100px!important;min-width:100px!important;width:100px!important" v-if="!checkIcon(detail.icon)">
-                    <v-avatar style="height:100px!important;min-width:100px!important;width:100px!important" >
+                <v-list-item-avatar 
+                    style="height:100px!important;min-width:100px!important;width:100px!important" 
+                    v-if="!checkIcon(detail.icon)">
+                    <v-avatar 
+                        style="height:100px!important;min-width:100px!important;width:100px!important" >
                         <img  :src="setAvaOrIcon(detail.icon)">
                     </v-avatar>
                 </v-list-item-avatar>
@@ -22,7 +27,6 @@
                 <span class="fs-13">
                      {{detail.objectType}}
                 </span>
-                </v-autocomplete>
             </v-col>
         </v-row>
          <v-row class="pt-0" style="margin-bottom:-10px">
