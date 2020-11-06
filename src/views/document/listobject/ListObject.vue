@@ -247,12 +247,10 @@ export default {
                     if(Object.keys(thisCpn.recordSelected).length > 0){
                         for (let index = 0; index < listObject.length; index++) {
                             let row = listObject[index];
-                            debugger
                             let rowChecked = Object.values(thisCpn.recordSelected).filter(r=>{
                                 return r.document_object_id == row.document_object_id
                             })
                             if(rowChecked.length > 0){
-                                debugger
                                 listObject[index]['checkbox_select_item'] = true;
                             }
                         }

@@ -155,6 +155,12 @@ export default {
             "action": "list"
         },
     },
+    admin: {
+        title: "admin",
+        icon: "mdi-cog-transfer-outline",
+        group: "Administrator",
+		link: '/admin',
+    },
     userManager: {
         title: "Account management",
         icon: "mdi-account-cog-outline",
