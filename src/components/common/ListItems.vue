@@ -1,7 +1,7 @@
 <template>
     <div class="pl-2 w-100 pr-3 pt-3 list-item-common-symper" >
         <div :style="{width:contentWidth, display: 'inline-block'}">
-            <v-row no-gutters class="pb-2" ref="topBar">
+           <v-row v-if="showToolbar" no-gutters class="pb-2" ref="topBar"> 
                 <v-col>
                     <span class="symper-title float-left">{{pageTitle}}</span>
                     <div :class="{'float-right': true, 'overline' : true , 'show-panel-mode': actionPanel } ">
@@ -78,7 +78,6 @@
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel_history')}}</span>
                         </v-btn>
-                          <!-- show menu khi hien sidebar -->
                          <v-menu
                             
                             bottom
@@ -158,7 +157,7 @@
                         </v-tooltip>
                     </div>
                 </v-col>
-            </v-row>
+            </v-row> 
             <v-row no-gutters>
                 <v-col
                     :class="{
@@ -507,7 +506,7 @@ export default {
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
             hotTableContextMenuItems: [],
             allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
-            hasColumnsChecked:false,
+            hasColumnsChecked:true,
         };
     },
     activated(){
@@ -531,6 +530,14 @@ export default {
        
     },
     props: {
+		showToolbar:{
+			type:Boolean, 
+			default: true
+		},
+		useWorkFlowHeader:{
+			type: Boolean,
+			default:false
+		},
         widthContentCustom:{
             type: Number,
             default:0
@@ -1217,7 +1224,7 @@ export default {
                 let emptyOption = false;
                 let header = {};
                 let routeName = this.$getRouteName();
-                if(routeName == "deployHistory" || routeName == "listProcessInstances"){
+                if(routeName == "deployHistory" || routeName == "listProcessInstances" || thisCpn.useWorkFlowHeader){
                     header = {
                         Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0'
                     };
@@ -1515,7 +1522,6 @@ export default {
                     }, []);
                     self.tableFilter.currentColumn.colFilter.selectItems = self.createSelectableItems(items);
                 }
-                console.log(self.tableFilter.currentColumn.selectItems, 'datadatadatadatadata');
             }
             this.prepareFilterAndCallApi(columns , false, true, success, options);
         },
@@ -1626,7 +1632,8 @@ export default {
         addCheckBoxColumn(){
             this.hasColumnsChecked = true;
             this.tableColumns.unshift({name:"checkbox_select_item",data:"checkbox_select_item",title:"Chọn",type:"checkbox"});
-        },
+		},
+	
         removeCheckBoxColumn(){
             this.hasColumnsChecked = false;
             this.tableColumns.shift();
