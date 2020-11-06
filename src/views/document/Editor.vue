@@ -81,6 +81,7 @@
             <Submit
                 :showSubmitButton="false"
                 ref="subSubmitView" 
+                @before-close-submit="beforeCloseSubmit"
                 :dataPreview="dataPreviewSubmit"/>
         </v-dialog>
     </v-flex>
@@ -2903,30 +2904,33 @@ export default {
            
         },
         /**
-     * Xử li sau khi thy đổi font size , font family thì thêm style cho control
-     */
-    handleExecCommand(e){
-        let mapCommandToStyle = {FontSize:'font-size',FontName:'font-family'}
-        try {
-            let value = e.value;
-            if(Object.keys(mapCommandToStyle).includes(e.command)){
-                let contentSelection = this.editorCore.selection.getContent();
-                let allControlInForm = $(contentSelection).find('.s-control');
-                for (let index = 0; index < allControlInForm.length; index++) {
-                    let element = allControlInForm[index];
-                    let id = $(element).attr('id');
-                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).css(mapCommandToStyle[e.command],value);
-                    let curStyle = $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).attr('style');
-                    
-                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).attr('data-mce-style',curStyle)
+         * Xử li sau khi thy đổi font size , font family thì thêm style cho control
+         */
+        handleExecCommand(e){
+            let mapCommandToStyle = {FontSize:'font-size',FontName:'font-family'}
+            try {
+                let value = e.value;
+                if(Object.keys(mapCommandToStyle).includes(e.command)){
+                    let contentSelection = this.editorCore.selection.getContent();
+                    let allControlInForm = $(contentSelection).find('.s-control');
+                    for (let index = 0; index < allControlInForm.length; index++) {
+                        let element = allControlInForm[index];
+                        let id = $(element).attr('id');
+                        $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).css(mapCommandToStyle[e.command],value);
+                        let curStyle = $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).attr('style');
+                        
+                        $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).attr('data-mce-style',curStyle)
+                    }
                 }
+                
+                
+            } catch (error) {
+                
             }
-            
-            
-        } catch (error) {
-            
+        },
+        beforeCloseSubmit(){
+            this.isShowPreviewSubmit = false;
         }
-    }
 
     },
     

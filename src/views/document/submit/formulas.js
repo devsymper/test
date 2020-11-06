@@ -720,7 +720,8 @@ export default class Formulas {
      */
     detectControlInTable(mapControlEffected, name, script, listInputInDocument) {
         let s = script.replace(/(REF|ref)\s*\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm, "");
-        s = s.replace(/{.}/gm, "");
+        s = s.replace(/{.*?}/gm, "");
+        s = s.replace(/(as|AS)\s+(\w+)/gm, "");
         let listWord = s.match(/[A-Za-z0-9_]+/g);
         for (let controlName in listInputInDocument) {
             if (listWord != null && listWord.indexOf(controlName) != -1) {
@@ -733,7 +734,6 @@ export default class Formulas {
         }
 
     }
-
 
     // hàm thay thế tham số search của input filer lúc gõ search
     wrapSyqlForSearchInputFilter(search) {
