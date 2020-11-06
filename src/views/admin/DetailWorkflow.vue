@@ -130,7 +130,7 @@
 					color="error"
 					small
 					:disabled="disableBtn"
-					@click="deleteProcessInstance"
+					@click="confirmDelete"
 				>
 					Xóa
 				</v-btn>
@@ -186,6 +186,11 @@
 				:showActionPanelInDisplayConfig="false"
 			/>
 		</div>
+		<ConfirmDelete 
+			:showDialog="showDialog"
+			@cancel="cancel"
+			@confirm="deleteProcessInstance"
+			 />
 	</div>
 </template>
 
@@ -196,15 +201,18 @@ import {adminApi} from '@/api/Admin.js'
 import { appConfigs } from "./../../configs.js";
 import { reformatGetListInstances } from "@/components/process/reformatGetListData.js";
 import ModelerDetail from "./ModelerDetail"
+import ConfirmDelete from "./ConfirmDelete"
 export default {
 	components:{
 		ListItems,
-		ModelerDetail
+		ModelerDetail,
+		ConfirmDelete
 	},
 	data(){
 		return {
 			containerHeight:null,
 			colors:['#1976D2','#53B257'],
+			showDialog:false,
 			listItemSelected:[],
 			disableBtn: true,
 			isShowDonutChart: false,
@@ -313,8 +321,14 @@ export default {
 			}
 			
 		},
+		confirmDelete(){
+			this.showDialog = true
+		},
 		deleteProcessInstance(){
-			
+			this.showDialog = false
+		},
+		cancel(){
+			this.showDialog = false
 		}
 	},
 	watch:{
@@ -360,7 +374,6 @@ export default {
 }
 .summary-workflow{
 	width: 340px;
-	/* margin-top:10px */
 }
 .summary-workflow .value-summary{
 	white-space: nowrap;
