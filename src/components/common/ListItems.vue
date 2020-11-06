@@ -1226,8 +1226,8 @@ export default {
                 }
 
                 configs.searchKey = this.searchKey;
-                configs.page = this.page;
-                configs.pageSize = this.pageSize;
+                configs.page = configs.page ? configs.page :  this.page ;
+                configs.pageSize = configs.pageSize ? configs.pageSize : this.pageSize;
                 configs.formulaCondition = this.formulaCondition;
                 let tableFilter = this.tableFilter;
                 tableFilter.allColumnInTable = this.tableColumns;
@@ -1503,7 +1503,8 @@ export default {
             let options = {
                 pageSize: 300,
                 getDataMode: 'autocomplete',
-                distinct: true
+                distinct: true,
+                page: 1
             };
             let success = (data) => {
                 if(data.status == 200){

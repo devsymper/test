@@ -156,7 +156,10 @@ export default {
                 }
             }
 		},
-		
+		closeCurrentTab(){
+            this.closeTab(this.$store.state.app.currentTabIndex);
+        },
+
         closeTab(idx){            
             let urlToTabArr = Object.keys(this.$store.state.app.urlToTabTitleMap);
             let urlKey = urlToTabArr[idx];
@@ -217,6 +220,14 @@ export default {
         this.$evtBus.$on("auto-active-tab", tabIndex => {
             self.$store.state.app.currentTabIndex = tabIndex;
             self.handleChangeTab(tabIndex);
+        });
+        
+        this.$evtBus.$on("close-current-app-tab", () => {
+            self.closeCurrentTab();
+        });
+
+        this.$evtBus.$on("close-app-tab", (idx) => {
+            self.closeTab(idx);
         });
     },
     computed: {
