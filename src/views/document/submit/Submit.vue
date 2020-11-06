@@ -219,6 +219,9 @@ let impactedFieldsList = {};
 let impactedFieldsArr = {};
 
 export default {
+    beforeDestroy(){
+        alert('xxxxxxx');
+    },
     inject: ['theme'],
     props: {
         isQickSubmit: {
