@@ -345,7 +345,6 @@ export default {
         },
         setAvaOrIcon(icon){
             if(icon){
-                debugger
                 if(icon.indexOf('user_avatar_')>-1||icon=='default.png'){
                     return appConfigs.apiDomain.fileManagement+'readFile/'+icon ;}
             }       

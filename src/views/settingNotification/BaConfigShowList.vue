@@ -106,7 +106,6 @@ export default {
                    )
                    let listBA= self.$store.state.app.allBA;
                      for(let i = 0; i<data.listObject.length; i++){
-                         //debugger
                         data.listObject[i].originState = data.listObject[i].state;
                         data.listObject[i].icon = data.listObject[i].icon;
                         data.listObject[i].action = data.listObject[i].action;
@@ -167,7 +166,6 @@ export default {
     },
     methods:{
         addNotification(){
-            debugger
             this.refreshListNotification();
             this.typeNoti="add";
 
@@ -196,7 +194,6 @@ export default {
             
         },
         viewNotification(des){
-            debugger
             this.typeNoti="view";
             this.$refs.listNotification.openactionPanel();
             this.$refs.config.viewNotificationInfo(des)
@@ -269,7 +266,6 @@ export default {
             return nameStatus;
         },
         refreshListNotification(){
-            debugger
             this.$refs.listNotification.refreshList();
             this.$refs.config.refreshAll();
         },
