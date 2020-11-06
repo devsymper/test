@@ -1,6 +1,6 @@
 <template>
-	<div class="w-100" style="position:absolute;margin-top:-24px">
-		<span class="ml-3" style="position:relative; top:34px;left:0"> Chi tiết công việc : {{title}}</span>
+	<div class="w-100" style="position:absolute;margin-top:-18px">
+		<span class="ml-3 fs-15" style="position:relative; top:30px;left:0"> Chi tiết công việc : {{title}}</span>
 		<workDetail
 			class="workDetail"
 			:workInfo="workInfo"
