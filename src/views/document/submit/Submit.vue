@@ -1553,7 +1553,6 @@ export default {
                             if(formulas[formulasType].hasOwnProperty('instance')){
                                 let inputControl = formulas[formulasType].instance.inputControl;
                                 if(formulasType == 'formulas'){
-                                    debugger
                                 }
                                 let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
                                 let inputFromDatasets = formulas[formulasType].instance.inputFromDatasets;
@@ -1582,7 +1581,6 @@ export default {
                     }
                 }
             }
-            debugger
             this.updateEffectedControlToStore(mapControlEffected);
         },
        

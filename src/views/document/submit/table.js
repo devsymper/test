@@ -292,7 +292,6 @@ export default class Table {
                     let controlName = columns[columnIndex].data;
 
                     if (thisObj.checkControlType('time', columnIndex)) {
-                        debugger
                         if (event.keyCode == 13 && thisObj.showPopupTime) {
                             thisObj.showPopupTime = false;
                             event.stopImmediatePropagation();
