@@ -1590,8 +1590,10 @@ export default {
             // Phát sự kiện khi xóa danh sách các item trong list
             this.$emit("remove-item", []);
         },
-        refreshList() {
-            // Phát sự kiện khi click vào refresh dữ liệu
+        refreshList(){
+			// Phát sự kiện khi click vào refresh dữ liệu
+			this.allRowChecked = {}
+			this.$emit('after-selected-row', this.allRowChecked)
             this.getData();
             this.$emit("refresh-list", {});
         },

@@ -214,7 +214,8 @@
 			"selected":"Chọn",
 			"startUserId":"Người bắt đầu",
 			"startTime":"Thời gian bắt đầu",
-			"tenantId": "ID"
+			"tenantId": "ID",
+			"suspended": "Trạng thái"
 		}
 	},
     "validate": {

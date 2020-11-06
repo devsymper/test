@@ -13,13 +13,28 @@ export const adminApi = {
         return bpmneApi.get(appConfigs.apiDomain.bpmne.definitions, {key:key, latest:true}, testHeader);
 	},
 	stopProcessInstances(id){
-		return bpmneApi.put(appConfigs.apiDomain.bpmne.instances+'/'+id , {
-			action: 'suspend',
-			name: 'string',
-			businessKey: 'string'
-		},
-		testHeader)
+		return bpmneApi.put(appConfigs.apiDomain.bpmne.instances+'/'+id ,
+			JSON.stringify({
+				"action": "suspend",
+			}),
+			testHeader
+		)
 	},
+	activeProcessInstances(id){
+		return bpmneApi.put(appConfigs.apiDomain.bpmne.instances+'/'+id ,
+			JSON.stringify({
+				"action": "activate",
+			}),
+			testHeader
+		)
+	},
+	deleteProcessInstances(id){
+		return bpmneApi.delete(appConfigs.apiDomain.bpmne.instances+'/'+id ,
+			{},
+			testHeader
+		)
+	},
+
 	stopWorkFlow(id){
 		return bpmneApi
 	},

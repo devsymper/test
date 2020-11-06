@@ -144,6 +144,16 @@
 				>
 					Tạm dừng
 				</v-btn>
+				<v-btn
+					class="mr-2 white--text"
+					depressed
+					color="success"
+					small
+					:disabled="disableBtn"
+					@click="activeProcessInstance"
+				>
+				Chạy
+				</v-btn>
 				
 				 <v-tooltip bottom>
      				 <template v-slot:activator="{ on, attrs }">
@@ -202,6 +212,7 @@ import { appConfigs } from "./../../configs.js";
 import { reformatGetListInstances } from "@/components/process/reformatGetListData.js";
 import ModelerDetail from "./ModelerDetail"
 import ConfirmDelete from "./ConfirmDelete"
+import Handsontable from 'handsontable';
 export default {
 	components:{
 		ListItems,
@@ -225,6 +236,25 @@ export default {
                             {name: "id", title: "id", type: "numeric", noFilter:true},
 							{name: "name", title: "name", type: "text", noFilter:true},
 							{name: "startUserId", title: "startUserId", type: "text", noFilter:true},
+							{name: "suspended", title: "suspended", type: "date", noFilter:true,
+								  renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+										Handsontable.dom.empty(td);
+										let span;
+										span = document.createElement('span');	
+										if(value === null || value == ""){
+											$(span).text("Đang chạy")
+											$(span).css('color', 'green')
+											td.appendChild(span);
+											return td;
+										}
+										if(value == true){
+											$(span).text("Tạm dừng ")
+											$(span).css('color', 'orange')
+											td.appendChild(span);
+											return td;
+										}
+									},
+							},
 							{name: "startTime", title: "startTime", type: "date", noFilter:true},
 						 ],
 						 listObject: res.data,
@@ -306,6 +336,7 @@ export default {
 			ctx.fillText(this.sAdmin.sumProcess,cx,cy+innerRadius*.9);
 		},
 		afterSelectedRow(items){
+			debugger
 			this.$set(this, 'listItemSelected', items)
 			if(Object.keys(this.listItemSelected).length == 0){
 					this.disableBtn = true
@@ -318,8 +349,48 @@ export default {
 			this.$goToPage('/workflow/process-key/'+processKey+'/instances', this.$t('process.instance.listModelInstance')+processKey)
 		},
 		stopProcessInstance(){
+			let self = this
 			for(let i in this.listItemSelected){
 				adminApi.stopProcessInstances(this.listItemSelected[i].id).then(res=>{
+					if(res.suspended == true){
+						self.$snotify(
+							{
+								type: "success",
+								title:" Thành công"
+							}
+						)
+					}
+				self.$refs.listWorkFlow.refreshList()
+
+				}).catch(err=>{
+					self.$snotify(
+							{
+								type: "error",
+								title:"Tác vụ này đã được dừng"
+							}
+						)
+				})
+			}
+			debugger
+		},
+		activeProcessInstance(){
+			let self = this
+			for(let i in this.listItemSelected){
+				adminApi.activeProcessInstances(this.listItemSelected[i].id).then(res=>{
+					self.$snotify(
+						{
+							type: "success",
+							title:" Thành công"
+						}
+					)
+					self.$refs.listWorkFlow.refreshList()
+				}).catch(err=>{
+					self.$snotify(
+							{
+								type: "error",
+								title:"Tác vụ này đang chạy"
+							}
+						)
 				})
 			}
 			
@@ -329,6 +400,25 @@ export default {
 		},
 		deleteProcessInstance(){
 			this.showDialog = false
+			let self = this
+			for(let i in this.listItemSelected){
+				adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
+					self.$snotify(
+						{
+							type: "success",
+							title:" Thành công"
+						}
+					)
+					self.$refs.listWorkFlow.refreshList()
+				}).catch(err=>{
+					self.$snotify(
+							{
+								type: "error",
+								title:"Đã có lỗi xảy ra"
+							}
+						)
+				})
+			}
 		},
 		cancel(){
 			this.showDialog = false
