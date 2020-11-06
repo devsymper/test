@@ -330,14 +330,19 @@ export default {
         });
     },
     created() {
+        this.currentTabIndex = this.$store.state.app.currentTabIndex;
         if(this.routeName == 'editDocument'){
+            /**
+             * hoangnd: kiểm tra xem doc có đang hoạt động hay ko
+             */
             this.currentInteractTime = Date.now();
             this.intervalCheckExpired = setInterval((self) => {
                 let curTime = Date.now();
                 if(curTime - self.currentInteractTime > 300000){
                     self.dialog = true;
                     let docTitle = self.sDocumentProp.title.value;
-                    self.titleDialog = "Document "+docTitle+" sẽ bị đóng do thời gian tương tác quá hạn!. Vui lòng quay lại sau"
+                    self.titleDialog = "Document "+docTitle+" sẽ bị đóng do thời gian tương tác quá hạn!. Vui lòng quay lại sau";
+                    self.typeDialog = "documentExpire";
                 }
             }, 10000,this);
         }
@@ -393,7 +398,8 @@ export default {
             isShowPreviewSubmit:false,
             controlTemplateId:0,
             currentInteractTime:Date.now(),
-            intervalCheckExpired:null
+            intervalCheckExpired:null,
+            currentTabIndex:null
         }
     },
     
@@ -481,12 +487,13 @@ export default {
             if(this.typeDialog == 'deletePage'){
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
             }
-            if(this.sDocumentProp == "documentExpire"){
+            if(this.typeDialog == "documentExpire"){
                 clearInterval(this.intervalCheckExpired);
                 this.currentInteractTime = null;
+                this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
             }
-            if(this.sDocumentProp == "baEditting"){
-                
+            if(this.typeDialog == "baEditting"){
+                this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
             }
         },
 
@@ -1907,24 +1914,33 @@ export default {
         },
         async checkAllowEditDocument(document){
             if(Number(document.userEditting) != 0){
-                let baAcc = await accountApi.detailBa(document.userEditting);
-                if(baAcc.status == 200){
-                    let data = baAcc.data.data;
-                    if(data.length > 0){
-                        let curBa = data[0];
-                        this.dialog = true;
-                        this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
-                        this.typeDialog = "baEditting";
+                try {
+                    let baAcc = await accountApi.detailBa(document.userEditting);
+                    if(baAcc.status == 200){
+                        let data = baAcc.data.data;
+                        if(data.length > 0){
+                            let curBa = data[0];
+                            this.dialog = true;
+                            this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
+                            this.typeDialog = "baEditting";
+                            return false;
+                        }
                     }
+                } catch (error) {
+                    return false;
+                    console.log(error);
                 }
             }
+            return true;
         },
         // hàm gọi request lấy thông tin của document khi vào edit doc
         async getContentDocument(){
             if(this.documentId != 0){
                 let res = await documentApi.detailDocument(this.documentId);
-                let checkEditting = this.checkAllowEditDocument(res.data.document);
-              
+                let checkEditting = await this.checkAllowEditDocument(res.data.document);
+                if(checkEditting == false){
+                    return;
+                }
                 if (res.status == 200) {
                     if(this.routeName == "editDocument"){
                         this.setDocumentProperties(res.data.document);
