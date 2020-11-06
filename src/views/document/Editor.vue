@@ -69,7 +69,7 @@
                 <v-card-title class="notice-title">{{titleDialog}}</v-card-title>
                 <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="green darken-1" text @click="dialog = false">Hủy bỏ</v-btn>
+                <v-btn color="green darken-1" v-if="!intervalCheckExpired" text @click="dialog = false">Hủy bỏ</v-btn>
                 <v-btn color="green darken-1" text @click="acceptDialog">Đồng ý</v-btn>
                 </v-card-actions>
             </v-card>
@@ -346,8 +346,11 @@ export default {
                     self.dialog = true;
                     let docTitle = self.sDocumentProp.title.value;
                     self.titleDialog = "Document "+docTitle+" sẽ bị đóng do thời gian tương tác quá hạn!. Vui lòng quay lại sau";
+                    clearInterval(self.intervalCheckExpired);
+                    self.currentInteractTime = null;
                     self.typeDialog = "documentExpire";
                     documentApi.setEdittingDocument({id:self.documentId,status:0});
+                    
                 }
             }, 10000,this);
         }
@@ -506,8 +509,7 @@ export default {
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
             }
             if(this.typeDialog == "documentExpire"){
-                clearInterval(this.intervalCheckExpired);
-                this.currentInteractTime = null;
+                
                 this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
             }
             if(this.typeDialog == "baEditting"){
