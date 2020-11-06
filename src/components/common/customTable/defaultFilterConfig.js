@@ -112,16 +112,12 @@ function getOptionForGetList(configs, columns, filterData) {
 
 
 function  getSortConfigs(filterData) {
-    let columnMap = filterData.allColumnInTable.reduce((map, item) => {
-        map[item.data] = item;
-        return map;
-    }, {});
     let sort = [];
     for (let colName in filterData.allColumn) {
         let filter = filterData.allColumn[colName];
         if (filter.sort != "") {
             sort.push({
-                column: columnMap[colName].data,
+                column: colName,
                 type: filter.sort
             });
         }
