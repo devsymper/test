@@ -748,3 +748,7 @@ body {
 .v-navigation-drawer--fixed {
     z-index: 7!important;
 }
+
+.symper-list-item-current-row {
+    background-color:#4c89fc33!important;
+}

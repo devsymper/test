@@ -1133,7 +1133,8 @@
             "title_aproval": "Action work",
             "titlePermissionDenied": "Permission denied!",
             "contentPermissionDenied": "You are not authorized to do this!"
-        }
+        },
+        "unfinished": "Unfinished"
 
     },
     "tasks": {
@@ -1166,7 +1167,8 @@
             "submitForm": "Submit form",
             "alertDescription": "No description",
             "relatedTask": "RELATED TASK",
-            "attachment": "ATTACHMENT FILE"
+            "attachment": "ATTACHMENT FILE",
+            "status":"Status"
 
         },
         "filterOptions": {
