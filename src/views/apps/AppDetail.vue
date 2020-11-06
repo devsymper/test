@@ -304,7 +304,7 @@ export default {
 }
 .app-details >>> .app-item .app-child-item .child-item-active{
 	background-color: #E9E9E9;
-
+	border-radius: 5px;
 }
 .app-details >>> .app-item li{
 	cursor: pointer;

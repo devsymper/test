@@ -1580,7 +1580,6 @@ export default {
                     }
                 }
             }
-            debugger
             this.updateEffectedControlToStore(mapControlEffected);
         },
        

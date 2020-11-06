@@ -10,6 +10,12 @@ export default [{
     component: () =>
         import ('@/components/myItem/DoTask.vue')
 },
+{
+    path: "/myitem/:type",
+    name: "myItem",
+    component: () =>
+    import ('../../views/myItem/index.vue'),
+},
 // {
 //     path: "/works",
 //     name: "workList",
