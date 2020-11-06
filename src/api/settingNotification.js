@@ -16,6 +16,9 @@ export default {
     addChanel(data) {
         return api.post('channels', data)
     },
+    updateChanel(id, data) {
+        return api.put('channels/' + id, data)
+    },
     subscribeChanel(id, data) {
         return api.post('channels/' + id + '/filter', data)
     },

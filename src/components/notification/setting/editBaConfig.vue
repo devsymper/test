@@ -2,7 +2,7 @@
   <div class="ml-4 config-notification choose-picture">
      <div v-if="type!='view'">
         <div class="mb-3">
-            <h4>Cài đặt thông báo</h4>
+            <h4>Sửa cài đặt thông báo</h4>
         </div>
         <v-row class="pt-0" style="margin-top:-10px">
             <v-col class="fs-13 col-md-5" style="margin-top:5px">Hình đại diện</v-col>
@@ -17,17 +17,17 @@
                 </v-select>
             </v-col>
           </v-row>
-          <v-row class="pt-0 " 
-                v-if="typeSelected[0]==typePictureSelected " 
-                style="margin-bottom:-20px; margin-top:-10px">
+               <v-row class="pt-0 " v-if="typeSelected[0]==typePictureSelected" style="margin-bottom:-20px; margin-top:-10px">
             <v-col class="fs-13 col-md-5" style="margin-top:-5px">Ảnh</v-col>
             <v-col class="col-md-7" style="margin-top:-10px">
                 <v-avatar :size="60">
+                    <img v-if="avatarUrl != ''"
+                        :src="avatarUrl"
+                    >
                     <img v-if="avatarUrl== ''"
-                      :src="require('./../../../assets/image/avatar_default.jpg')">
-                    <img v-else :src="avatarUrl">
+                        :src="require('./../../../assets/image/avatar_default.jpg')"
+                    >
                 </v-avatar>
-                <!-- <v-icon v-else class="display-3 pt-0">{{iconName.iconName}}</v-icon> -->
                <UploadFile 
                     ref="uploadAvatar"
                     :fileName="avatarFileName"
@@ -51,7 +51,6 @@
             <v-col class="col-md-7">  
                 <v-autocomplete
                     outlined
-                    hide-details 
                     return-object
                     item-value="value"
                     item-text="name"
@@ -59,6 +58,7 @@
                     :items="listModuleObj"
                     v-model="objectType"
                     dense
+                    clearable
                     label="Chọn"
                 >
                 
@@ -71,6 +71,7 @@
                  <v-autocomplete
                     outlined
                     class="sym-small-size"
+                    clearable
                     return-object
                     item-value="value"
                     item-text="text"
@@ -89,6 +90,7 @@
                     class="sym-small-size"
                     dense
                     outlined
+                    clearable
                     return-object
                     v-model="receiver"
                     :items="listReceiver"
@@ -105,6 +107,7 @@
                 <v-autocomplete
                      class="sym-small-size" 
                     outlined
+                    clearable
                     dense
                     item-value="value"
                     item-text="text"
@@ -133,7 +136,7 @@
             >
             <v-textarea
                 :rows="5" type="text"
-                style="width:250px;font-size:13px" v-model="description"
+                style="width:250px" v-model="description"
               />
             </draggable>
           <div class="col-md-4 ml-8" > 
@@ -177,38 +180,19 @@
   </div>
 </template>
 <script>
-
 import ViewBaConfig from "./../../../components/notification/setting/viewBaConfig"
-import draggable from 'vuedraggable';
+  import draggable from 'vuedraggable';
 import iconPicker from "../../../components/common/pickIcon";
 import { util } from '../../../plugins/util';
 import UploadFile from "./../../../components/common/UploadFile";
 import {userApi} from "./../../../api/user";
-import { appConfigs } from '../../../configs';
 import notification from "./../../../api/settingNotification";
 export default {
   props: ['type'],
-   watch: {
-     type(){
-      //  debugger
-       if(this.type=="add"){
-         
-       }else{
-
-       }
-     },
+   watch: {   
       objectType(){
-        //debugger
-        
-         this.refreshSelected();
-         if(this.objectType.value){
-           this.getSource(this.objectType.value)
-
-         }else{
-           this.getSource(this.objectType)
-
-         }
-         
+        //  this.refreshSelected();
+        //   this.getSource(this.objectType.value);
       }
   },
   created () {
@@ -223,74 +207,72 @@ export default {
     },
   data() {
     return {
-      id:0,
       detailNotification:{},
       updateData:{},
       list2: [
         { name: "", id: 0 },
       ],
        typeSelected:[
-            "Avatar đối tượng gây ra",
-            "Tùy chọn icon"
-        ],
-        typePictureSelected:'Avatar đối tượng gây ra',
-        iconName:{
-            icon: "",
-            iconName: "",
-            name: "",
-            note: "",
-            status: false
-        },
-        avatarUrl:'',
-        parameter:[],
-        avatarFileName:'',
-        allListObj:{},
-        listModule:[],
-        listModuleObj:[],
-        objectType:'',
-        listAction:[],
-        action:'',
-        listReceiver:[],
-        listActionClickNotifi:[],
-        receiver:'',
-        actionClickNotifi:'',
-        listSource:[],
-        state:true,
-        avatar:'',
-        icon:'',
-        dragging: false,
-        description:''
+                "Avatar đối tượng gây ra",
+                "Tùy chọn icon"
+            ],
+            typePictureSelected:'Avatar đối tượng gây ra',
+            iconName:{
+                icon: "",
+                iconName: "",
+                name: "",
+                note: "",
+                status: false
+            },
+            avatarUrl:'',
+            parameter:[],
+            avatarFileName:'',
+            allListObj:{},
+            listModule:[],
+            listModuleObj:[],
+            objectType:'account',
+            listAction:[],
+            action:{value:'',text:''},
+            listReceiver:[],
+            listActionClickNotifi:[],
+            receiver:{value:'',text:''},
+            actionClickNotifi:{value:'',text:''},
+            listSource:[],
+            state:true,
+            avatar:'',
+            icon:'',
+      dragging: false,
+      description:''
     };
   },
   computed: {
   },
   methods: {
-    // nếu là ảnh trả về false
-     checkIcon(icon){
-        let check = true;
-        if(icon.indexOf('user_avatar_')>-1){
-            check = false;
-        }
-        return check
-    },
-    setAvaOrIcon(icon){
-        if(icon){
-            if(icon.indexOf('user_avatar_')>-1){
-              debugger
-                return appConfigs.apiDomain.fileManagement+'readFile/'+icon ;}
-        }       
-    },
     viewNotificationInfo(des){
+      debugger
+    //  this.detailNotification.avatarUrl='123';
       this.detailNotification.icon=des.icon;
       this.detailNotification.objectType=des.objectType;
       this.detailNotification.content=des.content;
       this.detailNotification.action=des.event;
       this.detailNotification.receiver=des.defaultUser;
-      this.detailNotification.actionClickNotifi=des.originAction;
+      this.detailNotification.actionClickNotifi=des.icon;
       this.detailNotification.state=des.state=="Theo dõi"?true:false;
     },
     setNotificationInfo(des){
-      this.state=des.state=="Theo dõi"?true:false;
+      //this.action.value,
+      debugger
+            this.state=des.state=="Theo dõi"?true:false;
+           // this.objectType.value='Nhân viên';
+            //this.objectType.name='account';
+
+
+            // state:this.state?1:0,
+          
+            // objectType:this.objectType,
+            // receiver:this.receiver.value,
+            // action:this.actionClickNotifi,
+
     },
     handleAvatarSelected(tempUrl){
         this.avatarUrl = tempUrl;
@@ -309,38 +291,31 @@ export default {
       return description;
     },
     getDataUpdate(des){
-        this.id = des.id;
-        this.state=des.originState;
-        this.objectType=des.originObjectType;
-        this.receiver=des.originDefaultUser;
-        this.action=des.originEvent;
-        this.actionClickNotifi=des.action;
-        this.iconName.iconName=des.icon;
-        this.description= des.content;
-        this.avatarUrl = appConfigs.apiDomain.fileManagement+'readFile/'+des.icon;
-        if(this.checkIcon(des.icon)){
-              this.typePictureSelected=this.typeSelected[1]
-        }else{
-          this.typePictureSelected=this.typeSelected[0]
-        }
-    },
-    update(){
-      if(this.avatarFileName){
+
+       if(this.avatarFileName){
         this.$refs.uploadAvatar.uploadFile();
       }
-      
-       this.updateData={
-          id: this.id,
-          event: this.action.value,
-          source:this.objectType.value,
-          state:this.state?1:0,
-          objectType:this.objectType.value,
-          receiver:this.receiver.value,
-          action:this.actionClickNotifi,
-          icon:this.iconName.iconName?"mdi "+this.iconName.iconName:this.avatarFileName,
-          content:this.replaceDescription()
+        this.state=des.originState;
+        this.objectType.value=des.originObjectType;
+        this.receiver.value=des.originDefaultUser;
+        this.action.value=des.originEvent;
+        this.actionClickNotifi=des.action;
+        this.iconName.iconName=des.icon;
+        this.content= des.content;
+         this.updateData={
+            id:des.id,
+            event: this.action.value,
+            source:this.objectType.value,
+            state:this.state?1:0,
+            objectType:this.objectType,
+            receiver:this.receiver.value,
+            action:this.actionClickNotifi,
+            icon:this.iconName.iconName?"mdi "+this.iconName.iconName:this.avatarFileName,
+            content:this.replaceDescription()
+        };
 
-        }
+    },
+    update(){
       debugger
       const self = this;
       notification.updateChanel(this.updateData.id, this.updateData).then(res=>{
@@ -360,7 +335,6 @@ export default {
         })
     },
     add(){
-      //debugger
        if(this.avatarFileName){
         this.$refs.uploadAvatar.uploadFile();
       }
@@ -374,6 +348,7 @@ export default {
             icon:this.iconName.iconName?"mdi "+this.iconName.iconName:this.avatarFileName,
             content:this.replaceDescription()
         };
+        debugger
        const self = this;
         notification.addChanel(data).then(res=>{
             if(res.status==200){
@@ -396,22 +371,23 @@ export default {
       if(this.type=="add"){ 
         this.add()
       }else{
+
         this.update()
       }
     },
       pickIcon(data) {
-        this.$set(this.iconName, 'iconName', data.icon.trim() )
-        this.$set(this.iconName, 'iconType' , data.type)
+            this.$set(this.iconName, 'iconName', data.icon.trim() )
+            this.$set(this.iconName, 'iconType' , data.type)
 		},
     refreshSelected(){
-      this.listActionClickNotifi = [];
-      this.listAction = [];
-      this.listReceiver=[];
+         this.listActionClickNotifi = [];
+          this.listAction = [];
+          this.listReceiver=[];
     },
     refreshAll(){
       this.objectType='';
-      this.state=true;
-      this.receiver='';
+      this.state=false;
+      this.receiver.value='';
       this.actionClickNotifi='';
       this.iconName.iconName='';
       this.avatarUrl='';

@@ -35,7 +35,7 @@
                              </v-btn>
                               <v-btn small text @click.stop="tickAll(item.title, false)"  v-if="type=='follow'">
                                 <span class="fs-13 fw-400 light-grey">
-                                  Ngày theo dõi
+                                  Theo dõi
                                 </span>
                              </v-btn>
                             </v-list-action>
