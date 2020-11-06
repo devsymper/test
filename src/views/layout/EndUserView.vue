@@ -24,7 +24,7 @@
                                     <span>{{ item.title }} </span>
                                 </v-tooltip>
                                 
-                                <i class="mdi mdi-close float-right close-tab-btn" @click.stop="handleCloseTabClick(idx)"></i>
+                                <i class="mdi mdi-close float-right close-tab-btn" @click.stop="handleCloseTab(idx)"></i>
                             </v-tab>
                         </v-tabs>
                     </div>
