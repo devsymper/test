@@ -374,8 +374,13 @@ export default {
             let elControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body #'+locale.id);
             this.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
         });
-        this.$evtBus.$on("close-current-app-tab", () => {
-            alert('ok')
+        this.$evtBus.$on("before-close-app-tab", (data) => {
+            if(this._inactive == true) return;
+            if(this.routeName == 'editDocument'){
+                documentApi.setEdittingDocument({id:this.documentId,status:0});
+                clearInterval(this.intervalCheckExpired);
+                this.currentInteractTime = null;
+            }
         });
     },
     data(){
@@ -452,7 +457,12 @@ export default {
     },
     watch:{
         // kiểm tra xem route thay đổi khi vào editor là edit doc hay create doc
-        '$route' (to) {
+        '$route' (to, old) {
+            if(old.name == 'editDocument'){
+                documentApi.setEdittingDocument({id:this.documentId,status:0});
+                clearInterval(this.intervalCheckExpired);
+                this.currentInteractTime = null;
+            }
             this.documentId = Date.now();
             // this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
             if(to.name =='editDocument'){
