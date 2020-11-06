@@ -46,10 +46,21 @@
 							class="ma-2"
 							x-small
 							color="primary"
+							v-if="processDefination.suspended == false"
 							label
 							text-color="white"
 							>
 							Hoạt động
+						</v-chip>
+						<v-chip
+							class="ma-2"
+							x-small
+							color="orange"
+							v-else
+							label
+							text-color="white"
+							>
+							Tạm dừng
 						</v-chip>
 					</span>
 				</div>
@@ -58,14 +69,14 @@
 						Phiên bản
 					</span>
 					<span class="value-summary">
-						2
+						{{processDefination.version ? processDefination.version  : ""}}
 					</span>
 				</div>
-				<div class="d-flex" style="margin-top:16px">	
+				<div  class="d-flex" style="margin-top:16px">	
 					<div style="width:150px; height:150px" >
-						<canvas id="canvas" width=300 height=300></canvas>
+						<canvas  id="canvas" width=300 height=300></canvas>
 					</div>
-					<div class="description-summary d-flex flex-column">
+					<div v-if="isShowDonutChart" class="description-summary d-flex flex-column">
 						<div>
 							 <v-chip
 								class="ma-2"
@@ -77,10 +88,11 @@
 							</v-chip>
 							<span>Chưa hoàn thành</span>
 						</div>
-						<div>
+						<div >
 							 <v-chip
 								class="ma-2"
 								color="green"
+								
 								text-color="white"
 								small
 								>
@@ -115,6 +127,16 @@
 				<v-btn
 					class="mr-2 white--text"
 					depressed
+					color="error"
+					small
+					:disabled="disableBtn"
+					@click="deleteProcessInstance"
+				>
+					Xóa
+				</v-btn>
+				<v-btn
+					class="mr-2 white--text"
+					depressed
 					color="orange"
 					small
 					:disabled="disableBtn"
@@ -122,16 +144,7 @@
 				>
 					Tạm dừng
 				</v-btn>
-				<v-btn
-					depressed
-					class="mr-2 white--text"
-					small
-					color="success"
-					:disabled=" disableBtn"
-					@click="finishProcessInstance"
-				>
-					Hoàn thành
-				</v-btn>
+				
 				 <v-tooltip bottom>
      				 <template v-slot:activator="{ on, attrs }">
 						<v-btn 
@@ -164,6 +177,7 @@
 				:customAPIResult="customAPIResult"
 				:containerHeight="containerHeight"
 				:headerPrefixKeypath="'admin.table'"
+				:tableContextMenu="tableContextMenu"
 				:showToolbar="false"
 				:isTablereadOnly="false"
 				@after-selected-row="afterSelectedRow"
@@ -190,10 +204,10 @@ export default {
 	data(){
 		return {
 			containerHeight:null,
-			colors:['#1976D2','#53B257','#F44A3E'],
+			colors:['#1976D2','#53B257'],
 			listItemSelected:[],
 			disableBtn: true,
-			values: [60,30,10],
+			isShowDonutChart: false,
 			customAPIResult:{
 				reformatData(res){
 					return{
@@ -208,6 +222,15 @@ export default {
 					}
 				}
 			},
+			tableContextMenu: {
+               viewDetails: {
+                    name: "View details",
+                    text: "Xem chi tiết",
+                    callback: (obj, callback) => {
+						
+                    },
+                },
+            },
 		}
 	},
 	props:{
@@ -220,7 +243,6 @@ export default {
 	},
 	mounted(){
 		this.containerHeight = util.getComponentSize(this).h /2 - 50
-		this.dmbChart(85,85,70,20,this.values,this.colors,0);
 	},
 	computed:{
 		processDefination(){
@@ -232,13 +254,20 @@ export default {
 		},
 		processKey(){
 			return this.$store.state.admin.processKey
+		},
+		sAdmin(){
+			return this.$store.state.admin
+		},
+		values(){
+			return this.$store.state.admin.currentAggregateWorkflow
 		}
 	},
 	
 	methods:{
 		dmbChart(cx,cy,radius,arcwidth,values,colors,selectedValue){
-			var canvas = document.getElementById("canvas");
+			var canvas = document.getElementById('canvas');
 			var ctx = canvas.getContext("2d");
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
 			var tot = 0;
 			var accum = 0;
 			var PI = Math.PI;
@@ -263,7 +292,7 @@ export default {
 			ctx.fillStyle=colors[selectedValue];
 			ctx.textAlign='center';
 			ctx.font="30px  roboto";
-			ctx.fillText("3,5k",cx,cy+innerRadius*.9);
+			ctx.fillText(this.sAdmin.sumProcess,cx,cy+innerRadius*.9);
 		},
 		afterSelectedRow(items){
 			this.$set(this, 'listItemSelected', items)
@@ -278,10 +307,14 @@ export default {
 			this.$goToPage('/workflow/process-key/'+processKey+'/instances', this.$t('process.instance.listModelInstance')+processKey)
 		},
 		stopProcessInstance(){
-
+			for(let i in this.listItemSelected){
+				adminApi.stopProcessInstances(this.listItemSelected[i].id).then(res=>{
+				})
+			}
+			
 		},
-		finishProcessInstance(){
-
+		deleteProcessInstance(){
+			
 		}
 	},
 	watch:{
@@ -296,6 +329,21 @@ export default {
 					this.disableBtn = true
 				}else{
 					this.disableBtn = false
+				}
+            }
+		},
+		values:{
+			deep: true,
+            immediate: true,
+            handler(arr){
+				if(arr.length > 0){
+					this.isShowDonutChart = true
+					this.dmbChart(85,85,70,20,arr,this.colors,0)
+				}else{
+					this.isShowDonutChart = false
+					var canvas = document.getElementById('canvas');
+					var ctx = canvas.getContext("2d");
+					ctx.clearRect(0, 0, canvas.width, canvas.height);
 				}
             }
 		}
