@@ -44,6 +44,13 @@ export default [{
 
     },
     {
+        path: '/workflow/process-key/:processKey/list-instances',
+        name: "listProcessInstancess",
+        component: () =>
+            import ('@/views/admin/ListProcessInstance.vue')
+
+    },
+    {
         path: "/workflow/process-instances/:idInstance/tracking",
         name: "trackingProcessInstance",
         component: () =>

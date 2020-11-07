@@ -140,7 +140,9 @@
             "listTrashApps": "List trash application",
             "listOrgchart": "List orgchart",
             "listTrashOrgchart": "List trash orgchart",
-            "viewOrgchart": "View orgchart default"
+			"viewOrgchart": "View orgchart default",
+			"list_workflow":"List Workflow",
+			"list_work":"List Jobs"
         },
         "system": "System",
         "copy": "Copy"

@@ -136,7 +136,6 @@
                                 </v-list-item>
                             </v-list>
                         </v-menu>
-
                         <component
                             :is="'span'"
                         >
@@ -524,7 +523,7 @@ export default {
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
             hotTableContextMenuItems: [],
             allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
-            hasColumnsChecked:true,
+            hasColumnsChecked: false,
             focusingRowIndex: -1,
         };
     },
@@ -1675,7 +1674,10 @@ export default {
             this.hasColumnsChecked = true;
             this.tableColumns.unshift({name:"checkbox_select_item",data:"checkbox_select_item",title:"Chọn",type:"checkbox"});
 		},
-	
+		// dungna doi hasColumnsChecked = true
+		addColumnsChecked(){
+			this.hasColumnsChecked = true
+		},
         removeCheckBoxColumn(){
             this.hasColumnsChecked = false;
             this.tableColumns.shift();
