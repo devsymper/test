@@ -77,6 +77,14 @@
                     v-if="!sideBySideMode && !compackMode && !smallComponentMode"
                     class="fs-13 font-weight-medium"
                 >{{$t("tasks.header.status")}}
+                    <v-icon 
+                        @click="showFilterColumn($event,'isDone')" 
+                        class="fs-15 float-right" 
+                        style="padding-top:3px"
+                        :class="{
+                            'd-active-color': filteredColumns['isDone'] && filteredColumns['isDone']==true ,
+                        }"
+                    >mdi-filter-variant</v-icon>
                 </v-col>
                 <v-col
                     cols="1"

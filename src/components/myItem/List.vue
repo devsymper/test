@@ -339,10 +339,8 @@ export default {
         commentCountPerTask(){
             return this.$store.state.comment.commentCountPerObj.list;
         },
-
         groupFlatTasks() {
             let allTask = this.data;
- 
             const groups = allTask.reduce((groups, task) => {
                 let appName="";
                 if (task.symperApplicationId) {
