@@ -45,6 +45,9 @@ export const documentApi = {
     updateDocument(objId, data) {
         return coreApi.put("documents/objects/" + objId, data);
     },
+    setEdittingDocument(data) {
+        return coreApi.put("documents/editting", data);
+    },
     saveMultiFormulas(data) {
         return formulasApi.post('/formulas/batch', data);
     },
