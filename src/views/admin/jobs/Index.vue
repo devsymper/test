@@ -57,7 +57,7 @@ export default {
                 }
 			},
 			tableContextMenu: {
-               viewDetails: {
+                viewDetails: {
                     name: "View details",
                     text: "Xem chi tiết",
                     callback: (obj, callback) => {

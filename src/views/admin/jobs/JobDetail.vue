@@ -93,7 +93,7 @@
 				Thông tin thêm
 			</span>
 		</div>
-		<div class="w-100 border border-dark">
+		<div class="more-infor mr-6 ">
 				ahuhu
 		</div>
 	</div>
@@ -111,5 +111,8 @@ export default {
 }
 .content-status-detail-job{
 	margin: -8px;
+}
+.more-infor{
+	border: 1px solid lightgray;
 }
 </style>
