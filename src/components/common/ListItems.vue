@@ -136,7 +136,6 @@
                                 </v-list-item>
                             </v-list>
                         </v-menu>
-
                         <component
                             :is="'span'"
                         >

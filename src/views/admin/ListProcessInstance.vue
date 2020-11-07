@@ -171,7 +171,6 @@ export default {
 	mounted(){
 		this.containerHeight = util.getComponentSize(this).h 
 		this.$refs.listWorkFlow.addColumnsChecked()
-		debugger
 	},
 	watch:{
 		processKey(val){

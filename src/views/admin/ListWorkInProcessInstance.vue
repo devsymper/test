@@ -1,6 +1,5 @@
 <template>
 	<div class="w-100" >
-		<!-- <span class="ml-3 fs-15" style="position:relative; top:30px;left:0"> Chi tiết công việc : {{title}}</span> -->
 		<workDetail
 			class="workDetail"
 			:workInfo="workInfo"
@@ -20,8 +19,7 @@ export default {
 	},
 	data(){
 		return {
-			workInfo: [],
-			title: "",
+			workInfo: {},
 		}
 	},
 	created(){
@@ -32,9 +30,13 @@ export default {
 			let processInstanceId = this.$route.params.processInstanceId
             let self=this;
             try {
-			 	let data = await BPMNEngine.getProcessInstanceHistory({processInstanceId:processInstanceId, includeProcessVariables: true});
-				this.workInfo = data.data[0]
-				this.title = data.data[0].name
+				 let data = await BPMNEngine.getProcessInstanceHistory({processInstanceId:processInstanceId, includeProcessVariables: true});
+				 if(data.data[0]){
+					this.workInfo = data.data[0]
+				 }else{
+					this.workInfo = {}
+				 }
+			
             } catch (error) {
                 self.$snotifyError(error, "Get task process current failed");
             }
