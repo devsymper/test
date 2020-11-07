@@ -35,7 +35,7 @@
                              </v-btn>
                               <v-btn small text @click.stop="tickAll(item.title, false)"  v-if="type=='follow'">
                                 <span class="fs-13 fw-400 light-grey">
-                                  Ngày theo dõi
+                                  Theo dõi
                                 </span>
                              </v-btn>
                             </v-list-action>
@@ -97,6 +97,7 @@ export default {
         deep: true,
         immediate: true,
         handler(newValue){
+            debugger
         for(let i = 0; i<newValue.length;i++){
             if(newValue[i].active){
                 for(let j = 0; j<newValue[i].items.length;j++){
@@ -117,6 +118,7 @@ export default {
   props: ['type','listItems','listSubcribed','allListChanel'],
     methods: {
         tickAll(objectType, isFollow){
+            debugger
             let data={state:false};
             for(let i=0;i<this.allListChanel.length;i++){
                 if(this.allListChanel[i].objectType==objectType){
