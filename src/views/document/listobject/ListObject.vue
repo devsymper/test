@@ -436,7 +436,7 @@ export default {
                 return arr;
             },[]);
             let thisCpn = this;
-            this.dialog = false;
+			this.dialog = false;
             documentApi
             .deleteDocumentObject({objectIds:JSON.stringify(ids)})
             .then(res => {

@@ -40,7 +40,7 @@ export const adminApi = {
 	aggregateWorkflow(id){
 		return workflowExtendApi.get('workflow/'+id+'/aggregate')
 	},
-	deleteDocInstance(){
-		return documentApi.delete('documents/objects')
-	}
+	deleteDocumentObject(objectIds) {
+        return documentApi.delete("documents/objects", objectIds);
+    },
 }

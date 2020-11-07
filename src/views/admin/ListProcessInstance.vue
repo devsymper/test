@@ -10,6 +10,15 @@
 				<v-btn
 					class="mr-2 white--text"
 					depressed
+					color="primary"
+					small
+					@click="addCheckBoxColumn"
+				>
+					 Chọn
+				</v-btn>
+				<v-btn
+					class="mr-2 white--text"
+					depressed
 					color="error"
 					small
 					:disabled="disableBtn"
@@ -90,6 +99,8 @@
 import ConfirmDelete from "./ConfirmDelete"
 import { util } from "@/plugins/util.js";
 import { appConfigs } from "./../../configs.js";
+import {adminApi} from '@/api/Admin.js'
+import {documentApi} from '@/api/Document.js'
 import ListItems from "@/components/common/ListItems.vue"
 import Handsontable from 'handsontable';
 export default {
@@ -116,7 +127,7 @@ export default {
 				reformatData(res){
 					return{
                          columns: [
-							{name: "checkbox_select_item",data:"checkbox_select_item",title:"selected",type:"checkbox", noFilter:true},
+							// {name: "checkbox_select_item",data:"checkbox_select_item",title:"selected",type:"checkbox", noFilter:true},
                             {name: "id", title: "id", type: "numeric", noFilter:true},
 							{name: "name", title: "name", type: "text", noFilter:true},
 							{name: "startUserId", title: "startUserId", type: "text", noFilter:true},
@@ -170,7 +181,7 @@ export default {
 	},
 	mounted(){
 		this.containerHeight = util.getComponentSize(this).h 
-		this.$refs.listWorkFlow.addColumnsChecked()
+		this.$refs.listWorkFlow.addCheckBoxColumn()
 	},
 	watch:{
 		processKey(val){
@@ -250,15 +261,48 @@ export default {
 		confirmDelete(){
 			this.showDialog = true
 		},
-		deleteProcessInstance(){
+		addCheckBoxColumn(){
+			this.$refs.listWorkFlow.addCheckBoxColumn()
+		},
+		deleteProcessInstance(value){
 			this.showDialog = false
 			let self = this
+			if(value == true){
+				let arr = []
+				for(let i in this.listItemSelected){
+					arr.push(this.listItemSelected[i].id)
+				}
+				documentApi.deleteDocumentObject({workflowObjectIds:JSON.stringify(arr)}).then(res=>{
+					if(res.status == 400){
+						self.$snotify(
+							{
+								type: "error",
+								title:" Không tìm thấy bản ghi liên quan"
+							}
+						)
+					}else if(res.status = 200){
+						self.$snotify(
+							{
+								type: "success",
+								title:" Xóa bản ghi liên quan hành công"
+							}
+						)
+					}
+				}).catch(err=>{
+					self.$snotify(
+						{
+							type: "error",
+							title:" Xóa bản ghi liên quan thất bại"
+						}
+					)
+				})
+			}
 			for(let i in this.listItemSelected){
 				adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
 					self.$snotify(
 						{
 							type: "success",
-							title:" Thành công"
+							title:" Xóa tác vụ hành công"
 						}
 					)
 					self.$refs.listWorkFlow.refreshList()
@@ -271,6 +315,7 @@ export default {
 						)
 				})
 			}
+			
 		},
 		cancel(){
 			this.showDialog = false
