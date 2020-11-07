@@ -166,6 +166,7 @@
                             'loosen-row':  tableDisplayConfig.value.densityMode == 0,
                             'medium-row':  tableDisplayConfig.value.densityMode == 1,
                             'compact-row':  tableDisplayConfig.value.densityMode == 2,
+                            'list-sbs': alwaysShowActionPanel
                         }"
                 >
                     <hot-table
@@ -389,6 +390,7 @@ export default {
                 manualRowResize: true,
                 readOnly: this.isTablereadOnly,
                 contextMenu: {},
+                currentRowClassName: 'symper-list-item-current-row',
                 viewportRowRenderingOffset: 20,
                 viewportColumnRenderingOffset: 20,
                 rowHeights: 21,
@@ -405,6 +407,7 @@ export default {
                     self.debounceEmitRowSelectEvt = setTimeout(() => {
                         self.$emit('row-selected', self.data[row]);
                     }, time);
+                    self.focusingRowIndex = row;
                 },
                 afterScrollVertically(){
                     if(self.lazyLoad){
@@ -507,6 +510,7 @@ export default {
             hotTableContextMenuItems: [],
             allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
             hasColumnsChecked:true,
+            focusingRowIndex: -1,
         };
     },
     activated(){
@@ -1370,6 +1374,7 @@ export default {
         getTableColumns(columns, forcedReOrder = false) {
             let savedOrderCols = this.savedTableDisplayConfig;
             let colMap = {};
+            let self = this;
             if (forcedReOrder) {
                 for (let item of columns) {
                     colMap[item.data] = item;
@@ -1409,6 +1414,23 @@ export default {
                     
                     if(item.renderer){
                         colMap[item.name].renderer = item.renderer;
+                    }
+                    
+                    if(!colMap[item.name].renderer){
+                        colMap[item.name].renderer = function (instance, td, row, col, prop, value, cellProperties) {
+                            Handsontable.dom.empty(td);
+                            td.innerHTML = value ;
+                            return td;
+                        }
+                    }
+
+                    let renderer = colMap[item.name].renderer;
+                    colMap[item.name].renderer = function(instance, td, row, col, prop, value, cellProperties){
+                        td = renderer(instance, td, row, col, prop, value, cellProperties);
+                        if(self.focusingRowIndex > 0 && row == self.focusingRowIndex ){
+                            $(td).addClass('symper-list-item-current-row-sbs');
+                        }
+                        return td;
                     }
                 }
             }
@@ -1591,8 +1613,10 @@ export default {
             // Phát sự kiện khi xóa danh sách các item trong list
             this.$emit("remove-item", []);
         },
-        refreshList() {
-            // Phát sự kiện khi click vào refresh dữ liệu
+        refreshList(){
+			// Phát sự kiện khi click vào refresh dữ liệu
+			this.allRowChecked = {}
+			this.$emit('after-selected-row', this.allRowChecked)
             this.getData();
             this.$emit("refresh-list", {});
         },

@@ -24,7 +24,7 @@
                                     <span>{{ item.title }} </span>
                                 </v-tooltip>
                                 
-                                <i class="mdi mdi-close float-right close-tab-btn" @click.stop="closeTab(idx)"></i>
+                                <i class="mdi mdi-close float-right close-tab-btn" @click.stop="handleCloseTab(idx)"></i>
                             </v-tab>
                         </v-tabs>
                     </div>
@@ -133,6 +133,10 @@ export default {
 
     },
     methods: {
+        handleCloseTab(idx){
+            this.$evtBus.$emit("before-close-app-tab", idx);
+            this.closeTab(idx);
+        },
         /**
          * Xử lý các tab
          */

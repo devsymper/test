@@ -325,6 +325,14 @@ const addToDocumentSubmitStore = (state, params) => {
         Vue.set(state.submit[instance], key, value);
     }
 }
+const updateControlFormulaInfinity = (state, params) => {
+    let key = params.key
+    let value = params.value
+    let instance = params.instance
+    if (state.submit.hasOwnProperty(instance)) {
+        Vue.set(state.submit[instance].controlFormulaInfinity, key, value);
+    }
+}
 const addToDocumentDetailStore = (state, params) => {
         let key = params.key
         let value = params.value
@@ -409,7 +417,8 @@ const setDefaultSubmitStore = (state, params) => {
         orgchartTableSqlName: {},
         readyLoaded: false,
         listTableRootControl: {},
-        listControlMappingDatasets: {}
+        listControlMappingDatasets: {},
+        controlFormulaInfinity: {}
     }
     let instance = params.instance;
     Vue.set(state.submit, instance, value);
@@ -578,6 +587,7 @@ export {
     updateListInputInDocument,
     updateFormulasId,
     addToDocumentSubmitStore,
+    updateControlFormulaInfinity,
     addToDocumentDetailStore,
     changeViewType,
     updateListLinkControl,

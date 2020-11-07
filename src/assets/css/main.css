@@ -748,3 +748,10 @@ body {
 .v-navigation-drawer--fixed {
     z-index: 7!important;
 }
+
+.symper-list-item-current-row,
+.symper-list-item-current-row + .current.highlight,
+.list-sbs .symper-list-item-current-row-sbs,
+.list-sbs .symper-list-item-current-row-sbs + .current.highlight {
+    background-color:#4c89fc33!important;
+}

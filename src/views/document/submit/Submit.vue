@@ -119,7 +119,7 @@
                     <span>{{$t('document.submit.fab.toggleSize')}}</span>
                 </v-tooltip>
             </v-speed-dial>
-            <err-message :listErr="listMessageErr" ref="errMessage"/>
+            <err-message :listErr="listMessageErr" ref="errMessage" @after-close-dialog="afterCloseDialogValidate"/>
         </div>
         <EmbedDataflow 
         @after-mounted="afterDataFlowMounted" 
@@ -330,10 +330,14 @@ export default {
         },
         linkControl(){
             return this.$store.state.document.linkControl[this.keyInstance]
+        },
+        baInfo(){
+            return this.$store.state.app.baInfo
         }
     },
     data() {
         return {
+            controlInfinity:[],
             focusingControlName: '',
             contentDocument: null,
             documentInfo:null,
@@ -1446,37 +1450,50 @@ export default {
                 }
             }
             this.listDataFlow = listDataFlow;
-            if(!isSetEffectedControl);
-            this.getEffectedControl();
-            if(this.docObjId == null){
-                thisCpn.findRootControl();
+            if(!isSetEffectedControl){
+                this.getEffectedControl();
             }
-            else{   // trường hơp đã lưu cấu trúc root trên server
-                if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
-                    impactedFieldsList = this.preDataSubmit.impactedFieldsList;
-                    let impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
-                    let listTableRootControl = this.preDataSubmit.tableRootControl;
-                    this.pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl);
-                    for(let tableName in listTableRootControl){
-                        let tableRootControl = listTableRootControl[tableName];
-                        for(let controlInTable in tableRootControl){
-                            let controlInstance = getControlInstanceFromStore(this.keyInstance,controlInTable);
-                            let controlFormulas = controlInstance.controlFormulas;
-                            if(controlFormulas.hasOwnProperty('formulas')){
-                                let formulasInstance = controlFormulas['formulas'].instance;
-                                // chạy công thức để lấy giá trị dòng mặc định trong table(phục vụ cho việc shift enter xuống dòng phải có dữ liệu mặc định)
-                                if(formulasInstance){
-                                    this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+            if(this.controlInfinity.length > 0 && this.baInfo && this.baInfo.id){
+                this.listMessageErr = [];
+                this.listMessageErr.push("Mối quan hệ giữa các control sau dẫn đến vòng lặp vô hạn");
+                for (let index = 0; index < this.controlInfinity.length; index++) {
+                    let controlName = this.controlInfinity[index];
+                    let controlIns = getControlInstanceFromStore(this.keyInstance, controlName);
+                    if(controlIns != false){
+                        this.listMessageErr.push(controlName + " - " + controlIns.title);
+                    }
+                }
+                this.$refs.errMessage.showDialog('checkInfinityControl');   
+            }
+            else{
+                if(this.docObjId == null){
+                    thisCpn.findRootControl();
+                }
+                else{   // trường hơp đã lưu cấu trúc root trên server
+                    if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
+                        impactedFieldsList = this.preDataSubmit.impactedFieldsList;
+                        let impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
+                        let listTableRootControl = this.preDataSubmit.tableRootControl;
+                        this.pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl);
+                        for(let tableName in listTableRootControl){
+                            let tableRootControl = listTableRootControl[tableName];
+                            for(let controlInTable in tableRootControl){
+                                let controlInstance = getControlInstanceFromStore(this.keyInstance,controlInTable);
+                                let controlFormulas = controlInstance.controlFormulas;
+                                if(controlFormulas.hasOwnProperty('formulas')){
+                                    let formulasInstance = controlFormulas['formulas'].instance;
+                                    // chạy công thức để lấy giá trị dòng mặc định trong table(phục vụ cho việc shift enter xuống dòng phải có dữ liệu mặc định)
+                                    if(formulasInstance){
+                                        this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+                                    }
                                 }
+                                
                             }
-                            
                         }
                     }
-                   
-                    
                 }
             }
-            this.hidePreloader();
+            this.hidePreloader();            
         },
 
         pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl){
@@ -1518,7 +1535,9 @@ export default {
 
         
         /**
-         * Hàm lấy ra các control bị ảnh hưởng từ 1 control và set vao store
+         * Hàm lấy ra các control bị ảnh hưởng từ 1 control
+         * từ đó tạo dựng mối quan hệ cho các control
+         * lưu vào db cho lần submit sau không phải tìm lại
          */
         getEffectedControl() {
             let mapControlEffected = {};
@@ -1580,9 +1599,49 @@ export default {
                     }
                 }
             }
-            this.updateEffectedControlToStore(mapControlEffected);
+            if(this.baInfo && this.baInfo.id){
+                this.checkInfinityControl(mapControlEffected);
+            }
+            if(this.controlInfinity.length == 0){
+                this.updateEffectedControlToStore(mapControlEffected);
+            }
         },
-       
+        /**
+         * hoangnd: kiểm tra công thức chạy infinity hay ko 
+         *  
+        */       
+        checkInfinityControl(mapControlEffected){
+            this.controlInfinity = [];
+            for(let formulaType in mapControlEffected){
+                for(let controlName in mapControlEffected[formulaType]){
+                    this.search(controlName, mapControlEffected[formulaType][controlName], mapControlEffected[formulaType]);
+                }
+            }
+        },
+      
+        /**
+         * DFS trong cây mối quan hệ để tìm control trùng lặp
+         */
+        search (controlCheck, effectedControl, mapControlEffected) {
+            var i, children = Object.keys(effectedControl), found;
+            for (i = 0; i < children.length; i += 1) {
+                if(mapControlEffected[children[i]]){
+                    if(children[i] == controlCheck){
+                        this.controlInfinity.push(children[i]);
+                        break;
+                    }
+                    else{
+                        if(!Object.keys(mapControlEffected[children[i]]).includes(children[i]) && children[i] != controlCheck){
+                            this.search(controlCheck, mapControlEffected[children[i]], mapControlEffected);
+                        }
+                    }
+                }
+            }
+        },
+      
+        /**
+         * Hàm lấy các control đầu vào là các cột của table sqllite
+         */
         detectControlEffectedInTableInDoc(mapControlEffected,name,formulasInstance){
             formulasInstance.detectControlInTable(mapControlEffected,name,formulasInstance.formulas,this.sDocumentSubmit.listInputInDocument)  
         },
@@ -2569,6 +2628,14 @@ export default {
             resetImpactedFieldsList(this.keyInstance);
             this.handleControlInputChange(locale.controlName);
         },
+        /**
+         * Hàm nhận sự kiên sau khi đóng pop up validate
+         */
+        afterCloseDialogValidate(type){
+            if(type == "checkInfinityControl"){
+                this.$emit('before-close-submit');
+            }
+        }
     }
     
     

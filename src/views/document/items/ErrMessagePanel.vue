@@ -2,6 +2,7 @@
     
     <v-dialog
         v-model="isShowModalErr"
+        persistent
         width="800"
         >
         <v-card
@@ -53,17 +54,20 @@ export default {
     data(){
         return {
             isShowModalErr:false,
-            listError:[]
+            listError:[],
+            dialogType:false
         }
     },
    
     methods:{
         
-        showDialog(){
-            this.isShowModalErr = true
+        showDialog(type = false){
+            this.isShowModalErr = true;
+            this.dialogType = type
         },
         hideDialog(){
-            this.isShowModalErr = false
+            this.isShowModalErr = false;
+            this.$emit('after-close-dialog',this.dialogType);
         },
      
         
