@@ -116,91 +116,9 @@
 				
 			</div>
 		</div>
-		<div class="list-workflow-instance d-flex flex-column">
-			<div class="d-flex">
-				<div class="ml-2 mt-2 " style="flex-grow:1">
-					<h3>	
-						Danh sách các quy trình con
-					</h3>
-				</div>
-			
-				<v-btn
-					class="mr-2 white--text"
-					depressed
-					color="error"
-					small
-					:disabled="disableBtn"
-					@click="confirmDelete"
-				>
-					Xóa
-				</v-btn>
-				<v-btn
-					class="mr-2 white--text"
-					depressed
-					color="orange"
-					small
-					:disabled="disableBtn"
-					@click="stopProcessInstance"
-				>
-					Tạm dừng
-				</v-btn>
-				<v-btn
-					class="mr-2 white--text"
-					depressed
-					color="success"
-					small
-					:disabled="disableBtn"
-					@click="activeProcessInstance"
-				>
-				Chạy
-				</v-btn>
-				
-				 <v-tooltip bottom>
-     				 <template v-slot:activator="{ on, attrs }">
-						<v-btn 
-							icon 
-							tile  
-							v-bind="attrs"
-          					v-on="on"
-							class="mr-3 white--text"
-							color="primary"
-							small
-							@click="switchFullScreen"
-							>
-							<v-icon small>
-								mdi-monitor-share
-							</v-icon>
-						</v-btn>
-					</template>
-					<span>Xem toàn màn hình</span>
-				</v-tooltip>	
-			</div>
-			<ListItems 
-				ref="listWorkFlow"
-				:pageTitle="'Danh sách các quy trình con'"
-				:showButtonAdd="false"
-				:getDataUrl="apiUrl"
-				:showExportButton="false"
-				:showImportButton="false"
-				:useDefaultContext="false"
-				:useWorkFlowHeader="true"
-				:customAPIResult="customAPIResult"
-				:containerHeight="containerHeight"
-				:headerPrefixKeypath="'admin.table'"
-				:tableContextMenu="tableContextMenu"
-				:showToolbar="false"
-				:isTablereadOnly="false"
-				@after-selected-row="afterSelectedRow"
-				:showImportHistoryBtn="false"
-				:showPagination="false"
-				:showActionPanelInDisplayConfig="false"
-			/>
+		<div class="list-workflow-instance d-flex flex-column h-100">
+			<ListProcessInstance :showSwitchBtn="true" />
 		</div>
-		<ConfirmDelete 
-			:showDialog="showDialog"
-			@cancel="cancel"
-			@confirm="deleteProcessInstance"
-			 />
 	</div>
 </template>
 
@@ -211,67 +129,20 @@ import {adminApi} from '@/api/Admin.js'
 import { appConfigs } from "./../../configs.js";
 import { reformatGetListInstances } from "@/components/process/reformatGetListData.js";
 import ModelerDetail from "./ModelerDetail"
-import ConfirmDelete from "./ConfirmDelete"
 import Handsontable from 'handsontable';
+import ListProcessInstance from "./ListProcessInstance"
 export default {
 	components:{
 		ListItems,
 		ModelerDetail,
-		ConfirmDelete
+		ListProcessInstance
 	},
 	data(){
 		let self = this
 		return {
-			containerHeight:null,
 			colors:['#1976D2','#53B257'],
-			showDialog:false,
 			listItemSelected:[],
-			disableBtn: true,
 			isShowDonutChart: false,
-			customAPIResult:{
-				reformatData(res){
-					return{
-                         columns: [
-							{name: "checkbox_select_item",data:"checkbox_select_item",title:"selected",type:"checkbox", noFilter:true},
-                            {name: "id", title: "id", type: "numeric", noFilter:true},
-							{name: "name", title: "name", type: "text", noFilter:true},
-							{name: "startUserId", title: "startUserId", type: "text", noFilter:true},
-							{name: "suspended", title: "suspended", type: "date", noFilter:true,
-								  renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-										Handsontable.dom.empty(td);
-										let span;
-										span = document.createElement('span');	
-										if(value === null || value == ""){
-											$(span).text("Đang chạy")
-											$(span).css('color', 'green')
-											td.appendChild(span);
-											return td;
-										}
-										if(value == true){
-											$(span).text("Tạm dừng ")
-											$(span).css('color', 'orange')
-											td.appendChild(span);
-											return td;
-										}
-									},
-							},
-							{name: "startTime", title: "startTime", type: "date", noFilter:true},
-						 ],
-						 listObject: res.data,
-					}
-				}
-			},
-			tableContextMenu: {
-               viewDetails: {
-                    name: "View details",
-                    text: "Xem chi tiết",
-                    callback: (obj, callback) => {
-						self.$goToPage( "/work/"+obj.id,
-                            " Chi tiết " + (obj.name ? obj.name : "")
-                        );
-                    },
-                },
-            },
 		}
 	},
 	props:{
@@ -282,19 +153,10 @@ export default {
 			}
 		}
 	},
-	mounted(){
-		this.containerHeight = util.getComponentSize(this).h /2 - 50
-	},
+	
 	computed:{
 		processDefination(){
 			return this.$store.state.admin.processDefination
-		},
-		apiUrl(){
-			let processKey = this.$store.state.admin.processKey
-			return appConfigs.apiDomain.bpmne.instances+'?size=100&sort=startTime&order=desc&processDefinitionKey='+processKey;
-		},
-		processKey(){
-			return this.$store.state.admin.processKey
 		},
 		sAdmin(){
 			return this.$store.state.admin
@@ -307,127 +169,39 @@ export default {
 	methods:{
 		dmbChart(cx,cy,radius,arcwidth,values,colors,selectedValue){
 			var canvas = document.getElementById('canvas');
-			var ctx = canvas.getContext("2d");
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			var tot = 0;
-			var accum = 0;
-			var PI = Math.PI;
-			var PI2 = PI*2;
-			var offset = -PI/2;
-			ctx.lineWidth = arcwidth;
-			for(var i = 0; i < values.length; i++){
-				tot += values[i]
-			}
-			for(var i = 0; i < values.length; i++){
-				ctx.beginPath();
-				ctx.arc(cx,cy,radius,
-					offset+PI2*(accum/tot),
-					offset+PI2*((accum+values[i])/tot)
-				);
-				ctx.strokeStyle=colors[i];
-				ctx.stroke();
-				accum+=values[i];
-			}
-			var innerRadius=radius-arcwidth;
-			ctx.beginPath();
-			ctx.fillStyle=colors[selectedValue];
-			ctx.textAlign='center';
-			ctx.font="30px  roboto";
-			ctx.fillText(this.sAdmin.sumProcess,cx,cy+innerRadius*.9);
-		},
-		afterSelectedRow(items){
-			debugger
-			this.$set(this, 'listItemSelected', items)
-			if(Object.keys(this.listItemSelected).length == 0){
-					this.disableBtn = true
-				}else{
-					this.disableBtn = false
+			if(canvas){
+				var ctx = canvas.getContext("2d");
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				var tot = 0;
+				var accum = 0;
+				var PI = Math.PI;
+				var PI2 = PI*2;
+				var offset = -PI/2;
+				ctx.lineWidth = arcwidth;
+				for(var i = 0; i < values.length; i++){
+					tot += values[i]
 				}
-		},
-		switchFullScreen(){
-			let processKey = this.$store.state.admin.processKey
-			this.$goToPage('/workflow/process-key/'+processKey+'/instances', this.$t('process.instance.listModelInstance')+processKey)
-		},
-		stopProcessInstance(){
-			let self = this
-			for(let i in this.listItemSelected){
-				adminApi.stopProcessInstances(this.listItemSelected[i].id).then(res=>{
-					if(res.suspended == true){
-						self.$snotify(
-							{
-								type: "success",
-								title:" Thành công"
-							}
-						)
-					}
-				self.$refs.listWorkFlow.refreshList()
-
-				}).catch(err=>{
-					self.$snotify(
-							{
-								type: "error",
-								title:"Tác vụ này đã được dừng"
-							}
-						)
-				})
-			}
-			debugger
-		},
-		activeProcessInstance(){
-			let self = this
-			for(let i in this.listItemSelected){
-				adminApi.activeProcessInstances(this.listItemSelected[i].id).then(res=>{
-					self.$snotify(
-						{
-							type: "success",
-							title:" Thành công"
-						}
-					)
-					self.$refs.listWorkFlow.refreshList()
-				}).catch(err=>{
-					self.$snotify(
-							{
-								type: "error",
-								title:"Tác vụ này đang chạy"
-							}
-						)
-				})
-			}
-			
-		},
-		confirmDelete(){
-			this.showDialog = true
-		},
-		deleteProcessInstance(){
-			this.showDialog = false
-			let self = this
-			for(let i in this.listItemSelected){
-				adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
-					self.$snotify(
-						{
-							type: "success",
-							title:" Thành công"
-						}
-					)
-					self.$refs.listWorkFlow.refreshList()
-				}).catch(err=>{
-					self.$snotify(
-							{
-								type: "error",
-								title:"Đã có lỗi xảy ra"
-							}
-						)
-				})
+				for(var i = 0; i < values.length; i++){
+					ctx.beginPath();
+					ctx.arc(cx,cy,radius,
+						offset+PI2*(accum/tot),
+						offset+PI2*((accum+values[i])/tot)
+					);
+					ctx.strokeStyle=colors[i];
+					ctx.stroke();
+					accum+=values[i];
+				}
+				var innerRadius=radius-arcwidth;
+				ctx.beginPath();
+				ctx.fillStyle=colors[selectedValue];
+				ctx.textAlign='center';
+				ctx.font="30px  roboto";
+				ctx.fillText(this.sAdmin.sumProcess,cx,cy+innerRadius*.9);
 			}
 		},
-		cancel(){
-			this.showDialog = false
-		}
 	},
 	watch:{
-		processKey(val){
-			this.listItemSelected = []
-		},
+		
 		listItemSelected:{
 			deep: true,
             immediate: true,
