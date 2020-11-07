@@ -28,7 +28,7 @@
 					Tạm dừng
 				</v-btn>
 				<v-btn
-					class="mr-2 white--text"
+					:class="{'mr-2 white--text':true, 'mr-8':showSwitchBtn == false}"
 					depressed
 					color="success"
 					small

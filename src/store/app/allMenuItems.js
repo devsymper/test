@@ -158,8 +158,18 @@ export default {
     admin: {
         title: "admin",
         icon: "mdi-cog-transfer-outline",
-        group: "Administrator",
-		link: '/admin',
+		group: "Administrator",
+		children: {
+            list_workflow: {
+                title: "list_workflow",
+                link: "/admin",
+            },
+            list_work: {
+                title: "list_work",
+                link: "/admin/jobs",
+            },
+           
+        }
     },
     userManager: {
         title: "Account management",

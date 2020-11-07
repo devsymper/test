@@ -141,7 +141,6 @@ export default {
 		let self = this
 		return {
 			colors:['#1976D2','#53B257'],
-			listItemSelected:[],
 			isShowDonutChart: false,
 		}
 	},
@@ -201,18 +200,6 @@ export default {
 		},
 	},
 	watch:{
-		
-		listItemSelected:{
-			deep: true,
-            immediate: true,
-            handler(obj){
-				if(Object.keys(obj).length == 0){
-					this.disableBtn = true
-				}else{
-					this.disableBtn = false
-				}
-            }
-		},
 		values:{
 			deep: true,
             immediate: true,

@@ -140,7 +140,9 @@
             "listTrashApps": "Danh sách ứng dụng đã xóa",
             "listOrgchart": "Danh sách SĐTC",
             "listTrashOrgchart": "Danh sách SĐTC đã xóa",
-            "viewOrgchart": "Xem SĐTC mặc định"
+			"viewOrgchart": "Xem SĐTC mặc định",
+			"list_workflow":"Danh sách quy trình",
+			"list_work":"Danh sách công việc"
         },
         "system": "Hệ thống",
         "copy": "Sao chép"
