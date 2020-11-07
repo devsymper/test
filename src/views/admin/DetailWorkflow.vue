@@ -336,7 +336,6 @@ export default {
 			ctx.fillText(this.sAdmin.sumProcess,cx,cy+innerRadius*.9);
 		},
 		afterSelectedRow(items){
-			debugger
 			this.$set(this, 'listItemSelected', items)
 			if(Object.keys(this.listItemSelected).length == 0){
 					this.disableBtn = true
@@ -371,7 +370,6 @@ export default {
 						)
 				})
 			}
-			debugger
 		},
 		activeProcessInstance(){
 			let self = this

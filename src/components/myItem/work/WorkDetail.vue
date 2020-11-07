@@ -357,7 +357,6 @@ export default {
             deep: true,
             immediate:true,
             handler(valueAfter){
-				debugger
                 this.changeWorkDetail();
             }
         },
@@ -606,7 +605,6 @@ export default {
                 filter.sort= "startTime";
                 filter.order= "desc";
 				let res = await BPMNEngine.postTaskHistory(filter);
-				debugger
                 if (res.total>0) {
                     self.listTaskCurrent=res.data;
                 }else{
