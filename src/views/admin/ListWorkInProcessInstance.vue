@@ -1,6 +1,6 @@
 <template>
-	<div class="w-100" style="position:absolute;margin-top:-18px">
-		<span class="ml-3 fs-15" style="position:relative; top:30px;left:0"> Chi tiết công việc : {{title}}</span>
+	<div class="w-100" >
+		<!-- <span class="ml-3 fs-15" style="position:relative; top:30px;left:0"> Chi tiết công việc : {{title}}</span> -->
 		<workDetail
 			class="workDetail"
 			:workInfo="workInfo"
@@ -33,7 +33,7 @@ export default {
             let self=this;
             try {
 			 	let data = await BPMNEngine.getProcessInstanceHistory({processInstanceId:processInstanceId, includeProcessVariables: true});
-				this.workInfo = data.data
+				this.workInfo = data.data[0]
 				this.title = data.data[0].name
             } catch (error) {
                 self.$snotifyError(error, "Get task process current failed");

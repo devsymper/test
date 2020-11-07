@@ -103,6 +103,9 @@ export default {
 			default: false
 		}
 	},	
+	created(){
+	
+	},
 	data(){
 		let self = this
 		return{
@@ -167,6 +170,8 @@ export default {
 	},
 	mounted(){
 		this.containerHeight = util.getComponentSize(this).h 
+		this.$refs.listWorkFlow.addColumnsChecked()
+		debugger
 	},
 	watch:{
 		processKey(val){

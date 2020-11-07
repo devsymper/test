@@ -64,6 +64,20 @@ export default {
 						self.$refs.listWork.actionPanel = true;
                     },
                 },
+                runWork: {
+                    name: "runWork",
+                    text: "Chạy công việc",
+                    callback: (obj, callback) => {
+						self.$refs.listWork.actionPanel = true;
+                    },
+                },
+                stopWork: {
+                    name: "stopWork",
+                    text: "Dừng công việc",
+                    callback: (obj, callback) => {
+						self.$refs.listWork.actionPanel = true;
+                    },
+                },
 		}
 	}
 	}

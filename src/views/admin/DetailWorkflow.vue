@@ -210,8 +210,10 @@ export default {
 				}else{
 					this.isShowDonutChart = false
 					var canvas = document.getElementById('canvas');
-					var ctx = canvas.getContext("2d");
-					ctx.clearRect(0, 0, canvas.width, canvas.height);
+					if(canvas){
+						var ctx = canvas.getContext("2d");
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+					}
 				}
             }
 		}
