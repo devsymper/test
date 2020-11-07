@@ -2,7 +2,7 @@
     <div class="w-100 mr-10">
         <v-row class="header ml-3">
             <v-col class="col-md-8 col-sm-8 ">
-                  <!-- <v-menu style="height:350px!important" offset-y  :close-on-content-click="false">
+                  <v-menu style="height:350px!important" offset-y  :close-on-content-click="false">
                     <template v-slot:activator="{ on, attrs }">
                     <v-btn
                         color="primary"
@@ -14,7 +14,7 @@
                     </v-btn>
                     </template>
                <NotificationPopUp @close="close" style="background:white" :name="'Đơn bán hàng'" :objType="'comment'" />
-                </v-menu> -->
+                </v-menu>
                     <span class="fs-15 fw-430" v-if="showMain">Cài đặt thông báo</span>
                 <span class="fs-15 fw-430" v-if="showFollow">Danh sách đối tượng đang theo dõi</span>
                 <span class="fs-15 fw-430" v-if="showUnfollow">Danh sách đối tượng không theo dõi</span>

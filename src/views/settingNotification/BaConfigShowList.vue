@@ -5,6 +5,7 @@
         :headerPrefixKeypath="'notificationConfig'"
         :useDefaultContext="false"
         :showExportButton="false"
+        @after-open-add-panel="addNotification"
         :showImportHistory="false"
         :pageTitle="'Thông báo'"
         :tableContextMenu="tableContextMenu"
@@ -15,15 +16,15 @@
         :actionPanelWidth="actionPanelWidth">
         <div slot="right-panel-content" class="h-100" style="overflow:hidden!important">
            <configNotification 
-           ref="config"
-            @refreshList="refreshListNotification()"
+                ref="config"
+                :type="typeNoti"
+                @refreshList="refreshListNotification()"
            />
         </div>
         </list-items>
     </div>
 </template>
 <script>
-
 import { userApi } from "./../../api/user.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import configNotification from "./../../components/notification/setting/BAconfig";
@@ -105,10 +106,18 @@ export default {
                    )
                    let listBA= self.$store.state.app.allBA;
                      for(let i = 0; i<data.listObject.length; i++){
+                        data.listObject[i].originState = data.listObject[i].state;
+                        data.listObject[i].icon = data.listObject[i].icon;
+                        data.listObject[i].action = data.listObject[i].action;
+                        data.listObject[i].originAction = self.getName(data.listObject[i].objectType,data.listObject[i].action);
                         data.listObject[i].state = self.renameStatus(data.listObject[i].state);
+                        data.listObject[i].originContent =data.listObject[i].content;
                         data.listObject[i].content = self.reNameParam(data.listObject[i].objectType,data.listObject[i].content);
+                        data.listObject[i].originDefaultUser = data.listObject[i].defaultUser;
                         data.listObject[i].defaultUser = self.renameReceiver(data.listObject[i].objectType,data.listObject[i].defaultUser);
+                        data.listObject[i].originEvent = data.listObject[i].event;
                         data.listObject[i].event = self.renameAction(data.listObject[i].objectType,data.listObject[i].event);
+                        data.listObject[i].originObjectType = data.listObject[i].objectType;
                         data.listObject[i].objectType = self.$t('objects.'+data.listObject[i].objectType);
                         data.listObject[i].userUpdate= self.getBAName(listBA,data.listObject[i].userCreate.split(':')[1]);
                         data.listObject[i].userCreate = self.getBAName(listBA,data.listObject[i].userCreate.split(':')[1]);
@@ -117,24 +126,33 @@ export default {
                     return  data;
                 } 
             },
+            typeNoti:'add',
             listSource:{},
             getListUrl: {},
             actionPanelWidth:520,
             tableContextMenu:{
-                delete: {
+             
+                 update: {
+                    name:"update",
+                    text:this.$t('user.table.contextMenu.edit'), 
+                    callback: (notification, callback) => {
+                        this.updateNotification(notification);
+                    }
+                },
+                 view: {
+                    name:"view",
+                    text:this.$t('user.table.contextMenu.view'), 
+                    callback: (notification, callback) => {
+                        this.viewNotification(notification);
+                    }
+                },
+                   delete: {
                     name:"delete",
                     text:this.$t('user.table.contextMenu.delete'), 
                     callback: (notification, callback) => {
                         this.deleteNotification(notification);
                     }
                 },
-                //  update: {
-                //     name:"update",
-                //     text:this.$t('user.table.contextMenu.update'), 
-                //     callback: (notification, callback) => {
-                //         this.updateNotification(notification);
-                //     }
-                // }
             },
             containerHeight: 100,
         }
@@ -147,6 +165,20 @@ export default {
         this.getSource();
     },
     methods:{
+        addNotification(){
+            this.refreshListNotification();
+            this.typeNoti="add";
+
+        },
+        getName(nameModule,action){
+             let name = action;
+            for(let i = 0; i<this.listSource[nameModule].action.length;i++){
+                if(this.listSource[nameModule].action[i].value==action){
+                name = this.listSource[nameModule].action[i].text;
+                }
+            }
+            return name
+        },
         reNameParam(nameModule,des){
              let name = des;
             for(let i = 0; i<this.listSource[nameModule].parameter.length;i++){
@@ -161,8 +193,16 @@ export default {
           //  }
             
         },
+        viewNotification(des){
+            this.typeNoti="view";
+            this.$refs.listNotification.openactionPanel();
+            this.$refs.config.viewNotificationInfo(des)
+        },
         updateNotification(des){
-            },
+            this.$refs.listNotification.openactionPanel();
+            this.typeNoti="update";
+            this.$refs.config.getDataUpdate(des)
+        },
         renameReceiver(nameModule,receiver){
             let name = receiver;
             for(let i = 0; i<this.listSource[nameModule].receiver.length;i++){
@@ -227,6 +267,7 @@ export default {
         },
         refreshListNotification(){
             this.$refs.listNotification.refreshList();
+            this.$refs.config.refreshAll();
         },
         deleteNotification(notification){
             const self = this;

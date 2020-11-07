@@ -807,7 +807,7 @@
         "action": {
             "create": "Tạo quy trình mới"
         },
-        "taskList": "Danh sách công việc  ",
+        "taskList": "Danh sách tác vụ ",
         "instance": {
             "list": "Danh sách các bản đã chạy",
             "name": "Tên bản chạy",
@@ -1214,7 +1214,7 @@
         "objType": "Loại đối tượng",
         "filterObj": "Bộ lọc",
         "today": "Hôm nay",
-        "header": "Danh sách work",
+        "header": "Danh sách công việc",
         "headerDoc": "Danh sách document",
         "work": {
             "parentWork": "Parent work",
@@ -1232,7 +1232,8 @@
             "title_aproval": "Thực thi công việc",
             "titlePermissionDenied": "Từ chối thực thi!",
             "contentPermissionDenied": "Bạn không có quyền thực hiện công việc này!"
-        }
+        },
+        "unfinished": "Chưa hoàn thành"
 
     },
     "tasks": {
@@ -1265,7 +1266,8 @@
             "submitForm": "Form nhập liệu",
             "alertDescription": "Không có mô tả",
             "relatedTask": "CÁC TASK LIÊN QUAN",
-            "attachment": "TỆP ĐÍNH KÈM"
+            "attachment": "TỆP ĐÍNH KÈM",
+            "status":"Trạng thái"
         },
         "filterOptions": {
             "all": "Toàn bộ task",

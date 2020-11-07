@@ -1,16 +1,8 @@
 <template>
   <div class="w-100 d-flex justify-space-between py-2">
     <div class="pl-3 symper-title" v-if="!sideBySideMode">
-      {{headerTitle}}
-      <v-chip
-        v-if="workStatus == 'notDone'"
-        class="ma-2"
-        color="amber"
-        text-color="white"
-        x-small
-      >{{$t('common.pendding')}}</v-chip>
-
-      <v-chip v-else class="ml-1" color="green" text-color="white" x-small>{{$t('common.done')}}</v-chip>
+        {{headerTitle}}
+        <span class="fs-13" style="color:#00000060">(Tổng số công việc: {{totalObject}})</span>
     </div>
     <div
       :class="{
@@ -173,6 +165,14 @@ export default {
     DialogCreateTask
   },
   props: {
+    totalObject:{
+      type:Number,
+      default:0
+    },
+    totalCurrent:{
+      type:Number,
+      default:0
+    },
     isSmallRow: {
       type: Boolean,
       default: true
