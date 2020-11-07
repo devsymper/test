@@ -22,7 +22,7 @@
                     <template v-slot:activator="{ on }">
                     <div  @click="selectedItem(item)" v-on="on" class="text-ellipsis">
                         <v-icon style="font-size:16px">{{item.icon}}</v-icon> 
-                        <span class="pl-1">{{item.name}}</span>
+                        <span class="pl-1" style="color:#000000CC">{{item.name}}</span>
                     </div>
                     </template>
                     <span>{{item.name}}</span>
