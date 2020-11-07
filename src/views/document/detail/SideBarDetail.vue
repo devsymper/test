@@ -253,8 +253,11 @@ export default {
 		taskId(after){
 			let self = this
 			if(after != "" && after != "0"){
-				bpmnApi.getATaskInfo(this.taskId).then(res=>{
-                   self.taskName = res.name == null ? "" : res.name
+				//Tger chỉnh sửa lại api get detail task
+				bpmnApi.postTaskHistory({taskId:this.taskId}).then(res=>{
+					if (res.total>0) {
+                   		self.taskName = res.data[0].name == null ? "" : res.data[0].name
+					}
                 });
 			}
 		},

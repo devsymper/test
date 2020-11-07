@@ -1230,7 +1230,9 @@
             "titlePermissionDenied": "Từ chối thực thi!",
             "contentPermissionDenied": "Bạn không có quyền thực hiện công việc này!"
         },
-        "unfinished": "Chưa hoàn thành"
+        "unfinished": "Chưa hoàn thành",
+        "totalTask": "Tổng số tác vụ",
+        "totalWork": "Tổng số công việc"
 
     },
     "tasks": {

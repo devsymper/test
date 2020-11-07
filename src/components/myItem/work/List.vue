@@ -29,7 +29,7 @@
                 >{{$t("tasks.header.name")}}
                     <v-icon 
                         @click="showFilterColumn($event,'name')" 
-                        class="fs-15 float-right pr-1" 
+                        class="fs-15 float-right" 
                         style="padding-top:3px"
                         :class="{
                             'd-active-color': filteredColumns['name'] && filteredColumns['name']==true ,
@@ -249,7 +249,7 @@
 
     <table-filter
         ref="tableFilter"
-        :columnFilter="tableFilter.currentColumn.colFilter"
+        :columnFilter="columnFilter()"
         @apply-filter-value="applyFilter"
         @search-autocomplete-items="searchAutocompleteItems"
     ></table-filter>
@@ -484,6 +484,21 @@ export default {
         self.reCalcListTaskHeight();
     },
     methods: {
+        columnFilter(){
+            if (this.tableFilter.currentColumn.name=="isDone") {
+                if(this.tableFilter.currentColumn.colFilter.selectItems.length>0){
+                    let items=this.tableFilter.currentColumn.colFilter.selectItems;
+                    for (let i = 0; i < items.length; i++) {
+                        if (items[i].value==1) {
+                            this.tableFilter.currentColumn.colFilter.selectItems[i].label=this.$t('common.done');;
+                        }else if(items[i].value==0){
+                            this.tableFilter.currentColumn.colFilter.selectItems[i].label=this.$t('myItem.unfinished');
+                        }
+                    }
+                }
+            }
+            return this.tableFilter.currentColumn.colFilter;
+        },
         /**
          * Kiểm tra xem một cột trong table có đang áp dụng filter hay ko
          */
@@ -511,7 +526,7 @@ export default {
          * Thực hiện filter khi người dùng click vào nút apply của filter
          */
         applyFilter(filter, source = "filter") {
-            console.log("aaaaaaaaaa");
+            this.page=1;// gán lại page=1 để reset data
             let colName = this.tableFilter.currentColumn.name;
             this.$set(this.tableFilter.allColumn, colName, filter);
             let hasFilter = this.checkColumnHasFilter(colName, filter);

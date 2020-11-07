@@ -2,7 +2,7 @@
   <div class="w-100 d-flex justify-space-between py-2">
     <div class="pl-3 symper-title" v-if="!sideBySideMode">
         {{headerTitle}}
-        <span class="fs-13" style="color:#00000060">(Tổng số công việc: {{totalObject}})</span>
+        <span class="fs-13" style="color:#00000060">({{$t("myItem.totalWork")}}: {{totalObject}})</span>
     </div>
     <div
       :class="{
