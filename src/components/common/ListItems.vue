@@ -507,7 +507,7 @@ export default {
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
             hotTableContextMenuItems: [],
             allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
-            hasColumnsChecked:true,
+            hasColumnsChecked:false,
             focusingRowIndex: -1,
         };
     },
