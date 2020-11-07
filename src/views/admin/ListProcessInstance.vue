@@ -302,7 +302,7 @@ export default {
 					self.$snotify(
 						{
 							type: "success",
-							title:" Xóa tác vụ hành công"
+							title:" Xóa tác vụ thành công"
 						}
 					)
 					self.$refs.listWorkFlow.refreshList()

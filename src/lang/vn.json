@@ -1054,7 +1054,8 @@
                 "update": "Sửa",
                 "list_instance": "Ds bản ghi",
                 "start_instance": "Bắt đầu",
-                "unfavorite": "Bỏ yêu thích"
+                "unfavorite": "Bỏ yêu thích",
+                "view": "Chi tiết"
             },
             "dashboard": {
                 "create": "Tạo mới",
@@ -1117,6 +1118,7 @@
                 "unfavorite": "mdi-star-off"
             },
             "workflow_definition": {
+                "view": "mdi-clipboard-list-outline",
                 "list": "mdi-clipboard-list-outline",
                 "create": "mdi-folder-plus-outline",
                 "deploy": "mdi-rocket",
