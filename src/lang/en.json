@@ -94,6 +94,7 @@
         "of": "of",
         "entries": "Entries",
         "always_show_sidebar": "Always show sidebar",
+        "not_show_sidebar": "Disable show sidebar",
         "import_excel": "Import excel",
         "isDefault": "Default orgchart",
         "restore": "Restore",

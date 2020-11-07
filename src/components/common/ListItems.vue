@@ -149,10 +149,25 @@
                                     small
                                     v-on="on"
                                 >
-                                    <v-icon left dark class="ml-1 mr-0">mdi-table-cog</v-icon>
+                                    <v-icon left dark class="ml-1 mr-0 ">mdi-table-cog</v-icon>
                                 </v-btn>
                             </template>
                             <span>{{ $t('common.list_config') }}</span>
+                        </v-tooltip>
+                        
+                        <v-tooltip top v-if="showActionPanelInDisplayConfig">
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    @click="changeAlwayShowSBSState"
+                                    depressed
+                                    small
+                                    class="ml-2"
+                                    v-on="on"
+                                >
+                                    <v-icon left dark class="ml-1 mr-0">{{alwaysShowActionPanel ? 'mdi-flip-horizontal' : 'mdi-format-list-checkbox'}}</v-icon>
+                                </v-btn>
+                            </template>
+                            <span>{{alwaysShowActionPanel ? $t('common.not_always_show_sidebar') : $t('common.always_show_sidebar')}}</span>
                         </v-tooltip>
                     </div>
                 </v-col>
@@ -821,6 +836,9 @@ export default {
         }
     },
     methods: {
+        changeAlwayShowSBSState(){
+            this.tableDisplayConfig.value.alwaysShowSidebar = !this.tableDisplayConfig.value.alwaysShowSidebar;
+        },
         getHotInstance(){
             return this.$refs.dataTable.hotInstance;
         },  
