@@ -166,6 +166,7 @@
                             'loosen-row':  tableDisplayConfig.value.densityMode == 0,
                             'medium-row':  tableDisplayConfig.value.densityMode == 1,
                             'compact-row':  tableDisplayConfig.value.densityMode == 2,
+                            'list-sbs': alwaysShowActionPanel
                         }"
                 >
                     <hot-table
@@ -389,6 +390,7 @@ export default {
                 manualRowResize: true,
                 readOnly: this.isTablereadOnly,
                 contextMenu: {},
+                currentRowClassName: 'symper-list-item-current-row',
                 viewportRowRenderingOffset: 20,
                 viewportColumnRenderingOffset: 20,
                 rowHeights: 21,
@@ -1426,7 +1428,7 @@ export default {
                     colMap[item.name].renderer = function(instance, td, row, col, prop, value, cellProperties){
                         td = renderer(instance, td, row, col, prop, value, cellProperties);
                         if(self.focusingRowIndex > 0 && row == self.focusingRowIndex ){
-                            $(td).addClass('symper-list-item-current-row');
+                            $(td).addClass('symper-list-item-current-row-sbs');
                         }
                         return td;
                     }
