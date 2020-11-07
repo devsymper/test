@@ -223,6 +223,7 @@ export default {
                     
                     if(!$(evt.target).hasClass("s-floatting-popup") &&
                         $(evt.target).closest(".s-floatting-popup").length == 0){
+                            this.focusingControlName = "";
                         this.$refs.floattingPopup.hide() 
                     }
                 }
@@ -236,6 +237,7 @@ export default {
             let controlName = locate.controlName;
             this.focusingControlName = controlName;
             this.$refs.floattingPopup.show(e, $('#sym-Detail-'+this.keyInstance), row);
+            
         });
         
        
