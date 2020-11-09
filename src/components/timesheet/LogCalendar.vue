@@ -219,7 +219,7 @@ export default {
         LogTimeView,
         DeleteLogView,
     },
-    props: ['timeView'],
+    props: ['timeView','userId'],
     data() {
         return {
             detail: false,
@@ -252,6 +252,37 @@ export default {
     methods: {
         start(date){
             this.$emit('showLog',date);   
+        },
+         getLogByUserId(id){
+            debugger
+             const self = this;
+            timesheetApi.getLogByUserId({userId:id})
+                .then(res => {
+                    if (res.status === 200) {
+                        const logTimeList = res.data.listLogTime;
+                        self.sum = res.data.sumLogTime;
+                        self.hoursRequired = res.data.hourRequired[0].hoursRequired;
+                        self.events = [...logTimeList.map((logTime, idx) => ({
+                            name: `${logTime.task_id}`,
+                            timed: true,
+                            // log form data
+                            date: logTime.date,
+                            start: Date.parse(logTime.start_time_at),
+                            end: Date.parse(logTime.end_time_at),
+                            duration: logTime.duration,
+                            category: logTime.category_task,
+                            category_key: logTime.key,
+                            task: logTime.task_id,
+                            desc: logTime.description,
+                            type: logTime.type,
+                            id: logTime.id
+                        }))];
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                    this.$store.commit("timesheet/setShowErrorDialog", { msg: '', show: true });
+                })
         },
         copyLogTime(event){
               timesheetApi.createLogTime({
@@ -658,6 +689,10 @@ export default {
         },
     },
     watch: {
+         userId(){
+            this.getLogByUserId(this.userId)
+
+        },
         // events(val) {
         //     if (val) {
         //         this.monthEvents = _.groupBy(val, 'date');
