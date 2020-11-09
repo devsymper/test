@@ -2,7 +2,7 @@
 	<div class="h-100 w-100">
 		<ListItems
 			ref="listWork"
-			:pageTitle="'Danh sách công việc'"
+			:pageTitle="'Danh sách các dịch vụ hệ thống'"
 			:getDataUrl="apiUrl"
 			:showButtonAdd="false"
 			:showExportButton="false"
@@ -12,6 +12,7 @@
 			:useDefaultContext="false"
 			:headerPrefixKeypath="'admin.table'"
 			:useActionPanel="true"
+			:useWorkFlowHeader="true"
 			:actionPanelWidth="700"
 			:containerHeight="containerHeight"
 			:showImportHistoryBtn="false"
@@ -40,9 +41,10 @@ export default {
 		let self = this
 		return { 
 			containerHeight:null,
-			apiUrl:'https://workflow-modeler.symper.vn/',
+			apiUrl:'https://workflow.symper.vn/symper-rest/service/management/timer-jobs',
 			customAPIResult: {
                 reformatData(res){
+					debugger
                    return{
 						 listObject: res.data.listObject,
 						 total: res.data.listObject.length,
