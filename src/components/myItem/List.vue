@@ -48,12 +48,30 @@
                                     cols="2"
                                     v-if="!sideBySideMode"
                                     class="fs-13 font-weight-medium"
-                                >{{$t("tasks.header.assignee")}}</v-col>
+                                >{{$t("tasks.header.assignee")}}
+                                    <v-icon 
+                                        @click="showFilterColumn($event,'assignee')" 
+                                        class="fs-15 float-right" 
+                                        style="padding-top:3px"
+                                        :class="{
+                                            'd-active-color': filteredColumns['assignee'] && filteredColumns['assignee']==true ,
+                                        }"
+                                    >mdi-filter-variant</v-icon>
+                                    </v-col>
                                 <v-col
                                     cols="2"
                                     v-if="!sideBySideMode"
                                     class="fs-13 font-weight-medium"
-                                >{{$t("tasks.header.owner")}}</v-col>
+                                >{{$t("tasks.header.owner")}}
+                                    <v-icon 
+                                        @click="showFilterColumn($event,'owner')" 
+                                        class="fs-15 float-right" 
+                                        style="padding-top:3px"
+                                        :class="{
+                                            'd-active-color': filteredColumns['owner'] && filteredColumns['owner']==true ,
+                                        }"
+                                    >mdi-filter-variant</v-icon>
+                                </v-col>
                                 <v-col
                                     cols="1"
                                     v-if="!sideBySideMode"
