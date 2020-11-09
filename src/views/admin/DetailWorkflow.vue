@@ -1,9 +1,8 @@
 <template>
 	<div class="detail-workflow w-100  h-100 d-flex flex-column">
 		<div class="d-flex" style="height:50%">
-			<div class="modeler-workflow mr-2">
+			<div class="modeler-workflow mr-2 w-100 h-100">
 				<ModelerDetail 
-					:instanceId="'136'"
 					:definitionName="processDefination.name"
 				/>
 			</div>

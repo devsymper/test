@@ -69,6 +69,7 @@ export default {
 						adminApi.getLatestWD(obj.processKey).then(res=>{
 							if(res.data[0]){
 								self.$store.commit('admin/setProcessDefination', res.data[0]);
+								self.$store.commit('admin/setProcessId', obj.id);
 								self.showPanel = true;
 							}
 						}).catch(err=>{

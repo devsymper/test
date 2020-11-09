@@ -399,7 +399,8 @@ export default {
                     return self.getDefinitionXML(resourceDataUrl);
                 })
                 .then(res => {
-                    self.diagramXML = res;
+					self.diagramXML = res;
+					debugger
                     self.getInstanceRuntimeData();
                     self.setColorForNodes().then(() => {
                         self.setTasksStatus();

@@ -3,7 +3,8 @@ const defaultState = {
 	processKey:"",
 	currentAggregateWorkflow: [],
 	sumProcess:0,
-	timerJobDetail: {}
+	timerJobDetail: {},
+	processId: null,
 };
 
 export default defaultState;

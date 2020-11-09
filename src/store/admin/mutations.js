@@ -20,10 +20,14 @@ const setCurrentAggregateWorkflow = (state, data) =>{
 		Vue.set(state, 'currentAggregateWorkflow', [])
 	}
 }
+const setProcessId = (state, data) =>{
+	state.processId = data
+} 
 
 export {
 	setProcessDefination,
 	setProcessKey,
 	setCurrentAggregateWorkflow,
-	setTimerJobDetail
+	setTimerJobDetail,
+	setProcessId
 };
