@@ -75,6 +75,17 @@ export default {
             let ctrlName = this.focusingControlName;
             let ctrlObj = getControlInstanceFromStore(this.instance, ctrlName);
             let trackChange = this.$store.state.document.detail[this.instance].trackChange;
+            let inTable = ctrlObj.inTable;
+            let tableControl = (inTable != false) ? getControlInstanceFromStore(this.instance, inTable) : false;
+            let hotTable = null, cellMeta, rowId;
+            if(tableControl != false){
+                hotTable = tableControl.tableInstance.tableInstance;
+                cellMeta = hotTable.getSelected();
+                if(cellMeta && cellMeta.length > 0){
+                    let curRowData = hotTable.getDataAtRow(cellMeta[0][0]);
+                    rowId = curRowData[curRowData.length - 2];
+                }
+            }
             let data = [];
             for(let item of trackChange){
                 let info = {
@@ -82,11 +93,26 @@ export default {
                     userupdate: item.userUpdate,
                 };
                 for(let ctrl of item.controls){
-                    if(ctrl.name == ctrlName){
-                        info.beforeValue = ctrl.data.old;
-                        info.afterValue = ctrl.data.new;
-                        data.push(info);
+                    if(inTable != false){
+                        if(ctrl.name == inTable){
+                            let dataRow = ctrl.data[rowId];
+                            for(let child of dataRow){
+                                if(child.name == ctrlName){
+                                    info.beforeValue = child.data.old;
+                                    info.afterValue = child.data.new;
+                                    data.push(info);
+                                }
+                            }
+                        }
                     }
+                    else{
+                        if(ctrl.name == ctrlName){
+                            info.beforeValue = ctrl.data.old;
+                            info.afterValue = ctrl.data.new;
+                            data.push(info);
+                        }
+                    }
+                    
                 }
             }
             this.dataTable = data;

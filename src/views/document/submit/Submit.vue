@@ -1324,7 +1324,7 @@ export default {
                     if(prepareData != null && prepareData != ""){
                         isSetEffectedControl = true;
                     }
-                    if(valueInput != undefined && valueInput != null && Object.keys(valueInput).length == 0){
+                    if(valueInput == undefined || valueInput == null){
                         valueInput = ""
                     }
                     if(allControlNotSetData.includes(controlType)){
@@ -1613,9 +1613,12 @@ export default {
         checkInfinityControl(mapControlEffected){
             this.controlInfinity = [];
             for(let formulaType in mapControlEffected){
-                for(let controlName in mapControlEffected[formulaType]){
-                    this.search(controlName, mapControlEffected[formulaType][controlName], mapControlEffected[formulaType]);
+                if(['list','formulas'].includes(formulaType)){
+                    for(let controlName in mapControlEffected[formulaType]){
+                        this.search(controlName, mapControlEffected[formulaType][controlName], mapControlEffected[formulaType]);
+                    }
                 }
+                
             }
         },
       

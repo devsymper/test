@@ -36,7 +36,7 @@
         <div  class="sym-document__side-bar-right">
             <sidebar-right ref="sidebarRight" :isConfigPrint="isConfigPrint" :styles="contentStyle" :instance="keyInstance"/>
         </div>
-        <s-table-setting v-if="!isConfigPrint" ref="tableSetting" @add-columns-table="addColumnTable"/>
+        <s-table-setting v-if="!isConfigPrint" ref="tableSetting" :instance="keyInstance" @add-columns-table="addColumnTable"/>
         <PrintTableConfig v-if="isConfigPrint" ref="printTableConfig" @config-column-table-print="configColumnTablePrint"/>
         <auto-complete-control v-if="!isConfigPrint" ref="autocompleteControl" @add-control="insertControl"/>
         <save-doc-panel 
@@ -342,7 +342,7 @@ export default {
             this.currentInteractTime = Date.now();
             this.intervalCheckExpired = setInterval((self) => {
                 let curTime = Date.now();
-                if(curTime - self.currentInteractTime > 300000){
+                if(curTime - self.currentInteractTime > 2000000){
                     self.dialog = true;
                     let docTitle = self.sDocumentProp.title.value;
                     self.titleDialog = "Document "+docTitle+" sẽ bị đóng do thời gian tương tác quá hạn!. Vui lòng quay lại sau";

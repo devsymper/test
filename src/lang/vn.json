@@ -94,6 +94,7 @@
         "of": "của",
         "entries": "bản ghi",
         "always_show_sidebar": "Luôn hiển thị sidebar",
+        "not_always_show_sidebar": "Ẩn sidebar",
         "import_excel": "Nhập bằng excel",
         "isDefault": "SĐTC mặc định",
         "restore": "Khôi phục",
@@ -140,7 +141,9 @@
             "listTrashApps": "Danh sách ứng dụng đã xóa",
             "listOrgchart": "Danh sách SĐTC",
             "listTrashOrgchart": "Danh sách SĐTC đã xóa",
-            "viewOrgchart": "Xem SĐTC mặc định"
+			"viewOrgchart": "Xem SĐTC mặc định",
+			"list_workflow":"Danh sách quy trình",
+			"list_work":"Danh sách công việc"
         },
         "system": "Hệ thống",
         "copy": "Sao chép"
@@ -1052,7 +1055,8 @@
                 "update": "Sửa",
                 "list_instance": "Ds bản ghi",
                 "start_instance": "Bắt đầu",
-                "unfavorite": "Bỏ yêu thích"
+                "unfavorite": "Bỏ yêu thích",
+                "view": "Chi tiết"
             },
             "dashboard": {
                 "create": "Tạo mới",
@@ -1115,6 +1119,7 @@
                 "unfavorite": "mdi-star-off"
             },
             "workflow_definition": {
+                "view": "mdi-clipboard-list-outline",
                 "list": "mdi-clipboard-list-outline",
                 "create": "mdi-folder-plus-outline",
                 "deploy": "mdi-rocket",
