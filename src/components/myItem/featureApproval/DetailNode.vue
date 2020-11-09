@@ -55,8 +55,8 @@
                                 <div
                                     class="fs-11  text-ellipsis"
                                 >
-                                    <v-icon v-if="obj.dueDate && checkTimeDueDate(obj)" style="font-size:10px; color:red;padding-left:2px">mdi-circle</v-icon>
-                                    <v-icon v-else style="font-size:10px; color:green;padding-left:2px">mdi-circle</v-icon>
+                                    <v-icon v-if="obj.dueDate && checkTimeDueDate(obj)" style="font-size:10px; color:#EE6B60;padding-left:2px">mdi-circle</v-icon>
+                                    <v-icon v-else style="font-size:10px; color:#0760D9;padding-left:2px">mdi-circle</v-icon>
                                 {{obj.taskData.extraLabel}} {{obj.taskData.extraValue}}</div>
 
                                 <div class="fs-11 py-0  text-ellipsis">

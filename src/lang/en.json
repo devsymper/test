@@ -1137,7 +1137,9 @@
             "titlePermissionDenied": "Permission denied!",
             "contentPermissionDenied": "You are not authorized to do this!"
         },
-        "unfinished": "Unfinished"
+        "unfinished": "Unfinished",
+        "totalTask": "Total task",
+        "totalWork": "Total work"
 
     },
     "tasks": {

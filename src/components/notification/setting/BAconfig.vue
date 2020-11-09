@@ -341,7 +341,6 @@ export default {
           content:this.replaceDescription()
 
         }
-      debugger
       const self = this;
       notification.updateChanel(this.updateData.id, this.updateData).then(res=>{
         if(res.status==200){
