@@ -258,14 +258,16 @@
                                         >
                                             <div class="pt-3">
                                                 <v-chip
-                                                    v-if="!obj.endTime"
-                                                    color="#0760D9"
+                                                    v-if="obj.endTime"
+                                                    color="#408137"
                                                     class="px-2"
                                                     text-color="white"
                                                     style="border-radius:4px"
                                                     x-small
-                                                >{{$t('myItem.unfinished')}}</v-chip>
-                                                <v-chip class="px-2" style="border-radius:4px" v-else color="#408137" text-color="white" x-small>{{$t('common.done')}}</v-chip>
+                                                >{{$t('common.done')}}</v-chip>
+                                                <v-chip class="px-2" style="border-radius:4px" v-else-if="obj.createTime && checkTimeDueDate(obj)" color="#EE6B60" text-color="white" x-small>{{$t('myItem.unfinished')}}</v-chip>
+                                                <v-chip class="px-2" style="border-radius:4px" v-else-if="obj.createTime && !checkTimeDueDate(obj)" color="#0760D9" text-color="white" x-small>{{$t('myItem.unfinished')}}</v-chip>
+                                           
                                             </div>
                                         </v-col>
                                         <v-col
