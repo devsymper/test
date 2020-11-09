@@ -244,17 +244,17 @@ export default {
                 reformatData(res){
                     let thisCpn = util.getClosestVueInstanceFromDom(document.querySelector('.list-object-component'));
                     let listObject = res.data.listObject;
-                    if(Object.keys(thisCpn.recordSelected).length > 0){
-                        for (let index = 0; index < listObject.length; index++) {
-                            let row = listObject[index];
-                            let rowChecked = Object.values(thisCpn.recordSelected).filter(r=>{
-                                return r.document_object_id == row.document_object_id
-                            })
-                            if(rowChecked.length > 0){
-                                listObject[index]['checkbox_select_item'] = true;
-                            }
-                        }
-                    }
+                    // if(Object.keys(thisCpn.recordSelected).length > 0){
+                    //     for (let index = 0; index < listObject.length; index++) {
+                    //         let row = listObject[index];
+                    //         let rowChecked = Object.values(thisCpn.recordSelected).filter(r=>{
+                    //             return r.document_object_id == row.document_object_id
+                    //         })
+                    //         if(rowChecked.length > 0){
+                    //             listObject[index]['checkbox_select_item'] = true;
+                    //         }
+                    //     }
+                    // }
                     return{
                         columns:res.data.columns,
                         listObject:res.data.listObject,
@@ -436,7 +436,7 @@ export default {
                 return arr;
             },[]);
             let thisCpn = this;
-            this.dialog = false;
+			this.dialog = false;
             documentApi
             .deleteDocumentObject({objectIds:JSON.stringify(ids)})
             .then(res => {

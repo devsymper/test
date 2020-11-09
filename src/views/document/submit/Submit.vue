@@ -1324,7 +1324,7 @@ export default {
                     if(prepareData != null && prepareData != ""){
                         isSetEffectedControl = true;
                     }
-                    if(valueInput != undefined && valueInput != null && Object.keys(valueInput).length == 0){
+                    if(valueInput == undefined || valueInput == null){
                         valueInput = ""
                     }
                     if(allControlNotSetData.includes(controlType)){

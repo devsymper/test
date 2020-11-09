@@ -69,7 +69,7 @@ export const setDataForPropsControl = function(fields, instance, from) {
                 properties: properties,
                 formulas: formulas,
                 type: type,
-                value: value,
+                value: (type == 'percent') ? value * 100 : value,
                 prepareData: prepareData,
                 userUpdate: userUpdate
             }, instance, from);

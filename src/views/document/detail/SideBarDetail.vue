@@ -405,7 +405,7 @@ export default {
 						let curRowIndex = allColumnId.indexOf(rowId);
 						for (let index = 0; index < dataChange.length; index++) {
 							let cellChange = dataChange[index];
-							if(cellChange.data.new !== cellChange.data.old){
+							if(cellChange.data.new != cellChange.data.old){
 								table.tableInstance.validateValueMap[curRowIndex + "_" + mapControlToIndex[cellChange.name]] = {
 									type: 'linkControl',
 								};
@@ -438,9 +438,16 @@ export default {
 				// [{id:'s-control-id-1596780602772',data:[]}]
 				if(	ctrl
 					&& oldObj.hasOwnProperty(name) && !$.isArray(oldObj[name])
-					&& newObj.hasOwnProperty(name) && !$.isArray(newObj[name])
-					&& oldObj[name] !== newObj[name] // nếu khác giá trị
+					&& newObj.hasOwnProperty(name) && !$.isArray(newObj[name]) // nếu khác giá trị
 				){
+					if( ['number','percent'].includes(ctrl.type)){
+						if(Number(oldObj[name]) === Number(newObj[name])){
+							continue
+						}
+					}
+					if(oldObj[name] === newObj[name]){
+						continue
+					}
 					let item = {
 						id: ctrl.id,
 						data: {
