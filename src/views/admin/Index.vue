@@ -76,20 +76,17 @@ export default {
 											self.$store.commit('admin/setCurrentTrackingProcess', res.data);
 										}
 								}).catch(err=>{
-
+								})
+								adminApi.aggregateWorkflow(res.data[0].id).then(res=>{
+									if(res.status == 200){
+										self.$store.commit('admin/setCurrentAggregateWorkflow', res.data);
+									}
+								}).catch(err=>{
 								})
 							}
 							
 						}).catch(err=>{
 						})
-						let processDefinationId = self.$store.state.admin.processDefination.id
-						adminApi.aggregateWorkflow(processDefinationId).then(res=>{
-							if(res.status == 200){
-								self.$store.commit('admin/setCurrentAggregateWorkflow', res.data);
-							}
-						}).catch(err=>{
-						})
-						
                     },
                 },
                stopProcess: {

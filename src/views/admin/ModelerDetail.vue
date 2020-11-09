@@ -1218,14 +1218,11 @@ export default {
             for(let elName in self.stateAllElements){
 				let el = self.stateAllElements[elName];
 				if(el.type == "UserTask" || el.type == "ScriptTask" ){
-					let count 
 					if(processTracking){
 						processTracking.forEach(function(e){
 							if(e.act_id_ == el.id){
-								count = e
-								console.log(e.act_name_,'act_name_act_name_');
-								// ve o day
-							}
+								//
+							}	
 						})
 					}
 					

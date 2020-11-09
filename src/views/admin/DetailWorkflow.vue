@@ -137,11 +137,13 @@ import { reformatGetListInstances } from "@/components/process/reformatGetListDa
 import ModelerDetail from "./ModelerDetail"
 import ConfirmDelete from "./ConfirmDelete"
 import Handsontable from 'handsontable';
+import ListProcessInstance from "./ListProcessInstance"
 export default {
 	components:{
 		ListItems,
 		ModelerDetail,
-		ConfirmDelete
+		ConfirmDelete,
+		ListProcessInstance
 	},
 	data(){
 		let self = this
