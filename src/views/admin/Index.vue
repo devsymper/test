@@ -45,7 +45,8 @@ export default {
 			apiUrl:'https://workflow-modeler.symper.vn/',
 			customAPIResult: {
                 reformatData(res){
-                   return{
+					
+                    return{
 						 listObject: res.data.listObject,
 						 total: res.data.listObject.length,
                          columns: [

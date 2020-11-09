@@ -29,6 +29,8 @@
 import ListItems from "@/components/common/ListItems.vue"
 import { util } from "@/plugins/util.js";
 import JobDetail from "./JobDetail"
+import {adminApi} from '@/api/Admin.js'
+import Handsontable from 'handsontable';
 export default {
 	components:{
 		ListItems,
@@ -44,16 +46,42 @@ export default {
 			apiUrl:'https://workflow.symper.vn/symper-rest/service/management/timer-jobs',
 			customAPIResult: {
                 reformatData(res){
-					debugger
+					res.data.forEach(function(e){
+						adminApi.getProcessDefinationDetail(e.processDefinitionId).then(resI=>{
+							e.suspended = resI.suspended
+							e.nameProcess = resI.name
+							e.type = "Event timer"
+							self.$refs.listWork.rerenderTable()
+						}).catch(err=>{
+						})
+					})
                    return{
-						 listObject: res.data.listObject,
-						 total: res.data.listObject.length,
+						 listObject: res.data,
+						 total: res.data.length,
                          columns: [
                             {name: "id", title: "id", type: "numeric"},
-							{name: "processKey", title: "key", type: "text"},
-							{name: "name", title: "name", type: "text"},
-							{name: "description", title: "description", type: "text"},
-							{name: "lastUpdateTime", title: "last_update_at", type: "date"},
+							{name: "nameProcess", title: "nameProcess", type: "text"},
+							{name: "type", title: "type", type: "text"},
+							{name: "suspended", title: "suspended", type: "text",
+								renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+									Handsontable.dom.empty(td);
+									let span;
+									span = document.createElement('span');	
+									if(value === null || value == ""){
+										$(span).text("Đang chạy")
+										$(span).css('color', 'green')
+										td.appendChild(span);
+										return td;
+									}
+									if(value == true){
+										$(span).text("Tạm dừng ")
+										$(span).css('color', 'orange')
+										td.appendChild(span);
+										return td;
+									}
+								},
+							},
+							{name: "dueDate", title: "dueDate", type: "date"},
                          ],
                    }
                 }
@@ -64,6 +92,11 @@ export default {
                     text: "Xem chi tiết",
                     callback: (obj, callback) => {
 						self.$refs.listWork.actionPanel = true;
+						adminApi.getTimerJobDetail(obj.id).then(res=>{
+							self.$store.commit('admin/setTimerJobDetail', res)
+						}).catch(err=>{
+
+						})
                     },
                 },
                 runWork: {

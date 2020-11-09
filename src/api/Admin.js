@@ -42,5 +42,11 @@ export const adminApi = {
 	},
 	deleteDocumentObject(objectIds) {
         return documentApi.delete("documents/objects", objectIds);
-    },
+	},
+	getProcessDefinationDetail(id){
+		return bpmneApi.get(appConfigs.apiDomain.bpmne.definitions+'/'+id, {},testHeader )
+	},
+	getTimerJobDetail(id){
+		return bpmneApi.get(appConfigs.apiDomain.bpmne.timerJob+'/'+id, {},testHeader )
+	},
 }

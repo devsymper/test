@@ -23,7 +23,8 @@ export const appConfigs = {
             history: "https://workflow.symper.vn/symper-rest/service/history",
             tasks: "https://workflow.symper.vn/symper-rest/service/runtime/tasks",
             tasksHistory: "https://workflow.symper.vn/symper-rest/service/history/historic-task-instances",
-            validateModel: "https://workflow.symper.vn/symper-modeler/api/editor/validate-model"
+			validateModel: "https://workflow.symper.vn/symper-modeler/api/editor/validate-model",
+			timerJob: "https://workflow.symper.vn/symper-rest/service/management/timer-jobs"
         },
         documents: 'https://v2hoangnd.dev.symper.vn/document',
         nofitication: 'https://notifi.symper.vn/',
