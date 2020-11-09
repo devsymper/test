@@ -168,6 +168,115 @@ export default {
 	methods:{
 		dmbChart(cx,cy,radius,arcwidth,values,colors,selectedValue){
 			var canvas = document.getElementById('canvas');
+			var ctx = canvas.getContext("2d");
+			ctx.clearRect(0, 0, canvas.width, canvas.height);
+			var tot = 0;
+			var accum = 0;
+			var PI = Math.PI;
+			var PI2 = PI*2;
+			var offset = -PI/2;
+			ctx.lineWidth = arcwidth;
+			for(var i = 0; i < values.length; i++){
+				tot += values[i]
+			}
+			for(var i = 0; i < values.length; i++){
+				ctx.beginPath();
+				ctx.arc(cx,cy,radius,
+					offset+PI2*(accum/tot),
+					offset+PI2*((accum+values[i])/tot)
+				);
+				ctx.strokeStyle=colors[i];
+				ctx.stroke();
+				accum+=values[i];
+			}
+			var innerRadius=radius-arcwidth;
+			ctx.beginPath();
+			ctx.fillStyle=colors[selectedValue];
+			ctx.textAlign='center';
+			ctx.font="30px  roboto";
+			ctx.fillText(this.sAdmin.sumProcess,cx,cy+innerRadius*.9);
+		},
+		afterSelectedRow(items){
+			this.$set(this, 'listItemSelected', items)
+			if(Object.keys(this.listItemSelected).length == 0){
+					this.disableBtn = true
+				}else{
+					this.disableBtn = false
+				}
+		},
+		switchFullScreen(){
+			let processKey = this.$store.state.admin.processKey
+			this.$goToPage('/workflow/process-key/'+processKey+'/instances', this.$t('process.instance.listModelInstance')+processKey)
+		},
+		stopProcessInstance(){
+			let self = this
+			for(let i in this.listItemSelected){
+				adminApi.stopProcessInstances(this.listItemSelected[i].id).then(res=>{
+					if(res.suspended == true){
+						self.$snotify(
+							{
+								type: "success",
+								title:" Thành công"
+							}
+						)
+					}
+				self.$refs.listWorkFlow.refreshList()
+
+				}).catch(err=>{
+					self.$snotify(
+							{
+								type: "error",
+								title:"Tác vụ này đã được dừng"
+							}
+						)
+				})
+			}
+		},
+		activeProcessInstance(){
+			let self = this
+			for(let i in this.listItemSelected){
+				adminApi.activeProcessInstances(this.listItemSelected[i].id).then(res=>{
+					self.$snotify(
+						{
+							type: "success",
+							title:" Thành công"
+						}
+					)
+					self.$refs.listWorkFlow.refreshList()
+				}).catch(err=>{
+					self.$snotify(
+							{
+								type: "error",
+								title:"Tác vụ này đang chạy"
+							}
+						)
+				})
+			}
+			
+		},
+		confirmDelete(){
+			this.showDialog = true
+		},
+		deleteProcessInstance(){
+			this.showDialog = false
+			let self = this
+			for(let i in this.listItemSelected){
+				adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
+					self.$snotify(
+						{
+							type: "success",
+							title:" Thành công"
+						}
+					)
+					self.$refs.listWorkFlow.refreshList()
+				}).catch(err=>{
+					self.$snotify(
+							{
+								type: "error",
+								title:"Đã có lỗi xảy ra"
+							}
+						)
+				})
 			if(canvas){
 				var ctx = canvas.getContext("2d");
 				ctx.clearRect(0, 0, canvas.width, canvas.height);

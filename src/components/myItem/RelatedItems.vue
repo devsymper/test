@@ -20,9 +20,9 @@
                             <span style=" font-size:13px">{{displayContent(item.description)}}</span>
                         </div>
                         <div  @dblclick="goDoTask(item.id)">
-                            <v-icon v-if="item.createTime && checkTimeDueDate(item)" style="font-size:11px; color:red;margin-left: 3px;">mdi-circle</v-icon>
-                            <v-icon v-else-if="item.createTime && !checkTimeDueDate(item)" style="font-size:11px; color:blue;margin-left: 3px;">mdi-circle</v-icon>
-                            <v-icon v-else style="font-size:11px ; color:green;margin-left: 3px;">mdi-circle</v-icon>
+                            <v-icon v-if="item.createTime && checkTimeDueDate(item)" style="font-size:11px; color:#EE6B60;margin-left: 3px;">mdi-circle</v-icon>
+                            <v-icon v-else-if="item.createTime && !checkTimeDueDate(item)" style="font-size:11px; color:#0760D9;margin-left: 3px;">mdi-circle</v-icon>
+                            <v-icon v-else style="font-size:11px ; color:#408137;margin-left: 3px;">mdi-circle</v-icon>
                             {{displayDescription(item.description)}}
                         </div>
                     </v-col>
