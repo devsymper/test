@@ -128,7 +128,6 @@ export default {
 			deep:true, 
 			immediate:true,
 			handler(obj){
-						debugger
 				let self = this
 				if(obj.processDefinitionId){
 					adminApi.getProcessDefinationDetail(obj.processDefinitionId).then(res=>{

@@ -400,7 +400,6 @@ export default {
                 })
                 .then(res => {
 					self.diagramXML = res;
-					debugger
                     self.getInstanceRuntimeData();
                     self.setColorForNodes().then(() => {
                         self.setTasksStatus();

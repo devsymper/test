@@ -61,7 +61,24 @@ import Api from "@/api/api.js";
 import { appConfigs } from '@/configs';
 import serviceTaskDefinitions from "@/components/process/elementDefinitions/serviceTaskDefinitions";
 
+
 const apiCaller = new Api('');
+
+const nodeStatusColors = {
+    failed: {
+        fill: "#e24747",
+        stroke: "#fff7f7"
+    },
+    todo: {
+        fill: "#ffffff",
+        stroke: "#0760D9"
+    },
+    done: {
+        fill: "#edffee",
+        stroke: "#4CAF50"
+    },
+  
+};
 
 // Khung data của từng node cần lưu vào db
 const nodeDataTpl = {
@@ -116,7 +133,8 @@ export default {
 		},
 		handleFocus(){
             this.$refs.symperBpmn.focus();
-        },
+		},
+		
         /**
          * Tìm và đặt các control cho việc lựa chọn cho phép edit trong lúc duyệt
          */
@@ -250,9 +268,8 @@ export default {
          * check validateStatus 
          */
         checkValStatus(){
-            let self=this;
-            console.log("aaa",this.stateAllElements);
-            let isCheck=true;
+            let self = this;
+            let isCheck = true;
             let arrError;
             return new Promise((resolve,reject)=>{
                 let allElements=this.stateAllElements;
@@ -385,7 +402,6 @@ export default {
             }
             let xml = this.$refs.symperBpmn.getXML();
             xml = this.standardXMLToSave(xml);
-            console.log(xml,'xmlxmlxmlxmlxmlxmlxml');
             let jsonConfig = {};
             for(let elName in allSymEls){
                 jsonConfig[elName] = {};
@@ -1002,7 +1018,6 @@ export default {
         handleNodeSelected(node) {
             let type = this.getNodeType(node);
             let wp = node.di.waypoint;
-            console.log(type, node);
 
             let nodeData = this.getNodeData(node.id, type);
             nodeData.name = node.name;
@@ -1181,7 +1196,6 @@ export default {
                 let modelData = await bpmnApi.getModelData(idProcess);
                 modelData = modelData.data;
                 let xml = this.cleanXMLBeforeRender(modelData.content);
-                console.log(xml);
                 let afterRender = await this.$refs.symperBpmn.renderFromXML(xml);
                 if(modelData.configValue){
                     this.restoreAttrValueFromJsonConfig(modelData.configValue);
@@ -1194,12 +1208,28 @@ export default {
             }
         },
         restoreAttrValueFromJsonConfig(jsonStr){
-            let configValue = JSON.parse(jsonStr);
+			let processTracking = this.$store.state.admin.currentTrackingProcess
+			let self = this
+			let symBpmn = this.$refs.symperBpmn;
+			let configValue = JSON.parse(jsonStr);
             this.fillNodeData();
             let gatewayEls = [];
-            let formKeyToNodeIdMap = {};
-            for(let elName in this.stateAllElements){
-                let el = this.stateAllElements[elName];
+			let formKeyToNodeIdMap = {};
+            for(let elName in self.stateAllElements){
+				let el = self.stateAllElements[elName];
+				if(el.type == "UserTask" || el.type == "ScriptTask" ){
+					let count 
+					if(processTracking){
+						processTracking.forEach(function(e){
+							if(e.act_id_ == el.id){
+								count = e
+								console.log(e.act_name_,'act_name_act_name_');
+								// ve o day
+							}
+						})
+					}
+					
+				}
                 if(configValue[elName]){
                     for(let attrName in el.attrs){
                         if(configValue[elName].hasOwnProperty(attrName)){
@@ -1497,5 +1527,8 @@ export default {
 }
 .modeler-detail-admin >>> .djs-container {
 	width:600px !important
+}
+.modeler-detail-admin >>> .djs-hit  {
+	pointer-events: none;
 }
 </style>

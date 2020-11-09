@@ -3,7 +3,6 @@
 		<div class="d-flex" style="height:50%">
 			<div class="modeler-workflow mr-2 w-100 h-100">
 				<ModelerDetail 
-					:definitionName="processDefination.name"
 				/>
 			</div>
 			<div class="summary-workflow d-flex flex-column">
@@ -12,7 +11,7 @@
 						ID
 					</span>
 					<span class="value-summary">
-						{{processDefination.id}}
+						{{processDefination.id  ? processDefination.id : "" }}
 					</span>
 				</div>
 				<div class="d-flex pt-2">
@@ -50,7 +49,7 @@
 							color="primary"
 							v-if="processDefination.suspended == false"
 							label
-							text-color="white"
+							text-color="white"	
 							>
 							Hoạt động
 						</v-chip>

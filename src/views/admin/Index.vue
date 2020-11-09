@@ -71,7 +71,15 @@ export default {
 								self.$store.commit('admin/setProcessDefination', res.data[0]);
 								self.$store.commit('admin/setProcessId', obj.id);
 								self.showPanel = true;
+								adminApi.trackingProcess(res.data[0].id).then(res=>{
+									if(res.status == 200){
+											self.$store.commit('admin/setCurrentTrackingProcess', res.data);
+										}
+								}).catch(err=>{
+
+								})
 							}
+							
 						}).catch(err=>{
 						})
 						let processDefinationId = self.$store.state.admin.processDefination.id
@@ -80,8 +88,8 @@ export default {
 								self.$store.commit('admin/setCurrentAggregateWorkflow', res.data);
 							}
 						}).catch(err=>{
-
 						})
+						
                     },
                 },
                stopProcess: {

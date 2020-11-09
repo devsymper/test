@@ -5,6 +5,7 @@ const defaultState = {
 	sumProcess:0,
 	timerJobDetail: {},
 	processId: null,
+	currentTrackingProcess: []
 };
 
 export default defaultState;

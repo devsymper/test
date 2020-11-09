@@ -23,11 +23,15 @@ const setCurrentAggregateWorkflow = (state, data) =>{
 const setProcessId = (state, data) =>{
 	state.processId = data
 } 
+const setCurrentTrackingProcess = (state , data) =>{
+	state.currentTrackingProcess = data
+}
 
 export {
 	setProcessDefination,
 	setProcessKey,
 	setCurrentAggregateWorkflow,
 	setTimerJobDetail,
-	setProcessId
+	setProcessId,
+	setCurrentTrackingProcess
 };
