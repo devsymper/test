@@ -1,17 +1,19 @@
 <template>
 <div class="calendar-viewmode">
-    <v-btn v-if="type === 'week'||type ==='day'||type === 'weekday'" icon @click="timeView()">
-            <v-tooltip top>
-                        <!-- màn hình month - header ngày, giờ -->
-                <template v-slot:activator="{ on }">
-                        <v-icon v-on="on">mdi-clock-outline</v-icon>
-                </template>
-                <span>
-                    Time view
-                </span>
-            </v-tooltip>
+    
+    <v-btn style="float:left" v-if="type === 'week'||type ==='day'||type === 'weekday'" icon @click="timeView()">
+        <v-tooltip top>
+                    <!-- màn hình month - header ngày, giờ -->
+            <template v-slot:activator="{ on }">
+                    <v-icon v-on="on">mdi-clock-outline</v-icon>
+            </template>
+            <span>
+                Time view
+            </span>
+        </v-tooltip>
     </v-btn>
-    <v-btn class="mr-2" v-if="type === 'week'||type ==='day'||type === 'weekday'" icon @click="listView()">
+      
+    <v-btn style="float:left" class="mr-2" v-if="type === 'week'||type ==='day'||type === 'weekday'" icon @click="listView()">
          <v-tooltip top>
           <template v-slot:activator="{ on }">
                     <v-icon v-on="on">mdi-apps</v-icon>
@@ -21,10 +23,18 @@
                 </span>
             </v-tooltip>
     </v-btn>
+   
     <span style="padding-right: 10px" v-if="type === 'month'"> </span>
-    <v-select style="margin-top:0px" 
-    @change="changeView" :value="type" class="viewmode" :menu-props="{'nudge-top':-40}" :items="types" 
-    item-color="white" label="View" background-color="#F7F7F7">
+   
+    <v-select style="margin-top:0px;float:left" 
+        @change="changeView" 
+        :value="type" 
+        class="viewmode" 
+        :menu-props="{'nudge-top':-40}" 
+        :items="types" 
+        item-color="white" 
+        label="View" 
+        background-color="#F7F7F7">
         <template v-slot:item="data">
             <span class="viewmode-item">{{ format(data.item) }}
                 <v-icon v-if="data.item === type" color="success">
@@ -35,6 +45,9 @@
           <span style= "color:black!important; padding-left:4px"> {{format(type)}}</span>
         </template>
     </v-select>
+     <v-btn class="mt-1 ml-1" style="float:right" small text @click="$router.push('/category')">
+        <v-icon class="mdi-18px">mdi mdi-cog-outline</v-icon>
+    </v-btn>
 </div>
 </template>
 

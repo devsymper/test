@@ -50,11 +50,12 @@
         </v-app-bar>
         <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification bg-white" :z-index="99999">
             <v-row v-if="checkToday" class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-2px">
-                <span style="color:orange; font-weight:430">{{$t('notification.today')}}</span>
+                 <span class="fw-430 " style="color:orange">{{$t('notification.today')}}</span>
             </v-row>
             <v-row v-if="checkToday" 
                 v-for="item in listNotification.filter(x=>changeDate(x.createTime)==today)" 
                 :key="item.id"
+                style="height:55px"
                 class="text-left notification-item pt-0 pb-0"
             >
                 <v-col cols="2">
@@ -89,7 +90,7 @@
                         </v-col>
                     </v-row>
                 </v-col>
-                   <!-- <v-divider style="width:95%" class="ml-2" ></v-divider> -->
+                   <v-divider style="width:95%; margin-top:-10px" class="ml-2" ></v-divider>
                 <v-menu
                     :close-on-content-click="true"
                     :open-on-hover="true"
@@ -120,10 +121,12 @@
                 </v-menu>
             </v-row>
             <!-- older -->
-            <v-row class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-3px"><span style="color:orange; font-weight:430">{{$t('notification.older')}}</span></v-row>
+            <v-row class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-3px"><span style="color:orange; font-weight:430">
+                {{$t('notification.older')}}</span></v-row>
             <v-row
                 v-for="item in listNotification.filter(x=>changeDate(x.createTime)!=today)" 
                 :key="item.id"
+                style="height:55px"
                 class="text-left notification-item  pt-0 pb-0"
             >
                 <v-col cols="2">
@@ -166,7 +169,7 @@
                         </v-col>
                     </v-row>
                 </v-col>
-                   <v-divider style="width:95%" class="ml-2" ></v-divider>
+                   <v-divider style="width:95%; margin-top:-10px" class="ml-2" ></v-divider>
                 <v-menu
                     :close-on-content-click="true"
                     :open-on-hover="true"
@@ -379,7 +382,13 @@ export default {
         },
         getScope(action){
             if(action){
-                return JSON.parse(action).module
+                if(JSON.parse(action).module=="document"&&JSON.parse(action).scope=="workflow"){
+                     return "taskBPM"
+                }else{
+                    return JSON.parse(action).module
+                }
+            
+               
             }
             
         },
