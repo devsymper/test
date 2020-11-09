@@ -1,8 +1,11 @@
 <template>
 	<div class="detail-workflow w-100  h-100 d-flex flex-column">
 		<div class="d-flex" style="height:50%">
-			<div class="modeler-workflow">
-				<ModelerDetail />
+			<div class="modeler-workflow mr-2">
+				<ModelerDetail 
+					:instanceId="'136'"
+					:definitionName="processDefination.name"
+				/>
 			</div>
 			<div class="summary-workflow d-flex flex-column">
 				<div class="d-flex pt-2">
@@ -116,7 +119,7 @@
 				
 			</div>
 		</div>
-		<div class="list-workflow-instance d-flex flex-column h-100">
+		<div class="list-workflow-instance d-flex flex-column h-100 mt-8" >
 			<ListProcessInstance :showSwitchBtn="true" />
 		</div>
 	</div>
