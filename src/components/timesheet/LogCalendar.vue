@@ -9,7 +9,7 @@
             :weekdays="weekday" 
             :event-color="getEventColor"
             :type="internalCalendarType" 
-            v-model="focus" 
+            v-model="value" 
             :events="events" 
             :color="color" 
             @mousedown:event="startDrag" 
@@ -18,6 +18,13 @@
             @mousedown:time="startTime" 
             @mouseleave.native="cancelDrag" 
             :start="calendarShowDate">
+            <template v-slot:day-body="{ date, week }">
+              <div
+                class="v-current-time"
+                :class="{ first: date === week[0].date }"
+                :style="{ top: nowY }"
+              ></div>
+            </template>
             <template v-slot:day-label="{day,present,past, month, date}">
                 <div v-bind:class="[monthEvents[date]? 'dark-sea-green' :'grey-color']" 
                  style="height: 25px; margin-left:3px;">
@@ -222,6 +229,8 @@ export default {
     props: ['timeView','userId'],
     data() {
         return {
+            value: '',
+            ready: false,
             detail: false,
             color: 'orange',
             dragEvent: null,
@@ -250,6 +259,17 @@ export default {
         this.load();
     },
     methods: {
+         getCurrentTime () {
+            return this.cal ? this.cal.times.now.hour * 60 + this.cal.times.now.minute : 0
+        },
+        scrollToTime () {
+            const time = this.getCurrentTime()
+            const first = Math.max(0, time - (time % 30) - 30)
+            this.cal.scrollToTime(first)
+        },
+        updateTime () {
+            setInterval(() => this.cal.updateTimes(), 60 * 1000)
+            },
         start(date){
             this.$emit('showLog',date);   
         },
@@ -649,6 +669,12 @@ export default {
         }
     },
     computed: {
+            cal () {
+                return this.ready ? this.$refs.calendar : null
+            },
+            nowY () {
+                return this.cal ? this.cal.timeToY(this.cal.times.now) + 'px' : '-10px'
+            },
         ...mapState('timesheet', {
             calendarShowDate: 'calendarShowDate',
             calendarType: 'calendarType',
@@ -727,9 +753,12 @@ export default {
         }
     },
     mounted() {
-        this.$refs.calendar.scrollToTime('07:40');
+        // this.$refs.calendar.scrollToTime('07:40');
         this.onChangeCalendar();
-    },
+         this.ready = true
+        this.scrollToTime()
+        this.updateTime()
+        },
 
 };
 </script>
@@ -843,7 +872,27 @@ export default {
 .month-tooltip {
     opacity: 1 !important;
 }
+.v-current-time {
+height: 2px;
+background-color: #ea4335;
+position: absolute;
+left: -1px;
+right: 0;
+pointer-events: none;
+
+&.first::before {
+  content: '';
+  position: absolute;
+  background-color: #ea4335;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-top: -5px;
+  margin-left: -6.5px;
+}
+}
 </style><style>
+
 .create-timesheet-container {
     display: flex;
     align-items: stretch;

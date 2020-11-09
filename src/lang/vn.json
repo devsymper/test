@@ -131,7 +131,7 @@
             "List workflows": "Danh sách quy trình",
             "List documents": "Danh sách văn bản",
             "File": "Quản lý tệp",
-			"admin": "Admin",
+            "admin": "Admin",
             "workflows": "Quy trình",
             "documents": "Văn bản",
             "orgchart": "Sơ đồ tổ chức",
@@ -141,9 +141,9 @@
             "listTrashApps": "Danh sách ứng dụng đã xóa",
             "listOrgchart": "Danh sách SĐTC",
             "listTrashOrgchart": "Danh sách SĐTC đã xóa",
-			"viewOrgchart": "Xem SĐTC mặc định",
-			"list_workflow":"Danh sách quy trình",
-			"list_work":"Danh sách công việc"
+            "viewOrgchart": "Xem SĐTC mặc định",
+            "list_workflow": "Danh sách quy trình",
+            "list_work": "Danh sách công việc"
         },
         "system": "Hệ thống",
         "copy": "Sao chép"
@@ -205,21 +205,21 @@
             "filter_by_value": "Lọc bởi giá trị",
             "filter_by_condition": "Lọc bởi điều kiện"
         }
-	},
-	"admin":{
-		"table":{
-			"id":"ID",
-			"key":"Key",
-			"name":"Tên qui trình",
-			"description":"Ghi chú",
-			"last_update_at":"Thời gian cập nhật",
-			"selected":"Chọn",
-			"startUserId":"Người bắt đầu",
-			"startTime":"Thời gian bắt đầu",
-			"tenantId": "ID",
-			"suspended": "Trạng thái"
-		}
-	},
+    },
+    "admin": {
+        "table": {
+            "id": "ID",
+            "key": "Key",
+            "name": "Tên qui trình",
+            "description": "Ghi chú",
+            "last_update_at": "Thời gian cập nhật",
+            "selected": "Chọn",
+            "startUserId": "Người bắt đầu",
+            "startTime": "Thời gian bắt đầu",
+            "tenantId": "ID",
+            "suspended": "Trạng thái"
+        }
+    },
     "validate": {
         "required": "Không được bỏ trống",
         "min_8": "Yêu cầu mật khẩu lớn hơn 8 kí tự",
@@ -426,6 +426,22 @@
         }
     },
     "timesheet": {
+        "table": {
+            "category": "Danh sách các nhóm công việc",
+            "name": "Tên nhóm ",
+            "key": "Key",
+            "id": "id",
+            "description": "Mô tả",
+            "status": "Trạng thái",
+            "user_created": "Người tạo",
+            "date_created": "Ngày tạo",
+            "user_updated": "Người cập nhật",
+            "date_updated": "Ngày cập nhật",
+            "create": "Thêm",
+            "update": "Cập nhật",
+            "delete": "Xóa",
+            "view": "Chi tiết"
+        },
         "assignee": "Người được giao",
         "fre_submit": "Tần suất submit",
         "fow": "Ngày đầu tháng",
@@ -1270,7 +1286,7 @@
             "alertDescription": "Không có mô tả",
             "relatedTask": "CÁC TASK LIÊN QUAN",
             "attachment": "TỆP ĐÍNH KÈM",
-            "status":"Trạng thái"
+            "status": "Trạng thái"
         },
         "filterOptions": {
             "all": "Toàn bộ task",

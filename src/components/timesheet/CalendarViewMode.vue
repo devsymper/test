@@ -23,9 +23,7 @@
                 </span>
             </v-tooltip>
     </v-btn>
-   
     <span style="padding-right: 10px" v-if="type === 'month'"> </span>
-   
     <v-select style="margin-top:0px;float:left" 
         @change="changeView" 
         :value="type" 
