@@ -48,12 +48,30 @@
                                     cols="2"
                                     v-if="!sideBySideMode"
                                     class="fs-13 font-weight-medium"
-                                >{{$t("tasks.header.assignee")}}</v-col>
+                                >{{$t("tasks.header.assignee")}}
+                                    <v-icon 
+                                        @click="showFilterColumn($event,'assignee')" 
+                                        class="fs-15 float-right" 
+                                        style="padding-top:3px"
+                                        :class="{
+                                            'd-active-color': filteredColumns['assignee'] && filteredColumns['assignee']==true ,
+                                        }"
+                                    >mdi-filter-variant</v-icon>
+                                    </v-col>
                                 <v-col
                                     cols="2"
                                     v-if="!sideBySideMode"
                                     class="fs-13 font-weight-medium"
-                                >{{$t("tasks.header.owner")}}</v-col>
+                                >{{$t("tasks.header.owner")}}
+                                    <v-icon 
+                                        @click="showFilterColumn($event,'owner')" 
+                                        class="fs-15 float-right" 
+                                        style="padding-top:3px"
+                                        :class="{
+                                            'd-active-color': filteredColumns['owner'] && filteredColumns['owner']==true ,
+                                        }"
+                                    >mdi-filter-variant</v-icon>
+                                </v-col>
                                 <v-col
                                     cols="1"
                                     v-if="!sideBySideMode"
@@ -240,14 +258,16 @@
                                         >
                                             <div class="pt-3">
                                                 <v-chip
-                                                    v-if="!obj.endTime"
-                                                    color="#0760D9"
+                                                    v-if="obj.endTime"
+                                                    color="#408137"
                                                     class="px-2"
                                                     text-color="white"
                                                     style="border-radius:4px"
                                                     x-small
-                                                >{{$t('myItem.unfinished')}}</v-chip>
-                                                <v-chip class="px-2" style="border-radius:4px" v-else color="#408137" text-color="white" x-small>{{$t('common.done')}}</v-chip>
+                                                >{{$t('common.done')}}</v-chip>
+                                                <v-chip class="px-2" style="border-radius:4px" v-else-if="obj.createTime && checkTimeDueDate(obj)" color="#EE6B60" text-color="white" x-small>{{$t('myItem.unfinished')}}</v-chip>
+                                                <v-chip class="px-2" style="border-radius:4px" v-else-if="obj.createTime && !checkTimeDueDate(obj)" color="#0760D9" text-color="white" x-small>{{$t('myItem.unfinished')}}</v-chip>
+                                           
                                             </div>
                                         </v-col>
                                         <v-col

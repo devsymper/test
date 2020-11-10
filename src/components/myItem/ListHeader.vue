@@ -60,7 +60,7 @@
         </v-menu>
 
         <!-- Bộ lọc cho  task -->
-        <v-menu
+        <!-- <v-menu
             offset-y
             light
             :close-on-content-click="false"
@@ -82,7 +82,7 @@
             <div>
             <TaskListFilter @filter-change-value="handleChangeFilterValue"></TaskListFilter>
             </div>
-        </v-menu>
+        </v-menu> -->
 
         <v-menu
             offset-y

@@ -1223,7 +1223,7 @@ let allAttrs = {
     },
     "callactivityprocessinstancename": {
         "title": "Process instance name",
-        "type": "text",
+        "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYPROCESSINSTANCENAMEPACKAGE.CALLACTIVITYPROCESSINSTANCENAME.DESCRIPTION",
         "dg": "detail",
