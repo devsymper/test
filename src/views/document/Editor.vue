@@ -69,7 +69,7 @@
                 <v-card-title class="notice-title">{{titleDialog}}</v-card-title>
                 <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="green darken-1" v-if="!intervalCheckExpired" text @click="dialog = false">Hủy bỏ</v-btn>
+                <v-btn color="green darken-1" v-if="intervalSetEditting" text @click="dialog = false">Hủy bỏ</v-btn>
                 <v-btn color="green darken-1" text @click="acceptDialog">Đồng ý</v-btn>
                 </v-card-actions>
             </v-card>
@@ -316,10 +316,6 @@ export default {
                 ed.on('drop', function(e) {
                     self.handleDropControlInEditor(e);
                 });
-                ed.on('mouseover', function(e) {
-                    self.currentInteractTime = Date.now();
-                    console.log('currentInteractTime',self.currentInteractTime);
-                });
                 ed.on('ExecCommand', function(e) {
                     self.handleExecCommand(e);
                 });
@@ -334,27 +330,7 @@ export default {
         });
     },
     created() {
-        this.currentTabIndex = this.$store.state.app.currentTabIndex;
-        if(this.routeName == 'editDocument'){
-            /**
-             * hoangnd: kiểm tra xem doc có đang hoạt động hay ko
-             */
-            this.currentInteractTime = Date.now();
-            this.intervalCheckExpired = setInterval((self) => {
-                let curTime = Date.now();
-                if(curTime - self.currentInteractTime > 2000000){
-                    self.dialog = true;
-                    let docTitle = self.sDocumentProp.title.value;
-                    self.titleDialog = "Document "+docTitle+" sẽ bị đóng do thời gian tương tác quá hạn!. Vui lòng quay lại sau";
-                    clearInterval(self.intervalCheckExpired);
-                    self.currentInteractTime = null;
-                    self.typeDialog = "documentExpire";
-                    documentApi.setEdittingDocument({id:self.documentId,status:0});
-                    
-                }
-            }, 10000,this);
-        }
-        
+        this.currentTabIndex = this.$store.state.app.currentTabIndex;        
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
         this.isConfigPrint = false;
         if(this.routeName == 'printConfigDocument'){
@@ -381,8 +357,7 @@ export default {
             if(this._inactive == true) return;
             if(this.routeName == 'editDocument'){
                 documentApi.setEdittingDocument({id:this.documentId,status:0});
-                clearInterval(this.intervalCheckExpired);
-                this.currentInteractTime = null;
+                clearInterval(this.intervalSetEditting);
             }
         });
     },
@@ -413,8 +388,7 @@ export default {
             dataPreviewSubmit:null,
             isShowPreviewSubmit:false,
             controlTemplateId:0,
-            currentInteractTime:Date.now(),
-            intervalCheckExpired:null,
+            intervalSetEditting:null,
             currentTabIndex:null,
             dataPivotTable:{},
             defaultTablePivotConfig:{}
@@ -465,8 +439,7 @@ export default {
         '$route' (to, old) {
             if(old.name == 'editDocument'){
                 documentApi.setEdittingDocument({id:this.documentId,status:0});
-                clearInterval(this.intervalCheckExpired);
-                this.currentInteractTime = null;
+                clearInterval(this.intervalSetEditting);
             }
             this.documentId = Date.now();
             // this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
@@ -509,10 +482,6 @@ export default {
             this.dialog = false;
             if(this.typeDialog == 'deletePage'){
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
-            }
-            if(this.typeDialog == "documentExpire"){
-                
-                this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
             }
             if(this.typeDialog == "baEditting"){
                 this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
@@ -1218,11 +1187,28 @@ export default {
                     });
                 }
                 else{
-                    thisCpn.$snotify({
-                        type: "error",
-                        title: res.message,
-                        text:res.lastErrorMessage,
-                    });
+                    if(res.data && res.data.baId){
+                        accountApi.detailBa(document.userEditting).then(res=>{
+                            if(res.status == 200){
+                                let data = res.data.data;
+                                if(data.length > 0){
+                                    let curBa = data[0];
+                                    this.dialog = true;
+                                    this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
+                                    this.typeDialog = "baEditting";
+                                    return false;
+                                }
+                            }
+                        }).always({}).catch({})
+                    }
+                    else{
+                        thisCpn.$snotify({
+                            type: "error",
+                            title: res.message,
+                            text:res.lastErrorMessage,
+                        });
+                    }
+                    
                 }
                 
             })
@@ -1952,22 +1938,35 @@ export default {
 
         },
         async checkAllowEditDocument(document){
-            if(Number(document.userEditting) != 0  && this.baInfo && this.baInfo.id != document.userEditting){
-                try {
-                    let baAcc = await accountApi.detailBa(document.userEditting);
-                    if(baAcc.status == 200){
-                        let data = baAcc.data.data;
-                        if(data.length > 0){
-                            let curBa = data[0];
-                            this.dialog = true;
-                            this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
-                            this.typeDialog = "baEditting";
-                            return false;
+            let updateTime = new Date(document.updateAt).getTime();
+            let timeDiff = Date.now() - updateTime;
+            if(timeDiff > 4000){
+                /**
+                 * hoangnd: kiểm tra xem doc có đang hoạt động hay ko
+                 */
+                documentApi.setEdittingDocument({id:self.documentId});
+                this.intervalSetEditting = setInterval((self) => {
+                    documentApi.setEdittingDocument({id:self.documentId});
+                }, 2000,this);
+                return true;
+            }else{
+                if(Number(document.userEditting) != 0  && this.baInfo && this.baInfo.id != document.userEditting){
+                    try {
+                        let baAcc = await accountApi.detailBa(document.userEditting);
+                        if(baAcc.status == 200){
+                            let data = baAcc.data.data;
+                            if(data.length > 0){
+                                let curBa = data[0];
+                                this.dialog = true;
+                                this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
+                                this.typeDialog = "baEditting";
+                                return false;
+                            }
                         }
+                    } catch (error) {
+                        return false;
+                        console.log(error);
                     }
-                } catch (error) {
-                    return false;
-                    console.log(error);
                 }
             }
             return true;
@@ -1979,9 +1978,6 @@ export default {
                 let checkEditting = await this.checkAllowEditDocument(res.data.document);
                 if(checkEditting == false){
                     return;
-                }
-                else{
-                    documentApi.setEdittingDocument({id:this.documentId});
                 }
                 if (res.status == 200) {
                     if(this.routeName == "editDocument"){
