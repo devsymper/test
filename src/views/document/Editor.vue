@@ -1474,8 +1474,8 @@ export default {
                         if($(tbody[i].innerHTML).length == 0){
                             continue
                         }
-                        let idControl = $(tbody[i].innerHTML).first().attr('id');
-                        let typeControl = $(tbody[i].innerHTML).first().attr('s-control-type');
+                        let idControl = $(tbody[i].outerHTML).find('.s-control').attr('id');
+                        let typeControl = $(tbody[i].outerHTML).find('.s-control').attr('s-control-type');
                         let name = this.editorStore.allControl[tableId]['listFields'][idControl].properties.name.value;
                         let title = this.editorStore.allControl[tableId]['listFields'][idControl].properties.title.value;
                         let row = {columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl}

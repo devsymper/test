@@ -52,7 +52,7 @@ export default class TableControl extends Control {
                 this.tablePrint.render();
             } else {
                 this.tableInstance.render();
-                this.pivotTable.render();
+                // this.pivotTable.render();
                 this.ele.detach().hide();
 
             }
