@@ -49,13 +49,13 @@
                             >
                             <template v-slot:activator="{ on }">
                                 <v-btn icon v-on="on">
-                                    <v-icon>mdi-apps</v-icon>
+                                    <v-icon class="mdi-18px">mdi-apps</v-icon>
                                 </v-btn>
                             </template>
                             <EndUserPopup style="z-index:1000 !important"   />
                         </v-menu>
                         <v-btn icon @click="showSearchInput = !showSearchInput">
-                            <v-icon>mdi-magnify</v-icon>
+                            <v-icon class="mdi-18px">mdi-magnify</v-icon>
                         </v-btn>
                         <v-menu  v-model="isShowDialogNotification"
                             z-index="161"
@@ -74,11 +74,11 @@
                                         color="red"
                                         overlap
                                     >
-                                        <v-icon>mdi-bell-outline</v-icon>
+                                        <v-icon class="mdi-18px">mdi-bell-outline</v-icon>
                                     </v-badge>
                                 </v-btn>
                                 <v-btn v-on="on" icon v-else>
-                                    <v-icon>mdi-bell-outline</v-icon>
+                                    <v-icon class="mdi-18px">mdi-bell-outline</v-icon>
                                 </v-btn>
                             </template>
                             <list-notification></list-notification>
