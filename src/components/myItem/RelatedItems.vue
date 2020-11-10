@@ -29,7 +29,9 @@
                     <v-col class="pa-1" cols="4">
                         <v-icon x-small >mdi-clock-time-nine-outline</v-icon>
                         {{item.createTime ? $moment(item.createTime).format('DD/MM/YY HH:mm'):$moment(item.endTime).format('DD/MM/YY HH:mm')}}
-                        <div class="quickView" @click="showInfoTask($event,item)">{{$t("myItem.sidebar.quickView")}}</div>
+                        <div style="padding-top: 2px;">
+                            <span class="quickView" @click="showInfoTask($event,item)">{{$t("myItem.sidebar.quickView")}}</span>
+                        </div>
                     </v-col>
             
                 </v-row>
@@ -58,13 +60,13 @@ export default {
         return{
             x:-1,
             y:-1,
-            showByIndex: null,
             processParent:{},
             listSubProcessInstance:[],
             listProcessSibling:[],
             processInstanceCurrent:{},
             statusQuickView:false,
             taskSelected:{},
+            
         }
     },
     props: {
@@ -143,9 +145,11 @@ export default {
             this.statusQuickView=false;
         },
         showInfoTask(e,item){
+            e.preventDefault(); 
+            e.stopPropagation(); 
             this.taskSelected={};
             this.taskSelected=item;
-            this.statusQuickView=!this.statusQuickView;
+            this.statusQuickView=true;
             this.$refs.infoTaskRelated.setPosittion({bottom:$(document).height() - e.clientY + 30 + 'px'})
 
         },
@@ -358,7 +362,18 @@ export default {
         }
     },
     created(){
+        this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
+            if(evt == undefined){
+                return;
+            }
+            if(this._inactive == true) return;
+            if (this.statusQuickView) {
+                this.statusQuickView=false;
+            }
+        });
+      
         this.getData();
+
     }
 }
 </script>
