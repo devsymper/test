@@ -6,6 +6,9 @@ const setProcessDefination = (state, data) =>{
 const setProcessKey = (state, data) =>{
 	Vue.set(state, 'processKey', data)
 }
+const setTimerJobDetail = (state, data) =>{
+	Vue.set(state, 'timerJobDetail', data)
+}
 const setCurrentAggregateWorkflow = (state, data) =>{
 	let sum = parseInt(data.done) + parseInt(data.running)
 	if(sum > 0){
@@ -17,9 +20,18 @@ const setCurrentAggregateWorkflow = (state, data) =>{
 		Vue.set(state, 'currentAggregateWorkflow', [])
 	}
 }
+const setProcessId = (state, data) =>{
+	state.processId = data
+} 
+const setCurrentTrackingProcess = (state , data) =>{
+	state.currentTrackingProcess = data
+}
 
 export {
 	setProcessDefination,
 	setProcessKey,
-	setCurrentAggregateWorkflow
+	setCurrentAggregateWorkflow,
+	setTimerJobDetail,
+	setProcessId,
+	setCurrentTrackingProcess
 };

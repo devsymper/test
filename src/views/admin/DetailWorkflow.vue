@@ -1,8 +1,9 @@
 <template>
 	<div class="detail-workflow w-100  h-100 d-flex flex-column">
 		<div class="d-flex" style="height:50%">
-			<div class="modeler-workflow">
-				<ModelerDetail />
+			<div class="modeler-workflow mr-2 w-100 h-100">
+				<ModelerDetail 
+				/>
 			</div>
 			<div class="summary-workflow d-flex flex-column">
 				<div class="d-flex pt-2">
@@ -10,7 +11,7 @@
 						ID
 					</span>
 					<span class="value-summary">
-						{{processDefination.id}}
+						{{processDefination.id  ? processDefination.id : "" }}
 					</span>
 				</div>
 				<div class="d-flex pt-2">
@@ -48,7 +49,7 @@
 							color="primary"
 							v-if="processDefination.suspended == false"
 							label
-							text-color="white"
+							text-color="white"	
 							>
 							Hoạt động
 						</v-chip>
@@ -116,85 +117,8 @@
 				
 			</div>
 		</div>
-		<div class="list-workflow-instance d-flex flex-column">
-			<div class="d-flex">
-				<div class="ml-2 mt-2 " style="flex-grow:1">
-					<h3>	
-						Danh sách các quy trình con
-					</h3>
-				</div>
-			
-				<v-btn
-					class="mr-2 white--text"
-					depressed
-					color="error"
-					small
-					:disabled="disableBtn"
-					@click="confirmDelete"
-				>
-					Xóa
-				</v-btn>
-				<v-btn
-					class="mr-2 white--text"
-					depressed
-					color="orange"
-					small
-					:disabled="disableBtn"
-					@click="stopProcessInstance"
-				>
-					Tạm dừng
-				</v-btn>
-				<v-btn
-					class="mr-2 white--text"
-					depressed
-					color="success"
-					small
-					:disabled="disableBtn"
-					@click="activeProcessInstance"
-				>
-				Chạy
-				</v-btn>
-				
-				 <v-tooltip bottom>
-     				 <template v-slot:activator="{ on, attrs }">
-						<v-btn 
-							icon 
-							tile  
-							v-bind="attrs"
-          					v-on="on"
-							class="mr-3 white--text"
-							color="primary"
-							small
-							@click="switchFullScreen"
-							>
-							<v-icon small>
-								mdi-monitor-share
-							</v-icon>
-						</v-btn>
-					</template>
-					<span>Xem toàn màn hình</span>
-				</v-tooltip>	
-			</div>
-			<ListItems 
-				ref="listWorkFlow"
-				:pageTitle="'Danh sách các quy trình con'"
-				:showButtonAdd="false"
-				:getDataUrl="apiUrl"
-				:showExportButton="false"
-				:showImportButton="false"
-				:useDefaultContext="false"
-				:useWorkFlowHeader="true"
-				:customAPIResult="customAPIResult"
-				:containerHeight="containerHeight"
-				:headerPrefixKeypath="'admin.table'"
-				:tableContextMenu="tableContextMenu"
-				:showToolbar="false"
-				:isTablereadOnly="false"
-				@after-selected-row="afterSelectedRow"
-				:showImportHistoryBtn="false"
-				:showPagination="false"
-				:showActionPanelInDisplayConfig="false"
-			/>
+		<div class="list-workflow-instance d-flex flex-column h-100 mt-8" >
+			<ListProcessInstance :showSwitchBtn="true" />
 		</div>
 		<ConfirmDelete 
 			:showDialog="showDialog"
@@ -213,11 +137,13 @@ import { reformatGetListInstances } from "@/components/process/reformatGetListDa
 import ModelerDetail from "./ModelerDetail"
 import ConfirmDelete from "./ConfirmDelete"
 import Handsontable from 'handsontable';
+import ListProcessInstance from "./ListProcessInstance"
 export default {
 	components:{
 		ListItems,
 		ModelerDetail,
-		ConfirmDelete
+		ConfirmDelete,
+		ListProcessInstance
 	},
 	data(){
 		let self = this

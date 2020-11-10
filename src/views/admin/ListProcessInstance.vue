@@ -9,6 +9,7 @@
 			
 				<v-btn
 					class="mr-2 white--text"
+					v-if="showBtnAddCheckbox"
 					depressed
 					color="primary"
 					small
@@ -123,6 +124,7 @@ export default {
 			showDialog:false,
 			disableBtn: true,
 			listItemSelected:[],
+			showBtnAddCheckbox: true,
 			customAPIResult:{
 				reformatData(res){
 					return{
@@ -186,11 +188,13 @@ export default {
 	watch:{
 		processKey(val){
 			this.listItemSelected = []
+			this.showBtnAddCheckbox = true
 		},
 		listItemSelected:{
 			deep: true,
             immediate: true,
             handler(obj){
+				this.showBtnAddCheckbox = true
 				if(Object.keys(obj).length == 0){
 					this.disableBtn = true
 				}else{
@@ -220,7 +224,7 @@ export default {
 						self.$snotify(
 							{
 								type: "success",
-								title:" Thành công"
+								title:" Dừng tác vụ thành công"
 							}
 						)
 					}
@@ -243,7 +247,7 @@ export default {
 					self.$snotify(
 						{
 							type: "success",
-							title:" Thành công"
+							title:" Chạy tác vụ thành công"
 						}
 					)
 					self.$refs.listWorkFlow.refreshList()
@@ -262,6 +266,7 @@ export default {
 			this.showDialog = true
 		},
 		addCheckBoxColumn(){
+			this.showBtnAddCheckbox = false
 			this.$refs.listWorkFlow.addCheckBoxColumn()
 		},
 		deleteProcessInstance(value){
