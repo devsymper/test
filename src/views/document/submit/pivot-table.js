@@ -4,26 +4,21 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-alpine.css';
 
-function myCustomAggFunc(values) {
-    var sum = "";
-    values.forEach(function(value) { sum += value; });
-    return sum;
-}
 export default class PivotTable {
     constructor(control, tableName, controlId, pivotConfig, keyInstance) {
         this.controlObj = control;
         this.tableName = tableName;
-        /**
-         * Biến lưu id element của control table
-         */
         this.tableControlId = controlId
         this.keyInstance = keyInstance;
         this.gridOptions = null;
         this.pivotConfig = pivotConfig;
         this.tableContainer = null;
         this.columnDefs = [];
-        this.rowData = []
     }
+    /**
+     * hoangnd
+     * Hàm đọc thông tin pivot đã lưu để tạo cấu trúc các cột pivot (bao gồm header và các cột group)
+     */
     setPivotColumns() {
         let rows = this.pivotConfig.rows;
         let cols = this.pivotConfig.cols;
@@ -51,24 +46,20 @@ export default class PivotTable {
             let colItem = values[index];
             let colPivot = {
                 field: colItem.name,
-                aggFunc: myCustomAggFunc
+                aggFunc: this.customPivotFunc
             };
             this.columnDefs.push(colPivot);
         }
     }
     setData(vl) {
         this.setPivotColumns();
-        this.rowData = vl;
         this.gridOptions.api.setColumnDefs(this.columnDefs);
         this.gridOptions.api.setRowData(vl);
     }
     render() {
-
-        // specify the data
-        // let the grid know which columns and what data to use
         this.gridOptions = {
             columnDefs: this.columnDefs,
-            rowData: this.rowData,
+            rowData: [],
             autoGroupColumnDef: { minWidth: 250 },
             pivotMode: true,
             defaultColDef: {
@@ -84,7 +75,21 @@ export default class PivotTable {
         this.controlObj.ele.before(this.tableContainer);
         new Grid(this.tableContainer, this.gridOptions, { modules: [ClientSideRowModelModule, RowGroupingModule] });
     }
-
+    /**
+     * hoangnd
+     * hàm set giá trị cho các cột được đưa vào values của pivot
+     * @param {} values 
+     */
+    customPivotFunc(values) {
+        var v = "";
+        values.forEach(function(value) {
+            if (!value) {
+                value = "";
+            }
+            v += value;
+        });
+        return v;
+    }
     show() {
         this.tableContainer.style.height = '400px'
     }

@@ -2277,6 +2277,7 @@ export default {
          */
         setDataToTable(tableControlId,data){
             let tableName = this.sDocumentEditor.allControl[tableControlId].properties.name.value;
+            markBinedField(this.keyInstance,tableName);
             data = data.data
             let tableControl = getControlInstanceFromStore(this.keyInstance,tableName);
             if(data.length == 0){
@@ -2284,8 +2285,8 @@ export default {
                 return;
             }
             tableControl.tableInstance.setData(data);
-            tableControl.pivotTable.show();
-            tableControl.pivotTable.setData(data);
+            // tableControl.pivotTable.show();
+            // tableControl.pivotTable.setData(data);
         },
 
         /**
