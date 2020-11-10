@@ -8,6 +8,9 @@ import {
     innerSVG
 } from 'tiny-svg';
 
+import h337  from 'heatmap.js';
+import heatmapInstance  from 'heatmap.js';
+
 import {
     getRoundRectPath
 } from 'bpmn-js/lib/draw/BpmnRenderUtil';
@@ -46,11 +49,22 @@ export default class CustomRenderer extends BaseRenderer {
 			debugger
 			svgClasses(shape).add('cursor-pointer');
 			if(countEnd){
-				let rect = drawRect(parentNode, r+5, r, 2, STATUS_COLORS['end']);
-				svgAttr(rect, {
-					transform: `translate(24, -16)`
-				});
-				insertText(parentNode,countEnd ,STATUS_COLORS['end'])
+				var config = {
+					container: parentNode,
+					radius: 10,
+					maxOpacity: .5,
+					minOpacity: 0,
+					blur: .75
+				  };
+				var heatmapInstance = h337.create(config);
+				var dataPoint = {
+					x: 5, // x coordinate of the datapoint, a number
+					y: 5, // y coordinate of the datapoint, a number
+					value: 100 // the value at datapoint(x, y)
+				};
+				heatmapInstance.addData(dataPoint);
+				debugger
+
 			}
 			if(countRunning){
 				let rect = drawRect(parentNode, r+5, r, 2, STATUS_COLORS['running']);
