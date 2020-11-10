@@ -347,6 +347,7 @@ import Api from "./../../api/api.js";
 import vClickOutside from 'v-click-outside'
 import icon from "../../components/common/SymperIcon";
 import ListPermission from "../../components/common/ListPermission";
+import { util } from '../../plugins/util.js';
 export default {
     name: "grandPermission",
     components: {
@@ -368,7 +369,7 @@ export default {
     },
     data: function() {
         return {
-            apiUrl: "https://v2hoangnd.dev.symper.vn/",
+            apiUrl: util.addEnvToUrl("https://v2hoangnd.dev.symper.vn/"),
             packPath: "permission-packages",
             actionPackPath: "action-packs",
             appskPath: "apps",

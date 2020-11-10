@@ -1,10 +1,11 @@
 import { data } from "jquery";
+import { util } from "../../../plugins/util";
 import {userAssignmentToXMLValue} from "../allAttrsOfNodes" ;
 export default {
     script: {
         params: {
             requestMethod: 'POST',
-            requestUrl: 'https://syql.symper.vn/formulas/compileClient',
+            requestUrl: util.addEnvToUrl('https://syql.symper.vn/formulas/compileClient'),
             requestHeaders: 'Accept: application/json',
             requestBody: '',
             requestBodyEncoding: 'UTF8',
@@ -32,7 +33,7 @@ export default {
     notification:{
         params: {
             requestMethod: 'POST',
-            requestUrl: 'https://notifi.symper.vn/notifications',
+            requestUrl: util.addEnvToUrl('https://notifi.symper.vn/notifications'),
             requestHeaders: 'Accept: application/json',
             requestBody: '',
             requestBodyEncoding: 'UTF8',
