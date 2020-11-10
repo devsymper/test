@@ -191,6 +191,7 @@ import DatePicker from "./../../../components/common/DateTimePicker";
 import TimeInput from "./../../../components/common/TimeInput";
 import UploadFile from "@/components/common/UploadFile.vue";
 import Table from "./table.js";
+import PivotTable from "./pivot-table";
 import SymperDragPanel from "./../../../components/common/SymperDragPanel.vue";
 import { util } from "./../../../plugins/util.js";
 import AutocompleteInput from "./items/AutocompleteInput.vue";
@@ -382,7 +383,8 @@ export default {
             controlTrace:null,
             listFileControl:[],
             currentImageControl:null,
-            currentControlDataflow:null
+            currentControlDataflow:null,
+            dataPivotTable:{}
         };
 
     },
@@ -1212,7 +1214,8 @@ export default {
                             thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
                             if(res.data.document.otherInfo != null && res.data.document.otherInfo != "")
 							thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
-							thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
+                            thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
+                            thisCpn.dataPivotTable = res.data.pivotConfig;
                             setDataForPropsControl(res.data.fields,thisCpn.keyInstance,'submit'); // ddang chay bat dong bo
                             setTimeout(() => {
                                 thisCpn.processHtml(content);
@@ -1409,6 +1412,16 @@ export default {
                                 id,
                                 thisCpn.keyInstance
                             );
+                            if(this.dataPivotTable[controlName]){
+                                tableControl.pivotTable = new PivotTable(
+                                    tableControl,
+                                    controlName,
+                                    id,
+                                    this.dataPivotTable[controlName],
+                                    thisCpn.keyInstance
+                                );
+                            }
+                            
                             let tableEle = $(allInputControl[index]);
                             tableEle.find(".s-control").each(function() {
                                 let childControlId = $(this).attr("id");
@@ -2271,7 +2284,8 @@ export default {
                 return;
             }
             tableControl.tableInstance.setData(data);
-            
+            tableControl.pivotTable.show();
+            tableControl.pivotTable.setData(data);
         },
 
         /**
