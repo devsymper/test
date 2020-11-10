@@ -36,7 +36,7 @@
         <div  class="sym-document__side-bar-right">
             <sidebar-right ref="sidebarRight" :isConfigPrint="isConfigPrint" :styles="contentStyle" :instance="keyInstance"/>
         </div>
-        <s-table-setting v-if="!isConfigPrint" ref="tableSetting" :instance="keyInstance" @add-columns-table="addColumnTable"/>
+        <s-table-setting v-if="!isConfigPrint" ref="tableSetting" :instance="keyInstance" @add-columns-table="addColumnTable" :defaultTablePivotConfig="defaultTablePivotConfig"/>
         <PrintTableConfig v-if="isConfigPrint" ref="printTableConfig" @config-column-table-print="configColumnTablePrint"/>
         <auto-complete-control v-if="!isConfigPrint" ref="autocompleteControl" @add-control="insertControl"/>
         <save-doc-panel 
@@ -415,7 +415,9 @@ export default {
             controlTemplateId:0,
             currentInteractTime:Date.now(),
             intervalCheckExpired:null,
-            currentTabIndex:null
+            currentTabIndex:null,
+            dataPivotTable:{},
+            defaultTablePivotConfig:{}
         }
     },
     
@@ -1201,6 +1203,9 @@ export default {
          * Hàm gọi api edit document
          */
         editDocument(dataPost){
+            if(Object.keys(this.dataPivotTable).length > 0){
+                dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
+            }
             let thisCpn = this;
             documentApi.editDocument(dataPost).then(res => {
                 this.$evtBus.$emit('document-editor-save-doc-callback')
@@ -1276,10 +1281,16 @@ export default {
             }
         },
         // hàm xử lí thêm các cột vào trong control table khi lưu ở tablesetting
-        addColumnTable(listRowData){
+        addColumnTable(data){
+            let listRowData = data.listRows;
+            let tablePivotConfig = data.tablePivotConfig;
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-table.on-selected');
             let table = elements.find('thead').closest('.s-control-table');
             let tableId = table.attr('id');
+            let currentControl = this.editorStore.currentSelectedControl;
+            if(currentControl.properties.name.name.value){
+                this.dataPivotTable[currentControl.properties.name.name.value] = tablePivotConfig;
+            }
             let thead = '';
             let tbody = '';
             for(let i = 0; i < listRowData.length; i++ ){
@@ -1460,15 +1471,23 @@ export default {
                 let listData = [];
                 if($(tbody[0].innerHTML).length > 0){
                     for(let i = 0; i< thead.length; i++){
-                        let idControl = $(tbody[i].innerHTML).first().attr('id');
-                        let typeControl = $(tbody[i].innerHTML).first().attr('s-control-type');
+                        if($(tbody[i].innerHTML).length == 0){
+                            continue
+                        }
+                        let idControl = $(tbody[i].outerHTML).find('.s-control').attr('id');
+                        let typeControl = $(tbody[i].outerHTML).find('.s-control').attr('s-control-type');
                         let name = this.editorStore.allControl[tableId]['listFields'][idControl].properties.name.value;
                         let title = this.editorStore.allControl[tableId]['listFields'][idControl].properties.title.value;
                         let row = {columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl}
                         listData.push(row)
+
                     }
                 }
                 this.$refs.tableSetting.showDialog();
+                let currentControl = this.editorStore.currentSelectedControl;
+                if(currentControl.properties.name.name.value && this.dataPivotTable[currentControl.properties.name.name.value]){
+                    this.defaultTablePivotConfig = this.dataPivotTable[currentControl.properties.name.name.value];
+                }
                 this.$refs.tableSetting.setListRow(listData);
             }
         },
@@ -1976,6 +1995,7 @@ export default {
                         this.setDefaultStyle(res1.data.formStyle);
                     }
                     this.editorCore.setContent(content);
+                    this.dataPivotTable = res.data.pivotConfig;
                     $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body select').each(function(e){
                         let id = $(this).attr('id')
                         $(this).replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '">');

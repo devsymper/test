@@ -1,4 +1,6 @@
-export const appConfigs = {
+import { util } from "./plugins/util";
+
+var configs = {
     defaultAvatar: '/img/avatar_default.jpg',
     dataTypeIcon: { // icon cho các kiểu dữ liệu: numeric, text, date, datetime, time, 
         numeric: 'mdi-numeric',
@@ -82,5 +84,21 @@ export const appConfigs = {
                 "scope": "document"
             }
         }
+    },
+    reformatUrl(obj){
+        for(let key in obj){
+            if(obj[key]){    
+                if(typeof obj[key] == 'string'){
+                    obj[key] = util.addEnvToUrl(obj[key]);
+                }else if(typeof obj[key] == 'object'){
+                    this.reformatUrl(obj[key]);
+                }
+            }
+        }
     }
 };
+configs.reformatUrl(configs.apiDomain);
+// sửa lại url theo môi trường code
+
+
+export const appConfigs = configs;
