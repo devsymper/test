@@ -8,25 +8,44 @@
 						tile 
 						icon
 						x-small
+						class="mr-2"
+					>
+						<v-icon small >mdi-numeric-2-box-outline</v-icon>
+					</v-btn>
+					<v-btn
+						tile 
+						icon
+						x-small
+						class="mr-2"
+					>
+						<v-icon x-small >mdi-coolant-temperature</v-icon>
+					</v-btn>
+					<v-btn
+						tile 
+						icon
+						x-small
+						class="mr-2"
 						@click="handleZoomOut"
 					>
-						<v-icon   >mdi-plus-circle-outline</v-icon>
+						<v-icon  small >mdi-plus-circle-outline</v-icon>
 					</v-btn>
 					<v-btn
 						tile 
 						icon
 						x-small
+						class="mr-2"
 						@click="handleZoomIn"
 					>
-						<v-icon>mdi-minus-circle-outline</v-icon>
+						<v-icon small>mdi-minus-circle-outline</v-icon>
 					</v-btn>
 					<v-btn
 						tile 
 						icon
 						x-small
+						class="mr-2"
 						@click="handleFocus"
 					>
-						<v-icon>mdi-image-filter-center-focus</v-icon>
+						<v-icon small>mdi-image-filter-center-focus</v-icon>
 					</v-btn>
 				</div>
 			</div>
@@ -37,6 +56,7 @@
                 :height="diagramHeight"
 				:width="600"
                 :diagramXML="diagramXML"
+				:customModules="customRender"
             ></symper-bpmn>
         </div>
                 <!-- :customExtension="customExtension" -->
@@ -60,7 +80,7 @@ import { pushCustomElementsToModel, collectInfoForTaskDescription } from "@/comp
 import Api from "@/api/api.js";
 import { appConfigs } from '@/configs';
 import serviceTaskDefinitions from "@/components/process/elementDefinitions/serviceTaskDefinitions";
-
+import CustomRenderProcessCount from '@/components/process/CustomRenderProcessCount'
 
 const apiCaller = new Api('');
 
@@ -1217,11 +1237,17 @@ export default {
 			let formKeyToNodeIdMap = {};
             for(let elName in self.stateAllElements){
 				let el = self.stateAllElements[elName];
-				if(el.type == "UserTask" || el.type == "ScriptTask" ){
+				if(el.type.includes('Task') ){ //== "UserTask" || el.type == "ScriptTask" 
 					if(processTracking){
 						processTracking.forEach(function(e){
 							if(e.act_id_ == el.id){
-								//
+								//lam o day
+								debugger
+								symBpmn.updateElementProperties(el.id,{
+									countEnd: e.count_end,
+									countRunning: e.count_running,
+
+								})
 							}	
 						})
 					}
@@ -1386,7 +1412,13 @@ export default {
             attrPannelHeight: "300px", // chiều cao của panel cấu hình các element
             modelAction: "create", // hành động đối với model này là gì: create | clone | edit
             modelId: "", // Id của model này trong DB
-            searchAttrKey: "",
+			searchAttrKey: "",
+			customRender: [
+                {
+                    __init__: ["customRenderer"],
+                    customRenderer: ["type", CustomRenderProcessCount]
+                }
+            ],
             diagramHeight: 300,
             headerActions: {
                 undo: {
@@ -1434,7 +1466,8 @@ export default {
     components: {
         "symper-bpmn": SymperBpmn,
         "form-tpl": FormTpl,
-        VuePerfectScrollbar
+		VuePerfectScrollbar,
+		CustomRenderProcessCount
     },
     props: {
         // Hành động cho editor này, nhận một trong các giá trị: create, edit, view, clone

@@ -101,7 +101,7 @@
 							</v-chip>
 							<span>Hoàn thành</span>
 						</div>
-						<div>
+						<!-- <div>
 							 <v-chip
 								class="ma-2"
 								color="red"
@@ -111,7 +111,7 @@
 								n
 							</v-chip>
 							<span>Lỗi</span>
-						</div>
+						</div> -->
 					</div>
 				</div>
 				
@@ -407,7 +407,7 @@ export default {
 	margin: -8px 
 }
 .description-summary{
-	margin-top:24px;
+	margin-top:45px;
 	margin-left:16px;
 }
 /* canvas{

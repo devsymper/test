@@ -121,15 +121,6 @@ export default {
             this.modeling.setColor(ele, data);
 		},
 		
-		// dungna them phan dem so process chay qua moi node 
-        addProcessCountPerNode(ele,isCurrentNode=false){
-            if(typeof ele == 'string'){ // Nếu truyền vào id
-                ele = this.bpmnModeler.get("elementRegistry").get(ele);
-			}
-			// this.modeling.setColor(ele, data);
-            // this.modeling.append("svg").attr("width","20").attr("height","20").append("circle");;
-		},
-		
         getAllNodes(bizObj = true) {
             let allNododes = this.bpmnModeler
                 .get("elementRegistry")
