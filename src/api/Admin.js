@@ -2,7 +2,7 @@ import Api from "./api";
 import { appConfigs } from "./../configs.js";
 
 var bpmneApi = new Api(appConfigs.apiDomain.bpmne.models);
-
+var documentApi = new Api(appConfigs.apiDomain.sdocumentManagement);
 var workflowExtendApi = new Api(appConfigs.apiDomain.workflowExtend)
 let testHeader = {
     Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0',
@@ -39,5 +39,17 @@ export const adminApi = {
 	},
 	aggregateWorkflow(id){
 		return workflowExtendApi.get('workflow/'+id+'/aggregate')
-	}
+	},
+	trackingProcess(id){
+		return workflowExtendApi.get('workflow/'+id+'/tracking')
+	},
+	deleteDocumentObject(objectIds) {
+        return documentApi.delete("documents/objects", objectIds);
+	},
+	getProcessDefinationDetail(id){
+		return bpmneApi.get(appConfigs.apiDomain.bpmne.definitions+'/'+id, {},testHeader )
+	},
+	getTimerJobDetail(id){
+		return bpmneApi.get(appConfigs.apiDomain.bpmne.timerJob+'/'+id, {},testHeader )
+	},
 }

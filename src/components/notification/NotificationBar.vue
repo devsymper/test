@@ -1,7 +1,6 @@
 <template>
     <v-row>
         <v-app-bar dense flat color="white" class="notification-list-bar" fixed>
-
             <v-col :cols="4"> <v-toolbar-title class="nofitication-title-bar" style="font-weight:400">
                 Notifications
             </v-toolbar-title>
@@ -51,12 +50,13 @@
         </v-app-bar>
         <v-row class="ml-0 mr-0 pl-5 pr-5 list-notification bg-white" :z-index="99999">
             <v-row v-if="checkToday" class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-2px">
-                <span style="color:orange; font-weight:430">{{$t('notification.today')}}</span>
+                 <span class="fw-430 " style="color:orange">{{$t('notification.today')}}</span>
             </v-row>
             <v-row v-if="checkToday" 
                 v-for="item in listNotification.filter(x=>changeDate(x.createTime)==today)" 
                 :key="item.id"
-                class="text-left notification-item  pt-0 pb-0"
+                style="height:55px"
+                class="text-left notification-item pt-0 pb-0"
             >
                 <v-col cols="2">
                     <v-row> 
@@ -68,7 +68,6 @@
                             <v-avatar v-else>
                                 <!-- {{item.icon}} -->
                                 <img v-if="!checkIcon(item.icon)" :src="setAvaOrIcon(item.icon)">
-                            
                                  <v-icon v-else >{{item.icon}}</v-icon>
                             </v-avatar>
                         </v-list-item-avatar>
@@ -81,9 +80,9 @@
                         </span>
                     </v-row>
                     <v-row class="notification-item-info mt-1">
-                        <v-col cols="6">
-                            <v-icon class="mr-2" size="12">mdi-cog</v-icon>
-                            <span>{{item.extraLabel?item.extraLabel:''}} {{item.extraValue?item.extraValue:''}}</span>
+                        <v-col cols="6" class="ellipsis">
+                            <v-icon class="mr-2" size="12">{{$i('input.'+getScope(item.action))}}</v-icon>
+                            <span >{{item.extraLabel?item.extraLabel:''}} {{item.extraValue?item.extraValue:''}}</span>
                         </v-col>
                         <v-col cols="6" class="text-right pr-3">
                             <span>{{$moment.unix(item.createTime).fromNow()}}</span>
@@ -91,7 +90,7 @@
                         </v-col>
                     </v-row>
                 </v-col>
-                   <!-- <v-divider style="width:95%" class="ml-2" ></v-divider> -->
+                   <v-divider style="width:95%; margin-top:-10px" class="ml-2" ></v-divider>
                 <v-menu
                     :close-on-content-click="true"
                     :open-on-hover="true"
@@ -122,10 +121,12 @@
                 </v-menu>
             </v-row>
             <!-- older -->
-            <v-row class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-3px"><span style="color:orange; font-weight:430">{{$t('notification.older')}}</span></v-row>
+            <v-row class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-3px"><span style="color:orange; font-weight:430">
+                {{$t('notification.older')}}</span></v-row>
             <v-row
                 v-for="item in listNotification.filter(x=>changeDate(x.createTime)!=today)" 
                 :key="item.id"
+                style="height:55px"
                 class="text-left notification-item  pt-0 pb-0"
             >
                 <v-col cols="2">
@@ -158,8 +159,8 @@
                         </span>
                     </v-row>
                     <v-row class="notification-item-info mt-1">
-                        <v-col cols="6">
-                            <v-icon class="mr-2" size="12">mdi-cog</v-icon>
+                        <v-col cols="6"  class="ellipsis">
+                            <v-icon class="mr-2" size="12">{{$i('input.'+getScope(item.action))}}</v-icon>
                             <span>{{item.extraLabel}} {{item.extraValue}}</span>
                         </v-col>
                         <v-col cols="6" class="text-right pr-3">
@@ -168,7 +169,7 @@
                         </v-col>
                     </v-row>
                 </v-col>
-                   <v-divider style="width:95%" class="ml-2" ></v-divider>
+                   <v-divider style="width:95%; margin-top:-10px" class="ml-2" ></v-divider>
                 <v-menu
                     :close-on-content-click="true"
                     :open-on-hover="true"
@@ -246,7 +247,9 @@
                 <slot name="header">
                     <v-toolbar-title class="notification-subscribe-type-title w-100">
                     {{dialogConfigNotificationSubscribeTitle}}<br/>
-                    <span class="notification-subscribe-type-description">{{dialogConfigNotificationSubscribeDescription}}</span>
+                    <span class="notification-subscribe-type-description">
+                        {{dialogConfigNotificationSubscribeDescription}}
+                    </span>
                      <v-icon
                             class="close-btn float-right"
                             @click="hideSubcribeConfig()"
@@ -379,7 +382,13 @@ export default {
         },
         getScope(action){
             if(action){
-                return JSON.parse(action).scope
+                if(JSON.parse(action).module=="document"&&JSON.parse(action).scope=="workflow"){
+                     return "taskBPM"
+                }else{
+                    return JSON.parse(action).module
+                }
+            
+               
             }
             
         },
@@ -637,5 +646,10 @@ export default {
 }
 .theme--light.v-divider {
     border-color: rgba(0, 0, 0, 0.05);
+}
+.ellipsis{
+    overflow: hidden;
+    white-space: nowrap; 
+    text-overflow: ellipsis
 }
 </style>

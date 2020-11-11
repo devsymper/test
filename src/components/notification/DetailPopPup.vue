@@ -69,7 +69,7 @@ export default {
                 isPersonal:true,
                 isAll:false,
                 listSource:{},
-
+                allChanel:[]
             }
     },
     created () {
@@ -84,7 +84,7 @@ export default {
             handler(newValue){
                 for(let i= 0; i<newValue.length;i++){
                     if(newValue[i].subscribed){
-                        this.subcribedAllChanel(newValue[i].id) 
+                        this.subcribedAllChanel(newValue[i].id,newValue[i].actionName) 
                     }else{
                           this.unsubcribedAllChanel(newValue[i].id) 
                     }
@@ -143,10 +143,27 @@ export default {
             if(res.status==200){}
         })
         },
-      subcribedAllChanel(id){
-        notification.subscribeChanel(id).then(res=>{
-            if(res.status==200){}
-        })
+        checkExistChanel(action){
+            let userId= 973;
+            let check = false;
+            for(let i = 0; i<this.allChanel.length;i++){
+                if(this.allChanel[i].event==action&&this.allChanel[i].objectType==this.objType&&this.allChanel[i].userCreate.split(':')[1]==userId){
+                    check = true;
+                }
+            }
+
+
+        },
+      subcribedAllChanel(id,action){
+          if(this.checkExistChanel(action)){
+              //update
+               notification.subscribeChanel(id).then(res=>{
+                    if(res.status==200){}
+                })
+          }else{
+          //add
+          }
+       
       },
      getAllListChanel(){
         this.items=[];
@@ -155,6 +172,7 @@ export default {
         if(res.status==200){
             let format = [];
             let listModules = res.data;
+            this.allChanel=res.data;
             for(let i = 0; i<listModules.length;i++){
                 if(listModules[i].objectType==self.objType){
                     format.push(listModules[i])
