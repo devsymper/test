@@ -21,6 +21,9 @@ export const appManagementApi = {
 	getActiveApp() {
 		return coreApi.get('application-active')
 	},
+	getActiveAppSBS() {
+		return coreApi.get('application-active/side-by-side')
+	},
 	updateApp(data) {
 		return coreApi.put("application", data)
 	},
