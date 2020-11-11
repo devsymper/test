@@ -1840,7 +1840,7 @@ export default {
                     // nếu submit từ form sub submit thì ko rediect trang
                     // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
                     
-                    if(this.$getRouteName() == 'submitDocument' && this.$route.params.id == this.documentId){
+                    if(thisCpn.$getRouteName() == 'submitDocument' && thisCpn.$route.params.id == thisCpn.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                     }
                     else{
@@ -1892,7 +1892,7 @@ export default {
                         type: "success",
                         title: "update document success!"
                     });        
-                    if(thisCpn.$getRouteName() == 'updateDocumentObject')
+                    if(thisCpn.$getRouteName() == 'updateDocumentObject' && thisCpn.$route.params.id == thisCpn.documentId)
                      thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
                 else{
