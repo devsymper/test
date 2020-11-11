@@ -23,7 +23,7 @@
 									</v-tooltip>
 									<v-tooltip bottom  v-else >
 										<template v-slot:activator="{ on, attrs }">
-											<div class="title-document" 	
+											<div class="title-document-enduser" 	
 												v-bind="attrs"
 												v-on="on" >
 												<span>{{childItem.name}}</span> 
