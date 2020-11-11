@@ -41,7 +41,7 @@
                                     <v-list-item
                                         
                                         >
-                                        <img class="icon-control" :src="`https://hoangnd.dev.symper.vn/`+item.icon">
+                                        <img class="icon-control" :src="fontEndUrl+item.icon">
                                         <v-list-item-content>
                                         <v-list-item-title > <span>{{item.title}}</span> <span style="font:10px roboto;font-weight:400;padđing-left:4px">{{item.name}}</span></v-list-item-title>
                                         </v-list-item-content>
@@ -66,7 +66,7 @@
                         v-for="(item,i) in listColumnSelected"
                         :key="i"
                     >
-                        <img class="icon-control" :src="`https://hoangnd.dev.symper.vn/`+item.icon">
+                        <img class="icon-control" :src="fontEndUrl+item.icon">
                         <v-icon
                             class="red lighten-1 icon-remove"
                             dark
@@ -107,6 +107,7 @@
     </div>
 </template>
 <script>
+import { util } from "@/plugins/util.js";
 import ListColumnAutoComplete from './ListColumnAutoComplete'
 import {documentApi} from "@/api/Document.js"
 import TreeSqlConfig from "./TreeSqlConfig.vue"
@@ -158,7 +159,9 @@ export default {
             listColumn:null,
             cacheFieldDocument:{},
             treeConfigData:null,
-            rejectInput:false
+            rejectInput:false,
+            fontEndUrl:util.addEnvToUrl(`https://hoangnd.dev.symper.vn`),
+
         }
     },
     computed:{

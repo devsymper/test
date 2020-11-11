@@ -29,7 +29,7 @@
             <template v-slot:item="dataType" class="mh-15">
                  <v-list-item-content class="p-0">
                     <v-list-item>
-                        <img :src="`https://hoangnd.dev.symper.vn/`+dataType.item.prop.icon" style="height: 12px;width:14px;margin-right: 8px;">
+                        <img :src="fontEndUrl+dataType.item.prop.icon" style="height: 12px;width:14px;margin-right: 8px;">
                         <v-list-item-title >{{ dataType.item.prop.title }}</v-list-item-title>
                     </v-list-item>
                 </v-list-item-content>
@@ -62,6 +62,8 @@
     </tr>
 </template>
 <script>
+import { util } from "@/plugins/util.js";
+
 import { getAllControlForTableSetting,getControlElementForTableSetting } from "./../../../components/document/controlPropsFactory.js";
 export default {
     props:{
@@ -90,7 +92,7 @@ export default {
                 return control.type == e
             })
             if(control.length > 0)
-            this.imageControl = 'https://hoangnd.dev.symper.vn'+control[0].prop.icon
+            this.imageControl = fontEndUrl+control[0].prop.icon
         },
         //xóa dòng gọi lại cho tablesetting để xóa data
         removeRow(){
@@ -130,7 +132,8 @@ export default {
     data(){
         return {
             controlSelected : '',
-            imageControl:""
+            imageControl:"",
+            fontEndUrl:util.addEnvToUrl(`https://hoangnd.dev.symper.vn`),
         }
     },
   

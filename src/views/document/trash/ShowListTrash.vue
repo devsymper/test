@@ -1,7 +1,7 @@
 <template>
     <list-items
         ref="listDocument"
-        :getDataUrl="'https://sdocument-management.symper.vn/documents/trash'"   
+        :getDataUrl="sDocumentManagementUrl+'documents/trash'"   
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('document.title')"
@@ -13,6 +13,7 @@
     </list-items>
 </template>
 <script>
+import { appConfigs } from "@/configs.js";
 import { documentApi } from "./../../../api/Document.js";
 import ListItems from "./../../../components/common/ListItems.vue";
 import { util } from "./../../../plugins/util.js";
@@ -22,6 +23,7 @@ export default {
     },
     data(){
         return {
+            sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
             commonActionProps: {
                 "module": "document",
                 "resource": "document_definition",
