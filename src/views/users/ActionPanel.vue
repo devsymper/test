@@ -947,29 +947,29 @@ export default {
 		 * Hàm upload avatar user 
 		 */
 		//chon avatar -> preview
-		onFileChange(e) {
-			let thisCpn = this;
-			const file = e.target.files[0];
-			var formData = new FormData();
-			var type = file.type;
-			var match = ["image/gif", "image/png", "image/jpg", "image/jpeg"];
-			//kiểm tra kiểu file
-			if (type == match[0] || type == match[1] || type == match[2] || type == match[3]) {
-				formData.append('file', file);
-				formData.append('userId', 0);
-				userApi.uploadAvatar(formData).then(res => {
-					if (res.Status == 1) {
-						thisCpn.url = "https://kh.symper.vn/"+res.Data.path
-					}
-				})
-				.catch(err => {
-					console.log("error from upload avatar api!!!", err);
-				})
-				.always(() => {
+		// onFileChange(e) {
+		// 	let thisCpn = this;
+		// 	const file = e.target.files[0];
+		// 	var formData = new FormData();
+		// 	var type = file.type;
+		// 	var match = ["image/gif", "image/png", "image/jpg", "image/jpeg"];
+		// 	//kiểm tra kiểu file
+		// 	if (type == match[0] || type == match[1] || type == match[2] || type == match[3]) {
+		// 		formData.append('file', file);
+		// 		formData.append('userId', 0);
+		// 		userApi.uploadAvatar(formData).then(res => {
+		// 			if (res.Status == 1) {
+		// 				thisCpn.url = "https://kh.symper.vn/"+res.Data.path
+		// 			}
+		// 		})
+		// 		.catch(err => {
+		// 			console.log("error from upload avatar api!!!", err);
+		// 		})
+		// 		.always(() => {
 
-				});
-			}
-		},
+		// 		});
+		// 	}
+		// },
 		triggerClickAddAvatar(){
 			this.$refs.btnAddAvatar.click();
 		},
