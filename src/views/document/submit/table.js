@@ -162,6 +162,7 @@ const makeDelay = function(ms) {
 };
 var delay = makeDelay(1000);
 var delayTypingEnter = makeDelay(500);
+var delayAfterInsertRow = makeDelay(1000);;
 
 
 /**
@@ -453,6 +454,10 @@ export default class Table {
              * @param {*} source 
              */
             afterChange: function(changes, source) {
+                SYMPER_APP.$evtBus.$emit('symper-submit-on-table-change', {
+                    data: this.getSourceData(),
+                    tableName:thisObj.tableName
+                });
                 if (thisObj.isAutoCompleting) {
                     return;
                 }
@@ -553,7 +558,6 @@ export default class Table {
             this.dataInsertRows.push([]);
             let thisObj = this;
             delayTypingEnter(function() {
-                console.log("dataInsertRowsdataInsertRows", thisObj.dataInsertRows);
                 let listRootTable = sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'];
                 if (listRootTable.hasOwnProperty(thisObj.tableName)) {
                     let rowData = util.cloneDeep(listRootTable[thisObj.tableName]['defaultRow']);
@@ -905,8 +909,6 @@ export default class Table {
             }
         }
         let dataForStore = [];
-        debugger
-
         try {
             await formulasInstance.getDataMultiple(dataPost).then(res => {
                 if (res == undefined || !res.hasOwnProperty('data')) {
@@ -1166,8 +1168,19 @@ export default class Table {
              * @param {*} source 
              */
             afterCreateRow: function(index, amount, source) {
-                let id = Date.now();
-                thisObj.tableInstance.setDataAtCell(index, thisObj.tableInstance.getDataAtRow(0).length - 1, id);
+                let hotTable = this;
+                delayAfterInsertRow(function() {
+                    let colData = hotTable.getDataAtCol(hotTable.getDataAtRow(0).length - 1);
+                    let vls = [];
+                    for (let index = 0; index < colData.length; index++) {
+                        let id = Date.now() + index;
+                        let cellValue = colData[index];
+                        if(!cellValue){
+                            vls.push([index, 's_table_id_sql_lite', id]);
+                        }
+                    }
+                    thisObj.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+                });
             },
             afterRemoveRow: function(index, amount, physicalRows, source) {
                 let listInput = thisObj.getListInputInDocument();

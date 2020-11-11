@@ -133,7 +133,7 @@ const commonProps = {
     formatNumber: {
         title: "Định dạng số",
         type: "numberFormat",
-        value: ".00",
+        value: "#,###",
         groupType: "display"
     },
     // formatDateTime: {

@@ -91,6 +91,7 @@ import {systemDataMappingApi} from "@/api/systemDataMapping";
 import {listControlNotNameProp} from "@/components/document/controlPropsFactory.js";
 
 import Api from "@/api/api.js";
+import { util } from '../../../plugins/util';
 export default {
     props:{
         instance:{
@@ -192,7 +193,7 @@ export default {
             }
             let self = this;
             let domain = mappingItem.objectType.ownerDomain;
-            let api = new Api("https://"+domain);
+            let api = new Api(util.addEnvToUrl("https://"+domain));
             api.get("/object/"+mappingItem.objectType.name).then(res=>{
                 let data = res.data;
                 for(let columnName in data){
