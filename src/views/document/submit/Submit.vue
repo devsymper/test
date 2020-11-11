@@ -1892,7 +1892,7 @@ export default {
                         type: "success",
                         title: "update document success!"
                     });        
-                    if(thisCpn.$getRouteName() == 'updateDocumentObject' && thisCpn.$route.params.id == thisCpn.documentId)
+                    if(thisCpn.$getRouteName() == 'updateDocumentObject')
                      thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
                 else{
