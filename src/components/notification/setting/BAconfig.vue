@@ -190,16 +190,9 @@ export default {
   props: ['type'],
    watch: {
      type(){
-      //  debugger
-       if(this.type=="add"){
-         
-       }else{
-
-       }
+    
      },
       objectType(){
-        //debugger
-        
          this.refreshSelected();
          if(this.objectType.value){
            this.getSource(this.objectType.value)
@@ -276,7 +269,6 @@ export default {
     setAvaOrIcon(icon){
         if(icon){
             if(icon.indexOf('user_avatar_')>-1){
-              debugger
                 return appConfigs.apiDomain.fileManagement+'readFile/'+icon ;}
         }       
     },
@@ -298,7 +290,6 @@ export default {
         this.$refs.uploadAvatar.uploadFile();
     },
     replaceDescription(){
-    //  debugger
       let description = this.description;
       for(let i = 0; i<this.parameter.length;i++){
         let oldValue= new RegExp('<'+this.parameter[i].text+'>');
@@ -341,7 +332,6 @@ export default {
           content:this.replaceDescription()
 
         }
-      debugger
       const self = this;
       notification.updateChanel(this.updateData.id, this.updateData).then(res=>{
         if(res.status==200){
@@ -360,7 +350,6 @@ export default {
         })
     },
     add(){
-      //debugger
        if(this.avatarFileName){
         this.$refs.uploadAvatar.uploadFile();
       }

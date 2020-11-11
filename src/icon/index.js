@@ -1,6 +1,7 @@
 export default {
     input: {
         search: 'mdi-magnify',
+        task: '',
         my_application: 'mdi mdi-format-list-checkbox',
         workflow_definition: "mdi-lan",
         document_definition: "mdi-file-document-edit-outline",
@@ -26,7 +27,8 @@ export default {
         dashboard: "mdi mdi-view-dashboard",
         action_pack: " mdi mdi-package-variant-closed",
         import: "mdi mdi-import",
-        task: "mdi-office-building-outline"
+        task: "mdi-office-building-outline",
+        role: "mdi mdi-account-circle-outline"
 
 
 
