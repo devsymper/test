@@ -1,7 +1,7 @@
 <template>
-<div class="sym-control"  >
+<div class="sym-control" >
     <div class="control-content" :control-type="type" draggable="true" :control-id="dataControl.id" :table-id="dataControl.tableId">
-        <img class="icon-control" :src="fontEndUrl+dataControl.icon">
+        <img class="icon-control" :src="require('./../../../../public/img/document'+dataControl.icon)" v-if="dataControl.icon">
         <div @click="clickItem(type)" class="title-control fs-11">{{dataControl.title}}</div>
     </div>
     <div class="list-child-control">
@@ -17,6 +17,7 @@
 <script>
 import { util } from "@/plugins/util.js";
 import { getControlElement,listControlNotNameProp } from '../../../components/document/controlPropsFactory';
+
 export default {
     name:"control",
     props:{
@@ -33,7 +34,6 @@ export default {
     },
     data(){
         return{
-            fontEndUrl:util.addEnvToUrl(`https://hoangnd.dev.symper.vn`),
             dataControl : {},
             currentIndex: 1,
         }
