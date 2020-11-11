@@ -1057,6 +1057,14 @@ export default {
                 if(!isCheck && allControl[controlId].type == 'user'){
                     allUserControl['user'].push(allControl[controlId].properties.name.value)
                 }
+                let controlFormulas = allControl[controlId].formulas;
+                for(let formulaType in controlFormulas){
+                    if(formulaType != 'linkConfig'){
+                        if(controlFormulas[formulaType].value.trim() == ""){
+                            allControl[controlId].formulas[formulaType].formulasId = 0;
+                        }
+                    }
+                }
                 
             }
             return {minimizeControl:allControl,userControls:allUserControl}
