@@ -14,7 +14,7 @@
                     <span style="font:13px roboto;padding-left:8px">Yêu thích</span>
                 </div>
 				<VuePerfectScrollbar :style="{height:heightListApp}"  >
-					<div v-for="(item,i) in listApp" :key="i" 
+					<div v-for="(item,i) in listApps" :key="i" 
 						:class="{'list-app-item': true,'active': item.id == activeIndex}"
 						@click="clickDetails(item)"
 						>
@@ -81,7 +81,8 @@ import {util} from './../../../plugins/util'
 import MenuConfigTypeView from './MenuConfigTypeView'
     export default {
     created(){
-        this.getFavorite()
+		this.getFavorite()
+		this.getActiveApp()
     },
     components:{
         AppDetail,
@@ -115,6 +116,23 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 		
     },
     methods:{
+		getActiveApp(){
+			appManagementApi.getActiveApp().then(res=>{
+				if(res.status == 200){
+					this.listApps = res.data.listObject
+				}else{
+					this.$snotify({
+						type: "error",
+						title: "Không thể lấy danh sách application"
+					})
+				}
+			}).catch(err=>{
+					this.$snotify({
+						type: "error",
+						title: "Không thể lấy danh sách application"
+					})
+			})
+		},
         rightClickHandler(event,item,type){
 			event.stopPropagation();
 			event.preventDefault();
@@ -388,6 +406,7 @@ x				}
     data(){
         return { 
             apps: [],
+            listApps: [],
 			activeIndex: '',
             showDetailDiv:false,
             searchKey: '',
