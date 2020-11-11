@@ -169,6 +169,9 @@ import VueResizable from 'vue-resizable';
 import { util } from "./../../../plugins/util.js";
 import Detail from '@/views/document/detail/Detail.vue'
 import { orgchartApi } from "@/api/orgchart.js";
+import {
+    appConfigs
+} from "@/configs";
 export default {
     props: {
         allDepartments: {
@@ -542,7 +545,7 @@ export default {
                     if(after.length == 0){
                         after = 131237173123717323713277
                     }
-                    this.apiUrl = 'https://account.symper.vn/users?limitIds=['+after+']'
+                    this.apiUrl = appConfigs.apiDomain.account+'users?limitIds=['+after+']'
                 }
                
             }
