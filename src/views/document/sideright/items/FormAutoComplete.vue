@@ -41,7 +41,7 @@
                                     <v-list-item
                                         
                                         >
-                                        <img class="icon-control" :src="fontEndUrl+item.icon">
+                                        <img class="icon-control" :src="require('./../../../../../public/img/document'+item.icon)">
                                         <v-list-item-content>
                                         <v-list-item-title > <span>{{item.title}}</span> <span style="font:10px roboto;font-weight:400;padđing-left:4px">{{item.name}}</span></v-list-item-title>
                                         </v-list-item-content>
@@ -66,7 +66,7 @@
                         v-for="(item,i) in listColumnSelected"
                         :key="i"
                     >
-                        <img class="icon-control" :src="fontEndUrl+item.icon">
+                        <img class="icon-control" :src="require('./../../../../../public/img/document'+item.icon)">
                         <v-icon
                             class="red lighten-1 icon-remove"
                             dark
@@ -160,7 +160,6 @@ export default {
             cacheFieldDocument:{},
             treeConfigData:null,
             rejectInput:false,
-            fontEndUrl:util.addEnvToUrl(`https://hoangnd.dev.symper.vn`),
 
         }
     },

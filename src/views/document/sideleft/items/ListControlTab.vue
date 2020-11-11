@@ -12,7 +12,7 @@
 >
     <template v-slot:label="{ item }">
         <div v-on:click="clickItem($event,item)" :class="`tree-`+item.id">
-            <img :src="fontEndUrl+item.icon" height="14" width="14" style="margin-top:3px;margin-right:8px;margin-bottom: -2px;">
+            <img :src="require('./../../../../../public/img/document'+item.icon)" height="14" width="14" style="margin-top:3px;margin-right:8px;margin-bottom: -2px;">
             <label  :title="item.name">{{item.name}}</label>
         </div>
         
@@ -46,7 +46,6 @@ export default {
     data: () => ({
         tree: [],
         treeData:{},
-        fontEndUrl:util.addEnvToUrl(`https://hoangnd.dev.symper.vn`),
     }),
     methods:{
         handleTreeData(data){
