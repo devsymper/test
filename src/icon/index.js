@@ -30,9 +30,5 @@ export default {
         taskBPM: "mdi-lan",
         task: "mdi-hand-left",
         role: "mdi mdi-account-circle-outline"
-
-
-
-
     }
 }

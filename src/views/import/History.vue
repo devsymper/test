@@ -11,7 +11,7 @@
         :showExportButton="false"
         :customAPIResult="customAPIResult"
         :tableContextMenu="tableContextMenu"
-        :getDataUrl="'https://io.dev.symper.vn/history/document'">
+        :getDataUrl="getListUrl">
     </list-items>
         <v-navigation-drawer
             :style="{'width':(drawer)?'500px':'0'}"
@@ -161,10 +161,11 @@ export default {
                     }
                 }
             },
-            getListUrl: {},
+            getListUrl: '',
             actionPanelWidth:800,
             containerHeight: 200,
             columns: [],
+            linkDownload:'',
             totalPage: 6,
             listDocument: [],
         }
@@ -173,12 +174,13 @@ export default {
         this.calcContainerHeight();
     },
     created(){
-        this.getListUrl = appConfigs.apiDomain.importExcel+'history?page=1&pageSize=20';
+        this.getListUrl = appConfigs.apiDomain.viewHistoryImport;
+        this.linkDownload = appConfigs.apiDomain.importExcel
     },
     methods:{
         downloadExcel(importEx){
             let fileName = importEx.fileName;
-            window.location.href = "https://io.dev.symper.vn/download/"+fileName
+            window.location.href = this.linkDownload+"download/"+fileName
         },
         showDetail(importEx){
              this.importInfo = importEx;

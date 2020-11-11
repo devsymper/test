@@ -1,185 +1,213 @@
 <template>
     <div class="symper-detail-user pl-4 pt-2">
         <!-- panel title -->
-        <div class="w-100 h-100 d-flex flex-column flex-grow-1" v-if="isViewUserRole==false">
-            <div class="symper-title">
-                {{$t('user.myInfo.title')}}
-                <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-icon
-                            v-on="on"
-                            class="close-btn float-right"
-                            @click="closePanel"
-                        >mdi-close</v-icon>
-                    </template>
-                    <span>{{$t('common.close')}}</span>
-                </v-tooltip>
-            </div>
-
-            <div class="d-flex w-100 mt-4">
-                <!-- Thông tin chính -->
-                <div class="general-info d-inline-block" style="width: 65%">
-                    <div class="subtitle-2 " style="position: relative">
-                        {{$t('user.myInfo.generalInfo')}}
-
-                        <v-tooltip top v-if="!isEditing">
-                            <template v-slot:activator="{ on }">
-                                <v-btn
-                                    @click="isEditing = true"
-                                    icon tile class="float-right" small style="position: absolute; bottom: 2px; right: 0px"
-                                    >
-                                    
-                                    <v-icon
-                                    v-on="on"
-                                    size="16"
-                                    >mdi-grease-pencil</v-icon>
-                                </v-btn>
-                            </template>
-                            <span>{{$t('common.update') + ' ' + $t('user.myInfo.generalInfo')}}</span>
-                        </v-tooltip>
-
-
-                        <v-tooltip top v-else>
-                            <template v-slot:activator="{ on }">
-                                <v-btn
-                                    color="blue"
-                                    @click="saveUserInfo"
-                                    icon tile class="float-right" small style="position: absolute; bottom: 2px; right: 0px"
-                                    >
-                                    <v-icon
-                                        class=""
+        <v-row class="w-100 h-100">
+            <v-col :class="{'col-md-4':isViewUserRole}">
+                <v-list-item style="margin-left:-15px">
+                    <SymperAvatar 
+                        v-if="!isEditing"
+                        :userId="lazyUserInfo.id" 
+                        class="mr-3" />
+                    <v-list-item-avatar v-else >
+                        <v-avatar >
+                            <img v-if="avatarUrl != ''"
+                                :src="avatarUrl"
+                            >
+                            <img v-if="avatarUrl== ''"
+                                :src="require('./../../../assets/image/avatar_default.jpg')"
+                            >
+                        </v-avatar> 
+                        <!-- <UploadFile 
+                            :pickAvatar="true"
+                            :fileName="avatarFileName"
+                            @selected-file="handleAvatarSelected"
+                            ref="uploadAvatar"
+                        />  -->
+                   </v-list-item-avatar> 
+                    <v-list-item-content>
+                        <v-list-item-title >
+                            {{lazyUserInfo.displayName}}
+                            <v-tooltip top v-if="!isEditing">
+                                <template v-slot:activator="{ on }">
+                                    <v-btn
+                                        @click="isEditing = true"
+                                        icon tile class="float-right" 
+                                        style="margin-right:-5px" 
+                                        small 
+                                        >
+                                        <v-icon
                                         v-on="on"
                                         size="16"
-                                    >mdi-content-save</v-icon>
-                                </v-btn>
-                            </template>
-                            <span>{{$t('common.save') + ' ' + $t('user.myInfo.generalInfo')}}</span>
-                        </v-tooltip>
-                    </div>
-                    <div v-for="(value, key) in showableUserInfo" :key="key" class="pl-4 mb-1">
-                        <div class="detail-user-label">
-                            {{$t('user.general.personalInfo.'+key)}}
-                        </div>
-                        <div v-if="isEditing && (key != 'email' && key != 'displayName')" class="detail-user-value editable-value">
-                            <v-text-field
-                                solo
-                                flat
-                                hide-details
-                                class="sym-small-size sym-style-input"
-                                single-line
-                                v-model="showableUserInfo[key]">
-                            </v-text-field>
-                        </div>
-                        <div v-else class="detail-user-value read-only-value">
-                            {{showableUserInfo[key]}}
-                        </div>
-                        <v-btn 
-                            icon tile class="float-right" v-if=" !isEditing && (key == 'email' || key == 'phone')" small style="position: relative; bottom: 2px">
-                            <v-tooltip top>
-                                <template v-slot:activator="{ on }">
-                                    <v-icon
-                                        class="close-btn float-right"
-                                        v-on="on"
-                                        v-clipboard:copy="showableUserInfo[key]"  
-                                        size="15"
-                                        >mdi-content-copy
-                                    </v-icon>
+                                        >mdi-grease-pencil</v-icon>
+                                    </v-btn>
                                 </template>
-                                <span>{{$t('common.copy') + ' ' + $t('user.general.personalInfo.'+key) }}</span>
+                                <span>{{$t('common.update') + ' ' + $t('user.myInfo.generalInfo')}}</span>
                             </v-tooltip>
-                        </v-btn>
-                    </div>
-                    <div class="ml-4">
-                         <div @click="changePass()" class="detail-user-label">
-                            {{$t('user.general.personalInfo.pass')}}
-                              <v-icon style = "font-size: 16px; margin-top:-2px">mdi-lock-outline</v-icon>
-                        </div>
-                          <v-dialog
-                                v-model="openChangePassForm"
-                                width="397"
-                                >
-                            <NotificationChangePass ref = "changePass" @cancel="cancelDialog()"/>
-                        </v-dialog>
-                    </div>
+                            <v-tooltip top v-else>
+                                <template v-slot:activator="{ on }">
+                                    <v-btn
+                                        color="blue"
+                                        @click="saveUserInfo"
+                                        icon tile class="float-right"
+                                        style="margin-right:-5px" 
+                                        small 
+                                        >
+                                        <v-icon
+                                            v-on="on"
+                                            size="16"
+                                        >mdi-content-save</v-icon>
+                                    </v-btn>
+                                </template>
+                                <span>{{$t('common.save') + ' ' + $t('user.myInfo.generalInfo')}}</span>
+                            </v-tooltip>
+                        </v-list-item-title>
+                        <v-list-item-subtitle style="color:black">
+                            {{lazyUserInfo.email}}
+                             <v-tooltip top>
+                            <template v-slot:activator="{ on }">
+                                <v-icon
+                                    class="close-btn float-right "
+                                    v-on="on"
+                                    v-clipboard:copy="showableUserInfo['email']"  
+                                    size="15"
+                                    >mdi-content-copy
+                                </v-icon>
+                            </template>
+                            <span>{{$t('common.copy') + ' ' + $t('user.general.personalInfo.email') }}</span>
+                        </v-tooltip>
+                        </v-list-item-subtitle>
+                    </v-list-item-content>
+                </v-list-item>
+            <div class=" mt-4">
+                <!-- Thông tin chính -->
+                <div>
+                    <v-icon class="fs-16" >mdi mdi-information-outline</v-icon>
+                    <span class="fs-13 fw-430">
+                        {{$t('user.myInfo.generalInfo')}}
+                    </span>
                 </div>
-
+                <div v-for="(value, key) in showableUserInfo"
+                    v-if="key!='email'&&key!='displayName'"
+                    :key="key" 
+                    class="pl-4" 
+                    style="margin-bottom:-20px">
+                    <v-row>
+                         <v-col class="col-md-4 fs-13 fw-430" >
+                        {{$t('user.general.personalInfo.'+key)}}
+                        </v-col>
+                    <v-col class="col-md-8" v-if="isEditing && (key != 'email' && key != 'displayName')" >
+                        <v-text-field
+                            solo
+                            flat
+                            hide-details
+                            class="sym-small-size sym-style-input"
+                            single-line
+                            v-model="showableUserInfo[key]">
+                        </v-text-field>
+                    </v-col>
+                    <v-col v-if="!isEditing" >
+                        <span class="fs-13" >
+                            {{showableUserInfo[key]?showableUserInfo[key]:"Đang để trống"}}
+                        </span>
+                        <v-btn 
+                        icon tile 
+                        class="float-right" 
+                        v-if=" (key == 'email' || key == 'phone')">
+                        <v-tooltip top>
+                            <template v-slot:activator="{ on }">
+                                <v-icon
+                                    style="margin-top:-10px"
+                                    class="close-btn float-right mr-3"
+                                    v-on="on"
+                                    v-clipboard:copy="showableUserInfo[key]"  
+                                    size="15"
+                                    >mdi-content-copy
+                                </v-icon>
+                            </template>
+                            <span>{{$t('common.copy') + ' ' + $t('user.general.personalInfo.'+key) }}</span>
+                        </v-tooltip>
+                    </v-btn>
+                    </v-col>
+                    </v-row>
+                </div>
+                <div class="ml-4" :class="{'mt-2':isEditing}">
+                    <div @click="changePass()" class="detail-user-label">
+                        {{$t('user.general.personalInfo.pass')}}
+                        <v-icon style = "font-size: 16px; margin-top:-2px">mdi-lock-outline</v-icon>
+                    </div>
+                    <v-dialog
+                        v-model="openChangePassForm"
+                        width="397"
+                        >
+                    <NotificationChangePass ref = "changePass" @cancel="cancelDialog()"/>
+                    </v-dialog>
+                </div>
                 <!-- Avatar -->
-                <div class="user-avatar d-inline-block pa-2" style="width: 35%" >
-                    <v-avatar :size="80">
-                        <img v-if="avatarUrl != ''"
-                            :src="avatarUrl"
-                        >
-                        <img v-if="avatarUrl== ''"
-                            :src="require('./../../../assets/image/avatar_default.jpg')"
-                        >
-                     </v-avatar>
-                    <!-- <SymperAvatar :userId="lazyUserInfo.id" :size="100" /> -->
-                    <UploadFile 
-                        :pickAvatar="true"
-                        :fileName="avatarFileName"
-						@selected-file="handleAvatarSelected"
-                        ref="uploadAvatar"
-                    />
-                </div>
-            </div>
-            
             <!-- Vai trò của user -->
-            <div class="user-role-info w-100 fs-13 mt-6">
-                <div class="subtitle-2 ">
+            <div class="user-role-info w-100 mt-3">
+                <div>
+                    <v-icon class="fs-16">mdi mdi-office-building-outline</v-icon>
+                    <span class="fw-430 fs-13 "> 
                     {{$t('user.myInfo.myPosition')}}
+                    </span>
                 </div>
-
-                <div class="pl-4 d-flex mt-1" v-if="lazyUserInfo.roles.orgchart.length">
-                    <div class="detail-user-label  mt-1">
+                <div 
+                    class="pl-4 d-flex mt-1" 
+                    v-if="lazyUserInfo.roles.orgchart.length">
+                    <div class="detail-user-label mt-1">
                         {{$t('common.orgchart')}}
                     </div>
-                    <div class="detail-user-value">
-                        <div v-for="role in lazyUserInfo.roles.orgchart" :key="role.id">
-                            <div >
-                                <i class="fs-16 mdi mdi-check  indigo--text text--darken-4 mr-1"></i>
-                                <v-btn class="fm fw-400" 
-                                    style="margin-bottom:-8px"
-                                    text 
-                                    @click="viewUserRole(role.id)" >
-                                    <span class='fm'>
-                                        {{role.name}}
-                                    </span>
-                                </v-btn>
-                            </div>
-                            <div class="text--lighten-2 grey-text pl-6">
-                                {{role.path}}
-                            </div>
-                        </div>
+                </div>
+                <div v-for="role in lazyUserInfo.roles.orgchart" :key="role.id">
+                    <div class="ml-5">
+                        <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon>
+                        <!-- <i class="fs-16 mdi mdi-check  indigo--text text--darken-4 mr-1"></i> -->
+                        <v-btn class="font-normal " 
+                            style="margin-bottom:-8px"
+                            text 
+                            @click="viewUserRole(role.id)" >
+                            <span style="margin-top:-5px">
+                                {{role.name}}
+                            </span>
+                        </v-btn>
+                    </div>
+                    <div class="text--lighten-2 grey-text pl-6">
+                        {{role.path}}
                     </div>
                 </div>
-                
-                <div class="pl-4 d-flex mt-2" v-if="lazyUserInfo.roles.orgchart.length">
-                    <div class="detail-user-label mt-1">
-                        {{$t('common.system')}}
+                </div>
+                <div class="mt-2" v-if="lazyUserInfo.roles.orgchart.length">
+                    <div class=" mt-1">
+                        <v-icon class="fs-16">mdi mdi-account-tie-outline</v-icon>
+                       <span 
+                        class="fs-13 fw-430">
+                         {{$t('common.system')}}
+                        </span>
                     </div>
                     <div class="detail-user-value">
                         <div v-for="role in lazyUserInfo.roles.systemRole" :key="role.id">
-                            <div class="">
-                                <i class="fs-16 mdi mdi-check  indigo--text text--darken-4 mr-1"></i> 
-                                <v-btn class="fm fw-400" 
-                                    style="margin-bottom:-8px"
-                                    text 
-                                    @click="viewUserRole(role.id)" >
-                                    <span class='fm'>
-                                        {{role.name}}
-                                    </span>
-                                </v-btn>
-                            </div>
+                            <!-- <i class="fs-16 indigo--text text--darken-4 mr-1"></i>  -->   
+                            <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon>
+                            <v-btn class="fm fw-400" 
+                                style="margin-bottom:-8px"
+                                text 
+                                @click="viewUserRole(role.id)" >
+                                <span class='fm'>
+                                    <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon>
+                                    {{role.name}}
+                                </span>
+                            </v-btn>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-        <div  class="w-100 h-100" v-if="isViewUserRole">
-            <ViewRoles 
-                @show-userInfo="showUserInfo()"
-                :rolesList="role"/>
-        </div>
+            </v-col>
+            <v-col class="col-md-8" v-if="isViewUserRole">
+                <ViewRoles 
+                    @show-userInfo="showUserInfo()"
+                    :rolesList="role"/>
+            </v-col>
+        </v-row>
     </div>
 </template>
 
@@ -321,24 +349,11 @@ export default {
 </script>
 
 <style scoped>
-    .fm{
-		font-family:Roboto!important;
-		font-size:13px!important
-	}
-	.fw-400{
-		font-weight:400
-	}
+  
     .symper-detail-user .detail-user-label {
-        width: 100px;
         font-weight: 500;
         display: inline-block;
         font-size: 13px;
-    }
-
-    .symper-detail-user .detail-user-value{
-        font-size: 13px;
-        /* width: calc(100% - 100px); */
-        display: inline-block;
     }
 
     .symper-detail-user .detail-user-value.editable-value{
@@ -349,5 +364,10 @@ export default {
         display: inline-block;
         text-align: center;
         margin: auto;
+    }
+    .symper-detail-user ::v-deep .v-avatar{
+        height: 70px!important;
+        min-width: 70px!important;
+        width: 70px!important;
     }
 </style>

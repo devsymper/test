@@ -92,9 +92,8 @@
                 </v-layout>
             </v-container>
         </v-content>
-        
         <v-navigation-drawer
-            v-bind:class="[isExpand==true?'width-1200':'width-500']"
+            v-bind:class="[isExpand==true?'width-1200':'width-400']"
             right
             v-model="showMyInfo"
             v-show="showMyInfo"
@@ -102,7 +101,6 @@
             style="z-index:999!important"
             temporary>
             <DetailUser 
-            
                 :userInfo="sapp.endUserInfo"
                 @expand-panel="isExpand=true"
                 :close="isExpand"
@@ -278,7 +276,7 @@ export default {
     width:1200px!important
 
 }
-.width-500{
-    width:500px!important
+.width-400{
+    width:400px!important
 }
 </style>
