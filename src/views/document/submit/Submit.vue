@@ -473,6 +473,18 @@ export default {
             this.focusingControlName = controlName;
             this.$refs.floattingPopup.show(e, $('#sym-submit-'+this.keyInstance), row);
         });
+        /**
+         * Su kiện phát ra khi có sự thay đổi trong table, để convert sang pivot table
+         */
+        this.$evtBus.$on("symper-submit-on-table-change", locate => {
+            if(thisCpn._inactive == true) return;
+            let tableName = locate.tableName;
+            if(this.dataPivotTable[tableName]){
+                let data = locate.data;
+                let tableIns = getControlInstanceFromStore(this.keyInstance, tableName);
+                this.setDataToPivotTable(tableIns,data);
+            }
+        });
 
         this.$evtBus.$on("run-formulas-control-outside-table", e => {
             if(thisCpn._inactive == true) return;
@@ -2270,7 +2282,13 @@ export default {
 
             }
         },
-     
+        /**
+         * Hàm cập nhật dữ liệu cho bảng pivot
+         */
+        setDataToPivotTable(tableControl, data){
+            tableControl.pivotTable.show();
+            tableControl.pivotTable.setData(data);
+        },
 
         /**
          * Hàm set data cho bảng trong doc sau khi chạy công thức có dữ liệu
@@ -2285,8 +2303,7 @@ export default {
                 return;
             }
             tableControl.tableInstance.setData(data);
-            // tableControl.pivotTable.show();
-            // tableControl.pivotTable.setData(data);
+            this.setDataToPivotTable(tableControl,data);
         },
 
         /**
