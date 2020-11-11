@@ -161,21 +161,17 @@ export default {
                     }
                 }
             },
-            getListUrl: '',
+            getListUrl: appConfigs.apiDomain.viewHistoryImport,
             actionPanelWidth:800,
             containerHeight: 200,
             columns: [],
-            linkDownload:'',
+            linkDownload:appConfigs.apiDomain.importExcel,
             totalPage: 6,
             listDocument: [],
         }
     },
     mounted() {
         this.calcContainerHeight();
-    },
-    created(){
-        this.getListUrl = appConfigs.apiDomain.viewHistoryImport;
-        this.linkDownload = appConfigs.apiDomain.importExcel
     },
     methods:{
         downloadExcel(importEx){

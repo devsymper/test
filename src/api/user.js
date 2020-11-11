@@ -2,7 +2,6 @@ import Api from "./api";
 import { appConfigs } from "./../configs.js";
 import { util } from "../plugins/util";
 
-// var api = new Api(appConfigs.apiDomain.user);
 var coreApi = new Api(appConfigs.apiDomain.user);
 var permissionApi = new Api(appConfigs.apiDomain.permission);
 var operationsApi = new Api(appConfigs.apiDomain.operations);
@@ -59,7 +58,7 @@ export const userApi = {
         return coreApi.post("users/locale", { locale: locale });
     },
     changeDelegate(userInfo) {
-        return api.post('auth/change-delegate', { user_id: userInfo.id })
+        return coreApi.post('auth/change-delegate', { user_id: userInfo.id })
     },
     changeRole(roleId) {
         return coreApi.post('auth/set-role', {
