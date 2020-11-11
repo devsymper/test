@@ -101,6 +101,8 @@ export default {
             if(newValue[i].active){
                 for(let j = 0; j<newValue[i].items.length;j++){
                     if(newValue[i].items[j].active){
+                       
+                        // this.listItems
                           //newValue[i].active=false;
                         this.subcribedAllChanel(newValue[i].title, newValue[i].items[j].title,i,j) 
                     }else{
@@ -149,11 +151,16 @@ export default {
             })
         },
         //subcribed all
-        subcribedAllChanel(objectType,event,k,h){
+        subcribedAllChanel(objectType,event,listItemsIdx,childrenListItemsIdx){
+                  debugger
             for(let i=0;i<this.allListChanel.length;i++){
                 if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&!this.allListChanel[i].userFilterState){
+              
+                    // this.listItems[listItemsIdx].subTitle.push(this.listItems[listItemsIdx].items[childrenListItemsIdx].title);
+                    // this.listItems[listItemsIdx].subTitle = this.listItems[listItemsIdx].subTitle.filter((item, index) => this.listItems[listItemsIdx].subTitle.indexOf(item) === index);
                        notification.subscribeChanel(this.allListChanel[i].id).then(res=>{
                         if(res.status==200){
+                            
                         }
                     })
                 }
