@@ -204,7 +204,7 @@ export default {
         },
          getActiveapps(){
             let self = this
-			appManagementApi.getActiveApp().then(res => {
+			appManagementApi.getActiveAppSBS().then(res => {
 				if (res.status == 200) {
                     for(let e of res.data.listObject){
                         e.childrenAppReduce = {}

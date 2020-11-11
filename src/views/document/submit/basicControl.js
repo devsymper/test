@@ -713,4 +713,33 @@ export default class BasicControl extends Control {
             this.ele.parent().append(icon);
         }
     }
+     /**
+     * Hàm chuyển định dạng date sang dạng sql hiểu được
+     */
+    convertDateToStandard(data){
+        let dateFormat = this.controlProperties.formatDate.value;
+        if(!dateFormat){
+            return data;
+        }
+        if(!data){
+            return "";
+        }
+        if(typeof data == 'object'){
+            let newData = [];
+            for (let index = 0; index < data.length; index++) {
+                let value = data[index];
+                if(value){
+                    newData.push(moment(value,dateFormat).format('YYYY-MM-DD'))
+                }
+                else{
+                    newData.push("");
+                }
+                
+            }
+            return newData;
+        }
+        else{
+            return moment(value,dateFormat).format('YYYY-MM-DD')
+        }
+    }
 }
