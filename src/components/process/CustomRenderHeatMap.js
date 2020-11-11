@@ -46,7 +46,6 @@ export default class CustomRenderer extends BaseRenderer {
 			let countRunning = element.businessObject.$attrs.countRunning;
 			let r = 16
 			let runner = 0;
-			debugger
 			svgClasses(shape).add('cursor-pointer');
 			if(countEnd){
 				var config = {
@@ -58,21 +57,30 @@ export default class CustomRenderer extends BaseRenderer {
 				  };
 				var heatmapInstance = h337.create(config);
 				var dataPoint = {
-					x: 5, // x coordinate of the datapoint, a number
-					y: 5, // y coordinate of the datapoint, a number
+					x: 100, // x coordinate of the datapoint, a number
+					y: 100, // y coordinate of the datapoint, a number
 					value: 100 // the value at datapoint(x, y)
 				};
 				heatmapInstance.addData(dataPoint);
-				debugger
-
 			}
 			if(countRunning){
-				let rect = drawRect(parentNode, r+5, r, 2, STATUS_COLORS['running']);
-				let offset = runner * r * 1.5;
-				svgAttr(rect, {
-					transform: `translate(${offset}, -16)`
+				var config = {
+					container: parentNode,
+					radius: 10,
+					maxOpacity: .5,
+					minOpacity: 0,
+					blur: .75
+				  };
+				var heatmapInstance = h337.create(config);
+				var dataPoint = {
+					x: 50, // x coordinate of the datapoint, a number
+					y: 50, // y coordinate of the datapoint, a number
+					value: 100 // the value at datapoint(x, y)
+				};
+				heatmapInstance.setData({
+					max:20,
+					data: dataPoint
 				});
-				insertText(parentNode,countRunning ,STATUS_COLORS['running'], true)
 			}
           
           

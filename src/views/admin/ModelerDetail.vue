@@ -10,7 +10,6 @@
 						x-small
 						class="mr-2"
 						@click="changeTab('tab-1')"
-						active-class="tab-1"
 					>
 						<v-icon small >mdi-numeric-2-box-outline</v-icon>
 					</v-btn>
@@ -19,7 +18,6 @@
 						icon
 						x-small
 						class="mr-2"
-						active-class="tab-2"
 						@click="changeTab('tab-2')"
 					>
 						<v-icon x-small >mdi-coolant-temperature</v-icon>
@@ -1275,11 +1273,9 @@ export default {
 						processTracking.forEach(function(e){
 							if(e.act_id_ == el.id){
 								//lam o day
-								debugger
 								symBpmn.updateElementProperties(el.id,{
 									countEnd: e.count_end,
 									countRunning: e.count_running,
-
 								})
 							}	
 						})
@@ -1583,8 +1579,8 @@ export default {
 			this.$store.dispatch("app/getAllUsers");
 			this.$store.dispatch("process/getLastestProcessDefinition");
 			this.$store.dispatch('process/getAllDefinitions');
+			// this.applySavedData(this.processId)
 			this.applySavedData(val);
-			this.tab = "tab-1"
 		},
 		tab(){
 			this.instanceKey = Date.now();

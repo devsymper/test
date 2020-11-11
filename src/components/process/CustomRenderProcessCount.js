@@ -43,7 +43,6 @@ export default class CustomRenderer extends BaseRenderer {
 			let countRunning = element.businessObject.$attrs.countRunning;
 			let r = 16
 			let runner = 0;
-			debugger
 			svgClasses(shape).add('cursor-pointer');
 			if(countEnd){
 				let rect = drawRect(parentNode, r+5, r, 2, STATUS_COLORS['end']);
