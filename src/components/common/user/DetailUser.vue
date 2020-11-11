@@ -166,7 +166,7 @@
                             style="margin-bottom:-8px"
                             text 
                             @click="viewUserRole(role.id)" >
-                            <span style="margin-top:-5px">
+                            <span style="margin-top:-px">
                                 {{role.name}}
                             </span>
                         </v-btn>
