@@ -150,6 +150,7 @@
 
 <script>
 import { SplitGrid, SplitGridArea, SplitGridGutter } from "vue-split-grid";
+import { util } from '../../plugins/util.js';
 import Api from "./../../api/api.js";
 export default {
     name: "ExpandableListPermissions",
@@ -161,7 +162,7 @@ export default {
     computed: {},
     data: function() {
         return {
-            apiUrl: "https://v2hoangnd.dev.symper.vn/",
+            apiUrl: util.addEnvToUrl("https://v2hoangnd.dev.symper.vn/"),
             packPath: "permission-packages",
             packName: "",
             listPackages: [],

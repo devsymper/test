@@ -503,7 +503,7 @@ export default {
                 }
             },
             filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
-            getDataUrl:"https://workflow-extend.symper.vn/tasks",
+            getDataUrl: util.addEnvToUrl("https://workflow-extend.symper.vn/tasks"),
              /**
              * Thêm điều kiện để quy vấn qua api
              */

@@ -170,6 +170,9 @@ export default {
         },
         instance:{
             type:Number
+        },
+        defaultTablePivotConfig:{
+            type:Object
         }
     },
     watch:{
@@ -178,6 +181,14 @@ export default {
             immediate:true,
             handler:function(vl){
                 this.listRows = vl;
+            }
+        },
+        defaultTablePivotConfig:{
+            deep:true,
+            immediate:true,
+            handler:function(vl){
+                if(Object.keys(vl).length > 0 )
+                this.tablePivotConfig = vl;
             }
         },
         tab(vl){
@@ -312,7 +323,7 @@ export default {
         saveTable(){
             this.filterRowNotExistType();
             if(this.listRows.length > 0){
-                this.$emit("add-columns-table",this.listRows);
+                this.$emit("add-columns-table",{listRows:this.listRows, tablePivotConfig:this.tablePivotConfig});
             }
             this.listRows = [];
             this.hideDialog()

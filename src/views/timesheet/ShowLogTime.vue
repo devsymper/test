@@ -1,7 +1,7 @@
 <template>
 <div class='log-time h-100' style="padding-left: 10px">
     <v-row style="padding-bottom: 10px; margin-left:2px; margin-bottom:-22px">
-        <period-selector />
+        <period-selector  @load-logtime="reloadLog" />
         <div style="width:38%;float:right" 
              class="">
             <CalendarViewMode
@@ -60,6 +60,7 @@
         </DeleteLogView>
     </v-dialog>
     <LogCalendar 
+        :userId="userId"
         @showLog="showLog" 
         ref="logCalendar" 
         :time-view="time_view" 
@@ -93,6 +94,7 @@ export default {
     },
     data() {
         return {
+            userId:'',
             showTask:false,
             showCategory:false,
             time_view: true,
@@ -139,6 +141,9 @@ export default {
     methods: {
         doneCate(){
             this.updateAPICate = false
+        },
+        reloadLog(userId){
+            this.userId = userId;
         },
         updateAPICategory(){
             this.updateAPICate =true;
