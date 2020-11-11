@@ -34,8 +34,13 @@ export const adminApi = {
 			testHeader
 		)
 	},
-	stopWorkFlow(id){
-		return bpmneApi
+	stopProcessDefinition(id){
+		return bpmneApi.put(appConfigs.apiDomain.bpmne.definitions+'/'+id,
+			JSON.stringify({
+				"action": "suspend",
+			}),
+		testHeader
+		)
 	},
 	aggregateWorkflow(id){
 		return workflowExtendApi.get('workflow/'+id+'/aggregate')

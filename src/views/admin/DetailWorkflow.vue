@@ -101,30 +101,18 @@
 							</v-chip>
 							<span>Hoàn thành</span>
 						</div>
-						<div>
-							 <v-chip
-								class="ma-2"
-								color="red"
-								text-color="white"
-								small
-								>
-								n
-							</v-chip>
-							<span>Lỗi</span>
-						</div>
 					</div>
 				</div>
-				
 			</div>
 		</div>
 		<div class="list-workflow-instance d-flex flex-column h-100 mt-8" >
 			<ListProcessInstance :showSwitchBtn="true" />
 		</div>
-		<ConfirmDelete 
+		<!-- <ConfirmDelete 
 			:showDialog="showDialog"
 			@cancel="cancel"
 			@confirm="deleteProcessInstance"
-			 />
+			 /> -->
 	</div>
 </template>
 
@@ -233,33 +221,36 @@ export default {
 	methods:{
 		dmbChart(cx,cy,radius,arcwidth,values,colors,selectedValue){
 			var canvas = document.getElementById('canvas');
-			var ctx = canvas.getContext("2d");
-			ctx.clearRect(0, 0, canvas.width, canvas.height);
-			var tot = 0;
-			var accum = 0;
-			var PI = Math.PI;
-			var PI2 = PI*2;
-			var offset = -PI/2;
-			ctx.lineWidth = arcwidth;
-			for(var i = 0; i < values.length; i++){
-				tot += values[i]
-			}
-			for(var i = 0; i < values.length; i++){
+			if(canvas){
+				var ctx = canvas.getContext("2d");
+				ctx.clearRect(0, 0, canvas.width, canvas.height);
+				var tot = 0;
+				var accum = 0;
+				var PI = Math.PI;
+				var PI2 = PI*2;
+				var offset = -PI/2;
+				ctx.lineWidth = arcwidth;
+				for(var i = 0; i < values.length; i++){
+					tot += values[i]
+				}
+				for(var i = 0; i < values.length; i++){
+					ctx.beginPath();
+					ctx.arc(cx,cy,radius,
+						offset+PI2*(accum/tot),
+						offset+PI2*((accum+values[i])/tot)
+					);
+					ctx.strokeStyle=colors[i];
+					ctx.stroke();
+					accum+=values[i];
+				}
+				var innerRadius=radius-arcwidth;
 				ctx.beginPath();
-				ctx.arc(cx,cy,radius,
-					offset+PI2*(accum/tot),
-					offset+PI2*((accum+values[i])/tot)
-				);
-				ctx.strokeStyle=colors[i];
-				ctx.stroke();
-				accum+=values[i];
+				ctx.fillStyle=colors[selectedValue];
+				ctx.textAlign='center';
+				ctx.font="30px  roboto";
+				ctx.fillText(this.sAdmin.sumProcess,cx,cy+innerRadius*.9);
 			}
-			var innerRadius=radius-arcwidth;
-			ctx.beginPath();
-			ctx.fillStyle=colors[selectedValue];
-			ctx.textAlign='center';
-			ctx.font="30px  roboto";
-			ctx.fillText(this.sAdmin.sumProcess,cx,cy+innerRadius*.9);
+			
 		},
 		afterSelectedRow(items){
 			this.$set(this, 'listItemSelected', items)
@@ -373,8 +364,11 @@ export default {
 				}else{
 					this.isShowDonutChart = false
 					var canvas = document.getElementById('canvas');
-					var ctx = canvas.getContext("2d");
-					ctx.clearRect(0, 0, canvas.width, canvas.height);
+					if(canvas){
+						var ctx = canvas.getContext("2d");
+						ctx.clearRect(0, 0, canvas.width, canvas.height);
+					}
+					
 				}
             }
 		}
@@ -407,7 +401,7 @@ export default {
 	margin: -8px 
 }
 .description-summary{
-	margin-top:24px;
+	margin-top:45px;
 	margin-left:16px;
 }
 /* canvas{

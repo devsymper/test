@@ -146,7 +146,7 @@ export default {
     },
     data: function() {
         return {
-            apiUrl: "https://core.symper.vn/application",
+            // apiUrl: "https://core.symper.vn/application",
             appUrl: "apps",
             removeCallback: null,
             showResult: false,

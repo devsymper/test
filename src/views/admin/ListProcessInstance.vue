@@ -127,13 +127,14 @@ export default {
 			showBtnAddCheckbox: true,
 			customAPIResult:{
 				reformatData(res){
+					debugger
 					return{
                          columns: [
 							// {name: "checkbox_select_item",data:"checkbox_select_item",title:"selected",type:"checkbox", noFilter:true},
-                            {name: "id", title: "id", type: "numeric", noFilter:true},
-							{name: "name", title: "name", type: "text", noFilter:true},
-							{name: "startUserId", title: "startUserId", type: "text", noFilter:true},
-							{name: "suspended", title: "suspended", type: "date", noFilter:true,
+                            {name: "id", title: "id", type: "numeric"},
+							{name: "processDefinitionName", title: "name", type: "text"},
+							{name: "startUserId", title: "startUserId", type: "text"},
+							{name: "suspended", title: "suspended", type: "date",
 								  renderer:  function(instance, td, row, col, prop, value, cellProperties) {
 										Handsontable.dom.empty(td);
 										let span;
