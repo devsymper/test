@@ -1,5 +1,5 @@
 <template>
-    <span><img :src="imgBaseDomain+icon" height="14" style="margin-right:8px" alt="">{{text}}</span>
+    <span><img :src="require('./../../../../public/img/document'+icon)" height="14" style="margin-right:8px" alt="">{{text}}</span>
 </template>
 <script>
 import { util } from '../../../plugins/util';
@@ -7,7 +7,6 @@ import { util } from '../../../plugins/util';
 export default {
     data(){
         return {
-            imgBaseDomain: util.addEnvToUrl(`https://hoangnd.dev.symper.vn`),
             icon: null,
             text:''
         };
