@@ -448,7 +448,7 @@ export default {
                 }
             },
             filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
-            getDataUrl:"https://workflow-extend.symper.vn/works",
+            getDataUrl:appConfigs.apiDomain.workflowExtend+"works",
              /**
              * Thêm điều kiện để quy vấn qua api
              */

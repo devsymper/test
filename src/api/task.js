@@ -9,7 +9,7 @@ export const taskApi = {
         return fileManagement.get('getFileByObjectIdentifier', { objectIdentifier: data.objectIdentifier, objectType: data.objectType });
     },
     downloadFile(id) {
-        window.open('https://file.symper.vn/downloadS/' + id, '_blank');
+        window.open(appConfigs.apiDomain.fileManagement+'downloadS/' + id, '_blank');
     },
     deleteFile(data) {
         return fileManagement.put('changeStatusSymperFile', data);
