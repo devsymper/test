@@ -325,11 +325,11 @@ export default {
                 }
                 work.symperApplicationName=appName;
 
-                if ( work.endTime) {
-                    date = work.endTime.split("T")[0];
-                }else{
-                    date = work.startTime.split("T")[0];
-                }
+                // if ( work.endTime) {
+                //     date = work.endTime.split("T")[0];
+                // }else{
+                    date = work.startTime.split(" ")[0];
+                // }
                 let fromNow = this.getDateFormNow(date);
                 if (!groups[fromNow]) {
                     groups[fromNow] = [];
@@ -448,7 +448,7 @@ export default {
                 }
             },
             filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
-            getDataUrl:"https://workflow-extend.symper.vn/works",
+            getDataUrl:appConfigs.apiDomain.workflowExtend+"works",
              /**
              * Thêm điều kiện để quy vấn qua api
              */
