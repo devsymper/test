@@ -120,9 +120,17 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 			appManagementApi.getActiveApp().then(res=>{
 				if(res.status == 200){
 					this.listApps = res.data.listObject
+				}else{
+					this.$snotify({
+						type: "error",
+						title: "Không thể lấy danh sách application"
+					})
 				}
 			}).catch(err=>{
-
+					this.$snotify({
+						type: "error",
+						title: "Không thể lấy danh sách application"
+					})
 			})
 		},
         rightClickHandler(event,item,type){
