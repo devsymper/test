@@ -101,30 +101,18 @@
 							</v-chip>
 							<span>Hoàn thành</span>
 						</div>
-						<!-- <div>
-							 <v-chip
-								class="ma-2"
-								color="red"
-								text-color="white"
-								small
-								>
-								n
-							</v-chip>
-							<span>Lỗi</span>
-						</div> -->
 					</div>
 				</div>
-				
 			</div>
 		</div>
 		<div class="list-workflow-instance d-flex flex-column h-100 mt-8" >
 			<ListProcessInstance :showSwitchBtn="true" />
 		</div>
-		<ConfirmDelete 
+		<!-- <ConfirmDelete 
 			:showDialog="showDialog"
 			@cancel="cancel"
 			@confirm="deleteProcessInstance"
-			 />
+			 /> -->
 	</div>
 </template>
 

@@ -92,8 +92,20 @@ export default {
                stopProcess: {
                     name: "Dừng quy trình",
                     text: "Dừng quy trình",
-                    callback: (user, callback) => {
-                       
+                    callback: (obj, callback) => {
+						adminApi.stopProcessDefinition(obj.processKey).then(res=>{
+							if(res.status == 200){
+								this.$snotify({
+									type: "success",
+									title: "Dừng thành công"
+								})
+							}
+						}).catch(err=>{
+							this.$snotify({
+								type: "error",
+								title: "Không tìm thấy "
+							})
+						})
                     },
                 },
              

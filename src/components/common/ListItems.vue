@@ -332,14 +332,14 @@ window.tableDropdownClickHandle = function(el, event) {
 export default {
     name: "SymperListItem",
     watch: {
-        actionPanel() {
+        actionPanel(){
             if (this.actionPanel == true) {
                 this.$emit("open-panel");
             }
         },
         getDataUrl(){   
 			this.page = 1
-            this.refreshList();
+        	this.refreshList();
         },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
             if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
@@ -1057,7 +1057,7 @@ export default {
                 clearTimeout(this.debounceGetData);
             }
             this.debounceGetData = setTimeout((self) => {
-				this.page = 1
+				self.page = 1
                 self.getData();
             }, 300, this);
         },
