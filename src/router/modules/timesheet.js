@@ -11,6 +11,12 @@ export default [{
         component: () =>
             import ('../../views/timesheet/ReportTimesheet.vue'),
     },
+    {
+        path: "/category",
+        name: "Timesheet Category",
+        component: () =>
+            import ('../../views/timesheet/ListCategory.vue'),
+    },
 
     {
         path: "/timesheet/submit",

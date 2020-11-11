@@ -193,14 +193,14 @@
                                         cols="2"
                                         class="fs-13 "
                                     >
-                                        <span class="mt-1">{{processParent.startTime ==null? '':$moment(processParent.startTime).fromNow()}}</span>
+                                        <span class="mt-1">{{obj.startTime ==null? '':$moment(obj.startTime).fromNow()}}</span>
                                     </v-col>
 
                                     <v-col
                                         cols="4"
                                         class="fs-13 py-0"
                                     >
-                                        <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
+                                        <span class="mt-1 title-quytrinh">{{obj.processDefinitionName}}</span>
                                         <div class="pa-0 grey--text justify-space-between">
                                             {{workInfo.appName}}
                                         </div>
@@ -255,13 +255,13 @@
                                         cols="2"
                                         class="fs-13 "
                                     >
-                                        <span class="mt-1">{{processParent.startTime ==null? '':$moment(processParent.startTime).fromNow()}}</span>
+                                        <span class="mt-1">{{obj.startTime ==null? '':$moment(obj.startTime).fromNow()}}</span>
                                     </v-col>
                                     <v-col
                                         cols="4"
                                         class="fs-13 py-0"
                                     >
-                                        <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
+                                        <span class="mt-1 title-quytrinh">{{obj.processDefinitionName}}</span>
                                         <div class="pa-0 grey--text justify-space-between">
                                             {{workInfo.appName}}
                                         </div>
@@ -346,7 +346,11 @@ export default {
         parentHeight: {
             type: Number,
             default: 300
-        },
+		},
+		showTitle:{
+			type:Boolean,
+			default:false
+		}
     },
     watch: {
         workInfo: {
@@ -454,7 +458,7 @@ export default {
         },
         listTaskComputed(){
             let self=this;
-            let arrListTask=this.listTaskCurrent;
+            let arrListTask = this.listTaskCurrent;
             arrListTask.forEach(task => {
                 task.taskData = self.getTaskData(task);
                 task = addMoreInfoToTask(task);
@@ -600,7 +604,7 @@ export default {
                 filter.processInstanceId=processInstanceId;
                 filter.sort= "startTime";
                 filter.order= "desc";
-                let res = await BPMNEngine.postTaskHistory(filter);
+				let res = await BPMNEngine.postTaskHistory(filter);
                 if (res.total>0) {
                     self.listTaskCurrent=res.data;
                 }else{

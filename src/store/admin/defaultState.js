@@ -1,6 +1,11 @@
 const defaultState = {
 	processDefination:{},
-	processKey:""
+	processKey:"",
+	currentAggregateWorkflow: [],
+	sumProcess:0,
+	timerJobDetail: {},
+	processId: null,
+	currentTrackingProcess: []
 };
 
 export default defaultState;

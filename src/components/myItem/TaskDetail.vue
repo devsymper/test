@@ -344,28 +344,35 @@ export default {
                 return;
             }
             let self = this;
-            let filter = this.stask.filter;
-            BPMNEngine.getATaskInfo(taskId,filter).then((res) => {
-                console.log(res,"task");
-                for(let role in self.tabsData.people){
-                    self.tabsData.people[role]=[];
-                    if(res[role]){
-                        let userIdentifier=res[role];
-                        if (userIdentifier.indexOf(":")>0){
-                            userIdentifier=(userIdentifier.split(":"))[0];
-                        }
-                        self.tabsData.people[role] =userIdentifier.split(',').reduce((arr, el) => {
-                            if(self.usersMap[el]){
-                                arr.push(self.usersMap[el]);
-                            }else{
-                                console.warn('user id not found : ', el);
-                            }
-                            return arr;
-                        }, []);
-                    }
+            let filter="notDone";
+            if (this.originData) {
+                if (this.originData.endTime) {
+                    filter = "done";
+                }else{
+                    filter = "notDone";
                 }
-                self.setTaskBreadcrumb(res);
-            });
+            }
+            this.$store.commit("task/setFilter", filter);
+           
+            for(let role in self.tabsData.people){
+                self.tabsData.people[role]=[];
+                if(this.originData[role]){
+                    let userIdentifier=this.originData[role];
+                    if (userIdentifier.indexOf(":")>0){
+                        userIdentifier=(userIdentifier.split(":"))[0];
+                    }
+                    self.tabsData.people[role] =userIdentifier.split(',').reduce((arr, el) => {
+                        if(self.usersMap[el]){
+                            arr.push(self.usersMap[el]);
+                        }else{
+                            console.warn('user id not found : ', el);
+                        }
+                        return arr;
+                    }, []);
+                }
+            }
+            self.setTaskBreadcrumb(this.originData);
+            
         },
         setTaskBreadcrumb(task){
             if(!task.name){

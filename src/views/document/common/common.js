@@ -95,7 +95,7 @@ const checkNameControl = function(instance) {
             elements.addClass('s-control-error');
             isValid = false;
         } else {
-            if (/^[a-zA-Z_$][a-zA-Z_$0-9]*$/.test(input.value) == false) {
+            if (/^[a-z_$][a-z_$0-9]*$/.test(input.value) == false) {
                 errValue = "Tên không hợp lệ";
                 elements.addClass('s-control-error');
                 isValid = false;
@@ -130,7 +130,7 @@ const checkNameControl = function(instance) {
                     if (listNameValueControl[instance].hasOwnProperty(curControl.id)) {
                         for (let index = 0; index < listNameValueControl[instance][curControl.id].length; index++) {
                             const element = listNameValueControl[instance][curControl.id][index];
-                            $('#document-editor-' + instance + '_ifr').contents().find('#' + element.id).removeClass('s-control-error')
+                            $('#document-editor-' + instance + '_ifr').contents().find('#' + element.id).removeClass('s-control-error');
                         }
                     }
                 } else {
@@ -140,10 +140,10 @@ const checkNameControl = function(instance) {
                             let control = controlOldConflic[index];
                             listNameValueControl[instance][control].match.splice(listNameValueControl[instance][control].match.indexOf(curControl.id), 1);
                             if (listNameValueControl[instance][control].match.length == 0)
-                                $('#document-editor-' + instance + '_ifr').contents().find('#' + control).removeClass('s-control-error')
+                                $('#document-editor-' + instance + '_ifr').contents().find('#' + control).removeClass('s-control-error');
                         }
                     }
-                    $('#document-editor-' + instance + '_ifr').contents().find('#' + curControl.id).removeClass('s-control-error')
+                    $('#document-editor-' + instance + '_ifr').contents().find('#' + curControl.id).removeClass('s-control-error');
                 }
             }
         }

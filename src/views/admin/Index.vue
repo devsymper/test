@@ -45,7 +45,8 @@ export default {
 			apiUrl:'https://workflow-modeler.symper.vn/',
 			customAPIResult: {
                 reformatData(res){
-                   return{
+					
+                    return{
 						 listObject: res.data.listObject,
 						 total: res.data.listObject.length,
                          columns: [
@@ -68,10 +69,23 @@ export default {
 						adminApi.getLatestWD(obj.processKey).then(res=>{
 							if(res.data[0]){
 								self.$store.commit('admin/setProcessDefination', res.data[0]);
+								self.$store.commit('admin/setProcessId', obj.id);
 								self.showPanel = true;
+								adminApi.trackingProcess(res.data[0].id).then(res=>{
+									if(res.status == 200){
+											self.$store.commit('admin/setCurrentTrackingProcess', res.data);
+										}
+								}).catch(err=>{
+								})
+								adminApi.aggregateWorkflow(res.data[0].id).then(res=>{
+									if(res.status == 200){
+										self.$store.commit('admin/setCurrentAggregateWorkflow', res.data);
+									}
+								}).catch(err=>{
+								})
 							}
+							
 						}).catch(err=>{
-
 						})
                     },
                 },

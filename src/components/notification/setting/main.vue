@@ -97,7 +97,6 @@ export default {
         deep: true,
         immediate: true,
         handler(newValue){
-            
         for(let i = 0; i<newValue.length;i++){
             if(newValue[i].active){
                 for(let j = 0; j<newValue[i].items.length;j++){

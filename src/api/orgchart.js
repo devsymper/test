@@ -84,32 +84,35 @@ export const orgchartApi = {
             data
         )
     },
-    getAllOrgchartStruct(){
+    getAllOrgchartStruct() {
         return orgchart.get("orgchart/struct-only");
     },
-    getUserIdentifiFromProcessModeler(data){
-        return orgchart.post("role/query-users", data, {}, {dataType:"text"});
+    getUserIdentifiFromProcessModeler(data) {
+        return orgchart.post("role/query-users", data, {}, { dataType: "text" });
     },
-    getDocumentByUserId(data){
+    getDocumentByUserId(data) {
         return documentApi.post("documents/map-query", data)
     },
-    getDescriptionNode(data){
+    getDescriptionNode(data) {
         return documentApi.post("documents/map-query", data)
     },
-    getIdOrgchartDefault(){
+    getIdOrgchartDefault() {
         return orgchart.get('get-orgchart-default')
     },
-    getDocInstance(params){
-        return sdocumentManagementApi.get('documents/'+params.id+'/objects?search=&page=1&pageSize=50&distinct=false&formulaCondition='+params.script)
+    getDocInstance(params) {
+        return sdocumentManagementApi.get('documents/' + params.id + '/objects?search=&page=1&pageSize=50&distinct=false&formulaCondition=' + params.script)
     },
-    getListTrash(){
-        return trashApi.get('items', {type: "orgchart"})
+    getListTrash() {
+        return trashApi.get('items', { type: "orgchart" })
     },
-    deleteTrashItem(id){
-        return trashApi.delete('items/object/orgchart:'+id)
+    deleteTrashItem(id) {
+        return trashApi.delete('items/object/orgchart:' + id)
     },
-    restore(id){
-        return orgchart.put('restore/'+id,)
+    restore(id) {
+        return orgchart.put('restore/' + id, )
     },
+    getSubDepartMent() {
+        return orgchart.get('my-sub-deparments/user')
+    }
 
 };

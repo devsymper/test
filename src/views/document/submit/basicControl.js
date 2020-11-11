@@ -350,9 +350,6 @@ export default class BasicControl extends Control {
         }
         if (!value) {
             value = "";
-        }
-        if (this.type == 'percent') {
-            value *= 100
         } else if (this.type == 'number') {
             if (!isNaN(Number(value)))
                 value = numbro(Number(value)).format(this.numberFormat)

@@ -119,7 +119,7 @@
                     <span>{{$t('document.submit.fab.toggleSize')}}</span>
                 </v-tooltip>
             </v-speed-dial>
-            <err-message :listErr="listMessageErr" ref="errMessage"/>
+            <err-message :listErr="listMessageErr" ref="errMessage" @after-close-dialog="afterCloseDialogValidate"/>
         </div>
         <EmbedDataflow 
         @after-mounted="afterDataFlowMounted" 
@@ -191,6 +191,7 @@ import DatePicker from "./../../../components/common/DateTimePicker";
 import TimeInput from "./../../../components/common/TimeInput";
 import UploadFile from "@/components/common/UploadFile.vue";
 import Table from "./table.js";
+import PivotTable from "./pivot-table";
 import SymperDragPanel from "./../../../components/common/SymperDragPanel.vue";
 import { util } from "./../../../plugins/util.js";
 import AutocompleteInput from "./items/AutocompleteInput.vue";
@@ -219,9 +220,6 @@ let impactedFieldsList = {};
 let impactedFieldsArr = {};
 
 export default {
-    beforeDestroy(){
-        alert('xxxxxxx');
-    },
     inject: ['theme'],
     props: {
         isQickSubmit: {
@@ -333,10 +331,14 @@ export default {
         },
         linkControl(){
             return this.$store.state.document.linkControl[this.keyInstance]
+        },
+        baInfo(){
+            return this.$store.state.app.baInfo
         }
     },
     data() {
         return {
+            controlInfinity:[],
             focusingControlName: '',
             contentDocument: null,
             documentInfo:null,
@@ -381,7 +383,8 @@ export default {
             controlTrace:null,
             listFileControl:[],
             currentImageControl:null,
-            currentControlDataflow:null
+            currentControlDataflow:null,
+            dataPivotTable:{}
         };
 
     },
@@ -1211,7 +1214,8 @@ export default {
                             thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
                             if(res.data.document.otherInfo != null && res.data.document.otherInfo != "")
 							thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
-							thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
+                            thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
+                            thisCpn.dataPivotTable = res.data.pivotConfig;
                             setDataForPropsControl(res.data.fields,thisCpn.keyInstance,'submit'); // ddang chay bat dong bo
                             setTimeout(() => {
                                 thisCpn.processHtml(content);
@@ -1323,7 +1327,7 @@ export default {
                     if(prepareData != null && prepareData != ""){
                         isSetEffectedControl = true;
                     }
-                    if(valueInput != undefined && valueInput != null && Object.keys(valueInput).length == 0){
+                    if(valueInput == undefined || valueInput == null){
                         valueInput = ""
                     }
                     if(allControlNotSetData.includes(controlType)){
@@ -1408,6 +1412,16 @@ export default {
                                 id,
                                 thisCpn.keyInstance
                             );
+                            if(this.dataPivotTable[controlName]){
+                                tableControl.pivotTable = new PivotTable(
+                                    tableControl,
+                                    controlName,
+                                    id,
+                                    this.dataPivotTable[controlName],
+                                    thisCpn.keyInstance
+                                );
+                            }
+                            
                             let tableEle = $(allInputControl[index]);
                             tableEle.find(".s-control").each(function() {
                                 let childControlId = $(this).attr("id");
@@ -1449,37 +1463,50 @@ export default {
                 }
             }
             this.listDataFlow = listDataFlow;
-            if(!isSetEffectedControl);
-            this.getEffectedControl();
-            if(this.docObjId == null){
-                thisCpn.findRootControl();
+            if(!isSetEffectedControl){
+                this.getEffectedControl();
             }
-            else{   // trường hơp đã lưu cấu trúc root trên server
-                if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
-                    impactedFieldsList = this.preDataSubmit.impactedFieldsList;
-                    let impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
-                    let listTableRootControl = this.preDataSubmit.tableRootControl;
-                    this.pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl);
-                    for(let tableName in listTableRootControl){
-                        let tableRootControl = listTableRootControl[tableName];
-                        for(let controlInTable in tableRootControl){
-                            let controlInstance = getControlInstanceFromStore(this.keyInstance,controlInTable);
-                            let controlFormulas = controlInstance.controlFormulas;
-                            if(controlFormulas.hasOwnProperty('formulas')){
-                                let formulasInstance = controlFormulas['formulas'].instance;
-                                // chạy công thức để lấy giá trị dòng mặc định trong table(phục vụ cho việc shift enter xuống dòng phải có dữ liệu mặc định)
-                                if(formulasInstance){
-                                    this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+            if(this.controlInfinity.length > 0 && this.baInfo && this.baInfo.id){
+                this.listMessageErr = [];
+                this.listMessageErr.push("Mối quan hệ giữa các control sau dẫn đến vòng lặp vô hạn");
+                for (let index = 0; index < this.controlInfinity.length; index++) {
+                    let controlName = this.controlInfinity[index];
+                    let controlIns = getControlInstanceFromStore(this.keyInstance, controlName);
+                    if(controlIns != false){
+                        this.listMessageErr.push(controlName + " - " + controlIns.title);
+                    }
+                }
+                this.$refs.errMessage.showDialog('checkInfinityControl');   
+            }
+            else{
+                if(this.docObjId == null){
+                    thisCpn.findRootControl();
+                }
+                else{   // trường hơp đã lưu cấu trúc root trên server
+                    if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
+                        impactedFieldsList = this.preDataSubmit.impactedFieldsList;
+                        let impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
+                        let listTableRootControl = this.preDataSubmit.tableRootControl;
+                        this.pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl);
+                        for(let tableName in listTableRootControl){
+                            let tableRootControl = listTableRootControl[tableName];
+                            for(let controlInTable in tableRootControl){
+                                let controlInstance = getControlInstanceFromStore(this.keyInstance,controlInTable);
+                                let controlFormulas = controlInstance.controlFormulas;
+                                if(controlFormulas.hasOwnProperty('formulas')){
+                                    let formulasInstance = controlFormulas['formulas'].instance;
+                                    // chạy công thức để lấy giá trị dòng mặc định trong table(phục vụ cho việc shift enter xuống dòng phải có dữ liệu mặc định)
+                                    if(formulasInstance){
+                                        this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
+                                    }
                                 }
+                                
                             }
-                            
                         }
                     }
-                   
-                    
                 }
             }
-            this.hidePreloader();
+            this.hidePreloader();            
         },
 
         pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl){
@@ -1521,7 +1548,9 @@ export default {
 
         
         /**
-         * Hàm lấy ra các control bị ảnh hưởng từ 1 control và set vao store
+         * Hàm lấy ra các control bị ảnh hưởng từ 1 control
+         * từ đó tạo dựng mối quan hệ cho các control
+         * lưu vào db cho lần submit sau không phải tìm lại
          */
         getEffectedControl() {
             let mapControlEffected = {};
@@ -1583,9 +1612,52 @@ export default {
                     }
                 }
             }
-            this.updateEffectedControlToStore(mapControlEffected);
+            if(this.baInfo && this.baInfo.id){
+                this.checkInfinityControl(mapControlEffected);
+            }
+            if(this.controlInfinity.length == 0){
+                this.updateEffectedControlToStore(mapControlEffected);
+            }
         },
-       
+        /**
+         * hoangnd: kiểm tra công thức chạy infinity hay ko 
+         *  
+        */       
+        checkInfinityControl(mapControlEffected){
+            this.controlInfinity = [];
+            for(let formulaType in mapControlEffected){
+                if(['list','formulas'].includes(formulaType)){
+                    for(let controlName in mapControlEffected[formulaType]){
+                        this.search(controlName, mapControlEffected[formulaType][controlName], mapControlEffected[formulaType]);
+                    }
+                }
+                
+            }
+        },
+      
+        /**
+         * DFS trong cây mối quan hệ để tìm control trùng lặp
+         */
+        search (controlCheck, effectedControl, mapControlEffected) {
+            var i, children = Object.keys(effectedControl), found;
+            for (i = 0; i < children.length; i += 1) {
+                if(mapControlEffected[children[i]]){
+                    if(children[i] == controlCheck){
+                        this.controlInfinity.push(children[i]);
+                        break;
+                    }
+                    else{
+                        if(!Object.keys(mapControlEffected[children[i]]).includes(children[i]) && children[i] != controlCheck){
+                            this.search(controlCheck, mapControlEffected[children[i]], mapControlEffected);
+                        }
+                    }
+                }
+            }
+        },
+      
+        /**
+         * Hàm lấy các control đầu vào là các cột của table sqllite
+         */
         detectControlEffectedInTableInDoc(mapControlEffected,name,formulasInstance){
             formulasInstance.detectControlInTable(mapControlEffected,name,formulasInstance.formulas,this.sDocumentSubmit.listInputInDocument)  
         },
@@ -2205,6 +2277,7 @@ export default {
          */
         setDataToTable(tableControlId,data){
             let tableName = this.sDocumentEditor.allControl[tableControlId].properties.name.value;
+            markBinedField(this.keyInstance,tableName);
             data = data.data
             let tableControl = getControlInstanceFromStore(this.keyInstance,tableName);
             if(data.length == 0){
@@ -2212,7 +2285,8 @@ export default {
                 return;
             }
             tableControl.tableInstance.setData(data);
-            
+            // tableControl.pivotTable.show();
+            // tableControl.pivotTable.setData(data);
         },
 
         /**
@@ -2572,6 +2646,14 @@ export default {
             resetImpactedFieldsList(this.keyInstance);
             this.handleControlInputChange(locale.controlName);
         },
+        /**
+         * Hàm nhận sự kiên sau khi đóng pop up validate
+         */
+        afterCloseDialogValidate(type){
+            if(type == "checkInfinityControl"){
+                this.$emit('before-close-submit');
+            }
+        }
     }
     
     

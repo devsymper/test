@@ -13,6 +13,7 @@ export default class TableControl extends Control {
          */
         this.tableInstance = null;
         this.tablePrint = null;
+        this.pivotTable = null;
         this.isPrintView = isPrintView;
         /**
          * tên các control nằm trong control này, mặc định là null, nếu control là table thì mới có giá trị là {'tên control':true}
@@ -51,6 +52,7 @@ export default class TableControl extends Control {
                 this.tablePrint.render();
             } else {
                 this.tableInstance.render();
+                // this.pivotTable.render();
                 this.ele.detach().hide();
 
             }
@@ -74,7 +76,6 @@ export default class TableControl extends Control {
                 this.tableInstance.tableInstance.render();
             }
 
-            return;
         }
         if (this.isPrintView) {
             let dataTablePrint = [];

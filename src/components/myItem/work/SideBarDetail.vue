@@ -54,6 +54,7 @@
 					<v-expansion-panel-content class="sym-v-expand-content border-top-1" style="height:200px">
 						<v-row class="ma-0" style="height:200px">
 							<trackingProcessInstance
+								class="popup-model-diagram"
 								v-if="workInfo.id"
 								:instanceId="workInfo.id"
 								@showPopupDiagram="showPopupDiagram"
@@ -642,5 +643,8 @@ export default {
 	.border-top-1 >>>.v-expansion-panel-content__wrap{
 		border: 1px solid #cecece!important;
 		border-radius: 5px;
+	}
+	.popup-model-diagram >>> .djs-hit  {
+		pointer-events: none;
 	}
 </style>

@@ -36,7 +36,7 @@
         <div  class="sym-document__side-bar-right">
             <sidebar-right ref="sidebarRight" :isConfigPrint="isConfigPrint" :styles="contentStyle" :instance="keyInstance"/>
         </div>
-        <s-table-setting v-if="!isConfigPrint" ref="tableSetting" @add-columns-table="addColumnTable"/>
+        <s-table-setting v-if="!isConfigPrint" ref="tableSetting" :instance="keyInstance" @add-columns-table="addColumnTable" :defaultTablePivotConfig="defaultTablePivotConfig"/>
         <PrintTableConfig v-if="isConfigPrint" ref="printTableConfig" @config-column-table-print="configColumnTablePrint"/>
         <auto-complete-control v-if="!isConfigPrint" ref="autocompleteControl" @add-control="insertControl"/>
         <save-doc-panel 
@@ -69,7 +69,7 @@
                 <v-card-title class="notice-title">{{titleDialog}}</v-card-title>
                 <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="green darken-1" text @click="dialog = false">Hủy bỏ</v-btn>
+                <v-btn color="green darken-1" v-if="!intervalCheckExpired" text @click="dialog = false">Hủy bỏ</v-btn>
                 <v-btn color="green darken-1" text @click="acceptDialog">Đồng ý</v-btn>
                 </v-card-actions>
             </v-card>
@@ -81,6 +81,7 @@
             <Submit
                 :showSubmitButton="false"
                 ref="subSubmitView" 
+                @before-close-submit="beforeCloseSubmit"
                 :dataPreview="dataPreviewSubmit"/>
         </v-dialog>
     </v-flex>
@@ -105,6 +106,7 @@ import { GetControlProps,mappingOldVersionControlProps,
         mappingOldVersionControlFormulas,getAPropsControl,
         getIconFromType,listControlNotNameProp } from "./../../components/document/controlPropsFactory.js";
 import { documentApi } from "./../../api/Document.js";
+import accountApi from "./../../api/account";
 import { biApi } from "./../../api/bi.js";
 import { formulasApi } from "./../../api/Formulas.js";
 import { util } from "./../../plugins/util.js";
@@ -158,6 +160,12 @@ export default {
         allControlDeleted(){  
             return this.$store.state.document.editor[this.keyInstance].allControlDeleted;
         },
+        allUsers(){
+            return this.$store.state.app.allUsers
+        },
+        baInfo(){
+            return this.$store.state.app.baInfo
+        }
     }, 
     components: {
         'sidebar-left' : SideBarLeft,
@@ -308,6 +316,10 @@ export default {
                 ed.on('drop', function(e) {
                     self.handleDropControlInEditor(e);
                 });
+                ed.on('mouseover', function(e) {
+                    self.currentInteractTime = Date.now();
+                    console.log('currentInteractTime',self.currentInteractTime);
+                });
                 ed.on('ExecCommand', function(e) {
                     self.handleExecCommand(e);
                 });
@@ -322,6 +334,27 @@ export default {
         });
     },
     created() {
+        this.currentTabIndex = this.$store.state.app.currentTabIndex;
+        if(this.routeName == 'editDocument'){
+            /**
+             * hoangnd: kiểm tra xem doc có đang hoạt động hay ko
+             */
+            this.currentInteractTime = Date.now();
+            this.intervalCheckExpired = setInterval((self) => {
+                let curTime = Date.now();
+                if(curTime - self.currentInteractTime > 2000000){
+                    self.dialog = true;
+                    let docTitle = self.sDocumentProp.title.value;
+                    self.titleDialog = "Document "+docTitle+" sẽ bị đóng do thời gian tương tác quá hạn!. Vui lòng quay lại sau";
+                    clearInterval(self.intervalCheckExpired);
+                    self.currentInteractTime = null;
+                    self.typeDialog = "documentExpire";
+                    documentApi.setEdittingDocument({id:self.documentId,status:0});
+                    
+                }
+            }, 10000,this);
+        }
+        
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
         this.isConfigPrint = false;
         if(this.routeName == 'printConfigDocument'){
@@ -343,6 +376,14 @@ export default {
             if(this._inactive == true) return;
             let elControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body #'+locale.id);
             this.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
+        });
+        this.$evtBus.$on("before-close-app-tab", (data) => {
+            if(this._inactive == true) return;
+            if(this.routeName == 'editDocument'){
+                documentApi.setEdittingDocument({id:this.documentId,status:0});
+                clearInterval(this.intervalCheckExpired);
+                this.currentInteractTime = null;
+            }
         });
     },
     data(){
@@ -371,7 +412,12 @@ export default {
             oldTableId:null,
             dataPreviewSubmit:null,
             isShowPreviewSubmit:false,
-            controlTemplateId:0
+            controlTemplateId:0,
+            currentInteractTime:Date.now(),
+            intervalCheckExpired:null,
+            currentTabIndex:null,
+            dataPivotTable:{},
+            defaultTablePivotConfig:{}
         }
     },
     
@@ -416,7 +462,12 @@ export default {
     },
     watch:{
         // kiểm tra xem route thay đổi khi vào editor là edit doc hay create doc
-        '$route' (to) {
+        '$route' (to, old) {
+            if(old.name == 'editDocument'){
+                documentApi.setEdittingDocument({id:this.documentId,status:0});
+                clearInterval(this.intervalCheckExpired);
+                this.currentInteractTime = null;
+            }
             this.documentId = Date.now();
             // this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
             if(to.name =='editDocument'){
@@ -458,6 +509,13 @@ export default {
             this.dialog = false;
             if(this.typeDialog == 'deletePage'){
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
+            }
+            if(this.typeDialog == "documentExpire"){
+                
+                this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
+            }
+            if(this.typeDialog == "baEditting"){
+                this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
             }
         },
 
@@ -1145,6 +1203,9 @@ export default {
          * Hàm gọi api edit document
          */
         editDocument(dataPost){
+            if(Object.keys(this.dataPivotTable).length > 0){
+                dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
+            }
             let thisCpn = this;
             documentApi.editDocument(dataPost).then(res => {
                 this.$evtBus.$emit('document-editor-save-doc-callback')
@@ -1220,10 +1281,16 @@ export default {
             }
         },
         // hàm xử lí thêm các cột vào trong control table khi lưu ở tablesetting
-        addColumnTable(listRowData){
+        addColumnTable(data){
+            let listRowData = data.listRows;
+            let tablePivotConfig = data.tablePivotConfig;
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-table.on-selected');
             let table = elements.find('thead').closest('.s-control-table');
             let tableId = table.attr('id');
+            let currentControl = this.editorStore.currentSelectedControl;
+            if(currentControl.properties.name.name.value){
+                this.dataPivotTable[currentControl.properties.name.name.value] = tablePivotConfig;
+            }
             let thead = '';
             let tbody = '';
             for(let i = 0; i < listRowData.length; i++ ){
@@ -1404,15 +1471,23 @@ export default {
                 let listData = [];
                 if($(tbody[0].innerHTML).length > 0){
                     for(let i = 0; i< thead.length; i++){
-                        let idControl = $(tbody[i].innerHTML).first().attr('id');
-                        let typeControl = $(tbody[i].innerHTML).first().attr('s-control-type');
+                        if($(tbody[i].innerHTML).length == 0){
+                            continue
+                        }
+                        let idControl = $(tbody[i].outerHTML).find('.s-control').attr('id');
+                        let typeControl = $(tbody[i].outerHTML).find('.s-control').attr('s-control-type');
                         let name = this.editorStore.allControl[tableId]['listFields'][idControl].properties.name.value;
                         let title = this.editorStore.allControl[tableId]['listFields'][idControl].properties.title.value;
                         let row = {columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl}
                         listData.push(row)
+
                     }
                 }
                 this.$refs.tableSetting.showDialog();
+                let currentControl = this.editorStore.currentSelectedControl;
+                if(currentControl.properties.name.name.value && this.dataPivotTable[currentControl.properties.name.name.value]){
+                    this.defaultTablePivotConfig = this.dataPivotTable[currentControl.properties.name.name.value];
+                }
                 this.$refs.tableSetting.setListRow(listData);
             }
         },
@@ -1876,10 +1951,38 @@ export default {
             
 
         },
+        async checkAllowEditDocument(document){
+            if(Number(document.userEditting) != 0  && this.baInfo && this.baInfo.id != document.userEditting){
+                try {
+                    let baAcc = await accountApi.detailBa(document.userEditting);
+                    if(baAcc.status == 200){
+                        let data = baAcc.data.data;
+                        if(data.length > 0){
+                            let curBa = data[0];
+                            this.dialog = true;
+                            this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
+                            this.typeDialog = "baEditting";
+                            return false;
+                        }
+                    }
+                } catch (error) {
+                    return false;
+                    console.log(error);
+                }
+            }
+            return true;
+        },
         // hàm gọi request lấy thông tin của document khi vào edit doc
         async getContentDocument(){
             if(this.documentId != 0){
-                let res = await documentApi.detailDocument(this.documentId)
+                let res = await documentApi.detailDocument(this.documentId);
+                let checkEditting = await this.checkAllowEditDocument(res.data.document);
+                if(checkEditting == false){
+                    return;
+                }
+                else{
+                    documentApi.setEdittingDocument({id:this.documentId});
+                }
                 if (res.status == 200) {
                     if(this.routeName == "editDocument"){
                         this.setDocumentProperties(res.data.document);
@@ -1892,6 +1995,7 @@ export default {
                         this.setDefaultStyle(res1.data.formStyle);
                     }
                     this.editorCore.setContent(content);
+                    this.dataPivotTable = res.data.pivotConfig;
                     $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body select').each(function(e){
                         let id = $(this).attr('id')
                         $(this).replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '">');
@@ -2832,30 +2936,33 @@ export default {
            
         },
         /**
-     * Xử li sau khi thy đổi font size , font family thì thêm style cho control
-     */
-    handleExecCommand(e){
-        let mapCommandToStyle = {FontSize:'font-size',FontName:'font-family'}
-        try {
-            let value = e.value;
-            if(Object.keys(mapCommandToStyle).includes(e.command)){
-                let contentSelection = this.editorCore.selection.getContent();
-                let allControlInForm = $(contentSelection).find('.s-control');
-                for (let index = 0; index < allControlInForm.length; index++) {
-                    let element = allControlInForm[index];
-                    let id = $(element).attr('id');
-                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).css(mapCommandToStyle[e.command],value);
-                    let curStyle = $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).attr('style');
-                    
-                    $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).attr('data-mce-style',curStyle)
+         * Xử li sau khi thy đổi font size , font family thì thêm style cho control
+         */
+        handleExecCommand(e){
+            let mapCommandToStyle = {FontSize:'font-size',FontName:'font-family'}
+            try {
+                let value = e.value;
+                if(Object.keys(mapCommandToStyle).includes(e.command)){
+                    let contentSelection = this.editorCore.selection.getContent();
+                    let allControlInForm = $(contentSelection).find('.s-control');
+                    for (let index = 0; index < allControlInForm.length; index++) {
+                        let element = allControlInForm[index];
+                        let id = $(element).attr('id');
+                        $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).css(mapCommandToStyle[e.command],value);
+                        let curStyle = $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).attr('style');
+                        
+                        $("#document-editor-"+this.keyInstance+"_ifr").contents().find("#"+id).attr('data-mce-style',curStyle)
+                    }
                 }
+                
+                
+            } catch (error) {
+                
             }
-            
-            
-        } catch (error) {
-            
+        },
+        beforeCloseSubmit(){
+            this.isShowPreviewSubmit = false;
         }
-    }
 
     },
     

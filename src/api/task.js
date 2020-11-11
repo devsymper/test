@@ -25,7 +25,7 @@ export const taskApi = {
         return document.get('documents/objects-out-workflow/'+ userId);
     },
     getListNodeInProcess(){
-        return workfloweExtend.get("activitys");
+        return workfloweExtend.get("activities");
     },
     getVariableWorkflow(filter){
         if (filter.size) {

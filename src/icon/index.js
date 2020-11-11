@@ -27,8 +27,10 @@ export default {
         dashboard: "mdi mdi-view-dashboard",
         action_pack: " mdi mdi-package-variant-closed",
         import: "mdi mdi-import",
-        task: "mdi-office-building-outline",
+        taskBPM: "mdi-lan",
+        task: "mdi-hand-left",
         role: "mdi mdi-account-circle-outline"
+
 
 
 

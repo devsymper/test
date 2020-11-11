@@ -13,6 +13,7 @@ import { createDepartmentNode, defineDepartment, DEFAULT_DEPARTMENT_DISPLAY, FOU
 import { createPositionNode, definePosition, DEFAULT_POSITION_DISPLAY, FOUCUS_POSITION_DISPLAY } from "./../nodeDefinition/positionDefinition";
 import { SYMPER_HOME_ORGCHART, getDefaultConfigNodeData, jointLinkNode } from './nodeAttrFactory';  
 import avatarDefault from "@/assets/image/avatar_default.jpg";
+import { util } from '../../../plugins/util';
 require('@/plugins/rappid/rappid.css');
 export default {
     components: {
@@ -102,7 +103,8 @@ export default {
                         cell.attr(mapName[attrName]+'/'+key, value[key]);
                     }
                 }else{
-                    if(value.includes('https://file.symper.vn/readFileSvg/user_avatar')){
+                    let imgurl = util.addEnvToUrl('https://file.symper.vn/readFileSvg/user_avatar');
+                    if(value.includes(imgUrl)){
                           cell.attr(mapName[attrName], value,
                         );
                     }else{
@@ -300,7 +302,7 @@ export default {
         },
         changeUserDisplayInNode(userIdList){
             let lastUserInfo = this.mapUserById[userIdList[userIdList.length - 1]];
-            let avatarUser = "https://file.symper.vn/readFileSvg/user_avatar_"+lastUserInfo.id
+            let avatarUser = util.addEnvToUrl("https://file.symper.vn/readFileSvg/user_avatar_")+lastUserInfo.id
             if(this.context == 'department'){
                 if(!lastUserInfo) return;
                 this.updateCellAttrs(this.selectingNode.id, 'managerName', lastUserInfo.displayName );

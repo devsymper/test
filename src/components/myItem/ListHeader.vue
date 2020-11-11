@@ -2,15 +2,7 @@
   <div class="w-100 d-flex justify-space-between py-2">
     <div class="pl-3 symper-title" v-if="!sideBySideMode">
       {{headerTitle}}
-      <v-chip
-        v-if="taskStatus == 'notDone'"
-        class="ma-2"
-        color="amber"
-        text-color="white"
-        x-small
-      >{{$t('common.pendding')}}</v-chip>
-
-      <v-chip v-else class="ml-1" color="green" text-color="white" x-small>{{$t('common.done')}}</v-chip>
+      <span class="fs-13" style="color:#00000060">({{$t("myItem.totalTask")}}: {{totalObject}})</span>
     </div>
     <div
       :class="{
@@ -68,7 +60,7 @@
         </v-menu>
 
         <!-- Bộ lọc cho  task -->
-        <v-menu
+        <!-- <v-menu
             offset-y
             light
             :close-on-content-click="false"
@@ -90,7 +82,7 @@
             <div>
             <TaskListFilter @filter-change-value="handleChangeFilterValue"></TaskListFilter>
             </div>
-        </v-menu>
+        </v-menu> -->
 
         <v-menu
             offset-y
@@ -262,6 +254,10 @@ export default {
     "symper-document-selec": SymperDocSelect
   },
   props: {
+    totalObject:{
+      type:Number,
+      default:0
+    },
     changeStatusMoreApproval:{
       type:Boolean,
       default:false,

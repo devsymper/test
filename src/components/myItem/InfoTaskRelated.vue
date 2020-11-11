@@ -9,12 +9,11 @@
                     <span style=" font-size:13px">{{displayContent(taskSelected.description)}}</span>
                 </div>
                 <div class="mb-1">
-                    <v-icon v-if="taskSelected.createTime" style="font-size:11px; color:blue;margin-left: 3px;">mdi-circle</v-icon>
-                    <v-icon v-else style="font-size:11px ;color:green;margin-left: 3px;">mdi-circle</v-icon>
-                    {{displayDescription(taskSelected.description)}}
+                    <v-icon v-if="taskSelected.endTime" style="font-size:11px ; color:#408137;padding-left: 1px;padding-top:4px">mdi-circle</v-icon>
+                    <v-icon v-else-if="taskSelected.createTime && checkTimeDueDate(taskSelected)" style="font-size:11px ; color:#EE6B60;padding-left: 1px;padding-top:4px">mdi-circle</v-icon>
+                    <v-icon v-else-if="taskSelected.createTime && !checkTimeDueDate(taskSelected)" style="color:#0760D9;font-size:11px ;padding-left: 1px;padding-top:4px">mdi-circle</v-icon>{{displayDescription(taskSelected.description)}}
                 </div>
             </div>
-        
             <v-divider></v-divider>
             <div class="ml-1">
                 <div style="white-space: nowrap;
@@ -41,7 +40,6 @@
                     >
                         <v-icon class="pt-2" style="font-size:14px">mdi-account-tie-outline</v-icon>
                         <span >{{$t("tasks.header.owner")}}</span>
-                        
                     </div>
                     <div class="fs-11 py-0  text-ellipsis" style="width:160px">
                         <infoUser v-if="taskSelected.ownerInfo.id" class="userInfo" :userId="taskSelected.ownerInfo.id" :roleInfo="taskSelected.ownerRole ? taskSelected.ownerRole:{}" />
@@ -137,6 +135,18 @@ export default {
         }
     },
     methods:{
+        checkTimeDueDate(item){
+            if (item.dueDate) {
+                let dueDate=new Date(item.dueDate).getTime();
+                if (dueDate<Date.now()) {
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        },
         goDoTask(id){
             this.$router.push("/myitem/tasks/"+id);
             this.$emit("closeInfoTaskRelated");

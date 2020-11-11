@@ -1,14 +1,26 @@
 <template>
-<div style="width:62%;float:left">
+<div style="width:62%;float:left"  class="period-selector">
     <div class="float-lg-left float-md-left  select-time" 
         v-bind:class = "[type=='month' ? 'width-55' :'width-58']">
-        <v-menu offset-y>
+        <!-- <v-menu offset-y>
             <v-list>
                 <v-list-item v-for="(item, index) in items" :key="index">
                     <v-list-item-title>{{ item.title }}</v-list-item-title>
                 </v-list-item>
             </v-list>
-        </v-menu>
+        </v-menu> -->
+        <v-autocomplete
+            style="width:30%; float:left"
+            
+              v-model="user"
+              :items="listUser"
+              return-object
+              placeholder="Chọn user"
+                item-text="displayName"
+                item-value="id"              
+              class="auto-complete mr-1 "
+              dense
+            ></v-autocomplete>
         <v-btn v-for="action in actions" :key="action.label" depressed small class="mr-1" color="#F7F7F7" 
             @click="action.action">
             {{format(action.label)}}
@@ -29,6 +41,7 @@
 <script>
 import dayjs from 'dayjs';
 import { mapState } from 'vuex';
+import { orgchartApi } from '../../api/orgchart.js';
 
 const dayjsTypeMapper = {
     'day': 'day',
@@ -39,6 +52,14 @@ const dayjsTypeMapper = {
 
 export default {
     methods: {
+         getSubDepartmentUser(){
+            const self = this;
+            orgchartApi.getSubDepartMent().then(res=>{
+                if(res.status=200){
+                    self.listUser = [...res.data];
+                }
+            })
+        },
         format(date){
             switch(date){
                 case'Next week':
@@ -131,26 +152,30 @@ export default {
         }),
         hoursRequired() {
             return this.$store.getters['timesheet/getTotalHoursBy']('timesheet');
-        }
+        },
+         sapp() {
+            return this.$store.state.app;
+        },
     },
     data: () => ({
-        today: '2019-01-08',
-        items: [{
-                title: 'Dương'
-            },
-            {
-                title: 'Trung'
-            },
-        ],
+       listUser:[],
+        actions: [],
+        user:'',
         actions: []
     }),
     created() {
+        this.getSubDepartmentUser(),
         this.changeActions(this.type);
     },
     watch: {
         type(newType) {
             this.changeActions(newType);
-        }
+        },
+        user(){
+            let userId = this.user.id;
+            this.$emit('load-logtime', userId)
+          
+        },
     }
 }
 </script>
@@ -158,6 +183,57 @@ export default {
 <style lang="scss" scoped>
 .v-btn:not(.v-btn--round).v-size--small {
     padding: 0 4px !important;
+}
+.auto-complete ::v-deep .v-list {
+    width: 385px !important;
+}
+
+.auto-complete ::v-deep .v-input__slot {
+    background-color: #F7F7F7;
+    margin-top: -19px;
+}
+
+.auto-complete ::v-deep .v-label {
+    font-size: 13px;
+    padding-left: 10px;
+}
+
+.auto-complete ::v-deep .v-input__slot:after {
+    border-color: transparent !important
+}
+
+.auto-complete ::v-deep .v-input__slot:before {
+    border-color: transparent !important
+}
+
+.auto-complete ::v-deep .v-label--active {
+    display: none;
+}
+
+.auto-complete ::v-deep .v-list {
+    width: 385px !important;
+}
+
+.auto-complete ::v-deep .v-select__slot {
+    height: 25px
+}
+
+.auto-complete ::v-deep .v-input__icon {
+    padding-bottom: 6px !important
+}
+
+.auto-complete ::v-deep .v-select__slot>input {
+    padding-top: 15px;
+}
+
+.auto-complete ::v-deep .v-input__icon>button {
+    font-size: 14px !important
+}
+
+.period-selector ::v-deep .v-input__slot{
+   margin-top:-3px;
+   padding-left: 10px;
+   padding-bottom: 2px
 }
 
 span {

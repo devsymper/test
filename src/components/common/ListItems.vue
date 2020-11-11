@@ -136,7 +136,6 @@
                                 </v-list-item>
                             </v-list>
                         </v-menu>
-
                         <component
                             :is="'span'"
                         >
@@ -150,10 +149,25 @@
                                     small
                                     v-on="on"
                                 >
-                                    <v-icon left dark class="ml-1 mr-0">mdi-table-cog</v-icon>
+                                    <v-icon left dark class="ml-1 mr-0 ">mdi-table-cog</v-icon>
                                 </v-btn>
                             </template>
                             <span>{{ $t('common.list_config') }}</span>
+                        </v-tooltip>
+                        
+                        <v-tooltip top v-if="showActionPanelInDisplayConfig">
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    @click="changeAlwayShowSBSState"
+                                    depressed
+                                    small
+                                    class="ml-2"
+                                    v-on="on"
+                                >
+                                    <v-icon left dark class="ml-1 mr-0">{{alwaysShowActionPanel ? 'mdi-flip-horizontal' : 'mdi-format-list-checkbox'}}</v-icon>
+                                </v-btn>
+                            </template>
+                            <span>{{alwaysShowActionPanel ? $t('common.not_always_show_sidebar') : $t('common.always_show_sidebar')}}</span>
                         </v-tooltip>
                     </div>
                 </v-col>
@@ -166,6 +180,7 @@
                             'loosen-row':  tableDisplayConfig.value.densityMode == 0,
                             'medium-row':  tableDisplayConfig.value.densityMode == 1,
                             'compact-row':  tableDisplayConfig.value.densityMode == 2,
+                            'list-sbs': alwaysShowActionPanel
                         }"
                 >
                     <hot-table
@@ -389,6 +404,7 @@ export default {
                 manualRowResize: true,
                 readOnly: this.isTablereadOnly,
                 contextMenu: {},
+                currentRowClassName: 'symper-list-item-current-row',
                 viewportRowRenderingOffset: 20,
                 viewportColumnRenderingOffset: 20,
                 rowHeights: 21,
@@ -507,7 +523,7 @@ export default {
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
             hotTableContextMenuItems: [],
             allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
-            hasColumnsChecked:true,
+            hasColumnsChecked: false,
             focusingRowIndex: -1,
         };
     },
@@ -820,6 +836,9 @@ export default {
         }
     },
     methods: {
+        changeAlwayShowSBSState(){
+            this.tableDisplayConfig.value.alwaysShowSidebar = !this.tableDisplayConfig.value.alwaysShowSidebar;
+        },
         getHotInstance(){
             return this.$refs.dataTable.hotInstance;
         },  
@@ -1426,7 +1445,7 @@ export default {
                     colMap[item.name].renderer = function(instance, td, row, col, prop, value, cellProperties){
                         td = renderer(instance, td, row, col, prop, value, cellProperties);
                         if(self.focusingRowIndex > 0 && row == self.focusingRowIndex ){
-                            $(td).addClass('symper-list-item-current-row');
+                            $(td).addClass('symper-list-item-current-row-sbs');
                         }
                         return td;
                     }
@@ -1611,8 +1630,10 @@ export default {
             // Phát sự kiện khi xóa danh sách các item trong list
             this.$emit("remove-item", []);
         },
-        refreshList() {
-            // Phát sự kiện khi click vào refresh dữ liệu
+        refreshList(){
+			// Phát sự kiện khi click vào refresh dữ liệu
+			this.allRowChecked = {}
+			this.$emit('after-selected-row', this.allRowChecked)
             this.getData();
             this.$emit("refresh-list", {});
         },
@@ -1653,7 +1674,10 @@ export default {
             this.hasColumnsChecked = true;
             this.tableColumns.unshift({name:"checkbox_select_item",data:"checkbox_select_item",title:"Chọn",type:"checkbox"});
 		},
-	
+		// dungna doi hasColumnsChecked = true
+		addColumnsChecked(){
+			this.hasColumnsChecked = true
+		},
         removeCheckBoxColumn(){
             this.hasColumnsChecked = false;
             this.tableColumns.shift();

@@ -15,6 +15,7 @@
 					<v-col cols="8" class="h-100 pa-0 ma-0">
 						<v-row class="ma-0" style="height:60%">
 							<trackingProcessInstance
+								class="popup-model-diagram"
 								v-if="workInfo.id"
 								:instanceId="workInfo.id"
 								@dataInstanceRuntime="dataInstanceRuntime"
@@ -32,6 +33,7 @@
 			</div>
 			<div class="tracking-process" style="height:100%" v-else-if="showType==''">
 				<trackingProcessInstance
+					class="popup-model-diagram"
 					v-if="taskInfo.action.parameter.processInstanceId"
 					:instanceId="taskInfo.action.parameter.processInstanceId"
 					:elementId="taskInfo.action.parameter.activityId"
@@ -252,5 +254,8 @@ export default {
 		width: 100%;
 		height: 100%;
 		background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+	}
+	.popup-model-diagram >>> .djs-hit  {
+		pointer-events: none;
 	}
 </style>>
