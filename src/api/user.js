@@ -89,7 +89,7 @@ export const userApi = {
     // Lấy các operation của user ở role hiện tại
     getCurrentRoleOperations() {
         let roleIden = util.auth.getCurrentUserRole();
-        return api.get(permissionApi + `roles/${roleIden}/accesscontrol`);
+        return permissionApi.get(`roles/${roleIden}/accesscontrol`);
     },
     getActionAndObject(role) {
         return permissionApi.get('roles/' + role + '/accesscontrol')
