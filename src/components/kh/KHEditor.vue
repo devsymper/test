@@ -34,7 +34,7 @@
                     block_formats: 'Paragraph=p;Header 1=h1;Header 2=h2;Header 3=h3;Header 4=h4;Header 5=h5;Header 6=h6',
                     fontsize_formats: '7pt 8pt 9pt 10pt 11pt 12pt 13pt 14pt 16pt 18pt 24pt 36pt 48pt',
                     paste_data_images: true,
-                    images_upload_url:'https://kh-service.dev.symper.vn/uploadImage',
+                    images_upload_url: appConfigs.apiDomain.knowledge+'uploadImage',
                     quickbars_insert_toolbar: false,
                     quickbars_selection_toolbar: ' addHandsonTableBtn | bold italic underline strikethrough | fontselect fontsizeselect formatselect |numlist bullist checklist| forecolor backcolor casechange| blockquote quicklink| alignleft aligncenter alignright alignjustify| codesample | outdent indent quickimage media| emoticons | table',
                     media_live_embeds: true,
@@ -73,6 +73,7 @@ import KHHeader from "./../../components/kh/KHHeader.vue";
 import KHAddSizeTable from "./../../components/kh/KHAddSizeTable.vue";
 import KHHandsonTable from "./../../components/kh/KHHandsonTable.vue";
 import { SYMPER_APP } from "./../../main.js";
+import { appConfigs } from "./../../configs.js";
 
 export default {
   data() {

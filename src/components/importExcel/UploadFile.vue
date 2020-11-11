@@ -111,6 +111,7 @@
 <script>
 import { util } from '../../plugins/util';
 import uploader from 'vue-simple-uploader'
+import { appConfigs } from '../../configs';
 
 export default {
     props: ['errorMessage','importInfo'],
@@ -148,7 +149,7 @@ export default {
     computed: {
       options() {
         return {
-          target: 'https://io.dev.symper.vn/upload-file',
+          target: appConfigs.apiDomain.importExcel + 'upload-file',
           testChunks: false,
           chunkSize:100*1024*1024,
           query: {

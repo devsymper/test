@@ -384,7 +384,7 @@ export default class Formulas {
         try {
             listControlInDoc = this.getDataSubmitInStore();
         } catch (error) {
-
+            console.log(error);
         }
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
@@ -401,7 +401,7 @@ export default class Formulas {
             }
             if (value == undefined || typeof value == 'undefined' || value == null) {
                 value = ""
-                if (dataFromStore && listControlInDoc[controlName].type == 'number' || listControlInDoc[controlName].type == 'percent') {
+                if (listControlInDoc[controlName].type == 'number' || listControlInDoc[controlName].type == 'percent') {
                     value = 0;
                 }
             }

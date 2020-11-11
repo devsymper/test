@@ -38,6 +38,9 @@ import {dashboardApi} from './../../api/dashboard';
 import BpmnEngine from './../../api/BPMNEngine';
 import Handsontable from 'handsontable';
 import { util } from '../../plugins/util.js';
+import {
+    appConfigs
+} from "@/configs";
 export default {
     name: "listApps",
     components: {
@@ -61,7 +64,7 @@ export default {
                 "resource": "application_definition",
                 "scope": "application",
             },
-            apiUrl: "https://core.symper.vn/application",
+            apiUrl: appConfigs.apiDomain.appManagement+"application",
             appUrl: "apps",
             isEdit: false,
             customAPIResult: {

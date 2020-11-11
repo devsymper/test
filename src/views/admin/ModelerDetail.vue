@@ -8,38 +8,84 @@
 						tile 
 						icon
 						x-small
+						class="mr-2"
+						@click="changeTab('tab-1')"
+					>
+						<v-icon small >mdi-numeric-2-box-outline</v-icon>
+					</v-btn>
+					<v-btn
+						tile 
+						icon
+						x-small
+						class="mr-2"
+						@click="changeTab('tab-2')"
+					>
+						<v-icon x-small >mdi-coolant-temperature</v-icon>
+					</v-btn>
+					<v-btn
+						tile 
+						icon
+						x-small
+						class="mr-2"
 						@click="handleZoomOut"
 					>
-						<v-icon   >mdi-plus-circle-outline</v-icon>
+						<v-icon  small >mdi-plus-circle-outline</v-icon>
 					</v-btn>
 					<v-btn
 						tile 
 						icon
 						x-small
+						class="mr-2"
 						@click="handleZoomIn"
 					>
-						<v-icon>mdi-minus-circle-outline</v-icon>
+						<v-icon small>mdi-minus-circle-outline</v-icon>
 					</v-btn>
 					<v-btn
 						tile 
 						icon
 						x-small
+						class="mr-2"
 						@click="handleFocus"
 					>
-						<v-icon>mdi-image-filter-center-focus</v-icon>
+						<v-icon small>mdi-image-filter-center-focus</v-icon>
 					</v-btn>
 				</div>
 			</div>
-            <symper-bpmn
-                @node-clicked="handleNodeSelected"
-                @node-changed="handleNodeChangeProps"
-                ref="symperBpmn"
-                :height="diagramHeight"
-				:width="600"
-                :diagramXML="diagramXML"
-            ></symper-bpmn>
+			<v-tabs
+			v-model="tab"
+			v-show="false"
+			>
+			</v-tabs>
+			<v-tabs-items v-model="tab">
+				<v-tab-item
+				value='tab-1'
+				>
+					<symper-bpmn
+						@node-clicked="handleNodeSelected"
+						@node-changed="handleNodeChangeProps"
+						ref="symperBpmn"
+						:height="diagramHeight"
+						:width="600"
+						:diagramXML="diagramXML"
+						:customModules="customRender"
+					></symper-bpmn>
+				</v-tab-item>
+				<v-tab-item
+				value='tab-2'
+				>
+					 <symper-bpmn
+						@node-clicked="handleNodeSelected"
+						@node-changed="handleNodeChangeProps"
+						ref="symperBpmn"
+						:height="diagramHeight"
+						:width="600"
+						:diagramXML="diagramXML"
+						:customModules="customRenderHeatMap"
+					></symper-bpmn>
+				</v-tab-item>
+			</v-tabs-items>
+           
         </div>
-                <!-- :customExtension="customExtension" -->
 
     </div>
 </template>
@@ -60,7 +106,8 @@ import { pushCustomElementsToModel, collectInfoForTaskDescription } from "@/comp
 import Api from "@/api/api.js";
 import { appConfigs } from '@/configs';
 import serviceTaskDefinitions from "@/components/process/elementDefinitions/serviceTaskDefinitions";
-
+import CustomRenderProcessCount from '@/components/process/CustomRenderProcessCount'
+import CustomRenderHeatMap from '@/components/process/CustomRenderHeatMap'
 
 const apiCaller = new Api('');
 
@@ -122,6 +169,9 @@ const mappNodeActivity={
 
 export default {
     methods: {
+		changeTab(data){
+			this.tab = data
+		},
         calcDiagramHeight(){
             this.diagramHeight = window.innerHeight - 400;
 		},
@@ -1198,7 +1248,8 @@ export default {
                 let xml = this.cleanXMLBeforeRender(modelData.content);
                 let afterRender = await this.$refs.symperBpmn.renderFromXML(xml);
                 if(modelData.configValue){
-                    this.restoreAttrValueFromJsonConfig(modelData.configValue);
+					this.restoreAttrValueFromJsonConfig(modelData.configValue);
+					this.$refs.symperBpmn.focus();
                 }
             } catch (error) {
                 this.$snotifyError(
@@ -1217,11 +1268,15 @@ export default {
 			let formKeyToNodeIdMap = {};
             for(let elName in self.stateAllElements){
 				let el = self.stateAllElements[elName];
-				if(el.type == "UserTask" || el.type == "ScriptTask" ){
+				if(el.type.includes('Task') ){ //== "UserTask" || el.type == "ScriptTask" 
 					if(processTracking){
 						processTracking.forEach(function(e){
 							if(e.act_id_ == el.id){
-								//
+								//lam o day
+								symBpmn.updateElementProperties(el.id,{
+									countEnd: e.count_end,
+									countRunning: e.count_running,
+								})
 							}	
 						})
 					}
@@ -1382,11 +1437,24 @@ export default {
     },
     data() {
         return {
+			tab:'tab-1',
             instanceKey: null, // key của instance hiện tại
             attrPannelHeight: "300px", // chiều cao của panel cấu hình các element
             modelAction: "create", // hành động đối với model này là gì: create | clone | edit
             modelId: "", // Id của model này trong DB
-            searchAttrKey: "",
+			searchAttrKey: "",
+			customRender: [
+                {
+                    __init__: ["customRenderer"],
+                    customRenderer: ["type", CustomRenderProcessCount]
+                }
+            ],
+			customRenderHeatMap: [
+                {
+                    __init__: ["customRenderer"],
+                    customRenderer: ["type", CustomRenderHeatMap]
+                }
+            ],
             diagramHeight: 300,
             headerActions: {
                 undo: {
@@ -1434,7 +1502,9 @@ export default {
     components: {
         "symper-bpmn": SymperBpmn,
         "form-tpl": FormTpl,
-        VuePerfectScrollbar
+		VuePerfectScrollbar,
+		CustomRenderProcessCount,
+		CustomRenderHeatMap
     },
     props: {
         // Hành động cho editor này, nhận một trong các giá trị: create, edit, view, clone
@@ -1500,8 +1570,31 @@ export default {
 	},
 	watch:{
 		processId(val){
+			this.instanceKey = Date.now();
+			this.$store.commit(
+				"process/initInstance",
+				this.instanceKey
+			);
+			this.$store.dispatch("app/getAllOrgChartData");
+			this.$store.dispatch("app/getAllUsers");
+			this.$store.dispatch("process/getLastestProcessDefinition");
+			this.$store.dispatch('process/getAllDefinitions');
+			// this.applySavedData(this.processId)
 			this.applySavedData(val);
+		},
+		tab(){
+			this.instanceKey = Date.now();
+			this.$store.commit(
+				"process/initInstance",
+				this.instanceKey
+			);
+			this.$store.dispatch("app/getAllOrgChartData");
+			this.$store.dispatch("app/getAllUsers");
+			this.$store.dispatch("process/getLastestProcessDefinition");
+			this.$store.dispatch('process/getAllDefinitions');
+			this.applySavedData(this.processId)
 		}
+
 	}
 };
 </script>

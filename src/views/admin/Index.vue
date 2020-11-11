@@ -31,6 +31,9 @@ import ListItems from "@/components/common/ListItems.vue"
 import DetailWorkflow from "./DetailWorkflow"
 import { util } from "@/plugins/util.js";
 import {adminApi} from '@/api/Admin.js'
+import {
+    appConfigs
+} from "@/configs";
 export default {
 	components:{
 		ListItems,
@@ -42,7 +45,7 @@ export default {
 			containerHeight:null,
 			showPanel:false,
 			selectedItem: null,
-			apiUrl:'https://workflow-modeler.symper.vn/',
+			apiUrl: appConfigs.apiDomain.bpmne.models,
 			customAPIResult: {
                 reformatData(res){
 					
@@ -92,8 +95,20 @@ export default {
                stopProcess: {
                     name: "Dừng quy trình",
                     text: "Dừng quy trình",
-                    callback: (user, callback) => {
-                       
+                    callback: (obj, callback) => {
+						adminApi.stopProcessDefinition(obj.processKey).then(res=>{
+							if(res.status == 200){
+								this.$snotify({
+									type: "success",
+									title: "Dừng thành công"
+								})
+							}
+						}).catch(err=>{
+							this.$snotify({
+								type: "error",
+								title: "Không tìm thấy "
+							})
+						})
                     },
                 },
              

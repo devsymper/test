@@ -41,9 +41,9 @@
                         <v-menu
                             v-model="isShowDialog"
                             :close-on-content-click="false"
-                            :max-width="500"
+                            :max-width="700"
                             :max-height="700"
-       				   	    :nudge-width="370"
+       				   	    :nudge-width="570"
                             offset-y
                             style="z-index:1000"
                             >
