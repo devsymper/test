@@ -5,8 +5,9 @@ import { SYMPER_APP } from './../../../main.js'
 import Util from './util'
 var numbro = require("numbro");
 import moment from "moment-timezone";
-
+import { appConfigs } from "@/configs.js";
 import { documentApi } from "../../../api/Document";
+let sDocumentManagementUrl = appConfigs.apiDomain.sdocumentManagement;
 const fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
     'txt': 'mdi-file-document-outline',
@@ -443,8 +444,9 @@ export default class BasicControl extends Control {
                     let element = valueArr[index];
                     let fileExt = Util.getFileExtension(element);
                     let icon = fileTypes[fileExt];
+                    api
                     let file = `<div title="${element}" class="file-item">
-                            <i  onclick="window.open('https://sdocument-management.symper.vn/file/public/` + element + `');" class="mdi ` + icon + ` file-view" ></i>
+                            <i  onclick="window.open('`+sDocumentManagementUrl+`file/public/` + element + `');" class="mdi ` + icon + ` file-view" ></i>
                         </div>`
                     addTpl += file;
                 }
@@ -466,7 +468,7 @@ export default class BasicControl extends Control {
                 }
                 let file = `<div  class="file-item">
                                 ` + deleteFileIcon + `
-                                <i onclick="window.open('https://sdocument-management.symper.vn/file/public` + fileName + `');" class="mdi ` + icon + ` file-view" ></i>
+                                <i onclick="window.open('`+sDocumentManagementUrl+`file/public` + fileName + `');" class="mdi ` + icon + ` file-view" ></i>
                             </div>`
                 addTpl += file;
             }
@@ -483,7 +485,7 @@ export default class BasicControl extends Control {
         let icon = fileTypes[type];
         let thisObj = this;
         $.ajax({
-            url: 'https://sdocument-management.symper.vn/uploadFile',
+            url: '`+sDocumentManagementUrl+`uploadFile',
             dataType: 'json',
             processData: false,
             contentType: false,
@@ -493,7 +495,7 @@ export default class BasicControl extends Control {
                 if (response.status == 200) {
                     let file = `<div title="${response.data.path}" class="file-item">
                                 <span data-file-name="${response.data.path}" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
-                                <i  onclick="window.open('https://sdocument-management.symper.vn/file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
+                                <i  onclick="window.open('`+sDocumentManagementUrl+`file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
                             </div>`
                     thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name)
                     thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
@@ -622,7 +624,7 @@ export default class BasicControl extends Control {
     }
     renderUserControl() {
         let listUser = store.state.app.allUsers;
-        if (this.checkViewType('detail') || this.checkViewType('print')) {
+        if (!this.checkViewType('submit')) {
             if (this.value != null && this.value != "" && !isNaN(this.value)) {
                 let user = listUser.filter(u => {
                     return u.id == this.value

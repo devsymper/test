@@ -239,11 +239,13 @@ export default {
                     var e = event.originalEvent;
                 try {
                     var control = e.dataTransfer.getData('control');
-                    control = JSON.parse(control);
-                    self.listRows[controlInd].disable = true;
-                    self.tablePivotConfig.rows.push(control)
+                    if(self.tablePivotConfig.rows.length < 2){
+                        control = JSON.parse(control);
+                        self.listRows[controlInd].disable = true;
+                        self.tablePivotConfig.rows.push(control)
+                    }
                 } catch (error) {
-                    
+                    console.log(error);
                 }
                 return false;
             });
@@ -257,11 +259,13 @@ export default {
                     var e = event.originalEvent;
                 try {
                     var control = e.dataTransfer.getData('control');
-                    control = JSON.parse(control);
-                    self.listRows[controlInd].disable = true;
-                    self.tablePivotConfig.cols.push(control)
+                    if(self.tablePivotConfig.cols.length < 2){
+                        control = JSON.parse(control);
+                        self.listRows[controlInd].disable = true;
+                        self.tablePivotConfig.cols.push(control);
+                    }
                 } catch (error) {
-                    
+                    console.log(error);                    
                 }
                 return false;
             });

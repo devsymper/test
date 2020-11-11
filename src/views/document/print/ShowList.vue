@@ -1,7 +1,7 @@
 <template>
     <list-items
         ref="listDocument"
-        :getDataUrl="'https://sdocument-management.symper.vn/documents/'+docId+'/prints'"
+        :getDataUrl="sDocumentManagementUrl+'documents/'+docId+'/prints'"
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('document.title')"
@@ -23,6 +23,7 @@ export default {
     },
     data(){
         return {
+            sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
             docId:this.$route.params.id,
             commonActionProps: {
                 // "module": "document",
