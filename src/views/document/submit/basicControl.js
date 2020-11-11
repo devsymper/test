@@ -622,7 +622,7 @@ export default class BasicControl extends Control {
     }
     renderUserControl() {
         let listUser = store.state.app.allUsers;
-        if (this.checkViewType('detail') || this.checkViewType('print')) {
+        if (!this.checkViewType('submit')) {
             if (this.value != null && this.value != "" && !isNaN(this.value)) {
                 let user = listUser.filter(u => {
                     return u.id == this.value
