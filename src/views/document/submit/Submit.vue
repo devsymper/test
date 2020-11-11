@@ -619,26 +619,26 @@ export default {
         // sự kiện ném ra khi gõ vào control department
         // một số key code gõ vào thì ko mở hoặc phải đóng đi
         this.$evtBus.$on("document-submit-department-key-event", e => {
-            if(thisCpn._inactive == true) return;
+            if(this._inactive == true) return;
             try {
                 if((e.e.keyCode >= 97 && e.e.keyCode <= 105) ||
                     (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
                     (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [189,16,8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
-                    if(!thisCpn.$refs.autocompleteInput.isShow()){
-                        thisCpn.$refs.autocompleteInput.show(e.e);
+                    if(!this.$refs.autocompleteInput.isShow()){
+                        this.$refs.autocompleteInput.show(e.e);
                         let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
                         if(currentTableInteractive != null && currentTableInteractive != undefined)
                         currentTableInteractive.isAutoCompleting = true;
-                        thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                        this.$store.commit("document/addToDocumentSubmitStore", {
                             key: 'currentControlAutoComplete',
                             value: e.controlName,
-                            instance: thisCpn.keyInstance
+                            instance: this.keyInstance
                         });
                     }
-                    thisCpn.getDataOrgchart(e);
+                    this.getDataOrgchart(e);
                 }
                 else if((e.e.keyCode < 37 || e.e.keyCode > 40)){
-                    thisCpn.$refs.autocompleteInput.hide();
+                    this.$refs.autocompleteInput.hide();
                 }
                 
             } catch (error) { 
@@ -648,20 +648,20 @@ export default {
         });
         // hàm nhận sự thay đổi của input select gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-select-input", e => {
-            if(thisCpn._inactive == true) return;
+            if(this._inactive == true) return;
             try { 
-                thisCpn.$refs.autocompleteInput.show(e.e);
+                this.$refs.autocompleteInput.show(e.e);
                 let controlName = (e.cellActive) ? e.alias + ":"+e.cellActive[0][0]+":"+e.cellActive[0][1] : e.alias;
-                thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                this.$store.commit("document/addToDocumentSubmitStore", {
                             key: 'currentControlAutoComplete',
                             value: controlName,
-                            instance: thisCpn.keyInstance
+                            instance: this.keyInstance
                         });
-                thisCpn.$refs.autocompleteInput.setTypeInput(e.type);
+                this.$refs.autocompleteInput.setTypeInput(e.type);
                 if(e.type == 'combobox'){
-                    thisCpn.$refs.autocompleteInput.setSingleSelectCombobox(e.isSingleSelect);
+                    this.$refs.autocompleteInput.setSingleSelectCombobox(e.isSingleSelect);
                 }
-                thisCpn.getDataForAutocomplete(e,e.type,e.alias);
+                this.getDataForAutocomplete(e,e.type,e.alias);
             } catch (error) {
                 console.log('errorerrorerror',error);
             }
@@ -2396,7 +2396,7 @@ export default {
             let impactedFieldsListWhenStart = {}
             let listTableRootControl = {};
             let listRootControl = [];
-			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
+			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0 && false){
 				impactedFieldsList = this.preDataSubmit.impactedFieldsList;
 				impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
 				listRootControl = this.preDataSubmit.rootControl;
@@ -2520,7 +2520,6 @@ export default {
             let sourceControlInstance = getControlInstanceFromStore(this.keyInstance,sourceName);
             var arr = [];
             if (sourceControlInstance != false) {
-                if(Object.keys(sourceControlInstance).includes(sourceName))
                 for (var i in sourceControlInstance['effectedControl']) {
                     if(i != sourceName){
                         arr.push(i);
@@ -2528,6 +2527,7 @@ export default {
                     }
                     
                 }
+                
             }
             return arr;
         },
