@@ -4,7 +4,6 @@ import {
 } from './../configs.js';
 
 var coreApi = new Api(appConfigs.apiDomain.fileManagement);
-var fileApi = new Api(appConfigs.apiDomain.fileManagement);
 export const fileManagementApi = {
     getFileByList(ids) {
         return coreApi.get('getFileByList', {
@@ -16,7 +15,7 @@ export const fileManagementApi = {
         return coreApi.post('uploadS', data, {}, options);
     },
     download(id) {
-        window.open(fileApi+'downloadS/' + id, '_blank');
+        window.open(appConfigs.apiDomain.fileManagement+'downloadS/' + id, '_blank');
     },
 
     /**

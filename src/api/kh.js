@@ -93,7 +93,7 @@ export const knowledgeApi = {
         return fileManagement.put('changeStatusSymperFile', data);
     },
     downloadFile(id) {
-        window.open(fileManagement+'downloadS/' + id, '_blank');
+        window.open(appConfigs.apiDomain.fileManagement+'downloadS/' + id, '_blank');
     },
     renameFile(data) {
         return fileManagement.put('renameFile', data);
