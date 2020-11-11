@@ -122,6 +122,7 @@ import { appManagementApi } from '@/api/AppManagement';
 import { extractTaskInfoFromObject, addMoreInfoToTask } from '@/components/process/processAction';
 
 import VueClipboard from 'vue-clipboard2';
+import { util } from '../../plugins/util';
 
 
 Vue.use(VueClipboard)
@@ -342,7 +343,7 @@ export default {
         changeTaskDetailInfo(taskId){
             let hostname=window.location.hostname;
             let copyText = this.taskInfo.action.parameter.taskId;
-            copyText='https://'+hostname+'/#/myitem/tasks/'+copyText;
+            copyText=util.addEnvToUrl('https://'+hostname+'/#/myitem/tasks/'+copyText);
             this.linkTask=copyText;
 
             if(!taskId){
