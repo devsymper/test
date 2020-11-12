@@ -52,6 +52,7 @@ export default class PivotTable {
         }
     }
     setData(vl) {
+        this.columnDefs = [];
         this.setPivotColumns();
         this.gridOptions.api.setColumnDefs(this.columnDefs);
         this.gridOptions.api.setRowData(vl);
@@ -59,6 +60,12 @@ export default class PivotTable {
     render() {
         this.gridOptions = {
             columnDefs: this.columnDefs,
+            headerHeight:24,
+            groupHeaderHeight:24,
+            pivotHeaderHeight:24,
+            pivotGroupHeaderHeight:24,
+            animateRows: true,
+            getRowHeight: this.getRowHeight,
             rowData: [],
             autoGroupColumnDef: { minWidth: 250 },
             pivotMode: true,
@@ -75,19 +82,29 @@ export default class PivotTable {
         this.controlObj.ele.before(this.tableContainer);
         new Grid(this.tableContainer, this.gridOptions, { modules: [ClientSideRowModelModule, RowGroupingModule] });
     }
+    getRowHeight(params) {
+        if (params.node.group) {
+            return 25;
+        } else {
+            return 25;
+        }
+    }
     /**
      * hoangnd
      * hàm set giá trị cho các cột được đưa vào values của pivot
      * @param {} values 
      */
     customPivotFunc(values) {
-        var v = "";
+        var v = 0;
         values.forEach(function(value) {
             if (!value) {
-                value = "";
+                value = 0;
             }
             v += value;
         });
+        if(v==0){
+            v=""
+        }
         return v;
     }
     show() {

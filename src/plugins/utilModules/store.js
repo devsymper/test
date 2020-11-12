@@ -2,7 +2,6 @@
  * Các hàm phục vụ cho việc xác thực, lưu trữ dữ liệu đăng nhập cho người dùng
  */
 import { cookie } from "./cookie.js";
-import env  from "@/../env.json";
 export const store = {
     getComponentSize(comp) {
         if (!comp) {
@@ -102,8 +101,8 @@ export const store = {
     addEnvToUrl(url){
         url = url.trim();
         if(url.indexOf('https://') === 0){
-            if(env.environment != ''){
-                url = url.replace('https://', `https://${env.environment}.`);                
+            if(SYMPER_ENV.environment != ''){
+                url = url.replace('https://', `https://${SYMPER_ENV.environment}.`);                
             }
         }else{
             console.error("url must start with https://");
@@ -112,16 +111,3 @@ export const store = {
     }
     
 }
-
-
-// namespace Library;
-// class Environment{
-//     public static function getPrefixEnvironment(){
-//         if($GLOBALS['env']['environment']!=""){
-//             return $GLOBALS['env']['environment'].".";
-//         }
-//         else{
-//             return "";
-//         }
-//     }
-// }
