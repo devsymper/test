@@ -36,7 +36,7 @@
                     powerpaste_word_import:'merge',
                     images_upload_url: apiUploadImage,
                     external_plugins: {
-                      'powerpaste': 'https://www.revistacontinente.com.br/public/gwm/js/tinymce/plugins/powerpaste/plugin.min.js'
+                      'powerpaste': 'https://www.revistacontinente.com.br/public/gwm/js/tinymce/plugins/powerpaste/plugin.min.js' // plugin này đã lưu trữ trữ trong resource/tiny-mce
                     },
                     quickbars_insert_toolbar: false,
                     quickbars_selection_toolbar: ' addHandsonTableBtn | bold italic underline strikethrough | fontselect fontsizeselect formatselect |numlist bullist checklist| forecolor backcolor casechange| blockquote quicklink| alignleft aligncenter alignright alignjustify| codesample | outdent indent quickimage media| emoticons | table',
@@ -76,15 +76,11 @@ import KHAddSizeTable from "./../../components/kh/KHAddSizeTable.vue";
 import KHHandsonTable from "./../../components/kh/KHHandsonTable.vue";
 import { SYMPER_APP } from "./../../main.js";
 import { appConfigs } from "./../../configs.js";
-import pasteUrl from '../../../public/js/tiny-mce/powerpaste/plugin.min.js';
-
 export default {
   data() {
     let self = this;
-    debugger
     return {
         widthEditor:650,
-        link: pasteUrl,
         loading: true,
         id: "",
         hash: "",
