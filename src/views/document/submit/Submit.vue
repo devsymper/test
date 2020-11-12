@@ -171,7 +171,8 @@
             ref="traceControlView" 
             v-show="isShowTraceControlSidebar" />
         </v-navigation-drawer>
-
+    <PopupPivotTable ref="popupPivotTableView" :dataColPivot="dataColPivot" :data="dataPivotMode" @before-add-pivot-data="beforeAddPivotData"/>
+    <input type="text" class="input-pivot" @keyup="afterKeyupInputPivot" @blur="afterBlurInputPivot">
     </div>
      
 </template>
@@ -210,6 +211,7 @@ import Preloader from './../../../components/common/Preloader';
 import {listControlNotNameProp} from "./../../../components/document/controlPropsFactory.js"
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import FloattingPopup from './../common/FloattingPopup'
+import PopupPivotTable from './items/PopupPivotTable'
 
 
 
@@ -314,7 +316,8 @@ export default {
         UploadFile,
         SidebarTraceFormulas,
         VuePerfectScrollbar,
-        FloattingPopup
+        FloattingPopup,
+        PopupPivotTable
     },
     computed: {
         sDocumentEditor() {
@@ -384,7 +387,9 @@ export default {
             listFileControl:[],
             currentImageControl:null,
             currentControlDataflow:null,
-            dataPivotTable:{}
+            dataPivotTable:{},
+            dataColPivot:[],
+            dataPivotMode:[],
         };
 
     },
@@ -464,6 +469,43 @@ export default {
         if(this.docObjId != null){
             this.loadDocumentObject();
         }
+
+        this.$evtBus.$on("on-add-data-to-pivot-table", locate => {
+            if(thisCpn._inactive == true) return;
+            let type = locate.type;
+            let tableName = locate.tableName;
+            let tableInstance = getControlInstanceFromStore(this.keyInstance,tableName);
+            let pivotData = tableInstance.pivotTable.getDataGroup();
+            let rowsConfig = pivotData['rows'];
+            this.dataColPivot = [];
+            this.dataPivotMode = [];
+            for (let index = 0; index < rowsConfig.length; index++) {
+                let controlName = rowsConfig[index];
+                let controlBindData = getControlInstanceFromStore(this.keyInstance,controlName);
+                let value = controlBindData.value;
+                let uniqueData = value.filter(function(value, index, self){
+                    return self.indexOf(value) === index;
+                })
+                this.dataPivotMode.push({controlName:controlName, controlTitle:controlBindData.title,value:uniqueData});
+            }
+            let colsConfig = pivotData['cols'];
+            for (let index = 0; index < colsConfig.length; index++) {
+                let controlName = colsConfig[index];
+                let controlBindData = getControlInstanceFromStore(this.keyInstance,controlName);
+                let value = controlBindData.value;
+                let uniqueData = value.filter(function(value, index, self){
+                    return self.indexOf(value) === index;
+                })
+                if(type == 'cols'){
+                    this.dataColPivot.push({controlName:controlName, controlTitle:controlBindData.title});
+                }
+                else{
+                    this.dataPivotMode.push({controlName:controlName, controlTitle:controlBindData.title,value:uniqueData});
+                }
+            }
+            
+            this.$refs.popupPivotTableView.show(type, tableName);
+        });
 
         this.$evtBus.$on("on-info-btn-in-table-click", locate => {
             if(thisCpn._inactive == true) return;
@@ -849,8 +891,44 @@ export default {
     },
     
     methods: {
-        
-        
+        afterBlurInputPivot(event){
+            $(event.target).css({display:'none'});
+        },
+        afterKeyupInputPivot(event){
+            if(event.which == 13){
+                $(event.target).css({display:'none'});
+            }
+        },
+        beforeAddPivotData(data){
+            let tableName = data.tableName;
+            let type = data.type;
+            let dataRowGroup = data.dataRowGroup;
+            let dataColPivot = data.dataColPivot;
+            let rowData = {};
+            for (let index = 0; index < dataRowGroup.length; index++) {
+                let cell = dataRowGroup[index];
+                rowData[cell.controlName] = cell.selected
+            }
+            for (let index = 0; index < dataColPivot.length; index++) {
+                let cell = dataColPivot[index];
+                rowData[cell.controlName] = cell.selected
+            }
+            let tableControl = getControlInstanceFromStore(this.keyInstance,tableName);
+            let hotTb = tableControl.tableInstance.tableInstance;
+            let allData = hotTb.getSourceData();
+            for (let index = 0; index < allData.length; index++) {
+                let row = allData[index];
+                delete allData[index].s_table_id_sql_lite;
+            }
+            for (let control in allData[0]) {
+                if(!rowData[control]){
+                    rowData[control] = ""
+                }
+            }
+            allData.push(rowData);
+            tableControl.tableInstance.setData(allData);
+            this.$refs.popupPivotTableView.hide();
+        },
         /**
          * Hàm ẩn loader
          */
@@ -2286,8 +2364,10 @@ export default {
          * Hàm cập nhật dữ liệu cho bảng pivot
          */
         setDataToPivotTable(tableControl, data){
-            tableControl.pivotTable.show();
-            tableControl.pivotTable.setData(data);
+            if(tableControl.pivotTable){
+                tableControl.pivotTable.show();
+                tableControl.pivotTable.setData(data);
+            }
         },
 
         /**
