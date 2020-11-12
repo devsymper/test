@@ -25,7 +25,7 @@
 				:label="$t('apps.search')"
 				single-line
 				solo
-				dense	
+				dense
 				class="mr-2 fs-13"
 				append-icon="mdi-magnify"
 				v-model="searchKey"
@@ -35,6 +35,7 @@
 			<v-list-item
 				v-for="i in 3"
 				:key="i"
+				class="mr-6 ml-6 pr-0 pl-0"
 			>
 
 				<v-list-item-content>
@@ -100,6 +101,12 @@ export default {
 }
 .environemt-management >>> .v-text-field__details{
 	display: none !important;
+}
+.environemt-management >>> .v-list-item__content{
+	padding:2px
+}
+.environemt-management >>> .v-list-item{
+	border-bottom: 1px solid lightgray
 }
 
 </style>
