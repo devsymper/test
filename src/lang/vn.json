@@ -143,7 +143,8 @@
             "listTrashOrgchart": "Danh sách SĐTC đã xóa",
             "viewOrgchart": "Xem SĐTC mặc định",
             "list_workflow": "Danh sách quy trình",
-            "list_work": "Danh sách công việc"
+            "list_work": "Danh sách công việc",
+            "environment": "Quản lí môi trường"
         },
         "system": "Vai trò người dùng",
         "copy": "Sao chép"
