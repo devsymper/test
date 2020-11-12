@@ -905,7 +905,6 @@ export default class Table {
             }
         }
         let dataForStore = [];
-        debugger
 
         try {
             await formulasInstance.getDataMultiple(dataPost).then(res => {

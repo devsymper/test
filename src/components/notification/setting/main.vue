@@ -152,7 +152,6 @@ export default {
         },
         //subcribed all
         subcribedAllChanel(objectType,event,listItemsIdx,childrenListItemsIdx){
-                  debugger
             for(let i=0;i<this.allListChanel.length;i++){
                 if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&!this.allListChanel[i].userFilterState){
               
