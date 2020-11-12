@@ -77,7 +77,6 @@ export default class TableControl extends Control {
                 })
                 this.tableInstance.tableInstance.render();
             }
-
         }
         if (this.isPrintView) {
             let dataTablePrint = [];
@@ -113,6 +112,9 @@ export default class TableControl extends Control {
             this.ele.find('table tbody').append(bodyHtml);
             this.ele.find('table').attr('contenteditable', 'false')
         } else {
+            if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1){
+                return;
+            }
             let dataTable = [];
             let rowLength = data[Object.keys(data)[0]].length;
             for (let index = 0; index < rowLength; index++) {
