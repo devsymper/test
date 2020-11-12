@@ -10,6 +10,7 @@
 			<v-btn
 				class="mr-2 font-normal fs-13" 
 				depressed
+				@click="showDialogAdd"
 			>
 				Thêm môi trường
 			</v-btn>
@@ -29,16 +30,54 @@
 				v-model="searchKey"
 			></v-text-field>
 		</div>
+		<div class="content-environment-management d-flex flex-column mt-2">
+			<v-list-item
+				v-for="i in 3"
+				:key="i"
+			>
 
+				<v-list-item-content>
+					<v-list-item-title>App-beta.symper.vn</v-list-item-title>
+
+					<v-list-item-subtitle >
+						<span>ID : ádhashdhsjd123214</span>
+						<span class="ml-16">
+							Loại môi trường development
+						</span>
+					</v-list-item-subtitle>
+				</v-list-item-content>
+
+				<v-list-item-action>
+					<v-icon color="green lighten-1">mdi-chevron-down</v-icon>
+				</v-list-item-action>
+			</v-list-item>
+		</div>
+		<AddEnvironmentDialog 
+			:showDialog="showDialogAddItem"
+			@cancel="cancelAdd"
+			 />
 	</div>
 </template>
 
 <script>
+import AddEnvironmentDialog from "./AddEnvironmentDialog"
 export default {
+	components:{
+		AddEnvironmentDialog
+	},
 	data(){
 		return {
 			searchKey: "",
+			showDialogAddItem: true
 		}
+	},
+	methods:{
+		showDialogAdd(){
+			this.showDialogAddItem = true
+		},
+		cancelAdd(){
+			this.showDialogAddItem = false
+		},
 	}
 }
 </script>
