@@ -202,7 +202,7 @@ export default class PivotTable {
             if (!value) {
                 value = 0;
             }
-            v += value;
+            v += Number(value);
         });
         if(v==0){
             v=""

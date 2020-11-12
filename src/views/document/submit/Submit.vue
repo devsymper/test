@@ -896,17 +896,17 @@ export default {
     methods: {
         afterBlurInputPivot(event){
             $(event.target).css({display:'none'});
-            this.updateDataAfterChangePivot();
+            this.updateDataAfterChangePivot($(event.target));
 
         },
         afterKeyupInputPivot(event){
             if(event.which == 13){
                 $(event.target).css({display:'none'});
-                this.updateDataAfterChangePivot();
+                this.updateDataAfterChangePivot($(event.target));
                 
             }
         },
-        updateDataAfterChangePivot(){
+        updateDataAfterChangePivot(input){
             let currentRowChangePivotMode = this.currentRowChangePivotMode;
             let keyChange = currentRowChangePivotMode.key;
             let value = currentRowChangePivotMode.value;
@@ -916,6 +916,8 @@ export default {
 
             }
             else{   // thêm dòng mới cho table thường
+                value[keyChange] = input.val();
+                debugger
                 this.updateToTableNomalData(tableName, {}, value)
             }
 
