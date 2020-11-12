@@ -24,7 +24,7 @@ export const commentApi = {
         return coreApi.put('comment', data)
     },
     download(id) {
-        window.open('https://file.symper.vn/downloadS/' + id, '_blank');
+        window.open(appConfigs.apiDomain.fileManagement+'downloadS/' + id, '_blank');
     },
     getCommentCountPerObj(ids) {
         return coreApi.get('count-on-object?ids=' + JSON.stringify(ids))

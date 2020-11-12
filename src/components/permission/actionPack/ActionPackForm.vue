@@ -1,5 +1,12 @@
 <template>
-    <div class="pa-2 h-100">
+    <div class="pl-2 pr-2 h-100">
+        <div class="title mb-2">
+            {{$t('common.'+action) }} {{$t('common.actionPack')}}
+            <v-icon
+                class="close-btn float-right"
+                @click="closeActionPackForm"
+            >mdi-close</v-icon>
+        </div>
         <FormTpl
             ref="comonAttr"
             :viewOnly="action == 'detail'"
@@ -8,7 +15,13 @@
             @input-value-changed="handleInputValueChange"
         >
         </FormTpl> 
-
+        <ConfigActionPackOrgchart 
+            v-if="allInputs.objectType.value == 'department'"
+            @permission-selected="handlePermissionSelected"
+            @department-selected="handleDepartmentSelected"
+            :checkboxes="permissionDepartment"
+            :departmentSelected="departmentSelectedProps"
+        />
         <div class="w-100">
             <div class="my-2 fs-12">
                 {{$t('permissions.actionPack.allOperation')}}
@@ -19,7 +32,7 @@
                 :height="70"
                 :columns="tableColumnsForObjectType"
                 :colHeaders="colHeadersForObjectType"
-                class="fs-13"
+                class="fs-13 action-form"
                 ref="dataTableForObjectType">
 
             </hot-table>
@@ -41,15 +54,16 @@
 
             </hot-table>
         </div>
-
+     
         <ObjectInApplication 
             v-if="allInputs.objectType.value == 'application_definition'"
             :tableDataDefinition="multipleLevelObjects.application_definition"
             :commonTableSetting="commonTableSetting"
             :idApplication="focusingIdApplication"
             @app-detail-get="translateAppObjectIdToTableData" />
-
+          
         <DocumentInstanceOperation 
+            @change-data="handleChangeDocumentInstanceOperation"
             v-if="allInputs.objectType.value == 'document_definition'"
             :tableDataDefinition="multipleLevelObjects.document_definition"
             :commonTableSetting="commonTableSetting"
@@ -57,6 +71,18 @@
 
         <div class="mt-2" v-if="action != 'view' ">
             <v-btn
+                v-if="action == 'detail'"
+                class="float-right mr-1"
+                small
+                depressed
+                color="primary"
+                text
+                @click="switchToUpdateForm">
+                <v-icon size="15" class="mr-2" >mdi-pencil</v-icon>
+                {{$t('common.edit')}} {{$t('common.actions')}}
+            </v-btn>
+            <v-btn
+                v-else
                 class="float-right mr-1"
                 small
                 depressed
@@ -67,6 +93,7 @@
                 {{action == 'create' ? $t('common.save') : $t('common.update')}}
             </v-btn>
         </div>
+      
     </div>
 </template>
 
@@ -79,6 +106,7 @@ import { permissionApi } from '../../../api/permissionPack';
 import { permissionPackageApi } from '../../../api/PermissionPackage';
 import ObjectInApplication from "./ObjectInApplication";
 import DocumentInstanceOperation from "./DocumentInstanceOperation";
+import ConfigActionPackOrgchart from "./ConfigActionPackOrgchart.vue" ;
 
 let defaultTabConfig = {
     tableData: [],
@@ -110,6 +138,42 @@ export default {
         this.genAllInputForFormTpl();
     },
     methods: { 
+        closeActionPackForm(){
+            this.$emit('close-form');
+        },
+        handlePermissionSelected(data){
+            this.permissionDepartment = data           
+        },
+        handleDepartmentSelected(data){
+            if(this.departmentSelected.includes(data)){
+                this.departmentSelected.splice(this.departmentSelected.indexOf(data),1)
+            }else{
+                this.departmentSelected.push(data)
+            }
+        },
+        handleChangeDocumentInstanceOperation(info){
+            let operationForInstancesOfDocDef = this.multipleLevelObjects.document_definition.savedOpsForAllInstancesDocDef;
+            
+            let tableData = this.multipleLevelObjects.document_definition.tableData;
+            let docId = tableData[info.rowIndex]['object'];
+            docId = docId.split('-')[0].trim();
+            let action = info.action;
+
+            if(info.after){
+                operationForInstancesOfDocDef.push({
+                    documentId: docId,
+                    action: action
+                });
+            }else{
+                for(let i =  0; i < operationForInstancesOfDocDef.length; i++){
+                    let item = operationForInstancesOfDocDef[i];
+                    if(item.documentId == docId && item.action == action){
+                        operationForInstancesOfDocDef.splice(i, 1);
+                        break;
+                    }
+                }
+            }
+        },
         genAllInputForFormTpl(){
             this.allInputs = null;
             this.allInputs = {
@@ -149,7 +213,7 @@ export default {
             for(let op of operationForInstancesOfDocDef){
                 dataTable[op.documentId][op.action] = true;
             }
-            this.multipleLevelObjects.document_definition.tableData = Object.values(dataTable);
+            this.multipleLevelObjects.document_definition.tableData = util.cloneDeep(Object.values(dataTable));
         },
         setRowsForAllInstancesDocDef(operationForInstancesOfDocDef, rowsOfDocDefs){
             this.multipleLevelObjects.document_definition.savedOpsForAllInstancesDocDef = operationForInstancesOfDocDef;
@@ -391,9 +455,38 @@ export default {
             return cols;
         },
         handleInputValueChange(name, inputInfo, data){
+            let self = this
+            self.departmentSelected
             if(name == 'objectType'){
-                this.handleChangeObjectType();
+                if(data == "department"){
+                    let objectType = this.allInputs.objectType.value;
+                    let rows = this.itemData.mapActionForAllObjects[objectType];
+                    let rowsItem = this.itemData.mapActionAndObjects[objectType];
+
+                    if(rows){
+                        for(let i in rows[0]){
+                            if(rows[0][i] == true){
+                                self.permissionDepartment.push(i)
+                            }
+                        }
+                    }
+                    if(rowsItem){
+                        self.permissionDepartment.push('view_other')
+                        self.$store.dispatch('orgchart/getAllOrgchartStruct');
+                        setTimeout(function(){
+                            rowsItem.forEach(function(e){
+                                if(e.object != ""){
+                                    self.departmentSelected.push('department:'+e.object);
+                                    self.departmentSelectedProps.push(e.object)
+                                }
+                             })
+                        },1000)
+                    }
+                }else{
+                    this.handleChangeObjectType();
+                }
             }
+            
         },
         handleChangeObjectType(){
             this.dataSchema = this.getDataSchema();
@@ -461,14 +554,37 @@ export default {
             });
         },
         getOperationToSaveFromDataTable(dataTable, allResource, objectType){
+            let self = this
             let newOperations = [];
+            
             for (let row of dataTable) {
                 let key = row['object'];
                 let id = '';
                 if(key){
                     id = key.slice(0, key.indexOf(' -'));
                 }
-                
+                if(objectType == "department"){
+                    self.permissionDepartment.forEach(function(e){
+                        if(e == 'view_other'){
+                            self.departmentSelected.forEach(function(k){
+                                 newOperations.push({
+                                    objectType: objectType,
+                                    action: 'view',
+                                    objectIdentifier: k,
+                                    name: k
+                                });
+                            })
+                        }else{
+                            newOperations.push({
+                                objectType: objectType,
+                                action: e,
+                                objectIdentifier: 'department:0',
+                                name: e
+                            });
+                        }
+                        
+                    }) 
+                }
                 if(allResource.hasOwnProperty(objectType) ){
                     if(allResource[objectType][id]){
                         for(let actionName in row){
@@ -489,6 +605,7 @@ export default {
                             if(actionName == 'object'){
                                 continue
                             }
+                            
                             if(row[actionName]){
                                 newOperations.push({
                                     objectType: objectType,
@@ -555,7 +672,6 @@ export default {
                 let dataTable = this.itemData.mapActionAndObjects[objectType];
                 newOperations = newOperations.concat(this.getOperationToSaveFromDataTable(dataTable, allResource, objectType));
             }
-            
             for(let objectType in this.multipleLevelObjects.application_definition){
                 let dataTable = this.multipleLevelObjects.application_definition[objectType].tableData;
                 newOperations = newOperations.concat(this.getOperationToSaveFromDataTable(dataTable, allResource, objectType));
@@ -565,24 +681,29 @@ export default {
             newOperations = this.removeDuplicateOperations(newOperations);
 
             for(let objectType in this.itemData.mapActionForAllObjects){
-                let dataTable = this.itemData.mapActionForAllObjects[objectType];
-                let row = dataTable[0];
+                if(objectType != 'department'){
+                     let dataTable = this.itemData.mapActionForAllObjects[objectType];
+                    let row = dataTable[0];
 
-                if(allResource.hasOwnProperty(objectType)){
-                    for(let actionName in row){
-                        let objectIdentifier = actionForObjectType[actionName] ? objectType : (objectType + ':0' );
-                        if(row[actionName]){
-                            newOperations.push({
-                                objectType: objectType,
-                                action: actionName,
-                                objectIdentifier: objectIdentifier,
-                                name: actionName.replace(/_/g, ' ') + ' '+ objectType.replace(/_/g, ' ')
-                            });
+                    if(allResource.hasOwnProperty(objectType)){
+                        for(let actionName in row){
+                            let objectIdentifier = actionForObjectType[actionName] ? objectType : (objectType + ':0' );
+                            if(row[actionName]){
+                                newOperations.push({
+                                    objectType: objectType,
+                                    action: actionName,
+                                    objectIdentifier: objectIdentifier,
+                                    name: actionName.replace(/_/g, ' ') + ' '+ objectType.replace(/_/g, ' ')
+                                });
+                            }
                         }
                     }
                 }
             }
             return newOperations;
+        },
+        switchToUpdateForm(){
+            this.$emit('trigger-update-action-pack', this.itemData);
         },
         async saveActionPack(){
             let listNewOperations = await this.createNewOperations();
@@ -596,7 +717,6 @@ export default {
                 description: this.allInputs.description.value,
                 listOperations: JSON.stringify(operationsIds)
             };
-
             let res;
             try {
                 if(this.action == 'update'){
@@ -635,6 +755,7 @@ export default {
                 });
 
                 if(res.status == 200){
+
                     let dataToStore = this.translateDataToStore(res.data, objectType);
                     this.$store.commit('actionPack/cacheAllResourceItem',{
                         type: objectType,
@@ -703,7 +824,6 @@ export default {
                         let nameAction  = el.title.toLowerCase();
                         arr.push(this.$t('actions.listActions.document.'+ nameAction));
                        // arr.push(this.$t(nameAction));
-
                     }
                 }
             }
@@ -724,6 +844,9 @@ export default {
     data(){
         let self = this;
         return {
+            permissionDepartment:[],
+            departmentSelected:[],
+            departmentSelectedProps: [],
             tableHeight: 200,
             isEditingCell : false,
             tableColumnsForObjectType: [],
@@ -734,7 +857,9 @@ export default {
             commonTableSetting : commonTableSetting,
             tableSettings: {
                 ...commonTableSetting,
+
                 afterChange: function(changes, source) {
+                    
                     if(!changes){
                         return;
                     }
@@ -753,7 +878,7 @@ export default {
                         }
                     }, 0);
                 },
-                afterSelectionEnd(rowNum	, column, row2 , column2 , preventScrolling, selectionLayerLevel){
+                afterSelectionEnd(rowNum, column, row2 , column2 , preventScrolling, selectionLayerLevel){
                     let objectType = self.allInputs.objectType.value;
                     if(objectType == 'application_definition'){
                         let object = this.getDataAtRow(rowNum)[0];
@@ -777,7 +902,7 @@ export default {
                     setTimeout(function() {
                         self.itemData.mapActionForAllObjects[self.itemData.objectType] = htIst.getSourceData();
                     }, 0);
-                },
+                }
             },
 
             // cấu trúc data giành cho các loại đối tượng có nhiều tầng object settings
@@ -803,7 +928,8 @@ export default {
         CustomSelect,
         HotColumn,
         ObjectInApplication,
-        DocumentInstanceOperation
+        DocumentInstanceOperation,
+        ConfigActionPackOrgchart
     },
     props: {
         itemData: {
@@ -884,5 +1010,11 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.action-form ::v-deep .wtHolder{
+    height: 88px!important
+}
+.action-form ::v-deep .ht_clone_left{
+    height: 58px!important
+}
 </style>

@@ -6,6 +6,7 @@ import {
 
 var coreApi = new Api(appConfigs.apiDomain.appManagement);
 var accessControlApi = new Api(appConfigs.apiDomain.operations);
+let trashApi = new Api(appConfigs.apiDomain.trash);
 // var formulasApi = new Api(appConfigs.apiDomain.formulasService)
 export const appManagementApi = {
 	addApp(data) {
@@ -20,15 +21,19 @@ export const appManagementApi = {
 	getActiveApp() {
 		return coreApi.get('application-active')
 	},
+	getActiveAppSBS() {
+		return coreApi.get('application-active/side-by-side')
+	},
 	updateApp(data) {
 		return coreApi.put("application", data)
 	},
-	addFavoriteItem(userId, objectIdentifier, objectType, action) {
+	addFavoriteItem(userId, objectIdentifier, objectType, action, appId) {
 		return coreApi.post('app-item-favorite', {
 			userId: userId,
 			objectIdentifier: objectIdentifier,
 			objectType: objectType,
-			action: action
+			action: action,
+			appId: appId
 		})
 	},
 	getItemFavorite(userId) {
@@ -40,4 +45,10 @@ export const appManagementApi = {
 	getListObjectIdentifier(data){
 		return accessControlApi.post('objects',data)
 	},
+	restore(id){
+		return coreApi.put('application/restore',{id: id})
+	},
+	deleteTrashItem(id){
+        return trashApi.delete('items/object/application_definition:'+id)
+    },
 };

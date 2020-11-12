@@ -1,24 +1,36 @@
 <template>
-    <div class="h-100 w-100">
+    <div class="w-100" style="height: 100%">
         <v-skeleton-loader
             v-if="loadingActionTask"
             :type="'table-tbody'"
             class="mx-auto"
             width="100%" height="100%" 
         ></v-skeleton-loader>
-        <v-row class="ml-0 mr-0 justify-space-between" style="    line-height: 36px;">
-            <div class="fs-13 pl-2 pt-1 float-left">
-                {{taskBreadcrumb}}
-            </div>
-            <div class="text-right pt-1 pb-1 pr-0 float-right">
-                <span v-if="!originData.endTime">
-                    <v-btn small depressed v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
-                        {{action.text}}
-                    </v-btn>
+        <v-row class="ml-0 mr-0 justify-space-between task-header" id="taskHeader" style="line-height: 36px;height:44px">
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <div v-on="on" class="fs-13 pl-2 pt-1 float-left text-ellipsis" :style="{'width':widthInfoTask+'px'}"> 
+                        {{taskBreadcrumb}}
+                    </div>
+                </template>
+                <span>{{taskBreadcrumb}}</span>
+            </v-tooltip>
+            <div id="action-task" class="text-right pt-1 pb-1 pr-0 float-right">
+                <span v-if="!originData.endTime && !hideActionTask ">
+                    <span v-if="checkRole(originData.assigneeInfo.id)==true">
+                        <v-btn small depressed  v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
+                            {{action.text}}
+                        </v-btn>
+                    </span>
+                    <span v-else>
+                        <v-btn small depressed disabled v-for="(action, idx) in taskActionBtns"  :key="idx" :color="action.color"  class="mr-2">
+                            {{action.text}}
+                        </v-btn>
+
+                    </span>
+                  
                 </span>
-                <!-- <input class="d-none" type="text" id="myInputLink" v-model="linkTask" > -->
-                <!-- <v-text-field class="d-none"  v-model="linkTask"></v-text-field> -->
-                 <v-tooltip bottom>
+                <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
                         <v-btn  
                             style="color:green"
@@ -30,7 +42,6 @@
                     </template>
                     <span>Xem chi tiết</span>
                 </v-tooltip>
-
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
                         <v-btn  
@@ -44,9 +55,7 @@
                     </template>
                     <span>Sao chép đường dẫn</span>
                 </v-tooltip>
-
-                
-                <v-tooltip bottom>
+                <v-tooltip bottom v-if="checkShowEditRecord()">
                     <template v-slot:activator="{ on }">
                         <v-btn  
                             @click="showUpdateSubmitedDocument()"
@@ -58,24 +67,20 @@
                     </template>
                     <span>Sửa nội dung văn bản</span>
                 </v-tooltip>
-
-
-
                 <!-- <button @click="getTaskTest">Click</button> -->
-
                 <v-btn small tile icon text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
                 </v-btn>
-
             </div>
         </v-row>
-        <v-divider style="border-color: #bebebe;"></v-divider>
-        <v-row class="ma-0">
+        <v-divider style="border-color: #dedede;"></v-divider>
+        <v-row class="ma-0 detail-task" style="height: calc(100% - 45px);">
             <!-- <VuePerfectScrollbar :style="{height: parentHeight +'px'}" > -->
                 <task 
                     @task-submited="handleTaskSubmited" 
                     :is="`task`"
                     :taskInfo="taskInfo"
+                    :appId="appId"
                     :isShowSidebar="isShowSidebar"
                     :originData="originData"
                     :tabsData="tabsData['people']"
@@ -86,6 +91,16 @@
                 </task>
             <!-- </VuePerfectScrollbar> -->
         </v-row>
+        <v-dialog v-model="showDialogAlert" max-width="350">
+            <v-card>
+            <v-card-title class="headline">{{$t("myItem.alert.title_aproval")}}</v-card-title>
+            <v-card-text>{{$t("myItem.alert.contentPermissionDenied")}}</v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="red darken-1" text @click="showDialogAlert=false">Ok</v-btn>
+            </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -104,8 +119,10 @@ import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../compone
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
 import { appManagementApi } from '@/api/AppManagement';
+import { extractTaskInfoFromObject, addMoreInfoToTask } from '@/components/process/processAction';
 
 import VueClipboard from 'vue-clipboard2';
+import { util } from '../../plugins/util';
 
 
 Vue.use(VueClipboard)
@@ -122,7 +139,12 @@ export default {
         originData: {
             type: Object,
             default: () => {
-                return {}
+                let self = this;
+                return {
+                    assigneeInfo: {
+                        id: 0
+                    }
+                }
             }
         },
         isInitInstance: {
@@ -133,6 +155,24 @@ export default {
             type: Number,
             default: 300
         },
+        hideActionTask:{
+            type: Boolean,
+            default: false
+        },
+        allVariableProcess:{
+            type:Array,
+            default: () => {
+                return []
+            }
+        },
+        appId:{
+            type:String,
+            default:''
+        },
+        reload:{
+            type:Boolean,
+            default: true
+        }
     },
     watch: {
         taskInfo: {
@@ -140,9 +180,15 @@ export default {
             immediate:true,
             handler(valueAfter){
                 this.changeTaskDetail();
+                this.setCustomDocControls();
             }
         },
-
+        taskBreadcrumb:function(){
+            this.getWidthHeaderTask();
+        },
+        "sapp.collapseSideBar": function(newVl) {
+            this.getWidthHeaderTask();
+        }
     },
     components: {
         icon: icon,
@@ -151,7 +197,9 @@ export default {
     },
     data: function() {
         return {
-            appId:'',
+            showDialogAlert:false,
+            isRole:false, //value =falses khi assignee = userId, =true khi assignee = userId:role
+            widthInfoTask:330,
             isShowSidebar:false,
             loadingActionTask:false,
             breadcrumb: {
@@ -192,6 +240,9 @@ export default {
         stask() {
             return this.$store.state.task;
         },
+        sapp() {
+            return this.$store.state.app;
+        },
         usersMap(){
             return this.$store.state.app.allUsers.reduce((map, el) => {
                 map[el.id] = el;
@@ -221,6 +272,44 @@ export default {
         this.checkAndSwitchToTab();
     },
     methods: {
+        getWidthHeaderTask(){
+            setTimeout((self) => {
+                let width=$("#taskHeader").width()-$("#action-task").width()-40;
+                self.widthInfoTask=width;
+            }, 210,this);
+        },
+        checkShowEditRecord(){
+            let taskInfo = this.taskInfo;
+            if(this.originData){
+                let isPendding = !this.originData.endTime;
+                let isApprovalTask = taskInfo.action.action == 'approval';
+                let hasEditableControls = !taskInfo.approvalEditableControls || (taskInfo.approvalEditableControls && taskInfo.approvalEditableControls.length);
+                return isPendding && isApprovalTask && hasEditableControls;
+            }
+        },
+        checkRole(assigneeId){
+            
+            if (assigneeId==this.$store.state.app.endUserInfo.id) {
+                return true;
+            }else{
+                return false;
+            }
+        },
+        setCustomDocControls(){
+            let editableControls = this.taskInfo.approvalEditableControls;
+            if(editableControls && $.isArray(editableControls)){
+                for(let ctrl of editableControls){
+                    if(ctrl == 'SYMPER_NONE_CONTROLS'){
+                        editableControls = [];
+                        break;
+                    }else if(ctrl == 'SYMPER_ALL_CONTROLS'){
+                        editableControls = null;
+                        break;
+                    }
+                }
+            }
+            this.taskInfo.approvalEditableControls = editableControls;
+        },
         showUpdateSubmitedDocument(){
             this.$refs.task.showUpdateSubmitedDocument = true;
         },
@@ -254,30 +343,42 @@ export default {
         changeTaskDetailInfo(taskId){
             let hostname=window.location.hostname;
             let copyText = this.taskInfo.action.parameter.taskId;
-            copyText='https://'+hostname+'/#/myitem/tasks/'+copyText;
+            copyText=util.addEnvToUrl('https://'+hostname+'/#/myitem/tasks/'+copyText);
             this.linkTask=copyText;
 
             if(!taskId){
                 return;
             }
             let self = this;
-            let filter = this.stask.filter;
-            BPMNEngine.getATaskInfo(taskId,filter).then((res) => {
-                console.log(res,"task");
-                for(let role in self.tabsData.people){
-                    if(res[role]){
-                        self.tabsData.people[role] = res[role].split(',').reduce((arr, el) => {
-                            if(self.usersMap[el]){
-                                arr.push(self.usersMap[el]);
-                            }else{
-                                console.warn('user id not found : ', el);
-                            }
-                            return arr;
-                        }, []);
-                    }
+            let filter="notDone";
+            if (this.originData) {
+                if (this.originData.endTime) {
+                    filter = "done";
+                }else{
+                    filter = "notDone";
                 }
-                self.setTaskBreadcrumb(res);
-            });
+            }
+            this.$store.commit("task/setFilter", filter);
+           
+            for(let role in self.tabsData.people){
+                self.tabsData.people[role]=[];
+                if(this.originData[role]){
+                    let userIdentifier=this.originData[role];
+                    if (userIdentifier.indexOf(":")>0){
+                        userIdentifier=(userIdentifier.split(":"))[0];
+                    }
+                    self.tabsData.people[role] =userIdentifier.split(',').reduce((arr, el) => {
+                        if(self.usersMap[el]){
+                            arr.push(self.usersMap[el]);
+                        }else{
+                            console.warn('user id not found : ', el);
+                        }
+                        return arr;
+                    }, []);
+                }
+            }
+            self.setTaskBreadcrumb(this.originData);
+            
         },
         setTaskBreadcrumb(task){
             if(!task.name){
@@ -295,7 +396,6 @@ export default {
             if(task.processDefinitionId){
                 let processDefinitionId=task.processDefinitionId;
 		        var arrProcessDefinitionId = processDefinitionId.split(":"); //tách chuỗi để lấy DefinitionKey
-
                 this.breadcrumb.definitionName = this.$store.state.process.allDefinitions[arrProcessDefinitionId[0]].name;
                 this.breadcrumb.instanceName = this.taskInfo.extraLabel+' '+this.taskInfo.extraValue;
             }else{
@@ -303,78 +403,102 @@ export default {
                 this.breadcrumb.instanceName = '';
             }
             if (task.processInstanceId && task.processInstanceId!=null) {
-                this.getProcessInstance(task.processInstanceId);
+                this.getAppName(task.processInstanceId);
             }
         },
-        async getProcessInstance(processInstanceId){
+        async getAppName(processInstanceId){
             let self=this;
-            await BPMNEngine.getProcessInstanceVars(processInstanceId).then((res) => {
-                const symperAppId = res.find(element => element.name=='symper_application_id');
-                    if (symperAppId) {
-                        self.appId=symperAppId.value;
-                        console.log(res,"symperApp");
-                    }else{
-                        self.appId='';
-                    }
-            }).catch(()=>{
-                self.appId='';
-            });
-
-            if (this.appId!=-1 && this.appId!="") {
-                await appManagementApi.getAppDetails(Number(this.appId)).then((res) => {
-                    console.log(res,"Appdetail");
-                    self.breadcrumb.appName=res.data.listObject.name;
-                }).catch(()=>{
-                    self.breadcrumb.appName=null;
-                });
+            if (this.appId) {
+                if (this.$store.state.task.allAppActive.length==0) {
+                    await self.$store.dispatch("task/getAllAppActive");
+                }
+                let allApp = this.$store.state.task.allAppActive;
+                let app=allApp.find(element => element.id== self.appId);
+                if (app) {
+                    self.breadcrumb.appName=app.name;
+                }else{
+                    self.breadcrumb.appName= "";
+                }
             }else{
-                self.breadcrumb.appName=null;
+                const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===processInstanceId);
+                if (dataVariable) {
+                    self.appId=dataVariable.value;
+                    if (this.$store.state.task.allAppActive.length==0) {
+                        await self.$store.dispatch("task/getAllAppActive");
+                    }
+                    let allApp = this.$store.state.task.allAppActive;
+                    let app=allApp.find(element => element.id== self.appId);
+                    if (app) {
+                        self.breadcrumb.appName=app.name;
+                    }else{
+                        self.breadcrumb.appName= "";
+                    }
+                }else{
+                    self.breadcrumb.appName="";
+                }
             }
+           
         },
         closeDetail() {
             this.$emit("close-detail", {});
         },
         async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
-            this.loadingActionTask=true;
-            if(this.taskAction == 'submit' || this.taskAction == 'update' ){
-                this.$refs.task.submitForm(value);
-            }else if(this.taskAction == 'approval'){
-                let elId = this.originData.taskDefinitionKey;
-                let taskData = {
-                    // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
-                    "action": "complete",
-                    "assignee": "1",
-                    // "formDefinitionId": "12345",
-                    "outcome": value,
-                    "variables": [
-                        {
-                            name: elId+'_outcome',
-                            type: 'string',
-                            value: value
-                        },
-                        {
-                            name: elId+'_executor_fullname',
-                            type: 'string',
-                            value: this.$store.state.app.endUserInfo.displayName
-                        },
-                        {
-                            name: elId+'_executor_id',
-                            type: 'string',
-                            value: this.$store.state.app.endUserInfo.id
-                        },
-                    ],
-                    // "transientVariables": []
-                }
-                let res = await this.submitTask(taskData);
-                this.saveApprovalHistory(value);
-                this.$emit('task-submited', res);
-            }else if(this.taskAction == '' ||this.taskAction==undefined){
-                let taskData = {
-                    "action": "complete",
-                    "outcome": value,
-                }
-                let res = await this.submitTask(taskData);
-                this.$emit('task-submited', res);
+            //check xem user có phải assignee
+            // kiểm tra xem user hiện tại có role được phân quyền trong task không? 
+            if (this.$store.state.app.endUserInfo.id != this.originData.assigneeInfo.id) {
+                this.showDialogAlert=true;
+            }else if(this.checkRoleUser(this.originData)){
+                this.loadingActionTask=true;
+                    if(this.taskAction == 'submit' || this.taskAction == 'update' ){
+                        this.$refs.task.submitForm(value);
+                    }else if(this.taskAction == 'approval'){
+                        let elId = this.originData.taskDefinitionKey;
+                        let taskData = {
+                            // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
+                            "action": "complete",
+                            "assignee": "1",
+                            // "formDefinitionId": "12345",
+                            "outcome": value,
+                            "variables": [
+                                {
+                                    name: elId+'_outcome',
+                                    type: 'string',
+                                    value: value
+                                },
+                                {
+                                    name: elId+'_executor_fullname',
+                                    type: 'string',
+                                    value: this.$store.state.app.endUserInfo.displayName
+                                },
+                                {
+                                    name: elId+'_executor_id',
+                                    type: 'string',
+                                    value: this.$store.state.app.endUserInfo.id
+                                },
+                            ],
+                            // "transientVariables": []
+                        }
+                        let res = await this.submitTask(taskData);
+                        this.saveApprovalHistory(value);
+                        if (this.reload) {
+                            this.$emit('task-submited', res);
+                        }else{
+                            this.reloadDetailTask();
+                        }
+                    }else if(this.taskAction == '' ||this.taskAction==undefined ||this.taskAction == 'submitAdhocTask'){
+                        let taskData = {
+                            "action": "complete",
+                            "outcome": value,
+                        }
+                        let res = await this.submitTask(taskData);
+                        if (this.reload) {
+                            this.$emit('task-submited', res);
+                        }else{
+                            this.reloadDetailTask();
+                        }
+                    }
+            }else{
+                this.showDialogAlert=true;
             }
             this.loadingActionTask=false;
         },
@@ -397,7 +521,7 @@ export default {
         },
         async submitTask(taskData){
             let self = this;
-            if (this.taskAction=='submit') {
+            if (this.taskAction=='submit' || this.isRole==false) { // isRole == false thi update task cập nhật role hiện tại
                 await this.updateTask(taskData);
             }
             return new Promise(async (resolve, reject) => {
@@ -416,24 +540,52 @@ export default {
                     reject(error);
                 }
             });
-            
+        },
+        async checkRoleUser(originData){
+            let self=this;
+            if (originData.assignee.indexOf(":")>0) {
+                let arrDataAssignee=originData.assignee.split(":");
+                let assigneeId=arrDataAssignee[0];
+                let roleIdentify=originData.assignee.slice(assigneeId.length);
+                // ktra enduser có tồn tại role trong assignee không
+                let rolesUser=self.$store.state.app.endUserInfo.roles;
+                let role=rolesUser[arrDataAssignee[1]].find(element => element.id==originData.assignee);
+                if (role) {
+                    self.isRole=true;
+                    return true;
+                }else{
+                    self.isRole=false;
+                    return false;
+                }
+            }else{
+                self.isRole=false;
+                return true;
+            }
         },
         async updateTask(taskData) {
-            let description;
-            if ((typeof this.descriptionTask)=="string" ) {
-                description=JSON.parse(this.descriptionTask) ;
-            }else{
-                description=this.descriptionTask;
-            }
-            description.action.parameter.documentObjectId=taskData.variables[0].value;
-            let taskId=taskData.variables[5].value;
             let data = {};
-            data.description= JSON.stringify(description);
+            if (this.isRole==false) {
+                data.assignee=this.$store.state.app.endUserInfo.id+":"+this.$store.state.app.endUserInfo.currentRole.id;
+            }
+            if (this.taskAction=='submit') { // khi submit task
+                let description;
+                if ((typeof this.descriptionTask)=="string" ) {
+                    description=JSON.parse(this.descriptionTask) ;
+                }else{
+                    description=this.descriptionTask;
+                }
+                description.action.parameter.documentObjectId=taskData.variables[0].value;
+                data.description= JSON.stringify(description);
+            }
+          
+            let taskId=this.originData.id;
             return BPMNEngine.updateTask(taskId,data);
         },
         async handleTaskSubmited(data){
             if(this.isInitInstance){
-                this.$emit('task-submited', data);            
+                if (this.reload) {
+                    this.$emit('task-submited', data);            
+                }
             }else{
                 let elId = this.taskInfo.action.parameter.activityId;
                 let docId = data.document_id;
@@ -449,7 +601,11 @@ export default {
                     "variables": varsForBackend.vars,
                 }
                 let res =  await this.submitTask(taskData);
-                this.$emit('task-submited', res);
+                if (this.reload) {
+                    this.$emit('task-submited', res);
+                }else{
+                    this.reloadDetailTask();
+                }
             }
         },
         showApprovalOutcomes(approvalActions){
@@ -473,7 +629,7 @@ export default {
             self.taskAction = self.taskInfo.action.action;
             if(self.taskAction == 'approval'){
                 self.showApprovalOutcomes(JSON.parse(self.taskInfo.approvalActions));
-            }else if(self.taskAction == 'submit'){
+            }else if(self.taskAction == 'submit' || self.taskAction == 'submitAdhocTask'){
                 self.taskActionBtns = [
                     {
                     text:"Submit",
@@ -481,7 +637,7 @@ export default {
                     color:"blue"
                     }
                 ]
-            }else if(self.taskAction == 'undefined'){
+            }else if(self.taskAction == 'undefined' ){
                 self.taskActionBtns = [
                     {
                         text:"Complete",
@@ -491,6 +647,30 @@ export default {
                 ]
             }
             self.changeTaskDetailInfo(self.taskInfo.action.parameter.taskId);
+        },
+        async reloadDetailTask(){
+            let self=this;
+            let filter={};
+            filter.taskId=this.originData.id;
+            let res =await BPMNEngine.postTaskHistory(filter);
+            if (res.total>0) {
+                let task=res.data[0];
+                if (task.endTime && task.endTime!=null) {
+                    self.$store.commit("task/setFilter", 'done');
+                }else{
+                    self.$store.commit("task/setFilter", 'notDone');
+                }
+                let taskInfo = extractTaskInfoFromObject(task);
+                task = addMoreInfoToTask(task);
+                task.symperApplicationId=this.appId;
+                let infotTask={};
+                infotTask.taskInfo= taskInfo;
+                infotTask.originData=task;
+                self.$emit("change-info-task",infotTask);
+                // if (task.processInstanceId && task.processInstanceId!=null) {
+                //     await self.getVariablesProcess(task.processInstanceId)
+                // }
+            }
         }
     }
 }
@@ -502,6 +682,13 @@ export default {
     border-width: 20px!important;
     text-transform: none !important;
 
+}
+.task-header{
+    position: relative;
+}
+.task-header #action-task{
+    position: absolute;
+    right: 10px;
 }
 
 </style>

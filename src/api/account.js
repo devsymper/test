@@ -7,4 +7,7 @@ export default {
     getListBA(page, pageSize) {
         return api.get("supporters?search=" + page + "&pageSize=" + pageSize);
     },
+    detailBa(id) {
+        return api.get("supporters?id=" + id);
+    }
 }

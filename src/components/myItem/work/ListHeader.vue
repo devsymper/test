@@ -1,16 +1,8 @@
 <template>
   <div class="w-100 d-flex justify-space-between py-2">
     <div class="pl-3 symper-title" v-if="!sideBySideMode">
-      {{headerTitle}}
-      <v-chip
-        v-if="workStatus == 'notDone'"
-        class="ma-2"
-        color="amber"
-        text-color="white"
-        x-small
-      >{{$t('common.pendding')}}</v-chip>
-
-      <v-chip v-else class="ml-1" color="green" text-color="white" x-small>{{$t('common.done')}}</v-chip>
+        {{headerTitle}}
+        <span class="fs-13" style="color:#00000060">({{$t("myItem.totalWork")}}: {{totalObject}})</span>
     </div>
     <div
       :class="{
@@ -31,11 +23,16 @@
         label="Search"
         :placeholder="$t('common.search')"
       ></v-text-field>
-      <!-- Add task -->
-      <v-btn v-show="!sideBySideMode" small class="mr-2" depressed @click="openCreateTaskDialog">
-        <v-icon size="18">mdi-plus</v-icon>
-        <span class="ml-2">{{$t('tasks.createTask.title')}}</span>
-      </v-btn>
+        <!-- Add task -->
+        <v-tooltip bottom>
+            <template v-slot:activator="{ on }">
+                <v-btn v-on="on" v-show="!sideBySideMode" small class="mr-2" depressed @click="openCreateTaskDialog">
+                    <v-icon size="18">mdi-plus</v-icon>
+                    <span class="ml-2">{{$t('tasks.createTask.title')}}</span>
+                </v-btn>
+            </template>
+            <span>{{$t('tasks.createTask.title')}}</span>
+        </v-tooltip> 
       <!-- Bo loc cho  loai doi tuong -->
       <v-menu
         :close-on-content-click="false"
@@ -44,11 +41,16 @@
         class="mr-2"
         style="z-index:1000!important"
       >
-        <template v-slot:activator="{ on }">
-         <v-btn v-on="on"  depressed class="mr-2" small>
-            <v-icon size="18">mdi-filter-menu</v-icon>
-            <span v-if="!sideBySideMode" class="ml-2">{{$t('myItem.objType')}}</span>
-          </v-btn>
+        <template v-slot:activator="{ on: onMenu }">
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on:onTooltip }">
+                    <v-btn v-on="{...onMenu, ...onTooltip}"  depressed class="mr-2" small>
+                        <v-icon size="18">mdi-filter-menu</v-icon>
+                        <span v-if="!sideBySideMode" class="ml-2">{{listObjectType[1].title}}</span>
+                    </v-btn>
+                </template>
+                <span>{{listObjectType[1].title}}</span>
+            </v-tooltip>
         </template>
         <v-list>
           <v-list-item v-for="(item, index) in listObjectType" :key="index" @click="changeObjectType(index)">
@@ -56,27 +58,7 @@
           </v-list-item>
         </v-list>
       </v-menu>
-      <!-- Bộ lọc cho  task -->
-      <!-- <v-menu
-        offset-y
-        light
-        :close-on-content-click="false"
-        :min-width="300"
-        class="mr-2"
-        style="z-index:1000!important"
-      >
-        <template v-slot:activator="{ on }">
-          <v-btn v-on="on" depressed class="mr-2" small>
-            <v-icon size="18">mdi-filter-menu-outline</v-icon>
-            <span v-if="!sideBySideMode" class="ml-2">{{$t('common.filter')}}</span>
-          </v-btn>
-        </template>
-        <div>
-          <TaskListFilter @filter-change-value="handleChangeFilterValue"></TaskListFilter>
-        </div>
-      </v-menu> -->
 
-      <!-- Bộ lọc loại đối tượng -->
       <v-menu
         offset-y
         light
@@ -85,11 +67,16 @@
         class="mr-2"
         style="z-index:1000!important"
       >
-        <template v-slot:activator="{ on }">
-          <v-btn small class="mr-2" v-on="on" depressed>
-            <v-icon size="18">mdi-swap-vertical</v-icon>
-            <span v-show="!sideBySideMode" class="ml-2">{{$t('common.sort')}}</span>
-          </v-btn>
+        <template v-slot:activator="{ on: onMenu }">
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on:onTooltip }">
+                    <v-btn  v-on="{...onMenu, ...onTooltip}" depressed class="mr-2" small>
+                        <v-icon size="18">mdi-swap-vertical</v-icon>
+                        <span v-show="!sideBySideMode" class="ml-2">{{$t('common.sort')}}</span>
+                    </v-btn>
+                     </template>
+                <span>{{$t('common.sort')}}</span>
+            </v-tooltip> 
         </template>
         <v-list dense light nav>
           <v-subheader class="font-weight-bold fs-14" style="height: 25px">{{this.$t("sortBy")}}</v-subheader>
@@ -122,76 +109,13 @@
       </v-menu>
 
       <!-- Dãn nở dòng -->
-      <v-btn small solo depressed class="mr-2" @click="refreshTaskList" v-show="!sideBySideMode">
-        <v-icon size="18">mdi-refresh</v-icon>
-      </v-btn>
-      <v-btn small solo depressed class="mr-2" @click="changeDensity" v-show="!sideBySideMode">
-        <v-icon size="18">{{isSmallRow ? 'mdi-view-headline' : 'mdi-menu'}}</v-icon>
-      </v-btn>
+        <v-btn small solo depressed class="mr-2" @click="refreshTaskList" v-show="!sideBySideMode">
+            <v-icon size="18">mdi-refresh</v-icon>
+        </v-btn>
+        <v-btn small solo depressed class="mr-2" @click="changeDensity" v-show="!sideBySideMode">
+            <v-icon size="18">{{isSmallRow ? 'mdi-view-headline' : 'mdi-menu'}}</v-icon>
+        </v-btn>
     </div>
-    <!-- <v-dialog v-model="dialog" width="400">
-      <v-card>
-        <v-card-title>{{$t("tasks.createTask.title")}}</v-card-title>
-        <div class="mr-0 ml-0 pl-6 pr-6">
-          <div class="label pt-2">{{$t("tasks.header.name")}}</div>
-          <div>
-            <v-text-field
-              class="sym-small-size"
-              dense
-              solo
-              flat
-              background-color=" grey lighten-3"
-              v-model="taskObject.name"
-            ></v-text-field>
-          </div>
-          <div class="label pt-2">{{$t("tasks.header.assignee")}}</div>
-          <div>
-            <userSelector
-              ref="userSelector"
-              :isMulti="false"
-              :compactChip="true"
-              :color="'transparent'"
-              :textColor="''"
-              :flat="true"
-              @input="inputAssignee"
-            ></userSelector>
-          </div>
-          <div class="label pt-2">{{$t("tasks.header.dueDate")}}</div>
-          <div>
-            <datePicker v-model="taskObject.dueDate"></datePicker>
-          </div>
-
-          <div class="label pt-2">{{$t("tasks.header.submitForm")}}</div>
-          <div>
-            <symper-document-selec v-model="taskObject.docId"></symper-document-selec>
-          </div>
-          <div class="label pt-2">{{$t("tasks.header.description")}}</div>
-          <div>
-            <v-textarea
-              class="sym-small-size sym-small-lineheight"
-              dense
-              solo
-              flat
-              background-color="grey lighten-3"
-              v-model="taskObject.description"
-            ></v-textarea>
-          </div>
-        </div>
-        <v-card-actions class="pt-4">
-          <v-spacer></v-spacer>
-          <v-btn
-            color="primary"
-            text
-            small
-            :disabled="taskObject.name.length == 0 ||
-                                    taskObject.dueDate.length == 0 ||
-                                    taskObject.assignee.length == 0"
-            @click="saveTask"
-          >{{$t('common.add')}}</v-btn>
-          <v-btn text small @click="dialog = false" class="mr-2">{{$t('common.close')}}</v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-dialog> -->
     <DialogCreateTask :showCreateTask="showCreateTask" @create-task="createdTask" @close-dialog="closeDialog"/>
   </div>
 </template>
@@ -241,6 +165,14 @@ export default {
     DialogCreateTask
   },
   props: {
+    totalObject:{
+      type:Number,
+      default:0
+    },
+    totalCurrent:{
+      type:Number,
+      default:0
+    },
     isSmallRow: {
       type: Boolean,
       default: true
@@ -301,7 +233,6 @@ export default {
       ],
       sortBy: null,
       orderBy: null,
-      apiUrl: "https://v2.symper.vn/symper-rest/service/",
       queryProcessInstance: "runtime/process-instances",
       listProrcessInstances: [],
       dialog: false,
@@ -416,46 +347,50 @@ export default {
       });
     },
     async saveTask() {
-      if (!this.taskObject.assignee) {
-        this.$snotifyError(
-          {},
-          this.$t("tasks.error.canNotCreateTask"),
-          this.$t("tasks.error.emptyAssignee")
-        );
-        return;
-      }
-      let data = {
-        ...this.taskObject,
-        assignee: this.taskObject.assignee,
-        parentTaskId: this.parentTaskId ? this.parentTaskId : "",
-        owner: this.$store.state.app.endUserInfo.id
-      };
-      let description = util.cloneDeep(defaultTaskDescription);
-      if (this.taskObject.docId) {
-        description.action.action = "submit";
-        description.action.parameter.documentId = this.taskObject.docId;
-      }
+        if (!this.taskObject.assignee) {
+            this.$snotifyError(
+            {},
+            this.$t("tasks.error.canNotCreateTask"),
+            this.$t("tasks.error.emptyAssignee")
+            );
+            return;
+        }
+        let data = {
+            ...this.taskObject,
+            assignee: this.taskObject.assignee,
+            parentTaskId: this.parentTaskId ? this.parentTaskId : "",
+            owner: this.$store.state.app.endUserInfo.id
+        };
+        let description = util.cloneDeep(defaultTaskDescription);
+        description.action.module = "task";
+        description.action.resource = "task";
+        if (this.taskObject.docId) {
+            description.action.action = "submit";
+            description.action.parameter.documentId = this.taskObject.docId;
+        }else{
+            description.action.action = "submitAdhocTask";
+        }
 
-      description.content = this.taskObject.name;
+        description.content = this.taskObject.name;
 
-      if (
-        this.taskObject.description == "" ||
-        this.taskObject.description == null
-      ) {
-        description.extraLabel = this.$t("tasks.header.alertDescription");
-      } else {
-        description.extraLabel = this.taskObject.description;
-      }
-      data.description = JSON.stringify(description);
-      let res = await BPMNEngine.addTask(JSON.stringify(data));
-      if (res.id != undefined) {
-        this.selectedProcess = null;
-        this.dialog = false;
-        this.$emit("create-task", res);
-        this.$snotifySuccess(this.$t("tasks.created"));
-      } else {
-        this.showError();
-      }
+        if (
+            this.taskObject.description == "" ||
+            this.taskObject.description == null
+        ) {
+            description.extraLabel = this.$t("tasks.header.alertDescription");
+        } else {
+            description.extraLabel = this.taskObject.description;
+        }
+        data.description = JSON.stringify(description);
+        let res = await BPMNEngine.addTask(JSON.stringify(data));
+        if (res.id != undefined) {
+            this.selectedProcess = null;
+            this.dialog = false;
+            this.$emit("create-task", res);
+            this.$snotifySuccess(this.$t("tasks.created"));
+        } else {
+            this.showError();
+        }
     }
   }
 };

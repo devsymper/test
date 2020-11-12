@@ -56,7 +56,48 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
         style: getNodeStyleConfig(),
         collapseExpandStatus: 'collapse' // expand | collapse
     };
-
+    if(nodeId == "SYMPER_HOME_ORGCHART"){
+        let isDefault = {   
+            "title": "SĐTC mặc định",
+            "type": "checkbox",
+            "value": false,
+        }
+        let mappingDoc = {
+            "title": "Document sử dụng",
+            "type": "autocomplete",
+            "value": '',
+            "options": [
+              
+            ],
+        }
+        let scriptMapping = {
+            "title": "Điều kiện chọn bản ghi hiển thị",
+            "type": "script",       
+            "value": '',
+        }
+        let tableMapping = {
+            "title": "Khớp thông tin từ doc sang các node ",
+            "type": "table",
+            "value": [{}],
+            "columns": [{
+                    title: 'Control',
+                    name: 'control',
+                    type: 'autocomplete',
+                    source:[],
+                },
+                {
+                    title: 'Trường của node',
+                    name: 'nodeColumn',
+                    type: 'autocomplete',
+                    source:['image', 'name', 'code'],
+                },
+            ],
+        }
+        config.commonAttrs.mappingDoc = mappingDoc
+        config.commonAttrs.scriptMapping = scriptMapping
+        config.commonAttrs.tableMapping = tableMapping
+        config.commonAttrs.isDefault = isDefault
+    }
     if (isDepartment) {
         config.positionDiagramCells = {
             instanceKey: Date.now(),
@@ -65,7 +106,11 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
     } else {
         config.users = [];
         config.permissions = [];
+        config.isSetPermissions = false;
     }
+    config.dataFromDoc ={
+        users:[]
+    } 
     return config;
 }
 
@@ -152,15 +197,27 @@ export const jointLinkNode = function(source, target) {
             },
             label: {
                 text: 'Hello',
+            },
+            isHidden: function() {
+                // If the target element is collapsed, we don't want to
+                // show the link either
+                var targetElement = this.getTargetElement();
+                return !targetElement || targetElement.isHidden();
             }
-            
+
         },
-    }, {
         isHidden: function() {
             // If the target element is collapsed, we don't want to
             // show the link either
-            var targetElement = this.getTargetElement();
-            return !targetElement || targetElement.isHidden();
+            // var targetElement = this.getTargetElement();
+            // return !targetElement || targetElement.isHidden();
         }
+    }, {
+        // isHidden: function() {
+        //     // If the target element is collapsed, we don't want to
+        //     // show the link either
+        //     var targetElement = this.getTargetElement();
+        //     return !targetElement || targetElement.isHidden();
+        // }
     });
 }

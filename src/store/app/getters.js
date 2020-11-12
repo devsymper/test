@@ -43,11 +43,16 @@ const userMenuItems = function(state) {
     let opsMap = state.userOperations;
     let userInfo = util.auth.getSavedUserInfo();
     let userType = userInfo.profile.type;
+
+    for (let objectType in mapObjectTypeAndMenu) {
+        mapObjectTypeAndMenu[objectType].active = false;
+    }
+
     if (userType == 'ba') {
         return Object.values(mapObjectTypeAndMenu);
     } else {
         // let allwaysHave = ['tasks', 'myItem', 'works', 'my_application'];
-        let allwaysHave = ['my_application', 'lisTaskToDo'];
+        let allwaysHave = ['my_application', 'myItem', 'lisTaskToDo', 'orgchart.viewOrgchart', 'settingNotication.settingNotificationUser'];
         let items = [];
         for (let objectType in opsMap) {
             if (hasShowListPermission(opsMap, objectType)) {
@@ -55,9 +60,17 @@ const userMenuItems = function(state) {
             }
         }
 
-        for (let objectType of allwaysHave) {
-            if (mapObjectTypeAndMenu[objectType]) {
-                items.push(mapObjectTypeAndMenu[objectType]);
+        for (let objType of allwaysHave) {
+            if (objType.includes('.')) {
+                let data = objType.split('.')
+                let father = mapObjectTypeAndMenu[data[0]]
+                let children = father.children[data[1]]
+                father.children = {}
+                father.children[data[1]] = children
+                items.push(father)
+            }
+            if (mapObjectTypeAndMenu[objType]) {
+                items.push(mapObjectTypeAndMenu[objType]);
             }
         }
         return items;

@@ -15,7 +15,6 @@
 <script>
 import Detail from './../detail/Detail'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-
 export default {
     components:{
         'detail-view' : Detail,
@@ -53,7 +52,6 @@ export default {
         }
     },
     methods:{
-
         afterLoaded(){
             if(!this.isAlwaysPrint){
                 return;
@@ -84,11 +82,32 @@ export default {
                                 width:100%;
                                 }
                             }
+                            .wrap-print-multiple table{
+                                width:100% !important;
+                                 page-break-inside:avoid;
+                            }
+                            .wrap-print-multiple{
+                                width:100%;
+                                 page-break-inside:avoid;
+                            }
+                            .sym-form-Detail{
+                                overflow:hidden;
+                                page-break-inside:avoid;
+                                page-break-before: always;
+                                page-break-after: always;
+                            }
+                           
+                            table { page-break-inside:auto }
+                            tr    { page-break-inside:avoid; page-break-after:auto }
+                            thead { display:table-header-group }
+                            tfoot { display:table-footer-group }
+                        }
+                        
+
                     </style>`
                      stylesHtml += cstyle;
             // Open the print window
             const WinPrint = window.open('', 'Print', 'width=800,height=900,toolbar=0,scrollbars=0,status=0');
-
             WinPrint.document.write(`<!DOCTYPE html>
             <html>
             <head>
@@ -98,10 +117,8 @@ export default {
                 ${prtHtml}
             </body>
             </html>`);
-
             WinPrint.document.close(); // necessary for IE >= 10
             WinPrint.focus(); // necessary for IE >= 10*/
-
             setTimeout(() => {
                 WinPrint.print();
                 WinPrint.close();
@@ -118,6 +135,13 @@ export default {
 <style scoped>
     .wrap-print-multiple{
         overflow: auto;
-        height: calc(100vh);
+        height: calc(100%);
+        width: 100%;
+    }
+    .wrap-print-multiple >>> .wrap-s-control-table table{
+        width: 100% !important;
+    }
+    .wrap-print-multiple >>> .wrap-content-detail{
+        overflow-y: hidden !important;
     }
 </style>

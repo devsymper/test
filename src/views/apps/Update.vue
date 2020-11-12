@@ -2,6 +2,11 @@
     <div class="update-app-symper">
         <v-card-title class="pt-0 pb-2 subtitle-1 ">
             <v-icon class="pr-4">mdi-apps</v-icon> {{ !!!isEdit ? $t('apps.addApp') : $t('apps.editApp') }}
+            <v-icon
+                class="close-btn float-right"
+                style="position: absolute; right: 8px; top: 8px"
+                @click="closeForm"
+            >mdi-close</v-icon>
         </v-card-title>
         <v-divider></v-divider>
         <v-card-title class="pt-3 pb-0 subtitle-2 font-weight-bold">
@@ -141,7 +146,7 @@ export default {
     },
     data: function() {
         return {
-            apiUrl: "https://core.symper.vn/application",
+            // apiUrl: "https://core.symper.vn/application",
             appUrl: "apps",
             removeCallback: null,
             showResult: false,
@@ -174,6 +179,9 @@ export default {
     mounted(){
     },
     methods: {
+        closeForm(){
+            this.$emit('close-app-form');
+        },
         setAppObject(app) {
             this.currentApp = JSON.parse(JSON.stringify(app));
         },

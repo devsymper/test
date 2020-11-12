@@ -87,6 +87,33 @@ const getAllAppActive = async(context) => {
         }
     }
 }
+const getListNodeInProcess = async(context) => {
+    if (context.state.listNodeInProcess.length==0) {
+        try {
+            let res = await taskApi.getListNodeInProcess();
+            if (res.status == 200) {
+                if (res.data!=false) {
+                    context.commit('setListNodeInProcess', res.data);
+                }
+            } 
+        } catch (error) {
+            console.log("Can not get list app!");
+        }
+    }
+}
+const getVariableOfProcess = async(context,data) => {
+    try {
+        let res = await taskApi.getVariableWorkflow(data);
+        if (res.status == 200) {
+            context.commit('setVariableOfProcess', res.data);
+            console.log("variablesProcess",res.data);
+        } 
+    } catch (error) {
+        console.log("Can not get variable of process!");
+    }
+}
+
+
 
 export {
     getArrFileAttachment,
@@ -94,6 +121,8 @@ export {
     getArrDocObjId,
     getListDocumentObjId,
     getListDocumentObjIdWithUserSubmit,
-    getAllAppActive
+    getAllAppActive,
+    getListNodeInProcess,
+    getVariableOfProcess
 
 };

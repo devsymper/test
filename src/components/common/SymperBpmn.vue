@@ -4,7 +4,7 @@
             'containers h-100 w-100': true,
             'hide-process-palette': readOnly 
         }" ref="content">
-        <div class="symper-bpm-canvas h-100" ref="canvas"></div>
+        <div class="symper-bpm-canvas" :style="{height: height > 0 ? height+'px' : '100%!important'}" ref="canvas"></div>
         <a ref="downloadLinkXML" href></a>
         <a ref="downloadLinkSVG" href></a>
     </div>
@@ -14,16 +14,20 @@
 import BpmnModeler from "bpmn-js/lib/Modeler";
 import { Moddle } from "moddle/dist";
 import { getBusinessObject } from "bpmn-js/lib/util/ModelUtil";
-
+import h337  from 'heatmap.js';
 import "bpmn-js/dist/assets/diagram-js.css";
 import "bpmn-js/dist/assets/bpmn-font/css/bpmn.css";
 import "bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css";
 import "bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css";
 import { util } from '../../plugins/util';
 
+
 export default {
     name: "symper-bpmn",
     props: {
+        height: {
+            default: 0
+        },
         diagramXML: {
             type: String,
             default:
@@ -75,10 +79,12 @@ export default {
                     if (err) {
                         console.error(err, "errror on import XML");
                     }else{
-                        self.$emit('after-render-diagram-from-xml', {})
+                        self.$emit('after-render-diagram-from-xml', {});
                     }
+                    self.$emit('after-render-diagram-from-xml', {});
+
                 });
-            }, 100);
+            }, 200);
      
         }
     },
@@ -108,13 +114,43 @@ export default {
                     }
                 });
             });
-        },
-        changeElementColor(ele,data){
+		},
+		// plotHeatmap() {
+		// 	var heatmap = h337.create({
+		// 		container: self.bpmnModeler.get('canvas')
+		// 	});
+		// 	var data = [];
+		// 	var registry = self.bpmnModeler.get('elementRegistry');
+		// 	var canvas = self.bpmnModeler.get('canvas');
+		// 	for (var i in registry.getAll()) {
+		// 		var element = registry.getAll()[i];
+		// 		if (stats[element.id] != null) {
+		// 		// don't ask how we got to this calc. lots of tries. The 300/232 is the factor of the modeler available area and used.
+		// 		const rect = canvas.getGraphics(element).getBoundingClientRect();
+		// 		const x = (rect.x + rect.width / 2);
+		// 		const y = (rect.y + rect.height / 2);
+
+		// 		data.push({
+		// 			x: x.toFixed(0),
+		// 			y: y.toFixed(0),
+		// 			value: stats[element.id]
+		// 		});
+		// 		}
+		// 	}
+
+		// 	heatmap.setData({
+		// 		max: 20,
+		// 		data: data
+		// 	});
+		// },
+
+        changeElementColor(ele,data,isCurrentNode=false){
             if(typeof ele == 'string'){ // Nếu truyền vào id
                 ele = this.bpmnModeler.get("elementRegistry").get(ele);
             }
             this.modeling.setColor(ele, data);
-        },
+		},
+		
         getAllNodes(bizObj = true) {
             let allNododes = this.bpmnModeler
                 .get("elementRegistry")
@@ -258,8 +294,10 @@ export default {
          * @param {Object} attrs Các thuộc tính cần update, dạng key-value
          */
         updateElementProperties(eleId, props) {
-            let ele = this.bpmnModeler.get("elementRegistry").get(eleId);
-            this.modeling.updateProperties(ele, props);
+			let ele = this.bpmnModeler.get("elementRegistry").get(eleId);
+            if (ele) {
+                this.modeling.updateProperties(ele, props);
+            }
         },
         // Lấy data theo id của diagram
         getElData(id){

@@ -1,60 +1,72 @@
 <template>
     <div class="pt-2">
         <div class="subtask-container">
-        <div
-            v-for="(item, idex) in listTaskRelated"
+            <div v-for="(item, idex) in listTaskRelated"
                 :key="idex"
             >
                 <v-row  :class="{
                     'mr-0 ml-0 single-row': true ,
-                    'd-active':showByIndex==idex 
                     }"
                     :style="{
                         minHeight: '25px'
                     }"
                     v-if="checkShowTotalTask(idex)"
-	                @mouseover="showByIndex = idex"
-                    @mouseout="showByIndex = null"
                 >
-                    <v-col cols="8" >
+                    <v-col cols="8" class="pa-1">
                         <div style="white-space: nowrap;
                             overflow: hidden;
-                            text-overflow: ellipsis;"  @click="goDoTask(item.id)">
+                            text-overflow: ellipsis;"  @dblclick="goDoTask(item.id)">
                             <v-icon style="font-size:16px">{{displayIcon(item.description)}}</v-icon>
                             <span style=" font-size:13px">{{displayContent(item.description)}}</span>
                         </div>
-                        <div  @click="goDoTask(item.id)">
-                              <v-icon v-if="item.createTime" style="font-size:11px; color:blue;margin-left: 3px;">mdi-circle</v-icon>
-                              <v-icon v-else style="font-size:11px ; color:green;margin-left: 3px;">mdi-circle</v-icon>
-                              {{displayDescription(item.description)}}
+                        <div  @dblclick="goDoTask(item.id)">
+                            <v-icon v-if="item.createTime && checkTimeDueDate(item)" style="font-size:11px; color:#EE6B60;margin-left: 3px;">mdi-circle</v-icon>
+                            <v-icon v-else-if="item.createTime && !checkTimeDueDate(item)" style="font-size:11px; color:#0760D9;margin-left: 3px;">mdi-circle</v-icon>
+                            <v-icon v-else style="font-size:11px ; color:#408137;margin-left: 3px;">mdi-circle</v-icon>
+                            {{displayDescription(item.description)}}
                         </div>
                     </v-col>
-                    <v-col cols="4" style="padding-top:15px">
+                    <v-col class="pa-1" cols="4">
                         <v-icon x-small >mdi-clock-time-nine-outline</v-icon>
                         {{item.createTime ? $moment(item.createTime).format('DD/MM/YY HH:mm'):$moment(item.endTime).format('DD/MM/YY HH:mm')}}
-
+                        <div style="padding-top: 2px;">
+                            <span class="quickView" @click="showInfoTask($event,item)">{{$t("myItem.sidebar.quickView")}}</span>
+                        </div>
                     </v-col>
-             
+            
                 </v-row>
             </div>
         </div>
+        <infoTaskRelated
+            v-show="statusQuickView && taskSelected"
+            :taskSelected="taskSelected"
+            :appId="appId"
+            @closeInfoTaskRelated="closeInfoTaskRelated"
+            ref="infoTaskRelated"
+         />
     </div>
 </template>
 
 <script>
 import BPMNEngine from "@/api/BPMNEngine.js";
+import infoTaskRelated from "./InfoTaskRelated";
 
 export default {
     name: "relatedItems",
     components: {
+        infoTaskRelated
     },
     data(){
         return{
-            showByIndex: null,
+            x:-1,
+            y:-1,
             processParent:{},
             listSubProcessInstance:[],
             listProcessSibling:[],
-            processInstanceCurrent:{}
+            processInstanceCurrent:{},
+            statusQuickView:false,
+            taskSelected:{},
+            
         }
     },
     props: {
@@ -77,6 +89,10 @@ export default {
         showMoreTask:{
             type:Boolean,
             default:false
+        },
+        appId:{
+            type:Number,
+            default:0,
         }
     },
     watch:{
@@ -87,7 +103,6 @@ export default {
     computed: {
         taskFilter(){
             return {
-                // ownerLike: String(this.$store.state.app.endUserInfo.id),
                 processInstanceId: this.taskInfo.action.parameter.processInstanceId,
                 assigneeLike:  String(this.$store.state.app.endUserInfo.id)
             }
@@ -102,11 +117,42 @@ export default {
             tasks=tasks.concat(this.stask.listTaskDoneInProcessParent);
             tasks=tasks.concat(this.stask.listTaskInProcessSub);
             tasks=tasks.concat(this.stask.listTaskInProcessSibling);
-            console.log("listTaskRelated",tasks);
-            return tasks;
+            let set = new Set();
+            let uniqueTask = tasks.filter(item => {
+                if (!set.has(item.id)) {
+                    set.add(item.id);
+                    return true;
+                }
+                return false;
+            }, set);
+            return uniqueTask;
         }
     },
     methods:{
+        checkTimeDueDate(item){
+            if (item.dueDate) {
+                let dueDate=new Date(item.dueDate).getTime();
+                if (dueDate<Date.now()) {
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        },
+        closeInfoTaskRelated(){
+            this.statusQuickView=false;
+        },
+        showInfoTask(e,item){
+            e.preventDefault(); 
+            e.stopPropagation(); 
+            this.taskSelected={};
+            this.taskSelected=item;
+            this.statusQuickView=true;
+            this.$refs.infoTaskRelated.setPosittion({bottom:$(document).height() - e.clientY + 30 + 'px'})
+
+        },
         checkShowTotalTask(idex){
             if (this.showMoreTask==false) {
                 if (idex<=2) {
@@ -120,6 +166,7 @@ export default {
         },
         goDoTask(id){
             this.$router.push("/myitem/tasks/"+id);
+          
         },
         displayIcon(description){
             let data=JSON.parse(description);
@@ -130,20 +177,20 @@ export default {
             }
         },
         displayDescription(description){
-            let data=JSON.parse(description);
-            let des='',value='';
-            if (data.extraLabel=="" ||data.extraLabel==null) {
-                des='Mô tả';
+            let data = JSON.parse(description);
+            let des = '',value = '';
+            if (data.extraLabel == "" ||data.extraLabel == null) {
+                des ='Mô tả';
             }else{
-                des=data.extraLabel;
+                des = data.extraLabel;
             }
 
-            if (data.extraValue=="" ||data.extraValue==null) {
-                value='Không có mô tả';
+            if (data.extraValue == "" && data.extraLabel == "") {
+                value = 'Không có mô tả';
             }else{
-                value=data.extraValue;
-            }
-
+                value = data.extraValue;
+            }    
+            
             return des +' '+ value;
 
         },
@@ -177,8 +224,6 @@ export default {
                 let filter={};
                 if (isCheckProcess=='') {
                     filter.processInstanceId=processInstanceId;
-                    filter.assigneeLike= String(self.$store.state.app.endUserInfo.id);
-                    filter.assignee=self.tabsData.assignee.length>0 ? self.tabsData.assignee[0].id: '';
                     filter.size=100;
                     filter.sort= 'createTime';
                     filter.order= 'desc';
@@ -317,16 +362,29 @@ export default {
         }
     },
     created(){
+        this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
+            if(evt == undefined){
+                return;
+            }
+            if(this._inactive == true) return;
+            if (this.statusQuickView) {
+                this.statusQuickView=false;
+            }
+        });
+      
         this.getData();
+
     }
 }
 </script>
 
 <style scoped>
-.single-row{
+.single-row:hover{
+    background: #e5e5e5;
     cursor: pointer;
 }
-.d-active {
-    background: #e5e5e5;
+.quickView:hover{
+    text-decoration-line:underline
 }
+
 </style>

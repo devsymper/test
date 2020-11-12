@@ -12,7 +12,7 @@
         <v-tab
             v-for="tab in sideRightTabs"
             :key="tab.id"
-            style="margin-bottom: 4px;"
+            style="margin-bottom: 4px;width:30px;min-width:unset;"
         >
              <v-tooltip right>
                 <template v-slot:activator="{ on }">
@@ -76,15 +76,29 @@
             </VuePerfectScrollbar>
         </v-tab-item>
         <v-tab-item
-            class="p-2 h-100 formulas-control-tab"
-        >
-        <VuePerfectScrollbar style="height:calc(100vh - 90px);">
-            <control-props-config 
-            @input-blur="handleInputBlur"
-            :singleLine="false" 
-            @input-value-changed="handleChangeInput" 
-            :allInputs="sCurrentDocument.formulas"/>
-        </VuePerfectScrollbar>
+            class="h-100 formulas-control-tab"
+            >
+            <VuePerfectScrollbar style="height:calc(100vh - 90px);">
+                <control-props-config 
+                @input-blur="handleInputBlur"
+                :singleLine="false" 
+                @input-value-changed="handleChangeInput" 
+                :instance="instance"
+                :allInputs="sCurrentDocument.formulas"/>
+            </VuePerfectScrollbar>
+        </v-tab-item>
+         <v-tab-item
+            class="h-100 style-form-tab"
+            >
+            <VuePerfectScrollbar style="height:calc(100vh - 90px);">
+                <h3 class="pl-2">Thông tin định dạng</h3>
+                <table class="general-info">
+                    <tr v-for="(value,key) in listStyle" :key="key">
+                        <td class="p-2">{{key}}:</td>
+                        <td class="pl-2">{{value}}</td>
+                    </tr>
+                </table>
+            </VuePerfectScrollbar>
         </v-tab-item>
 
         
@@ -110,7 +124,7 @@ export default {
     },
     components:{
         'control-props-config' : FormTpl,
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
     },
     computed: {
         sCurrentDocument(){
@@ -122,7 +136,9 @@ export default {
 
         controlPropsGroup(){
             return this.$store.state.document.editor[this.instance].currentSelectedControl.properties;
-            // return this.sCurrentDocument.properties;
+        },
+        listStyle(){
+            return this.$store.state.document.documentStyle[this.instance];   
         }
     },
     watch:{
@@ -133,23 +149,23 @@ export default {
          */
         "controlPropsGroup.name":function(){
             setTimeout(() => {
-                $('.sym-v-expand-content input').first().focus();
+                // $('.sym-v-expand-content input').first().focus();
             }, 200);
-        }
-        
+        },
+     
     },
     data () {
         return {
             panel: [0, 1, 2],
             sideRightTab: null,
             sideRightTabs: [
-            {id:'element', tab: 'Thuộc tính' ,icon:'mdi-hammer-screwdriver'},
-            {id:'formulas', tab: 'Công thức' ,icon:'mdi-function-variant'},
-            
+                {id:'element', tab: 'Thuộc tính' ,icon:'mdi-hammer-screwdriver'},
+                {id:'formulas', tab: 'Công thức' ,icon:'mdi-function-variant'},
+                {id:'style', tab: 'Trình bày' ,icon:'mdi-format-line-style'},
             ],
             listNameValueControl:{},    
-            delayTimer:null
-        
+            delayTimer:null,
+            styles:null
         }
     },
     methods:{
@@ -171,42 +187,83 @@ export default {
             })
             try {
                 let params = JSON.parse(currentDataflow[0].params);
+                let datasets = currentDataflow[0].datasets;
                 this.$store.commit(
                     "document/updateCurrentControlProps",{instance:this.instance,group:'table',prop:'mapParamsDataflow',typeProp:'value',value:params}
                 );  
-                 this.$store.commit(
+                this.$store.commit(
                     "document/updateProp",{id:this.sCurrentDocument.id,name:'mapParamsDataflow',value:params,tableId:tableId,type:"value",instance:this.instance}
+                );   
+                this.$store.commit(
+                    "document/updateProp",{id:this.sCurrentDocument.id,name:'mapParamsDataflow',value:datasets,tableId:tableId,type:"datasets",instance:this.instance}
                 );   
             } catch (error) {
                 
             }
         },
         handleChangeInput(name, input, data){
+            
             if(input.groupType == "formulas"){
+                let tableId = this.getTableWrapControl();
+                if(name == "autocomplete" && typeof data == 'object'){
+                    this.$set(input.configData,'treeData',data.treeData);
+                    this.$set(input.configData,'documentSelected',data.documentSelected);
+                    this.$set(input.configData,'columnSelected',data.columnSelected);
+                    this.$set(input.configData,'rejectInput',data.rejectInput);
+                    this.$set(input,'value',data.sql);
+                    this.$store.commit(
+                        "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:input.configData,tableId:tableId,type:'configData',instance:this.instance}
+                    );  
+                }
+                else if(name == "linkConfig"){
+                    this.$set(input,'configData',data);
+                    this.$store.commit(
+                        "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:input.configData,tableId:tableId,type:'configData',instance:this.instance}
+                    );  
+                }
                 this.handleValidateControl(name, input, data);
             }
             if(['numberFormat','checkbox','dateFormat'].includes(input.type)){
-                input.value = data
+                input.value = data;
+                this.handleValidateControl(name, input, data);
+            }
+            else if(name == 'dataFlowId'){
+                input.value = {id:input.value}
                 this.handleValidateControl(name, input, data);
             }
         },
+        /**
+         * Hàm lấy id của table chứa control
+         */
+        getTableWrapControl(){
+            let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
+            let tableId = checkInTable(elements);
+            if( tableId == this.sCurrentDocument.id){
+                tableId = '0';
+            }
+            return tableId
+        },
+        /**
+         * Hàm xử lí các thuộc tính của control trước khi đẩy lên store
+         */
         handleValidateControl(name, input, data){
             let value = input.value
             let elements = $('#document-editor-'+this.instance+'_ifr').contents().find('#'+this.sCurrentDocument.id);
             if(name == "width"){
                 elements.css({width:value});
+                elements.attr('data-mce-style',elements.attr('style'));
             }
             if(name == "height"){
                 elements.css({height:value});
+                elements.attr('data-mce-style',elements.attr('style'));
             }
-            let tableId = checkInTable(elements);
-            if( tableId == this.sCurrentDocument.id)
-            tableId = '0';
+            let tableId = this.getTableWrapControl();
             if(name === "dataFlowId"){
                 this.setMappingForParamsDataFlow(data.value,tableId)
             }
+            let propType = "value";
             this.$store.commit(
-                "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:"value",instance:this.instance}
+                "document/updateProp",{id:this.sCurrentDocument.id,name:name,value:value,tableId:tableId,type:propType,instance:this.instance}
             );   
             if((name == 'name' || name == 'title') && !this.isConfigPrint){
                 checkNameControl(this.instance);
@@ -237,5 +294,11 @@ export default {
     }
     .sym-v-expand-content{
         padding-left: 8px;
+    }
+    .formulas-control-tab ::v-deep .symper-form-input{
+        margin-right: 10px;
+    }
+    .formulas-control-tab{
+        padding: 0.5rem 0 0.5rem 0.5rem !important;
     }
 </style>

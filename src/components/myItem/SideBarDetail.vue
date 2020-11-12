@@ -5,6 +5,7 @@
 	permanent
 	right
 	:width="sidebarWidth"
+	v-if="isShow"
 	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)'}"
 	>
 	<div class="main-info">
@@ -15,7 +16,7 @@
 
 		<v-divider></v-divider>
 
-		<VuePerfectScrollbar style="height:calc(100% - 110px);">
+		<VuePerfectScrollbar style="height:calc(100% - 20px);">
 			<v-expansion-panels
 			v-model="panel"
 			multiple
@@ -29,17 +30,34 @@
 							<table class="general-info">
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.dateCreate')}}</td>
-									<td>{{originData.createTime ? $moment(originData.createTime).format('DD/MM/YY HH:mm:ss'):$moment(originData.endTime).format('DD/MM/YY HH:mm:ss')}}</td>
+									<td class="pl-2">{{originData.createTime ? $moment(originData.createTime).format('DD/MM/YY HH:mm:ss'):$moment(originData.endTime).format('DD/MM/YY HH:mm:ss')}}</td>
 								</tr>
-								<!-- <tr>
-									<td>{{$t('document.detail.sidebar.body.general.history')}}</td>
-									<td @click="showHistory" style="text-decoration: underline;cursor:pointer;color:#F1853B;">Đã sửa 2 lần</td>
-								</tr> -->
+								<tr>
+									<td>{{$t('tasks.header.dueDate')}}</td>
+									<td class="pl-2">{{originData.dueDate ? $moment(originData.dueDate).fromNow():""}}</td>
+								</tr>
+								<tr v-if="originData.endTime">
+									<td>{{$t('tasks.header.endTime')}}</td>
+									<td class="pl-2">{{ $moment(originData.endTime).fromNow()}}</td>
+								</tr>
+								<tr >
+									<td>{{$t('tasks.header.description')}}</td>
+									<td class="pl-2">
+										<v-tooltip bottom>
+											<template v-slot:activator="{ on }">
+											<div v-on="on" class="text-ellipsis" style="width:250px">
+												{{taskInfo.extraLabel}} {{taskInfo.extraValue}}
+											</div>
+										</template>
+										<span>{{taskInfo.extraLabel}} {{taskInfo.extraValue}}</span>
+										</v-tooltip>
+									</td>
+								</tr>
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.comment')}}</td>
-									<td style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
+									<td class="pl-2" style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
 										{{$t('document.detail.sidebar.body.general.has')}} 
-										<!-- {{countCommentNotResolve}}  -->
+										{{countCommentNotResolve}} 
 										{{$t('document.detail.sidebar.body.general.commentNotResolve')}}
 									</td>
 								</tr>
@@ -50,9 +68,10 @@
 				
 				<v-expansion-panel>
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.worflowInfo')}}</v-expansion-panel-header>
-					<v-expansion-panel-content class="sym-v-expand-content" style="height:200px">
-						<v-row class="border-top-1" style="height:200px">
+					<v-expansion-panel-content class="sym-v-expand-content border-top-1" style="height:200px">
+						<v-row class="ma-0" style="height:200px">
 							<trackingProcessInstance
+								class="popup-model-diagram"
 								v-if="taskInfo.action.parameter.processInstanceId"
 								:instanceId="taskInfo.action.parameter.processInstanceId"
 								:elementId="taskInfo.action.parameter.activityId"
@@ -66,17 +85,15 @@
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.userRelated.title')}}</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
 				   		<div class="w-100 pl-2" v-for="(users, role) in dataTask" :key="role" >
-							<div v-if="users.length>0 " style="height: 30px" class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
+							<div v-if="users.length>0 "  class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
 								<span>
 									<v-icon class="mr-3" size="18">mdi-account</v-icon> 
 									<span mt-1>{{$t("tasks.header."+role)}}</span>
 								</span>
-								<!-- <v-btn small icon @click="addUserForRole(role)" class="ml-3 symper-add-user-btn" style="display: none" v-if="roleCanAddUser[role]">
-									<v-icon>mdi-plus</v-icon>
-								</v-btn> -->
 							</div>
 							<div class="pl-7 d-flex justify-space-between user-show" v-for="userItem in tabsData[role]" :key="userItem.id" >
-								<user :user="userItem" class="float-left"></user>
+								<!-- <user :user="userItem" class="float-left"></user> -->
+                                <infoUser class="userInfo" :userId="userItem.id" />
 								<div class="float-right action-for-role d-flex"  >
 									<div v-for="(btn, idx) in actionsForRole[role]" :key="idx" class="d-flex" >
 										<v-menu v-if="btn.showUserSelect==true" 
@@ -106,13 +123,10 @@
 											<div class="bg-white" style="width: 200px; z-index: 1002" :ref="'selectUserWrapper_'+role+'_'+idx">
 											</div>
 										</v-menu>
-
-										<!-- <v-btn v-else depressed class="mr-3" small @click="handleAction(btn.name, role, idx)" >
-											<v-icon left>{{btn.icon}}</v-icon> {{btn.text}}
-										</v-btn> -->
 									</div>
 								</div>
 							</div>
+							<div class="pl-13" v-if="users.length>0 && originData[role+'Role'] " style="clear:both">{{originData[role+'Role'].name}}</div>
 						</div>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
@@ -122,6 +136,7 @@
 						<RelatedItems
 							:taskInfo="taskInfo"
 							:tabsData="tabsData"
+							:appId="appId"
 							:showMoreTask="showMoreTask"
 						 />
 						 <span class="showMoreRelated" @click="handleShowMoreTask" v-if="!showMoreTask" >{{$t('myItem.sidebar.showMoreTask')}}</span>
@@ -166,13 +181,20 @@
 														white-space: nowrap;
 														overflow: hidden;
 														text-overflow: ellipsis;
-														width: 140px;">
+														display:flex;
+													">
 											<v-icon v-if="item.type=='doc' ||item.type=='docx' " style="font-size:15px">mdi-file-word</v-icon>
 											<v-icon v-else-if="item.type=='pdf'" style="font-size:15px">mdi-file-pdf</v-icon>
 											<v-icon v-else-if="item.type=='jpg' ||item.type=='jpeg'||item.type=='png'" style="font-size:15px">mdi-file-image-outline</v-icon>
 											<v-icon v-else-if="item.type=='xlsx' ||item.type=='xls' " style="font-size:15px">mdi-file-excel</v-icon>
 											<v-icon v-else style="font-size:15px">mdi-file-document-outline</v-icon>
-											{{item.name}}</div>
+											 <v-list-item-title
+												:id="`file-`+item.id"
+												v-on="on"
+												class="fs-13 "
+												v-text="item.name"
+												></v-list-item-title>
+											</div>
 										</template>
 										<span>{{ item.name }}</span>
 									</v-tooltip>
@@ -180,9 +202,9 @@
 								<v-col 	
 									cols="4" 
 									style="font-size:12px;padding:0px;padding-top:3px!important">
-									<span>{{item.createAt}}</span>
+									<span class=" text-ellipsis w-100">{{item.createAt}}</span>
 								</v-col>
-								<v-col class="pull-right" style="padding:0px;padding-top:3px!important">
+								<v-col style="padding:0px;padding-top:4px!important">
 									<v-icon  @click="downLoadFile(item.id)"  v-show="showByIndex === idex" style="font-size:18px;margin-left:40px">mdi-download</v-icon>
 									<v-icon  @click="actionFileAttachment($event,item.serverPath,item.name,item.type,item.id)"  v-show="showByIndex === idex" style="font-size:18px; margin-left:8px">mdi-dots-horizontal</v-icon>
 								</v-col> 
@@ -215,7 +237,7 @@
 		</VuePerfectScrollbar>
 	</div>
 		<Comment style="height:100%" 
-			:objectIdentifier="originData.id"
+			:objectIdentifier="String(originData.id)"
 			ref="commentTaskView"
 			/>
 	
@@ -259,6 +281,7 @@
 </template>
 <script>
 import user from "./User";
+
 import { taskApi } from "@/api/task.js";
 import { userApi } from "@/api/user.js";
 import { documentApi } from "@/api/Document";
@@ -270,6 +293,8 @@ import Comment from './Comment'
 import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue";
 import UploadFile from "@/components/common/UploadFile.vue";
 import RelatedItems from "./RelatedItems.vue";
+import infoUser from "./InfoUser";
+
 export default {
 	components:{
 		VuePerfectScrollbar,
@@ -277,7 +302,8 @@ export default {
 		user,
 		trackingProcessInstance,
 		UploadFile,
-		RelatedItems
+		RelatedItems,
+		infoUser
 	},
 	data () {
 		return {
@@ -313,7 +339,68 @@ export default {
 				{
 					title: this.$t("kh.contextmenu.rename"),
 						menuAction: action => {
-							alert("Đổi tên");
+							let id = this.fileId;
+							let name=this.name;
+							var renameInput = $("<input id="+"file-" + id + " value=" + name + " >");
+							$("#file-" + id).replaceWith(renameInput);
+							$("#file-" + id).val(name);
+							renameInput.on("blur", function(evt) {
+								$(this).replaceWith(
+									"<div id="+"file-" +
+									id +
+									" class='v-list-item__title fs-13'>"+
+									name +
+									" </div>"
+								);
+							});
+
+							setTimeout(function() {
+								$("#file-" + id)
+									.focus()
+									.val(name)
+									.select();
+							}, 200);
+							$("#file-" + id).keyup(function(e) {
+								if (e.keyCode === 13) {
+									var text = $("#file-" + id)
+									.val()
+									.trim();
+
+									if (text != "" && text != name) {
+									let data = {};
+									data.id = id;
+									data.newName = text;
+									taskApi
+										.renameFile(data)
+										.then(res => {
+										if (res.status == 200) {
+											$(this).replaceWith(
+												"<div id="+"file-" +
+												id +
+												" class='v-list-item__title fs-13'>" +
+												text +
+												" </div>"
+											);
+										} else if (res.status == 403) {
+											SYMPER_APP.$snotifyError("Error", res.message);
+										}
+										})
+										.catch(err => {
+										console.log("error from rename file !!!", err);
+										})
+										.always(() => {});
+									} else {
+									$(this).replaceWith(
+										"<div id="+"file-" +
+										id +
+										" class='v-list-item__title fs-13'>" +
+										name +
+										" </div>"
+									);
+									}
+								}
+								}
+							);
 						},
 					icon: "mdi-pencil"
 				},
@@ -423,6 +510,10 @@ export default {
 		documentObjectId:{
 			type:String,
 			default:""
+		},
+		appId:{
+			type:Number,
+			default:0
 		}
 	
 	},
@@ -436,6 +527,9 @@ export default {
 		
 	},
 	computed:{
+		countCommentNotResolve(){
+			return this.$store.state.comment.listComment.length
+		},
 		sapp(){
             return this.$store.state.app;
         },
@@ -485,10 +579,7 @@ export default {
 				}
 			})
 			.catch(err => {
-
 			})
-			.always(() => {});
-
 		this.$evtBus.$on('symper-app-wrapper-clicked', (evt) => {
             if(!($(evt.target).hasClass('symper-select-user-autocomplete') || $(evt.target).parents('.symper-select-user-autocomplete').length > 0)){
                 for(let key in  this.showDelegatedUser){
@@ -704,9 +795,10 @@ export default {
 		margin-top: 0px !important;
 	}
 	.s-drawer{
+		height: 100%;
 		z-index: 160;
 		padding: 12px 6px 6px 12px;
-		top:86px!important;
+		top: 0;
 	}
 
 	::v-deep .v-expansion-panel:not(:first-child)::after{
@@ -830,8 +922,19 @@ export default {
 		cursor:pointer;
 		margin-right: 20px;
 		margin-bottom: 20px;
+		
+	}
+	.showMoreRelated:hover{
+		text-decoration-line:underline
 	}
 	.v-expansion-panel::before{
 		box-shadow: none;
+	}
+	.border-top-1 >>>.v-expansion-panel-content__wrap{
+		border: 1px solid #cecece!important;
+		border-radius: 5px;
+	}
+	.popup-model-diagram >>> .djs-hit  {
+		pointer-events: none;
 	}
 </style>

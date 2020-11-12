@@ -1,5 +1,5 @@
 <template>
-    <div class="w-100 h-100">
+    <div class="w-100 h-100 myitem">
        <list-task v-if="objecType==0" @changeObjectType="changeObjectType" :height="height" @change-height="changeHeight"></list-task>
        <list-work v-if="objecType==1" @changeObjectType="changeObjectType" :height="height" @change-height="changeHeight"></list-work>
        <list-document v-if="objecType==2" @changeObjectType="changeObjectType" :height="height" @change-height="changeHeight"></list-document>
@@ -24,9 +24,7 @@ export default {
     mounted() {
     },
     data: function() {
-
         return {
-            apiUrl: "https://v2hoangnd.dev.symper.vn/",
             virtualdocUrl: "virtualdocs",
             height: "calc(100vh - 120px)",
             objecType:0,
@@ -39,6 +37,15 @@ export default {
         changeObjectType(index){
             this.objecType=index;
         }
+    },
+    created(){
+        if (this.$route.params.type) {
+            if (this.$route.params.type=="work") {
+                this.objecType=1;
+            }
+        }
+       
     }
+    
 }
 </script>

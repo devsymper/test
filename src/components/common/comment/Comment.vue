@@ -116,9 +116,8 @@ export default {
 		},
 	},
 	mounted(){
-		 var x =util.getComponentSize(this);
-		 this.heightListComment = x.h - 120
-		
+		 let windowHeight = $(window).height();
+		 this.heightListComment = windowHeight - 250
 	},
 	
 	 props: {
@@ -277,23 +276,23 @@ export default {
 			this.getCommentById()
 		},
 		uuid:function(val){
-			if(val == "0"){
-				this.getCommentById()
-			}else{
-				this.getCommentByUuid()
-				this.floatComment = true
-				 var x = util.getComponentSize(this);
-				 let item =  $('.symper-comment-float .comment-item')
-				 let height = 0
-				 $.each(item,function(k,v){
-					 height += $(v).height()
-				 })
-				 let targetArea = $(".symper-comment-float .target-area-comment").height()
-				 if(height + targetArea + 70 > 500){
-					this.heightListComment = 500
-				 }
+			// if(val == "0"){
+			// 	this.getCommentById()
+			// }else{
+			// 	this.getCommentByUuid()
+			// 	this.floatComment = true
+			// 	 var x = util.getComponentSize(this);
+			// 	 let item =  $('.symper-comment-float .comment-item')
+			// 	 let height = 0
+			// 	 $.each(item,function(k,v){
+			// 		 height += $(v).height()
+			// 	 })
+			// 	 let targetArea = $(".symper-comment-float .target-area-comment").height()
+			// 	 if(height + targetArea + 70 > 500){
+			// 		this.heightListComment = 500
+			// 	 }
 
-			}
+			// }
 				
 		},
 		tab:function(val){
@@ -382,7 +381,7 @@ export default {
 	height:32px;
 }
 .symper-comment >>> .v-slide-group__wrapper{
-	margin-left:20px !important;
+	/* margin-left:20px !important; */
 	height: 32px;
 }
 .symper-comment >>> .v-toolbar__extension{

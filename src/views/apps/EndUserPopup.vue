@@ -1,5 +1,5 @@
 <template>
-  <div class="end-user-popup"> 
+  <div class="end-user-popup" > 
 	<v-card> 
 		<v-tabs
 			v-model="tab"
@@ -29,10 +29,16 @@
 						<ul style="margin:0 10px;" v-else-if="loadingFavorite == false && sFavorite.length > 0">
 							<VuePerfectScrollbar style="max-height:200px"  >
 								<li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer"> 
-									<div style="position:relative">
-										<div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
-										<div v-else  class="title-item-favorite">{{item.name}}</div> 
-										<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:0px;right:0px">mdi-star</v-icon>
+									<div style="position:relative; display:flex">
+										<v-icon style="font-size:13px;margin-right:8px">{{listIcon[item.type]}}</v-icon>
+										<div  class="d-flex flex-column">
+											<div class="title-item-favorite">
+												{{item.type == 'document_definition' ? item.title : item.name}}
+											</div>
+											<span style="font:12px roboto; font-weight:200">{{item.appName}}</span>
+										</div>
+									
+										<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:6px;right:0px">mdi-star</v-icon>
 									</div>
 								</li>
 							</VuePerfectScrollbar>
@@ -130,6 +136,12 @@ export default {
 		 tab: 'tab-1',
 		 isEndUserCpn:true,
 		 searchKey:"",
+		 listIcon:{
+			 document_definition: 'mdi-file-document-outline',
+			 workflow_definition: 'mdi-lan',
+			 orgchart: 'mdi-widgets-outline',
+			 dashboard: 'mdi-view-dashboard'
+		 },
 		 apps:{},
 		 listFavorite:[],
 		 testListFavorite:[],
@@ -179,6 +191,7 @@ export default {
 			});
 			$(document).click(function(e){
 				if(!$(e.target).is('.context-menu')){
+					$(".context-menu").css("display", "none")
 					if(thisCpn.tab == 'tab-1'){
 						thisCpn.$refs.contextMenu.hide()
 					}else{
@@ -201,8 +214,11 @@ export default {
 		},
 		listApp(){
             return this.$store.state.appConfig.listApps
-        }
+		},
+		
+		
 	},
+	
 	methods:{
 		getActiveapps(){
 			appManagementApi.getActiveApp().then(res => {
@@ -235,11 +251,13 @@ export default {
 						}  
 					})
 					this.checkTypeFavorite(res.data.listObject)
-					this.$store.commit('appConfig/updateListFavorite',this.listFavorite)
-					this.loadingFavorite = false
+					this.$store.commit('appConfig/updateListFavorite',self.listFavorite)
+					
 				}
 			}).catch((err) => {
 			});
+			this.loadingFavorite = false
+
 		},
 		clickDetails(item){
 			this.$refs.contextMenu.hide()
@@ -248,6 +266,7 @@ export default {
 			this.title.iconType = item.iconType;
 			this.title.name = item.name;
 			this.$store.commit("appConfig/updateCurrentAppId",item.id);
+			this.$store.commit("appConfig/updateCurrentAppName",item.name);
 			appManagementApi.getAppDetails(item.id).then(res => {
 				if (res.status == 200) {
 					if(Object.keys(res.data.listObject.childrenApp).length > 0){
@@ -320,6 +339,7 @@ export default {
 						item.favorite = 1
 						item.actions = value.actions
 						item.type = type
+						item.appName = value.appName
 					} 
 				})
 			}
@@ -462,7 +482,7 @@ export default {
 .end-user-popup {
 	font: 13px Roboto;
 	overflow: hidden;
-	width:500px;
+	width:600px;
 }
 .end-user-popup >>> .tittle{
 	font: 15px Roboto;
@@ -470,12 +490,15 @@ export default {
 	font-weight:400
 
 }
+.end-user-popup >>> .list-favorite{
+	overflow-x: hidden;
+}
 .end-user-popup >>> .list-favorite ul{
 	list-style: none;
 }
 .end-user-popup >>> .list-favorite .title-item-favorite{
 	white-space: nowrap; 
-	width: 410px; 
+	width: 500px; 
 	overflow: hidden;
 	text-overflow: ellipsis; 
 	
@@ -511,7 +534,7 @@ export default {
 .end-user-popup >>> .list-app-cointaner{
 	display: flex;
     flex-wrap: wrap;
-	width: 460px;
+	width: 560px;
 	margin-right:auto;
 	margin-left: 30px;
 }

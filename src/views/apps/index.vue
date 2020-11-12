@@ -1,17 +1,19 @@
 <template>
-    <v-container fluid>
+    <div class="h-100 w-100">
         <ListItems
             ref="listApp"
             :getDataUrl="apiUrl"
             :headerPrefixKeypath="'apps.header'"
-            :pageTitle="$t('apps.title')"
+            :pageTitle="$t('apps.titleApplication')"
             :containerHeight="tableHeight"
             :tableContextMenu="tableContextMenu"
             :useDefaultContext="false"
-            :actionPanelWidth="600"
+            :actionPanelWidth="600" 
             @after-open-add-panel="showAddModal"
             :customAPIResult="customAPIResult"
+            :showActionPanelInDisplayConfig="true"
             :commonActionProps="commonActionProps"
+            @row-selected="onRowSelected"
         >
             <div slot="right-panel-content" class="h-100">
                 <updateApp
@@ -19,10 +21,11 @@
                     :isEdit="isEdit"
                     @add-app="addApp"
                     @update-app="updateApp"
+					@close-app-form="closeAppForm"
                 ></updateApp>
             </div>
         </ListItems>
-    </v-container>
+    </div>
 </template>
 <script>
 import Api from "./../../api/api.js";
@@ -34,6 +37,10 @@ import {documentApi} from './../../api/Document';
 import {dashboardApi} from './../../api/dashboard';
 import BpmnEngine from './../../api/BPMNEngine';
 import Handsontable from 'handsontable';
+import { util } from '../../plugins/util.js';
+import {
+    appConfigs
+} from "@/configs";
 export default {
     name: "listApps",
     components: {
@@ -50,19 +57,21 @@ export default {
 		this.$store.dispatch('actionPack/getAllActionByObjectType')
     },
     data: function() {
+		let self = this;
         return {
             commonActionProps: {
                 "module": "application",
                 "resource": "application_definition",
                 "scope": "application",
             },
-            apiUrl: "https://core.symper.vn/application",
+            apiUrl: appConfigs.apiDomain.appManagement+"application",
             appUrl: "apps",
             isEdit: false,
             customAPIResult: {
                 reformatData(res){
                    return{
-                         listObject: res.data.listObject,
+						 listObject: res.data.listObject,
+						 total: res.data.listObject.length,
                          columns: [
                                 {name: "id", title: "id", 	type: "text", },
                                 {name: "name", title: "name", type: "text"},
@@ -79,7 +88,7 @@ export default {
 											icon.classList.add(value);
 											$(icon).css('font-size','16px')
 											td.appendChild(icon);
-                                       		 return td;
+											return td;
 										}else{
 											let img;
 											img = document.createElement('img');
@@ -98,7 +107,6 @@ export default {
 										Handsontable.dom.empty(td);
 										span = document.createElement('span')
 										if(value === "1"){
-											
 											$(span).text('Kích hoạt')
 										}else{
 												$(span).text('Không kich hoạt')
@@ -124,7 +132,7 @@ export default {
 											Handsontable.dom.empty(td);
 											span = document.createElement('span')
 											let newValue = value.slice(0,value.length-3)
-												$(span).text(newValue)
+											$(span).text(newValue)
 											td.appendChild(span);
 											return td
 										},
@@ -139,20 +147,7 @@ export default {
                     text: this.$t("apps.contextMenu.edit"),
                     callback: (app, callback) => {
                         this.editCallback = callback;
-                        appManagementApi.getAppDetailBa(app.id).then(res => {
-                        if (res.status == 200) {
-							if(Object.keys(res.data.listObject.childrenApp).length > 0){
-								this.checkChildrenApp(res.data.listObject.childrenApp)
-							}else{
-								this.$store.commit('appConfig/emptyItemSelected')
-							}
-                             this.showEditAppPanel(res.data.listObject)   
-                        }else {
-                            this.showError()
-                        }
-                         }).catch((err) => {
-                                this.showError()
-                        });
+                        self.openUpdateApp(app);
                     },
                 },
                 remove: {
@@ -178,9 +173,34 @@ export default {
         };
     },
     mounted() {
-        this.tableHeight = document.body.clientHeight - 0;
+		this.tableHeight = util.getComponentSize(this).h;
     },
     methods: {
+		closeAppForm(){
+			this.$refs.listApp.closeactionPanel();
+		},
+		openUpdateApp(app){
+			appManagementApi.getAppDetailBa(app.id).then(res => {
+				if (res.status == 200) {
+					if(Object.keys(res.data.listObject.childrenApp).length > 0){
+						this.checkChildrenApp(res.data.listObject.childrenApp)
+					}else{
+						this.$store.commit('appConfig/emptyItemSelected')
+					}
+						this.showEditAppPanel(res.data.listObject)   
+				}else {
+					this.showError()
+				}
+			}).catch((err) => {
+				this.showError()
+			});
+		},
+		onRowSelected(row){
+			if(this.$refs.listApp.alwaysShowActionPanel){
+				this.$refs.listApp.openactionPanel();
+				this.openUpdateApp(row);
+            }
+		},
         showEditAppPanel(app) {
             this.isEdit = true;
             this.$refs.actionPanel.setAppObject(app);
@@ -238,12 +258,7 @@ export default {
         },
         updateApp(res) {
             if (res.status == 200) {
-                this.editCallback({
-                    ...res,
-                    data: {
-                        ...this.currentApp,
-                    },
-                });
+				this.$refs.listApp.refreshList()
                 this.closeSidebar();
                 this.$snotify({
                     type: 'success',

@@ -89,18 +89,17 @@ export const knowledgeApi = {
     getListFileDocument(hash) {
         return knowledge.get("upload/" + hash);
     },
-    getFileByList(ids) {
-        return fileManagement.get('getFileByList', { ids: ids });
-    },
-    removeFileAttach(fileId) {
-        return knowledge.delete('upload/' + fileId);
+    removeFileAttach(data) {
+        return fileManagement.put('changeStatusSymperFile', data);
     },
     downloadFile(id) {
-        window.open('https://file.symper.vn/downloadS/' + id, '_blank');
+        window.open(appConfigs.apiDomain.fileManagement+'downloadS/' + id, '_blank');
     },
     renameFile(data) {
         return fileManagement.put('renameFile', data);
-    }
-
+    },
+    getFileByList(data) {
+        return fileManagement.get('getFileByObjectIdentifier', { objectIdentifier: data.objectIdentifier, objectType: data.objectType });
+    },
 
 }

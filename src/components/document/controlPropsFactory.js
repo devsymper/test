@@ -5,14 +5,18 @@ import {
 // đầu ra: tất cả các thuộc tính của control đó
 const commonProps = {
     dataFlowId: {
-        title: "dataflow id",
+        title: "Dataflow",
         type: "autocomplete",
         groupType: "name",
-        // items: function() {
-        //     debugger
-        //     return [];
-        // },
         options: [],
+        properties: {
+            dense: true,
+            solo: true,
+            'hide-details': true,
+            flat: true,
+        },
+        isSelectionChip: false,
+        value: {}
     },
     name: {
         title: "Tên",
@@ -129,7 +133,7 @@ const commonProps = {
     formatNumber: {
         title: "Định dạng số",
         type: "numberFormat",
-        value: ".00",
+        value: "#,###",
         groupType: "display"
     },
     // formatDateTime: {
@@ -269,12 +273,7 @@ const commonProps = {
         value: "",
         groupType: "display"
     },
-    isAllowPrint: {
-        title: "Cho phép in",
-        type: "checkbox",
-        value: "",
-        groupType: "print"
-    },
+
     isBorderSubmit: {
         title: "Border submit",
         type: "checkbox",
@@ -288,7 +287,7 @@ const commonProps = {
         groupType: "print"
     },
     isBorderPrint: {
-        title: "Border view",
+        title: "Border print",
         type: "checkbox",
         value: "",
         groupType: "print"
@@ -350,12 +349,26 @@ let commonFormulas = {
         type: "script",
         groupType: "formulas"
     },
+    // autocomplete: {
+    //     title: "Công thức autocomplete",
+    //     value: "",
+    //     formulasId: 0,
+    //     type: "script",
+    //     groupType: "formulas"
+    // },
     autocomplete: {
-        title: "Công thức autocomplete",
+        title: "Cấu hình autocomplete",
         value: "",
         formulasId: 0,
         type: "script",
-        groupType: "formulas"
+        isConfigCustom: true,
+        isConfigAutocomplete: false,
+        groupType: "formulas",
+        configData: {
+            treeData: [],
+            documentSelected: {},
+            columnSelected: []
+        }
     },
     validate: {
         title: "Công thức xác thực",
@@ -407,10 +420,18 @@ let commonFormulas = {
         groupType: "formulas"
     },
     submit: {
-        title: "Công thức submit",
+        title: "Công thức sau submit",
         value: "",
         formulasId: 0,
         type: "script",
+        groupType: "formulas"
+    },
+    linkConfig: {
+        title: "Link đến đối tượng hệ thống",
+        value: "",
+        configData: [],
+        formulasId: 0,
+        type: "linkConfig",
         groupType: "formulas"
     }
 }
@@ -434,17 +455,17 @@ let groupType = {
 const controlTypes = {
     labelPrint: {
         icon: `/icon/ic_label.png`,
-        html: `<span class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label">Aa</span>&nbsp;`,
+        html: `<label class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label">Aa</label>&nbsp;`,
         title: "Label in",
         inProps: ['width', 'color', 'fontSize'],
         formulas: ['formulas']
     },
     label: {
         icon: `/icon/ic_label.png`,
-        html: `<span class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label">Aa</span>&nbsp;`,
+        html: `<label class="s-control s-control-label" contenteditable="false" s-control-type="label"  title="Label">Aa</label>&nbsp;`,
         title: "Label",
         notInProps: ['isQuickSubmit', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'formatDate', 'isSumTable', 'isReadOnly'],
-        formulas: ['link', 'formulas', 'hidden']
+        formulas: ['linkConfig', 'formulas', 'hidden']
     },
     qrCode: {
         icon: "/icon/ic_qrcode.png",
@@ -454,24 +475,23 @@ const controlTypes = {
                 </span>&nbsp;`,
         title: "QrCode",
         notInProps: ['isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatDate', 'fontSize', 'color', 'formatNumber', 'isSumTable', 'isRequired', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['link', 'formulas', 'hidden']
+        formulas: ['linkConfig', 'formulas', 'hidden']
     },
     image: {
         icon: "/icon/ic_image.png",
-        html: `<span class="s-control s-control-image" contenteditable="false"  title="Image" style="cursor: pointer;text-align: center;display: inline-block;width: 25px;height: 25px;" s-control-type="image">
+        html: `<label class="s-control s-control-image" contenteditable="false"  title="Image" style="cursor: pointer;text-align: center;display: inline-block;width: 25px;height: 25px;" s-control-type="image">
                     <span class="mdi mdi-image-area" style="font-size: 22px;color: #757575;"></span>
-                    <input type="hidden" >
-                </span>&nbsp;`,
+                </label>&nbsp;`,
         title: "Image",
         notInProps: ['isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatDate', 'fontSize', 'color', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['link', 'formulas', 'hidden']
+        formulas: ['linkConfig', 'formulas', 'hidden']
     },
     textInput: {
         icon: "/icon/ic_textinput.png",
         html: `<input class="s-control s-control-text mdi" contenteditable="false" s-control-type="textInput" type="text" title="Text Input">&nbsp;&nbsp;`,
         title: "Text input",
         notInProps: ['autoHeight', 'dataFlowId', 'formatNumber', 'formatDate', 'isSumTable', 'isAllowUpdate'],
-        formulas: ['link', 'formulas', 'hidden', 'readOnly', 'autocomplete', 'require', 'validate']
+        formulas: ['linkConfig', 'linkConfig', 'formulas', 'hidden', 'readOnly', 'autocomplete', 'require', 'validate']
     },
     department: {
         icon: "/icon/ic_textinput.png",
@@ -485,14 +505,14 @@ const controlTypes = {
         html: `<textarea class="s-control s-control-rich-text" contenteditable="false"  title="Rich-text" s-control-type="richText" type="text"></textarea>&nbsp;&nbsp;`,
         title: "Rich text",
         notInProps: ['isQuickSubmit', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'formatDate', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['link', 'formulas', 'hidden', 'readOnly', 'require']
+        formulas: ['linkConfig', 'formulas', 'hidden', 'readOnly', 'require']
     },
     number: {
         icon: "/icon/ic_number.png",
         html: `<input class="s-control s-control-number" contenteditable="false"  title="Number" s-control-type="number" type="number">&nbsp;&nbsp;`,
         title: "Number",
         notInProps: ['isQuickSubmit', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatDate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['link', 'formulas', 'hidden', 'readOnly', 'require', 'validate']
+        formulas: ['linkConfig', 'formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     date: {
         icon: "/icon/ic_date.png",
@@ -527,14 +547,14 @@ const controlTypes = {
         html: `<input class="s-control s-control-select" readonly="readonly" contenteditable="false" title="Select" s-control-type="select" type="select">&nbsp;&nbsp;`,
         title: "Select",
         notInProps: ['autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'isSumTable', 'formatDate', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'link', 'require']
+        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'linkConfig', 'require']
     },
     combobox: {
         icon: "/icon/ic_select.png",
         html: `<input class="s-control s-control-combobox" readonly="readonly" contenteditable="false" title="Combobox" s-control-type="combobox">&nbsp;&nbsp;`,
         title: "Combobox",
         notInProps: ['autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'isSumTable', 'formatDate', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'link', 'require']
+        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'linkConfig', 'require']
     },
     documentSelect: {
         icon: "/icon/ic_document_select.png",
@@ -575,7 +595,7 @@ const controlTypes = {
         icon: "/icon/ic_checkbox.png",
         html: `<input type="checkbox" value="false" class="s-control s-control-checkbox" title="Checkbox" s-control-type="checkbox" contenteditable="false">&nbsp;`,
         title: "Checkbox",
-        notInProps: ['isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatDate', 'fontSize', 'formatNumber', 'isSumTable', 'isDBOnly', 'isRequired', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
+        notInProps: ['isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'otherInfo', 'formatDate', 'fontSize', 'formatNumber', 'isSumTable', 'isDBOnly', 'isRequired', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isBorderPrint'],
         formulas: ['formulas', 'hidden', 'readOnly', 'require']
     },
     color: {
@@ -604,7 +624,7 @@ const controlTypes = {
         html: `<input class="s-control s-control-filter" contenteditable="false" title="Input filter" type="text" s-control-type="inputFilter">&nbsp;`,
         title: "Input filter",
         notInProps: ['autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'formatDate', 'isSumTable', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'link', 'require', 'validate']
+        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'linkConfig', 'require', 'validate']
     },
     hidden: {
         icon: "/icon/ic_hidden.png",
@@ -637,7 +657,7 @@ const controlTypes = {
             </tbody>
             </table></div> &nbsp;&nbsp;`,
         title: "Table",
-        notInProps: ['isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'width', 'height', 'formatDate', 'isPrimary', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
+        notInProps: ['isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'width', 'height', 'formatDate', 'isPrimary', 'formatNumber', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue', 'isBorderPrint'],
         formulas: ['formulas', 'hidden', 'readOnly', 'headerTable', 'filterOptions']
     },
     panel: {
@@ -649,7 +669,7 @@ const controlTypes = {
                     </div>
                 </div>&nbsp;`,
         title: "Panel",
-        notInProps: ['isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'fontSize', 'formatNumber', 'formatDate', 'isPrimary', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isAllowPrint', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
+        notInProps: ['isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'fontSize', 'formatNumber', 'formatDate', 'isPrimary', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isBorderPrint'],
         formulas: ['hidden']
     },
     fileUpload: {
@@ -668,7 +688,7 @@ const controlTypes = {
                 <h5 style="margin:0;height: 100%;padding-top: 5px;font-size: 12px;font-weight:normal">Report</h5>
                 </div>&nbsp;`,
         title: "Report",
-        notInProps: ['isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'fontSize', 'formatDate', 'mobileProps', 'isPrimary', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
+        notInProps: ['isQuickSubmit', 'defaultValue', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'fontSize', 'formatDate', 'mobileProps', 'isPrimary', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue', 'isBorderPrint'],
         formulas: ['hidden', 'report']
     },
     dataFlow: {
@@ -683,14 +703,14 @@ const controlTypes = {
                         text-align: center;
                         align-items: center;
                         justify-content: center;">
-                            <img style="width:14px;height:14px;margin: 0 4px;" src="https://hoangnd.dev.symper.vn/icon/ic_report.png">
-                            <img style="width:14px;height:14px;margin: 0 4px;" src="https://hoangnd.dev.symper.vn/icon/ic_table.png">
-                            <img style="width:14px;height:14px;margin: 0 4px;" src="https://hoangnd.dev.symper.vn/icon/ic_document_select.png">
+                            <img style="width:14px;height:14px;margin: 0 4px;" src="`+require('./../../../public/img/document/icon/ic_report.png')+`">
+                            <img style="width:14px;height:14px;margin: 0 4px;" src="`+require('./../../../public/img/document/icon/ic_table.png')+`">
+                            <img style="width:14px;height:14px;margin: 0 4px;" src="`+require('./../../../public/img/document/icon/ic_document_select.png')+`">
                         </div>
                     </div>
                 </div>&nbsp;`,
         title: "Data Flow",
-        inProps: ['dataFlowId', 'mapParamsDataflow', 'name', 'title', 'width', 'height', 'isAllowPrint'],
+        inProps: ['mapParamsDataflow', 'name', 'title', 'dataFlowId', 'width', 'height', 'isAllowPrint'],
         formulas: []
     },
     approvalHistory: {
@@ -700,7 +720,7 @@ const controlTypes = {
                 <div class="list-approval-history"></div>
                 </div>&nbsp;`,
         title: "Approval history",
-        inProps: ['isAllowPrint', 'formatDate', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
+        inProps: ['formatDate', 'isBorderPrint'],
         formulas: ['hidden']
     },
     trackingValue: {
@@ -709,7 +729,7 @@ const controlTypes = {
                 <h5 style="margin:0;height: 100%;padding-top: 5px;font-size: 12px;font-weight:normal">Tracking giá trị của control</h5>
                 </div>&nbsp;`,
         title: "Tracking value",
-        inProps: ['name', 'isAllowPrint', 'formatDate', 'isBorderSubmit', 'isBorderView', 'isBorderPrint'],
+        inProps: ['name', 'formatDate', 'isBorderPrint'],
         formulas: ['hidden']
     },
     submit: {

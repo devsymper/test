@@ -1,7 +1,7 @@
 <template>
-    <div class="wraper-comment" :style="style">
+    <div style="border-left: 1px solid #dedede;padding-left: 12px;" class="wraper-comment" :style="style">
         <div class="comment-task" style="height:100%">
-			<Comment style="margin-left:-12px;margin-right:8px" :showComment="true"  :objectIdentifier="objectIdentifier" :objectType="objectType!=''?objectType:'task'" :height="'90%'" :buttonClose="true" @close-comment="hide" />
+			<Comment style="margin-left:-12px;margin-right:8px;" :showComment="true"  :objectIdentifier="objectIdentifier" :objectType="objectType!=''?objectType:'task'" :height="'90%'" :buttonClose="true" @close-comment="hide" />
         </div>
 	</div>
 </template>
@@ -58,7 +58,11 @@ export default {
 		cursor: pointer;
 		margin-right: 8px;
 	}
+	.wraper-comment >>> .comment-task .v-window{
+	    height: calc(100% - 110px);
+	}
 	.wraper-comment >>> .comment-task .input-comment{
-		bottom: 95px!important;
+		position: unset;
+		bottom: unset;
 	}
 </style>

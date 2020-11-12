@@ -3,6 +3,9 @@ import Vue from "vue";
 const cacheAllResourceItem = (state, data) => {
     let type = data.type;
     let items = data.data;
+    if(type == "department"){
+        Vue.set(state.allResource, 'department', []);
+    }
     if (!state.allResource[type] && !$.isEmptyObject(items)) {
         Vue.set(state.allResource, type, items);
 

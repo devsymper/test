@@ -20,6 +20,7 @@
                 :items="allPermission"
                 filled
                 dense
+                :disabled="disabled"
                 solo
                 flat
                 outlined
@@ -58,8 +59,8 @@
                 </span>
             </v-tooltip>
         </div>
-<!--         
-        <v-list dense  >
+        
+        <v-list dense>
             <v-list-item-group class="mt-1">
                 <v-list-item
                     v-for="(item, i) in filterLazyValue"
@@ -83,7 +84,7 @@
                     </v-btn>
                 </v-list-item>
             </v-list-item-group>
-        </v-list> -->
+        </v-list>
     </div>
 </template>
 
@@ -160,12 +161,18 @@ export default {
                 return []
             }
         },
+        disabled:{
+            type: Boolean,
+            default: false
+        }
     },
     watch: {
         value: {
             deep: true,
             immediate: true,
             handler: function(after){
+                 this.lazyValue = []
+                 this.selectedPermission = []
                 this.lazyValue = after;
                 this.selectedPermission = after;
             }

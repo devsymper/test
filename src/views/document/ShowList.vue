@@ -2,7 +2,7 @@
 <div style="width:100%">
     <list-items
         ref="listDocument"
-        :getDataUrl="'https://sdocument-management.symper.vn/documents'"  
+        :getDataUrl="sDocumentManagementUrl+'documents'"  
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('document.title')"
@@ -13,26 +13,23 @@
         :commonActionProps="commonActionProps"
     >
         <div slot="right-panel-content" class="h-100">
-            <submit-view ref="submitView" :isQickSubmit="true" :action="'submit'" @submit-document-success="aftersubmitDocument" :docId="documentId"/>
+            <submit-view 
+                ref="submitView" 
+                :isQickSubmit="true" 
+                :action="'submit'" 
+                @submit-document-success="aftersubmitDocument" 
+                :docId="documentId"/>
         </div> 
     </list-items>
-      <v-navigation-drawer 
-        v-model="drawerImportExelPanel" 
-        absolute
-        class="d-none d-sm-none d-md-flex"
-        temporary
-        style="height: 100vh"
-        v-bind:class="[showValidate==true?'manage-timesheet-800':'manage-timesheet-500']" 
-        right>
-         <ImportExcelPanel 
-            @cancel="closeImportExcelPanel" 
-            :documentId="documentId" 
-            @showValidate="showValidateComponent"
-            :drawerImportExelPanel="drawerImportExelPanel" />
-    </v-navigation-drawer>
+         <ImportExcelPanel
+            :options="options"
+            :nameRows="listRowDocument"
+            :open="showImportPanel" />
+
 </div>
 </template>
 <script>
+
 import ImportExcelPanel from "./../../components/document/ImportExelPanel";
 import { documentApi } from "./../../api/Document.js";
 import ListItems from "./../../components/common/ListItems.vue";
@@ -40,6 +37,7 @@ import ActionPanel from "./../../views/users/ActionPanel.vue";
 import ChangePassPanel from "./../../views/users/ChangePass.vue";
 import Submit from './submit/Submit'
 import { util } from "./../../plugins/util.js";
+import { appConfigs } from '../../configs';
 export default {
     components: {
         ImportExcelPanel: ImportExcelPanel,
@@ -49,14 +47,18 @@ export default {
     },
     data(){
         return {
-            showValidate:false,
-            drawerImportExelPanel: null,
+            sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
+            documentId:0,
+            options:{
+            },
+            propertyDocument:[],
+            listRowDocument:[],
             commonActionProps: {
                 "module": "document",
                 "resource": "document_definition",
                 "scope": "document",
             },
-            documentId:0,
+            showImportPanel:false,
             actionPanelWidth:830,
             containerHeight: 200,
             tableContextMenu:{
@@ -208,8 +210,9 @@ export default {
                         return " <i class= 'mdi mdi-file-upload-outline' > </i>&nbsp; Import Excel";
                     },
                     callback: (document, callback) => {
-                        this.drawerImportExelPanel = true; 
-                        this.documentId = Number(document.id);
+                        const self = this;
+                        self.showImportPanel = !self.showImportPanel; 
+                        self.documentId = Number(document.id);
                        // this.documentId = 1729;
                     },
                 },
@@ -229,14 +232,117 @@ export default {
         });
     },
     watch:{
-        
+        documentId(){
+            this.getApiDocument();
+        }
     },
     methods:{
-        closeImportExcelPanel(){
-            this.drawerImportExelPanel = false;
+        getApiDocument(){
+            const self = this;
+            documentApi.detailDocument(this.documentId)
+            .then(res => {
+                if (res.status === 200) {
+                   self.options.objId =self.documentId;
+                   self.options.objType = 'document';
+                   self.options.subObjType = res.data.document.type;
+                  
+                   self.options.nameObj = res.data.document.title;
+                   self.propertyDocument = Object.values(res.data.fields);
+                    // lưu tên của các property từ API document vào mảng  
+                    let tableNames = [];
+                    let tableTitle = [];
+                    for (let i = 0; i < self.propertyDocument.length; i++) {
+                        if (this.propertyDocument[i].type === 'table') {
+                            tableNames.push(self.propertyDocument[i].properties.name);
+                            tableTitle.push(self.propertyDocument[i].properties.title);
+                        };
+                    };
+                    // khởi tạo mảng lưu các giá trị của table document
+                       self.createTable(tableNames, tableTitle);
+                }
+            })
+            .catch(err => {
+               // console.log(err)
+            })
         },
-        showValidateComponent(data){
-            this.showValidate = data;
+        getDataType(controlType) {
+            let typeMap = {
+                number: 'number',
+                month: 'number',
+                percent: 'number',
+                date: 'date',
+                time: 'time',
+                datetime: 'datetime',
+                table: 'table'
+            }
+            if (typeMap[controlType]) {
+                return typeMap[controlType];
+            } else {
+                return 'text';
+            }
+        },
+        createTable(tableNames,tableTitle) {
+            // general
+            let controls = [];
+            for (let i = 0; i < this.propertyDocument.length; i++) {
+                if(['submit','approvalHistory','reset','draft'].includes(this.propertyDocument[i].type)){
+                    continue
+                }
+                controls.push({
+                    name: this.propertyDocument[i].properties.name,
+                    title: this.propertyDocument[i].properties.title,
+                    isKeyControl: false,
+                    isNull:this.checkIsRequired(this.propertyDocument[i].properties.isRequired),
+                    dataColumn: null,
+                    dataType: this.getDataType(this.propertyDocument[i].type)
+                });
+             
+            };
+            let tables = [{
+                sheetMap: '',
+                name: 'Thông tin chung',
+                title: 'Thông tin chung',
+                controls,
+            }]
+            // tables
+            for (let i = 0; i < tableNames.length; i++) {
+                tables.push({
+                    sheetMap: '',
+                    title:tableTitle[i],
+                    keyColumn: {
+                        index: -1,
+                        name: ''
+                    },
+                    name: tableNames[i],
+                    controls: this.findControlsForTable(tableNames[i]),
+                 })
+            }
+            this.listRowDocument = tables;
+        },
+        checkIsRequired(isRequired){
+            if(isRequired==0){
+                return true
+            }else{
+                return false
+            }
+        },
+         findControlsForTable(nameTable) {
+            let controls = [];
+            let property = this.propertyDocument.filter(p => p.listFields && p.properties.name == nameTable);
+            for (let i = 0; i < property.length; i++) {
+                let list = Object.values(property[i].listFields);
+                for (let j = 0; j < list.length; j++) {
+                    controls.push({
+                        name: list[j].properties.name,
+                        title:list[j].properties.title,
+                        isKeyControl: false,
+                        isNull:this.checkIsRequired(list[j].properties.isRequired),
+                        dataColumn: null,
+                        dataType: this.getDataType(list[j].type)
+                    });
+                }
+            }
+            return controls;
         },
         addDocument(){
             this.$router.push('/document/editor');
@@ -251,52 +357,4 @@ export default {
     }
 }
 </script>
-<style lang="scss" scoped>
-.manage-timesheet-500{
-    width: 470px!important;
-}
-.manage-timesheet-800{
-    width: 800px!important  ;
-}
-.manage-timesheet ::v-deep .v-card {
-    box-shadow: none !important;
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-}
-
-.manage-timesheet ::v-deep .v-window {
-    display: flex;
-    flex-direction: column;
-}
-
-.manage-timesheet ::v-deep .v-window__container {
-    flex-grow: 1;
-    display: flex;
-    flex-direction: column;
-}
-.fw-500 {
-    font-weight: 500;
-}
-.fw-400{
-    font-weight: 400;
-}
-
-.fw-300 {
-    font-weight: 300;
-}
-.font-normal {
-    font-size: 13px!important;
-    font-family: Roboto!important;
-    font-weight: normal!important;
-}
-.font{
-    font-size: 13px!important;
-    font-family: Roboto!important;
-}
-
-.color-normal {
-    color: #707070
-}
-</style>
 

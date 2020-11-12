@@ -108,6 +108,19 @@ const getAllUsers = async(context) => {
         }
     }
 }
+
+const getAllSymperRoles = async(context) => {
+    try {
+        let res = await userRoleApi.getAllSymperRoles();
+        if (res.status == 200) {
+            context.commit('setAllSymperRoles', res.data);
+        } else {
+            SYMPER_APP.$snotifyError(error, "Can not get all symper roles!");
+        }
+    } catch (error) {
+        SYMPER_APP.$snotifyError(error, "Can not get all symper roles!");
+    }
+}
 const getAllBA = async(context) => {
     if (context.state.allBA.length == 0) {
         try {
@@ -271,7 +284,7 @@ const getAndSetUserOperations = async function(context) {
             }
 
             let sections = op.objectIdentifier.split(':');
-            let id = sections[1];
+            let id = sections[2] ? sections[1]+':'+sections[2]+':'+sections[3] : sections[1];
 
             if (!id || id == '0') { // xét các trường hợp từ trước đến nay là set cho tất cả các object trong danh sách
                 id = 0;
@@ -285,7 +298,7 @@ const getAndSetUserOperations = async function(context) {
             } else {
                 opsByObjectType[type][id][op.action] = true;
             }
-        }
+        } 
         context.commit('setUserActionsForObjects', opsByObjectType);
     } else {
         SYMPER_APP.$snotifyError(res, "Can not get operations of current role");
@@ -298,5 +311,6 @@ export {
     getAllBA,
     getAllRoles,
     setUserInfo,
-    changeUserRole
+    changeUserRole,
+    getAllSymperRoles
 };

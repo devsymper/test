@@ -49,8 +49,8 @@
             <v-tab-item :key="'main'" class="px-2 pt-2">
                 <span class="fs-15 font-weight-medium">{{$t('orgchart.editor.generalAttributes')}}</span>
                 <form-tpl
-                    :viewOnly="action == 'view'"
-                    :singleLine="true"
+                    :viewOnly="action == 'view' || action == 'structureManagement'"
+                    :singleLine="(context == 'department' && selectingNode.id == SYMPER_HOME_ORGCHART) ? false : true"
                     :labelWidth="'60px'"
                     @input-value="handleAttrValueInput"
                     :allInputs="selectingNode.commonAttrs"
@@ -62,7 +62,7 @@
                     <UserSelector
                         ref="userSelector"
                         :isMulti="true"
-                        :disabled="action == 'view'"
+                        :disabled="action == 'view' || action == 'structureManagement'"
                         :compactChip="true"
                         :color="'grey lighten-3'"
                         :textColor="''"
@@ -70,16 +70,32 @@
                         @input="handleChangeUser"
                         v-model="selectingNode.users"
                     ></UserSelector>
+                   <div v-if="action != 'create'">
+                          <span
+                        class="mt-3p fs-12">
+                       Select user from document
+                    </span>
+                    <MappingDocInstanceSelector
+                     :disabled="action != 'structureManagement'"
+                     :homeConfig="homeConfig.commonAttrs"
+                     v-model="selectingNode.dataFromDoc.users"
+                      />
+                   </div>
                 </div>
 
                 <div class="mt-3" v-if="context == 'position' && selectingNode.id != SYMPER_HOME_ORGCHART">
+                    
                     <span
                         class="fs-12">
                     Select permissions
                     </span>
                     <PermissionSelector
-                        v-model="selectingNode.permissions">
+                        :disabled="action == 'view' || action == 'structureManagement'"
+                        :value="selectingNode.permissions"
+                        @input="selectedPermissions"
+                        >
                     </PermissionSelector>
+                  
                 </div>
             </v-tab-item>
 
@@ -97,9 +113,9 @@
                                 <span
                                     class="fs-15 pl-4 font-weight-medium"
                                     :style="{
-                                            position: 'relative',
-                                            top: '5px'
-                                        }"
+                                        position: 'relative',
+                                        top: '5px'
+                                    }"
                                 >{{$t('orgchart.editor.listDynamicAttributes')}}</span>
                                 <v-btn
                                     class="dynamic-attr-form-activator float-right"
@@ -108,6 +124,7 @@
                                     v-if="action != 'view'"
                                     icon
                                     v-bind="attrs"
+                                    v-on="on"
                                     @click="actionBeforeAddAttr"
                                 >
                                     <v-icon size="21">mdi-plus</v-icon>
@@ -176,7 +193,7 @@
                 <span class="fs-15 font-weight-medium">{{$t('orgchart.editor.style')}}</span>
                 <SearchNodeStyle class="mt-2 mb-4" @change-style-template="changeNodeStyle" :change="Math.floor(Math.random() * 1000)"></SearchNodeStyle>
                 <form-tpl
-                    :viewOnly="action == 'view'"
+                    :viewOnly="action == 'view' || action == 'structureManagement'"
                     :singleLine="false"
                     :labelWidth="'60px'"
                     :allInputs="nodeStyleConfig"
@@ -265,6 +282,7 @@ import { orgchartApi } from "../../../api/orgchart";
 import { elementTools } from "jointjs";
 import SearchNodeStyle from "@/components/orgchart/editor/SearchNodeStyle";
 import PermissionSelector from "@/components/permission/PermissionSelector.vue";
+import MappingDocInstanceSelector from './MappingDocInstanceSelector'
 
 export default {
     created() {
@@ -285,12 +303,21 @@ export default {
         "form-tpl": FormTpl,
         UserSelector,
         SearchNodeStyle,
-        PermissionSelector
+        PermissionSelector,
+        MappingDocInstanceSelector
     },
     computed: {
         selectingNode() {
-            return this.$store.state.orgchart.editor[this.instanceKey]
-                .selectingNode;
+            let selectingNode = this.$store.state.orgchart.editor[this.instanceKey].selectingNode
+            if(!selectingNode.dataFromDoc){
+                selectingNode.dataFromDoc = {
+                    users:[]
+                }
+            }
+            return selectingNode;
+        },
+        homeConfig(){
+            return this.$store.state.orgchart.editor[this.instanceKey].homeConfig
         }
     },
     props: {
@@ -318,6 +345,9 @@ export default {
                     );
                 }
             }
+        },
+        isDefault(val){
+            this.handleAttrValueInput("isDefault", 'sdsadas', val)
         }
     },
     data() {
@@ -348,6 +378,7 @@ export default {
             showUpdateAttr: false,
             currentTab: null,
             openAddPanel: false,
+            isDefault:false,
             addPanelAction: "add",
             selectingAttrIndex: null,
             dynamicValueInputs: {
@@ -379,10 +410,13 @@ export default {
         };
     },
     methods: {
+        selectedPermissions(data){
+            this.$store.commit('orgchart/updatePermissionsSelectingNode', {instanceKey: this.instanceKey, data:data} )
+        },
         changeNodeStyle(styleData) {
             try {
                 let style = styleData.content;
-                for (let key in style) {
+                for (let key in style){
                     this.nodeStyleConfig[key].value = style[key];
                 }
             } catch (error) {

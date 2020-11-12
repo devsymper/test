@@ -1,7 +1,7 @@
 <template>
-    <v-container fluid>
+    <div class="h-100 w-100">
         <ListItems
-            ref="listPack"
+            ref="listPermission"
             :getDataUrl="getDataUrl"
             :headerPrefixKeypath="'permissions.header'"
             :pageTitle="$t('permissions.title')"
@@ -13,9 +13,12 @@
             :currentItemData="currentItemData"
             :customAPIResult="customAPIResult"
             :commonActionProps="commonActionProps"
-        >
+            :showActionPanelInDisplayConfig="true"
+            @row-selected="onRowSelected"
+        > 
             <template slot="right-panel-content" slot-scope="{itemData}">
                 <PermissionForm
+                    @close-form="closeForm"
                     @saved-item-data="handleSavedItem"
                     :action="actionOnItem"
                     :itemData="itemData">
@@ -23,7 +26,7 @@
                 </PermissionForm>
             </template>
         </ListItems>
-    </v-container>
+    </div>
 </template>
 
 <script>
@@ -132,24 +135,7 @@ export default {
                     name: "edit",
                     text: this.$t("permissions.contextMenu.edit"),
                     callback: async (pack, callback) => {
-
-                        for(let key in pack){
-                            self.$set(self.currentItemData, key, pack[key]);
-                        }
-
-                        self.actionOnItem = 'update';
-                        let res = await permissionApi.getActionPackOfPermission(pack.id);
-                        
-                        if(res.status == 200){
-                            let listActionPacks = res.data;
-                            let mapActionPack = self.$store.state.permission.allActionPack;
-                            self.currentItemData.actionPacks = listActionPacks.reduce((arr, el) => {
-                                arr.push(mapActionPack[el.actionPackId]);
-                                return arr;
-                            }, []);
-                        }else{
-                            self.$snotifyError(res, "Can not get list action pack of permission "+pack.name);
-                        }
+                        self.updatePermissionData(pack);
                     }
                 },
                 remove: {
@@ -178,9 +164,38 @@ export default {
         };
     },
     mounted() {
-        this.tableHeight = document.body.clientHeight - 0;
+		this.tableHeight = util.getComponentSize(this).h;
     },
     methods: {
+        closeForm(){
+            this.$refs.listPermission.closeactionPanel();
+        },
+        async updatePermissionData(pack){
+            let self = this;
+            for(let key in pack){
+                self.$set(self.currentItemData, key, pack[key]);
+            }
+
+            self.actionOnItem = 'update';
+            let res = await permissionApi.getActionPackOfPermission(pack.id);
+            
+            if(res.status == 200){
+                let listActionPacks = res.data;
+                let mapActionPack = self.$store.state.permission.allActionPack;
+                self.currentItemData.actionPacks = listActionPacks.reduce((arr, el) => {
+                    arr.push(mapActionPack[el.actionPackId]);
+                    return arr;
+                }, []);
+            }else{
+                self.$snotifyError(res, "Can not get list action pack of permission "+pack.name);
+            }
+        },
+        onRowSelected(row){
+            if(this.$refs.listPermission.alwaysShowActionPanel){
+                this.$refs.listPermission.openactionPanel();
+                this.updatePermissionData(row);
+            }
+        },
         setNameForUserId(listData){
             let list = this.$store.state.app.allBA;
             for(let i = 0; i<listData.length; i++){
@@ -221,7 +236,7 @@ export default {
             }
         },
         handleSavedItem(){
-            this.$refs.listPack.refreshList();
+            this.$refs.listPermission.refreshList();
         },
         handleAddItem(){
             this.actionOnItem = 'create';

@@ -1,13 +1,14 @@
 <template>
   <div class="view-applications-wrapper h-100 w-100">
-        <ViewDetailsAllApp ref="ViewDetailsAllApp" v-if="viewSideBySide == false" />
-        <ViewSideBySideApp ref="ViewSideBySideApp" v-else />
+        <ViewDetailsAllApp ref="ViewDetailsAllApp" v-if="viewSideBySide == false"  :currentType="currentType" />
+        <ViewSideBySideApp ref="ViewSideBySideApp" v-else  />
   </div>
 </template>
 
 <script>
 import ViewDetailsAllApp from './ViewDetailsAllApp.vue'
 import ViewSideBySideApp from './ViewSideBySideApp.vue'
+import {uiConfigApi} from "@/api/uiConfig";
 export default {
     components:{
         ViewDetailsAllApp,
@@ -16,6 +17,11 @@ export default {
     computed:{
         viewSideBySide(){
             return this.$store.state.appConfig.viewSideBySide
+        }
+    },
+    data(){
+        return {
+            currentType: 0,
         }
     },
     mounted(){
@@ -35,20 +41,20 @@ export default {
 				}
 			})
     },
-    watch:{
-        // viewSideBySide(val){
-        //     if(val == true ){
-        //          if(this.$refs.ViewDetailsAllApp){
-        //                     this.$refs.ViewDetailsAllApp.hideContextMenu()		
-        //         }
-        //     }else{
-        //          if(this.$refs.ViewSideBySideApp){
-        //                     this.$refs.ViewSideBySideApp.hideContextMenu()		
-        //         }
-        //     }
-        //     debugger
-        // }
-    }
+    beforeCreate(){
+        let self = this
+        uiConfigApi.getUiConfig('myApplication').then(res=>{
+            if(res.status == 200){
+                let value = JSON.parse(res.data.detail)
+                if(value.typeView == 0){
+		        	this.$store.commit('appConfig/setTypeView', false)
+                }else{
+		        	this.$store.commit('appConfig/setTypeView', true)
+                }
+                self.currentType = value.typeView
+            }
+        })
+    },
 }
 </script>
 

@@ -75,7 +75,6 @@
     padding-bottom: 2px;
     margin: 0px;
     overflow: hidden;
-    width: 108px;
     text-align: left;
 }
 
@@ -303,11 +302,11 @@
 }
 
 .kh-table {
-    width: 94%;
+    width: 97%;
 }
 
 .kh-sub-table {
-    width: 99%!important;
+    width: 97%!important;
 }
 
 .kh-table th {
@@ -422,7 +421,7 @@
 
 .kh-sbr-all .sb-top {
     border-bottom: 1px solid #cccccc;
-    padding-right: 20px;
+   
 }
 
 .kh-sbr-all .sb-top .symper-title,
@@ -498,7 +497,7 @@
 
 .kh-sidebar-right #toc {
     list-style: none!important;
-    padding-left: 0px!important;
+    padding-left: 8px!important;
     padding-top: 5px!important;
 }
 
@@ -514,16 +513,14 @@
 .kh-comment .v-toolbar__content {
     border-bottom: 1px solid #cccccc;
     padding: 0px;
-    padding-left: 4px;
+    padding-left: 8px;
     height: 33px!important;
 }
 
 .kh-comment .v-toolbar__extension {
     border-bottom: 1px solid #cccccc!important;
     padding: 0px!important;
-    padding-right: 10px!important;
 }
-
 .kh-comment .v-toolbar__extension .v-item-group .v-slide-group__wrapper .v-slide-group__content .v-tab {
     padding: 0px!important;
     padding-right: 16px!important;
@@ -532,11 +529,6 @@
 .kh-comment .v-toolbar__content .v-toolbar__title {
     font-weight: 500!important;
 }
-
-.kh-comment {
-    margin-left: 1px;
-}
-
 
 /* Handson table */
 
@@ -563,4 +555,25 @@
 
 .v-autocomplete:not(.v-input--is-focused).v-select--chips input {
     max-height: unset!important;
+}
+.checkBoxTask{
+    font-size: 13px;
+    height: 22px;
+}
+.checkBoxTask .v-input__control .v-input__slot{
+    margin-top: 8px!important;
+}
+.checkBox .v-input__control .v-input__slot .v-input--selection-controls__input i{
+    font-size: 18px;
+}
+.v-input--selection-controls__ripple {
+    /* border-radius: 50%;
+    cursor: pointer;
+    height: 25px;
+    position: absolute;
+    transition: inherit;
+    width: 25px;
+    left: -8px;
+    top: calc(50% - 20px);
+    margin: 7px; */
 }

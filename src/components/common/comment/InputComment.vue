@@ -252,25 +252,31 @@ export default {
 			this.dataPostComment.content = this.inputComment
 			this.dataPostComment.attachments = this.attachments
 			this.dataPostComment.tags = this.tags
+			let emptyCheck = this.dataPostComment.content.trim().length == 0 &&  this.dataPostComment.attachments.length == 0
 			if(this.isAdd == true){
-				let data = JSON.stringify(this.dataPostComment)
-				commentApi.addComment(data).then(res => {
-					this.$store.commit('comment/updateParentCommentTarget',0)
-					this.updateComment()
-					this.inputComment = ''
-					this.attachments = []
-                    this.tags = []
-                    this.$store.commit('comment/setWaitingCommentCountPerObj', this.sComment.objectType+':'+this.sComment.objectIdentifier);
-				});
+				if(emptyCheck == false){
+					let data = JSON.stringify(this.dataPostComment)
+					commentApi.addComment(data).then(res => {
+						this.$store.commit('comment/updateParentCommentTarget',0)
+						this.updateComment()
+						this.inputComment = ''
+						this.attachments = []
+						this.tags = []
+						this.$store.commit('comment/setWaitingCommentCountPerObj', this.sComment.objectType+':'+this.sComment.objectIdentifier);
+					});
+				}
+				
 			} else {
-				this.dataPostComment.id = this.item.id
-				let dataEdit = JSON.stringify(this.dataPostComment)
-				commentApi.editComment(dataEdit).then(res => {
-					this.$store.commit('comment/updateParentCommentTarget',0)
-					this.updateComment()
-					this.attachments = []
-					this.tags = []
-				});
+				if(emptyCheck == false){
+					this.dataPostComment.id = this.item.id
+					let dataEdit = JSON.stringify(this.dataPostComment)
+					commentApi.editComment(dataEdit).then(res => {
+						this.$store.commit('comment/updateParentCommentTarget',0)
+						this.updateComment()
+						this.attachments = []
+						this.tags = []
+					});
+				}
 			}
 			this.$store.commit('comment/updateReplyStatus',false)
 		},
@@ -431,7 +437,7 @@ export default {
 }
 .content-comment >>> .content-comment-img{
 	display:flex;	
-	width:90%;
+	width:85%;
 	margin-bottom:20px;
 	margin-top:4px;
 }
@@ -449,7 +455,7 @@ export default {
 	right: 0;
 }
 .content-comment >>> .splide__arrow svg{
-width: 0.6em;
+	width: 0.6em;
     height: 0.6em;
 }
 .content-comment >>> .content-comment-file{
@@ -487,6 +493,14 @@ width: 0.6em;
 	width:94%;
 	font:13px roboto
 }
+.content-comment >>>  .v-tab{
+	padding:0px 4px !important;	
+}
+.content-comment >>>  .v-slide-group__prev,
+.content-comment >>>  .v-slide-group__next{
+	min-width: unset;
+}
+
 .content-comment >>> .content-comment-file .v-icon{
 	font-size: 13px;
 }

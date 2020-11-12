@@ -7,7 +7,28 @@
 		<v-divider></v-divider>
 
 		<VuePerfectScrollbar style="calc(100% - 62px);">
-             <v-stepper alt-labels>
+            <div class="control-info">
+                    <table class="w-100">
+                        <tr>
+                            <td style="width:40%;">Tiêu đề Document</td>
+                            <td>{{documentInfo.title}}</td>
+                        </tr>
+                        <tr>
+                            <td style="width:70px">Tên control:</td>
+                            <td>{{controlInfo.name}}</td>
+                        </tr>
+                        <tr>
+
+                            <td>Tiêu đề control: </td>
+                            <td>{{controlInfo.title}}</td>
+                        </tr>
+                        <tr>
+                           <td>Người tạo control: </td>
+                            <td>{{controlInfo.userUpdate}}</td>
+                        </tr>
+                    </table>
+            </div>
+            <v-stepper alt-labels>
                 <v-stepper-header>
                     <v-stepper-step step="1" :color="'#ff800380'" >{{$t('document.submit.panel.traceInput')}}</v-stepper-step>
 
@@ -62,7 +83,8 @@ export default {
             listFormulas:{},
             effectedControl:{},
             inputControl:{},
-            controlNameTrace:null
+            controlNameTrace:null,
+            controlInfo:{name:"",title:"",userUpdate:""}
         }
     },
     computed:{
@@ -78,13 +100,13 @@ export default {
         traceControlFormulas(instance){
             this.removeTrace();
             let curControl = this.listInputInDocument[this.controlNameTrace];
+            
             if(curControl.inTable){
                 // nếu là control trong table , trường hợp này do handson tự render lại nên cần set current trace lại tại cột đó
                 setTimeout(() => {
                     curControl.renderCurrentTraceControlColor();
                 }, 200);
             }
-            
             let formulasType = instance.type;
             this.inputControl = instance.inputControl;
             if(['list','autocomplete','formulas'].includes(formulasType)){
@@ -138,41 +160,59 @@ export default {
         controlTrace:{
             type:String,
             default:""
+        },
+        documentInfo:{
+            type:Object
         }
     },
     watch:{
-        controlTrace(name){
-            this.controlNameTrace = name
+        controlTrace:{
+            deep:true,
+            immediate:true,
+            handler:function(vl){
+                this.controlNameTrace = vl;
+                let curControl = this.listInputInDocument[this.controlNameTrace];
+                this.controlInfo.name = curControl.name;
+                this.controlInfo.title = curControl.title;
+                this.controlInfo.userUpdate = curControl.lastUserUpdate;
+            }
         },
+        
         /**
          * Hàm xử lí data trước khi đưa vào sidebar
          */
-        listFormulasTrace(after){
-            let data = {};
-            let index = 0;
-            this.panel = [];
-            for(let formulasType in after){
-                if(!after[formulasType].instance){
-                    continue;
-                }
-                let formItem = {};
-                let input = {};
-                formItem[formulasType] = {
-                    title: after[formulasType].title,
-                    value: after[formulasType].instance.formulas,
-                    type: "script",
-                    isShowTitle:true
-                }
-                input['title'] = after[formulasType].title
-                input['input'] = formItem
-                input['instance'] = after[formulasType].instance
-                data[formulasType] = input;
-                this.panel.push(index);
-                index++;
+        listFormulasTrace:{
+            deep:true,
+            immediate:true,
+            handler:function(after){
+                let data = {};
+                let index = 0;
+                this.panel = [];
+                for(let formulasType in after){
+                    if(!after[formulasType].instance){
+                        continue;
+                    }
+                    let formItem = {};
+                    let input = {};
+                    formItem[formulasType] = {
+                        title: after[formulasType].title,
+                        value: after[formulasType].instance.formulas,
+                        type: "script",
+                        isShowTitle:true
+                    }
+                    input['title'] = after[formulasType].title
+                    input['input'] = formItem
+                    input['instance'] = after[formulasType].instance
+                    data[formulasType] = input;
+                    this.panel.push(index);
+                    index++;
 
-            }
-            this.listFormulas = data;
-        },
+                }
+                this.listFormulas = data;
+            },
+        }
+        
+        
         
     }
 }
@@ -238,5 +278,8 @@ export default {
 
     .trace-btn:focus{
         outline: none;
+    }
+    .control-info{
+        font-size: 12px;
     }
 </style>

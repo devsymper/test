@@ -1,9 +1,9 @@
 <template>
     
-    <div class="h-100 w-100">
+    <div class="h-100 w-100 list-object-component">
         <list-items
-        :getDataUrl="'https://sdocument-management.symper.vn/documents/'+docId+'/objects'"   
-        :exportLink="'https://sdocument-management.symper.vn/documents/'+docId+'/export-excel'" 
+        :getDataUrl="sDocumentManagementUrl+'documents/'+docId+'/objects'"
+        :exportLink="sDocumentManagementUrl+'documents/'+docId+'/export-excel'" 
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('documentObject.title')"
@@ -13,6 +13,8 @@
         :showActionPanelInDisplayConfig="true"
         :showExportButton="true"
         :showImportButton="true"
+        :isTablereadOnly="false"
+        :conditionByFormula="formulasInput.formula.value"
         @after-open-add-panel="submitDocument"
         @data-get="afterGetData"
         @before-keydown="afterRowSelected"
@@ -20,58 +22,111 @@
         @after-selected-row="afterSelectedRow"
         @row-selected="afterCellSelection"
         :commonActionProps="commonActionProps"
+        :customAPIResult="customAPIResult"
         ref="listObject"
     >
         <div slot="right-panel-content" class="h-100">
-            
-            <div class="panel-header">
-                <div class="left-action">
-                    <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <v-icon  @click="hidePanel" v-on="on">mdi-close</v-icon>
-                        </template>
-                        <span>{{$t('common.close')}}</span>
-                    </v-tooltip>
-                    <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <v-icon  @click="prevRecord" v-on="on">mdi-chevron-left</v-icon>
-                        </template>
-                        <span>{{$t('document.instance.showlist.prev')}}</span>
-                    </v-tooltip>
-                    <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <v-icon  @click="nextRecord" v-on="on">mdi-chevron-right</v-icon>
-                        </template>
-                        <span>{{$t('document.instance.showlist.next')}}</span>
-                    </v-tooltip>
-                    <span class="document-title">{{panelDocTitle}}</span>
+            <div v-if="isDeleteMultiple" class="h-100">
+                <div class="d-flex">
+                    <h2>Công thức truy vẫn xóa</h2>
+                    <v-icon @click="closePanelFormulas" style="margin-left:auto;font-size:20px;">mdi-close</v-icon>
                 </div>
-                <div class="right-action">
-                    
-                    <span class="copyed d-none" transition="scroll-y-reverse-transition">{{$t('document.instance.showlist.copied')}}</span>
-                    <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <v-icon  @click="addToClipboard($event)" :clipboard="dataClipboard" v-on="on">mdi-page-next-outline</v-icon>
-                        </template>
-                        <span>{{$t('document.instance.showlist.copyLink')}}</span>
-                    </v-tooltip>
-                    <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <v-icon  v-on="on">mdi-download-outline</v-icon>
-                        </template>
-                        <span>{{$t('document.instance.showlist.download')}}</span>
-                    </v-tooltip>
-                    <v-tooltip bottom>
-                        <template v-slot:activator="{ on }">
-                            <v-icon  @click="showDetailInfoDocument" v-on="on">mdi-information-outline</v-icon>
-                        </template>
-                        <span>{{$t('document.instance.showlist.info')}}</span>
-                    </v-tooltip>
-                    
+                <div class="formulas-input">
+                    <FormTpl  
+                        :singleLine="false" 
+                        :labelWidth="`100px`"  
+                        :allInputs="formulasInput"/>
+                    <v-icon @click="runFormulas" class="run-formulas-btn">mdi-send</v-icon>
                 </div>
+                <v-progress-linear
+                    v-if="showProgress"
+                    indeterminate
+                    color="orange"
+                    ></v-progress-linear>
+                    <br>
+                <v-btn small @click="showDialog" class="delete-record-btn">
+                    <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
+                </v-btn>
             </div>
-            <div class="panel-body">
-                <detail-object @after-hide-sidebar="afterHideSidebarDetail" ref="viewDetail" @after-load-document="handleAfterLoadDocument" :quickView="true" :docObjInfo="docObjInfo"/>
+            <div v-else>
+                <div class="panel-header" v-if="actionOnRightSidebar == 'detail'">
+                    <div class="left-action">
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-icon  @click="hidePanel" v-on="on">mdi-close</v-icon>
+                            </template>
+                            <span>{{$t('common.close')}}</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-icon  @click="prevRecord" v-on="on">mdi-chevron-left</v-icon>
+                            </template>
+                            <span>{{$t('document.instance.showlist.prev')}}</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-icon  @click="nextRecord" v-on="on">mdi-chevron-right</v-icon>
+                            </template>
+                            <span>{{$t('document.instance.showlist.next')}}</span>
+                        </v-tooltip>
+                        <span class="document-title">{{panelDocTitle}}</span>
+                    </div>
+                    <div class="right-action">
+                        
+                        <span class="copyed d-none" transition="scroll-y-reverse-transition">{{$t('document.instance.showlist.copied')}}</span>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-icon  @click="addToClipboard($event)" :clipboard="dataClipboard" v-on="on">mdi-page-next-outline</v-icon>
+                            </template>
+                            <span>{{$t('document.instance.showlist.copyLink')}}</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-icon  v-on="on">mdi-download-outline</v-icon>
+                            </template>
+                            <span>{{$t('document.instance.showlist.download')}}</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-icon  @click="showDetailInfoDocument" v-on="on">mdi-information-outline</v-icon>
+                            </template>
+                            <span>{{$t('document.instance.showlist.info')}}</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                    <v-icon @click="updateCurrentRecord" v-on="on">mdi-pencil</v-icon>
+                            </template>
+                            <span>{{$t('document.instance.showlist.update')}}</span>
+                        </v-tooltip>
+                    </div>
+                    <v-btn small @click="showDialog" class="delete-record-btn">
+                        <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
+                    </v-btn>
+                </div>
+                <div  v-else-if="actionOnRightSidebar == 'update'">
+                    <span class="title float-left">
+                        {{$t('document.instance.showlist.update')}}
+                    </span>
+                    <v-icon
+                        class="close-btn float-right"
+                        @click="hidePanel"
+                    >mdi-close</v-icon>
+                </div>
+                <div class="panel-body">
+                    <detail-object 
+                        v-if="actionOnRightSidebar == 'detail'"
+                        @after-hide-sidebar="afterHideSidebarDetail" 
+                        ref="viewDetail" 
+                        @after-load-document="handleAfterLoadDocument" 
+                        :quickView="true" 
+                        :docObjInfo="docObjInfo"/>
+
+                    <DocumentSubmit 
+                        v-if="actionOnRightSidebar == 'update'"
+                        :action="'update'"
+                        :documentObjectId="docObjInfo.docObjId"
+                        @submit-document-success="onDocumentUpdateSuccess"/>
+                </div>
             </div>
         </div>
     </list-items>
@@ -98,29 +153,71 @@
                     <span>{{$t('document.instance.showlist.select')}} {{countRecordSelected}} {{$t('document.instance.showlist.record')}}</span>
                 </div>
                 <div class="sheet-action">
-                    <v-btn tile small @click="printSelected" >
-                        <v-icon left>mdi-printer</v-icon> {{$t('document.instance.showlist.printRecord')}}
-                    </v-btn>
-                    <v-btn @click="selectPrintConfig" tile small>
-                        <v-icon left>mdi-printer-pos</v-icon> {{$t('document.instance.showlist.selectPrintConfig')}}
-                    </v-btn>
-                    <v-btn @click="hideBottomSheet" tile small> {{$t('common.close')}}
-                    </v-btn>
+                    <div v-if="isDeleteMultiple">
+                        <v-btn small @click="printSelected" >
+                            <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
+                        </v-btn>
+                        <v-btn @click="hideBottomSheet" tile small> {{$t('common.close')}}
+                        </v-btn>
+                    </div>
+                    <div v-else>
+                        <v-btn tile small @click="printSelected" >
+                            <v-icon left>mdi-printer</v-icon> {{$t('document.instance.showlist.printRecord')}}
+                        </v-btn>
+                        <v-btn @click="selectPrintConfig" tile small>
+                            <v-icon left>mdi-printer-pos</v-icon> {{$t('document.instance.showlist.selectPrintConfig')}}
+                        </v-btn>
+                        <v-btn @click="hideBottomSheet" tile small> {{$t('common.close')}}
+                        </v-btn>
+                    </div>
+                    
                 </div>
             </div>
         </BottomSheet>
+        <v-dialog
+            v-model="dialog"
+            max-width="290">
+            <v-card>
+                <v-card-title class="headline">Xác nhận Xóa</v-card-title>
+                <v-card-text>
+                Xác nhận xóa {{countRecordSelected}} bản ghi
+                </v-card-text>
+
+                <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <v-btn
+                    color="darken-1"
+                    text
+                    @click="dialog = false"
+                >
+                    {{$t('common.close')}}
+                </v-btn>
+
+                <v-btn
+                    color="green"
+                    text
+                    @click="deleteSelectedRecord">
+                    {{$t('common.delete')}}
+                </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 <script>
+import { appConfigs } from "@/configs.js";
 import ListItems from "./../../../components/common/ListItems.vue";
 import BottomSheet from './../../../components/common/BottomSheet'
 import PrintView from "./../print/PrintView";
 import ActionPanel from "./../../../views/users/ActionPanel.vue";
 import Tablet from "./../../../components/common/Tablet";
-
+import FormTpl from "@/components/common/FormTpl.vue"
 import { documentApi } from "./../../../api/Document.js";
 import { util } from "./../../../plugins/util.js";
-import Detail from './../detail/Detail.vue'
+import Detail from './../detail/Detail.vue';
+import DocumentSubmit from "@/views/document/submit/Submit.vue";
+
 export default {
     components: {
         "list-items": ListItems,
@@ -128,16 +225,44 @@ export default {
         "action-panel": ActionPanel,
         Tablet,
         BottomSheet,
-        PrintView
+        PrintView,
+        DocumentSubmit,
+        FormTpl
 
     },
     data(){
         return {
+            sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
+            dialog:false,
+            showProgress:false,
+            actionOnRightSidebar: 'detail',
             commonActionProps: {
                 "module": "document",
                 "resource": "document_instance",
                 "scope": "document",
                 "parentId": this.$route.params.id
+            },
+            customAPIResult:{
+                reformatData(res){
+                    let thisCpn = util.getClosestVueInstanceFromDom(document.querySelector('.list-object-component'));
+                    let listObject = res.data.listObject;
+                    // if(Object.keys(thisCpn.recordSelected).length > 0){
+                    //     for (let index = 0; index < listObject.length; index++) {
+                    //         let row = listObject[index];
+                    //         let rowChecked = Object.values(thisCpn.recordSelected).filter(r=>{
+                    //             return r.document_object_id == row.document_object_id
+                    //         })
+                    //         if(rowChecked.length > 0){
+                    //             listObject[index]['checkbox_select_item'] = true;
+                    //         }
+                    //     }
+                    // }
+                    return{
+                        columns:res.data.columns,
+                        listObject:res.data.listObject,
+                        total:res.data.listObject.length,
+                    }
+                }
             },
             docId:parseInt(this.$route.params.id),
             currentDocObjectActiveIndex:'',
@@ -154,7 +279,18 @@ export default {
             currentRowData:{},
             allObjectPrint:[],
             totalRecord:0,
+            isDeleteMultiple:false,
             dataClipboard:"",
+            formulasInput:{
+                formula : {
+                    title: "Nhập công thức",
+                    type: "script",
+                    value: '',
+                    style:{
+                        height:'300px'
+                    }
+                }, 
+            },
             listActionForPrint:{    // data truyền vào cho slot action view table
                 print:{
                     title: this.$t('common.print'),
@@ -184,7 +320,7 @@ export default {
                         },[]);
                         let thisCpn = this;
                         documentApi
-                        .deleteDocumentObject({objectIds:ids.join()})
+                        .deleteDocumentObject({objectIds:JSON.stringify(ids)})
                         .then(res => {
                             if (res.status == 200) {
                                 thisCpn.$snotify({
@@ -209,7 +345,7 @@ export default {
                     name: "detail",
                     text: this.$t('common.detail'),
                     callback: (documentObject, callback) => {
-                        this.$goToPage('/documents/objects/'+documentObject.document_object_id,"Danh sách bản ghi");
+                        this.$goToPage('/documents/objects/'+documentObject.document_object_id,"Chi tiết");
                     },
                 },
                 
@@ -234,6 +370,16 @@ export default {
                     callback: (documentObject, callback) => {
                         this.toggleCheckBoxListItem()
                     
+                    },
+                },
+                delete_multi: {
+                    name: "deleteMulti",
+                    text: this.$t('document.instance.showlist.deleteMultiple'),
+                    callback: (documentObject, callback) => {
+                        this.isDeleteMultiple = true;
+                        this.toggleCheckBoxListItem(false);
+                        this.actionPanelWidth = 400;
+                        this.$refs.listObject.openactionPanel();
                     },
                 },
                 // detail_in_view: {
@@ -267,13 +413,77 @@ export default {
         }).catch(err => {}).always(() => {});
     },
     activated(){
-        if(this.$refs.listObject.isShowCheckedRow()){
-            this.showBottomSheet();
+        if(this.$refs.listObject && this.$refs.listObject.isShowCheckedRow()){
+            if(this.isDeleteMultiple){
+                // for(let row in this.recordSelected){
+                //     this.$refs.listObject.getHotInstance().setDataAtCell(row,0,true,'edit');
+                // }
+            }
+            else{
+                this.showBottomSheet();
+            }
         }
     },
     methods:{
+         onDocumentUpdateSuccess(){
+            this.actionOnRightSidebar = 'detail';
+        },
+        updateCurrentRecord(){
+            this.actionOnRightSidebar = 'update';
+        },
+        deleteSelectedRecord(){
+            let itemSelected = Object.values(this.recordSelected);
+            let ids = itemSelected.reduce((arr,obj)=>{
+                arr.push(obj.document_object_id);
+                return arr;
+            },[]);
+            let thisCpn = this;
+			this.dialog = false;
+            documentApi
+            .deleteDocumentObject({objectIds:JSON.stringify(ids)})
+            .then(res => {
+                if (res.status == 200) {
+                    thisCpn.$snotify({
+                        type: "success",
+                        title: "Delete document Object success!"
+                    });  
+                    thisCpn.$refs.listObject.removeAllRowChecked();
+                    thisCpn.$refs.listObject.refreshList();
+                }
+                else{
+                    thisCpn.$snotify({
+                        type: "error",
+                        title: res.messagr
+                    });  
+                }
+            })
+            .catch(err => {
+            })
+            .always(() => {});
+        },
+        showDialog(){
+            this.dialog = true;
+        },
+        closePanelFormulas(){
+            this.formulasInput.formula.value = "";
+            this.isDeleteMultiple = false;
+            this.$refs.listObject.removeCheckBoxColumn();
+            this.actionPanelWidth = 800;
+            this.$refs.listObject.closeactionPanel();
+            setTimeout((self) => {
+                self.$refs.listObject.refreshList(); 
+            }, 200,this);
+        },
+        runFormulas(){
+            this.showProgress = true;
+            this.$refs.listObject.refreshList();
+        },
         afterGetData(data){
-            this.dataTable = data
+            this.showProgress = false;
+            if(this.isDeleteMultiple){
+                this.$refs.listObject.addCheckBoxColumn();
+            }
+            this.dataTable = data;
         },
         nextRecord(){
             if(this.dataTable.length > this.currentDocObjectActiveIndex+1){
@@ -379,9 +589,11 @@ export default {
         /**
          * Hàm hiển thị cột checkbox trong compon listItem
          */
-        toggleCheckBoxListItem(){
+        toggleCheckBoxListItem(isShowBottomSheet = true){
             if(!this.$refs.listObject.isShowCheckedRow()){
-                this.showBottomSheet();
+                if(isShowBottomSheet){
+                    this.showBottomSheet();
+                }
                 this.$refs.listObject.addCheckBoxColumn();
             }
         },
@@ -422,6 +634,7 @@ export default {
          * Sự kiện khi selection vào cell
          */
         afterCellSelection(rowData){
+            this.actionOnRightSidebar = 'detail';
             this.currentRowData = rowData;
         }
     }
@@ -488,6 +701,20 @@ export default {
         display: inline-block;
         padding: 12px;
         height: 100%;
+    }
+    .formulas-input{
+        position: relative;
+    }
+    .run-formulas-btn{
+        position: absolute;
+        right: 4px;
+        bottom: 14px;
+        font-size: 18px;
+    }
+    .delete-record-btn{
+        position: absolute;
+        bottom: 16px;
+        right: 16px;
     }
 
 </style>

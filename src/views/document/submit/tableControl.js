@@ -1,4 +1,5 @@
 import Control from "./control";
+import moment from "moment-timezone";
 
 export default class TableControl extends Control {
     constructor(idField, ele, controlProps, curParentInstance) {
@@ -12,6 +13,7 @@ export default class TableControl extends Control {
          */
         this.tableInstance = null;
         this.tablePrint = null;
+        this.pivotTable = null;
         this.isPrintView = isPrintView;
         /**
          * tên các control nằm trong control này, mặc định là null, nếu control là table thì mới có giá trị là {'tên control':true}
@@ -22,25 +24,50 @@ export default class TableControl extends Control {
         this.ele.wrap('<span style="position:relative;display: block;" class="wrap-table">');
 
     }
-    renderTable() {
-            if (this.isPrintView) {
-                this.ele.attr('table-id', this.ele.attr('id'));
-                this.ele.removeAttr('id');
-                this.ele.find('table').addClass('table-print');
-                this.ele.find('table tbody').empty();
-                this.tablePrint.render();
-            } else {
-                this.tableInstance.render();
-                this.ele.detach().hide();
-
+    renderInfoButtonInRow(linkControl) {
+        if (linkControl) {
+            let allControlHasLink = Object.keys(linkControl);
+            for (let index = 0; index < allControlHasLink.length; index++) {
+                let controlLink = allControlHasLink[index];
+                if (Object.keys(this.listInsideControls).includes(controlLink)) {
+                    let listLinkInCol = linkControl[controlLink];
+                    let curColIndex = this.tableInstance.colName2Idx[controlLink];
+                    for (let key in listLinkInCol) {
+                        let rowIdx = key.replace(/linkConfig_(.+)_/g, "");
+                        rowIdx = Number(rowIdx)
+                        this.tableInstance.validateValueMap[rowIdx + "_" + curColIndex] = {
+                            type: 'linkControl',
+                        };
+                    }
+                }
             }
+        }
+    }
+    renderTable() {
+        if (this.isPrintView) {
+            this.ele.attr('table-id', this.ele.attr('id'));
+            this.ele.removeAttr('id');
+            this.ele.find('table').addClass('table-print');
+            this.ele.find('table tbody').empty();
+            this.tablePrint.render();
+        } else {
+            this.tableInstance.render();
+            if(this.pivotTable){
+                this.pivotTable.render();
+            }
+            this.ele.detach().hide();
 
         }
-        /**
-         * Hàm set data cho handson table, cho trường hợp viewdetail đã có data
-         * @param {*} data 
-         */
+
+    }
+    /**
+     * Hàm set data cho handson table, cho trường hợp viewdetail đã có data
+     * @param {*} data 
+     */
     setData(data) {
+        if (Object.keys(data).length == 0) {
+            return;
+        }
         if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1) {
             if (this.tableInstance.tableInstance) {
                 this.tableInstance.tableInstance.updateSettings({
@@ -50,8 +77,6 @@ export default class TableControl extends Control {
                 })
                 this.tableInstance.tableInstance.render();
             }
-
-            return;
         }
         if (this.isPrintView) {
             let dataTablePrint = [];
@@ -87,30 +112,37 @@ export default class TableControl extends Control {
             this.ele.find('table tbody').append(bodyHtml);
             this.ele.find('table').attr('contenteditable', 'false')
         } else {
-            for (let controlName in data) {
-                let dataControl = data[controlName];
-                let vls = [];
-                for (let index = 0; index < dataControl.length; index++) {
-                    let row = dataControl[index];
-                    if (row == null || row == 'null')
-                        row = '';
-                    vls.push([index, controlName, row]);
-                }
-                this.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+            if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1){
+                return;
             }
+            let dataTable = [];
+            let rowLength = data[Object.keys(data)[0]].length;
+            for (let index = 0; index < rowLength; index++) {
+                let rowData = {};
+                for (let i = 0; i < Object.keys(data).length; i++) {
+                    let key = Object.keys(data)[i];
+                    let control = this.controlInTable[key];
+                    if (control && control.type == 'date') {
+                        data[key][index] = moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
+                    }
+                    rowData[key] = data[key][index];
+                }
+                dataTable.push(rowData)
+
+            }
+
+            if (this.tableInstance.tableHasRowSum) { // trường hợp có dòng tính tổng thì thêm dòng ở cuối hiển thị tổng cột
+                dataTable.push({})
+            }
+            this.tableInstance.tableInstance.loadData(dataTable);
+            setTimeout((self) => {
+                self.tableInstance.tableInstance.render();
+            }, 100, this);
             if (this.currentDataStore.docStatus == 'init') {
                 this.defaultValue = data;
-                this.getDefaultRowInTable();
             }
 
         }
-    }
-
-    // hàm chạy lại các công thức root trong table để lấy ra được dòng giá trị defaul phục vụ cho việc shift+enter thêm dòng thì 
-    // điền giá trị default này vào
-    getDefaultRowInTable() {
-        console.log(this.currentDataStore, 'this.currentDataStore');
-
     }
 
 }

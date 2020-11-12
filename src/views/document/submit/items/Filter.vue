@@ -58,9 +58,6 @@ export default {
             totalRecord:0
         }
     },
-    created(){
-       
-    },
     beforeMount(){
         this.columns = []
         this.data = []
@@ -119,12 +116,15 @@ export default {
             }
         },
         saveInputFilter(){
-            this.$emit('save-input-filter',{controlId:this.curControlId,value:this.dataSelected.join()});
+            this.$emit('save-input-filter',{controlId:this.curControlId,value:this.dataSelected.join(),controlName:this.controlName});
         },
         setFormulas(formulas,controlName){
             this.formulas = formulas;
             this.controlName = controlName;
             this.getSearchField(formulas.instance.formulas)
+        },
+        setControlName(controlName){
+            this.controlName = controlName;
         },
         getSearchField(formulas){
             let titleFieldSearch = []

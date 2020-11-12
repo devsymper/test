@@ -7,6 +7,7 @@
 							<li  v-if="isEndUserCpn == true" 
 								v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)"
 								v-on:click="rightClickHandler($event,childItem,itemT.name)"
+								:class="{'child-item-active': childItem.objectIdentifier == activeIndexChild}"
 							>
 								<div style="position:relative">
 									<v-tooltip bottom v-if="itemT.name == 'document_category' || itemT.name == 'document_major'">
@@ -20,25 +21,43 @@
 										<span style="font:13px roboto">{{childItem.title}}</span> 
 										<span style="font:8px;opacity:0.4">{{childItem.name}}</span>
 									</v-tooltip>
-									<div v-else >{{childItem.name}}</div>
+									<v-tooltip bottom  v-else >
+										<template v-slot:activator="{ on, attrs }">
+											<div class="title-document-enduser" 	
+												v-bind="attrs"
+												v-on="on" >
+												<span>{{childItem.name}}</span> 
+											</div>
+										</template>
+										<span style="font:13px roboto">{{childItem.name}}</span> 
+									</v-tooltip>
 									<v-icon  @click="changeFavorite(childItem,itemT.name)" :class="{'icon-star-active' : childItem.favorite==true, 'icon-star': true}" >mdi-star</v-icon>	
 								</div>
 							</li>
 							<li v-else>
 								<div style="position:relative">
 									<v-tooltip bottom v-if="itemT.name == 'document_category' || itemT.name == 'document_major'">
-									<template v-slot:activator="{ on, attrs }">
-										<div class="title-document" 	
-											v-bind="attrs"
-											v-on="on" >
-											<span>{{childItem.title}}</span> 
-											<span style="font:10px;opacity:0.4">{{childItem.name}}</span>
-										</div>
-									</template>
+										<template v-slot:activator="{ on, attrs }">
+											<div class="title-document" 	
+												v-bind="attrs"
+												v-on="on" >
+												<span>{{childItem.title}}</span> 
+												<span style="font:10px;opacity:0.4">{{childItem.name}}</span>
+											</div>
+										</template>
 										<span style="font:13px roboto">{{childItem.title}}</span> 
 										<span style="font:8px;opacity:0.4">{{childItem.name}}</span>
 									</v-tooltip>
-									<div v-else>{{childItem.name}}</div>
+									<v-tooltip bottom  v-else >
+										<template v-slot:activator="{ on, attrs }">
+											<div class="title-document" 	
+												v-bind="attrs"
+												v-on="on" >
+												<span>{{childItem.name}}</span> 
+											</div>
+										</template>
+										<span style="font:13px roboto">{{childItem.name}}</span> 
+									</v-tooltip>
 									<v-icon  class="icon-remove"  @click="removeItem(childItem,itemT.name)">mdi-delete-empty-outline</v-icon>
 								</div>
 							</li>
@@ -109,6 +128,9 @@ export default {
 				this.filterItem();
 				return this.objFilter
 			}
+		},
+		activeIndexChild(){
+			return this.$store.state.appConfig.activeChildItem
 		},
 		listItemHeight(){
 			if(this.isMyApplication == true){
@@ -190,6 +212,7 @@ export default {
 		rightClickHandler(event,item,type){
 			event.stopPropagation();
 			event.preventDefault();
+			this.$store.commit('appConfig/updateActiveChildItem', item.objectIdentifier )
 			this.$refs.contextMenu.setContextItem([...new Set(item.actions)])
 			this.$refs.contextMenu.show(event)
 			this.$refs.contextMenu.setItem(item)
@@ -202,7 +225,9 @@ export default {
 			this.$refs.contextMenu.hide()
 		},	
 		changeFavorite(item,type){
-			 event.stopPropagation()
+			let	appId = this.$store.state.appConfig.currentAppId
+			let	appName = this.$store.state.appConfig.currentAppName
+			event.stopPropagation()
 			if(type == "document_major" || type == "document_category"){
 				type = "document_definition"
 			}
@@ -220,14 +245,15 @@ export default {
 				item.id = item.objectIdentifier.replace("workflow_definition:","")
 			}
 			if(item.favorite == false){
-				appManagementApi.addFavoriteItem(userId,item.id,type,1).then(res => {
+				appManagementApi.addFavoriteItem(userId,item.id,type,1,appId).then(res => {
 					if (res.status == 200) {
+						item.appName  = appName;
 						this.$store.commit('appConfig/insertFavorite',item)
 						item.favorite = true;
 					}
 				});
 			}else{
-				appManagementApi.addFavoriteItem(userId,item.id,type,0).then(res => {
+				appManagementApi.addFavoriteItem(userId,item.id,type,0,appId).then(res => {
 					if (res.status == 200) {
 						item.type = type;
 						this.$store.commit('appConfig/delFavorite',item)
@@ -293,6 +319,10 @@ export default {
 	position:absolute;
 	top:-2px;
 	right:0px;
+}
+.app-details >>> .app-item .app-child-item .child-item-active{
+	background-color: #E9E9E9;
+	border-radius: 5px;
 }
 .app-details >>> .app-item li{
 	cursor: pointer;

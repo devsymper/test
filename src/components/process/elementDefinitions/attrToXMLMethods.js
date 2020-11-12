@@ -184,6 +184,13 @@ export default {
         }
     },
 
+    scriptTextForScriptNodeMethod(el, elKey, attr, bpmnModeler, attrName) {
+        if (el.businessObject && attr.value.trim() != '') {
+            let bizObj = el.businessObject;
+            bizObj['script'] = "<![CDATA[" + attr.value + "]]>";
+        }
+    },
+
     conditionExpressionMethod(el, elKey, attr, bpmnModeler, attrName) {
 
         if (el.businessObject && attr.value.trim() != '') {

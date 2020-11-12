@@ -13,6 +13,8 @@ const defaultState = {
     listTaskInProcessSibling:[],
     isStatusSubmit:false,
     allAppActive:[],
+    listNodeInProcess:[],
+    variableOfProcess:[],
 
 
 };

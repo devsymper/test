@@ -3,7 +3,7 @@
          width: '100%',
          height: tableHeight
      }"
-                 :class="{'ag-theme-balham': true, 'like-handson-table': likeHandsonTable == true}"
+                 :class="{'ag-theme-balham': true, 'like-handson-table': likeHandsonTable == true, 'hide-row-border': hideRowBorderCss == true}"
                  :gridOptions="gridOptions"
                  :defaultColDef="defaultColDef"
                  :autoGroupColumnDef="autoGroupColumnDef"
@@ -12,18 +12,26 @@
                  @cell-editing-started="cellEditingStarted"
                  @cell-value-changed="cellValueChanged"
                  @cell-double-clicked="cellDoubleClick"
+                 @cell-clicked="cellClicked"
+                 @cell-context-menu="cellContextMenu($event)"
+                 @cell-mouse-over="cellMouseOver"
+                 @cell-mouse-out="cellMouseOut"
                  :rowData="rowDataTable"
                  :treeData="true"
                  :animateRows="true"
+                 :enableRangeSelection="true"
+                 :allowContextMenuWithControlKey="true"
                  :groupDefaultExpanded="groupDefaultExpanded"
                  :frameworkComponents="frameworkComponents"
                  :modules="modules"
                  :getDataPath="getDataPath"
+                 @grid-ready="onGridReady"
                  >
     </ag-grid-vue>
 </template>
 <script>
 import {AgGridVue} from "ag-grid-vue";
+import { MenuModule } from '@ag-grid-enterprise/menu';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
@@ -83,23 +91,30 @@ export default {
         likeHandsonTable:{
             type: Boolean,
             default: false
+        },
+        hideRowBorderCss:{
+            type:Boolean,
+            default:false
         }
     },
     data(){
         return {
             gridOptions:null,
             modules: [
+                MenuModule,
                 RowGroupingModule,
+                ClientSideRowModelModule,
+                RowGroupingModule
             ],
             defaultColDef: null,
             autoGroupColumnDef: null,
             columns:[],
             rowDataTable:[],
-            modules: [ClientSideRowModelModule, RowGroupingModule],
             autoGroupColumnDef: null,
             groupDefaultExpanded: null,
             getDataPath: null,
             frameworkComponents: null,
+           
         }
     },
     components: {
@@ -119,6 +134,7 @@ export default {
         };
         this.autoGroupColumnDef = { minWidth: 100 };
         this.gridOptions = {};
+        this.gridOptions.rowHeight = 20.5;
         this.columns = this.allColumns;
         this.rowDataTable = this.rowData;
         this.autoGroupColumnDef = {
@@ -155,9 +171,13 @@ export default {
     },
     
     mounted(){
-        // this.gridOptions.api.sizeColumnsToFit();
     },  
     methods:{
+        cellContextMenu(params,x){
+             params.event.preventDefault()
+            params.event.stopPropagation()
+            this.$emit('on-cell-context-menu', params)
+        },
         refreshData(columns){
             this.gridOptions.api.clearFocusedCell()
             this.columns = columns;
@@ -187,7 +207,21 @@ export default {
             this.$emit('on-cell-change',params)
         },
         cellDoubleClick(params){
+            params.event.preventDefault()
+            params.event.stopPropagation()
             this.$emit('on-cell-dbl-click',params)
+        },
+        cellClicked(params){
+            this.$emit('on-cell-click',params)
+        },
+        cellMouseOver(params){
+            this.$emit('on-cell-mouse-over',params)
+        },
+        cellMouseOut(params){
+            this.$emit('on-cell-mouse-out',params)
+        },
+        onGridReady(param){
+            this.$emit('grid-ready', param)
         }
         
     },
@@ -198,6 +232,7 @@ export default {
 <style scoped>
     .like-handson-table >>> .ag-header{
         background-color: #FFFFFF;
+        
     }
     .like-handson-table >>> .ag-header-icon .ag-icon{
         display: inline-block;
@@ -214,10 +249,44 @@ export default {
     .like-handson-table >>> .ag-cell-wrapper .ag-row-group .ag-row-group-indent-3 {
         padding-left: 0px !important;
     }
-    /* .like-handson-table >>> .ag-row{
-        height:20px !important;
+     .like-handson-table >>> .ag-header{
+        min-height:unset !important;
+        height: 28px !important;
     }
-    .like-handson-table >>> .ag-header-cell-label .ag-focus-managed .ag-pivot-off{
-        height:20px !important; 
+     .like-handson-table >>> .ag-header .ag-header-cell-text,
+     .like-handson-table >>> .ag-header .ag-header-icon{
+         margin-bottom:9px;
+         font:12px roboto;
+         font-weight: 600;
+    }
+     .like-handson-table >>> .ag-row{
+         /* transform: translateY(20px) !important; */
+    }
+    /* .like-handson-table >>> .ag-cell-wrapper.ag-row-group[class*="ag-row-group-indent"],
+    .like-handson-table >>> .ag-cell-wrapper.ag-row-group-leaf-indent[class*="ag-row-group-indent"] {
+      padding-left: 2;
     } */
+    .like-handson-table >>> .ag-cell-wrapper.ag-row-group{
+        align-items:unset !important;
+    }
+    .like-handson-table >>> .ag-cell{
+        margin-bottom:unset;
+    }
+    .like-handson-table >>> .ag-cell-wrapper {
+        /* height:unset !important */
+    }
+    .like-handson-table >>> .ag-cell{
+        line-height: unset !important;
+    }
+    .like-handson-table >>> .ag-group-child-count{
+        display:none !important;
+    }
+    .like-handson-table >>> .ag-group-expanded,
+    .like-handson-table >>> .ag-group-contracted{
+        height: unset !important;
+    }
+    .hide-row-border >>> .ag-row{
+        border-top-style:unset !important;
+    }
+   
 </style>

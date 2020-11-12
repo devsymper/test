@@ -5,6 +5,7 @@
 	permanent
 	right
 	:width="sidebarWidth"
+	v-if="isShow"
 	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)'}"
 	>
 	<div class="main-info">
@@ -15,7 +16,7 @@
 
 		<v-divider></v-divider>
 
-		<VuePerfectScrollbar style="height:calc(100% - 110px);">
+		<VuePerfectScrollbar style="height:calc(100% - 65px);">
 			<v-expansion-panels
 			v-model="panel"
 			multiple
@@ -29,12 +30,17 @@
 							<table class="general-info">
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.dateCreate')}}</td>
-									<td>{{workInfo.startTime ? $moment(workInfo.startTime).format('DD/MM/YY HH:mm:ss'):''}}</td>
+									<td class="pl-2">{{workInfo.startTime ? $moment(workInfo.startTime).format('DD/MM/YY HH:mm:ss'):''}}</td>
+								</tr>
+								<tr v-if="workInfo.endTime">
+									<td>{{$t('tasks.header.endTime')}}</td>
+									<td class="pl-2">{{ $moment(workInfo.endTime).fromNow()}}</td>
 								</tr>
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.comment')}}</td>
-									<td style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
+									<td class="pl-2" style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
 										{{$t('document.detail.sidebar.body.general.has')}} 
+										{{countCommentNotResolve}} 
 										{{$t('document.detail.sidebar.body.general.commentNotResolve')}}
 									</td>
 								</tr>
@@ -45,9 +51,10 @@
 				
 				<v-expansion-panel>
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.worflowInfo')}}</v-expansion-panel-header>
-					<v-expansion-panel-content class="sym-v-expand-content" style="height:200px">
-						<v-row class="border-top-1" style="height:200px">
+					<v-expansion-panel-content class="sym-v-expand-content border-top-1" style="height:200px">
+						<v-row class="ma-0" style="height:200px">
 							<trackingProcessInstance
+								class="popup-model-diagram"
 								v-if="workInfo.id"
 								:instanceId="workInfo.id"
 								@showPopupDiagram="showPopupDiagram"
@@ -59,18 +66,14 @@
 				<v-expansion-panel>
 					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.userRelated.title')}}</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content">
-						<!-- trường hợp cho work -->
-
 						<div v-if="objSideBar=='work'"  class="w-100 pl-2" >
-							<div style="height: 30px" class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
+							<div style="height: 25px" class=" fs-13 font-weight-medium symper-user-role-in-task d-flex">
 								<span>
 									<v-icon class="mr-3" size="18">mdi-account</v-icon> 
 									<span mt-1>{{$t("tasks.header.userCreate")}}</span>
 								</span>
-								<div class="pl-7 d-flex justify-space-between user-show">
-
-								</div>
 							</div>
+							<infoUser class="userInfo pl-7" :userId="workInfo.startUserId" :roleInfo="workInfo.roleInfo" />
 						</div>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
@@ -161,7 +164,7 @@
 		</VuePerfectScrollbar>
 	</div>
 	<Comment 
-	style="height:100%" 
+	style="height:calc(100% - 40px)" 
 	:objectIdentifier="workInfo.id"
 	:objectType="'work'"
 	ref="commentTaskView"
@@ -192,6 +195,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import Comment from '../Comment'
 import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue";
 import UploadFile from "@/components/common/UploadFile.vue";
+import infoUser from "./../InfoUser";
 export default {
 	components:{
 		VuePerfectScrollbar,
@@ -199,6 +203,7 @@ export default {
 		user,
 		trackingProcessInstance,
 		UploadFile,
+		infoUser
 	},
 	data () {
 		return {
@@ -360,7 +365,10 @@ export default {
 		listFileAttachment() {
 			let arr = this.stask.arrFileAttach;
 			return arr;
-		}
+		},
+		countCommentNotResolve(){
+			return this.$store.state.comment.listComment.length
+		},
 	},
 	created(){
 		let thisCpn = this;
@@ -631,5 +639,12 @@ export default {
 	}
 	.v-expansion-panel::before{
 		box-shadow: none;
+	}
+	.border-top-1 >>>.v-expansion-panel-content__wrap{
+		border: 1px solid #cecece!important;
+		border-radius: 5px;
+	}
+	.popup-model-diagram >>> .djs-hit  {
+		pointer-events: none;
 	}
 </style>

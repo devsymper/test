@@ -13,6 +13,7 @@
                 :isInitInstance="true" 
                 @task-submited="handleTaskSubmited" 
                 :taskInfo="taskInfo"
+                :originData="originTaskData"
                 :parentHeight="thisHeight"
                 @close-detail="closeDetail">
             </taskDetail>
@@ -39,6 +40,11 @@ export default {
     },
     data(){
         return {
+            originTaskData: {
+                assigneeInfo: {
+                    id: 0
+                }
+            },
             startWorkflowStatus: 'init', // init | started
             taskInfo: {
                 action: {
@@ -63,12 +69,12 @@ export default {
         }).catch((err) => {
 
         });
+        this.originTaskData.assigneeInfo.id = this.$store.state.app.endUserInfo.id;
     },
     methods: {
         async getFirstNodeData(){
             let self=this;
             let idDefinition = this.$route.params.id;
-            
             let definitionModel = await BPMNEApi.getDefinitionModel(idDefinition);
             this.definitionModel = definitionModel;
             let documentToStart = this.getStartDocId(definitionModel);
@@ -77,25 +83,59 @@ export default {
             }else{
                 let processDef = await BPMNEApi.getDefinitionData(this.$route.params.id);
                 try {
-                    let instanceName = await this.getInstanceName([]);
+                    let instanceName = await self.getInstanceName([]);
                     let newProcessInstance = await runProcessDefinition(this, processDef, [], instanceName);
-                    let filter={};
-                    filter.processInstanceId=newProcessInstance.id;
-                    let dataTaskNew=await BPMNEApi.getTask(filter);
-                    if (dataTaskNew.total>0) {
-                        let arrTask=dataTaskNew.data;
-                        arrTask.forEach(task => {
-                            if (task.assignee==self.$store.state.app.endUserInfo.id) {
-                                self.$router.push("/myitem/tasks/"+task.id);
-                            }
-                        });
-                    }
+                    await self.checkAndGotoMyTask(newProcessInstance);
                     this.$snotifySuccess("Workfow started successfully!");
                 } catch (error) {
                     this.$snotifyError(error ,"Error on run process definition ");
                 }
             }
             this.startWorkflowStatus = 'started';
+        },
+        async checkAndGotoMyTask(newProcessInstance){
+            let filter={};
+            let arrTask = [];
+            filter.processInstanceId = newProcessInstance.id;
+            let dataTaskNew = await BPMNEApi.getTask(filter); // lấy task theo quy trình hiện tại
+            if (dataTaskNew.total>0) {
+                arrTask = dataTaskNew.data;
+            }else { // lấy task theo quy trình con 
+                let childProcessInstances = await BPMNEApi.getProcessInstance({
+                    superProcessInstanceId: newProcessInstance.id
+                });
+                if(childProcessInstances.data.length > 0){
+                    let myTasks = [];
+                    for(let instance of childProcessInstances.data){
+                        myTasks.push(
+                            BPMNEApi.getTask({
+                                processInstanceId: instance.id,
+                            })
+                        ); 
+                    }
+                    myTasks = await Promise.all(myTasks);
+                    for(let res of myTasks){
+                        arrTask = arrTask.concat(res.data);
+                    }
+                }
+            }
+            for(let task of arrTask){
+                let assignee=task.assignee;
+                if (assignee.indexOf(":")>0) {
+                    assignee=assignee.split(":")[0];
+                }
+                if (assignee == this.$store.state.app.endUserInfo.id) {
+                    if(this.$route.name == 'my-applications'){
+                        this.$evtBus.$emit('symper-change-action-view-url', {
+                            link: "/myitem/tasks/"+task.id
+                        });
+                    }else{
+                        this.$router.push("/myitem/tasks/"+task.id);
+                    }
+                    break;
+                }
+            }
+            
         },
         getStartDocId(definitionModel){
             return Number(definitionModel.mainProcess.initialFlowElement.formKey);
@@ -123,7 +163,6 @@ export default {
                 dataInputForFormula = varsForBackend.nameAndValueMap;
                 
                 let instanceName = await this.getInstanceName(dataInputForFormula);
-                
                 let newProcessInstance = await runProcessDefinition(this, processDef, vars, instanceName);
                 this.$snotifySuccess("Task submited successfully");
                 this.$router.push('/documents/objects/'+outcomeData.document_object_id);
@@ -148,21 +187,11 @@ export default {
                     resolve('');
                 }else{
                     if(dataObjsMap.instanceDisplayText){
-                        formulasApi.execute({
-                            data_input: JSON.stringify(dataInput),
-                            formula: dataObjsMap.instanceDisplayText.value
-                        }).then((formulaData) => {
-                            if( formulaData.status == 200){
-                                formulaData = formulaData.data.data;
-                                if(formulaData.length > 0){
-                                    formulaData = formulaData[0];
-                                    resolve(Object.values(formulaData)[0]);
-                                }else{
-                                    resolve('');
-                                }
-                            }else{
-                                resolve('');
-                            }
+                        formulasApi.getDataByAllScriptType(
+                            dataObjsMap.instanceDisplayText.value, 
+                            JSON.stringify(dataInput)
+                        ).then((formulaData) => {
+                            resolve(formulaData);
                         }).catch(err=>{
                             reject(err);
                         });                    

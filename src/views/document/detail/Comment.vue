@@ -1,11 +1,11 @@
 <template>
     <div class="wraper-comment" :style="style">
-        <div class="comment-content " style="height:100%">
+        <div class="comment-content " style="height:90%">
 			<Comment style="margin-left:-12px;margin-right:8px" 
 				:showComment="true" 
-				:objectIdentifier="objectIdentifierCmt" 
+				:objectIdentifier="String(objectIdentifierCmt)" 
 				:objectType="'document'" 
-				:height="'100%'"
+				:height="'95%'"
 				:buttonClose="true" 
 				@close-comment="hide"
 			/>
@@ -18,14 +18,10 @@ import { parseJSON } from 'jquery'
 export default {
 	props:{
 		objectIdentifier:{
-			type: Number,
+			type: String,
 		}
 	},
-	// watch:{
-	// 	objectIdentifier(after){
-	// 		this.objectIdentifierCmt = after + ""
-	// 	}
-	// },
+
 	computed:{
 		objectIdentifierCmt(){
 			return parseInt(this.objectIdentifier)

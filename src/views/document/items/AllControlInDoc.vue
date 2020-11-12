@@ -46,20 +46,20 @@
             
         </v-dialog>
         <symper-drag-panel
-                @before-close="closeLargeFormulaEditor()"
-                :showPanel="largeFormulaEditor.open"
-                :actionTitle="largeFormulaEditor.data.title"
-                :panelData="largeFormulaEditor.data">
-                <template slot="drag-panel-content" slot-scope="{panelData}">
-                    
-                    <formula-editor
-                        v-model="panelData.valueChange"
-                        :formulaValue="panelData.valueChange"
-                        :width="'100%'"
-                        :height="'370px'"
-                    ></formula-editor>
-                </template>
-            </symper-drag-panel>
+            @before-close="closeLargeFormulaEditor()"
+            :showPanel="largeFormulaEditor.open"
+            :actionTitle="largeFormulaEditor.data.title"
+            :panelData="largeFormulaEditor.data">
+            <template slot="drag-panel-content" slot-scope="{panelData}">
+                
+                <formula-editor
+                    v-model="panelData.valueChange"
+                    :formulaValue="panelData.valueChange"
+                    :width="'100%'"
+                    :height="'370px'"
+                ></formula-editor>
+            </template>
+        </symper-drag-panel>
        
     </div>
    

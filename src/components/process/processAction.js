@@ -9,6 +9,7 @@ import BPMNEngine from "./../../api/BPMNEngine";
 import {
     SYMPER_APP
 } from "@/main.js";
+import Vue from "vue";
 
 function moveTaskTitleToNameAttr(content, configValue) {
     // for (let idEl in configValue) {
@@ -36,6 +37,8 @@ function cleanContent(content, configValue) {
         .replace(/↵+/, ' ')
         .replace(/\bbpmn:/g, '')
         .replace(/<di:/g, '<omgdi:')
+        .replace(/<scriptTask /g, '<serviceTask ')
+        .replace(/<\/scriptTask>/g, '<\/serviceTask>')
         .replace(/<dc:/g, '<omgdc:')
         .replace(/symper_prefix_chars_/g, 'symper:')
         .replace(/symper:symper:/g, 'symper:')
@@ -43,6 +46,9 @@ function cleanContent(content, configValue) {
         .replace(/&#10;/g, ' ')
         .replace(/symper_symper_in_tag/g, 'symper:in')
         .replace(/symper_symper_out_tag/g, 'symper:out')
+        .replace(/symper_symper_string_tag/g, 'symper:string')
+        .replace(/symper_symper_expression_tag/g, 'symper:expression')
+        .replace(/symper_symper_field_tag/g, 'symper:field')
         .replace(/symper_symper_value_tag/g, 'symper:value');
 
     let symperMatches = rsl.match(/<symper:([a-zA-Z0-9_]+)/g);
@@ -91,9 +97,10 @@ export const deployProcess = function(self, processData) {
             console.log(content, 'contentcontentcontentcontentcontentcontent');
 
             let file = util.makeStringAsFile(content, "process_draft.bpmn");
+            let processName=processData.name.replace(/[^\sA-Za-z0-9._-]/g," ");
             bpmnApi.deployProcess({
                 deploymentKey: processData.id,
-                deploymentName: processData.name,
+                deploymentName: processName,
                 tenantId: processData.tenantId ? processData.tenantId : '1',
             }, file).then((res) => {
                 self.$snotifySuccess('Deploy process successfully');
@@ -129,7 +136,22 @@ export const deployProcessFromXML = function(xml, key = 14, name = 'test', tenan
 
 
 function moreInfoForInstanceVars() {
-    let rsl = [];
+    let rsl = [
+        {
+        "name": 'symper_user_id_start_workflow',
+        "type": 'string',
+        "value": SYMPER_APP.$store.state.app.endUserInfo.id+":"+SYMPER_APP.$store.state.app.endUserInfo.currentRole.id,
+        "valueUrl": "",
+        "scope": "global"
+        },
+        {
+            "name": 'symper_last_executor_id',
+            "type": 'string',
+            "value": SYMPER_APP.$store.state.app.endUserInfo.id+":"+SYMPER_APP.$store.state.app.endUserInfo.currentRole.id,
+            "valueUrl": "",
+            "scope": "global"
+        },
+    ];
     if (SYMPER_APP.$route.params.extraData && SYMPER_APP.$route.params.extraData.appId) {
         rsl.push({
             "name": 'symper_application_id',
@@ -139,6 +161,7 @@ function moreInfoForInstanceVars() {
             "scope": "global"
         });
     }
+
     return rsl;
 }
 
@@ -252,6 +275,13 @@ export const getVarsFromSubmitedDoc = async(docData, elId, docId) => {
                 type: 'string',
                 value: SYMPER_APP.$store.state.app.endUserInfo.id
             });
+            vars.push({
+                name: 'symper_last_executor_id',
+                type: 'string',
+                value: SYMPER_APP.$store.state.app.endUserInfo.id+":"+SYMPER_APP.$store.state.app.endUserInfo.currentRole.id,
+                valueUrl: "",
+                scope: "global"
+            });
             resolve({
                 vars: vars,
                 nameAndValueMap: dataInputForFormula
@@ -342,18 +372,53 @@ export const extractTaskInfoFromObject = function(obj) {
     return taskInfo;
 }
 
+function getRoleUser(roleIdentify){
+    let arrDataRole=roleIdentify.split(":");
+    let allSymperRole=SYMPER_APP.$store.state.app.allSymperRoles;
+    if (allSymperRole[arrDataRole[0]]) {
+        let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+        return role;
+    }else{
+        return {};
+    }
+  
+}
 
 export const addMoreInfoToTask = function(task) {
     let mapUser = SYMPER_APP.$store.getters['app/mapIdToUser'];
     task.assigneeInfo = {};
-    if (mapUser[task.assignee]) {
-        task.assigneeInfo = mapUser[task.assignee];
+    let assigneeId=task.assignee;
+    let roleInfo={};
+
+    if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
+        let arrDataAssignee=task.assignee.split(":");
+        assigneeId=arrDataAssignee[0];
+        if (arrDataAssignee.length>3) { // loại trừ trường hợp role=0
+            let roleIdentify=task.assignee.slice(assigneeId.length+1);
+            roleInfo=getRoleUser(roleIdentify);
+        }
+    }
+    if (mapUser[assigneeId]) {
+        task.assigneeInfo = mapUser[assigneeId];
+        task.assigneeRole = roleInfo;
     }
 
     task.ownerInfo = {};
-    if (mapUser[task.owner]) {
-        task.ownerInfo = mapUser[task.owner];
+    let ownerId=task.owner;
+    roleInfo={};
+    if (task.owner && task.owner.indexOf(":")>0) {
+        let arrDataOwner=task.owner.split(":");
+        ownerId=arrDataOwner[0];
+        if (arrDataOwner.length>3) { // loại trừ trường hợp role=0
+            let roleIdentify=task.owner.slice(ownerId.length+1);
+            roleInfo=getRoleUser(roleIdentify);
+        }
     }
+    if (mapUser[ownerId]) {
+        task.ownerInfo = mapUser[ownerId];
+        task.ownerRole=roleInfo;
+    }
+
     let allDefinitions = SYMPER_APP.$store.state.process.allDefinitions;
     let processDefinitionId = task.processDefinitionId;
     if (processDefinitionId != null && processDefinitionId != '') {
@@ -362,8 +427,8 @@ export const addMoreInfoToTask = function(task) {
             task.processDefinitionName = allDefinitions[arrProcessDefinitionId[0]].name;
         }
     }
-
     return task;
+   
 }
 
 export const getLastestDefinition = function(row, needDeploy = false) {
@@ -389,6 +454,5 @@ export const getLastestDefinition = function(row, needDeploy = false) {
             });
             resolve(defData);
         }
-
     });
 }

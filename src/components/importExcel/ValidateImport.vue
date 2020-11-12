@@ -25,6 +25,9 @@
                 {{processing.preprocessing.processed?processing.preprocessing.processed:0}}</span></v-row>
             <BeatLoader class="justify-center d-flex custom-class" :size="10" color="orange" />
         </v-list>
+        <v-list>
+            <v-btn small  color="primary" class="mt-4 ml-7" @click="stopImport()">Stop</v-btn>
+        </v-list>
         <!-- kiểm tra dữ liêu -->
         <v-list 
             dense 
@@ -160,6 +163,97 @@
             </v-row>
         
         </v-list>
+        <!-- showErrorUser -->
+        <v-list v-if="processing.preprocessing.isDone&&processing.validating.errors.length==0&&processing.importing.processed>1&&processing.dataUserError.length>0" class="ml-6 fs-13">
+           Danh sách tài khoản import không thành công
+           <v-row class="ml-0" v-if="existEmail.length>0"> Lỗi trùng email</v-row>
+           <v-row v-if="existEmail.length>0" style="background-color:#F5F5F5; height: 30px" class="ml-0 mr-5">
+                <v-col class="col-md-6">
+                    Tên tài khoản
+                </v-col>
+                <v-col class="col-md-6"  >
+                    Email
+                </v-col>
+            </v-row>
+           <div v-if="existEmail.length>0" 
+               class="ml-0 mr-4" 
+               v-for="(error, errorIdxUser) in existEmail" :key="errorIdxUser"  >
+                        <!-- xử lý trường hợp không đúng định dạng dữ liệu -->
+                <div>
+                    <v-row class="ml-0 mr-1" style="background-color:#F5F5F5 ">
+                        <v-col class="col-md-6" v-if="errorIdxUser<10">
+                            {{processing.dataUserError[errorIdxUser].displayName}}
+                        </v-col>
+                            <v-col class="col-md-6" v-if="errorIdxUser<10">
+                            
+                            {{processing.dataUserError[errorIdxUser].email}}
+                        </v-col>
+                    </v-row>
+                    <v-row v-if=" processing.dataUserError.length>10 " class="ml-0 mr-4" style="background-color:#F5F5F5 ">
+                        <v-col  class="col-md-4">
+                            ...
+                        </v-col>
+                        <v-col class="col-md-8">
+                            ...
+                        </v-col>
+                    </v-row>
+                </div>
+        </div>
+        <!-- invalid Email -->
+         <v-row v-if="invalidEmail.length>0" class="ml-0" style="color:red"> Lỗi email không đúng định dạng</v-row>
+           <v-row v-if="invalidEmail.length>0" style="background-color:#F5F5F5; height: 30px" class="ml-0 mr-5">
+                <v-col class="col-md-12"  >
+                    Email
+                </v-col>
+            </v-row>
+           <div v-if="invalidEmail.length>0" class="ml-0 mr-4" v-for="(error, errorIdxUser) in invalidEmail" :key="errorIdxUser"  >
+                        <!-- xử lý trường hợp không đúng định dạng dữ liệu -->
+                <div>
+                    <v-row class="ml-0 mr-1" style="background-color:#F5F5F5 ">
+                            <v-col class="col-md-12" v-if="errorIdxUser<10">
+                            
+                            {{processing.dataUserError[errorIdxUser].email}}
+                        </v-col>
+                    </v-row>
+                    <v-row v-if=" processing.dataUserError.length>10 " class="ml-0 mr-4" style="background-color:#F5F5F5 ">
+                        <v-col  class="col-md-4">
+                            ...
+                        </v-col>
+                        <v-col class="col-md-8">
+                            ...
+                        </v-col>
+                    </v-row>
+                </div>
+        </div>
+        <!-- invalidPass -->
+         <v-row v-if="invalidPass.length>0" class="ml-0" style="color:red"> Lỗi mật khẩu không đúng định dạng </v-row>
+         <v-row v-if="invalidPass.length>0" class="fs-12 ml-0 mr-3" style="color:grey">(Mật khẩu gồm tối thiểu 8 ký tự, 1 chữ cái thường, 1 chữ cái hoa và số)
+        </v-row>
+           <v-row v-if="invalidPass.length>0" style="background-color:#F5F5F5; height: 30px" class="ml-0 mr-5">
+                <v-col class="col-md-12">
+                   Password
+                </v-col>
+            </v-row>
+           <div v-if="invalidPass.length>0" class="ml-0 mr-4" v-for="(error, errorIdxUser) in invalidPass" :key="errorIdxUser"  >
+                        <!-- xử lý trường hợp không đúng định dạng dữ liệu -->
+                <div>
+                    <v-row class="ml-0 mr-1" style="background-color:#F5F5F5 ">
+                            <v-col class="col-md-6" v-if="errorIdxUser<10">
+                            
+                            {{processing.dataUserError[errorIdxUser].password}}
+                        </v-col>
+                    </v-row>
+                    <v-row v-if=" processing.dataUserError.length>10 " class="ml-0 mr-4" style="background-color:#F5F5F5 ">
+                        <v-col  class="col-md-4">
+                            ...
+                        </v-col>
+                        <v-col class="col-md-8">
+                            ...
+                        </v-col>
+                    </v-row>
+                </div>
+        </div>
+        </v-list>
     </div>
 </template>
 
@@ -173,6 +267,18 @@ export default {
     },
     props:['fileName','setInterval','importFile'],
     methods: {
+        stopImport(){
+             importApi.cancelImport(this.fileName)
+              .then(res => {
+                    if (res.status === 200) {
+                         this.$snotify({
+                            type: "success",
+                            title: res.message
+                    });  
+                        }
+                    })
+                   .catch(console.log);
+        },
         getPercentage(process, total){
             let result = (process/total).toFixed(4)*1000/10;
             result = String(result);
@@ -200,7 +306,10 @@ export default {
                     }
                 }else{
                      clearInterval(this.loopCheckProcess); 
-                     this.$emit("error",'Tên sheet trùng nhau');
+                     this.$snotify({
+                        type: "error",
+                        title: res.message
+                    });  
                 }
             })
             .catch(err => {
@@ -216,6 +325,7 @@ export default {
     watch: {
         newImport(val) {
             if (val) {
+                
                 this.processing = {
                     preprocessing: {
                     processed: 0,
@@ -231,6 +341,7 @@ export default {
                         processed: 0
                     },      
                 };
+
                 clearInterval(this.loopCheckProcess);
             }
         },
@@ -239,7 +350,21 @@ export default {
                 clearInterval(this.loopCheckProcess)
            };
            if(this.processing.importing.processed/this.processing.importing.total==1){
-                setTimeout(()=>this.$emit('showNotification'), 1000);
+               if(this.objType=="document"){
+                     setTimeout(()=>this.$emit('showNotification'), 1000);
+               }
+               else{
+                   if(this.processing.dataUserError.length>0){
+                       this.existEmail = this.processing.dataUserError.filter(x=>x.result=='Email already exist');
+                       this.invalidEmail= this.processing.dataUserError.filter(x=>x.result=='Email invalid');
+                       this.invalidPass = this.processing.dataUserError.filter(x=>x.result=='Password invalid');
+                        setTimeout(()=>this.$emit('showNotification'), 1000);
+                       this.showErrorImportUser = ! this.showErrorImportUser;
+                   }else{
+                        setTimeout(()=>this.$emit('showNotification'), 1000);
+                   }
+               }
+
                 clearInterval(this.loopCheckProcess)
            };
            if(this.processing.importing.processed/this.processing.importing.total>1){
@@ -251,6 +376,7 @@ export default {
             if (this.importFile>=0) {
                 const self = this;
                 if(this.setInterval){
+    
                     this.loopCheckProcess = setInterval(()=>{
                             self.getApiProcessingImport();
                     }, 500);
@@ -260,6 +386,10 @@ export default {
     },
     data() {
         return {
+            showErrorImportUser:false,
+            existEmail:[],
+            invalidEmail:[],
+            invalidPass:[],
             processing:{
                 preprocessing: {
                 processed: 0,

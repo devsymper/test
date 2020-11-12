@@ -1,5 +1,5 @@
 <template>
-    <div class="mt-1">
+    <div class="mt-1 symper-form-input">
         <div
             v-for="(inputInfo, name) in allInputs"
             :key="name"
@@ -20,6 +20,13 @@
                 }"
                 v-if="!inputInfo.hidden && (inputInfo.type != 'checkbox' && inputInfo.type != 'switch' ) && !inputInfo.isShowTitle">
                 {{inputInfo.title}}
+                <div v-if="inputInfo.isConfigCustom" style="padding:4px 0;display:flex;">
+                    <span>Chỉ sử dụng 1 kiểu config</span>
+                    <div class="config-action">
+                        <span @click="changeConfigAutoComplete(inputInfo, 'config')" :class="{'active-config-autocomplete':inputInfo.isConfigAutocomplete,'mdi mdi-cog':true}"></span>
+                        <span @click="changeConfigAutoComplete(inputInfo, 'input')" :class="{'active-config-autocomplete':!inputInfo.isConfigAutocomplete,'mdi mdi-function-variant':true}"></span>
+                    </div>
+                </div>
                 <i
                     :class="{'mdi mdi-calendar float-right input-item-func ml-1': true}"
                     :style="{
@@ -34,7 +41,7 @@
                 <i
                     :class="{'mdi mdi-dock-window float-right input-item-func ml-1': true,'active': inputInfo.title == largeFormulaEditor.name, 'd-none':(inputInfo.activeTab && inputInfo.activeTab=='orgchart' )}"
                     @click="openLargeValueEditor(inputInfo, name)"
-                    v-if="inputInfo.type == 'script' || inputInfo.type == 'userAssignment'"
+                    v-if="(!inputInfo.isConfigAutocomplete && inputInfo.type == 'script') || inputInfo.type == 'userAssignment'"
                 ></i>
                 <i
                     :class="{'mdi mdi-function float-right input-item-func': true, 'active':inputInfo.activeTab == 'script'}"
@@ -48,47 +55,58 @@
                     v-if="inputInfo.type == 'userAssignment'"
                 ></i>
             </div>
-            <component
+             
+            <transition name="fade" mode="out-in">
+                <component
+                    @change="(data) => {
+                        handleChangeInputValue(inputInfo, name,data);
+                    }"
+                    @input="(data) => {
+                        handleInputValue(inputInfo, name,data);
+                    }"
+                    @blur="handleInputBlur(inputInfo, name)"
+                    @keyup="(data) => {
+                        handleKeyUpInputValue(inputInfo, name,data);
+                    }"
+                    :ref="'inputItem_'+name"
+                    solo
+                    :items="inputInfo.options"
+                    flat
+                    hide-details
+                    v-if="!inputInfo.hidden && !inputInfo.isConfigAutocomplete"
+                    :style="{
+                        'min-width': inputMinwidth,
+                        'width': alwaysSingleLine[inputInfo.type] ? '100%' : inputWidth,
+                    }"
+                    :id="inputInfo.id ? inputInfo.id : ''"
+                    :class="'sym-small-size sym-style-input d-inline-block '+(inputInfo.classes ? inputInfo.classes : '') "
+                    :key="name"
+                    single-line
+                    :disabled="viewOnly"
+                    v-bind="getInputProps(inputInfo)"
+                    v-model="inputInfo.value"
+                    :append-icon="(inputInfo.appendIcon) ? inputInfo.appendIcon : ''"
+                    @click:append="handleClickAppend"
+                    :is="getInputTag(inputInfo.type)">
+                    <template slot="item" slot-scope="data">
+                        <template>
+                            <div>
+                                <v-icon v-if="data.item.icon">{{data.item.icon}}</v-icon>
+                                <span>{{data.item.text}}</span>
+                            </div>
+                        </template>
+                    </template>
+                </component>
+             </transition>
+             <transition name="fade" mode="out-in">
+                <v-autocomplete-auto
+                :configData="inputInfo.configData"
+                :instance="instance"
                 @change="(data) => {
                     handleChangeInputValue(inputInfo, name,data);
                 }"
-                @input="(data) => {
-                    handleInputValue(inputInfo, name,data);
-                }"
-                @blur="handleInputBlur(inputInfo, name)"
-                @keyup="(data) => {
-                    handleKeyUpInputValue(inputInfo, name,data);
-                }"
-                :ref="'inputItem_'+name"
-                solo
-                :items="inputInfo.options"
-                flat
-                hide-details
-                v-if="!inputInfo.hidden"
-                :style="{
-                    'min-width': inputMinwidth,
-                    'width': alwaysSingleLine[inputInfo.type] ? '100%' : inputWidth,
-                }"
-                :id="inputInfo.id ? inputInfo.id : ''"
-                :class="'sym-small-size sym-style-input d-inline-block '+(inputInfo.classes ? inputInfo.classes : '') "
-                :key="name"
-                single-line
-                :disabled="viewOnly"
-                v-bind="getInputProps(inputInfo)"
-                v-model="inputInfo.value"
-                :append-icon="(inputInfo.appendIcon) ? inputInfo.appendIcon : ''"
-                @click:append="handleClickAppend"
-                :is="getInputTag(inputInfo.type)">
-                <template slot="item" slot-scope="data">
-                    <template>
-                        <div>
-                            <v-icon v-if="data.item.icon">{{data.item.icon}}</v-icon>
-                            <span>{{data.item.text}}</span>
-                        </div>
-                    </template>
-                </template>
-            </component>
-
+                 v-if="inputInfo.isConfigCustom && inputInfo.isConfigAutocomplete"/>
+             </transition>
             <div class="error-message" v-if="inputInfo.validateStatus && !inputInfo.validateStatus.isValid">
                 {{inputInfo.validateStatus.message}}
             </div>
@@ -98,7 +116,19 @@
             :showPanel="largeFormulaEditor.open"
             :actionTitle="largeFormulaEditor.data.title"
             :panelData="largeFormulaEditor.data"
+            :dragPanelWidth="dragPanelWidth"
+            :dragPanelHeight="dragPanelHeight"
             ref="dragPanel">
+            <template slot="panel-action">
+                <v-icon
+                    v-if="isDebugMode && !isShowDebugMode"
+                    @click="showDebugMode"
+                >mdi-bug-outline</v-icon>
+                <v-icon
+                    v-if="isShowDebugMode"
+                    @click="debug"
+                >mdi-play-outline</v-icon>
+            </template>
             <template slot="drag-panel-content" slot-scope="{panelData}">
                 <orgchart-selector
                     @input="translateOrgchartValuesToTags"
@@ -119,7 +149,8 @@
                     v-model="panelData.value"
                     ref="edtFormula"
                     :width="'100%'"
-                    :height="'370px'"
+                    :height="isShowDebugMode ? '250px' : '365px'"
+                    :isDebugView="true"
                 ></formula-editor>
             </template>
         </symper-drag-panel>
@@ -139,6 +170,8 @@ import {
     VTextarea
 } from "vuetify/lib";
 import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl.vue";
+import LinkConfig from "./../../views/document/sideright/items/LinkConfig.vue";
+import FormAutoComplete from "./../../views/document/sideright/items/FormAutoComplete";
 import FormulaEditor from "./../formula/editor/FormulaEditor";
 import DateFormat from "./../common/DateFormat";
 import NumberFormat from "./../common/NumberFormat";
@@ -150,6 +183,7 @@ import DateTimePicker from './../common/DateTimePicker.vue';
 import SymperListOrdering from "./../common/symperInputs/SymperListOrdering";
 import SymperListAutocomplete from "./../common/symperInputs/SymperListAutocomplete";
 import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicker.vue";
+import SymperDefaultControlDocument from "@/components/common/symperInputs/SymperDefaultControlDocument.vue";
 
 const inputTypeConfigs = {
     numeric: {
@@ -215,17 +249,28 @@ const inputTypeConfigs = {
         tag: "v-tree-validate",
         props(config) {
             return {
-                label: config.title
+                label: config.title,
             };
         }
     },
+  
+    linkConfig: {
+        tag: "s-link-config",
+        props(config) {
+            return {
+                label: config.title,
+                dataConfig:config.configData
+            };
+        }
+    },
+  
     script: {
         tag: "formula-editor",
         props(config) {
             return {
                 simpleMode: true,
                 width: "100%",
-                height: "80px",
+                height: (config.style && config.style.height) ? config.style.height : '80px',
                 formulaValue: config.value
             };
         }
@@ -247,10 +292,16 @@ const inputTypeConfigs = {
                 columns: config.columns,
                 data: config.value,
                 multipleSelection: config.multipleSelection,
-                showId: config.hasOwnProperty('showId') ? config.showId : true
+                showId: config.hasOwnProperty('showId') ? config.showId : true,
+                isSelectionChip:(config.isSelectionChip == false) ? false : true,
+                value: config.value
+                
             };
             if(config.onSearch){
                 props.onSearch  = config.onSearch;
+            }
+            if(config.properties){
+                props.properties = config.properties
             }
 
             if(config.textKey){
@@ -302,8 +353,17 @@ const inputTypeConfigs = {
             }
         }
     },
+    defaultControlDocument:{
+        tag:"default-control-document",
+        props(config){
+            return{
+                docId: config.docId
+            }
+        }
+    }
 };
 export default {
+    name:"formTpl",
     created(){
         this.setActiveTabForUserAssignment();
     },
@@ -329,10 +389,53 @@ export default {
                 open: false, // có mở largeFormulaEditor hay ko
                 data: {}, // Dữ liệu của input cần mở lên để edit trong khung lớn,
             },
-            currentPointer:{left:'35px',top:'0'}
+            currentPointer:{left:'35px',top:'0'},
+            dragPanelWidth:500,
+            isShowDebugMode:false,
+            isDebugMode:true,
+            dragPanelHeight:400
         };
     },
     methods: {
+        /**
+         * hoangnd:
+         * Hàm chuyển giữa 2 kiểu config của autocomplete tự động
+         */
+        changeConfigAutoComplete(input, type){
+            if(!input.isConfigAutocomplete && type == 'config'){
+                input.isConfigAutocomplete = true;
+            }
+            if(input.isConfigAutocomplete && type == 'input'){
+                input.isConfigAutocomplete = false;   
+            }
+        },
+        /**
+         * hoangnd
+         * Hàm mở sang chế độ debug để kiểm tra công thức
+         * (syntax, query...)
+         */
+        showDebugMode(){
+            this.isShowDebugMode = true;
+            this.dragPanelWidth = 900;
+            this.dragPanelHeight = 700;
+            this.$refs.edtFormula.toggleDebugView();
+        },
+        /**
+         * hoangnd
+         * Ẩn chế độ debug
+         */
+        hideDebugMode(){
+            this.isShowDebugMode = false;
+            this.dragPanelWidth = 500;
+            this.dragPanelHeight = 400;
+            this.$refs.edtFormula.toggleDebugView();
+        },
+        /**
+         * Hàm thực thi query khi ấn debug
+         */
+        debug(){
+            this.$refs.edtFormula.executeFormulas();
+        },
         setActiveTabForUserAssignment(){
             if(!this.markAllInputChangeByInternal){
                 for(let inputName in this.allInputs){
@@ -347,7 +450,7 @@ export default {
             this.$emit('append-icon-click');
         },
         handleLargeFormulaEditorBlur(){
-            this.hideDragPanel();
+            // this.hideDragPanel();
             let name = this.largeFormulaEditor.name;
             let inputInfo = this.allInputs[name];
             this.handleInputBlur(inputInfo, name);
@@ -417,6 +520,9 @@ export default {
             }, 50, this);
         },
         closeLargeFormulaEditor() {
+            if(this.isShowDebugMode){
+                this.hideDebugMode();
+            }
             let info = this.largeFormulaEditor;
             setTimeout((self) => {
                 self.largeFormulaEditor.name = '';
@@ -526,6 +632,9 @@ export default {
         viewOnly: {
             type: Boolean,
             default: false
+        },
+        instance:{
+            type:Number
         }
     },
     computed: {
@@ -553,6 +662,8 @@ export default {
         VSwitch,
         VTextarea,
         "v-tree-validate": TreeValidate,
+        "s-link-config": LinkConfig,
+        "v-autocomplete-auto": FormAutoComplete,
         FormulaEditor,
         DataTable,
         "date-format":DateFormat,
@@ -563,7 +674,8 @@ export default {
         SymperListOrdering: SymperListOrdering,
         SymperListAutocomplete,
         "datetime-picker" : DateTimePicker,
-        SymperColorPicker: SymperColorPicker
+        SymperColorPicker: SymperColorPicker,
+        "default-control-document":SymperDefaultControlDocument
 
     }
 };
@@ -586,5 +698,26 @@ export default {
         color: red;
         text-align: right;
         margin-top: 2px;
+    }
+    .config-action{
+        margin-left: auto;
+        margin-right: 4px;
+        margin-bottom: 2px;
+        font-size: 14px;
+    }
+    .config-action .mdi{
+        border-radius: 3px;
+        padding: 2px;
+        cursor: pointer;
+        margin-left: 2px;
+    }
+    .active-config-autocomplete{
+        background: var(--symper-background-active);
+    }
+    .fade-enter-active, .fade-leave-active {
+        transition: opacity .5s;
+    }
+    .fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+        opacity: 0;
     }
 </style>

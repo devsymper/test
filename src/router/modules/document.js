@@ -13,6 +13,18 @@ export default [
             import ('../../views/document/trash/ShowListTrash.vue'),
     },
     {
+        path: "/documents/delete-history",
+        name: "documentHistory",
+        component: () =>
+            import ('../../views/document/trash/History.vue'),
+    },
+    {
+        path: "/documents/delete-history/objects",
+        name: "documentObjectHistory",
+        component: () =>
+            import ('../../views/document/trash/ListObjectDeleted.vue'),
+    },
+    {
         path: "/documents/:id?/print-config",
         name: "prinConfigDocument",
         component: () =>
@@ -41,6 +53,13 @@ export default [
     {
         path: "/documents/:id?/editor/clone",
         name: "cloneDocument",
+        component: () =>
+            import ('../../views/document/Editor.vue'),
+
+    },
+    {
+        path: "/documents/control-template/:id?",
+        name: "editControlTemplate",
         component: () =>
             import ('../../views/document/Editor.vue'),
 

@@ -1,3 +1,4 @@
+
 <template>
 	<div class="symper-upload-file">
 		<v-btn icon
@@ -145,7 +146,7 @@ export default {
 					formData.append('file',this.selectedFile)
 					this.formDatas = formData;
 					this.$emit('selected-file', window.URL.createObjectURL(e.target.files[0]))
-					if(this.autoUpload == true){
+					if(this.autoUpload ){
 						this.uploadFile()
 					}
 				}

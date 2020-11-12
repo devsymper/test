@@ -27,13 +27,15 @@ export default {
         if(ids){
             for(let idUser of ids){
                 if(!isNaN(idUser)){
-
                     let user = mapIdToUser[idUser];
-                    users.push({
-                        id: user.id,
-                        avatar: user.avatar ? user.avatar :  avatarDefault,
-                        fullName: user.displayName
-                    });
+                    if(user){
+                        users.push({
+                            id: user.id,
+                            avatar: user.avatar ? user.avatar :  avatarDefault,
+                            fullName: user.displayName
+                        });
+                    }
+                    
                 }
             }
         }

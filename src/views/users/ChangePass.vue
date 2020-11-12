@@ -1,16 +1,22 @@
 <template>
     <div class="h-100">
-        <h3 class="header-title" >{{$t('user.passwordSetting.title')}}</h3>
-        
+        <h3 class="header-title" >{{$t('user.passwordSetting.title')}}
+            <div style="width:15px; float:right">
+                <i class='mdi mdi-close' @click="close()"></i>
+            </div>
+        </h3>
         <div class=" ml-3 content-edit-pass">
-            <h4 class="mt-2">{{$t('user.passwordSetting.changePassword.title')}}</h4>
-			<v-checkbox dense class="sym-small-size mt-2 pl-3" v-model="checkChangePassword" @click="changePassword = !changePassword" :label="$t('user.passwordSetting.changePassword.title')"></v-checkbox>
-
+            <h4 class="mt-2">{{$t('user.passwordSetting.changePassword.title')}}
+            </h4>
+			<v-checkbox style="width:200px" dense class="sym-small-size mt-2 pl-3" 
+                v-model="checkChangePassword" 
+                @click="changePassword = !changePassword" 
+                :label="$t('user.passwordSetting.changePassword.title')"></v-checkbox>
             <v-row>
-                <v-col cols="3">
+                <v-col cols="6">
                     <v-subheader class="fs-13">{{$t('user.passwordSetting.changePassword.newPass')}}</v-subheader>
                 </v-col>
-                <v-col cols="5">
+                <v-col cols="6">
                     <v-text-field
                         class="fs-13"
                         v-model="newPassword"
@@ -24,11 +30,11 @@
                     ></v-text-field>
                 </v-col>
             </v-row>
-            <v-row>
-                <v-col cols="3">
+            <v-row style="margin-top:-20px">
+                <v-col cols="6">
                     <v-subheader class="fs-13">{{$t('user.passwordSetting.changePassword.reNewPass')}}</v-subheader>
                 </v-col>
-                <v-col cols="5">
+                <v-col cols="6">
                     <v-text-field
                         class="fs-13"
                         v-model="reNewPassword"
@@ -42,11 +48,16 @@
                     ></v-text-field>
                 </v-col>
             </v-row>
-
             <h4 class="mt-2 mb-4">{{$t('user.passwordSetting.configChange.title')}}</h4>
-			<v-checkbox dense class="sym-small-size mt-2 pl-3" v-model="checkChangeDuedate" @click="changeDuedate = !changeDuedate" :label="$t('user.passwordSetting.configChange.checkChange')"></v-checkbox>
+			<v-checkbox 
+                dense 
+                style="width:200px"
+                class="sym-small-size mt-2 pl-3" 
+                v-model="checkChangeDuedate" 
+                @click="changeDuedate = !changeDuedate" 
+                :label="$t('user.passwordSetting.configChange.checkChange')">
+            </v-checkbox>
             <label class="title__a">{{$t('user.passwordSetting.configChange.lblSelectTime')}}</label>
-                
             <v-text-field
                 ref="dueDate"
                 class="dueDate fs-13"
@@ -56,7 +67,6 @@
                 :rules="[rules.required]"
                 dense
             ></v-text-field>
-            
             <v-select
                 v-model="typeDueDate"
                 return-object
@@ -71,14 +81,12 @@
                     {name:$t('user.passwordSetting.configChange.year'),type:'year'}
                     ]"
             ></v-select>
-
         </div>
         <v-btn
             class="float-right btn-update"
             :loading="loading"
             :disabled="loading"
             @click="loader = 'loading'">
-
             {{$t('common.update')}}
         </v-btn>
     </div>
@@ -86,12 +94,7 @@
 <script>
 import { userApi } from "./../../api/user.js";
 export default {
-    props:{
-        user:{
-            type: Object,
-            default : {id:0}
-        }
-    },
+    props:['user','resetPass','id'],
     data(){
         return {
             changePassword:false,
@@ -107,7 +110,8 @@ export default {
 				required: value => !!value || 'Không được bỏ trống.',
 				min: v => (typeof v != 'undefined' && v != undefined && v.length >= 8) || 'Yêu cầu mật khẩu lớn hơn 8 kí tự',
                 max: v => (typeof v != 'undefined' && v != undefined && v.length < 25) || 'Yêu cầu mật khẩu ít hơn 24 kí tự',
-                match: v => (v == this.reNewPassword) || "Mật khẩu không khớp",
+                match: v => (v == this.newPassword) || "Mật khẩu không khớp",
+               
             },
             typeDueDate:{name:'tháng',type:'month'},
             dueDate:'',
@@ -121,6 +125,9 @@ export default {
        
     },
     methods:{
+        close(){
+			this.$emit('close-panel')
+		},
         getTypeDueData(){
             let props = this.user.passwordProps;
             let passwordProps = JSON.parse(props);
@@ -130,6 +137,7 @@ export default {
             this.changeDuedate = this.checkChangeDuedate;
         },
         submit(){
+           
             let data = {id:this.user.id};
             this.passProps.dueDate = {};
             this.passProps.dueDate['active'] = (this.checkChangeDuedate) ? 1 : 0;
@@ -144,14 +152,28 @@ export default {
 				if (res.status == 200) {
                     this.loader = "";
                     this.loading = false;
-				}
+                    this.$snotify({
+					type: "success",
+                    title:  this.$t("notification.changePass")+" "+ this.$t("notification.successTitle")});
+                    this.rules.required = "";
+				}else{
+                    this.$snotify({
+					type: "error",
+					title: this.$t("notification.changePass")+" "+ this.$t("notification.error")});
+                }
 			})
 			.catch(err => {
 				console.log("error from change pass user api!!!", err);
 			})
 			.always(() => {
 
-			});
+            });
+            //reset pass
+            this.newPassword='';
+            this.reNewPassword="";
+            this.checkChangePassword=false;
+          
+           
         },
         validateForm(){
             let isValid = true;
@@ -180,16 +202,26 @@ export default {
     watch:{
         loader () {
             if(this.loader == 'loading'){
-                this.loading = true;
                 this.validateForm();
             }
-            
+        },
+        resetPass(){
+            this.rules.required = '';
+            this.newPassword = '';
+			this.reNewPassword = "";
+			this.checkChangePassword = false;
         },
         user(){
             this.getTypeDueData();
+        },
+        dueDate(){
+            if(Number.isInteger(Number(this.dueDate))==false||Number(this.dueDate)==false||Number(this.dueDate)<1){
+                this.rules.required = "Giá trị không hợp lệ";
+            }else{
+                 this.rules.required = "";
+            }
         }
     }
-   
 }
 </script>
 <style scoped>
@@ -229,4 +261,13 @@ export default {
     .title__b{
         padding-left: 4px;
     }
+    .error--text{
+        color:black
+    }
+    .v-messages__message {
+        color: red
+    }
+    .v-application .error--text {
+        color:black}
+   
 </style>
