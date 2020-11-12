@@ -17,6 +17,7 @@
 			<v-btn 
 				class="mr-2 font-normal fs-13"
 				depressed
+				@click="showSyncHistory"
 			>
 				Lịch sử đồng bộ
 			</v-btn>
@@ -78,6 +79,11 @@ export default {
 		cancelAdd(){
 			this.showDialogAddItem = false
 		},
+		showSyncHistory(){
+			this.$goToPage(
+				"environment-sync-history", "Lịch sử đồng bộ"
+			)
+		}
 	}
 }
 </script>
