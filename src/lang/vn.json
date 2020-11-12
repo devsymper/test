@@ -449,11 +449,12 @@
             "edit": "sửa",
             "submit": "hiển thị",
             "list": "danh sách",
-            "list_trash": "danh sách nháp",
-            "list_instance": "danh sách bản ghi",
+            "delete": "xóa",
+            "list_trash": "d.ách nháp",
+            "list_instance": "d.sách bản ghi",
             "deploy": "triển khai",
             "drop": "xóa",
-            "start_instance": "bắt đầu quy trình"
+            "start_instance": "bắt đầu"
         },
         "icon": {
             "document_instance": "mdi mdi-file-document-outline",
