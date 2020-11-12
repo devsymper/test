@@ -337,6 +337,9 @@ export default {
         },
         baInfo(){
             return this.$store.state.app.baInfo
+        },
+        currentRowChangePivotMode(){
+            return this.$store.state.document.submit[this.keyInstance].currentRowChangePivotMode
         }
     },
     data() {
@@ -893,11 +896,29 @@ export default {
     methods: {
         afterBlurInputPivot(event){
             $(event.target).css({display:'none'});
+            this.updateDataAfterChangePivot();
+
         },
         afterKeyupInputPivot(event){
             if(event.which == 13){
                 $(event.target).css({display:'none'});
+                this.updateDataAfterChangePivot();
+                
             }
+        },
+        updateDataAfterChangePivot(){
+            let currentRowChangePivotMode = this.currentRowChangePivotMode;
+            let keyChange = currentRowChangePivotMode.key;
+            let value = currentRowChangePivotMode.value;
+            let tableName = currentRowChangePivotMode.tableName;
+            let tableIns = getControlInstanceFromStore(this.keyInstance, tableName);
+            if(value.s_table_id_sql_lite){  // edit dòng đã có
+
+            }
+            else{   // thêm dòng mới cho table thường
+                this.updateToTableNomalData(tableName, {}, value)
+            }
+
         },
         beforeAddPivotData(data){
             let tableName = data.tableName;
@@ -913,21 +934,29 @@ export default {
                 let cell = dataColPivot[index];
                 rowData[cell.controlName] = cell.selected
             }
+            this.updateToTableNomalData(tableName,{},rowData)
+            this.$refs.popupPivotTableView.hide();
+        },
+        updateToTableNomalData(tableName, oldData = {}, newData = {}){
             let tableControl = getControlInstanceFromStore(this.keyInstance,tableName);
             let hotTb = tableControl.tableInstance.tableInstance;
             let allData = hotTb.getSourceData();
-            for (let index = 0; index < allData.length; index++) {
-                let row = allData[index];
-                delete allData[index].s_table_id_sql_lite;
+            if(Object.keys(oldData).length > 0){
+                
             }
-            for (let control in allData[0]) {
-                if(!rowData[control]){
-                    rowData[control] = ""
+            else{
+                for (let index = 0; index < allData.length; index++) {
+                    delete allData[index].s_table_id_sql_lite;
                 }
+                for (let control in allData[0]) {
+                    if(!newData[control]){
+                        newData[control] = "";
+                    }
+                }
+                allData.push(newData);
+                tableControl.tableInstance.setData(allData);
             }
-            allData.push(rowData);
-            tableControl.tableInstance.setData(allData);
-            this.$refs.popupPivotTableView.hide();
+            
         },
         /**
          * Hàm ẩn loader

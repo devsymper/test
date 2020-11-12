@@ -4,6 +4,7 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-alpine.css';
+import store from './../../../store'
 
 window.addNewDataPivotTable = function(el, event, type){
     let tableName = $(el).attr('table-name');
@@ -18,11 +19,12 @@ export default class PivotTable {
         this.controlObj = control;
         this.tableName = tableName;
         this.tableControlId = controlId
-        this.keyInstance = keyInstance;
+        this.instance = keyInstance;
         this.gridOptions = null;
         this.pivotConfig = pivotConfig;
         this.tableContainer = null;
         this.columnDefs = [];
+        let thisObj = this;
     }
     /**
      * hoangnd
@@ -110,6 +112,7 @@ export default class PivotTable {
             suppressAggFuncInHeader: true,
             onCellDoubleClicked: this.onCellDoubleClick,
             onCellClicked: this.onCellClick,
+            tableIns:this
         };
         this.tableContainer = $(`<div id="ag-` + this.controlObj.id + `" style="height: 0px; width: auto;position:relative;" class="ag-theme-alpine" s-control-type="table">
         
@@ -146,22 +149,47 @@ export default class PivotTable {
             return 25;
         }
     }
-    onCellClick(row){
-        console.log("sadsadsad",row);
-        console.log("sadsadsad",row.api.getSelectedNodes());
-    }
 
     onCellDoubleClick(row){
         let column = row.colDef;
         let columnNameSelected = column.otherName;
         let pivotKeys = column.pivotKeys;
-        debugger
-        let cellEl = $(row.event.target).closest('.ag-cell');
-        let offset = cellEl.offset();
+        if(row.node.level == 1){
+            let rowData = util.cloneDeep(row.node.childrenMapped[Object.keys(row.node.childrenMapped)[0]][0].data);
+            let controlName = "";
+            if(columnNameSelected && pivotKeys){
+                let cols = this.tableIns.pivotConfig.cols;
+                controlName = columnNameSelected;
+                let key = cols[0].name;
+                if(rowData[key] != pivotKeys[0]){   //tao dong moi
+                    rowData[key] = pivotKeys[0];
+                    let rows = this.tableIns.pivotConfig.rows;
+                    let newRowData = {}
+                    for (let index = 0; index < rows.length; index++) {
+                        let row = rows[index];
+                        let colName = row['name'];
+                        newRowData[colName] = rowData[colName];
+                    }
+                    rowData = newRowData;
+                }
+            }
+            else {
+                let rows = this.tableIns.pivotConfig.rows;
+                controlName = rows[1].name;
+            }
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentRowChangePivotMode',
+                value: {key:controlName,value:rowData,tableName:this.tableIns.tableName},
+                instance: this.tableIns.instance
+            });
+        }
+        if(row.node.level > 0 || (row.node.level == 0 && row.value)){
+            let cellEl = $(row.event.target).closest('.ag-cell');
+            let offset = cellEl.offset();
+            $('.input-pivot').val(cellEl.text());
+            $('.input-pivot').css({display:'block',top:offset.top,left:offset.left,width:cellEl.outerWidth()}).focus();
+        }
         
-
-        $('.input-pivot').val(cellEl.text());
-        $('.input-pivot').css({display:'block',top:offset.top,left:offset.left,width:cellEl.outerWidth()}).focus();
     }
     /**
      * hoangnd
