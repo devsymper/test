@@ -142,7 +142,8 @@
             "listTrashOrgchart": "List trash orgchart",
 			"viewOrgchart": "View orgchart default",
 			"list_workflow":"List Workflow",
-			"list_work":"List Jobs"
+			"list_work":"List Jobs",
+            "environment": "Environment management"
         },
         "system": "System",
         "copy": "Copy"

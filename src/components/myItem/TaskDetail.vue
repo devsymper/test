@@ -119,8 +119,10 @@ import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../compone
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
 import { appManagementApi } from '@/api/AppManagement';
+import { extractTaskInfoFromObject, addMoreInfoToTask } from '@/components/process/processAction';
 
 import VueClipboard from 'vue-clipboard2';
+import { util } from '../../plugins/util';
 
 
 Vue.use(VueClipboard)
@@ -166,6 +168,10 @@ export default {
         appId:{
             type:String,
             default:''
+        },
+        reload:{
+            type:Boolean,
+            default: true
         }
     },
     watch: {
@@ -337,7 +343,7 @@ export default {
         changeTaskDetailInfo(taskId){
             let hostname=window.location.hostname;
             let copyText = this.taskInfo.action.parameter.taskId;
-            copyText='https://'+hostname+'/#/myitem/tasks/'+copyText;
+            copyText=util.addEnvToUrl('https://'+hostname+'/#/myitem/tasks/'+copyText);
             this.linkTask=copyText;
 
             if(!taskId){
@@ -474,14 +480,22 @@ export default {
                         }
                         let res = await this.submitTask(taskData);
                         this.saveApprovalHistory(value);
-                        this.$emit('task-submited', res);
+                        if (this.reload) {
+                            this.$emit('task-submited', res);
+                        }else{
+                            this.reloadDetailTask();
+                        }
                     }else if(this.taskAction == '' ||this.taskAction==undefined ||this.taskAction == 'submitAdhocTask'){
                         let taskData = {
                             "action": "complete",
                             "outcome": value,
                         }
                         let res = await this.submitTask(taskData);
-                        this.$emit('task-submited', res);
+                        if (this.reload) {
+                            this.$emit('task-submited', res);
+                        }else{
+                            this.reloadDetailTask();
+                        }
                     }
             }else{
                 this.showDialogAlert=true;
@@ -569,7 +583,9 @@ export default {
         },
         async handleTaskSubmited(data){
             if(this.isInitInstance){
-                this.$emit('task-submited', data);            
+                if (this.reload) {
+                    this.$emit('task-submited', data);            
+                }
             }else{
                 let elId = this.taskInfo.action.parameter.activityId;
                 let docId = data.document_id;
@@ -585,7 +601,11 @@ export default {
                     "variables": varsForBackend.vars,
                 }
                 let res =  await this.submitTask(taskData);
-                this.$emit('task-submited', res);
+                if (this.reload) {
+                    this.$emit('task-submited', res);
+                }else{
+                    this.reloadDetailTask();
+                }
             }
         },
         showApprovalOutcomes(approvalActions){
@@ -627,6 +647,30 @@ export default {
                 ]
             }
             self.changeTaskDetailInfo(self.taskInfo.action.parameter.taskId);
+        },
+        async reloadDetailTask(){
+            let self=this;
+            let filter={};
+            filter.taskId=this.originData.id;
+            let res =await BPMNEngine.postTaskHistory(filter);
+            if (res.total>0) {
+                let task=res.data[0];
+                if (task.endTime && task.endTime!=null) {
+                    self.$store.commit("task/setFilter", 'done');
+                }else{
+                    self.$store.commit("task/setFilter", 'notDone');
+                }
+                let taskInfo = extractTaskInfoFromObject(task);
+                task = addMoreInfoToTask(task);
+                task.symperApplicationId=this.appId;
+                let infotTask={};
+                infotTask.taskInfo= taskInfo;
+                infotTask.originData=task;
+                self.$emit("change-info-task",infotTask);
+                // if (task.processInstanceId && task.processInstanceId!=null) {
+                //     await self.getVariablesProcess(task.processInstanceId)
+                // }
+            }
         }
     }
 }

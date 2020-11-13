@@ -250,7 +250,6 @@
 
 <script>
 import { knowledgeApi } from "./../../api/kh.js";
-//import UploadFile from "./../../components/kh/uploadfile";
 import UploadFile from "@/components/common/UploadFile.vue";
 import KHShowImage from "./../../components/kh/KHShowImage";
 import Comment from '@/components/common/comment/Comment.vue';

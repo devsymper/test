@@ -1,6 +1,6 @@
 <template>
     <list-items
-        :getDataUrl="'https://sdocument-management.symper.vn/documents/'+docId+'/draft-objects'"   
+        :getDataUrl="sDocumentManagementUrl+'documents/'+docId+'/draft-objects'"   
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('draft.title')"
@@ -26,6 +26,7 @@ export default {
     },
     data(){
         return {
+            sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
             docId:this.$route.params.id,
             docObjInfo:{},
             actionPanelWidth:800,

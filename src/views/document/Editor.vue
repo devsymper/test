@@ -1983,12 +1983,12 @@ export default {
         async getContentDocument(){
             if(this.documentId != 0){
                 let res = await documentApi.detailDocument(this.documentId);
-                let checkEditting = await this.checkAllowEditDocument(res.data.document);
-                if(checkEditting == false){
-                    return;
-                }
                 if (res.status == 200) {
                     if(this.routeName == "editDocument"){
+                        let checkEditting = await this.checkAllowEditDocument(res.data.document);
+                        if(checkEditting == false){
+                            return;
+                        }
                         this.setDocumentProperties(res.data.document);
                     }
                     let content = res.data.document.content;

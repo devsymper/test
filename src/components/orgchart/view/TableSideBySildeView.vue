@@ -37,6 +37,7 @@
 import ListItems from '@/components/common/ListItems.vue'
 import VueResizable from 'vue-resizable';
 import { util } from "./../../../plugins/util.js";
+import { appConfigs } from '../../../configs.js';
 export default {
     components:{
         ListItems,
@@ -53,7 +54,7 @@ export default {
     data(){
         return {
             listUserInNode: [],
-            apiUrl: 'https://account.symper.vn/users',
+            apiUrl: appConfigs.apiDomain.account + 'users',
             containerHeight:null,
             tableContextMenu: {
                viewDetails: {

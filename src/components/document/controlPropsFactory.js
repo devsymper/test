@@ -133,7 +133,7 @@ const commonProps = {
     formatNumber: {
         title: "Định dạng số",
         type: "numberFormat",
-        value: ".00",
+        value: "#,###",
         groupType: "display"
     },
     // formatDateTime: {
@@ -703,9 +703,9 @@ const controlTypes = {
                         text-align: center;
                         align-items: center;
                         justify-content: center;">
-                            <img style="width:14px;height:14px;margin: 0 4px;" src="https://hoangnd.dev.symper.vn/icon/ic_report.png">
-                            <img style="width:14px;height:14px;margin: 0 4px;" src="https://hoangnd.dev.symper.vn/icon/ic_table.png">
-                            <img style="width:14px;height:14px;margin: 0 4px;" src="https://hoangnd.dev.symper.vn/icon/ic_document_select.png">
+                            <img style="width:14px;height:14px;margin: 0 4px;" src="`+require('./../../../public/img/document/icon/ic_report.png')+`">
+                            <img style="width:14px;height:14px;margin: 0 4px;" src="`+require('./../../../public/img/document/icon/ic_table.png')+`">
+                            <img style="width:14px;height:14px;margin: 0 4px;" src="`+require('./../../../public/img/document/icon/ic_document_select.png')+`">
                         </div>
                     </div>
                 </div>&nbsp;`,

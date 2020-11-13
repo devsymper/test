@@ -316,6 +316,8 @@
                 :taskInfo="selectedTask.taskInfo"
                 :originData="selectedTask.originData"
                 :appId="String(selectedTask.originData.symperApplicationId)"
+                :reload="false"
+                @change-info-task="changeInfoTask"
                 @close-detail="closeDetail"
                 @task-submited="handleTaskSubmited"
                 @changeUpdateAsignee="changeUpdateAsignee"
@@ -374,9 +376,7 @@ export default {
 
                 let date;
                 if ( task.createTime) {
-                    date = task.createTime.split("T")[0];
-                }else{
-                    date = task.endTime.split("T")[0];
+                    date = task.createTime.split(" ")[0];
                 }
                 let fromNow = this.getDateFormNow(date);
                 if (!groups[fromNow]) {
@@ -503,7 +503,7 @@ export default {
                 }
             },
             filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
-            getDataUrl: util.addEnvToUrl("https://workflow-extend.symper.vn/tasks"),
+            getDataUrl: appConfigs.apiDomain.workflowExtend+"tasks",
              /**
              * Thêm điều kiện để quy vấn qua api
              */
@@ -884,6 +884,23 @@ export default {
             }
             this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
         },
+        changeInfoTask(selectedTask){
+            selectedTask.originData.createTime=selectedTask.originData.startTime;
+            this.$set(this.selectedTask, "originData", selectedTask.originData);  
+            this.$set(this.selectedTask, "taskInfo", selectedTask.taskInfo);  
+            for (let i = 0; i < this.groupFlatTasks.length; i++) {
+                for (let j = 0; j < this.groupFlatTasks[i].tasks.length; j++) {
+                    let task=this.groupFlatTasks[i].tasks[j];
+                    if (task.id==selectedTask.originData.id) {
+                        this.groupFlatTasks[i].tasks[j].createTime = selectedTask.originData.startTime;
+                        this.groupFlatTasks[i].tasks[j].endTime = selectedTask.originData.endTime;
+                        this.groupFlatTasks[i].tasks[j].description = selectedTask.originData.description;
+                        return;
+                    }
+                }
+                
+            }
+        }
     }
 };
 </script>

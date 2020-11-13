@@ -44,24 +44,26 @@ export default class TableControl extends Control {
         }
     }
     renderTable() {
-            if (this.isPrintView) {
-                this.ele.attr('table-id', this.ele.attr('id'));
-                this.ele.removeAttr('id');
-                this.ele.find('table').addClass('table-print');
-                this.ele.find('table tbody').empty();
-                this.tablePrint.render();
-            } else {
-                this.tableInstance.render();
-                // this.pivotTable.render();
-                this.ele.detach().hide();
-
+        if (this.isPrintView) {
+            this.ele.attr('table-id', this.ele.attr('id'));
+            this.ele.removeAttr('id');
+            this.ele.find('table').addClass('table-print');
+            this.ele.find('table tbody').empty();
+            this.tablePrint.render();
+        } else {
+            this.tableInstance.render();
+            if(this.pivotTable){
+                this.pivotTable.render();
             }
+            this.ele.detach().hide();
 
         }
-        /**
-         * Hàm set data cho handson table, cho trường hợp viewdetail đã có data
-         * @param {*} data 
-         */
+
+    }
+    /**
+     * Hàm set data cho handson table, cho trường hợp viewdetail đã có data
+     * @param {*} data 
+     */
     setData(data) {
         if (Object.keys(data).length == 0) {
             return;
@@ -75,7 +77,6 @@ export default class TableControl extends Control {
                 })
                 this.tableInstance.tableInstance.render();
             }
-
         }
         if (this.isPrintView) {
             let dataTablePrint = [];
@@ -111,6 +112,9 @@ export default class TableControl extends Control {
             this.ele.find('table tbody').append(bodyHtml);
             this.ele.find('table').attr('contenteditable', 'false')
         } else {
+            if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1){
+                return;
+            }
             let dataTable = [];
             let rowLength = data[Object.keys(data)[0]].length;
             for (let index = 0; index < rowLength; index++) {
