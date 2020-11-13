@@ -44,12 +44,39 @@
 						value="John"
 						color="success"
 					>
-						<template v-slot:label>
+						<template v-slot:label >
 							<div class="d-flex w-100 fs-13">
-								<span class="flex-grow-1">
+								<span class="flex-grow-1" >
 									File management
 								</span>
-								<span>ahihihi</span>
+								 <v-menu
+									:nudge-width="100"
+									bottom
+            						left
+								>
+									<template v-slot:activator="{ on }">
+										<span v-on="on" @click="stopEvent($event)">
+											v-2.0.1
+										</span>
+									</template>
+									<v-list
+											nav
+											dense
+										>
+											<v-list-item-group
+												color="primary"
+												>
+												<v-list-item
+													v-for="(item, i) in 3"
+													:key="i"
+												>
+													<v-list-item-content>
+													<v-list-item-title >version {{item}}</v-list-item-title>
+													</v-list-item-content>
+												</v-list-item>
+											</v-list-item-group>
+									</v-list>
+								</v-menu>
 							</div>
 						</template>
 					</v-checkbox>
@@ -103,6 +130,10 @@ export default {
 	methods:{
 		cancel(){
 			this.$emit('cancel')
+		},
+		stopEvent(event){
+			event.preventDefault()
+			event.stopPropagation()
 		}
 	},
 	data(){

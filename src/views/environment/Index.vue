@@ -38,10 +38,10 @@
 				class="mr-6 ml-6 pr-0 pl-0 fs-13"
 			>
 
-				<v-list-item-content>
-					<v-list-item-title>App-beta.symper.vn</v-list-item-title>
+				<v-list-item-content >
+					<v-list-item-title class="fs-13">App-beta.symper.vn</v-list-item-title>
 
-					<v-list-item-subtitle >
+					<v-list-item-subtitle class="fs-13" >
 						<span>ID : ádhashdhsjd123214</span>
 						<span class="ml-16">
 							Loại môi trường development
@@ -62,15 +62,15 @@
 </template>
 
 <script>
-import AddEnvironmentDialog from "./AddEnvironmentDialog"
+import AddEnvironmentDialog from "./dialogs/AddEnvironmentDialog"
 export default {
 	components:{
-		AddEnvironmentDialog
+		AddEnvironmentDialog,
 	},
 	data(){
 		return {
 			searchKey: "",
-			showDialogAddItem: true
+			showDialogAddItem: false
 		}
 	},
 	methods:{
@@ -90,6 +90,13 @@ export default {
 </script>
 
 <style scoped>
+.environemt-management >>> .v-text-field__slot,
+.environemt-management >>> .v-text-field__slot label{
+	font-size: 13px !important;
+}
+.environemt-management >>> .v-input__append-inner{
+	font-size: 13px !important;
+}
 .environemt-management >>> .v-input__control{
 	width: 30px !important;
 	min-height: unset;
