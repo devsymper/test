@@ -29,6 +29,7 @@ export default {
         import: "mdi mdi-import",
         taskBPM: "mdi-lan",
         task: "mdi-hand-left",
-        role: "mdi mdi-account-circle-outline"
+        role: "mdi mdi-account-circle-outline",
+        time_sheet: "mdi mdi-calendar-month-outline"
     }
 }

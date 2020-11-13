@@ -530,7 +530,7 @@
         "department": "Phòng ban"
     },
     "objectType": {
-
+        "time_sheet": "Lịch làm việc",
         "Document definition": "Văn bản",
         "Document instance": "Danh sách bản ghi",
         "Orgchart": "Sơ đồ tổ chức",
@@ -554,6 +554,7 @@
         "Timesheet": "Thời gian biểu"
     },
     "objects": {
+        "time_sheet": "Lịch làm việc",
         "import": "Import",
         "task": "Task",
         "role": "Role",
