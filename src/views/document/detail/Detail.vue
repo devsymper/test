@@ -308,6 +308,9 @@ export default {
                             else if(this.formSize.type == 'A5'){
                                 contentPrintCss = {'transform':'scale(0.84)','transform-origin':'top left','margin':'auto'}
                             }
+                            if(this.$getRouteName() == 'printMultiple'){
+                                contentPrintCss['transform'] = 'scale(1)'
+                            }
                             Object.assign(this.formSize,contentPrintCss);
                         }
                     }
