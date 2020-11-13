@@ -917,7 +917,6 @@ export default {
             }
             else{   // thêm dòng mới cho table thường
                 value[keyChange] = input.val();
-                debugger
                 this.updateToTableNomalData(tableName, {}, value)
             }
 
@@ -1705,7 +1704,6 @@ export default {
                         else{
                             if(formulas[formulasType].hasOwnProperty('instance')){
                                 let inputControl = formulas[formulasType].instance.inputControl;
-                                // debugger
                                 let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
                                 let inputFromDatasets = formulas[formulasType].instance.inputFromDatasets;
                                 for (let controlEffect in inputControl) {
