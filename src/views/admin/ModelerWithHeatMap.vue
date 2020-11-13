@@ -1,109 +1,13 @@
 <template>
-    <div class="w-100 h-100 modeler-detail-admin">
-        <div class="h-100 w-100">
-			<div class="action-diagram-bpmn d-flex ">
-				<div class="fs-15 flex-grow-1 text-uppercase font-weight-bold mt-2" >Thông tin chi tiết</div>
-				<div class="d-flex mt-1">
-					<v-btn
-						tile 
-						icon
-						x-small
-						class="mr-2"
-						@click="changeTab('tab-1')"
-					>
-						<v-icon small >mdi-numeric-2-box-outline</v-icon>
-					</v-btn>
-					<v-btn
-						tile 
-						icon
-						x-small
-						class="mr-2"
-						@click="changeTab('tab-2')"
-					>
-						<v-icon x-small >mdi-coolant-temperature</v-icon>
-					</v-btn>
-					<v-btn
-						tile 
-						icon
-						x-small
-						class="mr-2"
-						@click="handleZoomOut"
-					>
-						<v-icon  small >mdi-plus-circle-outline</v-icon>
-					</v-btn>
-					<v-btn
-						tile 
-						icon
-						x-small
-						class="mr-2"
-						@click="handleZoomIn"
-					>
-						<v-icon small>mdi-minus-circle-outline</v-icon>
-					</v-btn>
-					<v-btn
-						tile 
-						icon
-						x-small
-						class="mr-2"
-						@click="handleFocus"
-					>
-						<v-icon small>mdi-image-filter-center-focus</v-icon>
-					</v-btn>
-				</div>
-			</div>
-				<symper-bpmn
-					v-show="tab == 'tab-1'"
-					@node-clicked="handleNodeSelected"
-					@node-changed="handleNodeChangeProps"
-					ref="symperBpmn"
-					:height="diagramHeight"
-					:width="600"
-					:diagramXML="diagramXML"
-					:customModules="customRender"
-				></symper-bpmn>
-				<ModelerWithHeatMap 
-				 	v-show="tab == 'tab-2'"
-					:tab="tab"
-				/>
-			<!-- <v-tabs
-			v-model="tab"
-			v-show="false"
-			>
-			</v-tabs>
-			<v-tabs-items v-model="tab">
-				<v-tab-item
-				value='tab-1'
-				>
-					<symper-bpmn
-						@node-clicked="handleNodeSelected"
-						@node-changed="handleNodeChangeProps"
-						ref="symperBpmn"
-						:height="diagramHeight"
-						:width="600"
-						:diagramXML="diagramXML"
-						:customModules="customRender"
-					></symper-bpmn>
-				</v-tab-item>
-				<v-tab-item
-				value='tab-2'
-				>
-				ahihis -->
-					<!-- <symper-bpmn
-						@node-clicked="handleNodeSelected"
-						@node-changed="handleNodeChangeProps"
-						ref="symperBpmn"
-						:height="diagramHeight"
-						:width="600"
-						:diagramXML="diagramXML"
-						:customModules="customRender"
-					></symper-bpmn> -->
-					<!-- <ModelerWithHeatMap v-if="tab == 'tab-2'" /> -->
-				<!-- </v-tab-item>
-			</v-tabs-items> -->
-           
-        </div>
-
-    </div>
+	<div class="h-100 w-100"> 
+		<symper-bpmn
+			ref="symperBpmnHeatMap"
+			:height="diagramHeight"
+			:width="600"
+			:diagramXML="diagramXML"
+			:heatMapMode="true"
+		></symper-bpmn>
+	</div>
 </template>
 
 <script>
@@ -123,26 +27,8 @@ import Api from "@/api/api.js";
 import { appConfigs } from '@/configs';
 import serviceTaskDefinitions from "@/components/process/elementDefinitions/serviceTaskDefinitions";
 import CustomRenderProcessCount from '@/components/process/CustomRenderProcessCount'
-import ModelerWithHeatMap from "./ModelerWithHeatMap"
-
 const apiCaller = new Api('');
-
-const nodeStatusColors = {
-    failed: {
-        fill: "#e24747",
-        stroke: "#fff7f7"
-    },
-    todo: {
-        fill: "#ffffff",
-        stroke: "#0760D9"
-    },
-    done: {
-        fill: "#edffee",
-        stroke: "#4CAF50"
-    },
-  
-};
-
+import h337  from 'heatmap.js';
 // Khung data của từng node cần lưu vào db
 const nodeDataTpl = {
     bounds: {
@@ -183,6 +69,13 @@ const mappNodeActivity={
     ScriptTask :"ScriptTask"
 }
 
+const stats = {
+  'START_PROCESS': 10,
+  'SCAN_QR_CODE': 20,
+  'SCAN_OK': 10,
+  'END_PROCESS': 5
+}
+
 export default {
     methods: {
 		changeTab(data){
@@ -192,15 +85,59 @@ export default {
             this.diagramHeight = window.innerHeight - 400;
 		},
 		handleZoomOut(){
-            this.$refs.symperBpmn.zoomOut();
+            this.$refs.symperBpmnHeatMap.zoomOut();
 		},
 		handleZoomIn(){
-            this.$refs.symperBpmn.zoomIn();
+            this.$refs.symperBpmnHeatMap.zoomIn();
 		},
 		handleFocus(){
-            this.$refs.symperBpmn.focus();
+            this.$refs.symperBpmnHeatMap.focus();
 		},
 		
+
+		/**
+		 * 
+		 */
+
+		plotHeatmap() {
+			let allNodes = this.$refs.symperBpmnHeatMap.getAllNodes()
+			let currentTrackingProcess = this.$store.state.admin.currentTrackingProcess
+			debugger
+			if(currentTrackingProcess){
+				var heatmapInstance = h337.create({
+					container: document.querySelector('.symper-bpm-canvas-heat-map')
+				});
+				var points = [];
+				var max = 0;
+				var width = 600;
+				var height = 300;
+				allNodes.forEach(function(e){
+					if(e.$type == "bpmn:UserTask"){
+						currentTrackingProcess.forEach(function(k){
+							if(k.act_id_ == e.id ){
+								var val = Math.floor(Math.random()*100);
+								var radius = Math.floor(Math.random()*70);
+								let pos = e.di.bounds
+								var point = {
+									x: pos.x + 50,
+									y: pos.y + 40,
+									value: val,
+									radius: 100
+								}
+								points.push(point);
+							}
+						})
+					}
+				})
+				var data = {
+					max: max,
+					data: points
+				};
+				heatmapInstance.setData(data);
+			}
+			
+		},
+
         /**
          * Tìm và đặt các control cho việc lựa chọn cho phép edit trong lúc duyệt
          */
@@ -280,9 +217,9 @@ export default {
                                         text: "Go to element",
                                         icon: "mdi-send-check",
                                         action: (close) => {
-                                            let symperBpmn = self.$refs.symperBpmn;
-                                            let errEl = symperBpmn.getElData(err.activityId)
-                                            symperBpmn.bpmnModeler.get('selection').select(errEl);
+                                            let symperBpmnHeatMap = self.$refs.symperBpmnHeatMap;
+                                            let errEl = symperBpmnHeatMap.getElData(err.activityId)
+                                            symperBpmnHeatMap.bpmnModeler.get('selection').select(errEl);
                                             self.handleNodeSelected(errEl.businessObject);
                                             close();
                                         }
@@ -402,7 +339,7 @@ export default {
             }
 
             // update thuộc tính của panel setting cho phần hiển thị
-            let vizBizEl = this.$refs.symperBpmn.updateElementProperties(modelAttr.id, {
+            let vizBizEl = this.$refs.symperBpmnHeatMap.updateElementProperties(modelAttr.id, {
                 isExecutable: modelAttr.attrs.isexecutable.value
             });
             modelAttr = modelAttr.attrs;
@@ -422,7 +359,7 @@ export default {
          *
          */
         fillNodeData() {
-            let allBNodes = this.$refs.symperBpmn.getAllNodes();
+            let allBNodes = this.$refs.symperBpmnHeatMap.getAllNodes();
             let nodeType = "";
             let allBNodesMap = {};
             let allNodes = this.stateAllElements;
@@ -456,17 +393,17 @@ export default {
             }
         },
         getModelDataForSymperService(){
-            let allVizEls = this.$refs.symperBpmn.getAllNodes(false);
+            let allVizEls = this.$refs.symperBpmnHeatMap.getAllNodes(false);
             let allSymEls = this.stateAllElements;
-            let bpmnModeler = this.$refs.symperBpmn.bpmnModeler;
+            let bpmnModeler = this.$refs.symperBpmnHeatMap.bpmnModeler;
             collectInfoForTaskDescription(allVizEls, allSymEls,  bpmnModeler);
             pushCustomElementsToModel(allVizEls, allSymEls,  bpmnModeler);
             for(let el of allVizEls){
                 if(el.businessObject.$type == 'bpmn:Task'){
-                    this.$refs.symperBpmn.changeTaskNodeToUserTaskNode(el.id);
+                    this.$refs.symperBpmnHeatMap.changeTaskNodeToUserTaskNode(el.id);
                 }
             }
-            let xml = this.$refs.symperBpmn.getXML();
+            let xml = this.$refs.symperBpmnHeatMap.getXML();
             xml = this.standardXMLToSave(xml);
             let jsonConfig = {};
             for(let elName in allSymEls){
@@ -586,7 +523,7 @@ export default {
              * Một số quy tắc lưu của flowable:
              * 1. Tất cả các mũi tên (sequence flow) đều thuộc childShapes của BPMNDiagram chứ ko thuộc về thằng cha của mũi tên đó
              */
-            let allBNodes = this.$refs.symperBpmn.getAllNodes();
+            let allBNodes = this.$refs.symperBpmnHeatMap.getAllNodes();
 
             let di; // object chứa thông tin của diagram
             let nodeType = "";
@@ -770,7 +707,7 @@ export default {
             };
         },
         addBPMNLoopAttr(props, idNode){
-            let vizNodeData = this.$refs.symperBpmn.getElData(idNode);
+            let vizNodeData = this.$refs.symperBpmnHeatMap.getElData(idNode);
             if(vizNodeData){
                 let bizData = vizNodeData.businessObject;
                 if(bizData.hasOwnProperty('loopCharacteristics')){
@@ -968,7 +905,7 @@ export default {
             if (reApplyToView[name]) {
                 let applyValue = {};
                 applyValue[reApplyToView[name]] = inputInfo.value;
-                this.$refs.symperBpmn.updateElementProperties(
+                this.$refs.symperBpmnHeatMap.updateElementProperties(
                     this.selectingNode.id,
                     applyValue
                 );
@@ -1120,7 +1057,7 @@ export default {
         },
         setFlowsOrderForGateway(nodeData){
             let outFlows = [];
-            let bizNodeData = this.$refs.symperBpmn.getElData(nodeData.id).businessObject;
+            let bizNodeData = this.$refs.symperBpmnHeatMap.getElData(nodeData.id).businessObject;
             let diOutFlowsMap = {};
             let needUpdate = false;
             let dataFlows = nodeData.attrs.sequencefloworder.value;
@@ -1162,7 +1099,7 @@ export default {
          * // tham số object để check trường hợp là services task thì sẽ tìm cả node duyệt và node submit
          */
         setTaskActionableNodes(nodeData, attrName = 'approvalForElement',object=''){ 
-            let allEls = this.$refs.symperBpmn.getAllNodes();
+            let allEls = this.$refs.symperBpmnHeatMap.getAllNodes();
             let currBizNode = {};
             let submitTasks = [];
 
@@ -1230,7 +1167,7 @@ export default {
             
 
             for(let id in currBizNode.symper_link_prev){
-                let prevNode = this.$refs.symperBpmn.getElData(id);
+                let prevNode = this.$refs.symperBpmnHeatMap.getElData(id);
                 this.findSubmitTasksFromNode(result, prevNode.businessObject, searchedNodeMap,object);                
                 searchedNodeMap[id] = true;
             }
@@ -1247,7 +1184,7 @@ export default {
                     self.$snotifySuccess("Validation passed");
                 });
             } else {
-                this.$refs.symperBpmn[ac]();
+                this.$refs.symperBpmnHeatMap[ac]();
             }
         },
         cleanXMLBeforeRender(xml){
@@ -1262,10 +1199,12 @@ export default {
                 let modelData = await bpmnApi.getModelData(idProcess);
                 modelData = modelData.data;
                 let xml = this.cleanXMLBeforeRender(modelData.content);
-                let afterRender = await this.$refs.symperBpmn.renderFromXML(xml);
+                let afterRender = await this.$refs.symperBpmnHeatMap.renderFromXML(xml);
                 if(modelData.configValue){
 					this.restoreAttrValueFromJsonConfig(modelData.configValue);
-					this.$refs.symperBpmn.focus();
+					// this.$refs.symperBpmnHeatMap.focus();
+					this.plotHeatmap()
+
                 }
             } catch (error) {
                 this.$snotifyError(
@@ -1273,12 +1212,11 @@ export default {
                     this.$t("process.editror.err.get_xml")
                 );
             }
-		},
-	
+        },
         restoreAttrValueFromJsonConfig(jsonStr){
 			let processTracking = this.$store.state.admin.currentTrackingProcess
 			let self = this
-			let symBpmn = this.$refs.symperBpmn;
+			let symBpmn = this.$refs.symperBpmnHeatMap;
 			let configValue = JSON.parse(jsonStr);
             this.fillNodeData();
             let gatewayEls = [];
@@ -1412,12 +1350,12 @@ export default {
         // tạo id duy nhất cho workflow, và chính là key của workflow
         createUniqueIdentifyForWorkflow(){
             setTimeout((self) => {
-                let allEls = self.$refs.symperBpmn.getAllNodes();
+                let allEls = self.$refs.symperBpmnHeatMap.getAllNodes();
                 for(let el of allEls){
                     if(el.$type == "bpmn:Process"){
                         let uniqueId = util.str.randomString(6)+'_'+Date.now();
                         uniqueId = uniqueId.toLowerCase();
-                        self.$refs.symperBpmn.updateElementProperties(
+                        self.$refs.symperBpmnHeatMap.updateElementProperties(
                             el.id,
                             {
                                 id: uniqueId
@@ -1430,19 +1368,20 @@ export default {
     },
 
     created() {
-        let self = this;
-        this.instanceKey = Date.now();
-        this.$store.commit(
-            "process/initInstance",
-            this.instanceKey
-        );
-        this.$store.dispatch("app/getAllOrgChartData");
-        this.$store.dispatch("app/getAllUsers");
-        this.$store.dispatch("process/getLastestProcessDefinition");
-		this.$store.dispatch('process/getAllDefinitions');
-		this.applySavedData(this.processId)
+        // let self = this;
+        // this.instanceKey = Date.now();
+        // this.$store.commit(
+        //     "process/initInstance",
+        //     this.instanceKey
+        // );
+        // this.$store.dispatch("app/getAllOrgChartData");
+        // this.$store.dispatch("app/getAllUsers");
+        // this.$store.dispatch("process/getLastestProcessDefinition");
+		// this.$store.dispatch('process/getAllDefinitions');
+		// this.applySavedData(this.processId)
     },
     mounted(){
+		
         this.resetAttrPanelHeight();
         this.calcDiagramHeight();
         let uniqueId = util.str.randomString(6)+'_'+Date.now();
@@ -1454,19 +1393,18 @@ export default {
     },
     data() {
         return {
-			tab:'tab-1',
             instanceKey: null, // key của instance hiện tại
             attrPannelHeight: "300px", // chiều cao của panel cấu hình các element
             modelAction: "create", // hành động đối với model này là gì: create | clone | edit
             modelId: "", // Id của model này trong DB
 			searchAttrKey: "",
+			diagramHeight: 300,
 			customRender: [
                 {
                     __init__: ["customRenderer"],
                     customRenderer: ["type", CustomRenderProcessCount]
                 }
             ],
-            diagramHeight: 300,
             headerActions: {
                 undo: {
                     icon: "mdi-undo",
@@ -1514,15 +1452,18 @@ export default {
         "symper-bpmn": SymperBpmn,
         "form-tpl": FormTpl,
 		VuePerfectScrollbar,
-		CustomRenderProcessCount,
-		ModelerWithHeatMap
+		CustomRenderProcessCount
     },
     props: {
         // Hành động cho editor này, nhận một trong các giá trị: create, edit, view, clone
         action: {
             type: String,
             default: "view"
-        }
+		},
+		tab:{
+			type: String,
+			default:'tab-1'
+		}
     },
     computed: {
         routeName(){
@@ -1581,29 +1522,46 @@ export default {
 	},
 	watch:{
 		processId(val){
-			this.tab = 'tab-1'
-			// this.instanceKey = Date.now();
-			// this.$store.commit(
-			// 	"process/initInstance",
-			// 	this.instanceKey
-			// );
-			// this.$store.dispatch("app/getAllOrgChartData");
-			// this.$store.dispatch("app/getAllUsers");
-			// this.$store.dispatch("process/getLastestProcessDefinition");
-			// this.$store.dispatch('process/getAllDefinitions');
-			this.applySavedData(val);
+				let canvas = document.getElementsByClassName('heatmap-canvas');
+				// if(canvas.length > 0){
+				// 	var ctx = canvas.getContext("2d");
+				// 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+				// }
+				let self = this;
+				this.instanceKey = Date.now();
+				this.$store.commit(
+					"process/initInstance",
+					this.instanceKey
+				);
+				this.$store.dispatch("app/getAllOrgChartData");
+				this.$store.dispatch("app/getAllUsers");
+				this.$store.dispatch("process/getLastestProcessDefinition");
+				this.$store.dispatch('process/getAllDefinitions');
+				this.applySavedData(val)
+				debugger
 		},
-		tab(){
-			this.instanceKey = Date.now();
-			this.$store.commit(
-				"process/initInstance",
-				this.instanceKey
-			);
-			this.$store.dispatch("app/getAllOrgChartData");
-			this.$store.dispatch("app/getAllUsers");
-			this.$store.dispatch("process/getLastestProcessDefinition");
-			this.$store.dispatch('process/getAllDefinitions');
-			this.applySavedData(this.processId);
+		tab(val){
+			if(val == "tab-2"){
+				let canvas = document.getElementsByClassName('heatmap-canvas');
+				// if(canvas.length > 0){
+				// 	var ctx = canvas.getContext("2d");
+				// 	ctx.clearRect(0, 0, canvas.width, canvas.height);
+				// }
+				let self = this;
+				this.instanceKey = Date.now();
+				this.$store.commit(
+					"process/initInstance",
+					this.instanceKey
+				);
+				this.$store.dispatch("app/getAllOrgChartData");
+				this.$store.dispatch("app/getAllUsers");
+				this.$store.dispatch("process/getLastestProcessDefinition");
+				this.$store.dispatch('process/getAllDefinitions');
+				this.applySavedData(this.processId)
+			}else{
+			
+			}
+			
 		}
 	}
 };
@@ -1630,5 +1588,9 @@ export default {
 }
 .modeler-detail-admin >>> .djs-hit  {
 	pointer-events: none;
+}
+.modeler-detail-admin >>> .heatmap-canvas{
+	width: 600px;
+	height: 200px;
 }
 </style>

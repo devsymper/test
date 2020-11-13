@@ -4,7 +4,7 @@
             'containers h-100 w-100': true,
             'hide-process-palette': readOnly 
         }" ref="content">
-        <div class="symper-bpm-canvas" :style="{height: height > 0 ? height+'px' : '100%!important'}" ref="canvas"></div>
+        <div :class="{'symper-bpm-canvas': true, 'symper-bpm-canvas-heat-map': heatMapMode == true}" :style="{height: height > 0 ? height+'px' : '100%!important'}" ref="canvas"></div>
         <a ref="downloadLinkXML" href></a>
         <a ref="downloadLinkSVG" href></a>
     </div>
@@ -27,7 +27,11 @@ export default {
     props: {
         height: {
             default: 0
-        },
+		},
+		heatMapMode:{
+			type: Boolean,
+			default: false
+		},
         diagramXML: {
             type: String,
             default:
@@ -310,5 +314,8 @@ export default {
 <style>
 .bjs-powered-by {
     display: none !important;
+}
+.symper-bpm-canvas-heat-map{
+	position: relative;
 }
 </style>
