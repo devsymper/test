@@ -53,7 +53,7 @@
                         });
                     },
                     init_instance_callback: function(editor) {
-                    getData()
+                        getData()
                     },
              
                 }"
