@@ -251,6 +251,12 @@ export default {
             },
 
         }
-    },
+	},
+	environmentManagement:{
+		title: 'environment',
+        icon: 'mdi-earth',
+		group: "Setting",
+		link: '/environment-management',
+	}
 
 };

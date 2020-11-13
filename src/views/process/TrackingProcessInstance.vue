@@ -236,7 +236,7 @@ export default {
                     setTimeout((self) => {
                         symBpmn.updateElementProperties(self.flowElementMap[index].id, {
                             infoAssignee: infoAssignee,
-                            setColor:nodeStatusColors.notStart
+							setColor:nodeStatusColors.notStart,
                         });
                     }, 200,this);
                 }

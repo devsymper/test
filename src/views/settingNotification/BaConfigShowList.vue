@@ -12,7 +12,7 @@
         :containerHeight="containerHeight"
         :customAPIResult="customAPIResult"
         :showImportButton="false"
-        :getDataUrl="'https://notifi.symper.vn/channels'"
+        :getDataUrl="notifiDomain + 'channels'"
         :actionPanelWidth="actionPanelWidth">
         <div slot="right-panel-content" class="h-100" style="overflow:hidden!important">
            <configNotification 
@@ -40,6 +40,7 @@ export default {
     data(){
         const self = this;
         return {
+            notifiDomain: appConfigs.apiDomain.nofitication,
             customAPIResult: {
                 reformatData(res){
                     let data={

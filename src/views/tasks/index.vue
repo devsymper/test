@@ -19,7 +19,6 @@ export default {
     },
     data: function() {
         return {
-            apiUrl: "https://v2hoangnd.dev.symper.vn/",
             virtualdocUrl: "virtualdocs",
             height: "calc(100vh - 120px)"
         };

@@ -136,13 +136,22 @@ export const deployProcessFromXML = function(xml, key = 14, name = 'test', tenan
 
 
 function moreInfoForInstanceVars() {
-    let rsl = [{
+    let rsl = [
+        {
         "name": 'symper_user_id_start_workflow',
         "type": 'string',
         "value": SYMPER_APP.$store.state.app.endUserInfo.id+":"+SYMPER_APP.$store.state.app.endUserInfo.currentRole.id,
         "valueUrl": "",
         "scope": "global"
-    }];
+        },
+        {
+            "name": 'symper_last_executor_id',
+            "type": 'string',
+            "value": SYMPER_APP.$store.state.app.endUserInfo.id+":"+SYMPER_APP.$store.state.app.endUserInfo.currentRole.id,
+            "valueUrl": "",
+            "scope": "global"
+        },
+    ];
     if (SYMPER_APP.$route.params.extraData && SYMPER_APP.$route.params.extraData.appId) {
         rsl.push({
             "name": 'symper_application_id',
@@ -152,6 +161,7 @@ function moreInfoForInstanceVars() {
             "scope": "global"
         });
     }
+
     return rsl;
 }
 
@@ -264,6 +274,13 @@ export const getVarsFromSubmitedDoc = async(docData, elId, docId) => {
                 name: elId + '_executor_id',
                 type: 'string',
                 value: SYMPER_APP.$store.state.app.endUserInfo.id
+            });
+            vars.push({
+                name: 'symper_last_executor_id',
+                type: 'string',
+                value: SYMPER_APP.$store.state.app.endUserInfo.id+":"+SYMPER_APP.$store.state.app.endUserInfo.currentRole.id,
+                valueUrl: "",
+                scope: "global"
             });
             resolve({
                 vars: vars,

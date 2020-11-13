@@ -25,8 +25,8 @@ var configs = {
             history: "https://workflow.symper.vn/symper-rest/service/history",
             tasks: "https://workflow.symper.vn/symper-rest/service/runtime/tasks",
             tasksHistory: "https://workflow.symper.vn/symper-rest/service/history/historic-task-instances",
-			validateModel: "https://workflow.symper.vn/symper-modeler/api/editor/validate-model",
-			timerJob: "https://workflow.symper.vn/symper-rest/service/management/timer-jobs"
+            validateModel: "https://workflow.symper.vn/symper-modeler/api/editor/validate-model",
+            timerJob: "https://workflow.symper.vn/symper-rest/service/management/timer-jobs"
         },
         documents: 'https://v2hoangnd.dev.symper.vn/document',
         nofitication: 'https://notifi.symper.vn/',
@@ -52,6 +52,7 @@ var configs = {
         timesheet: 'https://timesheet-service.dev.symper.vn/',
         search: "https://search.symper.vn/",
         importExcel: 'https://io.dev.symper.vn/',
+        viewHistoryImport: "https://io.dev.symper.vn/history/document",
         uiConfig: "https://ui.symper.vn",
         workflowExtend: "https://workflow-extend.symper.vn/",
         trash: "https://trash.symper.vn/",
@@ -85,12 +86,12 @@ var configs = {
             }
         }
     },
-    reformatUrl(obj){
-        for(let key in obj){
-            if(obj[key]){    
-                if(typeof obj[key] == 'string'){
+    reformatUrl(obj) {
+        for (let key in obj) {
+            if (obj[key]) {
+                if (typeof obj[key] == 'string') {
                     obj[key] = util.addEnvToUrl(obj[key]);
-                }else if(typeof obj[key] == 'object'){
+                } else if (typeof obj[key] == 'object') {
                     this.reformatUrl(obj[key]);
                 }
             }

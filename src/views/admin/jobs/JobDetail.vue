@@ -105,7 +105,11 @@
 			</span>
 		</div>
 		<div class="more-infor mr-6 text-wrap ">
-				{{timerJobDetail}}
+			<pre>
+				<code>
+					{{timerJobDetail}}
+				</code>
+			</pre>
 		</div>
 	</div>
 </template>
