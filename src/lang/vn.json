@@ -1,5 +1,6 @@
 {
     "common": {
+        "number_instance": "Tổng số instance",
         "id": "Id",
         "select_lang": "Thay đổi ngôn ngữ",
         "KH": "Knowledge Management",
