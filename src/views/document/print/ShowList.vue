@@ -17,6 +17,8 @@
 import { documentApi } from "./../../../api/Document.js";
 import ListItems from "./../../../components/common/ListItems.vue";
 import { util } from "./../../../plugins/util.js";
+import { appConfigs } from './../../../configs';
+
 export default {
     components: {
         "list-items": ListItems,
