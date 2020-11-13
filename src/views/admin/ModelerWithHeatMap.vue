@@ -1,5 +1,8 @@
 <template>
 	<div class="h-100 w-100"> 
+		<v-btn icon x-small @click="handleFocus">
+			
+		</v-btn>
 		<symper-bpmn
 			ref="symperBpmnHeatMap"
 			:height="diagramHeight"
@@ -96,17 +99,23 @@ export default {
 		
 
 		/**
-		 * 
+		 * Ve heatmap 
 		 */
 
 		plotHeatmap() {
 			let allNodes = this.$refs.symperBpmnHeatMap.getAllNodes()
+			console.log(allNodes, 'dasdasd all nodes ')
+			let sumProcess = this.$store.state.admin.sumProcess
 			let currentTrackingProcess = this.$store.state.admin.currentTrackingProcess
-			debugger
 			if(currentTrackingProcess){
+				var canvas = document.getElementsByClassName('heatmap-canvas');
+				if(canvas[0]){
+					canvas[0].remove();
+				}
 				var heatmapInstance = h337.create({
 					container: document.querySelector('.symper-bpm-canvas-heat-map')
 				});
+			
 				var points = [];
 				var max = 0;
 				var width = 600;
@@ -115,7 +124,8 @@ export default {
 					if(e.$type == "bpmn:UserTask"){
 						currentTrackingProcess.forEach(function(k){
 							if(k.act_id_ == e.id ){
-								var val = Math.floor(Math.random()*100);
+								let sum = parseInt(k.count_end) +  parseInt(k.count_running)
+								var val = Math.floor(sum/sumProcess * 100);
 								var radius = Math.floor(Math.random()*70);
 								let pos = e.di.bounds
 								var point = {
@@ -128,12 +138,98 @@ export default {
 							}
 						})
 					}
+					if(e.$type == "bpmn:ExclusiveGateway"){
+						currentTrackingProcess.forEach(function(k){
+							if(k.act_id_ == e.id ){
+								let sum = parseInt(k.count_end) +  parseInt(k.count_running)
+								var val = Math.floor(sum/sumProcess * 100);
+								var radius = Math.floor(Math.random()*70);
+								let pos = e.di.bounds
+								var point = {
+									x: pos.x + 20,
+									y: pos.y + 25,
+									value: val,
+									radius: 80
+								}
+								points.push(point);
+							}
+						})
+					}
+					if(e.$type == 'bpmn:SequenceFlow'){
+						if(e.di){
+							for(let i in e.di.waypoint){
+								let c = parseInt(i)
+								if(e.di.waypoint[c+1]){
+									if(e.di.waypoint[i].y == e.di.waypoint[c+1].y){
+										let x = e.di.waypoint[i].x
+										if(x < e.di.waypoint[c+1].x){
+											while(x <  e.di.waypoint[c+1].x){
+												var point = {
+													x: x ,
+													y: e.di.waypoint[i].y,
+													value: 0,
+													radius:10,
+												}
+												points.push(point);
+												x += 5										
+											}
+										}else{
+											while( e.di.waypoint[c+1].x < x){
+												var point = {
+													x: e.di.waypoint[c+1].x ,
+													y: e.di.waypoint[i].y,
+													value: 0,
+													radius:10,
+												}
+												points.push(point);
+												e.di.waypoint[c+1].x += 5										
+											}
+										}
+										
+									}
+									if(e.di.waypoint[i].x == e.di.waypoint[c+1].x){
+										let y1 = e.di.waypoint[i].y
+										let y2 = e.di.waypoint[c+1].y
+										if(y1 < y2){
+											while(y1 < y2){
+												var point = {
+													x: e.di.waypoint[i].x ,
+													y: y1,
+													value: 0,
+													radius:10,
+												}
+												points.push(point);
+												y1 += 5										
+											}
+										}else{
+											while(y1 > y2){
+												var point = {
+													x: e.di.waypoint[i].x,
+													y: y2,
+													value: 0,
+													radius:10,
+												}
+												points.push(point);
+												y2 += 5										
+											}
+										}
+										
+									}
+								}
+							}
+						}
+					}
 				})
 				var data = {
 					max: max,
 					data: points
 				};
 				heatmapInstance.setData(data);
+				// var canvas = document.getElementsByClassName('heatmap-canvas');
+				// let ctx = canvas[0].getContext('2d')
+				// ctx.save();
+				// ctx.translate(15, 0);
+				// ctx.transform(1, 0, 0, 1, 0, 0)
 			}
 			
 		},
@@ -1202,8 +1298,8 @@ export default {
                 let afterRender = await this.$refs.symperBpmnHeatMap.renderFromXML(xml);
                 if(modelData.configValue){
 					this.restoreAttrValueFromJsonConfig(modelData.configValue);
-					// this.$refs.symperBpmnHeatMap.focus();
 					this.plotHeatmap()
+					this.$refs.symperBpmnHeatMap.focus();
 
                 }
             } catch (error) {
@@ -1463,6 +1559,10 @@ export default {
 		tab:{
 			type: String,
 			default:'tab-1'
+		},
+		handleAction:{
+			type: String,
+			default: ""
 		}
     },
     computed: {
@@ -1522,11 +1622,6 @@ export default {
 	},
 	watch:{
 		processId(val){
-				let canvas = document.getElementsByClassName('heatmap-canvas');
-				// if(canvas.length > 0){
-				// 	var ctx = canvas.getContext("2d");
-				// 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-				// }
 				let self = this;
 				this.instanceKey = Date.now();
 				this.$store.commit(
@@ -1538,15 +1633,20 @@ export default {
 				this.$store.dispatch("process/getLastestProcessDefinition");
 				this.$store.dispatch('process/getAllDefinitions');
 				this.applySavedData(val)
-				debugger
+		},
+		handleAction(val){
+			if(val == "handleZoomOut"){
+				this.handleZoomOut()
+			}
+			if(val == "handleZoomIn"){
+				this.handleZoomIn()
+			}
+			if(val == "handleFocus"){
+				this.handleFocus()
+			}
 		},
 		tab(val){
 			if(val == "tab-2"){
-				let canvas = document.getElementsByClassName('heatmap-canvas');
-				// if(canvas.length > 0){
-				// 	var ctx = canvas.getContext("2d");
-				// 	ctx.clearRect(0, 0, canvas.width, canvas.height);
-				// }
 				let self = this;
 				this.instanceKey = Date.now();
 				this.$store.commit(

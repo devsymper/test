@@ -64,6 +64,7 @@
 				<ModelerWithHeatMap 
 				 	v-show="tab == 'tab-2'"
 					:tab="tab"
+					:handleAction="handleAction"
 				/>
 			<!-- <v-tabs
 			v-model="tab"
@@ -192,12 +193,15 @@ export default {
             this.diagramHeight = window.innerHeight - 400;
 		},
 		handleZoomOut(){
+			this.handleAction = 'handleZoomOut'
             this.$refs.symperBpmn.zoomOut();
 		},
 		handleZoomIn(){
+			this.handleAction = 'handleZoomIn'
             this.$refs.symperBpmn.zoomIn();
 		},
 		handleFocus(){
+			this.handleAction = 'handleFocus'
             this.$refs.symperBpmn.focus();
 		},
 		
@@ -1455,6 +1459,7 @@ export default {
     data() {
         return {
 			tab:'tab-1',
+			handleAction: "",
             instanceKey: null, // key của instance hiện tại
             attrPannelHeight: "300px", // chiều cao của panel cấu hình các element
             modelAction: "create", // hành động đối với model này là gì: create | clone | edit
