@@ -52,7 +52,7 @@ export default {
             console.log('asfsadasd',data);
             let treeData = [{
                 name: 'Control',
-                icon: 'icon/ic_image.png',
+                icon: '/icon/ic_image.png',
                 root: true,
                 children: [
 
