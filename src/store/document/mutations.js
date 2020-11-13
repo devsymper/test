@@ -412,7 +412,12 @@ const setDefaultSubmitStore = (state, params) => {
         readyLoaded: false,
         listTableRootControl: {},
         listControlMappingDatasets: {},
-        controlFormulaInfinity: {}
+        controlFormulaInfinity: {},
+        currentRowChangePivotMode:{
+            tableName:"",
+            key:"",
+            data:{}
+        }
     }
     let instance = params.instance;
     Vue.set(state.submit, instance, value);

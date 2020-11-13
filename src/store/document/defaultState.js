@@ -81,7 +81,12 @@ const defaultState = {
             readyLoaded: false, // biến đánh dấu công thức đã chạy xong mỗi lần thực thi hay chưa
             listTableRootControl: {}, // biến lưu lại các controk được coi là root trong trong table (trường hợp công thức ko có đầu vào thì là root)
             listControlMappingDatasets: {},
-            controlFormulaInfinity: {}
+            controlFormulaInfinity: {},
+            currentRowChangePivotMode:{
+                tableName:"",
+                key:"",
+                data:{}
+            }
         }
     },
     detail: {
