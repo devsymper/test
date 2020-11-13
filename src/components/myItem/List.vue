@@ -885,6 +885,7 @@ export default {
             this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
         },
         changeInfoTask(selectedTask){
+            selectedTask.originData.createTime=selectedTask.originData.startTime;
             this.$set(this.selectedTask, "originData", selectedTask.originData);  
             this.$set(this.selectedTask, "taskInfo", selectedTask.taskInfo);  
             for (let i = 0; i < this.groupFlatTasks.length; i++) {
