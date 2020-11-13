@@ -744,6 +744,7 @@
         "department": "Department"
     },
     "objectType": {
+        "time_sheet": "Timesheet",
         "Document definition": "Document definition",
         "Document instance": "Document instance",
         "Orgchart": "Orgchart",
@@ -773,6 +774,7 @@
         }
     },
     "objects": {
+        "time_sheet": "Timesheet",
         "document_instance": "Document instance",
         "user": "User",
         "document_definition": "Document definition",
