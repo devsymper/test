@@ -190,14 +190,16 @@ export default class PivotTable {
                 instance: this.tableIns.instance
             });
         }
-        if(row.node.level == 0){
+        if(row.node.level == 0){    // trường hợp sửa ở cell group
             row.node.setExpanded(true)
             let allChildRowNode = util.cloneDeep(row.node.childrenMapped);
             let allGroupRow = [];
             for(let key in allChildRowNode){
                 let rowNode = allChildRowNode[key];
-                let childRow = rowNode.childrenMapped[Object.keys(rowNode.childrenMapped)[0]][0].data;
-                allGroupRow.push(childRow);
+                for(let colPivot in rowNode.childrenMapped){
+                    let childRow = rowNode.childrenMapped[colPivot][0].data;
+                    allGroupRow.push(childRow);
+                }
                 
             }
             controlName = row.node.field;
@@ -211,7 +213,7 @@ export default class PivotTable {
         if(controlIns && controlIns.checkProps('isReadOnly')){
             return;
         }
-        if(row.node.level > 0 || (row.node.level == 0 && row.value)){
+        if(row.node.level > 0 || (row.node.level == 0 && !column.otherName)){
             let cellEl = $(row.event.target).closest('.ag-cell');
             let offset = cellEl.offset();
             let curCellValue = cellEl.text();

@@ -929,15 +929,15 @@ export default {
                 for (let index = 0; index < value.length; index++) {
                     value[index][keyChange] = input.val();
                 }
-                this.updateToTableNomalData(tableName, value, {})
+                this.updateToTableNomalData(tableName, value, {});
             }
             else{
                 value[keyChange] = input.val();
                 if(value.s_table_id_sql_lite){  // edit dòng đã có
-                    this.updateToTableNomalData(tableName, [value], {})
+                    this.updateToTableNomalData(tableName, [value], {});
                 }
                 else{   // thêm dòng mới cho table thường
-                    this.updateToTableNomalData(tableName, [], value)
+                    this.updateToTableNomalData(tableName, [], value);
                 }    
             }
         },
@@ -962,7 +962,7 @@ export default {
             this.$refs.popupPivotTableView.hide();
         },
         /**
-         * Hàm call lại thêm data vào bảng nomal sau khi có sự thay đổi ở bảng pivot
+         * Hàm call lại chuẩn bị data để thêm vào bảng nomal sau khi có sự thay đổi ở bảng pivot
          */
         updateToTableNomalData(tableName, oldData = [], newData = {}){
             let tableControl = getControlInstanceFromStore(this.keyInstance,tableName);
@@ -972,21 +972,19 @@ export default {
             let allColumnTable = tableControl.controlInTable;
             if(oldData.length > 0){
                 for (let index = 0; index < allData.length; index++) {
-                    for(let control in allColumnTable){
-                        if(!allData[index][control]){
-                            allData[index][control] = null;
-                        }
-                    }
                     for (let i = 0; i < oldData.length; i++) {
                         let rowChange = oldData[i];
                         if(allData[index].s_table_id_sql_lite == rowChange.s_table_id_sql_lite){
                             allData[index] = rowChange;
                         }
                     }
-                   
                     delete allData[index].s_table_id_sql_lite;
+                    for(let control in allColumnTable){
+                        if(!allData[index][control]){
+                            allData[index][control] = null;
+                        }
+                    }
                 }
-                  
             }
             else{
                 for (let index = 0; index < allData.length; index++) {
@@ -1005,7 +1003,6 @@ export default {
                 allData.push(newData);
             }
             tableControl.tableInstance.setData(allData);
-            
         },
         /**
          * Hàm ẩn loader
