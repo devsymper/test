@@ -147,7 +147,6 @@ export default {
                  },
                 reformatData(res){
                     let listKey = this.getListKey(res.data.listObject);
-                    // debugger
                      res.data.columns.push(
                         {
                             name:'number_instance',
@@ -158,7 +157,6 @@ export default {
                    let listWork = res.data;
                     taskApi.countInstant({keys:JSON.stringify(listKey)}).then(res=>{
                          if (res.status === 200) {
-                              debugger
                               for(let i = 0; i<listWork.listObject.length; i++){
                                   for(let j =0; j<res.data.length;j++){
                                       if(listWork.listObject[i].processKey==res.data[j].key){
@@ -169,9 +167,6 @@ export default {
                               self.$refs.listModels.rerenderTable();
                          }
                     })
-                        //debugger
-                   
-                   
                     return  listWork;
                 } 
             },

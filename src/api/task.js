@@ -9,7 +9,6 @@ export const taskApi = {
         return fileManagement.get('getFileByObjectIdentifier', { objectIdentifier: data.objectIdentifier, objectType: data.objectType });
     },
     countInstant(data) {
-        debugger
         return workfloweExtend.post('works/count', data)
     },
     downloadFile(id) {
