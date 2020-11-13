@@ -5,6 +5,7 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-alpine.css';
 import store from './../../../store'
+import {getControlInstanceFromStore} from './../common/common'
 
 window.addNewDataPivotTable = function(el, event, type){
     let tableName = $(el).attr('table-name');
@@ -114,7 +115,7 @@ export default class PivotTable {
             onCellClicked: this.onCellClick,
             tableIns:this
         };
-        this.tableContainer = $(`<div id="ag-` + this.controlObj.id + `" style="height: 0px; width: auto;position:relative;" class="ag-theme-alpine" s-control-type="table">
+        this.tableContainer = $(`<div id="ag-` + this.controlObj.id + `" style="height: 400px; width: auto;position:relative;" class="ag-theme-alpine" s-control-type="table">
         
         
             <div class="dropdown">
@@ -154,10 +155,14 @@ export default class PivotTable {
         let column = row.colDef;
         let columnNameSelected = column.otherName;
         let pivotKeys = column.pivotKeys;
+        let controlName = "";
         if(row.node.level == 1){
             let rowData = util.cloneDeep(row.node.childrenMapped[Object.keys(row.node.childrenMapped)[0]][0].data);
-            let controlName = "";
+            if(pivotKeys && row.node.childrenMapped[pivotKeys[0]]){
+                rowData = util.cloneDeep(row.node.childrenMapped[pivotKeys[0]][0].data);
+            }
             if(columnNameSelected && pivotKeys){
+                
                 let cols = this.tableIns.pivotConfig.cols;
                 controlName = columnNameSelected;
                 let key = cols[0].name;
@@ -165,6 +170,8 @@ export default class PivotTable {
                     rowData[key] = pivotKeys[0];
                     let rows = this.tableIns.pivotConfig.rows;
                     let newRowData = {}
+                    newRowData[key] = pivotKeys[0];
+
                     for (let index = 0; index < rows.length; index++) {
                         let row = rows[index];
                         let colName = row['name'];
@@ -183,10 +190,33 @@ export default class PivotTable {
                 instance: this.tableIns.instance
             });
         }
+        if(row.node.level == 0){
+            row.node.setExpanded(true)
+            let allChildRowNode = util.cloneDeep(row.node.childrenMapped);
+            let allGroupRow = [];
+            for(let key in allChildRowNode){
+                let rowNode = allChildRowNode[key];
+                let childRow = rowNode.childrenMapped[Object.keys(rowNode.childrenMapped)[0]][0].data;
+                allGroupRow.push(childRow);
+                
+            }
+            controlName = row.node.field;
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentRowChangePivotMode',
+                value: {key:controlName,value:allGroupRow,tableName:this.tableIns.tableName, type:'group'},
+                instance: this.tableIns.instance
+            });
+        }
+        let controlIns = getControlInstanceFromStore(this.tableIns.instance, controlName);
+        if(controlIns && controlIns.checkProps('isReadOnly')){
+            return;
+        }
         if(row.node.level > 0 || (row.node.level == 0 && row.value)){
             let cellEl = $(row.event.target).closest('.ag-cell');
             let offset = cellEl.offset();
-            $('.input-pivot').val(cellEl.text());
+            let curCellValue = cellEl.text();
+            curCellValue = curCellValue.replace(/\(\d\)$/g,"");
+            $('.input-pivot').val(curCellValue);
             $('.input-pivot').css({display:'block',top:offset.top,left:offset.left,width:cellEl.outerWidth()}).focus();
         }
         
@@ -210,7 +240,12 @@ export default class PivotTable {
         return v;
     }
     show() {
-        this.tableContainer.style.height = '400px';
+        this.tableContainer.style.maxHeight = 'unset';
+        this.tableContainer.style.opacity = '1';
+    }
+    hide() {
+        this.tableContainer.style.opacity = '0';
+        this.tableContainer.style.maxHeight = '0';
     }
 
 }

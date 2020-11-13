@@ -1087,7 +1087,6 @@ export default class Table {
             afterRender: function(isForced) {
 
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
-                console.log('tbHeighttbHeight', tbHeight);
                 if (tbHeight < MAX_TABLE_HEIGHT) {
                     $(this.rootElement).css('height', 'auto');
                 } else {
@@ -1677,5 +1676,13 @@ export default class Table {
         }
         this.tableInstance.updateSettings(setting);
         this.tableInstance.scrollViewportTo(0, colIndex)
+    }
+    show(){
+        this.tableContainer[0].style.maxHeight = 'unset';
+        this.tableContainer[0].style.opacity = '1';
+    }
+    hide(){
+        this.tableContainer[0].style.opacity = '0';
+        this.tableContainer[0].style.maxHeight = '0';
     }
 }
