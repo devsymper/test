@@ -55,7 +55,8 @@
                                 <div
                                     class="fs-11  text-ellipsis"
                                 >
-                                    <v-icon style="font-size:10px; color:green;padding-left:2px">mdi-circle</v-icon>
+                                    <v-icon v-if="obj.dueDate && checkTimeDueDate(obj)" style="font-size:10px; color:#EE6B60;padding-left:2px">mdi-circle</v-icon>
+                                    <v-icon v-else style="font-size:10px; color:#0760D9;padding-left:2px">mdi-circle</v-icon>
                                 {{obj.taskData.extraLabel}} {{obj.taskData.extraValue}}</div>
 
                                 <div class="fs-11 py-0  text-ellipsis">
@@ -71,9 +72,8 @@
                         cols="2"
                         class="fs-12 pl-3 px-1 py-0 mt-2"
                     >
-                    <symperAvatar :size="20" :userId="obj.assigneeInfo.id" />
-                    {{obj.assigneeInfo.displayName}}
-                    <div class="fs-11 ml-5 grey--text" v-if="obj.assigneeRole">{{obj.assigneeRole.name}}</div>
+                        <infoUser class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole?obj.assigneeRole:{}" />
+                    
                     </v-col>
                     <v-col
                         @click="selectObject(obj, idx)"
@@ -81,15 +81,13 @@
                         cols="2"
                         class="fs-12 pl-3 px-1 py-0 mt-2"
                         >
-                    <symperAvatar v-if="obj.ownerInfo.id" :size="20" :userId="obj.ownerInfo.id" />
-                    <symperAvatar v-else :size="20" :userId="obj.assigneeInfo.id" />
-                    {{obj.ownerInfo.id ? obj.ownerInfo.displayName: obj.assigneeInfo.displayName }}
-                    <div class="fs-11 ml-5 grey--text" v-if="obj.ownerRole">{{obj.ownerRole.name}}</div>
+                        <infoUser v-if="obj.ownerInfo.id" class="userInfo" :userId="obj.ownerInfo.id" :roleInfo="obj.ownerRole ? obj.ownerRole:{}" />
+                        <infoUser v-else class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole" />
                     </v-col>
                     <v-col
                        @click="selectObject(obj, idx)"
                         v-if="!sideBySideMode"
-                        style="line-height: 42px;flex: 0 0 10.666667%;"
+                        style="line-height: 42px;flex: 0 0 11.666667%;"
                         cols="2"
                         class="fs-13  pl-3 px-1 py-0"
                     >
@@ -195,7 +193,8 @@
                                                 class="fs-11  text-ellipsis"
                                                 style="width: 155px;"
                                             >
-                                                <v-icon style="font-size:10px; color:green;padding-left:2px">mdi-circle</v-icon>
+                                                <v-icon v-if="obj.dueDate && checkTimeDueDate(obj)" style="font-size:10px; color:red;padding-left:2px">mdi-circle</v-icon>
+                                                <v-icon v-else style="font-size:10px; color:green;padding-left:2px">mdi-circle</v-icon>
                                             {{obj.taskData.extraLabel}} {{obj.taskData.extraValue}}</div>
 
                                             <div class="fs-11 py-0  text-ellipsis mr-2">
@@ -208,14 +207,11 @@
                         </v-row>
                     </v-col>
                     <v-col class="detailDoc" cols="9" style="padding:0px!important;height:100%">
-                        <!-- <detailDocument 
-                            :showCommentInDoc="true"
-                            :docObjInfo="docObjInfo">
-                        </detailDocument> -->
                            <taskDetail
                                 class="approval-taskDetail"
                                 :taskInfo="selectedTask.taskInfo"
                                 :originData="selectedTask.originData"
+                                :appId="selectedTask.appId"
                                 @close-detail="closeDetail"
                                 :hideActionTask="true"
                             ></taskDetail>
@@ -230,9 +226,9 @@
 <script>
 import BPMNEngine from "@/api/BPMNEngine";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import symperAvatar from "@/components/common/SymperAvatar.vue";
 import detailDocument from '@/views/document/detail/Detail';
 import taskDetail from "../TaskDetail";
+import infoUser from "./../InfoUser";
 
 import {
   extractTaskInfoFromObject,
@@ -257,9 +253,9 @@ export default {
     },
     components: {
         VuePerfectScrollbar: VuePerfectScrollbar,
-        symperAvatar: symperAvatar,
         detailDocument,
-        taskDetail
+        taskDetail,
+        infoUser
 
     },
     watch:{
@@ -307,11 +303,24 @@ export default {
             selectedTask: {
                 taskInfo: {},
                 idx: -1,
-                originData: null
+                originData: null,
+                appId:""
             },
         }
     },
     methods:{
+        checkTimeDueDate(item){
+            if (item.dueDate) {
+                let dueDate=new Date(item.dueDate).getTime();
+                if (dueDate<Date.now()) {
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        },
         closeDetail(){
             this.$emit("closeDetail");
         },
@@ -336,7 +345,7 @@ export default {
         async getData(){
             let self=this;
              if (self.nodeInfo.process_definition_id) {
-                 let filter={};
+                let filter={};
                 filter.sort= "createTime";
                 filter.order= "desc";
                 filter.processDefinitionId=self.nodeInfo.process_definition_id;
@@ -350,10 +359,17 @@ export default {
         selectObject(obj, idx){
             this.selectObj=idx;
             let desc=JSON.parse(obj.description);
+            let taskInfo = extractTaskInfoFromObject(obj);
+            let appId='';
+            const objApp = obj.variables.find(element => element.name=='symper_application_id');
+            if (objApp) {
+                appId=objApp.value;
+            }
             //this.docObjInfo.docObjId= String(desc.action.parameter.documentObjectId);
             this.$set(this.selectedTask, "originData", obj);
-            let taskInfo = extractTaskInfoFromObject(obj);
             this.$set(this.selectedTask, "taskInfo", taskInfo);
+            this.$set(this.selectedTask, "appId", appId);
+            
 
             this.$emit("changeSideBySide",true);
 
@@ -390,13 +406,20 @@ export default {
 .detailDoc >>>.wrap-content-detail{
     height: calc(100%)!important;
 }
+.approval-taskDetail {
+    position: relative;
+}
 .approval-taskDetail >>>.justify-space-between{
     margin-right: 20px!important;
 }
 .approval-taskDetail >>>.detail-task .s-drawer{
-    top:45px!important;
+    top:0px!important;
+    padding:12px;
 }
-
+.approval-taskDetail >>>.doc-detail .s-drawer{
+    top:0px!important;
+    padding:12px;
+}
 .approval-taskDetail >>>.task-header{
     line-height: 39px!important;
 }

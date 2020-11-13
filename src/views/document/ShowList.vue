@@ -2,7 +2,7 @@
 <div style="width:100%">
     <list-items
         ref="listDocument"
-        :getDataUrl="'https://sdocument-management.symper.vn/documents'"  
+        :getDataUrl="sDocumentManagementUrl+'documents'"  
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('document.title')"
@@ -13,7 +13,12 @@
         :commonActionProps="commonActionProps"
     >
         <div slot="right-panel-content" class="h-100">
-            <submit-view ref="submitView" :isQickSubmit="true" :action="'submit'" @submit-document-success="aftersubmitDocument" :docId="documentId"/>
+            <submit-view 
+                ref="submitView" 
+                :isQickSubmit="true" 
+                :action="'submit'" 
+                @submit-document-success="aftersubmitDocument" 
+                :docId="documentId"/>
         </div> 
     </list-items>
          <ImportExcelPanel
@@ -32,6 +37,7 @@ import ActionPanel from "./../../views/users/ActionPanel.vue";
 import ChangePassPanel from "./../../views/users/ChangePass.vue";
 import Submit from './submit/Submit'
 import { util } from "./../../plugins/util.js";
+import { appConfigs } from '../../configs';
 export default {
     components: {
         ImportExcelPanel: ImportExcelPanel,
@@ -41,6 +47,7 @@ export default {
     },
     data(){
         return {
+            sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
             documentId:0,
             options:{
             },
@@ -238,6 +245,7 @@ export default {
                    self.options.objId =self.documentId;
                    self.options.objType = 'document';
                    self.options.subObjType = res.data.document.type;
+                  
                    self.options.nameObj = res.data.document.title;
                    self.propertyDocument = Object.values(res.data.fields);
                     // lưu tên của các property từ API document vào mảng  
@@ -273,7 +281,7 @@ export default {
                 return 'text';
             }
         },
-         createTable(tableNames,tableTitle) {
+        createTable(tableNames,tableTitle) {
             // general
             let controls = [];
             for (let i = 0; i < this.propertyDocument.length; i++) {

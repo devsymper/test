@@ -2,7 +2,7 @@
    <div class="view-details-all-app h-100" style="display:flex">
        <div class="header-view-details-all-app">
             <h4 style="flex-grow:1;font:15px roboto"> Danh sách công việc của tôi </h4>
-            <div style="width:470px;display:flex">
+            <div style="width:500px;display:flex">
                 <v-btn
                     class="button-add-task"
                     style="backgound-color:#F7F7F7;margin-8px"
@@ -18,15 +18,16 @@
                         solo
                         append-icon="mdi-magnify"
                         v-model="searchItemKey"
-                    ></v-text-field>
-                   <div class="button-header">
-                        <v-btn icon tile style="width:32px;height:32px;margin:0px 4px" >
-                         <v-icon @click="collapse" >mdi-arrow-collapse-up</v-icon>  
-                        </v-btn>
-                        <v-btn icon tile  style="width:32px;height:32px;margin:0px 4px">
-                            <v-icon @click="changeView">mdi-page-previous-outline</v-icon>  
-                        </v-btn>
-                   </div>
+				></v-text-field>
+				<div class="button-header">
+					<v-btn icon tile style="width:32px;height:32px;margin:0px 4px" >
+						<v-icon @click="collapse" >mdi-arrow-collapse-up</v-icon>  
+					</v-btn>
+					<v-btn icon tile  style="width:32px;height:32px;margin:0px 4px">
+						<v-icon @click="changeView">mdi-page-previous-outline</v-icon>  
+					</v-btn>
+					<MenuConfigTypeView :currentTypeView="currentType" :titleTypeView="'hellooo'" />
+				</div>
             </div>
         </div>
         <VuePerfectScrollbar :style="{height: menuItemsHeight}">
@@ -136,11 +137,13 @@ import {util} from './../../../plugins/util'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue';
 import DialogCreateTask from '@/components/myItem/work/DialogCreateTask.vue'
+import MenuConfigTypeView from './MenuConfigTypeView'
 export default {
     components:{
         VuePerfectScrollbar,
         ContextMenu,
-        DialogCreateTask
+        DialogCreateTask,
+        MenuConfigTypeView
     },
     computed:{
         listApp(){
@@ -151,8 +154,12 @@ export default {
             for(let i = 0; i < appArr.length; i++){
                 rsl[i%2][appArr[i].id] = appArr[i];
             }
-            
             return rsl;
+        }
+    },
+    props:{
+        currentType:{
+            type: Number,
         }
     },
     methods:{
@@ -179,6 +186,7 @@ export default {
 		},	
         changeView(){
             this.hideContextMenu()
+            this.$emit('change-type')
             this.$store.commit('appConfig/changeTypeView')
         },
         collapse(){
@@ -196,7 +204,7 @@ export default {
         },
          getActiveapps(){
             let self = this
-			appManagementApi.getActiveApp().then(res => {
+			appManagementApi.getActiveAppSBS().then(res => {
 				if (res.status == 200) {
                     for(let e of res.data.listObject){
                         e.childrenAppReduce = {}
@@ -317,14 +325,14 @@ export default {
 				item.id = item.objectIdentifier.replace("workflow_definition:","")
 			}
 			if(item.favorite == false){
-				appManagementApi.addFavoriteItem(userId,item.id,type,1).then(res => {
+				appManagementApi.addFavoriteItem(userId,item.id,type,1,app.id).then(res => {
 					if (res.status == 200){
                         self.$store.commit('appConfig/insertFavorite',item)
                         self.$store.commit('appConfig/updateFavoriteMyAppItem',{appId:app.id,itemId:item.objectIdentifier,value:true})
 					}
 				});
 			}else{
-				appManagementApi.addFavoriteItem(userId,item.id,type,0).then(res => {
+				appManagementApi.addFavoriteItem(userId,item.id,type,0,app.id).then(res => {
 					if (res.status == 200) {
 						item.type = type;
                         self.$store.commit('appConfig/delFavorite',item)

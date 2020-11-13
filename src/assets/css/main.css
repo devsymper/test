@@ -1,9 +1,15 @@
 html {
-    overflow-x: hidden;
+    /* overflow-x: hidden;
     overflow-y: hidden!important;
-    overflow: hidden;
+    overflow: hidden; */
+    overflow-y: auto!important;
+    overflow-x: auto!important;
     height: 100vh;
     width: 100vw;
+}
+
+body {
+    height: 100%;
 }
 
 :root {
@@ -737,4 +743,15 @@ html {
 
 .color-normal {
     color: #707070!important
+}
+
+.v-navigation-drawer--fixed {
+    z-index: 7!important;
+}
+
+.symper-list-item-current-row,
+.symper-list-item-current-row + .current.highlight,
+.list-sbs .symper-list-item-current-row-sbs,
+.list-sbs .symper-list-item-current-row-sbs + .current.highlight {
+    background-color:#4c89fc33!important;
 }

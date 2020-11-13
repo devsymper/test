@@ -284,7 +284,7 @@ const getAndSetUserOperations = async function(context) {
             }
 
             let sections = op.objectIdentifier.split(':');
-            let id = sections[1];
+            let id = sections[2] ? sections[1]+':'+sections[2]+':'+sections[3] : sections[1];
 
             if (!id || id == '0') { // xét các trường hợp từ trước đến nay là set cho tất cả các object trong danh sách
                 id = 0;
@@ -298,7 +298,7 @@ const getAndSetUserOperations = async function(context) {
             } else {
                 opsByObjectType[type][id][op.action] = true;
             }
-        }
+        } 
         context.commit('setUserActionsForObjects', opsByObjectType);
     } else {
         SYMPER_APP.$snotifyError(res, "Can not get operations of current role");

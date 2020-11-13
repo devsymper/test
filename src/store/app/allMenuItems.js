@@ -44,6 +44,11 @@ export default {
                 title: "Lists trash",
                 icon: "mdi-trash",
                 link: "/documents/trash"
+            },
+            history: {
+                title: "deleteHistory",
+                icon: "mdi-file-document-edit-outline",
+                link: "/documents/delete-history"
             }
         }
     },
@@ -51,16 +56,30 @@ export default {
         title: "Report",
         icon: "mdi-view-dashboard-outline",
         group: "My work",
+        action: {
+            "module": "dashboard",
+            "resource": "dashboard",
+            "scope": "dashboard",
+            "action": "list"
+        },
     },
     orgchart: {
         title: "orgchart",
         icon: "mdi-office-building-outline",
         group: "My work",
-        action: {
-            "module": "orgchart",
-            "resource": "orgchart",
-            "scope": "orgchart",
-            "action": "list"
+        children: {
+            list: {
+                title: "listOrgchart",
+                link: "/orgchart"
+            },
+            trash: {
+                title: "listTrashOrgchart",
+                link: "/orgchart/trash"
+            },
+            viewOrgchart: {
+                title: "viewOrgchart",
+                // link: "/orgchart/:id/view"
+            },
         }
     },
     myItem: {
@@ -127,8 +146,30 @@ export default {
     fileManagement: {
         title: 'File',
         icon: 'mdi-upload-outline',
-        link: '/knowledge',
-        group: "Applications"
+        link: '/file-management',
+        group: "Applications",
+        action: {
+            "module": "file",
+            "resource": "file",
+            "scope": "file",
+            "action": "list"
+        },
+    },
+    admin: {
+        title: "admin",
+        icon: "mdi-cog-transfer-outline",
+		group: "Administrator",
+		children: {
+            list_workflow: {
+                title: "list_workflow",
+                link: "/admin",
+            },
+            list_work: {
+                title: "list_work",
+                link: "/admin/jobs",
+            },
+           
+        }
     },
     userManager: {
         title: "Account management",
@@ -177,24 +218,45 @@ export default {
     application_definition: {
         title: "apps",
         icon: "mdi mdi-widgets-outline",
-        link: "/apps",
-        group: "My work"
+        group: "My work",
+        children: {
+            listApp: {
+                title: "listApps",
+                icon: "mdi-folder-account",
+                link: "/apps",
+            },
+            listTrashApp: {
+                title: "listTrashApps",
+                icon: "mdi-access-point-network",
+                link: "/apps/trash"
+            },
+
+        }
     },
     settingNotication: {
         title: 'Notification',
         icon: 'mdi-bell-check-outline',
-        link: '/setting-notification',
-        group: "Setting"
-    },
-    // comment: {
-    // 	title: 'tesstsdádasdad',
-    // 	icon: 'mdi-file-edit-outline',
-    // 	link: '/comment',
-    // },
-    // { title: "reports", icon: "mdi-view-dashboard", link: "/reports" },
-    // { title: "virtualdocs", icon: "mdi-table", link: "/virtualdocs" },
-    // { title: "methods", icon: "mdi-function", link: "/methods" },
-    // { title: "virtual_doc", icon: "mdi-table-sync", link: "/virtual-doc" },
-    // { title: "service", icon: "mdi-cogs", link: "/service" },
-    // { title: "snippets", icon: "mdi-contain", link: "/snippets" },
+        group: "Setting",
+        children: {
+            settingNotificationUser: {
+                title: "Notification User",
+                icon: "mdi-folder-account",
+                link: "/setting-notification",
+            },
+            settingNoticationBa: {
+                icon: 'mdi-bell-plus-outline',
+                title: "Notification Config BA",
+                icon: "mdi-access-point-network",
+                link: '/setting-notification-Ba',
+            },
+
+        }
+	},
+	environmentManagement:{
+		title: 'environment',
+        icon: 'mdi-earth',
+		group: "Setting",
+		link: '/environment-management',
+	}
+
 };

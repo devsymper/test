@@ -27,11 +27,13 @@ const defaultState = {
     allUserInOrgChart: {},
     userInActiveNode: {},
     orgChartData: {},
+    listChildInCurrentNode: [],
     userInNode: {},
     listChildrenOfNode: {},
-
+    viewOnlySub: false,
     getStructFlag: false,
-    allOrgchartStruct: []
+    allOrgchartStruct: [],
+    listVizParentId: []
 };
 
 export default defaultState;

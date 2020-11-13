@@ -2,7 +2,6 @@
 <div class="w-100">
      <list-items
         ref="listUser"
-        @after-open-add-panel="addUser"
         :headerPrefixKeypath="'user.table'"
         :useDefaultContext="false"
         :pageTitle="$t('user.trash')"
@@ -24,7 +23,6 @@
             />
         </div>
         </list-items>
-      <UserDetailPopUp :show="isShow" :userInfo="userInfo"/>
     </div>
 </template>
 <script>
@@ -38,8 +36,6 @@ export default {
     components: {
         "list-items": ListItems,
         "action-panel": ActionPanel,
-        ImportExcelPanel: ImportExcelPanel,
-        UserDetailPopUp
     },
     data(){
         return {
@@ -82,7 +78,7 @@ export default {
                 "scope": "account",
             },
             getListUrl: {},
-            actionPanelWidth:800,
+            actionPanelWidth:600,
             containerHeight: 200,
             userInfo:{},
             tableContextMenu:{           
@@ -103,7 +99,6 @@ export default {
             },
             columns: [],
             data: [],
-            totalPage: 6,
             actionType:'',
             isSettingPasswordView : false,
             showViewInfo: false

@@ -112,8 +112,35 @@ const updateListChildrenNode = (state, params) => {
 
     });
 }
+const getUserByVizId = (state, params) => {
+    params.data.forEach(e => {
+        if (e.vizId == params.vizId && params.list.includes(e) == false) {
+            params.list.push(e)
+            e.orgchartId = params.orgchartId
+            e.data = params.data
+            e.list = params.list
+            getUserByVizId(state, e)
+            if (state.listChildInCurrentNode.includes(e) == false) {
+                state.listChildInCurrentNode.push(e)
+            }
+        }
+        if (e.vizParentId == params.vizId) {
+            params.list.push(e)
+            e.orgchartId = params.orgchartId
+            e.data = params.data
+            e.list = params.list
+            getUserByVizId(state, e)
+            if (state.listChildInCurrentNode.includes(e) == false) {
+                state.listChildInCurrentNode.push(e)
+            }
+        }
+    });
+}
 const emptyListChildrenNode = (state, param) => {
     state.listChildrenOfNode[param] = []
+}
+const emptyListChildInCurrentNode = (state) =>{
+    state.listChildInCurrentNode = []
 }
 const updatePermissionsSelectingNode = (state, params) => {
     Vue.set(state.editor[params.instanceKey].selectingNode, 'permissions', params.data)
@@ -121,6 +148,12 @@ const updatePermissionsSelectingNode = (state, params) => {
 
 const setAllOrgchartStruct = (state, params) => {
     Vue.set(state, 'allOrgchartStruct', params)
+}
+const changeViewOnlySub = (state, data) => {
+    Vue.set(state, 'viewOnlySub', data)
+}
+const updateListVizParentId = (state, data) =>{
+    state.listVizParentId.push(data)
 }
 
 
@@ -141,7 +174,11 @@ export {
     deleteNode,
     setAllUserInOrgchart,
     setDataOrgchartSideBySide,
-    updateListChildrenNode,
+    emptyListChildInCurrentNode,
     emptyListChildrenNode,
-    updatePermissionsSelectingNode
+    updateListChildrenNode,
+    getUserByVizId,
+    updatePermissionsSelectingNode,
+    changeViewOnlySub,
+    updateListVizParentId
 };

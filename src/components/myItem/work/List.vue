@@ -1,6 +1,6 @@
 <template>
-  <div class="list-objects">
-    <v-row class="mr-0 ml-0">
+  <div class="list-objects h-100">
+    <v-row class="mr-0 ml-0 h-100">
         <v-col
             :cols="!sideBySideMode ? 12 : 4"
             :md="!sideBySideMode ? 12 : 3"
@@ -12,37 +12,82 @@
             :sideBySideMode="sideBySideMode"
             :compackMode="compackMode"
             :parentTaskId="filterFromParent.parentTaskId"
+            :totalObject="totalObject"
+            :totalCurrent="data.length"
             @change-density="isSmallRow = !isSmallRow"
             @changeObjectType="changeObjectType"
             @filter-change-value="handleChangeFilterValue"
-            @create-task="getWorks({})"
-            @refresh-task-list="getWorks()"
+            @refresh-task-list="getData()"
             ></listHeader>
-            <v-divider v-if="!sideBySideMode"></v-divider>
+            <v-divider v-if="!sideBySideMode" ></v-divider>
             <v-row class="ml-0 mr-0" v-if="!sideBySideMode">
             <v-col cols="12" class="list-tasks pt-0 pb-0">
                 <v-row>
                 <v-col
                     :cols="sideBySideMode ? 12 : compackMode ? 6 : 4"
                     class="pl-3 fs-13 font-weight-medium"
-                >{{$t("tasks.header.name")}}</v-col>
+                >{{$t("tasks.header.name")}}
+                    <v-icon 
+                        @click="showFilterColumn($event,'name')" 
+                        class="fs-15 float-right" 
+                        style="padding-top:3px"
+                        :class="{
+                            'd-active-color': filteredColumns['name'] && filteredColumns['name']==true ,
+                        }"
+                    >mdi-filter-variant</v-icon>
+                </v-col>
                 <v-col
                     cols="2"
                     v-if="!sideBySideMode"
                     class="fs-13 font-weight-medium"
-                >{{$t("tasks.header.userCreate")}}</v-col>
+                >{{$t("tasks.header.userCreate")}}
+                    <!-- <v-icon @click="showFilterColumn($event,'startTime')" class="fs-15 float-right" style="padding-top:3px">mdi-filter-variant</v-icon> -->
+                </v-col>
                 <v-col
                     cols="2"
                     v-if="!sideBySideMode"
                     class="fs-13 font-weight-medium"
-                >{{$t("tasks.header.createDate")}}</v-col>
+                >
+                    {{$t("tasks.header.createDate")}}
+                    <v-icon 
+                        @click="showFilterColumn($event,'startTime')" 
+                        class="fs-15 float-right" 
+                        style="padding-top:3px"
+                        :class="{
+                            'd-active-color': filteredColumns['startTime'] && filteredColumns['startTime']==true ,
+                        }"
+                    >mdi-filter-variant</v-icon>
+                </v-col>
                 <v-col
                     cols="2"
                     v-if="!sideBySideMode && !compackMode && !smallComponentMode"
                     class="fs-13 font-weight-medium"
-                >{{$t("tasks.header.app")}}</v-col>
+                >{{$t("tasks.header.app")}}
+                    <v-icon 
+                        @click="showFilterColumn($event,'processDefinitionName')" 
+                        class="fs-15 float-right" 
+                        style="padding-top:3px"
+                        :class="{
+                            'd-active-color': filteredColumns['processDefinitionName'] && filteredColumns['processDefinitionName']==true ,
+                        }"
+                    >mdi-filter-variant</v-icon>
+                </v-col>
                 <v-col
-                    cols="2"
+                    cols="1"
+                    v-if="!sideBySideMode && !compackMode && !smallComponentMode"
+                    class="fs-13 font-weight-medium"
+                >{{$t("tasks.header.status")}}
+                    <v-icon 
+                        @click="showFilterColumn($event,'isDone')" 
+                        class="fs-15 float-right" 
+                        style="padding-top:3px"
+                        :class="{
+                            'd-active-color': filteredColumns['isDone'] && filteredColumns['isDone']==true ,
+                        }"
+                    >mdi-filter-variant</v-icon>
+                </v-col>
+                <v-col
+                    cols="1"
                     v-if="!sideBySideMode && !compackMode && !smallComponentMode"
                     class="fs-13 font-weight-medium"
                 >{{$t("common.add")}}</v-col>
@@ -70,7 +115,7 @@
                         }"
                         style="border-bottom: 1px solid #eeeeee!important;"
                     >
-                    <span style="color:#FF8003; font-size:13px;margin-left:16px;margin-top:6px">{{ showTime(workGroup.date)}}</span>
+                    <span style="color:#FF8003; font-size:13px;margin-left:16px;margin-top:6px">{{ workGroup.fromNow}}</span>
                     </v-row>
                     <v-row
                         v-for="(obj, idx) in workGroup.works"
@@ -97,8 +142,8 @@
                                                 class="fs-13 text-ellipsis w-100"
                                                 v-on="on"
                                             >
-                                                <v-icon v-if="obj.endTime && obj.endTime!=null" style="font-size:11px; color:green;margin-left: 3px;">mdi-circle</v-icon>
-                                                <v-icon v-else style="font-size:11px ; color:blue;margin-left: 3px;">mdi-circle</v-icon>
+                                                <v-icon v-if="obj.endTime && obj.endTime!=null" style="font-size:11px; color:#408137;margin-left: 3px;">mdi-circle</v-icon>
+                                                <v-icon v-else style="font-size:11px ; color:#0760D9;margin-left: 3px;">mdi-circle</v-icon>
                                             {{ obj.name}}
                                             </div>
                                         </template>
@@ -107,35 +152,32 @@
                                     <div class="fs-11 py-0 " style="width:200px;margin-top:3px">
                                         {{obj.startTime ? $moment(obj.startTime).format('DD/MM/YY HH:mm:ss'):$moment(obj.endTime).format('DD/MM/YY HH:mm:ss')}}
                                         <v-icon class="grey--text " x-small>mdi-clock-time-nine-outline</v-icon>
-                                    
                                     </div>
                                 </div>
                             </div>
                         </v-col>
-                    
                         <v-col
                             v-if="!sideBySideMode"
                             cols="2"
-                            class="fs-12 px-1 py-0 mt-2"
+                            class="fs-12 px-1 py-0 pt-2"
                         >
-                            <symperAvatar :size="20"  :userId="obj.startUserId" />
-                            <span class="ml-1">{{obj.startUserName}}</span>
-                            <div class="fs-11 ml-5 grey--text" v-if="obj.roleInfo">{{obj.roleInfo.name}}</div>
+                            <infoUser class="userInfo" :userId="String(obj.startUserId)" :roleInfo="obj.roleInfo" />
                         </v-col> 
                         <v-col
                             v-if="!sideBySideMode"
-                            style="line-height: 42px"
                             cols="2"
                             class="fs-13 px-1 py-0"
                         >
-                            <span class="mt-1">{{obj.startTime ==null? '':$moment(obj.startTime).fromNow()}}</span>
+                            <div class="pt-3">{{obj.startTime ==null? '':$moment(obj.startTime).fromNow()}}</div>
                         </v-col>
                         <v-col
                             class="py-0"
                             cols="2"
                             v-if="!sideBySideMode && !smallComponentMode"
                         >
-                        <div class="mt-1">
+                            <div class="pt-1"
+                                :class="{ 'pt-3': !obj.symperApplicationName}"
+                            >
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on }">
                                     <div
@@ -148,14 +190,32 @@
                                     <span>{{ obj.processDefinitionName?  obj.processDefinitionName : `ad hoc` }}</span>
                                 </v-tooltip>
                                 <div class="pa-0 grey--text mt-1 lighten-2 d-flex justify-space-between">
-                                {{selectValueInVariables(obj.id)}}
+                                {{obj.symperApplicationName}}
                                 </div>
                             </div>
                             
                         </v-col>
                         <v-col
                             v-if="!sideBySideMode"
-                            cols="2"
+                            cols="1"
+                            class="fs-13 px-1 py-0"
+                        >
+                            <div class="pt-3">
+                                <v-chip
+                                    v-if="!obj.endTime"
+                                    color="#0760D9"
+                                    class="px-2"
+                                    text-color="white"
+                                    style="border-radius:4px"
+                                    x-small
+                                >{{$t('myItem.unfinished')}}</v-chip>
+
+                                <v-chip class="px-2" style="border-radius:4px" v-else color="#408137" text-color="white" x-small>{{$t('common.done')}}</v-chip>
+                            </div>
+                        </v-col>
+                        <v-col
+                            v-if="!sideBySideMode"
+                            cols="1"
                             class="fs-13 px-1 py-0"
                         >
                             <div class="pl-1 pt-1">
@@ -187,12 +247,21 @@
             style="border-left: 1px solid #e0e0e0;"
         >
         <workDetail
+          class="workDetail"
           :parentHeight="listTaskHeight"
           :workInfo="selectedWork.workInfo"
           @close-detail="closeDetail"
         ></workDetail>
       </v-col>
     </v-row>
+
+    <table-filter
+        ref="tableFilter"
+        :columnFilter="columnFilter()"
+        @apply-filter-value="applyFilter"
+        @search-autocomplete-items="searchAutocompleteItems"
+    ></table-filter>
+
   </div>
 </template>
 
@@ -206,98 +275,93 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../../plugins/util";
 import { appConfigs } from "../../../configs";
 import { taskApi } from "@/api/task.js";
+import TableFilter from "@/components/common/customTable/TableFilter.vue";
+import { getDataFromConfig, getDefaultFilterConfig } from "@/components/common/customTable/defaultFilterConfig.js";
 
 import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
 } from "@/components/process/processAction";
-import symperAvatar from "@/components/common/SymperAvatar.vue";
-
+import infoUser from "./../InfoUser";
+import ShowListTrashVue from '../../../views/document/trash/ShowListTrash.vue';
 export default {
-  computed: {
-    fileCountPerTask(){
-        return this.$store.state.file.fileCountPerObj.list;
-    },
-    commentCountPerTask(){
-        return this.$store.state.comment.commentCountPerObj.list;
-    },
-    groupAllProcessInstance() {
-        let allUserById = this.$store.getters['app/mapIdToUser'];
-        let allPrcess = this.allFlatWorks;
+    computed: {
+        fileCountPerTask(){
+            return this.$store.state.file.fileCountPerObj.list;
+        },
+        commentCountPerTask(){
+            return this.$store.state.comment.commentCountPerObj.list;
+        },
+        groupAllProcessInstance() {
+            let allUserById = this.$store.getters['app/mapIdToUser'];
+            let allPrcess = this.data;
+            console.log("allPrcessallPrcessallPrcess",allPrcess);
 
-        // allPrcess.sort(function(a, b) {
-        //         if (a.endTime) {
-        //             var keyA = new Date(a.endTime);
-        //         }else{
-        //             var keyA = new Date(a.startTime);
-        //         }
-        //         if (b.endTime) {
-        //             var keyB = new Date(b.endTime);
-        //         }else{
-        //             var keyB = new Date(b.startTime);
-        //         }
-        //         if (keyA > keyB) return -1;
-        //         if (keyA < keyB) return 1;
-        //         return 0;
-        // });
-
-        const groups = allPrcess.reduce((groups, work) => {
-            let date;
-            work.startUserId = 0;
-            work.startUserName = '';
-            let roleInfo={};
-
-            const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===work.id && element.name==="symper_user_id_start_workflow" );
-            if (dataVariable) {
-                let userIdStart=dataVariable.value;
-                if (dataVariable.value.indexOf(":")>0) {  //check là userId hay userId:role
-                    let arrDataUserIden=dataVariable.value.split(":");
-                    userIdStart=arrDataUserIden[0];
-                    if (arrDataUserIden.length>3) { // loại trừ trường hợp role=0
-                        let roleIdentify=dataVariable.value.slice(userIdStart.length+1);
-                        roleInfo=this.getRoleUser(roleIdentify);
+            const groups = allPrcess.reduce((groups, work) => {
+                let date;
+                work.startUserName = '';
+                let roleInfo={};
+                if (work.startUserId) {
+                    let userIdStart=work.startUserId;
+                    if (userIdStart.indexOf(":")>0) {  //check là userId hay userId:role
+                        let arrDataUserIden=userIdStart.split(":");
+                        userIdStart=arrDataUserIden[0];
+                        if (arrDataUserIden.length>3) { // loại trừ trường hợp role=0
+                            let roleIdentify=work.startUserId.slice(userIdStart.length+1);
+                            roleInfo=this.getRoleUser(roleIdentify);
+                        }
+                    }
+                    work.startUserId = userIdStart;
+                    work.startUserName = allUserById[work.startUserId] ? allUserById[work.startUserId].displayName : '';
+                    work.roleInfo = roleInfo;
+                }
+                let appName="";
+                if (work.symperApplicationId) {
+                    let allApp = this.$store.state.task.allAppActive;
+                    let app=allApp.find(element => element.id==work.symperApplicationId);
+                    if (app) {
+                        appName= app.name;
                     }
                 }
-                work.startUserId = userIdStart;
-                work.startUserName = allUserById[work.startUserId] ? allUserById[work.startUserId].displayName : '';
-                work.roleInfo = roleInfo;
-            }
+                work.symperApplicationName=appName;
 
-            if ( work.startTime) {
-                date = work.startTime.split("T")[0];
-            }else{
-                date = work.endTime.split("T")[0];
-            }
-            if (!groups[date]) {
-                groups[date] = [];
-            }
-            groups[date].push(work);
-            return groups;
-        }, {});
-        // Edit: to add it in the array format instead
-        const groupArrayWork = Object.keys(groups).map(date => {
-            return {
-            date,
-            works: groups[date]
-            };
-        });
-        return groupArrayWork;
+                // if ( work.endTime) {
+                //     date = work.endTime.split("T")[0];
+                // }else{
+                    date = work.startTime.split(" ")[0];
+                // }
+                let fromNow = this.getDateFormNow(date);
+                if (!groups[fromNow]) {
+                    groups[fromNow] = [];
+                }
+                groups[fromNow].push(work);
+                return groups;
+            }, {});
+            // Edit: to add it in the array format instead
+            const groupArrayWork = Object.keys(groups).map(fromNow => {
+                return {
+                fromNow,
+                works: groups[fromNow]
+                };
+            });
+            return groupArrayWork;
+        },
+        stask() {
+        return this.$store.state.task;
+        },
+        sapp() {
+        return this.$store.state.app;
+        }
     },
-    stask() {
-      return this.$store.state.task;
-    },
-    sapp() {
-      return this.$store.state.app;
-    }
-  },
     name: "listWork",
     components: {
         icon: icon,
         listHeader: listHeader,
         userSelector: userSelector,
         VuePerfectScrollbar: VuePerfectScrollbar,
-        symperAvatar: symperAvatar,
-        workDetail
+        workDetail,
+        infoUser,
+        TableFilter,
     },
     watch:{
         sideBySideMode(vl){
@@ -307,257 +371,436 @@ export default {
             }
         }
     },
-  props: {
-    compackMode: {
-      type: Boolean,
-      default: false
-    },
-    height: {
-      type: String,
-      default: "calc(100vh - 120px)"
-    },
-    // component này có ở chế độ là component con của một component khác hay ko, false nếu component này là view
-    smallComponentMode: {
-      type: Boolean,
-      default: false
-    },
-    filterFromParent: {
-      type: Object,
-      default() {
-        return {};
-      }
-    },
-    headerTitle: {
-      type: String,
-      default() {
-        return this.$t("myItem.header");
-      }
-    },
-    filterTaskAction: {
-      type: String,
-      default: "getList"
-    }
-  },
-  data: function() {
-    return {
-        index: -1,
-        dataIndex:-1,
-        loadingTaskList: false,
-        loadingMoreTask: false,
-        listTaskHeight: 300,
-        totalWork: 0,
-        selectedTask: {
-            taskInfo: {},
-            idx: -1,
-            originData: null
+    props: {
+        compackMode: {
+            type: Boolean,
+            default: false
         },
-        selectedWork:{
-            workInfo: {},
-            idx: -1,
+        height: {
+            type: String,
+            default: "calc(100vh - 120px)"
         },
-        isSmallRow: false,
-        sideBySideMode: false,
-        allFlatWorks: [],
-        allWorkIdUserStart:[],
-        allVariableProcess:[],
-        myOwnFilter: {
-            size: 50,
-            sort: "startTime",
-            order: "desc",
-            page: 1,
-            involvedUser: this.$store.state.app.endUserInfo.id+"%"
+        // component này có ở chế độ là component con của một component khác hay ko, false nếu component này là view
+        smallComponentMode: {
+            type: Boolean,
+            default: false
         },
-        filterVariables:{
-            names:"symper_application_id,symper_user_id_start_workflow",
-            page:1,
-            processInstanceIds:[]
+        filterFromParent: {
+            type: Object,
+            default() {
+                return {};
+            }
         },
-        filterListProcessUserStartWork:{
-            names:"symper_user_id_start_workflow",
-            page:1,
-            valueLike:this.$store.state.app.endUserInfo.id+"%"
+        headerTitle: {
+            type: String,
+            default() {
+                return this.$t("myItem.header");
+            }
         },
-        defaultAvatar: appConfigs.defaultAvatar,
-        listIdProcessInstance:[],
-    };
-  },
-  created() {
-  },
-  mounted() {
-    let self = this;
-    this.$store
-      .dispatch("process/getAllDefinitions")
-      .then(res => {
-        self.getWorks();
-      })
-      .catch(err => {});
-    self.reCalcListTaskHeight();
-  },
-  methods: {
-    getRoleUser(roleIdentify){
-        let arrDataRole=roleIdentify.split(":");
-        let allSymperRole=this.$store.state.app.allSymperRoles;
-        let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
-        return role;
-    },  
-    changeUpdateAsignee(){
-      this.handleTaskSubmited();
-    },
-    showTime(time){
-        var today = this.$moment().format('YYYY-MM-DD');
-        if (time===today) {
-            return this.$t('myItem.today');
-        }
-        else{
-            return this.$moment(time).fromNow();
-        }
-    },
-    changeObjectType(index) {
-      this.$emit("changeObjectType", index);
-    },
-    selectValueInVariables(processInstanceId){
-        if (processInstanceId!=null) {
-            const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===processInstanceId && element.name=="symper_application_id");
-            if (dataVariable) {
-                let appId=dataVariable.value;
-                let allApp = this.$store.state.task.allAppActive;
-                let app=allApp.find(element => element.id==appId);
-                if (app) {
-                    return app.name;
-                }else{
-                    return "";
+        filterTaskAction: {
+            type: String,
+            default: "getList"
+        },
+         /**
+         * Dữ liệu mặc định cho table
+         */
+        defaultData:{
+            type: Object,
+            default(){
+                return {
+                    listObject:{},
+                    columns:{},
+                    total:0
                 }
-            }else{
-                return "";
             }
-        }else{
-            return "";
-        }
-    },
-    handleReachEndList() {
-        if (
-            this.allFlatWorks.length < this.totalWork &&
-            this.allFlatWorks.length > 0  && !this.loadingTaskList && !this.loadingMoreTask
-        ) {
-            this.myOwnFilter.page += 1;
-            this.filterListProcessUserStartWork.page +=1;
-
-            if ((this.myOwnFilter.page-1)*this.myOwnFilter.size <this.totalWork) {
-                this.getWorks();
+        },
+        /**
+         * Dùng Trong trường hợp mà gọi đến một API mà không thể thay đổi định dạng trả về của API đó  theo đúng với định dạng chung của ListItem 
+         * định dạng: 
+         * {
+         *     reformatData(res){} // Lấy ra các cột cần hiển thị
+         * }
+         **/
+        customAPIResult: {
+            type: Object,
+            default(){
+                return {}
             }
-        }
+        },
     },
-    handleTaskSubmited() {
-        this.sideBySideMode = false;
-        this.getWorks();
-    },
-    handleChangeFilterValue(data) {
-        for (let key in data) {
-            this.$set(this.myOwnFilter, key, data[key]);
-        }
-        this.getWorks();
-    },
-    reCalcListTaskHeight() {
-        this.listTaskHeight =util.getComponentSize(this.$el.parentElement).h - 125;
-    },
-    getUser(id) {
-        this.$refs.user.getUser(id);
-    },
-    selectObject(obj, idx,idex) {
-        this.index = idx;
-        this.dataIndex = idex;
-        this.$set(this.selectedWork, "workInfo", obj);
-        this.selectedWork.workInfo.appName=this.selectValueInVariables(obj.id);
-        this.selectedWork.idx = idx;
-        if (!this.compackMode) {
-            this.sideBySideMode = true;
-            this.$emit("change-height", "calc(100vh - 88px)");
-        }
-    },
-    closeDetail() {
-      this.sideBySideMode = false;
-      this.$emit("change-height", "calc(100vh - 120px)");
-    },
+    data: function() {
+        return {
+            data:[],
+            page: 1, // trang hiện tại
+            pageSize: 50,
+            searchKey: "", //Từ khóa cần tìm kiếm trên tất cả các cột,
+            totalObject:0,// Tổng số trang của danh sách này
+            tableFilter: {
+                // cấu hình filter của danh sách này
+                allColumn: {
+                    // cấu hình filter của tất cả các cột trong bảng này dạng {tên cột : cấu hình filter}
+                   // startTime:getDefaultFilterConfig(),
+                    
+                },
+                currentColumn: {
+                    colFilter: getDefaultFilterConfig(),
+                    name: ""
+                }
+            },
+            filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
+            getDataUrl:appConfigs.apiDomain.workflowExtend+"works",
+             /**
+             * Thêm điều kiện để quy vấn qua api
+             */
+            conditionByFormula:{
+                type:String
+            },
+            tableColumns: [],
+        
 
-    async getWorks(filter = {}) { // đây là get processInstance chứ k phải get Task
-        if (this.loadingTaskList || this.loadingMoreTask) {
-            return;
-        }
+            index: -1,
+            dataIndex:-1,
+            loadingTaskList: false,
+            loadingMoreTask: false,
+            listTaskHeight: 300,
+            selectedWork:{
+                workInfo: {},
+                idx: -1,
+            },
+            isSmallRow: false,
+            sideBySideMode: false,
+            myOwnFilter: {
+                size: 50,
+                sort: "startTime",
+                order: "desc",
+                page: 1,
+                involvedUser: this.$store.state.app.endUserInfo.id+"%"
+            },
+        };
+    },
+    created() {
+        this.getData();
+    },
+    mounted() {
         let self = this;
-        if (this.myOwnFilter.page == 1) {
-            this.allFlatWorks = [];
-            this.loadingTaskList = true;
-        } else {
-            this.loadingMoreTask = true;
-        }
-        filter = Object.assign(filter, this.filterFromParent);
-        filter = Object.assign(filter, this.myOwnFilter);
-        let processIden = [],processId=[];
-        // get variable process mà user start
-        let res2 = {};
-        res2 = await taskApi.getVariableWorkflow(self.filterListProcessUserStartWork);
-        let processIdUserStart=[];
-        for (let item of res2.data) {
-            if (self.listIdProcessInstance.indexOf(item.processInstanceId) === -1) {
-                processIdUserStart.push(item.processInstanceId);
-                processId.push(item.processInstanceId);
-                processIden.push('work:'+item.processInstanceId);
-            }
-        }
-        await this.getProcessInstanceUserStart(processIdUserStart);
-        // get processInstance theo involvedUser
-        let res = {};
-        let listWork = [];
-        res = await BPMNEngine.getProcessInstanceHistory(filter);
-        listWork = res.data;
-        this.totalWork = Number(res.total);
-       
-        for (let work of listWork) {
-            if (self.listIdProcessInstance.indexOf(work.processInstanceId) === -1) {
-                self.allFlatWorks.push(work);
-                processIden.push('work:'+work.id);
-                processId.push(work.id);
-                self.listIdProcessInstance.push(work.id);
-            }
-        }
-       
-        
-        self.filterVariables.pageSize=(processId.length)*2;
-        self.filterVariables.processInstanceIds=JSON.stringify(processId);
-        
-        let resVariable = {};
-        resVariable = await taskApi.getVariableWorkflow(self.filterVariables);
-        for (let item of resVariable.data) {
-            if (self.allVariableProcess.indexOf(item.id) === -1) {
-                self.allVariableProcess.push(item);
-            }
-        }
-
-        this.$store.commit('file/setWaitingFileCountPerObj', processIden);
-        this.$store.commit('comment/setWaitingCommentCountPerObj', processIden);
-        this.$store.dispatch('file/getWaitingFileCountPerObj');
-        this.$store.dispatch('comment/getWaitingCommentCountPerObj');
-        self.loadingTaskList = false;
-        self.loadingMoreTask = false;
+        this.$store
+            .dispatch("process/getAllDefinitions")
+            .then(res => {
+                self.getData();
+            })
+            .catch(err => {});
+        self.reCalcListTaskHeight();
     },
-    async getProcessInstanceUserStart(processIdUserStart){
-        if (processIdUserStart.length>0) {
-            let self=this;
-            let filter={};
-            filter.size= processIdUserStart.length+1;
-            filter.sort= "startTime";
-            filter.order= "desc";
-            filter.processInstanceIds=processIdUserStart;
-            let res={};
-            res = await BPMNEngine.getProcessInstanceHistory(filter);
-            for (let work of res.data) {
-                if (!self.allFlatWorks[work.id]) {
-                    self.allFlatWorks.push(work);
+    methods: {
+        columnFilter(){
+            if (this.tableFilter.currentColumn.name=="isDone") {
+                if(this.tableFilter.currentColumn.colFilter.selectItems.length>0){
+                    let items=this.tableFilter.currentColumn.colFilter.selectItems;
+                    for (let i = 0; i < items.length; i++) {
+                        if (items[i].value==1) {
+                            this.tableFilter.currentColumn.colFilter.selectItems[i].label=this.$t('common.done');;
+                        }else if(items[i].value==0){
+                            this.tableFilter.currentColumn.colFilter.selectItems[i].label=this.$t('myItem.unfinished');
+                        }
+                    }
                 }
             }
-        }
+            return this.tableFilter.currentColumn.colFilter;
+        },
+        /**
+         * Kiểm tra xem một cột trong table có đang áp dụng filter hay ko
+         */
+        checkColumnHasFilter(colName, filter = false) {
+            if (!filter) {
+                filter = this.tableFilter.allColumn[colName];
+            }
+            if (!filter) {
+                return false;
+            } else {
+                if (
+                    filter.sort == "" &&
+                    $.isEmptyObject(filter.valuesIn) &&
+                    $.isEmptyObject(filter.valuesNotIn) &&
+                    filter.conditionFilter.items[0].type == "none" &&
+                    filter.searchKey == ''
+                ) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+        },
+        /**
+         * Thực hiện filter khi người dùng click vào nút apply của filter
+         */
+        applyFilter(filter, source = "filter") {
+            this.page=1;// gán lại page=1 để reset data
+            let colName = this.tableFilter.currentColumn.name;
+            this.$set(this.tableFilter.allColumn, colName, filter);
+            let hasFilter = this.checkColumnHasFilter(colName, filter);
+            this.filteredColumns[colName] = hasFilter;
+            let icon = $(this.$el).find(
+                ".symper-table-dropdown-button[col-name=" + colName + "]"
+            );
+            this.getData(false,false,true);
+            if(hasFilter && source != "clear-filter"){
+                icon.addClass("applied-filter");
+            }else{
+                this.$delete(this.tableFilter.allColumn, colName);
+                icon.removeClass("applied-filter");
+            }
+        },
+        showFilterColumn(event,colName){
+            let x=event.clientX;
+            let y=event.clientY;
+            var windowWidth = $(window).width()/1.1;
+            if( event.clientX > windowWidth){
+                x-= 190;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            let filterDom = $(this.$refs.tableFilter.$el);
+            filterDom.css("left", x + "px").css("top", y + 20 + "px");
+            this.$refs.tableFilter.show();
+            let colFilter = this.tableFilter.allColumn[colName];
+            if (!colFilter) {
+                colFilter = getDefaultFilterConfig();
+                this.$set(this.tableFilter.allColumn, colName, colFilter);
+            }
+         
+            this.$set(this.tableFilter, "currentColumn", {
+                name: colName,
+                colFilter: colFilter
+            });
+            this.getItemForValueFilter();
+
+        },
+           /**
+         * Lấy các item phục vụ cho việc lựa chọn trong autocomplete cuar filter
+         */
+        getItemForValueFilter(){
+            let columns = [this.tableFilter.currentColumn.name];
+            let self = this;
+            let options = {
+                pageSize: 300,
+                getDataMode: 'autocomplete',
+                distinct: true,
+                page: 1
+            };
+            let success = (data) => {
+                if(data.status == 200){
+                    self.tableFilter.currentColumn.colFilter.selectItems = null;
+                    let items = data.data.listObject.reduce((arr, el) => {
+                        arr.push(el[columns[0]]);
+                        return arr;
+                    }, []);
+                    self.tableFilter.currentColumn.colFilter.selectItems = self.createSelectableItems(items);
+                }
+                console.log(self.tableFilter.currentColumn.selectItems, 'datadatadatadatadata');
+            }
+            this.prepareFilterAndCallApi(columns , false, true, success, options);
+        },
+        /* Lấy ra cấu hình cho việc sort
+         */
+        prepareFilterAndCallApi(columns = false, cache = false, applyFilter = false, success, configs = {}){
+            if(Object.keys(this.defaultData.listObject).length > 0){
+                success({data:this.defaultData});
+                return;
+            }
+            let url = this.getDataUrl;
+            let method = 'GET';
+            if (url != "") {
+                let thisCpn = this;
+                // thisCpn.loadingData = true;
+                // let options = this.getOptionForGetList(configs, columns);
+                let emptyOption = false;
+                let header = {};
+                let routeName = this.$getRouteName();
+                if(routeName == "deployHistory" || routeName == "listProcessInstances"){
+                    header = {
+                        Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0'
+                    };
+                    // options = {};
+                    emptyOption = true;
+                }
+
+                //configs.searchKey = this.searchKey;
+                configs.page = configs.page ? configs.page : this.page;
+                configs.pageSize = this.pageSize;
+                configs.formulaCondition = this.conditionByFormula;
+                let tableFilter = this.tableFilter;
+                tableFilter.allColumnInTable = [];
+                configs.emptyOption = emptyOption;
+                getDataFromConfig(url, configs, columns, tableFilter, success, 'GET', header);
+            }
+        },
+      
+        searchAutocompleteItems(vl){
+            this.tableFilter.currentColumn.colFilter.searchKey = vl;
+            this.getItemForValueFilter();
+        },
+            /**
+         * Tạo ra các item có check box với trạng thái đã check hay chưa 
+         * @param items danh sách các value dạng ['ccc','xxc', ....]
+         */
+        createSelectableItems(items){
+            let colFilter = this.tableFilter.currentColumn.colFilter;
+            let selectableItems = [];
+            if(colFilter.clickedSelectAll){ // chọn tất cả
+                selectableItems = items.reduce((arr, el) => {
+                    arr.push({
+                        value: el,
+                        checked: true
+                    });
+                    return arr;
+                }, []);
+            }else if(colFilter.selectAll){ // not in
+                selectableItems = items.reduce((arr, el) => {
+                    arr.push({
+                        value: el,
+                        checked: colFilter.valuesNotIn[el] ? false : true
+                    });
+                    return arr;
+                }, []);
+            }else{ // in
+                selectableItems = items.reduce((arr, el) => {
+                    arr.push({
+                        value: el,
+                        checked: colFilter.valuesIn[el] ? true : false
+                    });
+                    return arr;
+                }, []);
+            }  
+            return selectableItems;
+        },
+
+        /**~~~~~~~~~~~~~~~~~~~~ */
+        getRoleUser(roleIdentify){
+            let arrDataRole=roleIdentify.split(":");
+            let allSymperRole=this.$store.state.app.allSymperRoles;
+            if (allSymperRole[arrDataRole[0]]) {
+                let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+                return role;
+            }else{
+                return {};
+            }
+        },  
+        changeUpdateAsignee(){
+            this.handleTaskSubmited();
+        },
+        getDateFormNow(time){
+            var today = this.$moment().format('YYYY-MM-DD');
+            if (time===today) {
+                return this.$t('myItem.today');
+            }
+            else{
+                return this.$moment(time).fromNow();
+            }
+        },
+        changeObjectType(index) {
+            this.$emit("changeObjectType", index);
+        },
+        handleReachEndList() {
+            if (
+                this.data.length < this.totalObject &&
+                this.data.length > 0  && !this.loadingTaskList && !this.loadingMoreTask
+            ) {
+               // this.myOwnFilter.page += 1;
+                this.page +=1;
+                // if ((this.myOwnFilter.page-1)*this.myOwnFilter.size <this.totalWork) {
+                //     this.getWorks();
+                // }
+                this.getData();
+            }
+        },
+        handleTaskSubmited() {
+            this.sideBySideMode = false;
+            this.getData();
+        },
+        handleChangeFilterValue(data) {
+            for (let key in data) {
+                this.$set(this.myOwnFilter, key, data[key]);
+            }
+            this.getData();
+        },
+        reCalcListTaskHeight() {
+            this.listTaskHeight =util.getComponentSize(this.$el.parentElement).h - 85;
+        },
+        getUser(id) {
+            this.$refs.user.getUser(id);
+        },
+        selectObject(obj, idx,idex) {
+            this.index = idx;
+            this.dataIndex = idex;
+            this.$set(this.selectedWork, "workInfo", obj);
+            this.selectedWork.workInfo.appName=obj.symperApplicationName;
+            this.selectedWork.idx = idx;
+            if (!this.compackMode) {
+                this.sideBySideMode = true;
+                this.$emit("change-height", "calc(100vh - 88px)");
+            }
+        },
+        closeDetail() {
+            this.sideBySideMode = false;
+            this.$emit("change-height", "calc(100vh - 120px)");
+        },
+         /**
+         * Lấy data từ server
+         * @param {Array} columns chứa thông tin của các cột cần trả về.
+         * @param {Boolean} cache có ưu tiên dữ liệu từ cache hay ko
+         *
+         */
+        getData(columns = false, cache = false, applyFilter = true, lazyLoad = true ) {
+            if (this.loadingTaskList || this.loadingMoreTask) {
+                return;
+            }
+            let self = this;
+            if (this.page == 1) {
+                this.data = [];
+                this.loadingTaskList = true;
+            } else {
+                this.loadingMoreTask = true;
+            }
+            if (Object.keys(this.tableFilter.allColumn).length==0 ) {
+                this.tableFilter.allColumn["startTime"]=getDefaultFilterConfig();
+                this.tableFilter.allColumn.startTime.sort="desc";
+            }
+            let thisCpn = this;
+            let handler = (data) => {
+                if(thisCpn.customAPIResult.reformatData){
+                    data = thisCpn.customAPIResult.reformatData(data);
+                }else{
+                    data = data.data;
+                }
+                this.totalObject = data.total ? parseInt(data.total) : 0;
+            
+                let resData = data.listObject ? data.listObject : []
+
+                let processIden = [],processId=[];
+                if(lazyLoad){
+                    resData.forEach(function(e){
+                        thisCpn.data.push(e)
+                    })
+                }else{
+                    thisCpn.data = resData;
+                }
+
+                for (let work of resData) {
+                    processIden.push('work:'+work.id);
+                }
+            
+                this.$store.commit('file/setWaitingFileCountPerObj', processIden);
+                this.$store.commit('comment/setWaitingCommentCountPerObj', processIden);
+                this.$store.dispatch('file/getWaitingFileCountPerObj');
+                this.$store.dispatch('comment/getWaitingCommentCountPerObj');
+
+                thisCpn.$emit('data-get', data.listObject);
+                thisCpn.loadingTaskList = false;
+                thisCpn.loadingMoreTask = false;
+            }
+            this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
+        },
     }
-  }
 };
 </script>
 
@@ -637,5 +880,8 @@ export default {
 .col-10 {
     flex: 0 0 97%;
     max-width: 97%;
+}
+.d-active-color{
+    color: #f58634;
 }
 </style>

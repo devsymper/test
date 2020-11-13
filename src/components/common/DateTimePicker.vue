@@ -87,26 +87,27 @@ export default {
                 if($(e.target).is('div.htAutocompleteArrow')){
                     edtos = $(e.target).parent().offset();;
                 }
-                
                 let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
                 this.position = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
             }
             //nêu là ngoài bảng
             else{
-                let autoEL = $(this.$el).detach();
-                $(e.target).parent().append(autoEL);
                 let inputOffset = $(e.target).offset();
-                if(window.innerWidth < inputOffset.left + $('.card-datetime-picker').width() + 10){
-                    this.position = {'top':'26px','right':'0px'};
+                let submitFormOffset = $('#sym-submit-'+this.keyInstance).offset();
+                let submitFormWidth = $('#sym-submit-'+this.keyInstance).width();
+                let leftDiff = inputOffset.left - submitFormOffset.left;
+                let cardWidth = $('.card-datetime-picker').width();
+                let cardHeight = $('.card-datetime-picker').height();
+                let inputWidth = $(e.target).width();
+                if(cardWidth + leftDiff > submitFormWidth){
+                    this.position = {'top':inputOffset.top - submitFormOffset.top + 26 +'px','left':Math.abs(inputOffset.left + inputWidth - 10 - cardWidth)+'px'};
                 }
                 else{
-                    this.position = {'top':'26px','left':'0px'};
+                    this.position = {'top':inputOffset.top - submitFormOffset.top + 26 +'px','left':Math.abs(inputOffset.left - submitFormOffset.left)+'px'};
                 }
                 if(window.innerHeight < inputOffset.top + $('.card-datetime-picker').height() + 40){
-                    delete this.position.top;
-                    this.position['bottom'] = '26px';
+                    this.position.top = Math.abs(inputOffset.top - submitFormOffset.top - cardHeight) + 'px'
                 }
-                
             }
         },
         applyDateTime(){

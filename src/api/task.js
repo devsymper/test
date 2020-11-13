@@ -9,11 +9,14 @@ export const taskApi = {
         return fileManagement.get('getFileByObjectIdentifier', { objectIdentifier: data.objectIdentifier, objectType: data.objectType });
     },
     downloadFile(id) {
-        window.open('https://file.symper.vn/downloadS/' + id, '_blank');
+        window.open(appConfigs.apiDomain.fileManagement+'downloadS/' + id, '_blank');
     },
     deleteFile(data) {
         return fileManagement.put('changeStatusSymperFile', data);
 
+    },
+    renameFile(data) {
+        return fileManagement.put('renameFile', data);
     },
     getDocumentObjIds(data) {
         return document.post('documents/object/batch', data);
@@ -22,7 +25,7 @@ export const taskApi = {
         return document.get('documents/objects-out-workflow/'+ userId);
     },
     getListNodeInProcess(){
-        return workfloweExtend.get("activitys");
+        return workfloweExtend.get("activities");
     },
     getVariableWorkflow(filter){
         if (filter.size) {
@@ -33,7 +36,12 @@ export const taskApi = {
     },
     getDocumentInVariables(filter){
         return workfloweExtend.get("variables/documents",{page:filter.page,pageSize:filter.pageSize});
+    },
+
+    getListWork(filter){
+        return workfloweExtend.get("works",filter);
     }
+   
 
     
 

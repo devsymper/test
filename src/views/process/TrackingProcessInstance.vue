@@ -1,7 +1,7 @@
 <template>
     <div class="h-100 w-100">
         <div class="action-diagram-bpmn" style="text-align:right;margin-top:3px">
-            <span class="fs-13" style="float:left">{{definitionName}}</span>
+            <span class="fs-13 pl-1" style="float:left">{{definitionName}}</span>
             <v-icon class="action-btn"  @click="handleZoomOut">mdi-plus-circle-outline</v-icon>
             <v-icon class="action-btn"  @click="handleZoomIn">mdi-minus-circle-outline</v-icon>
             <v-icon class="action-btn"  @click="handleFocus">mdi-image-filter-center-focus</v-icon>
@@ -84,6 +84,10 @@ export default {
         instanceId(){
             this.setInstanceXML();
            // this.getInstanceRuntimeData();
+        },
+        elementId(){
+            this.setInstanceXML();
+            this.eventAfterRender();
         }
     },
     created() {
@@ -128,7 +132,7 @@ export default {
             if(this.needFocus){
                 setTimeout((self) => {
                     self.$refs.symperBpmn.focus();
-                }, 100,this);
+                }, 200,this);
             }
         },
         handleClosePopup(){
@@ -156,6 +160,7 @@ export default {
                 bpmneApi
                 .getDefinitionModel(this.processDefinitionId)
                 .then(res => {
+
                     let data=res.mainProcess.flowElementMap;
                     for (const key in data) {
                         if (data[key].assignee && !self.runtimeNodeMap[key]) {
@@ -163,7 +168,7 @@ export default {
                         }
                     }
                     self.getVariableProcessInstance(self.instanceId);
-                    console.log("aaaax",self.flowElementMap);
+                    console.log("aaaax",res);
                 })
                 .catch(err => {
                     self.$snotifyError(
@@ -178,7 +183,7 @@ export default {
             let filter={};
             filter.includeProcessVariables=true;
             filter.processInstanceId=instanceId;
-            await bpmneApi
+            bpmneApi
                 .getProcessInstanceHistory(filter)
                 .then(res => {
                     self.updateDrawDataInDiagram(res.data[0].variables);
@@ -191,6 +196,7 @@ export default {
                 });
         },
         async updateDrawDataInDiagram(variables){
+            let self=this;
             let symBpmn = this.$refs.symperBpmn;
             let mapUser = this.$store.getters['app/mapIdToUser'];
             for (let index = 0; index < this.flowElementMap.length; index++) {
@@ -204,31 +210,36 @@ export default {
                     data.data=this.flowElementMap[index].assignee;
                     data.type="multiple";
                     let res=await orgchartApi.getUserIdentifiFromProcessModeler(data);
-                    this.flowElementMap[index].assignee=res;
+                    self.flowElementMap[index].assignee=res;
                 }
 
                 let infoAssignee={};
                 let roleInfo={};
                 infoAssignee.assignee={};
                 infoAssignee.role={};
-                let task=this.flowElementMap[index];
+                let task=self.flowElementMap[index];
                 let assigneeId=task.assignee;
                 if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
                     let arrDataAssignee=task.assignee.split(":");
                     assigneeId=arrDataAssignee[0];
                     if (arrDataAssignee.length>3) { // loại trừ trường hợp role=0
                         let roleIdentify=task.assignee.slice(assigneeId.length+1);
-                        roleInfo=this.getRoleUser(roleIdentify);
+                        roleInfo=self.getRoleUser(roleIdentify);
                     }
                 }
                 if (mapUser[assigneeId]) {
                     infoAssignee.assignee = mapUser[assigneeId];
                     infoAssignee.role = roleInfo;
                 }
-                symBpmn.updateElementProperties(this.flowElementMap[index].id, {
-                    infoAssignee: infoAssignee,
-                    setColor:nodeStatusColors.notStart
-                });
+
+                if (self.flowElementMap[index].id) {
+                    setTimeout((self) => {
+                        symBpmn.updateElementProperties(self.flowElementMap[index].id, {
+                            infoAssignee: infoAssignee,
+							setColor:nodeStatusColors.notStart,
+                        });
+                    }, 200,this);
+                }
             }
         },
         // Lấy ra thông tin chạy của các node của instance
@@ -286,8 +297,10 @@ export default {
             let arrDataRole=roleIdentify.split(":");
             let allSymperRole=this.$store.state.app.allSymperRoles;
             if (Object.keys(allSymperRole).length>0) {
-                let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
-                return role;
+                if (allSymperRole[arrDataRole[0]]) {
+                    let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+                    return role;
+                }
             }
             return {}
         },
@@ -312,20 +325,21 @@ export default {
                         Object.keys(taskInfo).forEach(item => {
                             let task=taskInfo[item];
                             let assigneeId=task.assignee;
-                            if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
-                                let arrDataAssignee=task.assignee.split(":");
-                                assigneeId=arrDataAssignee[0];
-                                if (arrDataAssignee.length>3) { // loại trừ trường hợp role=0
-                                    let roleIdentify=task.assignee.slice(assigneeId.length+1);
-                                    roleInfo=this.getRoleUser(roleIdentify);
+                            if (task.assignee) {
+                                if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
+                                    let arrDataAssignee=task.assignee.split(":");
+                                    assigneeId=arrDataAssignee[0];
+                                    if (arrDataAssignee.length>3) { // loại trừ trường hợp role=0
+                                        let roleIdentify=task.assignee.slice(assigneeId.length+1);
+                                        roleInfo=this.getRoleUser(roleIdentify);
+                                    }
+                                }
+                                if (mapUser[assigneeId]) {
+                                    infoAssignee.assignee = mapUser[assigneeId];
+                                    infoAssignee.role = roleInfo;
                                 }
                             }
-                            if (mapUser[assigneeId]) {
-                                infoAssignee.assignee = mapUser[assigneeId];
-                                infoAssignee.role = roleInfo;
-                            }
                         });
-                        //console.log(taskInfo,"aaaaaxx");
                         symBpmn.updateElementProperties(eleId, {
                             statusCount: nodeInfo.instancesStatusCount,
                             currentNode: currentNode,
@@ -350,7 +364,9 @@ export default {
                         let allNode = symBpmn.getAllNodes();
                         let nodeStatus = "";
                         if(self.elementId){
-                            self.runtimeNodeMap[self.elementId].currentNode = true;
+                            if (self.runtimeNodeMap[self.elementId]) {
+                                self.runtimeNodeMap[self.elementId].currentNode = true;
+                            }
                         }
                         for (let node of allNode) {
                             if (node.$type != "bpmn:Process") {
@@ -383,7 +399,7 @@ export default {
                     return self.getDefinitionXML(resourceDataUrl);
                 })
                 .then(res => {
-                    self.diagramXML = res;
+					self.diagramXML = res;
                     self.getInstanceRuntimeData();
                     self.setColorForNodes().then(() => {
                         self.setTasksStatus();
@@ -460,7 +476,8 @@ export default {
             this.nodeDetailPanel.titleIcon = 'mdi-account';
             this.nodeDetailPanel.show = true;
         },
-    }
+    },
+   
 
 };
 </script>

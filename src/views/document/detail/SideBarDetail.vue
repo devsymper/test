@@ -4,10 +4,11 @@
 	absolute
 	permanent
 	right
+	v-show="isShow"
 	:width="400"
 	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)','display':displaySidebar}"
 	>
-	<div class="main-info">
+	<div v-show="showMainInfo" class="main-info">
 		<div style="display:flex;">
 			<span style="font-size:15px;">{{$t('document.detail.sidebar.heading')}}</span>
 			<span class="mdi mdi-close" @click="hide"></span>
@@ -33,6 +34,10 @@
 								<tr>
 									<td style="width:70px">{{$t('document.detail.sidebar.body.general.userCreate')}}</td>
 									<td>{{userCreate}}</td>
+								</tr>
+								<tr v-if="userRoleInfo">
+									<td style="width:70px">{{$t('document.detail.sidebar.body.general.userRole')}}</td>
+									<td>{{userRoleInfo}}</td>
 								</tr>
 								<tr>
 
@@ -60,7 +65,7 @@
 								<span>{{$t('document.detail.sidebar.body.userRelated.subTitle1')}}</span>
 							</p>
 							<div v-for="user in listApprovalUser" :key="user.id" class="user-info">
-								<img :src="'https://file.symper.vn/readFile/user_avatar_'+user.userId" alt="">
+								<img :src="fileDomain + 'readFile/user_avatar_'+user.userId" alt="">
 								<span class="user-name">{{user.displayName}}</span>
 							</div>
 						</div>
@@ -70,7 +75,7 @@
 								<span>{{$t('document.detail.sidebar.body.userRelated.subTitle2')}}</span>
 							</p> 
 							<div v-for="user in listRelatedUser" :key="user.id" class="user-info">
-								<img :src="'https://file.symper.vn/readFile/user_avatar_'+user.userId" alt="">
+								<img :src="fileDomain + 'readFile/user_avatar_'+user.userId" alt="">
 								<span class="user-name">{{user.displayName}}</span>
 							</div>
 						</div>
@@ -93,7 +98,9 @@
 			</v-expansion-panels>
 		</VuePerfectScrollbar>
 	</div>
-	<div class="history-info" style="transform:translateX(400px)">
+	<div 
+	v-show="showHistoryInfo"
+	class="history-info" style="transform:translateX(400px)">
 		<div style="display:flex;">
 			<span class="mdi mdi-keyboard-backspace" @click="hideHistory"></span>
 			<span style="font-size:15px;">LỊCH SỬ CHỈNH SỬA</span>
@@ -101,7 +108,7 @@
 
 		<v-divider></v-divider>
 
-		<VuePerfectScrollbar style="calc(100% - 62px);">
+		<VuePerfectScrollbar style="height: calc(100% - 25px);">
 			<div v-for="history in listHistoryControl" 
 			:key="history.id" 
 			@click="showHistoryControl(history)"
@@ -110,10 +117,7 @@
 					<div class="date-update">
 						{{history.date}}
 					</div>
-					<div>
-						<img src="https://randomuser.me/api/portraits/men/81.jpg" height="14px" alt="">
-						<span>{{history.userUpdate}}</span>
-					</div>
+					<InfoUser :userId="history.userUpdate"/>
 				</div>
 				<div class="history-item__action">
 					<v-tooltip left>
@@ -130,25 +134,34 @@
 			</div>
 		</VuePerfectScrollbar>
 	</div>
-	<Comment v-if="showCommentInDoc" 
-	style="height:100%" ref="commentView" 
+	<Comment v-show="showCommentInfo" 
+	v-if="showCommentInDoc" 
+	style="height:95%" ref="commentView" 
+	@close-comment="hideComment"
 	:objectIdentifier="String(documentObjectId)" />
 
 	</v-navigation-drawer>
 </template>
 <script>
 
-import { userApi } from "./../../../api/user.js";
-import { documentApi } from "./../../../api/Document";
-import bpmnApi from "./../../../api/BPMNEngine.js";
-import { util } from "./../../../plugins/util.js";
+import { userApi } from "@/api/user.js";
+import { documentApi } from "@/api/Document";
+import { orgchartApi } from "@/api/orgchart";
+import bpmnApi from "@/api/BPMNEngine.js";
+import { util } from "@/plugins/util.js";
 import { data } from 'jquery'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import Comment from './Comment'
+import {logServiceApi} from "@/api/log.js";
+import { getControlInstanceFromStore } from '../common/common';
+import InfoUser from "@/components/myItem/InfoUser.vue";
+import { appConfigs } from '../../../configs';
+
 export default {
 	components:{
-		 VuePerfectScrollbar,
-		 Comment
+		VuePerfectScrollbar,
+		Comment,
+		InfoUser
 	},
 	data () {
 		return {
@@ -157,7 +170,9 @@ export default {
 			userCreate:"",
 			createdDate:"",
 			workflowName:"",
+			userRoleInfo:"",
 			showPanelWorkflow:true,
+			fileDomain: appConfigs.apiDomain.fileManagement,
 			taskName:"",
 			listApprovalUser:[],
 			listRelatedUser:[],
@@ -165,10 +180,16 @@ export default {
                 {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:2, controls:[{id:'s-control-id-1596780634836',data:[]},{id:'s-control-id-1596780602772',data:[]},{id:'s-control-id-1596780611212',data:[]}]},
                 {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:1, controls:[{id:'s-control-id-1596780602772',data:[]}]},
 			],
-			displaySidebar:'none'
+			displaySidebar:'none',
+			showMainInfo:false,
+			showHistoryInfo:false,
+			showCommentInfo:false,
 		}
 	},
 	props:{
+		keyInstance: {
+			default: null
+		},
 		sidebarWidth:{
 			type:Number,
 			default:400
@@ -196,37 +217,55 @@ export default {
 		documentObjectId:{
 			type:Number,
 			default:0
+		},
+		userRole:{			// role của user submit doc
+			type:String
 		}
 	},
 	watch:{
 		userId(after){
-			userApi.getDetailUser(after).then(res=>{
-				if(res.status == 200)
-				this.userCreate = res.data.user.displayName
+			if(!after){
+				return;
+			}
+			let user = this.allUsers.filter(u=>{
+				return u.id == after;
 			});
+			this.userCreate = user[0].displayName;
+			let self = this;
+			if(self.userRole){
+				orgchartApi.getRolesByUser([{idUser: after}]).then(res=>{
+					let listRole = res.data[0].roles;
+					if(listRole.length > 0){
+						let curRole = listRole.filter(role=>{
+							return role.id == self.userRole;
+						})
+						self.userRoleInfo = curRole[0].name;
+					}
+				});
+			}
 		},
 		workflowId(after){
 			let self = this
-			if(after != ""){
+			if(after != "" && after != "0"){
 				bpmnApi.getProcessInstanceData(this.workflowId).then(res=>{
 					self.workflowName = res.data[0].processDefinitionName
 				});
 			}
-			
 		},
 		taskId(after){
 			let self = this
-			if(after != ""){
-				bpmnApi.getATaskInfo(this.taskId).then(res=>{
-                   self.taskName = res.name == null ? "" : res.name
+			if(after != "" && after != "0"){
+				//Tger chỉnh sửa lại api get detail task
+				bpmnApi.postTaskHistory({taskId:this.taskId}).then(res=>{
+					if (res.total>0) {
+                   		self.taskName = res.data[0].name == null ? "" : res.data[0].name
+					}
                 });
 			}
-			
 		},
 		createTime(after){
 			this.createdDate = after
 		},
-		
 	},
 	computed:{
 		allUsers(){
@@ -251,25 +290,196 @@ export default {
 							user.displayName = userInfo[0].displayName
 							thisCpn.listApprovalUser.push(user);
 						}
-						
 					}
 				}
 			})
 			.catch(err => {
-
 			})
 			.always(() => {});
 	},
+	mounted() {
+		setTimeout((self) => {
+			self.setDocUpdateHistory();
+		}, 2000, this);
+	},
 	methods:{
+		async setDocUpdateHistory(){
+			let res = await logServiceApi.query({
+				"query": {
+					"bool": {
+					"must": [
+							{
+								"term": {
+									"logObjectType": "document_instance"
+								}
+							},{
+								"term": {
+									"logAction": "update"
+								}
+							},{
+								"term": {
+									"logObjectId": this.documentObjectId
+								}
+							}
+						]
+					}
+				}
+			});
+			if(res.status == 200){
+				let list = [];
+				this.listHistoryControl = this.getFormattedUpdateHistory(res.data);
+				let param = {
+					instance: this.keyInstance, 
+					data: this.listHistoryControl
+				};
+        		this.$store.commit("document/setDetailTrackChange",param);
+			}else{
+				this.$snotifyError(res, "Can not get document update history!");
+			}
+		},
+		getFormattedUpdateHistory(list){
+			let rsl = [];
+			
+			for(let item of list){
+				let newValue = typeof item.new == 'string' ? JSON.parse(item.new) : item.new;
+				let oldValue = typeof item.old == 'string' ? JSON.parse(item.old) : item.old;
+
+				rsl.push({
+					old: oldValue,
+					new: newValue,
+					date: newValue.document_object_update_time, 
+					userUpdate: item.user_update_id, 
+					// historyid:2, 
+					controls: this.getAllControlValueChange(oldValue, newValue)
+				});
+			}
+			return rsl;
+		},
+		getAllControlValueChange(oldObj, newObj){
+			let controlValueIndoc = {};
+			let controlValueInTables = {};
+
+			let changedControls = {
+				doc: this.compareTwoRows(oldObj, newObj),
+				tables: []
+			};
+
+			let mapTableAndControls = {};
+			for(let name in newObj){
+				if($.isArray(newObj[name])){
+					mapTableAndControls[name] = {
+						new: {},
+						old: {}
+					};
+
+					if($.isArray(newObj[name])){
+						for(let row of newObj[name]){
+							mapTableAndControls[name].new[row.document_object_id] = row;
+						}
+					}
+
+					if($.isArray(oldObj[name])){
+						for(let row of oldObj[name]){
+							mapTableAndControls[name].old[row.document_object_id] = row;
+						}
+					}
+				}
+			}
+
+			for(let tbName in mapTableAndControls){
+				let tbChange = {};
+				for(let idRow in mapTableAndControls[tbName].new){
+					if(mapTableAndControls[tbName].old[idRow]){
+						let oldObj = mapTableAndControls[tbName].old[idRow];
+						let newObj = mapTableAndControls[tbName].new[idRow];
+						tbChange[idRow] = this.compareTwoRows(oldObj, newObj);
+					}
+				}
+
+				if(!$.isEmptyObject(tbChange)){
+					let mapDocControl = this.$store.state.document.submit[this.keyInstance].listInputInDocument;
+					let table = mapDocControl[tbName];
+					let mapControlToIndex = table.mapControlToIndex;
+					let allColumnId = table.tableInstance.tableInstance.getDataAtProp('childObjectId');
+					
+					for(let rowId in tbChange){
+						let dataChange = tbChange[rowId];
+						let curRowIndex = allColumnId.indexOf(rowId);
+						for (let index = 0; index < dataChange.length; index++) {
+							let cellChange = dataChange[index];
+							if(cellChange.data.new != cellChange.data.old){
+								table.tableInstance.validateValueMap[curRowIndex + "_" + mapControlToIndex[cellChange.name]] = {
+									type: 'linkControl',
+								};
+							}
+						}
+						
+						
+					}
+					setTimeout(() => {
+						table.tableInstance.tableInstance.render()
+					}, 50);
+					changedControls.tables.push({
+						id: table.id,
+						data: tbChange,
+						name: tbName,
+						isTable: true
+					});
+				}
+			}
+
+			let rsl = changedControls.doc.concat(changedControls.tables);
+			return rsl;
+		},
+		compareTwoRows(oldObj, newObj){
+			let mapDocControl = this.$store.state.document.submit[this.keyInstance].listInputInDocument;
+			let rsl = [];
+
+			for(let name in newObj){
+				let ctrl = mapDocControl[name];
+				// [{id:'s-control-id-1596780602772',data:[]}]
+				if(	ctrl
+					&& oldObj.hasOwnProperty(name) && !$.isArray(oldObj[name])
+					&& newObj.hasOwnProperty(name) && !$.isArray(newObj[name]) // nếu khác giá trị
+				){
+					if( ['number','percent'].includes(ctrl.type)){
+						if(Number(oldObj[name]) === Number(newObj[name])){
+							continue
+						}
+					}
+					if(oldObj[name] === newObj[name]){
+						continue
+					}
+					let item = {
+						id: ctrl.id,
+						data: {
+							new: newObj[name],
+							old: oldObj[name],
+						},
+						name: name,
+						isTable: false
+					};	
+					rsl.push(item);	
+					let ctrlObj = getControlInstanceFromStore(this.keyInstance, name);
+					if(!ctrlObj.valueChanged){
+						ctrlObj.valueChanged = true;
+						ctrlObj.renderInfoIconToControl(name);
+					}
+				}
+			}
+			return rsl;
+		},
 		hide(){
 			this.isShow = false;
 			setTimeout((self) => {
 					self.displaySidebar = 'none';
+					self.showMainInfo = false;
 				}, 250, this);
 			this.$emit('after-hide-sidebar');
 		},
 		show(){
 			this.displaySidebar = '';
+			this.showMainInfo = true;
 			setTimeout((self) => {
 				self.isShow = true;
 			}, 10, this);
@@ -280,16 +490,38 @@ export default {
 				const control = history.controls[index];
 				$("#"+control.id).addClass('highlight-history');
 			}
-			
-		},
-		hideHistory(){
-			$('.history-info').css({transform:'translateX(400px)'})
-		},
-		showHistory(){
-			$('.history-info').css({transform:'translateX(0px)'})
 		},
 		showComment(){
-			this.$refs.commentView.show()
+			this.showCommentInfo = true;
+			setTimeout((self) => {
+				self.$refs.commentView.show();
+			}, 10, this);
+			setTimeout((self) => {
+				self.showMainInfo = false;
+			}, 250, this);
+		},
+		hideComment(){
+			this.showMainInfo = true;
+			setTimeout((self) => {
+				self.showCommentInfo = false;
+			}, 250, this);
+		},
+		showHistory(){
+			this.showHistoryInfo = true;
+			setTimeout((self) => {
+				$('.history-info').css({transform:'translateX(0px)'});
+			}, 10, this);
+			
+			setTimeout((self) => {
+				self.showMainInfo = false;
+			}, 250, this);
+		},
+		hideHistory(){
+			this.showMainInfo = true;
+			$('.history-info').css({transform:'translateX(400px)'});
+			setTimeout((self) => {
+				self.showHistoryInfo = false;
+			}, 250, this);
 		}
 	},
 

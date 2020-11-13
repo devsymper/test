@@ -3,12 +3,13 @@ import { appConfigs } from "./../configs.js";
 
 var coreApi = new Api(appConfigs.apiDomain.sdocumentManagement);
 var formulasApi = new Api(appConfigs.apiDomain.formulasService);
+var trashApi = new Api(appConfigs.apiDomain.trashService);
 export const documentApi = {
     getListDocument() {
         return coreApi.get("documents?pageSize=3000");
     },
     getBatchDocument(data) {
-        return coreApi.post("documents/batch",data);
+        return coreApi.post("documents/batch", data);
     },
     saveDocument(data) {
         return coreApi.post("documents", data);
@@ -38,8 +39,14 @@ export const documentApi = {
     submitDocument(data) {
         return coreApi.post("documents/objects", data);
     },
+    updateInfoDocumentObj(id, data) {
+        return coreApi.put("documents/objects-info/" + id, data);
+    },
     updateDocument(objId, data) {
         return coreApi.put("documents/objects/" + objId, data);
+    },
+    setEdittingDocument(data) {
+        return coreApi.put("documents/editting", data);
     },
     saveMultiFormulas(data) {
         return formulasApi.post('/formulas/batch', data);
@@ -60,8 +67,11 @@ export const documentApi = {
     getBatchFieldInfoInDoc(data) {
         return coreApi.post("documents/fields/batch", data);
     },
-    getFieldByDocId(id) {
-        return coreApi.post("documents/" + id + "/fields");
+    getFieldByDocId(name) {
+        return coreApi.get("documents/" + name + "/fields");
+    },
+    updateFields(data) {
+        return coreApi.put("fields/batch", data);
     },
     getDetailDocumentByName(data) {
         return coreApi.get("documents/by-name", data);
@@ -90,6 +100,9 @@ export const documentApi = {
     },
     restoreDocument(data) {
         return coreApi.post('documents/trash', data);
+    },
+    restoreDocumentObject(data) {
+        return coreApi.post('documents/objects/restore', data);
     },
     savePrintConfig(data) {
         return coreApi.post('documents/prints', data);
@@ -127,4 +140,7 @@ export const documentApi = {
     getDetailControlTemplate(id) {
         return coreApi.get('control-templates/' + id);
     },
+    deleteObjectInTrash(data) {
+        return trashApi.post('items/delete-multi', data)
+    }
 };

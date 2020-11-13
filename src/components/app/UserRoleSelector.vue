@@ -24,7 +24,6 @@
                                 {{item.orgchartName}}
                             </div>
                         </div>
-
                         <v-icon  color="green" v-if="currentRole.id == item.id" class="selected-role-check float-right ml-4">
                             mdi-check
                         </v-icon>

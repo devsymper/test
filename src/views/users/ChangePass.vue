@@ -1,17 +1,22 @@
 <template>
     <div class="h-100">
-        <h3 class="header-title" >{{$t('user.passwordSetting.title')}}</h3>
+        <h3 class="header-title" >{{$t('user.passwordSetting.title')}}
+            <div style="width:15px; float:right">
+                <i class='mdi mdi-close' @click="close()"></i>
+            </div>
+        </h3>
         <div class=" ml-3 content-edit-pass">
-            <h4 class="mt-2">{{$t('user.passwordSetting.changePassword.title')}}</h4>
+            <h4 class="mt-2">{{$t('user.passwordSetting.changePassword.title')}}
+            </h4>
 			<v-checkbox style="width:200px" dense class="sym-small-size mt-2 pl-3" 
                 v-model="checkChangePassword" 
                 @click="changePassword = !changePassword" 
                 :label="$t('user.passwordSetting.changePassword.title')"></v-checkbox>
             <v-row>
-                <v-col cols="3">
+                <v-col cols="6">
                     <v-subheader class="fs-13">{{$t('user.passwordSetting.changePassword.newPass')}}</v-subheader>
                 </v-col>
-                <v-col cols="5">
+                <v-col cols="6">
                     <v-text-field
                         class="fs-13"
                         v-model="newPassword"
@@ -25,11 +30,11 @@
                     ></v-text-field>
                 </v-col>
             </v-row>
-            <v-row>
-                <v-col cols="3">
+            <v-row style="margin-top:-20px">
+                <v-col cols="6">
                     <v-subheader class="fs-13">{{$t('user.passwordSetting.changePassword.reNewPass')}}</v-subheader>
                 </v-col>
-                <v-col cols="5">
+                <v-col cols="6">
                     <v-text-field
                         class="fs-13"
                         v-model="reNewPassword"
@@ -120,6 +125,9 @@ export default {
        
     },
     methods:{
+        close(){
+			this.$emit('close-panel')
+		},
         getTypeDueData(){
             let props = this.user.passwordProps;
             let passwordProps = JSON.parse(props);
@@ -143,7 +151,6 @@ export default {
             userApi.updateUser(this.user.id, data).then(res => {
 				if (res.status == 200) {
                     this.loader = "";
-        
                     this.loading = false;
                     this.$snotify({
 					type: "success",

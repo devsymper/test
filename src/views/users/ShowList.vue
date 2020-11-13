@@ -2,24 +2,32 @@
 <div class="w-100">
      <list-items
         ref="listUser"
+        :showImportButton="true"
+        :showExportButton="false"
+        :actionPanelType="'modal'"
         @after-open-add-panel="addUser"
         :headerPrefixKeypath="'user.table'"
         :useDefaultContext="false"
         :pageTitle="$t('user.title')"
+        :debounceRowSelectTime="200"
         :tableContextMenu="tableContextMenu"
         :containerHeight="containerHeight"
+        :showActionPanelInDisplayConfig="true"
         :customAPIResult="customAPIResult"
         :getDataUrl="getListUrl+'users?page=1&pageSize=50'"
         :actionPanelWidth="actionPanelWidth"
         @import-excel="importExcel()"
+        @row-selected="onRowSelected"
         :commonActionProps="commonActionProps">
         <div slot="right-panel-content" class="h-100">
             <action-panel
                 ref="panel"
+                @change-width-panel="changeWidth()"
                 :showDetailView="showDetailView"
                 @refresh-data="refreshListUser"
                 @refresh-new-user="setNewUserItem"
                 @close-panel="closePanel"
+                @edit-user-info="handleEditUserInfo"
                 :actionType="actionType"
                 :isSettingPasswordView="isSettingPasswordView"
                 :showViewInfo="showViewInfo"
@@ -91,7 +99,7 @@ export default {
                 "scope": "account",
             },
             getListUrl: {},
-            actionPanelWidth:800,
+            actionPanelWidth:650,
             containerHeight: 200,
             tableContextMenu:{
                 change_pass: {
@@ -153,6 +161,18 @@ export default {
         
     },
     methods:{
+        changeWidth(){
+            this.actionPanelWidth=900;
+        },
+        handleEditUserInfo(info){
+            this.editUser(info);  
+        },
+        onRowSelected(row){
+            this.focusingUser = row;
+            if(this.$refs.listUser.alwaysShowActionPanel){
+                this.showViewDetailInfo(row);
+            }
+        },
          getListFieldUser(){
              this.listRowUser =  [{
                 sheetMap: '',
@@ -219,29 +239,13 @@ export default {
                         dataColumn:null,
                         dataType:"text",
                         isKeyControl:false,
-                        name:"password",
-                        title:"Mật khẩu",
-                        isNull:true
-                    },
-                    {
-                        dataColumn:null,
-                        dataType:"text",
-                        isKeyControl:false,
-                        name:"password",
-                        title:"Mật khẩu",
-                        isNull:true
-                    },
-                    {
-                        dataColumn:null,
-                        dataType:"number",
-                        isKeyControl:false,
                         name:"orgchart_id",
                         title:"Mã sơ đồ tổ chức",
                         isNull:true
                     },
                     {
                         dataColumn:null,
-                        dataType:"number",
+                        dataType:"text",
                         isKeyControl:false,
                         name:"position_id",
                         title:"Vị trí",
@@ -263,12 +267,14 @@ export default {
             this.$refs.panel.resetPermissionPosittionOrgChart();
         },
         showViewSetingPassword(user){
+            this.actionPanelWidth=500;
             this.isSettingPasswordView = true;
             this.showViewInfo = false;
             this.$refs.panel.setDetailInfo(user);
             this.$refs.listUser.openactionPanel();
         },
         showViewDetailInfo(user){
+            this.actionPanelWidth=550;
             this.showDetailView=!this.showDetailView;
             this.showViewInfo = true;
             this.$refs.panel.setDetailInfo(user);
@@ -280,12 +286,14 @@ export default {
             this.$refs.listUser.closeactionPanel();
         },
         addUser(){
+            this.actionPanelWidth=650;
             this.isSettingPasswordView = false;
             this.showViewInfo = false;
             this.actionType = 'add';
             this.$refs.listUser.openactionPanel();
         },
         editUser(user){
+            this.actionPanelWidth=650;
             this.isSettingPasswordView = false;
             this.showViewInfo = false;
             this.actionType = 'edit';

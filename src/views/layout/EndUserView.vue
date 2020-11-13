@@ -3,7 +3,7 @@
         <ba-sidebar @show-user-detail="showMyInfo = true" />
         <v-content>
             <v-container fluid fill-height class="pa-0">
-                <div class="w-100 app-header-bg-color" style="border-bottom:1px solid #e6e5e5">
+                <div class=" app-header-bg-color" style="border-bottom:1px solid #e6e5e5; width: calc(100% - 5px)">
                     <div style="width:calc(100% - 500px)" class="float-left">
                         <v-tabs
                             hide-slider
@@ -24,7 +24,7 @@
                                     <span>{{ item.title }} </span>
                                 </v-tooltip>
                                 
-                                <i class="mdi mdi-close float-right close-tab-btn" @click.stop="closeTab(idx)"></i>
+                                <i class="mdi mdi-close float-right close-tab-btn" @click.stop="handleCloseTab(idx)"></i>
                             </v-tab>
                         </v-tabs>
                     </div>
@@ -41,21 +41,21 @@
                         <v-menu
                             v-model="isShowDialog"
                             :close-on-content-click="false"
-                            :max-width="500"
+                            :max-width="700"
                             :max-height="700"
-       				   	    :nudge-width="370"
+       				   	    :nudge-width="570"
                             offset-y
                             style="z-index:1000"
                             >
                             <template v-slot:activator="{ on }">
                                 <v-btn icon v-on="on">
-                                    <v-icon>mdi-apps</v-icon>
+                                    <v-icon class="mdi-18px">mdi-apps</v-icon>
                                 </v-btn>
                             </template>
                             <EndUserPopup style="z-index:1000 !important"   />
                         </v-menu>
                         <v-btn icon @click="showSearchInput = !showSearchInput">
-                            <v-icon>mdi-magnify</v-icon>
+                            <v-icon class="mdi-18px">mdi-magnify</v-icon>
                         </v-btn>
                         <v-menu  v-model="isShowDialogNotification"
                             z-index="161"
@@ -74,11 +74,11 @@
                                         color="red"
                                         overlap
                                     >
-                                        <v-icon>mdi-bell-outline</v-icon>
+                                        <v-icon class="mdi-18px">mdi-bell-outline</v-icon>
                                     </v-badge>
                                 </v-btn>
                                 <v-btn v-on="on" icon v-else>
-                                    <v-icon>mdi-bell-outline</v-icon>
+                                    <v-icon class="mdi-18px">mdi-bell-outline</v-icon>
                                 </v-btn>
                             </template>
                             <list-notification></list-notification>
@@ -86,18 +86,19 @@
 					<!--  -->
                     </div>
                 </div>
-                <v-layout style="height:calc(100% - 41px)" class="w-100 h-100" justify-center>
+                <v-layout style="height:calc(100% - 41px)" class="w-100" justify-center>
                     <slot>
 					</slot>
                 </v-layout>
             </v-container>
         </v-content>
-        
         <v-navigation-drawer
-            v-bind:class="[isExpand==true?'width-1200':'width-500']"
+            v-bind:class="[isExpand==true?'width-1200':'width-400']"
             right
             v-model="showMyInfo"
+            v-show="showMyInfo"
             absolute
+            style="z-index:999!important"
             temporary>
             <DetailUser 
                 :userInfo="sapp.endUserInfo"
@@ -130,6 +131,10 @@ export default {
 
     },
     methods: {
+        handleCloseTab(idx){
+            this.$evtBus.$emit("before-close-app-tab", idx);
+            this.closeTab(idx);
+        },
         /**
          * Xử lý các tab
          */
@@ -153,15 +158,36 @@ export default {
                 }
             }
 		},
-		
+		closeCurrentTab(){
+            this.closeTab(this.$store.state.app.currentTabIndex);
+        },
+
         closeTab(idx){            
-            let urlKey = Object.keys(this.$store.state.app.urlToTabTitleMap)[idx];
+            let urlToTabArr = Object.keys(this.$store.state.app.urlToTabTitleMap);
+            let urlKey = urlToTabArr[idx];
             let urlInfo = this.tabUrlItems[urlKey];
 
             this.$store.commit("app/removeTab", urlKey);
-            this.$evtBus.$emit('symper-close-app-tab', {
-                pageInstanceKey: urlInfo.pageInstanceKey
-            });
+            if(urlInfo){
+                // this.$evtBus.$emit('symper-close-app-tab', {
+                //     pageInstanceKey: urlInfo.pageInstanceKey
+                // });
+            }
+
+            setTimeout((self) => {
+                let arr = Object.keys(self.$store.state.app.urlToTabTitleMap);
+                if(arr.length == 0){
+                    self.$goToPage("/", "Trang chủ");
+                }else{
+                    let currentTabIndex = self.$store.state.app.currentTabIndex;
+                    if(currentTabIndex == idx){
+                        self.handleChangeTab(currentTabIndex);
+                    }else if(idx < currentTabIndex ){
+                        self.$store.state.app.currentTabIndex = currentTabIndex - 1;
+                        self.handleChangeTab(currentTabIndex - 1);
+                    }
+                }
+            }, 100, this);
         },
         updateCountUnreadNotification(){
             let req = new Api(appConfigs.apiDomain.nofitication);
@@ -196,6 +222,14 @@ export default {
         this.$evtBus.$on("auto-active-tab", tabIndex => {
             self.$store.state.app.currentTabIndex = tabIndex;
             self.handleChangeTab(tabIndex);
+        });
+        
+        this.$evtBus.$on("close-current-app-tab", () => {
+            self.closeCurrentTab();
+        });
+
+        this.$evtBus.$on("close-app-tab", (idx) => {
+            self.closeTab(idx);
         });
     },
     computed: {
@@ -242,7 +276,7 @@ export default {
     width:1200px!important
 
 }
-.width-500{
-    width:500px!important
+.width-400{
+    width:400px!important
 }
 </style>

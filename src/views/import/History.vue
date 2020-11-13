@@ -1,44 +1,46 @@
 <template>
 <div class="w-100">
      <list-items
-        @cancel-import="cancelImport()"
         ref="listImport"
+        :showImportHistory="false"
+        :showButtonAdd="false"
         :headerPrefixKeypath="'import.table'"
         :useDefaultContext="false"
         :pageTitle="$t('import.import_history')"
         :containerHeight="containerHeight"
+        :showExportButton="false"
         :customAPIResult="customAPIResult"
         :tableContextMenu="tableContextMenu"
-        :getDataUrl="'https://io.dev.symper.vn/history/document'">
+        :getDataUrl="getListUrl">
     </list-items>
-     <v-navigation-drawer
-        width="500"
-        v-model="drawer"
-        absolute
-        temporary
-        right
-      >
-       <action-panel :importInfo="importInfo" />
-       
-      </v-navigation-drawer>
+        <v-navigation-drawer
+            :style="{'width':(drawer)?'500px':'0'}"
+            v-model="drawer"
+            absolute
+            temporary
+            right
+        >
+        <action-panel :importInfo="importInfo" />
+        </v-navigation-drawer>
     </div>
 </template>
 <script>
-import { userApi } from "./../../api/user.js";
 import { documentApi } from "./../../api/Document.js";
-
-import timesheetApi from "./../../api/timesheet.js";
 import ActionPanel from "./../../views/import/Detail.vue";
 import ListItems from "./../../components/common/ListItems.vue";
+import importApi from "./../../api/ImportExcel";
 import { util } from "./../../plugins/util.js";
 import { appConfigs } from '../../configs';
+import Handsontable from 'handsontable';
 
 export default {
     components: {
         "list-items": ListItems,
         "action-panel": ActionPanel,
+        Handsontable
     },
     data(){
+        const self = this
         return {
             showDetailView:false,
             listRowUser:[],
@@ -48,7 +50,6 @@ export default {
             drawer:false,
             showImportUser:false,
             customAPIResult: {
-                
                 setObjectType(obj){
                     let name = '';
                     switch(obj){
@@ -113,9 +114,34 @@ export default {
                                     }
                                 }
                             }
+                            self.$refs.listImport.rerenderTable();
                         }
                     })
                     .catch(console.log);
+                     data.columns[7].renderer = function(instance, td, row, col, prop, value, cellProperties){
+                         let span;
+                        Handsontable.dom.empty(td);
+                        let div = document.createElement('div')
+                        span = document.createElement('span')
+                        if(value === "Lỗi"){
+                            $(span).css("color",'red');
+                            $(span).text('Lỗi')
+                        }
+                        else if(value === "Chưa import"){
+                            $(span).css("color",'orange');
+                            $(span).text('Chưa import')
+                        }
+                        else if(value === "Đang xử lý"){
+                            $(span).css("color",'blue');
+                            $(span).text('Chưa import')
+                        }
+                        else{
+                            $(span).css("color",'green');
+                            $(span).text('Hoàn thành')
+                        }
+                        td.appendChild(span);
+                        return td
+                     }
                     return  data;
                 } 
             },
@@ -126,43 +152,38 @@ export default {
                     callback: (importEx, callback) => {
                         this.showDetail(importEx);
                     }
+                },
+                 downloadExcel: {
+                    name:"downloadExcel",
+                    text:this.$t('import.table.contextMenu.download'),
+                    callback: (importEx, callback) => {
+                        this.downloadExcel(importEx);
+                    }
                 }
             },
-            getListUrl: {},
+            getListUrl: appConfigs.apiDomain.viewHistoryImport,
             actionPanelWidth:800,
             containerHeight: 200,
             columns: [],
-            data: [],
+            linkDownload:appConfigs.apiDomain.importExcel,
             totalPage: 6,
             listDocument: [],
-            actionType:'',
-            isSettingPasswordView : false,
-            showViewInfo: false
         }
     },
     mounted() {
         this.calcContainerHeight();
     },
-    created(){
-        this.getListUrl = appConfigs.apiDomain.importExcel+'history?page=1&pageSize=20';
-       
-    },
-    watch:{
-        
-    },
     methods:{
+        downloadExcel(importEx){
+            let fileName = importEx.fileName;
+            window.location.href = this.linkDownload+"download/"+fileName
+        },
         showDetail(importEx){
              this.importInfo = importEx;
              this.drawer =!this.drawer
         },
-        cancelImport(){
-            alert('Hello')
-        },
         refreshListUser(){
             this.$refs.listUser.refreshList();
-        },
-        changePage(page){
-            alert('ok');
         },
         calcContainerHeight() {
             this.containerHeight = util.getComponentSize(this).h;

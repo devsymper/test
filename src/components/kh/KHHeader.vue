@@ -1,19 +1,19 @@
 <template>
   <div class="kh-header">
-    <div class="kh-header-slug">
+    <div class="kh-header-slug h-100">
       <v-icon
-        class="fs-16"
-        style="float:left; margin-left:10px; margin-right:0px;margin-top: 8px;"
+        class="fs-16 pa-1"
+        style="float:left;"
         v-if="skh.subCollapseSideBar==true"
         @click.stop="invertSubSidebarShow()"
       >mdi-chevron-double-right</v-icon>
       <v-icon
-        class="fs-16"
-        style="float:left; margin-left:10px; margin-right:0px;padding-top: 8px;"
+        class="fs-16 pa-1"
+        style="float:left;"
         v-if="skh.subCollapseSideBar==false"
         @click.stop="invertSubSidebarShow()"
       >mdi-chevron-double-left</v-icon>
-      <div class="kh-slug" v-if="skh.header_slug!=0">
+      <div class="kh-slug h-100 pt-1" v-if="skh.header_slug!=0">
         <span id="slug" v-for="(item, index) in slugs" :key="index">
           <span class="kh-slug-item" @click.stop="goRoute(item.id,item.hash)">{{item.name}}</span>
           <span v-if="index < count-1 ">/</span>
@@ -237,16 +237,14 @@ export default {
 </script>
 <style scoped>
 .kh-header {
-  display: flex;
-  height: 33px;
-  border-bottom: 1px solid #cccccc;
+    display: flex;
+    height: 33px;
+    border-bottom: 1px solid #cccccc;
 }
 .kh-header-slug {
-  width: 700px;
+    display: flex;
 }
-.kh-slug {
-  padding-top: 3px;
-}
+
 .kh-slug #slug {
   margin-left: 8px;
 }

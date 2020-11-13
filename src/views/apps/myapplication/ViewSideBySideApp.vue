@@ -1,17 +1,20 @@
 <template>
    <div class="view-side-by-side-apps h-100">
        <div class="list-apps h-100">
-				 <h4>Ứng dụng</h4>
-				<v-btn icon tile style="position:absolute;top:2px;right:6px;font-size:13px" >
+				<div class="d-flex">
+					 <h4>Ứng dụng</h4>
+				<v-btn icon tile style="position:absolute;top:2px;right:12px;font-size:13px" >
 					<v-icon @click="changeView" style="font-size:13px" >mdi-page-previous-outline</v-icon>  
 				</v-btn>
+				 <!-- <MenuConfigTypeView   :currentTypeView="1" :titleTypeView="'hellooo'" /> -->
+				</div>
             <div style="margin:20px 0px 0px 0px">
                 <div :class="{'favorite-area': true , 'active': showFavorite == true}" @click="showListFavorite">
                     <v-icon style="font-size:16px" color="#F6BE4F"> mdi-star</v-icon>
                     <span style="font:13px roboto;padding-left:8px">Yêu thích</span>
                 </div>
 				<VuePerfectScrollbar :style="{height:heightListApp}"  >
-					<div v-for="(item,i) in listApp" :key="i" 
+					<div v-for="(item,i) in listApps" :key="i" 
 						:class="{'list-app-item': true,'active': item.id == activeIndex}"
 						@click="clickDetails(item)"
 						>
@@ -45,11 +48,16 @@
               <h4>Danh sách yêu thích</h4>
 					<VuePerfectScrollbar :style="{height:heightListFavorite}"  >
 						<ul style="margin:0px 0px 0px -24px" v-if="sFavorite.length > 0">
-							<li v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer" :class="{'child-item-active': item.objectIdentifier == activeIndexChild}" > 
-								<div style="position:relative" >
-									<div v-if="item.type == 'document_definition'" class="title-item-favorite">{{item.title}}</div>
-									<div v-else  class="title-item-favorite">{{item.name}}</div> 
-									<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:4px;right:4px">mdi-star</v-icon>
+							<li  v-for="(item,i) in sFavorite" :key="i" v-on:click="rightClickHandler($event,item,item.type)" v-on:contextmenu="rightClickHandler($event,item,item.type)" style="cursor:pointer" :class="{'child-item-active': item.objectIdentifier == activeIndexChild}" > 
+								<div style="position:relative;display:flex" >
+									<v-icon style="font-size:13px;margin-right:8px">{{listIcon[item.type]}}</v-icon>
+									<div class=" d-flex flex-column">
+										<div class="title-item-favorite">
+											{{item.type == 'document_definition' ? item.title : item.name}}
+											</div>
+										<span style="font:12px roboto; font-weight:200"> {{item.appName}}</span>
+									</div>
+									<v-icon  color="#F6BE4F" style="float:right;font-size:13px;position:absolute;top:10px;right:4px">mdi-star</v-icon>
 								</div>
 							</li>
 						</ul>
@@ -70,15 +78,18 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue'
 import SymperActionView from '@/action/SymperActionView.vue'
 import {util} from './../../../plugins/util'
+import MenuConfigTypeView from './MenuConfigTypeView'
     export default {
     created(){
-        this.getFavorite()
+		this.getFavorite()
+		this.getActiveApp()
     },
     components:{
         AppDetail,
         VuePerfectScrollbar,
         ContextMenu,
-        SymperActionView
+		SymperActionView,
+		MenuConfigTypeView
 	},
 	mounted(){
 		this.widthActionArea = "calc(100% - 520px)"
@@ -105,6 +116,23 @@ import {util} from './../../../plugins/util'
 		
     },
     methods:{
+		getActiveApp(){
+			appManagementApi.getActiveApp().then(res=>{
+				if(res.status == 200){
+					this.listApps = res.data.listObject
+				}else{
+					this.$snotify({
+						type: "error",
+						title: "Không thể lấy danh sách application"
+					})
+				}
+			}).catch(err=>{
+					this.$snotify({
+						type: "error",
+						title: "Không thể lấy danh sách application"
+					})
+			})
+		},
         rightClickHandler(event,item,type){
 			event.stopPropagation();
 			event.preventDefault();
@@ -243,6 +271,7 @@ x				}
 					if(item.objectIdentifier == key){
 						item.favorite = 1
 						item.actions = value.actions
+						item.appName = value.appName
 						item.type = type
 					} 
 				})
@@ -250,7 +279,7 @@ x				}
 			return array
 		},
         changeView(){
-            this.$store.commit('appConfig/changeTypeView')
+			this.$store.commit('appConfig/changeTypeView')
         },
         hideContextMenu(){
             if(this.$refs.appDetail){
@@ -271,7 +300,8 @@ x				}
         clickDetails(item){
             this.activeIndex = item.id
             this.showFavorite = false
-            this.$store.commit("appConfig/updateCurrentAppId",item.id);
+			this.$store.commit("appConfig/updateCurrentAppId",item.id);
+			this.$store.commit("appConfig/updateCurrentAppName",item.name);
 			// this.showDetailDiv = true
 			this.$store.commit('appConfig/showDetailAppArea')
 			this.$store.commit('appConfig/emptyItemSelected')
@@ -376,6 +406,7 @@ x				}
     data(){
         return { 
             apps: [],
+            listApps: [],
 			activeIndex: '',
             showDetailDiv:false,
             searchKey: '',
@@ -386,6 +417,12 @@ x				}
 			heightListApp: 'calc(100vh - 130px)',
 			widthActionArea:null,
 			widthActionArea: '',
+			listIcon:{
+				document_definition: 'mdi-file-document-outline',
+				workflow_definition: 'mdi-lan',
+				orgchart: 'mdi-widgets-outline',
+				dashboard: 'mdi-view-dashboard'
+			},
             arrType:{
                 document_definition:[],
                 orgchart:[],
@@ -529,12 +566,11 @@ x				}
 .view-side-by-side-apps >>> .favorite-area-item .child-item-active{
 	background-color: #E9E9E9
 }
-.view-side-by-side-apps >>> .favorite-area-item li:hover{
-}
+
 .view-side-by-side-apps >>> .favorite-area-item .title-item-favorite{
    	white-space: nowrap; 
 	font:13px roboto;
-	width: 90%; 
+	width: 220px; 
 	overflow: hidden;
 	text-overflow: ellipsis; 
 	padding:4px 0px;

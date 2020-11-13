@@ -2,7 +2,6 @@ import Api from "./api";
 import { appConfigs } from "./../configs.js";
 import { util } from "../plugins/util";
 
-var api = new Api(appConfigs.apiDomain.user);
 var coreApi = new Api(appConfigs.apiDomain.user);
 var permissionApi = new Api(appConfigs.apiDomain.permission);
 var operationsApi = new Api(appConfigs.apiDomain.operations);
@@ -16,98 +15,81 @@ export const userApi = {
             email: userName,
             password: password
         };
-        return api.post(appConfigs.apiDomain.account + "auth/login", data);
+        return coreApi.post(appConfigs.apiDomain.account + "auth/login", data);
     },
-    changePassUser(pass) {
+    changePassUser(oldPass, newPass) {
         let data = {
-            oldPassword: pass,
-            newPassword: pass
+            oldPassword: oldPass,
+            newPassword: newPass
         };
-        return api.post('user/change-password', data)
+        return coreApi.post('user/change-password', data)
     },
     getListUser(page, pageSize) {
-        return api.get("users?page=" + page + "&pageSize=" + pageSize);
+        return coreApi.get("users?page=" + page + "&pageSize=" + pageSize);
     },
     getGroupUser() {
-        return api.get("user-group");
+        return coreApi.get("user-group");
     },
     addUser(data) {
-        return api.post('users', data);
+        return coreApi.post('users', data);
     },
     changeUserProfile(data) {
-        return api.put('user/profile', data)
+        return coreApi.put('user/profile', data)
     },
     updateUser(id, data) {
-        return api.put('users/' + id, data);
+        return coreApi.put('users/' + id, data);
     },
     getDetailUser(id) {
-        return api.get("users/" + id);
+        return coreApi.get("users/" + id);
     },
     getListUserPackage(id) {
-        return api.get('users/permission/package/' + id);
+        return coreApi.get('users/permission/package/' + id);
     },
     getListUserPosition(id) {
-        return api.get('users/permission/position-orgchart/' + id);
+        return coreApi.get('users/permission/position-orgchart/' + id);
     },
     deleteUserPackage(data) {
-        return api.delete('users/permission/package', data);
+        return coreApi.delete('users/permission/package', data);
     },
     deleteUserPosition(data) {
-        return api.delete('users/permission/position-orgchart', data);
-    },
-    uploadAvatar(data) {
-        return coreApi.post('https://kh.symper.vn/publicapi/uploadFile/', data, {}, {
-            cache: false,
-            contentType: false,
-            processData: false
-        });
+        return coreApi.delete('users/permission/position-orgchart', data);
     },
     setUserLocale(locale) {
-        return api.post("users/locale", { locale: locale });
-    },
-    saveUserViewConfig(configType, viewName, configs) {
-        return coreApi.put('https://v2khadm.dev.symper.vn/user/view-configs', {
-            configType: configType,
-            viewName: viewName,
-            configs: configs,
-        });
-    },
-    getUserViewConfig(viewName, configType) {
-        return coreApi.get(`https://v2khadm.dev.symper.vn/user/view-configs/${viewName}/${configType}`);
+        return coreApi.post("users/locale", { locale: locale });
     },
     changeDelegate(userInfo) {
-        return api.post('auth/change-delegate', { user_id: userInfo.id })
+        return coreApi.post('auth/change-delegate', { user_id: userInfo.id })
     },
     changeRole(roleId) {
-        return api.post('auth/set-role', {
+        return coreApi.post('auth/set-role', {
             role: roleId
         });
     },
 
     createBAAccount(data) {
-        return api.post('supporters', data);
+        return coreApi.post('supporters', data);
     },
 
     updateBAAccountInfo(id, data) {
-        return api.put('supporters/' + id, data);
+        return coreApi.put('supporters/' + id, data);
     },
 
     deleteBAAccount(ids) {
         let deleteArr = [];
         ids.forEach(id => {
-            deleteArr.push(api.delete('supporters/' + id));
+            deleteArr.push(coreApi.delete('supporters/' + id));
         });
         return Promise.all(deleteArr);
     },
 
     updateBAAccountPassword(id, data) {
-        return api.put('supporters/' + id + '/password', data);
+        return coreApi.put('supporters/' + id + '/password', data);
     },
 
     // Lấy các operation của user ở role hiện tại
     getCurrentRoleOperations() {
         let roleIden = util.auth.getCurrentUserRole();
-        return api.get(`https://accesscontrol.symper.vn/roles/${roleIden}/accesscontrol`);
+        return permissionApi.get(`roles/${roleIden}/accesscontrol`);
     },
     getActionAndObject(role) {
         return permissionApi.get('roles/' + role + '/accesscontrol')

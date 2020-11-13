@@ -29,6 +29,7 @@ export default class Formulas {
              */
             this.type = type;
             this.inputControl = this.setInputControl();
+            this.inputFromDatasets = this.getDatasetEffectedFormula();
             this.refFormulas = this.getReferenceFormulas();
             this.orgChartFormulas = this.getOrgChartFormulas();
             this.localFormulas = this.getLocalFormulas();
@@ -55,12 +56,17 @@ export default class Formulas {
         var formulas = this.formulas;
         formulas = await this.handleRunLocalFormulas(formulas, dataInput);
         formulas = await this.handleRunOrgChartFormulas(formulas, dataInput);
+        if (typeof formulas == 'object' && formulas.isStop) {
+            return {
+                server: true,
+                data: { data: formulas.data }
+            };
+        }
         let listSyql = this.getReferenceFormulas(formulas);
         if (listSyql != null && listSyql.length > 0) {
             for (let i = 0; i < listSyql.length; i++) {
                 let syql = listSyql[i].trim();
-                syql = syql.replace('ref(', '');
-                syql = syql.replace('REF(', '');
+                syql = syql.replace(/(REF|ref)\s*\(/g, '');
                 syql = syql.substring(0, syql.length - 1);
                 let res = await this.runSyql(syql, dataInput);
                 let beforeStr = this.checkBeforeReferenceFormulas(formulas, listSyql[i].trim());
@@ -97,8 +103,7 @@ export default class Formulas {
         if (listLocal != null && listLocal.length > 0) {
             for (let index = 0; index < listLocal.length; index++) {
                 let sql = listLocal[index];
-                sql = sql.replace('local(', '');
-                sql = sql.replace('LOCAL(', '');
+                syql = syql.replace(/(local|LOCAL)\s*\(/g, '');
                 sql = sql.substring(0, sql.length - 1);
                 sql = sql.replace(/\r?\n|\r/g, ' ');
                 if (Object.keys(dataInput).length == 0) {
@@ -118,11 +123,13 @@ export default class Formulas {
             if (listOrgChartFormulas != null && listOrgChartFormulas.length > 0) {
                 let item = {};
                 for (let i = 0; i < listOrgChartFormulas.length; i++) {
-                    let reverseData = sDocument.state.submit[this.keyInstance].orgchartTableSqlName[listOrgChartFormulas[i].trim()];
+                    let reverseData = undefined
+                    if (sDocument.state.submit[this.keyInstance]) {
+                        reverseData = sDocument.state.submit[this.keyInstance].orgchartTableSqlName[listOrgChartFormulas[i].trim()];
+                    }
                     if (reverseData == undefined) {
                         let orgChartFormulas = listOrgChartFormulas[i].trim();
-                        orgChartFormulas = orgChartFormulas.replace('orgchart(', '');
-                        orgChartFormulas = orgChartFormulas.replace('ORGCHART(', '');
+                        orgChartFormulas = orgChartFormulas.replace(/(role|ROLE)\s*\(/g, '');
                         orgChartFormulas = orgChartFormulas.substring(0, orgChartFormulas.length - 1);
                         if (Object.keys(dataInput).length == 0) {
                             dataInput = false;
@@ -131,7 +138,7 @@ export default class Formulas {
                         let res = await this.queryOrgchart(orgChartFormulas);
                         let beforeStr = this.checkBeforeReferenceFormulas(formulas, listOrgChartFormulas[i].trim());
                         if (!beforeStr) {
-                            return res.data;
+                            return { isStop: true, data: res.data.fullInfo };
                         } else {
                             reverseData = await this.reverseDataToFormulas(res.data.fullInfo, beforeStr.trim().toLowerCase());
                             item[listOrgChartFormulas[i].trim()] = reverseData;
@@ -161,8 +168,7 @@ export default class Formulas {
         if (listLocal != null && listLocal.length > 0) {
             for (let index = 0; index < listLocal.length; index++) {
                 let sql = listLocal[index];
-                sql = sql.replace('local(', '');
-                sql = sql.replace('LOCAL(', '');
+                syql = syql.replace(/(local|LOCAL)\s*\(/g, '');
                 sql = sql.substring(0, sql.length - 1);
                 sql = sql.replace(/\r?\n|\r/g, ' ');
                 let res = await this.runSQLLiteFormulas(sql);
@@ -189,8 +195,7 @@ export default class Formulas {
                 // return { data: dataRespone, from: 'local' }
             } else if (listSyql.length == 1) {
                 let syql = listSyql[0];
-                syql = syql.replace('ref(', '');
-                syql = syql.replace('REF(', '');
+                syql = syql.replace(/(REF|ref)\s*\(/g, '');
                 syql = syql.substring(0, syql.length - 1);
                 syql = syql.replace(/\r?\n|\r/g, ' ');
                 let dataPost = {
@@ -220,8 +225,7 @@ export default class Formulas {
         if (listLocal != null && listLocal.length > 0) {
             for (let i = 0; i < listLocal.length; i++) {
                 let sql = listLocal[i].trim();
-                sql = sql.replace('local(', '');
-                sql = sql.replace('LOCAL(', '');
+                syql = syql.replace(/(local|LOCAL)\s*\(/g, '');
                 sql = sql.substring(0, sql.length - 1);
                 if (Object.keys(dataInput).length == 0) {
                     dataInput = false;
@@ -380,7 +384,7 @@ export default class Formulas {
         try {
             listControlInDoc = this.getDataSubmitInStore();
         } catch (error) {
-
+            console.log(error);
         }
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
@@ -397,7 +401,7 @@ export default class Formulas {
             }
             if (value == undefined || typeof value == 'undefined' || value == null) {
                 value = ""
-                if (dataFromStore && listControlInDoc[controlName].type == 'number' || listControlInDoc[controlName].type == 'percent') {
+                if (listControlInDoc[controlName].type == 'number' || listControlInDoc[controlName].type == 'percent') {
                     value = 0;
                 }
             }
@@ -431,38 +435,43 @@ export default class Formulas {
 
     // Hàm chạy công thức cho autocomplete
     handleRunAutoCompleteFormulas(dataInput = false) {
-        let listSyql = this.refFormulas;
-        if (listSyql != null && listSyql.length > 0) {
-            let syql = listSyql[0].trim();
-            syql = syql.replace('ref(', '');
-            syql = syql.replace('REF(', '');
-
-            syql = syql.substring(0, syql.length - 1);
-            return this.runSyql(syql, dataInput);
-        } else {
-            let formulas = this.replaceParamsToData(dataInput, this.formulas);
-            return this.runSQLLiteFormulas(formulas, true);
+            let listSyql = this.refFormulas;
+            if (listSyql != null && listSyql.length > 0) {
+                let syql = listSyql[0].trim();
+                syql = syql.replace(/(REF|ref)\s*\(/g, '');
+                syql = syql.substring(0, syql.length - 1);
+                return this.runSyql(syql, dataInput);
+            } else {
+                let formulas = this.replaceParamsToData(dataInput, this.formulas);
+                return this.runSQLLiteFormulas(formulas, true);
+            }
         }
-    }
+        /**
+         * Hàm chỉ ra control nào được alias để binding vào giá trị control sau khi chọn từ autocomplete
+         * @param {*} alias 
+         */
     autocompleteDetectAliasControl(alias = true) {
-        let formulas = this.getFormulas();
-        formulas = formulas.replace(/\r?\n|\r/g, ' ');
-        let selectColumn = formulas.match(/(?<=select|SELECT).*(?=from|FROM)/gi);
-        if (selectColumn == null) {
-            return 'column1';
+            let formulas = this.getFormulas();
+            formulas = formulas.replace(/\r?\n|\r/g, ' ');
+            let selectColumn = formulas.match(/(?<=select|SELECT).*(?=from|FROM)/gi);
+            if (selectColumn == null) {
+                return 'column1';
+            }
+            let control = selectColumn[0].match(/([a-zA-Z0-9_]+)\s+(as|AS)\s+(([a-zA-Z0-9_]+))/gi);
+            if (control == null) {
+                return "column1";
+            }
+            let controlAlias = control[0].split(/(as|AS)/);
+            if (alias && controlAlias.length > 1) {
+                return controlAlias[2].trim();
+            } else {
+                return controlAlias[0].trim();
+            }
         }
-        let control = selectColumn[0].match(/([a-zA-Z0-9_]+)\s+as\s+(([a-zA-Z0-9_]+))/gi);
-        if (control == null) {
-            return "column1";
-        }
-        let controlAlias = control[0].split('as');
-        if (alias && controlAlias.length > 1) {
-            return controlAlias[1].trim();
-        } else {
-            return controlAlias[0].trim();
-        }
-    }
-    autocompleteDetectTableQuery() {
+        /**
+         * Hàm chỉ ra table trong công thức
+         */
+    detectTableQuery() {
         let table = this.formulas.match(/(from|FROM)\s+(\w+\.)?(\w+)(?=\s+as)?(\s+\w+\n+)?/gim);
         if (table == null) {
             return false;
@@ -470,7 +479,7 @@ export default class Formulas {
         let listTable = []
         for (let index = 0; index < table.length; index++) {
             let fromTable = table[index];
-            let tableItem = fromTable.trim().replace("from ", "");
+            let tableItem = fromTable.trim().replace(/(from |FROM )/, "");
             listTable.push(tableItem);
         }
         return listTable;
@@ -510,7 +519,7 @@ export default class Formulas {
         if (formulas == false) {
             formulas = this.formulas
         }
-        let listSyql = formulas.match(/(REF|ref)\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
+        let listSyql = formulas.match(/(REF|ref)\s*\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
         return listSyql;
     }
 
@@ -518,14 +527,14 @@ export default class Formulas {
      * Hàm tách các công thức local (công thức chạy owr client)
      */
     getLocalFormulas() {
-            let listSqlite = this.formulas.match(/(LOCAL|local)\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
+            let listSqlite = this.formulas.match(/(LOCAL|local)\s*\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
             return listSqlite;
         }
         /**
          * Hàm tách các công thức local (công thức chạy owr client)
          */
     getOrgChartFormulas() {
-        let listSqlite = this.formulas.match(/(ORGCHART|orgchart)\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
+        let listSqlite = this.formulas.match(/(role|ROLE)\s*\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
         return listSqlite;
     }
 
@@ -576,7 +585,11 @@ export default class Formulas {
     }
 
     getDataSubmitInStore() {
-        return sDocument.state.submit[this.keyInstance].listInputInDocument;
+        if (sDocument.state.submit.hasOwnProperty(this.keyInstance)) {
+            return sDocument.state.submit[this.keyInstance].listInputInDocument;
+        } else {
+            return false
+        }
     }
 
 
@@ -585,8 +598,33 @@ export default class Formulas {
      * Đồng thời đẩy vào thông tin về việc control nào thay đổi dẫn đến các control khác thay đổi theo
      */
     setInputControl() {
+            let allInput = {}
             if (this.checkExistFormulas()) {
                 let allRelateName = this.formulas.match(/{[A-Za-z0-9_]+}/gi);
+                let colSelect = this.getColumnsSelect(this.formulas);
+                let listInput = this.getDataSubmitInStore();
+                if (colSelect && !/\*/.test(colSelect[0])) {
+                    let colFromOtherTable = colSelect[0];
+                    colFromOtherTable = colFromOtherTable.replace(/distinct|DISTINCT/, "");
+                    colFromOtherTable = colFromOtherTable.match(/\([a-zA-Z0-9_]*\)/gm);
+                    if (colFromOtherTable) {
+                        for (let index = 0; index < colFromOtherTable.length; index++) {
+                            let col = colFromOtherTable[index];
+                            col = col.replace(/\)/g, "");
+                            col = col.replace(/\(/g, "");
+                            col = col.trim();
+                            if (listInput != false) {
+                                if (Object.keys(listInput).includes(col)) {
+                                    allInput[col] = true;
+                                }
+                            } else {
+                                allInput[col] = true;
+                            }
+
+                        }
+                    }
+
+                }
                 if (!allRelateName) {
                     return {};
                 }
@@ -598,8 +636,8 @@ export default class Formulas {
                     return obj;
                 }, {});
 
-
-                return names;
+                Object.assign(allInput, names);
+                return allInput;
             }
             return {}
         }
@@ -633,6 +671,23 @@ export default class Formulas {
         }
         return false;
     }
+    getDatasetEffectedFormula() {
+        if (!this.type) {
+            return {};
+        }
+        let inputDatasets = {};
+        let allMappingDatasets = sDocument.state.submit[this.keyInstance].listControlMappingDatasets;
+        let table = this.detectTableQuery();
+        for (let index = 0; index < table.length; index++) {
+            const tableName = table[index];
+            for (let dataflowName in allMappingDatasets) {
+                if (allMappingDatasets[dataflowName].includes(tableName)) {
+                    inputDatasets[dataflowName] = true;
+                }
+            }
+        }
+        return inputDatasets;
+    }
     getInputControl() {
             return this.inputControl;
         }
@@ -664,8 +719,9 @@ export default class Formulas {
      * @param {*} listInputInDocument 
      */
     detectControlInTable(mapControlEffected, name, script, listInputInDocument) {
-        let s = script.replace(/ref\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm, "");
-        s = s.replace(/{.}/gm, "");
+        let s = script.replace(/(REF|ref)\s*\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm, "");
+        s = s.replace(/{.*?}/gm, "");
+        s = s.replace(/(as|AS)\s+(\w+)/gm, "");
         let listWord = s.match(/[A-Za-z0-9_]+/g);
         for (let controlName in listInputInDocument) {
             if (listWord != null && listWord.indexOf(controlName) != -1) {
@@ -679,7 +735,6 @@ export default class Formulas {
 
     }
 
-
     // hàm thay thế tham số search của input filer lúc gõ search
     wrapSyqlForSearchInputFilter(search) {
             this.setFormulas(this.oldFormulas);
@@ -689,6 +744,12 @@ export default class Formulas {
             return refFormulas;
         }
         // hàm lấy các column được query sau select và trước from
+
+    getColumnsSelect(syql) {
+        syql = syql.replace(/[\s\r]+/gm, " ");
+        return syql.match(/(?<=SELECT|select).*(?=FROM|from)/gm);
+
+    }
     getColumnsQuery(syql) {
         let columns = [];
         syql = syql.replace(/[\s\r]+/gm, " ");

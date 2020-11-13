@@ -1,8 +1,19 @@
 <template>
 	<div class="h-100 w-100">
+			<div>
+				<h4 class="fw-430 header-title">
+					<div style="width:15px; float:right">
+						<i class='mdi mdi-close' @click="close()"></i>
+					</div>
+					<span class="ml-0 fs-15">
+						Xem chi tiết
+					</span>
+				</h4>
+			</div>	
 		<v-stepper class="w-100 d-flex stepper-create-user">
-			<div class="w-100 ml-4" v-if="!isViewUserRole">
-				<h4>{{ $t('user.general.personalInfo.title')}}</h4>
+			<div class="w-100 ml-1 mt-2 fs-15" v-if="!isViewUserRole">
+				<h4 style="font-weight:430!important">{{ $t('user.general.personalInfo.title')}}
+				</h4>
 				<v-row class="mt-1" >
 					<!-- thong tin -->
 					<v-col cols="8">
@@ -85,7 +96,7 @@
 					</v-col>	
 					<!-- ket thuc anh -->
 				</v-row>
-				<h4 class="mb-2">Phân quyền</h4>
+				<h4 class="mb-2 fs-15 fw-430">Phân quyền</h4>
 				<v-row  v-if="rolesOgchart.length>0" class="ml-5 fs-13 fw-430" >Vị trí</v-row>
 				<v-row class="ml-6" v-for="(rolesOg,index) in rolesOgchart" :key='index'>
 					<v-icon  class="icon-check mr-0 mt-2">mdi mdi-check</v-icon>
@@ -121,6 +132,17 @@
 				:rolesList="role"/>
 			</div>
 			<!-- user roles -->
+
+			<v-btn  
+				style="position: absolute;top: 8px; right: 8px"
+				v-if="showUpdateBtn"
+				small 
+				text
+				color="primary"
+				@click="triggerEditUser">
+				<i class="mdi mdi-pencil mr-2 fs-18"></i>
+				<span>{{$t('common.update')}}</span>
+			</v-btn>
 		</v-stepper>
 	</div>
 </template>
@@ -139,13 +161,19 @@ export default {
 		ViewRoles
 	},
 	props:
-        ['detailInfo','changeDetail','showDetailView'],
+        ['detailInfo','changeDetail','showDetailView','showUpdateBtn'],
 	computed: {
         sapp() {
             return this.$store.state.app;
         },
     },
     methods:{
+		close(){
+			this.$emit('close-panel')
+		},
+		triggerEditUser(){
+			this.$emit('edit-user-info', this.detailInfo);
+		},
 		// xử lý chuyển tên object
 		async getRoleOrgchartByUser(id){
 			const self = this;
@@ -162,6 +190,7 @@ export default {
 				}
 		},
 		viewUserRole(role){
+			this.$emit("change-width");
 			this.isViewUserRole =! this.isViewUserRole;
 			this.role = role;
 		},    

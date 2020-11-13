@@ -43,7 +43,7 @@
                         v-if="!sideBySideMode"
                         cols="2"
                         class="fs-13  pt-1 pb-0 font-weight-medium"
-                        style="flex: 0 0 10.666667%;"
+                        style="flex: 0 0 11.666667%;"
                     >{{$t("tasks.header.dueDate")}}</v-col>
                     <v-col
                         v-if="!sideBySideMode"
@@ -450,7 +450,6 @@ export default {
         })
         .catch(err => {});
         self.reCalcListTaskHeight();
-       // self.$refs.bottomSheetView.toggle();
     },
     activated(){
         this.selectAll=false;

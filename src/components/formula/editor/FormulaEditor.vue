@@ -44,6 +44,7 @@
                     @grid-ready="onGridReady"
                     class="ag-theme-balham mt-2"
                     :columnDefs="columnDefs"
+                    
                     :rowData="rowData">
                 </AgGridVue>
                 
@@ -87,7 +88,8 @@ export default {
             instance:Date.now(),
             totalRecord:0,
             debugStatus:null,
-            timeRequest:0
+            timeRequest:0,
+            cacheDataInput:{}
         }
     },
     beforeMount() {
@@ -271,9 +273,11 @@ export default {
             }
             if(selectionText.length > 0){
                 let dataInput = selectionText.match(/(?<={)[A-Za-z0-9_]+(?=})/gi);
+                let self = this;
                 if(dataInput){
                     this.allInput = dataInput.reduce(function(obj, cur, i) {
-                        obj[cur] = {value:""};
+                        let value = (self.cacheDataInput[cur]) ?self.cacheDataInput[cur] : ""
+                        obj[cur] = {value:value};
                         return obj;
                     }, {});
                 }
@@ -294,6 +298,7 @@ export default {
             let self = this;
             for(let input in this.allInput){
                 dataInput[input] = this.allInput[input].value;
+                this.cacheDataInput[input] = this.allInput[input].value;
             }
             let start = Date.now();
             formulas.handleBeforeRunFormulas(dataInput).then(rs=>{
@@ -315,7 +320,7 @@ export default {
                     self.totalRecord = values.length;
                     for (let index = 0; index < columns.length; index++) {
                         let col = columns[index];
-                        self.columnDefs.push( {headerName: col, field: col});
+                        self.columnDefs.push( {headerName: col, field: col, resizable: true });
                     }
                     for (let k = 0; k < values.length; k++) {
                         let rowVal = values[k];
@@ -342,7 +347,7 @@ export default {
         handleDataToTable(data){
             let firstRow = data[0];
             for(let column in firstRow){
-                this.columnDefs.push( {headerName: column, field: column});
+                this.columnDefs.push( {headerName: column, field: column, resizable: true});
             }
             this.rowData = data;
             this.totalRecord = this.rowData.length;

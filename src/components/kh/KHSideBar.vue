@@ -1,41 +1,42 @@
 <template>
-  <vue-resizable :maxWidth="500" :width="skh.widthSideBar">
+  <vue-resizable  @resize:end="resizeSidebar" :width="skh.widthSideBar" style="height: calc(100% - 10px);">
     <v-navigation-drawer class="khSidebar resizable-content" v-show="!skh.subCollapseSideBar">
-      <div>
+      <div class="sideBar h-100">
         <v-text-field
-          v-model="search"
-          background-color="#F7F7F7"
-          class="d-inline-block mr-2 sym-small-size pa-1 w-100"
-          single-line
-          append-icon="mdi-magnify"
-          dense
-          @keyup="changeValueOpenAll"
-          solo
-          label="Search"
-          :placeholder="$t('common.search')"
+            v-model="search"
+            background-color="#F7F7F7"
+            class="d-inline-block mr-2 sym-small-size pa-1 w-100"
+            single-line
+            append-icon="mdi-magnify"
+            dense
+            @keyup="changeValueOpenAll"
+            solo
+            label="Search"
+            :placeholder="$t('common.search')"
         ></v-text-field>
-        <div class="kh-side-bar">
-          <v-container style="height: calc(100vh - 65px);overflow: auto;">
-            <div class="workspace">
-              <div class="symper-title">WORKSPACE</div>
-              <div class="icon-add">
-                <v-icon v-on:click="addNode()" class="fs-16 add-folder">mdi-plus</v-icon>
-              </div>
-            </div>
-            <div class="kh-add-node-parent" v-bind:class="{'d-none' : !showAddNode}">
-              <v-list-item-group class="favorite">
-                <v-list-item>
-                  <v-icon class="fs-14">mdi-folder</v-icon>
-                  <v-text-field
-                    v-model="txtNode"
-                    v-on:keyup="validateAddNode"
-                    ref="newFolderInput"
-                    @blur="handleBlur"
-                    class="fs-13"
-                  ></v-text-field>
-                </v-list-item>
-              </v-list-item-group>
-            </div>
+        
+        <div class="kh-side-bar" style="height: calc(100% - 36px);">
+            <v-container style="height: 100%;overflow: auto;">
+                <div class="workspace">
+                    <div class="symper-title">WORKSPACE</div>
+                    <div class="icon-add">
+                        <v-icon v-on:click="addNode()" class="fs-16 add-folder">mdi-plus</v-icon>
+                    </div>
+                </div>
+                <div class="kh-add-node-parent" v-bind:class="{'d-none' : !showAddNode}">
+                    <v-list-item-group class="favorite">
+                        <v-list-item>
+                            <v-icon class="fs-14">mdi-folder</v-icon>
+                            <v-text-field
+                                v-model="txtNode"
+                                v-on:keyup="validateAddNode"
+                                ref="newFolderInput"
+                                @blur="handleBlur"
+                                class="fs-13"
+                            ></v-text-field>
+                        </v-list-item>
+                    </v-list-item-group>
+                </div>
             <template>
               <v-treeview
                 v-model="tree"
@@ -70,6 +71,7 @@
                           :id="item.id ? item.id: item.path"
                           @click="dbclickDoc(item.path,item.id,item.hash)"
                           class="objTitle"
+                          style="width:80%"
                         >{{item.name}}</p>
                       </template>
                       <span>{{ item.name }}</span>
@@ -517,6 +519,10 @@ export default {
     }
   },
   methods: {
+    resizeSidebar(e){
+        console.log("aaaaa",e.width);
+        this.$evtBus.$emit("kh-resize-sidebar",e.width);
+    },
     dbclickDoc(path, id, hash) {
       $(".favorite .v-list-item").removeClass("v-item--active");
       if (!this.skh.statusEdit) {
@@ -542,14 +548,14 @@ export default {
      * Thay đổi trạng thái doc để lưu doc
      */
     saveDocument() {
-      this.$store.commit("kh/changeStatusEdit", !this.skh.statusEdit);
-      this.dialogSave = false;
-      let hash = this.hash;
-      this.$store.commit("kh/setCurrentDocument", hash);
-      const state = {};
-      const title = "SYMPER APP";
-      const url = "/#/knowledge/document/" + hash;
-      history.pushState(state, title, url);
+        this.$store.commit("kh/changeStatusEdit", !this.skh.statusEdit);
+        this.dialogSave = false;
+        let hash = this.hash;
+        this.$store.commit("kh/setCurrentDocument", hash);
+        const state = {};
+        const title = "SYMPER APP";
+        const url = "/#/knowledge/document/" + hash;
+        history.pushState(state, title, url);
     },
     /**
      * Show div input thêm node và focus vào input
@@ -945,13 +951,13 @@ export default {
 </script>
 
 <style scoped>
-.resizable-component{
+/* .resizable-component{
   height: 100%!important;
-}
-.resizable-content {
+} */
+/* .resizable-content {
   height: 100%;
   width: 100%;
-}
+} */
 .collapse-sidebar-btn {
   position: absolute;
   bottom: 20px;
@@ -965,4 +971,8 @@ export default {
 .khSidebar hr {
   display: none;
 }
+.side-bar-item >>>.v-btn__content{
+  width: 100%;
+}
+
 </style>

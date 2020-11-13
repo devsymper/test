@@ -76,6 +76,7 @@
                                 </div>
                                 <div >
                                     <v-icon v-if="obj.endTime !=null" style="font-size:10px; color:green;">mdi-circle</v-icon>
+                                    <v-icon v-else-if="obj.dueDate && checkTimeDueDate(obj)" style="font-size:10px ; color:red;">mdi-circle</v-icon>
                                     <v-icon v-else style="font-size:10px ; color:blue;">mdi-circle</v-icon>
                                 </div>
                             </div>
@@ -104,21 +105,18 @@
                             </div>
                         </v-col>
                         <v-col
-                            style="line-height: 42px"
                             cols="2"
-                            class="pl-3 fs-12 px-1 py-0"
+                            class="py-0 pl-3 fs-12"
                         >
-                            <symperAvatar :size="20" :userId="obj.assigneeInfo.id" />
-                            {{obj.assigneeInfo.displayName}}
+							<infoUser class="userInfo h-100 pt-3" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole?obj.assigneeRole:{}" />
+
                         </v-col>
                         <v-col
-                            style="line-height: 42px"
                             cols="2"
-                            class="pl-3 fs-12 px-1 py-0"
+                            class="py-0 pl-3 fs-12"
                         >
-                            <symperAvatar v-if="obj.ownerInfo.id" :size="20" :userId="obj.ownerInfo.id" />
-                            <symperAvatar v-else :size="20" :userId="obj.assigneeInfo.id" />
-                            {{obj.ownerInfo.id ? obj.ownerInfo.displayName: obj.assigneeInfo.displayName }}
+							<infoUser v-if="obj.ownerInfo.id" class="userInfo h-100 pt-3" :userId="obj.ownerInfo.id" :roleInfo="obj.ownerRole ? obj.ownerRole:{}" />
+							<infoUser v-else class="userInfo h-100 pt-3" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole" />
                         </v-col>
                         <v-col
                             style="line-height: 42px"
@@ -170,11 +168,12 @@
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import icon from "@/components/common/SymperIcon";
-import symperAvatar from "@/components/common/SymperAvatar.vue";
 import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
 } from "@/components/process/processAction";
+import infoUser from "./../InfoUser";
+
 export default {
     props: {
         listTask: {
@@ -198,7 +197,7 @@ export default {
     components: {
         icon: icon,
         VuePerfectScrollbar,
-        symperAvatar
+        infoUser
     },
     data: function() {
         return {
@@ -229,6 +228,18 @@ export default {
         }
     },
     methods:{
+        checkTimeDueDate(item){
+            if (item.dueDate) {
+                let dueDate=new Date(item.dueDate).getTime();
+                if (dueDate<Date.now()) {
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        },
         handleReachEndList(){},
         selectNameApp(variables){
             const symperAppId = variables.find(element => element.name=='symper_application_id');

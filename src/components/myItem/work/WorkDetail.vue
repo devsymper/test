@@ -1,17 +1,22 @@
 <template>
-    <div class="h-100 w-100">
+    <div class="h-100 w-100" style="position: relative">
         <v-skeleton-loader
             v-if="loadingAction"
             :type="'table-tbody'"
             class="mx-auto"
             width="100%" height="100%" 
         ></v-skeleton-loader>
-        <v-row class="ml-0 mr-0 justify-space-between" style="line-height: 36px;">
-            <div class="fs-13 pl-2 pt-1 float-left">
-                <v-icon v-if="statusDetailWork" @click="backToListWork">mdi-chevron-left</v-icon> 
-                {{taskBreadcrumb}}
-            </div>
-            <div class="text-right pt-1 pb-1 pr-0 float-right">
+        <v-row class="ml-0 mr-0 justify-space-between task-header" id="taskHeader" style="line-height: 36px;height:44px">
+            <v-tooltip bottom>
+                <template v-slot:activator="{ on }">
+                    <div v-on="on" class="fs-13 pl-2 pt-1 text-ellipsis" :style="{'width':widthInfoWork+'px'}">
+                        <v-icon v-if="statusDetailWork" @click="backToListWork">mdi-chevron-left</v-icon> 
+                        {{taskBreadcrumb}}
+                    </div>
+                </template>
+                <span>{{taskBreadcrumb}}</span>
+            </v-tooltip>
+            <div id="action-task" class="text-right pt-1 pb-1 pr-0">
                 <v-menu
                     :close-on-content-click="false"
                     :close-on-click="closeOnClick"
@@ -49,11 +54,11 @@
 
             </div>
         </v-row>
-        <v-divider style="border-color: #bebebe;"></v-divider>
-        <div class="detail-work" style="height:100%" v-if="filterObject==0 && statusDetailWork==false">
+        <v-divider style="border-color: #dedede;"></v-divider>
+        <div class="detail-work" style="height:auto" v-if="filterObject==0 && statusDetailWork==false">
             <v-row class="ma-0">
                 <v-col cols="12" class="list-tasks pt-0 pb-0">
-                    <v-row>
+                    <v-row class="ma-0 w-100">
                         <v-col
                             cols=4
                             class="pl-3 fs-13 font-weight-medium"
@@ -118,10 +123,10 @@
                                 </v-col>
                                 <v-col
                                     cols="2"
-                                    class="fs-13 "
+                                    class="fs-13 user-create"
                                 >  
-                                    <symperAvatar :size="20" :userId="workInfo.startUserId" />
-                                    {{workInfo.startUserName}}
+							        <infoUser class="userInfo " :userId="workInfo.startUserId" :roleInfo="workInfo.roleInfo" />
+
                                 </v-col>
                                 <v-col
                                     cols="2"
@@ -178,24 +183,24 @@
                                         </div>
                                     </v-col>
                                     <v-col
-                                        cols="2"
+                                        cols="2 user-create"
                                         class="fs-13 "
                                     >  
-                                        <symperAvatar :size="20" :userId="workInfo.startUserId" />
-                                         {{workInfo.startUserName}}
+							            <infoUser class="userInfo " :userId="workInfo.startUserId" :roleInfo="workInfo.roleInfo" />
+
                                     </v-col>
                                     <v-col
                                         cols="2"
                                         class="fs-13 "
                                     >
-                                        <span class="mt-1">{{processParent.startTime ==null? '':$moment(processParent.startTime).fromNow()}}</span>
+                                        <span class="mt-1">{{obj.startTime ==null? '':$moment(obj.startTime).fromNow()}}</span>
                                     </v-col>
 
                                     <v-col
                                         cols="4"
                                         class="fs-13 py-0"
                                     >
-                                        <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
+                                        <span class="mt-1 title-quytrinh">{{obj.processDefinitionName}}</span>
                                         <div class="pa-0 grey--text justify-space-between">
                                             {{workInfo.appName}}
                                         </div>
@@ -240,23 +245,23 @@
                                         </div>
                                     </v-col>
                                     <v-col
-                                        cols="2"
+                                        cols="2 user-create"
                                         class="fs-13 "
                                     >  
-                                        <symperAvatar :size="20" :userId="workInfo.startUserId" />
-                                        {{workInfo.startUserName}}
+							            <infoUser class="userInfo " :userId="workInfo.startUserId" :roleInfo="workInfo.roleInfo" />
+
                                     </v-col>
                                     <v-col
                                         cols="2"
                                         class="fs-13 "
                                     >
-                                        <span class="mt-1">{{processParent.startTime ==null? '':$moment(processParent.startTime).fromNow()}}</span>
+                                        <span class="mt-1">{{obj.startTime ==null? '':$moment(obj.startTime).fromNow()}}</span>
                                     </v-col>
                                     <v-col
                                         cols="4"
                                         class="fs-13 py-0"
                                     >
-                                        <span class="mt-1 title-quytrinh">{{processParent.processDefinitionName}}</span>
+                                        <span class="mt-1 title-quytrinh">{{obj.processDefinitionName}}</span>
                                         <div class="pa-0 grey--text justify-space-between">
                                             {{workInfo.appName}}
                                         </div>
@@ -268,11 +273,10 @@
                 </v-expansion-panels>
             </VuePerfectScrollbar>
         </div>
-        <div v-else-if="filterObject==1 && statusDetailWork==false">
+        <div class="list-task" style="height:calc(100% - 45px)" v-else-if="filterObject==1 && statusDetailWork==false">
             <listTask 
                 :listTask="listTaskCurrent"
                 :appName="workInfo.appName"
-
             />
         </div>
         <div v-if="statusDetailWork">
@@ -282,6 +286,8 @@
             />
         </div>
         <SideBarDetail
+            style="top:45px!important;height: calc(100% - 45px);"
+            class="side-bar"
             :sidebarWidth="sidebarWidth"  
             :isShowSidebar="isShowSidebar"
             :objSideBar="`work`"
@@ -310,7 +316,6 @@ import icon from "@/components/common/SymperIcon";
 import BPMNEngine from "@/api/BPMNEngine.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { appManagementApi } from '@/api/AppManagement';
-import symperAvatar from "@/components/common/SymperAvatar.vue";
 import listTask from "./ListTask";
 import workDetailSub from "./WorkDetailSub";
 import SideBarDetail from "./SideBarDetail";
@@ -322,6 +327,7 @@ import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
 } from "@/components/process/processAction";
+import infoUser from "./../InfoUser";
 
 export default {
     name: "WorkDetail",
@@ -340,7 +346,11 @@ export default {
         parentHeight: {
             type: Number,
             default: 300
-        },
+		},
+		showTitle:{
+			type:Boolean,
+			default:false
+		}
     },
     watch: {
         workInfo: {
@@ -350,20 +360,27 @@ export default {
                 this.changeWorkDetail();
             }
         },
+        taskBreadcrumb:function(){
+            this.getWidthHeaderWork();
+        },
+        "sapp.collapseSideBar": function(newVl) {
+            this.getWidthHeaderWork();
+        }
 
     },
     components: {
         icon: icon,
         listTask,
         VuePerfectScrollbar,
-        symperAvatar,
         workDetailSub,
         SideBarDetail,
         KHShowFile,
-        PopupProcessTracking
+        PopupProcessTracking,
+        infoUser
     },
     data: function() {
         return {
+            widthInfoWork:330,
             fileId: "",
 			serverPath: "",
 			name: "",
@@ -441,7 +458,7 @@ export default {
         },
         listTaskComputed(){
             let self=this;
-            let arrListTask=this.listTaskCurrent;
+            let arrListTask = this.listTaskCurrent;
             arrListTask.forEach(task => {
                 task.taskData = self.getTaskData(task);
                 task = addMoreInfoToTask(task);
@@ -453,6 +470,12 @@ export default {
     created(){
     },
     methods: {
+        getWidthHeaderWork(){
+            setTimeout((self) => {
+                let width=$("#taskHeader").width()-$("#action-task").width()-40;
+                self.widthInfoWork=width;
+            }, 210,this);
+        },
         showContentFile(data){
             this.serverPath = data.serverPath;
 			this.name = data.name;
@@ -581,7 +604,7 @@ export default {
                 filter.processInstanceId=processInstanceId;
                 filter.sort= "startTime";
                 filter.order= "desc";
-                let res = await BPMNEngine.postTaskHistory(filter);
+				let res = await BPMNEngine.postTaskHistory(filter);
                 if (res.total>0) {
                     self.listTaskCurrent=res.data;
                 }else{
@@ -630,6 +653,13 @@ export default {
 </script>
 
 <style scoped>
+.task-header{
+    position: relative;
+}
+.task-header #action-task{
+    position: absolute;
+    right: 10px;
+}
 .v-tab{
     padding: 0px!important;
     border-width: 20px!important;
@@ -662,6 +692,18 @@ export default {
   display: -webkit-box !important;
   -webkit-line-clamp: 1;
   -webkit-box-orient: vertical;
+}
+.col-4{
+    flex: 0 0 32.3333333333%;
+    max-width: 32.3333333333%;
+}
+.user-create {
+    flex: 0 0 17.6666666667%;
+    max-width: 17.6666666667%;
+    padding: 4px;
+}
+.col{
+    padding:4px;
 }
 
 </style>

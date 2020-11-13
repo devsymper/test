@@ -1,5 +1,5 @@
 <template>
-<div class="w-100">
+<div class="w-100 h-100">
    <v-skeleton-loader
         v-if="loading"
         class="mx-auto"
@@ -8,7 +8,7 @@
         type="table"
         >
       </v-skeleton-loader>
-  <div style="display: flex;
+  <div class="document h-100" style="display: flex;
     width: 100%;">
     <side-bar />
     <k-h-editor>

@@ -12,11 +12,13 @@
             flat
             @change="changePageSize"
         ></v-select>
-        <div style="vertical-align: middle;" class="  float-left">
+        <div :style="{
+            'vertical-align': 'middle',
+            'width': pagesWidth
+        }" class="  float-left">
             <v-pagination
                 class="s-pagination"
                 v-model="page"
-                :page="page"
                 :length="pageLength"
                 next-icon="mdi-chevron-right"
                 prev-icon="mdi-chevron-left"
@@ -55,6 +57,9 @@ export default {
             }else{
                 return Math.floor(this.total/this.size) + 1;
             }
+        },
+        pagesWidth(){
+            return (36 * this.totalVisible + 100) + 'px';
         }
     },
     props:{
@@ -162,5 +167,9 @@ export default {
     }
     .s-pagination ::v-deep li > .v-pagination__item--active{
         background: rgb(0 0 0 / 0.05) !important;
+    }
+
+    .s-pagination ::v-deep ul.v-pagination {
+        justify-content: start!important;
     }
 </style>

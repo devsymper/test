@@ -2,6 +2,7 @@ import Api from "./api";
 import {
 	appConfigs
 } from "./../configs.js";
+import { util } from "../plugins/util";
 
 let api = new Api(appConfigs.apiDomain.dashboard);
 
@@ -16,7 +17,7 @@ export const dashboardApi = {
 	// 	return api.get('dashboards', filter)
 	// }
 	getDashboards(filter) {
-		return api.get('https://bi-service.symper.vn/dashboards', filter)
+		return api.get(appConfigs.apiDomain.dashboard, filter)
 	}
 
 };

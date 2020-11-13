@@ -6,8 +6,7 @@
         </div>
         <hot-table
             :height="tableHeight"
-            :settings="tableSettings"
-
+            :settings="tableSettings1"
             :data="tableDataDefinition.tableData"
             :columns="tableDataDefinition.columns"
             :colHeaders="tableDataDefinition.colHeaders"
@@ -27,21 +26,32 @@ export default {
         HotTable
     },
     computed: {
-        tableSettings() {
-            let setting = util.cloneDeep({
-                ...this.commonTableSetting,
-            });
+        tableSettings1() {
+            let self = this;
+            let setting = {
+                 filters: true,
+                manualColumnMove: true,
+                manualColumnResize: true,
+                manualRowResize: true,
+                stretchH: "all",
+                rowHeaders: true,
+                licenseKey: "non-commercial-and-evaluation",
+                afterChange: function(changes, source) {
+                    if($.isArray(changes) && changes.length == 1){
+                        self.$emit('change-data', {
+                            rowIndex: changes[0][0],
+                            action: changes[0][1],
+                            after: changes[0][3],
+                        });
+                    }
+                },
+            }
             // setting.
             return setting;
         }
     },
     props: {
-        /**
-         * Các thuộc tính chung của table cần hiển thị
-         */
-        commonTableSetting: {
 
-        },
         tableHeight: {
             default: 100
         },

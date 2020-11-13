@@ -12,15 +12,17 @@
             :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
             :action="action"
             :documentObjectId="converstNumber(documentObjectId)"
+            :overrideControls="overrideControls"
             @submit-document-success="onSubmitDone">
         </DocumentSubmit>
         <Detail 
+            class="doc-detail"
             :showCommentInDoc="false"
             v-else-if="(showDetailDocument && showDoTaskComponent && (action == 'approval')) || filter=='done'"
             :docObjInfo="docObjInfo">
         </Detail>
-        <div style="width:100%" v-else-if="filter=='done-noneObj'">
-            <h3 style="text-align:left; margin-top:20px; color:#4e4e4e">Mô tả: {{taskInfo.extraLabel}} </h3>
+        <div style="width:100%" v-else-if="filter=='done-noneObj' || action=='submitAdhocTask'">
+            <h3 class="pl-2" style="text-align:left; margin-top:20px; color:#4e4e4e">Mô tả: {{taskInfo.extraLabel}} </h3>
         </div>
         <div v-else-if="action == 'undefined'">
             <div class="text-md-center mt-6">
@@ -190,6 +192,21 @@ export default {
         stask() {
             return this.$store.state.task;
         },
+        overrideControls(){
+            let overrideValueControls={};
+            if (this.taskInfo.selectDefaultControlDocument) {
+                if (this.taskInfo.selectDefaultControlDocument.length>0) {
+                    let selectDefaultControlDocument=this.taskInfo.selectDefaultControlDocument;
+                    for (let index = 0; index < selectDefaultControlDocument.length; index++) {
+                        if (selectDefaultControlDocument[index].name && selectDefaultControlDocument[index].value) {
+                            overrideValueControls[selectDefaultControlDocument[index].name]={formulas:"SELECT '"+selectDefaultControlDocument[index].value+"'"};
+                        }
+                    }
+                }
+                return overrideValueControls;
+            }
+          
+        }
     },
     watch: {
         taskInfo: {
@@ -324,12 +341,16 @@ export default {
 <style scoped>
 .task-style{
     overflow: hidden!important;
+    position: relative;
 }
 .task-style >>> .wrap-content-submit{
     width:96%!important;
 }
 ::v-deep .dialog-edit-doc{
     overflow: hidden;
+}
+.doc-detail {
+    height:100%!important;
 }
 
 

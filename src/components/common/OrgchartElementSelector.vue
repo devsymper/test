@@ -1,28 +1,29 @@
 <template>
-<div class="orgchart-element-selector">
-    <v-treeview
-        class="fs-13"
-        activatable
-        :items="treeData"
-        dense>
-         <template v-slot:label="{ item }">
-            <v-checkbox
-                @change="handleChangeSelectedNode(item)"
-                v-if="item.type == 'position'"
-                v-model="item.selected"
-                :label="item.name"
-                dense
-            ></v-checkbox>
-            <span v-else>
-                {{item.name}}
-            </span>
-        </template>
-    </v-treeview>
-</div>
+    <div class="orgchart-element-selector">
+        <v-treeview
+            class="fs-13"
+            activatable
+            :items="treeData"
+            dense>
+            <template v-slot:label="{ item }">
+                <v-checkbox
+                    @change="handleChangeSelectedNode(item)"
+                    v-if="checkboxMode.includes(item.type)"
+                    v-model="item.selected"
+                    :label="item.name"
+                    dense
+                ></v-checkbox>
+                <span v-else>
+                    {{item.name}}
+                </span>
+            </template>
+        </v-treeview>
+    </div>
 </template>
 
 <script>
 import { util } from '../../plugins/util';
+import { orgchartApi } from '@/api/orgchart.js';
 export default {
     created(){
         this.$store.dispatch('orgchart/getAllOrgchartStruct');
@@ -37,13 +38,12 @@ export default {
                 return []
             }
         },
-
         /**
          * Hiển thị checkbox ở loại node nào trong orgchart: position, department hoặc all (cả hai loại node trên)
          */
         checkboxMode: {
-            type: String,
-            default: 'position' // Hiển thị ô check ở những loại node nào: position, department, all
+            type: Array,
+            default: ['position'] // Hiển thị ô check ở những loại node nào: position, department
         },
         searchKey:{
             type:String,
@@ -51,14 +51,18 @@ export default {
         }
     },
     watch: {
-        value(){
-            
-            let mapNode = this.$store.state.orgchart.allOrgchartStruct.map;
-            for(let item of this.value){
-                if(mapNode[item]){
-                    mapNode[item].selected = true;
+        value:{
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                let mapNode = this.$store.state.orgchart.allOrgchartStruct.map;
+                for(let item of newValue){
+                    if(mapNode[item]){
+                        mapNode[item].selected = true;
+                    }
                 }
             }
+           
         }
     },
     data(){

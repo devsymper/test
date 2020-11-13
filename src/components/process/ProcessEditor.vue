@@ -192,9 +192,11 @@ export default {
                     }
                 }
             }
-
-            approvalNodeData.attrs.approvalEditableControls.options = null;
-            approvalNodeData.attrs.approvalEditableControls.options = ctrls;
+            if (approvalNodeData.type!="ServiceTask") {
+                approvalNodeData.attrs.approvalEditableControls.options = null;
+                approvalNodeData.attrs.approvalEditableControls.options = ctrls;
+            }
+         
         },
         resetAttrPanelHeight(){
             this.attrPannelHeight = (util.getComponentSize(this).h - 50)+'px';
@@ -390,6 +392,7 @@ export default {
                             nodeData.attrs.process_id.value;
                     }
                 }
+
             }
 
             // Loại bỏ data của các node mà ko có trong diagram
@@ -417,10 +420,13 @@ export default {
             for(let elName in allSymEls){
                 jsonConfig[elName] = {};
                 for(let attrName in allSymEls[elName].attrs){
-                    let attr = allSymEls[elName].attrs[attrName];
-                    if(attr){
-                        jsonConfig[elName][attrName] = attr.getValue(attr.value);
+                    if (attrName!="idNode") {
+                        let attr = allSymEls[elName].attrs[attrName];
+                        if(attr){
+                            jsonConfig[elName][attrName] = attr.getValue(attr.value);
+                        }
                     }
+                   
                 }
             }
             let modelDataAsFlowable = this.getModelData();
@@ -439,6 +445,8 @@ export default {
             xml = xml.replace(/\]\]\&gt;/g, ']]>');
             xml = xml.replace(/&lt;symper:symper_symper_string_tag&gt;/g,'<symper:symper_symper_string_tag>');
             xml = xml.replace(/&lt;\/symper:symper_symper_string_tag&gt;/g,'</symper:symper_symper_string_tag>');
+            xml = xml.replace(/&lt;symper:symper_symper_expression_tag&gt;/g,'<symper:symper_symper_expression_tag>');
+            xml = xml.replace(/&lt;\/symper:symper_symper_expression_tag&gt;/g,'</symper:symper_symper_expression_tag>');
             return xml;
         },
         /**
@@ -541,9 +549,12 @@ export default {
                 });
         },
 
-        fillValueForHiddenServiceTaskAttr(nodeId){
+        fillValueForHiddenServiceTaskAttr(nodeId, serviceTaskType = ''){
             let sNodeAttrs = this.stateAllElements[nodeId];
-            let seletedType = serviceTaskDefinitions[sNodeAttrs.attrs.serviceTaskType.value];
+            if(!serviceTaskType){
+                serviceTaskType = sNodeAttrs.attrs.serviceTaskType.value;
+            }
+            let seletedType = serviceTaskDefinitions[serviceTaskType];
             for (let key in seletedType.params) {
                 let attr = sNodeAttrs.attrs['httptask'+key.toLowerCase()];
                 if(attr){
@@ -588,9 +599,10 @@ export default {
                         nodeData.dockers = [];
                         nodeData.outgoing = [];
 
-                        
                         if(nodeType == "ServiceTask"){
                             this.fillValueForHiddenServiceTaskAttr(bnode.id);
+                        }else if(nodeType == "ScriptTask"){
+                            this.fillValueForHiddenServiceTaskAttr(bnode.id, 'script');
                         }
                     }
 
@@ -599,7 +611,7 @@ export default {
                 nodeData.properties = this.getNodeProperties(bnode.id, false);
                 nodeData.stencil.id = nodeType; // flowable quy định loại node nằm trong nodeData.stencil.id
 
-                if(nodeData.stencil.id == 'ServiceTask'){
+                if(nodeData.stencil.id == 'ServiceTask' || nodeData.stencil.id == 'ScriptTask' ){
                     nodeData.stencil.id = 'HttpTask';
                 }
                 mapSaveNodes[bnode.id] = nodeData;
@@ -961,12 +973,23 @@ export default {
                 this.$delete(this.stateAllElements, oldId);
                 this.$set(this.stateAllElements, newId, this.selectingNode);
             }
+            
 
             // Nếu set formreference cho StartNoneEvent thì đặt các lựa chọn control để làm business key
             if(this.selectingNode.type == 'StartNoneEvent' && name == 'formreference'){
                 this.setControlsForBizKey(inputInfo.value);
             }
+            // set documentId cho selectDefaultControlDocument để cấu hình điền sẵn các giá trị mặc định cho document
+            if (this.selectingNode.type=="UserTask" 
+                && this.selectingNode.attrs.taskAction.value=="submit"
+                && name=="formreference"
+                ) {
+                this.selectingNode.attrs.selectDefaultControlDocument.docId=data.value;
+            }
+            
+
         },
+        
         /**
          * Thay đổi giá trị của id cho các node có attr cần lựa chọn dùng tới node nào.
          * VD: approvalForElement, updateForElement ...
@@ -1066,6 +1089,9 @@ export default {
             if(nodeData.type == 'UserTask'){
                 this.setTaskActionableNodes(nodeData, 'approvalForElement');
                 this.setTaskActionableNodes(nodeData, 'updateForElement');
+                if (nodeData.attrs.taskAction.value=="submit" && nodeData.attrs.formreference.value) {
+                    this.selectingNode.attrs.selectDefaultControlDocument.docId=nodeData.attrs.formreference.value;
+                }
             }else if(nodeData.type == 'BPMNDiagram'){
                 nodeData.attrs.controlsForBizKey.options = this.controlsForBizKey;
             }else if(nodeData.type.includes('Gateway')){

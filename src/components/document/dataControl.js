@@ -15,17 +15,23 @@ import {
  */
 export const allControlNotSetData = ['approvalHistory', 'submit', 'draft', 'reset']
 export const setDataForPropsControl = function(fields, instance, from) {
+    let controlMapDatasetDataflow = {};
+    let viewType = sDocument.state.viewType[instance];
     for (let controlId in fields) {
         let control = GetControlProps(fields[controlId].type);
         let userUpdate = fields[controlId].userUpdate
         let properties = control.properties;
         let formulas = control.formulas
-        let type = fields[controlId].type
+        let type = fields[controlId].type;
+        if (type == 'dataFlow') {
+            controlMapDatasetDataflow[fields[controlId].properties['name']] = fields[controlId].properties['datasets'];
+        }
         let id = fields[controlId]['properties'].id;
         let prepareData = fields[controlId].dataPrepareSubmit;
         $.each(properties, function(k, v) {
             if (type == 'checkbox') {
-                properties[k].value = (fields[controlId]['properties'][k] == 0 || fields[controlId]['properties'][k] == '0' || fields[controlId]['properties'][k] == '') ? false : true
+                let valueControl = fields[controlId]['properties'][k];
+                properties[k].value = valueControl;
             } else {
                 let valueControl = fields[controlId]['properties'][k];
                 if (type == "number" && k == 'defaultValue' && valueControl == "") {
@@ -35,14 +41,21 @@ export const setDataForPropsControl = function(fields, instance, from) {
             }
         })
         if (fields[controlId]['formulas'] != false && fields[controlId]['formulas'] != "[]") {
-
-            $.each(formulas, function(k, v) {
-                if (fields[controlId]['formulas'][k] == "") {
-                    delete control.formulas[k];
-                } else {
-                    formulas[k].value = fields[controlId]['formulas'][k]
+            if (viewType != 'detail') {
+                for (let fType in formulas) {
+                    if (!fields[controlId]['formulas'][fType]) {
+                        delete control.formulas[fType];
+                    } else {
+                        if (fType == 'linkConfig') {
+                            if (fields[controlId]['formulas'][fType] && fields[controlId]['formulas'][fType]['configData'].length > 0) {
+                                formulas[fType].configData = fields[controlId]['formulas'][fType]['configData'];
+                            }
+                        } else {
+                            formulas[fType].value = fields[controlId]['formulas'][fType]
+                        }
+                    }
                 }
-            })
+            }
         }
         if (fields[controlId].type != "table" && sDocument.state.detail[instance].allData != null) {
             let value = ""
@@ -56,14 +69,13 @@ export const setDataForPropsControl = function(fields, instance, from) {
                 properties: properties,
                 formulas: formulas,
                 type: type,
-                value: value,
+                value: (type == 'percent') ? value * 100 : value,
                 prepareData: prepareData,
                 userUpdate: userUpdate
             }, instance, from);
         } else {
             let listField = fields[controlId].listFields
             let listChildField = {};
-            let i = 0;
             let colValue = {};
             let childObjectId = [];
             for (let childFieldId in listField) {
@@ -85,13 +97,21 @@ export const setDataForPropsControl = function(fields, instance, from) {
                     }
                 })
                 if (listField[childFieldId]['formulas'] != false && listField[childFieldId]['formulas'] != "[]") {
-                    $.each(childFormulas, function(k, v) {
-                        if (listField[childFieldId]['formulas'][k] == "") {
-                            delete childControl.formulas[k];
-                        } else {
-                            childFormulas[k].value = listField[childFieldId]['formulas'][k]
-                        }
-                    })
+                    if (viewType != 'detail') {
+                        $.each(childFormulas, function(k, v) {
+                            if (!listField[childFieldId]['formulas'][k]) {
+                                delete childControl.formulas[k];
+                            } else {
+                                if (k == 'linkConfig') {
+                                    if (listField[childFieldId]['formulas'][k] && listField[childFieldId]['formulas'][k]['configData'].length > 0) {
+                                        childFormulas[k].configData = listField[childFieldId]['formulas'][k]['configData'];
+                                    }
+                                } else {
+                                    childFormulas[k].value = listField[childFieldId]['formulas'][k];
+                                }
+                            }
+                        })
+                    }
                 }
                 if (childProperties.hasOwnProperty('name') && sDocument.state.detail[instance].allData != null) {
                     let controlName = childProperties['name'].value;
@@ -119,7 +139,6 @@ export const setDataForPropsControl = function(fields, instance, from) {
                     }
                 }
 
-                i++;
             }
             colValue['childObjectId'] = childObjectId;
             addToAllControlInDoc(controlId, {
@@ -135,6 +154,9 @@ export const setDataForPropsControl = function(fields, instance, from) {
                 instance, from);
         }
     }
+    store.commit(
+        "document/addToDocumentSubmitStore", { key: 'listControlMappingDatasets', value: controlMapDatasetDataflow, instance: instance }
+    );
 }
 
 function addToAllControlInDoc(controlId, control, instance, from) {

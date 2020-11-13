@@ -45,7 +45,7 @@
                     </v-list-item-title>
                     <div class="w-100 mb-1 ">
                         <div class="w-100 d-flex" v-if="sapp.baInfo.name"  style="color: rgba(0, 0, 0, 0.54)">
-                            <v-tooltip top>
+                            <v-tooltip top z-index="200">
                                 <template v-slot:activator="{ on }">
                                     <i v-on="on" 
                                         class="mdi mdi-account-check-outline fs-16 mr-1" 
@@ -60,7 +60,7 @@
                                 nudge-bottom='0'
                                 :close-on-content-click="false">
                                 <template v-slot:activator="{ on: menu, attrs }">
-                                    <v-tooltip bottom>
+                                    <v-tooltip bottom z-index="200">
                                         <template v-slot:activator="{ on: tooltip }">
                                             <v-btn
                                                 x-small
@@ -105,7 +105,6 @@
                                             <span class="fs-13">{{$t('common.search')}}</span>
                                         </template>
                                         <template v-slot:item="data">
-                                        
                                             <div class="fs-13 py-1" >
                                                  <SymperAvatar
                                                     style="height:25px!important; width:25px!important; margin-left:-5px"  
@@ -118,7 +117,7 @@
                             </v-menu>
                         </div>
                         <div class="w-100 d-flex" style="color: rgba(0, 0, 0, 0.54)">
-                            <v-tooltip top>
+                            <v-tooltip top z-index="200">
                                 <template v-slot:activator="{ on }">
                                     <i class="mdi mdi-account-circle-outline fs-16 mr-1" v-on="on" style="position: relative;top: 2px;"></i>                            
                                 </template>
@@ -129,7 +128,7 @@
                                 :offset-y="true"
                                 :close-on-content-click="false">
                                 <template v-slot:activator="{ on: menu, attrs }">
-                                     <v-tooltip top>
+                                     <v-tooltip top z-index="200">
                                         <template v-slot:activator="{ on: tooltip }">
                                             <v-btn
                                                 x-small
@@ -203,7 +202,7 @@
                             style="margin-left:-25px; height:32px!important"
                             v-for="(subMenu, objectType) in item.children"
                             :key="objectType"
-                             :class="{'menu-group-active': subMenu.active == true }"
+                            :class="{'menu-group-active': subMenu.active == true }"
                             @click="gotoPage(subMenu,true,item)">
                             <v-list-item-title class="fm" style=" color:rgb(0,0,0,0.8)" >
                                 {{$t('common.sidebar.'+subMenu.title)}}
@@ -230,9 +229,10 @@
                            <v-menu 
                                 right offset-y
                                 nudge-right='40'
+                                z-index="200"
                                 nudge-top='30'>
                                 <template v-slot:activator="{ on: menu }">
-                                    <v-tooltip bottom>
+                                    <v-tooltip z-index="200" bottom>
                                         <template v-slot:activator="{ on: tooltip }">
                                             <v-icon class="collapse icon-group" @click="gotoPage(item)" v-on="{ ...tooltip, ...menu }">
                                             {{ item.icon }}
@@ -335,6 +335,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import UserRoleSelector from "@/components/app/UserRoleSelector.vue";
 import { appConfigs } from '../../configs.js';
 import SymperAvatar from "@/components/common/SymperAvatar";
+import { orgchartApi } from '../../api/orgchart.js';
 
 export default {
     created(){
@@ -465,16 +466,32 @@ export default {
             );
         },
         gotoPage(item, subItem = false , parent){
+            console.log(item,'menu');
+            if(item.title == 'viewOrgchart'){
+                this.viewOrgchartAction()
+                this.setActive(item,subItem, parent)
+            }
             if(item.action){
                  this.$evtBus.$emit('symper-app-call-action-handler', item.action, this, {});
             }else{
                 let path = 'common.sidebar.'+item.title;
                 let title = this.$t(path);
-                
                 this.$goToPage(item.link, title, false, false);
             }
             this.setActive(item,subItem, parent)
             
+        },
+        viewOrgchartAction(){
+            orgchartApi.getIdOrgchartDefault().then(res=>{
+                let id = res.data.id
+                this.$goToPage(
+                    `/orgchart/${id}/view`,
+                    this.$t("common.detail") + "  " + res.data.name,
+                    false,
+                    false
+                );
+                
+            }).catch(err=>{})
         },
         setActive(item, subItem, parent){
             let self = this

@@ -91,6 +91,7 @@ import {systemDataMappingApi} from "@/api/systemDataMapping";
 import {listControlNotNameProp} from "@/components/document/controlPropsFactory.js";
 
 import Api from "@/api/api.js";
+import { util } from '../../../plugins/util';
 export default {
     props:{
         instance:{
@@ -182,17 +183,17 @@ export default {
          * Thay đổi kiểu đối tượng thì gọi lại api lấy dánh sách các column của object hệ thống
          */
         onChangeSelectedObject(mappingItem){
-            if(mappingItem.objectType.name != 'account'){
+            if(!['account','department'].includes(mappingItem.objectType.name)){
                 mappingItem.systemObjectIdentifier.options = [];
                 return;
             }
             if(this.cacheDataObject[mappingItem.objectType.name]){ // nếu có dữ liệu trong cache rồi thì lấy ra
-               mappingItem.systemObjectIdentifier.options = this.cacheDataObject[mappingItem.objectType.name];
+                mappingItem.systemObjectIdentifier.options = this.cacheDataObject[mappingItem.objectType.name];
                 return
             }
             let self = this;
             let domain = mappingItem.objectType.ownerDomain;
-            let api = new Api("https://"+domain);
+            let api = new Api(util.addEnvToUrl("https://"+domain));
             api.get("/object/"+mappingItem.objectType.name).then(res=>{
                 let data = res.data;
                 for(let columnName in data){

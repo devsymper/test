@@ -1,8 +1,45 @@
 <template>
-    <div class="d-flex w-100 h-100">
+    <div :class="{'d-flex w-100 h-100': true, 'diagram-hortical': typeView == 'B','diagram-vertical': typeView == 'R'   } ">
         <div class="h-100 flex-grow-1">
-            <div class="border-bottom-1 pt-1 pl-2">
+            <div class="border-bottom-1 pt-1 pl-2 w-100 d-flex">
+                  <div style="margin-right:8px;margin-top:4px" v-if="showMenuPickTab">
+                       <span style="font:17px roboto;font-weight:500">SĐTC dạng lưu đồ</span>
+                        <v-menu
+                            :max-width="500"
+                            :max-height="700"
+                            :nudge-width="200"
+                            offset-y
+                            >
+                            <template v-slot:activator="{ on }" class="float-right">
+                                <v-btn icon tile x-small v-on="on">
+                                    <v-icon>mdi-chevron-down</v-icon>
+                                </v-btn>
+                            </template>
+                            <v-list
+                                    nav
+                                    dense
+                                >
+                                    <v-list-item-group
+                                        v-model="currentTab"
+                                        color="primary"
+                                        >
+                                        <v-list-item
+                                            v-for="(item, i) in menuPickTab"
+                                            :key="i"
+                                        >
+                                            <v-list-item-icon>
+                                            <v-icon v-text="item.icon"></v-icon>
+                                            </v-list-item-icon>
+                                            <v-list-item-content>
+                                            <v-list-item-title v-text="item.title"></v-list-item-title>
+                                            </v-list-item-content>
+                                        </v-list-item>
+                                    </v-list-item-group>
+                            </v-list>
+                        </v-menu>
+                    </div>
                 <v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
+                   
                     <template v-slot:activator="{ on }">
                         <v-btn
                             @click="handleHeaderAction(key)"
@@ -28,9 +65,11 @@
                     </template>
                     <span>thêm node moi </span>
                 </v-tooltip>
-                <v-btn
+              <div style="flex-grow:1">
+                    <v-btn
                     v-if="action != 'view' && context == 'department'"
                     class="float-right mr-1"
+                    style=""
                     @click="saveOrgchart"
                     small
                     depressed
@@ -39,6 +78,7 @@
                     <v-icon class="mr-2" primary>mdi-content-save</v-icon>
                     {{$t('common.save')}}
                 </v-btn>
+              </div>
             </div>
             <div v-if="loadingDiagramView" style="
                 position: absolute;
@@ -61,8 +101,8 @@
             <EditorWorkspace 
                 :class="{
                     'w-100': true,
-                    'symper-orgchart-view': action == 'view',
-                    'symper-orgchart-active-editor': action != 'view'
+                    'symper-orgchart-view': action == 'view' || action == 'structureManagement',
+                    'symper-orgchart-active-editor': action != 'view' && action != 'structureManagement'
                 }"
                 style="height: calc(100% - 41px)"
                 @new-viz-cell-added="handleNewNodeAdded"
@@ -71,6 +111,7 @@
                 @cell-clicked="selectNode"
 				@delete-node="handlerDeleteNode"
                 :instanceKey="instanceKey"
+                :readonly="action == 'view' || action == 'structureManagement' ? true : false "
                 :context="context"
                 ref="editorWorkspace"/>
         </div>
@@ -120,13 +161,25 @@ import jointjs from "jointjs";
 import { orgchartApi } from "@/api/orgchart.js";
 import { FOUCUS_DEPARTMENT_DISPLAY, DEFAULT_DEPARTMENT_DISPLAY, departmentMarkup } from '../nodeDefinition/departmentDefinition';
 import { permissionApi } from '../../../api/permissionPack';
+import {documentApi} from "@/api/Document.js"
+
 
 export default {
     name: 'OrgchartEditor',
     computed: {
         selectingNode(){
             return this.$store.state.orgchart.editor[this.instanceKey].selectingNode;
-        }
+        },
+        listDocument() {
+            let listDoc = Object.values(this.$store.state.document.listAllDocument);
+            listDoc = listDoc.reduce((arr,obj)=>{
+                let newObj = {id:obj.id, name:obj.name, title:obj.title};
+                arr.push(newObj);
+                return arr;
+            },[])
+            return listDoc;
+        },
+
     },
     components: {
         ConfigPanel,
@@ -148,14 +201,42 @@ export default {
         },
         id: {
             default: ''
-        }
+        },
+        currentTab:{
+            type:Number,
+            default:2
+        },
+        showMenuPickTab:{
+            type: Boolean,
+            default: false
+        },
+       
     },
     data(){
         return {
             loadingDiagramView: true,
             typeView: "B",
-			positionEditor: false,
-			checkPageEmpty: false,
+            positionEditor: false,
+            selectedDoc: null,
+            listFieldInSelectedDoc: [],
+            checkPageEmpty: false,
+            menuPickTab:[
+                {
+                    icon: "mdi-grid",
+                    title:"SĐTC dạng bảng",
+                    action:"tableView"
+                },
+                {
+                    icon: "mdi-account-multiple",
+                    title:"SĐTC dạng cây",
+                    action:"tableSideBySideView"
+                },
+                {
+                    icon: "mdi-share-variant",
+                    title:"SĐTC dạng lưu đồ",
+                    action:"diagramView"
+                },
+            ],
 			listUserIds:null,
             headerActions: {
                 zoomIn: {
@@ -192,8 +273,17 @@ export default {
             },
         }
     },
-    created(){
+    created(){  
         this.initOrgchartData();
+        // this.$store.dispatch('document/setListDocuments')
+        documentApi.getListDocument().then(res=>{
+            if(res.status == 200){
+                let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
+               homeConfig.commonAttrs.mappingDoc.options = res.data.listObject
+            }
+            
+        })
+       
         if(this.action != 'create'){
             this.restoreOrgchartView(this.id)
         }else{
@@ -212,7 +302,17 @@ export default {
             if(after === false){
                 this.storeDepartmentPositionCells();
             }
-        }
+        },
+        currentTab(val){
+            if(val == 0 || val == 1){
+                this.$emit('current-tab' , val)
+            }
+        },
+       selectedDoc(val){
+           if(val){
+              this.getFieldsInDoc(val)
+           }
+       },
     },
     methods: {
 		handlerDeleteNode(){
@@ -305,11 +405,15 @@ export default {
 				})
         },
         restoreMainOrgchartConfig(config){
+            let mappingDocInfo = JSON.parse(config.mappingDocInfo)
             let homeConfig = this.$store.state.orgchart.editor[this.instanceKey].homeConfig;
             homeConfig.commonAttrs.name.value = config.name;
             homeConfig.commonAttrs.description.value = config.description;
             homeConfig.commonAttrs.code.value = config.code;
             homeConfig.commonAttrs.isDefault.value = config.isDefault == "1" ? true : false;
+            homeConfig.commonAttrs.mappingDoc.value = mappingDocInfo ? mappingDocInfo.docId : ""
+            homeConfig.commonAttrs.scriptMapping.value = mappingDocInfo ? mappingDocInfo.script : ""
+            homeConfig.commonAttrs.tableMapping.value = mappingDocInfo ? mappingDocInfo.fieldMapping : [{}]
             homeConfig.customAttributes = config.dynamicAttributes;
         },
         correctDiagramDisplay(content){
@@ -324,6 +428,7 @@ export default {
             return content;
         },
         async restoreOrgchartView(id){
+            let self = this
             if(!id){
                 return
             }
@@ -341,16 +446,18 @@ export default {
                     }
                     this.restoreMainOrgchartConfig(savedData.orgchart);
                     let mapIdToDpm = {};
-
                     for(let node of savedData.departments){
+                        let users = self.getListUserAsArr(node.users)
                         let nodeData = {
                             id: node.vizId,
                             name: node.name,
                             description: node.description,
                             code: node.code,
-                            users: this.getListUserAsArr(node.users)
+                            users: users,
+                            dataFromDoc:{
+                                users: JSON.parse(node.usersFromDoc)
+                            }
                         };
-
                         if(node.content && node.content !== 'false'){ 
                             nodeData.positionDiagram = {
                                 cells: JSON.parse(node.content)
@@ -365,6 +472,7 @@ export default {
                     }
                     savedData.positions.forEach(function(e){
                         e.users = JSON.parse(e.users)
+                        e.usersFromDoc = JSON.parse(e.usersFromDoc)
                     })
                     let allPositionInADpm = getMapDpmIdToPosition(savedData.positions);
                     for(let dpmId in allPositionInADpm){
@@ -377,7 +485,10 @@ export default {
                                 name: position.name,
                                 description: position.description,
                                 code: position.code,
-                                users: userSelected
+                                users: userSelected,
+                                dataFromDoc:{
+                                    users: position.usersFromDoc
+                                }
                             };
                             let newPosition = this.createNodeConfigData('position', nodeData, dpmInstanceKey);
                             newPosition.style = this.restoreNodeStyle(position.style);
@@ -411,6 +522,7 @@ export default {
             }
             return users;
         },
+      
         restoreNodeStyle(savedStyle){
             if(typeof savedStyle != 'object'){
                 savedStyle = JSON.parse(savedStyle);
@@ -458,8 +570,10 @@ export default {
 						this.$store.commit('orgchart/changeSelectingNode', {
 							instanceKey: self.selectingNode.positionDiagramCells.instanceKey,
 							nodeId: firstNode.id,
-						});
-						self.$refs.positionDiagram.$refs.editorWorkspace.changeUserDisplayInNode(this.listUserIds);
+                        });
+                        if(self.listUserIds != null){
+					    	self.$refs.positionDiagram.$refs.editorWorkspace.changeUserDisplayInNode(self.listUserIds);
+                        }
 						self.$store.commit('orgchart/updateFirstChildNodeId', firstNode.id)
                         self.$store.commit('orgchart/updateCurrentChildrenNodeId',firstNode.id)
                     }else{
@@ -681,7 +795,6 @@ export default {
 
             if(passed){
                 let orgchartData = this.getDataToSave();
-                debugger
                 this.$emit('save-orgchart-data', orgchartData);    
             }
         },
@@ -696,7 +809,12 @@ export default {
                 dynamicAttrs: JSON.stringify(orgchartAttr.customAttributes),
                 name: orgchartAttr.commonAttrs.name.value,
                 code: orgchartAttr.commonAttrs.code.value,
-                isDefault: orgchartAttr.commonAttrs.isDefault.value == true ? 1 : 0
+                isDefault: orgchartAttr.commonAttrs.isDefault.value == true ? 1 : 0,
+                mappingDocInfo:{
+                    docId: orgchartAttr.commonAttrs.mappingDoc.value,
+                    script: orgchartAttr.commonAttrs.scriptMapping.value,
+                    fieldMapping: orgchartAttr.commonAttrs.tableMapping.value,
+                }
 			};
             return data;
         },
@@ -753,7 +871,8 @@ export default {
                 vizParentId: '',
                 dynamicAttrs: node.customAttributes,
                 style: JSON.stringify(nodeStyle),
-                users: JSON.stringify(node.users)
+                users: JSON.stringify(node.users),
+                usersFromDoc: JSON.stringify(node.dataFromDoc.users),
             };
             
             if(nodeType == 'department'){
@@ -798,6 +917,9 @@ export default {
             }
         },
         handleConfigValueChange(data){
+            if(data.name = "mappingDoc"){
+                this.selectedDoc = data.data
+            }
             let cellId = this.selectingNode.id;
             if(data.name == 'name' && cellId != SYMPER_HOME_ORGCHART){
                 this.$refs.editorWorkspace.updateCellAttrs(cellId, 'name', data.data);
@@ -884,7 +1006,11 @@ export default {
             if(nodeData.users){
                 defaultConfig.users = nodeData.users;
             }
-            
+            if(nodeData.dataFromDoc){
+                defaultConfig.dataFromDoc.users = nodeData.dataFromDoc.users 
+            }else{
+                defaultConfig.dataFromDoc.users = []
+            }
             this.$store.commit('orgchart/setNodeConfig', {
                 instanceKey: instanceKey,
                 nodeId: nodeData.id,
@@ -914,6 +1040,29 @@ export default {
                 this.showPermissionsOfNode();
             }       
         },
+        /**
+         * ham lay cac field cua doc duoc chon
+         */
+         getFieldsInDoc(id){
+            let self = this
+                documentApi.getFieldByDocId(id).then(res=>{
+                    if(res.status == 200){
+                        let data = res.data
+                        for(let i in data){
+                            let obj = {}
+                            obj.name = data[i].properties.name
+                            obj.title = data[i].properties.title
+                            self.listFieldInSelectedDoc.push(obj.name)
+                        }
+                    let homeConfig = self.$store.state.orgchart.editor[self.instanceKey].homeConfig;
+                    this.$set(homeConfig.commonAttrs.tableMapping.columns[0], 'source',self.listFieldInSelectedDoc )
+                    }
+                 
+                }).catch(err=>{
+
+                })
+            
+        },
 
         async showPermissionsOfNode(){
             if(this.selectingNode.permissions.length > 0 || this.action == 'create'){
@@ -938,6 +1087,9 @@ export default {
 </script>
 
 <style>
+.v-menu__content {
+    z-index:10000 !important
+}
 .symper-orgchart-paper .marker-arrowheads, 
 .symper-orgchart-paper .link-tools,
 .symper-orgchart-paper .marker-vertex-group,
@@ -951,5 +1103,14 @@ export default {
 
 .symper-orgchart-active-editor .symper-orgchart-paper .symper-orgchart-node:hover .orgchart-action {
     display: block!important;
+}
+
+
+.diagram-hortical .btn-collapse-expand-ver{
+    display: none !important ;
+}
+
+.diagram-vertical .btn-collapse-expand-hor{
+    display: none;
 }
 </style>

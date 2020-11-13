@@ -4,6 +4,7 @@
         :grid-size="gridSize" 
         :draw-grid="drawGrid" 
         @init="setupGraph"
+        :readonly="readonly"
         ref="jointPaper" />
 </template>
 <script>
@@ -12,6 +13,10 @@ import { createDepartmentNode, defineDepartment, DEFAULT_DEPARTMENT_DISPLAY, FOU
 import { createPositionNode, definePosition, DEFAULT_POSITION_DISPLAY, FOUCUS_POSITION_DISPLAY } from "./../nodeDefinition/positionDefinition";
 import { SYMPER_HOME_ORGCHART, getDefaultConfigNodeData, jointLinkNode } from './nodeAttrFactory';  
 import avatarDefault from "@/assets/image/avatar_default.jpg";
+import { util } from '../../../plugins/util';
+import {
+    appConfigs
+} from "@/configs";
 require('@/plugins/rappid/rappid.css');
 export default {
     components: {
@@ -23,6 +28,10 @@ export default {
         },
         context: {
             default: 'department'
+        },
+        readonly:{
+            type: Boolean,
+            default: false
         }
     },
     created(){
@@ -70,7 +79,9 @@ export default {
             this.$refs.jointPaper.actionOnToolbar(action);
         },
         loadDiagramFromJson(cells){
+             let treeLayout = this.$refs.jointPaper.treeLayout;
             this.$refs.jointPaper.graph.fromJSON(cells);
+            treeLayout.layout();
         },
         getAllDiagramCells(){
             return this.$refs.jointPaper.graph.toJSON();
@@ -95,7 +106,8 @@ export default {
                         cell.attr(mapName[attrName]+'/'+key, value[key]);
                     }
                 }else{
-                    if(value.includes('https://file.symper.vn/readFileSvg/user_avatar')){
+                    let imgurl = util.addEnvToUrl(appConfigs.apiDomain.fileManagement+'readFileSvg/user_avatar');
+                    if(value.includes(imgUrl)){
                           cell.attr(mapName[attrName], value,
                         );
                     }else{
@@ -184,7 +196,6 @@ export default {
             paper.on('element:collapse', function(view, evt) {
                 evt.stopPropagation();
                 self.toggleBranch(view.model);
-                // self.$refs.jointPaper.actionOnToolbar('zoomToFit');
             });
         },
         toggleBranch(root){
@@ -197,15 +208,14 @@ export default {
                     collapsed: false
                 });
             });
-            this.layoutAndFocus(self.viewportRect.center());
+            this.layoutAndFocus(this.viewportRect.center());
         },
         layoutAndFocus(focusPoint) {
             let treeLayout = this.$refs.jointPaper.treeLayout;
             treeLayout.layout();
-            var center = focusPoint || treeLayout.getLayoutBBox().center();
+            var center = treeLayout.getLayoutBBox().center();
             this.resizePaper();
             this.paperScroller.center(center.x, center.y);
-            debugger
         },
         resizePaper() {
             let treeLayout = this.$refs.jointPaper.treeLayout;
@@ -295,7 +305,7 @@ export default {
         },
         changeUserDisplayInNode(userIdList){
             let lastUserInfo = this.mapUserById[userIdList[userIdList.length - 1]];
-            let avatarUser = "https://file.symper.vn/readFileSvg/user_avatar_"+lastUserInfo.id
+            let avatarUser = util.addEnvToUrl(appConfigs.apiDomain.fileManagement+"readFileSvg/user_avatar_")+lastUserInfo.id
             if(this.context == 'department'){
                 if(!lastUserInfo) return;
                 this.updateCellAttrs(this.selectingNode.id, 'managerName', lastUserInfo.displayName );
@@ -313,7 +323,6 @@ export default {
             }
         },
         setupGraph(graph, paper, paperScroller,viewportRect){
-            //dung them dong nay 
             this.viewportRect = viewportRect
             this.paper = paper
             this.paperScroller = paperScroller
@@ -383,7 +392,10 @@ export default {
         initDiagramView(){
             
         }
-	}
+    },
+    watch:{
+       
+    }
 }
 </script>
 

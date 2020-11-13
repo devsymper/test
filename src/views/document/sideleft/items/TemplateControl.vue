@@ -145,9 +145,9 @@ export default {
                 let controlTemplate = allControlTemplate.filter(c=>{
                     return c.id == control.id
                 });
-                delete allControlTemplate[allControlTemplate.indexOf(controlTemplate[0])]
+                let index = allControlTemplate.indexOf(controlTemplate[0]);
                 thisCpn.$store.commit(
-                    "document/addToDocumentEditorStore",{key:'allControlTemplate',value:allControlTemplate,instance:thisCpn.instance}
+                    "document/deleteControlTemplate",{index:index,instance:thisCpn.instance}
                 );
             }).catch(err => {
             })

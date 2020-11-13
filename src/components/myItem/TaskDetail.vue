@@ -1,21 +1,21 @@
 <template>
-    <div class="h-100 w-100">
+    <div class="w-100" style="height: 100%">
         <v-skeleton-loader
             v-if="loadingActionTask"
             :type="'table-tbody'"
             class="mx-auto"
             width="100%" height="100%" 
         ></v-skeleton-loader>
-        <v-row class="ml-0 mr-0 justify-space-between task-header" style="line-height: 36px;">
+        <v-row class="ml-0 mr-0 justify-space-between task-header" id="taskHeader" style="line-height: 36px;height:44px">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
-                    <div v-on="on" class="fs-13 pl-2 pt-1 float-left text-ellipsis" style="width:330px"> 
+                    <div v-on="on" class="fs-13 pl-2 pt-1 float-left text-ellipsis" :style="{'width':widthInfoTask+'px'}"> 
                         {{taskBreadcrumb}}
                     </div>
                 </template>
                 <span>{{taskBreadcrumb}}</span>
             </v-tooltip>
-            <div class="text-right pt-1 pb-1 pr-0 float-right">
+            <div id="action-task" class="text-right pt-1 pb-1 pr-0 float-right">
                 <span v-if="!originData.endTime && !hideActionTask ">
                     <span v-if="checkRole(originData.assigneeInfo.id)==true">
                         <v-btn small depressed  v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
@@ -30,7 +30,6 @@
                     </span>
                   
                 </span>
-             
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
                         <v-btn  
@@ -43,7 +42,6 @@
                     </template>
                     <span>Xem chi tiết</span>
                 </v-tooltip>
-
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
                         <v-btn  
@@ -57,8 +55,6 @@
                     </template>
                     <span>Sao chép đường dẫn</span>
                 </v-tooltip>
-
-                
                 <v-tooltip bottom v-if="checkShowEditRecord()">
                     <template v-slot:activator="{ on }">
                         <v-btn  
@@ -71,17 +67,14 @@
                     </template>
                     <span>Sửa nội dung văn bản</span>
                 </v-tooltip>
-
                 <!-- <button @click="getTaskTest">Click</button> -->
-
                 <v-btn small tile icon text  @click="closeDetail">
                     <v-icon small>mdi-close</v-icon>
                 </v-btn>
-
             </div>
         </v-row>
         <v-divider style="border-color: #dedede;"></v-divider>
-        <v-row class="ma-0 detail-task">
+        <v-row class="ma-0 detail-task" style="height: calc(100% - 45px);">
             <!-- <VuePerfectScrollbar :style="{height: parentHeight +'px'}" > -->
                 <task 
                     @task-submited="handleTaskSubmited" 
@@ -126,8 +119,10 @@ import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../compone
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
 import { appManagementApi } from '@/api/AppManagement';
+import { extractTaskInfoFromObject, addMoreInfoToTask } from '@/components/process/processAction';
 
 import VueClipboard from 'vue-clipboard2';
+import { util } from '../../plugins/util';
 
 
 Vue.use(VueClipboard)
@@ -144,7 +139,12 @@ export default {
         originData: {
             type: Object,
             default: () => {
-                return {}
+                let self = this;
+                return {
+                    assigneeInfo: {
+                        id: 0
+                    }
+                }
             }
         },
         isInitInstance: {
@@ -161,7 +161,17 @@ export default {
         },
         allVariableProcess:{
             type:Array,
-            default:[]
+            default: () => {
+                return []
+            }
+        },
+        appId:{
+            type:String,
+            default:''
+        },
+        reload:{
+            type:Boolean,
+            default: true
         }
     },
     watch: {
@@ -173,7 +183,12 @@ export default {
                 this.setCustomDocControls();
             }
         },
-
+        taskBreadcrumb:function(){
+            this.getWidthHeaderTask();
+        },
+        "sapp.collapseSideBar": function(newVl) {
+            this.getWidthHeaderTask();
+        }
     },
     components: {
         icon: icon,
@@ -184,7 +199,7 @@ export default {
         return {
             showDialogAlert:false,
             isRole:false, //value =falses khi assignee = userId, =true khi assignee = userId:role
-            appId:'',
+            widthInfoTask:330,
             isShowSidebar:false,
             loadingActionTask:false,
             breadcrumb: {
@@ -257,6 +272,12 @@ export default {
         this.checkAndSwitchToTab();
     },
     methods: {
+        getWidthHeaderTask(){
+            setTimeout((self) => {
+                let width=$("#taskHeader").width()-$("#action-task").width()-40;
+                self.widthInfoTask=width;
+            }, 210,this);
+        },
         checkShowEditRecord(){
             let taskInfo = this.taskInfo;
             if(this.originData){
@@ -267,6 +288,7 @@ export default {
             }
         },
         checkRole(assigneeId){
+            
             if (assigneeId==this.$store.state.app.endUserInfo.id) {
                 return true;
             }else{
@@ -321,34 +343,42 @@ export default {
         changeTaskDetailInfo(taskId){
             let hostname=window.location.hostname;
             let copyText = this.taskInfo.action.parameter.taskId;
-            copyText='https://'+hostname+'/#/myitem/tasks/'+copyText;
+            copyText=util.addEnvToUrl('https://'+hostname+'/#/myitem/tasks/'+copyText);
             this.linkTask=copyText;
 
             if(!taskId){
                 return;
             }
             let self = this;
-            let filter = this.stask.filter;
-            BPMNEngine.getATaskInfo(taskId,filter).then((res) => {
-                console.log(res,"task");
-                for(let role in self.tabsData.people){
-                    if(res[role]){
-                        let userIdentifier=res[role];
-                        if (userIdentifier.indexOf(":")>0){
-                            userIdentifier=(userIdentifier.split(":"))[0];
-                        }
-                        self.tabsData.people[role] =userIdentifier.split(',').reduce((arr, el) => {
-                            if(self.usersMap[el]){
-                                arr.push(self.usersMap[el]);
-                            }else{
-                                console.warn('user id not found : ', el);
-                            }
-                            return arr;
-                        }, []);
-                    }
+            let filter="notDone";
+            if (this.originData) {
+                if (this.originData.endTime) {
+                    filter = "done";
+                }else{
+                    filter = "notDone";
                 }
-                self.setTaskBreadcrumb(res);
-            });
+            }
+            this.$store.commit("task/setFilter", filter);
+           
+            for(let role in self.tabsData.people){
+                self.tabsData.people[role]=[];
+                if(this.originData[role]){
+                    let userIdentifier=this.originData[role];
+                    if (userIdentifier.indexOf(":")>0){
+                        userIdentifier=(userIdentifier.split(":"))[0];
+                    }
+                    self.tabsData.people[role] =userIdentifier.split(',').reduce((arr, el) => {
+                        if(self.usersMap[el]){
+                            arr.push(self.usersMap[el]);
+                        }else{
+                            console.warn('user id not found : ', el);
+                        }
+                        return arr;
+                    }, []);
+                }
+            }
+            self.setTaskBreadcrumb(this.originData);
+            
         },
         setTaskBreadcrumb(task){
             if(!task.name){
@@ -378,9 +408,7 @@ export default {
         },
         async getAppName(processInstanceId){
             let self=this;
-            const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===processInstanceId);
-            if (dataVariable) {
-                self.appId=dataVariable.value;
+            if (this.appId) {
                 if (this.$store.state.task.allAppActive.length==0) {
                     await self.$store.dispatch("task/getAllAppActive");
                 }
@@ -392,8 +420,24 @@ export default {
                     self.breadcrumb.appName= "";
                 }
             }else{
-                self.breadcrumb.appName="";
+                const dataVariable = this.allVariableProcess.find(element => element.processInstanceId===processInstanceId);
+                if (dataVariable) {
+                    self.appId=dataVariable.value;
+                    if (this.$store.state.task.allAppActive.length==0) {
+                        await self.$store.dispatch("task/getAllAppActive");
+                    }
+                    let allApp = this.$store.state.task.allAppActive;
+                    let app=allApp.find(element => element.id== self.appId);
+                    if (app) {
+                        self.breadcrumb.appName=app.name;
+                    }else{
+                        self.breadcrumb.appName= "";
+                    }
+                }else{
+                    self.breadcrumb.appName="";
+                }
             }
+           
         },
         closeDetail() {
             this.$emit("close-detail", {});
@@ -436,14 +480,22 @@ export default {
                         }
                         let res = await this.submitTask(taskData);
                         this.saveApprovalHistory(value);
-                        this.$emit('task-submited', res);
-                    }else if(this.taskAction == '' ||this.taskAction==undefined){
+                        if (this.reload) {
+                            this.$emit('task-submited', res);
+                        }else{
+                            this.reloadDetailTask();
+                        }
+                    }else if(this.taskAction == '' ||this.taskAction==undefined ||this.taskAction == 'submitAdhocTask'){
                         let taskData = {
                             "action": "complete",
                             "outcome": value,
                         }
                         let res = await this.submitTask(taskData);
-                        this.$emit('task-submited', res);
+                        if (this.reload) {
+                            this.$emit('task-submited', res);
+                        }else{
+                            this.reloadDetailTask();
+                        }
                     }
             }else{
                 this.showDialogAlert=true;
@@ -492,7 +544,6 @@ export default {
         async checkRoleUser(originData){
             let self=this;
             if (originData.assignee.indexOf(":")>0) {
-                debugger
                 let arrDataAssignee=originData.assignee.split(":");
                 let assigneeId=arrDataAssignee[0];
                 let roleIdentify=originData.assignee.slice(assigneeId.length);
@@ -532,7 +583,9 @@ export default {
         },
         async handleTaskSubmited(data){
             if(this.isInitInstance){
-                this.$emit('task-submited', data);            
+                if (this.reload) {
+                    this.$emit('task-submited', data);            
+                }
             }else{
                 let elId = this.taskInfo.action.parameter.activityId;
                 let docId = data.document_id;
@@ -548,7 +601,11 @@ export default {
                     "variables": varsForBackend.vars,
                 }
                 let res =  await this.submitTask(taskData);
-                this.$emit('task-submited', res);
+                if (this.reload) {
+                    this.$emit('task-submited', res);
+                }else{
+                    this.reloadDetailTask();
+                }
             }
         },
         showApprovalOutcomes(approvalActions){
@@ -572,7 +629,7 @@ export default {
             self.taskAction = self.taskInfo.action.action;
             if(self.taskAction == 'approval'){
                 self.showApprovalOutcomes(JSON.parse(self.taskInfo.approvalActions));
-            }else if(self.taskAction == 'submit'){
+            }else if(self.taskAction == 'submit' || self.taskAction == 'submitAdhocTask'){
                 self.taskActionBtns = [
                     {
                     text:"Submit",
@@ -580,7 +637,7 @@ export default {
                     color:"blue"
                     }
                 ]
-            }else if(self.taskAction == 'undefined'){
+            }else if(self.taskAction == 'undefined' ){
                 self.taskActionBtns = [
                     {
                         text:"Complete",
@@ -590,6 +647,30 @@ export default {
                 ]
             }
             self.changeTaskDetailInfo(self.taskInfo.action.parameter.taskId);
+        },
+        async reloadDetailTask(){
+            let self=this;
+            let filter={};
+            filter.taskId=this.originData.id;
+            let res =await BPMNEngine.postTaskHistory(filter);
+            if (res.total>0) {
+                let task=res.data[0];
+                if (task.endTime && task.endTime!=null) {
+                    self.$store.commit("task/setFilter", 'done');
+                }else{
+                    self.$store.commit("task/setFilter", 'notDone');
+                }
+                let taskInfo = extractTaskInfoFromObject(task);
+                task = addMoreInfoToTask(task);
+                task.symperApplicationId=this.appId;
+                let infotTask={};
+                infotTask.taskInfo= taskInfo;
+                infotTask.originData=task;
+                self.$emit("change-info-task",infotTask);
+                // if (task.processInstanceId && task.processInstanceId!=null) {
+                //     await self.getVariablesProcess(task.processInstanceId)
+                // }
+            }
         }
     }
 }
@@ -601,6 +682,13 @@ export default {
     border-width: 20px!important;
     text-transform: none !important;
 
+}
+.task-header{
+    position: relative;
+}
+.task-header #action-task{
+    position: absolute;
+    right: 10px;
 }
 
 </style>

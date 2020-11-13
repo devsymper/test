@@ -57,22 +57,36 @@ export default {
 	
 	},
 	mounted() {
+        let self = this
         let thisSize = util.getComponentSize(this);
         this.wrapper.height = (thisSize.h - 80)+'px';
         this.wrapper.width = thisSize.w+'px';
+
 		this.paper = new joint.dia.Paper({
 			cellViewNamespace: joint.shapes,
 			model: this.graph,
 			width: this.width,
 			height: this.height,
-			background: '#ffffff',
-            interactive: !this.readonly,
+            background: '#ffffff',
+            async: true,
+            defaultAnchor: { name: 'modelCenter' },
+            defaultConnectionPoint: { name: 'boundary' },
+            defaultConnector: { name: 'normal' },
+            interactive: true,
             sorting: joint.dia.Paper.sorting.APPROX,
             // dung na them 
-            viewport: function(view) {
+            viewport(view) {
                 var modelS = view.model;
                 // Hide elements and links which are currently collapsed
                 
+                if(modelS.attributes.type != 'Symper.Department' && modelS.attributes.type != 'Symper.Position'){
+                    var targetElement = modelS.getTargetElement();
+                    let flag = !targetElement || targetElement.get('hidden');
+                    if(flag){
+                        return false
+                    }
+                }
+              
                 if (modelS.get('hidden')) {
                     return false
                 };
@@ -85,6 +99,7 @@ export default {
                 return viewportRect.intersect(bbox);
             }
         });
+       
         var paperScroller = new joint.ui.PaperScroller({
             paper: this.paper,
             autoResizePaper: true
@@ -139,6 +154,8 @@ export default {
             });
             $(this.$refs.symperPaperToolbar).append(toolbar.render().el);
         }
+    },
+    watch:{
     }
 };
 </script>

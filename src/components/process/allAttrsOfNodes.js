@@ -4,7 +4,7 @@ import attrToXMLMethods from "./elementDefinitions/attrToXMLMethods";
 
 
 
-export const userAssignmentToXMLValue = function (config) {
+export const userAssignmentToXMLValue = function (config,returnString=false) {
     let rsl = {
         formula: config.formula,
         users: [
@@ -35,7 +35,11 @@ export const userAssignmentToXMLValue = function (config) {
     }
 
     if (rsl.formula != '' || rsl.roles.length > 0) {
-        return JSON.stringify(rsl);
+        if (returnString) { // return string
+            return rsl.formula;
+        }else{
+            return JSON.stringify(rsl);
+        }
     } else {
         rsl = rsl.users.reduce((arr, el) => {
             if (el && el.userId) {
@@ -660,17 +664,18 @@ let allAttrs = {
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.SCRIPTTEXTPACKAGE.SCRIPTTEXT.DESCRIPTION",
         "dg": "formula",
-        toXML: {
-            "symper_position": "el",
-            "name": "symperScriptTagPlacehoder",
-            "superClass": ["Element"],
-            "properties": [{
-                "name": "text",
-                "isBody": true,
-                "type": "String"
-            }]
-        },
-        pushToXML: attrToXMLMethods.scriptTextForScriptNodeMethod,
+        // toXML: {
+        //     "symper_position": "el",
+        //     "name": "symperScriptTagPlacehoder",
+        //     "superClass": ["Element"],
+        //     "properties": [{
+        //         "name": "text",
+        //         "isBody": true,
+        //         "type": "String"
+        //     }]
+        // },
+        // pushToXML: attrToXMLMethods.scriptTextForScriptNodeMethod,
+        pushToXML: attrToXMLMethods.notPushToXML,
     },
     "scriptautostorevariables": {
         "title": "Auto Store Variables",
@@ -1218,7 +1223,7 @@ let allAttrs = {
     },
     "callactivityprocessinstancename": {
         "title": "Process instance name",
-        "type": "text",
+        "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.CALLACTIVITYPROCESSINSTANCENAMEPACKAGE.CALLACTIVITYPROCESSINSTANCENAME.DESCRIPTION",
         "dg": "detail",
@@ -1577,7 +1582,7 @@ let allAttrs = {
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.CONDITIONALEVENTPACKAGE.CONDITION.DESCRIPTION",
-        "dg": "formula"
+        "dg": "detail"
     },
     "initiator": {
         "title": "Initiator",
@@ -2041,7 +2046,7 @@ let allAttrs = {
                         "green": "#4CAF50",
                         "blue": "#2196F3",
                         "purple": "#9C27B0",
-                        "gray": "#9E9E9E",
+                        "grey": "#9E9E9E",
                         "pink": "#E91E63",
                         "black": "#000000",
                         "white": "#FFFFFF"
@@ -2068,7 +2073,7 @@ let allAttrs = {
                 title: 'Color',
                 name: 'color',
                 type: 'autocomplete',
-                source: ["yellow", "red", "orange", "green", "blue", "gray", "black", "white"]
+                source: ["yellow", "red", "orange", "green", "blue", "grey", "black", "white"]
             },
         ],
         dg: 'taskAction',
@@ -2409,9 +2414,9 @@ let allAttrs = {
             formula: '',
             orgchartSelectorValue: [] // dạng value của orgchartselector để hiển thị lên
         },
-        getValueForXML(value) {
-            return userAssignmentToXMLValue(value);
-        },
+        // getValueForXML(value) {
+        //     return userAssignmentToXMLValue(value);
+        // },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'detail',
         hidden:false,
@@ -2480,6 +2485,18 @@ let allAttrs = {
         hidden:false,
         pushToXML: attrToXMLMethods.notPushToXML
     },
+    selectDefaultControlDocument: { // cấu hình form định nghĩa sẵn dữ liệu cho control của document
+        title: 'Giá trị mặc định',
+        type: 'defaultControlDocument',
+        value: [],
+        info: '',
+        docId: 0,
+        options: [],
+        dg: 'taskAction',
+        isSymperProp: true,
+        hidden:false,
+        pushToXML: attrToXMLMethods.notPushToXML
+    },
 
 }
 
@@ -2494,7 +2511,6 @@ for (let name in allAttrs) {
             return value;
         }
     }
-
     if (!attr.toXML) {
         attr.toXML = {
             "symper_position": "attr",

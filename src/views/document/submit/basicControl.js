@@ -5,8 +5,9 @@ import { SYMPER_APP } from './../../../main.js'
 import Util from './util'
 var numbro = require("numbro");
 import moment from "moment-timezone";
-
+import { appConfigs } from "@/configs.js";
 import { documentApi } from "../../../api/Document";
+let sDocumentManagementUrl = appConfigs.apiDomain.sdocumentManagement;
 const fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
     'txt': 'mdi-file-document-outline',
@@ -50,102 +51,115 @@ export default class BasicControl extends Control {
 
 
     render() {
-        this.ele.wrap('<span style="position:relative;display:inline-block">');
-        this.ele.attr('key-instance', this.curParentInstance);
+            this.ele.wrap('<span style="position:relative;display:inline-block">');
+            this.ele.attr('key-instance', this.curParentInstance);
+            // if (this.checkDetailView() &&
+            //     this.controlProperties['isSaveToDB'] !== undefined &&
+            //     (this.controlProperties['isSaveToDB'].value !== "1" ||
+            //         this.controlProperties['isSaveToDB'].value !== 1)) {
+            //     this.ele.css({ display: 'none' })
+            // }
+            if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
+                this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
+            }
+            if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
+                this.ele.attr('disabled', 'disabled');
+            }
+            // if (this.checkViewType('print') && this.checkProps('isBorderPrint')) {
+            //     this.ele.css('border-bottom', '0.5px solid rgb(230, 229, 229)')
+            // }
 
-        // if (this.checkDetailView() &&
-        //     this.controlProperties['isSaveToDB'] !== undefined &&
-        //     (this.controlProperties['isSaveToDB'].value !== "1" ||
-        //         this.controlProperties['isSaveToDB'].value !== 1)) {
-        //     this.ele.css({ display: 'none' })
-        // }
-        if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
-            this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
+            if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
+                this.ele.css({ 'display': 'none' })
+            }
+
+            if (this.ele.hasClass('s-control-number')) {
+                this.formulaValue = "";
+                this.renderNumberControl();
+
+            } else if (this.ele.hasClass('s-control-table')) {
+
+            } else if (this.ele.hasClass('s-control-hidden') || this.ele.hasClass('s-control-tracking-value')) {
+                this.ele.css('display', 'none');
+
+            } else if (this.ele.hasClass('s-control-filter')) {
+                this.renderFilterControl();
+
+            } else if (this.ele.hasClass('s-control-panel')) {
+                // presetPanel(this.ele);
+
+            } else if (this.ele.hasClass('s-control-report')) {
+                this.ele.removeClass('on-property');
+                // getReportTemplate(this.ele, {}, thisObj.name);
+
+            } else if (this.ele.hasClass('s-control-time')) {
+                this.ele.attr('type', 'text');
+                this.renderTimeControl();
+
+            } else if (this.ele.hasClass('s-control-percent')) {
+                this.renderPercentControl()
+
+            } else if (this.ele.hasClass('s-control-date')) {
+                this.renderDateControl();
+
+            } else if (this.ele.hasClass('s-control-datetime')) {
+                this.renderDateTimeControl();
+            } else if (this.ele.hasClass('s-control-file-upload')) {
+                this.renderFileControl();
+            } else if (this.ele.hasClass('s-control-user')) {
+                this.renderUserControl();
+            } else if (this.ele.hasClass('s-control-checkbox')) {
+                this.renderCheckboxControl();
+
+            } else if (this.ele.hasClass('s-control-select')) {
+                this.renderSelectControl();
+            } else if (this.ele.hasClass('s-control-combobox')) {
+                this.renderSelectControl(false);
+            } else if (this.ele.hasClass('s-control-label')) {
+                this.renderLabelControl();
+            }
+
+            if (this.checkDetailView()) {
+                // this.ele.addClass('detail-view');
+                this.ele.attr('disabled', 'disabled');
+            }
+            if (sDocument.state.viewType[this.curParentInstance] != 'submit') {
+                this.setValueControl();
+            }
+            this.setDefaultValue();
+            this.setEvent();
+            if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete')) {
+                let allTable = this.controlFormulas.autocomplete.instance.detectTableQuery();
+                let columnBinding = this.controlFormulas.autocomplete.instance.autocompleteDetectAliasControl(false);
+                this.columnBindingSubForm = columnBinding;
+                if (allTable !== false) {
+                    let table = allTable[0];
+                    documentApi.getDetailDocumentByName({ name: table }).then(res => {
+                            if (res.status == 200) {
+                                let documentId = res.data.id;
+                                this.renderSubformButton(documentId);
+                            }
+
+                        }).catch(err => {
+
+                        })
+                        .always(() => {});
+                }
+            }
+
         }
-        if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
-            this.ele.attr('disabled', 'disabled');
-        }
-
-        if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
-            this.ele.css({ 'display': 'none' })
-        }
-
-        if (this.ele.hasClass('s-control-number')) {
-
-            this.renderNumberControl();
-
-        } else if (this.ele.hasClass('s-control-table')) {
-
-        } else if (this.ele.hasClass('s-control-hidden') || this.ele.hasClass('s-control-tracking-value')) {
-            this.ele.css('display', 'none');
-
-        } else if (this.ele.hasClass('s-control-filter')) {
-            this.renderFilterControl();
-
-        } else if (this.ele.hasClass('s-control-panel')) {
-            // presetPanel(this.ele);
-
-        } else if (this.ele.hasClass('s-control-report')) {
-            this.ele.removeClass('on-property');
-            // getReportTemplate(this.ele, {}, thisObj.name);
-
-        } else if (this.ele.hasClass('s-control-time')) {
-            this.ele.attr('type', 'text');
-            this.renderTimeControl();
-
-        } else if (this.ele.hasClass('s-control-percent')) {
-            this.renderPercentControl()
-
-        } else if (this.ele.hasClass('s-control-date')) {
-            this.renderDateControl();
-
-        } else if (this.ele.hasClass('s-control-datetime')) {
-            this.renderDateTimeControl();
-        } else if (this.ele.hasClass('s-control-file-upload')) {
-            this.renderFileControl();
-        } else if (this.ele.hasClass('s-control-user')) {
-            this.renderUserControl();
-
-        } else if (this.ele.hasClass('s-control-select')) {
-            this.renderSelectControl();
-        } else if (this.ele.hasClass('s-control-combobox')) {
-            this.renderSelectControl(false);
-        } else if (this.ele.hasClass('s-control-label')) {
-            this.renderLabelControl();
-        }
-
-        if (this.checkDetailView()) {
-            // this.ele.addClass('detail-view');
-            this.ele.attr('disabled', 'disabled');
-        }
-        if (sDocument.state.viewType[this.curParentInstance] != 'submit') {
-            this.setValueControl();
-        }
-        this.setDefaultValue();
-        this.setEvent();
-        if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete')) {
-            let allTable = this.controlFormulas.autocomplete.instance.autocompleteDetectTableQuery();
-            let columnBinding = this.controlFormulas.autocomplete.instance.autocompleteDetectAliasControl(false);
-            this.columnBindingSubForm = columnBinding;
-            if (allTable !== false) {
-                let table = allTable[0];
-                documentApi.getDetailDocumentByName({ name: table }).then(res => {
-                        if (res.status == 200) {
-                            let documentId = res.data.id;
-                            this.renderSubformButton(documentId);
-                        }
-
-                    }).catch(err => {
-
-                    })
-                    .always(() => {});
+        /**
+         * Ham kiểm tra có các thông tin khác của control như  (comment, history, link) trên control hay không
+         * nếu có thì thêm icon info
+         */
+    checkHasInfoControl(dataLink) {
+            if (dataLink && Object.keys(dataLink).includes(this.name)) {
+                this.renderInfoIconToControl(this.name);
             }
         }
-    }
-
-    /**
-     * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
-     */
+        /**
+         * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
+         */
     setDefaultValue() {
         if (['submit'].includes(sDocument.state.viewType[this.curParentInstance]) &&
             this.controlProperties['defaultValue'] != undefined) {
@@ -176,16 +190,22 @@ export default class BasicControl extends Control {
         }
         return false;
     }
+    triggerOnChange() {
+        this.ele.trigger('change');
+    }
     setEvent() {
-
+            // biến check xem control có đang autocomplete hay ko
+            // nếu đang autocomplete thì ko nhận sự kiện thay đổi khi giá trị đang được gõ
             let thisObj = this;
             this.ele.on('change', function(e) {
                 let valueChange = $(e.target).val();
                 if (thisObj.type == 'label') {
                     valueChange = $(e.target).text();
+                } else if (thisObj.type == 'checkbox') {
+                    valueChange = $(e.target).prop("checked");
                 }
                 thisObj.value = valueChange;
-                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.name, val: valueChange })
+                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.name, val: valueChange });
             })
             this.ele.on('focus', function(e) {
                 store.commit("document/addToDocumentSubmitStore", {
@@ -196,18 +216,21 @@ export default class BasicControl extends Control {
             })
 
             this.ele.on('keyup', function(e) {
-                if (e.key == 'F2' && store.state.app.accountType == 'ba') {
+                if (e.key == 'F2' && store.state.app.baInfo && Object.keys(store.state.app.baInfo).length > 0) {
+                    if (thisObj.type == 'number' && thisObj.formulaValue) {
+                        thisObj.ele.val(thisObj.formulaValue);
+                    }
                     thisObj.traceControl();
                 }
                 if (thisObj.type == 'user') {
                     e.curTarget = e.target
                     SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
                 }
-                if (thisObj.type == 'percent') {
-                    if (e.target.value > 100) {
-                        $(e.target).val(100)
-                    }
-                }
+                // if (thisObj.type == 'percent') {
+                //     if (e.target.value > 100) {
+                //         $(e.target).val(100)
+                //     }
+                // }
                 if (thisObj.type == 'department') {
                     e['controlName'] = thisObj.name;
                     SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
@@ -262,13 +285,13 @@ export default class BasicControl extends Control {
                 if (thisObj.type == 'date') {
                     SYMPER_APP.$evtBus.$emit('document-submit-date-input-click', e)
                 } else if (thisObj.type == 'inputFilter') {
-                    e.formulas = thisObj.controlFormulas.formulas;
+                    e.formulas = thisObj.controlFormulas.list;
                     SYMPER_APP.$evtBus.$emit('document-submit-filter-input-click', e)
                 } else if (thisObj.type == 'time') {
                     e.curTarget = e.target
                     SYMPER_APP.$evtBus.$emit('document-submit-show-time-picker', e)
                 } else if (thisObj.type == 'image') {
-                    SYMPER_APP.$evtBus.$emit('document-submit-image-click', e)
+                    SYMPER_APP.$evtBus.$emit('document-submit-image-click', { e: e, controlIns: thisObj })
                 }
 
             });
@@ -289,8 +312,16 @@ export default class BasicControl extends Control {
         if (this.inTable === false) {
             if (this.type == 'label') {
                 $('#' + this.id).text(value);
+            } else if (this.type == 'richText') {
+                $('#' + this.id).html(value);
             } else if (this.type == 'date') {
                 $('#' + this.id).val(moment(value).format(this.formatDate));
+            } else if (this.type == 'checkbox') {
+                if (value)
+                    $('#' + this.id).attr('checked', 'checked');
+                else {
+                    $('#' + this.id).removeAttr('checked');
+                }
             } else if (this.type == 'number') {
                 let v = parseInt(value);
                 if (!isNaN(v))
@@ -313,13 +344,13 @@ export default class BasicControl extends Control {
     }
 
 
-    setValueControl() {
-        let value = this.value
+    setValueControl(vl = undefined) {
+        let value = vl;
+        if (vl == undefined) {
+            value = this.value;
+        }
         if (!value) {
             value = "";
-        }
-        if (this.type == 'percent') {
-            value *= 100
         } else if (this.type == 'number') {
             if (!isNaN(Number(value)))
                 value = numbro(Number(value)).format(this.numberFormat)
@@ -329,9 +360,19 @@ export default class BasicControl extends Control {
         }
         if (this.type == 'label') {
             this.ele.text(value)
+        } else if (this.type == 'richText') {
+            $('#' + this.id).html(value);
         } else if (this.type == 'image') {
             this.ele.empty();
-            let image = '<img height="70" src="' + value + '">';
+            let w = this.controlProperties.width.value;
+            let h = this.controlProperties.height.value;
+            if (!w) {
+                w = 'auto';
+            }
+            if (!h) {
+                h = '70';
+            }
+            let image = '<img height="' + h + '" width="' + w + '" src="' + value + '">';
             this.ele.append(image);
         } else {
             this.ele.val(value)
@@ -403,8 +444,9 @@ export default class BasicControl extends Control {
                     let element = valueArr[index];
                     let fileExt = Util.getFileExtension(element);
                     let icon = fileTypes[fileExt];
+                    api
                     let file = `<div title="${element}" class="file-item">
-                            <i  onclick="window.open('https://sdocument-management.symper.vn/file/public/` + element + `');" class="mdi ` + icon + ` file-view" ></i>
+                            <i  onclick="window.open('`+sDocumentManagementUrl+`file/public/` + element + `');" class="mdi ` + icon + ` file-view" ></i>
                         </div>`
                     addTpl += file;
                 }
@@ -426,7 +468,7 @@ export default class BasicControl extends Control {
                 }
                 let file = `<div  class="file-item">
                                 ` + deleteFileIcon + `
-                                <i onclick="window.open('https://sdocument-management.symper.vn/file/public` + fileName + `');" class="mdi ` + icon + ` file-view" ></i>
+                                <i onclick="window.open('`+sDocumentManagementUrl+`file/public` + fileName + `');" class="mdi ` + icon + ` file-view" ></i>
                             </div>`
                 addTpl += file;
             }
@@ -443,7 +485,7 @@ export default class BasicControl extends Control {
         let icon = fileTypes[type];
         let thisObj = this;
         $.ajax({
-            url: 'https://sdocument-management.symper.vn/uploadFile',
+            url: '`+sDocumentManagementUrl+`uploadFile',
             dataType: 'json',
             processData: false,
             contentType: false,
@@ -453,7 +495,7 @@ export default class BasicControl extends Control {
                 if (response.status == 200) {
                     let file = `<div title="${response.data.path}" class="file-item">
                                 <span data-file-name="${response.data.path}" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
-                                <i  onclick="window.open('https://sdocument-management.symper.vn/file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
+                                <i  onclick="window.open('`+sDocumentManagementUrl+`file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
                             </div>`
                     thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name)
                     thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
@@ -523,30 +565,44 @@ export default class BasicControl extends Control {
         this.ele.attr('type', 'text');
         this.numberFormat = this.getNumberFormat();
         this.ele.on('blur', function(e) {
-            if ($(this).val() == "") {
+            if ($(this).hasClass('trace-current-control')) {
+                return;
+            }
+            let currentInputValue = $(this).val();
+            if (currentInputValue == "") {
                 thisObj.ele.removeClass('error');
                 thisObj.ele.removeAttr('valid');
             } else {
-                if (/^[-0-9,.]+$/.test($(this).val())) {
+                if (/^=/.test(currentInputValue)) {
+                    thisObj.formulaValue = currentInputValue;
+                    currentInputValue = currentInputValue.replace(/=/g, "");
                     thisObj.ele.removeClass('error')
                     thisObj.ele.removeAttr('valid');
                     if (thisObj.numberFormat) {
-                        $(this).val(numbro($(this).val()).format(thisObj.numberFormat))
+                        $(this).val(numbro(eval(currentInputValue)).format(thisObj.numberFormat));
                     } else {
-                        if (/,|\.$/.test($(this).val())) {
+                        $(this).val(eval(currentInputValue));
+                    }
+                } else if (/[-0-9,.]*[0-9]$/.test(currentInputValue)) {
+                    thisObj.ele.removeClass('error')
+                    thisObj.ele.removeAttr('valid');
+                    if (thisObj.numberFormat) {
+                        $(this).val(numbro(currentInputValue).format(thisObj.numberFormat))
+                    } else {
+                        if (/,|\.$/.test(currentInputValue)) {
                             thisObj.ele.addClass('error');
                             let controlTitle = (thisObj.title == "") ? thisObj.name : thisObj.title;
                             let valid = "Giá trị trường " + controlTitle + " không đúng định dạng số"
                             thisObj.ele.attr('valid', valid);
                         }
                     }
-
                 } else {
                     thisObj.ele.addClass('error');
                     let controlTitle = (thisObj.title == "") ? thisObj.name : thisObj.title;
                     let valid = "Giá trị trường " + controlTitle + " phải là số"
                     thisObj.ele.attr('valid', valid);
                 }
+
             }
         })
         this.ele.on('focus', function(e) {
@@ -568,11 +624,11 @@ export default class BasicControl extends Control {
     }
     renderUserControl() {
         let listUser = store.state.app.allUsers;
-        if (this.checkDetailView()) {
+        if (!this.checkViewType('submit')) {
             if (this.value != null && this.value != "" && !isNaN(this.value)) {
                 let user = listUser.filter(u => {
                     return u.id == this.value
-                })
+                });
                 if (user[0]) {
                     this.value = user[0].displayName;
                     this.ele.val(this.value)
@@ -580,15 +636,16 @@ export default class BasicControl extends Control {
                     this.ele.val(this.value)
                 }
             }
-
         } else {
             this.ele.attr('type', 'text');
             this.ele.parent().css({ display: 'block' })
-
         }
     }
     renderLabelControl() {
         this.ele.text('').css({ border: 'none' })
+    }
+    renderCheckboxControl() {
+        this.ele.parent().css({ 'vertical-align': 'middle' })
     }
     renderSelectControl(isReadOnly = true) {
         let thisObj = this;
@@ -652,11 +709,39 @@ export default class BasicControl extends Control {
         }
         return false;
     }
-    renderLinkToControl(link) {
-        let icon = `<span class="mdi mdi-information link-icon" title="` + link + `"></span>`
-        this.ele.parent().append(icon);
-        this.ele.parent().find('.link-icon').on('click', function(e) {
-            window.open(link);
-        })
+    renderInfoIconToControl(controlName) {
+        if (this.ele.parent().find('.info-control-btn').length == 0) {
+            let icon = `<span class="mdi mdi-information info-control-btn" data-control="` + controlName + `"></span>`
+            this.ele.parent().append(icon);
+        }
+    }
+     /**
+     * Hàm chuyển định dạng date sang dạng sql hiểu được
+     */
+    convertDateToStandard(data){
+        let dateFormat = this.controlProperties.formatDate.value;
+        if(!dateFormat){
+            return data;
+        }
+        if(!data){
+            return "";
+        }
+        if(typeof data == 'object'){
+            let newData = [];
+            for (let index = 0; index < data.length; index++) {
+                let value = data[index];
+                if(value){
+                    newData.push(moment(value,dateFormat).format('YYYY-MM-DD'))
+                }
+                else{
+                    newData.push("");
+                }
+                
+            }
+            return newData;
+        }
+        else{
+            return moment(value,dateFormat).format('YYYY-MM-DD')
+        }
     }
 }

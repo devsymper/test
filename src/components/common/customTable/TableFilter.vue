@@ -141,7 +141,7 @@
                     x-small
                     class="sym-small-size pa-0"
                     v-model="item.checked"
-                    :label="item.value"
+                    :label="item.label?item.label:item.value"
                     @change="handleSelectItemChange(item)"
                 ></v-checkbox>
             </VuePerfectScrollbar>

@@ -6,7 +6,7 @@
         </div>
     </v-card-title>
     <v-card-text class="mt-1 h-65" >
-        <span class="label ">{{$t('timesheet.category_task')}}<span style="color:red"> *</span></span>
+        <span class="label ">{{$t('timesheet.category_task')}}</span>
         <v-row>
             <div style="width: 275px!important" class="ml-3 mr-1">
                 <v-autocomplete 
@@ -14,7 +14,7 @@
                     :menu-props="{'nudge-top':-10}" 
                     v-model="categoryTask"
                     class="category-task" 
-                     :search-input.sync="searchCategory" 
+                    :search-input.sync="searchCategory" 
                     :items="category.category_name" 
                     placeholder="Tìm việc ..." 
                     item-color="white" 
@@ -41,7 +41,44 @@
      <v-card-text>
          <span class="red--text" v-show="cateError">{{cateError}}</span>
     </v-card-text>
-    <v-card-text class='task-form h-65' style="margin-top:-4px">
+    <!-- lọc user -->
+        <v-card-text  v-if="showSearchForm" class=" h-65 mb-2" >
+        <span class="label ">Lọc theo nhân viên<span style="color:red"></span></span>
+        <v-row class="mt-2">
+            <div style="width: 275px!important" class="ml-3 mr-1">
+                <v-autocomplete 
+                    style="margin-top:-10px!important; " 
+                    :menu-props="{'nudge-top':-10, maxHeight:300}" 
+                    :items="listUser"
+                    v-model="userSelected"
+                    item-text="displayName"
+                    item-value="id"
+                     class="category-task" 
+                    clearable
+                    placeholder="Tìm nhân viên ..." 
+                    item-color="white"
+                      background-color="#F7F7F7"
+                 >
+                        <template v-slot:item="data">
+                            <SymperAvatar class="mr-2" style ="height: 30px!important; width: 30px!important;min-width: 30px!important" :userId="data.item.id"/>
+                                <v-list-item-content>
+                                <v-list-item-title >{{data.item.displayName}}</v-list-item-title>
+                                <v-list-item-subtitle class="fs-11 color-grey" >{{data.item.email}}</v-list-item-subtitle>
+                                </v-list-item-content>
+                        </template>
+                </v-autocomplete>
+            </div>
+               <div>
+                   <!-- <v-checkbox v-model="checkbox" style="margin-top:2px"></v-checkbox> -->
+      <!-- </v-card-text> -->
+            </div>
+        </v-row>
+    </v-card-text>
+     <!-- <v-card-text v-if="showSearchForm" style="margin-top:-15px; margin-bottom:-15px"> -->
+       <!-- <v-checkbox v-model="checkbox" :label="'Chưa log'"></v-checkbox> -->
+      <!-- </v-card-text> -->
+    <!-- lọc user -->
+    <v-card-text  class='task-form h-65' style="margin-top:-4px">
         <span class="label">{{$t('timesheet.task_form')}}<span style="color:red"> *</span></span>
         <v-row style="margin-top:-10px">
             <div style="width: 275px!important" class="ml-3 mr-1">
@@ -52,18 +89,20 @@
                     :loading="isLoading" 
                     :search-input.sync="search" 
                     item-text="name"    
-                    item-value="symbol"
+                    item-value="id"
                     :menu-props="{'nudge-top':-10, 'max-width': 300}" 
                     label="Tìm loại công việc ...">
                         <template v-slot:item="data">
                             <v-list-item-content>
-                               <v-list-item-title class="st-icon-pandora">{{data.item.name?data.item.name:'Không có tên'}}</v-list-item-title>
+                               <v-list-item-title class="st-icon-pandora">
+                                   {{data.item.name?data.item.name:'Không có tên'}}
+                                </v-list-item-title>
                             <v-list-item-subtitle class="fs-11 color-grey" >
                                 <span v-if="data.item.categoryId" style="color:black" class="color-grey">
                                      {{getNameCategory(data.item.categoryId)}}-{{data.item.description?data.item.description:'Chưa có mô tả'}} </span>
                                 <span v-else style="color:black" class="color-grey">
-                                   Symper task  </span>
-                                   </v-list-item-subtitle>
+                                    </span>
+                                    </v-list-item-subtitle>
                             </v-list-item-content>
                         </template>
                 </v-autocomplete>
@@ -95,15 +134,15 @@
                         type="text">
                     </template>
                  <!-- date -->
-                 <!-- <v-date-picker ref="menu1" class="date-picker" no-title scrollable 
+                 <v-date-picker ref="menu1" class="date-picker" no-title scrollable 
                  color='orange' v-model="displayDate" nudge-top="-10" :close-on-content-click="false" 
                  transition="scale-transition" offset-y width="290px" 
-                 :allowed-dates="allowedDates" min="2020-07-11" max="2020-07-30" /> -->
+                 :allowed-dates="allowedDates" />
                  <!-- date -->
                 </v-menu>
             </div>
             <div class="duration"> <span class="label">{{$t('timesheet.duration')}}</span>
-                <input type="text" readonly v-model="displayDuration" class="input-logtime"></div>
+                <input type="text" v-model="displayDuration" class="input-logtime"></div>
             <div class='start-time'>
                 <span class="label">{{$t('timesheet.start_time')}}<span style="color:red"> *</span> </span>
                 <v-menu 
@@ -225,6 +264,7 @@ export default {
         showLog:false,
         showPlan:false,
         model: null,
+        nameTask:'',
         search: null,
         searchCategory:null,
         tab: null,
@@ -331,7 +371,9 @@ export default {
                 this.filterTaskByCategory();
             }
         },
+       
         task(){
+           // this.categoryTask = 'BD-Business Development'
              if(this.checkNullTask){
                 if(this.task==undefined){
                     this.taskError = this.$t('timesheet.required_value');
@@ -340,7 +382,11 @@ export default {
                     this.checkNullTask =false
                 }
              }
-             else{}
+             else{
+                let taskId = this.task;
+                this.findNameTask(this.task);
+                this.getCategoryId(taskId);
+             }
         },
         categoryTask(){
             if(!this.categoryTask){
@@ -391,6 +437,16 @@ export default {
         this.getCategory();
     },
     methods: {
+         findNameTask(id){
+             this.nameTask=this.items.filter(x=>x.id==id)[0].name;
+             return this.nameTask
+        },
+           getCategoryId(taskId){
+           let cateId = this.items.filter(x=>x.id==taskId)[0].categoryId;
+           if(cateId){
+                this.categoryTask = this.getFullNameCategory(cateId)
+           }
+        },
         filterTaskByCategory(){
             if(this.categoryTask){
                 let categoryId = this.getIdCategory(this.categoryTask);
@@ -437,10 +493,17 @@ export default {
             return dateTime;
         },
         //lấy danh sách category
-        getNameCategory(value){
+        getNameCategory(cateId){
             for(let i=0; i<this.listCategory.length; i++){
-                if(this.listCategory[i].id==value){
+                if(this.listCategory[i].id==cateId){
                     return this.listCategory[i].key;
+                }
+            }
+        },
+        getFullNameCategory(cateId){
+            for(let i=0; i<this.listCategory.length; i++){
+                if(this.listCategory[i].id==cateId){
+                    return this.listCategory[i].key+"-"+this.listCategory[i].name;
                 }
             }
         },
@@ -456,30 +519,25 @@ export default {
             this.inputs.endTime = this.eventLog.endTime;
             this.task  = this.eventLog.task;
             this.inputs.date  = this.eventLog.date;
-            
             this.categoryTask = this.eventLog.categoryTask;
             this.inputs.description = this.eventLog.desc;
-
-
          },
          showCategoryForm(){
              this.$emit("showCategoryForm",{
                     startTime:this.inputs.startTime,
                     endTime:this.inputs.endTime,
-                    task: this.task,
+                    task: this.findNameTask(this.task),
                     date: this.inputs.date,
                     categoryTask: this.categoryTask,
                     desc: this.inputs.description || ""
                 })
                 this.getEventLog();
-
          },
         showTaskForm(){
-
                 this.$emit("showTaskForm",{
                     startTime:this.inputs.startTime,
                     endTime:this.inputs.endTime,
-                    task: this.task,
+                    task: this.findNameTask(this.task),
                     date: this.inputs.date,
                     categoryTask: this.categoryTask,
                     desc: this.inputs.description || ""
@@ -524,7 +582,6 @@ export default {
             }else{
                 start = dayjs(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
                 end  = dayjs(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
-
             }
             if (!check){}
             else{
@@ -532,7 +589,7 @@ export default {
                     start: start,
                     end: end,
                     duration: this.duration,
-                    task: this.task,
+                    task: this.findNameTask(this.task),
                     type: type,
                     date: this.inputs.date,
                     categoryTask: this.categoryTask,
@@ -542,7 +599,6 @@ export default {
                     if (res.status === 200) {
                         this.onSave();
                         this.$emit('loadMonthView')
-                     
                     }
                 })
                 .catch();
@@ -588,7 +644,7 @@ export default {
                         start: dayjs(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
                         end: dayjs(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
                         duration: this.duration,
-                        task: this.task,
+                        task: this.findNameTask(this.task),
                         type: type,
                         id: this.newEvent.id,
                         date: this.inputs.date,

@@ -1,7 +1,7 @@
 <template>
-    <div class="ml-2 w-100 pr-3 pt-3 list-item-common-symper" >
+    <div class="pl-2 w-100 pr-3 pt-3 list-item-common-symper" >
         <div :style="{width:contentWidth, display: 'inline-block'}">
-            <v-row no-gutters class="pb-2" ref="topBar">
+           <v-row v-if="showToolbar" no-gutters class="pb-2" ref="topBar"> 
                 <v-col>
                     <span class="symper-title float-left">{{pageTitle}}</span>
                     <div :class="{'float-right': true, 'overline' : true , 'show-panel-mode': actionPanel } ">
@@ -73,12 +73,11 @@
                             small
                             @click="showImportHistory()"
                             class="mr-2"
-                            v-if="showImportHistory && !actionPanel"
+                            v-if="showImportHistoryBtn && !actionPanel"
                         >
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel_history')}}</span>
                         </v-btn>
-                          <!-- show menu khi hien sidebar -->
                          <v-menu
                             
                             bottom
@@ -137,7 +136,6 @@
                                 </v-list-item>
                             </v-list>
                         </v-menu>
-
                         <component
                             :is="'span'"
                         >
@@ -151,14 +149,29 @@
                                     small
                                     v-on="on"
                                 >
-                                    <v-icon left dark class="ml-1 mr-0">mdi-table-cog</v-icon>
+                                    <v-icon left dark class="ml-1 mr-0 ">mdi-table-cog</v-icon>
                                 </v-btn>
                             </template>
                             <span>{{ $t('common.list_config') }}</span>
                         </v-tooltip>
+                        
+                        <v-tooltip top v-if="showActionPanelInDisplayConfig">
+                            <template v-slot:activator="{ on }">
+                                <v-btn
+                                    @click="changeAlwayShowSBSState"
+                                    depressed
+                                    small
+                                    class="ml-2"
+                                    v-on="on"
+                                >
+                                    <v-icon left dark class="ml-1 mr-0">{{alwaysShowActionPanel ? 'mdi-flip-horizontal' : 'mdi-format-list-checkbox'}}</v-icon>
+                                </v-btn>
+                            </template>
+                            <span>{{alwaysShowActionPanel ? $t('common.not_always_show_sidebar') : $t('common.always_show_sidebar')}}</span>
+                        </v-tooltip>
                     </div>
                 </v-col>
-            </v-row>
+            </v-row> 
             <v-row no-gutters>
                 <v-col
                     :class="{
@@ -167,6 +180,7 @@
                             'loosen-row':  tableDisplayConfig.value.densityMode == 0,
                             'medium-row':  tableDisplayConfig.value.densityMode == 1,
                             'compact-row':  tableDisplayConfig.value.densityMode == 2,
+                            'list-sbs': alwaysShowActionPanel
                         }"
                 >
                     <hot-table
@@ -185,7 +199,7 @@
                     ></hot-table>
                 </v-col>
             </v-row>
-            <v-row no-gutters ref="bottomBar" class="pt-3">
+            <v-row v-show="showPagination" no-gutters ref="bottomBar" class="pt-3">
                 <Pagination
                     :total="totalObject"
                     :totalVisible="7"
@@ -194,7 +208,6 @@
                 ></Pagination>
             </v-row>
         </div>
-    
         <component
             :is="actionPanelWrapper"
             :width="actionPanelWidth"
@@ -203,6 +216,7 @@
             class="pa-3"
             absolute
             right
+            v-show="actionPanel"
             v-if="reComputeActionPanelType != 'drag'"
             :temporary="reComputeActionPanelType == 'temporary'"
         >
@@ -217,7 +231,6 @@
                 </v-card>
             </slot>
         </component>
-
         <symper-drag-panel
             v-else
             @before-close="handleCloseDragPanel"
@@ -236,7 +249,7 @@
                 </slot>
             </template>
         </symper-drag-panel>
-
+ 
         <display-config
             ref="tableDisplayConfig"
             @drag-columns-stopped="handleStopDragColumn"
@@ -294,7 +307,7 @@ import Handsontable from 'handsontable';
 import FormTpl from "./FormTpl.vue";
 import { VDialog, VNavigationDrawer } from "vuetify/lib";
 import TableFilter from "./customTable/TableFilter.vue";
-import { getDefaultFilterConfig } from "./../common/customTable/defaultFilterConfig.js";
+import { getDataFromConfig, getDefaultFilterConfig } from "./../common/customTable/defaultFilterConfig.js";
 import Api from "./../../api/api.js";
 import { userApi } from "./../../api/user.js";
 import SymperDragPanel from "./SymperDragPanel.vue";
@@ -319,19 +332,29 @@ window.tableDropdownClickHandle = function(el, event) {
 export default {
     name: "SymperListItem",
     watch: {
-        actionPanel() {
+        actionPanel(){
             if (this.actionPanel == true) {
                 this.$emit("open-panel");
             }
         },
         getDataUrl(){   
-           this.refreshList();
+			this.page = 1
+        	this.refreshList();
         },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
-            if(value && !$.isEmptyObject(this.currentItemDataClone)){
+            if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
                 this.openactionPanel();
             }else{
                 this.closeactionPanel();
+            }
+        },
+        defaultData:{
+            deep:true,
+            immediate:true,
+            handler:function(vl){
+                if(vl.listObject.length > 0){
+                    this.getData()
+                }
             }
         }
     },
@@ -380,8 +403,9 @@ export default {
                 manualColumnResize: true,
                 renderAllRows: false,
                 manualRowResize: true,
-                readOnly: true,
+                readOnly: this.isTablereadOnly,
                 contextMenu: {},
+                currentRowClassName: 'symper-list-item-current-row',
                 viewportRowRenderingOffset: 20,
                 viewportColumnRenderingOffset: 20,
                 rowHeights: 21,
@@ -398,6 +422,23 @@ export default {
                     self.debounceEmitRowSelectEvt = setTimeout(() => {
                         self.$emit('row-selected', self.data[row]);
                     }, time);
+                    self.focusingRowIndex = row;
+                },
+                afterScrollVertically(){
+                    if(self.lazyLoad){
+                        let count = 2;
+                        let delayTimer
+                        clearTimeout(delayTimer);
+                        let value = event
+                        delayTimer = setTimeout(function() {
+                            if(value.target.scrollTop > $(value.target).height()/6*0.7){
+                                if(count != self.page){
+                                    self.nextPage(true)
+                                    count++;
+                                }
+                            }
+                        },500); 
+                    }
                 },
                 beforeContextMenuSetItems: () => {
                 },
@@ -483,7 +524,8 @@ export default {
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
             hotTableContextMenuItems: [],
             allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
-            hasColumnsChecked:false,
+            hasColumnsChecked: false,
+            focusingRowIndex: -1,
         };
     },
     activated(){
@@ -504,9 +546,26 @@ export default {
                 thisCpn.closeactionPanel();
             }
         });
+       
     },
     props: {
+		showToolbar:{
+			type:Boolean, 
+			default: true
+		},
+		useWorkFlowHeader:{
+			type: Boolean,
+			default:false
+		},
+        widthContentCustom:{
+            type: Number,
+            default:0
+        },
         showImportButton: {
+            type: Boolean,
+            default: false
+        },
+        showImportHistoryBtn:{
             type: Boolean,
             default: false
         },
@@ -514,17 +573,9 @@ export default {
             type: String,
             default: ''
         },
-        showExportButton: {
-            type: Boolean,
-            default: false
-        },
         widgetIdentifier: {
             type: String,
             default: ''
-        },
-        showImportButton: {
-            type: Boolean,
-            default: true
         },
         showExportButton: {
             type: Boolean,
@@ -572,6 +623,10 @@ export default {
         containerHeight: {
             type: Number,
             default: 200
+        },
+        lazyLoad:{
+            type:Boolean,
+            default:false
         },
         /**
          * * Các contextmenu cho các item trong list, có dạng:
@@ -661,9 +716,38 @@ export default {
             default(){
                 return {}
             }
+        },
+        // biến đánh dấu table đươc quyền edit hay ko
+        isTablereadOnly:{
+            type:Boolean,
+            default:true
+        },
+        /**
+         * Thêm điều kiện để quy vấn qua api
+         */
+        conditionByFormula:{
+            type:String
+        },
+        /**
+         * Dữ liệu mặc định cho table
+         */
+        defaultData:{
+            type: Object,
+            default(){
+                return {
+                    listObject:{},
+                    columns:{},
+                    total:0
+                }
+            }
+        },
+        showPagination:{
+            type: Boolean,
+            default:true
         }
     },
-    mounted() {},
+    mounted() {
+    },
     computed: {
         alwaysShowActionPanel(){
             return this.tableDisplayConfig.value.alwaysShowSidebar;
@@ -680,7 +764,13 @@ export default {
                 return "calc(100% - " + this.actionPanelWidth + "px)";
             } else if (this.tableDisplayConfig.show) {
                 return "calc(100% - " + this.tableDisplayConfig.width + "px)";
-            } else {
+            } else if(this.showPagination == false) {
+                if( this.widthContentCustom > 0){
+                   return this.widthContentCustom+"px"
+                }else{
+                    return "100%";
+                }
+            }else{
                 return "100%";
             }
         },
@@ -695,7 +785,7 @@ export default {
                     util.getComponentSize(ref.topBar).h +
                     util.getComponentSize(ref.bottomBar).h + 14;
             }
-            return tbHeight - 60;
+            return tbHeight - 15;
         },
         /**
          * Tạo cấu hình cho hiển thị header của table
@@ -747,6 +837,17 @@ export default {
         }
     },
     methods: {
+        changeAlwayShowSBSState(){
+            this.tableDisplayConfig.value.alwaysShowSidebar = !this.tableDisplayConfig.value.alwaysShowSidebar;
+        },
+        getHotInstance(){
+            return this.$refs.dataTable.hotInstance;
+        },  
+        rerenderTable(){
+            this.$refs.dataTable.hotInstance.render();
+        },
+        myFunctionScroll(e){
+        },
         importExcel(){
             this.$emit('import-excel');
         },
@@ -956,6 +1057,7 @@ export default {
                 clearTimeout(this.debounceGetData);
             }
             this.debounceGetData = setTimeout((self) => {
+				self.page = 1
                 self.getData();
             }, 300, this);
         },
@@ -1068,6 +1170,7 @@ export default {
          * Thực hiện filter khi người dùng click vào nút apply của filter
          */
         applyFilter(filter, source = "filter") {
+			this.page = 1
             let colName = this.tableFilter.currentColumn.name;
             this.$set(this.tableFilter.allColumn, colName, filter);
             let hasFilter = this.checkColumnHasFilter(colName, filter);
@@ -1089,7 +1192,7 @@ export default {
          * @param {Boolean} cache có ưu tiên dữ liệu từ cache hay ko
          *
          */
-        getData(columns = false, cache = false, applyFilter = true) {
+        getData(columns = false, cache = false, applyFilter = true, lazyLoad = false ) {
             let thisCpn = this;
             let handler = (data) => {
                 if(thisCpn.customAPIResult.reformatData){
@@ -1102,148 +1205,162 @@ export default {
                 thisCpn.tableColumns = thisCpn.getTableColumns(
                     data.columns
                 );
-                thisCpn.data = data.listObject ? data.listObject : [];
+                let resData = data.listObject ? data.listObject : []
+                if(lazyLoad){
+                    resData.forEach(function(e){
+                        thisCpn.data.push(e)
+                    })
+                    // thisCpn.data.concat(resData)
+                }else{
+                    thisCpn.data = resData;
+                }
                 thisCpn.handleStopDragColumn();
-                //AnhTger config show description
-                (data.listObject).forEach(element => {
-                    let processKey=element.processKey;
-                    if (processKey) {
-                        let configVale=JSON.parse(element.configValue)[processKey];
-                        if (configVale.description) {
-                            element.description=configVale.description;
-                        }
-                    }
-                   
-                });
                 thisCpn.$emit('data-get', data.listObject);
             }
             this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
         },
-        getOptionForGetList(configs, columns){
-            return {
-                filter: this.getFilterConfigs(configs.getDataMode),
-                sort: this.getSortConfigs(),
-                search: this.searchKey,
-                page: this.page,
-                pageSize: configs.pageSize ? configs.pageSize : this.pageSize,
-                columns: columns ? columns : [],
-                distinct: configs.distinct ? configs.distinct : false
-            };
-        },
+        // getOptionForGetList(configs, columns){
+        //     return {
+        //         filter: this.getFilterConfigs(configs.getDataMode),
+        //         sort: this.getSortConfigs(),
+        //         search: this.searchKey,
+        //         page: this.page,
+        //         pageSize: configs.pageSize ? configs.pageSize : this.pageSize,
+        //         columns: columns ? columns : [],
+        //         distinct: configs.distinct ? configs.distinct : false,
+        //         formulaCondition:this.conditionByFormula
+        //     };
+        // },
         /**
          * Lấy ra cấu hình cho việc sort
          */
         prepareFilterAndCallApi(columns = false, cache = false, applyFilter = false, success, configs = {}){
+            if(Object.keys(this.defaultData.listObject).length > 0){
+                success({data:this.defaultData});
+                return;
+            }
             let url = this.getDataUrl;
             let method = 'GET';
             if (url != "") {
                 let thisCpn = this;
                 thisCpn.loadingData = true;
-                let options = this.getOptionForGetList(configs, columns);
+                // let options = this.getOptionForGetList(configs, columns);
+                let emptyOption = false;
                 let header = {};
                 let routeName = this.$getRouteName();
-                if(routeName == "deployHistory" || routeName == "listProcessInstances"){
+                if(routeName == "deployHistory" || routeName == "listProcessInstances" || thisCpn.useWorkFlowHeader){
                     header = {
                         Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0'
                     };
-                    options = {};
+                    // options = {};
+                    emptyOption = true;
                 }
-                apiObj
-                    .callApi(method, url, options, header, {})
-                    .then(data => {
-                        success(data);
-                    })
-                    .catch(err => {
-                        console.warn(err);
-                        thisCpn.$snotify({
-                            type: "error",
-                            title: thisCpn.$t("table.error.cannot_get_data"),
-                            text: ""
-                        });
-                    });
+
+                configs.searchKey = this.searchKey;
+                configs.page = configs.page ? configs.page :  this.page ;
+                configs.pageSize = configs.pageSize ? configs.pageSize : this.pageSize;
+                configs.formulaCondition = this.conditionByFormula;
+                let tableFilter = this.tableFilter;
+                tableFilter.allColumnInTable = this.tableColumns;
+                configs.emptyOption = emptyOption;
+
+                getDataFromConfig(url, configs, columns, tableFilter, success, 'GET', header);
+                // apiObj
+                //     .callApi(method, url, options, header, {})
+                //     .then(data => {
+                //         success(data);
+                //     })
+                //     .catch(err => {
+                //         console.warn(err);
+                //         thisCpn.$snotify({
+                //             type: "error",
+                //             title: thisCpn.$t("table.error.cannot_get_data"),
+                //             text: ""
+                //         });
+                //     });
             }
         },
-        getSortConfigs() {
-            let columnMap = this.tableColumns.reduce((map, item) => {
-                map[item.data] = item;
-                return map;
-            }, {});
-            let sort = [];
-            for (let colName in this.tableFilter.allColumn) {
-                let filter = this.tableFilter.allColumn[colName];
-                if (filter.sort != "") {
-                    sort.push({
-                        column: columnMap[colName].data,
-                        type: filter.sort
-                    });
-                }
-            }
-            return sort;
-        },
+        // getSortConfigs() {
+        //     let columnMap = this.tableColumns.reduce((map, item) => {
+        //         map[item.data] = item;
+        //         return map;
+        //     }, {});
+        //     let sort = [];
+        //     for (let colName in this.tableFilter.allColumn) {
+        //         let filter = this.tableFilter.allColumn[colName];
+        //         if (filter.sort != "") {
+        //             sort.push({
+        //                 column: columnMap[colName].data,
+        //                 type: filter.sort
+        //             });
+        //         }
+        //     }
+        //     return sort;
+        // },
         /**
          * Chuyển đổi cấu hình filter của component này sang dạng api hiểu được
          */
-        getFilterConfigs(getDataMode = '') {
-            let configs = [];
-            for (let colName in this.tableFilter.allColumn) {
-                let filter = this.tableFilter.allColumn[colName];
-                let condition = filter.conditionFilter;
-                let option = {
-                    column: colName, // tên cột cần filter
-                    operation: condition.conjunction,
-                    conditions: []
-                };
-                if(getDataMode == 'autocomplete' && colName == this.tableFilter.currentColumn.name){
-                    option.conditions = [
-                        {
-                            name: 'contains',
-                            value: this.tableFilter.currentColumn.colFilter.searchKey ? this.tableFilter.currentColumn.colFilter.searchKey : ''
-                        }
-                    ];
-                    configs.push(option);
-                    continue;
-                }
-                if (condition.items[0].type != "none") {
-                    option.conditions = [
-                        {
-                            name: condition.items[0].type,
-                            value: condition.items[0].value
-                        }
-                    ];
-                    if (condition.items[1].type != "none") {
-                        option.conditions.push({
-                            name: condition.items[1].type,
-                            value: condition.items[1].value
-                        });
-                    }
-                }
-                if(filter.searchKey != '' && filter.clickedSelectAll){
-                    option.conditions = [
-                        {
-                            name: 'contains',
-                            value: filter.searchKey
-                        }
-                    ];
-                }
+        // getFilterConfigs(getDataMode = '') {
+        //     let configs = [];
+        //     for (let colName in this.tableFilter.allColumn) {
+        //         let filter = this.tableFilter.allColumn[colName];
+        //         let condition = filter.conditionFilter;
+        //         let option = {
+        //             column: colName, // tên cột cần filter
+        //             operation: condition.conjunction,
+        //             conditions: []
+        //         };
+        //         if(getDataMode == 'autocomplete' && colName == this.tableFilter.currentColumn.name){
+        //             option.conditions = [
+        //                 {
+        //                     name: 'contains',
+        //                     value: this.tableFilter.currentColumn.colFilter.searchKey ? this.tableFilter.currentColumn.colFilter.searchKey : ''
+        //                 }
+        //             ];
+        //             configs.push(option);
+        //             continue;
+        //         }
+        //         if (condition.items[0].type != "none") {
+        //             option.conditions = [
+        //                 {
+        //                     name: condition.items[0].type,
+        //                     value: condition.items[0].value
+        //                 }
+        //             ];
+        //             if (condition.items[1].type != "none") {
+        //                 option.conditions.push({
+        //                     name: condition.items[1].type,
+        //                     value: condition.items[1].value
+        //                 });
+        //             }
+        //         }
+        //         if(filter.searchKey != '' && filter.clickedSelectAll){
+        //             option.conditions = [
+        //                 {
+        //                     name: 'contains',
+        //                     value: filter.searchKey
+        //                 }
+        //             ];
+        //         }
 
-                if(filter.selectAll && !$.isEmptyObject(filter.valuesNotIn)){
-                    option.conditions.push({
-                        name: 'not_in',
-                        value: Object.keys(filter.valuesNotIn)
-                    });
-                }else if(!filter.selectAll && !$.isEmptyObject(filter.valuesIn)){
-                    option.conditions.push({
-                        name: 'in',
-                        value: Object.keys(filter.valuesIn)
-                    });
-                }
+        //         if(filter.selectAll && !$.isEmptyObject(filter.valuesNotIn)){
+        //             option.conditions.push({
+        //                 name: 'not_in',
+        //                 value: Object.keys(filter.valuesNotIn)
+        //             });
+        //         }else if(!filter.selectAll && !$.isEmptyObject(filter.valuesIn)){
+        //             option.conditions.push({
+        //                 name: 'in',
+        //                 value: Object.keys(filter.valuesIn)
+        //             });
+        //         }
                 
-                if(option.conditions.length > 0){
-                    configs.push(option);
-                }
-            }
-            return configs;
-        },
+        //         if(option.conditions.length > 0){
+        //             configs.push(option);
+        //         }
+        //     }
+        //     return configs;
+        // },
         /**
          * Xử lý việc sau khi kết thúc kéo thả các cột ở thanh cấu hình hiển thị danh sách
          */
@@ -1277,6 +1394,7 @@ export default {
         getTableColumns(columns, forcedReOrder = false) {
             let savedOrderCols = this.savedTableDisplayConfig;
             let colMap = {};
+            let self = this;
             if (forcedReOrder) {
                 for (let item of columns) {
                     colMap[item.data] = item;
@@ -1316,6 +1434,23 @@ export default {
                     
                     if(item.renderer){
                         colMap[item.name].renderer = item.renderer;
+                    }
+                    
+                    if(!colMap[item.name].renderer){
+                        colMap[item.name].renderer = function (instance, td, row, col, prop, value, cellProperties) {
+                            Handsontable.dom.empty(td);
+                            td.innerHTML = value ;
+                            return td;
+                        }
+                    }
+
+                    let renderer = colMap[item.name].renderer;
+                    colMap[item.name].renderer = function(instance, td, row, col, prop, value, cellProperties){
+                        td = renderer(instance, td, row, col, prop, value, cellProperties);
+                        if(self.focusingRowIndex > 0 && row == self.focusingRowIndex ){
+                            $(td).addClass('symper-list-item-current-row-sbs');
+                        }
+                        return td;
                     }
                 }
             }
@@ -1417,7 +1552,8 @@ export default {
             let options = {
                 pageSize: 300,
                 getDataMode: 'autocomplete',
-                distinct: true
+                distinct: true,
+                page: 1
             };
             let success = (data) => {
                 if(data.status == 200){
@@ -1428,7 +1564,6 @@ export default {
                     }, []);
                     self.tableFilter.currentColumn.colFilter.selectItems = self.createSelectableItems(items);
                 }
-                console.log(self.tableFilter.currentColumn.selectItems, 'datadatadatadatadata');
             }
             this.prepareFilterAndCallApi(columns , false, true, success, options);
         },
@@ -1498,8 +1633,10 @@ export default {
             // Phát sự kiện khi xóa danh sách các item trong list
             this.$emit("remove-item", []);
         },
-        refreshList() {
-            // Phát sự kiện khi click vào refresh dữ liệu
+        refreshList(){
+			// Phát sự kiện khi click vào refresh dữ liệu
+			this.allRowChecked = {}
+			this.$emit('after-selected-row', this.allRowChecked)
             this.getData();
             this.$emit("refresh-list", {});
         },
@@ -1511,7 +1648,7 @@ export default {
             // Phát sự kiện khi người dùng gõ vào ô tìm kiếm
             this.$emit("search-all", {});
         },
-        changePageSize(vl) {
+        changePageSize(vl){
             this.pageSize = vl.pageSize
             this.getData();
             // Phát sự kiện khi người dùng thay đổi số bản ghi ở mỗi page
@@ -1522,9 +1659,9 @@ export default {
             this.getData();
             this.$emit("change-page", vl.page);
         },
-        nextPage(){
+        nextPage(lazyLoad = false){
             this.page += 1
-            this.getData();
+            this.getData(false , false , true ,lazyLoad);
             this.$emit("change-page", this.page);
         },
         prevPage(){
@@ -1539,7 +1676,11 @@ export default {
         addCheckBoxColumn(){
             this.hasColumnsChecked = true;
             this.tableColumns.unshift({name:"checkbox_select_item",data:"checkbox_select_item",title:"Chọn",type:"checkbox"});
-        },
+		},
+		// dungna doi hasColumnsChecked = true
+		addColumnsChecked(){
+			this.hasColumnsChecked = true
+		},
         removeCheckBoxColumn(){
             this.hasColumnsChecked = false;
             this.tableColumns.shift();
@@ -1547,6 +1688,9 @@ export default {
         // Hàm trả về các dòng được selected
         getAllRowChecked(){
             return this.allRowChecked;
+        },
+        removeAllRowChecked(){
+            this.allRowChecked = []
         },
         isShowCheckedRow(){
             return this.hasColumnsChecked

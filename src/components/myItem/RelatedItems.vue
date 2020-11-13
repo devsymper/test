@@ -12,7 +12,7 @@
                     }"
                     v-if="checkShowTotalTask(idex)"
                 >
-                    <v-col cols="8" >
+                    <v-col cols="8" class="pa-1">
                         <div style="white-space: nowrap;
                             overflow: hidden;
                             text-overflow: ellipsis;"  @dblclick="goDoTask(item.id)">
@@ -20,15 +20,18 @@
                             <span style=" font-size:13px">{{displayContent(item.description)}}</span>
                         </div>
                         <div  @dblclick="goDoTask(item.id)">
-                            <v-icon v-if="item.createTime" style="font-size:11px; color:blue;margin-left: 3px;">mdi-circle</v-icon>
-                            <v-icon v-else style="font-size:11px ; color:green;margin-left: 3px;">mdi-circle</v-icon>
+                            <v-icon v-if="item.createTime && checkTimeDueDate(item)" style="font-size:11px; color:#EE6B60;margin-left: 3px;">mdi-circle</v-icon>
+                            <v-icon v-else-if="item.createTime && !checkTimeDueDate(item)" style="font-size:11px; color:#0760D9;margin-left: 3px;">mdi-circle</v-icon>
+                            <v-icon v-else style="font-size:11px ; color:#408137;margin-left: 3px;">mdi-circle</v-icon>
                             {{displayDescription(item.description)}}
                         </div>
                     </v-col>
-                    <v-col cols="4" style="padding-top:15px">
+                    <v-col class="pa-1" cols="4">
                         <v-icon x-small >mdi-clock-time-nine-outline</v-icon>
                         {{item.createTime ? $moment(item.createTime).format('DD/MM/YY HH:mm'):$moment(item.endTime).format('DD/MM/YY HH:mm')}}
-                        <div class="quickView" @click="showInfoTask($event,item)">{{$t("myItem.sidebar.quickView")}}</div>
+                        <div style="padding-top: 2px;">
+                            <span class="quickView" @click="showInfoTask($event,item)">{{$t("myItem.sidebar.quickView")}}</span>
+                        </div>
                     </v-col>
             
                 </v-row>
@@ -57,13 +60,13 @@ export default {
         return{
             x:-1,
             y:-1,
-            showByIndex: null,
             processParent:{},
             listSubProcessInstance:[],
             listProcessSibling:[],
             processInstanceCurrent:{},
             statusQuickView:false,
             taskSelected:{},
+            
         }
     },
     props: {
@@ -114,17 +117,39 @@ export default {
             tasks=tasks.concat(this.stask.listTaskDoneInProcessParent);
             tasks=tasks.concat(this.stask.listTaskInProcessSub);
             tasks=tasks.concat(this.stask.listTaskInProcessSibling);
-            return tasks;
+            let set = new Set();
+            let uniqueTask = tasks.filter(item => {
+                if (!set.has(item.id)) {
+                    set.add(item.id);
+                    return true;
+                }
+                return false;
+            }, set);
+            return uniqueTask;
         }
     },
     methods:{
+        checkTimeDueDate(item){
+            if (item.dueDate) {
+                let dueDate=new Date(item.dueDate).getTime();
+                if (dueDate<Date.now()) {
+                    return true;
+                }else{
+                    return false;
+                }
+            }else{
+                return false;
+            }
+        },
         closeInfoTaskRelated(){
             this.statusQuickView=false;
         },
         showInfoTask(e,item){
+            e.preventDefault(); 
+            e.stopPropagation(); 
             this.taskSelected={};
             this.taskSelected=item;
-            this.statusQuickView=!this.statusQuickView;
+            this.statusQuickView=true;
             this.$refs.infoTaskRelated.setPosittion({bottom:$(document).height() - e.clientY + 30 + 'px'})
 
         },
@@ -337,7 +362,18 @@ export default {
         }
     },
     created(){
+        this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
+            if(evt == undefined){
+                return;
+            }
+            if(this._inactive == true) return;
+            if (this.statusQuickView) {
+                this.statusQuickView=false;
+            }
+        });
+      
         this.getData();
+
     }
 }
 </script>

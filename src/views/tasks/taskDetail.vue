@@ -98,6 +98,7 @@ import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../compone
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
 import VueClipboard from 'vue-clipboard2';
+import { util } from '../../plugins/util';
 Vue.use(VueClipboard)
 export default {
     name: "taskDetail",
@@ -256,12 +257,6 @@ export default {
                 }
             }
         },
-        // getTaskTest(){
-        //     let taskId=this.taskInfo.action.parameter.taskId;
-        //     BPMNEngine.getATaskInfoV2(taskId).then((res) => {
-        //         console.log("task123",res);
-        //     });
-        // },
         onCopySuccess(){
            this.$snotify({
                 type: 'success',
@@ -272,7 +267,7 @@ export default {
         changeTaskDetailInfo(taskId){
             let hostname=window.location.hostname;
             let copyText = this.taskInfo.action.parameter.taskId;
-            copyText='https://'+hostname+'/#/tasks/'+copyText;
+            copyText= util.addEnvToUrl('https://'+hostname+'/#/tasks/'+copyText);
             this.linkTask=copyText;
 
             if(!taskId){

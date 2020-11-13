@@ -32,23 +32,28 @@
             :style="{'width':documentSize, 'height':contentHeight,'margin':contentMargin}">
             <div class="content-document" v-html="contentDocument"></div>
             <div class="content-print-document" :style="formSize" v-html="contentPrintDocument"></div>
+            <FloattingPopup 
+                ref="floattingPopup" 
+                :focusingControlName="focusingControlName"
+                :instance="keyInstance"/>
         </div>
       
         <side-bar-detail 
-        v-if="!isPrint"
-        ref="sidebarView"
-        :sidebarWidth="sidebarWidth"  
-        :userId="userId"
-        :taskId="taskId"
-        :createTime="createTime"
-        :documentObjectId="docObjId"
-        :workflowId="workflowId"
-        :showCommentInDoc="showCommentInDoc"
-        @after-hide-sidebar="afterHideSidebar"
+            v-if="!isPrint"
+            ref="sidebarView"
+            :keyInstance="keyInstance"
+            :sidebarWidth="sidebarWidth"  
+            :userId="userId"
+            :taskId="taskId"
+            :createTime="createTime"
+            :documentObjectId="docObjId"
+            :userRole="userCreateInfo.role"
+            :workflowId="workflowId"
+            :showCommentInDoc="showCommentInDoc"
+            @after-hide-sidebar="afterHideSidebar"
         />
         <HistoryControl ref="historyView" />
        
-
     </div>
 </template>
 <script>
@@ -66,6 +71,7 @@ import './../submit/customControl.css'
 import { getSDocumentSubmitStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
+import FloattingPopup from './../common/FloattingPopup'
 import Preloader from './../../../components/common/Preloader';
 
 import { util } from '../../../plugins/util.js';
@@ -103,12 +109,14 @@ export default {
         contentHeight:{
             type:String,
             default:"calc(100% - 30px);"
-        }
+        },
+        
     },   
     components:{
         'side-bar-detail':SideBarDetail,
         HistoryControl,
-        Preloader
+        Preloader,
+        FloattingPopup
     },
     computed: {
         routeName(){
@@ -119,6 +127,9 @@ export default {
         },
         sDocumentSubmit() {
             return this.$store.state.document.submit[this.keyInstance];
+        },
+        listLinkControl() {
+            return this.$store.state.document.linkControl[this.keyInstance];
         },
         allUsers(){
             let allUser = this.$store.state.app.allUsers
@@ -131,6 +142,7 @@ export default {
     },
     data() {
         return {
+            focusingControlName: '',
             contentDocument: null,
             contentPrintDocument:null,
             docObjId: null,
@@ -141,6 +153,7 @@ export default {
             sidebarWidth:400,
             workflowId:"",
             taskId:"",
+            userCreateInfo:"",
             createTime:"",
             userId:"",
             direction: "top",
@@ -155,23 +168,39 @@ export default {
             printConfigActive:null,
             formSize:{},
             wrapFormCss:{},
+            defaultData:{},
 
         };
     },
     beforeMount() {
         this.documentSize = "21cm";
     },
+    mounted(){
+        let self = this;
+        $(document).on('click','#sym-Detail-'+this.keyInstance+' .info-control-btn',function(e){
+            self.$refs.floattingPopup.show(e, $('#sym-Detail-'+self.keyInstance));
+            self.focusingControlName = $(e.target).attr('data-control');
+        })
+    },
     
     created(){
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
-        
+        if(this.$route.params.extraData && this.$route.params.extraData.defaultData){
+            this.defaultData = this.$route.params.extraData.defaultData;
+        }
         let thisCpn = this;
         this.$store.commit("document/changeViewType", {
             key: thisCpn.keyInstance,
             value: 'detail'
         });
+        if(this.isPrint || this.routeName == "printDocument"){
+            this.$store.commit("document/changeViewType", {
+                key: thisCpn.keyInstance,
+                value: 'print'
+            });
+        }
         if (this.documentObjectId != 0) {
             this.docObjId = Number(this.documentObjectId);
         } else if (this.routeName == "detailDocument" || this.routeName == "printDocument") {
@@ -187,13 +216,31 @@ export default {
                 }
                 else{
                     if(!$(evt.target).hasClass("v-data-table") &&
-                    $(evt.target).closest(".v-data-table").length == 0){
+                        $(evt.target).closest(".v-data-table").length == 0){
                         this.$refs.historyView.hide() 
+                    }
+
+                    
+                    if(!$(evt.target).hasClass("s-floatting-popup") &&
+                        $(evt.target).closest(".s-floatting-popup").length == 0){
+                            this.focusingControlName = "";
+                        this.$refs.floattingPopup.hide() 
                     }
                 }
             }
             
         })
+        this.$evtBus.$on("on-info-btn-in-table-click", locate => {
+            if(thisCpn._inactive == true) return;
+            let e = locate.e;
+            let row = locate.row;
+            let controlName = locate.controlName;
+            this.focusingControlName = controlName;
+            this.$refs.floattingPopup.show(e, $('#sym-Detail-'+this.keyInstance), row);
+            
+        });
+        
+       
     },
     watch:{
         docObjInfo:{
@@ -282,10 +329,7 @@ export default {
             this.contentDocument = ""
             try {
                 this.$refs.preLoaderView.show();
-                
-            } catch (error) {
-                
-            }
+            } catch (error) {}
             let thisCpn = this;
             let res = await documentApi
                 .detailDocumentObject(this.docObjId);
@@ -295,18 +339,28 @@ export default {
                 thisCpn.createTime = res.data.document_object_create_time
                 thisCpn.workflowId = res.data.document_object_workflow_id;
                 thisCpn.documentId = res.data.documentId;
+                thisCpn.userCreateInfo = res.data.userCreateInfo;
+                let dataToStore = res.data;
+                if(Object.keys(thisCpn.defaultData).length > 0){
+                    dataToStore = thisCpn.defaultData;
+                    dataToStore.documentId = res.data.documentId;
+                }
                 thisCpn.$store.commit('document/addToDocumentDetailStore',{
                     key: 'allData',
-                    value: res.data,
+                    value: dataToStore,
                     instance:thisCpn.keyInstance
                 }) 
+                thisCpn.$store.commit('document/updateListLinkControl',{
+                    key: thisCpn.keyInstance,
+                    value: res.data.otherInfo,
+                }); 
                 thisCpn.loadDocumentStruct(res.data.documentId,isPrint);
             }
             else{
-                    this.$snotify({
-                        type: "error",
-                        title: res.message,
-                    });
+                this.$snotify({
+                    type: "error",
+                    title: res.message,
+                });
             }
         },
         togglePageSize() {
@@ -396,6 +450,7 @@ export default {
                             control.init();
                             this.addToListInputInDocument(controlName,control)
                             control.render();
+                            control.checkHasInfoControl(this.listLinkControl);
                         }
                         //truong hop la control table
                         else {
@@ -447,6 +502,7 @@ export default {
                             this.addToListInputInDocument(controlName,tableControl)
                             tableControl.renderTable();
                             tableControl.setData(valueInput);
+                            tableControl.renderInfoButtonInRow(this.listLinkControl);
                         }
                     }
                 }
@@ -473,7 +529,6 @@ export default {
     .sym-form-Detail {
         width: 21cm;
         padding: 16px;
-        position: relative;
     }
     .wrap-content-detail{
         position: relative;

@@ -37,6 +37,8 @@ function cleanContent(content, configValue) {
         .replace(/↵+/, ' ')
         .replace(/\bbpmn:/g, '')
         .replace(/<di:/g, '<omgdi:')
+        .replace(/<scriptTask /g, '<serviceTask ')
+        .replace(/<\/scriptTask>/g, '<\/serviceTask>')
         .replace(/<dc:/g, '<omgdc:')
         .replace(/symper_prefix_chars_/g, 'symper:')
         .replace(/symper:symper:/g, 'symper:')
@@ -45,6 +47,7 @@ function cleanContent(content, configValue) {
         .replace(/symper_symper_in_tag/g, 'symper:in')
         .replace(/symper_symper_out_tag/g, 'symper:out')
         .replace(/symper_symper_string_tag/g, 'symper:string')
+        .replace(/symper_symper_expression_tag/g, 'symper:expression')
         .replace(/symper_symper_field_tag/g, 'symper:field')
         .replace(/symper_symper_value_tag/g, 'symper:value');
 
@@ -133,13 +136,22 @@ export const deployProcessFromXML = function(xml, key = 14, name = 'test', tenan
 
 
 function moreInfoForInstanceVars() {
-    let rsl = [{
+    let rsl = [
+        {
         "name": 'symper_user_id_start_workflow',
         "type": 'string',
         "value": SYMPER_APP.$store.state.app.endUserInfo.id+":"+SYMPER_APP.$store.state.app.endUserInfo.currentRole.id,
         "valueUrl": "",
         "scope": "global"
-    }];
+        },
+        {
+            "name": 'symper_last_executor_id',
+            "type": 'string',
+            "value": SYMPER_APP.$store.state.app.endUserInfo.id+":"+SYMPER_APP.$store.state.app.endUserInfo.currentRole.id,
+            "valueUrl": "",
+            "scope": "global"
+        },
+    ];
     if (SYMPER_APP.$route.params.extraData && SYMPER_APP.$route.params.extraData.appId) {
         rsl.push({
             "name": 'symper_application_id',
@@ -149,6 +161,7 @@ function moreInfoForInstanceVars() {
             "scope": "global"
         });
     }
+
     return rsl;
 }
 
@@ -262,6 +275,13 @@ export const getVarsFromSubmitedDoc = async(docData, elId, docId) => {
                 type: 'string',
                 value: SYMPER_APP.$store.state.app.endUserInfo.id
             });
+            vars.push({
+                name: 'symper_last_executor_id',
+                type: 'string',
+                value: SYMPER_APP.$store.state.app.endUserInfo.id+":"+SYMPER_APP.$store.state.app.endUserInfo.currentRole.id,
+                valueUrl: "",
+                scope: "global"
+            });
             resolve({
                 vars: vars,
                 nameAndValueMap: dataInputForFormula
@@ -355,8 +375,13 @@ export const extractTaskInfoFromObject = function(obj) {
 function getRoleUser(roleIdentify){
     let arrDataRole=roleIdentify.split(":");
     let allSymperRole=SYMPER_APP.$store.state.app.allSymperRoles;
-    let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
-    return role;
+    if (allSymperRole[arrDataRole[0]]) {
+        let role=(allSymperRole[arrDataRole[0]]).find(element => element.roleIdentify===roleIdentify);
+        return role;
+    }else{
+        return {};
+    }
+  
 }
 
 export const addMoreInfoToTask = function(task) {

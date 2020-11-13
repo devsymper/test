@@ -184,6 +184,10 @@ const getInsertionCSS = function() {
       .selection-highlight{
         background: #3297FD !important;
       }
+      .s-control.s-control-image{
+        background: #f2f2f2;
+        border-radius: 4px;
+      }
       `;
     return styles;
 }

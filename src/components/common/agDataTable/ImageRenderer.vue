@@ -1,7 +1,9 @@
 <template>
-    <span><img :src="`https://hoangnd.dev.symper.vn`+icon" height="14" style="margin-right:8px" alt="">{{text}}</span>
+    <span><img :src="require('./../../../../public/img/document'+icon)" height="14" style="margin-right:8px" alt="">{{text}}</span>
 </template>
 <script>
+import { util } from '../../../plugins/util';
+
 export default {
     data(){
         return {

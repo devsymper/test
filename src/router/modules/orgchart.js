@@ -5,6 +5,12 @@ export default [{
             import ('../../views/orgchart/OrgchartList.vue'),
     },
     {
+        path: "/orgchart/trash",
+        name: "trashOrgchart",
+        component: () =>
+            import ('../../views/orgchart/ListTrashOrgchart.vue'),
+    },
+    {
         path: "/orgchart/create",
         name: "createOrgchart",
         component: () =>
@@ -15,6 +21,12 @@ export default [{
         name: "editOrgchart",
         component: () =>
             import ('../../views/orgchart/EditOrgchart.vue'),
+    },
+    {
+        path: "/orgchart/:id/structure-management",
+        name: "orgchartStructureManagement",
+        component: () =>
+            import ('../../views/orgchart/OrgchartStructureManagement.vue'),
     },
 
     {

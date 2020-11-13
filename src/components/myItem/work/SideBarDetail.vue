@@ -5,6 +5,7 @@
 	permanent
 	right
 	:width="sidebarWidth"
+	v-if="isShow"
 	:style="{'transform':(isShow) ? 'translateX(0%)' : 'translateX(100%)'}"
 	>
 	<div class="main-info">
@@ -15,7 +16,7 @@
 
 		<v-divider></v-divider>
 
-		<VuePerfectScrollbar style="height:calc(100% - 110px);">
+		<VuePerfectScrollbar style="height:calc(100% - 65px);">
 			<v-expansion-panels
 			v-model="panel"
 			multiple
@@ -53,6 +54,7 @@
 					<v-expansion-panel-content class="sym-v-expand-content border-top-1" style="height:200px">
 						<v-row class="ma-0" style="height:200px">
 							<trackingProcessInstance
+								class="popup-model-diagram"
 								v-if="workInfo.id"
 								:instanceId="workInfo.id"
 								@showPopupDiagram="showPopupDiagram"
@@ -71,11 +73,7 @@
 									<span mt-1>{{$t("tasks.header.userCreate")}}</span>
 								</span>
 							</div>
-							<div class="pl-7 justify-space-between user-show">
-								<symperAvatar :size="20"  :userId="workInfo.startUserId" />
-								<span class="ml-1">{{workInfo.startUserName}}</span>
-                                <div class="fs-11 ml-5 grey--text" v-if="workInfo.roleInfo">{{workInfo.roleInfo.name}}</div>
-							</div>
+							<infoUser class="userInfo pl-7" :userId="workInfo.startUserId" :roleInfo="workInfo.roleInfo" />
 						</div>
 					</v-expansion-panel-content>
 				</v-expansion-panel>
@@ -166,7 +164,7 @@
 		</VuePerfectScrollbar>
 	</div>
 	<Comment 
-	style="height:100%" 
+	style="height:calc(100% - 40px)" 
 	:objectIdentifier="workInfo.id"
 	:objectType="'work'"
 	ref="commentTaskView"
@@ -197,8 +195,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import Comment from '../Comment'
 import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue";
 import UploadFile from "@/components/common/UploadFile.vue";
-import symperAvatar from "@/components/common/SymperAvatar.vue";
-
+import infoUser from "./../InfoUser";
 export default {
 	components:{
 		VuePerfectScrollbar,
@@ -206,7 +203,7 @@ export default {
 		user,
 		trackingProcessInstance,
 		UploadFile,
-		symperAvatar
+		infoUser
 	},
 	data () {
 		return {
@@ -646,5 +643,8 @@ export default {
 	.border-top-1 >>>.v-expansion-panel-content__wrap{
 		border: 1px solid #cecece!important;
 		border-radius: 5px;
+	}
+	.popup-model-diagram >>> .djs-hit  {
+		pointer-events: none;
 	}
 </style>

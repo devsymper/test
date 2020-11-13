@@ -4,25 +4,43 @@ import { util } from "../../../plugins/util";
 import serviceTaskDefinitions from "./serviceTaskDefinitions";
 
 function translateServiceTaskToHTTPTask(el, attrs, bpmnModeler) {
-    let moddle = bpmnModeler.get('moddle');
-    let modeling = bpmnModeler.get('modeling');
+    let httpTaskType = attrs.serviceTaskType.value;
+    setHttpTaskFromType(el, attrs, bpmnModeler, httpTaskType);
+}
+
+
+function translateScriptTaskToHTTPTask(el, attrs, bpmnModeler) {
+    let httpTaskType = 'script';
+    attrs.serviceTaskScriptValue = attrs.scripttext;
+    setHttpTaskFromType(el, attrs, bpmnModeler, httpTaskType);
+}
+
+function setHttpTaskFromType(el, attrs, bpmnModeler, httpTaskType) {
     let bizEl = el.businessObject;
     let extensionElements = bizEl.extensionElements;
-
-
+    attrs.idNode=el.id;
+    let moddle = bpmnModeler.get('moddle');
     extensionElements = moddle.create('bpmn:ExtensionElements');
     extensionElements.values = [];
-    let items = serviceTaskDefinitions[attrs.serviceTaskType.value].params;
-    serviceTaskDefinitions[attrs.serviceTaskType.value].makeRequestBody(attrs);
+    let modeling = bpmnModeler.get('modeling');
+    serviceTaskDefinitions[httpTaskType].makeRequestBody(attrs);
+    let items = serviceTaskDefinitions[httpTaskType].params;
     for (let name in items) {
         let subEl = moddle.create('symper:symper_symper_field_tag');
         subEl.name = name;
         let value = String(items[name]).replace(/\n/g, '');
         if (String(value)) {
-            subEl.text = `<symper:symper_symper_string_tag>
-                <![CDATA[${value}]]>
-            </symper:symper_symper_string_tag>`;
-            extensionElements.values.push(subEl);
+            if(name != 'requestBody'){
+                subEl.text = `<symper:symper_symper_string_tag>
+                    <![CDATA[${value}]]>
+                </symper:symper_symper_string_tag>`;
+                extensionElements.values.push(subEl);
+            }else{
+                subEl.text = `<symper:symper_symper_expression_tag>
+                    <![CDATA[${value}]]>
+                </symper:symper_symper_expression_tag>`;
+                extensionElements.values.push(subEl);
+            }
         }
     }
     modeling.updateProperties(el, {
@@ -47,6 +65,8 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
             vizEl = bizVizEl.$parent;
         } else if (bizVizEl.$type == 'bpmn:ServiceTask') {
             translateServiceTaskToHTTPTask(vizEl, attrs, bpmnModeler);
+        } else if (bizVizEl.$type == 'bpmn:ScriptTask') {
+            translateScriptTaskToHTTPTask(vizEl, attrs, bpmnModeler);
         }
 
         if (elKey) {
@@ -55,7 +75,7 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
 
         for (let attrName in attrs) {
             let attrDef = allNodesAttrs[attrName];
-            if (!attrDef) {
+            if (!attrDef || (!attrs.name.value && vizEl.type=="bpmn:SequenceFlow")) {
                 continue;
             }
             if (typeof attrDef.pushToXML == 'function') {
@@ -243,6 +263,7 @@ function setInfoForTaskDescription(el){
     elDocumentation.extraLabel = el.attrs.extraInfoLabel.value;
     elDocumentation.extraValue = el.attrs.extraInfoValue.value;
     elDocumentation.approvalEditableControls = el.attrs.approvalEditableControls.value;
+    elDocumentation.selectDefaultControlDocument = el.attrs.selectDefaultControlDocument.value;
 
     if (el.attrs.taskAction.value == 'submit') {
         elDocumentation.action.parameter.documentId = el.attrs.formreference.value;

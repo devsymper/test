@@ -13,6 +13,7 @@ export default class TableControl extends Control {
          */
         this.tableInstance = null;
         this.tablePrint = null;
+        this.pivotTable = null;
         this.isPrintView = isPrintView;
         /**
          * tên các control nằm trong control này, mặc định là null, nếu control là table thì mới có giá trị là {'tên control':true}
@@ -23,25 +24,50 @@ export default class TableControl extends Control {
         this.ele.wrap('<span style="position:relative;display: block;" class="wrap-table">');
 
     }
-    renderTable() {
-            if (this.isPrintView) {
-                this.ele.attr('table-id', this.ele.attr('id'));
-                this.ele.removeAttr('id');
-                this.ele.find('table').addClass('table-print');
-                this.ele.find('table tbody').empty();
-                this.tablePrint.render();
-            } else {
-                this.tableInstance.render();
-                this.ele.detach().hide();
-
+    renderInfoButtonInRow(linkControl) {
+        if (linkControl) {
+            let allControlHasLink = Object.keys(linkControl);
+            for (let index = 0; index < allControlHasLink.length; index++) {
+                let controlLink = allControlHasLink[index];
+                if (Object.keys(this.listInsideControls).includes(controlLink)) {
+                    let listLinkInCol = linkControl[controlLink];
+                    let curColIndex = this.tableInstance.colName2Idx[controlLink];
+                    for (let key in listLinkInCol) {
+                        let rowIdx = key.replace(/linkConfig_(.+)_/g, "");
+                        rowIdx = Number(rowIdx)
+                        this.tableInstance.validateValueMap[rowIdx + "_" + curColIndex] = {
+                            type: 'linkControl',
+                        };
+                    }
+                }
             }
+        }
+    }
+    renderTable() {
+        if (this.isPrintView) {
+            this.ele.attr('table-id', this.ele.attr('id'));
+            this.ele.removeAttr('id');
+            this.ele.find('table').addClass('table-print');
+            this.ele.find('table tbody').empty();
+            this.tablePrint.render();
+        } else {
+            this.tableInstance.render();
+            if(this.pivotTable){
+                this.pivotTable.render();
+            }
+            this.ele.detach().hide();
 
         }
-        /**
-         * Hàm set data cho handson table, cho trường hợp viewdetail đã có data
-         * @param {*} data 
-         */
+
+    }
+    /**
+     * Hàm set data cho handson table, cho trường hợp viewdetail đã có data
+     * @param {*} data 
+     */
     setData(data) {
+        if (Object.keys(data).length == 0) {
+            return;
+        }
         if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1) {
             if (this.tableInstance.tableInstance) {
                 this.tableInstance.tableInstance.updateSettings({
@@ -51,8 +77,6 @@ export default class TableControl extends Control {
                 })
                 this.tableInstance.tableInstance.render();
             }
-
-            return;
         }
         if (this.isPrintView) {
             let dataTablePrint = [];
@@ -88,6 +112,9 @@ export default class TableControl extends Control {
             this.ele.find('table tbody').append(bodyHtml);
             this.ele.find('table').attr('contenteditable', 'false')
         } else {
+            if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1){
+                return;
+            }
             let dataTable = [];
             let rowLength = data[Object.keys(data)[0]].length;
             for (let index = 0; index < rowLength; index++) {
@@ -103,13 +130,14 @@ export default class TableControl extends Control {
                 dataTable.push(rowData)
 
             }
+
+            if (this.tableInstance.tableHasRowSum) { // trường hợp có dòng tính tổng thì thêm dòng ở cuối hiển thị tổng cột
+                dataTable.push({})
+            }
             this.tableInstance.tableInstance.loadData(dataTable);
             setTimeout((self) => {
                 self.tableInstance.tableInstance.render();
             }, 100, this);
-            if (this.tableInstance.tableHasRowSum) { // trường hợp có dòng tính tổng thì thêm dòng ở cuối hiển thị tổng cột
-                this.tableInstance.tableInstance.alter('insert_row', Object.keys(data).length, 1);
-            }
             if (this.currentDataStore.docStatus == 'init') {
                 this.defaultValue = data;
             }
