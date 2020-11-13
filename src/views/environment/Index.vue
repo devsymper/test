@@ -4,7 +4,7 @@
 			<v-icon class="ml-2">
 				mdi-earth
 			</v-icon>
-			<span class="flex-grow-1 ml-2">
+			<span class="flex-grow-1 ml-2 fs-16 font-weight-bold">
 				Danh sách các môi trường 
 			</span>
 			<v-btn
@@ -35,7 +35,7 @@
 			<v-list-item
 				v-for="i in 3"
 				:key="i"
-				class="mr-6 ml-6 pr-0 pl-0"
+				class="mr-6 ml-6 pr-0 pl-0 fs-13"
 			>
 
 				<v-list-item-content>
