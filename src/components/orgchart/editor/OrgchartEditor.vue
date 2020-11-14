@@ -1113,4 +1113,5 @@ export default {
 .diagram-vertical .btn-collapse-expand-hor{
     display: none;
 }
+
 </style>

@@ -42,7 +42,7 @@
 					<v-list-item-title class="fs-13">App-beta.symper.vn</v-list-item-title>
 
 					<v-list-item-subtitle class="fs-13" >
-						<span>ID : ádhashdhsjd123214</span>
+						<span>ID : hsdashdhsjd123214</span>
 						<span class="ml-16">
 							Loại môi trường development
 						</span>
