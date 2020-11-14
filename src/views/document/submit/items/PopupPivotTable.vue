@@ -13,7 +13,7 @@
                 <div v-for="(item,i) in data" :key="i">
                     <div :class="{'mt-1':i > 0}">Giá trị cho {{item.controlTitle}}</div>
                     <v-combobox
-                    dense
+                    class="sym-small-size sym-style-input"
                     hide-selected
                     hide-details
                     solo
@@ -26,7 +26,7 @@
                         Giá trị cho {{item.controlTitle}}
                     </div>
                     <v-text-field
-                        solo
+                    class="sym-small-size sym-style-input"
                         dense
                         hide-details
                         v-model="item.selected"
@@ -105,5 +105,10 @@ export default {
     }
     .s-card-text{
         padding: 12px !important;
+        font-size: 13px;
+    }
+    .sym-small-size >>> .v-input__slot{
+        box-shadow: unset !important;
+        font-size: 12px;
     }
 </style>

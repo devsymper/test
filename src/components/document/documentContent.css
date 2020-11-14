@@ -571,8 +571,8 @@ button:hover {
 }
 .ag-pivot-action{
     position: absolute;
-    top: 3px;
-    left: 0;
+    top: 0px;
+    left: 25px;
     padding: 4px 6px;
     margin: 1px;
     background: var(--symper-background-default);
@@ -582,8 +582,7 @@ button:hover {
 }
   
   .dropdown {
-    position: relative;
-    display: inline-block;
+    position: absolute;
   }
   
   .dropdown-content {
@@ -593,7 +592,7 @@ button:hover {
     min-width: 120px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
-    left: 25px;
+    left: 52px;
     z-index: 2;
     top: 4px;
   }
@@ -620,5 +619,20 @@ button:hover {
       background: var(--symper-background-default);
   }
   .input-pivot:focus{
+      outline: none;
+  }
+  .swap-table-btn{
+    border: 4px;
+    opacity: 0.6;
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      height: 24px;
+      width: 24px;
+      z-index: 200;
+      font-size: 18px;
+      background: var(--symper-background-default);
+  }
+  .swap-table-btn:focus{
       outline: none;
   }
