@@ -99,7 +99,7 @@
                         <VueResizable :width="400" :max-width="500" :min-width="300" :active ="['r']" @resize:end="resizeEnd">
 
                                 <AgDataTable
-                                    :tableHeight="'calc(100% - 100px)'"
+                                    :tableHeight="'calc(100% - 50px)'"
                                     :likeHandsonTable="true"
                                     :rowData="dataTable"
                                     :editable="false"
