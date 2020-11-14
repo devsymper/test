@@ -535,7 +535,7 @@ export default {
         this.$evtBus.$on("symper-submit-on-table-change", locate => {
             if(thisCpn._inactive == true) return;
             let tableName = locate.tableName;
-            if(this.dataPivotTable[tableName]){
+            if(this.dataPivotTable && this.dataPivotTable[tableName]){
                 let data = locate.data;
                 let tableIns = getControlInstanceFromStore(this.keyInstance, tableName);
                 this.setDataToPivotTable(tableIns,data);
@@ -1577,7 +1577,8 @@ export default {
                                 id,
                                 thisCpn.keyInstance
                             );
-                            if(this.dataPivotTable[controlName]){
+                            if(this.dataPivotTable && this.dataPivotTable[controlName]){
+                                tableControl.tableMode = 'pivot';
                                 tableControl.pivotTable = new PivotTable(
                                     tableControl,
                                     controlName,
