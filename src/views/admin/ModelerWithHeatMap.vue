@@ -1299,7 +1299,7 @@ export default {
                 if(modelData.configValue){
 					this.restoreAttrValueFromJsonConfig(modelData.configValue);
 					this.plotHeatmap()
-					this.$refs.symperBpmnHeatMap.focus();
+					// this.$refs.symperBpmnHeatMap.focus();
 
                 }
             } catch (error) {
