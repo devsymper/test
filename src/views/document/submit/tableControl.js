@@ -1,6 +1,12 @@
 import Control from "./control";
+import { util } from "@/plugins/util.js";
 import moment from "moment-timezone";
-
+window.switchTableMode = function(el){
+    let tableName = $(el).attr('table-name');
+    let thisListItem = util.getClosestVueInstanceFromDom(el,'submitDocument');
+    thisListItem.$evtBus.$emit('on-switch-pivot-table-mode',{tableName:tableName})
+    
+}
 export default class TableControl extends Control {
     constructor(idField, ele, controlProps, curParentInstance) {
         super(idField, ele, controlProps, curParentInstance);
@@ -21,7 +27,9 @@ export default class TableControl extends Control {
         this.listInsideControls = null;
         this.controlInTable = {};
         this.mapControlToIndex = {};
+        this.tableMode = 'nomal';
         this.ele.wrap('<span style="position:relative;display: block;" class="wrap-table">');
+       
 
     }
     renderInfoButtonInRow(linkControl) {
@@ -54,11 +62,12 @@ export default class TableControl extends Control {
             this.tableInstance.render();
             if(this.pivotTable){
                 this.pivotTable.render();
+                let switchTableButton = $(`<button onclick="switchTableMode(this)" table-name="`+this.name+`" class="swap-table-btn"><span class="mdi mdi-swap-horizontal"></button>`)[0];
+                this.ele.before(switchTableButton);
             }
             this.ele.detach().hide();
-
         }
-
+        // this.switchTable();
     }
     /**
      * Hàm set data cho handson table, cho trường hợp viewdetail đã có data
@@ -142,6 +151,21 @@ export default class TableControl extends Control {
                 this.defaultValue = data;
             }
 
+        }
+    }
+    switchTable(){
+        if(this.tableMode == 'nomal'){
+            this.tableInstance.show();
+            if(this.pivotTable){
+                this.pivotTable.hide();
+            }
+        }
+        else{
+            this.tableInstance.hide();
+            if(this.pivotTable){
+                this.pivotTable.show();
+            }
+            
         }
     }
 

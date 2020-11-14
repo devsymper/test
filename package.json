@@ -30,7 +30,7 @@
         "core-js": "^3.6.4",
         "dayjs": "^1.8.35",
         "debounce": "^1.2.0",
-        "firebase": "^7.13.2",
+        "firebase": "^7.24.0",
         "handsontable": "^7.4.2",
         "heatmap.js": "^2.0.5",
         "html2canvas": "^1.0.0-rc.5",
