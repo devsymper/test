@@ -1284,7 +1284,7 @@ export default {
             let currentControl = this.editorStore.currentSelectedControl;
             if(currentControl.properties.name.name.value){
                 if(!this.dataPivotTable){
-                    this.dataPivotTable = {}
+                    this.dataPivotTable = {};
                 }
                 this.dataPivotTable[currentControl.properties.name.name.value] = tablePivotConfig;
 
