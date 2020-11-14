@@ -29,8 +29,7 @@ export default class TableControl extends Control {
         this.mapControlToIndex = {};
         this.tableMode = 'nomal';
         this.ele.wrap('<span style="position:relative;display: block;" class="wrap-table">');
-        let switchTableButton = $(`<button onclick="switchTableMode(this)" table-name="`+this.name+`" class="swap-table-btn"><span class="mdi mdi-swap-horizontal"></button>`)[0];
-        this.ele.before(switchTableButton);
+       
 
     }
     renderInfoButtonInRow(linkControl) {
@@ -63,10 +62,12 @@ export default class TableControl extends Control {
             this.tableInstance.render();
             if(this.pivotTable){
                 this.pivotTable.render();
+                let switchTableButton = $(`<button onclick="switchTableMode(this)" table-name="`+this.name+`" class="swap-table-btn"><span class="mdi mdi-swap-horizontal"></button>`)[0];
+                this.ele.before(switchTableButton);
             }
             this.ele.detach().hide();
         }
-        this.switchTable()
+        this.switchTable();
 
     }
     /**
@@ -156,13 +157,17 @@ export default class TableControl extends Control {
     switchTable(){
         if(this.tableMode == 'pivot'){
             this.tableInstance.show();
-            this.pivotTable.hide();
+            if(this.pivotTable){
+                this.pivotTable.hide();
+            }
             this.tableMode = 'nomal';
         }
         else{
             this.tableMode = 'pivot';
             this.tableInstance.hide();
-            this.pivotTable.show();
+            if(this.pivotTable){
+                this.pivotTable.show();
+            }
             
         }
     }

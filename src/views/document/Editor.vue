@@ -1283,7 +1283,11 @@ export default {
             let tableId = table.attr('id');
             let currentControl = this.editorStore.currentSelectedControl;
             if(currentControl.properties.name.name.value){
+                if(!this.dataPivotTable){
+                    this.dataPivotTable = {};
+                }
                 this.dataPivotTable[currentControl.properties.name.name.value] = tablePivotConfig;
+
             }
             let thead = '';
             let tbody = '';
@@ -1479,7 +1483,7 @@ export default {
                 }
                 this.$refs.tableSetting.showDialog();
                 let currentControl = this.editorStore.currentSelectedControl;
-                if(currentControl.properties.name.name.value && this.dataPivotTable[currentControl.properties.name.name.value]){
+                if(currentControl.properties.name.name.value && this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
                     this.defaultTablePivotConfig = this.dataPivotTable[currentControl.properties.name.name.value];
                 }
                 this.$refs.tableSetting.setListRow(listData);
