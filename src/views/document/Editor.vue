@@ -1123,7 +1123,7 @@ export default {
                                 text: res.message
                             });
                     }
-                }
+                } 
                 else{
                     if(this.routeName == "editDocument"){   //edit doc
                         this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
@@ -1134,8 +1134,9 @@ export default {
                 }
                 
             } catch (error) {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
-                this.$snotify({
+                console.log('errorerror',error);
+                thisCpn.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$snotify({
                             type: "error",
                             title: "error from formulas serice, can't not save into formulas service!!!",
                             text: error
@@ -1147,6 +1148,9 @@ export default {
          */
         createDocument(dataPost){
             let thisCpn = this;
+            if(this.dataPivotTable && Object.keys(this.dataPivotTable).length > 0){
+                dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
+            }
             documentApi.saveDocument(dataPost).then(res => {
                 this.$evtBus.$emit('document-editor-save-doc-callback')
                 if (res.status == 200) {

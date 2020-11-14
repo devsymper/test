@@ -479,6 +479,7 @@ export default {
             if(thisCpn._inactive == true) return;
             let tableName = locate.tableName;
             let tableInstance = getControlInstanceFromStore(this.keyInstance,tableName);
+            tableInstance.tableMode = (tableInstance.tableMode == 'nomal') ? 'pivot' : 'nomal';
             tableInstance.switchTable();
         })
         /**
