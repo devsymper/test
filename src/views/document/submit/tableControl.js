@@ -67,8 +67,7 @@ export default class TableControl extends Control {
             }
             this.ele.detach().hide();
         }
-        this.switchTable();
-
+        // this.switchTable();
     }
     /**
      * Hàm set data cho handson table, cho trường hợp viewdetail đã có data
