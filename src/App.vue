@@ -55,7 +55,6 @@
 import Api from "./api/api.js";
 import AppSidebar from "./components/common/AppSidebar.vue";
 import Content from "./components/common/Content.vue";
-import appWorker from "@/worker";
 import GeneralNotification from "./components/common/GeneralNotification.vue";
 import { appConfigs } from "./configs.js";
 var firebase = require("firebase/app");

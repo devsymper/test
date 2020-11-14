@@ -1180,7 +1180,7 @@ export default {
          * Hàm gọi api edit document
          */
         editDocument(dataPost){
-            if(Object.keys(this.dataPivotTable).length > 0){
+            if(this.dataPivotTable && Object.keys(this.dataPivotTable).length > 0){
                 dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
             }
             let thisCpn = this;
