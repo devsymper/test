@@ -1,6 +1,7 @@
 {
     "common": {
         "id": "Id",
+        "number_instance": "Number of process instance",
         "select_lang": "Select language",
         "KH": "Knowledge Management",
         "structureManagement": "Structure management",
@@ -140,9 +141,9 @@
             "listTrashApps": "List trash application",
             "listOrgchart": "List orgchart",
             "listTrashOrgchart": "List trash orgchart",
-			"viewOrgchart": "View orgchart default",
-			"list_workflow":"List Workflow",
-			"list_work":"List Jobs",
+            "viewOrgchart": "View orgchart default",
+            "list_workflow": "List Workflow",
+            "list_work": "List Jobs",
             "environment": "Environment management"
         },
         "system": "System",
@@ -743,6 +744,7 @@
         "department": "Department"
     },
     "objectType": {
+        "time_sheet": "Timesheet",
         "Document definition": "Document definition",
         "Document instance": "Document instance",
         "Orgchart": "Orgchart",
@@ -772,6 +774,7 @@
         }
     },
     "objects": {
+        "time_sheet": "Timesheet",
         "document_instance": "Document instance",
         "user": "User",
         "document_definition": "Document definition",
@@ -1174,7 +1177,7 @@
             "alertDescription": "No description",
             "relatedTask": "RELATED TASK",
             "attachment": "ATTACHMENT FILE",
-            "status":"Status"
+            "status": "Status"
 
         },
         "filterOptions": {
