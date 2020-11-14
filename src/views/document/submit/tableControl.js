@@ -154,15 +154,13 @@ export default class TableControl extends Control {
         }
     }
     switchTable(){
-        if(this.tableMode == 'pivot'){
+        if(this.tableMode == 'nomal'){
             this.tableInstance.show();
             if(this.pivotTable){
                 this.pivotTable.hide();
             }
-            this.tableMode = 'nomal';
         }
         else{
-            this.tableMode = 'pivot';
             this.tableInstance.hide();
             if(this.pivotTable){
                 this.pivotTable.show();
