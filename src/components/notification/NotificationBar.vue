@@ -55,7 +55,7 @@
             <v-row v-if="checkToday" 
                 v-for="item in listNotification.filter(x=>changeDate(x.createTime)==today)" 
                 :key="item.id"
-                style="height:55px"
+                style="height:58px"
                 class="text-left notification-item pt-0 pb-0"
             >
                 <v-col cols="2">
@@ -90,7 +90,7 @@
                         </v-col>
                     </v-row>
                 </v-col>
-                   <v-divider style="width:95%; margin-top:-10px" class="ml-2" ></v-divider>
+                   <v-divider style="width:95%; margin-top:-8px" class="ml-2" ></v-divider>
                 <v-menu
                     :close-on-content-click="true"
                     :open-on-hover="true"
@@ -126,7 +126,7 @@
             <v-row
                 v-for="item in listNotification.filter(x=>changeDate(x.createTime)!=today)" 
                 :key="item.id"
-                style="height:55px"
+                style="height:58px"
                 class="text-left notification-item  pt-0 pb-0"
             >
                 <v-col cols="2">
@@ -169,7 +169,7 @@
                         </v-col>
                     </v-row>
                 </v-col>
-                   <v-divider style="width:95%; margin-top:-10px" class="ml-2" ></v-divider>
+                   <v-divider style="width:95%; margin-top:-8px" class="ml-2" ></v-divider>
                 <v-menu
                     :close-on-content-click="true"
                     :open-on-hover="true"
@@ -381,16 +381,17 @@ export default {
             }
         },
         getScope(action){
-            if(action){
+            let result = "";
+            try{
+                // if(action){
                 if(JSON.parse(action).module=="document"&&JSON.parse(action).scope=="workflow"){
-                     return "taskBPM"
+                     result = "taskBPM"
                 }else{
-                    return JSON.parse(action).module
+                    result =  JSON.parse(action).module
                 }
-            
-               
+            }catch (error){
             }
-            
+            return result        
         },
         changeDate(value){
             return dayjs.unix(value).format('DD/MM/YYYY')

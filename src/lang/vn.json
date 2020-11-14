@@ -1,5 +1,6 @@
 {
     "common": {
+        "number_instance": "Tổng số instance",
         "id": "Id",
         "select_lang": "Thay đổi ngôn ngữ",
         "KH": "Knowledge Management",
@@ -530,7 +531,7 @@
         "department": "Phòng ban"
     },
     "objectType": {
-
+        "time_sheet": "Lịch làm việc",
         "Document definition": "Văn bản",
         "Document instance": "Danh sách bản ghi",
         "Orgchart": "Sơ đồ tổ chức",
@@ -554,6 +555,7 @@
         "Timesheet": "Thời gian biểu"
     },
     "objects": {
+        "time_sheet": "Lịch làm việc",
         "import": "Import",
         "task": "Task",
         "role": "Role",
