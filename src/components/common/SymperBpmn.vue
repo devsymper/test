@@ -21,7 +21,6 @@ import "bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css";
 import "bpmn-js/dist/assets/bpmn-font/css/bpmn-embedded.css";
 import { util } from '../../plugins/util';
 
-
 export default {
     name: "symper-bpmn",
     props: {
@@ -232,12 +231,12 @@ export default {
             for(let ext of this.customExtension){
                 moddleExtensions[ext.name] = ext.data;
             }
-
+            
             this.bpmnModeler = new BpmnModeler({
                 container: canvas,
                 keyboard: { bindTo: document },
                 moddleExtensions: moddleExtensions,
-                additionalModules: this.customModules,
+                additionalModules: this.getCustomModules(),
             });
             this.bpmnModeler.importXML(this.diagramXML, function(err) {
                 if (err) {
@@ -248,6 +247,32 @@ export default {
             this.modeling = this.bpmnModeler.get("modeling");
             this.listenModellerEvts();
           
+        },
+        getCustomModules(){
+            let self = this;
+            class EventBusLogger {
+                constructor(eventBus) {
+                    const fire = eventBus.fire.bind(eventBus);
+                        eventBus.fire = (type, data) => {
+                        fire(type, data);
+                        if(type == 'canvas.viewbox.changing'){
+                            if(self.debounceViewportChange){
+                                clearTimeout(self.debounceViewportChange);
+                            }
+                            self.debounceViewportChange = setTimeout(() => {
+                                self.$emit('viewport-change');
+                            }, 5000);
+                        }
+                    };
+                }
+            }
+            EventBusLogger.$inject = ["eventBus"];
+            let customModules = this.customModules;
+            customModules.push( {
+                __init__: ["eventBusLogger"],
+                eventBusLogger: ["type", EventBusLogger]
+            });
+            return customModules;
         },
         saveSVG(done) {
             if (!done) {
