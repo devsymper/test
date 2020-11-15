@@ -43,6 +43,8 @@
         "moment": "^2.25.3",
         "moment-timezone": "^0.5.28",
         "monaco-editor": "^0.21.2",
+        "monaco-editor-vue": "^1.0.10",
+        "monaco-editor-webpack-plugin": "^2.0.0",
         "node-sass": "^4.14.0",
         "npm-install": "^1.4.0",
         "numeral": "^2.0.6",

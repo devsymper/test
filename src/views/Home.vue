@@ -13,7 +13,8 @@
         >
             <NotificationChangePass @cancel="cancelDialog()"/>
         </v-dialog>
-        <Dashboard></Dashboard>
+        <!-- <Dashboard></Dashboard> -->
+        <SymperMonacoEditor width="200" v-model="editorTest"/>
         <!-- <SymperActionView 
             :actionDef="{
                 module: 'document',
@@ -42,6 +43,8 @@ import EmbedDataflow from "./../components/dataflow/EmbedDataflow";
 import NotificationChangePass from "./../components/notification/notificationChangeFirstPass";
 import { userApi } from "./../../src/api/user";
 import SymperActionView from "./../action/SymperActionView";
+
+import SymperMonacoEditor from "./../components/formula/editor/SymperMonacoEditor";
 
 export default {
     name: "Home",
@@ -107,6 +110,7 @@ export default {
     },
     data() {
         return {
+            editorTest: 'abc xys',
             testData: [],
             detailInfoUser:{},
             dialog:false,
@@ -173,7 +177,8 @@ export default {
         PermissionSelector,
         Dashboard,
         EmbedDataflow,
-        SymperActionView
+        SymperActionView,
+        SymperMonacoEditor
     }
 };
 </script>

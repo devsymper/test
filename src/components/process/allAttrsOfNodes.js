@@ -1609,7 +1609,7 @@ let allAttrs = {
     },
     "multiinstance_cardinality": {
         "title": "Cardinality ",
-        "type": "numeric",
+        "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_CARDINALITYPACKAGE.MULTIINSTANCE_CARDINALITY.DESCRIPTION",
         "dg": "multiInstance",

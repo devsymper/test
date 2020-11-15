@@ -755,3 +755,7 @@ body {
 .list-sbs .symper-list-item-current-row-sbs + .current.highlight {
     background-color:#4c89fc33!important;
 }
+
+.symper-monaco-editor .editor-widget.suggest-widget{
+    max-width: 100%!important;
+} 
