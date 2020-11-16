@@ -12,7 +12,7 @@
 		:customAPIResult="customAPIResult"
 		@after-open-add-panel="handleShowPanel('add')"
 		:showActionPanelInDisplayConfig="true"
-		:actionPanelWidth="1000"
+		:actionPanelWidth="800"
 	>
 		<template slot="right-panel-content" slot-scope="{}">
 			<ActionPackPanel
