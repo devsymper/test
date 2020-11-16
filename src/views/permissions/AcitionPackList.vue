@@ -52,7 +52,7 @@ export default {
             customAPIResult: {
                 reformatData(res) {
                     if (res.status == 200) {
-                         let listBA = self.$store.state.app.allBA;
+						let listBA = self.$store.state.app.allBA;
                         res.data.forEach(function(e){
                            if(!e.userCreate){
                              e.userCreateName = ""  
@@ -182,7 +182,7 @@ export default {
         this.calcContainerHeight();
     },
     created() {
-         this.$store.dispatch("app/getAllBA");
+		this.$store.dispatch("app/getAllBA");
         this.$store.dispatch("actionPack/getAllActionByObjectType");
     },
     watch: {},

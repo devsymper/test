@@ -1,14 +1,19 @@
 <template>
 	<ListItem 
-		:pageTitle="'Danh sách vai trò người dùng'"
+		 ref="listSystemRole"
+		:useDefaultContext="false"
+		:pageTitle="$t('systemRole.list.title')"
+		:tableContextMenu="tableContextMenu"
 		:containerHeight="containerHeight"
+		:getDataUrl="getListUrl"
+		:headerPrefixKeypath="'common'"
 	/>
 
 </template>
 
 <script>
 import ListItem from "@/components/common/ListItems.vue"
-import { util } from "@/plugins/util.js";
+import { appConfigs } from "@/configs.js";
 export default {
 	components:{
 		ListItem
@@ -20,11 +25,10 @@ export default {
 	},
 	data(){
 		return{
-			containerHeight: null,
+			getListUrl: appConfigs.apiDomain.systemRole+'system-role',
 		}
 	},
 	mounted(){
-        this.containerHeight = util.getComponentSize(this).h
     },
 }
 </script>
