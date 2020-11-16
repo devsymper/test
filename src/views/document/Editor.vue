@@ -1286,12 +1286,17 @@ export default {
             let table = elements.find('thead').closest('.s-control-table');
             let tableId = table.attr('id');
             let currentControl = this.editorStore.currentSelectedControl;
-            if(currentControl.properties.name.name.value){
+            if(currentControl.properties.name.name.value && tablePivotConfig){
                 if(!this.dataPivotTable){
                     this.dataPivotTable = {};
                 }
                 this.dataPivotTable[currentControl.properties.name.name.value] = tablePivotConfig;
 
+            }
+            else{
+                if(this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
+                    delete this.dataPivotTable[currentControl.properties.name.name.value];
+                }
             }
             let thead = '';
             let tbody = '';
