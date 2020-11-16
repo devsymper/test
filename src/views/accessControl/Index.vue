@@ -11,19 +11,19 @@
 				<span class="fs-11 font-weight-light mt-1"><v-icon x-small> mdi-information-outline</v-icon> {{item.subTitle}}</span>
 			</div>
 			<div class="ml-1  mr-1 d-flex flex-column fs-13 ">
-				<div class="mt-1 pl-6 " :class="{'role-user-item': true, 'selected-item': subActive == 'userRole'}" @click="handleUserRoleCLick('userRole')">
+				<div class="mt-1 pl-6 pt-1 pb-1 " :class="{'role-user-item': true, 'selected-item': subActive == 'userRole'}" @click="handleUserRoleCLick('userRole')">
 					+ Trong hệ thống
 				</div>
-				<div class="mt-1 pl-6" :class="{'role-user-item': true, 'selected-item': subActive == 'userRoleOrgchart'}" @click="handleUserRoleCLick('userRoleOrgchart')">
+				<div class="mt-1 pl-6 pt-1 pb-1 " :class="{'role-user-item': true, 'selected-item': subActive == 'userRoleOrgchart'}" @click="handleUserRoleCLick('userRoleOrgchart')">
 					+ Trong orgchart
 				</div>
 			</div>
 		</div>
 		<div class="list-item flex-grow-1 w-100 h-100">
-			<ListActionPack v-if="active =='actionPack'" />
-			<ListPermission  v-if="active =='permission'" />
-			<ListUserRole v-if="subActive == 'userRole'" />
-			<ListUserRoleOrgchart v-if="subActive == 'userRoleOrgchart'" />
+			<ListActionPack v-if="active =='actionPack'" :containerHeight="containerHeight" />
+			<ListPermission  v-if="active =='permission'" :containerHeight="containerHeight" />
+			<ListUserRole v-if="subActive == 'userRole'"  :containerHeight="containerHeight"/>
+			<ListUserRoleOrgchart v-if="subActive == 'userRoleOrgchart'"  :containerHeight="containerHeight"/>
 		</div>
 
 	</div>
@@ -33,6 +33,7 @@
 import ListActionPack from './lists/ListActionPack'
 import ListPermission from './lists/ListPermission'
 import ListUserRole from './lists/ListUserRole'
+import { util } from "@/plugins/util.js";
 import ListUserRoleOrgchart from './lists/ListUserRoleOrgchart'
 export default {
 	components:{
@@ -41,9 +42,16 @@ export default {
 		ListUserRole,
 		ListUserRoleOrgchart
 	},
+	created(){
+		this.$store.dispatch("app/getAllBA");
+	},
+	mounted(){
+		this.containerHeight = util.getComponentSize(this).h
+	},
 	data(){
 		return {
 			active: "actionPack",
+			containerHeight: null,
 			subActive: "",
 			listType:[
 				{

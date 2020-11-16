@@ -13,7 +13,11 @@ export default {
 	components:{
 		ListItem
 	},
-	
+	props:{
+		containerHeight:{
+			type: Number,
+		}
+	},
 	data(){
 		return{
 			containerHeight: null,

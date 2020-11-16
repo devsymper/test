@@ -2,26 +2,64 @@
 	<ListItem 
 		:pageTitle="'Danh sách orgchart'"
 		:containerHeight="containerHeight"
+		:useDefaultContext="false"
+		:getDataUrl="getListUrl"
+		:customAPIResult="customAPIResult"
+		:useActionPanel="false"
+		:headerPrefixKeypath="'common'"
 	/>
 
 </template>
 
 <script>
+import Handsontable from 'handsontable';
+import { appConfigs } from "@/configs.js";
 import ListItem from "@/components/common/ListItems.vue"
-import { util } from "@/plugins/util.js";
 export default {
 	components:{
 		ListItem
 	},
-	
-	data(){
-		return{
-			containerHeight: null,
+	props:{
+		containerHeight:{
+			type: Number,
 		}
 	},
-	mounted(){
-        this.containerHeight = util.getComponentSize(this).h
-    },
+	data(){
+		return{
+			getListUrl: appConfigs.apiDomain.orgchart+'orgchart',
+			customAPIResult:{
+				reformatData(res){
+                   	return{
+                       columns:[
+                            {name: "id", title: "id", type: "numeric"},
+                            {name: "code", title: "code", type: "text"},
+                            {name: "name", title: "name", type: "text"},
+                            {name: "isDefault", title: "isDefault", type: "text",
+                                renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+                                    let span;
+                                    Handsontable.dom.empty(td);
+                                    span = document.createElement('span')
+                                    if(value == "1"){
+                                        $(span).text('Mặc định')
+                                    }else{
+                                        $(span).text('')
+                                    }
+                                    td.appendChild(span);
+                                    return td
+                                },
+                            },
+                            {name: "description", title: "description", type: "text"},
+                            {name: "createAt", title: "create_at", type: "date"},
+                            {name: "lastUpdateAt", title: "last_update_at", type: "date"}
+                       ],
+                       listObject:res.data.listObject,
+                       total: res.data.listObject.length
+                   }
+                }
+            },
+		}
+	},
+	
 }
 </script>
 
