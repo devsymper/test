@@ -10,27 +10,41 @@
 				</div>
 				<span class="fs-11 font-weight-light mt-1"><v-icon x-small> mdi-information-outline</v-icon> {{item.subTitle}}</span>
 			</div>
-			<div class="ml-1 d-flex flex-column fs-13 ">
-				<div class="mt-1 pl-6" :class="{'role-user-item': true, 'selected-item': active == 'userRole'}" @click="active = 'userRole'">
+			<div class="ml-1  mr-1 d-flex flex-column fs-13 ">
+				<div class="mt-1 pl-6 " :class="{'role-user-item': true, 'selected-item': subActive == 'userRole'}" @click="handleUserRoleCLick('userRole')">
 					+ Trong hệ thống
 				</div>
-				<div class="mt-1 pl-6" :class="{'role-user-item': true, 'selected-item': active == 'userRoleOrgchart'}" @click="active = 'userRoleOrgchart'">
+				<div class="mt-1 pl-6" :class="{'role-user-item': true, 'selected-item': subActive == 'userRoleOrgchart'}" @click="handleUserRoleCLick('userRoleOrgchart')">
 					+ Trong orgchart
 				</div>
 			</div>
 		</div>
-		<div class="list-item flex-grow-1">
-			ahuhu
+		<div class="list-item flex-grow-1 w-100 h-100">
+			<ListActionPack v-if="active =='actionPack'" />
+			<ListPermission  v-if="active =='permission'" />
+			<ListUserRole v-if="subActive == 'userRole'" />
+			<ListUserRoleOrgchart v-if="subActive == 'userRoleOrgchart'" />
 		</div>
 
 	</div>
 </template>
 
 <script>
+import ListActionPack from './lists/ListActionPack'
+import ListPermission from './lists/ListPermission'
+import ListUserRole from './lists/ListUserRole'
+import ListUserRoleOrgchart from './lists/ListUserRoleOrgchart'
 export default {
+	components:{
+		ListActionPack,
+		ListPermission,
+		ListUserRole,
+		ListUserRoleOrgchart
+	},
 	data(){
 		return {
 			active: "actionPack",
+			subActive: "",
 			listType:[
 				{
 					title: "Action pack",
@@ -53,6 +67,16 @@ export default {
 	methods:{
 		handleTab(item){
 			this.active = item.action
+			if(item.action == "userRole"){
+				this.subActive = "userRole"
+			}else{
+				this.subActive = ""
+			}
+			
+		},
+		handleUserRoleCLick(type){
+			this.subActive = type
+			this.active = "userRole"
 		}
 	}
 }
@@ -64,7 +88,7 @@ export default {
 	border-right: 1px solid lightgray;
 }
 .selected-item{
-	background-color: #f7f7f7
+	background-color: #D8D8D8
 }
 .tab-select-item, .role-user-item {
 	cursor: pointer;
