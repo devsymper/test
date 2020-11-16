@@ -1003,7 +1003,7 @@ export default {
                 }
                 allData.push(newData);
             }
-            tableControl.tableInstance.setData(allData);
+            tableControl.tableInstance.setData(allData, false);
         },
         /**
          * Hàm ẩn loader
