@@ -182,6 +182,16 @@ export default {
                 this.$emit("node-clicked", getBusinessObject(evt.element), evt);
             });
 
+            this.bpmnModeler.on("canvas.viewbox.changing", evt => {
+                if(self.debounceViewportChange){
+                    clearTimeout(self.debounceViewportChange);
+                }
+
+                self.debounceViewportChange = setTimeout(() => {
+                    self.$emit('viewport-change');
+                }, 100);
+            });
+
             this.bpmnModeler.on("element.changed", evt => {
                 let nodeId = evt.element.id;
                 let bizObj = getBusinessObject(evt.element);
@@ -249,30 +259,30 @@ export default {
           
         },
         getCustomModules(){
-            let self = this;
-            class EventBusLogger {
-                constructor(eventBus) {
-                    const fire = eventBus.fire.bind(eventBus);
-                        eventBus.fire = (type, data) => {
-                        fire(type, data);
-                        if(type == 'canvas.viewbox.changing'){
-                            if(self.debounceViewportChange){
-                                clearTimeout(self.debounceViewportChange);
-                            }
-                            self.debounceViewportChange = setTimeout(() => {
-                                self.$emit('viewport-change');
-                            }, 5000);
-                        }
-                    };
-                }
-            }
-            EventBusLogger.$inject = ["eventBus"];
-            let customModules = this.customModules;
-            customModules.push( {
-                __init__: ["eventBusLogger"],
-                eventBusLogger: ["type", EventBusLogger]
-            });
-            return customModules;
+            // let self = this;
+            // class EventBusLogger {
+            //     constructor(eventBus) {
+            //         const fire = eventBus.fire.bind(eventBus);
+            //         eventBus.fire = (type, data) => {
+            //             fire(type, data);
+            //             if(type == 'canvas.viewbox.changing'){
+            //                 if(self.debounceViewportChange){
+            //                     clearTimeout(self.debounceViewportChange);
+            //                 }
+            //                 self.debounceViewportChange = setTimeout(() => {
+            //                     self.$emit('viewport-change');
+            //                 }, 100);
+            //             }
+            //         };
+            //     }
+            // }
+            // EventBusLogger.$inject = ["eventBus"];
+            // let customModules = this.customModules;
+            // customModules.push( {
+            //     __init__: ["eventBusLogger"],
+            //     eventBusLogger: ["type", EventBusLogger]
+            // });
+            return [];
         },
         saveSVG(done) {
             if (!done) {
