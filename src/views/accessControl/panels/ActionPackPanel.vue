@@ -37,7 +37,15 @@
 				</div>
 			</div>
 			<div>
-				{{objectActive}}
+				<div v-if="objectActive == 'applicationDefinition'" class="d-flex flex-column">
+					<div class="d-flex">
+						<span> Chọn ứng dụng:</span>
+						<ListItemSelector />
+					</div>
+				</div>
+				<div v-else>
+					{{objectActive}}
+				</div>
 			</div>
 		</div>
 	
@@ -45,7 +53,11 @@
 </template>
 
 <script>
+import ListItemSelector from "./../helpers/ListItemSelector.vue"
 export default {
+	components:{
+		ListItemSelector
+	},
 	props:{
 		action:{
 			type: String,
@@ -106,7 +118,7 @@ export default {
 	min-height: unset !important;
 }
 .action-pack-panel >>> .v-input__slot{
-	background-color:#D2D2D2 !important;
+	background-color:#f7f7f7 !important;
 	box-shadow: unset !important;	
 	min-height: unset !important;
 }
