@@ -39,8 +39,6 @@ export default {
 			customAPIResult: {
                 reformatData(res) {
                     if (res.status == 200) {
-						self.containerHeight
-						debugger
                         return {
                             listObject: self.setNameForUserId(res.data),
                             columns: [

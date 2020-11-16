@@ -8,18 +8,30 @@
 		:tableContextMenu="tableContextMenu"
 		:headerPrefixKeypath="'common'"
 		:showExportButton="false"
+		:debounceRowSelectTime="200"
 		:customAPIResult="customAPIResult"
+		@after-open-add-panel="handleShowPanel('add')"
 		:showActionPanelInDisplayConfig="true"
-	/>
+		:actionPanelWidth="1000"
+	>
+		<template slot="right-panel-content" slot-scope="{}">
+			<ActionPackPanel
+				:action="actionOnPanel"
+			/>
+		</template>
+	</ListItem>
 
 </template>
 
 <script>
 import { appConfigs } from "@/configs.js";
 import ListItem from "@/components/common/ListItems.vue"
+import { permissionApi } from "@/api/permissionPack";
+import ActionPackPanel from "./../panels/ActionPackPanel"
 export default {
 	components:{
-		ListItem
+		ListItem,
+		ActionPackPanel
 	},
 	props:{
 		containerHeight:{
@@ -30,11 +42,11 @@ export default {
 		let self = this
 		return{
 			getListUrl: appConfigs.apiDomain.actionPacks,
+			actionOnPanel: "",
 			customAPIResult: {
                 reformatData(res) {
                     if (res.status == 200) {
 						let listBA = self.$store.state.app.allBA;
-						debugger
                         res.data.forEach(function(e){
                            if(!e.userCreate){
                              e.userCreateName = ""  
@@ -106,26 +118,51 @@ export default {
                     name: "View details",
                     text: "Xem chi tiết",
                     callback: (user, callback) => {
+						self.handleShowPanel('view')
                     },
                 },
                	edit: {
                     name: "Edit",
                     text: "Chỉnh sửa ",
                     callback: (user, callback) => {
+						self.handleShowPanel('edit')
                     },
                 },
                	delete: {
                     name: "Delete",
                     text: "Xóa",
-                    callback: (user, callback) => {
+                    callback: async (rows, refreshList) => {
+                        try {
+                            let res = await permissionApi.deleteActionPack(rows.id);
+                            if (res.status == 200) {
+                                self.$snotifySuccess(
+                                    "Xóa Thành công"
+                                );
+                            } else {
+                                self.$snotifyError(
+                                    res,
+                                    "Can not delete selected items"
+                                );
+                            }
+                        } catch (error) {
+                            self.$snotifyError(
+                                error,
+                                "Can not delete selected items"
+                            );
+                        }
+                        refreshList();
                     },
                 },
              
             },
 		}
 	},
-	mounted(){
-    },
+	methods:{
+		handleShowPanel(action){
+			this.$refs.listActionPack.actionPanel = true;
+			this.actionOnPanel = action
+		}
+	}
 }
 </script>
 

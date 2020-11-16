@@ -8,7 +8,7 @@
 					</v-icon>
 					<span class="ml-2">{{item.title}}</span>
 				</div>
-				<span class="fs-11 font-weight-light mt-1"><v-icon x-small> mdi-information-outline</v-icon> {{item.subTitle}}</span>
+				<span class="fs-11 font-weight-light mt-1 ml-1 "><v-icon x-small> mdi-information-outline</v-icon> <span class="ml-1">{{item.subTitle}}</span></span>
 			</div>
 			<div class="ml-1  mr-1 d-flex flex-column fs-13 ">
 				<div class="mt-1 pl-6 pt-1 pb-1 " :class="{'role-user-item': true, 'selected-item': subActive == 'userRole'}" @click="handleUserRoleCLick('userRole')">

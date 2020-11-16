@@ -364,9 +364,6 @@ export default {
         },
         handleSavedItem() {
             this.$refs.listActionPack.refreshList();
-            // if(this.actionOnItem == "create"){
-            //     this.handleAddItem();
-            // }
         },
         handleAddItem() {
             this.actionOnItem = "create";
