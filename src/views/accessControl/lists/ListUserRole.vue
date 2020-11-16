@@ -5,6 +5,7 @@
 		:pageTitle="$t('systemRole.list.title')"
 		:tableContextMenu="tableContextMenu"
 		:containerHeight="containerHeight"
+		:showExportButton="false"	
 		:getDataUrl="getListUrl"
 		:headerPrefixKeypath="'common'"
 	/>

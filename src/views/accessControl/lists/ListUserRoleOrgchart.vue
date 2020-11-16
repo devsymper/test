@@ -6,6 +6,7 @@
 		:getDataUrl="getListUrl"
 		:customAPIResult="customAPIResult"
 		:useActionPanel="false"
+		:showExportButton="false"
 		:headerPrefixKeypath="'common'"
 	/>
 

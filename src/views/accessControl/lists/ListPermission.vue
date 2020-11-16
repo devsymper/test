@@ -6,6 +6,8 @@
 		:getDataUrl="getDataUrl"
 		:headerPrefixKeypath="'permissions.header'"
 		:useDefaultContext="false"
+		:tableContextMenu="tableContextMenu"
+		:showExportButton="false"
 		:customAPIResult="customAPIResult"
 		:showActionPanelInDisplayConfig="true"
 	/>
@@ -88,6 +90,27 @@ export default {
                         this.$snotifyError(res, "Can not get permissions list");
                     }
                 }
+			},
+			tableContextMenu: {
+               	viewDetails: {
+                    name: "View details",
+                    text: "Xem chi tiết",
+                    callback: (user, callback) => {
+                    },
+                },
+               	edit: {
+                    name: "Edit",
+                    text: "Chỉnh sửa ",
+                    callback: (user, callback) => {
+                    },
+                },
+               	delete: {
+                    name: "Delete",
+                    text: "Xóa",
+                    callback: (user, callback) => {
+                    },
+                },
+             
             },
 		}
 	},

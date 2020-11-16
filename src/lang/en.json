@@ -98,7 +98,11 @@
         "not_show_sidebar": "Disable show sidebar",
         "import_excel": "Import excel",
         "isDefault": "Default orgchart",
-        "restore": "Restore",
+		"restore": "Restore",
+		"userCreateName": "User Create Name",
+		"userUpdateName": "User Update Name",
+		"createAt": "Create At",
+		"updateAt": "Update At",
         "sidebar": {
             "Setting": "Setting",
             "action_pack": "Action Pack",
