@@ -25,10 +25,12 @@ export default {
         makeRequestBody(nodeAttr) {
             this.params.responseVariableName = 'symper_'+nodeAttr.idNode+'_formula_response';
             let formula = nodeAttr.serviceTaskScriptValue.value;
-            this.params.requestBody = `{
-                "formulas": "${formula}"
-            }`;
-            this.params.requestBody = this.params.requestBody.replace(/\n/g,' ').replace(/\s+/g,' ');
+            let requestBody = {
+                formulas: formula
+            };
+
+            this.params.requestBody = JSON.stringify(requestBody);
+            this.params.requestBody = this.params.requestBody.replace(/\r\n/g,' ').replace(/\n/g,' ').replace(/\s+/g,' ');
         }
     },
     notification:{
