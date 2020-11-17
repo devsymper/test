@@ -1023,9 +1023,9 @@ export default {
                 for (let index = 0; index < mapControlToParams.length; index++) {
                     let item = mapControlToParams[index];
                     let param = item.name
-                    let controlName = item.controlName;
+                    let controlName = item.name;
                     let listInputInDocument = getListInputInDocument(this.keyInstance);
-                    if(param != null && param != "" && controlName != null && controlName !="")
+                    if(param)
                     dataParams[param] = listInputInDocument[controlName].value;
                 } 
             }
