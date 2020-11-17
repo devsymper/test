@@ -105,12 +105,10 @@ export default class PivotTable {
             pivotHeaderHeight:24,
             pivotGroupHeaderHeight:24,
             animateRows: true,
-            // getRowHeight: this.getRowHeight,
+            rowHeight:24,
             groupDefaultExpanded: -1,
             rowData: [],
             autoGroupColumnDef: { 
-                // minWidth:200,
-                // maxWidth:200,
                 cellRendererParams: {
                     suppressCount: true
                 }
@@ -122,9 +120,8 @@ export default class PivotTable {
                 resizable: true,
                 wrapText:true,
                 autoHeight:true
-
             },
-            groupMultiAutoColumn: true,
+            // groupMultiAutoColumn: true,
             sideBar: false,
             suppressAggFuncInHeader: true,
             onCellDoubleClicked: this.onCellDoubleClick,
@@ -146,16 +143,11 @@ export default class PivotTable {
                                     `+actionBtn+`
                             </div>`)[0];
         this.controlObj.ele.before(this.tableContainer);
+        if(viewType == 'print'){
+            this.controlObj.ele.parent().find('.wrap-s-control-table').remove();
+        }
         new Grid(this.tableContainer, this.gridOptions, { modules: [ClientSideRowModelModule, RowGroupingModule] });
     }
-    getRowHeight(params) {
-        if (params.node.group) {
-            return 25;
-        } else {
-            return 25;
-        }
-    }
-
     onCellDoubleClick(row){
         let column = row.colDef;
         let columnNameSelected = column.otherName;
@@ -195,9 +187,9 @@ export default class PivotTable {
                 instance: this.tableIns.instance
             });
         }
-        if(row.node.level == 0){    // trường hợp sửa ở cell group hoặc chỉ có 1 dòng được group
+        if((row.node.level == 0 && !column.otherName) || (row.node.level == 0 && this.tableIns.pivotConfig.rows.length == 1)){    // trường hợp sửa ở cell group hoặc chỉ có 1 dòng được group
             row.node.setExpanded(true)
-            let allChildRowNode = util.cloneDeep(row.node.childrenMapped);
+            let allChildRowNode = row.node.childrenMapped;
             let allGroupRow = [];
             if(columnNameSelected && pivotKeys){
                 controlName = columnNameSelected;
@@ -234,8 +226,8 @@ export default class PivotTable {
             let offset = cellEl.offset();
             let curCellValue = cellEl.text();
             curCellValue = curCellValue.replace(/\(\d\)$/g,"");
-            $('.input-pivot').val(curCellValue);
-            $('.input-pivot').css({display:'block',top:offset.top,left:offset.left,width:cellEl.outerWidth()}).focus();
+            $('.input-pivot').val(curCellValue.trim());
+            $('.input-pivot').css({display:'block',top:offset.top,left:offset.left,width:cellEl.outerWidth(),height:cellEl.outerHeight()}).focus();
         }
         
     }

@@ -546,7 +546,6 @@ button:hover {
     font-size: 12px;
 }
 .ag-theme-alpine .ag-cell-wrapper > .ag-group-value{
-    line-height: 24px;
     font-family: "Roboto", sans-serif;
 }
 .ag-theme-alpine .ag-cell-wrapper > *:not(.ag-cell-value):not(.ag-group-value) .ag-icon-tree-closed,
