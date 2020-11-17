@@ -30,7 +30,7 @@
 				<h4 class="mb-2">
 					Đối tượng
 				</h4>
-				<div v-for="(item,i) in listObject" :key="i" :class="{'pt-1  pb-1 pl-2 fs-13 mr-2 action-pack-object':true,  'action-pack-object-active': objectActive == item.value} "  @click="handleObjClick(item)">
+				<div v-for="(item,i) in listObject" :key="i" :class="{'pt-1  pb-1 pl-1 fs-13 mr-2 action-pack-object':true,  'action-pack-object-active': objectActive == item.value} "  @click="handleObjClick(item)">
 					<span class="pl-2">
 						{{item.title}}
 					</span>
