@@ -1101,6 +1101,22 @@ export default {
             }else if(nodeData.type == 'ServiceTask'){
                 this.setTaskActionableNodes(nodeData, 'serviceNotificationActionForElement',"serviceTask");
             }
+
+            this.setDefinitionRef(nodeData);
+        },
+        setDefinitionRef(nodeData){
+            let allEls = this.$refs.symperBpmn.getAllNodes();
+
+            let homeId = allEls.filter((el, idx) => {
+                if(el.$type == 'bpmn:Process'){
+                    return true;
+                }
+            })[0]['id'];
+            let signaldefinitions = this.stateAllElements[homeId].attrs.signaldefinitions;
+            let homeData = this.getNodeData(homeId, 'BPMNDiagram');
+            if(nodeData.attrs.signalref){
+                nodeData.attrs.signalref.options = signaldefinitions.getValue(signaldefinitions.value);
+            }
         },
         setItemForSelectProcessModel(){
             this.selectingNode.attrs.callactivitycalledelement.options = this.$store.state.process.allProcessModel;

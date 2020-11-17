@@ -557,6 +557,16 @@ export const nodeAttrsDefinition = {
         },
         docker: dockerGroups.subProcess
     },
+    'BoundarySignalEvent': {
+        attrs: ["executionlisteners", "signalref"],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        },
+        docker: dockerGroups.event
+    },
 };
 
 

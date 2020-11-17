@@ -1404,7 +1404,11 @@ let allAttrs = {
         "type": "autocomplete",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.SIGNALREFPACKAGE.SIGNALREF.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        "options": [],
+        "textKey": 'name',
+        "valueKey": 'id',
+        "showId": false,
     },
     "errorref": {
         "title": "Error reference",
