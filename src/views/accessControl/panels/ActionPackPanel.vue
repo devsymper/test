@@ -38,10 +38,7 @@
 			</div>
 			<div>
 				<div v-if="objectActive == 'applicationDefinition'" class="d-flex flex-column">
-					<div class="d-flex">
-						<span> Chọn ứng dụng:</span>
-						<ListItemSelector />
-					</div>
+					<applicationDefinitionForm />
 				</div>
 				<div v-else>
 					{{objectActive}}
@@ -53,10 +50,10 @@
 </template>
 
 <script>
-import ListItemSelector from "./../helpers/ListItemSelector.vue"
+import applicationDefinitionForm from "./../helpers/ApplicationDefinitionForm"
 export default {
 	components:{
-		ListItemSelector
+		applicationDefinitionForm
 	},
 	props:{
 		action:{

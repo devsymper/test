@@ -102,4 +102,8 @@ export default {
 .tab-select-item, .role-user-item {
 	cursor: pointer;
 }
+.tab-select-item:hover, .role-user-item :hover{
+	background-color: #f7f7f7;
+	border-radius: 5px;
+}
 </style>
