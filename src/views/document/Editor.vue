@@ -2072,9 +2072,9 @@ export default {
                         if(type == 'dataFlow' && k == 'dataFlowId'){
                             properties[k].value = {id:fields[controlId]['properties'][k]};
                         }
-                        else if(k == 'mapParamsDataflow'){
-                            properties[k]['datasets'] = fields[controlId]['properties']['datasets'];
-                            properties[k]['value'] = fields[controlId]['properties']['value'];
+                        else if(type == 'dataFlow' && k == 'mapParamsDataflow'){
+                            properties[k]['datasets'] = fields[controlId]['properties'][k];
+                            properties[k]['value'] = fields[controlId]['properties'][k];
                         }
                         else{
                             if(typeof fields[controlId]['properties'][k] != "object"){
