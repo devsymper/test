@@ -1,31 +1,46 @@
 <template>
-	<div>
-		<div class="d-flex">
+	<div class="w-100 h-100">
+		<div class="d-flex w-100">
 			<span> Chọn ứng dụng:</span>
-			<ListItemSelector />
+			<ListItemSelector
+				@item-selected="handleItemSelected"
+			 />
 		</div>
-		<div class="d-flex children-application">
+		<div class="d-flex w-100 mr-2 children-application">
 			<div 
 				v-for="(item,i) in childrenTypeOfApp"  
 				:key="i" 
-				class="p-2 title-children-application"
+				class="p-2 title-children-application fs-13 w-100"
 				@click="handleChildTypeClick(item.value)" 
 				:class="{'title-children-application-active': active == item.value}"
 			>
-				{{item.title}}
+				<span style="margin-left:auto;margin-right:auto">
+					{{item.title}}
+				</span>
 			</div>
+		</div>
+		<div>
+			<OrgchartSelector 
+				v-if="active == 'orgchart'" 
+				:checkboxes="checkboxes"
+				:selectedApplication="selectedApplication"
+				@permission-selected="handlePermissionSelected"
+			/>
 		</div>
 	</div>
   
 </template>
 
 <script>
+import OrgchartSelector from "./OrgchartSelector"
 import ListItemSelector from "./ListItemSelector.vue"
 
 export default {
 	data(){
 		return {
 			active: "",
+			selectedApplication: "",
+			checkboxes:[],
 			childrenTypeOfApp:[
 				{
 					title: "Chứng từ",
@@ -52,11 +67,18 @@ export default {
 		}
 	},
 	components:{
-		ListItemSelector
+		ListItemSelector,
+		OrgchartSelector
 	},
 	methods:{
 		handleChildTypeClick(value){
 			this.active = value
+		},
+		handleItemSelected(value){
+			this.selectedApplication = value
+		},
+		handlePermissionSelected(value){
+			this.checkboxes = value
 		}
 	}
 
@@ -69,6 +91,8 @@ export default {
 }
 .title-children-application{
 	cursor: pointer;
+	margin-left: auto;
+	margin-right: auto;
 }
 .title-children-application:hover{
 	background-color: #f7f7f7;

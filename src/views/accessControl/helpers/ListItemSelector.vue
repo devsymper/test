@@ -90,6 +90,7 @@ export default {
 			this.selectingApp = false
 		},
 		handleAppClick(app){
+			this.$emit('item-selected' , app)
 		}
 	},
 	mounted(){
