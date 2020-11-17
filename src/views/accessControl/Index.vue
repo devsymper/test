@@ -96,7 +96,8 @@ export default {
 	border-right: 1px solid lightgray;
 }
 .selected-item{
-	background-color: #D8D8D8
+	background-color: #D8D8D8;
+	border-radius: 5px;
 }
 .tab-select-item, .role-user-item {
 	cursor: pointer;
