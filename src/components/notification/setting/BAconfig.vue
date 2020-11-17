@@ -1,5 +1,5 @@
 <template>
-  <div class="ml-4 config-notification choose-picture">
+  <div class="ml-4 config-notification choose-picture" >
      <div v-if="type!='view'">
         <div class="mb-3">
             <h4>Cài đặt thông báo</h4>
@@ -115,7 +115,7 @@
                 </v-autocomplete>
             </v-col>
         </v-row>   
-          <v-row class="pt-0" >
+        <v-row class="pt-0" >
             <v-col class="fs-13 col-md-5">
                 Nội dung notification
             </v-col>
@@ -123,8 +123,8 @@
                 Tham số
             </v-col>
         </v-row>
-          <v-row class="col-12"  >
-              <div class="col-md-8" style="margin-left:-15px"> 
+        <v-row class="col-12" style="margin-top:-30px" >
+              <!-- <div class="col-md-8" style="margin-left:-15px"> 
                 <FormulaEditor 
                   :listKeyworks="listVariable"
                   v-model="description"
@@ -133,8 +133,8 @@
                   @change="''"
                   @input="''"
               ></FormulaEditor>
-            </div>
-           <!-- <draggable
+            </div> -->
+           <draggable
               :list="list2"
               group="des"
               @change="log"
@@ -146,7 +146,7 @@
                 style="width:250px;font-size:13px" v-model="description"
               />
             </draggable>
-             -->
+            
           <div class="col-md-4" > 
               <div 
                 class="mt-1 ml-2" 
@@ -167,6 +167,26 @@
             </div>
           </div>
         </v-row>
+           <!-- <v-row class="pt-0" >
+            <v-col class="fs-13 col-md-5">
+                Lọc điều kiện
+            </v-col>
+            <v-col class="fs-13 col-md-2 ml-15">  
+                Tham số
+            </v-col>
+        </v-row> -->
+     
+              <!-- <div class="col-md-8" style="margin-left:-15px"> 
+                <FormulaEditor 
+                  :listKeyworks="listVariable"
+                  v-model="description"
+                  :height="'150px'"
+                  :simpleMode="false"
+                  @change="''"
+                  @input="''"
+              ></FormulaEditor>
+            </div> -->
+      
         <div class="col-12">
           <v-row class="pt-0" style="margin-bottom:-25px">
               <v-col class="fs-13 col-md-5 " style="margin-top:5px">Trạng thái</v-col>
@@ -269,7 +289,6 @@ export default {
   methods: {
     // nếu là ảnh trả về false
      checkIcon(icon){
-       debugger
         let check = true;
         if(icon.indexOf('user_avatar_')>-1){
             check = false;
@@ -300,22 +319,27 @@ export default {
         this.$refs.uploadAvatar.uploadFile();
     },
     replaceDescription(){
+      debugger
       let description = this.description;
-      for(let i = 0; i<this.parameter.length;i++){
-        if(this.parameter[i].value=='{data.dueDate}'){
-          let oldValue= new RegExp('<'+this.parameter[i].text+':dueDate>');
-          let newValue = this.parameter[i].value;
+      if(description.indexOf('<Deadline>')>-1){
+           let oldValue= "<Deadline>";
+          let newValue = '<*{data.dueDate}*>';
           description= description.replace(oldValue,newValue);
-          break;
-        }else{
-          let oldValue= new RegExp('<'+this.parameter[i].text+'>');
-          let newValue = this.parameter[i].value;
-          description= description.replace(oldValue,newValue);
+          if(this.type=='add'){
+            }
+      }else{
+        if(description.indexOf('<*Deadline*>')>-1){
+         let oldValue= '<*Deadline*>';
+         let newValue = '<*{data.dueDate}*>';
+        description= description.replace(oldValue,newValue);
         }
-
-       
       }
-    debugger
+      for(let i = 0; i<this.parameter.length;i++){
+          let oldValue= new RegExp('<'+this.parameter[i].text+'>');
+          let newValue = '<'+this.parameter[i].value+'>';
+          description= description.replace(oldValue,newValue);
+      }
+       
       return description;
     },
     getDataUpdate(des){
@@ -325,22 +349,24 @@ export default {
         this.receiver=des.originDefaultUser;
         this.action=des.originEvent;
         this.actionClickNotifi=des.action;
-        debugger
         this.iconName.iconName=des.icon;
         this.description= des.content;
         this.avatarUrl = appConfigs.apiDomain.fileManagement+'readFile/'+des.icon;
         if(this.checkIcon(des.icon)){
-          debugger
               this.typePictureSelected=this.typeSelected[1]
         }else{
-          debugger
           this.typePictureSelected=this.typeSelected[0];
+          debugger
           this.avatarFileName = des.icon
         }
     },
     update(){
       if(this.avatarFileName){
-        this.$refs.uploadAvatar.uploadFile();
+        try{
+          this.$refs.uploadAvatar.uploadFile();
+        }catch(error){
+
+        }
       }
        this.updateData={
           id: this.id,
@@ -410,7 +436,6 @@ export default {
       }
     },
       pickIcon(data) {
-        debugger
         this.$set(this.iconName, 'iconName', data.icon.trim() )
         this.$set(this.iconName, 'iconType' , data.type)
 		},

@@ -108,7 +108,6 @@ export default {
                    let listBA= self.$store.state.app.allBA;
                      for(let i = 0; i<data.listObject.length; i++){
                         data.listObject[i].originState = data.listObject[i].state;
-                        debugger
                         data.listObject[i].icon = data.listObject[i].icon;
                         data.listObject[i].action = data.listObject[i].action;
                         data.listObject[i].originAction = self.getName(data.listObject[i].objectType,data.listObject[i].action);
@@ -183,9 +182,12 @@ export default {
         },
         reNameParam(nameModule,des){
              let name = des;
+             if(des.indexOf('<*Deadline>*')>-1){
+                   name = name.replace('<*Deadline>*','<*{data.dueDate}*>'); 
+             }
             for(let i = 0; i<this.listSource[nameModule].parameter.length;i++){
                 let oldValue= new RegExp(this.listSource[nameModule].parameter[i].value);
-                let newValue ="<"+this.listSource[nameModule].parameter[i].text+'>';
+                let newValue =this.listSource[nameModule].parameter[i].text;
                name = name.replace(oldValue,newValue);
               // name='123'
             }
