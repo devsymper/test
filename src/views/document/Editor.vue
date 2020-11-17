@@ -2073,7 +2073,7 @@ export default {
                             properties[k].value = {id:fields[controlId]['properties'][k]};
                         }
                         else if(type == 'dataFlow' && k == 'mapParamsDataflow'){
-                            properties[k]['datasets'] = fields[controlId]['properties'][k];
+                            properties[k]['datasets'] = fields[controlId]['properties']['datasets'];
                             properties[k]['value'] = fields[controlId]['properties'][k];
                         }
                         else{
