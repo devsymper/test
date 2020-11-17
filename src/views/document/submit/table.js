@@ -1289,7 +1289,7 @@ export default class Table {
 
     // Hàm set data cho table
     // hàm gọi sau khi chạy công thức 
-    setData(vls) {
+    setData(vls, dateFormat = true) {
         ClientSQLManager.delete(this.keyInstance, this.tableName, false);
         if (vls != false) {
             let data = vls;
@@ -1314,7 +1314,7 @@ export default class Table {
                         dataToStore[controlName] = [];
                     }
                     let controlIns = this.getControlInstance(controlName);
-                    if (controlIns.type == 'date') {
+                    if (dateFormat && controlIns.type == 'date') {
                         data[index][controlName] = moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
                     }
                     if (data[index] != undefined)

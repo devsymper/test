@@ -54,6 +54,9 @@ export default class PivotTable {
                 headerName:colItem.title,
                 rowGroup: true,
                 enableRowGroup: true,
+                cellRendererParams: {
+                    suppressCount: true, // turn off the row count
+                },
             };
             this.columnDefs.push(colPivot);
         }
@@ -100,7 +103,12 @@ export default class PivotTable {
             getRowHeight: this.getRowHeight,
             groupDefaultExpanded: -1,
             rowData: [],
-            autoGroupColumnDef: { minWidth: 250 },
+            autoGroupColumnDef: { 
+                minWidth: 250,
+                cellRendererParams: {
+                    suppressCount: true
+                }
+            },
             pivotMode: true,
             defaultColDef: {
                 editable: true,
@@ -110,6 +118,7 @@ export default class PivotTable {
                 resizable: true,
             },
             sideBar: false,
+           
             suppressAggFuncInHeader: true,
             onCellDoubleClicked: this.onCellDoubleClick,
             onCellClicked: this.onCellClick,
@@ -190,19 +199,30 @@ export default class PivotTable {
                 instance: this.tableIns.instance
             });
         }
-        if(row.node.level == 0){    // trường hợp sửa ở cell group
+        if(row.node.level == 0){    // trường hợp sửa ở cell group hoặc chỉ có 1 dòng được group
             row.node.setExpanded(true)
             let allChildRowNode = util.cloneDeep(row.node.childrenMapped);
             let allGroupRow = [];
-            for(let key in allChildRowNode){
-                let rowNode = allChildRowNode[key];
-                for(let colPivot in rowNode.childrenMapped){
-                    let childRow = rowNode.childrenMapped[colPivot][0].data;
-                    allGroupRow.push(childRow);
-                }
-                
+            if(columnNameSelected && pivotKeys){
+                controlName = columnNameSelected;
+                allGroupRow.push(allChildRowNode[pivotKeys[0]][0]['data'])
             }
-            controlName = row.node.field;
+            else {
+                controlName = row.node.field;
+                for(let key in allChildRowNode){
+                    let rowNode = allChildRowNode[key];
+                    if(this.tableIns.pivotConfig.rows.length == 1){
+                        let childRow = rowNode[0].data;
+                        allGroupRow.push(childRow);
+                    }
+                    else{
+                        for(let colPivot in rowNode.childrenMapped){
+                            let childRow = rowNode.childrenMapped[colPivot][0].data;
+                            allGroupRow.push(childRow);
+                        }
+                    }
+                }
+            }
             store.commit("document/addToDocumentSubmitStore", {
                 key: 'currentRowChangePivotMode',
                 value: {key:controlName,value:allGroupRow,tableName:this.tableIns.tableName, type:'group'},
@@ -213,7 +233,7 @@ export default class PivotTable {
         if(controlIns && controlIns.checkProps('isReadOnly')){
             return;
         }
-        if(row.node.level > 0 || (row.node.level == 0 && !column.otherName)){
+        if(row.node.level > 0 || (row.node.level == 0 && !column.otherName) || (row.node.level == 0 && this.tableIns.pivotConfig.rows.length == 1)){
             let cellEl = $(row.event.target).closest('.ag-cell');
             let offset = cellEl.offset();
             let curCellValue = cellEl.text();
