@@ -4,11 +4,12 @@
 			<div v-for="(item,i) in listType" :key="i" :class="{'tab-select-item d-flex flex-column ml-1 mr-1 pl-1 pr-1 mt-1 pt-2 pb-2': true, 'selected-item': active == item.action}" @click="handleTab(item)">
 				<div>
 					<v-icon small>
-						mdi-circle-slice-8
+						mdi-circle-outline
 					</v-icon>
 					<span class="ml-2">{{item.title}}</span>
 				</div>
-				<span class="fs-11 font-weight-light mt-1 ml-1 "><v-icon x-small> mdi-information-outline</v-icon> <span class="ml-1">{{item.subTitle}}</span></span>
+				<span class="fs-10" style="position:absolute;left:9px; top:11px">{{i+1}}</span>
+				<span class="fs-10 font-weight-light mt-1 "><v-icon x-small> mdi-information-outline</v-icon> <span class="ml-1">{{item.subTitle}}</span></span>
 			</div>
 			<div class="ml-1  mr-1 d-flex flex-column fs-13 ">
 				<div class="mt-1 pl-6 pt-1 pb-1 " :class="{'role-user-item': true, 'selected-item': subActive == 'userRole'}" @click="handleUserRoleCLick('userRole')">
@@ -101,9 +102,10 @@ export default {
 }
 .tab-select-item, .role-user-item {
 	cursor: pointer;
+	position:relative;
 }
-.tab-select-item:hover, .role-user-item :hover{
+/* .tab-select-item:hover, .role-user-item :hover{
 	background-color: #f7f7f7;
 	border-radius: 5px;
-}
+} */
 </style>
