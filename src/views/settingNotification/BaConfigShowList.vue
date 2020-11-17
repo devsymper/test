@@ -108,6 +108,7 @@ export default {
                    let listBA= self.$store.state.app.allBA;
                      for(let i = 0; i<data.listObject.length; i++){
                         data.listObject[i].originState = data.listObject[i].state;
+                        debugger
                         data.listObject[i].icon = data.listObject[i].icon;
                         data.listObject[i].action = data.listObject[i].action;
                         data.listObject[i].originAction = self.getName(data.listObject[i].objectType,data.listObject[i].action);

@@ -383,7 +383,6 @@ export default {
         getScope(action){
             let result = "";
             try{
-                // if(action){
                 if(JSON.parse(action).module=="document"&&JSON.parse(action).scope=="workflow"){
                      result = "taskBPM"
                 }else{
