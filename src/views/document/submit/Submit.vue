@@ -533,7 +533,7 @@ export default {
         /**
          * Su kiện phát ra khi có sự thay đổi trong table, để convert sang pivot table
          */
-        this.$evtBus.$on("symper-submit-on-table-change", locate => {
+        this.$evtBus.$on("document-on-table-change", locate => {
             if(thisCpn._inactive == true) return;
             let tableName = locate.tableName;
             if(this.dataPivotTable && this.dataPivotTable[tableName]){
