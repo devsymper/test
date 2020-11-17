@@ -454,7 +454,7 @@ export default class Table {
              * @param {*} source 
              */
             afterChange: function(changes, source) {
-                SYMPER_APP.$evtBus.$emit('symper-submit-on-table-change', {
+                SYMPER_APP.$evtBus.$emit('document-on-table-change', {
                     data: this.getSourceData(),
                     tableName:thisObj.tableName
                 });

@@ -6,6 +6,7 @@ import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-alpine.css';
 import store from './../../../store'
 import {getControlInstanceFromStore} from './../common/common'
+import sDocument from './../../../store/document'
 
 window.addNewDataPivotTable = function(el, event, type){
     let tableName = $(el).attr('table-name');
@@ -90,67 +91,62 @@ export default class PivotTable {
         this.setPivotColumns();
         this.gridOptions.api.setColumnDefs(this.columnDefs);
         this.gridOptions.api.setRowData(vl);
-        this.onBtStartEditing();
+        let viewType = sDocument.state.viewType[this.instance];
+        if(viewType == 'print'){
+            this.gridOptions.api.setDomLayout('print');
+            // this.tableContainer.style.width = '';
+            // this.tableContainer.style.height = '';
+        }
+        
     }
     render() {
         this.gridOptions = {
             columnDefs: this.columnDefs,
-            headerHeight:24,
-            groupHeaderHeight:24,
             pivotHeaderHeight:24,
             pivotGroupHeaderHeight:24,
             animateRows: true,
-            getRowHeight: this.getRowHeight,
+            // getRowHeight: this.getRowHeight,
             groupDefaultExpanded: -1,
             rowData: [],
             autoGroupColumnDef: { 
-                minWidth: 250,
+                // minWidth:200,
+                // maxWidth:200,
                 cellRendererParams: {
                     suppressCount: true
                 }
             },
             pivotMode: true,
             defaultColDef: {
-                editable: true,
                 flex: 1,
-                minWidth: 150,
                 sortable: true,
                 resizable: true,
+                wrapText:true,
+                autoHeight:true
+
             },
+            groupMultiAutoColumn: true,
             sideBar: false,
-           
             suppressAggFuncInHeader: true,
             onCellDoubleClicked: this.onCellDoubleClick,
             onCellClicked: this.onCellClick,
             tableIns:this
         };
+        let viewType = sDocument.state.viewType[this.instance];
+        let actionBtn = ` <div class="dropdown">
+                            <button class="ag-pivot-action"><span class="mdi mdi-plus"></span></button>
+                            <div class="dropdown-content">
+                                <a onclick="addNewDataPivotTable(this, event, 'rows')" table-name="`+this.tableName+`">Thêm dòng</a>
+                                <a onclick="addNewDataPivotTable(this, event, 'cols')" table-name="`+this.tableName+`">Thêm cột</a>
+                            </div>
+                        </div>`;
+        if(['detail','print'].includes(viewType)){
+            actionBtn = ""
+        }
         this.tableContainer = $(`<div id="ag-` + this.controlObj.id + `" style="height: 400px; width: auto;position:relative;" class="ag-theme-alpine" s-control-type="table">
-        
-        
-            <div class="dropdown">
-                <button class="ag-pivot-action"><span class="mdi mdi-plus"></span></button>
-                <div class="dropdown-content">
-                    <a onclick="addNewDataPivotTable(this, event, 'rows')" table-name="`+this.tableName+`">Thêm dòng</a>
-                    <a onclick="addNewDataPivotTable(this, event, 'cols')" table-name="`+this.tableName+`">Thêm cột</a>
-                </div>
-            </div>
-            
-        
-        </div>`)[0];
+                                    `+actionBtn+`
+                            </div>`)[0];
         this.controlObj.ele.before(this.tableContainer);
         new Grid(this.tableContainer, this.gridOptions, { modules: [ClientSideRowModelModule, RowGroupingModule] });
-    }
-    onBtStartEditing(key, char, pinned) {
-        this.gridOptions.api.setFocusedCell(0, 'tb1_sl', pinned);
-      
-        this.gridOptions.api.startEditingCell({
-          rowIndex: 0,
-          colKey: 'tb1_sl',
-          // set to 'top', 'bottom' or undefined
-          rowPinned: pinned,
-          keyPress: key,
-          charPress: char,
-        });
     }
     getRowHeight(params) {
         if (params.node.group) {
