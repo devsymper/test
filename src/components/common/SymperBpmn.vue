@@ -282,7 +282,7 @@ export default {
             //     __init__: ["eventBusLogger"],
             //     eventBusLogger: ["type", EventBusLogger]
             // });
-            return [];
+            return this.customModules;
         },
         saveSVG(done) {
             if (!done) {
