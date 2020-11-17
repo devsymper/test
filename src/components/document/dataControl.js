@@ -24,6 +24,7 @@ export const setDataForPropsControl = function(fields, instance, from) {
         let formulas = control.formulas
         let type = fields[controlId].type;
         if (type == 'dataFlow') {
+            debugger
             controlMapDatasetDataflow[fields[controlId].properties['name']] = fields[controlId].properties['datasets'];
         }
         let id = fields[controlId]['properties'].id;

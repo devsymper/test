@@ -85,6 +85,17 @@ export default {
                                     height: 100% !important;
                                     overflow: hidden !important;
                                     display: flex !important;
+                                    width: auto !important;
+                                }
+                                .ag-root-wrapper.ag-layout-print, .ag-root-wrapper.ag-layout-print .ag-root-wrapper-body, .ag-root-wrapper.ag-layout-print .ag-root, .ag-root-wrapper.ag-layout-print .ag-body-viewport, .ag-root-wrapper.ag-layout-print .ag-center-cols-container, .ag-root-wrapper.ag-layout-print .ag-center-cols-viewport, .ag-root-wrapper.ag-layout-print .ag-center-cols-clipper, .ag-root-wrapper.ag-layout-print .ag-body-horizontal-scroll-viewport, .ag-root-wrapper.ag-layout-print .ag-virtual-list-viewport{
+                                        height: unset !important;
+                                        width: auto !important;
+                                        overflow: unset !important;
+                                        display: block !important;
+
+                                }
+                                .ag-center-cols-viewport{
+                                        border-top: 1px solid #dde2eb !important;
                                 }
                                 table { page-break-inside:auto }
                                 tr    { page-break-inside:avoid; page-break-after:auto }
