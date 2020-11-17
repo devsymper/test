@@ -447,6 +447,26 @@ export default {
             xml = xml.replace(/&lt;\/symper:symper_symper_string_tag&gt;/g,'</symper:symper_symper_string_tag>');
             xml = xml.replace(/&lt;symper:symper_symper_expression_tag&gt;/g,'<symper:symper_symper_expression_tag>');
             xml = xml.replace(/&lt;\/symper:symper_symper_expression_tag&gt;/g,'</symper:symper_symper_expression_tag>');
+
+            // Thêm tag đóng cho signalEvents
+            let signalEvents = xml.match(/<bpmn:signalEventDefinition(.*?)\/>/g);
+            if(signalEvents){
+                for(let item of signalEvents){
+                    let newItem = item.slice(0, item.length - 2) + '></bpmn:signalEventDefinition>';
+                    xml = xml.replace(item, newItem);
+                }
+            }
+
+            // Thêm thuộc tính cancelActivity cho boundaryEvent
+             let boundaryEvents = xml.match(/<bpmn:boundaryEvent(.*?)>/g);
+            if(boundaryEvents){
+                for(let item of boundaryEvents){
+                    if(item.indexOf('cancelActivity="') < 0){
+                        let newItem = item.slice(0, item.length - 1) + ' cancelActivity="true" >'
+                        xml = xml.replace(item, newItem);
+                    }
+                }
+            }
             return xml;
         },
         /**
@@ -795,7 +815,7 @@ export default {
                                 attr.value
                             );
                             if(allNodesAttrs[key].needReformatValue){
-                               props[key] = reformatValueToStr(attr.value);
+                               props[key] = reformatValueToStr(props[key]);
                             }
                         } else {
                             props[key] = attr.value ? attr.value : '';
@@ -1112,8 +1132,8 @@ export default {
                     return true;
                 }
             })[0]['id'];
-            let signaldefinitions = this.stateAllElements[homeId].attrs.signaldefinitions;
             let homeData = this.getNodeData(homeId, 'BPMNDiagram');
+            let signaldefinitions = this.stateAllElements[homeId].attrs.signaldefinitions;
             if(nodeData.attrs.signalref){
                 nodeData.attrs.signalref.options = signaldefinitions.getValue(signaldefinitions.value);
             }
