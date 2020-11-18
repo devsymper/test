@@ -224,7 +224,8 @@
             "startUserId": "Người bắt đầu",
             "startTime": "Thời gian bắt đầu",
             "tenantId": "ID",
-            "suspended": "Trạng thái"
+			"suspended": "Trạng thái",
+			"number_instance":"Tổng số instance"
         }
     },
     "validate": {
