@@ -1,5 +1,5 @@
 <template>
-  <div class="ml-4 config-notification choose-picture">
+  <div class="ml-4 config-notification choose-picture" >
      <div v-if="type!='view'">
         <div class="mb-3">
             <h4>Cài đặt thông báo</h4>
@@ -115,7 +115,7 @@
                 </v-autocomplete>
             </v-col>
         </v-row>   
-          <v-row class="pt-0" style="margin-bottom:-35px">
+        <v-row class="pt-0" >
             <v-col class="fs-13 col-md-5">
                 Nội dung notification
             </v-col>
@@ -123,7 +123,17 @@
                 Tham số
             </v-col>
         </v-row>
-          <v-row class="col-12" style="margin-bottom:-35px">
+        <v-row class="col-12" style="margin-top:-30px" >
+              <!-- <div class="col-md-8" style="margin-left:-15px"> 
+                <FormulaEditor 
+                  :listKeyworks="listVariable"
+                  v-model="description"
+                  :height="'150px'"
+                  :simpleMode="false"
+                  @change="''"
+                  @input="''"
+              ></FormulaEditor>
+            </div> -->
            <draggable
               :list="list2"
               group="des"
@@ -136,10 +146,11 @@
                 style="width:250px;font-size:13px" v-model="description"
               />
             </draggable>
-          <div class="col-md-4 ml-8" > 
+            
+          <div class="col-md-4" > 
               <div 
-                class="mt-1 mt-1" 
-                style="border:1px solid grey;height: 143px; margin-left:-30px; margin-right:-49px">
+                class="mt-1 ml-2" 
+                style="height: 143px; margin-left:-30px; margin-right:-49px; ">
                 <draggable
                 style="height: 180px!important; border:1px solid white"
                   :list="parameter"
@@ -147,8 +158,8 @@
                   :clone="cloneValue"
                   @change="log"
                 >
-                  <v-chip class="list-group-item"   
-                  color="primary"
+                  <v-chip class="list-group-item mr-1"   
+                    style="background-color:#e0e0e0; font-size: 11px; border-radius: 4px; height: 20px;"
                     v-for="element in parameter" :key="element.value">
                       {{ element.text }}
                   </v-chip>
@@ -156,6 +167,26 @@
             </div>
           </div>
         </v-row>
+           <!-- <v-row class="pt-0" >
+            <v-col class="fs-13 col-md-5">
+                Lọc điều kiện
+            </v-col>
+            <v-col class="fs-13 col-md-2 ml-15">  
+                Tham số
+            </v-col>
+        </v-row> -->
+     
+              <!-- <div class="col-md-8" style="margin-left:-15px"> 
+                <FormulaEditor 
+                  :listKeyworks="listVariable"
+                  v-model="description"
+                  :height="'150px'"
+                  :simpleMode="false"
+                  @change="''"
+                  @input="''"
+              ></FormulaEditor>
+            </div> -->
+      
         <div class="col-12">
           <v-row class="pt-0" style="margin-bottom:-25px">
               <v-col class="fs-13 col-md-5 " style="margin-top:5px">Trạng thái</v-col>
@@ -178,6 +209,7 @@
 </template>
 <script>
 
+import FormulaEditor from "../../formula/editor/FormulaEditor";
 import ViewBaConfig from "./../../../components/notification/setting/viewBaConfig"
 import draggable from 'vuedraggable';
 import iconPicker from "../../../components/common/pickIcon";
@@ -189,19 +221,13 @@ import notification from "./../../../api/settingNotification";
 export default {
   props: ['type'],
    watch: {
-     type(){
-    
-     },
       objectType(){
          this.refreshSelected();
          if(this.objectType.value){
            this.getSource(this.objectType.value)
-
          }else{
            this.getSource(this.objectType)
-
          }
-         
       }
   },
   created () {
@@ -212,11 +238,14 @@ export default {
       UploadFile,
       iconPicker,
       ViewBaConfig,
-      draggable
+      draggable,
+      FormulaEditor
     },
   data() {
     return {
+      test:'',
       id:0,
+      listVariable:[],
       detailNotification:{},
       updateData:{},
       list2: [
@@ -290,13 +319,27 @@ export default {
         this.$refs.uploadAvatar.uploadFile();
     },
     replaceDescription(){
+      debugger
       let description = this.description;
-      for(let i = 0; i<this.parameter.length;i++){
-        let oldValue= new RegExp('<'+this.parameter[i].text+'>');
-        let newValue = this.parameter[i].value;
+      if(description.indexOf('<Deadline>')>-1){
+           let oldValue= "<Deadline>";
+          let newValue = '<*{data.dueDate}*>';
+          description= description.replace(oldValue,newValue);
+          if(this.type=='add'){
+            }
+      }else{
+        if(description.indexOf('<*Deadline*>')>-1){
+         let oldValue= '<*Deadline*>';
+         let newValue = '<*{data.dueDate}*>';
         description= description.replace(oldValue,newValue);
+        }
       }
-     // description = this.description;
+      for(let i = 0; i<this.parameter.length;i++){
+          let oldValue= new RegExp('<'+this.parameter[i].text+'>');
+          let newValue = '<'+this.parameter[i].value+'>';
+          description= description.replace(oldValue,newValue);
+      }
+       
       return description;
     },
     getDataUpdate(des){
@@ -312,14 +355,19 @@ export default {
         if(this.checkIcon(des.icon)){
               this.typePictureSelected=this.typeSelected[1]
         }else{
-          this.typePictureSelected=this.typeSelected[0]
+          this.typePictureSelected=this.typeSelected[0];
+          debugger
+          this.avatarFileName = des.icon
         }
     },
     update(){
       if(this.avatarFileName){
-        this.$refs.uploadAvatar.uploadFile();
+        try{
+          this.$refs.uploadAvatar.uploadFile();
+        }catch(error){
+
+        }
       }
-      
        this.updateData={
           id: this.id,
           event: this.action.value,
@@ -328,9 +376,8 @@ export default {
           objectType:this.objectType.value,
           receiver:this.receiver.value,
           action:this.actionClickNotifi,
-          icon:this.iconName.iconName?"mdi "+this.iconName.iconName:this.avatarFileName,
+          icon:this.typeSelected[1]==this.typePictureSelected?"mdi "+this.iconName.iconName:this.avatarFileName,
           content:this.replaceDescription()
-
         }
       const self = this;
       notification.updateChanel(this.updateData.id, this.updateData).then(res=>{
@@ -360,7 +407,7 @@ export default {
             objectType:this.objectType,
             receiver:this.receiver.value,
             action:this.actionClickNotifi,
-            icon:this.iconName.iconName?"mdi "+this.iconName.iconName:this.avatarFileName,
+            icon:this.typeSelected[1]==this.typePictureSelected?"mdi "+this.iconName.iconName:this.avatarFileName,
             content:this.replaceDescription()
         };
        const self = this;
@@ -446,11 +493,14 @@ export default {
             this.parameter.push({
               text:this.allListObj[nameModule].parameter[i].text,
               value: this.allListObj[nameModule].parameter[i].value
+              });
+              this.listVariable.push({
+                caption: this.allListObj[nameModule].parameter[i].text,
+                value: this.allListObj[nameModule].parameter[i].value,
+                meta: "variable",
+                docHTML:"123",
               })
         }
-
-          
-     
     },
      log: function(evt) {
        this.description+=evt.added.element.name;
