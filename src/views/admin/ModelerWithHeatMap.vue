@@ -5,6 +5,7 @@
 		</v-btn>
 		<symper-bpmn
 			ref="symperBpmnHeatMap"
+			@viewport-change="plotHeatmap"
 			:height="diagramHeight"
 			:width="600"
 			:diagramXML="diagramXML"
@@ -96,15 +97,13 @@ export default {
 		handleFocus(){
             this.$refs.symperBpmnHeatMap.focus();
 		},
-		
 
 		/**
-		 * Ve heatmap 
+		 * Ve  heatmap 
 		 */
 
 		plotHeatmap() {
 			let allNodes = this.$refs.symperBpmnHeatMap.getAllNodes()
-			console.log(allNodes, 'dasdasd all nodes ')
 			let sumProcess = this.$store.state.admin.sumProcess
 			let currentTrackingProcess = this.$store.state.admin.currentTrackingProcess
 			if(currentTrackingProcess){
@@ -115,7 +114,6 @@ export default {
 				var heatmapInstance = h337.create({
 					container: document.querySelector('.symper-bpm-canvas-heat-map')
 				});
-			
 				var points = [];
 				var max = 0;
 				var width = 600;
