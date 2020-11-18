@@ -13,8 +13,8 @@
         >
             <NotificationChangePass @cancel="cancelDialog()"/>
         </v-dialog>
-        <!-- <Dashboard></Dashboard> -->
-        <SymperMonacoEditor width="500" v-model="editorTest"/>
+        <Dashboard></Dashboard>
+        <!-- <SymperMonacoEditor width="500" v-model="editorTest"/> -->
         <!-- <SymperActionView 
             :actionDef="{
                 module: 'document',

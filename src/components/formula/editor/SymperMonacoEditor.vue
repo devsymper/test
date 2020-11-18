@@ -3,8 +3,9 @@
         class="symper-monaco-editor"  
         ref="monacoWrapper" 
         :style="{
-            width: lazyWidth,
-            height: lazyHeight,
+            display: 'block',
+            width: lazyWidth + '!important',
+            height: lazyHeight + '!important',
         }">
         
     </div>
