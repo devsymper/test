@@ -38,11 +38,14 @@
                     @click="openDateTimePicker($event,inputInfo)"
                     v-if="inputInfo.isDateTime"
                 ></i>
-                <i
+                  <i
                     :class="{'mdi mdi-dock-window float-right input-item-func ml-1': true,'active': inputInfo.title == largeFormulaEditor.name, 'd-none':(inputInfo.activeTab && inputInfo.activeTab=='orgchart' )}"
                     @click="openLargeValueEditor(inputInfo, name)"
                     v-if="(!inputInfo.isConfigAutocomplete && inputInfo.type == 'script') || inputInfo.type == 'userAssignment'"
                 ></i>
+                <!-- @abc(inputInfo) -->
+                <configTime  @value="changeValue" :cronTabValue="inputInfo.value" v-if="(inputInfo.title=='Time cycle (cron)')">
+                </configTime>
                 <i
                     :class="{'mdi mdi-function float-right input-item-func': true, 'active':inputInfo.activeTab == 'script'}"
                     @click="changeAssignmentType(inputInfo, name, 'script')"
@@ -106,6 +109,7 @@
                     handleChangeInputValue(inputInfo, name,data);
                 }"
                  v-if="inputInfo.isConfigCustom && inputInfo.isConfigAutocomplete"/>
+                 
              </transition>
             <div class="error-message" v-if="inputInfo.validateStatus && !inputInfo.validateStatus.isValid">
                 {{inputInfo.validateStatus.message}}
@@ -154,10 +158,7 @@
                 ></formula-editor>
             </template>
         </symper-drag-panel>
-
         <datetime-picker ref="dateTimePicker" @apply-datetime="appendValueToSciptEditor" :position="currentPointer"></datetime-picker>
-
-
     </div>
 </template>
 <script>
@@ -170,6 +171,7 @@ import {
     VTextarea
 } from "vuetify/lib";
 import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl.vue";
+import ConfigTime from "./../common/ConfigTime.vue";;
 import LinkConfig from "./../../views/document/sideright/items/LinkConfig.vue";
 import FormAutoComplete from "./../../views/document/sideright/items/FormAutoComplete";
 import FormulaEditor from "./../formula/editor/FormulaEditor";
@@ -360,7 +362,16 @@ const inputTypeConfigs = {
                 docId: config.docId
             }
         }
+    },
+    configTime:{
+        tag: "configTime",
+        props(config) {
+            return {
+                label: config.title,
+            };
+        }
     }
+
 };
 export default {
     name:"formTpl",
@@ -397,6 +408,14 @@ export default {
         };
     },
     methods: {
+        changeValue(value){
+            let crobTab = '';
+            for(let i = 0; i<value.length;i++){
+                crobTab += value[i]+" ";
+            };
+            // let tes1= crobTab;
+             this.allInputs['timercycledefinition'].value=crobTab;
+        },
         /**
          * hoangnd:
          * Hàm chuyển giữa 2 kiểu config của autocomplete tự động
@@ -661,6 +680,7 @@ export default {
         VRadio,
         VSwitch,
         VTextarea,
+        "configTime":ConfigTime,
         "v-tree-validate": TreeValidate,
         "s-link-config": LinkConfig,
         "v-autocomplete-auto": FormAutoComplete,
@@ -675,7 +695,8 @@ export default {
         SymperListAutocomplete,
         "datetime-picker" : DateTimePicker,
         SymperColorPicker: SymperColorPicker,
-        "default-control-document":SymperDefaultControlDocument
+        "default-control-document":SymperDefaultControlDocument,
+
 
     }
 };

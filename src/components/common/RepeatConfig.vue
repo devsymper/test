@@ -49,7 +49,7 @@
                 :style="{
                     'display': (isShowPreviewTime) ? 'block' : 'none'
                 }">
-                    <v-card>
+                    <v-card style="top:250px!important;  background-color: white!important;z-index:100">
                         <h4 style="padding: 6px 12px;">Chọn ngày giờ</h4>
                         <v-divider></v-divider>
                         <v-date-picker
@@ -62,8 +62,33 @@
                     </v-card>
                 </div>
             </div>
-            
-            
+            <!-- minutes -->
+            <div  v-if="selectedType.type=='secondly'" class="mt-4">
+               
+                <v-checkbox 
+                    dense
+                    v-for="second in minutes" 
+                    :key="second.name"  class="ml-4"
+                    v-model="second.value"
+                    style="float:left; margin-top:-15px; margin-left:-10px" 
+                    :label="second.name"
+                    color="success darken-3">
+                 <template >
+                 </template>
+                </v-checkbox>
+            </div>
+            <!-- minutes -->
+              <div  v-if="selectedType.type=='hourly'" class="mt-4">
+                <v-checkbox class="ml-4" 
+                    style="float:left; margin-top:-15px; margin-left:-10px" 
+                    :key="hour.name" 
+                    v-for="hour in hour"
+                     v-model="hour.value"
+                    :label="hour.name"
+                color="success darken-3">
+                </v-checkbox>
+               
+            </div>
         </div>
         <div class="sym-repeat-body">
             <div v-if="selectedType.type=='daily' && !checkNoLoop" class="sym-repeat-daily">
@@ -369,8 +394,14 @@
     </div>
 </template>
 <script>
+import dayjs from 'dayjs';
+
 export default {
     props:{
+        cronTab:{
+            type:String,
+            default:'0 * * ? * * *'
+        },
         position:{
             type:Object,
             default(){
@@ -386,6 +417,8 @@ export default {
         }
     },
     created() {
+        this.generateMinutes();
+        this.generateHour();
         let thisCpn = this;
         this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
             if (
@@ -400,9 +433,14 @@ export default {
     },
     data(){
         return {
+            minutes:[],
+            crobTabValue:[0,'*','*','?','*','*','*'],
+            hour:[],
             date: new Date().toISOString().substr(0, 10),
             selectedType: {name:'Theo ngày',type:'daily',times:1},
             listType:[
+                {name:'Theo phút',type:'secondly',times:1},
+                {name:'Theo giờ',type:'hourly',times:1},
                 {name:'Theo ngày',type:'daily',times:1},
                 {name:'Theo tuần',type:'weekly',times:1},
                 {name:'Theo tháng',type:'monthly',times:1},
@@ -494,19 +532,60 @@ export default {
             ],
             isShowPreviewTime : false,
             arrayEvents:null,
-            
         }
     },
     watch:{
+        cronTab(){
+            this.cronTabValue= this.cronTab.split(' ')
+        },
+        selectedType:{
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                if(newValue.type=='daily'){
+                    debugger
+                    let day = dayjs().format('d');
+                    this.crobTabValue[5]=day+'/'+newValue.times;
+                    this.$emit('value',this.crobTabValue)
+                }
+            }
+        },
+        hour:{
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                let value = '';
+                for(let i = 0; i<newValue.length;i++){
+                    if(newValue[i].value){
+                        value+=Number(newValue[i].name)+",";
+                    }
+                }
+                this.crobTabValue[2]=value!=''?(value.substring(0, value.length - 1)):'*';
+                this.$emit('value',this.crobTabValue)
+            }
+        },
+        minutes:{
+            deep: true,
+            immediate: true,
+             handler(newValue){
+                let value = '';
+                for(let i = 0; i<newValue.length;i++){
+                    if(newValue[i].value){
+                        value+=Number(newValue[i].name)+",";
+                    }
+                }
+                this.crobTabValue[1]=value!=''?(value.substring(0, value.length - 1)):'*';
+                this.$emit('value',this.crobTabValue)
+            }
+        },
         onDayOfMonth(){
             this.onFastDayOfMonth = !this.onDayOfMonth
         },
         onFastDayOfMonth(){
             this.onDayOfMonth = !this.onFastDayOfMonth
-        }
+        },
     },
     beforeMount(){
-       
     },
     mounted(){
         this.arrayEvents = [...Array(6)].map(() => {
@@ -514,11 +593,46 @@ export default {
         const d = new Date()
         d.setDate(day)
         return d.toISOString().substr(0, 10)
-        
-        
       })
     },
     methods:{
+        generateMinutes(){
+            for(let i = 0; i<60; i++){
+                if(i<10){
+                    this.minutes.push({
+                    name:'0'+i,
+                    value:false
+                });
+                }else{
+                    this.minutes.push({
+                    name:i,
+                    value:false
+                });
+                }
+            }
+        },
+        generateHour(){
+             for(let i = 0; i<25; i++){
+                 if(i<10){
+                    //   if(i==0){
+                    //      this.hour.push({
+                    //     name:'00',
+                    //     value:false
+                    // })}
+                     this.hour.push({
+                    name:'0'+i,
+                    value:false
+                    });
+                 }else{
+                     this.hour.push({
+                    name:i,
+                    value:false
+                });
+                 }
+                
+              
+            }
+        },
         previewRepeatTime(){
             this.arrayEvents = []
             this.isShowPreviewTime = !this.isShowPreviewTime
@@ -1049,6 +1163,7 @@ export default {
         position: absolute;
         right: 30px;
         bottom: 0;
+      
     }
     
 </style>

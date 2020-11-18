@@ -67,7 +67,7 @@
 				</v-expansion-panel>
 				
 				<v-expansion-panel>
-					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.worflowInfo')}}</v-expansion-panel-header>
+					<v-expansion-panel-header class="v-expand-header">{{$t('document.detail.sidebar.body.worflowInfo')}}123123</v-expansion-panel-header>
 					<v-expansion-panel-content class="sym-v-expand-content border-top-1" style="height:200px">
 						<v-row class="ma-0" style="height:200px">
 							<trackingProcessInstance
