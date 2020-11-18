@@ -710,7 +710,7 @@ const controlTypes = {
                     </div>
                 </div>&nbsp;`,
         title: "Data Flow",
-        inProps: ['mapParamsDataflow', 'name', 'title', 'dataFlowId', 'width', 'height', 'isAllowPrint'],
+        inProps: ['mapParamsDataflow', 'name', 'title', 'dataFlowId', 'width', 'height'],
         formulas: []
     },
     approvalHistory: {
@@ -840,7 +840,6 @@ export const mappingOldVersionControlProps = {
     "AllowReadOnly": "isReadOnly",
     "MultipleValue": "isMultipleValue",
     "mobileProps": "mobileProps",
-    "AllowPrint": "isAllowPrint",
     "BorderSubmit": "isBorderSubmit",
     "BorderView": "isBorderView",
     "BorderPrint": "isBorderPrint",

@@ -454,7 +454,7 @@ export default class Table {
              * @param {*} source 
              */
             afterChange: function(changes, source) {
-                SYMPER_APP.$evtBus.$emit('symper-submit-on-table-change', {
+                SYMPER_APP.$evtBus.$emit('document-on-table-change', {
                     data: this.getSourceData(),
                     tableName:thisObj.tableName
                 });
@@ -1087,7 +1087,6 @@ export default class Table {
             afterRender: function(isForced) {
 
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
-                console.log('tbHeighttbHeight', tbHeight);
                 if (tbHeight < MAX_TABLE_HEIGHT) {
                     $(this.rootElement).css('height', 'auto');
                 } else {
@@ -1290,7 +1289,7 @@ export default class Table {
 
     // Hàm set data cho table
     // hàm gọi sau khi chạy công thức 
-    setData(vls) {
+    setData(vls, dateFormat = true) {
         ClientSQLManager.delete(this.keyInstance, this.tableName, false);
         if (vls != false) {
             let data = vls;
@@ -1315,7 +1314,7 @@ export default class Table {
                         dataToStore[controlName] = [];
                     }
                     let controlIns = this.getControlInstance(controlName);
-                    if (controlIns.type == 'date') {
+                    if (dateFormat && controlIns.type == 'date') {
                         data[index][controlName] = moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
                     }
                     if (data[index] != undefined)
@@ -1677,5 +1676,13 @@ export default class Table {
         }
         this.tableInstance.updateSettings(setting);
         this.tableInstance.scrollViewportTo(0, colIndex)
+    }
+    show(){
+        this.tableContainer[0].style.maxHeight = 'unset';
+        this.tableContainer[0].style.opacity = '1';
+    }
+    hide(){
+        this.tableContainer[0].style.opacity = '0';
+        this.tableContainer[0].style.maxHeight = '0';
     }
 }
