@@ -3,7 +3,7 @@
 		<h3 class="text-uppercase">
 			<span >{{action}}</span> action pack
 		</h3>
-		<div v-if="action == 'add'" class="d-flex flex-column">
+		<div v-if="action == 'add'" class="d-flex flex-column action-pack-panel-object">
 			<span class="fs-13 mb-2 mt-1">
 				Tạo mới action pack
 			</span>
@@ -25,23 +25,20 @@
 		<div v-else>
 			sửa nè ahihi
 		</div>
-		<div class="d-flex mt-2">
+		<div class="d-flex mt-2" >
 			<div class="d-flex flex-column" style="width:170px">
 				<h4 class="mb-2">
 					Đối tượng
 				</h4>
-				<div v-for="(item,i) in listObject" :key="i" :class="{'pt-1  pb-1 pl-2 fs-13 mr-2 action-pack-object':true,  'action-pack-object-active': objectActive == item.value} "  @click="handleObjClick(item)">
+				<div v-for="(item,i) in listObject" :key="i" :class="{'pt-1  pb-1 pl-1 fs-13 mr-2 action-pack-object':true,  'action-pack-object-active': objectActive == item.value} "  @click="handleObjClick(item)">
 					<span class="pl-2">
 						{{item.title}}
 					</span>
 				</div>
 			</div>
-			<div>
+			<div style="width: 670px">
 				<div v-if="objectActive == 'applicationDefinition'" class="d-flex flex-column">
-					<div class="d-flex">
-						<span> Chọn ứng dụng:</span>
-						<ListItemSelector />
-					</div>
+					<applicationDefinitionForm />
 				</div>
 				<div v-else>
 					{{objectActive}}
@@ -53,10 +50,10 @@
 </template>
 
 <script>
-import ListItemSelector from "./../helpers/ListItemSelector.vue"
+import applicationDefinitionForm from "./../helpers/ApplicationDefinitionForm"
 export default {
 	components:{
-		ListItemSelector
+		applicationDefinitionForm
 	},
 	props:{
 		action:{
@@ -117,7 +114,7 @@ export default {
 .action-pack-panel >>> .v-input__controv-text-field__slotzl{
 	min-height: unset !important;
 }
-.action-pack-panel >>> .v-input__slot{
+.action-pack-panel >>> .action-pack-panel-object .v-input__slot{
 	background-color:#f7f7f7 !important;
 	box-shadow: unset !important;	
 	min-height: unset !important;
