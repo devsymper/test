@@ -57,4 +57,12 @@ export const adminApi = {
 	getTimerJobDetail(id){
 		return bpmneApi.get(appConfigs.apiDomain.bpmne.timerJob+'/'+id, {},testHeader )
 	},
+	getStartUserName(ids){
+		return workflowExtendApi.post('variables/query', {
+			names: 'symper_user_id_start_workflow',
+			processInstanceIds: ids,
+			page:1,
+			pageSize:1000
+		})
+	}
 }
