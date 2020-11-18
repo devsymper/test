@@ -1,13 +1,15 @@
 <template>
-    <div 
-        class="symper-monaco-editor"  
-        ref="monacoWrapper" 
+    <div
         :style="{
-            display: 'block',
+            display: 'block!important',
             width: lazyWidth + '!important',
             height: lazyHeight + '!important',
         }">
-        
+        <div 
+            class="symper-monaco-editor h-100 w-100"  
+            ref="monacoWrapper">
+            
+        </div>
     </div>
 </template>
 
@@ -35,7 +37,9 @@ export default {
                 self.selfChange = true;
                 self.$emit('input', vl);
                 self.$emit('change', vl);
-                
+                if(this.completionDiv){
+                    this.completionDiv.css('visibility', 'hidden');
+                }
                 if(self.debouceChangeCompletionPosition){
                     clearTimeout(self.debouceChangeCompletionPosition);
                 }
@@ -50,12 +54,14 @@ export default {
         },
         changeCompletionPosition(){
             this.completionDiv = $($(this.$el).find('.editor-widget.suggest-widget')[0]);
-            let cWidth = this.completionDiv.width();
-            let leftOffset = Number(this.completionDiv.css('left').replace('px', ''));
-            let wraperWidth = $(this.$el).width();
-            debugger
-            if(leftOffset + cWidth > wraperWidth){
-                this.completionDiv.css('left', (leftOffset - (leftOffset + cWidth - wraperWidth)) + 'px');
+            if(this.completionDiv[0]){
+                this.completionDiv.css('visibility', 'visible');
+                let cWidth = this.completionDiv.width();
+                let leftOffset = Number(this.completionDiv.css('left').replace('px', ''));
+                let wraperWidth = $(this.$el).width();
+                if(leftOffset + cWidth > wraperWidth){
+                    this.completionDiv.css('left', (leftOffset - (leftOffset + cWidth - wraperWidth)) + 'px');
+                }
             }
         },
         checkLoadItems(){
@@ -186,7 +192,17 @@ export default {
                 this.model.setValue(vl);
             }
             this.selfChange = false;
-        }
+        },
+        height(){
+            setTimeout((self) => {
+                self.editor.layout();
+            }, 300, this);
+        },
+        width(){
+            setTimeout((self) => {
+                self.editor.layout();
+            }, 300, this);
+        },
     },
     created(){
         this.$store.dispatch('document/setListDocuments');
