@@ -1738,7 +1738,7 @@ export default {
                             for (let index = 0; index < allConfig.length; index++) {
                                 let config = allConfig[index];
                                 if(config.instance){
-                                    let inputControl = config.instance.inputControl;
+                                  let putControl = config.instance.inputControl;
                                     for (let controlEffect in inputControl) {
                                         if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
                                             mapControlEffected[formulasType][controlEffect] = {};
@@ -1751,7 +1751,6 @@ export default {
                         else{
                             if(formulas[formulasType].hasOwnProperty('instance')){
                                 let inputControl = formulas[formulasType].instance.inputControl;
-                                // debugger
                                 let inputLocalFormulas = formulas[formulasType].instance.inputForLocalFormulas;
                                 let inputFromDatasets = formulas[formulasType].instance.inputFromDatasets;
                                 for (let controlEffect in inputControl) {

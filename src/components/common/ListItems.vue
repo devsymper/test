@@ -332,13 +332,14 @@ window.tableDropdownClickHandle = function(el, event) {
 export default {
     name: "SymperListItem",
     watch: {
-        actionPanel() {
+        actionPanel(){
             if (this.actionPanel == true) {
                 this.$emit("open-panel");
             }
         },
         getDataUrl(){   
-           this.refreshList();
+			this.page = 1
+        	this.refreshList();
         },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
             if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
@@ -545,7 +546,6 @@ export default {
                 thisCpn.closeactionPanel();
             }
         });
-       
     },
     props: {
 		showToolbar:{
@@ -743,9 +743,17 @@ export default {
         showPagination:{
             type: Boolean,
             default:true
+        },
+        autoRefreshTopic:{
+            type: String,
+            default: ''
         }
     },
     mounted() {
+        this.checkMessageAndRefreshData();
+        setTimeout(() => {
+            this.registerAutoRefresh();        
+        }, 3000);
     },
     computed: {
         alwaysShowActionPanel(){
@@ -836,6 +844,29 @@ export default {
         }
     },
     methods: {
+        registerAutoRefresh(){
+            let topic = this.autoRefreshTopic.trim();
+            if(topic){
+                this.$store.dispatch('app/subscribeSystemMessagingTopics', [topic]);
+            }
+        },
+        checkMessageAndRefreshData(msg){
+            let self = this;
+            this.$evtBus.$on("app-receive-remote-msg", payload => {
+                console.log(payload);
+                payload = payload.data;
+                if(!self._inactive && self.autoRefreshTopic){
+                    let info = {};
+                    try {
+                        info = JSON.parse(payload.body);
+                    } catch (error) {}
+                    if(info.type == self.autoRefreshTopic && (payload.title == 'create' || payload.title == 'delete')){
+                        self.refreshList();
+                    }
+                }
+                
+            });
+        },
         changeAlwayShowSBSState(){
             this.tableDisplayConfig.value.alwaysShowSidebar = !this.tableDisplayConfig.value.alwaysShowSidebar;
         },
@@ -1056,6 +1087,7 @@ export default {
                 clearTimeout(this.debounceGetData);
             }
             this.debounceGetData = setTimeout((self) => {
+				self.page = 1
                 self.getData();
             }, 300, this);
         },
@@ -1168,6 +1200,7 @@ export default {
          * Thực hiện filter khi người dùng click vào nút apply của filter
          */
         applyFilter(filter, source = "filter") {
+			this.page = 1
             let colName = this.tableFilter.currentColumn.name;
             this.$set(this.tableFilter.allColumn, colName, filter);
             let hasFilter = this.checkColumnHasFilter(colName, filter);

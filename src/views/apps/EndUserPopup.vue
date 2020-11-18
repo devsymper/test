@@ -482,7 +482,7 @@ export default {
 .end-user-popup {
 	font: 13px Roboto;
 	overflow: hidden;
-	width:500px;
+	width:600px;
 }
 .end-user-popup >>> .tittle{
 	font: 15px Roboto;
@@ -490,12 +490,15 @@ export default {
 	font-weight:400
 
 }
+.end-user-popup >>> .list-favorite{
+	overflow-x: hidden;
+}
 .end-user-popup >>> .list-favorite ul{
 	list-style: none;
 }
 .end-user-popup >>> .list-favorite .title-item-favorite{
 	white-space: nowrap; 
-	width: 410px; 
+	width: 500px; 
 	overflow: hidden;
 	text-overflow: ellipsis; 
 	
@@ -531,7 +534,7 @@ export default {
 .end-user-popup >>> .list-app-cointaner{
 	display: flex;
     flex-wrap: wrap;
-	width: 460px;
+	width: 560px;
 	margin-right:auto;
 	margin-left: 30px;
 }

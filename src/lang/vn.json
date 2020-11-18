@@ -1,5 +1,6 @@
 {
     "common": {
+        "number_instance": "Tổng số instance",
         "id": "Id",
         "select_lang": "Thay đổi ngôn ngữ",
         "KH": "Knowledge Management",
@@ -17,7 +18,8 @@
         "import_excel_history": "Lịch sử Import",
         "edit": "Sửa",
         "cancel": "Hủy",
-        "update": "Cập nhật",
+		"update": "Cập nhật",
+		"create":"Thêm mới",
         "delete": "Xóa",
         "refresh": "Làm mới",
         "userDeletedName": "Email người xóa",
@@ -97,7 +99,11 @@
         "not_always_show_sidebar": "Ẩn sidebar",
         "import_excel": "Nhập bằng excel",
         "isDefault": "SĐTC mặc định",
-        "restore": "Khôi phục",
+		"restore": "Khôi phục",
+		"userCreateName": "Người tạo",
+		"userUpdateName": "Người cập nhật",
+		"createAt": "Thời gian tạo",
+		"updateAt": "Thời gian cập nhật",
         "sidebar": {
             "Notification Config BA": "Cài đặt thông báo",
             "Setting": "Cài đặt",
@@ -117,6 +123,7 @@
             "Administrator": "Quản trị viên",
             "Account management": "Quản lý tài khoản",
             "Access Management": "Quản lý truy cập",
+            "accessControl": "Quản lý truy cập",
             "users": "Tài khoản người dùng",
             "baAccount": "Tài khoản BA",
             "actionPack": "Action Pack",
@@ -143,9 +150,10 @@
             "listTrashOrgchart": "Danh sách SĐTC đã xóa",
             "viewOrgchart": "Xem SĐTC mặc định",
             "list_workflow": "Danh sách quy trình",
-            "list_work": "Danh sách công việc"
+            "list_work": "Danh sách công việc",
+            "environment": "Quản lí môi trường"
         },
-        "system": "Hệ thống",
+        "system": "Vai trò người dùng",
         "copy": "Sao chép"
     },
     "login": {
@@ -529,7 +537,7 @@
         "department": "Phòng ban"
     },
     "objectType": {
-
+        "time_sheet": "Lịch làm việc",
         "Document definition": "Văn bản",
         "Document instance": "Danh sách bản ghi",
         "Orgchart": "Sơ đồ tổ chức",
@@ -553,6 +561,7 @@
         "Timesheet": "Thời gian biểu"
     },
     "objects": {
+        "time_sheet": "Lịch làm việc",
         "import": "Import",
         "task": "Task",
         "role": "Role",

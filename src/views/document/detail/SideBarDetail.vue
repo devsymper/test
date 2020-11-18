@@ -65,7 +65,7 @@
 								<span>{{$t('document.detail.sidebar.body.userRelated.subTitle1')}}</span>
 							</p>
 							<div v-for="user in listApprovalUser" :key="user.id" class="user-info">
-								<img :src="'https://file.symper.vn/readFile/user_avatar_'+user.userId" alt="">
+								<img :src="fileDomain + 'readFile/user_avatar_'+user.userId" alt="">
 								<span class="user-name">{{user.displayName}}</span>
 							</div>
 						</div>
@@ -75,7 +75,7 @@
 								<span>{{$t('document.detail.sidebar.body.userRelated.subTitle2')}}</span>
 							</p> 
 							<div v-for="user in listRelatedUser" :key="user.id" class="user-info">
-								<img :src="'https://file.symper.vn/readFile/user_avatar_'+user.userId" alt="">
+								<img :src="fileDomain + 'readFile/user_avatar_'+user.userId" alt="">
 								<span class="user-name">{{user.displayName}}</span>
 							</div>
 						</div>
@@ -155,6 +155,7 @@ import Comment from './Comment'
 import {logServiceApi} from "@/api/log.js";
 import { getControlInstanceFromStore } from '../common/common';
 import InfoUser from "@/components/myItem/InfoUser.vue";
+import { appConfigs } from '../../../configs';
 
 export default {
 	components:{
@@ -171,6 +172,7 @@ export default {
 			workflowName:"",
 			userRoleInfo:"",
 			showPanelWorkflow:true,
+			fileDomain: appConfigs.apiDomain.fileManagement,
 			taskName:"",
 			listApprovalUser:[],
 			listRelatedUser:[],

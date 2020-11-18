@@ -14,6 +14,9 @@ import { createPositionNode, definePosition, DEFAULT_POSITION_DISPLAY, FOUCUS_PO
 import { SYMPER_HOME_ORGCHART, getDefaultConfigNodeData, jointLinkNode } from './nodeAttrFactory';  
 import avatarDefault from "@/assets/image/avatar_default.jpg";
 import { util } from '../../../plugins/util';
+import {
+    appConfigs
+} from "@/configs";
 require('@/plugins/rappid/rappid.css');
 export default {
     components: {
@@ -84,7 +87,6 @@ export default {
             return this.$refs.jointPaper.graph.toJSON();
         },
         updateCellAttrs(cellId, attrName, value){
-            
             let mapName = {
                 name: '.name/text',
                 border: '.card',
@@ -95,30 +97,34 @@ export default {
                 positionCode: '.position-code/text',
                 lastDynamicAttr: '.dynamic-attr-value/text',
                 highlight: '.border-bottom/fill'
-            };
-            let cell = this.$refs.jointPaper.graph.getCell(cellId);
+			};
+			
+			let cell = this.$refs.jointPaper.graph.getCell(cellId);
             if(cell && mapName[attrName]){
                 if(typeof value == 'object'){
                     for(let key in value){
                         cell.attr(mapName[attrName]+'/'+key, value[key]);
                     }
                 }else{
-                    let imgurl = util.addEnvToUrl('https://file.symper.vn/readFileSvg/user_avatar');
-                    if(value.includes(imgUrl)){
-                          cell.attr(mapName[attrName], value,
-                        );
+					let imgurl = util.addEnvToUrl(appConfigs.apiDomain.fileManagement+'readFileSvg/user_avatar');
+                    if(value.includes(imgurl)){
+						cell.attr(mapName[attrName], value,
+					);
                     }else{
-                           let newValue =   joint.util.breakText(
-                            value, 
-                            {
-                                width: 130,
-                                height: 30
-                            },
-                            { 'font-size': 13 },
-                            { ellipsis: true  }
-                        )
+						if(value){
+ 							let newValue =   joint.util.breakText(
+								value, 
+								{
+									width: 130,
+									height: 30
+								},
+								{ 'font-size': 13 },
+								{ ellipsis: true  }
+							)
                         cell.attr(mapName[attrName], newValue,
                         );
+						}
+                          
                     }
                   
                    
@@ -302,7 +308,7 @@ export default {
         },
         changeUserDisplayInNode(userIdList){
             let lastUserInfo = this.mapUserById[userIdList[userIdList.length - 1]];
-            let avatarUser = util.addEnvToUrl("https://file.symper.vn/readFileSvg/user_avatar_")+lastUserInfo.id
+            let avatarUser = util.addEnvToUrl(appConfigs.apiDomain.fileManagement+"readFileSvg/user_avatar_")+lastUserInfo.id
             if(this.context == 'department'){
                 if(!lastUserInfo) return;
                 this.updateCellAttrs(this.selectingNode.id, 'managerName', lastUserInfo.displayName );

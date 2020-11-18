@@ -70,7 +70,9 @@
                     :key="child.title"
                 >
                     <v-list-item-content class="ml-10" >
-                    <v-list-item-title class="fs-13 font-normal" style="color:rgba(0,0,0,0.8)">{{child.name}} </v-list-item-title>
+                    <v-list-item-title class="fs-13 font-normal" style="color:rgba(0,0,0,0.8)">{{child.name}} 
+                        <span v-if="type!='main'" > - {{child.defaultUser}} </span>
+                       </v-list-item-title>
                     </v-list-item-content>
                     <v-list-item-action>
                         <v-switch
@@ -101,6 +103,8 @@ export default {
             if(newValue[i].active){
                 for(let j = 0; j<newValue[i].items.length;j++){
                     if(newValue[i].items[j].active){
+                       
+                        // this.listItems
                           //newValue[i].active=false;
                         this.subcribedAllChanel(newValue[i].title, newValue[i].items[j].title,i,j) 
                     }else{
@@ -122,9 +126,7 @@ export default {
                 if(this.allListChanel[i].objectType==objectType){
                     if(!isFollow){
                         for(let j=0;j< this.listItems.length;j++){
-                            // this.listItems[i].active=false;
                             if(this.listItems[j].title==objectType){
-                               
                                 this.listItems[j].items.map(x=>x.active=false)
                             }
                         }
@@ -132,7 +134,6 @@ export default {
                             if(res.status==200){}})
                     }else{
                         for(let j=0;j< this.listItems.length;j++){
-                            //    this.listItems[i].active=false;
                             if(this.listItems[j].title==objectType){
                                 this.listItems[j].items.map(x=>x.active=true)
                             }
@@ -149,11 +150,14 @@ export default {
             })
         },
         //subcribed all
-        subcribedAllChanel(objectType,event,k,h){
+        subcribedAllChanel(objectType,event,listItemsIdx,childrenListItemsIdx){
             for(let i=0;i<this.allListChanel.length;i++){
                 if(this.allListChanel[i].objectType==objectType&&this.allListChanel[i].event==event&&!this.allListChanel[i].userFilterState){
+                    // this.listItems[listItemsIdx].subTitle.push(this.listItems[listItemsIdx].items[childrenListItemsIdx].title);
+                    // this.listItems[listItemsIdx].subTitle = this.listItems[listItemsIdx].subTitle.filter((item, index) => this.listItems[listItemsIdx].subTitle.indexOf(item) === index);
                        notification.subscribeChanel(this.allListChanel[i].id).then(res=>{
                         if(res.status==200){
+                            
                         }
                     })
                 }

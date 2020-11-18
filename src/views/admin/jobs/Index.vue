@@ -31,6 +31,9 @@ import { util } from "@/plugins/util.js";
 import JobDetail from "./JobDetail"
 import {adminApi} from '@/api/Admin.js'
 import Handsontable from 'handsontable';
+import {
+    appConfigs
+} from "@/configs";
 export default {
 	components:{
 		ListItems,
@@ -43,7 +46,7 @@ export default {
 		let self = this
 		return { 
 			containerHeight:null,
-			apiUrl:'https://workflow.symper.vn/symper-rest/service/management/timer-jobs',
+			apiUrl: appConfigs.apiDomain.bpmne.timerJob,
 			customAPIResult: {
                 reformatData(res){
 					res.data.forEach(function(e){
