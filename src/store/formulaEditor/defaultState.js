@@ -6,7 +6,7 @@ const defaultState = {
     /**
      * Các từ khóa động đã được set cho editor, phục vụ cho việc không bị trùng lặp keyword 
      */
-    dynamicCompletionItems: {
+    addedCompletionItems: {
         
     },
     /**

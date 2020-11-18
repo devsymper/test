@@ -1,13 +1,13 @@
 <template>
     <div
         ref="symperDragPanel"
-        v-show="selfShowPanel"
         class="symper-drag-panel elevation-12"
         :style="{
             width:dragPanelWidth+'px',
             height: dragPanelHeight+'px',
             top: topPosition+'px',
-            left: leftPosition+'px'
+            left: leftPosition+'px',
+            visibility: selfShowPanel ? 'visible' : 'hidden'
         }">
         <div class="position-relative w-100 h-100">
             <div class="pa-2 symper-drag-panel-header" style="height:30px">

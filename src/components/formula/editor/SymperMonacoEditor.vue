@@ -13,6 +13,7 @@
 <script>
 import {languages, editor} from 'monaco-editor';
 import staticCompletionItems from "./modules/sql/staticCompletionItems";
+import { documentApi } from '../../../api/Document';
 export default {
     methods: {
         focus(){
@@ -33,13 +34,68 @@ export default {
                 self.selfChange = true;
                 self.$emit('input', vl);
                 self.$emit('change', vl);
+                
+                if(self.debouceChangeCompletionPosition){
+                    clearTimeout(self.debouceChangeCompletionPosition);
+                }
+                self.debouceChangeCompletionPosition = setTimeout(() => {
+                    self.changeCompletionPosition();
+                }, 300);
+
+                setTimeout(() => {
+                    self.checkLoadItems();
+                }, 0);
             });
         },
+        changeCompletionPosition(){
+            this.completionDiv = $($(this.$el).find('.editor-widget.suggest-widget')[0]);
+            let cWidth = this.completionDiv.width();
+            let leftOffset = Number(this.completionDiv.css('left').replace('px', ''));
+            let wraperWidth = $(this.$el).width();
+            debugger
+            if(leftOffset + cWidth > wraperWidth){
+                this.completionDiv.css('left', (leftOffset - (leftOffset + cWidth - wraperWidth)) + 'px');
+            }
+        },
+        checkLoadItems(){
+            let startTime = Date.now();
+            let pos = this.editor.getPosition();
+            let lineContent = this.model.getLineContent(pos.lineNumber);
+            let nearestWord = [];
+            for(let i = (pos.column - 1); i-- ; i >= 0){
+                if(lineContent[i] != ' '){
+                    nearestWord.unshift(lineContent[i]);
+                }else{
+                    break;
+                }
+            }
+
+            nearestWord = nearestWord.join('');
+            if(nearestWord){
+                this.loadRemoteItems(nearestWord);
+            }
+        },
+        async loadRemoteItems(keyword){
+            let loadedItems = this.$store.state.formulaEditor.addedCompletionItems;
+            let key = `doc:${keyword}`;
+            if(loadedItems[key] && !loadedItems[key].loadedField){
+                loadedItems[key].loadedField = true;
+                let res = await documentApi.getFieldByDocId(keyword);
+                if(res.status == 200){
+                    this.$store.commit('formulaEditor/addCompletionItemsForDocControls', {
+                        docName: keyword,
+                        controls: res.data
+                    });
+                }else{
+                    this.$snotifyError(res, "Can not get field of doc " + keyword);
+                }
+            }
+        },
         getSelectedText(){
-            return this.editor.getModel().getValueInRange(this.editor.getSelection());
+            return this.model.getValueInRange(this.editor.getSelection());
         },
         getValue(){
-            return this.editor.getModel().getValue();
+            return this.model.getValue();
         },
         setReadOnly(readOnly = true){
             this.editor.updateOptions({ readOnly: readOnly });
@@ -79,6 +135,7 @@ export default {
             self.setStaticCompletionItems();
             self.$emit('init', self.editor);
             self.listenEditorEvents();
+            self.model = self.editor.getModel();
         }, 50, this);
     },
     props: {
@@ -125,10 +182,13 @@ export default {
         },
         value(vl){
             if(!this.selfChange){
-                this.editor.getModel().setValue(vl);
+                this.model.setValue(vl);
             }
             this.selfChange = false;
         }
+    },
+    created(){
+        this.$store.dispatch('document/setListDocuments');
     }
 }
 </script>

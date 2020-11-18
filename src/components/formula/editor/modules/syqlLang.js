@@ -2,7 +2,6 @@ export default {
     register(languages){
         // Register a new language
         languages.register({ id: 'syql' });
-        debugger
         // Register a tokens provider for the language
         languages.setMonarchTokensProvider('syql', this.lang);
     },
