@@ -158,6 +158,7 @@ export default {
            if(res.status==200){
             let format = [];
              let listModules = res.data;
+             debugger
              self.allListChanel = res.data;
              for(let i = 0; i<listModules.length;i++){
                  if(listModules[i].objectType){
