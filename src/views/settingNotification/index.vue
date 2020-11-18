@@ -89,6 +89,15 @@ export default {
     }
   },
   methods: {
+      renameReceiver(nameModule,receiver){
+            let name = receiver;
+            for(let i = 0; i<this.listSource[nameModule].receiver.length;i++){
+                if(this.listSource[nameModule].receiver[i].value==receiver){
+                name = this.listSource[nameModule].receiver[i].text;
+                }
+            }
+            return name
+        },
       searchList(){
         this.listSubcribed = [];
         this.listUnsubcribed=[];
@@ -158,7 +167,6 @@ export default {
            if(res.status==200){
             let format = [];
              let listModules = res.data;
-             debugger
              self.allListChanel = res.data;
              for(let i = 0; i<listModules.length;i++){
                  if(listModules[i].objectType){
@@ -168,11 +176,11 @@ export default {
              let formatListModules = _.groupBy(format, 'objectType');
              let name = Object.keys(formatListModules);
              for(let i=0;i<name.length;i++){
-                 //let a = name[i];
                 self.items.push({
                 title: name[i],
                 subTitle: [],
                 items: [],
+                // defaultUser:
                 icon:name[i]
             })      
             let groupByEvent= Object.keys(_.groupBy(formatListModules[name[i]], 'event'));
@@ -243,6 +251,7 @@ export default {
                     for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
                         self.listSubcribed[j].items.push({
                             title: grouplistByObjId[objId[j]][i].event,
+                            defaultUser:self.renameReceiver(objId[j],grouplistByObjId[objId[j]][i].defaultUser),
                             active:true,
                             name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
                             id:grouplistByObjId[objId[j]][i].id,
@@ -288,6 +297,7 @@ export default {
                             title: grouplistByObjId[objId[j]][i].event,
                             name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
                             active:  false,
+                             defaultUser:self.renameReceiver(objId[j],grouplistByObjId[objId[j]][i].defaultUser),
                             id:grouplistByObjId[objId[j]][i].id,
                         });
                         self.listUnsubcribed[j].userFilterAt= self.getDateFollow(objId[j],grouplistByObjId[objId[j]][i].event, false)

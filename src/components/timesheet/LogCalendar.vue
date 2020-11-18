@@ -274,7 +274,6 @@ export default {
             this.$emit('showLog',date);   
         },
          getLogByUserId(id){
-            debugger
              const self = this;
             timesheetApi.getLogByUserId({userId:id})
                 .then(res => {
