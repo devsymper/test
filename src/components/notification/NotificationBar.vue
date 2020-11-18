@@ -74,7 +74,18 @@
                     </v-row>
                 </v-col>
                 <v-col cols="10" style="padding:6px!important" @click="openNotification(item)">
-                    <v-row>
+                    <v-row v-if="item.title.indexOf('<*')>-1">
+                       <span class="notification-item-title">
+                            {{reNameContent(item.title)}}
+                        </span>
+                        <v-chip v-if="getDeadline(item.title)!='Invalid date'"
+                        style="height: 13px; font-size: 10px; background: blue; color: white; margin-right:-50px; relative:absolute;top:3px; left:160px"
+                         class="notification-item-title">
+                              {{(getDeadline(item.title))}}
+                        </v-chip>
+                    </v-row>
+                     <v-row v-else>
+                       
                         <span class="notification-item-title">
                             {{reNameContent(item.title)}}
                         </span>
@@ -85,6 +96,7 @@
                             <span >{{item.extraLabel?item.extraLabel:''}} {{item.extraValue?item.extraValue:''}}</span>
                         </v-col>
                         <v-col cols="6" class="text-right pr-3">
+                            
                             <span>{{$moment.unix(item.createTime).fromNow()}}</span>
                             <v-icon size="9" color="blue" class="ml-1" v-if="item.state=='0'">mdi-circle</v-icon>
                         </v-col>
@@ -154,9 +166,18 @@
                         </span>
                     </v-row>
                     <v-row v-else>
-                        <span class="notification-item-title">
-                            {{item.title}} 
+                          
+                       <span v-if="item.title.indexOf('<*')>-1" class="notification-item-title">
+                            {{reNameContent(item.title)}}
                         </span>
+                        <v-chip v-if="item.title.indexOf('<*')>-1" style="height:13px; font-size:10px;background:blue;color:white" class="notification-item-title">
+                            {{(getDeadline(item.title))}}
+                        </v-chip>
+                  
+                        <span  v-if="item.title.indexOf('<*')<-1" class="notification-item-title">
+                            {{reNameContent(item.title)}}
+                        </span>
+                  
                     </v-row>
                     <v-row class="notification-item-info mt-1">
                         <v-col cols="6"  class="ellipsis">
@@ -309,6 +330,7 @@ export default {
     },
     data: function() {
         return {
+            deadLine:'',
             img:'',
             listSource:{},
             overlay: true,
@@ -352,16 +374,29 @@ export default {
                     return appConfigs.apiDomain.fileManagement+'readFile/'+icon ;}
             }       
         },
-         reNameContent(des){
-             let name = des;
-             let nameModule = Object.keys(this.listSource);
-             for(let j = 0;j<nameModule.length;j++){
-                 for(let i = 0; i<this.listSource[nameModule[j]].parameter.length;i++){
-                        let oldValue= new RegExp(this.listSource[nameModule[j]].parameter[i].value);
-                        let newValue =this.listSource[nameModule[j]].parameter[i].text;
-                    name = name.replace(oldValue,newValue);
-                    }
-             }
+        getDeadline(description){
+            //let result = {value:'',check:false}
+            let deadline= description.split("<*")[1].split('*>')[0];
+            deadline = deadline.slice(0, 10);
+            let result= this.$moment.unix(deadline).fromNow().replace("giờ",'h');
+            result.replace('ngày','d')
+            // if(result.indexOf('tới')>-1){
+            // }
+            //result = result.replace('trước','');
+
+            //result.split(' ')[1];
+            return result
+        },
+         reNameContent(description){
+             //this.deadLine = '';
+            let name = description;
+            if(description.indexOf('<*')>-1){
+                let newValue = '';
+                let value = description.split("<*")[1].split('*>')[0];
+                // debugger
+                let oldValue= "<*"+value+"*>";
+                name= name.replace(oldValue,newValue);
+                }
             return name
         },
         getSource(){
@@ -399,9 +434,7 @@ export default {
             for (let i = 0;i<this.listNotification.length;i++){
                 let dayListNotification = dayjs.unix(this.listNotification[i].createTime).format('DD/MM/YYYY') ;
                 let today = dayjs().format('DD/MM/YYYY') ;
-
                 if(today==dayListNotification){
-    
                     this.checkToday = true;
                 }   
             }
