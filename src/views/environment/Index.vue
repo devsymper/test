@@ -4,7 +4,7 @@
 			<v-icon class="ml-2">
 				mdi-earth
 			</v-icon>
-			<span class="flex-grow-1 ml-2">
+			<span class="flex-grow-1 ml-2 fs-16 font-weight-bold">
 				Danh sách các môi trường 
 			</span>
 			<v-btn
@@ -35,14 +35,14 @@
 			<v-list-item
 				v-for="i in 3"
 				:key="i"
-				class="mr-6 ml-6 pr-0 pl-0"
+				class="mr-6 ml-6 pr-0 pl-0 fs-13"
 			>
 
-				<v-list-item-content>
-					<v-list-item-title>App-beta.symper.vn</v-list-item-title>
+				<v-list-item-content >
+					<v-list-item-title class="fs-13">App-beta.symper.vn</v-list-item-title>
 
-					<v-list-item-subtitle >
-						<span>ID : ádhashdhsjd123214</span>
+					<v-list-item-subtitle class="fs-13" >
+						<span>ID : hsdashdhsjd123214</span>
 						<span class="ml-16">
 							Loại môi trường development
 						</span>
@@ -62,15 +62,15 @@
 </template>
 
 <script>
-import AddEnvironmentDialog from "./AddEnvironmentDialog"
+import AddEnvironmentDialog from "./dialogs/AddEnvironmentDialog"
 export default {
 	components:{
-		AddEnvironmentDialog
+		AddEnvironmentDialog,
 	},
 	data(){
 		return {
 			searchKey: "",
-			showDialogAddItem: true
+			showDialogAddItem: false
 		}
 	},
 	methods:{
@@ -90,6 +90,13 @@ export default {
 </script>
 
 <style scoped>
+.environemt-management >>> .v-text-field__slot,
+.environemt-management >>> .v-text-field__slot label{
+	font-size: 13px !important;
+}
+.environemt-management >>> .v-input__append-inner{
+	font-size: 13px !important;
+}
 .environemt-management >>> .v-input__control{
 	width: 30px !important;
 	min-height: unset;

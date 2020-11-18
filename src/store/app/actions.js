@@ -5,6 +5,8 @@ import accountApi from "../../api/account.js";
 import { userRoleApi } from "../../api/userRole.js";
 import { systemRoleApi } from "../../api/systemRole.js";
 import { util } from "../../plugins/util.js";
+import Api from "../../api/api.js";
+import { appConfigs } from "../../configs.js";
 
 var countGetRoleType = 0;
 const handleUrlChanges = (context, data) => {
@@ -304,7 +306,77 @@ const getAndSetUserOperations = async function(context) {
         SYMPER_APP.$snotifyError(res, "Can not get operations of current role");
     }
 }
+
+
+
+const setSystemMessagingToken = async function (context, token) {
+    context.state.systemMessaging.token = token;
+    return new Promise((resolve, reject) => {
+        let req = new Api(appConfigs.apiDomain.nofitication);
+        req.post("/users/set-token",{"token":token})
+        .then(res => {
+            console.log(res);
+            if (res.status == 200) {
+                resolve(res); 
+            }else{
+                reject(res);
+            }
+        }).catch((err) => {
+            reject(err);
+        });    
+    })
+}
+
+
+const resetSystemMessagingToken = async function (context, newToken) {
+    await setSystemMessagingToken(context, newToken);
+
+    let resubscribeTopics = Object.keys(context.state.systemMessaging.topics);
+    context.state.systemMessaging.topics = {};
+    subscribeSystemMessagingTopics(context, resubscribeTopics);
+}
+
+/**
+ * 
+ * @param {*} context 
+ * @param {Array} topics mảng chứa các topic cần được subscribe 
+ */
+const subscribeSystemMessagingTopics = function (context, topics) {
+    let needSubscribeTopics = [];
+    let systemMessaging = context.state.systemMessaging;
+    let subscribedTopics = systemMessaging.topics;
+
+    for(let topic of topics){
+        if(!subscribedTopics[topic]){
+            needSubscribeTopics.push(topic);
+        }
+    }
+
+    if(needSubscribeTopics.length > 0){
+        let data = {
+            token : systemMessaging.token,
+            topics: needSubscribeTopics.join(',')
+        };
+    
+        let req = new Api(appConfigs.apiDomain.nofitication);
+        req.post("/users/subscribe", data)
+        .then(res => {
+            if(res.status == 200){
+                for(let topic of needSubscribeTopics){
+                    context.state.systemMessaging.topics[topic] = true;
+                }
+            }
+        }).catch((err) => {
+            console.error('can not subscibe topics ' + needSubscribeTopics.join(','), err);
+        });  
+    }
+}
+
+
 export {
+    resetSystemMessagingToken,
+    setSystemMessagingToken,
+    subscribeSystemMessagingTopics,
     getAndSetUserOperations,
     getAllOrgChartData,
     getAllUsers,

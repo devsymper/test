@@ -4,7 +4,6 @@
 			class="workDetail"
 			:workInfo="workInfo"
 		>
-		
 		</workDetail>
 	</div>
 	
@@ -26,21 +25,18 @@ export default {
 		this.getTaskCurrent()
 	},
 	methods:{
-		 async getTaskCurrent(){
+		getTaskCurrent(){
 			let processInstanceId = this.$route.params.processInstanceId
             let self=this;
-            try {
-				 let data = await BPMNEngine.getProcessInstanceHistory({processInstanceId:processInstanceId, includeProcessVariables: true});
-				 if(data.data[0]){
-					this.workInfo = data.data[0]
-				 }else{
+			BPMNEngine.getProcessInstanceHistory({processInstanceId:processInstanceId, includeProcessVariables: true}).then(res=>{
+				if(res.data[0]){
+					this.workInfo = res.data[0]
+				}else{
 					this.workInfo = {}
-				 }
-			
-            } catch (error) {
-                self.$snotifyError(error, "Get task process current failed");
-            }
-        },
+				}
+			}).catch(err=>{
+			})
+		}      
 	}
 }
 </script>
