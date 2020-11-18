@@ -1,25 +1,24 @@
 <template>
-  <div class="mt-2 orgchart-selector">
-      <span class="fs-13 ml-1">Thao tác với đối tượng </span>
-		<div class="fs-13 d-flex flex-wrap permission-selector">
-			<v-list v-for="(permission,i) in permissions" :key="i">
-				<v-list-item style="width:290px">
-					<v-checkbox 
-						:value="permission.value" 
-						:key="permission.title"
-						@change="handleChange"
-						:label="permission.title"
-						v-model="selectedPermission">
-					</v-checkbox>
-				</v-list-item>
-			</v-list>
-		</div>
+  <div>
+      <h3>Thao tác với đối tượng </h3>
+       <p>{{ selectedPermission }}</p>
+      <div class="fs-13">
+          <v-list v-for="(permission,i) in permissions" :key="i">
+            <v-list-item>
+                <v-checkbox :value="permission.value" 
+                            :key="permission.title"
+                            @change="handleChange"
+                            :label="permission.title"
+                            v-model="selectedPermission">
+                </v-checkbox>
+            </v-list-item>
+        </v-list>
+      </div>
          <OrgchartElementSelector 
-			v-if="showTreeOrgchart"
-			:value="departmentSelected"
-			:checkboxMode="checkboxMode"
-			:height="'320px'"
-			@change-node-selected="handleChangeNodeSelected"
+          v-if="showTreeOrgchart"
+          :value="departmentSelected"
+          :checkboxMode="checkboxMode"
+          @change-node-selected="handleChangeNodeSelected"
         />
   </div>
 </template>
@@ -62,10 +61,7 @@ export default {
         },
         departmentSelected:{
             type: Array,
-		},
-		selectedApplication:{
-
-		}
+        }
     },
     methods:{
         handleChangeNodeSelected(data){
@@ -104,12 +100,5 @@ export default {
 }
 .v-input__slot label{
     font:13px roboto !important;
-}
-
-.v-messages{
-	display: none !important;
-}
-.orgchart-selector >>> .v-input__slot{
-	background-color:unset !important;
 }
 </style>

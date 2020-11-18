@@ -192,9 +192,6 @@ export default {
         }
     },
     methods: {
-        mapIdToBa(id){
-             
-        },
         closeForm(){
             this.$refs.listActionPack.closeactionPanel();
         },
