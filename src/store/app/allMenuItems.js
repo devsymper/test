@@ -194,8 +194,8 @@ export default {
         }
     },
     accessManager: {
-        title: "Access Management",
-        icon: "mdi-shield-key-outline",
+        title: "demo Management",
+        icon: "mdi-shield-key",
         group: "Administrator",
         children: {
             permissions: {
@@ -214,7 +214,13 @@ export default {
                 link: "/action-pack"
             },
         }
-    },
+	},
+	access_control: {
+		title: "accessControl",
+        icon: "mdi mdi-shield-key-outline",
+		group: "Administrator",
+		link: "/access-control"
+	},
     application_definition: {
         title: "apps",
         icon: "mdi mdi-widgets-outline",

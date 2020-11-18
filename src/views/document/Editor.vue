@@ -1286,12 +1286,17 @@ export default {
             let table = elements.find('thead').closest('.s-control-table');
             let tableId = table.attr('id');
             let currentControl = this.editorStore.currentSelectedControl;
-            if(currentControl.properties.name.name.value){
+            if(currentControl.properties.name.name.value && tablePivotConfig){
                 if(!this.dataPivotTable){
                     this.dataPivotTable = {};
                 }
                 this.dataPivotTable[currentControl.properties.name.name.value] = tablePivotConfig;
 
+            }
+            else{
+                if(this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
+                    delete this.dataPivotTable[currentControl.properties.name.name.value];
+                }
             }
             let thead = '';
             let tbody = '';
@@ -2067,9 +2072,9 @@ export default {
                         if(type == 'dataFlow' && k == 'dataFlowId'){
                             properties[k].value = {id:fields[controlId]['properties'][k]};
                         }
-                        else if(k == 'mapParamsDataflow'){
+                        else if(type == 'dataFlow' && k == 'mapParamsDataflow'){
                             properties[k]['datasets'] = fields[controlId]['properties']['datasets'];
-                            properties[k]['value'] = fields[controlId]['properties']['value'];
+                            properties[k]['value'] = fields[controlId]['properties'][k];
                         }
                         else{
                             if(typeof fields[controlId]['properties'][k] != "object"){

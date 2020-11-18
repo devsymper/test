@@ -229,7 +229,7 @@ export const nodeAttrsDefinition = {
         },
     },
     'StartConditionalEvent': {
-        attrs: ["executionlisteners", "conditionalevent","conditionaleventcondition", "interrupting"],
+        attrs: ["executionlisteners", "conditionalevent","conditionaleventcondition", "isInterrupting"],
         validate: function(attrs) {
 
         },
@@ -251,7 +251,7 @@ export const nodeAttrsDefinition = {
 
     },
     'StartSignalEvent': {
-        attrs: ["executionlisteners", "signalref", "interrupting"],
+        attrs: ["executionlisteners", "signalref", "isInterrupting"],
         validate: function(attrs) {
 
         },
@@ -262,7 +262,7 @@ export const nodeAttrsDefinition = {
 
     },
     'StartMessageEvent': {
-        attrs: ["executionlisteners", "messageref", "interrupting"],
+        attrs: ["executionlisteners", "messageref", "isInterrupting"],
         validate: function(attrs) {
 
         },
@@ -556,6 +556,16 @@ export const nodeAttrsDefinition = {
 
         },
         docker: dockerGroups.subProcess
+    },
+    'BoundarySignalEvent': {
+        attrs: ["executionlisteners", "signalref"],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        },
+        docker: dockerGroups.event
     },
 };
 
