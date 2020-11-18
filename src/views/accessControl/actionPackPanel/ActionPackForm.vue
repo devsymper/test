@@ -255,7 +255,6 @@ export default {
                     initDocObjDataTable[id] = newRow;
                 }
             }
-            // this.multipleLevelObjects.document_definition.tableData = initDocObjDataTable;
             this.caculateTableDataForAllInstancesDocDef(initDocObjDataTable);
         },
         objectTypeToDocumentDefinition(){
@@ -265,7 +264,6 @@ export default {
         getTableDataFromOperations(operations){
             let mapActionAndObjectTypes = this.mapObjectTypesAndAction;
             let allResource = this.$store.state.actionPack.allResource;
-
             /**
              * Map giữa object type và action , có dạng
              * {
@@ -351,12 +349,6 @@ export default {
             }
         },
         initAllResource(needInitResources){
-            // let needInitResources = [
-            //     'document_definition',
-            //     'workflow_definition',
-            //     'orgchart',
-            //     'dashboard'
-            // ];
             for(let type of needInitResources){
                 this.getObjectsOfObjectType(type);
             }
@@ -702,9 +694,8 @@ export default {
 
             for(let objectType in this.itemData.mapActionForAllObjects){
                 if(objectType != 'department'){
-                     let dataTable = this.itemData.mapActionForAllObjects[objectType];
+					let dataTable = this.itemData.mapActionForAllObjects[objectType];
                     let row = dataTable[0];
-
                     if(allResource.hasOwnProperty(objectType)){
                         for(let actionName in row){
                             let objectIdentifier = actionForObjectType[actionName] ? objectType : (objectType + ':0' );
@@ -853,23 +844,11 @@ export default {
             let allActionByObjectType = this.$store.state.actionPack.allActionByObjectType;
             let rsl = [];
             for(let key in allActionByObjectType){
-				if(key != "department"){
-					if(key == 'account'){
-						rsl.unshift({
-							text: util.str.getCamelSpaceFromPascalText(key),
-							value: key
-						});
-					}else{
-						rsl.push({
-							text: util.str.getCamelSpaceFromPascalText(key),
-							value: key
-						});
-					}
-				}
-				
-				
+				rsl.push({
+					text: util.str.getCamelSpaceFromPascalText(key),
+					value: key
+				});
 			}
-
 			this.listObject = rsl
 			return rsl;
 
@@ -879,7 +858,7 @@ export default {
         let self = this;
         return {
 			listObject:[],
-			objectActive:"account",
+			objectActive:"document_definition",
             permissionDepartment:[],
             departmentSelected:[],
             departmentSelectedProps: [],
