@@ -239,5 +239,16 @@ export default {
         modeling.updateProperties(el, {
             extensionElements
         });
+    },
+    signalRefMethod(el, elKey, attr, bpmnModeler, attrName){
+        let moddle = bpmnModeler.get('moddle');
+        let bizEl = el.businessObject;
+
+        if(attr.value && attr.value.trim()){
+            let signal = moddle.create('bpmn:Signal');
+            signal.id = attr.value;
+            signal.name = attr.value;
+            bizEl.eventDefinitions[0].signalRef = signal;
+        }
     }
 }

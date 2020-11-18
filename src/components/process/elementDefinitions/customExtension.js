@@ -31,13 +31,15 @@ let customExt = {
 for (let attrName in allNodesAttrs) {
     let toXML = allNodesAttrs[attrName].toXML;
 
-    if (toXML.symper_position == 'attr' && !noNeedPrefix[toXML.name]) {
-        customExt.types[0].properties.push(toXML);
-    } else if (toXML.symper_position == 'el') {
-        customExt.types.push(toXML);
-        if (toXML.extraElements) {
-            for (let item of toXML.extraElements) {
-                customExt.types.push(item);
+    if(!toXML.defined){
+        if (toXML.symper_position == 'attr' && !noNeedPrefix[toXML.name]) {
+            customExt.types[0].properties.push(toXML);
+        } else if (toXML.symper_position == 'el') {
+            customExt.types.push(toXML);
+            if (toXML.extraElements) {
+                for (let item of toXML.extraElements) {
+                    customExt.types.push(item);
+                }
             }
         }
     }

@@ -68,14 +68,16 @@ import LayoutControl from "./../submit/layoutControl";
 import  Table from "./../submit/table.js"
 import  TablePrint from "./../print/PrintTable"
 import './../submit/customControl.css'
-import { getSDocumentSubmitStore } from './../common/common'
+import { getSDocumentSubmitStore,getControlInstanceFromStore } from './../common/common'
 import SideBarDetail from './SideBarDetail'
 import HistoryControl from './HistoryControl'
 import FloattingPopup from './../common/FloattingPopup'
 import Preloader from './../../../components/common/Preloader';
+import PivotTable from "./../submit/pivot-table";
 
 import { util } from '../../../plugins/util.js';
 export default {
+    name: "detailDocument",
     props: {
         documentObjectId: {
             type: Number,
@@ -169,7 +171,7 @@ export default {
             formSize:{},
             wrapFormCss:{},
             defaultData:{},
-
+            dataPivotTable:{},
         };
     },
     beforeMount() {
@@ -239,6 +241,28 @@ export default {
             this.$refs.floattingPopup.show(e, $('#sym-Detail-'+this.keyInstance), row);
             
         });
+        /**
+         * Nhận xử lí sự kiện click chuyển đổi dạng table <=> pivot mode
+         */
+        this.$evtBus.$on("on-switch-pivot-table-mode", locate =>{
+            if(thisCpn._inactive == true) return;
+            let tableName = locate.tableName;
+            let tableInstance = getControlInstanceFromStore(this.keyInstance,tableName);
+            tableInstance.tableMode = (tableInstance.tableMode == 'nomal') ? 'pivot' : 'nomal';
+            tableInstance.switchTable();
+        })
+        /**
+         * Sau khi load data cho table thi render pivot table
+         */
+        this.$evtBus.$on("document-on-table-change", locate =>{
+            if(thisCpn._inactive == true) return;
+            let tableName = locate.tableName;
+            if(this.dataPivotTable && this.dataPivotTable[tableName]){
+                let data = locate.data;
+                let tableIns = getControlInstanceFromStore(this.keyInstance, tableName);
+                tableIns.pivotTable.setData(data);
+            }
+        })
         
        
     },
@@ -284,6 +308,7 @@ export default {
                 }
                 let docDetailRes = await documentApi.detailDocument(documentId,dataPost);
                 if (docDetailRes.status == 200) {
+                    this.dataPivotTable = docDetailRes.data.pivotConfig;
                     let content = docDetailRes.data.document.content;
                     if(!isPrint){
                         $('.content-print-document').addClass('d-none');
@@ -406,7 +431,7 @@ export default {
                     ".s-control:not(.bkerp-input-table .s-control)"
                 );
             }
-            
+            let listTableIns = [];
             let thisCpn = this;
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
@@ -473,6 +498,16 @@ export default {
                                 id,
                                 thisCpn.keyInstance
                             );
+                            if(this.dataPivotTable && this.dataPivotTable[controlName]){
+                                tableControl.tableMode = 'pivot';
+                                tableControl.pivotTable = new PivotTable(
+                                    tableControl,
+                                    controlName,
+                                    id,
+                                    this.dataPivotTable[controlName],
+                                    this.keyInstance
+                                );
+                            }
                             tableControl.tablePrint = new TablePrint(
                                 tableControl,
                                 controlName,
@@ -506,12 +541,13 @@ export default {
                             tableControl.renderTable();
                             tableControl.setData(valueInput);
                             tableControl.renderInfoButtonInRow(this.listLinkControl);
+                            listTableIns[controlName] = tableControl;
                         }
                     }
                 }
             }
             this.$refs.preLoaderView.hide();
-            this.$emit("after-loaded-component-detail");
+            this.$emit("after-loaded-component-detail",listTableIns);
             $('.wrap-content-detail').removeAttr('style');
         },
 
