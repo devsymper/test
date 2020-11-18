@@ -44,7 +44,6 @@
                     @grid-ready="onGridReady"
                     class="ag-theme-balham mt-2"
                     :columnDefs="columnDefs"
-                    
                     :rowData="rowData">
                 </AgGridVue>
                 

@@ -1123,7 +1123,7 @@ export default {
                                 text: res.message
                             });
                     }
-                }
+                } 
                 else{
                     if(this.routeName == "editDocument"){   //edit doc
                         this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
@@ -1134,8 +1134,9 @@ export default {
                 }
                 
             } catch (error) {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
-                this.$snotify({
+                console.log('errorerror',error);
+                thisCpn.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$snotify({
                             type: "error",
                             title: "error from formulas serice, can't not save into formulas service!!!",
                             text: error
@@ -1147,6 +1148,9 @@ export default {
          */
         createDocument(dataPost){
             let thisCpn = this;
+            if(this.dataPivotTable && Object.keys(this.dataPivotTable).length > 0){
+                dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
+            }
             documentApi.saveDocument(dataPost).then(res => {
                 this.$evtBus.$emit('document-editor-save-doc-callback')
                 if (res.status == 200) {
@@ -1180,7 +1184,7 @@ export default {
          * Hàm gọi api edit document
          */
         editDocument(dataPost){
-            if(Object.keys(this.dataPivotTable).length > 0){
+            if(this.dataPivotTable && Object.keys(this.dataPivotTable).length > 0){
                 dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
             }
             let thisCpn = this;
@@ -1282,8 +1286,17 @@ export default {
             let table = elements.find('thead').closest('.s-control-table');
             let tableId = table.attr('id');
             let currentControl = this.editorStore.currentSelectedControl;
-            if(currentControl.properties.name.name.value){
+            if(currentControl.properties.name.name.value && tablePivotConfig){
+                if(!this.dataPivotTable){
+                    this.dataPivotTable = {};
+                }
                 this.dataPivotTable[currentControl.properties.name.name.value] = tablePivotConfig;
+
+            }
+            else{
+                if(this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
+                    delete this.dataPivotTable[currentControl.properties.name.name.value];
+                }
             }
             let thead = '';
             let tbody = '';
@@ -1479,7 +1492,7 @@ export default {
                 }
                 this.$refs.tableSetting.showDialog();
                 let currentControl = this.editorStore.currentSelectedControl;
-                if(currentControl.properties.name.name.value && this.dataPivotTable[currentControl.properties.name.name.value]){
+                if(currentControl.properties.name.name.value && this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
                     this.defaultTablePivotConfig = this.dataPivotTable[currentControl.properties.name.name.value];
                 }
                 this.$refs.tableSetting.setListRow(listData);
@@ -2059,9 +2072,9 @@ export default {
                         if(type == 'dataFlow' && k == 'dataFlowId'){
                             properties[k].value = {id:fields[controlId]['properties'][k]};
                         }
-                        else if(k == 'mapParamsDataflow'){
+                        else if(type == 'dataFlow' && k == 'mapParamsDataflow'){
                             properties[k]['datasets'] = fields[controlId]['properties']['datasets'];
-                            properties[k]['value'] = fields[controlId]['properties']['value'];
+                            properties[k]['value'] = fields[controlId]['properties'][k];
                         }
                         else{
                             if(typeof fields[controlId]['properties'][k] != "object"){

@@ -10,6 +10,7 @@
             :getDataUrl="getListUrl"
             :useActionPanel="false"
             :exportLink="exportLink"
+            :autoRefreshTopic="'workflow_definition'"
             :headerPrefixKeypath="'common'"
             :commonActionProps="commonActionProps"
             @on-add-item-clicked="goToCreatePage()"

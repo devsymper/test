@@ -5,6 +5,8 @@ import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-alpine.css';
 import store from './../../../store'
+import {getControlInstanceFromStore} from './../common/common'
+import sDocument from './../../../store/document'
 
 window.addNewDataPivotTable = function(el, event, type){
     let tableName = $(el).attr('table-name');
@@ -53,6 +55,9 @@ export default class PivotTable {
                 headerName:colItem.title,
                 rowGroup: true,
                 enableRowGroup: true,
+                cellRendererParams: {
+                    suppressCount: true, // turn off the row count
+                },
             };
             this.columnDefs.push(colPivot);
         }
@@ -86,78 +91,75 @@ export default class PivotTable {
         this.setPivotColumns();
         this.gridOptions.api.setColumnDefs(this.columnDefs);
         this.gridOptions.api.setRowData(vl);
-        this.onBtStartEditing();
+        let viewType = sDocument.state.viewType[this.instance];
+        if(viewType == 'print'){
+            this.gridOptions.api.setDomLayout('print');
+            // this.tableContainer.style.width = '';
+            // this.tableContainer.style.height = '';
+        }
+        
     }
     render() {
         this.gridOptions = {
             columnDefs: this.columnDefs,
-            headerHeight:24,
-            groupHeaderHeight:24,
             pivotHeaderHeight:24,
             pivotGroupHeaderHeight:24,
             animateRows: true,
-            getRowHeight: this.getRowHeight,
+            rowHeight:24,
             groupDefaultExpanded: -1,
             rowData: [],
-            autoGroupColumnDef: { minWidth: 250 },
+            autoGroupColumnDef: { 
+                cellRendererParams: {
+                    suppressCount: true
+                }
+            },
             pivotMode: true,
             defaultColDef: {
-                editable: true,
                 flex: 1,
-                minWidth: 150,
                 sortable: true,
                 resizable: true,
+                wrapText:true,
+                autoHeight:true
             },
+            // groupMultiAutoColumn: true,
             sideBar: false,
             suppressAggFuncInHeader: true,
             onCellDoubleClicked: this.onCellDoubleClick,
             onCellClicked: this.onCellClick,
             tableIns:this
         };
-        this.tableContainer = $(`<div id="ag-` + this.controlObj.id + `" style="height: 0px; width: auto;position:relative;" class="ag-theme-alpine" s-control-type="table">
-        
-        
-            <div class="dropdown">
-                <button class="ag-pivot-action"><span class="mdi mdi-plus"></span></button>
-                <div class="dropdown-content">
-                    <a onclick="addNewDataPivotTable(this, event, 'rows')" table-name="`+this.tableName+`">Thêm dòng</a>
-                    <a onclick="addNewDataPivotTable(this, event, 'cols')" table-name="`+this.tableName+`">Thêm cột</a>
-                </div>
-            </div>
-            
-        
-        </div>`)[0];
+        let viewType = sDocument.state.viewType[this.instance];
+        let actionBtn = ` <div class="dropdown">
+                            <button class="ag-pivot-action"><span class="mdi mdi-plus"></span></button>
+                            <div class="dropdown-content">
+                                <a onclick="addNewDataPivotTable(this, event, 'rows')" table-name="`+this.tableName+`">Thêm dòng</a>
+                                <a onclick="addNewDataPivotTable(this, event, 'cols')" table-name="`+this.tableName+`">Thêm cột</a>
+                            </div>
+                        </div>`;
+        if(['detail','print'].includes(viewType)){
+            actionBtn = ""
+        }
+        this.tableContainer = $(`<div id="ag-` + this.controlObj.id + `" style="height: 400px; width: auto;position:relative;" class="ag-theme-alpine" s-control-type="table">
+                                    `+actionBtn+`
+                            </div>`)[0];
         this.controlObj.ele.before(this.tableContainer);
+        if(viewType == 'print'){
+            this.controlObj.ele.parent().find('.wrap-s-control-table').remove();
+        }
         new Grid(this.tableContainer, this.gridOptions, { modules: [ClientSideRowModelModule, RowGroupingModule] });
     }
-    onBtStartEditing(key, char, pinned) {
-        this.gridOptions.api.setFocusedCell(0, 'tb1_sl', pinned);
-      
-        this.gridOptions.api.startEditingCell({
-          rowIndex: 0,
-          colKey: 'tb1_sl',
-          // set to 'top', 'bottom' or undefined
-          rowPinned: pinned,
-          keyPress: key,
-          charPress: char,
-        });
-    }
-    getRowHeight(params) {
-        if (params.node.group) {
-            return 25;
-        } else {
-            return 25;
-        }
-    }
-
     onCellDoubleClick(row){
         let column = row.colDef;
         let columnNameSelected = column.otherName;
         let pivotKeys = column.pivotKeys;
+        let controlName = "";
         if(row.node.level == 1){
             let rowData = util.cloneDeep(row.node.childrenMapped[Object.keys(row.node.childrenMapped)[0]][0].data);
-            let controlName = "";
+            if(pivotKeys && row.node.childrenMapped[pivotKeys[0]]){
+                rowData = util.cloneDeep(row.node.childrenMapped[pivotKeys[0]][0].data);
+            }
             if(columnNameSelected && pivotKeys){
+                
                 let cols = this.tableIns.pivotConfig.cols;
                 controlName = columnNameSelected;
                 let key = cols[0].name;
@@ -165,6 +167,8 @@ export default class PivotTable {
                     rowData[key] = pivotKeys[0];
                     let rows = this.tableIns.pivotConfig.rows;
                     let newRowData = {}
+                    newRowData[key] = pivotKeys[0];
+
                     for (let index = 0; index < rows.length; index++) {
                         let row = rows[index];
                         let colName = row['name'];
@@ -183,11 +187,47 @@ export default class PivotTable {
                 instance: this.tableIns.instance
             });
         }
-        if(row.node.level > 0 || (row.node.level == 0 && row.value)){
+        if((row.node.level == 0 && !column.otherName) || (row.node.level == 0 && this.tableIns.pivotConfig.rows.length == 1)){    // trường hợp sửa ở cell group hoặc chỉ có 1 dòng được group
+            row.node.setExpanded(true)
+            let allChildRowNode = row.node.childrenMapped;
+            let allGroupRow = [];
+            if(columnNameSelected && pivotKeys){
+                controlName = columnNameSelected;
+                allGroupRow.push(allChildRowNode[pivotKeys[0]][0]['data'])
+            }
+            else {
+                controlName = row.node.field;
+                for(let key in allChildRowNode){
+                    let rowNode = allChildRowNode[key];
+                    if(this.tableIns.pivotConfig.rows.length == 1){
+                        let childRow = rowNode[0].data;
+                        allGroupRow.push(childRow);
+                    }
+                    else{
+                        for(let colPivot in rowNode.childrenMapped){
+                            let childRow = rowNode.childrenMapped[colPivot][0].data;
+                            allGroupRow.push(childRow);
+                        }
+                    }
+                }
+            }
+            store.commit("document/addToDocumentSubmitStore", {
+                key: 'currentRowChangePivotMode',
+                value: {key:controlName,value:allGroupRow,tableName:this.tableIns.tableName, type:'group'},
+                instance: this.tableIns.instance
+            });
+        }
+        let controlIns = getControlInstanceFromStore(this.tableIns.instance, controlName);
+        if(controlIns && controlIns.checkProps('isReadOnly')){
+            return;
+        }
+        if(row.node.level > 0 || (row.node.level == 0 && !column.otherName) || (row.node.level == 0 && this.tableIns.pivotConfig.rows.length == 1)){
             let cellEl = $(row.event.target).closest('.ag-cell');
             let offset = cellEl.offset();
-            $('.input-pivot').val(cellEl.text());
-            $('.input-pivot').css({display:'block',top:offset.top,left:offset.left,width:cellEl.outerWidth()}).focus();
+            let curCellValue = cellEl.text();
+            curCellValue = curCellValue.replace(/\(\d\)$/g,"");
+            $('.input-pivot').val(curCellValue.trim());
+            $('.input-pivot').css({display:'block',top:offset.top,left:offset.left,width:cellEl.outerWidth(),height:cellEl.outerHeight()}).focus();
         }
         
     }
@@ -210,7 +250,12 @@ export default class PivotTable {
         return v;
     }
     show() {
-        this.tableContainer.style.height = '400px';
+        this.tableContainer.style.maxHeight = 'unset';
+        this.tableContainer.style.opacity = '1';
+    }
+    hide() {
+        this.tableContainer.style.opacity = '0';
+        this.tableContainer.style.maxHeight = '0';
     }
 
 }

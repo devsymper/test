@@ -1,11 +1,11 @@
 <template>
-    <div class="wraper-comment" :style="style">
-        <div class="comment-content " style="height:90%">
+    <div class="wraper-comment h-100" :style="style">
+        <div class="comment-content h-100">
 			<Comment style="margin-left:-12px;margin-right:8px" 
 				:showComment="true" 
 				:objectIdentifier="String(objectIdentifierCmt)" 
 				:objectType="'document'" 
-				:height="'95%'"
+				:height="'100%'"
 				:buttonClose="true" 
 				@close-comment="hide"
 			/>
