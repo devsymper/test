@@ -70,7 +70,9 @@
                     :key="child.title"
                 >
                     <v-list-item-content class="ml-10" >
-                    <v-list-item-title class="fs-13 font-normal" style="color:rgba(0,0,0,0.8)">{{child.name}} - {{child.defaultUser}} </v-list-item-title>
+                    <v-list-item-title class="fs-13 font-normal" style="color:rgba(0,0,0,0.8)">{{child.name}} 
+                        <span v-if="type!='main'" > - {{child.defaultUser}} </span>
+                       </v-list-item-title>
                     </v-list-item-content>
                     <v-list-item-action>
                         <v-switch
