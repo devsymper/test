@@ -1957,7 +1957,7 @@ let allAttrs = {
         "dg": "detail",
         toXML: {
             "symper_position": "attr",
-            "name": "terminateAll",
+            "name": "symper_symper_terminateAll_tag",
             "isAttr": true,
             "type": "String"
         }

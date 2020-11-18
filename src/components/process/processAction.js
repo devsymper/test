@@ -50,6 +50,7 @@ function cleanContent(content, configValue) {
         .replace(/symper_symper_expression_tag/g, 'symper:expression')
         .replace(/symper_symper_field_tag/g, 'symper:field')
         .replace(/symper_symper_scope_tag/g, 'symper:scope')
+        .replace(/symper_symper_terminateAll_tag/g, 'terminateAll')
         .replace(/symper_symper_value_tag/g, 'symper:value');
 
     let symperMatches = rsl.match(/<symper:([a-zA-Z0-9_]+)/g);
