@@ -25,6 +25,7 @@ export default class PivotTable {
         this.gridOptions = null;
         this.pivotConfig = pivotConfig;
         this.tableContainer = null;
+        this.tableHeight = "400px";
         this.columnDefs = [];
     }
     /**
@@ -96,7 +97,19 @@ export default class PivotTable {
             // this.tableContainer.style.width = '';
             // this.tableContainer.style.height = '';
         }
+        this.caculatorHeight();
         
+    }
+    caculatorHeight(){
+        let dataHeight = this.gridOptions.api.getDisplayedRowCount()*24;
+        let headerHeight = 0;
+        if(this.pivotConfig.cols.length > 0){
+            headerHeight += 24;
+        }
+        if(this.pivotConfig.values.length > 0){
+            headerHeight += 24;
+        }
+        $('#ag-'+this.controlObj.id).css({height:dataHeight + headerHeight + 3 + "px"});
     }
     render() {
         this.gridOptions = {
@@ -138,7 +151,7 @@ export default class PivotTable {
         if(['detail','print'].includes(viewType)){
             actionBtn = ""
         }
-        this.tableContainer = $(`<div id="ag-` + this.controlObj.id + `" style="height: 400px; width: auto;position:relative;" class="ag-theme-alpine" s-control-type="table">
+        this.tableContainer = $(`<div id="ag-` + this.controlObj.id + `" style="height: `+this.tableHeight+`; width: auto;position:relative;" class="ag-theme-alpine" s-control-type="table">
                                     `+actionBtn+`
                             </div>`)[0];
         this.controlObj.ele.before(this.tableContainer);
