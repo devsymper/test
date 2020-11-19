@@ -26,7 +26,6 @@ export default class PivotTable {
         this.pivotConfig = pivotConfig;
         this.tableContainer = null;
         this.columnDefs = [];
-        let thisObj = this;
     }
     /**
      * hoangnd
@@ -125,8 +124,8 @@ export default class PivotTable {
             sideBar: false,
             suppressAggFuncInHeader: true,
             onCellDoubleClicked: this.onCellDoubleClick,
-            onCellClicked: this.onCellClick,
-            tableIns:this
+            onCellKeyDown: this.onCellDoubleClick,
+            tableIns:this,
         };
         let viewType = sDocument.state.viewType[this.instance];
         let actionBtn = ` <div class="dropdown">
@@ -149,6 +148,12 @@ export default class PivotTable {
         new Grid(this.tableContainer, this.gridOptions, { modules: [ClientSideRowModelModule, RowGroupingModule] });
     }
     onCellDoubleClick(row){
+        if(row.type == 'cellKeyDown'){
+            var charTyped = String.fromCharCode(row.event.which);
+            if (!/[a-zA-Z0-9]/i.test(charTyped)) {
+                return;
+            }
+        }
         let column = row.colDef;
         let columnNameSelected = column.otherName;
         let pivotKeys = column.pivotKeys;
@@ -193,7 +198,17 @@ export default class PivotTable {
             let allGroupRow = [];
             if(columnNameSelected && pivotKeys){
                 controlName = columnNameSelected;
-                allGroupRow.push(allChildRowNode[pivotKeys[0]][0]['data'])
+                if(allChildRowNode[pivotKeys[0]]){
+                    allGroupRow.push(allChildRowNode[pivotKeys[0]][0]['data'])
+                }
+                else{
+                    let newRowData = {};
+                    let rowDefinition = row.node.field;
+                    let colPivotDefinition = this.tableIns.pivotConfig.cols[0].name;
+                    newRowData[colPivotDefinition] = pivotKeys[0];
+                    newRowData[rowDefinition] = row.node.key;
+                    allGroupRow.push(newRowData);
+                }
             }
             else {
                 controlName = row.node.field;

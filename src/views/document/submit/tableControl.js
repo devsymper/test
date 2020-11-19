@@ -191,6 +191,7 @@ export default class TableControl extends Control {
     switchTable(){
         if(this.tableMode == 'nomal'){
             this.tableInstance.show();
+            this.tableInstance.tableInstance.render();
             if(this.pivotTable){
                 this.pivotTable.hide();
             }
