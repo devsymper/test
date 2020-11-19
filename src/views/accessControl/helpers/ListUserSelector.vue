@@ -6,6 +6,7 @@
 				:items="listItem"
 				dense
 				chips
+				v-show="selectingApp == true && action != 'detail'"
 				:disabled="action == 'detail'"
 				solo
                 flat
@@ -20,13 +21,14 @@
 			></v-autocomplete>
 				<!-- v-show="selectingApp == true" -->
 
-			<!-- <v-btn
+			<v-btn
 				icon
 				tile
 				x-small
 				class="ml-1 mr-2"
 				color="green"
-				v-if="selectingApp == false && action != 'detail'"
+				:disabled="action == 'detail'"
+				v-if="selectingApp == false "
 				@click="selectApp"
 			>
 				<v-icon x-small>
@@ -45,7 +47,7 @@
 				<v-icon x-small>
 					mdi-close
 				</v-icon>
-			</v-btn> -->
+			</v-btn>
 		</div>
 		<div  style="width:350px; margin-top:-32px; margin-left:-4px">
 			<v-sheet
@@ -154,7 +156,7 @@ export default {
 }
 .list-item-selector >>> .v-input__control{
 	min-height: unset !important;
-	width: 100px !important;
+	width: 300px !important;
 }
 .list-item-selector >>> .v-input__slot{
 	min-height: unset !important;

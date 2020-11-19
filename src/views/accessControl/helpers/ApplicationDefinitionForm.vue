@@ -81,7 +81,6 @@ export default {
 			this.selectedApplication = value
 			appManagementApi.getAppDetailBa(value).then(res=>{
 			}).catch(err=>{
-
 			})
 			
 		},
