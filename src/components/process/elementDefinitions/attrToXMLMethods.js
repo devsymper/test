@@ -201,11 +201,11 @@ export default {
             let moddle = bpmnModeler.get('moddle');
             let bizObj = el.businessObject;
             let elTagName = attr.toXML.name;
-
+            let value = attr.value.replace(/\n|\r\n/g,' ');
             let newEl = moddle.create("bpmn:FormalExpression");
             newEl['xsi:type'] = "tFormalExpression";
-            newEl.text = "<![CDATA[" + attr.value + "]]>";
-            newEl.body = "<![CDATA[" + attr.value + "]]>";
+            newEl.text = "<![CDATA[" + value + "]]>";
+            newEl.body = "<![CDATA[" + value + "]]>";
             bizObj[elTagName] = newEl;
         }
     },
