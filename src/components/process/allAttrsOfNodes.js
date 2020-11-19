@@ -1615,7 +1615,7 @@ let allAttrs = {
     "multiinstance_cardinality": {
         "title": "Cardinality ",
         "type": "script",
-        "value": "",
+        "value": "1",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_CARDINALITYPACKAGE.MULTIINSTANCE_CARDINALITY.DESCRIPTION",
         "dg": "multiInstance",
         toXML: {
