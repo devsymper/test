@@ -19,7 +19,6 @@
             <span
                 class="fs-12 mb-2 "
             >Select action pack</span>
-
             <ActionPackSelector 
                 v-model="itemData.actionPacks">
             </ActionPackSelector>
@@ -64,7 +63,6 @@ export default {
 
             let res;
             try {
-                
                 if(this.action == 'update'){
                     res = await permissionApi.updatePermission(this.itemData.id, dataToSave);
                     if(res.status == '200'){

@@ -13,6 +13,7 @@
             :currentItemData="currentItemData"
             :customAPIResult="customAPIResult"
             :commonActionProps="commonActionProps"
+			:showExportButton="false"
             :showActionPanelInDisplayConfig="true"
             @row-selected="onRowSelected"
         > 
@@ -22,7 +23,6 @@
                     @saved-item-data="handleSavedItem"
                     :action="actionOnItem"
                     :itemData="itemData">
-
                 </PermissionForm>
             </template>
         </ListItems>

@@ -51,37 +51,43 @@
                 </span>
             </v-tooltip>
         </div>
-        
-        <v-list dense  >
-            <v-list-item-group class="mt-1">
-                <v-list-item
-                    v-for="(item, i) in filterLazyValue"
-                    :key="i"
-                    class="w-100 selected-permission-pack">
+			<VuePerfectScrollbar style="height:calc(100vh - 320px);margin-top:10px">
+				<v-list dense  >
+					<v-list-item-group class="mt-1 mr-4">
+							<v-list-item
+								v-for="(item, i) in filterLazyValue"
+								:key="i"
+								class="w-100 selected-permission-pack ">
 
-                    <span class="fs-13">
-                        {{item.name}}
-                    </span>
+								<span class="fs-13">
+									{{item.name}}
+								</span>
 
-                    <v-btn
-                        depressed
-                        icon
-                        small
-                        class="delete-selected-permission">
+								<v-btn
+									depressed
+									icon
+									small
+									class="delete-selected-permission">
 
-                        <v-icon size="18" @click="deleteSelectedActionPack(item, i)"   >
-                            mdi-trash-can-outline
-                        </v-icon>
+									<v-icon size="18" color="red" @click="deleteSelectedActionPack(item, i)"   >
+										mdi-close
+									</v-icon>
 
-                    </v-btn>
-                </v-list-item>
-            </v-list-item-group>
-        </v-list>
+								</v-btn>
+							</v-list-item>
+					</v-list-item-group>
+				</v-list>
+			</VuePerfectScrollbar>
     </div>
 </template>
 
 <script>
+import { TouchListener } from 'ag-grid-community';
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 export default {
+	components:{
+		VuePerfectScrollbar
+	},
     created(){
         this.$store.dispatch('permission/getAllActionPack');
     },
@@ -160,7 +166,8 @@ export default {
             deep: true,
             immediate: true,
             handler: function(after){
-                this.lazyValue = after
+				this.lazyValue = after
+				this.selectedActionPack = {}
             }
         }
     },
