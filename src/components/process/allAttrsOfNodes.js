@@ -1614,7 +1614,7 @@ let allAttrs = {
     },
     "multiinstance_cardinality": {
         "title": "Cardinality ",
-        "type": "numeric",
+        "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_CARDINALITYPACKAGE.MULTIINSTANCE_CARDINALITY.DESCRIPTION",
         "dg": "multiInstance",
@@ -1957,7 +1957,7 @@ let allAttrs = {
         "dg": "detail",
         toXML: {
             "symper_position": "attr",
-            "name": "terminateAll",
+            "name": "symper_symper_terminateAll_tag",
             "isAttr": true,
             "type": "String"
         }

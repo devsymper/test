@@ -36,9 +36,7 @@ export default {
 				}
 			}).catch(err=>{
 			})
-		}		
-			
-           
+		}      
 	}
 }
 </script>
