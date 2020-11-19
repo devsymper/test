@@ -25,6 +25,7 @@
                 solo
                 flat
                 outlined
+				:disabled="action == 'detail'"
                 return-object
                 item-text="name"
                 item-value="id"
@@ -66,6 +67,7 @@
 								<v-btn
 									depressed
 									icon
+									v-if="action != 'detail'"
 									small
 									class="delete-selected-permission">
 
@@ -159,7 +161,11 @@ export default {
             default(){
                 return []
             }
-        },
+		},
+		action:{
+			type: String, 
+			default: ""
+		}
     },
     watch: {
         value: {

@@ -62,7 +62,7 @@ export default {
     },
     created(){
         this.$store.dispatch("app/getAllBA");
-        this.getUserName();
+        // this.getUserName();
     },
     data: function() {
         let self = this;
@@ -131,6 +131,13 @@ export default {
             actionOnItem: 'create',
             currentItemData: util.cloneDeep(defaultItemData),
             tableContextMenu: {
+                viewDetails: {
+                    name: "view",
+                    text: this.$t("permissions.contextMenu.viewDetails"),
+                    callback: async (pack, callback) => {
+						self.updatePermissionData(pack, true);
+                    }
+                },
                 update: {
                     name: "edit",
                     text: this.$t("permissions.contextMenu.edit"),
@@ -148,11 +155,7 @@ export default {
                         }
                         try {
                             let res = await permissionApi.deletePermissionPack(ids);
-                            // if(res.status == 200){
                                 self.$snotifySuccess("Deleted "+ids.length+' items');
-                            // }else{
-                            //     self.$snotifyError(res, "Can not delete selected items");
-                            // }
                         } catch (error) {
                             self.$snotifyError(error, "Can not delete selected items");
                         }
@@ -170,13 +173,12 @@ export default {
         closeForm(){
             this.$refs.listPermission.closeactionPanel();
         },
-        async updatePermissionData(pack){
+        async updatePermissionData(pack , view = false){
             let self = this;
             for(let key in pack){
                 self.$set(self.currentItemData, key, pack[key]);
             }
-
-            self.actionOnItem = 'update';
+			self.actionOnItem = view == false ? 'update' : 'detail';
             let res = await permissionApi.getActionPackOfPermission(pack.id);
             
             if(res.status == 200){
