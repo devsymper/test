@@ -473,35 +473,41 @@ export default {
             let self = this
             if(name == 'objectType'){
                 if(data == "department"){
-                    let objectType = data;
-                    let rows = this.itemData.mapActionForAllObjects[objectType];
-					let rowsItem = this.itemData.mapActionAndObjects[objectType];
-                    if(rows){
-                        for(let i in rows[0]){
-                            if(rows[0][i] == true){
-                                self.permissionDepartment.push(i)
-                            }
-                        }
-                    }
-                    if(rowsItem){
-						if(self.permissionDepartment.includes('view_other') == false){
-                        	self.permissionDepartment.push('view_other')
-						}
-                        self.$store.dispatch('orgchart/getAllOrgchartStruct');
-                        setTimeout(function(){
-                            rowsItem.forEach(function(e){
-                                if(e.object != ""){
-                                    self.departmentSelected.push('department:'+e.object);
-                                    self.departmentSelectedProps.push(e.object)
-                                }
-                             })
-                        },1000)
-                    }
+					this.handleConfigDepartment(data)
                 }else{
                     this.handleChangeObjectType();
                 }
             }
-        },
+		},
+		handleConfigDepartment(data){
+			let self = this
+			let objectType = data;
+			let rows = this.itemData.mapActionForAllObjects[objectType];
+			let rowsItem = this.itemData.mapActionAndObjects[objectType];
+			if(rows){
+				for(let i in rows[0]){
+					if(rows[0][i] == true){
+						if(self.permissionDepartment.includes(i) == false){
+							self.permissionDepartment.push(i)
+						}
+					}
+				}
+			}
+			if(rowsItem){
+				if(self.permissionDepartment.includes('view_other') == false){
+					self.permissionDepartment.push('view_other')
+				}
+				self.$store.dispatch('orgchart/getAllOrgchartStruct');
+				setTimeout(function(){
+					rowsItem.forEach(function(e){
+						if(e.object != ""){
+							self.departmentSelected.push('department:'+e.object);
+							self.departmentSelectedProps.push(e.object)
+						}
+						})
+				},1000)
+			}
+		},
         handleChangeObjectType(){
             this.dataSchema = this.getDataSchema();
             this.tableColumnsForObjectType = this.getActionAsColumns();
