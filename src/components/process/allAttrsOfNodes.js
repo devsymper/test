@@ -1738,7 +1738,7 @@ let allAttrs = {
                 title: 'Scope',
                 name: 'symper_symper_scope_tag',
                 type: 'autocomplete',
-                source: ["global", "process instance"]
+                source: ["global", "processInstance"]
             },
         ],
         "info": "BPMN.PROPERTYPACKAGES.SIGNALDEFINITIONSPACKAGE.SIGNALDEFINITIONS.DESCRIPTION",
@@ -1759,6 +1759,17 @@ let allAttrs = {
 
                     if(newItem.id && newItem.id.trim()){
                         rsl.push(newItem);
+                    }
+                }
+            }
+            return rsl;
+        },
+        getValueForXML(value) {
+            let rsl = [];
+            if($.isArray(value)){
+                for(let item of value){
+                    if(item.id && item.id.trim()){
+                        rsl.push(item);
                     }
                 }
             }
