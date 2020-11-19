@@ -504,7 +504,7 @@ export default {
 							self.departmentSelected.push('department:'+e.object);
 							self.departmentSelectedProps.push(e.object)
 						}
-						})
+					})
 				},1000)
 			}
 		},
