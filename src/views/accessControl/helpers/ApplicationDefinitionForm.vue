@@ -80,7 +80,6 @@ export default {
 		handleItemSelected(value){
 			this.selectedApplication = value
 			appManagementApi.getAppDetailBa(value).then(res=>{
-				debugger
 			}).catch(err=>{
 
 			})
