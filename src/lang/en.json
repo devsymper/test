@@ -1,6 +1,7 @@
 {
     "common": {
         "id": "Id",
+        "number_instance": "Number of process instance",
         "select_lang": "Select language",
         "KH": "Knowledge Management",
         "structureManagement": "Structure management",
@@ -97,7 +98,11 @@
         "not_show_sidebar": "Disable show sidebar",
         "import_excel": "Import excel",
         "isDefault": "Default orgchart",
-        "restore": "Restore",
+		"restore": "Restore",
+		"userCreateName": "User Create Name",
+		"userUpdateName": "User Update Name",
+		"createAt": "Create At",
+		"updateAt": "Update At",
         "sidebar": {
             "Setting": "Setting",
             "action_pack": "Action Pack",

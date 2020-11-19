@@ -171,7 +171,8 @@
             ref="traceControlView" 
             v-show="isShowTraceControlSidebar" />
         </v-navigation-drawer>
-
+    <PopupPivotTable ref="popupPivotTableView" :dataColPivot="dataColPivot" :data="dataPivotMode" @before-add-pivot-data="beforeAddPivotData"/>
+    <input type="text" class="input-pivot" @keyup="afterKeyupInputPivot" @blur="afterBlurInputPivot" v-if="dataPivotTable">
     </div>
      
 </template>
@@ -210,6 +211,7 @@ import Preloader from './../../../components/common/Preloader';
 import {listControlNotNameProp} from "./../../../components/document/controlPropsFactory.js"
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import FloattingPopup from './../common/FloattingPopup'
+import PopupPivotTable from './items/PopupPivotTable'
 
 
 
@@ -314,7 +316,8 @@ export default {
         UploadFile,
         SidebarTraceFormulas,
         VuePerfectScrollbar,
-        FloattingPopup
+        FloattingPopup,
+        PopupPivotTable
     },
     computed: {
         sDocumentEditor() {
@@ -334,6 +337,9 @@ export default {
         },
         baInfo(){
             return this.$store.state.app.baInfo
+        },
+        currentRowChangePivotMode(){
+            return this.$store.state.document.submit[this.keyInstance].currentRowChangePivotMode
         }
     },
     data() {
@@ -384,7 +390,9 @@ export default {
             listFileControl:[],
             currentImageControl:null,
             currentControlDataflow:null,
-            dataPivotTable:{}
+            dataPivotTable:{},
+            dataColPivot:[],
+            dataPivotMode:[],
         };
 
     },
@@ -464,6 +472,55 @@ export default {
         if(this.docObjId != null){
             this.loadDocumentObject();
         }
+        /**
+         * Nhận xử lí sự kiện click chuyển đổi dạng table <=> pivot mode
+         */
+        this.$evtBus.$on("on-switch-pivot-table-mode", locate =>{
+            if(thisCpn._inactive == true) return;
+            let tableName = locate.tableName;
+            let tableInstance = getControlInstanceFromStore(this.keyInstance,tableName);
+            tableInstance.tableMode = (tableInstance.tableMode == 'nomal') ? 'pivot' : 'nomal';
+            tableInstance.switchTable();
+        })
+        /**
+         * Nhận xử lí sự kiện thêm dữ liệu cho bảng pivot
+         */
+        this.$evtBus.$on("on-add-data-to-pivot-table", locate => {
+            if(thisCpn._inactive == true) return;
+            let type = locate.type;
+            let tableName = locate.tableName;
+            let tableInstance = getControlInstanceFromStore(this.keyInstance,tableName);
+            let pivotData = tableInstance.pivotTable.getDataGroup();
+            let rowsConfig = pivotData['rows'];
+            this.dataColPivot = [];
+            this.dataPivotMode = [];
+            for (let index = 0; index < rowsConfig.length; index++) {
+                let controlName = rowsConfig[index];
+                let controlBindData = getControlInstanceFromStore(this.keyInstance,controlName);
+                let value = controlBindData.value;
+                let uniqueData = value.filter(function(value, index, self){
+                    return self.indexOf(value) === index;
+                })
+                this.dataPivotMode.push({controlName:controlName, controlTitle:controlBindData.title,value:uniqueData});
+            }
+            let colsConfig = pivotData['cols'];
+            for (let index = 0; index < colsConfig.length; index++) {
+                let controlName = colsConfig[index];
+                let controlBindData = getControlInstanceFromStore(this.keyInstance,controlName);
+                let value = controlBindData.value;
+                let uniqueData = value.filter(function(value, index, self){
+                    return self.indexOf(value) === index;
+                })
+                if(type == 'cols'){
+                    this.dataColPivot.push({controlName:controlName, controlTitle:controlBindData.title});
+                }
+                else{
+                    this.dataPivotMode.push({controlName:controlName, controlTitle:controlBindData.title,value:uniqueData});
+                }
+            }
+            
+            this.$refs.popupPivotTableView.show(type, tableName);
+        });
 
         this.$evtBus.$on("on-info-btn-in-table-click", locate => {
             if(thisCpn._inactive == true) return;
@@ -476,10 +533,10 @@ export default {
         /**
          * Su kiện phát ra khi có sự thay đổi trong table, để convert sang pivot table
          */
-        this.$evtBus.$on("symper-submit-on-table-change", locate => {
+        this.$evtBus.$on("document-on-table-change", locate => {
             if(thisCpn._inactive == true) return;
             let tableName = locate.tableName;
-            if(this.dataPivotTable[tableName]){
+            if(this.dataPivotTable && this.dataPivotTable[tableName]){
                 let data = locate.data;
                 let tableIns = getControlInstanceFromStore(this.keyInstance, tableName);
                 this.setDataToPivotTable(tableIns,data);
@@ -849,8 +906,105 @@ export default {
     },
     
     methods: {
-        
-        
+        afterBlurInputPivot(event){
+            $(event.target).css({display:'none'});
+            this.updateDataAfterChangePivot($(event.target));
+
+        },
+        afterKeyupInputPivot(event){
+            if(event.which == 13){
+                $(event.target).css({display:'none'});
+            }
+        },
+        /**
+         * Hàm nhận biết sự thay đổi của cell đang nhập ở bảng pivot từ đó update lại data
+         */
+        updateDataAfterChangePivot(input){
+            let currentRowChangePivotMode = this.currentRowChangePivotMode;
+            let keyChange = currentRowChangePivotMode.key;
+            let value = currentRowChangePivotMode.value;
+            let tableName = currentRowChangePivotMode.tableName;
+            let type = currentRowChangePivotMode.type;
+            let tableIns = getControlInstanceFromStore(this.keyInstance, tableName);
+            if(type && type == 'group'){
+                for (let index = 0; index < value.length; index++) {
+                    value[index][keyChange] = input.val();
+                }
+                this.updateToTableNomalData(tableName, value, {});
+            }
+            else{
+                value[keyChange] = input.val();
+                if(value.s_table_id_sql_lite){  // edit dòng đã có
+                    this.updateToTableNomalData(tableName, [value], {});
+                }
+                else{   // thêm dòng mới cho table thường
+                    this.updateToTableNomalData(tableName, [], value);
+                }    
+            }
+        },
+        /**
+         * Xử lí update data ngược lại từ bảng pivot -> table nomal
+         */
+        beforeAddPivotData(data){
+            let tableName = data.tableName;
+            let type = data.type;
+            let dataRowGroup = data.dataRowGroup;
+            let dataColPivot = data.dataColPivot;
+            let rowData = {};
+            for (let index = 0; index < dataRowGroup.length; index++) {
+                let cell = dataRowGroup[index];
+                rowData[cell.controlName] = cell.selected
+            }
+            for (let index = 0; index < dataColPivot.length; index++) {
+                let cell = dataColPivot[index];
+                rowData[cell.controlName] = cell.selected
+            }
+            this.updateToTableNomalData(tableName,[],rowData)
+            this.$refs.popupPivotTableView.hide();
+        },
+        /**
+         * Hàm call lại chuẩn bị data để thêm vào bảng nomal sau khi có sự thay đổi ở bảng pivot
+         */
+        updateToTableNomalData(tableName, oldData = [], newData = {}){
+            let tableControl = getControlInstanceFromStore(this.keyInstance,tableName);
+            let hotTb = tableControl.tableInstance.tableInstance;
+            let allData = hotTb.getSourceData();
+            let allColumn = hotTb.getColHeader();
+            let allColumnTable = tableControl.controlInTable;
+            if(oldData.length > 0){
+                for (let index = 0; index < allData.length; index++) {
+                    for (let i = 0; i < oldData.length; i++) {
+                        let rowChange = oldData[i];
+                        if(allData[index].s_table_id_sql_lite == rowChange.s_table_id_sql_lite){
+                            allData[index] = rowChange;
+                        }
+                    }
+                    delete allData[index].s_table_id_sql_lite;
+                    for(let control in allColumnTable){
+                        if(!allData[index][control]){
+                            allData[index][control] = null;
+                        }
+                    }
+                }
+            }
+            else{
+                for (let index = 0; index < allData.length; index++) {
+                    for(let control in allColumnTable){
+                        if(!allData[index][control]){
+                            allData[index][control] = null;
+                        }
+                    }
+                    delete allData[index].s_table_id_sql_lite;
+                }
+                for (let control in allData[0]) {
+                    if(!newData[control]){
+                        newData[control] = "";
+                    }
+                }
+                allData.push(newData);
+            }
+            tableControl.tableInstance.setData(allData, false);
+        },
         /**
          * Hàm ẩn loader
          */
@@ -1424,7 +1578,8 @@ export default {
                                 id,
                                 thisCpn.keyInstance
                             );
-                            if(this.dataPivotTable[controlName]){
+                            if(this.dataPivotTable && this.dataPivotTable[controlName]){
+                                tableControl.tableMode = 'pivot';
                                 tableControl.pivotTable = new PivotTable(
                                     tableControl,
                                     controlName,
@@ -2285,8 +2440,10 @@ export default {
          * Hàm cập nhật dữ liệu cho bảng pivot
          */
         setDataToPivotTable(tableControl, data){
-            tableControl.pivotTable.show();
-            tableControl.pivotTable.setData(data);
+            if(tableControl.pivotTable){
+                tableControl.pivotTable.show();
+                tableControl.pivotTable.setData(data);
+            }
         },
 
         /**

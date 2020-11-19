@@ -1404,7 +1404,12 @@ let allAttrs = {
         "type": "autocomplete",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.SIGNALREFPACKAGE.SIGNALREF.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        "options": [],
+        "textKey": 'name',
+        "valueKey": 'id',
+        "showId": false,
+        pushToXML: attrToXMLMethods.signalRefMethod
     },
     "errorref": {
         "title": "Error reference",
@@ -1731,18 +1736,50 @@ let allAttrs = {
             },
             {
                 title: 'Scope',
-                name: 'symper_prefix_chars_scope',
+                name: 'symper_symper_scope_tag',
                 type: 'autocomplete',
-                source: ["Global", "Process instance"]
+                source: ["global", "process instance"]
             },
         ],
         "info": "BPMN.PROPERTYPACKAGES.SIGNALDEFINITIONSPACKAGE.SIGNALDEFINITIONS.DESCRIPTION",
         "dg": "detail",
         getValue(value) {
-            return $.isArray(value) ? value : [];
+            let rsl = [];
+            if($.isArray(value)){
+                for(let item of value){
+                    if(!item.symper_symper_scope_tag){
+                        item.symper_symper_scope_tag = 'global';
+                    }
+
+                    let newItem = {
+                        "id": item.id,
+                        "name": item.name,
+                        "scope": item.symper_symper_scope_tag
+                    };
+
+                    if(newItem.id && newItem.id.trim()){
+                        rsl.push(newItem);
+                    }
+                }
+            }
+            return rsl;
         },
         restoreData(value) {
-            return value == '' ? [] : value;
+            let rsl = [];
+            if($.isArray(value)){
+                for(let item of value){
+                    let newItem = {
+                        "id": item.id,
+                        "name": item.name,
+                        "symper_symper_scope_tag": item.scope
+                    };
+
+                    if(newItem.id && newItem.id.trim()){
+                        rsl.push(newItem);
+                    }
+                }
+            }
+            return rsl;
         },
         needReformatValue: true,
         toXML: {
@@ -1760,7 +1797,7 @@ let allAttrs = {
                     "type": "String"
                 },
                 {
-                    "name": "symper_prefix_chars_scope",
+                    "name": "symper_symper_scope_tag",
                     "isAttr": true,
                     "type": "String"
                 },
@@ -1947,12 +1984,19 @@ let allAttrs = {
         "info": "BPMN.PROPERTYPACKAGES.DECISIONTASKFALLBACKTODEFAULTTENANTPACKAGE.DECISIONTASKFALLBACKTODEFAULTTENANT.DESCRIPTION",
         "dg": "detail"
     },
-    "interrupting": {
+    "isInterrupting": {
         "title": "Interrupting",
         "type": "checkbox",
         "value": true,
         "info": "BPMN.PROPERTYPACKAGES.INTERRUPTINGPACKAGE.INTERRUPTING.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        toXML: {
+            "symper_position": "attr",
+            "name": "isInterrupting",
+            "isAttr": true,
+            "type": "String",
+            "defined": true
+        }
     },
     "completioncondition": {
         "title": "Completion condition",
