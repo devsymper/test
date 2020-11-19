@@ -197,7 +197,6 @@ export default {
     },
 
     conditionExpressionMethod(el, elKey, attr, bpmnModeler, attrName) {
-
         if (el.businessObject && attr.value.trim() != '') {
             let moddle = bpmnModeler.get('moddle');
             let bizObj = el.businessObject;
