@@ -31,6 +31,11 @@ export default {
         let moddle = bpmnModeler.get('moddle');
         let modeling = bpmnModeler.get('modeling');
         let attrValue = attr.value;
+        
+        if (attr.hasOwnProperty('getValueForXML')) {
+            attrValue = attr.getValueForXML(attr.value);
+        }
+
         for (let item of attrValue) {
             let canAdd = false;
             for (let key in item) {
