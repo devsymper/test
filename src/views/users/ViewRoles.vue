@@ -8,6 +8,31 @@
                     <span class="fw-430">Danh sách phân quyền cho user</span>
             </v-col>
         </v-row>
+		Permission:
+		 <v-sheet max-width="93%" class="mb-3">
+                <v-slide-group multiple  prev-icon="mdi-minus">
+                    <template v-slot:next>
+                        <div class="slider-user-button slider-button-right"> 
+                           <v-icon> mdi mdi-chevron-right</v-icon>
+                        </div>
+                    </template>
+                    <template v-slot:prev >
+                        <div class="slider-user-button">
+                           <v-icon> mdi mdi-chevron-left</v-icon>
+                        </div>
+                    </template>
+                    <v-slide-item class="item-user"
+                        v-for="(item, permissionIdx) in  permission.orgchart"  
+                        :key="permissionIdx">
+                        <div class="d-flex justify-start ml-3 mr-3 slider-user ">
+                            <v-list-item-content style="background:#1B186F">
+                                <v-list-item-title style="margin-left: 0.5;  color:white" class="item-title fs-13">{{item.name}}
+                                </v-list-item-title>
+                            </v-list-item-content>
+                        </div>
+                    </v-slide-item>
+                </v-slide-group>
+            </v-sheet>
         <v-row class="w-100 h-100" style="border:1px solid rgba(0,0,0,0.1); margin-top:-10px" >
             <v-col cols="md-2" >
                 <v-list-item-group >
@@ -67,7 +92,7 @@
 import { userApi } from "./../../api/user.js";
 export default {
 
-    props:['rolesList'],
+    props:['rolesList','permission'],
     methods:{
         showUserInfo(){
             this.$emit("show-userInfo")

@@ -105,14 +105,15 @@
                             v-model="showableUserInfo[key]">
                         </v-text-field>
                     </v-col>
-                    <v-col v-if="!isEditing" >
+                    <v-col v-if="!isEditing"  >
                         <span class="fs-13" >
                             {{showableUserInfo[key]?showableUserInfo[key]:"Đang để trống"}}
                         </span>
                         <v-btn 
-                        icon tile 
-                        class="float-right" 
-                        v-if=" (key == 'email' || key == 'phone')">
+                            x-small
+                            icon tile 
+                            class="float-right" 
+                            v-if=" (key == 'email' || key == 'phone')">
                         <v-tooltip top>
                             <template v-slot:activator="{ on }">
                                 <v-icon
@@ -130,7 +131,7 @@
                     </v-col>
                     </v-row>
                 </div>
-                <div class="ml-4" :class="{'mt-2':isEditing}">
+                <div class="ml-4 mt-3" :class="{'mt-2':isEditing}">
                     <div @click="changePass()" class="detail-user-label">
                         {{$t('user.general.personalInfo.pass')}}
                         <v-icon style = "font-size: 16px; margin-top:-2px">mdi-lock-outline</v-icon>
@@ -153,30 +154,32 @@
                 </div>
                 <div 
                     class="pl-4 d-flex mt-1" 
-                    v-if="lazyUserInfo.roles.orgchart.length">
+                    v-if="orgRole.length">
                     <div class="detail-user-label mt-1">
                         {{$t('common.orgchart')}}
                     </div>
                 </div>
-                <div v-for="role in lazyUserInfo.roles.orgchart" :key="role.id">
-                    <div class="ml-5">
+                <div v-for="(role,indx) in orgRole" :key="indx">
+                    <div class="ml-5" v-if="role.name">
                         <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon>
                         <!-- <i class="fs-16 mdi mdi-check  indigo--text text--darken-4 mr-1"></i> -->
-                        <v-btn class="font-normal " 
-                            style="margin-bottom:-8px"
+                        <v-btn  x-small class="font-normal " 
                             text 
                             @click="viewUserRole(role.id)" >
-                            <span style="margin-top:-px">
+                            <span>
                                 {{role.name}}
                             </span>
                         </v-btn>
                     </div>
-                    <div class="text--lighten-2 grey-text pl-6">
-                        {{role.path}}
+                    <div class="ml-5 mt-1" v-else>
+                        <span class="fs-13" style="color:rgb(211, 109, 36)" >{{role.titleGroup}}</span>
                     </div>
+                    <!-- <div class="text--lighten-2 grey-text pl-6">
+                        {{role.path}}123
+                    </div> -->
                 </div>
                 </div>
-                <div class="mt-2" v-if="lazyUserInfo.roles.orgchart.length">
+                <div class="mt-2" v-if="lazyUserInfo.roles.systemRole.length">
                     <div class=" mt-1">
                         <v-icon class="fs-16">mdi mdi-account-tie-outline</v-icon>
                        <span 
@@ -187,10 +190,10 @@
                     <div class="detail-user-value">
                         <div v-for="role in lazyUserInfo.roles.systemRole" :key="role.id">
                             <!-- <i class="fs-16 indigo--text text--darken-4 mr-1"></i>  -->   
-                            <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon>
+                            <!-- <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon> -->
                             <v-btn class="fm fw-400" 
-                                style="margin-bottom:-8px"
                                 text 
+                                x-small
                                 @click="viewUserRole(role.id)" >
                                 <span class='fm'>
                                     <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon>
@@ -203,7 +206,8 @@
             </div>
             </v-col>
             <v-col class="col-md-8" v-if="isViewUserRole">
-                <ViewRoles 
+                <ViewRoles
+                    :permission="lazyUserInfo.roles"
                     @show-userInfo="showUserInfo()"
                     :rolesList="role"/>
             </v-col>
@@ -232,6 +236,7 @@ export default {
     data(){
         return {
             role:[],
+            orgRole:[],
             dialog:false,
             openChangePassForm:false,
             avatarUrl:'',
@@ -305,7 +310,16 @@ export default {
         },
         closePanel(){
             this.$emit('closePanel')
-        }, 
+        },
+        editOrgRole(ogrRole){
+            let nameOrgchart = _.groupBy(ogrRole, 'orgchartName');
+            this.orgRole= [];
+            Object.keys(nameOrgchart).forEach(type => {
+                this.orgRole.push({titleGroup: type });
+                this.orgRole.push(...nameOrgchart[type]);
+            })
+
+        },
         reAssignUserInfo(){
             let rsl = {};
             for(let key in this.lazyUserInfo){
@@ -315,6 +329,7 @@ export default {
             }
             this.lazyUserInfo = null;
             this.lazyUserInfo = rsl;
+            this.editOrgRole(rsl.roles.orgchart);
         }
     },
     props: {
