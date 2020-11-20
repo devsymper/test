@@ -3,7 +3,12 @@
         <div :style="{width:contentWidth, display: 'inline-block'}">
            <v-row v-if="showToolbar" no-gutters class="pb-2" ref="topBar"> 
                 <v-col>
-                    <span class="symper-title float-left">{{pageTitle}}</span>
+                    <span 
+						class="symper-title float-left"
+						:class="{'ml-4': dialogMode == true }"
+					>
+						{{pageTitle}}
+					</span>
                     <div :class="{'float-right': true, 'overline' : true , 'show-panel-mode': actionPanel } ">
                         <v-text-field
                             @input="bindToSearchkey"
@@ -16,7 +21,7 @@
                             :placeholder="$t('common.search')"
                         ></v-text-field>
                          <v-btn
-                            v-show="showButtonAdd && !actionPanel"
+                            v-show="showButtonAdd && !actionPanel && !dialogMode"
                             depressed
                             small
                             :loading="loadingRefresh"
@@ -34,13 +39,13 @@
                             :loading="loadingRefresh"
                             :disabled="loadingRefresh"
                             class="mr-2"
-                            v-if="!isCompactMode && !actionPanel "
+                            v-if="!isCompactMode && !actionPanel && !dialogMode"
                             @click="refreshList"
                         >
                             <v-icon left dark>mdi-refresh</v-icon>
                             <span >{{$t('common.refresh')}}</span>
                         </v-btn>
-                     
+
                       
                         <v-btn
                             depressed
@@ -49,7 +54,7 @@
                             :loading="loadingExportExcel"
                             class="mr-2"
                             :disabled="loadingExportExcel"
-                            v-if="!isCompactMode && showExportButton && !actionPanel"
+                            v-if="!isCompactMode && showExportButton && !actionPanel && !dialogMode"
                         >
                             <v-icon left dark>mdi-microsoft-excel</v-icon>
                             <span v-show="!actionPanel">{{$t('common.export_excel')}}</span>
@@ -61,7 +66,7 @@
                             small
                             @click="importExcel()"
                             class="mr-2"
-                            v-if="showImportButton && !actionPanel"
+                            v-if="showImportButton && !actionPanel && !dialogMode"
                         >
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel')}}</span>
@@ -73,10 +78,21 @@
                             small
                             @click="showImportHistory()"
                             class="mr-2"
-                            v-if="showImportHistoryBtn && !actionPanel"
+                            v-if="showImportHistoryBtn && !actionPanel && !dialogMode"
                         >
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel_history')}}</span>
+                        </v-btn>
+                        <v-btn
+                            depressed
+                            small
+							icon
+							tile
+                            @click="handleCloseClick"
+                            class="mr-2"
+                            v-if="dialogMode"
+                        >
+                            <v-icon dark>mdi-close</v-icon>
                         </v-btn>
                          <v-menu
                             
@@ -147,6 +163,7 @@
                                     @click="openTableDisplayConfigPanel"
                                     depressed
                                     small
+									v-if="!dialogMode"
                                     v-on="on"
                                 >
                                     <v-icon left dark class="ml-1 mr-0 ">mdi-table-cog</v-icon>
@@ -155,7 +172,7 @@
                             <span>{{ $t('common.list_config') }}</span>
                         </v-tooltip>
                         
-                        <v-tooltip top v-if="showActionPanelInDisplayConfig">
+                        <v-tooltip top v-if="showActionPanelInDisplayConfig ">
                             <template v-slot:activator="{ on }">
                                 <v-btn
                                     @click="changeAlwayShowSBSState"
@@ -548,6 +565,10 @@ export default {
         });
     },
     props: {
+		dialogMode:{
+			type: Boolean,
+			default:false
+		},
 		showToolbar:{
 			type:Boolean, 
 			default: true
@@ -849,7 +870,10 @@ export default {
             if(topic){
                 this.$store.dispatch('app/subscribeSystemMessagingTopics', [topic]);
             }
-        },
+		},
+		handleCloseClick(){
+			this.$emit('close-popup')
+		},
         checkMessageAndRefreshData(msg){
             let self = this;
             this.$evtBus.$on("app-receive-remote-msg", payload => {

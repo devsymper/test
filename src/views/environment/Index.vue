@@ -7,13 +7,13 @@
 			<span class="flex-grow-1 ml-2 fs-16 font-weight-bold">
 				Danh sách các môi trường 
 			</span>
-			<v-btn
+			<!-- <v-btn
 				class="mr-2 font-normal fs-13" 
 				depressed
 				@click="showDialogAdd"
 			>
 				Thêm môi trường
-			</v-btn>
+			</v-btn> -->
 			<v-btn 
 				class="mr-2 font-normal fs-13"
 				depressed
@@ -31,51 +31,119 @@
 				v-model="searchKey"
 			></v-text-field>
 		</div>
-		<div class="content-environment-management d-flex flex-column mt-2">
-			<v-list-item
-				v-for="i in 3"
-				:key="i"
-				class="mr-6 ml-6 pr-0 pl-0 fs-13"
-			>
-
-				<v-list-item-content >
-					<v-list-item-title class="fs-13">App-beta.symper.vn</v-list-item-title>
-
-					<v-list-item-subtitle class="fs-13" >
-						<span>ID : hsdashdhsjd123214</span>
-						<span class="ml-16">
-							Loại môi trường development
-						</span>
-					</v-list-item-subtitle>
-				</v-list-item-content>
-
-				<v-list-item-action>
-					<v-icon color="green lighten-1">mdi-chevron-down</v-icon>
-				</v-list-item-action>
-			</v-list-item>
-		</div>
-		<AddEnvironmentDialog 
+		<div class="content-environment-management d-flex flex-column mt-2 ml-8 mr-8">
+				 <v-expansion-panels accordion >
+					<v-expansion-panel
+						v-for="(item,i) in allEnvirontment"
+						:key="i"
+						@click="handleEnvClick(item)"
+					>
+						<v-expansion-panel-header v-if="item.show">
+							<div class="d-flex flex-column fs-13">
+								<div>
+									{{item.frontendDomain}}
+								</div>
+								<div class="mt-2 d-flex">
+									<div style="width: 300px">ID : {{item.id}}</div>
+									<span >
+										Loại môi trường {{item.type}}
+									</span>
+								</div>
+							</div>
+							<template v-slot:actions>
+								<v-icon color="success">mdi-chevron-down</v-icon>
+							</template>
+						</v-expansion-panel-header>
+						<v-expansion-panel-content class="fs-13" v-if="item.show">
+							<div v-if="serviceInstanceInEnv.length > 0">
+								<div v-for="(item,i) in serviceInstanceInEnv"  style="width: 350px" :key="i">
+									<span 
+										class="service-instance-title text-uppercase" 
+										
+										@click="handleServiceClick"
+									> 
+										{{ item.serviceName}}
+									</span>
+									<span class="float-right">
+											Version: {{ item.versionName}}
+									</span>
+								</div>
+							</div>
+						
+						</v-expansion-panel-content>
+					</v-expansion-panel>
+				</v-expansion-panels>
+		</div>	
+		<!-- <AddEnvironmentDialog 
 			:showDialog="showDialogAddItem"
 			@cancel="cancelAdd"
-			 />
+			 /> -->
+		<ListObjectInService 
+			:showDialog="showDialog"
+			:tableHeight="tableHeight"
+			@close-popup="handleCloseEvent"
+		/>	 
+			 
 	</div>
 </template>
 
 <script>
+import {util} from '@/plugins/util'
 import AddEnvironmentDialog from "./dialogs/AddEnvironmentDialog"
+import ListObjectInService from "./dialogs/ListObjectInService"
 export default {
 	components:{
 		AddEnvironmentDialog,
+		ListObjectInService
 	},
 	data(){
 		return {
 			searchKey: "",
-			showDialogAddItem: false
+			showDialog: false,
+			showDialogAddItem: false,
+			tableHeight:0
 		}
+	},
+	computed:{
+		allEnvirontment(){
+			let self = this
+			let envs = this.$store.state.environmentManagement.allEnvironment
+			if (this.searchKey == ""){
+				if(envs.length > 0){
+					envs.forEach(function(e){
+						e.show = true
+					})
+				}
+			}else{
+				envs.forEach(function(e){
+					if(e.frontendDomain.toLowerCase().includes(self.searchKey.toLowerCase())){
+						e.show = true
+					}else{
+						e.show = false
+					}
+				})
+			}
+			
+			return envs
+		},
+		serviceInstanceInEnv(){
+			debugger
+			let envData = this.$store.state.environmentManagement
+			return envData.serviceInstanceInEnv[envData.currentEnvId]
+		}
+	},
+	created(){
+		this.$store.dispatch('environmentManagement/getAllEnvirontment')
+	},
+	mounted(){
+		this.tableHeight = util.getComponentSize(this).h - 100
 	},
 	methods:{
 		showDialogAdd(){
 			this.showDialogAddItem = true
+		},
+		handleCloseEvent(){
+			this.showDialog = false
 		},
 		cancelAdd(){
 			this.showDialogAddItem = false
@@ -84,6 +152,12 @@ export default {
 			this.$goToPage(
 				"environment-sync-history", "Lịch sử đồng bộ"
 			)
+		},
+		handleEnvClick(env){
+			this.$store.dispatch('environmentManagement/getInstanceInEnv', env.id)
+		},
+		handleServiceClick(){
+			this.showDialog = true
 		}
 	}
 }
@@ -114,6 +188,22 @@ export default {
 }
 .environemt-management >>> .v-list-item{
 	border-bottom: 1px solid lightgray
+}
+.environemt-management >>> .v-expansion-panel-header{
+	padding: 8px !important;
+}
+.environemt-management >>> .v-expansion-panel,
+.environemt-management >>> .v-expansion-panel::before{
+	box-shadow: unset !important;
+}
+.environemt-management >>> .v-expansion-panel-header--active .v-icon{
+	transform: unset !important;
+}
+.environemt-management >>> .service-instance-title{
+	cursor: pointer;
+}
+.environemt-management >>> .service-instance-title:hover{
+	border-bottom: 1px solid black;	
 }
 
 </style>

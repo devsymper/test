@@ -56,7 +56,8 @@ var configs = {
         uiConfig: "https://ui.symper.vn",
         workflowExtend: "https://workflow-extend.symper.vn/",
         trash: "https://trash.symper.vn/",
-        log: "https://log.symper.vn"
+		log: "https://log.symper.vn",
+		environmentManagement: "https://system-management.symper.vn/"
     },
     notificationTimeout: {
         success: 3000,
