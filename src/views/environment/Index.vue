@@ -7,13 +7,13 @@
 			<span class="flex-grow-1 ml-2 fs-16 font-weight-bold">
 				Danh sách các môi trường 
 			</span>
-			<v-btn
+			<!-- <v-btn
 				class="mr-2 font-normal fs-13" 
 				depressed
 				@click="showDialogAdd"
 			>
 				Thêm môi trường
-			</v-btn>
+			</v-btn> -->
 			<v-btn 
 				class="mr-2 font-normal fs-13"
 				depressed
@@ -34,18 +34,19 @@
 		<div class="content-environment-management d-flex flex-column mt-2 ml-8 mr-8">
 				 <v-expansion-panels accordion >
 					<v-expansion-panel
-						v-for="(item,i) in 3"
+						v-for="(item,i) in allEnvirontment"
 						:key="i"
+						@click="handleEnvClick(item)"
 					>
-						<v-expansion-panel-header>
+						<v-expansion-panel-header v-if="item.show">
 							<div class="d-flex flex-column fs-13">
 								<div>
-									App-beta.symper.vn	
+									{{item.frontendDomain}}
 								</div>
-								<div class="mt-2">
-									<span>ID : hsdashdhsjd123214</span>
-									<span class="ml-16">
-										Loại môi trường development
+								<div class="mt-2 d-flex">
+									<div style="width: 300px">ID : {{item.id}}</div>
+									<span >
+										Loại môi trường {{item.type}}
 									</span>
 								</div>
 							</div>
@@ -53,7 +54,7 @@
 								<v-icon color="success">mdi-chevron-down</v-icon>
 							</template>
 						</v-expansion-panel-header>
-						<v-expansion-panel-content class="fs-13">
+						<v-expansion-panel-content class="fs-13" v-if="item.show">
 							Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
 						</v-expansion-panel-content>
 					</v-expansion-panel>
@@ -78,6 +79,32 @@ export default {
 			showDialogAddItem: false
 		}
 	},
+	computed:{
+		allEnvirontment(){
+			let self = this
+			let envs = this.$store.state.environmentManagement.allEnvironment
+			if (this.searchKey == ""){
+				if(envs.length > 0){
+					envs.forEach(function(e){
+						e.show = true
+					})
+				}
+			}else{
+				envs.forEach(function(e){
+					if(e.frontendDomain.toLowerCase().includes(self.searchKey.toLowerCase())){
+						e.show = true
+					}else{
+						e.show = false
+					}
+				})
+			}
+			
+			return envs
+		}
+	},
+	created(){
+		this.$store.dispatch('environmentManagement/getAllEnvirontment')
+	},
 	methods:{
 		showDialogAdd(){
 			this.showDialogAddItem = true
@@ -89,6 +116,9 @@ export default {
 			this.$goToPage(
 				"environment-sync-history", "Lịch sử đồng bộ"
 			)
+		},
+		handleEnvClick(env){
+			debugger
 		}
 	}
 }
