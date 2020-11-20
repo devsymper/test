@@ -8,16 +8,30 @@
 		:showExportButton="false"
 		:useDefaultContext="false"
 		:tableContextMenu="tableContextMenu"
+		:actionPanelWidth="550"
 		:customAPIResult="customAPIResult"
-	/>
+	>
+		 <template slot="right-panel-content" slot-scope="{}">
+			 <AddServiceForm 
+				@add-success="handleAddSuccess"
+			 />
+		</template>
+	</ListItems>
 </template>
 
 <script>
 import ListItems from "@/components/common/ListItems"
 import { appConfigs } from "@/configs.js";
+import AddServiceForm from './panels/AddServiceForm'
 export default {
 	components:{
-		ListItems
+		ListItems,
+		AddServiceForm
+	},
+	methods:{
+		handleAddSuccess(){
+			this.$refs.listService.refreshList()
+		}
 	},
 	props:{
 		containerHeight:{
@@ -36,6 +50,13 @@ export default {
 						self.$goToPage( "/service/"+row.id+"/versions",
                             "Chi tiết " + (row.name ? row.name : "")
                         );
+                    }
+                },
+                addVersion: {
+                    name: "addVersion",
+                    text: "Thêm version",
+                    callback: (row, callback) => {
+						
                     }
                 }
             },

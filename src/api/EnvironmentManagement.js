@@ -10,5 +10,8 @@ export const environmentManagementApi = {
 		return api.post('instances/query', {
 			environmentId: envId
 		})
-	}
+	},
+	addService(data){
+		return api.post('services',data )
+	},
 };
