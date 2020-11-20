@@ -152,7 +152,8 @@ export default {
                         {
                             name:'number_instance',
                             title:'number_instance',
-                            type:"numeric"
+                            type:"numeric",
+                            noFilter:true
                         },
                    )
                    let listWork = res.data;
