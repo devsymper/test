@@ -19,6 +19,30 @@ const getAllEnvirontment = (context) => {
     }
 }
 
+const getInstanceInEnv = (context , id) => {
+	context.commit('setCurrentEnvId', id)
+        try {
+
+			if(!context.state.serviceInstanceInEnv[id]){
+				environmentManagementApi.getEnvServiceInstance(id).then(res=>{
+					if (res.status == 200) {
+						let arr = res.data.length > 0 ? res.data : []
+						context.commit('setServiceInstanceInEnvironment', arr)
+					} else {
+						SYMPER_APP.$snotifyError(error, "Can not get all node style!");
+					}
+				}).catch(err=>{
+	
+				})
+			}
+			
+           
+        } catch (error) {
+            SYMPER_APP.$snotifyError(error, "Can not get all node style !");
+        }
+}
+
 export { 
-	getAllEnvirontment
+	getAllEnvirontment,
+	getInstanceInEnv
 };

@@ -1,5 +1,7 @@
 const defaultState = {
-	allEnvironment:[]
+	allEnvironment:[],
+	serviceInstanceInEnv:{},
+	currentEnvId: ""
 };
 
 export default defaultState;

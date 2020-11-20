@@ -55,14 +55,25 @@
 							</template>
 						</v-expansion-panel-header>
 						<v-expansion-panel-content class="fs-13" v-if="item.show">
-							Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.
+							<div v-if="serviceInstanceInEnv.length > 0">
+								<div v-for="(item,i) in serviceInstanceInEnv"  style="width: 350px" :key="i">
+									<span 
+										class="service-instance-title text-uppercase" 
+										
+										@click="handleServiceClick"
+									> 
+										{{ item.serviceName}}
+									</span>
+									<span class="float-right">
+											Version: {{ item.versionName}}
+									</span>
+								</div>
+							</div>
+						
 						</v-expansion-panel-content>
 					</v-expansion-panel>
 				</v-expansion-panels>
 		</div>	
-		<v-btn @click="handleServiceClick">
-			ahihi
-		</v-btn>
 		<!-- <AddEnvironmentDialog 
 			:showDialog="showDialogAddItem"
 			@cancel="cancelAdd"
@@ -114,6 +125,11 @@ export default {
 			}
 			
 			return envs
+		},
+		serviceInstanceInEnv(){
+			debugger
+			let envData = this.$store.state.environmentManagement
+			return envData.serviceInstanceInEnv[envData.currentEnvId]
 		}
 	},
 	created(){
@@ -138,6 +154,7 @@ export default {
 			)
 		},
 		handleEnvClick(env){
+			this.$store.dispatch('environmentManagement/getInstanceInEnv', env.id)
 		},
 		handleServiceClick(){
 			this.showDialog = true
@@ -181,6 +198,12 @@ export default {
 }
 .environemt-management >>> .v-expansion-panel-header--active .v-icon{
 	transform: unset !important;
+}
+.environemt-management >>> .service-instance-title{
+	cursor: pointer;
+}
+.environemt-management >>> .service-instance-title:hover{
+	border-bottom: 1px solid black;	
 }
 
 </style>
