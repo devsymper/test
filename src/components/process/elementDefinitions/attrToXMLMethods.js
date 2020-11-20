@@ -254,5 +254,17 @@ export default {
             signal.name = attr.value;
             bizEl.eventDefinitions[0].signalRef = signal;
         }
+    },
+
+    pushConditionTagToXML(el, elKey, attr, bpmnModeler, attrName){
+        let moddle = bpmnModeler.get('moddle');
+        let bizEl = el.businessObject;
+        if(attr.value && attr.value.trim()){
+            let eventDefinitions = moddle.create('bpmn:ConditionalEventDefinition');
+            let expression = moddle.create('bpmn:Expression');
+            expression.body = attr.value.trim().replace(/\n|\r\n/g,' ');
+            eventDefinitions.condition = expression;
+            bizEl.eventDefinitions = [eventDefinitions];
+        }
     }
 }

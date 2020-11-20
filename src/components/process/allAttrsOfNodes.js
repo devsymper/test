@@ -1587,7 +1587,8 @@ let allAttrs = {
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.CONDITIONALEVENTPACKAGE.CONDITION.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.pushConditionTagToXML
     },
     "initiator": {
         "title": "Initiator",
