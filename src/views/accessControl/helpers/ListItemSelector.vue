@@ -3,9 +3,11 @@
 		<v-autocomplete
             v-model="values"
 			v-show="selectingApp == true"
-            :items="tags"
+            :items="listItem"
             dense
             chips
+			item-text="name"
+			return-object
 			class="ml-1"
 			style="margin-top:-3px"
             small-chips
@@ -45,15 +47,15 @@
 					active-class="primary--text"
 				>
 					<v-chip
-						v-for="tag in values"
-						:key="tag"
+						v-for="value in values"
+						:key="value.id"
 						small
 						color="lightskyblue"
 						label
 						class="fs-13"
-						@click="handleAppClick(tag)"
+						@click="handleAppClick(value)"
 					>
-					{{ tag }}
+					{{ value.name }}
 					</v-chip>
 				</v-chip-group>
 			</v-sheet>
@@ -64,22 +66,17 @@
 <script>
 export default {
 	props:{
+		listItem:{
+			type: Array,
+			default(){
+				return []
+			}
+		}
 	},
 	data(){
 		return {
 			selectingApp: false,
-			tags: [
-				'Work',
-				'Home Improvement',
-				'Vacation',
-				'Food',
-				'Drawers',
-				'Shopping',
-				'Art',
-				'Tech',
-				'Creative Writing',
-			],
-			values:['Work']
+			values:[]
 		}
 	},
 	methods:{
@@ -90,8 +87,9 @@ export default {
 			this.selectingApp = false
 		},
 		handleAppClick(app){
-			this.$emit('item-selected' , app)
-		}
+			this.$emit('item-selected' , app.id)
+		},
+	
 	},
 	mounted(){
 

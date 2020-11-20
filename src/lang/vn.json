@@ -225,7 +225,8 @@
             "startUserId": "Người bắt đầu",
             "startTime": "Thời gian bắt đầu",
             "tenantId": "ID",
-            "suspended": "Trạng thái"
+			"suspended": "Trạng thái",
+			"number_instance":"Tổng số instance"
         }
     },
     "validate": {
@@ -394,6 +395,7 @@
         "grandPermission": "Phân quyền chi tiết",
         "apps": "Apps",
         "contextMenu": {
+			"viewDetails":"Xem chi tiết",
             "edit": "Sửa",
             "grantPermission": "Phân quyền",
             "remove": "Xóa"
@@ -758,7 +760,8 @@
                         "history": "Lịch sử",
                         "comment": "Bình luận",
                         "has": "Có",
-                        "commentNotResolve": "bình luận chưa được giải quyết"
+                        "commentNotResolve": "bình luận chưa được giải quyết",
+                        "id": "Định danh"
                     },
                     "worflowInfo": "THÔNG TIN QUY TRÌNH",
                     "userRelated": {

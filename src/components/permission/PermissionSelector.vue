@@ -31,16 +31,7 @@
                 class="sym-small-size sym-pad-0 mr-2 "
                 multiple
                 @change="addPermission">
-                <!-- <template v-slot:item="data">
-                    <div >
-                        <span @click="showCheck(1)"> {{data.item.name}}
-                         <span @click="showCheck()"> {{data.item.name}}ádasdasd
-                        <v-icon v-if="data.item.enable" color="success">
-                             mdi-check</v-icon>
-                    </span>
-                    </div>
-                 </template>-->
-                 
+              
             </v-autocomplete>
 
             <v-tooltip top>
@@ -59,37 +50,44 @@
                 </span>
             </v-tooltip>
         </div>
-        
-        <v-list dense>
-            <v-list-item-group class="mt-1">
-                <v-list-item
-                    v-for="(item, i) in filterLazyValue"
-                    :key="i"
-                    class="w-100 selected-permission-pack">
+        <VuePerfectScrollbar :style="{height: height}">	
+			<v-list dense>
+				<v-list-item-group class="mt-1 mr-4">
+					<v-list-item
+						v-for="(item, i) in filterLazyValue"
+						:key="i"
+						class="w-100 selected-permission-pack">
 
-                    <span class="fs-13">
-                        {{item.name}} 
-                    </span>
+						<span class="fs-13">
+							{{item.name}} 
+						</span>
 
-                    <v-btn
-                        depressed
-                        icon
-                        small
-                        class="delete-selected-permission">
+						<v-btn
+							depressed
+							icon
+							v-if="!disabled"
+							small
+							class="delete-selected-permission">
 
-                        <v-icon size="18" @click="deleteSelectedPermission(item, i)"   >
-                            mdi-trash-can-outline
-                        </v-icon>
+							<v-icon size="18" @click="deleteSelectedPermission(item, i)"   >
+								mdi-trash-can-outline
+							</v-icon>
 
-                    </v-btn>
-                </v-list-item>
-            </v-list-item-group>
-        </v-list>
+						</v-btn>
+					</v-list-item>
+				</v-list-item-group>
+			</v-list>
+		</VuePerfectScrollbar>
+      
     </div>
 </template>
 
 <script>
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 export default {
+	components:{
+		VuePerfectScrollbar
+	},
     created(){
         this.$store.dispatch('permission/getAllPermission');
         this.addEnable();
@@ -164,19 +162,32 @@ export default {
         disabled:{
             type: Boolean,
             default: false
-        }
+		},
+		height:{
+			type: String,
+			default: "100%"
+		},
+		action:{
+			type: String, 
+		}
     },
     watch: {
         value: {
             deep: true,
             immediate: true,
             handler: function(after){
-                 this.lazyValue = []
-                 this.selectedPermission = []
-                this.lazyValue = after;
-                this.selectedPermission = after;
+				this.lazyValue = []
+				this.selectedPermission = []
+				this.lazyValue = after;
+				this.selectedPermission = after;
             }
-        }
+		},
+		action(val){
+			if(val == 'create'){
+				this.lazyValue = []
+				this.selectedPermission = []
+			}
+		}
     },
     data(){
         return {
@@ -203,5 +214,8 @@ export default {
 
 .selected-permission-pack:hover .delete-selected-permission{
     display: block;
+}
+.v-select__selection{
+	display: none !important;
 }
 </style>
