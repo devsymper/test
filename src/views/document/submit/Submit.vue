@@ -501,9 +501,13 @@ export default {
                 let uniqueData = value.filter(function(value, index, self){
                     return self.indexOf(value) === index;
                 })
-                let inputData = {controlName:controlName, controlTitle:controlBindData.title,value:uniqueData};
+                let inputData = {controlName:controlName, controlTitle:controlBindData.title,value:uniqueData, type:'rows'};
                 if(tableInstance.pivotTable.pivotConfig.rows.length >1){
                     inputData.detailTitle = "Bỏ trống nếu muốn thêm dữ liệu cho toàn bộ dòng";
+                    this.dataPivotMode.push(inputData);
+                }
+                else{
+                    inputData.isDisable = true;
                     this.dataPivotMode.push(inputData);
                 }
             }
@@ -519,7 +523,15 @@ export default {
                     this.dataColPivot.push({controlName:controlName, controlTitle:controlBindData.title});
                 }
                 else{
-                    this.dataPivotMode.push({controlName:controlName, controlTitle:controlBindData.title,value:uniqueData, detailTitle:"Bỏ trống nếu muốn thêm dữ liệu cho toàn bộ cột"});
+                    this.dataPivotMode.push(
+                        {
+                            controlName:controlName, 
+                            controlTitle:controlBindData.title,
+                            value:uniqueData,
+                            type:'cols' ,
+                            detailTitle:"Bỏ trống nếu muốn thêm dữ liệu cho toàn bộ cột"
+                        }
+                    );
                 }
             }
             
@@ -929,11 +941,11 @@ export default {
             let value = currentRowChangePivotMode.value;
             let tableName = currentRowChangePivotMode.tableName;
             let type = currentRowChangePivotMode.type;
-            if(type && type == 'group'){
+            if(type && type == 'group' && value.length > 0){
                 for (let index = 0; index < value.length; index++) {
                     value[index][keyChange] = input.val();
                 }
-                if(value.s_table_id_sql_lite){  // edit dòng đã có
+                if(value[0].s_table_id_sql_lite){  // edit dòng đã có
                     this.updateToTableNomalData(tableName, value, []);
                 }
                 else{   // thêm dòng mới cho table thường
@@ -959,23 +971,32 @@ export default {
             let type = data.type;
             let dataRowGroup = data.dataRowGroup;
             let dataColPivot = data.dataColPivot;
-            debugger
             let rowData = [];
+            let rowSelected = dataRowGroup.filter(r=>{
+                return r.selected != undefined;
+            })
             for (let index = 0; index < dataRowGroup.length; index++) {
                 let cell = dataRowGroup[index];
-                if(!cell.selected){
-                    for (let i = 0; i < cell.value.length; i++) {
+                if(cell.type != type){
+                    if(!cell.selected){
+                        for (let i = 0; i < cell.value.length; i++) {
+                            let dataItem = {};
+                            if(rowSelected.length > 0){
+                                dataItem[rowSelected[0]['controlName']] = rowSelected[0]['selected']
+                            }
+                            dataItem[cell.controlName] = cell.value[i];
+                            rowData.push(dataItem);
+                        }
+                    }
+                    else{
                         let dataItem = {};
-                        dataItem[cell.controlName] = cell.value[i];
+                        if(rowSelected.length > 0){
+                            dataItem[rowSelected[0]['controlName']] = rowSelected[0]['selected']
+                        }
+                        dataItem[cell.controlName] = cell.selected;
                         rowData.push(dataItem);
                     }
                 }
-                else{
-                    let dataItem = {};
-                    dataItem[cell.controlName] = cell.selected;
-                    rowData.push(dataItem);
-                }
-                
             }
             for (let index = 0; index < dataColPivot.length; index++) {
                 let cell = dataColPivot[index];

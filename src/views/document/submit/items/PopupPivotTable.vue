@@ -11,16 +11,19 @@
             </v-card-title>
             <v-card-text class="s-card-text">
                 <div v-for="(item,i) in data" :key="i">
-                    <div :class="{'mt-1':i > 0}">Giá trị cho {{item.controlTitle}}</div>
-                    <v-combobox
-                    class="sym-small-size sym-style-input"
-                    hide-selected
-                    hide-details
-                    :label="item.detailTitle"
-                    solo
-                    v-model="item.selected"
-                    :items="item.value"
-                    ></v-combobox>
+                    <div v-if="!item.isDisable ">
+                        <div :class="{'mt-1':i > 0}">Giá trị cho {{item.controlTitle}}</div>
+                        <v-combobox
+                        class="sym-small-size sym-style-input"
+                        hide-selected
+                        hide-details
+                        :label="item.detailTitle"
+                        solo
+                        v-model="item.selected"
+                        :items="item.value"
+                        ></v-combobox>
+                    </div>
+                    
                 </div>
                 <div v-for="(item,i) in dataColPivot" :key="i+item.controlName" class="mt-1">
                     <div>
