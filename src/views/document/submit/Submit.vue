@@ -501,7 +501,11 @@ export default {
                 let uniqueData = value.filter(function(value, index, self){
                     return self.indexOf(value) === index;
                 })
-                this.dataPivotMode.push({controlName:controlName, controlTitle:controlBindData.title,value:uniqueData});
+                let inputData = {controlName:controlName, controlTitle:controlBindData.title,value:uniqueData};
+                if(tableInstance.pivotTable.pivotConfig.rows.length >1){
+                    inputData.detailTitle = "Bỏ trống nếu muốn thêm dữ liệu cho toàn bộ dòng";
+                    this.dataPivotMode.push(inputData);
+                }
             }
             let colsConfig = pivotData['cols'];
             for (let index = 0; index < colsConfig.length; index++) {
@@ -515,7 +519,7 @@ export default {
                     this.dataColPivot.push({controlName:controlName, controlTitle:controlBindData.title});
                 }
                 else{
-                    this.dataPivotMode.push({controlName:controlName, controlTitle:controlBindData.title,value:uniqueData});
+                    this.dataPivotMode.push({controlName:controlName, controlTitle:controlBindData.title,value:uniqueData, detailTitle:"Bỏ trống nếu muốn thêm dữ liệu cho toàn bộ cột"});
                 }
             }
             
@@ -925,20 +929,25 @@ export default {
             let value = currentRowChangePivotMode.value;
             let tableName = currentRowChangePivotMode.tableName;
             let type = currentRowChangePivotMode.type;
-            let tableIns = getControlInstanceFromStore(this.keyInstance, tableName);
             if(type && type == 'group'){
                 for (let index = 0; index < value.length; index++) {
                     value[index][keyChange] = input.val();
                 }
-                this.updateToTableNomalData(tableName, value, {});
+                if(value.s_table_id_sql_lite){  // edit dòng đã có
+                    this.updateToTableNomalData(tableName, value, []);
+                }
+                else{   // thêm dòng mới cho table thường
+                    this.updateToTableNomalData(tableName, [], value);
+                }
+                
             }
             else{
                 value[keyChange] = input.val();
                 if(value.s_table_id_sql_lite){  // edit dòng đã có
-                    this.updateToTableNomalData(tableName, [value], {});
+                    this.updateToTableNomalData(tableName, [value], []);
                 }
                 else{   // thêm dòng mới cho table thường
-                    this.updateToTableNomalData(tableName, [], value);
+                    this.updateToTableNomalData(tableName, [], [value]);
                 }    
             }
         },
@@ -950,22 +959,50 @@ export default {
             let type = data.type;
             let dataRowGroup = data.dataRowGroup;
             let dataColPivot = data.dataColPivot;
-            let rowData = {};
+            debugger
+            let rowData = [];
             for (let index = 0; index < dataRowGroup.length; index++) {
                 let cell = dataRowGroup[index];
-                rowData[cell.controlName] = cell.selected
+                if(!cell.selected){
+                    for (let i = 0; i < cell.value.length; i++) {
+                        let dataItem = {};
+                        dataItem[cell.controlName] = cell.value[i];
+                        rowData.push(dataItem);
+                    }
+                }
+                else{
+                    let dataItem = {};
+                    dataItem[cell.controlName] = cell.selected;
+                    rowData.push(dataItem);
+                }
+                
             }
             for (let index = 0; index < dataColPivot.length; index++) {
                 let cell = dataColPivot[index];
-                rowData[cell.controlName] = cell.selected
+                if(rowData.length > 0){
+                    for (let i = 0; i < rowData.length; i++) {
+                        rowData[i][cell.controlName] = cell.selected;
+                    }
+                }else{
+                    let tableControl = getControlInstanceFromStore(this.keyInstance,tableName);
+                    let hotTb = tableControl.tableInstance.tableInstance;
+                    let allData = hotTb.getSourceData();
+                    for (let index = 0; index < allData.length; index++) {
+                        let dataItem = {};
+                        dataItem[cell.controlName] = cell.selected;
+                        rowData.push(dataItem);
+                    }
+                }
+                
             }
+            
             this.updateToTableNomalData(tableName,[],rowData)
             this.$refs.popupPivotTableView.hide();
         },
         /**
          * Hàm call lại chuẩn bị data để thêm vào bảng nomal sau khi có sự thay đổi ở bảng pivot
          */
-        updateToTableNomalData(tableName, oldData = [], newData = {}){
+        updateToTableNomalData(tableName, oldData = [], newData = []){
             let tableControl = getControlInstanceFromStore(this.keyInstance,tableName);
             let hotTb = tableControl.tableInstance.tableInstance;
             let allData = hotTb.getSourceData();
@@ -988,20 +1025,25 @@ export default {
                 }
             }
             else{
-                for (let index = 0; index < allData.length; index++) {
-                    for(let control in allColumnTable){
-                        if(!allData[index][control]){
-                            allData[index][control] = null;
+                if(newData.length > 0){
+                    for (let i = 0; i < newData.length; i++) {
+                        let rowData = newData[i];
+                        for (let index = 0; index < allData.length; index++) {
+                            for(let control in allColumnTable){
+                                if(!allData[index][control]){
+                                    allData[index][control] = null;
+                                }
+                            }
+                            delete allData[index].s_table_id_sql_lite;
                         }
+                        for (let control in allData[0]) {
+                            if(!rowData[control]){
+                                rowData[control] = null;
+                            }
+                        }
+                        allData.push(rowData);
                     }
-                    delete allData[index].s_table_id_sql_lite;
                 }
-                for (let control in allData[0]) {
-                    if(!newData[control]){
-                        newData[control] = "";
-                    }
-                }
-                allData.push(newData);
             }
             tableControl.tableInstance.setData(allData, false);
         },
@@ -2441,7 +2483,6 @@ export default {
          */
         setDataToPivotTable(tableControl, data){
             if(tableControl.pivotTable){
-                tableControl.pivotTable.show();
                 tableControl.pivotTable.setData(data);
             }
         },

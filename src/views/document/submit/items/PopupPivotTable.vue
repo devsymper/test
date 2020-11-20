@@ -1,7 +1,7 @@
 <template>
     <v-dialog
         v-model="isShow"
-        width="300"
+        width="350"
         scrollable
         style="overflow:hidden;"
         >
@@ -16,6 +16,7 @@
                     class="sym-small-size sym-style-input"
                     hide-selected
                     hide-details
+                    :label="item.detailTitle"
                     solo
                     v-model="item.selected"
                     :items="item.value"
@@ -28,6 +29,7 @@
                     <v-text-field
                     class="sym-small-size sym-style-input"
                         dense
+                        solo
                         hide-details
                         v-model="item.selected"
                         
