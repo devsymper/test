@@ -1043,7 +1043,7 @@ export default {
             this.$refs.symDragPanel.hide();
         },
         searchDataFilter(data){
-            if(this._inactive == false) return;
+            if(this._inactive == true) return;
             this.runInputFilterFormulas(data.controlName,data.search);
         },
         /**

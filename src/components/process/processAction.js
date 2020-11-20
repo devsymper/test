@@ -10,6 +10,7 @@ import {
     SYMPER_APP
 } from "@/main.js";
 import Vue from "vue";
+import { appConfigs } from "../../configs";
 
 function moveTaskTitleToNameAttr(content, configValue) {
     // for (let idEl in configValue) {
@@ -92,29 +93,66 @@ async function saveDeployHistory(deployData, modelData) {
     });
 }
 
+function checkTheSameLogic(currentXML, prveXML) {
+    currentXML = currentXML.replace(/\n|\r\n/g,' ').replace(/\s+/g,' ');
+    prveXML = prveXML.replace(/\n|\r\n/g,' ').replace(/\s+/g,' ');
+
+    let prevProcess = prveXML.match(/<process.*>((.|\n)*?)<\/process>/g)[0];
+    let currentProcess = currentXML.match(/<process.*>((.|\n)*?)<\/process>/g)[0];
+    return prevProcess == currentProcess;
+}
+
+function checkDuplicatedXML(currentXML, processKey) {
+    return new Promise(async (resolve, reject) => {
+        let lastestDefinition = await getLastestDefinition({
+            processKey: processKey
+        });
+        
+        if(lastestDefinition.data[0]){
+            lastestDefinition = lastestDefinition.data[0];
+            let resourceDataUrl = appConfigs.apiDomain.bpmne.general + 'symper-rest/service/repository/deployments/'+lastestDefinition.deploymentId+'/resourcedata/process_draft.bpmn';
+            let prveXML = await bpmnApi.getDefinitionXML(resourceDataUrl);
+            if(checkTheSameLogic(currentXML, prveXML)){
+                resolve(true);
+            }else{
+                resolve(false);
+            }
+        }else{
+            resolve(false);
+        }
+    });
+}
+
 export const deployProcess = function(self, processData) {
     return new Promise((deployResolve, deployReject) => {
-        bpmnApi.getModelData(processData.id).then(res => {
+        bpmnApi.getModelData(processData.id).then(async (res) => {
             let content = cleanContent(res.data.content, JSON.parse(res.data.configValue));
             console.log(content, 'contentcontentcontentcontentcontentcontent');
 
-            let file = util.makeStringAsFile(content, "process_draft.bpmn");
-            let processName=processData.name.replace(/[^\sA-Za-z0-9._-]/g," ");
-            bpmnApi.deployProcess({
-                deploymentKey: processData.id,
-                deploymentName: processName,
-                tenantId: processData.tenantId ? processData.tenantId : '1',
-            }, file).then((res) => {
-                self.$snotifySuccess('Deploy process successfully');
-                saveDeployHistory(res, processData);
-                deployResolve(res);
-            }).catch((err) => {
-                self.$snotifyError(
-                    err,
-                    "Deploy process failed!"
-                );
-                deployReject(err);
-            });
+            let isDuplicated = await checkDuplicatedXML(content, processData.processKey);
+            if(!isDuplicated){
+                let file = util.makeStringAsFile(content, "process_draft.bpmn");
+                let processName=processData.name.replace(/[^\sA-Za-z0-9._-]/g," ");
+                bpmnApi.deployProcess({
+                    deploymentKey: processData.id,
+                    deploymentName: processName,
+                    tenantId: processData.tenantId ? processData.tenantId : '1',
+                }, file).then((res) => {
+                    self.$snotifySuccess('Deploy process successfully');
+                    saveDeployHistory(res, processData);
+                    deployResolve(res);
+                }).catch((err) => {
+                    self.$snotifyError(
+                        err,
+                        "Deploy process failed!"
+                    );
+                    deployReject(err);
+                });
+            }else{
+                SYMPER_APP.$snotifyWarning({}, "Deployment dose not run!", "Workflow logic is the same as previous version");
+            }
+
+            
         }).catch(err => {
             self.$snotifyError(
                 err,
@@ -448,13 +486,19 @@ export const getLastestDefinition = function(row, needDeploy = false) {
         if (lastestDefinition.data.length > 0) {
             resolve(lastestDefinition);
         } else {
-            let deploymentData = await deployProcess(self, row);
-            deploymentId = deploymentData.id;
-
-            let defData = await bpmnApi.getDefinitions({
-                deploymentId: deploymentId
-            });
-            resolve(defData);
+            if(needDeploy){
+                let deploymentData = await deployProcess(self, row);
+                deploymentId = deploymentData.id;
+    
+                let defData = await bpmnApi.getDefinitions({
+                    deploymentId: deploymentId
+                });
+                resolve(defData);
+            }else{
+                resolve({
+                    data: []
+                });
+            }
         }
     });
 }
