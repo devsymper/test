@@ -14,4 +14,7 @@ export const environmentManagementApi = {
 	addService(data){
 		return api.post('services',data )
 	},
+	addVersion(data){
+		return api.post('services/'+data.serviceId+"/versions",data.formData)
+	},
 };

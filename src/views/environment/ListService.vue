@@ -1,5 +1,6 @@
 <template>
-	<ListItems
+	<div>
+		<ListItems
 		ref="listService"
 		:pageTitle="'Danh sách service'"
 		:containerHeight="containerHeight"
@@ -17,16 +18,23 @@
 			 />
 		</template>
 	</ListItems>
+	<AddVersion 
+		:showDialog="showDialog"
+		@cancel="showDialog = false"
+	/>
+	</div>
 </template>
 
 <script>
 import ListItems from "@/components/common/ListItems"
 import { appConfigs } from "@/configs.js";
 import AddServiceForm from './panels/AddServiceForm'
+import AddVersion from './dialogs/AddVersion'
 export default {
 	components:{
 		ListItems,
-		AddServiceForm
+		AddServiceForm,
+		AddVersion
 	},
 	methods:{
 		handleAddSuccess(){
@@ -42,6 +50,7 @@ export default {
 	data(){
 		let self = this
 		return{
+			showDialog: false,
 			tableContextMenu: {
                 detail: {
                     name: "detail",
@@ -56,7 +65,8 @@ export default {
                     name: "addVersion",
                     text: "Thêm version",
                     callback: (row, callback) => {
-						
+						self.$store.commit('environmentManagement/setCurrentServieId', row.id)
+						self.showDialog = true
                     }
                 }
             },

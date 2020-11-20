@@ -6,7 +6,8 @@
 		:getDataUrl="getListUrl"
 		:headerPrefixKeypath="'table'"
 		:useDefaultContext="false"
-		:showExportButton="false"
+		:showExportButton="false"	
+		:showButtonAdd="false"
 		:tableContextMenu="tableContextMenu"
 		:customAPIResult="customAPIResult"
 	/>
