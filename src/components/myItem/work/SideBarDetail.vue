@@ -44,6 +44,26 @@
 										{{$t('document.detail.sidebar.body.general.commentNotResolve')}}
 									</td>
 								</tr>
+								<tr>
+									<td>{{$t('document.detail.sidebar.body.general.id')}}</td>
+									<td class="pl-2">
+										{{workInfo.id}}
+									</td>
+									  <v-tooltip bottom>
+										<template v-slot:activator="{ on }">
+											<v-btn  
+												icon
+												tile
+												v-clipboard:copy="workInfo.id"  
+												v-clipboard:success="onCopySuccess" 
+												class="ml-7"
+												v-on="on" text x-small>
+													<v-icon  x-small>mdi-page-next-outline</v-icon>
+											</v-btn>
+										</template>
+										<span>Sao chép đường dẫn</span>
+									</v-tooltip>
+								</tr>
 							</table>
 						</div>
 					</v-expansion-panel-content>
@@ -469,7 +489,14 @@ export default {
 			data.objectIdentifier = this.workInfo.id;
 			data.objectType = "work";
 			this.$store.dispatch("task/getArrFileAttachment", data);
-    	}
+		},
+		onCopySuccess(){
+			this.$snotify({
+				type: 'success',
+				title: "Sao chép thành công",
+			});
+		},
+		
 	},
 	
 
