@@ -179,7 +179,7 @@ export default {
             } else {
                 description.extraLabel = this.desc;
             }
-             description.action.action = "submitAdhocTask";
+            description.action.action = "submitAdhocTask";
             let data = {
                 assignee:this.user,
                 description: description,

@@ -9,9 +9,13 @@ const setServiceInstanceInEnvironment = (state, data) => {
 const setCurrentEnvId = (state, data) => {
     Vue.set(state, 'currentEnvId', data);
 };
+const setCurrentServieId = (state, data) => {
+    Vue.set(state, 'currentServiceId', data);
+};
 
 export {
 	setAllEnvironment,
 	setServiceInstanceInEnvironment,
-	setCurrentEnvId
+	setCurrentEnvId,
+	setCurrentServieId
 };
