@@ -184,7 +184,7 @@
 		</VuePerfectScrollbar>
 	</div>
 	<Comment 
-	style="height:calc(100% - 40px)" 
+	style="height:calc(100% - 2px)" 
 	:objectIdentifier="workInfo.id"
 	:objectType="'work'"
 	ref="commentTaskView"
