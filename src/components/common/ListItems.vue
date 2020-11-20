@@ -3,7 +3,12 @@
         <div :style="{width:contentWidth, display: 'inline-block'}">
            <v-row v-if="showToolbar" no-gutters class="pb-2" ref="topBar"> 
                 <v-col>
-                    <span class="symper-title float-left">{{pageTitle}}</span>
+                    <span 
+						class="symper-title float-left"
+						:class="{'ml-4': dialogMode == true }"
+					>
+						{{pageTitle}}
+					</span>
                     <div :class="{'float-right': true, 'overline' : true , 'show-panel-mode': actionPanel } ">
                         <v-text-field
                             @input="bindToSearchkey"
