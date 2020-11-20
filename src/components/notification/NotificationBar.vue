@@ -79,8 +79,7 @@
                             {{reNameContent(item.title)}}
                         </span>
                         <v-chip v-if="getDeadline(item.title)!='Invalid date'"
-                        style="height: 13px; font-size: 10px; background: blue; color: white; margin-right:-50px; relative:absolute;top:3px; left:160px"
-                         class="notification-item-title">
+                         class="notification-item-title deadline-tag">
                               {{(getDeadline(item.title))}}
                         </v-chip>
                     </v-row>
@@ -170,8 +169,11 @@
                        <span v-if="item.title.indexOf('<*')>-1" class="notification-item-title">
                             {{reNameContent(item.title)}}
                         </span>
-                        <v-chip v-if="item.title.indexOf('<*')>-1" style="height:13px; font-size:10px;background:blue;color:white" class="notification-item-title">
+                        <v-chip v-if="item.title.indexOf('<*')>-1&&getDeadline(item.title)!='Invalid date'" 
+                             
+                              class="notification-item-title deadline-tag">
                             {{(getDeadline(item.title))}}
+                           
                         </v-chip>
                   
                         <span  v-if="item.title.indexOf('<*')<-1" class="notification-item-title">
@@ -684,5 +686,15 @@ export default {
     overflow: hidden;
     white-space: nowrap; 
     text-overflow: ellipsis
+}
+.deadline-tag{
+    height: 13px; 
+    font-size: 10px;
+    background-color:#2196F3 !important;
+    color: white; 
+    margin-right:-50px; 
+  
+    top:3px;
+    left:160px
 }
 </style>

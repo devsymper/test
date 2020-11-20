@@ -141,11 +141,11 @@ export default {
                 },
             },
              customAPIResult: {
-                 getListKey(res){
+				getListKey(res){
                      let listKey = [];
                      res.map(x=>listKey.push(x.processKey));
                      return listKey
-                 },
+				},
                 reformatData(res){
                     let listKey = this.getListKey(res.data.listObject);
                      res.data.columns.push(
@@ -156,7 +156,7 @@ export default {
                         },
                    )
                    let listWork = res.data;
-                    taskApi.countInstant({keys:JSON.stringify(listKey)}).then(res=>{
+					taskApi.countInstant({keys:JSON.stringify(listKey)}).then(res=>{
                          if (res.status === 200) {
                               for(let i = 0; i<listWork.listObject.length; i++){
                                   for(let j =0; j<res.data.length;j++){
@@ -165,7 +165,7 @@ export default {
                                       }
                                   }
                             }
-                              self.$refs.listModels.rerenderTable();
+							self.$refs.listModels.rerenderTable();
                          }
                     })
                     return  listWork;
