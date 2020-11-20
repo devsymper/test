@@ -1,9 +1,11 @@
 <template>
 	<ListItems
 		ref="listService"
+		:pageTitle="'Danh sách service'"
 		:containerHeight="containerHeight"
 		:getDataUrl="getListUrl"
 		:headerPrefixKeypath="'table'"
+		:showExportButton="false"
 		:useDefaultContext="false"
 		:tableContextMenu="tableContextMenu"
 		:customAPIResult="customAPIResult"
@@ -32,7 +34,7 @@ export default {
                     text: this.$t("common.detail"),
                     callback: (row, callback) => {
 						self.$goToPage( "/service/"+row.id+"/versions",
-                            " Các version service" + (row.name ? row.name : "")
+                            "Chi tiết " + (row.name ? row.name : "")
                         );
                     }
                 }

@@ -186,6 +186,7 @@
 		"userUpdate": "UserUpdate",
 		"createAt": "Create At",
 		"updateAt": "Update At",
+		"versionName": "Version Name",
         "wrap_text_mode": "Wrap text mode",
         "display_density": "Row display density",
         "column_config": "Column configs",
