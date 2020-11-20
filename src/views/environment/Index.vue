@@ -60,23 +60,37 @@
 					</v-expansion-panel>
 				</v-expansion-panels>
 		</div>	
-		<AddEnvironmentDialog 
+		<v-btn @click="handleServiceClick">
+			ahihi
+		</v-btn>
+		<!-- <AddEnvironmentDialog 
 			:showDialog="showDialogAddItem"
 			@cancel="cancelAdd"
-			 />
+			 /> -->
+		<ListObjectInService 
+			:showDialog="showDialog"
+			:tableHeight="tableHeight"
+			@close-popup="handleCloseEvent"
+		/>	 
+			 
 	</div>
 </template>
 
 <script>
+import {util} from '@/plugins/util'
 import AddEnvironmentDialog from "./dialogs/AddEnvironmentDialog"
+import ListObjectInService from "./dialogs/ListObjectInService"
 export default {
 	components:{
 		AddEnvironmentDialog,
+		ListObjectInService
 	},
 	data(){
 		return {
 			searchKey: "",
-			showDialogAddItem: false
+			showDialog: false,
+			showDialogAddItem: false,
+			tableHeight:0
 		}
 	},
 	computed:{
@@ -105,9 +119,15 @@ export default {
 	created(){
 		this.$store.dispatch('environmentManagement/getAllEnvirontment')
 	},
+	mounted(){
+		this.tableHeight = util.getComponentSize(this).h - 100
+	},
 	methods:{
 		showDialogAdd(){
 			this.showDialogAddItem = true
+		},
+		handleCloseEvent(){
+			this.showDialog = false
 		},
 		cancelAdd(){
 			this.showDialogAddItem = false
@@ -118,7 +138,9 @@ export default {
 			)
 		},
 		handleEnvClick(env){
-			debugger
+		},
+		handleServiceClick(){
+			this.showDialog = true
 		}
 	}
 }
