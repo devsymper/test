@@ -74,28 +74,33 @@
                     </v-row>
                 </v-col>
                 <v-col cols="10" style="padding:6px!important" @click="openNotification(item)">
-                    <v-row v-if="item.title.indexOf('<*')>-1">
-                       <span class="notification-item-title">
+                    <v-row v-if="item.title.indexOf('<*')>-1" style="margin-top:-10px" >
+                        <v-col style="margin-top:-8px"  class="ellipsis">
+                            <span class="notification-item-title" style="margin-left:-12px">
                             {{reNameContent(item.title)}}
-                        </span>
-                        <v-chip v-if="getDeadline(item.title)!='Invalid date'"
-                         class="notification-item-title deadline-tag">
+                            </span>
+                        </v-col>
+                        <v-col style="margin-top:-8px" class="text-right pr-3">
+                            <v-chip v-if="getDeadline(item.title)!='Invalid date'&&getDeadline(item.title)"
+                         class="notification-item-title deadline-tag"
+                         >
                               {{(getDeadline(item.title))}}
                         </v-chip>
+                        </v-col>
                     </v-row>
-                     <v-row v-else>
-                       
-                        <span class="notification-item-title">
-                            {{reNameContent(item.title)}}
-                        </span>
+                     <v-row v-else style="margin-top:-10px" class="ellipsis">
+                        <v-col style="margin-top:-8px">
+                            <span  style="margin-left:-12px" class="notification-item-title">
+                                {{reNameContent(item.title)}}
+                            </span>
+                        </v-col>
                     </v-row>
-                    <v-row class="notification-item-info mt-1">
+                    <v-row class="notification-item-info" style="margin-top:-5px">
                         <v-col cols="6" class="ellipsis">
                             <v-icon class="mr-2" size="12">{{$i('input.'+getScope(item.action))}}</v-icon>
                             <span >{{item.extraLabel?item.extraLabel:''}} {{item.extraValue?item.extraValue:''}}</span>
                         </v-col>
                         <v-col cols="6" class="text-right pr-3">
-                            
                             <span>{{$moment.unix(item.createTime).fromNow()}}</span>
                             <v-icon size="9" color="blue" class="ml-1" v-if="item.state=='0'">mdi-circle</v-icon>
                         </v-col>
@@ -123,8 +128,11 @@
                             :key="i"
                         >
                             <template>
-                                <v-list-item-content class="pt-0 pb-0" @click="actionNotification(item,actionItem.value)">
-                                    <v-list-item-title class="font-weight-regular" v-text="actionItem.text"></v-list-item-title>
+                                <v-list-item-content class="pt-0 pb-0" 
+                                    @click="actionNotification(item,actionItem.value)">
+                                    <v-list-item-title class="font-weight-regular" 
+                                    v-text="actionItem.text">
+                                    </v-list-item-title>
                                 </v-list-item-content>
                             </template>
                         </v-list-item>    
@@ -132,8 +140,11 @@
                 </v-menu>
             </v-row>
             <!-- older -->
-            <v-row class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-3px"><span style="color:orange; font-weight:430">
-                {{$t('notification.older')}}</span></v-row>
+            <v-row class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-3px">
+                <span style="color:orange; font-weight:430">
+                {{$t('notification.older')}}
+                </span>
+            </v-row>
             <v-row
                 v-for="item in listNotification.filter(x=>changeDate(x.createTime)!=today)" 
                 :key="item.id"
@@ -165,24 +176,26 @@
                         </span>
                     </v-row>
                     <v-row v-else>
-                          
-                       <span v-if="item.title.indexOf('<*')>-1" class="notification-item-title">
-                            {{reNameContent(item.title)}}
-                        </span>
-                        <v-chip v-if="item.title.indexOf('<*')>-1&&getDeadline(item.title)!='Invalid date'" 
-                             
-                              class="notification-item-title deadline-tag">
-                            {{(getDeadline(item.title))}}
-                           
-                        </v-chip>
-                  
+                        <v-col style="margin-top:-18px" cols="9"  class="ellipsis">
+                            <span v-if="item.title.indexOf('<*')>-1" 
+                                class="notification-item-title"
+                                style="margin-left:-10px"
+                                >
+                                {{reNameContent(item.title)}}
+                            </span>
+                        </v-col>
+                        <v-col cols="3" style="margin-top:-18px" class="text-right pr-3">
+                            <v-chip v-if="item.title.indexOf('<*')>-1&&getDeadline(item.title)!='Invalid date'&&getDeadline(item.title)" 
+                                class="notification-item-title deadline-tag " >
+                                {{(getDeadline(item.title))}}
+                            </v-chip>
+                        </v-col>
                         <span  v-if="item.title.indexOf('<*')<-1" class="notification-item-title">
                             {{reNameContent(item.title)}}
                         </span>
-                  
                     </v-row>
-                    <v-row class="notification-item-info mt-1">
-                        <v-col cols="6"  class="ellipsis">
+                    <v-row class="notification-item-info" style="margin-top:-5px">
+                        <v-col cols="6"  class="ellipsis" >
                             <v-icon class="mr-2" size="12">{{$i('input.'+getScope(item.action))}}</v-icon>
                             <span>{{item.extraLabel}} {{item.extraValue}}</span>
                         </v-col>
@@ -377,16 +390,13 @@ export default {
             }       
         },
         getDeadline(description){
-            //let result = {value:'',check:false}
             let deadline= description.split("<*")[1].split('*>')[0];
             deadline = deadline.slice(0, 10);
-            let result= this.$moment.unix(deadline).fromNow().replace("giờ",'h');
-            result.replace('ngày','d')
-            // if(result.indexOf('tới')>-1){
-            // }
-            //result = result.replace('trước','');
-
-            //result.split(' ')[1];
+            let result = '';
+            if(deadline){
+                result= this.$moment.unix(deadline).fromNow().replace("giờ",'h').replace("trước",'').replace("tới",'').replace('năm','y');
+                result.replace('ngày','d').replace('tháng','m').replace("một",'1')
+            }
             return result
         },
          reNameContent(description){
@@ -607,6 +617,12 @@ export default {
     font-size: 11px;
 
 }
+.right-180{
+    right:-180px!important
+}
+.right-200{
+      right:-200px!important
+}
 .notification-item-info{
     color: #8E8E8E;
 }
@@ -692,9 +708,7 @@ export default {
     font-size: 10px;
     background-color:#2196F3 !important;
     color: white; 
-    margin-right:-50px; 
-  
     top:3px;
-    left:160px
+   
 }
 </style>
