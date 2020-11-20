@@ -171,6 +171,16 @@
         }
     },
     "table": {
+		"id": "ID",
+		"name": "Tên Service",
+		"description": "Mô tả",
+		"lastVersion": "Version mới nhất",
+		"language": "Ngôn ngữ",
+		"status": "Trạng thái",
+		"userCreate": "Người tạo",
+		"userUpdate": "Người cập nhât",
+		"createAt": "Thời gian tạo",
+		"updateAt": "Người cập cập nhât",
         "wrap_text_mode": "Chế độ xuống dòng",
         "display_density": "Mật độ hiển thị dòng",
         "column_config": "Cấu hình cột",

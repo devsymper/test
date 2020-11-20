@@ -176,6 +176,16 @@
         }
     },
     "table": {
+		"id": "ID",
+		"name": " Service Name",
+		"description": "Description",
+		"lastVersion": "Last Version ",
+		"language": "Language",
+		"status": "Status",
+		"userCreate": "User Create",
+		"userUpdate": "UserUpdate",
+		"createAt": "Create At",
+		"updateAt": "Update At",
         "wrap_text_mode": "Wrap text mode",
         "display_density": "Row display density",
         "column_config": "Column configs",
