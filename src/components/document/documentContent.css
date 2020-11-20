@@ -591,7 +591,7 @@ button:hover {
     min-width: 120px;
     box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
     z-index: 1;
-    left: 52px;
+    left: 50px;
     z-index: 2;
     top: 4px;
   }

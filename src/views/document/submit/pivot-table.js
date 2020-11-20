@@ -72,6 +72,9 @@ export default class PivotTable {
             this.columnDefs.push(colPivot);
         }
     }
+    /**
+     * Hàm lấy thông tin các cột và đong được pivot
+     */
     getDataGroup(){
         let allRowGroup = this.gridOptions.columnApi.getRowGroupColumns();
         let allPivotCol = this.gridOptions.columnApi.getPivotColumns();
@@ -86,6 +89,11 @@ export default class PivotTable {
         }
         return {cols:colPivotData,rows:rowGroup}
     }
+    /**
+     * Hoangnd
+     * Hàm xử lí data cho bảng
+     * @param {} vl 
+     */
     setData(vl) {
         this.columnDefs = [];
         this.setPivotColumns();
@@ -100,6 +108,10 @@ export default class PivotTable {
         this.caculatorHeight();
         
     }
+    /**
+     * Hoangnd:
+     * Hàm tính toán chiều cao cho table
+     */
     caculatorHeight(){
         let dataHeight = this.gridOptions.api.getDisplayedRowCount()*24;
         let headerHeight = 0;
@@ -109,7 +121,11 @@ export default class PivotTable {
         if(this.pivotConfig.values.length > 0){
             headerHeight += 24;
         }
-        $('#ag-'+this.controlObj.id).css({height:dataHeight + headerHeight + 3 + "px"});
+        let tableHeight = dataHeight + headerHeight + 3;
+        if(tableHeight > 500){
+            tableHeight = 500;
+        }
+        $('#ag-'+this.controlObj.id).css({height:tableHeight + "px"});
     }
     render() {
         this.gridOptions = {
@@ -160,6 +176,10 @@ export default class PivotTable {
         }
         new Grid(this.tableContainer, this.gridOptions, { modules: [ClientSideRowModelModule, RowGroupingModule] });
     }
+    /**
+     * double click vào cell thì edit cell đó
+     * @param {} row 
+     */
     onCellDoubleClick(row){
         if(row.type == 'cellKeyDown'){
             var charTyped = String.fromCharCode(row.event.which);
