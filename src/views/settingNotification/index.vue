@@ -13,7 +13,7 @@
                         Dropdown
                     </v-btn>
                     </template>
-               <NotificationPopUp @close="close" style="background:white" :name="'Đơn bán hàng'" :objType="'comment'" />
+               <NotificationPopUp @close="close" style="background:white" :name="'Đơn bán hàng'" :objType="'account'" />
                 </v-menu> -->
                     <span class="fs-15 fw-430" v-if="showMain">Cài đặt thông báo</span>
                 <span class="fs-15 fw-430" v-if="showFollow">Danh sách đối tượng đang theo dõi</span>
