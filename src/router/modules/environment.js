@@ -10,4 +10,10 @@ export default [{
 		component: () =>
 			import ('../../views/environment/SyncHistory.vue'),
 	},
+	{
+		path: "/service/:serviceId/versions",
+		name: "versionOfService",
+		component: () =>
+			import ('../../views/environment/ListVersionOfService.vue'),
+	},
 ]
