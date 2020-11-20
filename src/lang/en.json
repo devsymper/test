@@ -375,6 +375,7 @@
         "editPermissionPack": "Edit permission packge",
         "apps": "Apps",
         "contextMenu": {
+			"viewDetails":"View detail",
             "edit": "Edit",
             "grantPermission": "Grant Permission",
             "remove": "Remove"

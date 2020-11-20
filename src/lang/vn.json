@@ -395,6 +395,7 @@
         "grandPermission": "Phân quyền chi tiết",
         "apps": "Apps",
         "contextMenu": {
+			"viewDetails":"Xem chi tiết",
             "edit": "Sửa",
             "grantPermission": "Phân quyền",
             "remove": "Xóa"

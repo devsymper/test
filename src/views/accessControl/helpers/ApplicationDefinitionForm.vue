@@ -3,7 +3,9 @@
 		<div class="d-flex w-100">
 			<span> Chọn ứng dụng:</span>
 			<ListItemSelector
+				:listItem='allApp'
 				@item-selected="handleItemSelected"
+
 			 />
 		</div>
 		<div class="d-flex w-100 mr-2 children-application">
@@ -34,21 +36,19 @@
 <script>
 import OrgchartSelector from "./OrgchartSelector"
 import ListItemSelector from "./ListItemSelector.vue"
-
+import {accessControlApi} from '@/api/accessControl'
+import {appManagementApi} from '@/api/AppManagement.js'
 export default {
 	data(){
 		return {
 			active: "",
 			selectedApplication: "",
+			allApp:[],
 			checkboxes:[],
 			childrenTypeOfApp:[
 				{
-					title: "Chứng từ",
-					value: "documentDocumentary"
-				},
-				{
-					title: "Danh mục",
-					value: "documentCatalog"
+					title: "Văn bản",
+					value: "document"
 				},
 				{
 					title: "Báo cáo",
@@ -70,15 +70,37 @@ export default {
 		ListItemSelector,
 		OrgchartSelector
 	},
+	created(){
+		this.getActiveApp()
+	},
 	methods:{
 		handleChildTypeClick(value){
 			this.active = value
 		},
 		handleItemSelected(value){
 			this.selectedApplication = value
+			appManagementApi.getAppDetailBa(value).then(res=>{
+			}).catch(err=>{
+			})
+			
 		},
 		handlePermissionSelected(value){
 			this.checkboxes = value
+		},
+		getActiveApp(){
+			let self = this
+			accessControlApi.getAllApp().then(res=>{
+				if(res.status == 200){
+					self.allApp = res.data.listObject
+				}else{
+					self.$snotify({
+						type: "error",
+						title: " Không thể lấy dữ liệu"
+					})
+				}
+			}).catch(err=>{
+				
+			})
 		}
 	}
 
