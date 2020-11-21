@@ -1801,7 +1801,7 @@ export default {
                             for (let index = 0; index < allConfig.length; index++) {
                                 let config = allConfig[index];
                                 if(config.instance){
-                                  let putControl = config.instance.inputControl;
+                                  let inputControl = config.instance.inputControl;
                                     for (let controlEffect in inputControl) {
                                         if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
                                             mapControlEffected[formulasType][controlEffect] = {};
