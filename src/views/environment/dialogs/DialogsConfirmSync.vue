@@ -22,13 +22,26 @@
 						solo-inverted
 						class="fs-13"
 					></v-autocomplete>
-					<div>
+					<div class="mt-1">
 						Các dữ liệu liên quan sẽ được đồng bộ cùng dữ liệu chính 
 					</div>
 
 					<div class="text-wrap">
 						Nhấn OK để  đồng bộ dữ liệu 
 					</div>
+
+					<v-checkbox
+						v-model="selected"
+						label="Ghi đè dữ liệu nếu có trùng lặp"
+						value="overideConfligData"
+						class="fs-13"
+					></v-checkbox>
+					<v-checkbox
+						v-model="selected"
+						class="fs-13"
+						label="CHỉ đồng bộ dữ liệu không bị trùng lặp"
+						value="onlySyncDataNotConflig"
+					></v-checkbox>
 				</div>
 
 			</v-card-text>
@@ -101,5 +114,14 @@ export default {
 }
 .content-deploy-dialog >>> .v-menu{
 	font-size: 13px !important;
+}
+.content-deploy-dialog >>> label{
+	font-size: 13px !important;
+}
+.content-deploy-dialog >>> .v-messages{
+	display:none !important;
+}
+.content-deploy-dialog >>> .v-input__control{
+	margin-bottom:-12px !important;
 }
 </style>
