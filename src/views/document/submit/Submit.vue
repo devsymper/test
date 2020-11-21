@@ -2558,7 +2558,7 @@ export default {
                 if(data.length > 0){
                     for (let index = 0; index < data.length; index++) {
                         let dataItem = data[index][Object.keys(data[index])[0]];
-                        let fType = formulasType+"_"+row;
+                        let fType = formulasType+"_"+dataItem;
                         this.setDataForLinkControl(fType, dataItem, title, source, controlName);
                     }
                 }
