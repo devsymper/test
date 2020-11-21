@@ -24,7 +24,7 @@
 								:key="i"
 							>
 								<span 
-									class=" pt-4 pl-2 text-uppercase object-type-title"
+									class=" mt-10 ml-2 text-uppercase object-type-title"
 									@click="handleObjectViewDetail(item)"
 								>
 									{{item}}
@@ -106,7 +106,7 @@
 							:tableHeight="tableHeight"
 							@back="tab = 'tab-1'"
 							@close-popup="handleCloseEvent"
-							:getListUrl="getListUrl"
+							:getListUrl="getListUrls"
 						/>
 					</div>
 				</v-tab-item>	
@@ -150,7 +150,7 @@ export default {
 	data(){
 		return{
 			tab: 'tab-1',
-			getListUrl: '',
+			getListUrls: '',
 			showDialogSync: false,
 		}
 	},
@@ -164,7 +164,7 @@ export default {
 		handleObjectViewDetail(item){
 			this.tab = 'tab-2'
 			let type = this.$store.state.environmentManagement.currentServiceType
-			this.getListUrl = appConfigs.envDomain[type]+'env/'+item+'s'
+			this.getListUrls = appConfigs.envDomain[type]+'env/'+item+'s'
 		},
 		handletest(){
 			this.showDialogSync = true 

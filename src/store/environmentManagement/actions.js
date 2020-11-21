@@ -1,5 +1,5 @@
 import {environmentManagementApi} from '@/api/EnvironmentManagement'
-
+import { SYMPER_APP } from "@/main.js";
 const getAllEnvirontment = (context) => {
     if (context.state.allEnvironment.length == 0) {
         try {
@@ -48,18 +48,13 @@ const getObjectTypeOfService = (context , type) => {
 			if(!context.state.listObjectTypeInService[type]){
 				environmentManagementApi.getAllObjTypeOfService(type).then(res=>{
 					if (res.status == 200) {
-						debugger
 						let arr = res.data.length > 0 ? res.data : []
 						context.commit('setObjectTypeOfService', arr)
 					} else {
-						SYMPER_APP.$snotifyError(error, "Can not get data");
+						SYMPER_APP.$snotifyError("Can not get data");
 					}
 				}).catch(err=>{
-					debugger
-					self.$snotify({
-						type: "error",
-						title: err
-					})
+					SYMPER_APP.$snotifyError(err, "Can not get data");
 				})
 			}
 			
