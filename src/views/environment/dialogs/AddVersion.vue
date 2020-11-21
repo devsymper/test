@@ -18,7 +18,7 @@
 		<v-card-actions>
 			<v-spacer></v-spacer>
 			<v-btn
-				color="green darken-1"
+				color="red darken-1"
 				text
 				@click="cancel"
 			>
