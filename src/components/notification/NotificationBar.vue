@@ -176,23 +176,29 @@
                         </span>
                     </v-row>
                     <v-row v-else>
-                        <v-col style="margin-top:-18px" cols="9"  class="ellipsis">
-                            <span v-if="item.title.indexOf('<*')>-1" 
+                        <v-col v-if="item.title.indexOf('<*')>-1"  style="margin-top:-18px" cols="9"  class="ellipsis">
+                            <span 
                                 class="notification-item-title"
                                 style="margin-left:-10px"
                                 >
                                 {{reNameContent(item.title)}}
                             </span>
+                        
                         </v-col>
-                        <v-col cols="3" style="margin-top:-18px" class="text-right pr-3">
+                           <v-col v-else style="margin-top:-15px" cols="12"  class="ellipsis">
+                            <span 
+                                class="notification-item-title"
+                                style="margin-left:-10px"
+                                >
+                                {{item.title}}
+                            </span>
+                        </v-col>
+                        <v-col  v-if="item.title.indexOf('<*')>-1" cols="3" style="margin-top:-18px" class="text-right pr-3">
                             <v-chip v-if="item.title.indexOf('<*')>-1&&getDeadline(item.title)!='Invalid date'&&getDeadline(item.title)" 
                                 class="notification-item-title deadline-tag " >
                                 {{(getDeadline(item.title))}}
                             </v-chip>
                         </v-col>
-                        <span  v-if="item.title.indexOf('<*')<-1" class="notification-item-title">
-                            {{reNameContent(item.title)}}
-                        </span>
                     </v-row>
                     <v-row class="notification-item-info" style="margin-top:-5px">
                         <v-col cols="6"  class="ellipsis" >

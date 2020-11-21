@@ -14,7 +14,7 @@
         :showImportButton="false"
         :getDataUrl="notifiDomain + 'channels'"
         :actionPanelWidth="actionPanelWidth">
-        <div slot="right-panel-content" class="h-100" style="overflow:hidden!important">
+        <div slot="right-panel-content" class="h-100" >
            <configNotification 
                 ref="config"
                 :type="typeNoti"
