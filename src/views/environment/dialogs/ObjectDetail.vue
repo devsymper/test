@@ -16,7 +16,9 @@
 				class="mr-2 font-normal fs-13"
 				depressed
 				tile
+				v-if="showBtnAddCheckbox"
 				small
+				@click="addCheckBoxColumn"
 			>
 				Chọn
 			</v-btn>
@@ -25,7 +27,7 @@
 				depressed
 				tile
 				small
-				@click="handleClickCheck"
+				:disabled="showBtnAddCheckbox"
 			>
 				Kiểm tra
 			</v-btn>
@@ -34,17 +36,21 @@
 				depressed
 				tile
 				small
-				@click="handleClickSync"
+				:disabled="showBtnAddCheckbox"
 			>
 				Đồng bộ
 			</v-btn>
 		</span>
 		<ListItem 
+			ref="listObject"
 			:showExportButton="false"
 			:containerHeight="tableHeight"
 			:dialogMode="true"
+			:getDataUrl="getListUrl"
 			@close-popup="handleCloseEvent"
 			style="margin-left:10px"
+			:isTablereadOnly="false"
+			@after-selected-row="afterSelectedRow"
 		/>
 	</div>
 
@@ -59,6 +65,15 @@ export default {
 	props:{
 		tableHeight:{
 			type: Number
+		},
+		getListUrl:{
+			type: String
+		}
+	},
+	data(){
+		return{
+			listItemSelected: [],
+			showBtnAddCheckbox: true
 		}
 	},
 	methods:{
@@ -67,6 +82,20 @@ export default {
 		},
 		back(){
 			this.$emit('back')
+		},
+		addCheckBoxColumn(){
+			this.showBtnAddCheckbox = false
+			this.$refs.listObject.addCheckBoxColumn()
+		},
+		afterSelectedRow(items){
+			this.$set(this, 'listItemSelected', items)
+			debugger	
+		},
+	},
+	watch:{
+		getListUrl(val){
+			this.listItemSelected = [],
+			this.showBtnAddCheckbox = true
 		}
 	}
 }

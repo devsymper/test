@@ -102,10 +102,25 @@ var configs = {
 	},
 	mapDomainToEnvConfig(obj){
 		this.envDomain = {
-			orgchart: obj.orgchart,
-			account: obj.account,
-			documents: obj.documents,
-			appManagement: obj.appManagement,
+			'account': obj.account,
+			'sdocument': obj.documentService,
+			'notifi': obj.nofitication,
+			'workflow-extend' : obj.workflowExtend,
+			'ui' : obj.uiConfig,
+			'trash' : obj.trashService,
+			'syql' : obj.formulasService,
+			'search' : obj.search,
+			'accesscontrol' : obj.permission,
+			'io-service' : obj.importExcel,
+			'file-managementservice' : obj.fileManagement,
+			'comment-service' : obj.commnent,
+			'bi-service' : obj.biService,
+			'process-modeler' : obj.bpmne.models,
+			'bi' : obj.dashboard,
+			'kh-service' : obj.knowledge,
+			'app-service' : obj.appManagement,
+			'workflow' : obj.bpmne.general,
+			'frontend' : obj.bpmne.general,
 		}
 	}
 };

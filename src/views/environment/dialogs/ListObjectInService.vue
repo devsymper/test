@@ -106,6 +106,7 @@
 							:tableHeight="tableHeight"
 							@back="tab = 'tab-1'"
 							@close-popup="handleCloseEvent"
+							:getListUrl="getListUrl"
 						/>
 					</div>
 				</v-tab-item>	
@@ -121,7 +122,9 @@
 <script>
 import ListItem from "@/components/common/ListItems"
 import DialogsConfirmSync from './DialogsConfirmSync'
+import { appConfigs } from "@/configs.js";
 import ObjectDetail from './ObjectDetail'
+import {environmentManagementApi} from "@/api/EnvironmentManagement"
 export default {
 	components:{
 		ListItem,
@@ -147,6 +150,7 @@ export default {
 	data(){
 		return{
 			tab: 'tab-1',
+			getListUrl: '',
 			showDialogSync: false,
 		}
 	},
@@ -157,11 +161,10 @@ export default {
 		handleClickSync(){
 			
 		},
-		handleClickCheck(){
-
-		},
 		handleObjectViewDetail(item){
 			this.tab = 'tab-2'
+			let type = this.$store.state.environmentManagement.currentServiceType
+			this.getListUrl = appConfigs.envDomain[type]+'env/'+item+'s'
 		},
 		handletest(){
 			this.showDialogSync = true 

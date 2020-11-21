@@ -43,6 +43,7 @@ const getInstanceInEnv = (context , id) => {
 }
 const getObjectTypeOfService = (context , type) => {
 	context.commit('setCurrentServiceType', type)
+	let self = this
         try {
 			if(!context.state.listObjectTypeInService[type]){
 				environmentManagementApi.getAllObjTypeOfService(type).then(res=>{
@@ -54,7 +55,11 @@ const getObjectTypeOfService = (context , type) => {
 						SYMPER_APP.$snotifyError(error, "Can not get data");
 					}
 				}).catch(err=>{
-	
+					debugger
+					self.$snotify({
+						type: "error",
+						title: err
+					})
 				})
 			}
 			

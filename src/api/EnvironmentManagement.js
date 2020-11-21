@@ -26,5 +26,9 @@ export const environmentManagementApi = {
 	getAllObjTypeOfService(type){
 		let domainApi = new Api(appConfigs.envDomain[type])
 		return domainApi.get('env/object-types')
+	},
+	getAllObjOfTypeOfService(data){
+		let domainApi = new Api(appConfigs.envDomain[data.type])
+		return domainApi.get('env/'+data.value+'s')
 	}
 };
