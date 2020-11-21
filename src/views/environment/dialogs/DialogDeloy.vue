@@ -23,7 +23,7 @@
 						class="fs-13"
 					></v-autocomplete>
 					<div class="text-wrap">
-						Nhấn Deploy để deloy version này
+						Nhấn Deploy để deploy version này
 					</div>
 				</div>
 

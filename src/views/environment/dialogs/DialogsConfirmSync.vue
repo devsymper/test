@@ -1,59 +1,61 @@
 <template>
-	<v-dialog
-		v-model="showDialog"
-		persistent
-		max-width="290"
-	>
-		<v-card>
-		<v-card-title class="fs-13 ">
-			Đồng bộ dữ liệu về domain hiện tại
-		</v-card-title>
-		<v-card-text>
-			<div class="d-flex flex-column">
-				<div>
-					Đồng bộ dữ liệu qua domain
-				</div>
-				<div>
-					Các dữ liệu liên quan sẽ được đồng bộ cùng dữ liệu chính
-				</div>
-				<div class="text-wrap">
-					Nhấn OK để đồng bộ dữ liệu từ domain <span class="font-weight-bold">ba.app-beta.symper.vn</span> về domain  <span class="font-weight-bold">ba.app-beta.symper.vn</span> 
-				</div>
-				 <v-checkbox
-					v-model="selected"
-					label="John"
-					value="overrideConfligData"
-				></v-checkbox>
-				<v-checkbox
-					v-model="selected"
-					label="Jacob"
-					value="syncDataNotConflig"
-				></v-checkbox>
-			</div>
+	<div class="dialog-deploy">
+		<v-dialog
+			v-model="showDialog"
+			persistent
+			max-width="400"
+		>
+			<v-card>
+			<v-card-title class="fs-15">
+				Đồng bộ dữ liệu về domain hiện tại
+			</v-card-title>
+			<v-card-text>
+				<div class="content-deploy-dialog d-flex flex-column ml-2 fs-13">
+					<div class="fs-13 mb-2 mt-2 ">
+						Đồng bộ dữ liện qua domain
+					</div>
+					<v-autocomplete
+						v-model="envId"
+						:items="allEnv"
+						item-text="frontendDomain"
+						item-value="id"
+						solo-inverted
+						class="fs-13"
+					></v-autocomplete>
+					<div>
+						Các dữ liệu liên quan sẽ được đồng bộ cùng dữ liệu chính 
+					</div>
 
-		</v-card-text>
-		<v-card-actions>
-			<v-spacer></v-spacer>
-			<v-btn
-				color="red darken-1"
-				text
-				@click="cancel"
-			>
-				Hủy
-			</v-btn>
+					<div class="text-wrap">
+						Nhấn OK để  đồng bộ dữ liệu 
+					</div>
+				</div>
+
+			</v-card-text>
+			<v-card-actions>
+				<v-spacer></v-spacer>
 				<v-btn
-				color="green darken-1"
-				text
-				@click="syncData"
-			>
-				Thêm
-			</v-btn>
-		</v-card-actions>
-		</v-card>
-	</v-dialog>
+					color="red darken-1"
+					text
+					@click="cancel"
+				>
+					Hủy
+				</v-btn>
+					<v-btn
+					color="green darken-1"
+					text
+					@click="syncData"
+				>
+					Đồng bộ
+				</v-btn>
+			</v-card-actions>
+			</v-card>
+		</v-dialog>
+	</div>
 </template>
 
 <script>
+import {environmentManagementApi} from '@/api/EnvironmentManagement'
 export default {
 	props:{
 		showDialog:{
@@ -63,7 +65,16 @@ export default {
 	},
 	data(){
 		return{
-			selected:""
+			selected:"",
+			envId:""
+		}
+	},
+	created(){
+		this.$store.dispatch('environmentManagement/getAllEnvirontment')
+	},
+	computed:{
+		allEnv(){
+			return this.$store.state.environmentManagement.allEnvironment
 		}
 	},
 	methods:{
@@ -71,11 +82,24 @@ export default {
 			this.$emit('cancel')
 		},
 		syncData(){
+			let self = this
 		}
 	},
 }
 </script>
 
-<style>
-
+<style scoped>
+.content-deploy-dialog >>>  .v-text-field__details{
+	display: none !important;
+}
+.content-deploy-dialog >>> .v-input__slot{
+	box-shadow: unset !important;
+	min-height: unset !important;
+}
+.content-deploy-dialog >>> input{
+	font-size: 13px !important;
+}
+.content-deploy-dialog >>> .v-menu{
+	font-size: 13px !important;
+}
 </style>

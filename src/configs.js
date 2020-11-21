@@ -58,7 +58,9 @@ var configs = {
         trash: "https://trash.symper.vn/",
 		log: "https://log.symper.vn",
 		environmentManagement: "https://system-management.symper.vn/"
-    },
+	},
+	envDomain:{
+	},
     notificationTimeout: {
         success: 3000,
         warning: 5000,
@@ -97,9 +99,18 @@ var configs = {
                 }
             }
         }
-    }
+	},
+	mapDomainToEnvConfig(obj){
+		this.envDomain = {
+			orgchart: obj.orgchart,
+			account: obj.account,
+			documents: obj.documents,
+			appManagement: obj.appManagement,
+		}
+	}
 };
 configs.reformatUrl(configs.apiDomain);
+configs.mapDomainToEnvConfig(configs.apiDomain);
 // sửa lại url theo môi trường code
 
 
