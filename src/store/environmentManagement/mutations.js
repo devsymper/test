@@ -15,11 +15,19 @@ const setCurrentServieId = (state, data) => {
 const setCurrentVersionId = (state, data) => {
     Vue.set(state, 'currentVersionId', data);
 };
+const setObjectTypeOfService = (state, data) => {
+    Vue.set(state.listObjectTypeInService, state.currentServiceType, data);
+};
+const setCurrentServiceType = (state, data) => {
+    Vue.set(state, 'currentServiceType', data);
+};
 
 export {
 	setAllEnvironment,
 	setServiceInstanceInEnvironment,
 	setCurrentEnvId,
 	setCurrentServieId,
-	setCurrentVersionId
+	setCurrentVersionId,
+	setObjectTypeOfService,
+	setCurrentServiceType
 };

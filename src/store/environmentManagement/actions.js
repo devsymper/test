@@ -41,8 +41,31 @@ const getInstanceInEnv = (context , id) => {
             SYMPER_APP.$snotifyError(error, "Can not get all node style !");
         }
 }
+const getObjectTypeOfService = (context , type) => {
+	context.commit('setCurrentServiceType', type)
+        try {
+			if(!context.state.listObjectTypeInService[type]){
+				environmentManagementApi.getAllObjTypeOfService(type).then(res=>{
+					if (res.status == 200) {
+						debugger
+						let arr = res.data.length > 0 ? res.data : []
+						context.commit('setObjectTypeOfService', arr)
+					} else {
+						SYMPER_APP.$snotifyError(error, "Can not get data");
+					}
+				}).catch(err=>{
+	
+				})
+			}
+			
+           
+        } catch (error) {
+            SYMPER_APP.$snotifyError(error, "Can not get data");
+        }
+}
 
 export { 
 	getAllEnvirontment,
-	getInstanceInEnv
+	getInstanceInEnv,
+	getObjectTypeOfService
 };

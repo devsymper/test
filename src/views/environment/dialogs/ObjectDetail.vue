@@ -11,6 +11,34 @@
 		>
 			<v-icon dark small>mdi-keyboard-backspace</v-icon>
 		</v-btn>
+		<span class="btn-header-popup">
+			<v-btn 
+				class="mr-2 font-normal fs-13"
+				depressed
+				tile
+				small
+			>
+				Chọn
+			</v-btn>
+			<v-btn 
+				class="mr-2 font-normal fs-13"
+				depressed
+				tile
+				small
+				@click="handleClickCheck"
+			>
+				Kiểm tra
+			</v-btn>
+			<v-btn 
+				class="mr-2 font-normal fs-13"
+				depressed
+				tile
+				small
+				@click="handleClickSync"
+			>
+				Đồng bộ
+			</v-btn>
+		</span>
 		<ListItem 
 			:showExportButton="false"
 			:containerHeight="tableHeight"
@@ -47,5 +75,10 @@ export default {
 <style scoped>
 .symper-title{
 	margin-left: 12px !important;
+}
+.btn-header-popup{
+	position: absolute;
+	top: 15px;
+	right: 235px;
 }
 </style>

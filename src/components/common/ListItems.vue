@@ -1299,7 +1299,6 @@ export default {
             }
             let url = this.getDataUrl;
 			let method = this.apiMethod;
-			debugger
             if (url != "") {
                 let thisCpn = this;
                 thisCpn.loadingData = true;

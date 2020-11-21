@@ -3,7 +3,11 @@ const defaultState = {
 	serviceInstanceInEnv:{},
 	currentEnvId: "",
 	currentServiceId: "",
-	currentVersionId: ""
+	currentVersionId: "",
+	currentServiceType: "",
+	listObjectTypeInService: {
+
+	}
 };
 
 export default defaultState;

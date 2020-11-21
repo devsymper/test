@@ -165,11 +165,11 @@ export default {
 		},
 		handleServiceClick(item){
 			this.apiUrl = appConfigs.envDomain[item.serviceIdentifier]
-			environmentManagementApi.getAllObjTypeOfService(item.serviceIdentifier).then(res=>{
-				debugger
-			}).catch(err=>{
+			this.$store.dispatch('environmentManagement/getObjectTypeOfService',item.serviceIdentifier)
+			// environmentManagementApi.getAllObjTypeOfService().then(res=>{
+			// }).catch(err=>{
 
-			})
+			// })
 			this.showDialog = true
 		}
 	}

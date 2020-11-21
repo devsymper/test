@@ -65,7 +65,6 @@ export default {
 				serviceId:serviceId,
 				formData:formData
 			}).then(res=>{
-				debugger
 				if(res.status == 200){
 					self.$snotify({
 						type: "success",
