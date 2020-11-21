@@ -2055,6 +2055,7 @@ export default {
         //hoangnd: hàm set các giá trị của thuộc tính và formulas vào từng contrl trong doc lúc load dữ liệu và đưa vào state
         setDataForPropsControl(fields){
             console.log("ádsadasd",fields);
+            let thisCpn = this;
             for(let controlId in fields){
                 if(!fields[controlId].hasOwnProperty('type')){
                     continue;
@@ -2072,9 +2073,9 @@ export default {
                         if(type == 'dataFlow' && k == 'dataFlowId'){
                             properties[k].value = {id:fields[controlId]['properties'][k]};
                         }
-                        else if(k == 'mapParamsDataflow'){
+                        else if(type == 'dataFlow' && k == 'mapParamsDataflow'){
                             properties[k]['datasets'] = fields[controlId]['properties']['datasets'];
-                            properties[k]['value'] = fields[controlId]['properties']['value'];
+                            properties[k]['value'] = fields[controlId]['properties'][k];
                         }
                         else{
                             if(typeof fields[controlId]['properties'][k] != "object"){
@@ -2091,13 +2092,22 @@ export default {
                     $.each(formulas,function(k,v){
                         if(k == 'linkConfig'){
                             if(fields[controlId]['formulas'][k]){
-                                formulas[k]['configData'] = fields[controlId]['formulas'][k]['configData'];
+                                let configData = fields[controlId]['formulas'][k]['configData'];
+                                if(thisCpn.$getRouteName() == 'cloneDocument'){
+                                    for (let index = 0; index < configData.length; index++) {
+                                        configData[index]['formula']['id'] = 0;
+                                        
+                                    }
+                                }
+                                formulas[k]['configData'] = configData;
                             }
                         }
                         else{
                             if(fields[controlId]['formulas'][k]){
                                 formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0];
-                                formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                                if(thisCpn.$getRouteName() != 'cloneDocument'){
+                                    formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                                }
                             }
                             if(k == 'autocomplete'){
                                 formulas[k]['configData']= (autocompleteConfig == false) ? {} : autocompleteConfig;
@@ -2132,13 +2142,30 @@ export default {
                         })
                         if(listField[childFieldId]['formulas'] != false){
                             $.each(childFormulas,function(k,v){
-                                if(listField[childFieldId]['formulas'][k]){
-                                    childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0]
-                                    childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
+                                if(k == 'linkConfig'){
+                                    if(listField[childFieldId]['formulas'][k]){
+                                        let configData = listField[childFieldId]['formulas'][k]['configData'];
+                                        if(thisCpn.$getRouteName() == 'cloneDocument'){
+                                            for (let index = 0; index < configData.length; index++) {
+                                                configData[index]['formula']['id'] = 0;
+                                                
+                                            }
+                                        }
+                                        childFormulas[k]['configData'] = configData;
+                                    }
                                 }
-                                if(k == 'autocomplete'){
-                                    childFormulas[k]['configData']= (childAutocompleteConfig == false) ? {} : childAutocompleteConfig;
+                                else{
+                                    if(listField[childFieldId]['formulas'][k]){
+                                        childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0];
+                                        if(thisCpn.$getRouteName() != 'cloneDocument'){
+                                            childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0];
+                                        }
+                                    }
+                                    if(k == 'autocomplete'){
+                                        childFormulas[k]['configData']= (childAutocompleteConfig == false) ? {} : childAutocompleteConfig;
+                                    }
                                 }
+                                
                             })
                         }
                         listChildField[childFieldId] = {properties: childProperties, formulas : childFormulas,type:childType}

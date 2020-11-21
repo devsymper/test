@@ -368,7 +368,7 @@ export default {
             }
         },
         handleConfigUserSelectChange(listUserIds){
-            this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
+			this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
             if(this.context == 'department'){
 				this.changeManagerForDepartment(this.selectingNode.id, listUserIds);
 				let allNodes = this.$refs.positionDiagram.getAllNode()

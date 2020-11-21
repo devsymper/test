@@ -3,6 +3,7 @@
 		:pageTitle="'Danh sách orgchart'"
 		:containerHeight="containerHeight"
 		:useDefaultContext="false"
+		:tableContextMenu="tableContextMenu"
 		:getDataUrl="getListUrl"
 		:customAPIResult="customAPIResult"
 		:useActionPanel="false"
@@ -57,7 +58,16 @@ export default {
                        total: res.data.listObject.length
                    }
                 }
-            },
+			},
+			tableContextMenu: {
+				setPermission: {
+					name: "set",
+					text: "Phân quyền",
+					callback: (row, callback) => {
+					}
+				},
+			
+			}
 		}
 	},
 	

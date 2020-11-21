@@ -18,7 +18,8 @@
         "import_excel_history": "Lịch sử Import",
         "edit": "Sửa",
         "cancel": "Hủy",
-        "update": "Cập nhật",
+		"update": "Cập nhật",
+		"create":"Thêm mới",
         "delete": "Xóa",
         "refresh": "Làm mới",
         "userDeletedName": "Email người xóa",
@@ -170,6 +171,18 @@
         }
     },
     "table": {
+		"id": "ID",
+		"name": "Tên Service",
+		"description": "Mô tả",
+		"lastVersion": "Version mới nhất",
+		"language": "Ngôn ngữ",
+		"status": "Trạng thái",
+		"userCreate": "Người tạo",
+		"userUpdate": "Người cập nhât",
+		"createAt": "Thời gian tạo",
+		"updateAt": "Thời gian cập nhât",
+		"releaseAt": "Thời gian release",
+		"versionName": "Tên version",
         "wrap_text_mode": "Chế độ xuống dòng",
         "display_density": "Mật độ hiển thị dòng",
         "column_config": "Cấu hình cột",
@@ -224,7 +237,8 @@
             "startUserId": "Người bắt đầu",
             "startTime": "Thời gian bắt đầu",
             "tenantId": "ID",
-            "suspended": "Trạng thái"
+			"suspended": "Trạng thái",
+			"number_instance":"Tổng số instance"
         }
     },
     "validate": {
@@ -393,6 +407,7 @@
         "grandPermission": "Phân quyền chi tiết",
         "apps": "Apps",
         "contextMenu": {
+			"viewDetails":"Xem chi tiết",
             "edit": "Sửa",
             "grantPermission": "Phân quyền",
             "remove": "Xóa"
@@ -757,7 +772,8 @@
                         "history": "Lịch sử",
                         "comment": "Bình luận",
                         "has": "Có",
-                        "commentNotResolve": "bình luận chưa được giải quyết"
+                        "commentNotResolve": "bình luận chưa được giải quyết",
+                        "id": "Định danh"
                     },
                     "worflowInfo": "THÔNG TIN QUY TRÌNH",
                     "userRelated": {

@@ -1,11 +1,23 @@
 import Control from "./control";
 import { util } from "@/plugins/util.js";
 import moment from "moment-timezone";
+import sDocument from './../../../store/document'
+import {
+    SYMPER_APP
+} from './../../../main.js'
 window.switchTableMode = function(el){
     let tableName = $(el).attr('table-name');
-    let thisListItem = util.getClosestVueInstanceFromDom(el,'submitDocument');
-    thisListItem.$evtBus.$emit('on-switch-pivot-table-mode',{tableName:tableName})
-    
+    let viewType = $(el).attr('view-type');
+    let thisListItem = null;
+    if(viewType == 'detail'){
+        thisListItem = util.getClosestVueInstanceFromDom(el,'detailDocument');
+    }
+    else if(viewType == 'submit'){
+        thisListItem = util.getClosestVueInstanceFromDom(el,'submitDocument');
+    }
+    if(thisListItem){
+        thisListItem.$evtBus.$emit('on-switch-pivot-table-mode',{tableName:tableName})
+    }
 }
 export default class TableControl extends Control {
     constructor(idField, ele, controlProps, curParentInstance) {
@@ -52,22 +64,25 @@ export default class TableControl extends Control {
         }
     }
     renderTable() {
+        let viewType = sDocument.state.viewType[this.curParentInstance];
         if (this.isPrintView) {
-            this.ele.attr('table-id', this.ele.attr('id'));
-            this.ele.removeAttr('id');
-            this.ele.find('table').addClass('table-print');
-            this.ele.find('table tbody').empty();
-            this.tablePrint.render();
+            // this.ele.attr('table-id', this.ele.attr('id'));
+            // this.ele.removeAttr('id');
+            // this.ele.find('table').addClass('table-print');
+            // this.ele.find('table tbody').empty();
+            // this.tablePrint.render();
+            this.pivotTable.render();
         } else {
             this.tableInstance.render();
             if(this.pivotTable){
                 this.pivotTable.render();
-                let switchTableButton = $(`<button onclick="switchTableMode(this)" table-name="`+this.name+`" class="swap-table-btn"><span class="mdi mdi-swap-horizontal"></button>`)[0];
+                let switchTableButton = $(`<button onclick="switchTableMode(this)" view-type="`+viewType+`" table-name="`+this.name+`" class="swap-table-btn"><span class="mdi mdi-swap-horizontal"></button>`)[0];
                 this.ele.before(switchTableButton);
             }
             this.ele.detach().hide();
+            this.switchTable();
+
         }
-        // this.switchTable();
     }
     /**
      * Hàm set data cho handson table, cho trường hợp viewdetail đã có data
@@ -118,8 +133,24 @@ export default class TableControl extends Control {
                 tr += '</tr>';
                 bodyHtml += tr;
             }
-            this.ele.find('table tbody').append(bodyHtml);
-            this.ele.find('table').attr('contenteditable', 'false')
+            // this.ele.find('table tbody').append(bodyHtml);
+            // this.ele.find('table').attr('contenteditable', 'false')
+            let dataTable = [];
+            let rowLength = data[Object.keys(data)[0]].length;
+            for (let index = 0; index < rowLength; index++) {
+                let rowData = {};
+                for (let i = 0; i < Object.keys(data).length; i++) {
+                    let key = Object.keys(data)[i];
+                    let control = this.controlInTable[key];
+                    if (control && control.type == 'date') {
+                        data[key][index] = moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
+                    }
+                    rowData[key] = data[key][index];
+                }
+                dataTable.push(rowData)
+
+            }
+            this.pivotTable.setData(dataTable)
         } else {
             if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1){
                 return;
@@ -146,6 +177,10 @@ export default class TableControl extends Control {
             this.tableInstance.tableInstance.loadData(dataTable);
             setTimeout((self) => {
                 self.tableInstance.tableInstance.render();
+                SYMPER_APP.$evtBus.$emit('document-on-table-change', {
+                    data: self.tableInstance.tableInstance.getSourceData(),
+                    tableName:self.name
+                });
             }, 100, this);
             if (this.currentDataStore.docStatus == 'init') {
                 this.defaultValue = data;
@@ -156,6 +191,7 @@ export default class TableControl extends Control {
     switchTable(){
         if(this.tableMode == 'nomal'){
             this.tableInstance.show();
+            this.tableInstance.tableInstance.render();
             if(this.pivotTable){
                 this.pivotTable.hide();
             }
