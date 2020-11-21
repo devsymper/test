@@ -4,55 +4,55 @@ import attrToXMLMethods from "./elementDefinitions/attrToXMLMethods";
 
 
 
-export const userAssignmentToXMLValue = function (config,returnString=false) {
-    let rsl = {
-        formula: config.formula,
-        users: [
-            /**
-             * Danh sách các user được chọn, có dạng:
-             * {
-             *      userId: 100,
-             *      roleIdentify: 20:abc-xyz
-             * }
-             */
-        ],
-        roles: [
-            /**
-             * danh sách các role trong orgchart, mỗi item có dạng:['orgchart:20:abc-xyz']
-             */
-        ]
-    };
-    for (let item of config.orgChart) {
-        if (item.type == 'user') {
-            rsl.users.push({
-                userId: item.id.replace('user:', '')
-            });
-        } else if (item.type == 'department') {
-            rsl.roles.push(
-                'orgchart:' + item.id
-            );
-        }
-    }
-
-    if (rsl.formula != '' || rsl.roles.length > 0) {
-        if (returnString) { // return string
-            return rsl.formula;
-        }else{
-            return JSON.stringify(rsl);
-        }
-    } else {
-        rsl = rsl.users.reduce((arr, el) => {
-            if (el && el.userId) {
-                arr.push(el.userId);
+export const userAssignmentToXMLValue = function(config, returnString = false) {
+        let rsl = {
+            formula: config.formula,
+            users: [
+                /**
+                 * Danh sách các user được chọn, có dạng:
+                 * {
+                 *      userId: 100,
+                 *      roleIdentify: 20:abc-xyz
+                 * }
+                 */
+            ],
+            roles: [
+                /**
+                 * danh sách các role trong orgchart, mỗi item có dạng:['orgchart:20:abc-xyz']
+                 */
+            ]
+        };
+        for (let item of config.orgChart) {
+            if (item.type == 'user') {
+                rsl.users.push({
+                    userId: item.id.replace('user:', '')
+                });
+            } else if (item.type == 'department') {
+                rsl.roles.push(
+                    'orgchart:' + item.id
+                );
             }
-            return arr;
-        }, []);
-        return rsl.join(',');
+        }
+
+        if (rsl.formula != '' || rsl.roles.length > 0) {
+            if (returnString) { // return string
+                return rsl.formula;
+            } else {
+                return JSON.stringify(rsl);
+            }
+        } else {
+            rsl = rsl.users.reduce((arr, el) => {
+                if (el && el.userId) {
+                    arr.push(el.userId);
+                }
+                return arr;
+            }, []);
+            return rsl.join(',');
+        }
     }
-}
-/**
- * các biến
- */
+    /**
+     * các biến
+     */
 const commonEleAttrs = [{
         "name": "id",
         "isAttr": true,
@@ -1355,7 +1355,7 @@ let allAttrs = {
         "dg": "detail"
     },
     "timercycledefinition": {
-        "title": "Time cycle (e.g. R3/PT10H)",
+        "title": "Time cycle (cron)",
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.TIMERCYCLEDEFINITIONPACKAGE.TIMERCYCLEDEFINITION.DESCRIPTION",
@@ -1587,7 +1587,8 @@ let allAttrs = {
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.CONDITIONALEVENTPACKAGE.CONDITION.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.pushConditionTagToXML
     },
     "initiator": {
         "title": "Initiator",
@@ -1614,8 +1615,8 @@ let allAttrs = {
     },
     "multiinstance_cardinality": {
         "title": "Cardinality ",
-        "type": "numeric",
-        "value": "",
+        "type": "script",
+        "value": "1",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_CARDINALITYPACKAGE.MULTIINSTANCE_CARDINALITY.DESCRIPTION",
         "dg": "multiInstance",
         toXML: {
@@ -1738,7 +1739,7 @@ let allAttrs = {
                 title: 'Scope',
                 name: 'symper_symper_scope_tag',
                 type: 'autocomplete',
-                source: ["global", "process instance"]
+                source: ["global", "processInstance"]
             },
         ],
         "info": "BPMN.PROPERTYPACKAGES.SIGNALDEFINITIONSPACKAGE.SIGNALDEFINITIONS.DESCRIPTION",
@@ -1759,6 +1760,17 @@ let allAttrs = {
 
                     if(newItem.id && newItem.id.trim()){
                         rsl.push(newItem);
+                    }
+                }
+            }
+            return rsl;
+        },
+        getValueForXML(value) {
+            let rsl = [];
+            if($.isArray(value)){
+                for(let item of value){
+                    if(item.id && item.id.trim()){
+                        rsl.push(item);
                     }
                 }
             }
@@ -1957,7 +1969,7 @@ let allAttrs = {
         "dg": "detail",
         toXML: {
             "symper_position": "attr",
-            "name": "terminateAll",
+            "name": "symper_symper_terminateAll_tag",
             "isAttr": true,
             "type": "String"
         }
@@ -2359,8 +2371,7 @@ let allAttrs = {
         "value": "script",
         "info": "",
         "dg": "detail",
-        options: [
-            {
+        options: [{
                 text: 'Script',
                 value: 'script',
             },
@@ -2391,7 +2402,7 @@ let allAttrs = {
         "value": "",
         "info": "",
         "dg": "detail",
-        hidden:false,
+        hidden: false,
         pushToXML: attrToXMLMethods.notPushToXML,
     },
 
@@ -2463,7 +2474,7 @@ let allAttrs = {
         // },
         activeTab: 'orgchart', // tab nào sẽ mở: orgchart hoặc script
         dg: 'detail',
-        hidden:false,
+        hidden: false,
         pushToXML: attrToXMLMethods.notPushToXML,
     },
     serviceNotificationTitle: {
@@ -2472,7 +2483,7 @@ let allAttrs = {
         "value": "",
         "info": "",
         "dg": "detail",
-        hidden:false,
+        hidden: false,
         validate() {
             let vl = this.value;
             if (vl == null || vl == '') {
@@ -2498,7 +2509,7 @@ let allAttrs = {
         "value": "",
         "info": "",
         "dg": "detail",
-        hidden:false,
+        hidden: false,
         validate() {
             let vl = this.value;
             if (vl == null || vl == '') {
@@ -2526,7 +2537,7 @@ let allAttrs = {
         dg: 'detail',
         showId: false,
         isSymperProp: true,
-        hidden:false,
+        hidden: false,
         pushToXML: attrToXMLMethods.notPushToXML
     },
     selectDefaultControlDocument: { // cấu hình form định nghĩa sẵn dữ liệu cho control của document
@@ -2538,7 +2549,7 @@ let allAttrs = {
         options: [],
         dg: 'taskAction',
         isSymperProp: true,
-        hidden:false,
+        hidden: false,
         pushToXML: attrToXMLMethods.notPushToXML
     },
 

@@ -255,7 +255,6 @@ export default {
                     initDocObjDataTable[id] = newRow;
                 }
             }
-            // this.multipleLevelObjects.document_definition.tableData = initDocObjDataTable;
             this.caculateTableDataForAllInstancesDocDef(initDocObjDataTable);
         },
         objectTypeToDocumentDefinition(){
@@ -265,7 +264,6 @@ export default {
         getTableDataFromOperations(operations){
             let mapActionAndObjectTypes = this.mapObjectTypesAndAction;
             let allResource = this.$store.state.actionPack.allResource;
-
             /**
              * Map giữa object type và action , có dạng
              * {
@@ -351,12 +349,6 @@ export default {
             }
         },
         initAllResource(needInitResources){
-            // let needInitResources = [
-            //     'document_definition',
-            //     'workflow_definition',
-            //     'orgchart',
-            //     'dashboard'
-            // ];
             for(let type of needInitResources){
                 this.getObjectsOfObjectType(type);
             }
@@ -481,35 +473,41 @@ export default {
             let self = this
             if(name == 'objectType'){
                 if(data == "department"){
-                    let objectType = data;
-                    let rows = this.itemData.mapActionForAllObjects[objectType];
-					let rowsItem = this.itemData.mapActionAndObjects[objectType];
-                    if(rows){
-                        for(let i in rows[0]){
-                            if(rows[0][i] == true){
-                                self.permissionDepartment.push(i)
-                            }
-                        }
-                    }
-                    if(rowsItem){
-						if(self.permissionDepartment.includes('view_other') == false){
-                        	self.permissionDepartment.push('view_other')
-						}
-                        self.$store.dispatch('orgchart/getAllOrgchartStruct');
-                        setTimeout(function(){
-                            rowsItem.forEach(function(e){
-                                if(e.object != ""){
-                                    self.departmentSelected.push('department:'+e.object);
-                                    self.departmentSelectedProps.push(e.object)
-                                }
-                             })
-                        },1000)
-                    }
+					this.handleConfigDepartment(data)
                 }else{
                     this.handleChangeObjectType();
                 }
             }
-        },
+		},
+		handleConfigDepartment(data){
+			let self = this
+			let objectType = data;
+			let rows = this.itemData.mapActionForAllObjects[objectType];
+			let rowsItem = this.itemData.mapActionAndObjects[objectType];
+			if(rows){
+				for(let i in rows[0]){
+					if(rows[0][i] == true){
+						if(self.permissionDepartment.includes(i) == false){
+							self.permissionDepartment.push(i)
+						}
+					}
+				}
+			}
+			if(rowsItem){
+				if(self.permissionDepartment.includes('view_other') == false){
+					self.permissionDepartment.push('view_other')
+				}
+				self.$store.dispatch('orgchart/getAllOrgchartStruct');
+				setTimeout(function(){
+					rowsItem.forEach(function(e){
+						if(e.object != ""){
+							self.departmentSelected.push('department:'+e.object);
+							self.departmentSelectedProps.push(e.object)
+						}
+					})
+				},1000)
+			}
+		},
         handleChangeObjectType(){
             this.dataSchema = this.getDataSchema();
             this.tableColumnsForObjectType = this.getActionAsColumns();
@@ -702,9 +700,8 @@ export default {
 
             for(let objectType in this.itemData.mapActionForAllObjects){
                 if(objectType != 'department'){
-                     let dataTable = this.itemData.mapActionForAllObjects[objectType];
+					let dataTable = this.itemData.mapActionForAllObjects[objectType];
                     let row = dataTable[0];
-
                     if(allResource.hasOwnProperty(objectType)){
                         for(let actionName in row){
                             let objectIdentifier = actionForObjectType[actionName] ? objectType : (objectType + ':0' );
@@ -853,23 +850,11 @@ export default {
             let allActionByObjectType = this.$store.state.actionPack.allActionByObjectType;
             let rsl = [];
             for(let key in allActionByObjectType){
-				if(key != "department"){
-					if(key == 'account'){
-						rsl.unshift({
-							text: util.str.getCamelSpaceFromPascalText(key),
-							value: key
-						});
-					}else{
-						rsl.push({
-							text: util.str.getCamelSpaceFromPascalText(key),
-							value: key
-						});
-					}
-				}
-				
-				
+				rsl.push({
+					text: util.str.getCamelSpaceFromPascalText(key),
+					value: key
+				});
 			}
-
 			this.listObject = rsl
 			return rsl;
 
@@ -879,7 +864,7 @@ export default {
         let self = this;
         return {
 			listObject:[],
-			objectActive:"account",
+			objectActive:"document_definition",
             permissionDepartment:[],
             departmentSelected:[],
             departmentSelectedProps: [],

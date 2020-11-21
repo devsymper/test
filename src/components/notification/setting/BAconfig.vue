@@ -319,7 +319,6 @@ export default {
         this.$refs.uploadAvatar.uploadFile();
     },
     replaceDescription(){
-      debugger
       let description = this.description;
       if(description.indexOf('<Deadline>')>-1){
            let oldValue= "<Deadline>";
@@ -356,7 +355,6 @@ export default {
               this.typePictureSelected=this.typeSelected[1]
         }else{
           this.typePictureSelected=this.typeSelected[0];
-          debugger
           this.avatarFileName = des.icon
         }
     },
