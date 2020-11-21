@@ -201,11 +201,11 @@ export default {
             let moddle = bpmnModeler.get('moddle');
             let bizObj = el.businessObject;
             let elTagName = attr.toXML.name;
-
+            let value = attr.value.replace(/\n|\r\n/g,' ');
             let newEl = moddle.create("bpmn:FormalExpression");
             newEl['xsi:type'] = "tFormalExpression";
-            newEl.text = "<![CDATA[" + attr.value + "]]>";
-            newEl.body = "<![CDATA[" + attr.value + "]]>";
+            newEl.text = "<![CDATA[" + value + "]]>";
+            newEl.body = "<![CDATA[" + value + "]]>";
             bizObj[elTagName] = newEl;
         }
     },
@@ -253,6 +253,18 @@ export default {
             signal.id = attr.value;
             signal.name = attr.value;
             bizEl.eventDefinitions[0].signalRef = signal;
+        }
+    },
+
+    pushConditionTagToXML(el, elKey, attr, bpmnModeler, attrName){
+        let moddle = bpmnModeler.get('moddle');
+        let bizEl = el.businessObject;
+        if(attr.value && attr.value.trim()){
+            let eventDefinitions = moddle.create('bpmn:ConditionalEventDefinition');
+            let expression = moddle.create('bpmn:Expression');
+            expression.body = attr.value.trim().replace(/\n|\r\n/g,' ');
+            eventDefinitions.condition = expression;
+            bizEl.eventDefinitions = [eventDefinitions];
         }
     }
 }

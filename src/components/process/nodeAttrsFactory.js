@@ -317,7 +317,7 @@ export const nodeAttrsDefinition = {
 
     },
     'CatchConditionalEvent': {
-        attrs: ["executionlisteners", "conditionalevent"],
+        attrs: ["executionlisteners", "conditionaleventcondition"],
         validate: function(attrs) {
 
         },
@@ -358,6 +358,16 @@ export const nodeAttrsDefinition = {
     },
     'CatchSignalEvent': {
         attrs: ["executionlisteners", "signalref"],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        },
+        docker: dockerGroups.event
+    },
+    'BoundaryConditionalEvent': {
+        attrs: ["executionlisteners", "conditionaleventcondition"],
         validate: function(attrs) {
 
         },
