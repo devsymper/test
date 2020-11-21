@@ -565,6 +565,10 @@ export default {
         });
     },
     props: {
+		apiMethod:{
+			type: String,
+			default : "GET"
+		},
 		dialogMode:{
 			type: Boolean,
 			default:false
@@ -1294,7 +1298,8 @@ export default {
                 return;
             }
             let url = this.getDataUrl;
-            let method = 'GET';
+			let method = this.apiMethod;
+			debugger
             if (url != "") {
                 let thisCpn = this;
                 thisCpn.loadingData = true;
@@ -1318,7 +1323,7 @@ export default {
                 tableFilter.allColumnInTable = this.tableColumns;
                 configs.emptyOption = emptyOption;
 
-                getDataFromConfig(url, configs, columns, tableFilter, success, 'GET', header);
+                getDataFromConfig(url, configs, columns, tableFilter, success, method, header);
                 // apiObj
                 //     .callApi(method, url, options, header, {})
                 //     .then(data => {

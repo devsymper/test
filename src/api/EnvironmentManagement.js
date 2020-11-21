@@ -23,4 +23,8 @@ export const environmentManagementApi = {
 	deloy(data){
 		return api.post('instances/deploy',data)
 	},
+	getAllObjTypeOfService(type){
+		let domainApi = new Api(appConfigs.envDomain[type])
+		return domainApi.get('env/object-types')
+	}
 };

@@ -60,7 +60,7 @@
 									<span 
 										class="service-instance-title text-uppercase" 
 										
-										@click="handleServiceClick"
+										@click="handleServiceClick(item)"
 									> 
 										{{ item.serviceName}}
 									</span>
@@ -81,6 +81,7 @@
 		<ListObjectInService 
 			:showDialog="showDialog"
 			:tableHeight="tableHeight"
+			:apiUrl="apiUrl"
 			@close-popup="handleCloseEvent"
 		/>	 
 			 
@@ -91,6 +92,8 @@
 import {util} from '@/plugins/util'
 import AddEnvironmentDialog from "./dialogs/AddEnvironmentDialog"
 import ListObjectInService from "./dialogs/ListObjectInService"
+import {appConfigs} from "@/configs.js"
+import {environmentManagementApi} from '@/api/EnvironmentManagement'
 export default {
 	components:{
 		AddEnvironmentDialog,
@@ -107,6 +110,7 @@ export default {
 			searchKey: "",
 			showDialog: false,
 			showDialogAddItem: false,
+			apiUrl: "",
 			tableHeight:0
 		}
 	},
@@ -159,7 +163,13 @@ export default {
 		handleEnvClick(env){
 			this.$store.dispatch('environmentManagement/getInstanceInEnv', env.id)
 		},
-		handleServiceClick(){
+		handleServiceClick(item){
+			this.apiUrl = appConfigs.envDomain[item.serviceIdentifier]
+			environmentManagementApi.getAllObjTypeOfService(item.serviceIdentifier).then(res=>{
+				debugger
+			}).catch(err=>{
+
+			})
 			this.showDialog = true
 		}
 	}
