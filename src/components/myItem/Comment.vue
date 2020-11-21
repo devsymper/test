@@ -62,7 +62,7 @@ export default {
 	    height: calc(100% - 110px);
 	}
 	.wraper-comment >>> .comment-task .input-comment{
-		position: unset;
-		bottom: unset;
+		/* position: unset;
+		bottom: unset; */
 	}
 </style>

@@ -411,7 +411,7 @@ export default {
             if(description.indexOf('<*')>-1){
                 let newValue = '';
                 let value = description.split("<*")[1].split('*>')[0];
-                // debugger
+                // 
                 let oldValue= "<*"+value+"*>";
                 name= name.replace(oldValue,newValue);
                 }
