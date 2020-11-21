@@ -29,7 +29,13 @@ export default {
 		return{
 			containerHeight:0,
 			tableContextMenu: {
-               
+				deloy: {
+					name: "deloy",
+					text: "Deloy",
+					callback: (row, callback) => {
+
+					}
+				},
             },
 			customAPIResult:{
 				reformatData(res){

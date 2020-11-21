@@ -189,7 +189,8 @@
         "freeze_column": "Cố định cột này",
         "unfreeze_column": "Bỏ cố định cột này",
         "hide_column": "Ẩn cột này",
-        "show_column": "Hiện cột này",
+		"show_column": "Hiện cột này",
+		"git": "Link git",
         "wrap_tex_mode": {
             "wrap": "Xuống dòng",
             "clip": "Cắt bớt"
