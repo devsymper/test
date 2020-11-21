@@ -1,25 +1,33 @@
 <template>
-	<ListItems
-		ref="listService"
-		:pageTitle="'Danh sách version'"
-		:containerHeight="containerHeight"
-		:getDataUrl="getListUrl"
-		:headerPrefixKeypath="'table'"
-		:useDefaultContext="false"
-		:showExportButton="false"	
-		:showButtonAdd="false"
-		:tableContextMenu="tableContextMenu"
-		:customAPIResult="customAPIResult"
-	/>
+	<div class="h-100 w-100">
+		<ListItems
+			ref="listService"
+			:pageTitle="'Danh sách version'"
+			:containerHeight="containerHeight"
+			:getDataUrl="getListUrl"
+			:headerPrefixKeypath="'table'"
+			:useDefaultContext="false"
+			:showExportButton="false"	
+			:showButtonAdd="false"
+			:tableContextMenu="tableContextMenu"
+			:customAPIResult="customAPIResult"
+		/>
+		<DialogDeloy 
+			:showDialog="showDialog"
+			@cancel="showDialog = false"
+		/>
+	</div>
 </template>
 
 <script>
 import ListItems from "@/components/common/ListItems"
 import { appConfigs } from "@/configs.js";
 import { util } from "@/plugins/util.js";
+import DialogDeloy from './dialogs/DialogDeloy'
 export default {
 	components:{
-		ListItems
+		ListItems,
+		DialogDeloy
 	},
 	mounted(){
 		this.containerHeight = util.getComponentSize(this).h
@@ -27,13 +35,15 @@ export default {
 	data(){
 		let self = this
 		return{
+			showDialog: false,
 			containerHeight:0,
 			tableContextMenu: {
 				deloy: {
 					name: "deloy",
 					text: "Deloy",
 					callback: (row, callback) => {
-
+						self.$store.commit('environmentManagement/setCurrentVersionId', row.id)
+						self.showDialog = true
 					}
 				},
             },
