@@ -17,7 +17,7 @@
             </v-tooltip>
             <div id="action-task" class="text-right pt-1 pb-1 pr-0 float-right">
                 <span v-if="!originData.endTime && !hideActionTask ">
-                    <span v-if="checkRole(originData.assigneeInfo.id)==true">
+                    <span v-if="originData.assigneeInfo && checkRole(originData.assigneeInfo.id)==true">
                         <v-btn small depressed  v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
                             {{action.text}}
                         </v-btn>
@@ -282,9 +282,12 @@ export default {
             let taskInfo = this.taskInfo;
             if(this.originData){
                 let isPendding = !this.originData.endTime;
-                let isApprovalTask = taskInfo.action.action == 'approval';
-                let hasEditableControls = !taskInfo.approvalEditableControls || (taskInfo.approvalEditableControls && taskInfo.approvalEditableControls.length);
-                return isPendding && isApprovalTask && hasEditableControls;
+                if (taskInfo.action) {
+                    let isApprovalTask = taskInfo.action.action == 'approval';
+                    let hasEditableControls = !taskInfo.approvalEditableControls || (taskInfo.approvalEditableControls && taskInfo.approvalEditableControls.length);
+                    return isPendding && isApprovalTask && hasEditableControls;
+                }
+            
             }
         },
         checkRole(assigneeId){

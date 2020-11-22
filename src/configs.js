@@ -45,7 +45,7 @@ var configs = {
         actionPacks: "https://accesscontrol.symper.vn/action_packs",
         operations: "https://accesscontrol.symper.vn/operations",
         baAccount: "https://account.symper.vn/supporters",
-        appManagement: "https://core.symper.vn/",
+        appManagement: "https://apps-management.symper.vn/",
         commnent: "https://comment-service.symper.vn",
         fileManagement: 'https://file.symper.vn/',
         knowledge: 'https://kh-service.dev.symper.vn/',
