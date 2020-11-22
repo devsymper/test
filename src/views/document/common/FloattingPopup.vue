@@ -151,7 +151,9 @@ export default {
             if(rowId != undefined)
             this.rowIndex = rowId;
             this.isShow = true;
-            this.$refs.comp_trackChange[0].computeDataTable()
+            if(this.viewType == 'detail'){
+                this.$refs.comp_trackChange[0].computeDataTable();
+            }
             this.calculatorPositionBox(e, context);
         },
         calculatorPositionBox(e, context) {
