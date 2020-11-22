@@ -30,5 +30,8 @@ export const environmentManagementApi = {
 	getAllObjOfTypeOfService(data){
 		let domainApi = new Api(appConfigs.envDomain[data.type])
 		return domainApi.get('env/'+data.value+'s')
+	},
+	migrateData(data){
+		return api.post('instances/migrate',data)
 	}
 };

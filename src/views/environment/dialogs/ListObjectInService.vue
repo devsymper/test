@@ -107,6 +107,7 @@
 							@back="tab = 'tab-1'"
 							@close-popup="handleCloseEvent"
 							:getListUrl="getListUrls"
+							:currentObjectType="currentObjectType"
 						/>
 					</div>
 				</v-tab-item>	
@@ -152,6 +153,7 @@ export default {
 			tab: 'tab-1',
 			getListUrls: '',
 			showDialogSync: false,
+			currentObjectType: ""
 		}
 	},
 	methods:{
@@ -162,6 +164,7 @@ export default {
 			
 		},
 		handleObjectViewDetail(item){
+			this.currentObjectType = item
 			this.tab = 'tab-2'
 			let type = this.$store.state.environmentManagement.currentServiceType
 			this.getListUrls = appConfigs.envDomain[type]+'env/'+item+'s'

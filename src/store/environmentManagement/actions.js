@@ -50,18 +50,25 @@ const getObjectTypeOfService = (context , type) => {
 					if (res.status == 200) {
 						let arr = res.data.length > 0 ? res.data : []
 						context.commit('setObjectTypeOfService', arr)
+						return true
 					} else {
 						SYMPER_APP.$snotifyError("Can not get data");
+						return false
+
 					}
 				}).catch(err=>{
 					SYMPER_APP.$snotifyError(err, "Can not get data");
+					return false
+
 				})
 			}
 			
            
         } catch (error) {
-            SYMPER_APP.$snotifyError(error, "Can not get data");
-        }
+			SYMPER_APP.$snotifyError(error, "Can not get data");
+			return false
+			
+		}
 }
 
 export { 
