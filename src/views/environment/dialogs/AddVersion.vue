@@ -18,7 +18,7 @@
 		<v-card-actions>
 			<v-spacer></v-spacer>
 			<v-btn
-				color="green darken-1"
+				color="red darken-1"
 				text
 				@click="cancel"
 			>
@@ -65,7 +65,6 @@ export default {
 				serviceId:serviceId,
 				formData:formData
 			}).then(res=>{
-				debugger
 				if(res.status == 200){
 					self.$snotify({
 						type: "success",
