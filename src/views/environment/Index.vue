@@ -50,12 +50,12 @@ export default {
 			listType:[
 				{
 					title: "Quản lí service",
-					subTitle: "Action pack (gói thao tác) là tập hợp các hành động tương tác với các đối tượng trong hệ thống ",
+					subTitle: "Service  là tập hợp các service trong hệ thống. Mỗi service đảm nhiệm một chức năng riêng trong hệ thống ",
 					action: "serviceManagement"
 				},
 				{
 					title: "Quản lí môi trường",
-					subTitle: "Permission (quyền truy cập) là tập hợp các gói thao tác mà người dùng được phân quyền thực hiện",
+					subTitle: "Danh sách tập trung các môi trường của hệ thống",
 					action: "envManagement"
 				},
 			
