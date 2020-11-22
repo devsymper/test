@@ -565,6 +565,15 @@ export default {
         });
     },
     props: {
+        /**
+         * Hàm phục vụ cho việc dev tự định nghĩa data khi gọi API để lấy dữ liệu
+         * thay vì sử dụng hàm có sẵn, các tham số truyền vào giống như hàm getOptionForGetList trong defaultFilterConfig
+         */
+        custumDataForApi: {
+            type: Function,
+            // default: (configs, columns, filterData)=>{}
+            default: null
+        },
 		dialogMode:{
 			type: Boolean,
 			default:false
@@ -1318,6 +1327,9 @@ export default {
                 tableFilter.allColumnInTable = this.tableColumns;
                 configs.emptyOption = emptyOption;
 
+                if(this.custumDataForApi){
+                    configs.custumDataForApi = this.custumDataForApi;
+                }
                 getDataFromConfig(url, configs, columns, tableFilter, success, 'GET', header);
                 // apiObj
                 //     .callApi(method, url, options, header, {})

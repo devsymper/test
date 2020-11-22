@@ -161,6 +161,10 @@ export const getDataFromConfig = function(url, configs, columns, filterData, suc
     if(!configs.emptyOption){
         options = getOptionForGetList(configs, columns, filterData);
     }
+
+    if(configs.custumDataForApi){
+        options = configs.custumDataForApi(configs, columns, filterData);
+    }
     apiObj.callApi(method, url, options, header, {})
     .then(data => {
         success(data);
