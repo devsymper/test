@@ -37,6 +37,7 @@
 				tile
 				small
 				:disabled="showBtnAddCheckbox"
+				@click="handleSyncClick"
 			>
 				Đồng bộ
 			</v-btn>
@@ -52,15 +53,23 @@
 			:isTablereadOnly="false"
 			@after-selected-row="afterSelectedRow"
 		/>
+		<DialogsConfirmSync 
+			:showDialog="showDialog"
+			@cancel="showDialog = false"
+			:listItemSelected="listItemSelected"
+			:currentObjectType="currentObjectType"
+		/>
 	</div>
 
 </template>
 
 <script>
 import ListItem from "@/components/common/ListItems"
+import DialogsConfirmSync from './DialogsConfirmSync'
 export default {
 	components:{
-		ListItem
+		ListItem,
+		DialogsConfirmSync
 	},
 	props:{
 		tableHeight:{
@@ -68,12 +77,16 @@ export default {
 		},
 		getListUrl:{
 			type: String
-		}
+		},
+		currentObjectType:{
+			type: String
+		},
 	},
 	data(){
 		return{
 			listItemSelected: [],
-			showBtnAddCheckbox: true
+			showBtnAddCheckbox: true,
+			showDialog:false
 		}
 	},
 	methods:{
@@ -89,8 +102,10 @@ export default {
 		},
 		afterSelectedRow(items){
 			this.$set(this, 'listItemSelected', items)
-			debugger	
 		},
+		handleSyncClick(){
+			this.showDialog = true
+		}
 	},
 	watch:{
 		getListUrl(val){
