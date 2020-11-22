@@ -21,78 +21,78 @@
             ></listHeader>
             <v-divider v-if="!sideBySideMode" ></v-divider>
             <v-row class="ml-0 mr-0" v-if="!sideBySideMode">
-            <v-col cols="12" class="list-tasks pt-0 pb-0">
-                <v-row>
-                <v-col
-                    :cols="sideBySideMode ? 12 : compackMode ? 6 : 4"
-                    class="pl-3 fs-13 font-weight-medium"
-                >{{$t("tasks.header.name")}}
-                    <v-icon 
-                        @click="showFilterColumn($event,'name')" 
-                        class="fs-15 float-right" 
-                        style="padding-top:3px"
-                        :class="{
-                            'd-active-color': filteredColumns['name'] && filteredColumns['name']==true ,
-                        }"
-                    >mdi-filter-variant</v-icon>
+                <v-col cols="12" class="list-tasks pt-0 pb-0">
+                    <v-row>
+                    <v-col
+                        :cols="sideBySideMode ? 12 : compackMode ? 6 : 4"
+                        class="pl-3 fs-13 font-weight-medium"
+                    >{{$t("tasks.header.name")}}
+                        <v-icon 
+                            @click="showFilterColumn($event,'name')" 
+                            class="fs-15 float-right" 
+                            style="padding-top:3px"
+                            :class="{
+                                'd-active-color': filteredColumns['name'] && filteredColumns['name']==true ,
+                            }"
+                        >mdi-filter-variant</v-icon>
+                    </v-col>
+                    <v-col
+                        cols="2"
+                        v-if="!sideBySideMode"
+                        class="fs-13 font-weight-medium"
+                    >{{$t("tasks.header.userCreate")}}
+                        <!-- <v-icon @click="showFilterColumn($event,'startTime')" class="fs-15 float-right" style="padding-top:3px">mdi-filter-variant</v-icon> -->
+                    </v-col>
+                    <v-col
+                        cols="2"
+                        v-if="!sideBySideMode"
+                        class="fs-13 font-weight-medium"
+                    >
+                        {{$t("tasks.header.createDate")}}
+                        <v-icon 
+                            @click="showFilterColumn($event,'startTime')" 
+                            class="fs-15 float-right" 
+                            style="padding-top:3px"
+                            :class="{
+                                'd-active-color': filteredColumns['startTime'] && filteredColumns['startTime']==true ,
+                            }"
+                        >mdi-filter-variant</v-icon>
+                    </v-col>
+                    <v-col
+                        cols="2"
+                        v-if="!sideBySideMode && !compackMode && !smallComponentMode"
+                        class="fs-13 font-weight-medium"
+                    >{{$t("tasks.header.app")}}
+                        <v-icon 
+                            @click="showFilterColumn($event,'processDefinitionName')" 
+                            class="fs-15 float-right" 
+                            style="padding-top:3px"
+                            :class="{
+                                'd-active-color': filteredColumns['processDefinitionName'] && filteredColumns['processDefinitionName']==true ,
+                            }"
+                        >mdi-filter-variant</v-icon>
+                    </v-col>
+                    <v-col
+                        cols="1"
+                        v-if="!sideBySideMode && !compackMode && !smallComponentMode"
+                        class="fs-13 font-weight-medium"
+                    >{{$t("tasks.header.status")}}
+                        <v-icon 
+                            @click="showFilterColumn($event,'isDone')" 
+                            class="fs-15 float-right" 
+                            style="padding-top:3px"
+                            :class="{
+                                'd-active-color': filteredColumns['isDone'] && filteredColumns['isDone']==true ,
+                            }"
+                        >mdi-filter-variant</v-icon>
+                    </v-col>
+                    <v-col
+                        cols="1"
+                        v-if="!sideBySideMode && !compackMode && !smallComponentMode"
+                        class="fs-13 font-weight-medium"
+                    >{{$t("common.add")}}</v-col>
+                    </v-row>
                 </v-col>
-                <v-col
-                    cols="2"
-                    v-if="!sideBySideMode"
-                    class="fs-13 font-weight-medium"
-                >{{$t("tasks.header.userCreate")}}
-                    <!-- <v-icon @click="showFilterColumn($event,'startTime')" class="fs-15 float-right" style="padding-top:3px">mdi-filter-variant</v-icon> -->
-                </v-col>
-                <v-col
-                    cols="2"
-                    v-if="!sideBySideMode"
-                    class="fs-13 font-weight-medium"
-                >
-                    {{$t("tasks.header.createDate")}}
-                    <v-icon 
-                        @click="showFilterColumn($event,'startTime')" 
-                        class="fs-15 float-right" 
-                        style="padding-top:3px"
-                        :class="{
-                            'd-active-color': filteredColumns['startTime'] && filteredColumns['startTime']==true ,
-                        }"
-                    >mdi-filter-variant</v-icon>
-                </v-col>
-                <v-col
-                    cols="2"
-                    v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                    class="fs-13 font-weight-medium"
-                >{{$t("tasks.header.app")}}
-                    <v-icon 
-                        @click="showFilterColumn($event,'processDefinitionName')" 
-                        class="fs-15 float-right" 
-                        style="padding-top:3px"
-                        :class="{
-                            'd-active-color': filteredColumns['processDefinitionName'] && filteredColumns['processDefinitionName']==true ,
-                        }"
-                    >mdi-filter-variant</v-icon>
-                </v-col>
-                <v-col
-                    cols="1"
-                    v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                    class="fs-13 font-weight-medium"
-                >{{$t("tasks.header.status")}}
-                    <v-icon 
-                        @click="showFilterColumn($event,'isDone')" 
-                        class="fs-15 float-right" 
-                        style="padding-top:3px"
-                        :class="{
-                            'd-active-color': filteredColumns['isDone'] && filteredColumns['isDone']==true ,
-                        }"
-                    >mdi-filter-variant</v-icon>
-                </v-col>
-                <v-col
-                    cols="1"
-                    v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                    class="fs-13 font-weight-medium"
-                >{{$t("common.add")}}</v-col>
-                </v-row>
-            </v-col>
             </v-row>
             <v-divider></v-divider>
 
