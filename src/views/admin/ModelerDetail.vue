@@ -4,7 +4,7 @@
 			<div class="action-diagram-bpmn d-flex ">
 				<div class="fs-15 flex-grow-1 text-uppercase font-weight-bold mt-2" >Thông tin chi tiết</div>
 				<div class="d-flex mt-1">
-					<v-btn
+					<!-- <v-btn
 						tile 
 						icon
 						x-small
@@ -12,8 +12,8 @@
 						@click="changeTab('tab-1')"
 					>
 						<v-icon small >mdi-numeric-2-box-outline</v-icon>
-					</v-btn>
-					<v-btn
+					</v-btn> -->
+					<!-- <v-btn
 						tile 
 						icon
 						x-small
@@ -21,7 +21,7 @@
 						@click="changeTab('tab-2')"
 					>
 						<v-icon x-small >mdi-coolant-temperature</v-icon>
-					</v-btn>
+					</v-btn> -->
 					<v-btn
 						tile 
 						icon
