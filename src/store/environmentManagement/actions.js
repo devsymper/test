@@ -1,5 +1,5 @@
 import {environmentManagementApi} from '@/api/EnvironmentManagement'
-
+import { SYMPER_APP } from "@/main.js";
 const getAllEnvirontment = (context) => {
     if (context.state.allEnvironment.length == 0) {
         try {
@@ -41,8 +41,31 @@ const getInstanceInEnv = (context , id) => {
             SYMPER_APP.$snotifyError(error, "Can not get all node style !");
         }
 }
+const getObjectTypeOfService = (context , type) => {
+	context.commit('setCurrentServiceType', type)
+	let self = this
+        try {
+			if(!context.state.listObjectTypeInService[type]){
+				environmentManagementApi.getAllObjTypeOfService(type).then(res=>{
+					if (res.status == 200) {
+						let arr = res.data.length > 0 ? res.data : []
+						context.commit('setObjectTypeOfService', arr)
+					} else {
+						SYMPER_APP.$snotifyError("Can not get data");
+					}
+				}).catch(err=>{
+					SYMPER_APP.$snotifyError(err, "Can not get data");
+				})
+			}
+			
+           
+        } catch (error) {
+            SYMPER_APP.$snotifyError(error, "Can not get data");
+        }
+}
 
 export { 
 	getAllEnvirontment,
-	getInstanceInEnv
+	getInstanceInEnv,
+	getObjectTypeOfService
 };

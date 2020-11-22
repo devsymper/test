@@ -11,10 +11,24 @@ export const environmentManagementApi = {
 			environmentId: envId
 		})
 	},
+	getServerId(data){
+		return api.post('instances/query', data)
+	},
 	addService(data){
 		return api.post('services',data )
 	},
 	addVersion(data){
 		return api.post('services/'+data.serviceId+"/versions",data.formData)
 	},
+	deloy(data){
+		return api.post('instances/deploy',data)
+	},
+	getAllObjTypeOfService(type){
+		let domainApi = new Api(appConfigs.envDomain[type])
+		return domainApi.get('env/object-types')
+	},
+	getAllObjOfTypeOfService(data){
+		let domainApi = new Api(appConfigs.envDomain[data.type])
+		return domainApi.get('env/'+data.value+'s')
+	}
 };
