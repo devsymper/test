@@ -486,6 +486,7 @@ export default {
     },
     data: function() {
         return {
+            debounceGetData:null,
             data:[],
             page: 1, // trang hiện tại
             pageSize: 50,
@@ -688,7 +689,7 @@ export default {
                     emptyOption = true;
                 }
 
-                //configs.searchKey = this.searchKey;
+                configs.searchKey = this.searchKey;
                 configs.page = configs.page ? configs.page : this.page;
                 configs.pageSize = this.pageSize;
                 configs.formulaCondition = this.conditionByFormula;
@@ -783,10 +784,19 @@ export default {
             this.getData();
         },
         handleChangeFilterValue(data) {
-            for (let key in data) {
-                this.$set(this.myOwnFilter, key, data[key]);
+            // for (let key in data) {
+            //     this.$set(this.myOwnFilter, key, data[key]);
+            // }
+            // this.getData();
+
+            this.searchKey = data.nameLike;
+            if(this.debounceGetData){
+                clearTimeout(this.debounceGetData);
             }
-            this.getData();
+            this.debounceGetData = setTimeout((self) => {
+				self.page = 1
+                self.getData();
+            }, 300, this);
         },
         reCalcListTaskHeight() {
             this.listTaskHeight =
