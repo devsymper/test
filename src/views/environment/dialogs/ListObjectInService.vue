@@ -36,9 +36,6 @@
 									</span>
 								</div>	
 							</VuePerfectScrollbar>
-						
-							
-							
 						</div>
 						<div>
 							<v-btn

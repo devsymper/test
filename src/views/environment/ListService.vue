@@ -22,6 +22,7 @@
 	</ListItems>
 	<AddVersion 
 		:showDialog="showDialog"
+		@add-success="handleAddSuccess"
 		@cancel="showDialog = false"
 	/>
 	</div>
@@ -40,6 +41,7 @@ export default {
 	},
 	methods:{
 		handleAddSuccess(){
+			this.showDialog = false
 			this.$refs.listService.refreshList()
 		}
 	},
@@ -69,7 +71,8 @@ export default {
                     callback: (row, callback) => {
 						self.$goToPage( "/service/"+row.id+"/instances",
                             "Danh sách instance "
-                        );
+						);
+						self.$store.dispatch('environmentManagement/getAllVersionOfService', row)
                     }
                 },
                 addVersion: {

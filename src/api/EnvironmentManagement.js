@@ -23,6 +23,10 @@ export const environmentManagementApi = {
 	addVersion(data){
 		return api.post('services/'+data.serviceId+"/versions",data.formData)
 	},
+	getVersion(serviceId){
+		return api.get('services/'+serviceId+"/versions")
+	},
+
 	deloy(data){
 		return api.post('instances/deploy',data)
 	},

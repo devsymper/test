@@ -50,7 +50,6 @@ export default {
             },
 			customAPIResult:{
 				reformatData(res){
-					debugger
 					return {
 						columns:[
 							{name: "id", title: "id", type: "text", noFilter: true},
