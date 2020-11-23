@@ -52,7 +52,7 @@
                     :viewOnly="action == 'view' || action == 'structureManagement'"
                     :singleLine="(context == 'department' && selectingNode.id == SYMPER_HOME_ORGCHART) ? false : true"
                     :labelWidth="'60px'"
-                    @input-value="handleAttrValueInput"
+                    @input-value="handleAttrVconfig-value-inputalueInput"
                     :allInputs="selectingNode.commonAttrs"
                 ></form-tpl>
                 <div v-if="!(context == 'department' && selectingNode.id == SYMPER_HOME_ORGCHART)">
@@ -578,7 +578,6 @@ export default {
         },
         handleChangeInputValue(value) {},
         handleAttrValueInput(name, inputInfo, data) {
-			debugger
             this.$emit("config-value-input", {
                 name,
                 inputInfo,

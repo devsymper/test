@@ -12,7 +12,7 @@
 			:tableContextMenu="tableContextMenu"
 			:customAPIResult="customAPIResult"
 			:apiMethod="'POST'"
-			:custumDataForApi="custumDataForApi"
+			:customDataForApi="customDataForApi"
 		/>
 		<DialogDeloy 
 			:showDialog="showDialog"
@@ -39,7 +39,7 @@ export default {
 		return{
 			showDialog: false,
 			containerHeight:0,
-			custumDataForApi(configs, columns, filterData){
+			customDataForApi(configs, columns, filterData){
 				let serviceId = self.$route.params.serviceId
 				return {
 					serviceId:serviceId

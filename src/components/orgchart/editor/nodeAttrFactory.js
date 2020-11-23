@@ -55,7 +55,7 @@ export const getDefaultConfigNodeData = function(nodeId, isDepartment = false) {
         id: nodeId,
         style: getNodeStyleConfig(),
         collapseExpandStatus: 'collapse' // expand | collapse
-    };
+	};
     if(nodeId == "SYMPER_HOME_ORGCHART"){
         let isDefault = {   
             "title": "SĐTC mặc định",

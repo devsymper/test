@@ -383,7 +383,6 @@ export default {
             immediate: true,
             deep: true,
             handler(arr){
-				debugger
                 this.setActiveTabForUserAssignment();
             }
         }
