@@ -93,7 +93,6 @@ export default {
 						environmentId: self.envId
 					}
 					environmentManagementApi.deloy(formData).then(res=>{
-						debugger
 						if(res.status == 200){
 							self.$emit('cancel')
 							self.$snotify({

@@ -38,9 +38,9 @@ export default {
 			showDialog: false,
 			containerHeight:0,
 			tableContextMenu: {
-				deloy: {
-					name: "deloy",
-					text: "Deloy",
+				deploy: {
+					name: "deploy",
+					text: "Deploy",
 					callback: (row, callback) => {
 						self.$store.commit('environmentManagement/setCurrentVersionId', row.id)
 						self.showDialog = true
