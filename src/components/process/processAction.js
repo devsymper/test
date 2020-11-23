@@ -28,6 +28,27 @@ function moveTaskTitleToNameAttr(content, configValue) {
     return content;
 }
 
+// Xóa các thẻ định nghĩa về signal event trong http task, do replace throwSignal bằng http task
+function removeSignalDefinitionFromHttpTask(xml) {
+
+    // tìm các http task
+    let serviceTasks = xml.match(/<serviceTask(.*?)>((.|\n)*)<\/serviceTask>/gm);
+    if(serviceTasks){
+        for(let task of serviceTasks){
+            let signalEventDefinition = task.match(/<signalEventDefinition(.*?)>((.|\n)*)<\/signalEventDefinition>/gm);
+            if(signalEventDefinition){
+                for(let def of signalEventDefinition){
+                    // loại bỏ signalEventDefinition trong http task vừa tìm được
+                    let newTask = task.replace(def, ' ');
+                    // thay thế http task tìm được lúc đầu bằng http task đã loại bỏ thẻ signalEventDefinition
+                    xml = xml.replace(task, newTask);
+                }
+            }
+        }
+    }
+    return xml;
+}
+
 function cleanContent(content, configValue) {
     let ns = `definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:xsd="http://www.w3.org/2001/XMLSchema"
@@ -40,6 +61,8 @@ function cleanContent(content, configValue) {
         .replace(/<di:/g, '<omgdi:')
         .replace(/<scriptTask /g, '<serviceTask ')
         .replace(/<\/scriptTask>/g, '<\/serviceTask>')
+        .replace(/<intermediateThrowEvent /g, '<serviceTask ')
+        .replace(/<\/intermediateThrowEvent>/g, '<\/serviceTask>')
         .replace(/<dc:/g, '<omgdc:')
         .replace(/symper_prefix_chars_/g, 'symper:')
         .replace(/symper:symper:/g, 'symper:')
@@ -53,11 +76,24 @@ function cleanContent(content, configValue) {
         .replace(/symper_symper_scope_tag/g, 'symper:scope')
         .replace(/symper_symper_terminateAll_tag/g, 'terminateAll')
         .replace(/symper_symper_value_tag/g, 'symper:value');
+    
+    let notReplaceSymper = {
+        in: true,
+        out: true,
+        string: true,
+        expression: true,
+        field: true,
+        scope: true,
+        value: true
+    };
 
     let symperMatches = rsl.match(/<symper:([a-zA-Z0-9_]+)/g);
     symperMatches.forEach(element => {
         if (element != '<symper:formProperty') {
-            rsl = rsl.replace(element, "<" + element.split(':')[1]);
+            let tag = element.split(':')[1];
+            if(!notReplaceSymper[tag]){
+                rsl = rsl.replace(element, "<" + tag);
+            }
         }
     });
     symperMatches = rsl.match(/<\/symper:([a-zA-Z0-9_]+)/g);
@@ -66,6 +102,8 @@ function cleanContent(content, configValue) {
             rsl = rsl.replace(element, "</" + element.split(':')[1]);
         }
     });
+
+    rsl = removeSignalDefinitionFromHttpTask(rsl);
 
     // Thay đổi các ký tự trong CDATA thành các ký tự chưa mã hóa
     symperMatches = rsl.match(/<!\[CDATA\[(.*?)\]\]>/g);

@@ -15,6 +15,13 @@ function translateScriptTaskToHTTPTask(el, attrs, bpmnModeler) {
     setHttpTaskFromType(el, attrs, bpmnModeler, httpTaskType);
 }
 
+
+function translateThrowSignalToHTTPTask(el, attrs, bpmnModeler) {
+    let httpTaskType = 'throwSignal';
+    attrs.signalref.nameValue = attrs.signalref.value;
+    setHttpTaskFromType(el, attrs, bpmnModeler, httpTaskType);
+}
+
 function setHttpTaskFromType(el, attrs, bpmnModeler, httpTaskType) {
     let bizEl = el.businessObject;
     let extensionElements = bizEl.extensionElements;
@@ -67,6 +74,10 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
             translateServiceTaskToHTTPTask(vizEl, attrs, bpmnModeler);
         } else if (bizVizEl.$type == 'bpmn:ScriptTask') {
             translateScriptTaskToHTTPTask(vizEl, attrs, bpmnModeler);
+        } else if (bizVizEl.$type == 'bpmn:IntermediateThrowEvent') {
+            if(bizVizEl.eventDefinitions[0].$type == "bpmn:SignalEventDefinition"){
+                translateThrowSignalToHTTPTask(vizEl, attrs, bpmnModeler);
+            }
         }
 
         if (elKey) {
