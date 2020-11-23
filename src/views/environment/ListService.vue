@@ -61,6 +61,15 @@ export default {
                         );
                     }
                 },
+                viewInstance: {
+                    name: "viewInstance",
+                    text: "Xem danh sách instance",
+                    callback: (row, callback) => {
+						self.$goToPage( "/service/"+row.id+"/instances",
+                            "Danh sách instance "
+                        );
+                    }
+                },
                 addVersion: {
                     name: "addVersion",
                     text: "Thêm version",

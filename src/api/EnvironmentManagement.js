@@ -14,6 +14,9 @@ export const environmentManagementApi = {
 	getServerId(data){
 		return api.post('instances/query', data)
 	},
+	getInstanceOfService(data){
+		return api.post('instances/query', data)
+	},
 	addService(data){
 		return api.post('services',data )
 	},
