@@ -52,7 +52,7 @@
                     :viewOnly="action == 'view' || action == 'structureManagement'"
                     :singleLine="(context == 'department' && selectingNode.id == SYMPER_HOME_ORGCHART) ? false : true"
                     :labelWidth="'60px'"
-                    @input-value="handleAttrVconfig-value-inputalueInput"
+                    @input-value="handleAttrValueInput"
                     :allInputs="selectingNode.commonAttrs"
                 ></form-tpl>
                 <div v-if="!(context == 'department' && selectingNode.id == SYMPER_HOME_ORGCHART)">
