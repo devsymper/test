@@ -578,6 +578,7 @@ export default {
         },
         handleChangeInputValue(value) {},
         handleAttrValueInput(name, inputInfo, data) {
+			debugger
             this.$emit("config-value-input", {
                 name,
                 inputInfo,
