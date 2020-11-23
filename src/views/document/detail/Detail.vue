@@ -547,7 +547,7 @@ export default {
                 }
             }
             this.$refs.preLoaderView.hide();
-            this.$emit("after-loaded-component-detail",listTableIns);
+            this.$emit("after-loaded-component-detail",this.formSize);
             $('.wrap-content-detail').removeAttr('style');
         },
 
