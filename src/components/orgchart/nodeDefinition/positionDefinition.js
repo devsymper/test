@@ -227,15 +227,6 @@ export const positionMarkup = `<g class="rotatable symper-orgchart-node">
         <text class="add">+</text>
     </g>
 
-    <g class="btn-collapse-expand-hor">
-        <circle class="collapse-expand-circle"/>
-        <text class="expand-text">+</text>
-    </g>
-    <g class="btn-collapse-expand-ver">
-        <circle class="collapse-expand-circle"/>
-        <text class="expand-text">+</text>
-    </g>
-
     <g class="btn remove orgchart-action">
         <circle class="remove"/>
         <text class="remove">X</text>

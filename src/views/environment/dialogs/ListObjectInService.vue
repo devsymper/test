@@ -15,7 +15,7 @@
 				value='tab-1'
 				>
 					<div class="d-flex pt-2 pr-4 pl-4 " style="height:500px">
-						<div class="dialog-object-in-service d-flex flex-column h-100 w-100" style="z-index:1000;background-color: #ffffff ; position: relative">
+						<div class="dialog-object-in-service d-flex flex-column w-100 h-100" style="z-index:1000;background-color: #ffffff ; position: relative">
 							<div>
 								Danh sách các loại object có thể đồng bộ
 							</div>
@@ -30,59 +30,7 @@
 									{{item}}
 								</span>
 							</div>	
-							<!-- <div class="d-flex btn-header-popup" >
-								<v-btn 
-									class="mr-2 font-normal fs-13"
-									depressed
-									tile
-									small
-									@click="handletest"
-								>
-								Test cpn đồng bộ
-								</v-btn>
-								<v-btn 
-									class="mr-2 font-normal fs-13"
-									depressed
-									tile
-									small
-									@click="handleObjectViewDetail"
-								>
-								Test
-								</v-btn>
-								<v-btn 
-									class="mr-2 font-normal fs-13"
-									depressed
-									tile
-									small
-								>
-								Chọn
-								</v-btn>
-								<v-btn 
-									class="mr-2 font-normal fs-13"
-									depressed
-									tile
-									small
-									@click="handleClickCheck"
-								>
-								Kiểm tra
-								</v-btn>
-								<v-btn 
-									class="mr-2 font-normal fs-13"
-									depressed
-									tile
-									small
-									@click="handleClickSync"
-								>
-								Đồng bộ
-								</v-btn>
-							</div>
-							<ListItem 
-								:showExportButton="false"
-								:containerHeight="tableHeight"
-								:dialogMode="true"
-								@close-popup="handleCloseEvent"
-								style="margin-left:10px"
-							/> -->
+							
 							
 						</div>
 						<div>
@@ -167,10 +115,18 @@ export default {
 			this.currentObjectType = item
 			this.tab = 'tab-2'
 			let type = this.$store.state.environmentManagement.currentServiceType
-			this.getListUrls = appConfigs.envDomain[type]+'env/'+item+'s'
+			let currentService = this.$store.state.environmentManagement.currentService
+			let prefix = currentService.environmentIdentifier != ""  ?  currentService.environmentIdentifier+"." : ""  
+			let str = "https://" + prefix + currentService.serviceIdentifier + '.symper.vn/'
+			this.getListUrls = str+'env/'+item+'s'
 		},
 		handletest(){
 			this.showDialogSync = true 
+		}
+	},
+	watch:{
+		showDialog(val){
+			this.tab = 'tab-1'
 		}
 	}
 	
@@ -189,5 +145,9 @@ export default {
 }
 .dialog-object-in-service >>> .object-type-title:hover{
 	border-bottom: 1px solid lightgray;
+}
+.tab-obj-types{
+	width: 300px;
+	height: 300px;
 }
 </style>
