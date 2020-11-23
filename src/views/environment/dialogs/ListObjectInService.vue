@@ -3,7 +3,7 @@
 		<v-dialog
 			v-model="showDialog"
 			persistent
-			class="h-100 w-100"
+			:class="{'h-100 w-100' : tab == 'tab-2', 'tab-obj-types':tab == 'tab-1' }"
 		>
 			<v-tabs
 				v-model="tab"
@@ -189,5 +189,9 @@ export default {
 }
 .dialog-object-in-service >>> .object-type-title:hover{
 	border-bottom: 1px solid lightgray;
+}
+.dialog-object-in-service >>> .tab-obj-types{
+	width: 300px;
+	height: 300px;
 }
 </style>

@@ -23,8 +23,10 @@ export const environmentManagementApi = {
 	deloy(data){
 		return api.post('instances/deploy',data)
 	},
-	getAllObjTypeOfService(type){
-		let domainApi = new Api(appConfigs.envDomain[type])
+	getAllObjTypeOfService(obj){
+		let prefix = obj.environmentIdentifier != ""  ?  obj.environmentIdentifier+"." : ""  
+		let str = "https://" + prefix + obj.serviceIdentifier + '.symper.vn'
+		let domainApi = new Api(str)
 		return domainApi.get('env/object-types')
 	},
 	getAllObjOfTypeOfService(data){
