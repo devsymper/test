@@ -97,8 +97,15 @@ function checkTheSameLogic(currentXML, prveXML) {
     currentXML = currentXML.replace(/\n|\r\n/g,' ').replace(/\s+/g,' ');
     prveXML = prveXML.replace(/\n|\r\n/g,' ').replace(/\s+/g,' ');
 
-    let prevProcess = prveXML.match(/<process.*>((.|\n)*?)<\/process>/g)[0];
-    let currentProcess = currentXML.match(/<process.*>((.|\n)*?)<\/process>/g)[0];
+    // let prevProcess = prveXML.match(/<process.*>((.|\n)*?)<\/process>/g)[0];
+    // let currentProcess = currentXML.match(/<process.*>((.|\n)*?)<\/process>/g)[0];
+
+    let prevDisplayString = prveXML.match(/<bpmndi:BPMNDiagram.*>((.|\n)*?)<\/bpmndi:BPMNDiagram>/g)[0];
+    let currentDisplayString = currentXML.match(/<bpmndi:BPMNDiagram.*>((.|\n)*?)<\/bpmndi:BPMNDiagram>/g)[0];
+    
+    let prevProcess = prveXML.replace(prevDisplayString, '');
+    let currentProcess = currentXML.replace(currentDisplayString, '');
+
     return prevProcess == currentProcess;
 }
 
