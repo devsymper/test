@@ -14,6 +14,7 @@
             <div class="sym-document-body">
                 <div class="sym-document-action">
                     <editor-action
+                    ref="actionView"
                     @document-action-save-document="openPanelSaveDocument"
                     @document-action-clone-control="cloneControl"
                     @document-action-list-control-option="setShowAllControlOption"
@@ -483,9 +484,9 @@ export default {
             if(this.typeDialog == 'deletePage'){
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
             }
-            if(this.typeDialog == "baEditting"){
-                this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
-            }
+            // if(this.typeDialog == "baEditting"){
+            //     this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
+            // }
         },
 
         /**
@@ -1206,7 +1207,7 @@ export default {
                                 if(data.length > 0){
                                     let curBa = data[0];
                                     this.dialog = true;
-                                    this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
+                                    this.titleDialog = "BA "+curBa.name+" đang sửa doc này";
                                     this.typeDialog = "baEditting";
                                     return false;
                                 }
@@ -1959,7 +1960,7 @@ export default {
 
         },
         async checkAllowEditDocument(document){
-            let updateTime = new Date(document.updateAt).getTime();
+            let updateTime = new Date(document.lastEditAt).getTime();
             let timeDiff = Date.now() - updateTime;
             if(timeDiff > 4000){
                 /**
@@ -1979,12 +1980,14 @@ export default {
                             if(data.length > 0){
                                 let curBa = data[0];
                                 this.dialog = true;
-                                this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
+                                this.$refs.actionView.hideSaveBtn(curBa.name);
+                                this.titleDialog = "BA "+curBa.name+" đang sửa doc này.";
                                 this.typeDialog = "baEditting";
                                 return false;
                             }
                         }
                     } catch (error) {
+                        this.$refs.actionView.hideSaveBtn('');
                         return false;
                         console.log(error);
                     }
@@ -1998,10 +2001,7 @@ export default {
                 let res = await documentApi.detailDocument(this.documentId);
                 if (res.status == 200) {
                     if(this.routeName == "editDocument"){
-                        let checkEditting = await this.checkAllowEditDocument(res.data.document);
-                        if(checkEditting == false){
-                            return;
-                        }
+                        await this.checkAllowEditDocument(res.data.document);
                         this.setDocumentProperties(res.data.document);
                     }
                     let content = res.data.document.content;
