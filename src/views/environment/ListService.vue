@@ -11,6 +11,8 @@
 		:tableContextMenu="tableContextMenu"
 		:actionPanelWidth="550"
 		:customAPIResult="customAPIResult"
+		:showButtonAdd="false"	
+
 	>
 		 <template slot="right-panel-content" slot-scope="{}">
 			 <AddServiceForm 

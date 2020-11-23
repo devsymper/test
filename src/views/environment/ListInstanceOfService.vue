@@ -73,15 +73,15 @@ export default {
 					})
 					return {
 						columns:[
-							{name: "id", title: "id", type: "text"},
-							{name: "versionName", title: "versionName", type: "text"},
-							{name: "environmentIdentifier", title: "environmentIdentifier", type: "text"},
-							{name: "environmentName", title: "environmentName", type: "numeric"},
-							{name: "status", title: "status", type: "numeric"},
-							{name: "userCreateName", title: "userCreate", type: "text"},
-							{name: "userUpdateName", title: "userUpdate", type: "text"},
-							{name: "createAt", title: "createAt", type: "text"},
-							{name: "updateAt", title: "updateAt", type: "text"},
+							{name: "id", title: "id", type: "text", noFilter: true},
+							{name: "versionName", title: "versionName", type: "text", noFilter: true},
+							{name: "environmentIdentifier", title: "environmentIdentifier", type: "text", noFilter: true},
+							{name: "environmentName", title: "environmentName", type: "numeric", noFilter: true},
+							{name: "status", title: "status", type: "numeric", noFilter: true},
+							{name: "userCreateName", title: "userCreate", type: "text", noFilter: true},
+							{name: "userUpdateName", title: "userUpdate", type: "text", noFilter: true},
+							{name: "createAt", title: "createAt", type: "text", noFilter: true},
+							{name: "updateAt", title: "updateAt", type: "text", noFilter: true},
 						],
 						listObject: res.data,
 						total:res.data.length

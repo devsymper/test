@@ -3,8 +3,7 @@
 		<v-dialog
 			v-model="showDialog"
 			persistent
-			:content-class="{'h-100 w-100' : tab == 'tab-2', 'tab-obj-types':tab == 'tab-1' }"
-			class="h-100 "
+			class="h-100 w-100"
 		>
 			<v-tabs
 				v-model="tab"
@@ -31,59 +30,7 @@
 									{{item}}
 								</span>
 							</div>	
-							<!-- <div class="d-flex btn-header-popup" >
-								<v-btn 
-									class="mr-2 font-normal fs-13"
-									depressed
-									tile
-									small
-									@click="handletest"
-								>
-								Test cpn đồng bộ
-								</v-btn>
-								<v-btn 
-									class="mr-2 font-normal fs-13"
-									depressed
-									tile
-									small
-									@click="handleObjectViewDetail"
-								>
-								Test
-								</v-btn>
-								<v-btn 
-									class="mr-2 font-normal fs-13"
-									depressed
-									tile
-									small
-								>
-								Chọn
-								</v-btn>
-								<v-btn 
-									class="mr-2 font-normal fs-13"
-									depressed
-									tile
-									small
-									@click="handleClickCheck"
-								>
-								Kiểm tra
-								</v-btn>
-								<v-btn 
-									class="mr-2 font-normal fs-13"
-									depressed
-									tile
-									small
-									@click="handleClickSync"
-								>
-								Đồng bộ
-								</v-btn>
-							</div>
-							<ListItem 
-								:showExportButton="false"
-								:containerHeight="tableHeight"
-								:dialogMode="true"
-								@close-popup="handleCloseEvent"
-								style="margin-left:10px"
-							/> -->
+							
 							
 						</div>
 						<div>
@@ -175,6 +122,11 @@ export default {
 		},
 		handletest(){
 			this.showDialogSync = true 
+		}
+	},
+	watch:{
+		showDialog(val){
+			this.tab = 'tab-1'
 		}
 	}
 	
