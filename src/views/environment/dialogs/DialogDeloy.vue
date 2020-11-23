@@ -89,9 +89,11 @@ export default {
 				if(res.data[0]){
 					let formData = {
 						serverId: res.data[0].serverId,
-						versionId: versionId
+						versionId: versionId,
+						environmentId: self.envId
 					}
 					environmentManagementApi.deloy(formData).then(res=>{
+						debugger
 						if(res.status == 200){
 							self.$emit('cancel')
 							self.$snotify({
