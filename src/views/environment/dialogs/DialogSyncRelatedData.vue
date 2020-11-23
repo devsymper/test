@@ -7,7 +7,7 @@
 		>
 			<v-card>
 			<v-card-title class="fs-15">
-				Đồng bộ dữ liệu về domain hiện tại
+				Đồng bộ dữ liệu 
 			</v-card-title>
 			<v-card-text>
 				<div class="content-deploy-dialog d-flex flex-column ml-2 fs-13">
@@ -29,7 +29,6 @@
 					<div class="text-wrap">
 						Nhấn OK để  đồng bộ dữ liệu 
 					</div>
-
 					<v-checkbox
 						v-model="override"
 						label="Ghi đè dữ liệu nếu có trùng lặp"
@@ -117,42 +116,48 @@ export default {
 				if(res.data[0]){
 					let targetInstanceId = res.data[0].id
 					let type = self.currentObjectType
-					let arr = []
 					for(let i in self.listItemSelected){
-						arr.push(self.listItemSelected[i].id)
-					}
-					let ids = {
-						"ids":arr
-					}
-					let data = {
-						[type]:ids
-					}
-					environmentManagementApi.migrateData({
-						sourceInstanceId:sourceInstanceId,
-						targetInstanceId:targetInstanceId,
-						data: JSON.stringify(data),
-						override: self.override
-					}).then(res=>{
-						if(res.status == 200){
-							self.$emit('cancel')
-							self.$snotify({
-								type: "success",
-								title: "Đang chuyển dữ liệu"
-							})
-						}else if( res.status == 400){
+						let ids = []
+						if(self.listItemSelected[i].title == "document_definition"){
+							ids = {
+								ids: self.listItemSelected[i].arr
+							}
+						}else{
+							let arr = []
+							arr.push( self.listItemSelected[i].arr)
+							ids = {
+								ids: arr
+							}
+						}
+						let data = {
+							[self.listItemSelected[i].title]:ids
+						}
+						environmentManagementApi.migrateData({
+							sourceInstanceId:sourceInstanceId,
+							targetInstanceId:targetInstanceId,
+							data: JSON.stringify(data),
+							override: self.override
+						}).then(res=>{
+							debugger
+							if(res.status == 200){
+								self.$emit('cancel')
+								self.$snotify({
+									type: "success",
+									title: "Đang chuyển dữ liệu "+self.listItemSelected[i].title
+								})
+							}else if( res.status == 400){
+								self.$snotify({
+									type: "error",
+									title: "Nguồn và target không được trùng nhau"
+								})
+							}
+						}).catch(err=>{
 							self.$snotify({
 								type: "error",
-								title: "Nguồn và target không được trùng nhau"
+								title: "Có lỗi xảy ra"
 							})
-						}
-					}).catch(err=>{
-						self.$snotify({
-							type: "error",
-							title: "Có lỗi xảy ra"
-						})
-					})	
-
-
+						})	
+					}
 				}
 			}).catch(err=>{})
 			
