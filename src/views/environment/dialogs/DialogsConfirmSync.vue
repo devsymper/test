@@ -31,16 +31,16 @@
 					</div>
 
 					<v-checkbox
-						v-model="selected"
+						v-model="override"
 						label="Ghi đè dữ liệu nếu có trùng lặp"
-						value="overideConfligData"
+						value="1"
 						class="fs-13"
 					></v-checkbox>
 					<v-checkbox
-						v-model="selected"
+						v-model="override"
 						class="fs-13"
 						label="CHỉ đồng bộ dữ liệu không bị trùng lặp"
-						value="onlySyncDataNotConflig"
+						value="0"
 					></v-checkbox>
 				</div>
 
@@ -74,11 +74,17 @@ export default {
 		showDialog:{
 			type: Boolean,
 			default: false,
-		}
+		},
+		listItemSelected:{
+			type: Object,
+		},
+		currentObjectType:{
+			type: String
+		},
 	},
 	data(){
 		return{
-			selected:"",
+			override:null,
 			envId:""
 		}
 	},
@@ -96,6 +102,55 @@ export default {
 		},
 		syncData(){
 			let self = this
+			let sourceInstanceId = this.$store.state.environmentManagement.sourceInstanceId
+			let currentServiceId = this.$store.state.environmentManagement.currentServiceId
+			let currentEnvId = this.envId
+			environmentManagementApi.getServerId({
+				serviceId: currentServiceId,
+				environmentId: currentEnvId
+			}).then(res=>{
+				if(res.data[0]){
+					let targetInstanceId = res.data[0].id
+					let type = self.currentObjectType
+					let arr = []
+					for(let i in self.listItemSelected){
+						arr.push(self.listItemSelected[i].id)
+					}
+					let ids = {
+						"ids":arr
+					}
+					let data = {
+						[type]:ids
+					}
+					environmentManagementApi.migrateData({
+						sourceInstanceId:sourceInstanceId,
+						targetInstanceId:targetInstanceId,
+						data: JSON.stringify(data),
+						override: self.override
+					}).then(res=>{
+						if(res.status == 200){
+							self.$emit('cancel')
+							self.$snotify({
+								type: "success",
+								title: "Đang chuyển dữ liệu"
+							})
+						}else if( res.status == 400){
+							self.$snotify({
+								type: "error",
+								title: "Nguồn và target không được trùng nhau"
+							})
+						}
+					}).catch(err=>{
+						self.$snotify({
+							type: "error",
+							title: "Có lỗi xảy ra"
+						})
+					})	
+
+
+				}
+			}).catch(err=>{})
+			
 		}
 	},
 }

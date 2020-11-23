@@ -5,6 +5,8 @@ const defaultState = {
 	currentServiceId: "",
 	currentVersionId: "",
 	currentServiceType: "",
+	sourceInstanceId:"",
+	currentService:{},
 	listObjectTypeInService: {
 
 	}

@@ -55,7 +55,7 @@ export default {
 				},
 				{
 					title: "Quản lí môi trường",
-					subTitle: "Danh sách tập trung các môi trường của hệ thống",
+					subTitle: "Danh sách tập trung các môi trường của hệ thống, cho phép config và đồng bộ dữ liệu giữa các môi trường",
 					action: "envManagement"
 				},
 			

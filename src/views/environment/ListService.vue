@@ -11,6 +11,8 @@
 		:tableContextMenu="tableContextMenu"
 		:actionPanelWidth="550"
 		:customAPIResult="customAPIResult"
+		:showButtonAdd="false"	
+
 	>
 		 <template slot="right-panel-content" slot-scope="{}">
 			 <AddServiceForm 
@@ -58,6 +60,15 @@ export default {
                     callback: (row, callback) => {
 						self.$goToPage( "/service/"+row.id+"/versions",
                             "Chi tiết " + (row.name ? row.name : "")
+                        );
+                    }
+                },
+                viewInstance: {
+                    name: "viewInstance",
+                    text: "Xem danh sách instance",
+                    callback: (row, callback) => {
+						self.$goToPage( "/service/"+row.id+"/instances",
+                            "Danh sách instance "
                         );
                     }
                 },
