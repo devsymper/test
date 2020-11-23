@@ -71,7 +71,8 @@ export default {
                     callback: (row, callback) => {
 						self.$goToPage( "/service/"+row.id+"/instances",
                             "Danh sách instance "
-                        );
+						);
+						self.$store.dispatch('environmentManagement/getAllVersionOfService', row)
                     }
                 },
                 addVersion: {

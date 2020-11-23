@@ -14,8 +14,9 @@
 			:apiMethod="'POST'"
 			:customDataForApi="customDataForApi"
 		/>
-		<DialogDeloy 
+		<DialogUpgrade 
 			:showDialog="showDialog"
+			:currentInstance="currentInstance"
 			@cancel="showDialog = false"
 		/>
 	</div>
@@ -25,11 +26,13 @@
 import ListItems from "@/components/common/ListItems"
 import { appConfigs } from "@/configs.js";
 import { util } from "@/plugins/util.js";
+import DialogUpgrade from './dialogs/DialogUpgrade'
 import DialogDeloy from './dialogs/DialogDeloy'
 export default {
 	components:{
 		ListItems,
-		DialogDeloy
+		DialogDeloy,
+		DialogUpgrade
 	},
 	mounted(){
 		this.containerHeight = util.getComponentSize(this).h
@@ -38,6 +41,7 @@ export default {
 		let self = this
 		return{
 			showDialog: false,
+			currentInstance:{},
 			containerHeight:0,
 			customDataForApi(configs, columns, filterData){
 				let serviceId = self.$route.params.serviceId
@@ -46,7 +50,15 @@ export default {
 				}
 			},
 			tableContextMenu: {
-			
+				upgrade: {
+					name: "upgrade",
+					text: "Upgrade",
+					callback: (row, callback) => {
+						// self.$store.commit('environmentManagement/setCurrentVersionId', row.id)
+						self.currentInstance = row
+						self.showDialog = true
+					}
+				},
             },
 			customAPIResult:{
 				reformatData(res){
