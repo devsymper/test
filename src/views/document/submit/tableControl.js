@@ -66,12 +66,16 @@ export default class TableControl extends Control {
     renderTable() {
         let viewType = sDocument.state.viewType[this.curParentInstance];
         if (this.isPrintView) {
-            // this.ele.attr('table-id', this.ele.attr('id'));
-            // this.ele.removeAttr('id');
-            // this.ele.find('table').addClass('table-print');
-            // this.ele.find('table tbody').empty();
-            // this.tablePrint.render();
-            this.pivotTable.render();
+            if(this.pivotTable){
+                this.pivotTable.render();
+            }
+            else{
+                this.ele.attr('table-id', this.ele.attr('id'));
+                this.ele.removeAttr('id');
+                this.ele.find('table').addClass('table-print');
+                this.ele.find('table tbody').empty();
+                this.tablePrint.render();
+            }
         } else {
             this.tableInstance.render();
             if(this.pivotTable){
@@ -133,8 +137,10 @@ export default class TableControl extends Control {
                 tr += '</tr>';
                 bodyHtml += tr;
             }
-            // this.ele.find('table tbody').append(bodyHtml);
-            // this.ele.find('table').attr('contenteditable', 'false')
+            if(!this.pivotTable){
+                this.ele.find('table tbody').append(bodyHtml);
+                this.ele.find('table').attr('contenteditable', 'false');
+            }
             let dataTable = [];
             let rowLength = data[Object.keys(data)[0]].length;
             for (let index = 0; index < rowLength; index++) {
@@ -148,9 +154,10 @@ export default class TableControl extends Control {
                     rowData[key] = data[key][index];
                 }
                 dataTable.push(rowData)
-
             }
-            this.pivotTable.setData(dataTable)
+            if(this.pivotTable){
+                this.pivotTable.setData(dataTable)
+            }
         } else {
             if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1){
                 return;

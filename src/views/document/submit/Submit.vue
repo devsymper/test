@@ -648,17 +648,23 @@ export default {
          */
         this.$evtBus.$on("document-submit-filter-input-click", e => {
             if(this._inactive == true) return;
-            if($(document).height() - $(e.target).offset().top > 420){
-                this.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
+            let inputOffset = $(e.target).offset();
+            let submitFormOffset = $('#sym-submit-'+this.keyInstance).offset();
+            let submitFormWidth = $('#sym-submit-'+this.keyInstance).width();
+            let leftDiff   = inputOffset.left - submitFormOffset.left;
+            let cardWidth  = 600;
+            let cardHeight = 400;
+            let inputWidth = $(e.target).width();
+            if(cardWidth + leftDiff > submitFormWidth){
+                this.leftPositionDragPanel = Math.abs(inputOffset.left + inputWidth - cardWidth);
+                this.topPositionDragPanel = inputOffset.top + 26 ;
             }
             else{
-                this.topPositionDragPanel = $(e.target).offset().top  - 400 
+                this.leftPositionDragPanel = Math.abs(inputOffset.left);
+                this.topPositionDragPanel = inputOffset.top + 26 ;
             }
-            if(e.screenX - e.offsetX > 600){
-                this.leftPositionDragPanel = e.screenX - e.offsetX ;
-            }
-            else{
-                this.leftPositionDragPanel = e.screenX - e.offsetX - 300;
+            if(window.innerHeight < inputOffset.top + 400){
+                this.topPositionDragPanel = Math.abs(inputOffset.top - cardHeight);
             }
             this.titleDragPanel = "Tìm kiếm thông tin";
             this.titleDragPanelIcon = "mdi-file-search";
@@ -2056,12 +2062,12 @@ export default {
                 dataPost['linkData'] = JSON.stringify(this.linkControl);
             }
             documentApi.submitDocument(dataPost).then(res => {
-                let dataResponSubmit = res.data;
-                dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;
-                dataResponSubmit['isContinueSubmit'] = thisCpn.isContinueSubmit;
-                thisCpn.$emit('submit-document-success',dataResponSubmit);
-                thisCpn.isSubmitting = false;
                 if (res.status == 200) {
+                    let dataResponSubmit = res.data;
+                    dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;
+                    dataResponSubmit['isContinueSubmit'] = thisCpn.isContinueSubmit;
+                    thisCpn.$emit('submit-document-success',dataResponSubmit);
+                    thisCpn.isSubmitting = false;
                     thisCpn.$snotify({
                         type: "success",
                         title: "Submit document success!"
@@ -2558,7 +2564,7 @@ export default {
                 if(data.length > 0){
                     for (let index = 0; index < data.length; index++) {
                         let dataItem = data[index][Object.keys(data[index])[0]];
-                        let fType = formulasType+"_"+row;
+                        let fType = formulasType+"_"+dataItem;
                         this.setDataForLinkControl(fType, dataItem, title, source, controlName);
                     }
                 }
