@@ -41,12 +41,13 @@ const getInstanceInEnv = (context , id) => {
             SYMPER_APP.$snotifyError(error, "Can not get all node style !");
         }
 }
-const getObjectTypeOfService = (context , type) => {
-	context.commit('setCurrentServiceType', type)
+const getObjectTypeOfService = (context , item) => {
+	context.commit('setCurrentServiceType', item.serviceName)
+	context.commit('setCurrentService', item)
 	let self = this
         try {
-			if(!context.state.listObjectTypeInService[type]){
-				environmentManagementApi.getAllObjTypeOfService(type).then(res=>{
+			if(!context.state.listObjectTypeInService[item.serviceName]){
+				environmentManagementApi.getAllObjTypeOfService(item).then(res=>{
 					if (res.status == 200) {
 						let arr = res.data.length > 0 ? res.data : []
 						context.commit('setObjectTypeOfService', arr)

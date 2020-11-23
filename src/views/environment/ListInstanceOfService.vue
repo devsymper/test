@@ -50,7 +50,27 @@ export default {
             },
 			customAPIResult:{
 				reformatData(res){
-					debugger
+					let listBA = self.$store.state.app.allBA;
+					res.data.forEach(function(e){
+						if(!e.userCreate){
+							e.userCreateName = ""  
+						}else{
+							listBA.forEach(function(k){
+								if(k.id == e.userCreate){
+									e.userCreateName =  k.name
+								}
+							})
+						}
+						if(!e.userUpdate){
+							e.userUpdateName =""
+						}else{
+							listBA.forEach(function(k){
+								if(k.id == e.userUpdate){
+									e.userUpdateName =  k.name
+								}
+							})
+						}
+					})
 					return {
 						columns:[
 							{name: "id", title: "id", type: "text", noFilter: true},
@@ -72,7 +92,7 @@ export default {
 	},
 	computed:{
 		getListUrl(){
-			return appConfigs.apiDomain.fileManagement+'env/files/ids'
+			return appConfigs.apiDomain.environmentManagement+"instances/query"
 		}
 	}
 }
