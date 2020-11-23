@@ -138,7 +138,6 @@ export default {
 							data: JSON.stringify(data),
 							override: self.override
 						}).then(res=>{
-							debugger
 							if(res.status == 200){
 								self.$emit('cancel')
 								self.$snotify({

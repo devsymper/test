@@ -71,9 +71,37 @@ const getObjectTypeOfService = (context , item) => {
 			
 		}
 }
+const getAllVersionOfService = (context , item) => {
+	context.commit('setCurrentServiceType', item.identifier)
+	context.commit('setCurrentService', item)
+	let self = this
+        try {
+			if(!context.state.allVersionOfService[item.identifier]){
+				environmentManagementApi.getVersion(item.id).then(res=>{
+					if (res.status == 200) {
+						let arr = res.data.length > 0 ? res.data : []
+						context.commit('setVersionOfService', arr)
+					} else {
+						SYMPER_APP.$snotifyError("Can not get data");
+
+					}
+				}).catch(err=>{
+					SYMPER_APP.$snotifyError(err, "Can not get data");
+
+				})
+			}
+			
+           
+        } catch (error) {
+			SYMPER_APP.$snotifyError(error, "Can not get data");
+			return false
+			
+		}
+}
 
 export { 
 	getAllEnvirontment,
 	getInstanceInEnv,
-	getObjectTypeOfService
+	getObjectTypeOfService,
+	getAllVersionOfService
 };

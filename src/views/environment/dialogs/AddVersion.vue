@@ -49,6 +49,13 @@ export default {
 			default: false
 		}
 	},
+	watch:{
+		showDialog(){
+			for(let i in this.allInputs){
+				this.allInputs[i].value = ""
+			}
+		}
+	},
 	methods:{
 		cancel(){
 			this.$emit('cancel')
@@ -59,7 +66,11 @@ export default {
 			let formData = {
 			}
 			for(let i in this.allInputs){
-				formData[i] = this.allInputs[i].value
+				if(i == "status"){
+					formData[i] = this.allInputs[i].value == false ? 0 : 1
+				}else{
+					formData[i] = this.allInputs[i].value
+				}
 			}
 			environmentManagementApi.addVersion({
 				serviceId:serviceId,
@@ -70,7 +81,7 @@ export default {
 						type: "success",
 						title: " Thêm version thành công"
 					})
-					self.$emit('cancel')
+					self.$emit('add-success')
 				}else{
 					self.$snotify({
 						type: "error",
@@ -96,8 +107,8 @@ export default {
                 },
 				status: {
                     title: "Status",
-                    type: "text",
-                    value: "",
+                    type: "checkbox",
+                    value: false,
                     info: ""
 				},
 				releaseAt: {

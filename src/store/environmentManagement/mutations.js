@@ -27,6 +27,9 @@ const setSourceInstanceId = (state, data) => {
 const setCurrentService = (state, data) => {
     Vue.set(state, 'currentService', data);
 };
+const setVersionOfService = (state, data) => {
+    Vue.set(state.allVersionOfService, state.currentServiceType, data);
+};
 
 export {
 	setAllEnvironment,
@@ -37,5 +40,6 @@ export {
 	setObjectTypeOfService,
 	setCurrentServiceType,
 	setSourceInstanceId,
-	setCurrentService
+	setCurrentService,
+	setVersionOfService
 };
