@@ -56,7 +56,7 @@ export default {
 			tableContextMenu: {
                 detail: {
                     name: "detail",
-                    text: this.$t("common.detail"),
+                    text: "Danh sách version",
                     callback: (row, callback) => {
 						self.$goToPage( "/service/"+row.id+"/versions",
                             "Chi tiết " + (row.name ? row.name : "")
@@ -65,7 +65,7 @@ export default {
                 },
                 viewInstance: {
                     name: "viewInstance",
-                    text: "Xem danh sách instance",
+                    text: "Danh sách instance",
                     callback: (row, callback) => {
 						self.$goToPage( "/service/"+row.id+"/instances",
                             "Danh sách instance "

@@ -22,15 +22,16 @@
 			>
 				Chọn
 			</v-btn>
-			<v-btn 
+			<!-- <v-btn 
 				class="mr-2 font-normal fs-13"
 				depressed
 				tile
 				small
 				:disabled="showBtnAddCheckbox"
+				@click="handleCheckClick"
 			>
 				Kiểm tra
-			</v-btn>
+			</v-btn> -->
 			<v-btn 
 				class="mr-2 font-normal fs-13"
 				depressed
@@ -50,6 +51,8 @@
 			:getDataUrl="getListUrl"
 			@close-popup="handleCloseEvent"
 			style="margin-left:10px"
+			:useDefaultContext="false"
+			:tableContextMenu="tableContextMenu"
 			:isTablereadOnly="false"
 			@after-selected-row="afterSelectedRow"
 		/>
@@ -59,17 +62,24 @@
 			:listItemSelected="listItemSelected"
 			:currentObjectType="currentObjectType"
 		/>
+		<DialogDataRelate 
+			:showDialog="showDialogRelateData"
+			@cancel="showDialogRelateData = false"
+			:currentItem="dependencies"
+		/>
 	</div>
 
 </template>
 
 <script>
+import DialogDataRelate from './DialogDataRelate'
 import ListItem from "@/components/common/ListItems"
 import DialogsConfirmSync from './DialogsConfirmSync'
 export default {
 	components:{
 		ListItem,
-		DialogsConfirmSync
+		DialogsConfirmSync,
+		DialogDataRelate
 	},
 	props:{
 		tableHeight:{
@@ -83,10 +93,23 @@ export default {
 		},
 	},
 	data(){
+		let self = this
 		return{
-			listItemSelected: [],
+			listItemSelected: {},
 			showBtnAddCheckbox: true,
-			showDialog:false
+			showDialogRelateData: false,
+			dependencies: {},
+			showDialog:false,
+			tableContextMenu:{
+				checkRelated: {
+                    name: "checkRelated",
+                    text:" Dữ liệu liên quan",
+                    callback: (row, callback) => {
+						self.handleCheckClick()
+						self.dependencies = row.dependencies
+                    }
+                },
+			}
 		}
 	},
 	methods:{
@@ -105,11 +128,14 @@ export default {
 		},
 		handleSyncClick(){
 			this.showDialog = true
+		},
+		handleCheckClick(){
+			this.showDialogRelateData = true
 		}
 	},
 	watch:{
 		getListUrl(val){
-			this.listItemSelected = [],
+			this.listItemSelected = {},
 			this.showBtnAddCheckbox = true
 		}
 	}
