@@ -23,7 +23,8 @@ export default {
     data(){
         return {
             listObject:[],
-            countComponentDetail:0
+            countComponentDetail:0,
+            formSize:{}
         }
     },
     props:{
@@ -52,7 +53,8 @@ export default {
         }
     },
     methods:{
-        afterLoaded(){
+        afterLoaded(formSize){
+            this.formSize = formSize;
             if(!this.isAlwaysPrint){
                 return;
             }
@@ -78,9 +80,11 @@ export default {
             let cstyle = `<style type="text/css">
                          @media print {
                                 html, body{
-                                height:100%;
+                                height:auto;
                                 width:100%;
+                          
                                 }
+                                * { overflow: visible !important; } 
                                 .ag-root-wrapper, .ag-root-wrapper-body, .ag-root, .ag-body-viewport, .ag-center-cols-container, .ag-center-cols-viewport, .ag-center-cols-clipper, .ag-body-horizontal-scroll-viewport, .ag-virtual-list-viewport{
                                     height: 100% !important;
                                     overflow: hidden !important;
@@ -97,31 +101,26 @@ export default {
                                 .ag-center-cols-viewport{
                                         border-top: 1px solid #dde2eb !important;
                                 }
-                                table { page-break-inside:auto }
-                                tr    { page-break-inside:avoid; page-break-after:auto }
+                                @page{
+                                    margin-bottom :`+this.formSize['padding-bottom']+`;
+                                    margin-top :`+this.formSize['padding-top']+`;
+                                    margin-right :`+this.formSize['padding-right']+`;
+                                    margin-left :`+this.formSize['padding-left']+`;
+                                }
+                                tr    { page-break-inside:avoid; page-break-after:always;}
                                 thead { display:table-header-group }
                                 tfoot { display:table-footer-group }
+                                .wrap-print-multiple table{
+                                    width:100% !important;
+                                }
+                                .wrap-print-multiple{
+                                    width:100%;
+                                }
                             }
-                            .wrap-print-multiple table{
-                                width:100% !important;
-                                 page-break-inside:avoid;
+                             .content-print-document{
+                                padding: 0 !important;
                             }
-                            .wrap-print-multiple{
-                                width:100%;
-                                 page-break-inside:avoid;
-                            }
-                            .sym-form-Detail{
-                                overflow:hidden;
-                                page-break-inside:avoid;
-                                page-break-before: always;
-                                page-break-after: always;
-                            }
-                           
                             
-                            
-                        }
-                        
-
                     </style>`
                      stylesHtml += cstyle;
             // Open the print window
