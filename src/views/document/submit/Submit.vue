@@ -2062,12 +2062,12 @@ export default {
                 dataPost['linkData'] = JSON.stringify(this.linkControl);
             }
             documentApi.submitDocument(dataPost).then(res => {
-                let dataResponSubmit = res.data;
-                dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;
-                dataResponSubmit['isContinueSubmit'] = thisCpn.isContinueSubmit;
-                thisCpn.$emit('submit-document-success',dataResponSubmit);
-                thisCpn.isSubmitting = false;
                 if (res.status == 200) {
+                    let dataResponSubmit = res.data;
+                    dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;
+                    dataResponSubmit['isContinueSubmit'] = thisCpn.isContinueSubmit;
+                    thisCpn.$emit('submit-document-success',dataResponSubmit);
+                    thisCpn.isSubmitting = false;
                     thisCpn.$snotify({
                         type: "success",
                         title: "Submit document success!"
