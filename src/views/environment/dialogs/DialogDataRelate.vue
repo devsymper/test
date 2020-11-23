@@ -16,7 +16,7 @@
 					</div>
 					<div v-for="(item,i) in listItem" :key="i">
 						 <v-checkbox 
-						 	v-model="checkbox"
+						 	v-model="listItemSelected"
 							:value="item"
 						>
 							<template v-slot:label>
@@ -49,6 +49,7 @@
 					<v-btn
 					color="green darken-1"
 					text
+					:disable="Object.keys(listItemSelected).length == 0"
 					@click="syncRelatedData"
 				>
 					Đồng bộ
@@ -56,12 +57,21 @@
 			</v-card-actions>
 			</v-card>
 		</v-dialog>
+		<DialogSyncRelatedData 
+			:showDialog="showDialogSync"
+			@cancel="cancel"
+			:listItemSelected="listItemSelected"
+		/>
 	</div>
 </template>
 
 <script>
 import {environmentManagementApi} from '@/api/EnvironmentManagement'
+import DialogSyncRelatedData from './DialogSyncRelatedData'
 export default {
+	components:{
+		DialogSyncRelatedData
+	},
 	props:{
 		showDialog:{
 			type: Boolean,
@@ -76,7 +86,8 @@ export default {
 			selected:"",
 			envId:"",
 			listItem:[],
-			checkbox:[]
+			listItemSelected:{},
+			showDialogSync:false
 		}
 	},
 	created(){
@@ -89,13 +100,12 @@ export default {
 	},
 	methods:{
 		cancel(){
-			this.$emit('cancel')
+			this.$emit('cancel'),
+			this.showDialogSync = false
+			this.listItemSelected = {}
 		},
 		syncRelatedData(){
-
-			this.checkbox.forEach(function(e){
-				
-			})
+			this.showDialogSync = true
 
 		}
 	},
@@ -105,6 +115,8 @@ export default {
 			immediate: true,
 			handler(obj){
 				let self = this
+				self.listItem = []
+				self.listItemSelected = {}
 				if(Object.keys(obj).length > 0){
 					for(let i in obj){
 						if(!(obj[i] == "" || obj[i] == null)){

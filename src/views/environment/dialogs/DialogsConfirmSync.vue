@@ -77,6 +77,11 @@ export default {
 		},
 		listItemSelected:{
 			type: Object,
+			default(){
+				return {
+					
+				}
+			}
 		},
 		currentObjectType:{
 			type: String

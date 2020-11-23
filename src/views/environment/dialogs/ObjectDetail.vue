@@ -95,7 +95,7 @@ export default {
 	data(){
 		let self = this
 		return{
-			listItemSelected: [],
+			listItemSelected: {},
 			showBtnAddCheckbox: true,
 			showDialogRelateData: false,
 			dependencies: {},
@@ -135,7 +135,7 @@ export default {
 	},
 	watch:{
 		getListUrl(val){
-			this.listItemSelected = [],
+			this.listItemSelected = {},
 			this.showBtnAddCheckbox = true
 		}
 	}
