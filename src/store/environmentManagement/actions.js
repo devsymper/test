@@ -43,6 +43,7 @@ const getInstanceInEnv = (context , id) => {
 }
 const getObjectTypeOfService = (context , item) => {
 	context.commit('setCurrentServiceType', item.serviceName)
+	context.commit('setCurrentService', item)
 	let self = this
         try {
 			if(!context.state.listObjectTypeInService[item.serviceName]){

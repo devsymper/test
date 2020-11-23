@@ -3,7 +3,8 @@
 		<v-dialog
 			v-model="showDialog"
 			persistent
-			:class="{'h-100 w-100' : tab == 'tab-2', 'tab-obj-types':tab == 'tab-1' }"
+			:content-class="{'h-100 w-100' : tab == 'tab-2', 'tab-obj-types':tab == 'tab-1' }"
+			class="h-100 "
 		>
 			<v-tabs
 				v-model="tab"
@@ -15,7 +16,7 @@
 				value='tab-1'
 				>
 					<div class="d-flex pt-2 pr-4 pl-4 " style="height:500px">
-						<div class="dialog-object-in-service d-flex flex-column h-100 w-100" style="z-index:1000;background-color: #ffffff ; position: relative">
+						<div class="dialog-object-in-service d-flex flex-column w-100 h-100" style="z-index:1000;background-color: #ffffff ; position: relative">
 							<div>
 								Danh sách các loại object có thể đồng bộ
 							</div>
@@ -167,7 +168,10 @@ export default {
 			this.currentObjectType = item
 			this.tab = 'tab-2'
 			let type = this.$store.state.environmentManagement.currentServiceType
-			this.getListUrls = appConfigs.envDomain[type]+'env/'+item+'s'
+			let currentService = this.$store.state.environmentManagement.currentService
+			let prefix = currentService.environmentIdentifier != ""  ?  currentService.environmentIdentifier+"." : ""  
+			let str = "https://" + prefix + currentService.serviceIdentifier + '.symper.vn/'
+			this.getListUrls = str+'env/'+item+'s'
 		},
 		handletest(){
 			this.showDialogSync = true 
@@ -190,7 +194,7 @@ export default {
 .dialog-object-in-service >>> .object-type-title:hover{
 	border-bottom: 1px solid lightgray;
 }
-.dialog-object-in-service >>> .tab-obj-types{
+.tab-obj-types{
 	width: 300px;
 	height: 300px;
 }

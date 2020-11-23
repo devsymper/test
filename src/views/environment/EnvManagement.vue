@@ -167,7 +167,6 @@ export default {
 		handleServiceClick(item){
 			this.$store.commit('environmentManagement/setSourceInstanceId',item.id)
 			this.$store.commit('environmentManagement/setCurrentServieId', item.serviceId)
-			// this.apiUrl = appConfigs.envDomain[item.serviceIdentifier]
 			let flag = this.$store.dispatch('environmentManagement/getObjectTypeOfService',item)
 			if(flag){
 				this.showDialog = true

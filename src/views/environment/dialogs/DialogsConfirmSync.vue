@@ -76,7 +76,7 @@ export default {
 			default: false,
 		},
 		listItemSelected:{
-			type: Array,
+			type: Object,
 		},
 		currentObjectType:{
 			type: String
