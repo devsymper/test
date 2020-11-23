@@ -118,7 +118,6 @@ export default {
                 afterChange(changes){
                     if(changes){
                         changes.forEach(([row, prop, oldValue, newValue]) => {
-                            debugger
                         });
                     }
                 }

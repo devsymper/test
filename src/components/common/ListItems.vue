@@ -565,6 +565,19 @@ export default {
         });
     },
     props: {
+        /**
+         * Hàm phục vụ cho việc dev tự định nghĩa data khi gọi API để lấy dữ liệu
+         * thay vì sử dụng hàm có sẵn, các tham số truyền vào giống như hàm getOptionForGetList trong defaultFilterConfig
+         */
+        customDataForApi: {
+            type: Function,
+            // default: (configs, columns, filterData)=>{}
+            default: null
+        },
+		apiMethod:{
+			type: String,
+			default : "GET"
+		},
 		dialogMode:{
 			type: Boolean,
 			default:false
@@ -1273,18 +1286,6 @@ export default {
             }
             this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
         },
-        // getOptionForGetList(configs, columns){
-        //     return {
-        //         filter: this.getFilterConfigs(configs.getDataMode),
-        //         sort: this.getSortConfigs(),
-        //         search: this.searchKey,
-        //         page: this.page,
-        //         pageSize: configs.pageSize ? configs.pageSize : this.pageSize,
-        //         columns: columns ? columns : [],
-        //         distinct: configs.distinct ? configs.distinct : false,
-        //         formulaCondition:this.conditionByFormula
-        //     };
-        // },
         /**
          * Lấy ra cấu hình cho việc sort
          */
@@ -1294,7 +1295,7 @@ export default {
                 return;
             }
             let url = this.getDataUrl;
-            let method = 'GET';
+			let method = this.apiMethod;
             if (url != "") {
                 let thisCpn = this;
                 thisCpn.loadingData = true;
@@ -1318,103 +1319,12 @@ export default {
                 tableFilter.allColumnInTable = this.tableColumns;
                 configs.emptyOption = emptyOption;
 
-                getDataFromConfig(url, configs, columns, tableFilter, success, 'GET', header);
-                // apiObj
-                //     .callApi(method, url, options, header, {})
-                //     .then(data => {
-                //         success(data);
-                //     })
-                //     .catch(err => {
-                //         console.warn(err);
-                //         thisCpn.$snotify({
-                //             type: "error",
-                //             title: thisCpn.$t("table.error.cannot_get_data"),
-                //             text: ""
-                //         });
-                //     });
+                if(this.customDataForApi){
+                    configs.customDataForApi = this.customDataForApi;
+                }
+                getDataFromConfig(url, configs, columns, tableFilter, success, method, header);
             }
         },
-        // getSortConfigs() {
-        //     let columnMap = this.tableColumns.reduce((map, item) => {
-        //         map[item.data] = item;
-        //         return map;
-        //     }, {});
-        //     let sort = [];
-        //     for (let colName in this.tableFilter.allColumn) {
-        //         let filter = this.tableFilter.allColumn[colName];
-        //         if (filter.sort != "") {
-        //             sort.push({
-        //                 column: columnMap[colName].data,
-        //                 type: filter.sort
-        //             });
-        //         }
-        //     }
-        //     return sort;
-        // },
-        /**
-         * Chuyển đổi cấu hình filter của component này sang dạng api hiểu được
-         */
-        // getFilterConfigs(getDataMode = '') {
-        //     let configs = [];
-        //     for (let colName in this.tableFilter.allColumn) {
-        //         let filter = this.tableFilter.allColumn[colName];
-        //         let condition = filter.conditionFilter;
-        //         let option = {
-        //             column: colName, // tên cột cần filter
-        //             operation: condition.conjunction,
-        //             conditions: []
-        //         };
-        //         if(getDataMode == 'autocomplete' && colName == this.tableFilter.currentColumn.name){
-        //             option.conditions = [
-        //                 {
-        //                     name: 'contains',
-        //                     value: this.tableFilter.currentColumn.colFilter.searchKey ? this.tableFilter.currentColumn.colFilter.searchKey : ''
-        //                 }
-        //             ];
-        //             configs.push(option);
-        //             continue;
-        //         }
-        //         if (condition.items[0].type != "none") {
-        //             option.conditions = [
-        //                 {
-        //                     name: condition.items[0].type,
-        //                     value: condition.items[0].value
-        //                 }
-        //             ];
-        //             if (condition.items[1].type != "none") {
-        //                 option.conditions.push({
-        //                     name: condition.items[1].type,
-        //                     value: condition.items[1].value
-        //                 });
-        //             }
-        //         }
-        //         if(filter.searchKey != '' && filter.clickedSelectAll){
-        //             option.conditions = [
-        //                 {
-        //                     name: 'contains',
-        //                     value: filter.searchKey
-        //                 }
-        //             ];
-        //         }
-
-        //         if(filter.selectAll && !$.isEmptyObject(filter.valuesNotIn)){
-        //             option.conditions.push({
-        //                 name: 'not_in',
-        //                 value: Object.keys(filter.valuesNotIn)
-        //             });
-        //         }else if(!filter.selectAll && !$.isEmptyObject(filter.valuesIn)){
-        //             option.conditions.push({
-        //                 name: 'in',
-        //                 value: Object.keys(filter.valuesIn)
-        //             });
-        //         }
-                
-        //         if(option.conditions.length > 0){
-        //             configs.push(option);
-        //         }
-        //     }
-        //     return configs;
-        // },
         /**
          * Xử lý việc sau khi kết thúc kéo thả các cột ở thanh cấu hình hiển thị danh sách
          */
@@ -1879,6 +1789,5 @@ i.applied-filter {
 .ht_clone_left {
     z-index: 8;
 }
-
 </style>
 

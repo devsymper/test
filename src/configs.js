@@ -45,20 +45,21 @@ var configs = {
         actionPacks: "https://accesscontrol.symper.vn/action_packs",
         operations: "https://accesscontrol.symper.vn/operations",
         baAccount: "https://account.symper.vn/supporters",
-        appManagement: "https://core.symper.vn/",
+        appManagement: "https://apps-management.symper.vn/",
         commnent: "https://comment-service.symper.vn",
         fileManagement: 'https://file.symper.vn/',
-        knowledge: 'https://kh-service.dev.symper.vn/',
+        knowledge: 'https://kh-service.symper.vn/',
         timesheet: 'https://timesheet-service.dev.symper.vn/',
         search: "https://search.symper.vn/",
-        importExcel: 'https://io.dev.symper.vn/',
-        viewHistoryImport: "https://io.dev.symper.vn/history/document",
+        importExcel: 'https://io.symper.vn/',
+        viewHistoryImport: "https://io.symper.vn/history/document",
         uiConfig: "https://ui.symper.vn",
         workflowExtend: "https://workflow-extend.symper.vn/",
         trash: "https://trash.symper.vn/",
 		log: "https://log.symper.vn",
 		environmentManagement: "https://system-management.symper.vn/"
-    },
+	},
+	
     notificationTimeout: {
         success: 3000,
         warning: 5000,
@@ -97,7 +98,7 @@ var configs = {
                 }
             }
         }
-    }
+	},
 };
 configs.reformatUrl(configs.apiDomain);
 // sửa lại url theo môi trường code

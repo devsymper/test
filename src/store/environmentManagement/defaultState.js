@@ -2,7 +2,14 @@ const defaultState = {
 	allEnvironment:[],
 	serviceInstanceInEnv:{},
 	currentEnvId: "",
-	currentServiceId: ""
+	currentServiceId: "",
+	currentVersionId: "",
+	currentServiceType: "",
+	sourceInstanceId:"",
+	currentService:{},
+	listObjectTypeInService: {
+
+	}
 };
 
 export default defaultState;
