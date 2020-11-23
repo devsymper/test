@@ -163,9 +163,10 @@
                     <div class="ml-5" v-if="role.name">
                         <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon>
                         <!-- <i class="fs-16 mdi mdi-check  indigo--text text--darken-4 mr-1"></i> -->
+                        <!-- {{checkHasPermission(role.id)}}{{role.id}} -->
                         <v-btn  x-small class="font-normal " 
                             text 
-                            @click="viewUserRole(role.id)" >
+                            @click="viewUserRole(role.id,role.active)" >
                             <span>
                                 {{role.name}}
                             </span>
@@ -191,15 +192,15 @@
                         <div v-for="role in lazyUserInfo.roles.systemRole" :key="role.id">
                             <!-- <i class="fs-16 indigo--text text--darken-4 mr-1"></i>  -->   
                             <!-- <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon> -->
-                            <v-btn class="fm fw-400" 
-                                text 
-                                x-small
-                                @click="viewUserRole(role.id)" >
-                                <span class='fm'>
-                                    <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon>
-                                    {{role.name}}
-                                </span>
-                            </v-btn>
+                              <v-icon class="fs-16 fw-430 ml-5 ">mdi mdi-account-circle-outline</v-icon>
+                                <v-btn class="fm fw-400" 
+                                    text 
+                                    x-small
+                                    @click="viewUserRole(role.id)" >
+                                    <span class='fm fs-13'>
+                                      {{role.name}}
+                                    </span>
+                                </v-btn>
                         </div>
                     </div>
                 </div>
@@ -208,7 +209,7 @@
             <v-col class="col-md-8" v-if="isViewUserRole">
                 <ViewRoles
                     :permission="lazyUserInfo.roles"
-                    @show-userInfo="showUserInfo()"
+                    :allRole="lazyUserInfo"
                     :rolesList="role"/>
             </v-col>
         </v-row>
@@ -271,6 +272,19 @@ export default {
         }
     },
     methods: {
+        checkHasPermission(role){
+            const self = this;
+            userApi.getActionAndObject(role).then(res=>{
+                if (res.status === 200&&res.data.length>0) {
+                    self.orgRole.map(x=>{
+                        x.active = false;
+                        if(x.id==role){
+                            return x.active = true
+                        }
+                    })
+                    }
+                })
+        },
         cancelDialog(){
             this.openChangePassForm=false;
             //this.$refs.changePass.refreshAll();
@@ -291,13 +305,16 @@ export default {
             this.$refs.uploadAvatar.uploadFile();
         },
         showUserInfo(){
-            this.isViewUserRole=false; 
+           // this.isViewUserRole=false; 
             this.$emit('make-small-panel')
         },
-        viewUserRole(role){
-			this.isViewUserRole =! this.isViewUserRole;
-            this.role = role;
-            this.$emit("expand-panel")
+        viewUserRole(role,active){
+            if(active){
+                this.isViewUserRole = true;
+                this.role = role;
+                this.$emit("expand-panel")
+            }
+		   
 		},  
         saveUserInfo(){
             let self = this;
@@ -316,6 +333,7 @@ export default {
             this.orgRole= [];
             Object.keys(nameOrgchart).forEach(type => {
                 this.orgRole.push({titleGroup: type });
+                nameOrgchart[type].map(x=>x.active=this.checkHasPermission(x.id));
                 this.orgRole.push(...nameOrgchart[type]);
             })
 
