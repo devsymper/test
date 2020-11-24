@@ -102,8 +102,12 @@ var configs = {
         }
 	},
 };
-configs.reformatUrl(configs.apiDomain);
 // sửa lại url theo môi trường code
+configs.reformatUrl(configs.apiDomain);
 
+// Thêm các domain thuộc uniqueApiDomain vào khai báo domain của api
+for(let key in configs.uniqueApiDomain){
+    configs.apiDomain[key] = configs.uniqueApiDomain[key];
+}
 
 export const appConfigs = configs;
