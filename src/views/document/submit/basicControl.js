@@ -741,7 +741,7 @@ export default class BasicControl extends Control {
             return newData;
         }
         else{
-            return moment(value,dateFormat).format('YYYY-MM-DD')
+            return moment(data,dateFormat).format('YYYY-MM-DD')
         }
     }
 }

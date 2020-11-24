@@ -260,7 +260,7 @@ export default {
                     return{
                         columns:res.data.columns,
                         listObject:res.data.listObject,
-                        total:res.data.listObject.length,
+                        total:res.data.total,
                     }
                 }
             },
