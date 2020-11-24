@@ -57,9 +57,11 @@ var configs = {
         workflowExtend: "https://workflow-extend.symper.vn/",
         trash: "https://trash.symper.vn/",
 		log: "https://log.symper.vn",
+    },
+    // nơi chứa domain của các api mà ko bị phụ thuộc vào môi trường 
+	uniqueApiDomain: {
 		environmentManagement: "https://system-management.symper.vn/"
-	},
-	
+    },
     notificationTimeout: {
         success: 3000,
         warning: 5000,

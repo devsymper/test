@@ -1,7 +1,7 @@
 import Api from "./api";
 import { appConfigs } from "./../configs.js";
 
-var api = new Api(appConfigs.apiDomain.environmentManagement)
+var api = new Api(appConfigs.uniqueApiDomain.environmentManagement)
 export const environmentManagementApi = {
     getAllEnvironment() {
         return api.get('enviromments');
