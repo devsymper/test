@@ -32,10 +32,10 @@ function moveTaskTitleToNameAttr(content, configValue) {
 function removeSignalDefinitionFromHttpTask(xml) {
 
     // tìm các http task
-    let serviceTasks = xml.match(/<serviceTask(.*?)>((.|\n)*)<\/serviceTask>/gm);
+    let serviceTasks = xml.match(/<serviceTask(.*?)>[\s\S]*?<\/serviceTask>/gm);
     if(serviceTasks){
         for(let task of serviceTasks){
-            let signalEventDefinition = task.match(/<signalEventDefinition(.*?)>((.|\n)*)<\/signalEventDefinition>/gm);
+            let signalEventDefinition = task.match(/<signalEventDefinition(.*?)>[\s\S]*?<\/signalEventDefinition>/gm);
             if(signalEventDefinition){
                 for(let def of signalEventDefinition){
                     // loại bỏ signalEventDefinition trong http task vừa tìm được
