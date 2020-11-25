@@ -85,6 +85,11 @@ export default {
 				serviceId: serviceId,
 				environmentId: this.envId
 			}
+			self.$emit('cancel')
+			self.$snotify({
+				type: 'success',
+				title: "Đang xử lí. Vui lòng chờ kêt quả.... "
+			})
 			environmentManagementApi.getServerId(data).then(res=>{
 				if(res.data[0]){
 					let formData = {
@@ -94,10 +99,9 @@ export default {
 					}
 					environmentManagementApi.deloy(formData).then(res=>{
 						if(res.status == 200){
-							self.$emit('cancel')
 							self.$snotify({
 								type: 'success',
-								title: "Thành công . Đang deploy.... "
+								title: "Thành công . Đang deploy....."
 							})
 						}else{
 							self.$snotify({
@@ -115,7 +119,10 @@ export default {
 					})
 				}
 			}).catch(err=>{
-		
+					self.$snotify({
+						type: 'error',
+						title: "Có lỗi xảy ra"
+					})
 			})
 		}
 	},
