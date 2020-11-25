@@ -1041,9 +1041,10 @@ export default {
                         allControl[controlId].properties.dataFlowId.value = allControl[controlId].properties.dataFlowId.value.id;
                     }
                     else if(allControl[controlId].type == 'table'){
-                        if(allId.indexOf(controlId) === -1){
-                            for(let childControlId in allControl[controlId].listFields){
-                                let childControl = allControl[controlId].listFields[childControlId]
+                        if(allId.indexOf(controlId) !== -1){
+                            let listField = allControl[controlId].listFields;
+                            for(let childControlId in listField){
+                                let childControl = listField[childControlId]
                                 if(allId.indexOf(childControlId) === -1){
                                     delete allControl[controlId].listFields[childControlId];
                                     isCheck = true;
@@ -1051,21 +1052,32 @@ export default {
                                 if(!isCheck && childControl.type == 'user'){
                                     allUserControl['user'].push(childControl.properties.name.value)
                                 }
+                                let childControlFormulas = childControl.formulas;
+
+                                for(let formulaType in childControlFormulas){
+
+                                    if(formulaType != 'linkConfig'){
+                                        if(childControlFormulas[formulaType].value.trim() == ""){
+                                            allControl[controlId].listFields[childControlId].formulas[formulaType].formulasId = 0;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }   
-                }
-                if(!isCheck && allControl[controlId].type == 'user'){
-                    allUserControl['user'].push(allControl[controlId].properties.name.value)
-                }
-                let controlFormulas = allControl[controlId].formulas;
-                for(let formulaType in controlFormulas){
-                    if(formulaType != 'linkConfig'){
-                        if(controlFormulas[formulaType].value.trim() == ""){
-                            allControl[controlId].formulas[formulaType].formulasId = 0;
+                    if(!isCheck && allControl[controlId].type == 'user'){
+                        allUserControl['user'].push(allControl[controlId].properties.name.value)
+                    }
+                    let controlFormulas = allControl[controlId].formulas;
+                    for(let formulaType in controlFormulas){
+                        if(formulaType != 'linkConfig'){
+                            if(controlFormulas[formulaType].value.trim() == ""){
+                                allControl[controlId].formulas[formulaType].formulasId = 0;
+                            }
                         }
                     }
                 }
+                
                 
             }
             return {minimizeControl:allControl,userControls:allUserControl}
@@ -1075,7 +1087,8 @@ export default {
         // hoangnd: hàm gửi request lưu doc
         async saveDocument(){
             let minimizeControl = this.minimizeControlEL(this.editorStore.allControl);
-            let allControl = minimizeControl.minimizeControl
+            let allControl = minimizeControl.minimizeControl;
+            console.log('allControl',allControl);
             let userControls = minimizeControl.userControls
             let documentProperties = util.cloneDeep(this.sDocumentProp);
             documentProperties = Object.assign({controlInfo:userControls},documentProperties)
