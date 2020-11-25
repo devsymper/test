@@ -8,7 +8,8 @@
             <v-col class="fs-13 col-md-5" style="margin-top:5px">Hình đại diện</v-col>
             <v-col class="col-md-7">  
                  <v-select
-                    outlined
+                  outlined
+                  
                      class="sym-small-size"
                     :items="typeSelected"
                     v-model="typePictureSelected"
@@ -38,7 +39,8 @@
                         />
             </v-col>
         </v-row>
-         <v-row class="pt-0" style="margin-bottom:-15px" v-if="typeSelected[1]==typePictureSelected">
+         <v-row class="pt-0" style="margin-bottom:-15px" 
+                v-if="typeSelected[1]==typePictureSelected">
             <v-col class="fs-13 col-md-5 " style="margin-top:-10px">Icon</v-col>
             <v-col class="col-md-6 ml-2" style="margin-top:-10px">  
                  <v-icon class="display-3 pt-0">{{iconName.iconName}}</v-icon>
@@ -50,7 +52,7 @@
             <v-col class="fs-13 col-md-5" style="margin-top:5px">Module phát sinh</v-col>
             <v-col class="col-md-7">  
                 <v-autocomplete
-                    outlined
+                   style="border:1px solid grey; border-radius:4px"
                     hide-details 
                     return-object
                     item-value="value"
@@ -61,7 +63,6 @@
                     dense
                     label="Chọn"
                 >
-                
                 </v-autocomplete>
             </v-col>
         </v-row>
@@ -69,7 +70,7 @@
             <v-col class="fs-13 col-md-5" style="margin-top:5px">Hành động sinh ra notification</v-col>
             <v-col class="col-md-7">  
                  <v-autocomplete
-                    outlined
+                   style="border:1px solid grey; border-radius:4px"
                     class="sym-small-size"
                     return-object
                     item-value="value"
@@ -88,7 +89,7 @@
                 <v-autocomplete
                     class="sym-small-size"
                     dense
-                    outlined
+                   style="border:1px solid grey; border-radius:4px"
                     return-object
                     v-model="receiver"
                     :items="listReceiver"
@@ -104,7 +105,7 @@
             <v-col class="col-md-7">  
                 <v-autocomplete
                      class="sym-small-size" 
-                    outlined
+                   style="border:1px solid grey; border-radius:4px"
                     dense
                     item-value="value"
                     item-text="text"
@@ -124,21 +125,10 @@
             </v-col>
         </v-row>
         <v-row class="col-12" style="margin-top:-30px" >
-              <!-- <div class="col-md-8" style="margin-left:-15px"> 
-                <FormulaEditor 
-                  :listKeyworks="listVariable"
-                  v-model="description"
-                  :height="'150px'"
-                  :simpleMode="false"
-                  @change="''"
-                  @input="''"
-              ></FormulaEditor>
-            </div> -->
            <draggable
               :list="list2"
               group="des"
               @change="log"
-              style="height: 180px!important"
               handle=".handle"
             >
             <v-textarea
@@ -146,7 +136,6 @@
                 style="width:250px;font-size:13px" v-model="description"
               />
             </draggable>
-            
           <div class="col-md-4" > 
               <div 
                 class="mt-1 ml-2" 
@@ -167,40 +156,100 @@
             </div>
           </div>
         </v-row>
-           <!-- <v-row class="pt-0" >
+          
+        <!-- <v-row class="pt-0" style="margin-top:-80px">
+            <v-col class="fs-13 col-md-5">
+                Nội dung label
+            </v-col>
+            <v-col class="fs-13 col-md-2 ml-15">  
+                Tham số
+            </v-col>
+        </v-row>
+         <v-row class="col-12" style="margin-top:-30px" >
+           <draggable
+              :list="list2"
+              group="des"
+              @change="log1"
+              style="height: 50px!important"
+              handle=".handle"
+            >
+            <v-textarea
+                :rows="2" type="text"
+                style="width:250px;font-size:13px" v-model="label"
+              />
+            </draggable>
+          <div class="col-md-4" > 
+              <div 
+                class="mt-1 ml-2" 
+                style="height: 143px; margin-left:-30px; margin-right:-49px; ">
+                <draggable
+                style="height: 180px!important; border:1px solid white"
+                  :list="parameter1"
+                  :group="{ name: 'des', pull: 'clone', put: false }"
+                  :clone="cloneValue"
+                  @change="log1"
+                >
+                  <v-chip class="list-group-item mr-1"   
+                    style="background-color:#e0e0e0; font-size: 11px; border-radius: 4px; height: 20px;"
+                    v-for="element in parameter1" :key="element.value">
+                      {{ element.text }}
+                  </v-chip>
+              </draggable>
+            </div>
+          </div>
+        </v-row> -->
+            <v-row class="pt-0" style="margin-top:-35px" >
             <v-col class="fs-13 col-md-5">
                 Lọc điều kiện
             </v-col>
             <v-col class="fs-13 col-md-2 ml-15">  
                 Tham số
             </v-col>
-        </v-row> -->
-     
-              <!-- <div class="col-md-8" style="margin-left:-15px"> 
-                <FormulaEditor 
-                  :listKeyworks="listVariable"
-                  v-model="description"
-                  :height="'150px'"
-                  :simpleMode="false"
-                  @change="''"
-                  @input="''"
-              ></FormulaEditor>
-            </div> -->
-      
-        <div class="col-12">
-          <v-row class="pt-0" style="margin-bottom:-25px">
-              <v-col class="fs-13 col-md-5 " style="margin-top:5px">Trạng thái</v-col>
-              <v-col class="col-md-6">  
-                <v-checkbox
-                  v-model="state" 
-                  style="margin-top:0px">
-                </v-checkbox>
-              </v-col>
-          </v-row>
-          <v-row class="mt-5 d-flex justify-end" style="margin-top:-20px!important">
-              <v-btn text color="green" @click="save()">{{type=="add"?'Lưu':"Cập nhật"}}</v-btn>
-          </v-row>
-        </div>
+        </v-row>
+        <v-row class="col-12" style="margin-top:-30px" >
+           <draggable
+              :list="list2"
+              group="des"
+              @change="log2"
+              handle=".handle"
+            >
+            <v-textarea
+                :rows="3" type="text"
+                style="width:250px;font-size:13px" v-model="filter"
+              />
+            </draggable>
+          <div class="col-md-4" > 
+              <div 
+                class="mt-1 ml-2" 
+                style="height: 143px; margin-left:-30px; margin-right:-49px; ">
+                <draggable
+                style="height: 180px!important; border:1px solid white"
+                  :list="parameter"
+                  :group="{ name: 'des', pull: 'clone', put: false }"
+                  :clone="cloneValue"
+                  @change="log2"
+                >
+                  <v-chip class="list-group-item mr-1"   
+                    style="background-color:#e0e0e0; font-size: 11px; border-radius: 4px; height: 20px;"
+                    v-for="element in parameter" :key="element.value">
+                      {{ element.text }}
+                  </v-chip>
+              </draggable>
+            </div>
+          </div>
+        </v-row>
+            <v-row class="pt-0" style="margin-top:-80px" >
+                <v-col class="fs-13 col-md-5 " style="margin-top:5px">Trạng thái</v-col>
+                <v-col class="col-md-6">  
+                  <v-checkbox
+                    v-model="state" 
+                    style="margin-top:0px">
+                  </v-checkbox>
+                </v-col>
+            </v-row>
+            <v-row class="mt-5 d-flex justify-end" style="margin-top:-20px!important">
+                <v-btn text color="green" @click="save()">{{type=="add"?'Lưu':"Cập nhật"}}</v-btn>
+            </v-row>
     </div>
     <div v-else>
         <ViewBaConfig :detail="detailNotification"></ViewBaConfig>
@@ -221,6 +270,9 @@ import notification from "./../../../api/settingNotification";
 export default {
   props: ['type'],
    watch: {
+     typePictureSelected(){
+
+     },
       objectType(){
          this.refreshSelected();
          if(this.objectType.value){
@@ -232,7 +284,6 @@ export default {
   },
   created () {
       this.getNameModule();
-    
   },
   components:{
       UploadFile,
@@ -245,6 +296,8 @@ export default {
     return {
       test:'',
       id:0,
+      label:'',
+      filter:'',
       listVariable:[],
       detailNotification:{},
       updateData:{},
@@ -265,6 +318,20 @@ export default {
         },
         avatarUrl:'',
         parameter:[],
+        parameter1:[
+          {
+          text:'Người liên quan',
+          value:"{userRelatedId}"
+        },
+         {
+          text:'Tên module liên quan',
+          value:"{relatedObjectTitle}"
+        },
+        //  {
+        //   text:'Người liên quan',
+        //   value:"{userRelatedId}"
+        // },
+        ],
         avatarFileName:'',
         allListObj:{},
         listModule:[],
@@ -318,8 +385,8 @@ export default {
         this.avatarFileName = 'user_avatar_'+util.str.randomString(6)+Date.now();
         this.$refs.uploadAvatar.uploadFile();
     },
-    replaceDescription(){
-      let description = this.description;
+    replaceDescription(description){
+      // let description = this.description;
       if(description.indexOf('<Deadline>')>-1){
            let oldValue= "<Deadline>";
           let newValue = '<*{data.dueDate}*>';
@@ -352,10 +419,12 @@ export default {
         this.description= des.content;
         this.avatarUrl = appConfigs.apiDomain.fileManagement+'readFile/'+des.icon;
         if(this.checkIcon(des.icon)){
-              this.typePictureSelected=this.typeSelected[1]
+              this.typePictureSelected=this.typeSelected[1];
+              this.avatarUrl=""
         }else{
           this.typePictureSelected=this.typeSelected[0];
-          this.avatarFileName = des.icon
+          this.avatarFileName = des.icon;
+          this.iconName.iconName=''
         }
     },
     update(){
@@ -375,7 +444,8 @@ export default {
           receiver:this.receiver.value,
           action:this.actionClickNotifi,
           icon:this.typeSelected[1]==this.typePictureSelected?"mdi "+this.iconName.iconName:this.avatarFileName,
-          content:this.replaceDescription()
+          content:this.replaceDescription(this.description),
+          filter:this.replaceDescription(this.filter)
         }
       const self = this;
       notification.updateChanel(this.updateData.id, this.updateData).then(res=>{
@@ -406,7 +476,8 @@ export default {
             receiver:this.receiver.value,
             action:this.actionClickNotifi,
             icon:this.typeSelected[1]==this.typePictureSelected?"mdi "+this.iconName.iconName:this.avatarFileName,
-            content:this.replaceDescription()
+            content:this.replaceDescription(this.description),
+            filter:this.replaceDescription(this.filter)
         };
        const self = this;
         notification.addChanel(data).then(res=>{
@@ -502,6 +573,12 @@ export default {
     },
      log: function(evt) {
        this.description+=evt.added.element.name;
+    },
+    log1: function(evt) {
+       this.label+=evt.added.element.name;
+    },
+     log2: function(evt) {
+       this.filter+=evt.added.element.name;
     },
     cloneValue(value) {
       return {
