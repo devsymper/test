@@ -108,7 +108,8 @@
             "myApplication": "Ứng dụng của tôi",
             "tasks": "Tasks",
             "works": "Works",
-            "My work": "Ghi công",
+            "My work": "Tác vụ của tôi",
+            "My work timesheet": "Ghi công",
             "myWork": "Lịch làm việc",
             "Manage timesheet": "Quản lý  thời gian biểu",
             "Timesheet report": "Báo cáo thời gian biểu",
@@ -145,7 +146,7 @@
             "list_workflow": "Danh sách quy trình",
             "list_work": "Danh sách công việc"
         },
-        "system": "Hệ thống",
+        "system": "Vai trò người dùng",
         "copy": "Sao chép"
     },
     "login": {
@@ -348,7 +349,7 @@
         },
         "myInfo": {
             "title": "Thông tin của tôi",
-            "generalInfo": "Thông tin chung",
+            "generalInfo": "Thông tin chi tiết",
             "myPosition": "Vị trí của tôi"
         }
     },
@@ -502,6 +503,7 @@
         "submit": "Gửi",
         "date": "Ngày",
         "task_form": "Tạo task",
+        "task_logform": "Task",
         "time_invalid": "Thời gian không hợp lệ",
         "required_value": "Không được để trống",
         "of": "từ",
