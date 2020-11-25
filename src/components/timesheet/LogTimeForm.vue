@@ -200,10 +200,7 @@
             <span class="fs-13" >
                 Thêm liên tục
             </span>
-            <v-btn text class='cancel' @click=" this.createEvent = null
-            this.createStart = null
-            this.dragTime = null
-            this.dragEvent = null()">
+            <v-btn text class='cancel' @click="cancel()">
                {{$t('timesheet.cancel')}}
             </v-btn>
             <v-btn v-if= "update==false&&showLog" text  
@@ -248,6 +245,7 @@ export default {
     name: 'LogTimeForm',
     props: ['formType', 'newEvent', 'onSave', 'onCancel', 'update','dateMonth','eventLog','load','updateAPICategory','cancelTask','cancelCate'],
     data: () => ({
+        logTimeList:[],
         keepLog:false,
         isCaculate:false,
         datePicker:'',
@@ -306,13 +304,9 @@ export default {
                     let hourEnd = Number(endTime[0]);
                     let minutesEnd = Number(endTime[1]);
                     return ((hourEnd * 60 + minutesEnd) - (hourStart * 60 + minutesStart));      
-         
-
             }else{
                 return this.durationTime
             }
-                
-          
         },
         displayDuration() {
             if(!this.isCaculate){
@@ -407,7 +401,9 @@ export default {
                 }
              }
              else{
-                let taskId = this.task;
+                
+                    let taskId = this.task;
+                 
                 this.findNameTask(this.task);
                 this.getCategoryId(taskId);
              }
@@ -432,14 +428,16 @@ export default {
              // this.loadTaskList();
         },
         newEvent(val) {
-            this.getAllTask();
+            debugger
+            this.getAllTask(val.task);
             this.inputs.startTime = val ? dayjs(val.start).format('HH:mm') : "08:00";
             this.inputs.endTime = val ? dayjs(val.end).format('HH:mm') : "08:40";
             this.inputs.date = val ? dayjs(val.date).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
             this.displayDate = this.inputs.date;
             this.inputs.description = val.desc;
             this.categoryTask = val.category;
-            this.task = val.task;
+              debugger
+            this.task = val.task?val.task:getIdTask(val.task);
             this.items.push({name:val.task});
             // hiển thị nút plan và log theo từng giờ
             let now = dayjs();
@@ -457,6 +455,15 @@ export default {
         this.getCategory();
     },
     methods: {
+        // getIdTask(nameTask){
+        //     let id = 0;
+        //    this.logTimeList.map(task=>{
+        //        if(task.task_id==nameTask){
+        //            id = 
+        //        }
+
+        //     })
+        // },
         changeDuration(duration){
             let minutes = 0;
             let hour = 0;
@@ -482,10 +489,12 @@ export default {
             }
         },
          findNameTask(id){
+             debugger
              this.nameTask=this.items.filter(x=>x.id==id)[0].name;
              return this.nameTask
         },
-           getCategoryId(taskId){
+        getCategoryId(taskId){
+            debugger
            let cateId = this.items.filter(x=>x.id==taskId)[0].categoryId;
            if(cateId){
                 this.categoryTask = this.getFullNameCategory(cateId)
@@ -505,7 +514,7 @@ export default {
                 self.items.push(...res.data.task);
                 })
                 .catch(console.log);
-            await timesheetApi.getTask({descriptionLike:'%'+nameTask+'%'})
+            await timesheetApi.getTask({nameLike:'%'+nameTask+'%'})
             .then(res => {
                 self.items.push(...res.data);
                 })
@@ -568,25 +577,25 @@ export default {
          },
          showCategoryForm(){
              this.$emit("showCategoryForm",{
-                    startTime:this.inputs.startTime,
-                    endTime:this.inputs.endTime,
-                    task: this.findNameTask(this.task),
-                    date: this.inputs.date,
-                    categoryTask: this.categoryTask,
-                    desc: this.inputs.description || ""
-                })
-                this.getEventLog();
+                startTime:this.inputs.startTime,
+                endTime:this.inputs.endTime,
+                task: this.findNameTask(this.task),
+                date: this.inputs.date,
+                categoryTask: this.categoryTask,
+                desc: this.inputs.description || ""
+            })
+            this.getEventLog();
          },
         showTaskForm(){
-                this.$emit("showTaskForm",{
-                    startTime:this.inputs.startTime,
-                    endTime:this.inputs.endTime,
-                    task: this.findNameTask(this.task),
-                    date: this.inputs.date,
-                    categoryTask: this.categoryTask,
-                    desc: this.inputs.description || ""
-                })
-                this.getEventLog();
+            this.$emit("showTaskForm",{
+                startTime:this.inputs.startTime,
+                endTime:this.inputs.endTime,
+                task: this.findNameTask(this.task),
+                date: this.inputs.date,
+                categoryTask: this.categoryTask,
+                desc: this.inputs.description || ""
+            })
+            this.getEventLog();
         },
         getCategory(){
             let self= this;
@@ -604,24 +613,19 @@ export default {
                 }).catch(console.log);
         },
         refreshAll(){
+            this.taskError="";
+            this.cateError = '';
+            this.timeError = "";
             this.task="";
-            this.inputs.duration="";
-            this.inputs.endTime = "";
-            this.inputs.startTime = "";
-            this.inputs.date="";
             this.nameTask="";
             this.task="";
             this.categoryTask="";
-            this.taskError="";
             this.inputs.description="";
-            this.timeError = "";
         },
         cancel() {
             this.onCancel();
             this.$emit('cancel');
-            this.taskError = '';
-            this.cateError = '';
-            this.timeError = '';
+            this.refreshAll()
         },
         // type= 0 là plan, 1 là log
         log(type) {
@@ -639,6 +643,7 @@ export default {
             }
             if (!check){}
             else{
+               
                 timesheetApi.createLogTime({
                     start: start,
                     end: end,
@@ -697,11 +702,14 @@ export default {
             let check = this.checkValidateLogForm();
             if (!check){
             } else {
+                //  let taskId = this.task;
+                let taskId = Number(this.task)?this.task:this.items.filter(x=>x.name==this.task)[1].id;
+               // let test = this.items.filter(x=>x.name==this.task)[0].id;
                 timesheetApi.updateLogTime({
                         start: dayjs(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
                         end: dayjs(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
                         duration: this.duration,
-                        task: this.findNameTask(this.task),
+                        task: this.findNameTask(taskId),
                         type: type,
                         id: this.newEvent.id,
                         date: this.inputs.date,
