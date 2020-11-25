@@ -8,8 +8,7 @@
             <v-col class="fs-13 col-md-5" style="margin-top:5px">Hình đại diện</v-col>
             <v-col class="col-md-7">  
                  <v-select
-                  outlined
-                  
+                    outlined
                      class="sym-small-size"
                     :items="typeSelected"
                     v-model="typePictureSelected"
@@ -39,7 +38,7 @@
                         />
             </v-col>
         </v-row>
-         <v-row class="pt-0" style="margin-bottom:-15px" 
+         <v-row class="pt-0" style="margin-bottom:-18px" 
                 v-if="typeSelected[1]==typePictureSelected">
             <v-col class="fs-13 col-md-5 " style="margin-top:-10px">Icon</v-col>
             <v-col class="col-md-6 ml-2" style="margin-top:-10px">  
@@ -48,7 +47,7 @@
             </v-col >
               
         </v-row>
-        <v-row class="pt-0" style="margin-bottom:-10px">
+        <v-row class="pt-0" style="margin-bottom:-18px">
             <v-col class="fs-13 col-md-5" style="margin-top:5px">Module phát sinh</v-col>
             <v-col class="col-md-7">  
                 <v-autocomplete
@@ -66,7 +65,7 @@
                 </v-autocomplete>
             </v-col>
         </v-row>
-         <v-row class="pt-0" style="margin-bottom:-10px">
+         <v-row class="pt-0" style="margin-bottom:-18px">
             <v-col class="fs-13 col-md-5" style="margin-top:5px">Hành động sinh ra notification</v-col>
             <v-col class="col-md-7">  
                  <v-autocomplete
@@ -83,7 +82,7 @@
                 </v-autocomplete>
             </v-col>
         </v-row>
-          <v-row class="pt-0" style="margin-bottom:-10px" >
+          <v-row class="pt-0" style="margin-bottom:-18px" >
             <v-col class="fs-13 col-md-5" style="margin-top:5px">Đối tượng nhận notification</v-col>
             <v-col class="col-md-7">  
                 <v-autocomplete
@@ -270,8 +269,8 @@ import notification from "./../../../api/settingNotification";
 export default {
   props: ['type'],
    watch: {
-     typePictureSelected(){
-
+     action(){
+        this.reformatNameReviewer()
      },
       objectType(){
          this.refreshSelected();
@@ -294,7 +293,6 @@ export default {
     },
   data() {
     return {
-      test:'',
       id:0,
       label:'',
       filter:'',
@@ -354,6 +352,25 @@ export default {
   computed: {
   },
   methods: {
+    reformatNameReviewer(){
+       if(this.objectType.value=="comment"){
+          if(this.action.value!="tag"){
+              this.listReceiver={
+                value: "{data.userId}",
+                text: "Chủ thể"}
+          }else{
+            this.listReceiver=[
+              {
+                value: "{data.userId}",
+                text: "Chủ thể"
+              },
+              {
+                value: "{data.tags.objectIdentifier}",
+                text: "Người được tag"
+              }]
+        }
+       }
+    },
     // nếu là ảnh trả về false
      checkIcon(icon){
         let check = true;
@@ -375,6 +392,7 @@ export default {
       this.detailNotification.action=des.event;
       this.detailNotification.receiver=des.defaultUser;
       this.detailNotification.actionClickNotifi=des.originAction;
+      this.detailNotification.filter=des.filter;
       this.detailNotification.state=des.state=="Theo dõi"?true:false;
     },
     setNotificationInfo(des){
@@ -413,6 +431,7 @@ export default {
         this.state=des.originState;
         this.objectType=des.originObjectType;
         this.receiver=des.originDefaultUser;
+        this.filter = des.filter;
         this.action=des.originEvent;
         this.actionClickNotifi=des.action;
         this.iconName.iconName=des.icon;
@@ -432,7 +451,6 @@ export default {
         try{
           this.$refs.uploadAvatar.uploadFile();
         }catch(error){
-
         }
       }
        this.updateData={
@@ -563,12 +581,12 @@ export default {
               text:this.allListObj[nameModule].parameter[i].text,
               value: this.allListObj[nameModule].parameter[i].value
               });
-              this.listVariable.push({
-                caption: this.allListObj[nameModule].parameter[i].text,
-                value: this.allListObj[nameModule].parameter[i].value,
-                meta: "variable",
-                docHTML:"123",
-              })
+              // this.listVariable.push({
+              //   caption: this.allListObj[nameModule].parameter[i].text,
+              //   value: this.allListObj[nameModule].parameter[i].value,
+              //   meta: "variable",
+              //   docHTML:"123",
+              // })
         }
     },
      log: function(evt) {

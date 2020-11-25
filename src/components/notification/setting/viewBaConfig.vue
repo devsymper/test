@@ -49,9 +49,19 @@
             </v-col>
            
         </v-row>
-        <v-row  class="pt-0 fs-13 " style="margin-bottom:-25px">
+        <v-row  class="pt-0 fs-13 " style="margin-bottom:-10px">
               <v-col class="fs-13 col-md-12 ">
             {{detail.content}}
+            </v-col>
+        </v-row>
+         <v-row v-if="detail.filter" class="pt-0" style="margin-bottom:-10px">
+            <v-col class="fs-13 col-md-5 fw-430">
+                Filter
+            </v-col>
+        </v-row>
+        <v-row  class="pt-0 fs-13 " style="margin-bottom:-25px">
+              <v-col class="fs-13 col-md-12 ">
+            {{detail.filter}}
             </v-col>
         </v-row>
         <div class="col-12">
