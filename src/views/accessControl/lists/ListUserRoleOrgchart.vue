@@ -11,10 +11,11 @@
 		:showExportButton="false"
 		:headerPrefixKeypath="'common'"
 		:actionPanelWidth="650"
+		:dialogMode="false"
 	>
 		<template slot="right-panel-content" slot-scope="{itemData}">
 			<UserRoleOrgchartPanel 
-
+				:idOrgchart="idOrgchart"
 			/>
 		</template>
 	
@@ -41,6 +42,7 @@ export default {
 		let self = this
 		return{
 			getListUrl: appConfigs.apiDomain.orgchart+'orgchart',
+			idOrgchart:null,
 			customAPIResult:{
 				reformatData(res){
                    	return{
@@ -76,6 +78,7 @@ export default {
 					name: "set",
 					text: "Phân quyền",
 					callback: (row, callback) => {
+						self.idOrgchart = row.id
 						self.$refs.listOrgchart.actionPanel = true
 					}
 				},
