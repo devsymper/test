@@ -125,7 +125,7 @@ export default {
 					}
 				}
 			},
-			getListUrl: appConfigs.apiDomain.environmentManagement+'services',
+			getListUrl: appConfigs.uniqueApiDomain.environmentManagement+'services',
 		}
 	}
 }

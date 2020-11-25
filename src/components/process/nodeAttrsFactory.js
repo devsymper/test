@@ -377,7 +377,11 @@ export const nodeAttrsDefinition = {
         docker: dockerGroups.event
     },
     'ThrowSignalEvent': {
-        attrs: ["executionlisteners", "signalref", "asynchronousdefinition"],
+        attrs: [
+            
+            'httptaskrequesturl', 'httptaskrequestheaders', 'httptaskrequestbody', 'httptaskrequestbodyencoding', 'httptaskrequesttimeout', 'httptaskdisallowredirects', 'httptaskfailstatuscodes', 'httptaskhandlestatuscodes', 'httptaskignoreexception', 'httptasksaveresponseparameterstransient', 'httptasksaveresponseasjson', 'httptaskresponsevariablename', 'httptasksaverequestvariables', 'httptasksaveresponseparameters', 'httptaskresultvariableprefix',
+            "serviceTaskTypeHTTP",
+            "executionlisteners", "signalref", "asynchronousdefinition", "prefixForSignalParameters"],
         validate: function(attrs) {
 
         },

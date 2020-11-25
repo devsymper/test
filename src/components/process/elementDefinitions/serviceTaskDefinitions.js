@@ -77,5 +77,32 @@ export default {
                 "user_id":receiver
             });
         }
-    }
+    },
+    throwSignal:{
+        params: {
+            requestMethod: 'POST',
+            requestUrl: appConfigs.apiDomain.workflowExtend + 'signals',
+            requestHeaders: 'Accept: application/json',
+            requestBody: '',
+            requestBodyEncoding: 'UTF8',
+            requestTimeout: 10000,
+            disallowRedirects: true,
+            failStatusCodes: 500,
+            handleStatusCodes: 200,
+            responseVariableName: '',
+            ignoreException: true,
+            saveRequestVariables: false,
+            saveResponseParameters: true,
+            resultVariablePrefix: '',
+            saveResponseParametersTransient: false,
+            saveResponseVariableAsJson: true,
+        },
+        makeRequestBody(nodeAttr) {
+            this.params.responseVariableName = 'symper_'+nodeAttr.idNode+'_throw_signal_response';
+            this.params.requestBody =JSON.stringify({
+                signalName: nodeAttr.signalref.nameValue,
+                prefix: nodeAttr.prefixForSignalParameters.value
+            });
+        }
+    },
 }

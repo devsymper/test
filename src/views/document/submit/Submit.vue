@@ -374,7 +374,6 @@ export default {
             listMessageErr:[],
             titleValidate:"",
             messageValidate:"",
-            cacheDataRunFormulas:{},
 			isDraft:0,
             preDataSubmit:{},
             objectIdentifier:{},
@@ -1143,9 +1142,14 @@ export default {
         getDataOrgchart(e){
             let thisCpn = this;
             let aliasControl = e.formulasInstance.autocompleteDetectAliasControl();
-            let dataFromCache = this.getDataAutocompleteFromCache(e.e.target.value, aliasControl);
+            let dataInput = this.getDataInputFormulas(e.formulasInstance,e);
+            for(let controlName in dataInput){
+                if(Array.isArray(dataInput[controlName])){
+                    dataInput[controlName] = dataInput[controlName][e.e.rowIndex];
+                }
+            }
+            let dataFromCache = this.getDataAutocompleteFromCache(aliasControl, dataInput);
             if(dataFromCache == false){
-                let dataInput = this.getDataInputFormulas(e.formulasInstance,e);
                 e.formulasInstance.handleBeforeRunFormulas(dataInput).then(res=>{
                     res.status = 200
                     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,true)
@@ -1169,18 +1173,14 @@ export default {
             }
             else{
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
-                let dataFromCache = this.getDataAutocompleteFromCache(e.e.target.value, aliasControl);
-                if(dataFromCache == false){
-                    let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
-                    let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
-                    if(currentTableInteractive != null){
-                        let cellMeta = currentTableInteractive.tableInstance.getSelected();
-                        for(let controlName in dataInput){
-                            if(Array.isArray(dataInput[controlName])){
-                                dataInput[controlName] = dataInput[controlName][cellMeta[0][0]]
-                            }
-                        }
+                let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
+                for(let controlName in dataInput){
+                    if(Array.isArray(dataInput[controlName])){
+                        dataInput[controlName] = dataInput[controlName][e.e.rowIndex];
                     }
+                }
+                let dataFromCache = this.getDataAutocompleteFromCache(aliasControl, dataInput);
+                if(dataFromCache == false){
                     e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
                         thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,false)
                     });
@@ -1193,14 +1193,20 @@ export default {
         },
 
         // hàm lấy data từ cache của control autocomplete
-        getDataAutocompleteFromCache(curTyping,controlName){
+        getDataAutocompleteFromCache(controlName, dataInput){
+            let groupKey = [];
+            for(let ctlName in dataInput){
+                groupKey.push(dataInput[ctlName]);
+            }
+            groupKey = groupKey.join("-");
+            console.log('groupKeygroupKey',groupKey);
             if(this.sDocumentSubmit.autocompleteData.hasOwnProperty(controlName) &&
-                this.sDocumentSubmit.autocompleteData[controlName].header.length > 0 &&
-                this.sDocumentSubmit.autocompleteData[controlName].cacheData.hasOwnProperty(curTyping)
+                this.sDocumentSubmit.autocompleteData[controlName].header.hasOwnProperty(groupKey) &&
+                this.sDocumentSubmit.autocompleteData[controlName].cacheData.hasOwnProperty(groupKey)
             ){
                 return {
-                    headers:this.sDocumentSubmit.autocompleteData[controlName].header,
-                    dataBody:this.sDocumentSubmit.autocompleteData[controlName].cacheData[curTyping]
+                    headers:this.sDocumentSubmit.autocompleteData[controlName].header[groupKey],
+                    dataBody:this.sDocumentSubmit.autocompleteData[controlName].cacheData[groupKey]
                 }
             }
             else{
@@ -1226,16 +1232,27 @@ export default {
                     this.$refs.autocompleteInput.setAliasControl(aliasControl);
                     this.$refs.autocompleteInput.setData(dataTable);
                     if(dataTable.hasOwnProperty('headers')){
-                        let item = {}
-                        let textTyping = this.getTextTypingInSqlQuery(res.data.sql);
-                        item[textTyping] = dataTable.dataBody
-                        console.log("sadsadsadsa",item);
-                        this.$store.commit("document/cacheDataAutocomplete",{
-                            instance: this.keyInstance,
-                            controlName:aliasControl,
-                            header:dataTable.headers,
-                            cacheData:item
-                        })
+                        try {
+                            let dataInput = JSON.parse(res.parameter.data_input);
+                            let groupKey = [];
+                            for(let controlName in dataInput){
+                                groupKey.push(dataInput[controlName]);      
+                            }
+                            groupKey = groupKey.join("-");
+                            let itemData = {};
+                            let itemHeader = {};
+                            itemData[groupKey] = dataTable.dataBody;
+                            itemHeader[groupKey] = dataTable.headers;
+                            this.$store.commit("document/cacheDataAutocomplete",{
+                                instance: this.keyInstance,
+                                controlName:aliasControl,
+                                header:itemHeader,
+                                cacheData:itemData,
+                            })    
+                        } catch (error) {
+                            console.log(error,'errorerror');
+                        }
+                        
                     }
                 }
                 else{
@@ -1248,21 +1265,6 @@ export default {
                 this.$refs.autocompleteInput.setData(dataTable);
                 this.$refs.autocompleteInput.hideHeader();
             }
-        },
-
-        /**
-         * Hàm tìm ra đoạn text đã typing để query autocomplete
-         */
-        getTextTypingInSqlQuery(sql){
-            let textQuery = sql.match(/%.*?%/g);
-            if(textQuery){
-                textQuery = textQuery[0];
-                textQuery = textQuery.replace(/%*/g,"");
-            }
-            else{
-                textQuery = ""
-            }
-            return textQuery;
         },
         /**
          * Hàm bind dữ liệu cho control, và control trong bảng khi chọn apply trên timepicker

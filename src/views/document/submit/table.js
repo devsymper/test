@@ -458,6 +458,8 @@ export default class Table {
                     data: this.getSourceData(),
                     tableName:thisObj.tableName
                 });
+                console.log('ákjdaskdasd',changes,source);
+
                 if (thisObj.isAutoCompleting) {
                     return;
                 }
@@ -465,7 +467,7 @@ export default class Table {
                     return
                 }
                 // check nếu ko có thay đổi trong cell thì return
-                if (changes[0][2] == changes[0][3]) {
+                if (changes[0][2] == changes[0][3] && source == 'edit') {
                     return;
                 }
                 if (!changes[0][2] && !changes[0][3]) {
@@ -475,7 +477,6 @@ export default class Table {
                     sDocument.state.viewType[thisObj.keyInstance] == 'update') {
                     return;
                 }
-
                 if (/=SUM(.*)/.test(changes[0][2]) || /=SUM(.*)/.test(changes[0][3])) {
                     return;
                 }
