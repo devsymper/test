@@ -45,7 +45,11 @@
 			</div>
 			<div style="width: 670px">
 				<div v-if="objectActive == 'application_definition'" class="d-flex flex-column">
-					<ApplicationDefinitionForm />
+					<ApplicationDefinitionForm 
+						:actionPackId="itemData.id"
+						@list-item-selected="handleListAppSelected"
+						:listApp="listAppSelected"
+					/>
 				</div>
 				<div v-else-if="objectActive== 'department'">
 					 <ConfigActionPackOrgchart 
@@ -83,7 +87,6 @@
 							:dataSchema="dataSchema"
 							class="fs-13"
 							ref="dataTable">
-
 						</hot-table>
 					</div>
 				</div>
@@ -127,6 +130,7 @@ import { permissionPackageApi } from '@/api/PermissionPackage';
 import DocumentInstanceOperation from "./DocumentInstanceOperation";
 import ConfigActionPackOrgchart from "./ConfigActionPackOrgchart.vue" ;
 import ObjectInApplication from "./ObjectInApplication";
+import {uiConfigApi} from "@/api/uiConfig";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ApplicationDefinitionForm from "./../helpers/ApplicationDefinitionForm"
 let defaultTabConfig = {
@@ -162,7 +166,21 @@ export default {
     methods: { 
         closeActionPackForm(){
             this.$emit('close-form');
-        },
+		},
+		getAppInActionPack(){
+			let self = this
+			let str = 'action-pack:'+ this.itemData.id
+			uiConfigApi.getUiConfig(str).then(res=>{
+				if(res.status == 200){
+					let arr = JSON.parse(res.data.detail)
+					self.listAppSelected = arr
+				}else{
+					self.listAppSelected = []
+				}
+			}).catch(err=>{
+
+			})
+		},
         handlePermissionSelected(data){
             this.permissionDepartment = data           
         },
@@ -172,7 +190,10 @@ export default {
             }else{
                 this.departmentSelected.push(data)
             }
-        },
+		},
+		handleListAppSelected(lists){
+			this.listAppSelected = lists
+		},
         handleChangeDocumentInstanceOperation(info){
             let operationForInstancesOfDocDef = this.multipleLevelObjects.document_definition.savedOpsForAllInstancesDocDef;
             
@@ -356,7 +377,7 @@ export default {
         async translateAppObjectIdToTableData(data){
             let appId = data.id;
             let objs = data.objects;
-            let actionPackId = this.itemData.id;
+			let actionPackId = this.itemData.id;
             let initOperations = {}; // các operation mà có action rỗng để đảm bảo luôn hiển thị các object của app ngay cả khi các object này chưa có quyền
             let objectTypeDataTable = {};
             // let allOperation = await permissionApi.
@@ -737,14 +758,20 @@ export default {
             let res;
             try {
                 if(this.action == 'update'){
-                    res = await permissionApi.updateActionPack(this.itemData.id, dataToSave);
+					res = await permissionApi.updateActionPack(this.itemData.id, dataToSave);
+					let dataUi = {
+						widgetIdentifier: 'action-pack:'+this.itemData.id,
+						detail: JSON.stringify(this.listAppSelected)
+					}
+					uiConfigApi.saveUiConfig(dataUi).then(res=>{
+					})
                     if(res.status == '200'){
                         this.$snotifySuccess("Updated item successfully");
                     }else{
                         this.$snotifyError(res, "Error when update item");
                     }
                 }else if(this.action == 'create'){
-                    res = await permissionApi.createActionPack(dataToSave);
+					res = await permissionApi.createActionPack(dataToSave);
                     if(res.status == '200'){
                         this.$snotifySuccess("Create item successfully");
                     }else{
@@ -863,6 +890,7 @@ export default {
     data(){
         let self = this;
         return {
+			listAppSelected:[],
 			listObject:[],
 			objectActive:"document_definition",
             permissionDepartment:[],
@@ -990,7 +1018,8 @@ export default {
             deep: true,
             immediate: true,
             handler(vl){
-                this.genAllInputForFormTpl();
+				this.genAllInputForFormTpl();
+				this.getAppInActionPack()
             }
         },
         listAction: {

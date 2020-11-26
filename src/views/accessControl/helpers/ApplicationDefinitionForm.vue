@@ -5,7 +5,8 @@
 			<ListItemSelector
 				:listItem='allApp'
 				@item-selected="handleItemSelected"
-
+				@list-item-selected="handleListItemSelected"
+				:values="listApp"
 			 />
 		</div>
 		<div class="d-flex w-100 mr-2 children-application">
@@ -38,12 +39,14 @@ import OrgchartSelector from "./OrgchartSelector"
 import ListItemSelector from "./ListItemSelector.vue"
 import {accessControlApi} from '@/api/accessControl'
 import {appManagementApi} from '@/api/AppManagement.js'
+import {uiConfigApi} from "@/api/uiConfig";
 export default {
 	data(){
 		return {
 			active: "",
 			selectedApplication: "",
 			allApp:[],
+			values:[],
 			checkboxes:[],
 			childrenTypeOfApp:[
 				{
@@ -66,6 +69,18 @@ export default {
 			]
 		}
 	},
+	props:{
+		actionPackId:{
+			type: String,
+			default: ""
+		},
+		listApp:{
+			type: Array,
+			default(){
+				return []
+			}
+		}
+	},
 	components:{
 		ListItemSelector,
 		OrgchartSelector
@@ -83,6 +98,9 @@ export default {
 			}).catch(err=>{
 			})
 			
+		},
+		handleListItemSelected(lists){
+			this.$emit('list-item-selected' , lists)
 		},
 		handlePermissionSelected(value){
 			this.checkboxes = value
@@ -102,6 +120,19 @@ export default {
 				
 			})
 		}
+	},
+	watch:{
+		// actionPackId(val){
+		// 	let self = this
+		// 	let str = 'action-pack:'+ val
+		// 	uiConfigApi.getUiConfig(str).then(res=>{
+		// 		if(res.status == 200){
+		// 			debugger
+		// 			let arr = JSON.parse(res.data.detail)
+		// 			self.values = arr
+		// 		}
+		// 	})
+		// }
 	}
 
 }
