@@ -293,7 +293,7 @@
                 </div>
                     <v-menu top nudge-top='40' nudge-left='60'>
                     <template v-slot:activator="{ on: menu }">
-                        <v-btn style="margin-left:140px" icon tile v-on="menu">
+                        <v-btn style="position: absolute;right: 10px;" icon tile v-on="menu">
                             <v-icon style="font-size:18px">mdi-cog-outline</v-icon>
                         </v-btn>
                     </template>
@@ -438,7 +438,7 @@ export default {
             }, 400, this);
         },
         reCalcSidebarHeight(){
-            this.menuItemsHeight = (util.getComponentSize(this).h - 200)+'px';
+            this.menuItemsHeight = (util.getComponentSize(this).h - 155)+'px';
         },
         logout(){
             util.auth.logout();

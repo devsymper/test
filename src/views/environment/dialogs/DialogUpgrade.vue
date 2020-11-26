@@ -93,9 +93,13 @@ export default {
 				versionId: this.verId,
 				environmentId: this.currentInstance.environmentId
 			}
+			self.$emit('cancel')
+			self.$snotify({
+				type: 'success',
+				title: "Đang xử lí. Vui lòng chờ kêt quả.... "
+			})
 			environmentManagementApi.deloy(formData).then(res=>{
 				if(res.status == 200){
-					self.$emit('cancel')
 					self.$snotify({
 						type: 'success',
 						title: "Thành công . Đang deploy.... "
@@ -106,8 +110,12 @@ export default {
 						title: "Có lỗi xảy ra"
 					})
 				}
-			}).catch(
-			)
+			}).catch(err=>{
+				self.$snotify({
+					type: 'error',
+					title: "Có lỗi xảy ra"
+				})
+			})
 		}
 	},
 }
