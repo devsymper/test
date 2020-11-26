@@ -1,7 +1,7 @@
 <template>
 	<div class="w-100 h-100">
-		<div class="d-flex w-100">
-			<span> Chọn ứng dụng:</span>
+		<div class="d-flex w-100 mt-1">
+			<span class="fs-15 font-weight-bold"> Chọn ứng dụng:</span>
 			<ListItemSelector
 				:listItem='allApp'
 				@item-selected="handleItemSelected"
