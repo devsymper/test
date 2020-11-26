@@ -33,6 +33,7 @@
 import { util } from '@/plugins/util';
 import { orgchartApi } from '@/api/orgchart.js';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import {accessControlApi} from "@/api/accessControl"
 export default {
     created(){
         this.$store.dispatch('orgchart/getAllOrgchartStruct');
@@ -98,7 +99,8 @@ export default {
     data(){
         return{
 			res: [],
-			treeData:[]
+			treeData:[],
+			currentNode: ""
         }
 	},
 	components:{
@@ -111,18 +113,7 @@ export default {
                 return map;
             }, {});
         },
-        // treeData(){
-		// 	let self = this
-		// 	self.idOrgchart
-		// 	let item = {}
-		// 	let tree = this.$store.state.orgchart.allOrgchartStruct.tree;
-		// 	tree.forEach(function(e){
-		// 		if(e.id == self.idOrgchart){
-		// 			item = e
-		// 		}
-		// 	})
-		// 	return item
-        // }
+      
     },
 
     methods: {
@@ -161,7 +152,11 @@ export default {
             return self.res
         },
 		handleDepartmentClick(item){
-			debugger
+			this.currentNode = 'orgchart:'+this.idOrgchart+':'+item.vizId
+			this.$emit('current-node', this.currentNode, item.type)
+			// if(item.type == 'position'){
+				
+			// }
 		}
     }
 }

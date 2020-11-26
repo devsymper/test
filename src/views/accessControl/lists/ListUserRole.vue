@@ -18,7 +18,6 @@
                     @saved-item-data="handleSavedItem"
                     :action="actionOnItem"
                     :itemData="itemData">
-
                 </SystemRoleForm>
             </template>
         </list-items>
