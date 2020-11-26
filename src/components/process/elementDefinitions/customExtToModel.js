@@ -16,9 +16,14 @@ function translateScriptTaskToHTTPTask(el, attrs, bpmnModeler) {
 }
 
 
-function translateThrowSignalToHTTPTask(el, attrs, bpmnModeler) {
+function translateThrowSignalToHTTPTask(el, attrs, bpmnModeler, rootAttrs) {
     let httpTaskType = 'throwSignal';
-    attrs.signalref.nameValue = attrs.signalref.value;
+    let signalDefs = rootAttrs.signaldefinitions.value;
+    let signalMap = signalDefs.reduce((map, el) => {
+        map[el.id] = el;
+        return map;
+    }, {});
+    attrs.signalref.signalName = signalMap[attrs.signalref.value].name;
     setHttpTaskFromType(el, attrs, bpmnModeler, httpTaskType);
 }
 
@@ -76,7 +81,14 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
             translateScriptTaskToHTTPTask(vizEl, attrs, bpmnModeler);
         } else if (bizVizEl.$type == 'bpmn:IntermediateThrowEvent') {
             if(bizVizEl.eventDefinitions[0].$type == "bpmn:SignalEventDefinition"){
-                translateThrowSignalToHTTPTask(vizEl, attrs, bpmnModeler);
+                let rootAttrs = null;
+                for(let name in allSymEls){
+                    if(allSymEls[name].type == "BPMNDiagram"){
+                        rootAttrs = allSymEls[name].attrs;
+                        break;
+                    }
+                }
+                translateThrowSignalToHTTPTask(vizEl, attrs, bpmnModeler, rootAttrs);
             }
         }
 
