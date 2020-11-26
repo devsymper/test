@@ -1,5 +1,5 @@
 <template>
-    <div class="wrap-content-detail" style="overflow:hidden;">
+    <div class="wrap-content-detail" style="overflow:hidden;position: relative;">
         
         <Preloader ref="preLoaderView"/>
         <div class="panel-header" v-if="!quickView && !isPrint">

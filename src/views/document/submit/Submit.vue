@@ -5,13 +5,7 @@
 
     }">
     <VuePerfectScrollbar class="scroll-content h-100">
-         <date-picker
-            :keyInstance="keyInstance"
-            @clickDateCell="selectedDate"
-            :title="'Chọn ngày'"
-            :isTime="false"
-            ref="datePicker"
-        />
+         
         <Preloader ref="preLoaderView"/>
         <div
             :key="keyInstance"
@@ -19,6 +13,17 @@
             :id="'sym-submit-'+keyInstance"
             :style="{'width':docSize, 'height':'100%','opacity':0}"
         >
+            <date-picker
+                :keyInstance="keyInstance"
+                @clickDateCell="selectedDate"
+                :title="'Chọn ngày'"
+                :isTime="false"
+                ref="datePicker"
+            />
+            <FloattingPopup 
+                ref="floattingPopup" 
+                :focusingControlName="focusingControlName"
+                :instance="keyInstance"/>
             <div v-html="contentDocument"></div>
             <!-- <button v-on:click="togglePageSize" v-show="!isQickSubmit" id="toggle-doc-size">
                 <span class="mdi mdi-arrow-horizontal-lock"></span>
@@ -136,10 +141,7 @@
         class="d-none"
         @uploaded-file="afterFileUpload"
         :objectIdentifier="docId+''" />
-        <FloattingPopup 
-                ref="floattingPopup" 
-                :focusingControlName="focusingControlName"
-                :instance="keyInstance"/>
+        
          
         <div class="sub-form-action" v-if="parrentInstance != 0">
             <button @click="goToListDocument()" class=subfom-action__item>{{$t('document.submit.goToList')}}</button>
@@ -2904,7 +2906,7 @@ export default {
 </script>
 <style  scoped>
 .sym-form-submit {
-    position: unset;
+    position: relative;
     width: 21cm;
     padding: 16px;
     margin: auto;
