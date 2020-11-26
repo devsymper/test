@@ -100,6 +100,9 @@ export const store = {
     },
     addEnvToUrl(url){
         url = url.trim();
+        var SYMPER_ENV = {
+            "environment":""
+        };
         if(url.indexOf('https://') === 0){
             if(SYMPER_ENV.environment != ''){
                 url = url.replace('https://', `https://${SYMPER_ENV.environment}.`);                

@@ -573,7 +573,8 @@
                         "history": "History",
                         "comment": "Comment",
                         "has": "Has",
-                        "commentNotResolve": "comment Not Resolve"
+                        "commentNotResolve": "comment Not Resolve",
+                        "noComment": "No comment"
                     },
                     "worflowInfo": "Workflow infomation",
                     "userRelated": {
