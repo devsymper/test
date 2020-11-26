@@ -21,7 +21,7 @@
 			class="ml-1 mr-2"
 			color="green"
 			v-if="selectingApp == false"
-			@click="selectApp"
+			@click="selectApp($event)"
 		>
 			<v-icon x-small>
 				mdi-plus-thick
@@ -89,13 +89,16 @@ export default {
 		}
 	},
 	methods:{
-		selectApp(){
+		selectApp(event){
+			event.preventDefault()
+			event.stopPropagation() 
 			this.selectingApp = true
 		},
 		cancelSelect(){
 			this.selectingApp = false
 		},
 		handleAppClick(app){
+			this.selectingApp = false
 			this.$emit('item-selected' , app.id)
 		},
 		handleChange(){
@@ -104,7 +107,13 @@ export default {
 	
 	},
 	mounted(){
-
+		let self = this 
+		$(document).click(function(e){
+			debugger
+			// if(!$(e.target).is('.v-list') || !$(e.target).is('input')){
+			// 	self.selectingApp = false
+			// }
+		})
 	}
 }
 </script>

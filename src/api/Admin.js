@@ -64,5 +64,8 @@ export const adminApi = {
 			page:1,
 			pageSize:1000
 		})
+	},
+	getListProcessInstances(id){
+		return workflowExtendApi.get(id+'/process-instances')
 	}
 }

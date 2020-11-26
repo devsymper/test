@@ -43,12 +43,16 @@
 				</VuePerfectScrollbar>
 				
 			</div>
-			<div style="width: 670px">
+			<div style="width: 600px !important">
 				<div v-if="objectActive == 'application_definition'" class="d-flex flex-column">
 					<ApplicationDefinitionForm 
 						:actionPackId="itemData.id"
+						v-if="objectActive == 'application_definition'"
 						@list-item-selected="handleListAppSelected"
 						:listApp="listAppSelected"
+						:commonTableSetting="commonTableSetting"
+						:tableDataDefinition="multipleLevelObjects.application_definition"
+						@app-detail-get="translateAppObjectIdToTableData"
 					/>
 				</div>
 				<div v-else-if="objectActive== 'department'">
@@ -1020,6 +1024,7 @@ export default {
             handler(vl){
 				this.genAllInputForFormTpl();
 				this.getAppInActionPack()
+				this.objectActive = "document_definition"
             }
         },
         listAction: {

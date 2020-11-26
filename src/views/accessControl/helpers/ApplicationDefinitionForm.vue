@@ -10,7 +10,13 @@
 			 />
 		</div>
 		<div class="d-flex w-100 mr-2 children-application">
-			<div 
+			<ObjectInApplication 
+				:idApplication="selectedApplication"
+				:tableDataDefinition="tableDataDefinition"
+				:commonTableSetting="commonTableSetting"
+				@app-detail-get="translateAppObjectIdToTableData"
+			/>
+			<!-- <div 
 				v-for="(item,i) in childrenTypeOfApp"  
 				:key="i" 
 				class="p-2 title-children-application fs-13 w-100"
@@ -20,7 +26,7 @@
 				<span style="margin-left:auto;margin-right:auto">
 					{{item.title}}
 				</span>
-			</div>
+			</div> -->
 		</div>
 		<div>
 			<OrgchartSelector 
@@ -40,6 +46,7 @@ import ListItemSelector from "./ListItemSelector.vue"
 import {accessControlApi} from '@/api/accessControl'
 import {appManagementApi} from '@/api/AppManagement.js'
 import {uiConfigApi} from "@/api/uiConfig";
+import ObjectInApplication from "./../actionPackPanel/ObjectInApplication"
 export default {
 	data(){
 		return {
@@ -79,11 +86,16 @@ export default {
 			default(){
 				return []
 			}
+		},
+		tableDataDefinition:{
+		},
+		commonTableSetting:{
 		}
 	},
 	components:{
 		ListItemSelector,
-		OrgchartSelector
+		OrgchartSelector,
+		ObjectInApplication
 	},
 	created(){
 		this.getActiveApp()
@@ -94,10 +106,9 @@ export default {
 		},
 		handleItemSelected(value){
 			this.selectedApplication = value
-			appManagementApi.getAppDetailBa(value).then(res=>{
-			}).catch(err=>{
-			})
-			
+		},
+		translateAppObjectIdToTableData(data){
+			this.$emit( 'app-detail-get', data)
 		},
 		handleListItemSelected(lists){
 			this.$emit('list-item-selected' , lists)
