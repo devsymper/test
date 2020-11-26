@@ -413,6 +413,7 @@ export default {
                     this.$refs.symperBpmn.changeTaskNodeToUserTaskNode(el.id);
                 }
             }
+            this.removeRedundantAttr();
             let xml = this.$refs.symperBpmn.getXML();
             xml = this.standardXMLToSave(xml);
             console.log(xml,'xmlxmlxmlxmlxmlxmlxml');
@@ -478,6 +479,17 @@ export default {
                 let el = this.stateAllElements[elName];
                 if(el.type.includes('Gateway')){
                     this.setFlowsOrderForGateway(el);
+                }
+            }
+        },
+        // Loại bỏ các thuộc tính thừa trong attrs của các object trong diagram để sinh ra xml cho đúng với backend
+        removeRedundantAttr(){
+            let allEls = this.$refs.symperBpmn.getAllNodes();
+            for(let el of allEls){
+                if(el.$type == "bpmn:Collaboration"){
+                    delete el.$attrs.isExecutable;
+                }else if(el.$type == "bpmn:Participant"){
+                    el.processRef.isExecutable = true;
                 }
             }
         },
@@ -676,7 +688,9 @@ export default {
                             if(!mapSaveNodes[lane.id]){
                             }
                             poolToSave.childShapes.push(mapSaveNodes[lane.id]);
-                            this.addChildrenForProcess(mapSaveNodes[lane.id], lane.flowNodeRef, mapSaveNodes);
+                            if($.isArray(lane.flowNodeRef)){
+                                this.addChildrenForProcess(mapSaveNodes[lane.id], lane.flowNodeRef, mapSaveNodes);
+                            }
                         }
                     }else{
                         //tự Tạo một đối tượng lane mới do thư viện ko tạo trước
@@ -1128,7 +1142,7 @@ export default {
             let allEls = this.$refs.symperBpmn.getAllNodes();
 
             let homeId = allEls.filter((el, idx) => {
-                if(el.$type == 'bpmn:Process'){
+                if(el.$type == 'bpmn:Process' || el.$type == "bpmn:Collaboration"){
                     return true;
                 }
             })[0]['id'];
