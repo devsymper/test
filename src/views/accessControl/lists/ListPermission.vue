@@ -14,7 +14,6 @@
             :customAPIResult="customAPIResult"
             :commonActionProps="commonActionProps"
 			:showExportButton="false"
-            :showActionPanelInDisplayConfig="true"
             @row-selected="onRowSelected"
         > 
             <template slot="right-panel-content" slot-scope="{itemData}">

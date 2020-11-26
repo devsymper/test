@@ -13,7 +13,6 @@
             :currentItemData="currentItemData"
 			:showExportButton="false"
             :customAPIResult="customAPIResult"
-            :showActionPanelInDisplayConfig="true"
             :actionPanelWidth="800"
             @after-open-add-panel="handleAddItem"
             :commonActionProps="commonActionProps"

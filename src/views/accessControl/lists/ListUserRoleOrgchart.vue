@@ -11,9 +11,10 @@
 		:showExportButton="false"
 		:headerPrefixKeypath="'common'"
 		:actionPanelWidth="650"
+		:showButtonAdd="false"
 		:dialogMode="false"
 	>
-		<template slot="right-panel-content" slot-scope="{itemData}">
+		<template slot="right-panel-content" slot-scope="{}">
 			<UserRoleOrgchartPanel 
 				:idOrgchart="idOrgchart"
 			/>

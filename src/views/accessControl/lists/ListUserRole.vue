@@ -10,6 +10,7 @@
             :useActionPanel="true"
             :headerPrefixKeypath="'common'"
             :currentItemData="currentItemData"
+			:showExportButton="false"
             @after-open-add-panel="handleAddItem"
             :commonActionProps="commonActionProps"
         >
