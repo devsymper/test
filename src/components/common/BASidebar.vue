@@ -438,7 +438,7 @@ export default {
             }, 400, this);
         },
         reCalcSidebarHeight(){
-            this.menuItemsHeight = (util.getComponentSize(this).h - 155)+'px';
+            this.menuItemsHeight = (util.getComponentSize(this).h - 160)+'px';
         },
         logout(){
             util.auth.logout();
