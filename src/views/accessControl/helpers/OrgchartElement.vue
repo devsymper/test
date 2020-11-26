@@ -19,9 +19,9 @@
 						dense
 
 					></v-checkbox>
-					<span v-else style="cursor:pointer" @click="handleDepartmentClick(item)">
+					<div v-else style="cursor:pointer" @click="handleDepartmentClick(item)">
 						{{item.name}}
-					</span>
+					</div>
 				</template>
 			</v-treeview>
 		</VuePerfectScrollbar>
