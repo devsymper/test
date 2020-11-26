@@ -50,7 +50,7 @@ export default {
             saveResponseParameters: true,
             resultVariablePrefix: '',
             saveResponseParametersTransient: false,
-            saveResponseVariableAsJson: true,
+            saveResponseVariableAsJson: false,
         },
         makeRequestBody(nodeAttr) {
             this.params.responseVariableName = 'symper_'+nodeAttr.idNode+'_notification_response';
@@ -95,7 +95,7 @@ export default {
             saveResponseParameters: true,
             resultVariablePrefix: '',
             saveResponseParametersTransient: false,
-            saveResponseVariableAsJson: true,
+            saveResponseVariableAsJson: false,
         },
         makeRequestBody(nodeAttr) {
             this.params.responseVariableName = 'symper_'+nodeAttr.idNode+'_throw_signal_response';
