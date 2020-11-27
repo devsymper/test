@@ -17,9 +17,11 @@
 						v-model="item.selected"
 						:label="item.name"
 						dense
-
 					></v-checkbox>
 					<div v-else style="cursor:pointer" @click="handleDepartmentClick(item)">
+						<v-icon class="fs-13 mr-1">
+							{{ item.type == "position" ? 'mdi-briefcase-outline' : 'mdi-office-building-outline' }}
+						</v-icon>
 						{{item.name}}
 					</div>
 				</template>

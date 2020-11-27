@@ -109,7 +109,7 @@
                 <v-icon size="15" class="mr-2" >mdi-pencil</v-icon>
                 {{$t('common.edit')}} {{$t('common.actions')}}
             </v-btn>
-            <v-btn
+            <!-- <v-btn
                 v-else
                 class="float-right mr-1"
                 small
@@ -118,7 +118,7 @@
                 @click="saveActionPack">
                 <v-icon class="mr-2" primary>mdi-content-save</v-icon>
                 {{action == 'create' ? $t('common.save') : $t('common.update')}}
-            </v-btn>
+            </v-btn> -->
         </div>
       
     </div>
