@@ -22,21 +22,23 @@
 			>
 				Chọn
 			</v-btn>
-			<v-btn 
+			<!-- <v-btn 
 				class="mr-2 font-normal fs-13"
 				depressed
 				tile
 				small
 				:disabled="showBtnAddCheckbox"
+				@click="handleCheckClick"
 			>
 				Kiểm tra
-			</v-btn>
+			</v-btn> -->
 			<v-btn 
 				class="mr-2 font-normal fs-13"
 				depressed
 				tile
 				small
 				:disabled="showBtnAddCheckbox"
+				@click="handleSyncClick"
 			>
 				Đồng bộ
 			</v-btn>
@@ -49,18 +51,35 @@
 			:getDataUrl="getListUrl"
 			@close-popup="handleCloseEvent"
 			style="margin-left:10px"
+			:useDefaultContext="false"
+			:tableContextMenu="tableContextMenu"
 			:isTablereadOnly="false"
 			@after-selected-row="afterSelectedRow"
+		/>
+		<DialogsConfirmSync 
+			:showDialog="showDialog"
+			@cancel="showDialog = false"
+			:listItemSelected="listItemSelected"
+			:currentObjectType="currentObjectType"
+		/>
+		<DialogDataRelate 
+			:showDialog="showDialogRelateData"
+			@cancel="showDialogRelateData = false"
+			:currentItem="dependencies"
 		/>
 	</div>
 
 </template>
 
 <script>
+import DialogDataRelate from './DialogDataRelate'
 import ListItem from "@/components/common/ListItems"
+import DialogsConfirmSync from './DialogsConfirmSync'
 export default {
 	components:{
-		ListItem
+		ListItem,
+		DialogsConfirmSync,
+		DialogDataRelate
 	},
 	props:{
 		tableHeight:{
@@ -68,12 +87,29 @@ export default {
 		},
 		getListUrl:{
 			type: String
-		}
+		},
+		currentObjectType:{
+			type: String
+		},
 	},
 	data(){
+		let self = this
 		return{
-			listItemSelected: [],
-			showBtnAddCheckbox: true
+			listItemSelected: {},
+			showBtnAddCheckbox: true,
+			showDialogRelateData: false,
+			dependencies: {},
+			showDialog:false,
+			tableContextMenu:{
+				checkRelated: {
+                    name: "checkRelated",
+                    text:" Dữ liệu liên quan",
+                    callback: (row, callback) => {
+						self.handleCheckClick()
+						self.dependencies = row.dependencies
+                    }
+                },
+			}
 		}
 	},
 	methods:{
@@ -89,12 +125,17 @@ export default {
 		},
 		afterSelectedRow(items){
 			this.$set(this, 'listItemSelected', items)
-			debugger	
 		},
+		handleSyncClick(){
+			this.showDialog = true
+		},
+		handleCheckClick(){
+			this.showDialogRelateData = true
+		}
 	},
 	watch:{
 		getListUrl(val){
-			this.listItemSelected = [],
+			this.listItemSelected = {},
 			this.showBtnAddCheckbox = true
 		}
 	}

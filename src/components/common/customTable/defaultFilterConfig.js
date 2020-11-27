@@ -162,8 +162,8 @@ export const getDataFromConfig = function(url, configs, columns, filterData, suc
         options = getOptionForGetList(configs, columns, filterData);
     }
 
-    if(configs.custumDataForApi){
-        options = configs.custumDataForApi(configs, columns, filterData);
+    if(configs.customDataForApi){
+        options = configs.customDataForApi(configs, columns, filterData);
     }
     apiObj.callApi(method, url, options, header, {})
     .then(data => {

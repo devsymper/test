@@ -7,23 +7,23 @@
 		>
 			<v-card>
 			<v-card-title class="fs-15">
-				Deploy version
+				Upgrade version
 			</v-card-title>
 			<v-card-text>
 				<div class="content-deploy-dialog d-flex flex-column ml-2 fs-13">
 					<div class="fs-13 mb-2 mt-2 ">
-						Chọn môi trường bạn muốn deploy
+						Chọn version mà bạn muốn upgrade
 					</div>
 					<v-autocomplete
-						v-model="envId"
-						:items="allEnv"
-						item-text="name"
+						v-model="verId"
+						:items="allVer"
+						item-text="versionName"
 						item-value="id"
 						solo-inverted
 						class="fs-13"
 					></v-autocomplete>
 					<div class="text-wrap">
-						Nhấn Deploy để deploy version này
+						Nhấn Đòng ý để upgrade version này
 					</div>
 				</div>
 
@@ -42,7 +42,7 @@
 					text
 					@click="deloyVersion"
 				>
-					Deploy
+					Upgrade
 				</v-btn>
 			</v-card-actions>
 			</v-card>
@@ -57,20 +57,29 @@ export default {
 		showDialog:{
 			type: Boolean,
 			default: false,
+		},
+		currentInstance:{
+			type: Object,
+			default(){
+				return {
+
+				}
+			},
 		}
 	},
 	data(){
 		return{
 			selected:"",
-			envId:""
+			verId:""
 		}
 	},
 	created(){
 		this.$store.dispatch('environmentManagement/getAllEnvirontment')
 	},
 	computed:{
-		allEnv(){
-			return this.$store.state.environmentManagement.allEnvironment
+		allVer(){
+			let envStore = this.$store.state.environmentManagement
+			return envStore.allVersionOfService[envStore.currentServiceType]
 		}
 	},
 	methods:{
@@ -79,39 +88,22 @@ export default {
 		},
 		deloyVersion(){
 			let self = this
-			let serviceId = this.$route.params.serviceId
-			let versionId = this.$store.state.environmentManagement.currentVersionId
-			let data = {
-				serviceId: serviceId,
-				environmentId: this.envId
+			let formData = {
+				serverId: this.currentInstance.serverId,
+				versionId: this.verId,
+				environmentId: this.currentInstance.environmentId
 			}
 			self.$emit('cancel')
 			self.$snotify({
 				type: 'success',
 				title: "Đang xử lí. Vui lòng chờ kêt quả.... "
 			})
-			environmentManagementApi.getServerId(data).then(res=>{
-				if(res.data[0]){
-					let formData = {
-						serverId: res.data[0].serverId,
-						versionId: versionId,
-						environmentId: self.envId
-					}
-					environmentManagementApi.deloy(formData).then(res=>{
-						if(res.status == 200){
-							self.$snotify({
-								type: 'success',
-								title: "Thành công . Đang deploy....."
-							})
-						}else{
-							self.$snotify({
-								type: 'error',
-								title: "Có lỗi xảy ra"
-							})
-						}
-					}).catch(
-						
-					)
+			environmentManagementApi.deloy(formData).then(res=>{
+				if(res.status == 200){
+					self.$snotify({
+						type: 'success',
+						title: "Thành công . Đang deploy.... "
+					})
 				}else{
 					self.$snotify({
 						type: 'error',
@@ -119,10 +111,10 @@ export default {
 					})
 				}
 			}).catch(err=>{
-					self.$snotify({
-						type: 'error',
-						title: "Có lỗi xảy ra"
-					})
+				self.$snotify({
+					type: 'error',
+					title: "Có lỗi xảy ra"
+				})
 			})
 		}
 	},

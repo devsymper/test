@@ -16,7 +16,7 @@ export default class ClientSQLManager {
      */
     static async createDB(keyInstance) {
             const SQL = await initSqlJs({
-                locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.3.2/dist/sql-wasm.wasm`
+                locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.4.0/dist/sql-wasm.wasm`
             });
             let db = new SQL.Database();
             this.addSQLInstanceDBToStore(keyInstance, db);

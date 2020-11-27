@@ -11,6 +11,8 @@
 		:tableContextMenu="tableContextMenu"
 		:actionPanelWidth="550"
 		:customAPIResult="customAPIResult"
+		:showButtonAdd="false"	
+
 	>
 		 <template slot="right-panel-content" slot-scope="{}">
 			 <AddServiceForm 
@@ -20,6 +22,7 @@
 	</ListItems>
 	<AddVersion 
 		:showDialog="showDialog"
+		@add-success="handleAddSuccess"
 		@cancel="showDialog = false"
 	/>
 	</div>
@@ -38,6 +41,7 @@ export default {
 	},
 	methods:{
 		handleAddSuccess(){
+			this.showDialog = false
 			this.$refs.listService.refreshList()
 		}
 	},
@@ -54,11 +58,21 @@ export default {
 			tableContextMenu: {
                 detail: {
                     name: "detail",
-                    text: this.$t("common.detail"),
+                    text: "Danh sách version",
                     callback: (row, callback) => {
 						self.$goToPage( "/service/"+row.id+"/versions",
                             "Chi tiết " + (row.name ? row.name : "")
                         );
+                    }
+                },
+                viewInstance: {
+                    name: "viewInstance",
+                    text: "Danh sách instance",
+                    callback: (row, callback) => {
+						self.$goToPage( "/service/"+row.id+"/instances",
+                            "Danh sách instance "
+						);
+						self.$store.dispatch('environmentManagement/getAllVersionOfService', row)
                     }
                 },
                 addVersion: {
@@ -111,7 +125,7 @@ export default {
 					}
 				}
 			},
-			getListUrl: appConfigs.apiDomain.environmentManagement+'services',
+			getListUrl: appConfigs.uniqueApiDomain.environmentManagement+'services',
 		}
 	}
 }

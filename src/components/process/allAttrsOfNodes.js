@@ -1770,7 +1770,11 @@ let allAttrs = {
             if($.isArray(value)){
                 for(let item of value){
                     if(item.id && item.id.trim()){
-                        rsl.push(item);
+                        rsl.push({
+                            id: item.id,
+                            name: item.name,
+                            symper_symper_scope_tag: item.symper_symper_scope_tag
+                        });
                     }
                 }
             }
@@ -2552,7 +2556,14 @@ let allAttrs = {
         hidden: false,
         pushToXML: attrToXMLMethods.notPushToXML
     },
-
+    prefixForSignalParameters: {
+        title: 'Signal parameter prefix',
+        type: 'text',
+        value: 'signal',
+        info: '',
+        dg: 'detail',
+        pushToXML: attrToXMLMethods.notPushToXML
+    }
 }
 
 for (let name in allAttrs) {

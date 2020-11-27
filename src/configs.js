@@ -57,10 +57,11 @@ var configs = {
         workflowExtend: "https://workflow-extend.symper.vn/",
         trash: "https://trash.symper.vn/",
 		log: "https://log.symper.vn",
+    },
+    // nơi chứa domain của các api mà ko bị phụ thuộc vào môi trường 
+	uniqueApiDomain: {
 		environmentManagement: "https://system-management.symper.vn/"
-	},
-	envDomain:{
-	},
+    },
     notificationTimeout: {
         success: 3000,
         warning: 5000,
@@ -100,33 +101,13 @@ var configs = {
             }
         }
 	},
-	mapDomainToEnvConfig(obj){
-		this.envDomain = {
-			'account': obj.account,
-			'sdocument': obj.documentService,
-			'notifi': obj.nofitication,
-			'workflow-extend' : obj.workflowExtend,
-			'ui' : obj.uiConfig,
-			'trash' : obj.trashService,
-			'syql' : obj.formulasService,
-			'search' : obj.search,
-			'accesscontrol' : obj.permission,
-			'io-service' : obj.importExcel,
-			'file-managementservice' : obj.fileManagement,
-			'comment-service' : obj.commnent,
-			'bi-service' : obj.biService,
-			'process-modeler' : obj.bpmne.models,
-			'bi' : obj.dashboard,
-			'kh-service' : obj.knowledge,
-			'app-service' : obj.appManagement,
-			'workflow' : obj.bpmne.general,
-			'frontend' : obj.bpmne.general,
-		}
-	}
 };
-configs.reformatUrl(configs.apiDomain);
-configs.mapDomainToEnvConfig(configs.apiDomain);
 // sửa lại url theo môi trường code
+configs.reformatUrl(configs.apiDomain);
 
+// Thêm các domain thuộc uniqueApiDomain vào khai báo domain của api
+for(let key in configs.uniqueApiDomain){
+    configs.apiDomain[key] = configs.uniqueApiDomain[key];
+}
 
 export const appConfigs = configs;

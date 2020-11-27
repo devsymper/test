@@ -376,13 +376,13 @@ const inputTypeConfigs = {
 export default {
     name:"formTpl",
     created(){
-        this.setActiveTabForUserAssignment();
+		this.setActiveTabForUserAssignment();
     },
     watch: {
         allInputs: {
             immediate: true,
             deep: true,
-            handler(){
+            handler(arr){
                 this.setActiveTabForUserAssignment();
             }
         }

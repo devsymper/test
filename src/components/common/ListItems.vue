@@ -569,7 +569,7 @@ export default {
          * Hàm phục vụ cho việc dev tự định nghĩa data khi gọi API để lấy dữ liệu
          * thay vì sử dụng hàm có sẵn, các tham số truyền vào giống như hàm getOptionForGetList trong defaultFilterConfig
          */
-        custumDataForApi: {
+        customDataForApi: {
             type: Function,
             // default: (configs, columns, filterData)=>{}
             default: null
@@ -1305,7 +1305,8 @@ export default {
                 let routeName = this.$getRouteName();
                 if(routeName == "deployHistory" || routeName == "listProcessInstances" || thisCpn.useWorkFlowHeader){
                     header = {
-                        Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0'
+                        Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0',
+                        "Content-Type": "application/json",
                     };
                     // options = {};
                     emptyOption = true;
@@ -1319,8 +1320,8 @@ export default {
                 tableFilter.allColumnInTable = this.tableColumns;
                 configs.emptyOption = emptyOption;
 
-                if(this.custumDataForApi){
-                    configs.custumDataForApi = this.custumDataForApi;
+                if(this.customDataForApi){
+                    configs.customDataForApi = this.customDataForApi;
                 }
                 getDataFromConfig(url, configs, columns, tableFilter, success, method, header);
             }
