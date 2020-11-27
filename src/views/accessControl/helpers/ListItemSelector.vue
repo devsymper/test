@@ -108,12 +108,6 @@ export default {
 	},
 	mounted(){
 		let self = this 
-		$(document).click(function(e){
-			debugger
-			// if(!$(e.target).is('.v-list') || !$(e.target).is('input')){
-			// 	self.selectingApp = false
-			// }
-		})
 	}
 }
 </script>

@@ -27,15 +27,17 @@
 			</div>
 			 
 		</div>
-		<v-btn
-			small
-			color="primary"
-			class="btn-fixed-bottom update-btn"
-			@click="handleSaveClick"
-		>
-			<v-icon class="mr-2">mdi-content-save-outline</v-icon>
-			Lưu
-		</v-btn>
+		<div>
+			<v-btn
+				small
+				color="primary"
+				@click="handleSaveClick"
+				class="float-right mr-2"
+			>
+				<v-icon class="mr-2">mdi-content-save-outline</v-icon>
+				Lưu
+			</v-btn>
+		</div>
 	</div>
 </template>
 <script>
@@ -66,7 +68,6 @@ export default {
 		handleCurrentNodeClick(id , type){
 			let self = this
 			self.currentType = type
-			debugger
 			if(type == 'department'){
 				self.selectingNode = {
 					permissions:[]
@@ -98,7 +99,6 @@ export default {
 					self.selectingNode = self.listNode[id]
 				}
 			}
-			debugger
 			
 		},
 		handleSaveClick(){
