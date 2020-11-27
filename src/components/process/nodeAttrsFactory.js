@@ -535,7 +535,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'Pool': {
-        attrs: ["isexecutable", "process_id"],
+        attrs: ["process_id"],
         validate: function(attrs) {
 
         },
