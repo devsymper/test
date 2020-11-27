@@ -66,10 +66,7 @@ export default {
 		}
 	},
 	props:{
-		actionPackId:{
-			type: String,
-			default: ""
-		},
+		
 		listApp:{
 			type: Array,
 			default(){
@@ -122,17 +119,6 @@ export default {
 		}
 	},
 	watch:{
-		// actionPackId(val){
-		// 	let self = this
-		// 	let str = 'action-pack:'+ val
-		// 	uiConfigApi.getUiConfig(str).then(res=>{
-		// 		if(res.status == 200){
-		// 			debugger
-		// 			let arr = JSON.parse(res.data.detail)
-		// 			self.values = arr
-		// 		}
-		// 	})
-		// }
 	}
 
 }

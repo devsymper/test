@@ -46,7 +46,6 @@
 			<div style="width: 600px !important">
 				<div v-if="objectActive == 'application_definition'" class="d-flex flex-column">
 					<ApplicationDefinitionForm 
-						:actionPackId="itemData.id"
 						v-if="objectActive == 'application_definition'"
 						@list-item-selected="handleListAppSelected"
 						:listApp="listAppSelected"
