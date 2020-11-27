@@ -135,6 +135,10 @@ export default {
 	watch:{
 		idOrgchart(val){
 			this.listNode = []
+			this.selectingNode = {
+				permissions:[]
+			}
+			this.currentType = "department"
 		}
 	}
 }
