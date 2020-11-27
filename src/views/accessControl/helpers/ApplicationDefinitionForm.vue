@@ -16,17 +16,6 @@
 				:commonTableSetting="commonTableSetting"
 				@app-detail-get="translateAppObjectIdToTableData"
 			/>
-			<!-- <div 
-				v-for="(item,i) in childrenTypeOfApp"  
-				:key="i" 
-				class="p-2 title-children-application fs-13 w-100"
-				@click="handleChildTypeClick(item.value)" 
-				:class="{'title-children-application-active': active == item.value}"
-			>
-				<span style="margin-left:auto;margin-right:auto">
-					{{item.title}}
-				</span>
-			</div> -->
 		</div>
 		<div>
 			<OrgchartSelector 
