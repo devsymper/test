@@ -302,7 +302,6 @@ x				}
             this.showFavorite = false
 			this.$store.commit("appConfig/updateCurrentAppId",item.id);
 			this.$store.commit("appConfig/updateCurrentAppName",item.name);
-			// this.showDetailDiv = true
 			this.$store.commit('appConfig/showDetailAppArea')
 			this.$store.commit('appConfig/emptyItemSelected')
 			appManagementApi.getAppDetails(item.id).then(res => {
