@@ -64,14 +64,22 @@
             </div>
             <!-- minutes -->
             <div  v-if="selectedType.type=='secondly'" class="mt-4">
-               
+               <div class="w-100 ml-4">
+                    <v-checkbox 
+                    dense
+                    v-model="allMinutes"
+                   
+                    label="Mỗi phút"
+                    color="success darken-3">
+                </v-checkbox>
+               </div>
                 <v-checkbox 
                     dense
                     v-for="second in minutes" 
                     :key="second.name"  class="ml-4"
                     v-model="second.value"
                     style="float:left; margin-top:-15px; margin-left:-10px" 
-                    :label="second.name"
+                    :label="`${second.name}`"
                     color="success darken-3">
                  <template >
                  </template>
@@ -79,12 +87,20 @@
             </div>
             <!-- minutes -->
               <div  v-if="selectedType.type=='hourly'" class="mt-4">
+                <div class="w-100 ml-4">
+                    <v-checkbox 
+                    dense
+                    v-model="allHour"
+                    label="Mỗi giờ"
+                    color="success darken-3">
+                </v-checkbox>
+               </div>
                 <v-checkbox class="ml-4" 
                     style="float:left; margin-top:-15px; margin-left:-10px" 
                     :key="hour.name" 
                     v-for="hour in hour"
                      v-model="hour.value"
-                    :label="hour.name"
+                    :label="`${hour.name}`"
                 color="success darken-3">
                 </v-checkbox>
                
@@ -114,14 +130,14 @@
             </div>
             <div class="sym-repeat-weekly" v-if="selectedType.type=='weekly' && !checkNoLoop">
                 <div>
-                    <div 
+                    <!-- <div 
                     :style="{'width':titleWidth
                     }"
                     class="title-form"
                     >
                         <span>Mỗi</span>
-                    </div>
-                    <div
+                    </div> -->
+                    <!-- <div
                         :style="{'width':'150px',
                             'display': 'inline-block',
                             'font-size':'13px',
@@ -131,8 +147,8 @@
                     }"
                     >
                         <input v-model="selectedType.times" type="number" :style="{'height':'30px','padding':'8px'}">
-                    </div>
-                    <span class="title-form" style="margin-left:16px">Tuần</span>
+                    </div> -->
+                    <!-- <span class="title-form" style="margin-left:16px">Tuần</span> -->
                 </div>
                 <div class="form-select-week">
                      <div 
@@ -146,7 +162,7 @@
                         <ul>
                             <li v-for="day in dayOfWeek" 
                             :key="day.value" 
-                            v-on:click="selectDayOfWeek(day)" 
+                            @click="selectDayOfWeek(day)" 
                             :class="{'week':true,'active-day-of-week':day.active}"
                             :data-w="day.value">{{day.name}}</li>
                         </ul>
@@ -433,11 +449,15 @@ export default {
     },
     data(){
         return {
+            thOfMonth:1,
+            dOM:1,
             minutes:[],
             crobTabValue:[0,'*','*','?','*','*','*'],
             hour:[],
+            allMinutes:false,
+            allHour:false,
             date: new Date().toISOString().substr(0, 10),
-            selectedType: {name:'Theo ngày',type:'daily',times:1},
+            selectedType: {name:'Theo phút',type:'secondly',times:1},
             listType:[
                 {name:'Theo phút',type:'secondly',times:1},
                 {name:'Theo giờ',type:'hourly',times:1},
@@ -452,13 +472,13 @@ export default {
             repeatYearAdvance:false,
             listDayNumber:[],
             dayOfWeek:[
-                {name:'Mo',value:'1',active:false},
-                {name:'Tu',value:'2',active:false},
-                {name:'We',value:'3',active:false},
-                {name:'Th',value:'4',active:false},
-                {name:'Fr',value:'5',active:false},
-                {name:'Sa',value:'6',active:false},
-                {name:'Su',value:'7',active:false},
+                {name:'MON',value:'1',active:false},
+                {name:'TUE',value:'2',active:false},
+                {name:'WED',value:'3',active:false},
+                {name:'THU',value:'4',active:false},
+                {name:'FRI',value:'5',active:false},
+                {name:'SAT',value:'6',active:false},
+                {name:'SUN',value:'7',active:false},
             ],
             dayNumberOfMonth:[
                 {value:1,active:false},
@@ -496,11 +516,11 @@ export default {
             selectDaysOfMonthItems:[
                 {name:'Chủ nhật',value:'7'},
                 {name:'Thứ 2',value:'1'},
-                {name:'Thư 3',value:'2'},
-                {name:'Thư 4',value:'3'},
-                {name:'Thư 5',value:'4'},
-                {name:'Thư 6',value:'5'},
-                {name:'Thư 7',value:'6'},
+                {name:'Thứ 3',value:'2'},
+                {name:'Thứ 4',value:'3'},
+                {name:'Thứ 5',value:'4'},
+                {name:'Thứ 6',value:'5'},
+                {name:'Thứ 7',value:'6'},
                 {name:'Ngày',value:'day'},
                 {name:'Ngày trong tuần',value:'weekday'},
                 {name:'Ngày cuối tuần',value:'weekend'},
@@ -535,6 +555,83 @@ export default {
         }
     },
     watch:{
+        selectMonthsOfYear:{
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                let dateSelected = '';
+                for(let day of newValue){
+                    if(day.active){
+                        dateSelected += day.name+','
+                    }
+                } 
+                this.crobTabValue[4]= dateSelected.substring(0, dateSelected.length - 1)
+                // this.crobTabValue[4]= '1/1';
+                this.$emit('value',this.crobTabValue)
+            }
+        },
+        dayNumberOfMonth:{
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                let dateSelected = '';
+                for(let day of newValue){
+                    if(day.active){
+                        dateSelected += day.value+','
+                    }
+                } 
+                this.crobTabValue[3]= dateSelected.substring(0, dateSelected.length - 1)
+                // this.crobTabValue[4]= '1/1';
+                this.$emit('value',this.crobTabValue)
+            }
+        },
+        selectDayOfMonthItem:{
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                this.dOM =newValue.value;
+                this.crobTabValue[3]= '?';
+                this.crobTabValue[5]=newValue.value+'#'+this.thOfMonth;
+                // this.crobTabValue[4]= '1/1';
+                this.$emit('value',this.crobTabValue)
+            }  
+        },
+        selectDayOfMonthItem:{
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                debugger
+                this.crobTabValue[3]= '?';
+                this.crobTabValue[5]=this.dOM+'#'+newValue.value;
+                // this.crobTabValue[4]= '1/1';
+                this.$emit('value',this.crobTabValue)
+            }  
+        },
+        dayOfWeek:{
+            deep: true,
+            immediate: true,
+            handler(newValue){
+                let dateSelected = '';
+                for(let day of newValue){
+                    if(day.active){
+                        dateSelected += day.name+','
+                    }
+                } 
+                 this.crobTabValue[5]= dateSelected.substring(0, dateSelected.length - 1)
+                 this.$emit('value',this.crobTabValue)
+
+            }
+        },
+        allHour(){
+            let crontab = '0 * 0 ? * * *';
+            this.crobTabValue = crontab.split(' ');
+            this.$emit('value',this.crobTabValue)
+        },
+        allMinutes(){
+            let crontab= '0 0 * ? * * *'
+            this.crobTabValue = crontab.split(' ');
+            this.$emit('value',this.crobTabValue)
+        },
         cronTab(){
             this.cronTabValue= this.cronTab.split(' ')
         },
@@ -543,9 +640,8 @@ export default {
             immediate: true,
             handler(newValue){
                 if(newValue.type=='daily'){
-                    debugger
                     let day = dayjs().format('d');
-                    this.crobTabValue[5]=day+'/'+newValue.times;
+                    this.crobTabValue[5] = day+'/'+newValue.times;
                     this.$emit('value',this.crobTabValue)
                 }
             }
@@ -838,6 +934,11 @@ export default {
             return firstDay;
         },
         selectDayOfWeek(item){
+            // debugger
+            // debugger
+            // let dateSelect = '';
+            // dateSelect= dateSelect+item.name;
+            // this.crobTabValue[5]=;
             item.active = !item.active 
         },
         selectDayOfMonth(item){
@@ -906,7 +1007,7 @@ export default {
         },
         //hoangnd: hàm reset toàn bộ data của component
         resetRepeatData(){
-            this.selectedType = {name:'Theo ngày',type:'daily',times:1},
+            this.selectedType = {name:'Theo phút',type:'secondly',times:1},
             this.listType = [
                 {name:'Theo ngày',type:'daily',times:1},
                 {name:'Theo tuần',type:'weekly',times:1},
@@ -919,13 +1020,13 @@ export default {
             this.repeatYearAdvance = false;
             this.listDayNumber = [];
             this.dayOfWeek = [
-                {name:'Mo',value:'1',active:false},
-                {name:'Tu',value:'2',active:false},
-                {name:'We',value:'3',active:false},
-                {name:'Th',value:'4',active:false},
-                {name:'Fr',value:'5',active:false},
-                {name:'Sa',value:'6',active:false},
-                {name:'Su',value:'7',active:false},
+                {name:'MON',value:'1',active:false},
+                {name:'TUE',value:'2',active:false},
+                {name:'WED',value:'3',active:false},
+                {name:'THU',value:'4',active:false},
+                {name:'FRI',value:'5',active:false},
+                {name:'SAT',value:'6',active:false},
+                {name:'SUN',value:'7',active:false},
             ];
             this.dayNumberOfMonth = [
                 {value:1,active:false},
@@ -984,18 +1085,18 @@ export default {
             this.selectDayOfMonthItem1 = {name:'Đầu tiên',value:'1'};
 
             this.selectMonthsOfYear = [
-                {name:'Jan',value:"1",active:true},
-                {name:'Feb',value:"2",active:true},
-                {name:'Mar',value:"3",active:true},
-                {name:'Apr',value:"4",active:true},
-                {name:'May',value:"5",active:true},
-                {name:'Jun',value:"6",active:true},
-                {name:'Jul',value:"7",active:true},
-                {name:'Aug',value:"8",active:true},
-                {name:'Sep',value:"9",active:true},
-                {name:'Oct',value:"10",active:true},
-                {name:'Nov',value:"11",active:true},
-                {name:'Dec',value:"12",active:true},
+                {name:'JAN',value:"1",active:true},
+                {name:'FEB',value:"2",active:true},
+                {name:'MAR',value:"3",active:true},
+                {name:'APR',value:"4",active:true},
+                {name:'MAY',value:"5",active:true},
+                {name:'JUN',value:"6",active:true},
+                {name:'JUL',value:"7",active:true},
+                {name:'AUG',value:"8",active:true},
+                {name:'SEP',value:"9",active:true},
+                {name:'OCT',value:"10",active:true},
+                {name:'NOV',value:"11",active:true},
+                {name:'DEC',value:"12",active:true},
             ]
         },
 
