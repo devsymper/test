@@ -182,7 +182,7 @@
 <script>
 import ViewBaConfig from "./../../../components/notification/setting/viewBaConfig"
   import draggable from 'vuedraggable';
-import iconPicker from "../../../components/common/pickIcon";
+import iconPicker from "../../../components/common/iconPicker";
 import { util } from '../../../plugins/util';
 import UploadFile from "./../../../components/common/UploadFile";
 import {userApi} from "./../../../api/user";
