@@ -35,8 +35,9 @@
         <div class="w-100 mt-3">
             <div
                 class="fs-12 mb-2"
-            >Chọn permissions</div>
-
+            >
+				Chọn permissions
+			</div>
             <PermissionSelector 
             	v-model="itemData.permissions"
 				:disabled="action == 'detail'"
