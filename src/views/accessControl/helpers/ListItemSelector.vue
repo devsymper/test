@@ -21,7 +21,7 @@
 			class="ml-1 mr-2"
 			color="green"
 			v-if="selectingApp == false"
-			@click="selectApp($event)"
+			@click="selectApp"
 		>
 			<v-icon x-small>
 				mdi-plus-thick
@@ -89,9 +89,9 @@ export default {
 		}
 	},
 	methods:{
-		selectApp(event){
-			event.preventDefault()
-			event.stopPropagation() 
+		selectApp(){
+			// event.preventDefault()
+			// event.stopPropagation() 
 			this.selectingApp = true
 		},
 		cancelSelect(){
