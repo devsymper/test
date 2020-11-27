@@ -90,8 +90,6 @@ export default {
 	},
 	methods:{
 		selectApp(){
-			// event.preventDefault()
-			// event.stopPropagation() 
 			this.selectingApp = true
 		},
 		cancelSelect(){

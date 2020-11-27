@@ -24,6 +24,7 @@
                     @close-form="closeForm"
                     :action="actionOnItem"
                     :itemData="itemData"
+					
                     ref="actionPackForm"
                 ></ActionPackForm>
             </template>

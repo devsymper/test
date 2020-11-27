@@ -109,7 +109,7 @@
                 <v-icon size="15" class="mr-2" >mdi-pencil</v-icon>
                 {{$t('common.edit')}} {{$t('common.actions')}}
             </v-btn>
-            <!-- <v-btn
+            <v-btn
                 v-else
                 class="float-right mr-1"
                 small
@@ -118,7 +118,7 @@
                 @click="saveActionPack">
                 <v-icon class="mr-2" primary>mdi-content-save</v-icon>
                 {{action == 'create' ? $t('common.save') : $t('common.update')}}
-            </v-btn> -->
+            </v-btn>
         </div>
       
     </div>
@@ -770,14 +770,22 @@ export default {
 					uiConfigApi.saveUiConfig(dataUi).then(res=>{
 					})
                     if(res.status == '200'){
-                        this.$snotifySuccess("Updated item successfully");
+						this.$snotifySuccess("Updated item successfully");
+						this.$emit('close-form')
                     }else{
                         this.$snotifyError(res, "Error when update item");
                     }
                 }else if(this.action == 'create'){
 					res = await permissionApi.createActionPack(dataToSave);
                     if(res.status == '200'){
-                        this.$snotifySuccess("Create item successfully");
+						let dataUi = {
+							widgetIdentifier: 'action-pack:'+res.data.id,
+							detail: JSON.stringify(this.listAppSelected)
+						}
+						uiConfigApi.saveUiConfig(dataUi).then(res=>{
+						})
+						this.$snotifySuccess("Create item successfully");
+						this.$emit('close-form')
                     }else{
                         this.$snotifyError(res, "Error when create item");
                     }
