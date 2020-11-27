@@ -25,8 +25,8 @@ export default class PivotTable {
         this.gridOptions = null;
         this.pivotConfig = pivotConfig;
         this.tableContainer = null;
+        this.tableHeight = "400px";
         this.columnDefs = [];
-        let thisObj = this;
     }
     /**
      * hoangnd
@@ -72,6 +72,9 @@ export default class PivotTable {
             this.columnDefs.push(colPivot);
         }
     }
+    /**
+     * Hàm lấy thông tin các cột và đong được pivot
+     */
     getDataGroup(){
         let allRowGroup = this.gridOptions.columnApi.getRowGroupColumns();
         let allPivotCol = this.gridOptions.columnApi.getPivotColumns();
@@ -86,6 +89,11 @@ export default class PivotTable {
         }
         return {cols:colPivotData,rows:rowGroup}
     }
+    /**
+     * Hoangnd
+     * Hàm xử lí data cho bảng
+     * @param {} vl 
+     */
     setData(vl) {
         this.columnDefs = [];
         this.setPivotColumns();
@@ -97,7 +105,27 @@ export default class PivotTable {
             // this.tableContainer.style.width = '';
             // this.tableContainer.style.height = '';
         }
+        this.caculatorHeight();
         
+    }
+    /**
+     * Hoangnd:
+     * Hàm tính toán chiều cao cho table
+     */
+    caculatorHeight(){
+        let dataHeight = this.gridOptions.api.getDisplayedRowCount()*24;
+        let headerHeight = 0;
+        if(this.pivotConfig.cols.length > 0){
+            headerHeight += 24;
+        }
+        if(this.pivotConfig.values.length > 0){
+            headerHeight += 24;
+        }
+        let tableHeight = dataHeight + headerHeight + 3;
+        if(tableHeight > 500){
+            tableHeight = 500;
+        }
+        $('#ag-'+this.controlObj.id).css({height:tableHeight + "px"});
     }
     render() {
         this.gridOptions = {
@@ -125,8 +153,8 @@ export default class PivotTable {
             sideBar: false,
             suppressAggFuncInHeader: true,
             onCellDoubleClicked: this.onCellDoubleClick,
-            onCellClicked: this.onCellClick,
-            tableIns:this
+            onCellKeyDown: this.onCellDoubleClick,
+            tableIns:this,
         };
         let viewType = sDocument.state.viewType[this.instance];
         let actionBtn = ` <div class="dropdown">
@@ -139,7 +167,7 @@ export default class PivotTable {
         if(['detail','print'].includes(viewType)){
             actionBtn = ""
         }
-        this.tableContainer = $(`<div id="ag-` + this.controlObj.id + `" style="height: 400px; width: auto;position:relative;" class="ag-theme-alpine" s-control-type="table">
+        this.tableContainer = $(`<div id="ag-` + this.controlObj.id + `" style="height: `+this.tableHeight+`; width: auto;position:relative;" class="ag-theme-alpine" s-control-type="table">
                                     `+actionBtn+`
                             </div>`)[0];
         this.controlObj.ele.before(this.tableContainer);
@@ -148,7 +176,17 @@ export default class PivotTable {
         }
         new Grid(this.tableContainer, this.gridOptions, { modules: [ClientSideRowModelModule, RowGroupingModule] });
     }
+    /**
+     * double click vào cell thì edit cell đó
+     * @param {} row 
+     */
     onCellDoubleClick(row){
+        if(row.type == 'cellKeyDown'){
+            var charTyped = String.fromCharCode(row.event.which);
+            if (!/[a-zA-Z0-9]/i.test(charTyped)) {
+                return;
+            }
+        }
         let column = row.colDef;
         let columnNameSelected = column.otherName;
         let pivotKeys = column.pivotKeys;
@@ -193,7 +231,17 @@ export default class PivotTable {
             let allGroupRow = [];
             if(columnNameSelected && pivotKeys){
                 controlName = columnNameSelected;
-                allGroupRow.push(allChildRowNode[pivotKeys[0]][0]['data'])
+                if(allChildRowNode[pivotKeys[0]]){
+                    allGroupRow.push(allChildRowNode[pivotKeys[0]][0]['data'])
+                }
+                else{
+                    let newRowData = {};
+                    let rowDefinition = row.node.field;
+                    let colPivotDefinition = this.tableIns.pivotConfig.cols[0].name;
+                    newRowData[colPivotDefinition] = pivotKeys[0];
+                    newRowData[rowDefinition] = row.node.key;
+                    allGroupRow.push(newRowData);
+                }
             }
             else {
                 controlName = row.node.field;

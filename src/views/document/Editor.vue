@@ -14,6 +14,7 @@
             <div class="sym-document-body">
                 <div class="sym-document-action">
                     <editor-action
+                    ref="actionView"
                     @document-action-save-document="openPanelSaveDocument"
                     @document-action-clone-control="cloneControl"
                     @document-action-list-control-option="setShowAllControlOption"
@@ -483,9 +484,9 @@ export default {
             if(this.typeDialog == 'deletePage'){
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
             }
-            if(this.typeDialog == "baEditting"){
-                this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
-            }
+            // if(this.typeDialog == "baEditting"){
+            //     this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
+            // }
         },
 
         /**
@@ -1206,7 +1207,7 @@ export default {
                                 if(data.length > 0){
                                     let curBa = data[0];
                                     this.dialog = true;
-                                    this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
+                                    this.titleDialog = "BA "+curBa.name+" đang sửa doc này";
                                     this.typeDialog = "baEditting";
                                     return false;
                                 }
@@ -1959,7 +1960,7 @@ export default {
 
         },
         async checkAllowEditDocument(document){
-            let updateTime = new Date(document.updateAt).getTime();
+            let updateTime = new Date(document.lastEditAt).getTime();
             let timeDiff = Date.now() - updateTime;
             if(timeDiff > 4000){
                 /**
@@ -1979,12 +1980,14 @@ export default {
                             if(data.length > 0){
                                 let curBa = data[0];
                                 this.dialog = true;
-                                this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
+                                this.$refs.actionView.hideSaveBtn(curBa.name);
+                                this.titleDialog = "BA "+curBa.name+" đang sửa doc này.";
                                 this.typeDialog = "baEditting";
                                 return false;
                             }
                         }
                     } catch (error) {
+                        this.$refs.actionView.hideSaveBtn('');
                         return false;
                         console.log(error);
                     }
@@ -1998,10 +2001,7 @@ export default {
                 let res = await documentApi.detailDocument(this.documentId);
                 if (res.status == 200) {
                     if(this.routeName == "editDocument"){
-                        let checkEditting = await this.checkAllowEditDocument(res.data.document);
-                        if(checkEditting == false){
-                            return;
-                        }
+                        await this.checkAllowEditDocument(res.data.document);
                         this.setDocumentProperties(res.data.document);
                     }
                     let content = res.data.document.content;
@@ -2055,6 +2055,7 @@ export default {
         //hoangnd: hàm set các giá trị của thuộc tính và formulas vào từng contrl trong doc lúc load dữ liệu và đưa vào state
         setDataForPropsControl(fields){
             console.log("ádsadasd",fields);
+            let thisCpn = this;
             for(let controlId in fields){
                 if(!fields[controlId].hasOwnProperty('type')){
                     continue;
@@ -2091,13 +2092,22 @@ export default {
                     $.each(formulas,function(k,v){
                         if(k == 'linkConfig'){
                             if(fields[controlId]['formulas'][k]){
-                                formulas[k]['configData'] = fields[controlId]['formulas'][k]['configData'];
+                                let configData = fields[controlId]['formulas'][k]['configData'];
+                                if(thisCpn.$getRouteName() == 'cloneDocument'){
+                                    for (let index = 0; index < configData.length; index++) {
+                                        configData[index]['formula']['id'] = 0;
+                                        
+                                    }
+                                }
+                                formulas[k]['configData'] = configData;
                             }
                         }
                         else{
                             if(fields[controlId]['formulas'][k]){
                                 formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0];
-                                formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                                if(thisCpn.$getRouteName() != 'cloneDocument'){
+                                    formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                                }
                             }
                             if(k == 'autocomplete'){
                                 formulas[k]['configData']= (autocompleteConfig == false) ? {} : autocompleteConfig;
@@ -2132,13 +2142,30 @@ export default {
                         })
                         if(listField[childFieldId]['formulas'] != false){
                             $.each(childFormulas,function(k,v){
-                                if(listField[childFieldId]['formulas'][k]){
-                                    childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0]
-                                    childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
+                                if(k == 'linkConfig'){
+                                    if(listField[childFieldId]['formulas'][k]){
+                                        let configData = listField[childFieldId]['formulas'][k]['configData'];
+                                        if(thisCpn.$getRouteName() == 'cloneDocument'){
+                                            for (let index = 0; index < configData.length; index++) {
+                                                configData[index]['formula']['id'] = 0;
+                                                
+                                            }
+                                        }
+                                        childFormulas[k]['configData'] = configData;
+                                    }
                                 }
-                                if(k == 'autocomplete'){
-                                    childFormulas[k]['configData']= (childAutocompleteConfig == false) ? {} : childAutocompleteConfig;
+                                else{
+                                    if(listField[childFieldId]['formulas'][k]){
+                                        childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0];
+                                        if(thisCpn.$getRouteName() != 'cloneDocument'){
+                                            childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0];
+                                        }
+                                    }
+                                    if(k == 'autocomplete'){
+                                        childFormulas[k]['configData']= (childAutocompleteConfig == false) ? {} : childAutocompleteConfig;
+                                    }
                                 }
+                                
                             })
                         }
                         listChildField[childFieldId] = {properties: childProperties, formulas : childFormulas,type:childType}

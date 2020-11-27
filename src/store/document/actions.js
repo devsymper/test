@@ -23,6 +23,7 @@ const setListDocuments = async (context, forceGetData = false) => {
 			});
 			if (res.status == 200) {
 				context.commit('setAllDocuments', res.data.listObject);
+				SYMPER_APP.$store.commit('formulaEditor/addCompletionItemsForDocs', res.data.listObject);
 			} else {
 				console.error(res, "[Symper::get list documents failed!]");
 			}

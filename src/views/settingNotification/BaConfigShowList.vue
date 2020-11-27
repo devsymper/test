@@ -14,7 +14,7 @@
         :showImportButton="false"
         :getDataUrl="notifiDomain + 'channels'"
         :actionPanelWidth="actionPanelWidth">
-        <div slot="right-panel-content" class="h-100" style="overflow:hidden!important">
+        <div slot="right-panel-content" class="h-100"  style="overflow:hidden!important">
            <configNotification 
                 ref="config"
                 :type="typeNoti"
@@ -109,6 +109,7 @@ export default {
                      for(let i = 0; i<data.listObject.length; i++){
                         data.listObject[i].originState = data.listObject[i].state;
                         data.listObject[i].icon = data.listObject[i].icon;
+                        data.listObject[i].filter = data.listObject[i].filter;
                         data.listObject[i].action = data.listObject[i].action;
                         data.listObject[i].originAction = self.getName(data.listObject[i].objectType,data.listObject[i].action);
                         data.listObject[i].state = self.renameStatus(data.listObject[i].state);

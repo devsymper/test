@@ -16,7 +16,7 @@ var configs = {
         core: 'https://v2hoangnd.dev.symper.vn/',
         bpmne: {
             general: 'https://workflow.symper.vn/',
-            models: 'https://workflow-modeler.symper.vn',
+            models: 'https://workflow-modeler.symper.vn/workflow-modeler/',
             postTasksHistory: 'https://workflow.symper.vn/symper-rest/service/query/historic-task-instances',
             deployments: "https://workflow.symper.vn/symper-rest/service/repository/deployments",
             definitions: "https://workflow.symper.vn/symper-rest/service/repository/process-definitions",
@@ -45,18 +45,22 @@ var configs = {
         actionPacks: "https://accesscontrol.symper.vn/action_packs",
         operations: "https://accesscontrol.symper.vn/operations",
         baAccount: "https://account.symper.vn/supporters",
-        appManagement: "https://core.symper.vn/",
+        appManagement: "https://apps-management.symper.vn/",
         commnent: "https://comment-service.symper.vn",
         fileManagement: 'https://file.symper.vn/',
-        knowledge: 'https://kh-service.dev.symper.vn/',
+        knowledge: 'https://kh-service.symper.vn/',
         timesheet: 'https://timesheet-service.dev.symper.vn/',
         search: "https://search.symper.vn/",
-        importExcel: 'https://io.dev.symper.vn/',
-        viewHistoryImport: "https://io.dev.symper.vn/history/document",
+        importExcel: 'https://io.symper.vn/',
+        viewHistoryImport: "https://io.symper.vn/history/document",
         uiConfig: "https://ui.symper.vn",
         workflowExtend: "https://workflow-extend.symper.vn/",
         trash: "https://trash.symper.vn/",
-        log: "https://log.symper.vn"
+		log: "https://log.symper.vn",
+    },
+    // nơi chứa domain của các api mà ko bị phụ thuộc vào môi trường 
+	uniqueApiDomain: {
+		environmentManagement: "https://system-management.symper.vn/"
     },
     notificationTimeout: {
         success: 3000,
@@ -96,10 +100,14 @@ var configs = {
                 }
             }
         }
-    }
+	},
 };
-configs.reformatUrl(configs.apiDomain);
 // sửa lại url theo môi trường code
+configs.reformatUrl(configs.apiDomain);
 
+// Thêm các domain thuộc uniqueApiDomain vào khai báo domain của api
+for(let key in configs.uniqueApiDomain){
+    configs.apiDomain[key] = configs.uniqueApiDomain[key];
+}
 
 export const appConfigs = configs;

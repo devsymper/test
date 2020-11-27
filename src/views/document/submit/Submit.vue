@@ -374,7 +374,6 @@ export default {
             listMessageErr:[],
             titleValidate:"",
             messageValidate:"",
-            cacheDataRunFormulas:{},
 			isDraft:0,
             preDataSubmit:{},
             objectIdentifier:{},
@@ -501,7 +500,15 @@ export default {
                 let uniqueData = value.filter(function(value, index, self){
                     return self.indexOf(value) === index;
                 })
-                this.dataPivotMode.push({controlName:controlName, controlTitle:controlBindData.title,value:uniqueData});
+                let inputData = {controlName:controlName, controlTitle:controlBindData.title,value:uniqueData, type:'rows'};
+                if(tableInstance.pivotTable.pivotConfig.rows.length >1){
+                    inputData.detailTitle = "Bỏ trống nếu muốn thêm dữ liệu cho toàn bộ dòng";
+                    this.dataPivotMode.push(inputData);
+                }
+                else{
+                    inputData.isDisable = true;
+                    this.dataPivotMode.push(inputData);
+                }
             }
             let colsConfig = pivotData['cols'];
             for (let index = 0; index < colsConfig.length; index++) {
@@ -515,7 +522,15 @@ export default {
                     this.dataColPivot.push({controlName:controlName, controlTitle:controlBindData.title});
                 }
                 else{
-                    this.dataPivotMode.push({controlName:controlName, controlTitle:controlBindData.title,value:uniqueData});
+                    this.dataPivotMode.push(
+                        {
+                            controlName:controlName, 
+                            controlTitle:controlBindData.title,
+                            value:uniqueData,
+                            type:'cols' ,
+                            detailTitle:"Bỏ trống nếu muốn thêm dữ liệu cho toàn bộ cột"
+                        }
+                    );
                 }
             }
             
@@ -632,17 +647,23 @@ export default {
          */
         this.$evtBus.$on("document-submit-filter-input-click", e => {
             if(this._inactive == true) return;
-            if($(document).height() - $(e.target).offset().top > 420){
-                this.topPositionDragPanel = $(e.target).offset().top + 2 + $(e.target).height();
+            let inputOffset = $(e.target).offset();
+            let submitFormOffset = $('#sym-submit-'+this.keyInstance).offset();
+            let submitFormWidth = $('#sym-submit-'+this.keyInstance).width();
+            let leftDiff   = inputOffset.left - submitFormOffset.left;
+            let cardWidth  = 600;
+            let cardHeight = 400;
+            let inputWidth = $(e.target).width();
+            if(cardWidth + leftDiff > submitFormWidth){
+                this.leftPositionDragPanel = Math.abs(inputOffset.left + inputWidth - cardWidth);
+                this.topPositionDragPanel = inputOffset.top + 26 ;
             }
             else{
-                this.topPositionDragPanel = $(e.target).offset().top  - 400 
+                this.leftPositionDragPanel = Math.abs(inputOffset.left);
+                this.topPositionDragPanel = inputOffset.top + 26 ;
             }
-            if(e.screenX - e.offsetX > 600){
-                this.leftPositionDragPanel = e.screenX - e.offsetX ;
-            }
-            else{
-                this.leftPositionDragPanel = e.screenX - e.offsetX - 300;
+            if(window.innerHeight < inputOffset.top + 400){
+                this.topPositionDragPanel = Math.abs(inputOffset.top - cardHeight);
             }
             this.titleDragPanel = "Tìm kiếm thông tin";
             this.titleDragPanelIcon = "mdi-file-search";
@@ -925,20 +946,25 @@ export default {
             let value = currentRowChangePivotMode.value;
             let tableName = currentRowChangePivotMode.tableName;
             let type = currentRowChangePivotMode.type;
-            let tableIns = getControlInstanceFromStore(this.keyInstance, tableName);
-            if(type && type == 'group'){
+            if(type && type == 'group' && value.length > 0){
                 for (let index = 0; index < value.length; index++) {
                     value[index][keyChange] = input.val();
                 }
-                this.updateToTableNomalData(tableName, value, {});
+                if(value[0].s_table_id_sql_lite){  // edit dòng đã có
+                    this.updateToTableNomalData(tableName, value, []);
+                }
+                else{   // thêm dòng mới cho table thường
+                    this.updateToTableNomalData(tableName, [], value);
+                }
+                
             }
             else{
                 value[keyChange] = input.val();
                 if(value.s_table_id_sql_lite){  // edit dòng đã có
-                    this.updateToTableNomalData(tableName, [value], {});
+                    this.updateToTableNomalData(tableName, [value], []);
                 }
                 else{   // thêm dòng mới cho table thường
-                    this.updateToTableNomalData(tableName, [], value);
+                    this.updateToTableNomalData(tableName, [], [value]);
                 }    
             }
         },
@@ -950,22 +976,59 @@ export default {
             let type = data.type;
             let dataRowGroup = data.dataRowGroup;
             let dataColPivot = data.dataColPivot;
-            let rowData = {};
+            let rowData = [];
+            let rowSelected = dataRowGroup.filter(r=>{
+                return r.selected != undefined;
+            })
             for (let index = 0; index < dataRowGroup.length; index++) {
                 let cell = dataRowGroup[index];
-                rowData[cell.controlName] = cell.selected
+                if(cell.type != type){
+                    if(!cell.selected){
+                        for (let i = 0; i < cell.value.length; i++) {
+                            let dataItem = {};
+                            if(rowSelected.length > 0){
+                                dataItem[rowSelected[0]['controlName']] = rowSelected[0]['selected']
+                            }
+                            dataItem[cell.controlName] = cell.value[i];
+                            rowData.push(dataItem);
+                        }
+                    }
+                    else{
+                        let dataItem = {};
+                        if(rowSelected.length > 0){
+                            dataItem[rowSelected[0]['controlName']] = rowSelected[0]['selected']
+                        }
+                        dataItem[cell.controlName] = cell.selected;
+                        rowData.push(dataItem);
+                    }
+                }
             }
             for (let index = 0; index < dataColPivot.length; index++) {
                 let cell = dataColPivot[index];
-                rowData[cell.controlName] = cell.selected
+                if(rowData.length > 0){
+                    for (let i = 0; i < rowData.length; i++) {
+                        rowData[i][cell.controlName] = cell.selected;
+                    }
+                }else{
+                    let tableControl = getControlInstanceFromStore(this.keyInstance,tableName);
+                    let hotTb = tableControl.tableInstance.tableInstance;
+                    let allData = hotTb.getSourceData();
+                    for (let index = 0; index < allData.length; index++) {
+                        let dataItem = {};
+                        dataItem[cell.controlName] = cell.selected;
+                        rowData.push(dataItem);
+                    }
+                }
+                
             }
+            
             this.updateToTableNomalData(tableName,[],rowData)
             this.$refs.popupPivotTableView.hide();
         },
         /**
          * Hàm call lại chuẩn bị data để thêm vào bảng nomal sau khi có sự thay đổi ở bảng pivot
          */
-        updateToTableNomalData(tableName, oldData = [], newData = {}){
+        updateToTableNomalData(tableName, oldData = [], newData = []){
             let tableControl = getControlInstanceFromStore(this.keyInstance,tableName);
             let hotTb = tableControl.tableInstance.tableInstance;
             let allData = hotTb.getSourceData();
@@ -988,20 +1051,25 @@ export default {
                 }
             }
             else{
-                for (let index = 0; index < allData.length; index++) {
-                    for(let control in allColumnTable){
-                        if(!allData[index][control]){
-                            allData[index][control] = null;
+                if(newData.length > 0){
+                    for (let i = 0; i < newData.length; i++) {
+                        let rowData = newData[i];
+                        for (let index = 0; index < allData.length; index++) {
+                            for(let control in allColumnTable){
+                                if(!allData[index][control]){
+                                    allData[index][control] = null;
+                                }
+                            }
+                            delete allData[index].s_table_id_sql_lite;
                         }
+                        for (let control in allData[0]) {
+                            if(!rowData[control]){
+                                rowData[control] = null;
+                            }
+                        }
+                        allData.push(rowData);
                     }
-                    delete allData[index].s_table_id_sql_lite;
                 }
-                for (let control in allData[0]) {
-                    if(!newData[control]){
-                        newData[control] = "";
-                    }
-                }
-                allData.push(newData);
             }
             tableControl.tableInstance.setData(allData, false);
         },
@@ -1023,9 +1091,9 @@ export default {
                 for (let index = 0; index < mapControlToParams.length; index++) {
                     let item = mapControlToParams[index];
                     let param = item.name
-                    let controlName = item.controlName;
+                    let controlName = item.name;
                     let listInputInDocument = getListInputInDocument(this.keyInstance);
-                    if(param != null && param != "" && controlName != null && controlName !="")
+                    if(param)
                     dataParams[param] = listInputInDocument[controlName].value;
                 } 
             }
@@ -1043,7 +1111,7 @@ export default {
             this.$refs.symDragPanel.hide();
         },
         searchDataFilter(data){
-            if(this._inactive == false) return;
+            if(this._inactive == true) return;
             this.runInputFilterFormulas(data.controlName,data.search);
         },
         /**
@@ -1074,9 +1142,14 @@ export default {
         getDataOrgchart(e){
             let thisCpn = this;
             let aliasControl = e.formulasInstance.autocompleteDetectAliasControl();
-            let dataFromCache = this.getDataAutocompleteFromCache(e.e.target.value, aliasControl);
+            let dataInput = this.getDataInputFormulas(e.formulasInstance,e);
+            for(let controlName in dataInput){
+                if(Array.isArray(dataInput[controlName])){
+                    dataInput[controlName] = dataInput[controlName][e.e.rowIndex];
+                }
+            }
+            let dataFromCache = this.getDataAutocompleteFromCache(aliasControl, dataInput);
             if(dataFromCache == false){
-                let dataInput = this.getDataInputFormulas(e.formulasInstance,e);
                 e.formulasInstance.handleBeforeRunFormulas(dataInput).then(res=>{
                     res.status = 200
                     thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,true)
@@ -1100,18 +1173,14 @@ export default {
             }
             else{
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
-                let dataFromCache = this.getDataAutocompleteFromCache(e.e.target.value, aliasControl);
-                if(dataFromCache == false){
-                    let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
-                    let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
-                    if(currentTableInteractive != null){
-                        let cellMeta = currentTableInteractive.tableInstance.getSelected();
-                        for(let controlName in dataInput){
-                            if(Array.isArray(dataInput[controlName])){
-                                dataInput[controlName] = dataInput[controlName][cellMeta[0][0]]
-                            }
-                        }
+                let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
+                for(let controlName in dataInput){
+                    if(Array.isArray(dataInput[controlName])){
+                        dataInput[controlName] = dataInput[controlName][e.e.rowIndex];
                     }
+                }
+                let dataFromCache = this.getDataAutocompleteFromCache(aliasControl, dataInput);
+                if(dataFromCache == false){
                     e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
                         thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,false)
                     });
@@ -1124,14 +1193,20 @@ export default {
         },
 
         // hàm lấy data từ cache của control autocomplete
-        getDataAutocompleteFromCache(curTyping,controlName){
+        getDataAutocompleteFromCache(controlName, dataInput){
+            let groupKey = [];
+            for(let ctlName in dataInput){
+                groupKey.push(dataInput[ctlName]);
+            }
+            groupKey = groupKey.join("-");
+            console.log('groupKeygroupKey',groupKey);
             if(this.sDocumentSubmit.autocompleteData.hasOwnProperty(controlName) &&
-                this.sDocumentSubmit.autocompleteData[controlName].header.length > 0 &&
-                this.sDocumentSubmit.autocompleteData[controlName].cacheData.hasOwnProperty(curTyping)
+                this.sDocumentSubmit.autocompleteData[controlName].header.hasOwnProperty(groupKey) &&
+                this.sDocumentSubmit.autocompleteData[controlName].cacheData.hasOwnProperty(groupKey)
             ){
                 return {
-                    headers:this.sDocumentSubmit.autocompleteData[controlName].header,
-                    dataBody:this.sDocumentSubmit.autocompleteData[controlName].cacheData[curTyping]
+                    headers:this.sDocumentSubmit.autocompleteData[controlName].header[groupKey],
+                    dataBody:this.sDocumentSubmit.autocompleteData[controlName].cacheData[groupKey]
                 }
             }
             else{
@@ -1157,16 +1232,27 @@ export default {
                     this.$refs.autocompleteInput.setAliasControl(aliasControl);
                     this.$refs.autocompleteInput.setData(dataTable);
                     if(dataTable.hasOwnProperty('headers')){
-                        let item = {}
-                        let textTyping = this.getTextTypingInSqlQuery(res.data.sql);
-                        item[textTyping] = dataTable.dataBody
-                        console.log("sadsadsadsa",item);
-                        this.$store.commit("document/cacheDataAutocomplete",{
-                            instance: this.keyInstance,
-                            controlName:aliasControl,
-                            header:dataTable.headers,
-                            cacheData:item
-                        })
+                        try {
+                            let dataInput = JSON.parse(res.parameter.data_input);
+                            let groupKey = [];
+                            for(let controlName in dataInput){
+                                groupKey.push(dataInput[controlName]);      
+                            }
+                            groupKey = groupKey.join("-");
+                            let itemData = {};
+                            let itemHeader = {};
+                            itemData[groupKey] = dataTable.dataBody;
+                            itemHeader[groupKey] = dataTable.headers;
+                            this.$store.commit("document/cacheDataAutocomplete",{
+                                instance: this.keyInstance,
+                                controlName:aliasControl,
+                                header:itemHeader,
+                                cacheData:itemData,
+                            })    
+                        } catch (error) {
+                            console.log(error,'errorerror');
+                        }
+                        
                     }
                 }
                 else{
@@ -1179,21 +1265,6 @@ export default {
                 this.$refs.autocompleteInput.setData(dataTable);
                 this.$refs.autocompleteInput.hideHeader();
             }
-        },
-
-        /**
-         * Hàm tìm ra đoạn text đã typing để query autocomplete
-         */
-        getTextTypingInSqlQuery(sql){
-            let textQuery = sql.match(/%.*?%/g);
-            if(textQuery){
-                textQuery = textQuery[0];
-                textQuery = textQuery.replace(/%*/g,"");
-            }
-            else{
-                textQuery = ""
-            }
-            return textQuery;
         },
         /**
          * Hàm bind dữ liệu cho control, và control trong bảng khi chọn apply trên timepicker
@@ -1738,7 +1809,7 @@ export default {
                             for (let index = 0; index < allConfig.length; index++) {
                                 let config = allConfig[index];
                                 if(config.instance){
-                                  let putControl = config.instance.inputControl;
+                                  let inputControl = config.instance.inputControl;
                                     for (let controlEffect in inputControl) {
                                         if (!mapControlEffected[formulasType].hasOwnProperty(controlEffect)) {
                                             mapControlEffected[formulasType][controlEffect] = {};
@@ -1993,12 +2064,12 @@ export default {
                 dataPost['linkData'] = JSON.stringify(this.linkControl);
             }
             documentApi.submitDocument(dataPost).then(res => {
-                let dataResponSubmit = res.data;
-                dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;
-                dataResponSubmit['isContinueSubmit'] = thisCpn.isContinueSubmit;
-                thisCpn.$emit('submit-document-success',dataResponSubmit);
-                thisCpn.isSubmitting = false;
                 if (res.status == 200) {
+                    let dataResponSubmit = res.data;
+                    dataResponSubmit['document_object_user_created_fullname'] = thisCpn.endUserInfo.id;
+                    dataResponSubmit['isContinueSubmit'] = thisCpn.isContinueSubmit;
+                    thisCpn.$emit('submit-document-success',dataResponSubmit);
+                    thisCpn.isSubmitting = false;
                     thisCpn.$snotify({
                         type: "success",
                         title: "Submit document success!"
@@ -2441,7 +2512,6 @@ export default {
          */
         setDataToPivotTable(tableControl, data){
             if(tableControl.pivotTable){
-                tableControl.pivotTable.show();
                 tableControl.pivotTable.setData(data);
             }
         },
@@ -2496,7 +2566,7 @@ export default {
                 if(data.length > 0){
                     for (let index = 0; index < data.length; index++) {
                         let dataItem = data[index][Object.keys(data[index])[0]];
-                        let fType = formulasType+"_"+row;
+                        let fType = formulasType+"_"+dataItem;
                         this.setDataForLinkControl(fType, dataItem, title, source, controlName);
                     }
                 }

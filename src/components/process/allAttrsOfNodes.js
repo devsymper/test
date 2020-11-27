@@ -1587,7 +1587,8 @@ let allAttrs = {
         "type": "script",
         "value": "",
         "info": "BPMN.PROPERTYPACKAGES.CONDITIONALEVENTPACKAGE.CONDITION.DESCRIPTION",
-        "dg": "detail"
+        "dg": "detail",
+        pushToXML: attrToXMLMethods.pushConditionTagToXML
     },
     "initiator": {
         "title": "Initiator",
@@ -1614,8 +1615,8 @@ let allAttrs = {
     },
     "multiinstance_cardinality": {
         "title": "Cardinality ",
-        "type": "numeric",
-        "value": "",
+        "type": "script",
+        "value": "1",
         "info": "BPMN.PROPERTYPACKAGES.MULTIINSTANCE_CARDINALITYPACKAGE.MULTIINSTANCE_CARDINALITY.DESCRIPTION",
         "dg": "multiInstance",
         toXML: {
@@ -1738,7 +1739,7 @@ let allAttrs = {
                 title: 'Scope',
                 name: 'symper_symper_scope_tag',
                 type: 'autocomplete',
-                source: ["global", "process instance"]
+                source: ["global", "processInstance"]
             },
         ],
         "info": "BPMN.PROPERTYPACKAGES.SIGNALDEFINITIONSPACKAGE.SIGNALDEFINITIONS.DESCRIPTION",
@@ -1759,6 +1760,21 @@ let allAttrs = {
 
                     if(newItem.id && newItem.id.trim()){
                         rsl.push(newItem);
+                    }
+                }
+            }
+            return rsl;
+        },
+        getValueForXML(value) {
+            let rsl = [];
+            if($.isArray(value)){
+                for(let item of value){
+                    if(item.id && item.id.trim()){
+                        rsl.push({
+                            id: item.id,
+                            name: item.name,
+                            symper_symper_scope_tag: item.symper_symper_scope_tag
+                        });
                     }
                 }
             }
@@ -1957,7 +1973,7 @@ let allAttrs = {
         "dg": "detail",
         toXML: {
             "symper_position": "attr",
-            "name": "terminateAll",
+            "name": "symper_symper_terminateAll_tag",
             "isAttr": true,
             "type": "String"
         }
@@ -2540,7 +2556,14 @@ let allAttrs = {
         hidden: false,
         pushToXML: attrToXMLMethods.notPushToXML
     },
-
+    prefixForSignalParameters: {
+        title: 'Signal parameter prefix',
+        type: 'text',
+        value: 'signal',
+        info: '',
+        dg: 'detail',
+        pushToXML: attrToXMLMethods.notPushToXML
+    }
 }
 
 for (let name in allAttrs) {
