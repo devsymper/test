@@ -12,7 +12,7 @@
         :actionPanelType="'elastic'"
         :showActionPanelInDisplayConfig="true"
         :showExportButton="true"
-        :showImportButton="true"
+        :showImportButton="false"
         :isTablereadOnly="false"
         :conditionByFormula="formulasInput.formula.value"
         @after-open-add-panel="submitDocument"
