@@ -307,7 +307,7 @@
             :cols="!sideBySideMode ? 0 : 8"
             :md="!sideBySideMode ? 0 : 9"
             v-show="sideBySideMode"
-            class="pa-0 ma-0"
+            class="pa-0 ma-0 h-100"
             height="30"
             style="border-left: 1px solid #e0e0e0;"
         >

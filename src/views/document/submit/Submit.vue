@@ -57,7 +57,25 @@
             @apply-time-selected="applyTimePicker" 
             @after-check-input-time-valid="afterCheckTimeNotValid" 
             ref="timeInput" />
-            <v-speed-dial
+            
+            <err-message :listErr="listMessageErr" ref="errMessage" @after-close-dialog="afterCloseDialogValidate"/>
+        </div>
+        <EmbedDataflow 
+        @after-mounted="afterDataFlowMounted" 
+        @dataflow-finished-running="afterRunDataflow"
+        v-for="dataFlow in listDataFlow" 
+        :key="dataFlow.id"  
+        :dataflowId="dataFlow.id" 
+        :width="'100%'"
+        :ref="'dataFlow'+dataFlow.id"/>
+        <UploadFile 
+        :objectType="'document'"
+        :iconName="`mdi-upload-outline`"
+        ref="fileUploadView"
+        class="d-none"
+        @uploaded-file="afterFileUpload"
+        :objectIdentifier="docId+''" />
+        <v-speed-dial
                 v-if="parrentInstance == 0"
                 v-show="showSubmitButton"
                 v-model="fab"
@@ -68,7 +86,7 @@
                 :direction="direction"
                 :open-on-hover="hover"
                 :transition="transition"
-                style="z-index:9999;"
+                style="z-index:199; position: fixed;"
             >
                 <template v-slot:activator>
                     <v-btn v-model="fab" color="blue darken-2" dark fab>
@@ -124,24 +142,6 @@
                     <span>{{$t('document.submit.fab.toggleSize')}}</span>
                 </v-tooltip>
             </v-speed-dial>
-            <err-message :listErr="listMessageErr" ref="errMessage" @after-close-dialog="afterCloseDialogValidate"/>
-        </div>
-        <EmbedDataflow 
-        @after-mounted="afterDataFlowMounted" 
-        @dataflow-finished-running="afterRunDataflow"
-        v-for="dataFlow in listDataFlow" 
-        :key="dataFlow.id"  
-        :dataflowId="dataFlow.id" 
-        :width="'100%'"
-        :ref="'dataFlow'+dataFlow.id"/>
-        <UploadFile 
-        :objectType="'document'"
-        :iconName="`mdi-upload-outline`"
-        ref="fileUploadView"
-        class="d-none"
-        @uploaded-file="afterFileUpload"
-        :objectIdentifier="docId+''" />
-        
          
         <div class="sub-form-action" v-if="parrentInstance != 0">
             <button @click="goToListDocument()" class=subfom-action__item>{{$t('document.submit.goToList')}}</button>
@@ -175,6 +175,7 @@
         </v-navigation-drawer>
     <PopupPivotTable ref="popupPivotTableView" :dataColPivot="dataColPivot" :data="dataPivotMode" @before-add-pivot-data="beforeAddPivotData"/>
     <input type="text" class="input-pivot" @keyup="afterKeyupInputPivot" @blur="afterBlurInputPivot" v-if="dataPivotTable">
+    
     </div>
      
 </template>
@@ -2961,7 +2962,7 @@ export default {
 }
 .wrap-content-submit{
     width: 100%;
-    height: calc(100vh - 100px);
+    height: calc(100%);
     overflow: hidden;
     background: white;
 }
