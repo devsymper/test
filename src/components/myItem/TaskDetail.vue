@@ -18,7 +18,17 @@
             <div id="action-task" class="text-right pt-1 pb-1 pr-0 float-right">
                 <span v-if="!originData.endTime && !hideActionTask ">
                     <span v-if="originData.assigneeInfo && checkRole(originData.assigneeInfo.id)==true">
-                        <v-btn small depressed  v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
+                        <v-btn 
+                            small 
+                            depressed  
+                            v-for="(action, idx) in taskActionBtns" 
+                            dark 
+                            :key="idx" 
+                            :color="action.color" 
+                            @click="saveTaskOutcome(action.value)" 
+                            class="mr-2"
+                            :loading="loadingActionTask"
+                        >
                             {{action.text}}
                         </v-btn>
                     </span>
@@ -398,8 +408,10 @@ export default {
             this.breadcrumb.taskName = task.name;
             if(task.processDefinitionId){
                 let processDefinitionId=task.processDefinitionId;
-		        var arrProcessDefinitionId = processDefinitionId.split(":"); //tách chuỗi để lấy DefinitionKey
-                this.breadcrumb.definitionName = this.$store.state.process.allDefinitions[arrProcessDefinitionId[0]].name;
+                var arrProcessDefinitionId = processDefinitionId.split(":"); //tách chuỗi để lấy DefinitionKey
+                if (this.$store.state.process.allDefinitions[arrProcessDefinitionId[0]]) {
+                    this.breadcrumb.definitionName = this.$store.state.process.allDefinitions[arrProcessDefinitionId[0]].name;
+                }
                 this.breadcrumb.instanceName = this.taskInfo.extraLabel+' '+this.taskInfo.extraValue;
             }else{
                 this.breadcrumb.definitionName = '';
@@ -670,9 +682,7 @@ export default {
                 infotTask.taskInfo= taskInfo;
                 infotTask.originData=task;
                 self.$emit("change-info-task",infotTask);
-                // if (task.processInstanceId && task.processInstanceId!=null) {
-                //     await self.getVariablesProcess(task.processInstanceId)
-                // }
+           
             }
         }
     }
