@@ -76,7 +76,6 @@
 				:showExportButton="false"
 				:showImportButton="false"
 				:useDefaultContext="false"
-				:useWorkFlowHeader="true"
 				:customAPIResult="customAPIResult"
 				:containerHeight="containerHeight"
 				:headerPrefixKeypath="'admin.table'"
@@ -128,34 +127,73 @@ export default {
 			customAPIResult:{
 				reformatData(res){
 					debugger
+					if(res.data.listObject.length > 0){
+						let arr = []
+						res.data.listObject.forEach(function(e){
+							arr.push(e.id)
+						})
+						let obj = res.data.listObject
+						adminApi.getStartUserName(arr).then(resA=>{
+							obj.forEach(function(e){
+								resA.data.forEach(function(k){
+									if(e.id == k.processInstanceId){
+										let mapIdToUser = self.$store.getters['app/mapIdToUser'];
+										let newName = k.value.split(':')[0]
+										e.startUserName = mapIdToUser[newName].displayName
+									}
+								})
+							})
+							self.$refs.listWorkFlow.rerenderTable()
+						}).catch(err=>{
+
+						})
+					}
 					return{
                          columns: [
-							// {name: "checkbox_select_item",data:"checkbox_select_item",title:"selected",type:"checkbox", noFilter:true},
                             {name: "id", title: "id", type: "numeric"},
-							{name: "processDefinitionName", title: "name", type: "text"},
-							{name: "startUserId", title: "startUserId", type: "text"},
-							{name: "suspended", title: "suspended", type: "date",
+							{name: "name", title: "name", type: "text"},
+							{name: "startUserName", title: "startUserId", type: "text"},
+							{name: "status", title: "status", type: "date",
 								  renderer:  function(instance, td, row, col, prop, value, cellProperties) {
 										Handsontable.dom.empty(td);
 										let span;
 										span = document.createElement('span');	
-										if(value === null || value == ""){
+										
+										if(value == '1'){
 											$(span).text("Đang chạy")
-											$(span).css('color', 'green')
+											$(span).css('color', 'blue')
 											td.appendChild(span);
 											return td;
 										}
-										if(value == true){
-											$(span).text("Tạm dừng ")
+										if(value == '2'){
+											$(span).text("Tạm dừng")
 											$(span).css('color', 'orange')
+											td.appendChild(span);
+											return td;
+										}
+										if(value == '3'){
+											$(span).text("Hoàn thành")
+											$(span).css('color', 'green')
 											td.appendChild(span);
 											return td;
 										}
 									},
 							},
-							{name: "startTime", title: "startTime", type: "date", noFilter:true},
+							{name: "endTime", title: "endTime", type: "date", noFilter:true,
+								renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+									Handsontable.dom.empty(td);
+									let span;
+									span = document.createElement('span');	
+									if(value != null){
+										let data =  self.$moment(value).format('YYYY-MM-DD HH:mm:ss')
+										$(span).text(data)
+									}	
+									td.appendChild(span);
+									return td;
+								},
+							},
 						 ],
-						 listObject: res.data,
+						 listObject: res.data.listObject, 
 					}
 				}
 			},
@@ -176,7 +214,7 @@ export default {
 	computed:{
 		apiUrl(){
 			let processKey = this.$store.state.admin.processKey
-			return appConfigs.apiDomain.bpmne.instances+'?size=100&sort=startTime&order=desc&processDefinitionKey='+processKey;
+			return appConfigs.apiDomain.workflowExtend+processKey+'/process-instances';
 		},
 		processKey(){
 			return this.$store.state.admin.processKey
@@ -220,46 +258,65 @@ export default {
 		stopProcessInstance(){
 			let self = this
 			for(let i in this.listItemSelected){
-				adminApi.stopProcessInstances(this.listItemSelected[i].id).then(res=>{
-					if(res.suspended == true){
-						self.$snotify(
-							{
-								type: "success",
-								title:" Dừng tác vụ thành công"
-							}
-						)
-					}
-				self.$refs.listWorkFlow.refreshList()
-
-				}).catch(err=>{
+				if(this.listItemSelected[i].status == "3"){
 					self.$snotify(
-							{
-								type: "error",
-								title:"Tác vụ này đã được dừng"
-							}
-						)
-				})
+						{
+							type: "infor",
+							title:" Tác vụ này đã hoàn thành"
+						}
+					)
+				}else{
+					adminApi.stopProcessInstances(this.listItemSelected[i].id).then(res=>{
+						if(res.suspended == true){
+							self.$snotify(
+								{
+									type: "success",
+									title:" Dừng tác vụ thành công"
+								}
+							)
+						}
+						self.$refs.listWorkFlow.refreshList()
+					}).catch(err=>{
+						self.$snotify(
+								{
+									type: "error",
+									title:"Tác vụ này đã được dừng"
+								}
+							)
+					})
+				}
+				
 			}
  		},
 		activeProcessInstance(){
 			let self = this
 			for(let i in this.listItemSelected){
-				adminApi.activeProcessInstances(this.listItemSelected[i].id).then(res=>{
+				if(this.listItemSelected[i].status == "3"){
 					self.$snotify(
 						{
-							type: "success",
-							title:" Chạy tác vụ thành công"
+							type: "infor",
+							title:" Tác vụ này đã hoàn thành"
 						}
 					)
-					self.$refs.listWorkFlow.refreshList()
-				}).catch(err=>{
-					self.$snotify(
+				}else{
+					adminApi.activeProcessInstances(this.listItemSelected[i].id).then(res=>{
+						self.$snotify(
 							{
-								type: "error",
-								title:"Tác vụ này đang chạy"
+								type: "success",
+								title:" Chạy tác vụ thành công"
 							}
 						)
-				})
+						self.$refs.listWorkFlow.refreshList()
+					}).catch(err=>{
+						self.$snotify(
+								{
+									type: "error",
+									title:"Tác vụ này đang chạy"
+								}
+							)
+					})
+				}
+				
 			}
 			
 		},

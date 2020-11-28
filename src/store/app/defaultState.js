@@ -141,7 +141,12 @@ const defaultState = {
     generalNotificationPosition: 'top right',
     userLoadedRoleType: [],
     userOperations: {},
-
+    systemMessaging: {
+        messageObj: {},
+        token: '', // token của firebase
+        topics: {}, // các topic đã đăng ký, {documents: true, workflows: true, }
+    },
+    didRegisterSYQLForMonaco: false
 };
 
 export default defaultState;

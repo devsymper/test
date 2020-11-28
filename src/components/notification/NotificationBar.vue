@@ -55,7 +55,7 @@
             <v-row v-if="checkToday" 
                 v-for="item in listNotification.filter(x=>changeDate(x.createTime)==today)" 
                 :key="item.id"
-                style="height:55px"
+                style="height:58px"
                 class="text-left notification-item pt-0 pb-0"
             >
                 <v-col cols="2">
@@ -74,12 +74,28 @@
                     </v-row>
                 </v-col>
                 <v-col cols="10" style="padding:6px!important" @click="openNotification(item)">
-                    <v-row>
-                        <span class="notification-item-title">
+                    <v-row v-if="item.title.indexOf('<*')>-1" style="margin-top:-10px" >
+                        <v-col style="margin-top:-8px"  class="ellipsis">
+                            <span class="notification-item-title" style="margin-left:-12px">
                             {{reNameContent(item.title)}}
-                        </span>
+                            </span>
+                        </v-col>
+                        <v-col style="margin-top:-8px" class="text-right pr-3">
+                            <v-chip v-if="getDeadline(item.title)!='Invalid date'&&getDeadline(item.title)"
+                         class="notification-item-title deadline-tag"
+                         >
+                              {{(getDeadline(item.title))}}
+                        </v-chip>
+                        </v-col>
                     </v-row>
-                    <v-row class="notification-item-info mt-1">
+                     <v-row v-else style="margin-top:-10px" class="ellipsis">
+                        <v-col style="margin-top:-8px">
+                            <span  style="margin-left:-12px" class="notification-item-title">
+                                {{reNameContent(item.title)}}
+                            </span>
+                        </v-col>
+                    </v-row>
+                    <v-row class="notification-item-info" style="margin-top:-5px">
                         <v-col cols="6" class="ellipsis">
                             <v-icon class="mr-2" size="12">{{$i('input.'+getScope(item.action))}}</v-icon>
                             <span >{{item.extraLabel?item.extraLabel:''}} {{item.extraValue?item.extraValue:''}}</span>
@@ -90,7 +106,7 @@
                         </v-col>
                     </v-row>
                 </v-col>
-                   <v-divider style="width:95%; margin-top:-10px" class="ml-2" ></v-divider>
+                   <v-divider style="width:95%; margin-top:-8px" class="ml-2" ></v-divider>
                 <v-menu
                     :close-on-content-click="true"
                     :open-on-hover="true"
@@ -112,8 +128,11 @@
                             :key="i"
                         >
                             <template>
-                                <v-list-item-content class="pt-0 pb-0" @click="actionNotification(item,actionItem.value)">
-                                    <v-list-item-title class="font-weight-regular" v-text="actionItem.text"></v-list-item-title>
+                                <v-list-item-content class="pt-0 pb-0" 
+                                    @click="actionNotification(item,actionItem.value)">
+                                    <v-list-item-title class="font-weight-regular" 
+                                    v-text="actionItem.text">
+                                    </v-list-item-title>
                                 </v-list-item-content>
                             </template>
                         </v-list-item>    
@@ -121,12 +140,15 @@
                 </v-menu>
             </v-row>
             <!-- older -->
-            <v-row class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-3px"><span style="color:orange; font-weight:430">
-                {{$t('notification.older')}}</span></v-row>
+            <v-row class="w-100 fs-13 ml-3 mt-1" style="margin-bottom:-3px">
+                <span style="color:orange; font-weight:430">
+                {{$t('notification.older')}}
+                </span>
+            </v-row>
             <v-row
                 v-for="item in listNotification.filter(x=>changeDate(x.createTime)!=today)" 
                 :key="item.id"
-                style="height:55px"
+                style="height:58px"
                 class="text-left notification-item  pt-0 pb-0"
             >
                 <v-col cols="2">
@@ -154,12 +176,32 @@
                         </span>
                     </v-row>
                     <v-row v-else>
-                        <span class="notification-item-title">
-                            {{item.title}} 
-                        </span>
+                        <v-col v-if="item.title.indexOf('<*')>-1"  style="margin-top:-18px" cols="9"  class="ellipsis">
+                            <span 
+                                class="notification-item-title"
+                                style="margin-left:-10px"
+                                >
+                                {{reNameContent(item.title)}}
+                            </span>
+                        
+                        </v-col>
+                           <v-col v-else style="margin-top:-15px" cols="12"  class="ellipsis">
+                            <span 
+                                class="notification-item-title"
+                                style="margin-left:-10px"
+                                >
+                                {{item.title}}
+                            </span>
+                        </v-col>
+                        <v-col  v-if="item.title.indexOf('<*')>-1" cols="3" style="margin-top:-18px" class="text-right pr-3">
+                            <v-chip v-if="item.title.indexOf('<*')>-1&&getDeadline(item.title)!='Invalid date'&&getDeadline(item.title)" 
+                                class="notification-item-title deadline-tag " >
+                                {{(getDeadline(item.title))}}
+                            </v-chip>
+                        </v-col>
                     </v-row>
-                    <v-row class="notification-item-info mt-1">
-                        <v-col cols="6"  class="ellipsis">
+                    <v-row class="notification-item-info" style="margin-top:-5px">
+                        <v-col cols="6"  class="ellipsis" >
                             <v-icon class="mr-2" size="12">{{$i('input.'+getScope(item.action))}}</v-icon>
                             <span>{{item.extraLabel}} {{item.extraValue}}</span>
                         </v-col>
@@ -169,7 +211,7 @@
                         </v-col>
                     </v-row>
                 </v-col>
-                   <v-divider style="width:95%; margin-top:-10px" class="ml-2" ></v-divider>
+                   <v-divider style="width:95%; margin-top:-8px" class="ml-2" ></v-divider>
                 <v-menu
                     :close-on-content-click="true"
                     :open-on-hover="true"
@@ -309,6 +351,7 @@ export default {
     },
     data: function() {
         return {
+            deadLine:'',
             img:'',
             listSource:{},
             overlay: true,
@@ -352,16 +395,26 @@ export default {
                     return appConfigs.apiDomain.fileManagement+'readFile/'+icon ;}
             }       
         },
-         reNameContent(des){
-             let name = des;
-             let nameModule = Object.keys(this.listSource);
-             for(let j = 0;j<nameModule.length;j++){
-                 for(let i = 0; i<this.listSource[nameModule[j]].parameter.length;i++){
-                        let oldValue= new RegExp(this.listSource[nameModule[j]].parameter[i].value);
-                        let newValue =this.listSource[nameModule[j]].parameter[i].text;
-                    name = name.replace(oldValue,newValue);
-                    }
-             }
+        getDeadline(description){
+            let deadline= description.split("<*")[1].split('*>')[0];
+            deadline = deadline.slice(0, 10);
+            let result = '';
+            if(deadline){
+                result= this.$moment.unix(deadline).fromNow().replace("giờ",'h').replace("trước",'').replace("tới",'').replace('năm','y');
+                result.replace('ngày','d').replace('tháng','m').replace("một",'1')
+            }
+            return result
+        },
+         reNameContent(description){
+             //this.deadLine = '';
+            let name = description;
+            if(description.indexOf('<*')>-1){
+                let newValue = '';
+                let value = description.split("<*")[1].split('*>')[0];
+                // 
+                let oldValue= "<*"+value+"*>";
+                name= name.replace(oldValue,newValue);
+                }
             return name
         },
         getSource(){
@@ -381,13 +434,16 @@ export default {
             }
         },
         getScope(action){
-            if(action){
+            let result = "";
+            try{
                 if(JSON.parse(action).module=="document"&&JSON.parse(action).scope=="workflow"){
-                     return "taskBPM"
+                     result = "taskBPM"
                 }else{
-                    return JSON.parse(action).module
+                    result =  JSON.parse(action).module
                 }
+            }catch (error){
             }
+            return result;
         },
         changeDate(value){
             return dayjs.unix(value).format('DD/MM/YYYY')
@@ -396,9 +452,7 @@ export default {
             for (let i = 0;i<this.listNotification.length;i++){
                 let dayListNotification = dayjs.unix(this.listNotification[i].createTime).format('DD/MM/YYYY') ;
                 let today = dayjs().format('DD/MM/YYYY') ;
-
                 if(today==dayListNotification){
-    
                     this.checkToday = true;
                 }   
             }
@@ -569,6 +623,12 @@ export default {
     font-size: 11px;
 
 }
+.right-180{
+    right:-180px!important
+}
+.right-200{
+      right:-200px!important
+}
 .notification-item-info{
     color: #8E8E8E;
 }
@@ -648,5 +708,13 @@ export default {
     overflow: hidden;
     white-space: nowrap; 
     text-overflow: ellipsis
+}
+.deadline-tag{
+    height: 13px; 
+    font-size: 10px;
+    background-color:#2196F3 !important;
+    color: white; 
+    top:3px;
+   
 }
 </style>

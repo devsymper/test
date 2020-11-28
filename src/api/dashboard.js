@@ -17,8 +17,7 @@ export const dashboardApi = {
 	// 	return api.get('dashboards', filter)
 	// }
 	getDashboards(filter) {
-		let url = util.addEnvToUrl('https://bi-service.symper.vn/dashboards');
-		return api.get(url, filter)
+		return api.get(appConfigs.apiDomain.dashboard, filter)
 	}
 
 };

@@ -115,6 +115,12 @@ export default {
         tableSettings() {
             let setting = util.cloneDeep({
                 ...this.commonTableSetting,
+                afterChange(changes){
+                    if(changes){
+                        changes.forEach(([row, prop, oldValue, newValue]) => {
+                        });
+                    }
+                }
             });
             // setting.
             return setting;

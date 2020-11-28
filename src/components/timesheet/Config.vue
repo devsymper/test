@@ -1,6 +1,9 @@
 <template>
 <v-card>
     <v-tabs v-model="tab" color="orange" grow style="flex-grow: 0">
+        <v-tab href="#tab-1" class="tab">
+            {{$t('timesheet.period')}}
+        </v-tab>
         <v-tab href="#tab-2" class="tab">
             {{$t('timesheet.period')}}
         </v-tab>
@@ -13,7 +16,12 @@
     </v-tabs>
     <v-tabs-items v-model="tab" style="flex-grow: 1">
         <!-- start of tab 1 -->
-  
+        <v-tab-item :key="1" :value="'tab-' + 1" class="tab-item" style="flex-grow: 1">
+            <div class="ml-3 mt-3 mr-3">
+             <RepeatConfig />
+
+            </div>
+        </v-tab-item>
 
         <!-- start of tab 2 -->
         <v-tab-item :key="2" :value="'tab-' + 2" class="tab-item" style="flex-grow: 1">
@@ -250,11 +258,13 @@
 </template>
 
 <script>
+import RepeatConfig from "../../components/common/RepeatConfig"
 import timesheetApi from '../../api/timesheet';
 import CategoryForm from "../../components/timesheet/CategoryForm";
 export default {
     components:{
-        CategoryForm
+        CategoryForm,
+        RepeatConfig
     },
     data() {
         return {

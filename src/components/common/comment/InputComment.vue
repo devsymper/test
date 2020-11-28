@@ -2,7 +2,7 @@
 	<div class="content-comment">
 		<div v-if="listImage.length > 0"  class="content-comment-img">
 				<v-tabs
-				show-arrows
+					show-arrows
 				>
 				<v-tab
 				v-for="(item,i) in listImage"
@@ -10,9 +10,19 @@
 				:href="'#tab-' + i"
 				style="position:relative"
 				>
-					<v-img :src="item.serverPath" aspect-ratio="1.7" style="width:100px;height:100px"  @click="previewImage(item)">
+					<v-img 
+						:src="item.serverPath" 
+						aspect-ratio="1.7" 
+						style="width:100px;height:100px"  
+						@click="previewImage(item)"
+					>
 					</v-img>
-					<v-icon class="icon-remove-img" style="position:absolute;top:0;right:0" v-if="isEditing == true" @click="removeImage(item)">mdi-close-circle-outline</v-icon>
+					<v-icon 
+						class="icon-remove-img" 
+						style="position:absolute;top:0;right:0" 
+						v-if="isEditing == true" 
+						@click="removeImage(item)"
+					>mdi-close-circle-outline</v-icon>
 				</v-tab>
 			</v-tabs>
 		</div>
@@ -40,9 +50,18 @@
 						v-on:keyup.up="chooseUserUp($event)"
 						>
 					</textarea>
-				<UploadFile style="position:absolute;right:16px;bottom: 0px;" @uploaded-file="uploadInfo" :uploadMultyFile="true" @upload-error="showError" />
-				<v-btn style="position:absolute;right: 0px;bottom: 0px;" icon @click="addComment">
-					<v-icon >mdi-send-circle-outline</v-icon>
+				<UploadFile 
+					style="position:absolute;right:20px;bottom:0px;" 
+					@uploaded-file="uploadInfo" 
+					:uploadMultyFile="true" 
+					@upload-error="showError" 
+				/>
+				<v-btn 
+					small 
+					style=" position:absolute;right: 0px;bottom: 0px;" 
+					icon 
+					@click="debounceAddCommnent">
+					<v-icon small >mdi-send-circle-outline</v-icon>
 				</v-btn>
 				<MenuTagUser style="position:absolute;left:0;bottom:45px" ref="menuTagUser" @selected-item="tagged" :keyWord="keyWord" />
 			</div>
@@ -247,6 +266,9 @@ export default {
                 text: this.$t('notification.error')
             })
 		},
+		debounceAddCommnent: _.debounce(function(e){
+			this.addComment()
+		}, 200,this),
 		addComment(){
 			this.dataPostComment = this.sComment
 			this.dataPostComment.content = this.inputComment
@@ -265,7 +287,6 @@ export default {
 						this.$store.commit('comment/setWaitingCommentCountPerObj', this.sComment.objectType+':'+this.sComment.objectIdentifier);
 					});
 				}
-				
 			} else {
 				if(emptyCheck == false){
 					this.dataPostComment.id = this.item.id
@@ -331,9 +352,8 @@ export default {
 			if(this.isSelectingUser == true){
 				this.selectedUser()
 			}else{
-				this.addComment()
+				this.debounceAddCommnent()
 			}
-	/* float: right; */
 		},
 		addAvatar(data){
 			let mapIdToUser = this.$store.getters['app/mapIdToUser'];
@@ -433,11 +453,11 @@ export default {
 	max-width: unset;
 }
 .content-comment >>> .v-icon{
-	font-size:13px;	
+	font-size:19px;	
 }
 .content-comment >>> .content-comment-img{
 	display:flex;	
-	width:85%;
+	width: 300px;
 	margin-bottom:20px;
 	margin-top:4px;
 }

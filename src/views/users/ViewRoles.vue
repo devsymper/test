@@ -223,7 +223,7 @@ export default {
 				}
 			}
 		 },
-		//group những loại đối tượng dạng document_de:123123 trùng tên với nhau 
+		//group những loại đối tượng dạng document_de: trùng tên với nhau 
 		groupNameObj(){
 			this.nameObject;
 			let group = _.groupBy(this.nameObject,'name');

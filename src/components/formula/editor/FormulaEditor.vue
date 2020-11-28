@@ -1,15 +1,17 @@
 <template>
     <div class="h-100 w-100"  >
         <div class="d-flex" :style="{height: height}">
-            <code-editor
+            <SymperMonacoEditor
                 ref="edtScript" 
                 v-model="lazyValue" 
                 @init="editorInit"
-                lang="sql" 
-                theme="chrome" 
+                @blur="$emit('blur', {})"
+                @on-change-selection="getInputParams"
                 width="100%" 
-                :height="height">
-            </code-editor>
+                :height="height"
+                :listKeyworks="listKeyworks"
+                :options="editorOptions">
+            </SymperMonacoEditor>
             <div class="debug-input-view" v-if="showDebugView">
                 <p>{{$t('formulasEditor.inputParams')}}</p>
                 <VuePerfectScrollbar :style="{height: 'calc(100% - 30px)','padding-right': '12px'}">
@@ -44,7 +46,6 @@
                     @grid-ready="onGridReady"
                     class="ag-theme-balham mt-2"
                     :columnDefs="columnDefs"
-                    
                     :rowData="rowData">
                 </AgGridVue>
                 
@@ -70,6 +71,8 @@ import Pagination from './../../../components/common/Pagination'
 import Formulas from '../../../views/document/submit/formulas';
 import {AgGridVue} from "ag-grid-vue";
 import ClientSQLManager from '../../../views/document/submit/clientSQLManager';
+
+import SymperMonacoEditor from "./SymperMonacoEditor";
 export default {
     created(){
         this.$store.dispatch('document/setListDocuments');
@@ -99,14 +102,18 @@ export default {
     mounted(){
         let self = this;
         if(this.disabled){
-            this.$refs.edtScript.editor.setReadOnly(true);
+            this.$refs.edtScript.setReadOnly();
         }
-
-        this.$refs.edtScript.editor.on('blur', () => {
-            self.$emit('blur', {});
-        });
     },
     computed: {
+        editorOptions(){
+            return {
+                lineNumbers: this.simpleMode ? 'off' : 'on',
+                minimap: {
+                    enabled: this.simpleMode ? false : true
+                }
+            }
+        },
         lazyValue:{
             get(){
                 return this.value;
@@ -158,7 +165,8 @@ export default {
         VuePerfectScrollbar,
         'data-table' : AgDataTable,
         Pagination,
-        AgGridVue
+        AgGridVue,
+        SymperMonacoEditor
     },
     props:{
         value: {
@@ -199,77 +207,19 @@ export default {
             this.totalRecord = 0;
             this.debugStatus = null;
         },
-        async handleEditorInput(formula){
-            let pos = this.$refs.edtScript.editor.getCursorPosition();
-            let range = this.$refs.edtScript.editor.session.getLine(pos.row).slice(0,pos.column);
-
-            let lastWord = range.slice(
-                range.lastIndexOf(' ') + 1
-            );
-
-            let doc = this.listAllDocs[lastWord];
-            if(doc && !doc.allFields){
-                let docInfo = await documentApi.detailDocument(doc.id);
-                if(docInfo.status == 200){
-                    this.$set(doc, 'allFields', docInfo.data.fields);
-                }
-            }
-        },
         editorInit(edt){
-            require('brace/ext/language_tools'); //language extension prerequsite...
-            require('brace/mode/html')  ;              
-            require('brace/mode/sql')  ;  //language
-            require('brace/mode/less');
-            require('brace/theme/chrome');
-            edt.setOptions({
-                useWorker: true,
-                enableBasicAutocompletion: true,
-                enableSnippets: true,
-                showPrintMargin: false,
-                enableLiveAutocompletion: true,
-                indentedSoftWrap: false,
-                showGutter: !this.simpleMode,
-            });
-            this.customAceEditorSetting(edt);
-            this.setSelectionEvent(edt)
-        },
-        
-        customAceEditorSetting(editor) {
-            let langTools = ace.acequire("ace/ext/language_tools");
-            let self = this;
-            editor.getSession().setUseWrapMode(true);
-            let staticWordCompleter = {
-                identifierRegexps: [/[a-zA-Z_0-9\.\$\-\u00A2-\uFFFF]/],
-                getCompletions: function(editor, session, pos, prefix, callback) {
-                    callback(null, self.autocompleteWords);
-                },
-                getDocTooltip: (item) => {
-                }
-            }
-            langTools.setCompleters([staticWordCompleter]);
         },
         onFocus(){
-            this.$refs.edtScript.editor.focus();
-        },
-        /**
-         * Hoangnd
-         * Hàm nhận sự kiện thay đổi selection(bôi đen text) trên editor để tìm các tham số đầu vào cho việc debug
-         */
-        setSelectionEvent(edt){
-            let selection = edt.selection;
-            let self = this;
-            selection.on("changeSelection", function(){
-                if(!self.showDebugView){
-                    return;
-                }
-                self.getInputParams()
-            })
+            this.$refs.edtScript.focus();
         },
         getInputParams(){
+            if(!this.showDebugView){
+                return;
+            }
             this.allInput = {};
-            let selectionText = this.$refs.edtScript.editor.getSelectedText();
+            let selectionText = this.$refs.edtScript.getSelectedText();
             if(!selectionText){
-                selectionText = this.$refs.edtScript.editor.getValue();
+                selectionText = this.$refs.edtScript.getValue();
             }
             if(selectionText.length > 0){
                 let dataInput = selectionText.match(/(?<={)[A-Za-z0-9_]+(?=})/gi);
@@ -286,9 +236,9 @@ export default {
         executeFormulas(){
             this.timeRequest = 0;
             this.error = null;
-            let selectionText = this.$refs.edtScript.editor.getSelectedText();
+            let selectionText = this.$refs.edtScript.getSelectedText();
             if(!selectionText){
-                selectionText = this.$refs.edtScript.editor.getValue();
+                selectionText = this.$refs.edtScript.getValue();
             }
             if(!selectionText){
                 return;

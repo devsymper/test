@@ -12,9 +12,9 @@
         :containerHeight="containerHeight"
         :customAPIResult="customAPIResult"
         :showImportButton="false"
-        :getDataUrl="'https://notifi.symper.vn/channels'"
+        :getDataUrl="notifiDomain + 'channels'"
         :actionPanelWidth="actionPanelWidth">
-        <div slot="right-panel-content" class="h-100" style="overflow:hidden!important">
+        <div slot="right-panel-content" class="h-100"  style="overflow:hidden!important">
            <configNotification 
                 ref="config"
                 :type="typeNoti"
@@ -40,6 +40,7 @@ export default {
     data(){
         const self = this;
         return {
+            notifiDomain: appConfigs.apiDomain.nofitication,
             customAPIResult: {
                 reformatData(res){
                     let data={
@@ -108,6 +109,7 @@ export default {
                      for(let i = 0; i<data.listObject.length; i++){
                         data.listObject[i].originState = data.listObject[i].state;
                         data.listObject[i].icon = data.listObject[i].icon;
+                        data.listObject[i].filter = data.listObject[i].filter;
                         data.listObject[i].action = data.listObject[i].action;
                         data.listObject[i].originAction = self.getName(data.listObject[i].objectType,data.listObject[i].action);
                         data.listObject[i].state = self.renameStatus(data.listObject[i].state);
@@ -181,9 +183,12 @@ export default {
         },
         reNameParam(nameModule,des){
              let name = des;
+             if(des.indexOf('<*Deadline>*')>-1){
+                   name = name.replace('<*Deadline>*','<*{data.dueDate}*>'); 
+             }
             for(let i = 0; i<this.listSource[nameModule].parameter.length;i++){
                 let oldValue= new RegExp(this.listSource[nameModule].parameter[i].value);
-                let newValue ="<"+this.listSource[nameModule].parameter[i].text+'>';
+                let newValue =this.listSource[nameModule].parameter[i].text;
                name = name.replace(oldValue,newValue);
               // name='123'
             }

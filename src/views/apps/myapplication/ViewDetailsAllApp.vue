@@ -18,16 +18,16 @@
                         solo
                         append-icon="mdi-magnify"
                         v-model="searchItemKey"
-                    ></v-text-field>
-                   <div class="button-header">
-                        <v-btn icon tile style="width:32px;height:32px;margin:0px 4px" >
-                         <v-icon @click="collapse" >mdi-arrow-collapse-up</v-icon>  
-                        </v-btn>
-                        <v-btn icon tile  style="width:32px;height:32px;margin:0px 4px">
-                            <v-icon @click="changeView">mdi-page-previous-outline</v-icon>  
-                        </v-btn>
-                        <MenuConfigTypeView :currentTypeView="currentType" :titleTypeView="'hellooo'" />
-                   </div>
+				></v-text-field>
+				<div class="button-header">
+					<v-btn icon tile style="width:32px;height:32px;margin:0px 4px" >
+						<v-icon @click="collapse" >mdi-arrow-collapse-up</v-icon>  
+					</v-btn>
+					<v-btn icon tile  style="width:32px;height:32px;margin:0px 4px">
+						<v-icon @click="changeView">mdi-page-previous-outline</v-icon>  
+					</v-btn>
+					<MenuConfigTypeView :currentTypeView="currentType" :titleTypeView="'hellooo'" />
+				</div>
             </div>
         </div>
         <VuePerfectScrollbar :style="{height: menuItemsHeight}">

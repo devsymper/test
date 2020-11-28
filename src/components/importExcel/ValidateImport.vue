@@ -23,7 +23,7 @@
             class="ml-6 fs-13">
             <v-row class=" mb-2 ml-1 color-grey">Tiền xử lý:<span class="fw-400 ml-1"> 
                 {{processing.preprocessing.processed?processing.preprocessing.processed:0}}</span></v-row>
-            <BeatLoader class="justify-center d-flex custom-class" :size="10" color="orange" />
+                <div class="loader"></div>
         </v-list>
         <v-list>
             <v-btn small  color="primary" class="mt-4 ml-7" @click="stopImport()">Stop</v-btn>
@@ -259,12 +259,7 @@
 
 <script>
 import importApi from "./../../api/ImportExcel";
-import {VueSpinners} from '@saeris/vue-spinners';
-import {BeatLoader} from '@saeris/vue-spinners'
 export default {
-    components: {
-        BeatLoader
-    },
     props:['fileName','setInterval','importFile'],
     methods: {
         stopImport(){
@@ -411,6 +406,16 @@ export default {
 </script>
 
 <style lang="scss" scoped>
+.loader {
+  border: 10px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 10px solid #3498db;
+  width: 40px;
+  height: 40px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+}
+
 .color-grey {
     color: grey;
 }

@@ -26,9 +26,6 @@
                 :class="textColor+ ' mt-1'"
                 @click:close="remove(data.item)"
             > 
-                <!-- <v-avatar sizes="23" left v-if="compactChip">
-                    <v-img  sizes="23" :src="data.item.avatar ? data.item.avatar : avatarDefault"></v-img>
-                </v-avatar> -->
                 <symperAvatar :size="20" :userId="data.item.id" />
                 <span class="fs-11">{{ data.item.displayName }}</span>
             </v-chip>
@@ -36,7 +33,6 @@
         <template v-slot:item="data">
             <template>
                 <v-list-item-avatar height="20" width="20" size="20" class="mt-1 mb-1">
-                    <!-- <v-img sizes="20" height="20" width="20" :src="data.item.avatar ? data.item.avatar : avatarDefault"></v-img> -->
                     <symperAvatar :size="20" :userId="data.item.id" />
                 </v-list-item-avatar>
                 <v-list-item-content class="pt-0 pb-0">
@@ -93,7 +89,6 @@ export default {
         }
     },
     watch: {
-       
         value: {
             deep: true,
             immediate: true,
@@ -107,11 +102,6 @@ export default {
     },
     data: function() {
          const srcs = {
-            1: 'https://cdn.vuetifyjs.com/images/lists/1.jpg',
-            2: 'https://cdn.vuetifyjs.com/images/lists/2.jpg',
-            3: 'https://cdn.vuetifyjs.com/images/lists/3.jpg',
-            4: 'https://cdn.vuetifyjs.com/images/lists/4.jpg',
-            5: 'https://cdn.vuetifyjs.com/images/lists/5.jpg',
         }
         return {
             avatarDefault: avatarDefault,
@@ -147,8 +137,6 @@ export default {
     },
     computed: {
         allUser(){
-            console.log(this.$store.state.app.allUsers,"alluser");
-
             return this.$store.state.app.allUsers;
         }
     }

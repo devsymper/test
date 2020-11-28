@@ -14,6 +14,7 @@
             <div class="sym-document-body">
                 <div class="sym-document-action">
                     <editor-action
+                    ref="actionView"
                     @document-action-save-document="openPanelSaveDocument"
                     @document-action-clone-control="cloneControl"
                     @document-action-list-control-option="setShowAllControlOption"
@@ -33,7 +34,7 @@
                
             </div>
         </vue-resizable>
-        <div  class="sym-document__side-bar-right">
+        <div class="sym-document__side-bar-right">
             <sidebar-right ref="sidebarRight" :isConfigPrint="isConfigPrint" :styles="contentStyle" :instance="keyInstance"/>
         </div>
         <s-table-setting v-if="!isConfigPrint" ref="tableSetting" :instance="keyInstance" @add-columns-table="addColumnTable" :defaultTablePivotConfig="defaultTablePivotConfig"/>
@@ -483,9 +484,9 @@ export default {
             if(this.typeDialog == 'deletePage'){
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
             }
-            if(this.typeDialog == "baEditting"){
-                this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
-            }
+            // if(this.typeDialog == "baEditting"){
+            //     this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
+            // }
         },
 
         /**
@@ -1040,9 +1041,10 @@ export default {
                         allControl[controlId].properties.dataFlowId.value = allControl[controlId].properties.dataFlowId.value.id;
                     }
                     else if(allControl[controlId].type == 'table'){
-                        if(allId.indexOf(controlId) === -1){
-                            for(let childControlId in allControl[controlId].listFields){
-                                let childControl = allControl[controlId].listFields[childControlId]
+                        if(allId.indexOf(controlId) !== -1){
+                            let listField = allControl[controlId].listFields;
+                            for(let childControlId in listField){
+                                let childControl = listField[childControlId]
                                 if(allId.indexOf(childControlId) === -1){
                                     delete allControl[controlId].listFields[childControlId];
                                     isCheck = true;
@@ -1050,21 +1052,32 @@ export default {
                                 if(!isCheck && childControl.type == 'user'){
                                     allUserControl['user'].push(childControl.properties.name.value)
                                 }
+                                let childControlFormulas = childControl.formulas;
+
+                                for(let formulaType in childControlFormulas){
+
+                                    if(formulaType != 'linkConfig'){
+                                        if(childControlFormulas[formulaType].value.trim() == ""){
+                                            allControl[controlId].listFields[childControlId].formulas[formulaType].formulasId = 0;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }   
-                }
-                if(!isCheck && allControl[controlId].type == 'user'){
-                    allUserControl['user'].push(allControl[controlId].properties.name.value)
-                }
-                let controlFormulas = allControl[controlId].formulas;
-                for(let formulaType in controlFormulas){
-                    if(formulaType != 'linkConfig'){
-                        if(controlFormulas[formulaType].value.trim() == ""){
-                            allControl[controlId].formulas[formulaType].formulasId = 0;
+                    if(!isCheck && allControl[controlId].type == 'user'){
+                        allUserControl['user'].push(allControl[controlId].properties.name.value)
+                    }
+                    let controlFormulas = allControl[controlId].formulas;
+                    for(let formulaType in controlFormulas){
+                        if(formulaType != 'linkConfig'){
+                            if(controlFormulas[formulaType].value.trim() == ""){
+                                allControl[controlId].formulas[formulaType].formulasId = 0;
+                            }
                         }
                     }
                 }
+                
                 
             }
             return {minimizeControl:allControl,userControls:allUserControl}
@@ -1074,7 +1087,8 @@ export default {
         // hoangnd: hàm gửi request lưu doc
         async saveDocument(){
             let minimizeControl = this.minimizeControlEL(this.editorStore.allControl);
-            let allControl = minimizeControl.minimizeControl
+            let allControl = minimizeControl.minimizeControl;
+            console.log('allControl',allControl);
             let userControls = minimizeControl.userControls
             let documentProperties = util.cloneDeep(this.sDocumentProp);
             documentProperties = Object.assign({controlInfo:userControls},documentProperties)
@@ -1123,7 +1137,7 @@ export default {
                                 text: res.message
                             });
                     }
-                }
+                } 
                 else{
                     if(this.routeName == "editDocument"){   //edit doc
                         this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
@@ -1134,8 +1148,9 @@ export default {
                 }
                 
             } catch (error) {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
-                this.$snotify({
+                console.log('errorerror',error);
+                thisCpn.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$snotify({
                             type: "error",
                             title: "error from formulas serice, can't not save into formulas service!!!",
                             text: error
@@ -1147,6 +1162,9 @@ export default {
          */
         createDocument(dataPost){
             let thisCpn = this;
+            if(this.dataPivotTable && Object.keys(this.dataPivotTable).length > 0){
+                dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
+            }
             documentApi.saveDocument(dataPost).then(res => {
                 this.$evtBus.$emit('document-editor-save-doc-callback')
                 if (res.status == 200) {
@@ -1180,7 +1198,7 @@ export default {
          * Hàm gọi api edit document
          */
         editDocument(dataPost){
-            if(Object.keys(this.dataPivotTable).length > 0){
+            if(this.dataPivotTable && Object.keys(this.dataPivotTable).length > 0){
                 dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
             }
             let thisCpn = this;
@@ -1202,7 +1220,7 @@ export default {
                                 if(data.length > 0){
                                     let curBa = data[0];
                                     this.dialog = true;
-                                    this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
+                                    this.titleDialog = "BA "+curBa.name+" đang sửa doc này";
                                     this.typeDialog = "baEditting";
                                     return false;
                                 }
@@ -1282,8 +1300,17 @@ export default {
             let table = elements.find('thead').closest('.s-control-table');
             let tableId = table.attr('id');
             let currentControl = this.editorStore.currentSelectedControl;
-            if(currentControl.properties.name.name.value){
+            if(currentControl.properties.name.name.value && tablePivotConfig){
+                if(!this.dataPivotTable){
+                    this.dataPivotTable = {};
+                }
                 this.dataPivotTable[currentControl.properties.name.name.value] = tablePivotConfig;
+
+            }
+            else{
+                if(this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
+                    delete this.dataPivotTable[currentControl.properties.name.name.value];
+                }
             }
             let thead = '';
             let tbody = '';
@@ -1479,7 +1506,7 @@ export default {
                 }
                 this.$refs.tableSetting.showDialog();
                 let currentControl = this.editorStore.currentSelectedControl;
-                if(currentControl.properties.name.name.value && this.dataPivotTable[currentControl.properties.name.name.value]){
+                if(currentControl.properties.name.name.value && this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
                     this.defaultTablePivotConfig = this.dataPivotTable[currentControl.properties.name.name.value];
                 }
                 this.$refs.tableSetting.setListRow(listData);
@@ -1946,7 +1973,7 @@ export default {
 
         },
         async checkAllowEditDocument(document){
-            let updateTime = new Date(document.updateAt).getTime();
+            let updateTime = new Date(document.lastEditAt).getTime();
             let timeDiff = Date.now() - updateTime;
             if(timeDiff > 4000){
                 /**
@@ -1966,12 +1993,14 @@ export default {
                             if(data.length > 0){
                                 let curBa = data[0];
                                 this.dialog = true;
-                                this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
+                                this.$refs.actionView.hideSaveBtn(curBa.name);
+                                this.titleDialog = "BA "+curBa.name+" đang sửa doc này.";
                                 this.typeDialog = "baEditting";
                                 return false;
                             }
                         }
                     } catch (error) {
+                        this.$refs.actionView.hideSaveBtn('');
                         return false;
                         console.log(error);
                     }
@@ -1983,12 +2012,9 @@ export default {
         async getContentDocument(){
             if(this.documentId != 0){
                 let res = await documentApi.detailDocument(this.documentId);
-                let checkEditting = await this.checkAllowEditDocument(res.data.document);
-                if(checkEditting == false){
-                    return;
-                }
                 if (res.status == 200) {
                     if(this.routeName == "editDocument"){
+                        await this.checkAllowEditDocument(res.data.document);
                         this.setDocumentProperties(res.data.document);
                     }
                     let content = res.data.document.content;
@@ -2042,6 +2068,7 @@ export default {
         //hoangnd: hàm set các giá trị của thuộc tính và formulas vào từng contrl trong doc lúc load dữ liệu và đưa vào state
         setDataForPropsControl(fields){
             console.log("ádsadasd",fields);
+            let thisCpn = this;
             for(let controlId in fields){
                 if(!fields[controlId].hasOwnProperty('type')){
                     continue;
@@ -2059,9 +2086,9 @@ export default {
                         if(type == 'dataFlow' && k == 'dataFlowId'){
                             properties[k].value = {id:fields[controlId]['properties'][k]};
                         }
-                        else if(k == 'mapParamsDataflow'){
+                        else if(type == 'dataFlow' && k == 'mapParamsDataflow'){
                             properties[k]['datasets'] = fields[controlId]['properties']['datasets'];
-                            properties[k]['value'] = fields[controlId]['properties']['value'];
+                            properties[k]['value'] = fields[controlId]['properties'][k];
                         }
                         else{
                             if(typeof fields[controlId]['properties'][k] != "object"){
@@ -2078,13 +2105,22 @@ export default {
                     $.each(formulas,function(k,v){
                         if(k == 'linkConfig'){
                             if(fields[controlId]['formulas'][k]){
-                                formulas[k]['configData'] = fields[controlId]['formulas'][k]['configData'];
+                                let configData = fields[controlId]['formulas'][k]['configData'];
+                                if(thisCpn.$getRouteName() == 'cloneDocument'){
+                                    for (let index = 0; index < configData.length; index++) {
+                                        configData[index]['formula']['id'] = 0;
+                                        
+                                    }
+                                }
+                                formulas[k]['configData'] = configData;
                             }
                         }
                         else{
                             if(fields[controlId]['formulas'][k]){
                                 formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0];
-                                formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                                if(thisCpn.$getRouteName() != 'cloneDocument'){
+                                    formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                                }
                             }
                             if(k == 'autocomplete'){
                                 formulas[k]['configData']= (autocompleteConfig == false) ? {} : autocompleteConfig;
@@ -2119,13 +2155,30 @@ export default {
                         })
                         if(listField[childFieldId]['formulas'] != false){
                             $.each(childFormulas,function(k,v){
-                                if(listField[childFieldId]['formulas'][k]){
-                                    childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0]
-                                    childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
+                                if(k == 'linkConfig'){
+                                    if(listField[childFieldId]['formulas'][k]){
+                                        let configData = listField[childFieldId]['formulas'][k]['configData'];
+                                        if(thisCpn.$getRouteName() == 'cloneDocument'){
+                                            for (let index = 0; index < configData.length; index++) {
+                                                configData[index]['formula']['id'] = 0;
+                                                
+                                            }
+                                        }
+                                        childFormulas[k]['configData'] = configData;
+                                    }
                                 }
-                                if(k == 'autocomplete'){
-                                    childFormulas[k]['configData']= (childAutocompleteConfig == false) ? {} : childAutocompleteConfig;
+                                else{
+                                    if(listField[childFieldId]['formulas'][k]){
+                                        childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0];
+                                        if(thisCpn.$getRouteName() != 'cloneDocument'){
+                                            childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0];
+                                        }
+                                    }
+                                    if(k == 'autocomplete'){
+                                        childFormulas[k]['configData']= (childAutocompleteConfig == false) ? {} : childAutocompleteConfig;
+                                    }
                                 }
+                                
                             })
                         }
                         listChildField[childFieldId] = {properties: childProperties, formulas : childFormulas,type:childType}

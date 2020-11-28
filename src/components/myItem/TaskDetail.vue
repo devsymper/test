@@ -17,8 +17,18 @@
             </v-tooltip>
             <div id="action-task" class="text-right pt-1 pb-1 pr-0 float-right">
                 <span v-if="!originData.endTime && !hideActionTask ">
-                    <span v-if="checkRole(originData.assigneeInfo.id)==true">
-                        <v-btn small depressed  v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
+                    <span v-if="originData.assigneeInfo && checkRole(originData.assigneeInfo.id)==true">
+                        <v-btn 
+                            small 
+                            depressed  
+                            v-for="(action, idx) in taskActionBtns" 
+                            dark 
+                            :key="idx" 
+                            :color="action.color" 
+                            @click="saveTaskOutcome(action.value)" 
+                            class="mr-2"
+                            :loading="loadingActionTask"
+                        >
                             {{action.text}}
                         </v-btn>
                     </span>
@@ -122,6 +132,7 @@ import { appManagementApi } from '@/api/AppManagement';
 import { extractTaskInfoFromObject, addMoreInfoToTask } from '@/components/process/processAction';
 
 import VueClipboard from 'vue-clipboard2';
+import { util } from '../../plugins/util';
 
 
 Vue.use(VueClipboard)
@@ -281,9 +292,12 @@ export default {
             let taskInfo = this.taskInfo;
             if(this.originData){
                 let isPendding = !this.originData.endTime;
-                let isApprovalTask = taskInfo.action.action == 'approval';
-                let hasEditableControls = !taskInfo.approvalEditableControls || (taskInfo.approvalEditableControls && taskInfo.approvalEditableControls.length);
-                return isPendding && isApprovalTask && hasEditableControls;
+                if (taskInfo.action) {
+                    let isApprovalTask = taskInfo.action.action == 'approval';
+                    let hasEditableControls = !taskInfo.approvalEditableControls || (taskInfo.approvalEditableControls && taskInfo.approvalEditableControls.length);
+                    return isPendding && isApprovalTask && hasEditableControls;
+                }
+            
             }
         },
         checkRole(assigneeId){
@@ -342,7 +356,7 @@ export default {
         changeTaskDetailInfo(taskId){
             let hostname=window.location.hostname;
             let copyText = this.taskInfo.action.parameter.taskId;
-            copyText='https://'+hostname+'/#/myitem/tasks/'+copyText;
+            copyText=util.addEnvToUrl('https://'+hostname+'/#/myitem/tasks/'+copyText);
             this.linkTask=copyText;
 
             if(!taskId){
@@ -394,8 +408,10 @@ export default {
             this.breadcrumb.taskName = task.name;
             if(task.processDefinitionId){
                 let processDefinitionId=task.processDefinitionId;
-		        var arrProcessDefinitionId = processDefinitionId.split(":"); //tách chuỗi để lấy DefinitionKey
-                this.breadcrumb.definitionName = this.$store.state.process.allDefinitions[arrProcessDefinitionId[0]].name;
+                var arrProcessDefinitionId = processDefinitionId.split(":"); //tách chuỗi để lấy DefinitionKey
+                if (this.$store.state.process.allDefinitions[arrProcessDefinitionId[0]]) {
+                    this.breadcrumb.definitionName = this.$store.state.process.allDefinitions[arrProcessDefinitionId[0]].name;
+                }
                 this.breadcrumb.instanceName = this.taskInfo.extraLabel+' '+this.taskInfo.extraValue;
             }else{
                 this.breadcrumb.definitionName = '';
@@ -666,9 +682,7 @@ export default {
                 infotTask.taskInfo= taskInfo;
                 infotTask.originData=task;
                 self.$emit("change-info-task",infotTask);
-                // if (task.processInstanceId && task.processInstanceId!=null) {
-                //     await self.getVariablesProcess(task.processInstanceId)
-                // }
+           
             }
         }
     }

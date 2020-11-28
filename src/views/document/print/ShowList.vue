@@ -1,7 +1,7 @@
 <template>
     <list-items
         ref="listDocument"
-        :getDataUrl="'https://sdocument-management.symper.vn/documents/'+docId+'/prints'"
+        :getDataUrl="sDocumentManagementUrl+'documents/'+docId+'/prints'"
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('document.title')"
@@ -17,12 +17,15 @@
 import { documentApi } from "./../../../api/Document.js";
 import ListItems from "./../../../components/common/ListItems.vue";
 import { util } from "./../../../plugins/util.js";
+import { appConfigs } from './../../../configs';
+
 export default {
     components: {
         "list-items": ListItems,
     },
     data(){
         return {
+            sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
             docId:this.$route.params.id,
             commonActionProps: {
                 // "module": "document",

@@ -1,5 +1,5 @@
 <template>
-    <div class="w-100 h-100">
+    <div :class="{'w-100 h-100': true , 'view-only':action == 'view' || action == 'structureManagement'}">
         <v-tabs
             v-model="currentTab"
             background-color="transparent"
@@ -588,5 +588,12 @@ export default {
 };
 </script>
 
-<style>
+<style scoped>
+.view-only >>> .htAutocomplete,
+.view-only >>> .symper-autocomplete-input,
+.view-only >>> .pb-1
+{
+    pointer-events: none
+}
+
 </style>

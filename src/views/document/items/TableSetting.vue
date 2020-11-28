@@ -5,8 +5,9 @@
         width="800"
         scrollable
         style="overflow:hidden;"
+        
         >
-        <v-card height="600">
+        <v-card height="600" :id="'dialog-editor-'+instance">
             <v-card-title class="s-card-title">
                  <v-tabs
                     class="s-tabs"
@@ -28,28 +29,26 @@
                  <v-tabs-items v-model="tab">
                     <v-tab-item>
                         <div id="setting-control-table" class="setting-control-table">
-                            <div class="content-setting-control-table scroll-thin">
-                                <v-simple-table fixed-header height="100%" >
-                                    <template v-slot:default>
-                                        <thead>
-                                            <tr>
-                                                <th class="text-left">Thông tin cột</th>
-                                                <th class="text-center">Loại control</th>
-                                                <th class="text-left">Tên control</th>
-                                                <th class="text-left">Tiêu đề control</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="table-body-drag">
-                                            <s-row-table-setting
-                                            v-for="row in listRows"
-                                            :key="row.key"
-                                            :row="row"
-                                            @remove-row="removeRow"
-                                            />
-                                        </tbody>
+                            <div class="content-setting-control-table">
+                                <v-data-table hide-default-footer :headers="headers" fixed-header height="100%" >
+                                    <template v-slot:body>
+                                        <draggable
+                                                :list="listRows"
+                                                tag="tbody"
+                                                :animation="200"
+                                                >
+                                                <s-row-table-setting
+                                                    v-for="row in listRows"
+                                                    :key="row.key"
+                                                    :row="row"
+                                                    @remove-row="removeRow"
+                                                    />
+                                                
+                                                <!-- the row will go here -->
+                                            </draggable>
                                     </template>
-                                </v-simple-table>
+                                </v-data-table>
+                                 
                                 
                             </div>
                         </div>
@@ -155,14 +154,14 @@
 </template>
 <script>
 import TableSettingRow  from "./TableSettingRow.vue";
+import draggable from "vuedraggable";
 import { str } from "./../../../plugins/utilModules/str.js"
-import Sortable from 'sortablejs';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-let sortable = null;
 export default {
     components:{
         's-row-table-setting' : TableSettingRow,
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
+        draggable
     },
     props:{
         defaultRow:{
@@ -194,6 +193,7 @@ export default {
         tab(vl){
             if(vl >= 1){
                 setTimeout((self) => {
+                    if(!this.isSetDrag)
                     self.makeDrag();
                 }, 500,this);
             }
@@ -213,23 +213,54 @@ export default {
             items: [
             'Cài đặt chung', 'Pivot table',
             ],
-            tablePivotConfig:{rows:[],cols:[],values:[]}
+            tablePivotConfig:{rows:[],cols:[],values:[]},
+            isSetDrag:false,
+            headers: [
+                {
+                    text: 'Thông tin cột',
+                    align: 'start',
+                    value: 'columnName',
+                },
+                { text: 'Loại control', value: 'type' },
+                { text: 'Tên control', value: 'name' },
+                { text: 'Tiêu đề control', value: 'title' },
+                { text: '', value: '' },
+            ],
         }
-    },
-    created(){
-        
     },
     methods:{
         makeDrag(){
+            this.isSetDrag = true;
             let self = this;
             let controlInd = null;
-            $('.column-item').on('dragstart',function(e){
+            $('#dialog-editor-'+this.instance).on('dragstart','.column-item',function(e){
                 controlInd = $(e.target).attr('data-index');
                 let data = self.listRows[controlInd];
                 e.originalEvent.dataTransfer.setData("control", JSON.stringify(data));
             })
            
-            $('.detail-pivot-setting__rows')
+            $('#dialog-editor-'+this.instance +' .detail-pivot-setting__rows')
+            .on('dragover', false) 
+            .on('drop', function (event) {
+                var e;
+                if (event.isTrigger)
+                    e = triggerEvent.originalEvent;
+                else
+                    var e = event.originalEvent;
+                    var control = e.dataTransfer.getData('control');
+                    if(self.tablePivotConfig.rows.length < 2){
+                        control = JSON.parse(control);
+                        self.listRows[controlInd].disable = true;
+                        self.tablePivotConfig.rows.push(control)
+                    }
+                try {
+                    
+                } catch (error) {
+                    console.log(error);
+                }
+                return false;
+            });
+            $('#dialog-editor-'+this.instance +' .detail-pivot-setting__cols')
             .on('dragover', false) 
             .on('drop', function (event) {
                 var e;
@@ -239,33 +270,17 @@ export default {
                     var e = event.originalEvent;
                 try {
                     var control = e.dataTransfer.getData('control');
-                    control = JSON.parse(control);
-                    self.listRows[controlInd].disable = true;
-                    self.tablePivotConfig.rows.push(control)
+                    if(self.tablePivotConfig.cols.length < 2){
+                        control = JSON.parse(control);
+                        self.listRows[controlInd].disable = true;
+                        self.tablePivotConfig.cols.push(control);
+                    }
                 } catch (error) {
-                    
+                    console.log(error);                    
                 }
                 return false;
             });
-            $('.detail-pivot-setting__cols')
-            .on('dragover', false) 
-            .on('drop', function (event) {
-                var e;
-                if (event.isTrigger)
-                    e = triggerEvent.originalEvent;
-                else
-                    var e = event.originalEvent;
-                try {
-                    var control = e.dataTransfer.getData('control');
-                    control = JSON.parse(control);
-                    self.listRows[controlInd].disable = true;
-                    self.tablePivotConfig.cols.push(control)
-                } catch (error) {
-                    
-                }
-                return false;
-            });
-            $('.detail-pivot-setting__values')
+            $('#dialog-editor-'+this.instance +' .detail-pivot-setting__values')
             .on('dragover', false) 
             .on('drop', function (event) {
                 var e;
@@ -302,9 +317,9 @@ export default {
         },
         setListRow(listRows){
             this.listRows = listRows;
-            this.setOnDrag();
         },
         showDialog(){
+            this.tablePivotConfig = {rows:[],cols:[],values:[]}
             this.isShowTableSetting = true
         },
         hideDialog(){
@@ -312,7 +327,6 @@ export default {
         },
         addNewRow(){
             this.listRows.push({columnName :'', name:'',type:'',title:'',key:'s-control-id'+Date.now()})
-            this.setOnDrag();
         },
         removeRow(row){
             this.listRows.splice(this.listRows.findIndex(v => v.key === row.key), 1);
@@ -323,7 +337,11 @@ export default {
         saveTable(){
             this.filterRowNotExistType();
             if(this.listRows.length > 0){
-                this.$emit("add-columns-table",{listRows:this.listRows, tablePivotConfig:this.tablePivotConfig});
+                let dataEmit = {listRows:this.listRows};
+                if(this.tablePivotConfig.rows.length > 0 || this.tablePivotConfig.cols.length > 0 || this.tablePivotConfig.values.length > 0){
+                    dataEmit['tablePivotConfig'] = this.tablePivotConfig;
+                }
+                this.$emit("add-columns-table",dataEmit);
             }
             this.listRows = [];
             this.hideDialog()
@@ -334,33 +352,6 @@ export default {
                 return row.type != ''
             })
         },
-        //update lại listrow khi drop
-        dragReorder (oldIndex, newIndex) {
-            const movedItem = this.listRows.splice(oldIndex, 1)[0]
-            this.listRows.splice(newIndex, 0, movedItem)
-        },
-        // drag row
-        setOnDrag(){
-            setTimeout((self) => {
-                var el = $('#table-body-drag')[0];
-                if(self.sortable == null)
-                self.sortable = Sortable.create(
-                    el,
-                    {
-                        draggable: "#setting-control-table #rowDrag",
-                        handle: '#setting-control-table .sortHandle',
-                        animation: 150,
-                        easing: "cubic-bezier(1, 0, 0, 1)",
-                        sort: true,  // sorting inside list
-                        delay: 0,
-                        onEnd: function (/**Event*/evt) {
-                            var itemEl = evt.item;  // dragged HTMLElement
-                            self.dragReorder(evt.oldIndex,evt.newIndex);
-                        },
-                    }
-                ) 
-            }, 500, this);
-        }
     },
 }
 </script>

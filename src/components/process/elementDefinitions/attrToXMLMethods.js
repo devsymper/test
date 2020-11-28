@@ -31,6 +31,11 @@ export default {
         let moddle = bpmnModeler.get('moddle');
         let modeling = bpmnModeler.get('modeling');
         let attrValue = attr.value;
+        
+        if (attr.hasOwnProperty('getValueForXML')) {
+            attrValue = attr.getValueForXML(attr.value);
+        }
+
         for (let item of attrValue) {
             let canAdd = false;
             for (let key in item) {
@@ -192,16 +197,15 @@ export default {
     },
 
     conditionExpressionMethod(el, elKey, attr, bpmnModeler, attrName) {
-
         if (el.businessObject && attr.value.trim() != '') {
             let moddle = bpmnModeler.get('moddle');
             let bizObj = el.businessObject;
             let elTagName = attr.toXML.name;
-
+            let value = attr.value.replace(/\n|\r\n/g,' ');
             let newEl = moddle.create("bpmn:FormalExpression");
             newEl['xsi:type'] = "tFormalExpression";
-            newEl.text = "<![CDATA[" + attr.value + "]]>";
-            newEl.body = "<![CDATA[" + attr.value + "]]>";
+            newEl.text = "<![CDATA[" + value + "]]>";
+            newEl.body = "<![CDATA[" + value + "]]>";
             bizObj[elTagName] = newEl;
         }
     },
@@ -239,5 +243,28 @@ export default {
         modeling.updateProperties(el, {
             extensionElements
         });
+    },
+    signalRefMethod(el, elKey, attr, bpmnModeler, attrName){
+        let moddle = bpmnModeler.get('moddle');
+        let bizEl = el.businessObject;
+
+        if(attr.value && attr.value.trim()){
+            let signal = moddle.create('bpmn:Signal');
+            signal.id = attr.value;
+            signal.name = attr.value;
+            bizEl.eventDefinitions[0].signalRef = signal;
+        }
+    },
+
+    pushConditionTagToXML(el, elKey, attr, bpmnModeler, attrName){
+        let moddle = bpmnModeler.get('moddle');
+        let bizEl = el.businessObject;
+        if(attr.value && attr.value.trim()){
+            let eventDefinitions = moddle.create('bpmn:ConditionalEventDefinition');
+            let expression = moddle.create('bpmn:Expression');
+            expression.body = attr.value.trim().replace(/\n|\r\n/g,' ');
+            eventDefinitions.condition = expression;
+            bizEl.eventDefinitions = [eventDefinitions];
+        }
     }
 }
