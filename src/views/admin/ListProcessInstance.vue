@@ -127,6 +127,7 @@ export default {
 			showBtnAddCheckbox: true,
 			customAPIResult:{
 				reformatData(res){
+					debugger
 					if(res.data.length > 0){
 						let arr = []
 						res.data.forEach(function(e){
@@ -206,7 +207,7 @@ export default {
 	computed:{
 		apiUrl(){
 			let processKey = this.$store.state.admin.processKey
-			return appConfigs.apiDomain.bpmne.instances+'?size=100&sort=startTime&order=desc&processDefinitionKey='+processKey;
+			return appConfigs.apiDomain.workflowExtend+processKey+'/process-instances';
 		},
 		processKey(){
 			return this.$store.state.admin.processKey
