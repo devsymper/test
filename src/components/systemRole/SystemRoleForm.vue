@@ -49,7 +49,7 @@
         <div class="mt-2" v-if="action != 'detail' ">
             <v-btn
                 class="float-right mr-1"
-                @click="saveSystemRole"
+                @click="debounceSaveSystemRole"
                 small
                 depressed
                 color="primary"
@@ -70,7 +70,9 @@ import ListUserSelector from "@/views/accessControl/helpers/ListUserSelector"
 
 export default {
     methods: {
-	
+		debounceSaveSystemRole: _.debounce(function(e){
+			this.saveSystemRole()
+		}, 200,this),
         async saveSystemRole(){
             let dataToSave = {
                 name: this.allInputs.name.value,

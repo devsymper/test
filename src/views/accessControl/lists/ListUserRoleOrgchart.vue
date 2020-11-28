@@ -17,6 +17,7 @@
 		<template slot="right-panel-content" slot-scope="{}">
 			<UserRoleOrgchartPanel 
 				:idOrgchart="idOrgchart"
+				@close-form="handleCloseForm"
 			/>
 		</template>
 	
@@ -37,6 +38,11 @@ export default {
 	props:{
 		containerHeight:{
 			type: Number,
+		}
+	},
+	methods:{
+		handleCloseForm(){
+			this.$refs.listOrgchart.actionPanel = false
 		}
 	},
 	data(){

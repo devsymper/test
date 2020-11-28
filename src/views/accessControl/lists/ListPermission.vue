@@ -238,6 +238,7 @@ export default {
         },
         handleSavedItem(){
             this.$refs.listPermission.refreshList();
+            this.$refs.listPermission.actionPanel = false
         },
         handleAddItem(){
             this.actionOnItem = 'create';

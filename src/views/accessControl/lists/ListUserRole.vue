@@ -128,6 +128,7 @@ export default {
         },
         handleSavedItem(){
             this.$refs.listSystemRole.refreshList();
+            this.$refs.listSystemRole.actionPanel = false;
         },
         handleAddItem(){
             this.actionOnItem = 'create';
