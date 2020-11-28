@@ -477,7 +477,6 @@ export default class Table {
                 }
                 let controlName = changes[0][1];
 
-                thisObj.handeRunCurrentControlOtherFormula(controlName, changes)
                 if (thisObj.isAutoCompleting) {
                     return;
                 }
@@ -526,6 +525,7 @@ export default class Table {
                     } else {
                         thisObj.handlerAfterChangeCellByAutoSet(changes, columns, controlName);
                     }
+                    thisObj.handeRunUniqueDBFormula(controlName, changes);
                     thisObj.isAutoCompleting = false;
 
                 }
@@ -535,26 +535,14 @@ export default class Table {
         listTableInstance[this.tableName] = this;
     }
 
-    handeRunCurrentControlOtherFormula(controlName, changes){
+    handeRunUniqueDBFormula(controlName, changes){
         let dataInput = {}
         dataInput[controlName] = [changes[0][3]]
         let controlUniqueFormula = checkControlPropertyProp(this.keyInstance, controlName, 'isDBOnly');
-        let controlValidateFormula = checkControlFormulaProp(this.keyInstance, controlName, 'validate');
-        let controlReadOnlyFormula = checkControlFormulaProp(this.keyInstance, controlName, 'readOnly');
-        let controlHiddenFormula = checkControlFormulaProp(this.keyInstance, controlName, 'hidden');
-        debugger
         if (controlUniqueFormula != false) {
             this.handlerRunFormulasForControlInTable('uniqueDB', controlUniqueFormula, dataInput, controlUniqueFormula.controlFormulas.uniqueDB.instance);
         }
-        if (controlValidateFormula != false) {
-            this.handlerRunFormulasForControlInTable('validate', controlValidateFormula, dataInput, controlValidateFormula.controlFormulas.validate.instance);
-        }
-        if (controlReadOnlyFormula != false) {
-            this.handlerRunFormulasForControlInTable('readOnly', controlReadOnlyFormula, dataInput, controlReadOnlyFormula.controlFormulas.readOnly.instance);
-        }
-        if (controlHiddenFormula != false) {
-            this.handlerRunFormulasForControlInTable('hidden', controlHiddenFormula, dataInput, controlHiddenFormula.controlFormulas.hidden.instance);
-        }
+        
     }
 
     /**
