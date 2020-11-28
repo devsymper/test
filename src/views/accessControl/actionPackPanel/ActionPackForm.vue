@@ -114,7 +114,7 @@
                 small
                 depressed
                 color="primary"
-                @click="saveActionPack">
+                @click="debounceSaveActionPack">
                 <v-icon class="mr-2" primary>mdi-content-save</v-icon>
                 {{action == 'create' ? $t('common.save') : $t('common.update')}}
             </v-btn>
@@ -796,7 +796,10 @@ export default {
         },
         handleEditorShow(data){
             this.isEditingCell = data;
-        },
+		},
+		debounceSaveActionPack: _.debounce(function(e){
+			this.saveActionPack()
+		}, 200,this),
         async getObjectsOfObjectType(objectType = null){
             let allResource = this.$store.state.actionPack.allResource;
             if(!objectType){

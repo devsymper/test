@@ -31,7 +31,7 @@
 			<v-btn
 				small
 				color="primary"
-				@click="handleSaveClick"
+				@click="debounceSave"
 				class="float-right mr-2"
 			>
 				<v-icon class="mr-2">mdi-content-save-outline</v-icon>
@@ -101,6 +101,9 @@ export default {
 			}
 			
 		},
+		debounceSave: _.debounce(function(e){
+			this.handleSaveClick()
+		}, 200,this),
 		handleSaveClick(){
 			let permissions = []
 			let self = this
@@ -114,6 +117,7 @@ export default {
 			let data = JSON.stringify(permissions)
 			accessControlApi.savePermission(data).then(res=>{
 				if(res.status == 200){
+					self.$emit('close-form')
 					self.$snotify({
 						type: "success",
 						title: "Gắn permissions thành công"
