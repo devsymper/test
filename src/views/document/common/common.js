@@ -5,7 +5,7 @@ import { util } from '../../../plugins/util';
 let listNameValueControl = {};
 const checkControlPropertyProp = function(instance, controlName, type) {
     let control = getControlInstanceFromStore(instance, controlName);
-    if (control.controlProperties[type] && control.controlProperties[type].value) {
+    if (control && control.controlProperties[type] && control.controlProperties[type].value) {
         return control;
     } else {
         return false
@@ -13,7 +13,7 @@ const checkControlPropertyProp = function(instance, controlName, type) {
 }
 const checkControlFormulaProp = function(instance, controlName, type) {
     let control = getControlInstanceFromStore(instance, controlName);
-    if (control.controlFormulas[type] && control.controlFormulas[type].instance) {
+    if (control && control.controlFormulas[type] && control.controlFormulas[type].instance) {
         return control;
     } else {
         return false
