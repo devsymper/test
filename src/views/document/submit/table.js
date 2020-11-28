@@ -3,7 +3,7 @@ import Handsontable from 'handsontable';
 import sDocument from './../../../store/document'
 import store from './../../../store'
 import ClientSQLManager from './clientSQLManager';
-import { checkDbOnly, getControlType, getSDocumentSubmitStore } from './../common/common'
+import { checkControlFormulaProp,checkControlPropertyProp, getControlType, getSDocumentSubmitStore } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
 import { util } from '../../../plugins/util';
@@ -457,9 +457,7 @@ export default class Table {
                     data: this.getSourceData(),
                     tableName:thisObj.tableName
                 });
-                if (thisObj.isAutoCompleting) {
-                    return;
-                }
+                
                 if (!changes) {
                     return
                 }
@@ -477,15 +475,19 @@ export default class Table {
                 if (/=SUM(.*)/.test(changes[0][2]) || /=SUM(.*)/.test(changes[0][3])) {
                     return;
                 }
-
                 let controlName = changes[0][1];
+
+                thisObj.handeRunCurrentControlOtherFormula(controlName, changes)
+                if (thisObj.isAutoCompleting) {
+                    return;
+                }
+
                 let colIndex = this.propToCol(controlName);
                 let columns = thisObj.columnsInfo.columns;
                 let currentRowData = thisObj.tableInstance.getDataAtRow(changes[0][0]);
 
                 // nếu có sự thay đổi cell mà là id của row sqlite thì ko thực hiện update
                 if (controlName != 's_table_id_sql_lite') {
-
                     thisObj.checkUniqueTable(controlName, columns);
                     if (source != AUTO_SET) {
                         store.commit("document/addToDocumentSubmitStore", {
@@ -524,12 +526,6 @@ export default class Table {
                     } else {
                         thisObj.handlerAfterChangeCellByAutoSet(changes, columns, controlName);
                     }
-                    let controlUnique = checkDbOnly(thisObj.keyInstance, controlName);
-                    if (controlUnique != false) {
-                        let dataInput = {}
-                        dataInput[controlName] = [changes[0][3]]
-                        thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB.instance);
-                    }
                     thisObj.isAutoCompleting = false;
 
                 }
@@ -538,10 +534,33 @@ export default class Table {
         }
         listTableInstance[this.tableName] = this;
     }
-        /**
-         * Hàm xử lí thêm và xóa dòng sau khi bấm shift + enter, shift + delete
-         * @param {*} e 
-         */
+
+    handeRunCurrentControlOtherFormula(controlName, changes){
+        let dataInput = {}
+        dataInput[controlName] = [changes[0][3]]
+        let controlUniqueFormula = checkControlPropertyProp(this.keyInstance, controlName, 'isDBOnly');
+        let controlValidateFormula = checkControlFormulaProp(this.keyInstance, controlName, 'validate');
+        let controlReadOnlyFormula = checkControlFormulaProp(this.keyInstance, controlName, 'readOnly');
+        let controlHiddenFormula = checkControlFormulaProp(this.keyInstance, controlName, 'hidden');
+        debugger
+        if (controlUniqueFormula != false) {
+            this.handlerRunFormulasForControlInTable('uniqueDB', controlUniqueFormula, dataInput, controlUniqueFormula.controlFormulas.uniqueDB.instance);
+        }
+        if (controlValidateFormula != false) {
+            this.handlerRunFormulasForControlInTable('validate', controlValidateFormula, dataInput, controlValidateFormula.controlFormulas.validate.instance);
+        }
+        if (controlReadOnlyFormula != false) {
+            this.handlerRunFormulasForControlInTable('readOnly', controlReadOnlyFormula, dataInput, controlReadOnlyFormula.controlFormulas.readOnly.instance);
+        }
+        if (controlHiddenFormula != false) {
+            this.handlerRunFormulasForControlInTable('hidden', controlHiddenFormula, dataInput, controlHiddenFormula.controlFormulas.hidden.instance);
+        }
+    }
+
+    /**
+     * Hàm xử lí thêm và xóa dòng sau khi bấm shift + enter, shift + delete
+     * @param {*} e 
+     */
 
     checkEnterInsertRowEvent(e, cellMeta) {
         if (!e) {
@@ -1550,29 +1569,29 @@ export default class Table {
         let map = thisObj.validateValueMap[row + '_' + column];
         let controlTitle = (control.title == "") ? control.name : control.title;
         if (map) {
-            let sign = prop + '____' + row;
             let ele = $(td);
-            if (map.type === 'linkControl') {
-                ele.css({ 'position': 'relative' }).append(Util.renderInfoBtn());
-                ele.off('click', '.info-control-btn')
-                ele.on('click', '.info-control-btn', function(e) {
-                    SYMPER_APP.$evtBus.$emit('on-info-btn-in-table-click', { e: e, row: row, controlName: control.name })
-                })
-            }
-            if (map.type === 'readOnly') {
-                hotInstance.setCellMeta(row, column, 'readOnly', map.value);
-            }
-            if (map.vld === true) {
-                ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
-            }
-            if (map.validate === true) {
-                ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
-            }
-            if (map.uniqueDB === true) {
-                ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
-            }
-            if (map.require === true && (value === '' || value == null)) {
-                ele.css({ 'position': 'relative' }).append(Util.makeErrNoti("Không được bỏ trống", sign, controlTitle));
+            for (let index = 0; index < map.length; index++) {
+                const cellValidateInfo = map[index];
+                if (cellValidateInfo.type === 'linkControl') {
+                    ele.css({ 'position': 'relative' }).append(Util.renderInfoBtn());
+                    ele.off('click', '.info-control-btn')
+                    ele.on('click', '.info-control-btn', function(e) {
+                        SYMPER_APP.$evtBus.$emit('on-info-btn-in-table-click', { e: e, row: row, controlName: control.name })
+                    })
+                }
+                if (cellValidateInfo.type === 'readOnly') {
+                    hotInstance.setCellMeta(row, column, 'readOnly', cellValidateInfo.value);
+                }
+                if (cellValidateInfo.value) {
+                    if(ele.find('.validate-icon').length > 0){
+                        let curMsg = ele.find('.validate-icon').attr('title');
+                        curMsg = (curMsg) ? cellValidateInfo.msg : curMsg + "|||" + cellValidateInfo.msg;
+                        ele.find('.validate-icon').attr(curMsg);
+                    }
+                    else{
+                        ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(cellValidateInfo.msg, controlTitle));
+                    }
+                }
             }
             ele.off('click', '.validate-icon')
             ele.on('click', '.validate-icon', function(e) {
@@ -1583,6 +1602,25 @@ export default class Table {
         }
     }
 
+    /**
+     * Hàm set các cell được validate
+     * @param {*} key 
+     * @param {*} value 
+     */
+    addToValueMap(key,value){
+        if(!this.validateValueMap[key]){
+            this.validateValueMap[key] = [];
+        }
+        for (let index = 0; index < this.validateValueMap[key].length; index++) {
+            const cellVld = this.validateValueMap[key][index];
+            if(cellVld.type == value.type){
+                this.validateValueMap[key][index] = value;
+                return;
+            }
+            
+        }
+        this.validateValueMap[key].push(value);
+    }
     /**
      * validate time đúng định dạng hay k
      * @param {*} str 

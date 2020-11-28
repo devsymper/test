@@ -241,7 +241,7 @@ export default class Util {
         return ext == null ? "" : ext[0];
     }
 
-    static makeErrNoti = function(msg, sign, controlTitle) {
+    static makeErrNoti = function(msg, controlTitle) {
         return '<span class="mdi mdi-checkbox-blank-circle validate-icon" control-title="' + controlTitle + '" title="' + msg + '"></span>'
     }
     static renderInfoBtn = function() {

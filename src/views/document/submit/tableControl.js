@@ -54,10 +54,11 @@ export default class TableControl extends Control {
                     let curColIndex = this.tableInstance.colName2Idx[controlLink];
                     for (let key in listLinkInCol) {
                         let rowIdx = key.replace(/linkConfig_(.+)_/g, "");
-                        rowIdx = Number(rowIdx)
-                        this.tableInstance.validateValueMap[rowIdx + "_" + curColIndex] = {
+                        rowIdx = Number(rowIdx);
+                        let cellPos = rowIdx + "_" + curColIndex;
+                        this.tableInstance.addToValueMap(cellPos, {
                             type: 'linkControl',
-                        };
+                        })
                     }
                 }
             }
