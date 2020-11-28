@@ -105,14 +105,15 @@
                             v-model="showableUserInfo[key]">
                         </v-text-field>
                     </v-col>
-                    <v-col v-if="!isEditing" >
+                    <v-col v-if="!isEditing"  >
                         <span class="fs-13" >
                             {{showableUserInfo[key]?showableUserInfo[key]:"Đang để trống"}}
                         </span>
                         <v-btn 
-                        icon tile 
-                        class="float-right" 
-                        v-if=" (key == 'email' || key == 'phone')">
+                            x-small
+                            icon tile 
+                            class="float-right" 
+                            v-if=" (key == 'email' || key == 'phone')">
                         <v-tooltip top>
                             <template v-slot:activator="{ on }">
                                 <v-icon
@@ -130,7 +131,7 @@
                     </v-col>
                     </v-row>
                 </div>
-                <div class="ml-4" :class="{'mt-2':isEditing}">
+                <div class="ml-4 mt-3" :class="{'mt-2':isEditing}">
                     <div @click="changePass()" class="detail-user-label">
                         {{$t('user.general.personalInfo.pass')}}
                         <v-icon style = "font-size: 16px; margin-top:-2px">mdi-lock-outline</v-icon>
@@ -153,30 +154,33 @@
                 </div>
                 <div 
                     class="pl-4 d-flex mt-1" 
-                    v-if="lazyUserInfo.roles.orgchart.length">
+                    v-if="orgRole.length">
                     <div class="detail-user-label mt-1">
                         {{$t('common.orgchart')}}
                     </div>
                 </div>
-                <div v-for="role in lazyUserInfo.roles.orgchart" :key="role.id">
-                    <div class="ml-5">
+                <div v-for="(role,indx) in orgRole" :key="indx">
+                    <div class="ml-5" v-if="role.name">
                         <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon>
                         <!-- <i class="fs-16 mdi mdi-check  indigo--text text--darken-4 mr-1"></i> -->
-                        <v-btn class="font-normal " 
-                            style="margin-bottom:-8px"
+                        <!-- {{checkHasPermission(role.id)}}{{role.id}} -->
+                        <v-btn  x-small class="font-normal " 
                             text 
-                            @click="viewUserRole(role.id)" >
-                            <span style="margin-top:-px">
+                            @click="viewUserRole(role.id,role.active)" >
+                            <span>
                                 {{role.name}}
                             </span>
                         </v-btn>
                     </div>
-                    <div class="text--lighten-2 grey-text pl-6">
-                        {{role.path}}
+                    <div class="ml-5 mt-1" v-else>
+                        <span class="fs-13" style="color:rgb(211, 109, 36)" >{{role.titleGroup}}</span>
                     </div>
+                    <!-- <div class="text--lighten-2 grey-text pl-6">
+                        {{role.path}}123
+                    </div> -->
                 </div>
                 </div>
-                <div class="mt-2" v-if="lazyUserInfo.roles.orgchart.length">
+                <div class="mt-2" v-if="lazyUserInfo.roles.systemRole.length">
                     <div class=" mt-1">
                         <v-icon class="fs-16">mdi mdi-account-tie-outline</v-icon>
                        <span 
@@ -187,24 +191,25 @@
                     <div class="detail-user-value">
                         <div v-for="role in lazyUserInfo.roles.systemRole" :key="role.id">
                             <!-- <i class="fs-16 indigo--text text--darken-4 mr-1"></i>  -->   
-                            <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon>
-                            <v-btn class="fm fw-400" 
-                                style="margin-bottom:-8px"
-                                text 
-                                @click="viewUserRole(role.id)" >
-                                <span class='fm'>
-                                    <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon>
-                                    {{role.name}}
-                                </span>
-                            </v-btn>
+                            <!-- <v-icon class="fs-16">mdi mdi-account-circle-outline</v-icon> -->
+                              <v-icon class="fs-16 fw-430 ml-5 ">mdi mdi-account-circle-outline</v-icon>
+                                <v-btn class="fm fw-400" 
+                                    text 
+                                    x-small
+                                    @click="viewUserRole(role.id)" >
+                                    <span class='fm fs-13'>
+                                      {{role.name}}
+                                    </span>
+                                </v-btn>
                         </div>
                     </div>
                 </div>
             </div>
             </v-col>
             <v-col class="col-md-8" v-if="isViewUserRole">
-                <ViewRoles 
-                    @show-userInfo="showUserInfo()"
+                <ViewRoles
+                    :permission="lazyUserInfo.roles"
+                    :allRole="lazyUserInfo"
                     :rolesList="role"/>
             </v-col>
         </v-row>
@@ -232,6 +237,7 @@ export default {
     data(){
         return {
             role:[],
+            orgRole:[],
             dialog:false,
             openChangePassForm:false,
             avatarUrl:'',
@@ -266,6 +272,19 @@ export default {
         }
     },
     methods: {
+        checkHasPermission(role){
+            const self = this;
+            userApi.getActionAndObject(role).then(res=>{
+                if (res.status === 200&&res.data.length>0) {
+                    self.orgRole.map(x=>{
+                        x.active = false;
+                        if(x.id==role){
+                            return x.active = true
+                        }
+                    })
+                    }
+                })
+        },
         cancelDialog(){
             this.openChangePassForm=false;
             //this.$refs.changePass.refreshAll();
@@ -286,13 +305,16 @@ export default {
             this.$refs.uploadAvatar.uploadFile();
         },
         showUserInfo(){
-            this.isViewUserRole=false; 
+           // this.isViewUserRole=false; 
             this.$emit('make-small-panel')
         },
-        viewUserRole(role){
-			this.isViewUserRole =! this.isViewUserRole;
-            this.role = role;
-            this.$emit("expand-panel")
+        viewUserRole(role,active){
+            if(active){
+                this.isViewUserRole = true;
+                this.role = role;
+                this.$emit("expand-panel")
+            }
+		   
 		},  
         saveUserInfo(){
             let self = this;
@@ -305,7 +327,17 @@ export default {
         },
         closePanel(){
             this.$emit('closePanel')
-        }, 
+        },
+        editOrgRole(ogrRole){
+            let nameOrgchart = _.groupBy(ogrRole, 'orgchartName');
+            this.orgRole= [];
+            Object.keys(nameOrgchart).forEach(type => {
+                this.orgRole.push({titleGroup: type });
+                nameOrgchart[type].map(x=>x.active=this.checkHasPermission(x.id));
+                this.orgRole.push(...nameOrgchart[type]);
+            })
+
+        },
         reAssignUserInfo(){
             let rsl = {};
             for(let key in this.lazyUserInfo){
@@ -315,6 +347,7 @@ export default {
             }
             this.lazyUserInfo = null;
             this.lazyUserInfo = rsl;
+            this.editOrgRole(rsl.roles.orgchart);
         }
     },
     props: {

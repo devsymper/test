@@ -1,29 +1,35 @@
 <template>
-    <div class="orgchart-element-selector">
-        <v-treeview
-            class="fs-13"
-            activatable
-            :items="treeData"
-            dense>
-            <template v-slot:label="{ item }">
-                <v-checkbox
-                    @change="handleChangeSelectedNode(item)"
-                    v-if="checkboxMode.includes(item.type)"
-                    v-model="item.selected"
-                    :label="item.name"
-                    dense
-                ></v-checkbox>
-                <span v-else>
-                    {{item.name}}
-                </span>
-            </template>
-        </v-treeview>
+    <div class="orgchart-element-selector" :style="{height: height }" >
+		<VuePerfectScrollbar
+			:style="{height:height  }"
+		>	
+			<v-treeview
+				class="fs-13"
+				activatable
+				:items="treeData"
+				dense>
+				<template v-slot:label="{ item }">
+					<v-checkbox
+						@change="handleChangeSelectedNode(item)"
+						v-if="checkboxMode.includes(item.type)"
+						v-model="item.selected"
+						:label="item.name"
+						dense
+					></v-checkbox>
+					<span v-else>
+						{{item.name}}
+					</span>
+				</template>
+			</v-treeview>
+		</VuePerfectScrollbar>
+
     </div>
 </template>
 
 <script>
 import { util } from '../../plugins/util';
 import { orgchartApi } from '@/api/orgchart.js';
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 export default {
     created(){
         this.$store.dispatch('orgchart/getAllOrgchartStruct');
@@ -48,7 +54,11 @@ export default {
         searchKey:{
             type:String,
             default:""
-        }
+		},
+		height:{
+			type: String,
+			default: "100%"
+		}
     },
     watch: {
         value:{
@@ -69,7 +79,10 @@ export default {
         return{
             res: []
         }
-    },
+	},
+	components:{
+		VuePerfectScrollbar
+	},
     computed: {
         mapSelectedNode(){
             return this.value.reduce((map, el) => {

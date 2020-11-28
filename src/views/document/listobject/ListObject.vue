@@ -12,7 +12,7 @@
         :actionPanelType="'elastic'"
         :showActionPanelInDisplayConfig="true"
         :showExportButton="true"
-        :showImportButton="true"
+        :showImportButton="false"
         :isTablereadOnly="false"
         :conditionByFormula="formulasInput.formula.value"
         @after-open-add-panel="submitDocument"
@@ -260,7 +260,7 @@ export default {
                     return{
                         columns:res.data.columns,
                         listObject:res.data.listObject,
-                        total:res.data.listObject.length,
+                        total:res.data.total,
                     }
                 }
             },

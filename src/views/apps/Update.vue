@@ -114,7 +114,7 @@
 </template>
 <script>
 import Api from "./../../api/api.js";
-import iconPicker from "../../components/common/pickIcon";
+import iconPicker from "../../components/common/iconPicker";
 import vClickOutside from 'v-click-outside';
 import SearchModal from './SearchModal.vue';
 import AppDetailVue from './AppDetail.vue';

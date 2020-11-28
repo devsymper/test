@@ -2,6 +2,7 @@ const VueLoaderPlugin = require("vue-loader/lib/plugin");
 const path = require('path');
 const { CleanWebpackPlugin } = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const MonacoWebpackPlugin = require('monaco-editor-webpack-plugin')
 
 module.exports = {
     mode: "development",
@@ -48,6 +49,10 @@ module.exports = {
         new CleanWebpackPlugin(),
         new HtmlWebpackPlugin({
             title: 'Caching',
+        }),
+        new MonacoWebpackPlugin({
+            // available options are documented at https://github.com/Microsoft/monaco-editor-webpack-plugin#options
+            languages: ['javascript', 'sql']
         })
     ],
     output: {

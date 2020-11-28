@@ -306,8 +306,8 @@
         <v-col
             :cols="!sideBySideMode ? 0 : 8"
             :md="!sideBySideMode ? 0 : 9"
-            v-if="sideBySideMode"
-            class="pa-0 ma-0"
+            v-show="sideBySideMode"
+            class="pa-0 ma-0 h-100"
             height="30"
             style="border-left: 1px solid #e0e0e0;"
         >
@@ -486,6 +486,7 @@ export default {
     },
     data: function() {
         return {
+            debounceGetData:null,
             data:[],
             page: 1, // trang hiện tại
             pageSize: 50,
@@ -521,7 +522,7 @@ export default {
             selectedTask: {
                 taskInfo: {},
                 idx: -1,
-                originData: null
+                originData: {}
             },
             isSmallRow: false,
             sideBySideMode: false,
@@ -688,7 +689,7 @@ export default {
                     emptyOption = true;
                 }
 
-                //configs.searchKey = this.searchKey;
+                configs.searchKey = this.searchKey;
                 configs.page = configs.page ? configs.page : this.page;
                 configs.pageSize = this.pageSize;
                 configs.formulaCondition = this.conditionByFormula;
@@ -783,10 +784,19 @@ export default {
             this.getData();
         },
         handleChangeFilterValue(data) {
-            for (let key in data) {
-                this.$set(this.myOwnFilter, key, data[key]);
+            // for (let key in data) {
+            //     this.$set(this.myOwnFilter, key, data[key]);
+            // }
+            // this.getData();
+
+            this.searchKey = data.nameLike;
+            if(this.debounceGetData){
+                clearTimeout(this.debounceGetData);
             }
-            this.getData();
+            this.debounceGetData = setTimeout((self) => {
+				self.page = 1
+                self.getData();
+            }, 300, this);
         },
         reCalcListTaskHeight() {
             this.listTaskHeight =

@@ -454,10 +454,12 @@ export default class Table {
              * @param {*} source 
              */
             afterChange: function(changes, source) {
-                SYMPER_APP.$evtBus.$emit('symper-submit-on-table-change', {
+                SYMPER_APP.$evtBus.$emit('document-on-table-change', {
                     data: this.getSourceData(),
                     tableName:thisObj.tableName
                 });
+                console.log('ákjdaskdasd',changes,source);
+
                 if (thisObj.isAutoCompleting) {
                     return;
                 }
@@ -465,7 +467,7 @@ export default class Table {
                     return
                 }
                 // check nếu ko có thay đổi trong cell thì return
-                if (changes[0][2] == changes[0][3]) {
+                if (changes[0][2] == changes[0][3] && source == 'edit') {
                     return;
                 }
                 if (!changes[0][2] && !changes[0][3]) {
@@ -475,7 +477,6 @@ export default class Table {
                     sDocument.state.viewType[thisObj.keyInstance] == 'update') {
                     return;
                 }
-
                 if (/=SUM(.*)/.test(changes[0][2]) || /=SUM(.*)/.test(changes[0][3])) {
                     return;
                 }
@@ -1289,7 +1290,7 @@ export default class Table {
 
     // Hàm set data cho table
     // hàm gọi sau khi chạy công thức 
-    setData(vls) {
+    setData(vls, dateFormat = true) {
         ClientSQLManager.delete(this.keyInstance, this.tableName, false);
         if (vls != false) {
             let data = vls;
@@ -1314,7 +1315,7 @@ export default class Table {
                         dataToStore[controlName] = [];
                     }
                     let controlIns = this.getControlInstance(controlName);
-                    if (controlIns.type == 'date') {
+                    if (dateFormat && controlIns.type == 'date') {
                         data[index][controlName] = moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
                     }
                     if (data[index] != undefined)

@@ -128,7 +128,7 @@ export default class BasicControl extends Control {
             }
             this.setDefaultValue();
             this.setEvent();
-            if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete')) {
+            if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete') && this.controlFormulas.autocomplete.instance) {
                 let allTable = this.controlFormulas.autocomplete.instance.detectTableQuery();
                 let columnBinding = this.controlFormulas.autocomplete.instance.autocompleteDetectAliasControl(false);
                 this.columnBindingSubForm = columnBinding;
@@ -741,7 +741,7 @@ export default class BasicControl extends Control {
             return newData;
         }
         else{
-            return moment(value,dateFormat).format('YYYY-MM-DD')
+            return moment(data,dateFormat).format('YYYY-MM-DD')
         }
     }
 }

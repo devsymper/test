@@ -1,119 +1,88 @@
 <template>
-	<div class="d-flex flex-column w-100 h-100 environemt-management">
-		<div class="d-flex align-center mt-2">
-			<v-icon class="ml-2">
-				mdi-earth
-			</v-icon>
-			<span class="flex-grow-1 ml-2 fs-16 font-weight-bold">
-				Danh sách các môi trường 
-			</span>
-			<v-btn
-				class="mr-2 font-normal fs-13" 
-				depressed
-				@click="showDialogAdd"
-			>
-				Thêm môi trường
-			</v-btn>
-			<v-btn 
-				class="mr-2 font-normal fs-13"
-				depressed
-				@click="showSyncHistory"
-			>
-				Lịch sử đồng bộ
-			</v-btn>
-			 <v-text-field
-				:label="$t('apps.search')"
-				single-line
-				solo
-				dense
-				class="mr-2 fs-13"
-				append-icon="mdi-magnify"
-				v-model="searchKey"
-			></v-text-field>
+	<div class="d-flex h-100 w-100">
+		<div class="d-flex flex-column h-100  tab-select fs-13">
+			<div v-for="(item,i) in listType" :key="i" :class="{'tab-select-item d-flex flex-column ml-1 mr-1 pl-1 pr-1 mt-1 pt-2 pb-2': true, 'selected-item': active == item.action}" @click="handleTab(item)">
+				<div>
+					<v-icon small>
+						mdi-circle-outline
+					</v-icon>
+					<span class="ml-2">{{item.title}}</span>
+				</div>
+				<span class="fs-10" style="position:absolute;left:9px; top:11px">{{i+1}}</span>
+				<span class="fs-10 font-weight-light mt-1 "><v-icon x-small> mdi-information-outline</v-icon> <span class="ml-1">{{item.subTitle}}</span></span>
+			</div>
 		</div>
-		<div class="content-environment-management d-flex flex-column mt-2">
-			<v-list-item
-				v-for="i in 3"
-				:key="i"
-				class="mr-6 ml-6 pr-0 pl-0 fs-13"
-			>
-
-				<v-list-item-content >
-					<v-list-item-title class="fs-13">App-beta.symper.vn</v-list-item-title>
-
-					<v-list-item-subtitle class="fs-13" >
-						<span>ID : hsdashdhsjd123214</span>
-						<span class="ml-16">
-							Loại môi trường development
-						</span>
-					</v-list-item-subtitle>
-				</v-list-item-content>
-
-				<v-list-item-action>
-					<v-icon color="green lighten-1">mdi-chevron-down</v-icon>
-				</v-list-item-action>
-			</v-list-item>
+		<div class="list-item flex-grow-1 w-100 h-100">
+			<ListService 
+				v-if="active == 'serviceManagement' "
+				:containerHeight="containerHeight"
+			/>
+			<EnvManagement 
+				v-if="active == 'envManagement'"
+				:active="active"
+			/>
 		</div>
-		<AddEnvironmentDialog 
-			:showDialog="showDialogAddItem"
-			@cancel="cancelAdd"
-			 />
+
 	</div>
 </template>
 
 <script>
-import AddEnvironmentDialog from "./dialogs/AddEnvironmentDialog"
+import { util } from "@/plugins/util.js";
+import EnvManagement from './EnvManagement'
+import ListService from './ListService'
 export default {
 	components:{
-		AddEnvironmentDialog,
+		EnvManagement,
+		ListService
+	},
+	created(){
+		this.$store.dispatch("app/getAllBA");
+		this.$store.dispatch('environmentManagement/getAllEnvirontment')
+	},
+	mounted(){
+		this.containerHeight = util.getComponentSize(this).h
 	},
 	data(){
 		return {
-			searchKey: "",
-			showDialogAddItem: false
+			active: "serviceManagement",
+			containerHeight: null,
+			subActive: "",
+			listType:[
+				{
+					title: "Quản lí service",
+					subTitle: "Service  là tập hợp các service trong hệ thống. Mỗi service đảm nhiệm một chức năng riêng trong hệ thống ",
+					action: "serviceManagement"
+				},
+				{
+					title: "Quản lí môi trường",
+					subTitle: "Danh sách tập trung các môi trường của hệ thống, cho phép config và đồng bộ dữ liệu giữa các môi trường",
+					action: "envManagement"
+				},
+			
+			]
 		}
 	},
 	methods:{
-		showDialogAdd(){
-			this.showDialogAddItem = true
+		handleTab(item){
+			this.active = item.action
 		},
-		cancelAdd(){
-			this.showDialogAddItem = false
-		},
-		showSyncHistory(){
-			this.$goToPage(
-				"environment-sync-history", "Lịch sử đồng bộ"
-			)
-		}
+		
 	}
 }
 </script>
 
 <style scoped>
-.environemt-management >>> .v-text-field__slot,
-.environemt-management >>> .v-text-field__slot label{
-	font-size: 13px !important;
+.tab-select{
+	width: 250px;
+	border-right: 1px solid lightgray;
 }
-.environemt-management >>> .v-input__append-inner{
-	font-size: 13px !important;
+.selected-item{
+	background-color: #F0F0F0;
+	border-radius: 5px;
 }
-.environemt-management >>> .v-input__control{
-	width: 30px !important;
-	min-height: unset;
-	height: 32px !important
-}
-.environemt-management >>> .v-input__slot{
-	background-color: #f7f7f7 !important;
-	box-shadow: unset !important;
-}
-.environemt-management >>> .v-text-field__details{
-	display: none !important;
-}
-.environemt-management >>> .v-list-item__content{
-	padding:2px
-}
-.environemt-management >>> .v-list-item{
-	border-bottom: 1px solid lightgray
+.tab-select-item, .role-user-item {
+	cursor: pointer;
+	position:relative;
 }
 
 </style>

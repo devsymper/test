@@ -18,7 +18,8 @@
         "import_excel_history": "Lịch sử Import",
         "edit": "Sửa",
         "cancel": "Hủy",
-        "update": "Cập nhật",
+		"update": "Cập nhật",
+		"create":"Thêm mới",
         "delete": "Xóa",
         "refresh": "Làm mới",
         "userDeletedName": "Email người xóa",
@@ -98,7 +99,11 @@
         "not_always_show_sidebar": "Ẩn sidebar",
         "import_excel": "Nhập bằng excel",
         "isDefault": "SĐTC mặc định",
-        "restore": "Khôi phục",
+		"restore": "Khôi phục",
+		"userCreateName": "Người tạo",
+		"userUpdateName": "Người cập nhật",
+		"createAt": "Thời gian tạo",
+		"updateAt": "Thời gian cập nhật",
         "sidebar": {
             "Notification Config BA": "Cài đặt thông báo",
             "Setting": "Cài đặt",
@@ -118,6 +123,8 @@
             "Administrator": "Quản trị viên",
             "Account management": "Quản lý tài khoản",
             "Access Management": "Quản lý truy cập",
+            "accessControl": "Quản lý truy cập",
+            "accessControlBeta": "Quản lý truy cập beta",
             "users": "Tài khoản người dùng",
             "baAccount": "Tài khoản BA",
             "actionPack": "Action Pack",
@@ -165,13 +172,28 @@
         }
     },
     "table": {
+		"id": "ID",
+		"name": "Tên Service",
+		"description": "Mô tả",
+		"lastVersion": "Version mới nhất",
+		"language": "Ngôn ngữ",
+		"status": "Trạng thái",
+		"userCreate": "Người tạo",
+		"userUpdate": "Người cập nhât",
+		"createAt": "Thời gian tạo",
+		"updateAt": "Thời gian cập nhât",
+		"releaseAt": "Thời gian release",
+		"versionName": "Tên version",
         "wrap_text_mode": "Chế độ xuống dòng",
         "display_density": "Mật độ hiển thị dòng",
         "column_config": "Cấu hình cột",
-        "freeze_column": "Cố định cột này",
+		"freeze_column": "Cố định cột này",
+		"environmentIdentifier": "Định danh môi trường",
+		"environmentName": "Tên môi trường",
         "unfreeze_column": "Bỏ cố định cột này",
         "hide_column": "Ẩn cột này",
-        "show_column": "Hiện cột này",
+		"show_column": "Hiện cột này",
+		"git": "Link git",
         "wrap_tex_mode": {
             "wrap": "Xuống dòng",
             "clip": "Cắt bớt"
@@ -219,7 +241,8 @@
             "startUserId": "Người bắt đầu",
             "startTime": "Thời gian bắt đầu",
             "tenantId": "ID",
-            "suspended": "Trạng thái"
+			"suspended": "Trạng thái",
+			"number_instance":"Tổng số instance"
         }
     },
     "validate": {
@@ -388,6 +411,7 @@
         "grandPermission": "Phân quyền chi tiết",
         "apps": "Apps",
         "contextMenu": {
+			"viewDetails":"Xem chi tiết",
             "edit": "Sửa",
             "grantPermission": "Phân quyền",
             "remove": "Xóa"
@@ -751,8 +775,10 @@
                         "userRole": "Vai trò",
                         "history": "Lịch sử",
                         "comment": "Bình luận",
-                        "has": "Có",
-                        "commentNotResolve": "bình luận chưa được giải quyết"
+                        "has": "Có ",
+                        "commentNotResolve": " bình luận chưa được giải quyết",
+                        "noComment": "Không có bình luận nào",
+                        "id": "Định danh"
                     },
                     "worflowInfo": "THÔNG TIN QUY TRÌNH",
                     "userRelated": {

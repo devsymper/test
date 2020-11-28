@@ -15,6 +15,18 @@ function translateScriptTaskToHTTPTask(el, attrs, bpmnModeler) {
     setHttpTaskFromType(el, attrs, bpmnModeler, httpTaskType);
 }
 
+
+function translateThrowSignalToHTTPTask(el, attrs, bpmnModeler, rootAttrs) {
+    let httpTaskType = 'throwSignal';
+    let signalDefs = rootAttrs.signaldefinitions.value;
+    let signalMap = signalDefs.reduce((map, el) => {
+        map[el.id] = el;
+        return map;
+    }, {});
+    attrs.signalref.signalName = signalMap[attrs.signalref.value].name;
+    setHttpTaskFromType(el, attrs, bpmnModeler, httpTaskType);
+}
+
 function setHttpTaskFromType(el, attrs, bpmnModeler, httpTaskType) {
     let bizEl = el.businessObject;
     let extensionElements = bizEl.extensionElements;
@@ -67,6 +79,17 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
             translateServiceTaskToHTTPTask(vizEl, attrs, bpmnModeler);
         } else if (bizVizEl.$type == 'bpmn:ScriptTask') {
             translateScriptTaskToHTTPTask(vizEl, attrs, bpmnModeler);
+        } else if (bizVizEl.$type == 'bpmn:IntermediateThrowEvent') {
+            if(bizVizEl.eventDefinitions[0].$type == "bpmn:SignalEventDefinition"){
+                let rootAttrs = null;
+                for(let name in allSymEls){
+                    if(allSymEls[name].type == "BPMNDiagram"){
+                        rootAttrs = allSymEls[name].attrs;
+                        break;
+                    }
+                }
+                translateThrowSignalToHTTPTask(vizEl, attrs, bpmnModeler, rootAttrs);
+            }
         }
 
         if (elKey) {
@@ -75,7 +98,7 @@ export const pushCustomElementsToModel = function(allVizEls, allSymEls, bpmnMode
 
         for (let attrName in attrs) {
             let attrDef = allNodesAttrs[attrName];
-            if (!attrDef || (!attrs.name.value && vizEl.type=="bpmn:SequenceFlow")) {
+            if (!attrDef) {
                 continue;
             }
             if (typeof attrDef.pushToXML == 'function') {

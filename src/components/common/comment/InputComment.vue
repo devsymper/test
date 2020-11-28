@@ -40,9 +40,18 @@
 						v-on:keyup.up="chooseUserUp($event)"
 						>
 					</textarea>
-				<UploadFile style="position:absolute;right:16px;bottom: 0px;" @uploaded-file="uploadInfo" :uploadMultyFile="true" @upload-error="showError" />
-				<v-btn style="position:absolute;right: 0px;bottom: 0px;" icon @click="addComment">
-					<v-icon >mdi-send-circle-outline</v-icon>
+				<UploadFile 
+					style="position:absolute;right:20px;bottom:0px;" 
+					@uploaded-file="uploadInfo" 
+					:uploadMultyFile="true" 
+					@upload-error="showError" 
+				/>
+				<v-btn 
+					small 
+					style=" position:absolute;right: 0px;bottom: 0px;" 
+					icon 
+					@click="addComment">
+					<v-icon small >mdi-send-circle-outline</v-icon>
 				</v-btn>
 				<MenuTagUser style="position:absolute;left:0;bottom:45px" ref="menuTagUser" @selected-item="tagged" :keyWord="keyWord" />
 			</div>
@@ -432,7 +441,7 @@ export default {
 	max-width: unset;
 }
 .content-comment >>> .v-icon{
-	font-size:13px;	
+	font-size:19px;	
 }
 .content-comment >>> .content-comment-img{
 	display:flex;	

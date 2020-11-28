@@ -92,12 +92,19 @@
                                 <v-tooltip bottom>
                                     <template v-slot:activator="{ on }">
                                         <div v-on="on" class="text-left fs-13 pr-6 text-ellipsis w-100">
-                                        {{obj.activity_name}}
+                                        {{obj.activity_name}} ({{obj.number_of_task}})
                                         </div>
                                     </template>
                                 <span>{{ obj.activity_name }}</span>
                                 </v-tooltip>
-                                <span style="margin-right:15px; padding-top:3px">{{obj.number_of_task}}</span>
+                              
+                                <!-- <span style="margin-right:15px; padding-top:3px"> -->
+                                      <v-chip class="px-2" style="margin-right:15px;color:black; border-radius:4px;background-color:rgba(0,0,0,0.1); font-size:10px"
+                                       color="#EE6B60" 
+                                       x-small >
+                                    {{obj.process_definition_version}}
+                                    </v-chip>
+                                    <!-- </span> -->
                             </div>
                        
                             <div class="pa-0 grey--text  lighten-2 d-flex justify-space-between">

@@ -98,7 +98,11 @@
         "not_show_sidebar": "Disable show sidebar",
         "import_excel": "Import excel",
         "isDefault": "Default orgchart",
-        "restore": "Restore",
+		"restore": "Restore",
+		"userCreateName": "User Create Name",
+		"userUpdateName": "User Update Name",
+		"createAt": "Create At",
+		"updateAt": "Update At",
         "sidebar": {
             "Setting": "Setting",
             "action_pack": "Action Pack",
@@ -172,6 +176,17 @@
         }
     },
     "table": {
+		"id": "ID",
+		"name": " Service Name",
+		"description": "Description",
+		"lastVersion": "Last Version ",
+		"language": "Language",
+		"status": "Status",
+		"userCreate": "User Create",
+		"userUpdate": "UserUpdate",
+		"createAt": "Create At",
+		"updateAt": "Update At",
+		"versionName": "Version Name",
         "wrap_text_mode": "Wrap text mode",
         "display_density": "Row display density",
         "column_config": "Column configs",
@@ -371,6 +386,7 @@
         "editPermissionPack": "Edit permission packge",
         "apps": "Apps",
         "contextMenu": {
+			"viewDetails":"View detail",
             "edit": "Edit",
             "grantPermission": "Grant Permission",
             "remove": "Remove"
@@ -557,7 +573,8 @@
                         "history": "History",
                         "comment": "Comment",
                         "has": "Has",
-                        "commentNotResolve": "comment Not Resolve"
+                        "commentNotResolve": "comment Not Resolve",
+                        "noComment": "No comment"
                     },
                     "worflowInfo": "Workflow infomation",
                     "userRelated": {

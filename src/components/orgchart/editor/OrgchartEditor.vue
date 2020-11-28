@@ -368,7 +368,7 @@ export default {
             }
         },
         handleConfigUserSelectChange(listUserIds){
-            this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
+			this.$refs.editorWorkspace.changeUserDisplayInNode(listUserIds);
             if(this.context == 'department'){
 				this.changeManagerForDepartment(this.selectingNode.id, listUserIds);
 				let allNodes = this.$refs.positionDiagram.getAllNode()
@@ -917,10 +917,7 @@ export default {
             }
         },
         handleConfigValueChange(data){
-            if(data.name = "mappingDoc"){
-                this.selectedDoc = data.data
-            }
-            let cellId = this.selectingNode.id;
+			let cellId = this.selectingNode.id;
             if(data.name == 'name' && cellId != SYMPER_HOME_ORGCHART){
                 this.$refs.editorWorkspace.updateCellAttrs(cellId, 'name', data.data);
             }else if(cellId == SYMPER_HOME_ORGCHART && this.context == 'position'){
@@ -928,6 +925,9 @@ export default {
             }else if(this.context == 'position' && data.name == 'code'){
                 let content = data.data ? (this.$t('common.code') + ' : '+ data.data) : '';
                 this.$refs.editorWorkspace.updateCellAttrs(cellId, 'positionCode', content);
+			}
+			if(data.name = "mappingDoc"){
+                this.selectedDoc = data.data
             }
         },
         changeDepartmentName(newName, idDepartment = false){

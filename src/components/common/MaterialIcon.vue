@@ -23,7 +23,7 @@
                         cols="2" 
                         class="pt-0 pb-0 text-center single-icon" 
                         v-for="icon in listIconToShow" :key="icon"
-                        @click="selectIcon(icon,'icon')"
+                        @click="selectIcon(icon)"
                     >
                         <v-icon class="headline">{{icon}}</v-icon>
                     </v-col>
@@ -42,6 +42,14 @@ export default {
         VuePerfectScrollbar
     },
     props: {
+        /**
+         * Đánh dấu biến này bằng true khi nhúng compon này vào compon khác mà muốn nó luôn hiển thị
+         * nếu ở dạng popup thì mặc định là false
+         */
+        alwaysShow:{
+            type:Boolean,
+            default:false
+        },
         defaultIcon: {
             type: String,
             default: "",
@@ -67,6 +75,7 @@ export default {
             default:false
         }
     },
+    
     data: function() {
         return {
             listIcon: `
@@ -231,7 +240,7 @@ export default {
             ],
             searchIconKeyword: null,
             link: null,
-            isShow:false,
+            isShow:this.alwaysShow,
             context:""
         }
     },
@@ -263,9 +272,9 @@ export default {
                 this.listIconToShow = listIcons.slice(0, 150);
             }
         },
-        selectIcon(icon,type='img') {
+        selectIcon(icon) {
 			// console.log(icon);
-            this.$emit("selected", {icon: icon.trim(),type:type,context:this.context});
+            this.$emit("selected", icon.trim());
         },
         setContext(ctx){
             this.context = ctx

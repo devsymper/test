@@ -34,6 +34,7 @@ import {adminApi} from '@/api/Admin.js'
 import {
     appConfigs
 } from "@/configs";
+import {taskApi} from '@/api/task.js'
 export default {
 	components:{
 		ListItems,
@@ -48,16 +49,30 @@ export default {
 			apiUrl: appConfigs.apiDomain.bpmne.models,
 			customAPIResult: {
                 reformatData(res){
-					
+					let listKey = self.getListKey(res.data.listObject);
+					let listWork = res.data
+					taskApi.countInstant({keys:JSON.stringify(listKey)}).then(res=>{
+                         if (res.status === 200) {
+                              for(let i = 0; i< listWork.listObject.length; i++){
+                                  for(let j =0; j< res.data.length;j++){
+                                      if(listWork.listObject[i].processKey == res.data[j].key){
+										  listWork.listObject[i].number_instance = res.data[j].number_of_process_instance
+                                      }
+                                  }
+                            }
+							self.$refs.listWorkFlow.rerenderTable();
+                         }
+                    })
                     return{
-						 listObject: res.data.listObject,
-						 total: res.data.listObject.length,
+						 listObject: listWork.listObject,
+						 total: listWork.listObject.length,
                          columns: [
                             {name: "id", title: "id", type: "numeric"},
 							{name: "processKey", title: "key", type: "text"},
 							{name: "name", title: "name", type: "text"},
 							{name: "description", title: "description", type: "text"},
 							{name: "lastUpdateTime", title: "last_update_at", type: "date"},
+							{name: "number_instance", title: "number_instance", type: "text"},
                          ],
                    }
                 }
@@ -92,26 +107,6 @@ export default {
 						})
                     },
                 },
-               stopProcess: {
-                    name: "Dừng quy trình",
-                    text: "Dừng quy trình",
-                    callback: (obj, callback) => {
-						adminApi.stopProcessDefinition(obj.processKey).then(res=>{
-							if(res.status == 200){
-								this.$snotify({
-									type: "success",
-									title: "Dừng thành công"
-								})
-							}
-						}).catch(err=>{
-							this.$snotify({
-								type: "error",
-								title: "Không tìm thấy "
-							})
-						})
-                    },
-                },
-             
             },
 		}
 	},
@@ -121,7 +116,12 @@ export default {
 	methods:{
 		onRowSelected(item){
 			this.selectedItem = item
-		}
+		},
+		getListKey(res){
+			let listKey = [];
+			res.map(x=>listKey.push(x.processKey));
+			return listKey
+		},
 	}
 }
 </script>

@@ -751,7 +751,9 @@ export default {
 		},
 		getData(){
 			let data = {};
-			data.objectIdentifier = this.taskInfo.action.parameter.taskId;
+			if (this.taskInfo.action) {
+				data.objectIdentifier = this.taskInfo.action.parameter.taskId;
+			}
 			data.objectType = "task";
 			this.$store.dispatch("task/getArrFileAttachment", data);
     	}

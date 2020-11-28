@@ -413,6 +413,7 @@ export default {
                     this.$refs.symperBpmn.changeTaskNodeToUserTaskNode(el.id);
                 }
             }
+            this.removeRedundantAttr();
             let xml = this.$refs.symperBpmn.getXML();
             xml = this.standardXMLToSave(xml);
             console.log(xml,'xmlxmlxmlxmlxmlxmlxml');
@@ -447,6 +448,26 @@ export default {
             xml = xml.replace(/&lt;\/symper:symper_symper_string_tag&gt;/g,'</symper:symper_symper_string_tag>');
             xml = xml.replace(/&lt;symper:symper_symper_expression_tag&gt;/g,'<symper:symper_symper_expression_tag>');
             xml = xml.replace(/&lt;\/symper:symper_symper_expression_tag&gt;/g,'</symper:symper_symper_expression_tag>');
+
+            // Thêm tag đóng cho signalEvents
+            let signalEvents = xml.match(/<bpmn:signalEventDefinition(.*?)\/>/g);
+            if(signalEvents){
+                for(let item of signalEvents){
+                    let newItem = item.slice(0, item.length - 2) + '></bpmn:signalEventDefinition>';
+                    xml = xml.replace(item, newItem);
+                }
+            }
+
+            // Thêm thuộc tính cancelActivity cho boundaryEvent
+             let boundaryEvents = xml.match(/<bpmn:boundaryEvent(.*?)>/g);
+            if(boundaryEvents){
+                for(let item of boundaryEvents){
+                    if(item.indexOf('cancelActivity="') < 0){
+                        let newItem = item.slice(0, item.length - 1) + ' cancelActivity="true" >'
+                        xml = xml.replace(item, newItem);
+                    }
+                }
+            }
             return xml;
         },
         /**
@@ -458,6 +479,17 @@ export default {
                 let el = this.stateAllElements[elName];
                 if(el.type.includes('Gateway')){
                     this.setFlowsOrderForGateway(el);
+                }
+            }
+        },
+        // Loại bỏ các thuộc tính thừa trong attrs của các object trong diagram để sinh ra xml cho đúng với backend
+        removeRedundantAttr(){
+            let allEls = this.$refs.symperBpmn.getAllNodes();
+            for(let el of allEls){
+                if(el.$type == "bpmn:Collaboration"){
+                    delete el.$attrs.isExecutable;
+                }else if(el.$type == "bpmn:Participant"){
+                    el.processRef.isExecutable = true;
                 }
             }
         },
@@ -656,7 +688,9 @@ export default {
                             if(!mapSaveNodes[lane.id]){
                             }
                             poolToSave.childShapes.push(mapSaveNodes[lane.id]);
-                            this.addChildrenForProcess(mapSaveNodes[lane.id], lane.flowNodeRef, mapSaveNodes);
+                            if($.isArray(lane.flowNodeRef)){
+                                this.addChildrenForProcess(mapSaveNodes[lane.id], lane.flowNodeRef, mapSaveNodes);
+                            }
                         }
                     }else{
                         //tự Tạo một đối tượng lane mới do thư viện ko tạo trước
@@ -795,7 +829,7 @@ export default {
                                 attr.value
                             );
                             if(allNodesAttrs[key].needReformatValue){
-                               props[key] = reformatValueToStr(attr.value);
+                               props[key] = reformatValueToStr(props[key]);
                             }
                         } else {
                             props[key] = attr.value ? attr.value : '';
@@ -1100,6 +1134,22 @@ export default {
                 this.setItemForSelectProcessModel();
             }else if(nodeData.type == 'ServiceTask'){
                 this.setTaskActionableNodes(nodeData, 'serviceNotificationActionForElement',"serviceTask");
+            }
+
+            this.setDefinitionRef(nodeData);
+        },
+        setDefinitionRef(nodeData){
+            let allEls = this.$refs.symperBpmn.getAllNodes();
+
+            let homeId = allEls.filter((el, idx) => {
+                if(el.$type == 'bpmn:Process' || el.$type == "bpmn:Collaboration"){
+                    return true;
+                }
+            })[0]['id'];
+            let homeData = this.getNodeData(homeId, 'BPMNDiagram');
+            let signaldefinitions = this.stateAllElements[homeId].attrs.signaldefinitions;
+            if(nodeData.attrs.signalref){
+                nodeData.attrs.signalref.options = signaldefinitions.getValue(signaldefinitions.value);
             }
         },
         setItemForSelectProcessModel(){

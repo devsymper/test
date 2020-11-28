@@ -118,34 +118,6 @@ export default {
                 });
             });
 		},
-		// plotHeatmap() {
-		// 	var heatmap = h337.create({
-		// 		container: self.bpmnModeler.get('canvas')
-		// 	});
-		// 	var data = [];
-		// 	var registry = self.bpmnModeler.get('elementRegistry');
-		// 	var canvas = self.bpmnModeler.get('canvas');
-		// 	for (var i in registry.getAll()) {
-		// 		var element = registry.getAll()[i];
-		// 		if (stats[element.id] != null) {
-		// 		// don't ask how we got to this calc. lots of tries. The 300/232 is the factor of the modeler available area and used.
-		// 		const rect = canvas.getGraphics(element).getBoundingClientRect();
-		// 		const x = (rect.x + rect.width / 2);
-		// 		const y = (rect.y + rect.height / 2);
-
-		// 		data.push({
-		// 			x: x.toFixed(0),
-		// 			y: y.toFixed(0),
-		// 			value: stats[element.id]
-		// 		});
-		// 		}
-		// 	}
-
-		// 	heatmap.setData({
-		// 		max: 20,
-		// 		data: data
-		// 	});
-		// },
 
         changeElementColor(ele,data,isCurrentNode=false){
             if(typeof ele == 'string'){ // Nếu truyền vào id
@@ -180,6 +152,16 @@ export default {
             });
             this.bpmnModeler.on("element.click", evt => {
                 this.$emit("node-clicked", getBusinessObject(evt.element), evt);
+            });
+
+            this.bpmnModeler.on("canvas.viewbox.changing", evt => {
+                if(self.debounceViewportChange){
+                    clearTimeout(self.debounceViewportChange);
+                }
+
+                self.debounceViewportChange = setTimeout(() => {
+                    self.$emit('viewport-change');
+                }, 100);
             });
 
             this.bpmnModeler.on("element.changed", evt => {
@@ -249,30 +231,30 @@ export default {
           
         },
         getCustomModules(){
-            let self = this;
-            class EventBusLogger {
-                constructor(eventBus) {
-                    const fire = eventBus.fire.bind(eventBus);
-                        eventBus.fire = (type, data) => {
-                        fire(type, data);
-                        if(type == 'canvas.viewbox.changing'){
-                            if(self.debounceViewportChange){
-                                clearTimeout(self.debounceViewportChange);
-                            }
-                            self.debounceViewportChange = setTimeout(() => {
-                                self.$emit('viewport-change');
-                            }, 5000);
-                        }
-                    };
-                }
-            }
-            EventBusLogger.$inject = ["eventBus"];
-            let customModules = this.customModules;
-            customModules.push( {
-                __init__: ["eventBusLogger"],
-                eventBusLogger: ["type", EventBusLogger]
-            });
-            return customModules;
+            // let self = this;
+            // class EventBusLogger {
+            //     constructor(eventBus) {
+            //         const fire = eventBus.fire.bind(eventBus);
+            //         eventBus.fire = (type, data) => {
+            //             fire(type, data);
+            //             if(type == 'canvas.viewbox.changing'){
+            //                 if(self.debounceViewportChange){
+            //                     clearTimeout(self.debounceViewportChange);
+            //                 }
+            //                 self.debounceViewportChange = setTimeout(() => {
+            //                     self.$emit('viewport-change');
+            //                 }, 100);
+            //             }
+            //         };
+            //     }
+            // }
+            // EventBusLogger.$inject = ["eventBus"];
+            // let customModules = this.customModules;
+            // customModules.push( {
+            //     __init__: ["eventBusLogger"],
+            //     eventBusLogger: ["type", EventBusLogger]
+            // });
+            return this.customModules;
         },
         saveSVG(done) {
             if (!done) {
