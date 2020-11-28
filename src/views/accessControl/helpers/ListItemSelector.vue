@@ -11,6 +11,7 @@
 			class="ml-1"
 			style="margin-top:-3px"
             small-chips
+			@change="handleChange"
             multiple
           ></v-autocomplete>
 		<v-btn
@@ -71,12 +72,20 @@ export default {
 			default(){
 				return []
 			}
+		},
+		data:{
+
+		},
+		values:{
+			type: Array,
+			default(){
+				return []
+			}
 		}
 	},
 	data(){
 		return {
 			selectingApp: false,
-			values:[]
 		}
 	},
 	methods:{
@@ -87,12 +96,16 @@ export default {
 			this.selectingApp = false
 		},
 		handleAppClick(app){
+			this.selectingApp = false
 			this.$emit('item-selected' , app.id)
 		},
+		handleChange(){
+			this.$emit('list-item-selected' , this.values)
+		}
 	
 	},
 	mounted(){
-
+		let self = this 
 	}
 }
 </script>

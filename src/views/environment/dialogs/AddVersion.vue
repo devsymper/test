@@ -89,6 +89,13 @@ export default {
 		showDialog:{
 			type: Boolean,
 			default: false
+		},
+		mode:{
+			type: String,
+			default: "dialog"
+		},
+		routerSerViceId:{
+			type: String,
 		}
 	},
 	watch:{
@@ -105,7 +112,12 @@ export default {
 		},
 		addVersion(){
 			let self = this
-			let serviceId = this.$store.state.environmentManagement.currentServiceId
+			let serviceId 
+			if(this.mode == 'dialog'){
+				serviceId = this.$store.state.environmentManagement.currentServiceId
+			}else{
+				serviceId = this.routerSerViceId
+			}
 			let formData = {
 			}
 			for(let i in this.allInputs){

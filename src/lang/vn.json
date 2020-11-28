@@ -115,6 +115,7 @@
             "tasks": "Tasks",
             "works": "Works",
             "My work": "Tác vụ của tôi",
+            "My work timesheet": "Ghi công",
             "myWork": "Lịch làm việc",
             "Manage timesheet": "Quản lý  thời gian biểu",
             "Timesheet report": "Báo cáo thời gian biểu",
@@ -124,6 +125,7 @@
             "Account management": "Quản lý tài khoản",
             "Access Management": "Quản lý truy cập",
             "accessControl": "Quản lý truy cập",
+            "accessControlBeta": "Quản lý truy cập beta",
             "users": "Tài khoản người dùng",
             "baAccount": "Tài khoản BA",
             "actionPack": "Action Pack",
@@ -372,7 +374,7 @@
         },
         "myInfo": {
             "title": "Thông tin của tôi",
-            "generalInfo": "Thông tin chung",
+            "generalInfo": "Thông tin chi tiết",
             "myPosition": "Vị trí của tôi"
         }
     },
@@ -527,6 +529,7 @@
         "submit": "Gửi",
         "date": "Ngày",
         "task_form": "Tạo task",
+        "task_logform": "Task",
         "time_invalid": "Thời gian không hợp lệ",
         "required_value": "Không được để trống",
         "of": "từ",
