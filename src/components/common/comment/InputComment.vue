@@ -50,7 +50,7 @@
 					small 
 					style=" position:absolute;right: 0px;bottom: 0px;" 
 					icon 
-					@click="addComment">
+					@click="debounceAddCommnent">
 					<v-icon small >mdi-send-circle-outline</v-icon>
 				</v-btn>
 				<MenuTagUser style="position:absolute;left:0;bottom:45px" ref="menuTagUser" @selected-item="tagged" :keyWord="keyWord" />
@@ -256,6 +256,9 @@ export default {
                 text: this.$t('notification.error')
             })
 		},
+		debounceAddCommnent: _.debounce(function(e){
+			this.addComment()
+		}, 200,this),
 		addComment(){
 			this.dataPostComment = this.sComment
 			this.dataPostComment.content = this.inputComment
@@ -339,9 +342,8 @@ export default {
 			if(this.isSelectingUser == true){
 				this.selectedUser()
 			}else{
-				this.addComment()
+				this.debounceAddCommnent()
 			}
-	/* float: right; */
 		},
 		addAvatar(data){
 			let mapIdToUser = this.$store.getters['app/mapIdToUser'];
