@@ -1095,6 +1095,19 @@
                 "create": "Tạo ",
                 "execute": "Thực thi"
             },
+            "account": {
+                "change_avatar": "Đổi ava",
+                "add": "Thêm",
+                "update": "Cập nhật",
+                "info": "Thông tin",
+                "detail": "Chi tiết",
+                "change_pass": "Đổi pass",
+                "disable": "Ẩn",
+                "set_role": "Cài role"
+
+
+
+            },
             "application_definition": {
                 "update": "Sửa",
                 "view": "Xem",
