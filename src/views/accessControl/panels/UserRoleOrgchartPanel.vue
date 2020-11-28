@@ -103,7 +103,7 @@ export default {
 		},
 		debounceSave: _.debounce(function(e){
 			this.handleSaveClick()
-		}, 200,this),
+		}, 300,this),
 		handleSaveClick(){
 			let permissions = []
 			let self = this

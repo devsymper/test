@@ -799,7 +799,7 @@ export default {
 		},
 		debounceSaveActionPack: _.debounce(function(e){
 			this.saveActionPack()
-		}, 200,this),
+		}, 300,this),
         async getObjectsOfObjectType(objectType = null){
             let allResource = this.$store.state.actionPack.allResource;
             if(!objectType){

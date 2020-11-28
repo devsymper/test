@@ -49,7 +49,7 @@ export default {
     methods: {
 		debounceSavePermission: _.debounce(function(e){
 			this.savePermission()
-		}, 200,this),
+		}, 300,this),
         async savePermission(){
             let listActionPacks = this.itemData.actionPacks.reduce((arr, el) => {
                 arr.push(el.id);
