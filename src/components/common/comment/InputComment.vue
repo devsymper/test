@@ -265,7 +265,6 @@ export default {
 						this.$store.commit('comment/setWaitingCommentCountPerObj', this.sComment.objectType+':'+this.sComment.objectIdentifier);
 					});
 				}
-				
 			} else {
 				if(emptyCheck == false){
 					this.dataPostComment.id = this.item.id
