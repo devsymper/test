@@ -458,8 +458,6 @@ export default class Table {
                     data: this.getSourceData(),
                     tableName:thisObj.tableName
                 });
-                console.log('ákjdaskdasd',changes,source);
-
                 if (thisObj.isAutoCompleting) {
                     return;
                 }
@@ -738,7 +736,7 @@ export default class Table {
             let controlLinkEffected = controlInstance.getEffectedLinkControl();
             let controlValidateEffected = controlInstance.getEffectedValidateControl();
             this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
-            this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readonly');
+            this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readOnly');
             this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
             this.handlerRunOtherFormulasControl(controlLinkEffected, 'linkConfig');
             this.handlerRunOtherFormulasControl(controlValidateEffected, 'validate');
@@ -1286,8 +1284,14 @@ export default class Table {
         }
 
     }
+    getSourceData(){
+        return this.tableInstance.getSourceData(); 
+    }
 
-
+    setCellReadOnly(row, col, status){
+        this.tableInstance.setCellMeta(row, 0, 'readOnly', status);
+        
+    }
     // Hàm set data cho table
     // hàm gọi sau khi chạy công thức 
     setData(vls, dateFormat = true) {
@@ -1505,7 +1509,6 @@ export default class Table {
             rsl.dateFormat = ctrl.controlProperties.formatDate.value;
             rsl.correctFormat = true;
         }
-
         if (ctrl.controlProperties.isReadOnly && ctrl.controlProperties.isReadOnly.value == true) {
             rsl.readOnly = true;
         }
@@ -1556,6 +1559,9 @@ export default class Table {
                 ele.on('click', '.info-control-btn', function(e) {
                     SYMPER_APP.$evtBus.$emit('on-info-btn-in-table-click', { e: e, row: row, controlName: control.name })
                 })
+            }
+            if (map.type === 'readOnly') {
+                hotInstance.setCellMeta(row, column, 'readOnly', map.value);
             }
             if (map.vld === true) {
                 ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));

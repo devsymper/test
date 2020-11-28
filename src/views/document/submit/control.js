@@ -311,7 +311,32 @@ export default class Control {
         }
     }
     handlerDataAfterRunFormulasReadonly(values) {
-
+        if(this.inTable != false){
+            let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
+            let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
+            let tableData = tableControlInstance.tableInstance.getSourceData();
+            for (let index = 0; index < tableData.length; index++) {
+                const rowData = tableData[index];
+                let status = false;
+                if( rowData['s_table_id_sql_lite'] && values[rowData['s_table_id_sql_lite']]){
+                    if(values[rowData['s_table_id_sql_lite']] == 1 || values==true || values == 't' ){
+                        status = true;
+                    }
+                }
+                tableControlInstance.tableInstance.validateValueMap[index + "_" + colIndex] = {type:'readOnly',value:status};
+                
+            }
+        }
+        else{
+            if(Array.isArray(values)){
+                values=values[0]
+            }
+            if(values == 1 || values==true || values == 't' ){
+                $('#'+this.id).attr('disabled','disabled');
+            }else{
+                $('#'+this.id).removeAttr('disabled');
+            }
+        }
     }
 
     handlerDataAfterRunFormulasValue(values) {

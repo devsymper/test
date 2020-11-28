@@ -1154,8 +1154,7 @@ export default {
             let dataFromCache = this.getDataAutocompleteFromCache(aliasControl, dataInput);
             if(dataFromCache == false){
                 e.formulasInstance.handleBeforeRunFormulas(dataInput).then(res=>{
-                    res.status = 200
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,true)
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                 });
             }
             else{
@@ -1171,7 +1170,7 @@ export default {
             if(['select','combobox'].includes(type)){
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
                 e.selectFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,false)
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl)
                 });
             }
             else{
@@ -1185,7 +1184,7 @@ export default {
                 let dataFromCache = this.getDataAutocompleteFromCache(aliasControl, dataInput);
                 if(dataFromCache == false){
                     e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                        thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,false)
+                        thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                     });
                 }
                 else{
@@ -1220,54 +1219,53 @@ export default {
          * Hàm bind dữ liệu cho box autocomplete, cho component autocompleteInput
          * và đưa dữ liệu vào cache
          */
-        setDataForControlAutocomplete(res,aliasControl,controlTitle, fromSqlite=false){
+        setDataForControlAutocomplete(res,aliasControl,controlTitle = ''){
+            let fromSqlite = !res.server
             let controlAs = {};
             controlAs[aliasControl] = controlTitle;
-            if(res.data != undefined){
-                if(res.status == 200 && res.data != false){
-                    let dataTable = {}
-                    if(!fromSqlite && res.data.data !== ""){
-                        dataTable = this.handleDataAutoComplete(res.data.data,fromSqlite,controlAs);
-                    }
-                    else{
-                        dataTable = this.handleDataAutoComplete(res.data,fromSqlite,controlAs);
-                    }
-                    this.$refs.autocompleteInput.setAliasControl(aliasControl);
-                    this.$refs.autocompleteInput.setData(dataTable);
-                    if(dataTable.hasOwnProperty('headers')){
-                        try {
-                            let dataInput = JSON.parse(res.parameter.data_input);
-                            let groupKey = [];
-                            for(let controlName in dataInput){
-                                groupKey.push(dataInput[controlName]);      
-                            }
-                            groupKey = groupKey.join("-");
-                            let itemData = {};
-                            let itemHeader = {};
-                            itemData[groupKey] = dataTable.dataBody;
-                            itemHeader[groupKey] = dataTable.headers;
-                            this.$store.commit("document/cacheDataAutocomplete",{
-                                instance: this.keyInstance,
-                                controlName:aliasControl,
-                                header:itemHeader,
-                                cacheData:itemData,
-                            })    
-                        } catch (error) {
-                            console.log(error,'errorerror');
-                        }
-                        
-                    }
+            if(res.data){
+                let dataTable = {};
+                if(fromSqlite){
+                    dataTable = this.handleDataAutoComplete(res.data,fromSqlite,controlAs);
                 }
                 else{
-                    this.$refs.autocompleteInput.setData([]);
+                    dataTable = this.handleDataAutoComplete(res.data.data,fromSqlite,controlAs);
+                }
+                
+                this.$refs.autocompleteInput.setAliasControl(aliasControl);
+                this.$refs.autocompleteInput.setData(dataTable);
+                if(!controlTitle){
+                    this.$refs.autocompleteInput.hideHeader();
+                }
+                if(dataTable.hasOwnProperty('headers')){
+                    try {
+                        let dataInput = res.data.dataInput;
+                        let groupKey = [];
+                        for(let controlName in dataInput){
+                            groupKey.push(dataInput[controlName]);      
+                        }
+                        groupKey = groupKey.join("-");
+                        let itemData = {};
+                        let itemHeader = {};
+                        itemData[groupKey] = dataTable.dataBody;
+                        itemHeader[groupKey] = dataTable.headers;
+                        this.$store.commit("document/cacheDataAutocomplete",{
+                            instance: this.keyInstance,
+                            controlName:aliasControl,
+                            header:itemHeader,
+                            cacheData:itemData,
+                        })    
+                    } catch (error) {
+                        console.log(error,'errorerror');
+                    }
+                    
                 }
             }
             else{
-                let dataTable = this.handleDataAutoComplete(res,true,controlAs);
-                this.$refs.autocompleteInput.setAliasControl(aliasControl);
-                this.$refs.autocompleteInput.setData(dataTable);
-                this.$refs.autocompleteInput.hideHeader();
+                this.$refs.autocompleteInput.setData([]);
             }
+          
+            
         },
         /**
          * Hàm bind dữ liệu cho control, và control trong bảng khi chọn apply trên timepicker
@@ -2339,7 +2337,7 @@ export default {
                 let controlValidateEffected = controlInstance.getEffectedValidateControl();
                 this.runFormulasControlEffected(controlName,controlEffected);
                 this.runOtherFormulasEffected(controlName,controlHiddenEffected,'hidden');
-                this.runOtherFormulasEffected(controlName,controlReadonlyEffected,'readonly');
+                this.runOtherFormulasEffected(controlName,controlReadonlyEffected,'readOnly');
                 this.runOtherFormulasEffected(controlName,controlRequireEffected,'require');
                 this.runOtherFormulasEffected(controlName,controlLinkEffected,'linkConfig');
                 this.runOtherFormulasEffected(controlName,controlValidateEffected,'validate');
@@ -2404,7 +2402,8 @@ export default {
             let control = getControlInstanceFromStore(this.keyInstance,controlName);
             if(control.inTable != false){
                 let tableInstance = getControlInstanceFromStore(this.keyInstance,control.inTable);
-                let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulasInstance,tableInstance.name)
+                let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulasInstance,tableInstance.name);
+               
                 tableInstance.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataIn,formulasInstance);
             }
             formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
@@ -2493,7 +2492,7 @@ export default {
                                 this.handlerDataAfterRunFormulasHidden(controlInstance,value,controlId);
                                 break;
                             case "readOnly":
-                                this.handlerDataAfterRunFormulasReadonly(value,controlId);
+                                controlInstance.handlerDataAfterRunFormulasReadonly(value);
                                 break;
                             case "uniqueDB":
                                 controlInstance.handlerDataAfterRunFormulasUniqueDB(value);
