@@ -159,17 +159,7 @@ export default {
         title: "admin",
         icon: "mdi-cog-transfer-outline",
 		group: "Administrator",
-		children: {
-            list_workflow: {
-                title: "list_workflow",
-                link: "/admin",
-            },
-            list_work: {
-                title: "list_work",
-                link: "/admin/jobs",
-            },
-           
-        }
+		link: "/admin",
     },
     userManager: {
         title: "Account management",
@@ -194,8 +184,8 @@ export default {
         }
     },
     accessManager: {
-        title: "Access Management",
-        icon: "mdi-shield-key-outline",
+        title: "accessControl",
+        icon: "mdi-shield-key",
         group: "Administrator",
         children: {
             permissions: {
@@ -214,7 +204,13 @@ export default {
                 link: "/action-pack"
             },
         }
-    },
+	},
+	access_control: {
+		title: "accessControlBeta",
+        icon: "mdi mdi-shield-key-outline",
+		group: "Administrator",
+		link: "/access-control"
+	},
     application_definition: {
         title: "apps",
         icon: "mdi mdi-widgets-outline",
@@ -251,6 +247,12 @@ export default {
             },
 
         }
-    },
+	},
+	environmentManagement:{
+		title: 'environment',
+        icon: 'mdi-earth',
+		group: "Setting",
+		link: '/environment-management',
+	}
 
 };

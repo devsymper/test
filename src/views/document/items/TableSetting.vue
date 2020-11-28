@@ -5,8 +5,9 @@
         width="800"
         scrollable
         style="overflow:hidden;"
+        
         >
-        <v-card height="600">
+        <v-card height="600" :id="'dialog-editor-'+instance">
             <v-card-title class="s-card-title">
                  <v-tabs
                     class="s-tabs"
@@ -170,6 +171,9 @@ export default {
         },
         instance:{
             type:Number
+        },
+        defaultTablePivotConfig:{
+            type:Object
         }
     },
     watch:{
@@ -180,9 +184,18 @@ export default {
                 this.listRows = vl;
             }
         },
+        defaultTablePivotConfig:{
+            deep:true,
+            immediate:true,
+            handler:function(vl){
+                if(Object.keys(vl).length > 0 )
+                this.tablePivotConfig = vl;
+            }
+        },
         tab(vl){
             if(vl >= 1){
                 setTimeout((self) => {
+                    if(!this.isSetDrag)
                     self.makeDrag();
                 }, 500,this);
             }
@@ -202,23 +215,43 @@ export default {
             items: [
             'Cài đặt chung', 'Pivot table',
             ],
-            tablePivotConfig:{rows:[],cols:[],values:[]}
+            tablePivotConfig:{rows:[],cols:[],values:[]},
+            isSetDrag:false
         }
-    },
-    created(){
-        
     },
     methods:{
         makeDrag(){
+            this.isSetDrag = true;
             let self = this;
             let controlInd = null;
-            $('.column-item').on('dragstart',function(e){
+            $('#dialog-editor-'+this.instance).on('dragstart','.column-item',function(e){
                 controlInd = $(e.target).attr('data-index');
                 let data = self.listRows[controlInd];
                 e.originalEvent.dataTransfer.setData("control", JSON.stringify(data));
             })
            
-            $('.detail-pivot-setting__rows')
+            $('#dialog-editor-'+this.instance +' .detail-pivot-setting__rows')
+            .on('dragover', false) 
+            .on('drop', function (event) {
+                var e;
+                if (event.isTrigger)
+                    e = triggerEvent.originalEvent;
+                else
+                    var e = event.originalEvent;
+                    var control = e.dataTransfer.getData('control');
+                    if(self.tablePivotConfig.rows.length < 2){
+                        control = JSON.parse(control);
+                        self.listRows[controlInd].disable = true;
+                        self.tablePivotConfig.rows.push(control)
+                    }
+                try {
+                    
+                } catch (error) {
+                    console.log(error);
+                }
+                return false;
+            });
+            $('#dialog-editor-'+this.instance +' .detail-pivot-setting__cols')
             .on('dragover', false) 
             .on('drop', function (event) {
                 var e;
@@ -228,33 +261,17 @@ export default {
                     var e = event.originalEvent;
                 try {
                     var control = e.dataTransfer.getData('control');
-                    control = JSON.parse(control);
-                    self.listRows[controlInd].disable = true;
-                    self.tablePivotConfig.rows.push(control)
+                    if(self.tablePivotConfig.cols.length < 2){
+                        control = JSON.parse(control);
+                        self.listRows[controlInd].disable = true;
+                        self.tablePivotConfig.cols.push(control);
+                    }
                 } catch (error) {
-                    
+                    console.log(error);                    
                 }
                 return false;
             });
-            $('.detail-pivot-setting__cols')
-            .on('dragover', false) 
-            .on('drop', function (event) {
-                var e;
-                if (event.isTrigger)
-                    e = triggerEvent.originalEvent;
-                else
-                    var e = event.originalEvent;
-                try {
-                    var control = e.dataTransfer.getData('control');
-                    control = JSON.parse(control);
-                    self.listRows[controlInd].disable = true;
-                    self.tablePivotConfig.cols.push(control)
-                } catch (error) {
-                    
-                }
-                return false;
-            });
-            $('.detail-pivot-setting__values')
+            $('#dialog-editor-'+this.instance +' .detail-pivot-setting__values')
             .on('dragover', false) 
             .on('drop', function (event) {
                 var e;
@@ -294,6 +311,7 @@ export default {
             this.setOnDrag();
         },
         showDialog(){
+            this.tablePivotConfig = {rows:[],cols:[],values:[]}
             this.isShowTableSetting = true
         },
         hideDialog(){
@@ -312,7 +330,11 @@ export default {
         saveTable(){
             this.filterRowNotExistType();
             if(this.listRows.length > 0){
-                this.$emit("add-columns-table",this.listRows);
+                let dataEmit = {listRows:this.listRows};
+                if(this.tablePivotConfig.rows.length > 0 || this.tablePivotConfig.cols.length > 0 || this.tablePivotConfig.values.length > 0){
+                    dataEmit['tablePivotConfig'] = this.tablePivotConfig;
+                }
+                this.$emit("add-columns-table",dataEmit);
             }
             this.listRows = [];
             this.hideDialog()

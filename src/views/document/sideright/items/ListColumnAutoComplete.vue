@@ -16,7 +16,7 @@
             :key="i"
             @click="chooseItem(item)"
         >
-        <img class="icon-control" :src="`https://hoangnd.dev.symper.vn/`+item.icon">
+        <img class="icon-control" :src="require('./../../../../../public/img/document'+item.icon)">
         <v-list-item-content>
         <v-list-item-title > <span>{{item.title}}</span> <span style="font:10px roboto;font-weight:400;padđing-left:4px">{{item.name}}</span></v-list-item-title>
         </v-list-item-content>
@@ -27,12 +27,13 @@
 </template>
 
 <script>
+import { util } from "@/plugins/util.js";
 export default {
     data(){
         return {
             x:null,
             y:null,
-            isShow:false
+            isShow:false,
         }
     },
     props:{

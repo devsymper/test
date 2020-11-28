@@ -97,5 +97,17 @@ export const store = {
     },
     isPromise(value) {
         return value && value.then && typeof value.then === 'function';
+    },
+    addEnvToUrl(url){
+        url = url.trim();
+        if(url.indexOf('https://') === 0){
+            if(SYMPER_ENV.environment != ''){
+                url = url.replace('https://', `https://${SYMPER_ENV.environment}.`);                
+            }
+        }else{
+            console.error("url must start with https://");
+        }
+        return url;
     }
+    
 }

@@ -21,70 +21,78 @@
             ></listHeader>
             <v-divider v-if="!sideBySideMode" ></v-divider>
             <v-row class="ml-0 mr-0" v-if="!sideBySideMode">
-            <v-col cols="12" class="list-tasks pt-0 pb-0">
-                <v-row>
-                <v-col
-                    :cols="sideBySideMode ? 12 : compackMode ? 6 : 4"
-                    class="pl-3 fs-13 font-weight-medium"
-                >{{$t("tasks.header.name")}}
-                    <v-icon 
-                        @click="showFilterColumn($event,'name')" 
-                        class="fs-15 float-right pr-1" 
-                        style="padding-top:3px"
-                        :class="{
-                            'd-active-color': filteredColumns['name'] && filteredColumns['name']==true ,
-                        }"
-                    >mdi-filter-variant</v-icon>
+                <v-col cols="12" class="list-tasks pt-0 pb-0">
+                    <v-row>
+                    <v-col
+                        :cols="sideBySideMode ? 12 : compackMode ? 6 : 4"
+                        class="pl-3 fs-13 font-weight-medium"
+                    >{{$t("tasks.header.name")}}
+                        <v-icon 
+                            @click="showFilterColumn($event,'name')" 
+                            class="fs-15 float-right" 
+                            style="padding-top:3px"
+                            :class="{
+                                'd-active-color': filteredColumns['name'] && filteredColumns['name']==true ,
+                            }"
+                        >mdi-filter-variant</v-icon>
+                    </v-col>
+                    <v-col
+                        cols="2"
+                        v-if="!sideBySideMode"
+                        class="fs-13 font-weight-medium"
+                    >{{$t("tasks.header.userCreate")}}
+                        <!-- <v-icon @click="showFilterColumn($event,'startTime')" class="fs-15 float-right" style="padding-top:3px">mdi-filter-variant</v-icon> -->
+                    </v-col>
+                    <v-col
+                        cols="2"
+                        v-if="!sideBySideMode"
+                        class="fs-13 font-weight-medium"
+                    >
+                        {{$t("tasks.header.createDate")}}
+                        <v-icon 
+                            @click="showFilterColumn($event,'startTime')" 
+                            class="fs-15 float-right" 
+                            style="padding-top:3px"
+                            :class="{
+                                'd-active-color': filteredColumns['startTime'] && filteredColumns['startTime']==true ,
+                            }"
+                        >mdi-filter-variant</v-icon>
+                    </v-col>
+                    <v-col
+                        cols="2"
+                        v-if="!sideBySideMode && !compackMode && !smallComponentMode"
+                        class="fs-13 font-weight-medium"
+                    >{{$t("tasks.header.app")}}
+                        <v-icon 
+                            @click="showFilterColumn($event,'processDefinitionName')" 
+                            class="fs-15 float-right" 
+                            style="padding-top:3px"
+                            :class="{
+                                'd-active-color': filteredColumns['processDefinitionName'] && filteredColumns['processDefinitionName']==true ,
+                            }"
+                        >mdi-filter-variant</v-icon>
+                    </v-col>
+                    <v-col
+                        cols="1"
+                        v-if="!sideBySideMode && !compackMode && !smallComponentMode"
+                        class="fs-13 font-weight-medium"
+                    >{{$t("tasks.header.status")}}
+                        <v-icon 
+                            @click="showFilterColumn($event,'isDone')" 
+                            class="fs-15 float-right" 
+                            style="padding-top:3px"
+                            :class="{
+                                'd-active-color': filteredColumns['isDone'] && filteredColumns['isDone']==true ,
+                            }"
+                        >mdi-filter-variant</v-icon>
+                    </v-col>
+                    <v-col
+                        cols="1"
+                        v-if="!sideBySideMode && !compackMode && !smallComponentMode"
+                        class="fs-13 font-weight-medium"
+                    >{{$t("common.add")}}</v-col>
+                    </v-row>
                 </v-col>
-                <v-col
-                    cols="2"
-                    v-if="!sideBySideMode"
-                    class="fs-13 font-weight-medium"
-                >{{$t("tasks.header.userCreate")}}
-                    <!-- <v-icon @click="showFilterColumn($event,'startTime')" class="fs-15 float-right" style="padding-top:3px">mdi-filter-variant</v-icon> -->
-                </v-col>
-                <v-col
-                    cols="2"
-                    v-if="!sideBySideMode"
-                    class="fs-13 font-weight-medium"
-                >
-                    {{$t("tasks.header.createDate")}}
-                    <v-icon 
-                        @click="showFilterColumn($event,'startTime')" 
-                        class="fs-15 float-right" 
-                        style="padding-top:3px"
-                        :class="{
-                            'd-active-color': filteredColumns['startTime'] && filteredColumns['startTime']==true ,
-                        }"
-                    >mdi-filter-variant</v-icon>
-                </v-col>
-                <v-col
-                    cols="2"
-                    v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                    class="fs-13 font-weight-medium"
-                >{{$t("tasks.header.app")}}
-                    <v-icon 
-                        @click="showFilterColumn($event,'processDefinitionName')" 
-                        class="fs-15 float-right" 
-                        style="padding-top:3px"
-                        :class="{
-                            'd-active-color': filteredColumns['processDefinitionName'] && filteredColumns['processDefinitionName']==true ,
-                        }"
-                    >mdi-filter-variant</v-icon>
-                </v-col>
-                <v-col
-                    cols="1"
-                    v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                    class="fs-13 font-weight-medium"
-                >{{$t("tasks.header.status")}}
-                </v-col>
-                <v-col
-                    cols="1"
-                    v-if="!sideBySideMode && !compackMode && !smallComponentMode"
-                    class="fs-13 font-weight-medium"
-                >{{$t("common.add")}}</v-col>
-                </v-row>
-            </v-col>
             </v-row>
             <v-divider></v-divider>
 
@@ -249,7 +257,7 @@
 
     <table-filter
         ref="tableFilter"
-        :columnFilter="tableFilter.currentColumn.colFilter"
+        :columnFilter="columnFilter()"
         @apply-filter-value="applyFilter"
         @search-autocomplete-items="searchAutocompleteItems"
     ></table-filter>
@@ -317,11 +325,11 @@ export default {
                 }
                 work.symperApplicationName=appName;
 
-                if ( work.endTime) {
-                    date = work.endTime.split("T")[0];
-                }else{
-                    date = work.startTime.split("T")[0];
-                }
+                // if ( work.endTime) {
+                //     date = work.endTime.split("T")[0];
+                // }else{
+                    date = work.startTime.split(" ")[0];
+                // }
                 let fromNow = this.getDateFormNow(date);
                 if (!groups[fromNow]) {
                     groups[fromNow] = [];
@@ -422,6 +430,7 @@ export default {
     },
     data: function() {
         return {
+            debounceGetData:null,
             data:[],
             page: 1, // trang hiện tại
             pageSize: 50,
@@ -440,7 +449,7 @@ export default {
                 }
             },
             filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
-            getDataUrl:"https://workflow-extend.symper.vn/works",
+            getDataUrl:appConfigs.apiDomain.workflowExtend+"works",
              /**
              * Thêm điều kiện để quy vấn qua api
              */
@@ -484,6 +493,21 @@ export default {
         self.reCalcListTaskHeight();
     },
     methods: {
+        columnFilter(){
+            if (this.tableFilter.currentColumn.name=="isDone") {
+                if(this.tableFilter.currentColumn.colFilter.selectItems.length>0){
+                    let items=this.tableFilter.currentColumn.colFilter.selectItems;
+                    for (let i = 0; i < items.length; i++) {
+                        if (items[i].value==1) {
+                            this.tableFilter.currentColumn.colFilter.selectItems[i].label=this.$t('common.done');;
+                        }else if(items[i].value==0){
+                            this.tableFilter.currentColumn.colFilter.selectItems[i].label=this.$t('myItem.unfinished');
+                        }
+                    }
+                }
+            }
+            return this.tableFilter.currentColumn.colFilter;
+        },
         /**
          * Kiểm tra xem một cột trong table có đang áp dụng filter hay ko
          */
@@ -511,7 +535,7 @@ export default {
          * Thực hiện filter khi người dùng click vào nút apply của filter
          */
         applyFilter(filter, source = "filter") {
-            console.log("aaaaaaaaaa");
+            this.page=1;// gán lại page=1 để reset data
             let colName = this.tableFilter.currentColumn.name;
             this.$set(this.tableFilter.allColumn, colName, filter);
             let hasFilter = this.checkColumnHasFilter(colName, filter);
@@ -601,7 +625,7 @@ export default {
                     emptyOption = true;
                 }
 
-                //configs.searchKey = this.searchKey;
+                configs.searchKey = this.searchKey;
                 configs.page = configs.page ? configs.page : this.page;
                 configs.pageSize = this.pageSize;
                 configs.formulaCondition = this.conditionByFormula;
@@ -682,11 +706,7 @@ export default {
                 this.data.length < this.totalObject &&
                 this.data.length > 0  && !this.loadingTaskList && !this.loadingMoreTask
             ) {
-               // this.myOwnFilter.page += 1;
                 this.page +=1;
-                // if ((this.myOwnFilter.page-1)*this.myOwnFilter.size <this.totalWork) {
-                //     this.getWorks();
-                // }
                 this.getData();
             }
         },
@@ -695,10 +715,18 @@ export default {
             this.getData();
         },
         handleChangeFilterValue(data) {
-            for (let key in data) {
-                this.$set(this.myOwnFilter, key, data[key]);
+            // for (let key in data) {
+            //     this.$set(this.myOwnFilter, key, data[key]);
+            // }
+            // this.getData();
+            this.searchKey = data.nameLike;
+            if(this.debounceGetData){
+                clearTimeout(this.debounceGetData);
             }
-            this.getData();
+            this.debounceGetData = setTimeout((self) => {
+				self.page = 1
+                self.getData();
+            }, 300, this);
         },
         reCalcListTaskHeight() {
             this.listTaskHeight =util.getComponentSize(this.$el.parentElement).h - 85;

@@ -229,7 +229,7 @@ export const nodeAttrsDefinition = {
         },
     },
     'StartConditionalEvent': {
-        attrs: ["executionlisteners", "conditionalevent","conditionaleventcondition", "interrupting"],
+        attrs: ["executionlisteners", "conditionalevent","conditionaleventcondition", "isInterrupting"],
         validate: function(attrs) {
 
         },
@@ -251,7 +251,7 @@ export const nodeAttrsDefinition = {
 
     },
     'StartSignalEvent': {
-        attrs: ["executionlisteners", "signalref", "interrupting"],
+        attrs: ["executionlisteners", "signalref", "isInterrupting"],
         validate: function(attrs) {
 
         },
@@ -262,7 +262,7 @@ export const nodeAttrsDefinition = {
 
     },
     'StartMessageEvent': {
-        attrs: ["executionlisteners", "messageref", "interrupting"],
+        attrs: ["executionlisteners", "messageref", "isInterrupting"],
         validate: function(attrs) {
 
         },
@@ -317,7 +317,7 @@ export const nodeAttrsDefinition = {
 
     },
     'CatchConditionalEvent': {
-        attrs: ["executionlisteners", "conditionalevent"],
+        attrs: ["executionlisteners", "conditionaleventcondition"],
         validate: function(attrs) {
 
         },
@@ -366,8 +366,22 @@ export const nodeAttrsDefinition = {
         },
         docker: dockerGroups.event
     },
+    'BoundaryConditionalEvent': {
+        attrs: ["executionlisteners", "conditionaleventcondition"],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        },
+        docker: dockerGroups.event
+    },
     'ThrowSignalEvent': {
-        attrs: ["executionlisteners", "signalref", "asynchronousdefinition"],
+        attrs: [
+            
+            'httptaskrequesturl', 'httptaskrequestheaders', 'httptaskrequestbody', 'httptaskrequestbodyencoding', 'httptaskrequesttimeout', 'httptaskdisallowredirects', 'httptaskfailstatuscodes', 'httptaskhandlestatuscodes', 'httptaskignoreexception', 'httptasksaveresponseparameterstransient', 'httptasksaveresponseasjson', 'httptaskresponsevariablename', 'httptasksaverequestvariables', 'httptasksaveresponseparameters', 'httptaskresultvariableprefix',
+            "serviceTaskTypeHTTP",
+            "executionlisteners", "signalref", "asynchronousdefinition", "prefixForSignalParameters"],
         validate: function(attrs) {
 
         },
@@ -521,7 +535,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'Pool': {
-        attrs: ["isexecutable", "process_id"],
+        attrs: ["process_id"],
         validate: function(attrs) {
 
         },
@@ -556,6 +570,16 @@ export const nodeAttrsDefinition = {
 
         },
         docker: dockerGroups.subProcess
+    },
+    'BoundarySignalEvent': {
+        attrs: ["executionlisteners", "signalref"],
+        validate: function(attrs) {
+
+        },
+        checkShowOrHideInput: function(attrs) {
+
+        },
+        docker: dockerGroups.event
     },
 };
 

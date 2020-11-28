@@ -9,6 +9,7 @@
 			
 				<v-btn
 					class="mr-2 white--text"
+					v-if="showBtnAddCheckbox"
 					depressed
 					color="primary"
 					small
@@ -123,15 +124,37 @@ export default {
 			showDialog:false,
 			disableBtn: true,
 			listItemSelected:[],
+			showBtnAddCheckbox: true,
 			customAPIResult:{
 				reformatData(res){
+					if(res.data.length > 0){
+						let arr = []
+						res.data.forEach(function(e){
+							arr.push(e.id)
+						})
+						let obj = res.data
+						adminApi.getStartUserName(arr).then(resA=>{
+							obj.forEach(function(e){
+								resA.data.forEach(function(k){
+									if(e.id == k.processInstanceId){
+										let mapIdToUser = self.$store.getters['app/mapIdToUser'];
+										let newName = k.value.split(':')[0]
+										e.startUserName = mapIdToUser[newName].displayName
+									}
+								})
+							})
+							self.$refs.listWorkFlow.rerenderTable()
+						}).catch(err=>{
+
+						})
+					}
 					return{
                          columns: [
 							// {name: "checkbox_select_item",data:"checkbox_select_item",title:"selected",type:"checkbox", noFilter:true},
-                            {name: "id", title: "id", type: "numeric", noFilter:true},
-							{name: "name", title: "name", type: "text", noFilter:true},
-							{name: "startUserId", title: "startUserId", type: "text", noFilter:true},
-							{name: "suspended", title: "suspended", type: "date", noFilter:true,
+                            {name: "id", title: "id", type: "numeric"},
+							{name: "processDefinitionName", title: "name", type: "text"},
+							{name: "startUserName", title: "startUserId", type: "text"},
+							{name: "suspended", title: "suspended", type: "date",
 								  renderer:  function(instance, td, row, col, prop, value, cellProperties) {
 										Handsontable.dom.empty(td);
 										let span;
@@ -150,7 +173,17 @@ export default {
 										}
 									},
 							},
-							{name: "startTime", title: "startTime", type: "date", noFilter:true},
+							{name: "startTime", title: "startTime", type: "date", noFilter:true,
+								renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+									Handsontable.dom.empty(td);
+									let span;
+									span = document.createElement('span');	
+									let data =  self.$moment(value).format('YYYY-MM-DD HH:mm:ss')
+									$(span).text(data)
+									td.appendChild(span);
+									return td;
+								},
+							},
 						 ],
 						 listObject: res.data,
 					}
@@ -186,11 +219,13 @@ export default {
 	watch:{
 		processKey(val){
 			this.listItemSelected = []
+			this.showBtnAddCheckbox = true
 		},
 		listItemSelected:{
 			deep: true,
             immediate: true,
             handler(obj){
+				this.showBtnAddCheckbox = true
 				if(Object.keys(obj).length == 0){
 					this.disableBtn = true
 				}else{
@@ -220,7 +255,7 @@ export default {
 						self.$snotify(
 							{
 								type: "success",
-								title:" Thành công"
+								title:" Dừng tác vụ thành công"
 							}
 						)
 					}
@@ -243,7 +278,7 @@ export default {
 					self.$snotify(
 						{
 							type: "success",
-							title:" Thành công"
+							title:" Chạy tác vụ thành công"
 						}
 					)
 					self.$refs.listWorkFlow.refreshList()
@@ -262,6 +297,7 @@ export default {
 			this.showDialog = true
 		},
 		addCheckBoxColumn(){
+			this.showBtnAddCheckbox = false
 			this.$refs.listWorkFlow.addCheckBoxColumn()
 		},
 		deleteProcessInstance(value){

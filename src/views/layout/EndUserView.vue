@@ -1,7 +1,7 @@
 <template>
     <v-app id="symper-platform-app">
         <ba-sidebar @show-user-detail="showMyInfo = true" />
-        <v-content>
+        <v-content style="height:100vh;">
             <v-container fluid fill-height class="pa-0">
                 <div class=" app-header-bg-color" style="border-bottom:1px solid #e6e5e5; width: calc(100% - 5px)">
                     <div style="width:calc(100% - 500px)" class="float-left">
@@ -41,9 +41,9 @@
                         <v-menu
                             v-model="isShowDialog"
                             :close-on-content-click="false"
-                            :max-width="500"
+                            :max-width="700"
                             :max-height="700"
-       				   	    :nudge-width="370"
+       				   	    :nudge-width="570"
                             offset-y
                             style="z-index:1000"
                             >
@@ -91,10 +91,9 @@
 					</slot>
                 </v-layout>
             </v-container>
-        </v-content>
-        
+        </v-main>
         <v-navigation-drawer
-            v-bind:class="[isExpand==true?'width-1200':'width-500']"
+            v-bind:class="[isExpand==true?'width-1200':'width-400']"
             right
             v-model="showMyInfo"
             v-show="showMyInfo"
@@ -102,7 +101,6 @@
             style="z-index:999!important"
             temporary>
             <DetailUser 
-            
                 :userInfo="sapp.endUserInfo"
                 @expand-panel="isExpand=true"
                 :close="isExpand"
@@ -278,7 +276,7 @@ export default {
     width:1200px!important
 
 }
-.width-500{
-    width:500px!important
+.width-400{
+    width:400px!important
 }
 </style>

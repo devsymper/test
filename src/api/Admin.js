@@ -34,13 +34,38 @@ export const adminApi = {
 			testHeader
 		)
 	},
-	stopWorkFlow(id){
-		return bpmneApi
+	stopProcessDefinition(id){
+		return bpmneApi.put(appConfigs.apiDomain.bpmne.definitions+'/'+id,
+			JSON.stringify({
+				"action": "suspend",
+			}),
+		testHeader
+		)
 	},
 	aggregateWorkflow(id){
 		return workflowExtendApi.get('workflow/'+id+'/aggregate')
 	},
+	trackingProcess(id){
+		return workflowExtendApi.get('workflow/'+id+'/tracking')
+	},
 	deleteDocumentObject(objectIds) {
         return documentApi.delete("documents/objects", objectIds);
-    },
+	},
+	getProcessDefinationDetail(id){
+		return bpmneApi.get(appConfigs.apiDomain.bpmne.definitions+'/'+id, {},testHeader )
+	},
+	getTimerJobDetail(id){
+		return bpmneApi.get(appConfigs.apiDomain.bpmne.timerJob+'/'+id, {},testHeader )
+	},
+	getStartUserName(ids){
+		return workflowExtendApi.post('variables/query', {
+			names: 'symper_user_id_start_workflow',
+			processInstanceIds: ids,
+			page:1,
+			pageSize:1000
+		})
+	},
+	getListProcessInstances(id){
+		return workflowExtendApi.get(id+'/process-instances')
+	}
 }

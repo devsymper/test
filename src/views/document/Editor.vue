@@ -14,6 +14,7 @@
             <div class="sym-document-body">
                 <div class="sym-document-action">
                     <editor-action
+                    ref="actionView"
                     @document-action-save-document="openPanelSaveDocument"
                     @document-action-clone-control="cloneControl"
                     @document-action-list-control-option="setShowAllControlOption"
@@ -33,10 +34,10 @@
                
             </div>
         </vue-resizable>
-        <div  class="sym-document__side-bar-right">
+        <div class="sym-document__side-bar-right">
             <sidebar-right ref="sidebarRight" :isConfigPrint="isConfigPrint" :styles="contentStyle" :instance="keyInstance"/>
         </div>
-        <s-table-setting v-if="!isConfigPrint" ref="tableSetting" :instance="keyInstance" @add-columns-table="addColumnTable"/>
+        <s-table-setting v-if="!isConfigPrint" ref="tableSetting" :instance="keyInstance" @add-columns-table="addColumnTable" :defaultTablePivotConfig="defaultTablePivotConfig"/>
         <PrintTableConfig v-if="isConfigPrint" ref="printTableConfig" @config-column-table-print="configColumnTablePrint"/>
         <auto-complete-control v-if="!isConfigPrint" ref="autocompleteControl" @add-control="insertControl"/>
         <save-doc-panel 
@@ -69,7 +70,7 @@
                 <v-card-title class="notice-title">{{titleDialog}}</v-card-title>
                 <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="green darken-1" v-if="!intervalCheckExpired" text @click="dialog = false">Hủy bỏ</v-btn>
+                <v-btn color="green darken-1" v-if="intervalSetEditting" text @click="dialog = false">Hủy bỏ</v-btn>
                 <v-btn color="green darken-1" text @click="acceptDialog">Đồng ý</v-btn>
                 </v-card-actions>
             </v-card>
@@ -316,10 +317,6 @@ export default {
                 ed.on('drop', function(e) {
                     self.handleDropControlInEditor(e);
                 });
-                ed.on('mouseover', function(e) {
-                    self.currentInteractTime = Date.now();
-                    console.log('currentInteractTime',self.currentInteractTime);
-                });
                 ed.on('ExecCommand', function(e) {
                     self.handleExecCommand(e);
                 });
@@ -334,27 +331,7 @@ export default {
         });
     },
     created() {
-        this.currentTabIndex = this.$store.state.app.currentTabIndex;
-        if(this.routeName == 'editDocument'){
-            /**
-             * hoangnd: kiểm tra xem doc có đang hoạt động hay ko
-             */
-            this.currentInteractTime = Date.now();
-            this.intervalCheckExpired = setInterval((self) => {
-                let curTime = Date.now();
-                if(curTime - self.currentInteractTime > 2000000){
-                    self.dialog = true;
-                    let docTitle = self.sDocumentProp.title.value;
-                    self.titleDialog = "Document "+docTitle+" sẽ bị đóng do thời gian tương tác quá hạn!. Vui lòng quay lại sau";
-                    clearInterval(self.intervalCheckExpired);
-                    self.currentInteractTime = null;
-                    self.typeDialog = "documentExpire";
-                    documentApi.setEdittingDocument({id:self.documentId,status:0});
-                    
-                }
-            }, 10000,this);
-        }
-        
+        this.currentTabIndex = this.$store.state.app.currentTabIndex;        
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
         this.isConfigPrint = false;
         if(this.routeName == 'printConfigDocument'){
@@ -381,8 +358,7 @@ export default {
             if(this._inactive == true) return;
             if(this.routeName == 'editDocument'){
                 documentApi.setEdittingDocument({id:this.documentId,status:0});
-                clearInterval(this.intervalCheckExpired);
-                this.currentInteractTime = null;
+                clearInterval(this.intervalSetEditting);
             }
         });
     },
@@ -413,9 +389,10 @@ export default {
             dataPreviewSubmit:null,
             isShowPreviewSubmit:false,
             controlTemplateId:0,
-            currentInteractTime:Date.now(),
-            intervalCheckExpired:null,
-            currentTabIndex:null
+            intervalSetEditting:null,
+            currentTabIndex:null,
+            dataPivotTable:{},
+            defaultTablePivotConfig:{}
         }
     },
     
@@ -463,8 +440,7 @@ export default {
         '$route' (to, old) {
             if(old.name == 'editDocument'){
                 documentApi.setEdittingDocument({id:this.documentId,status:0});
-                clearInterval(this.intervalCheckExpired);
-                this.currentInteractTime = null;
+                clearInterval(this.intervalSetEditting);
             }
             this.documentId = Date.now();
             // this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
@@ -508,13 +484,9 @@ export default {
             if(this.typeDialog == 'deletePage'){
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
             }
-            if(this.typeDialog == "documentExpire"){
-                
-                this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
-            }
-            if(this.typeDialog == "baEditting"){
-                this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
-            }
+            // if(this.typeDialog == "baEditting"){
+            //     this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
+            // }
         },
 
         /**
@@ -1069,9 +1041,10 @@ export default {
                         allControl[controlId].properties.dataFlowId.value = allControl[controlId].properties.dataFlowId.value.id;
                     }
                     else if(allControl[controlId].type == 'table'){
-                        if(allId.indexOf(controlId) === -1){
-                            for(let childControlId in allControl[controlId].listFields){
-                                let childControl = allControl[controlId].listFields[childControlId]
+                        if(allId.indexOf(controlId) !== -1){
+                            let listField = allControl[controlId].listFields;
+                            for(let childControlId in listField){
+                                let childControl = listField[childControlId]
                                 if(allId.indexOf(childControlId) === -1){
                                     delete allControl[controlId].listFields[childControlId];
                                     isCheck = true;
@@ -1079,13 +1052,32 @@ export default {
                                 if(!isCheck && childControl.type == 'user'){
                                     allUserControl['user'].push(childControl.properties.name.value)
                                 }
+                                let childControlFormulas = childControl.formulas;
+
+                                for(let formulaType in childControlFormulas){
+
+                                    if(formulaType != 'linkConfig'){
+                                        if(childControlFormulas[formulaType].value.trim() == ""){
+                                            allControl[controlId].listFields[childControlId].formulas[formulaType].formulasId = 0;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }   
+                    if(!isCheck && allControl[controlId].type == 'user'){
+                        allUserControl['user'].push(allControl[controlId].properties.name.value)
+                    }
+                    let controlFormulas = allControl[controlId].formulas;
+                    for(let formulaType in controlFormulas){
+                        if(formulaType != 'linkConfig'){
+                            if(controlFormulas[formulaType].value.trim() == ""){
+                                allControl[controlId].formulas[formulaType].formulasId = 0;
+                            }
+                        }
+                    }
                 }
-                if(!isCheck && allControl[controlId].type == 'user'){
-                    allUserControl['user'].push(allControl[controlId].properties.name.value)
-                }
+                
                 
             }
             return {minimizeControl:allControl,userControls:allUserControl}
@@ -1095,7 +1087,8 @@ export default {
         // hoangnd: hàm gửi request lưu doc
         async saveDocument(){
             let minimizeControl = this.minimizeControlEL(this.editorStore.allControl);
-            let allControl = minimizeControl.minimizeControl
+            let allControl = minimizeControl.minimizeControl;
+            console.log('allControl',allControl);
             let userControls = minimizeControl.userControls
             let documentProperties = util.cloneDeep(this.sDocumentProp);
             documentProperties = Object.assign({controlInfo:userControls},documentProperties)
@@ -1144,7 +1137,7 @@ export default {
                                 text: res.message
                             });
                     }
-                }
+                } 
                 else{
                     if(this.routeName == "editDocument"){   //edit doc
                         this.editDocument({documentProperty:documentProperties,fields:JSON.stringify(allControl),content:htmlContent,id:this.documentId})
@@ -1155,8 +1148,9 @@ export default {
                 }
                 
             } catch (error) {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
-                this.$snotify({
+                console.log('errorerror',error);
+                thisCpn.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$snotify({
                             type: "error",
                             title: "error from formulas serice, can't not save into formulas service!!!",
                             text: error
@@ -1168,6 +1162,9 @@ export default {
          */
         createDocument(dataPost){
             let thisCpn = this;
+            if(this.dataPivotTable && Object.keys(this.dataPivotTable).length > 0){
+                dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
+            }
             documentApi.saveDocument(dataPost).then(res => {
                 this.$evtBus.$emit('document-editor-save-doc-callback')
                 if (res.status == 200) {
@@ -1201,6 +1198,9 @@ export default {
          * Hàm gọi api edit document
          */
         editDocument(dataPost){
+            if(this.dataPivotTable && Object.keys(this.dataPivotTable).length > 0){
+                dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
+            }
             let thisCpn = this;
             documentApi.editDocument(dataPost).then(res => {
                 this.$evtBus.$emit('document-editor-save-doc-callback')
@@ -1213,11 +1213,28 @@ export default {
                     });
                 }
                 else{
-                    thisCpn.$snotify({
-                        type: "error",
-                        title: res.message,
-                        text:res.lastErrorMessage,
-                    });
+                    if(res.data && res.data.baId){
+                        accountApi.detailBa(document.userEditting).then(res=>{
+                            if(res.status == 200){
+                                let data = res.data.data;
+                                if(data.length > 0){
+                                    let curBa = data[0];
+                                    this.dialog = true;
+                                    this.titleDialog = "BA "+curBa.name+" đang sửa doc này";
+                                    this.typeDialog = "baEditting";
+                                    return false;
+                                }
+                            }
+                        }).always({}).catch({})
+                    }
+                    else{
+                        thisCpn.$snotify({
+                            type: "error",
+                            title: res.message,
+                            text:res.lastErrorMessage,
+                        });
+                    }
+                    
                 }
                 
             })
@@ -1276,10 +1293,25 @@ export default {
             }
         },
         // hàm xử lí thêm các cột vào trong control table khi lưu ở tablesetting
-        addColumnTable(listRowData){
+        addColumnTable(data){
+            let listRowData = data.listRows;
+            let tablePivotConfig = data.tablePivotConfig;
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-table.on-selected');
             let table = elements.find('thead').closest('.s-control-table');
             let tableId = table.attr('id');
+            let currentControl = this.editorStore.currentSelectedControl;
+            if(currentControl.properties.name.name.value && tablePivotConfig){
+                if(!this.dataPivotTable){
+                    this.dataPivotTable = {};
+                }
+                this.dataPivotTable[currentControl.properties.name.name.value] = tablePivotConfig;
+
+            }
+            else{
+                if(this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
+                    delete this.dataPivotTable[currentControl.properties.name.name.value];
+                }
+            }
             let thead = '';
             let tbody = '';
             for(let i = 0; i < listRowData.length; i++ ){
@@ -1460,15 +1492,23 @@ export default {
                 let listData = [];
                 if($(tbody[0].innerHTML).length > 0){
                     for(let i = 0; i< thead.length; i++){
-                        let idControl = $(tbody[i].innerHTML).first().attr('id');
-                        let typeControl = $(tbody[i].innerHTML).first().attr('s-control-type');
+                        if($(tbody[i].innerHTML).length == 0){
+                            continue
+                        }
+                        let idControl = $(tbody[i].outerHTML).find('.s-control').attr('id');
+                        let typeControl = $(tbody[i].outerHTML).find('.s-control').attr('s-control-type');
                         let name = this.editorStore.allControl[tableId]['listFields'][idControl].properties.name.value;
                         let title = this.editorStore.allControl[tableId]['listFields'][idControl].properties.title.value;
                         let row = {columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl}
                         listData.push(row)
+
                     }
                 }
                 this.$refs.tableSetting.showDialog();
+                let currentControl = this.editorStore.currentSelectedControl;
+                if(currentControl.properties.name.name.value && this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
+                    this.defaultTablePivotConfig = this.dataPivotTable[currentControl.properties.name.name.value];
+                }
                 this.$refs.tableSetting.setListRow(listData);
             }
         },
@@ -1933,22 +1973,37 @@ export default {
 
         },
         async checkAllowEditDocument(document){
-            if(Number(document.userEditting) != 0  && this.baInfo && this.baInfo.id != document.userEditting){
-                try {
-                    let baAcc = await accountApi.detailBa(document.userEditting);
-                    if(baAcc.status == 200){
-                        let data = baAcc.data.data;
-                        if(data.length > 0){
-                            let curBa = data[0];
-                            this.dialog = true;
-                            this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
-                            this.typeDialog = "baEditting";
-                            return false;
+            let updateTime = new Date(document.lastEditAt).getTime();
+            let timeDiff = Date.now() - updateTime;
+            if(timeDiff > 4000){
+                /**
+                 * hoangnd: kiểm tra xem doc có đang hoạt động hay ko
+                 */
+                documentApi.setEdittingDocument({id:self.documentId});
+                this.intervalSetEditting = setInterval((self) => {
+                    documentApi.setEdittingDocument({id:self.documentId});
+                }, 2000,this);
+                return true;
+            }else{
+                if(Number(document.userEditting) != 0  && this.baInfo && this.baInfo.id != document.userEditting){
+                    try {
+                        let baAcc = await accountApi.detailBa(document.userEditting);
+                        if(baAcc.status == 200){
+                            let data = baAcc.data.data;
+                            if(data.length > 0){
+                                let curBa = data[0];
+                                this.dialog = true;
+                                this.$refs.actionView.hideSaveBtn(curBa.name);
+                                this.titleDialog = "BA "+curBa.name+" đang sửa doc này.";
+                                this.typeDialog = "baEditting";
+                                return false;
+                            }
                         }
+                    } catch (error) {
+                        this.$refs.actionView.hideSaveBtn('');
+                        return false;
+                        console.log(error);
                     }
-                } catch (error) {
-                    return false;
-                    console.log(error);
                 }
             }
             return true;
@@ -1957,15 +2012,9 @@ export default {
         async getContentDocument(){
             if(this.documentId != 0){
                 let res = await documentApi.detailDocument(this.documentId);
-                let checkEditting = await this.checkAllowEditDocument(res.data.document);
-                if(checkEditting == false){
-                    return;
-                }
-                else{
-                    documentApi.setEdittingDocument({id:this.documentId});
-                }
                 if (res.status == 200) {
                     if(this.routeName == "editDocument"){
+                        await this.checkAllowEditDocument(res.data.document);
                         this.setDocumentProperties(res.data.document);
                     }
                     let content = res.data.document.content;
@@ -1976,6 +2025,7 @@ export default {
                         this.setDefaultStyle(res1.data.formStyle);
                     }
                     this.editorCore.setContent(content);
+                    this.dataPivotTable = res.data.pivotConfig;
                     $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body select').each(function(e){
                         let id = $(this).attr('id')
                         $(this).replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '">');
@@ -2018,6 +2068,7 @@ export default {
         //hoangnd: hàm set các giá trị của thuộc tính và formulas vào từng contrl trong doc lúc load dữ liệu và đưa vào state
         setDataForPropsControl(fields){
             console.log("ádsadasd",fields);
+            let thisCpn = this;
             for(let controlId in fields){
                 if(!fields[controlId].hasOwnProperty('type')){
                     continue;
@@ -2035,9 +2086,9 @@ export default {
                         if(type == 'dataFlow' && k == 'dataFlowId'){
                             properties[k].value = {id:fields[controlId]['properties'][k]};
                         }
-                        else if(k == 'mapParamsDataflow'){
+                        else if(type == 'dataFlow' && k == 'mapParamsDataflow'){
                             properties[k]['datasets'] = fields[controlId]['properties']['datasets'];
-                            properties[k]['value'] = fields[controlId]['properties']['value'];
+                            properties[k]['value'] = fields[controlId]['properties'][k];
                         }
                         else{
                             if(typeof fields[controlId]['properties'][k] != "object"){
@@ -2054,13 +2105,22 @@ export default {
                     $.each(formulas,function(k,v){
                         if(k == 'linkConfig'){
                             if(fields[controlId]['formulas'][k]){
-                                formulas[k]['configData'] = fields[controlId]['formulas'][k]['configData'];
+                                let configData = fields[controlId]['formulas'][k]['configData'];
+                                if(thisCpn.$getRouteName() == 'cloneDocument'){
+                                    for (let index = 0; index < configData.length; index++) {
+                                        configData[index]['formula']['id'] = 0;
+                                        
+                                    }
+                                }
+                                formulas[k]['configData'] = configData;
                             }
                         }
                         else{
                             if(fields[controlId]['formulas'][k]){
                                 formulas[k].value = Object.values(fields[controlId]['formulas'][k])[0];
-                                formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                                if(thisCpn.$getRouteName() != 'cloneDocument'){
+                                    formulas[k].formulasId = Object.keys(fields[controlId]['formulas'][k])[0]
+                                }
                             }
                             if(k == 'autocomplete'){
                                 formulas[k]['configData']= (autocompleteConfig == false) ? {} : autocompleteConfig;
@@ -2095,13 +2155,30 @@ export default {
                         })
                         if(listField[childFieldId]['formulas'] != false){
                             $.each(childFormulas,function(k,v){
-                                if(listField[childFieldId]['formulas'][k]){
-                                    childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0]
-                                    childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0]
+                                if(k == 'linkConfig'){
+                                    if(listField[childFieldId]['formulas'][k]){
+                                        let configData = listField[childFieldId]['formulas'][k]['configData'];
+                                        if(thisCpn.$getRouteName() == 'cloneDocument'){
+                                            for (let index = 0; index < configData.length; index++) {
+                                                configData[index]['formula']['id'] = 0;
+                                                
+                                            }
+                                        }
+                                        childFormulas[k]['configData'] = configData;
+                                    }
                                 }
-                                if(k == 'autocomplete'){
-                                    childFormulas[k]['configData']= (childAutocompleteConfig == false) ? {} : childAutocompleteConfig;
+                                else{
+                                    if(listField[childFieldId]['formulas'][k]){
+                                        childFormulas[k].value = Object.values(listField[childFieldId]['formulas'][k])[0];
+                                        if(thisCpn.$getRouteName() != 'cloneDocument'){
+                                            childFormulas[k].formulasId = Object.keys(listField[childFieldId]['formulas'][k])[0];
+                                        }
+                                    }
+                                    if(k == 'autocomplete'){
+                                        childFormulas[k]['configData']= (childAutocompleteConfig == false) ? {} : childAutocompleteConfig;
+                                    }
                                 }
+                                
                             })
                         }
                         listChildField[childFieldId] = {properties: childProperties, formulas : childFormulas,type:childType}

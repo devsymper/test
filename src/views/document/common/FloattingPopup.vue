@@ -151,7 +151,9 @@ export default {
             if(rowId != undefined)
             this.rowIndex = rowId;
             this.isShow = true;
-            this.$refs.comp_trackChange[0].computeDataTable()
+            if(this.viewType == 'detail'){
+                this.$refs.comp_trackChange[0].computeDataTable();
+            }
             this.calculatorPositionBox(e, context);
         },
         calculatorPositionBox(e, context) {
@@ -174,15 +176,11 @@ export default {
             let cardHeight = $(".s-floatting-popup").height();
             let inputWidth = input.width();
             let top = inputOffset.top - detailFormOffset.top + 26;
-            if(this.viewType == 'detail'){
-                top = top + 30;
-            }
+            this.style.top = top + "px"
             if (cardWidth + leftDiff > detailFormWidth) {
-                this.style.top = top + "px",
-                this.style.left = Math.abs(inputOffset.left + inputWidth - 10 - cardWidth) + "px"
+                this.style.left = Math.abs(leftDiff + inputWidth - cardWidth) + "px"
             } else {
-                this.style.top = top + "px"
-                this.style.left = Math.abs(detailFormOffset.left + leftDiff) + "px"
+                this.style.left = Math.abs(leftDiff) + "px"
             }
             if (
                 window.innerHeight <
@@ -194,6 +192,8 @@ export default {
                 }
                 this.style.top = Math.abs(top1) +"px";
             }
+
+
         }
     }
 };

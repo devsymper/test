@@ -89,7 +89,20 @@ const setAccountType = (state, data) =>{
     // state.accountType = data
     Vue.set(state, 'accountType', data)
 }
+
+/**
+ * 
+ * @param {Object} state 
+ * @param {Object} data đối tượng chứa các value cần set lại cho SystemMessaging
+ */
+const updateSystemMessaging = (state, data) => {
+    for(let key in data ){
+        state.systemMessaging[key] = data[key];
+    }
+}
+
 export {
+    updateSystemMessaging,
     changeCollapseSidebar,
     increaseUnreadNotification,
     decreaseUnreadNotification,
@@ -105,5 +118,5 @@ export {
     setUserActionsForObjects,
     setAllSymperRoles,
     changeStatus,
-    setAccountType
+    setAccountType,
 };

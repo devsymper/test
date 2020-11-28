@@ -44,6 +44,26 @@
 										{{$t('document.detail.sidebar.body.general.commentNotResolve')}}
 									</td>
 								</tr>
+								<tr>
+									<td>{{$t('document.detail.sidebar.body.general.id')}}</td>
+									<td class="pl-2">
+										{{workInfo.id}}
+									</td>
+									  <v-tooltip bottom>
+										<template v-slot:activator="{ on }">
+											<v-btn  
+												icon
+												tile
+												v-clipboard:copy="workInfo.id"  
+												v-clipboard:success="onCopySuccess" 
+												class="ml-7"
+												v-on="on" text x-small>
+													<v-icon  x-small>mdi-page-next-outline</v-icon>
+											</v-btn>
+										</template>
+										<span>Sao chép đường dẫn</span>
+									</v-tooltip>
+								</tr>
 							</table>
 						</div>
 					</v-expansion-panel-content>
@@ -54,6 +74,7 @@
 					<v-expansion-panel-content class="sym-v-expand-content border-top-1" style="height:200px">
 						<v-row class="ma-0" style="height:200px">
 							<trackingProcessInstance
+								class="popup-model-diagram"
 								v-if="workInfo.id"
 								:instanceId="workInfo.id"
 								@showPopupDiagram="showPopupDiagram"
@@ -163,7 +184,7 @@
 		</VuePerfectScrollbar>
 	</div>
 	<Comment 
-	style="height:calc(100% - 40px)" 
+	style="height:calc(100% - 2px)" 
 	:objectIdentifier="workInfo.id"
 	:objectType="'work'"
 	ref="commentTaskView"
@@ -468,7 +489,14 @@ export default {
 			data.objectIdentifier = this.workInfo.id;
 			data.objectType = "work";
 			this.$store.dispatch("task/getArrFileAttachment", data);
-    	}
+		},
+		onCopySuccess(){
+			this.$snotify({
+				type: 'success',
+				title: "Sao chép thành công",
+			});
+		},
+		
 	},
 	
 
@@ -642,5 +670,8 @@ export default {
 	.border-top-1 >>>.v-expansion-panel-content__wrap{
 		border: 1px solid #cecece!important;
 		border-radius: 5px;
+	}
+	.popup-model-diagram >>> .djs-hit  {
+		pointer-events: none;
 	}
 </style>

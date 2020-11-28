@@ -4,7 +4,7 @@
             'containers h-100 w-100': true,
             'hide-process-palette': readOnly 
         }" ref="content">
-        <div class="symper-bpm-canvas" :style="{height: height > 0 ? height+'px' : '100%!important'}" ref="canvas"></div>
+        <div :class="{'symper-bpm-canvas': true, 'symper-bpm-canvas-heat-map': heatMapMode == true}" :style="{height: height > 0 ? height+'px' : '100%!important'}" ref="canvas"></div>
         <a ref="downloadLinkXML" href></a>
         <a ref="downloadLinkSVG" href></a>
     </div>
@@ -14,7 +14,7 @@
 import BpmnModeler from "bpmn-js/lib/Modeler";
 import { Moddle } from "moddle/dist";
 import { getBusinessObject } from "bpmn-js/lib/util/ModelUtil";
-
+import h337  from 'heatmap.js';
 import "bpmn-js/dist/assets/diagram-js.css";
 import "bpmn-js/dist/assets/bpmn-font/css/bpmn.css";
 import "bpmn-js/dist/assets/bpmn-font/css/bpmn-codes.css";
@@ -26,7 +26,11 @@ export default {
     props: {
         height: {
             default: 0
-        },
+		},
+		heatMapMode:{
+			type: Boolean,
+			default: false
+		},
         diagramXML: {
             type: String,
             default:
@@ -113,13 +117,15 @@ export default {
                     }
                 });
             });
-        },
+		},
+
         changeElementColor(ele,data,isCurrentNode=false){
             if(typeof ele == 'string'){ // Nếu truyền vào id
                 ele = this.bpmnModeler.get("elementRegistry").get(ele);
             }
             this.modeling.setColor(ele, data);
-        },
+		},
+		
         getAllNodes(bizObj = true) {
             let allNododes = this.bpmnModeler
                 .get("elementRegistry")
@@ -146,6 +152,16 @@ export default {
             });
             this.bpmnModeler.on("element.click", evt => {
                 this.$emit("node-clicked", getBusinessObject(evt.element), evt);
+            });
+
+            this.bpmnModeler.on("canvas.viewbox.changing", evt => {
+                if(self.debounceViewportChange){
+                    clearTimeout(self.debounceViewportChange);
+                }
+
+                self.debounceViewportChange = setTimeout(() => {
+                    self.$emit('viewport-change');
+                }, 100);
             });
 
             this.bpmnModeler.on("element.changed", evt => {
@@ -197,12 +213,12 @@ export default {
             for(let ext of this.customExtension){
                 moddleExtensions[ext.name] = ext.data;
             }
-
+            
             this.bpmnModeler = new BpmnModeler({
                 container: canvas,
                 keyboard: { bindTo: document },
                 moddleExtensions: moddleExtensions,
-                additionalModules: this.customModules,
+                additionalModules: this.getCustomModules(),
             });
             this.bpmnModeler.importXML(this.diagramXML, function(err) {
                 if (err) {
@@ -213,6 +229,32 @@ export default {
             this.modeling = this.bpmnModeler.get("modeling");
             this.listenModellerEvts();
           
+        },
+        getCustomModules(){
+            // let self = this;
+            // class EventBusLogger {
+            //     constructor(eventBus) {
+            //         const fire = eventBus.fire.bind(eventBus);
+            //         eventBus.fire = (type, data) => {
+            //             fire(type, data);
+            //             if(type == 'canvas.viewbox.changing'){
+            //                 if(self.debounceViewportChange){
+            //                     clearTimeout(self.debounceViewportChange);
+            //                 }
+            //                 self.debounceViewportChange = setTimeout(() => {
+            //                     self.$emit('viewport-change');
+            //                 }, 100);
+            //             }
+            //         };
+            //     }
+            // }
+            // EventBusLogger.$inject = ["eventBus"];
+            // let customModules = this.customModules;
+            // customModules.push( {
+            //     __init__: ["eventBusLogger"],
+            //     eventBusLogger: ["type", EventBusLogger]
+            // });
+            return this.customModules;
         },
         saveSVG(done) {
             if (!done) {
@@ -263,7 +305,7 @@ export default {
          * @param {Object} attrs Các thuộc tính cần update, dạng key-value
          */
         updateElementProperties(eleId, props) {
-            let ele = this.bpmnModeler.get("elementRegistry").get(eleId);
+			let ele = this.bpmnModeler.get("elementRegistry").get(eleId);
             if (ele) {
                 this.modeling.updateProperties(ele, props);
             }
@@ -279,5 +321,8 @@ export default {
 <style>
 .bjs-powered-by {
     display: none !important;
+}
+.symper-bpm-canvas-heat-map{
+	position: relative;
 }
 </style>

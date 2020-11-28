@@ -152,9 +152,6 @@ const updateProp = (state, params) => {
             }
             Vue.set(state.editor[instance].allControl[tableId]['listFields'][id]['properties'][name], type, value);
         } else if (state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name]) {
-            if (typeof value != 'object' && value.trim() == "") {
-                Vue.set(state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name], "formulasId", 0);
-            }
             Vue.set(state.editor[instance].allControl[tableId]['listFields'][id]['formulas'][name], type, value);
         }
 
@@ -165,9 +162,6 @@ const updateProp = (state, params) => {
             }
             Vue.set(state.editor[instance].allControl[id]['properties'][name], type, value);
         } else if (state.editor[instance].allControl[id]['formulas'][name]) {
-            if (typeof value != 'object' && value.trim() == "") {
-                Vue.set(state.editor[instance].allControl[id]['formulas'][name], "formulasId", 0);
-            }
             Vue.set(state.editor[instance].allControl[id]['formulas'][name], type, value);
         }
     }
@@ -418,7 +412,12 @@ const setDefaultSubmitStore = (state, params) => {
         readyLoaded: false,
         listTableRootControl: {},
         listControlMappingDatasets: {},
-        controlFormulaInfinity: {}
+        controlFormulaInfinity: {},
+        currentRowChangePivotMode:{
+            tableName:"",
+            key:"",
+            data:{}
+        }
     }
     let instance = params.instance;
     Vue.set(state.submit, instance, value);
@@ -524,17 +523,20 @@ const setAllDocuments = (state, docs) => {
     }, {});
     Vue.set(state, 'listAllDocument', docs);
 }
+/**
+ * Hàm lưu lại dữ liệu của autocomplete
+ * @param {*} state 
+ * @param {*} params 
+ */
 const cacheDataAutocomplete = (state, params) => {
-    let controlName = params.controlName
-    let header = params.header
-    let cacheData = params.cacheData
-    let object = { header: header, cacheData: cacheData }
+    let controlName = params.controlName;
+    let header = params.header;
+    let cacheData = params.cacheData;
+    let object = { header: header, cacheData: cacheData };
     let instance = params.instance;
     if (state.submit[instance]['autocompleteData'].hasOwnProperty(controlName)) {
         Vue.set(state.submit[instance]['autocompleteData'][controlName]['cacheData'], Object.keys(cacheData)[0], Object.values(cacheData)[0]);
-        if (state.submit[instance]['autocompleteData'][controlName]['header'].length == 0) {
-            Vue.set(state.submit[instance]['autocompleteData'][controlName], 'header', header);
-        }
+        Vue.set(state.submit[instance]['autocompleteData'][controlName]['header'],  Object.keys(header)[0], Object.values(header)[0]);
     } else {
         Vue.set(state.submit[instance]['autocompleteData'], controlName, object);
     }

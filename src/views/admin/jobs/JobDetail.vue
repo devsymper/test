@@ -5,7 +5,7 @@
 				ID
 			</span>
 			<span class="content-detail-job font-weight-bold">
-				1131
+				{{timerJobDetail.id}}
 			</span>
 		</div>
 		<div class="d-flex pt-2 ">
@@ -13,7 +13,7 @@
 				Tên quy trình 
 			</span>
 			<span class="content-detail-job">
-				viz_sdhasdh_dshshd
+				{{processDefination.key}}
 			</span>
 		</div>
 		<div class="d-flex  pt-2">
@@ -21,7 +21,7 @@
 				Tiêu đề quy trình 
 			</span>
 			<span class="content-detail-job">
-				Số nhập kho thành phẩm
+				{{processDefination.name}}
 			</span>
 		</div>
 		<div class="d-flex  pt-2">
@@ -42,9 +42,20 @@
 					x-small
 					color="primary"
 					label
+					v-if="processDefination.suspended == false"
 					text-color="white"
 					>
 					Hoạt động
+				</v-chip>
+				<v-chip
+					class="ma-2"
+					x-small
+					color="orange"
+					label
+					v-else
+					text-color="white"
+					>
+					Tạm dừng
 				</v-chip>
 			</span>
 		</div>
@@ -61,7 +72,7 @@
 				Thời gian triển khai
 			</span>
 			<span class="content-detail-job">
-				2020-11-06 23:32:49
+				{{timerJobDetail.createTime}}
 			</span>
 		</div>
 		<div class="d-flex  pt-2">
@@ -93,15 +104,43 @@
 				Thông tin thêm
 			</span>
 		</div>
-		<div class="more-infor mr-6 ">
-				ahuhu
+		<div class="more-infor mr-6 text-wrap ">
+			<pre>
+				<code>
+					{{timerJobDetail}}
+				</code>
+			</pre>
 		</div>
 	</div>
 </template>
 
 <script>
+import {adminApi} from '@/api/Admin.js'
 export default {
-
+	computed:{
+		timerJobDetail(){
+			return this.$store.state.admin.timerJobDetail
+		}
+	},
+	data(){
+		return{
+			processDefination:{}
+		}
+	},
+	watch:{
+		timerJobDetail:{
+			deep:true, 
+			immediate:true,
+			handler(obj){
+				let self = this
+				if(obj.processDefinitionId){
+					adminApi.getProcessDefinationDetail(obj.processDefinitionId).then(res=>{
+						self.processDefination = res
+					}).catch(err=>{})
+				}
+			}
+		}
+	}
 }
 </script>
 

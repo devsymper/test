@@ -1,34 +1,66 @@
 <template>
-    <div class="w-100 h-100">
-        <v-row style="margin-top:-13px; margin-left:-20px">
+    <div class="w-100 h-100 view-role">
+        <v-row style="margin-top:-13px; margin-left:-20px" class="mb-2">
             <v-col >
-                <v-btn  @click="showUserInfo()"  small text  fab>
-                    <i style="font-size:15px!important" class="mdi mdi-arrow-left"></i>
-                </v-btn>
-                    <span class="fw-430">Danh sách phân quyền cho user</span>
+                 <v-icon class="fs-16 fw-430 mr-1 ml-1 fw-400 ">mdi mdi-account-circle-outline</v-icon>
+                <span class="fw-430 fs-16">Chi tiết phân quyền cho user</span>
             </v-col>
         </v-row>
-        <v-row class="w-100 h-100" style="border:1px solid rgba(0,0,0,0.1); margin-top:-10px" >
-            <v-col cols="md-2" >
-                <v-list-item-group >
-                    <v-list dense>
-                        <v-row 
-                            class="fs-13 fm fw-430" 
-                            style=" border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-12px" >
-                            <span class="ml-3 mb-3">Đối tượng</span> </v-row>
-                        <v-list-item 
-                            class="mt-1" 
-                            v-for="(item,menuIdx) in menu" 
-                            :key="menuIdx" 
-                            style="margin-left:-8px; margin-right:-8px">
-                            <v-list-item-content style="margin-left:-20px" @click="detailView(item)">
-                                <v-list-item-title class="ml-2 fw-400">{{$t('objects.'+item)}}</v-list-item-title>
-                            </v-list-item-content>
-                        </v-list-item>
-                    </v-list>
-                </v-list-item-group >
-            </v-col>
-            <v-col cols="md-10" class=" left-table">
+		<v-row style="margin-top:-20px">
+			<v-col class="col-md-2">
+					<span class="fs-13">Permission:</span>
+					
+			</v-col>
+			<v-col class="col-md-10" >
+				<v-sheet style="float:right" max-width="90%" class="mb-3">
+                <v-slide-group multiple  prev-icon="mdi-minus">
+                    <template v-slot:next>
+                        <div class="slider-user-button slider-button-right"> 
+                           <v-icon> mdi mdi-chevron-right</v-icon>
+                        </div>
+                    </template>
+                    <template v-slot:prev >
+                        <div class="slider-user-button">
+                           <v-icon> mdi mdi-chevron-left</v-icon>
+                        </div>
+                    </template>
+                    <v-slide-item class="item-user"
+                        v-for="(item, permissionIdx) in  permission.orgchart"  
+                        :key="permissionIdx">
+                        <div class="d-flex justify-start ml-3 mr-3 slider-user ">
+							  <v-list-item-group multiple >
+                            <v-list-item dense style="background:rgba(27,24,111,0.1); border-radius:4px">
+                                <v-list-item-content style="margin-left: 0.5; color:black" 
+								class="item-title fs-13">
+								{{item.name}}
+                                </v-list-item-content>
+                            </v-list-item>
+							</v-list-item-group>
+                        </div>
+                    </v-slide-item>
+                </v-slide-group>
+            </v-sheet>
+			</v-col>
+		</v-row>
+		  <v-tabs 
+		  		style="margin-left: -65px; margin-top:-20px" class="mb-5"
+				v-model="tab"
+				background-color="#fff"
+				dark
+			>
+				<v-tab
+				@click="detailView(item)"
+				 v-for="(item,menuIdx) in menu" :key="menuIdx" 
+				
+				>
+				<span style="color:black" class="fw-400" @click="detailView(item)">
+					{{$t('objects.'+item)}}
+				</span>
+				</v-tab>
+			</v-tabs>
+			<v-tabs-items v-model="tab">
+			 <v-row class="w-100 h-100" style="border:1px solid rgba(0,0,0,0.1); margin-top:-10px" >
+            <v-col cols="md-12" class=" left-table">
                 <v-row style="border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-7px; padding-top:3px">
                     <v-col cols="md-3" class="fw-430 fs-13">
                         {{menuTitle.length==0?"Chọn":$t('objects.'+menuTitle)}}
@@ -41,7 +73,7 @@
                         {{$t('actions.listActions.'+menuTitle+"."+action)}}
                     </v-col>
                 </v-row>
-				<div style="height:650px;overflow:scroll;margin-right:-12px">
+				<div >
                     <v-row 
                         v-for="(nameObj,nameObjIdx) in titleAllNameObject" 
                         :key="nameObjIdx"
@@ -61,13 +93,14 @@
 				</div>
             </v-col>
         </v-row>
+      </v-tabs-items>
     </div>
 </template>
 <script>
 import { userApi } from "./../../api/user.js";
 export default {
 
-    props:['rolesList'],
+    props:['rolesList','permission','allRole'],
     methods:{
         showUserInfo(){
             this.$emit("show-userInfo")
@@ -83,7 +116,7 @@ export default {
 			return check
 		},
 		// lấy ra tất cả action và object 
-		async getActionAndObject(){
+			async getActionAndObject(){
             let res = await userApi.getActionAndObject(this.rolesList);
 			const self = this;
 			if (res.status === 200) {
@@ -131,9 +164,9 @@ export default {
 					 for(let j=0; j<this.listActionAndObj[object].length;j++){
 						 if(this.formatAction(this.listActionAndObj[object][j].objectIdentifier)){
 							 action.push(this.listActionAndObj[object][j].action);
-						 	this.nameObject.push({
-							 	name:this.listActionAndObj[object][j].objectIdentifier,
-							 	action: this.listActionAndObj[object][j].action,
+						 		this.nameObject.push({
+									name:this.listActionAndObj[object][j].objectIdentifier,
+									action: this.listActionAndObj[object][j].action,
 							 });
 						 }	 
 					 }
@@ -164,7 +197,7 @@ export default {
 				}
 			}
 		 },
-		//group những loại đối tượng dạng document_de:123123 trùng tên với nhau 
+		//group những loại đối tượng dạng document_de: trùng tên với nhau 
 		groupNameObj(){
 			this.nameObject;
 			let group = _.groupBy(this.nameObject,'name');
@@ -195,12 +228,26 @@ export default {
 			}
 			self.titleAllNameObject = newListObj;
 		},
+		refreshAll(){
+			this.allListAction={};
+			this.titleAllNameObject = [],
+			this.menu = [];
+			this.listActionAndObj=[]
+		}
 		// xử lý chuyển tên object    
     },
     created(){
+		
 		this.getActionAndObject();
 		this.getListActionAllObj();
-    },
+	},
+	watch:{
+		rolesList(){
+			this.refreshAll();
+			this.getActionAndObject();
+			this.getListActionAllObj();
+		}
+	},
 	data(){
 		return {
 			allListAction:{},
@@ -223,5 +270,17 @@ export default {
     }
     .fw-430{
         font-weight:430
-    }
+	}
+	.view-role ::v-deep .v-icon{
+		color:black
+	}
+	.view-role ::v-deep  .v-tabs-slider{
+		color:grey
+	}
+	.view-role ::v-deep .v-slide-group__prev{
+		margin-left:32px
+	}
+	.view-role ::v-deep .v-slide-group__wrapper{
+		margin-left:-25px
+	}
 </style>

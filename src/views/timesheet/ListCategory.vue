@@ -11,9 +11,8 @@
         :showExportButton="false"
         :customAPIResult="customAPIResult"
         :tableContextMenu="tableContextMenu"
-        :getDataUrl="'https://timesheet-service.dev.symper.vn/category'">
+        :getDataUrl="getListUrl">
     </list-items>
-       
     </div>
 </template>
 <script>
@@ -129,7 +128,7 @@ export default {
                     }
                 }
             },
-            getListUrl: {},
+            getListUrl: '',
             actionPanelWidth:800,
             containerHeight: 200,
             columns: [],
@@ -140,9 +139,9 @@ export default {
     mounted() {
         this.calcContainerHeight();
     },
-    // created(){
-    //     this.getListUrl = appConfigs.apiDomain.importExcel+'history?page=1&pageSize=20';
-    // },
+    created(){
+        this.getListUrl = appConfigs.apiDomain.timesheet+'category';
+    },
     methods:{
      
        

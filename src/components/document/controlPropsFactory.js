@@ -133,7 +133,7 @@ const commonProps = {
     formatNumber: {
         title: "Định dạng số",
         type: "numberFormat",
-        value: ".00",
+        value: "#,###",
         groupType: "display"
     },
     // formatDateTime: {
@@ -610,7 +610,7 @@ const controlTypes = {
         html: `<input class="s-control s-control-percent" contenteditable="false" title="Percent" s-control-type="percent" type="number" step="0.01">&nbsp;`,
         title: "Percent",
         notInProps: ['isQuickSubmit', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatDate', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['formulas', 'hidden', 'readOnly']
+        formulas: ['formulas', 'hidden', 'readOnly','validate']
     },
     user: {
         icon: "/icon/ic_user.png",
@@ -703,14 +703,14 @@ const controlTypes = {
                         text-align: center;
                         align-items: center;
                         justify-content: center;">
-                            <img style="width:14px;height:14px;margin: 0 4px;" src="https://hoangnd.dev.symper.vn/icon/ic_report.png">
-                            <img style="width:14px;height:14px;margin: 0 4px;" src="https://hoangnd.dev.symper.vn/icon/ic_table.png">
-                            <img style="width:14px;height:14px;margin: 0 4px;" src="https://hoangnd.dev.symper.vn/icon/ic_document_select.png">
+                            <img style="width:14px;height:14px;margin: 0 4px;" src="`+require('./../../../public/img/document/icon/ic_report.png')+`">
+                            <img style="width:14px;height:14px;margin: 0 4px;" src="`+require('./../../../public/img/document/icon/ic_table.png')+`">
+                            <img style="width:14px;height:14px;margin: 0 4px;" src="`+require('./../../../public/img/document/icon/ic_document_select.png')+`">
                         </div>
                     </div>
                 </div>&nbsp;`,
         title: "Data Flow",
-        inProps: ['mapParamsDataflow', 'name', 'title', 'dataFlowId', 'width', 'height', 'isAllowPrint'],
+        inProps: ['mapParamsDataflow', 'name', 'title', 'dataFlowId', 'width', 'height'],
         formulas: []
     },
     approvalHistory: {
@@ -840,7 +840,6 @@ export const mappingOldVersionControlProps = {
     "AllowReadOnly": "isReadOnly",
     "MultipleValue": "isMultipleValue",
     "mobileProps": "mobileProps",
-    "AllowPrint": "isAllowPrint",
     "BorderSubmit": "isBorderSubmit",
     "BorderView": "isBorderView",
     "BorderPrint": "isBorderPrint",

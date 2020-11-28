@@ -30,7 +30,7 @@
 							<table class="general-info">
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.dateCreate')}}</td>
-									<td class="pl-2">{{originData.createTime ? $moment(originData.createTime).format('DD/MM/YY HH:mm:ss'):$moment(originData.endTime).format('DD/MM/YY HH:mm:ss')}}</td>
+									<td class="pl-2">{{originData.createTime ? $moment(originData.createTime).format('DD/MM/YY HH:mm:ss'):$moment(originData.startTime).format('DD/MM/YY HH:mm:ss')}}</td>
 								</tr>
 								<tr>
 									<td>{{$t('tasks.header.dueDate')}}</td>
@@ -71,6 +71,7 @@
 					<v-expansion-panel-content class="sym-v-expand-content border-top-1" style="height:200px">
 						<v-row class="ma-0" style="height:200px">
 							<trackingProcessInstance
+								class="popup-model-diagram"
 								v-if="taskInfo.action.parameter.processInstanceId"
 								:instanceId="taskInfo.action.parameter.processInstanceId"
 								:elementId="taskInfo.action.parameter.activityId"
@@ -750,7 +751,9 @@ export default {
 		},
 		getData(){
 			let data = {};
-			data.objectIdentifier = this.taskInfo.action.parameter.taskId;
+			if (this.taskInfo.action) {
+				data.objectIdentifier = this.taskInfo.action.parameter.taskId;
+			}
 			data.objectType = "task";
 			this.$store.dispatch("task/getArrFileAttachment", data);
     	}
@@ -932,5 +935,8 @@ export default {
 	.border-top-1 >>>.v-expansion-panel-content__wrap{
 		border: 1px solid #cecece!important;
 		border-radius: 5px;
+	}
+	.popup-model-diagram >>> .djs-hit  {
+		pointer-events: none;
 	}
 </style>

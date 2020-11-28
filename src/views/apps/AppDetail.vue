@@ -14,39 +14,60 @@
 										<template v-slot:activator="{ on, attrs }">
 											<div class="title-document-enduser" 	
 												v-bind="attrs"
-												v-on="on" >
+												v-on="on">
 												<span >{{childItem.title}}</span> 
 											</div>
 										</template>
 										<span style="font:13px roboto">{{childItem.title}}</span> 
 										<span style="font:8px;opacity:0.4">{{childItem.name}}</span>
 									</v-tooltip>
-									<div v-else  class="title-document-enduser"  >{{childItem.name}}</div>
+									<v-tooltip bottom  v-else >
+										<template v-slot:activator="{ on, attrs }">
+											<div class="title-document-enduser" 	
+												v-bind="attrs"
+												v-on="on" >
+												<span>{{childItem.name}}</span> 
+											</div>
+										</template>
+										<span style="font:13px roboto">{{childItem.name}}</span> 
+									</v-tooltip>
 									<v-icon  @click="changeFavorite(childItem,itemT.name)" :class="{'icon-star-active' : childItem.favorite==true, 'icon-star': true}" >mdi-star</v-icon>	
 								</div>
 							</li>
 							<li v-else>
 								<div style="position:relative">
 									<v-tooltip bottom v-if="itemT.name == 'document_category' || itemT.name == 'document_major'">
-									<template v-slot:activator="{ on, attrs }">
-										<div class="title-document" 	
-											v-bind="attrs"
-											v-on="on" >
-											<span>{{childItem.title}}</span> 
-											<span style="font:10px;opacity:0.4">{{childItem.name}}</span>
-										</div>
-									</template>
+										<template v-slot:activator="{ on, attrs }">
+											<div class="title-document" 	
+												v-bind="attrs"
+												v-on="on" >
+												<span>{{childItem.title}}</span> 
+												<span style="font:10px;opacity:0.4">{{childItem.name}}</span>
+											</div>
+										</template>
 										<span style="font:13px roboto">{{childItem.title}}</span> 
 										<span style="font:8px;opacity:0.4">{{childItem.name}}</span>
 									</v-tooltip>
-									<div v-else class="title-document" >{{childItem.name}}</div>
+									<v-tooltip bottom  v-else >
+										<template v-slot:activator="{ on, attrs }">
+											<div class="title-document" 	
+												v-bind="attrs"
+												v-on="on" >
+												<span>{{childItem.name}}</span> 
+											</div>
+										</template>
+										<span style="font:13px roboto">{{childItem.name}}</span> 
+									</v-tooltip>
 									<v-icon  class="icon-remove"  @click="removeItem(childItem,itemT.name)">mdi-delete-empty-outline</v-icon>
 								</div>
 							</li>
 					</ul>
 			</div>	
 		</VuePerfectScrollbar>
-		<ContextMenu ref="contextMenu" :sideBySide="sideBySide" />	
+		<ContextMenu ref="contextMenu" 
+			:sideBySide="sideBySide"
+			:allAppMode="false"
+		/>	
   </div>
 </template>
 <script>
@@ -176,6 +197,7 @@ export default {
 					}
 				})
 			}
+			 
 			if(listItem.dashboard.item.length > 0){
 				listItem.dashboard.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
