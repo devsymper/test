@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="symper-permission-selector ">
         <div  class="d-flex">
             <v-text-field
                 style="width: calc(100% - 80px)!important"
@@ -201,7 +201,7 @@ export default {
 }
 </script>
 
-<style>
+<style scoped >
 
 .delete-selected-permission{
     position: absolute!important;
@@ -215,7 +215,7 @@ export default {
 .selected-permission-pack:hover .delete-selected-permission{
     display: block;
 }
-.v-select__selection{
+.symper-permission-selector >>> .v-select__selection{
 	display: none !important;
 }
 </style>
