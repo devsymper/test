@@ -411,9 +411,10 @@ export default {
 						for (let index = 0; index < dataChange.length; index++) {
 							let cellChange = dataChange[index];
 							if(cellChange.data.new != cellChange.data.old){
-								table.tableInstance.validateValueMap[curRowIndex + "_" + mapControlToIndex[cellChange.name]] = {
+								let cellPos = curRowIndex + "_" + mapControlToIndex[cellChange.name];
+								table.tableInstance.addToValueMap(cellPos, {
 									type: 'linkControl',
-								};
+								})
 							}
 						}
 						
