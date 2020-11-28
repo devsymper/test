@@ -236,6 +236,13 @@ function moreInfoForInstanceVars() {
             "valueUrl": "",
             "scope": "global"
         },
+        {
+            "name": 'symper_last_executor_name',
+            "type": 'string',
+            "value": SYMPER_APP.$store.state.app.endUserInfo.displayName,
+            "valueUrl": "",
+            "scope": "global"
+        }
     ];
     if (SYMPER_APP.$route.params.extraData && SYMPER_APP.$route.params.extraData.appId) {
         rsl.push({
@@ -364,6 +371,13 @@ export const getVarsFromSubmitedDoc = async(docData, elId, docId) => {
                 name: 'symper_last_executor_id',
                 type: 'string',
                 value: SYMPER_APP.$store.state.app.endUserInfo.id+":"+SYMPER_APP.$store.state.app.endUserInfo.currentRole.id,
+                valueUrl: "",
+                scope: "global"
+            });
+            vars.push({
+                name: 'symper_last_executor_name',
+                type: 'string',
+                value: SYMPER_APP.$store.state.app.endUserInfo.displayName,
                 valueUrl: "",
                 scope: "global"
             });
