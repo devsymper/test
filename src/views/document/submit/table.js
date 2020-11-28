@@ -5,7 +5,6 @@ import store from './../../../store'
 import ClientSQLManager from './clientSQLManager';
 import { checkDbOnly, getControlType, getSDocumentSubmitStore } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
-import { Date } from 'core-js';
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
 import { util } from '../../../plugins/util';
 import moment from "moment-timezone";

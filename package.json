@@ -61,7 +61,6 @@
         "numeral": "^2.0.6",
         "promise-worker": "^2.0.1",
         "rxjs": "^6.6.2",
-        "sortablejs": "^1.10.2",
         "sql.js": "^1.4.0",
         "tinymce": "^5.4.1",
         "v-click-outside": "^3.0.1",
