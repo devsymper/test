@@ -24,6 +24,7 @@ var configs = {
             historyInstances: "https://workflow.symper.vn/symper-rest/service/query/historic-process-instances",
             history: "https://workflow.symper.vn/symper-rest/service/history",
             tasks: "https://workflow.symper.vn/symper-rest/service/runtime/tasks",
+            task: "https://workflow.symper.vn/symper-rest/service/query/tasks",
             tasksHistory: "https://workflow.symper.vn/symper-rest/service/history/historic-task-instances",
             validateModel: "https://workflow.symper.vn/symper-modeler/api/editor/validate-model",
             timerJob: "https://workflow.symper.vn/symper-rest/service/management/timer-jobs"

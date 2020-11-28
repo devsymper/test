@@ -91,7 +91,7 @@
 					</slot>
                 </v-layout>
             </v-container>
-        </v-main>
+        </v-content>
         <v-navigation-drawer
             v-bind:class="[isExpand==true?'width-1200':'width-400']"
             right
