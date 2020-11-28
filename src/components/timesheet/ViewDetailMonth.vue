@@ -1,6 +1,6 @@
 <template>
-<v-list style="background-color: #fff; 
-width: 360px; color: black; max-height: 580px;" class='fs-13 view_detail_month view-detail'>
+<div>
+<v-list dense class='fs-13 view_detail_month view-detail'>
     <v-list-item style='margin-top:-20px; margin-bottom:-15px'>
         <v-row>
             <v-col></v-col>
@@ -18,27 +18,28 @@ width: 360px; color: black; max-height: 580px;" class='fs-13 view_detail_month v
         </v-row>
     </v-list-item>
     <v-divider style='width: 340px;margin-left: 10px'></v-divider>
-    <div v-for="(event,i) in detail" :key="event.start">
+    <div v-for="event in detail" :key="event.start">
     <v-list-item>
         <v-list-item-content class='pl-8'>
             <v-list-item-title style="margin-top:-10px">
-                <span style="font-size: 13px!important">{{formatTime(event.start)}}-{{formatTime(event.end)}}: </span>
+                <span class="fw-400" style="font-size: 13px!important">{{formatTime(event.start)}}-{{formatTime(event.end)}}: </span>
               {{event.category_key}}-{{event.name}}
             </v-list-item-title>
         </v-list-item-content>
     </v-list-item>
     <v-list-item class="pb-11" style="height:20px;">
         <v-list-item-content class='pl-8'>
-            <v-list-item-title class="description_task">
-                <span class="fs-12 pl-7" style="color:grey">
+            <v-list-item-title class="description_task fw-400">
+                <span class="fs-12 pl-7 fw-400" style="color:grey">
                     {{changeDuration(event.duration)}}: </span>
-                <span style="color:grey">{{event.desc?event.desc:$t('timesheet.view_des')}} </span>
+                <span style="color:grey" class="fw-400">{{event.desc?event.desc:$t('timesheet.view_des')}} </span>
             </v-list-item-title>
         </v-list-item-content>
     </v-list-item>
        <v-divider class= "ml-2" style='width: 340px'></v-divider>
     </div>
 </v-list>
+</div>
 </template>
 <script>
 
@@ -91,6 +92,13 @@ import dayjs from 'dayjs';
 </script>
 
 <style lang="scss" scoped>
+.view_detail_month{
+    background-color: #fff; 
+    width: 360px;
+    color: black; 
+    max-height: 580px;
+    overflow-y:auto!important
+}
 .view_detail_month ::v-deep .v-list-item {
     margin-top: -10px;
     margin-bottom: -10px;
@@ -116,12 +124,10 @@ import dayjs from 'dayjs';
     color: grey;
 }
 
-.view-detail{ overflow: auto;
-  overflow: hidden;
+.view-detail{ 
+    overflow: auto;
+    overflow: hidden;
     overflow: -moz-scrollbars-none;
     -ms-overflow-style: none;
-}
-.view-detail ::-webkit-scrollbar { 
-  overflow-y: scroll; box-sizing: content-box;
 }
 </style>

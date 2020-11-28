@@ -162,7 +162,7 @@ export default {
 	min-height: unset !important;
 }
 .list-item-selector >>> .v-text-field__details{
-	display: none !important;
+	/* display: none !important; */
 }
 .list-item-selector >>> .v-chip--select{
 	display: none !important;

@@ -377,7 +377,11 @@ export const nodeAttrsDefinition = {
         docker: dockerGroups.event
     },
     'ThrowSignalEvent': {
-        attrs: ["executionlisteners", "signalref", "asynchronousdefinition"],
+        attrs: [
+            
+            'httptaskrequesturl', 'httptaskrequestheaders', 'httptaskrequestbody', 'httptaskrequestbodyencoding', 'httptaskrequesttimeout', 'httptaskdisallowredirects', 'httptaskfailstatuscodes', 'httptaskhandlestatuscodes', 'httptaskignoreexception', 'httptasksaveresponseparameterstransient', 'httptasksaveresponseasjson', 'httptaskresponsevariablename', 'httptasksaverequestvariables', 'httptasksaveresponseparameters', 'httptaskresultvariableprefix',
+            "serviceTaskTypeHTTP",
+            "executionlisteners", "signalref", "asynchronousdefinition", "prefixForSignalParameters"],
         validate: function(attrs) {
 
         },
@@ -531,7 +535,7 @@ export const nodeAttrsDefinition = {
         }
     },
     'Pool': {
-        attrs: ["isexecutable", "process_id"],
+        attrs: ["process_id"],
         validate: function(attrs) {
 
         },

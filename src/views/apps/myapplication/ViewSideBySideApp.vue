@@ -8,7 +8,7 @@
 				</v-btn>
 				 <!-- <MenuConfigTypeView   :currentTypeView="1" :titleTypeView="'hellooo'" /> -->
 				</div>
-            <div style="margin:20px 0px 0px 0px">
+            <div>
                 <div :class="{'favorite-area': true , 'active': showFavorite == true}" @click="showListFavorite">
                     <v-icon style="font-size:16px" color="#F6BE4F"> mdi-star</v-icon>
                     <span style="font:13px roboto;padding-left:8px">Yêu thích</span>
@@ -302,7 +302,6 @@ x				}
             this.showFavorite = false
 			this.$store.commit("appConfig/updateCurrentAppId",item.id);
 			this.$store.commit("appConfig/updateCurrentAppName",item.name);
-			// this.showDetailDiv = true
 			this.$store.commit('appConfig/showDetailAppArea')
 			this.$store.commit('appConfig/emptyItemSelected')
 			appManagementApi.getAppDetails(item.id).then(res => {

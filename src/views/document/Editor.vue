@@ -14,6 +14,7 @@
             <div class="sym-document-body">
                 <div class="sym-document-action">
                     <editor-action
+                    ref="actionView"
                     @document-action-save-document="openPanelSaveDocument"
                     @document-action-clone-control="cloneControl"
                     @document-action-list-control-option="setShowAllControlOption"
@@ -33,7 +34,7 @@
                
             </div>
         </vue-resizable>
-        <div  class="sym-document__side-bar-right">
+        <div class="sym-document__side-bar-right">
             <sidebar-right ref="sidebarRight" :isConfigPrint="isConfigPrint" :styles="contentStyle" :instance="keyInstance"/>
         </div>
         <s-table-setting v-if="!isConfigPrint" ref="tableSetting" :instance="keyInstance" @add-columns-table="addColumnTable" :defaultTablePivotConfig="defaultTablePivotConfig"/>
@@ -483,9 +484,9 @@ export default {
             if(this.typeDialog == 'deletePage'){
                 this.handleClickDeletePageInControlTab(this.currentPageActive)
             }
-            if(this.typeDialog == "baEditting"){
-                this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
-            }
+            // if(this.typeDialog == "baEditting"){
+            //     this.$evtBus.$emit('close-app-tab',this.currentTabIndex)
+            // }
         },
 
         /**
@@ -1040,9 +1041,10 @@ export default {
                         allControl[controlId].properties.dataFlowId.value = allControl[controlId].properties.dataFlowId.value.id;
                     }
                     else if(allControl[controlId].type == 'table'){
-                        if(allId.indexOf(controlId) === -1){
-                            for(let childControlId in allControl[controlId].listFields){
-                                let childControl = allControl[controlId].listFields[childControlId]
+                        if(allId.indexOf(controlId) !== -1){
+                            let listField = allControl[controlId].listFields;
+                            for(let childControlId in listField){
+                                let childControl = listField[childControlId]
                                 if(allId.indexOf(childControlId) === -1){
                                     delete allControl[controlId].listFields[childControlId];
                                     isCheck = true;
@@ -1050,21 +1052,32 @@ export default {
                                 if(!isCheck && childControl.type == 'user'){
                                     allUserControl['user'].push(childControl.properties.name.value)
                                 }
+                                let childControlFormulas = childControl.formulas;
+
+                                for(let formulaType in childControlFormulas){
+
+                                    if(formulaType != 'linkConfig'){
+                                        if(childControlFormulas[formulaType].value.trim() == ""){
+                                            allControl[controlId].listFields[childControlId].formulas[formulaType].formulasId = 0;
+                                        }
+                                    }
+                                }
                             }
                         }
                     }   
-                }
-                if(!isCheck && allControl[controlId].type == 'user'){
-                    allUserControl['user'].push(allControl[controlId].properties.name.value)
-                }
-                let controlFormulas = allControl[controlId].formulas;
-                for(let formulaType in controlFormulas){
-                    if(formulaType != 'linkConfig'){
-                        if(controlFormulas[formulaType].value.trim() == ""){
-                            allControl[controlId].formulas[formulaType].formulasId = 0;
+                    if(!isCheck && allControl[controlId].type == 'user'){
+                        allUserControl['user'].push(allControl[controlId].properties.name.value)
+                    }
+                    let controlFormulas = allControl[controlId].formulas;
+                    for(let formulaType in controlFormulas){
+                        if(formulaType != 'linkConfig'){
+                            if(controlFormulas[formulaType].value.trim() == ""){
+                                allControl[controlId].formulas[formulaType].formulasId = 0;
+                            }
                         }
                     }
                 }
+                
                 
             }
             return {minimizeControl:allControl,userControls:allUserControl}
@@ -1074,7 +1087,8 @@ export default {
         // hoangnd: hàm gửi request lưu doc
         async saveDocument(){
             let minimizeControl = this.minimizeControlEL(this.editorStore.allControl);
-            let allControl = minimizeControl.minimizeControl
+            let allControl = minimizeControl.minimizeControl;
+            console.log('allControl',allControl);
             let userControls = minimizeControl.userControls
             let documentProperties = util.cloneDeep(this.sDocumentProp);
             documentProperties = Object.assign({controlInfo:userControls},documentProperties)
@@ -1206,7 +1220,7 @@ export default {
                                 if(data.length > 0){
                                     let curBa = data[0];
                                     this.dialog = true;
-                                    this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
+                                    this.titleDialog = "BA "+curBa.name+" đang sửa doc này";
                                     this.typeDialog = "baEditting";
                                     return false;
                                 }
@@ -1959,7 +1973,7 @@ export default {
 
         },
         async checkAllowEditDocument(document){
-            let updateTime = new Date(document.updateAt).getTime();
+            let updateTime = new Date(document.lastEditAt).getTime();
             let timeDiff = Date.now() - updateTime;
             if(timeDiff > 4000){
                 /**
@@ -1979,12 +1993,14 @@ export default {
                             if(data.length > 0){
                                 let curBa = data[0];
                                 this.dialog = true;
-                                this.titleDialog = "BA "+curBa.name+" đang sửa doc này. Vui lòng quay lại sau";
+                                this.$refs.actionView.hideSaveBtn(curBa.name);
+                                this.titleDialog = "BA "+curBa.name+" đang sửa doc này.";
                                 this.typeDialog = "baEditting";
                                 return false;
                             }
                         }
                     } catch (error) {
+                        this.$refs.actionView.hideSaveBtn('');
                         return false;
                         console.log(error);
                     }
@@ -1998,10 +2014,7 @@ export default {
                 let res = await documentApi.detailDocument(this.documentId);
                 if (res.status == 200) {
                     if(this.routeName == "editDocument"){
-                        let checkEditting = await this.checkAllowEditDocument(res.data.document);
-                        if(checkEditting == false){
-                            return;
-                        }
+                        await this.checkAllowEditDocument(res.data.document);
                         this.setDocumentProperties(res.data.document);
                     }
                     let content = res.data.document.content;

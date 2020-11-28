@@ -635,4 +635,6 @@ button:hover {
   .swap-table-btn:focus{
       outline: none;
   }
-  
+ .sym-form-submit div:empty, .sym-form-Detail div:empty{
+     height: 12px;
+ }

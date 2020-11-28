@@ -1,7 +1,7 @@
 import Api from "./api";
 import { appConfigs } from "./../configs.js";
 
-var api = new Api(appConfigs.apiDomain.environmentManagement)
+var api = new Api(appConfigs.uniqueApiDomain.environmentManagement)
 export const environmentManagementApi = {
     getAllEnvironment() {
         return api.get('enviromments');
@@ -23,6 +23,10 @@ export const environmentManagementApi = {
 	addVersion(data){
 		return api.post('services/'+data.serviceId+"/versions",data.formData)
 	},
+	getVersion(serviceId){
+		return api.get('services/'+serviceId+"/versions")
+	},
+
 	deloy(data){
 		return api.post('instances/deploy',data)
 	},

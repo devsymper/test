@@ -1,5 +1,5 @@
 <template>
-    <div class="wrap-content-detail" style="overflow:hidden;">
+    <div class="wrap-content-detail" style="overflow:hidden;position: relative;">
         
         <Preloader ref="preLoaderView"/>
         <div class="panel-header" v-if="!quickView && !isPrint">
@@ -26,17 +26,21 @@
                 </v-tooltip>
             </div>
         </div>
-        <div
-            class="sym-form-Detail"
-            :id="'sym-Detail-'+keyInstance"
-            :style="{'width':documentSize, 'height':contentHeight,'margin':contentMargin}">
-            <div class="content-document" v-html="contentDocument"></div>
-            <div class="content-print-document" :style="formSize" v-html="contentPrintDocument"></div>
-            <FloattingPopup 
-                ref="floattingPopup" 
-                :focusingControlName="focusingControlName"
-                :instance="keyInstance"/>
-        </div>
+        <VuePerfectScrollbar style="height: calc(100% - 30px);">
+            <div
+                class="sym-form-Detail"
+                :id="'sym-Detail-'+keyInstance"
+                :style="{'width':documentSize, 'height':contentHeight,'margin':contentMargin}">
+                <div class="content-document" v-html="contentDocument"></div>
+                <div class="content-print-document" :style="formSize" v-html="contentPrintDocument"></div>
+                <FloattingPopup 
+                    ref="floattingPopup" 
+                    :focusingControlName="focusingControlName"
+                    :instance="keyInstance"/>
+            </div>
+
+        </VuePerfectScrollbar>
+        
       
         <side-bar-detail 
             v-if="!isPrint"
@@ -74,6 +78,7 @@ import HistoryControl from './HistoryControl'
 import FloattingPopup from './../common/FloattingPopup'
 import Preloader from './../../../components/common/Preloader';
 import PivotTable from "./../submit/pivot-table";
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 import { util } from '../../../plugins/util.js';
 export default {
@@ -118,7 +123,8 @@ export default {
         'side-bar-detail':SideBarDetail,
         HistoryControl,
         Preloader,
-        FloattingPopup
+        FloattingPopup,
+        VuePerfectScrollbar
     },
     computed: {
         routeName(){
@@ -547,7 +553,7 @@ export default {
                 }
             }
             this.$refs.preLoaderView.hide();
-            this.$emit("after-loaded-component-detail",listTableIns);
+            this.$emit("after-loaded-component-detail",this.formSize);
             $('.wrap-content-detail').removeAttr('style');
         },
 

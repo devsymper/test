@@ -15,23 +15,27 @@
 				value='tab-1'
 				>
 					<div class="d-flex pt-2 pr-4 pl-4 " style="height:500px">
-						<div class="dialog-object-in-service d-flex flex-column w-100 h-100" style="z-index:1000;background-color: #ffffff ; position: relative">
+						<div 
+							class="dialog-object-in-service d-flex flex-column w-100 h-100 " 
+							style="z-index:1000;background-color: #ffffff ; position: relative"
+						>
 							<div>
 								Danh sách các loại object có thể đồng bộ
 							</div>
-							<div 
-								v-for="(item,i) in listObjectType"
-								:key="i"
-							>
-								<span 
-									class=" mt-10 ml-2 text-uppercase object-type-title"
-									@click="handleObjectViewDetail(item)"
+							<VuePerfectScrollbar style="height:470px">
+								<div 
+									v-for="(item,i) in listObjectType"
+									:key="i"
+									class="ml-10"
 								>
-									{{item}}
-								</span>
-							</div>	
-							
-							
+									<span 
+										class=" mt-10 ml-2 text-uppercase object-type-title"
+										@click="handleObjectViewDetail(item)"
+									>
+										{{item}}
+									</span>
+								</div>	
+							</VuePerfectScrollbar>
 						</div>
 						<div>
 							<v-btn
@@ -72,13 +76,15 @@
 import ListItem from "@/components/common/ListItems"
 import DialogsConfirmSync from './DialogsConfirmSync'
 import { appConfigs } from "@/configs.js";
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ObjectDetail from './ObjectDetail'
 import {environmentManagementApi} from "@/api/EnvironmentManagement"
 export default {
 	components:{
 		ListItem,
 		ObjectDetail,
-		DialogsConfirmSync	
+		DialogsConfirmSync	,
+		VuePerfectScrollbar,
 	},
 	computed:{
 		listObjectType(){
@@ -101,15 +107,12 @@ export default {
 			tab: 'tab-1',
 			getListUrls: '',
 			showDialogSync: false,
-			currentObjectType: ""
+			currentObjectType: "",
 		}
 	},
 	methods:{
 		handleCloseEvent(){
 			this.$emit('close-popup')
-		},
-		handleClickSync(){
-			
 		},
 		handleObjectViewDetail(item){
 			this.currentObjectType = item
@@ -120,9 +123,7 @@ export default {
 			let str = "https://" + prefix + currentService.serviceIdentifier + '.symper.vn/'
 			this.getListUrls = str+'env/'+item+'s'
 		},
-		handletest(){
-			this.showDialogSync = true 
-		}
+	
 	},
 	watch:{
 		showDialog(val){

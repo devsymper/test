@@ -1305,8 +1305,8 @@ export default {
                 let routeName = this.$getRouteName();
                 if(routeName == "deployHistory" || routeName == "listProcessInstances" || thisCpn.useWorkFlowHeader){
                     header = {
-						Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0',
-						 "Content-Type": "application/json",
+                        Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0',
+                        "Content-Type": "application/json",
                     };
                     // options = {};
                     emptyOption = true;

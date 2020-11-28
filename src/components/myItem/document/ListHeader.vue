@@ -193,6 +193,7 @@
                         taskObject.dueDate.length == 0 ||
                         taskObject.assignee.length == 0"
             @click="saveTask"
+            :loading="loading"
           >{{$t('common.add')}}</v-btn>
           <v-btn text small @click="dialog = false" class="mr-2">{{$t('common.close')}}</v-btn>
         </v-card-actions>
@@ -270,6 +271,7 @@ export default {
   },
     data: function() {
         return {
+            loading:false,
             closeOnClick: true,
             workStatus: "notDone",
             searchTaskKey: "",
@@ -412,6 +414,7 @@ export default {
       });
     },
     async saveTask() {
+        this.loading=true;
         if (!this.taskObject.assignee) {
             this.$snotifyError(
             {},
@@ -456,6 +459,7 @@ export default {
         } else {
             this.showError();
         }
+        this.loading=false;
     }
   }
 };

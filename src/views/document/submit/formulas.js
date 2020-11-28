@@ -313,7 +313,7 @@ export default class Formulas {
                     let columns = {};
                     let columnsTable = [];
                     for (let i in data[0]) {
-                        if (['id', 'createAt', 'style', 'departmentVizId', 'orgchartId', 'listForeignKey', 'nodeIdentify', 'vizParentId', 'vizId'].includes(i)) {
+                        if (['style', 'departmentVizId', 'listForeignKey', 'nodeIdentify', 'vizParentId', 'vizId'].includes(i)) {
                             continue;
                         }
                         columns[i] = "TEXT";

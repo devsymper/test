@@ -16,7 +16,7 @@ var configs = {
         core: 'https://v2hoangnd.dev.symper.vn/',
         bpmne: {
             general: 'https://workflow.symper.vn/',
-            models: 'https://workflow-modeler.symper.vn',
+            models: 'https://workflow-modeler.symper.vn/workflow-modeler/',
             postTasksHistory: 'https://workflow.symper.vn/symper-rest/service/query/historic-task-instances',
             deployments: "https://workflow.symper.vn/symper-rest/service/repository/deployments",
             definitions: "https://workflow.symper.vn/symper-rest/service/repository/process-definitions",
@@ -24,6 +24,7 @@ var configs = {
             historyInstances: "https://workflow.symper.vn/symper-rest/service/query/historic-process-instances",
             history: "https://workflow.symper.vn/symper-rest/service/history",
             tasks: "https://workflow.symper.vn/symper-rest/service/runtime/tasks",
+            task: "https://workflow.symper.vn/symper-rest/service/query/tasks",
             tasksHistory: "https://workflow.symper.vn/symper-rest/service/history/historic-task-instances",
             validateModel: "https://workflow.symper.vn/symper-modeler/api/editor/validate-model",
             timerJob: "https://workflow.symper.vn/symper-rest/service/management/timer-jobs"
@@ -57,9 +58,11 @@ var configs = {
         workflowExtend: "https://workflow-extend.symper.vn/",
         trash: "https://trash.symper.vn/",
 		log: "https://log.symper.vn",
+    },
+    // nơi chứa domain của các api mà ko bị phụ thuộc vào môi trường 
+	uniqueApiDomain: {
 		environmentManagement: "https://system-management.symper.vn/"
-	},
-	
+    },
     notificationTimeout: {
         success: 3000,
         warning: 5000,
@@ -100,8 +103,12 @@ var configs = {
         }
 	},
 };
-configs.reformatUrl(configs.apiDomain);
 // sửa lại url theo môi trường code
+configs.reformatUrl(configs.apiDomain);
 
+// Thêm các domain thuộc uniqueApiDomain vào khai báo domain của api
+for(let key in configs.uniqueApiDomain){
+    configs.apiDomain[key] = configs.uniqueApiDomain[key];
+}
 
 export const appConfigs = configs;
