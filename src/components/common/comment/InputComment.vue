@@ -2,7 +2,7 @@
 	<div class="content-comment">
 		<div v-if="listImage.length > 0"  class="content-comment-img">
 				<v-tabs
-				show-arrows
+					show-arrows
 				>
 				<v-tab
 				v-for="(item,i) in listImage"
@@ -10,9 +10,19 @@
 				:href="'#tab-' + i"
 				style="position:relative"
 				>
-					<v-img :src="item.serverPath" aspect-ratio="1.7" style="width:100px;height:100px"  @click="previewImage(item)">
+					<v-img 
+						:src="item.serverPath" 
+						aspect-ratio="1.7" 
+						style="width:100px;height:100px"  
+						@click="previewImage(item)"
+					>
 					</v-img>
-					<v-icon class="icon-remove-img" style="position:absolute;top:0;right:0" v-if="isEditing == true" @click="removeImage(item)">mdi-close-circle-outline</v-icon>
+					<v-icon 
+						class="icon-remove-img" 
+						style="position:absolute;top:0;right:0" 
+						v-if="isEditing == true" 
+						@click="removeImage(item)"
+					>mdi-close-circle-outline</v-icon>
 				</v-tab>
 			</v-tabs>
 		</div>
@@ -447,7 +457,7 @@ export default {
 }
 .content-comment >>> .content-comment-img{
 	display:flex;	
-	width:85%;
+	width: 300px;
 	margin-bottom:20px;
 	margin-top:4px;
 }
