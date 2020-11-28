@@ -53,22 +53,13 @@ export default class BasicControl extends Control {
     render() {
             this.ele.wrap('<span style="position:relative;display:inline-block">');
             this.ele.attr('key-instance', this.curParentInstance);
-            // if (this.checkDetailView() &&
-            //     this.controlProperties['isSaveToDB'] !== undefined &&
-            //     (this.controlProperties['isSaveToDB'].value !== "1" ||
-            //         this.controlProperties['isSaveToDB'].value !== 1)) {
-            //     this.ele.css({ display: 'none' })
-            // }
             if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
                 this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
             }
             if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
                 this.ele.attr('disabled', 'disabled');
+                this.ele.css({ background: 'rgba(0,0,0,0.05)' })
             }
-            // if (this.checkViewType('print') && this.checkProps('isBorderPrint')) {
-            //     this.ele.css('border-bottom', '0.5px solid rgb(230, 229, 229)')
-            // }
-
             if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
                 this.ele.css({ 'display': 'none' })
             }
@@ -205,7 +196,7 @@ export default class BasicControl extends Control {
                     valueChange = $(e.target).prop("checked");
                 }
                 thisObj.value = valueChange;
-                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.name, val: valueChange });
+                SYMPER_APP.$evtBus.$emit('document-submit-input-change', thisObj);
             })
             this.ele.on('focus', function(e) {
                 store.commit("document/addToDocumentSubmitStore", {

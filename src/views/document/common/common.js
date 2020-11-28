@@ -3,12 +3,17 @@ import sDocument from './../../../store/document';
 import { util } from '../../../plugins/util';
 
 let listNameValueControl = {};
-const checkDbOnly = function(instance, controlName) {
+const checkControlPropertyProp = function(instance, controlName, type) {
     let control = getControlInstanceFromStore(instance, controlName);
-    if (control.controlProperties['isDBOnly'] != undefined &&
-        (control.controlProperties['isDBOnly'].value == "1" ||
-            control.controlProperties['isDBOnly'].value == true ||
-            control.controlProperties['isDBOnly'].value == 1)) {
+    if (control && control.controlProperties[type] && control.controlProperties[type].value) {
+        return control;
+    } else {
+        return false
+    }
+}
+const checkControlFormulaProp = function(instance, controlName, type) {
+    let control = getControlInstanceFromStore(instance, controlName);
+    if (control && control.controlFormulas[type] && control.controlFormulas[type].instance) {
         return control;
     } else {
         return false
@@ -197,7 +202,8 @@ const checkTitleControl = function(instance) {
 export {
     // handlerRunOtherFormulasControl
     getControlInstanceFromStore,
-    checkDbOnly,
+    checkControlFormulaProp,
+    checkControlPropertyProp,
     checkInTable,
     getControlTitleFromName,
     getControlType,

@@ -219,7 +219,7 @@ import PopupPivotTable from './items/PopupPivotTable'
 
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
-import {checkDbOnly,getControlInstanceFromStore,getControlTitleFromName, getListInputInDocument,mapTypeToEffectedControl} from './../common/common'
+import {checkControlPropertyProp,getControlInstanceFromStore,getControlTitleFromName, getListInputInDocument,mapTypeToEffectedControl} from './../common/common'
 import Formulas from './formulas.js';
 let impactedFieldsList = {};
 let impactedFieldsArr = {};
@@ -603,46 +603,45 @@ export default {
         });
         var delayTimer;
         // hàm nhận sự kiện thay đổi của input
-        this.$evtBus.$on("document-submit-input-change", locale => {
+        this.$evtBus.$on("document-submit-input-change", controlInstance => {
             try {
-                if(thisCpn._inactive == true) return;
-                let valueControl = locale.val;
-                let controlInstance = getControlInstanceFromStore(thisCpn.keyInstance,locale.controlName);
+                if(this._inactive == true) return;
+                let valueControl = controlInstance.value;
                 if(controlInstance.checkAutoCompleteControl()){
                     clearTimeout(delayTimer);
+                    // delay trong trường hợp chọn dòng trong box autocomplete thì đã kích hoạt sự kiện onchange
+                    // lúc này input chưa có dữ liệu đên phải delay
                     delayTimer = setTimeout(function() {
-                        thisCpn.handleInputChangeByUser(locale, controlInstance, valueControl);
+                        thisCpn.handleInputChangeByUser( controlInstance, valueControl);
                     }, 300);
                 }
                 else{
-                    thisCpn.handleInputChangeByUser(locale, controlInstance, valueControl);
+                    this.handleInputChangeByUser( controlInstance, valueControl);
                 }
             } catch (error) {
                 console.warn(error);
             }
-            
-            
         });
         this.$evtBus.$on("run-effected-control-when-table-change", control => {
-            if(thisCpn._inactive == true) return;
-            thisCpn.handlerBeforeRunFormulasValue(control.controlFormulas.formulas.instance,control.id,control.name,'formulas');
+            if(this._inactive == true) return;
+            this.handlerBeforeRunFormulasValue(control.controlFormulas.formulas.instance,control.id,control.name,'formulas');
         });
         this.$evtBus.$on("document-submit-open-validate-message", e => {
-            if(thisCpn._inactive == true) return;
-            thisCpn.messageValidate = e.msg;
-            thisCpn.$refs.validate.show(e);
+            if(this._inactive == true) return;
+            this.messageValidate = e.msg;
+            this.$refs.validate.show(e);
         });
        
         this.$evtBus.$on("document-submit-show-time-picker", e => {
-            if(thisCpn._inactive == true) return;
-            thisCpn.$refs.timeInput.show(e);
+            if(this._inactive == true) return;
+            this.$refs.timeInput.show(e);
         });
         this.$evtBus.$on("document-submit-date-input-click", e => {
-            if(thisCpn._inactive == true) return;
-            thisCpn.$refs.datePicker.openPicker(e);
-            thisCpn.$store.commit("document/updateCurrentControlEditByUser", {
+            if(this._inactive == true) return;
+            this.$refs.datePicker.openPicker(e);
+            this.$store.commit("document/updateCurrentControlEditByUser", {
                 currentControl: e.controlName,
-                instance: thisCpn.keyInstance
+                instance: this.keyInstance
             });
         });
         /**
@@ -1154,8 +1153,7 @@ export default {
             let dataFromCache = this.getDataAutocompleteFromCache(aliasControl, dataInput);
             if(dataFromCache == false){
                 e.formulasInstance.handleBeforeRunFormulas(dataInput).then(res=>{
-                    res.status = 200
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,true)
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                 });
             }
             else{
@@ -1171,7 +1169,7 @@ export default {
             if(['select','combobox'].includes(type)){
                 let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
                 e.selectFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                    thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,false)
+                    thisCpn.setDataForControlAutocomplete(res,aliasControl)
                 });
             }
             else{
@@ -1185,7 +1183,7 @@ export default {
                 let dataFromCache = this.getDataAutocompleteFromCache(aliasControl, dataInput);
                 if(dataFromCache == false){
                     e.autocompleteFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                        thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle,false)
+                        thisCpn.setDataForControlAutocomplete(res,aliasControl,e.controlTitle)
                     });
                 }
                 else{
@@ -1202,7 +1200,6 @@ export default {
                 groupKey.push(dataInput[ctlName]);
             }
             groupKey = groupKey.join("-");
-            console.log('groupKeygroupKey',groupKey);
             if(this.sDocumentSubmit.autocompleteData.hasOwnProperty(controlName) &&
                 this.sDocumentSubmit.autocompleteData[controlName].header.hasOwnProperty(groupKey) &&
                 this.sDocumentSubmit.autocompleteData[controlName].cacheData.hasOwnProperty(groupKey)
@@ -1220,54 +1217,53 @@ export default {
          * Hàm bind dữ liệu cho box autocomplete, cho component autocompleteInput
          * và đưa dữ liệu vào cache
          */
-        setDataForControlAutocomplete(res,aliasControl,controlTitle, fromSqlite=false){
+        setDataForControlAutocomplete(res,aliasControl,controlTitle = ''){
+            let fromSqlite = !res.server
             let controlAs = {};
             controlAs[aliasControl] = controlTitle;
-            if(res.data != undefined){
-                if(res.status == 200 && res.data != false){
-                    let dataTable = {}
-                    if(!fromSqlite && res.data.data !== ""){
-                        dataTable = this.handleDataAutoComplete(res.data.data,fromSqlite,controlAs);
-                    }
-                    else{
-                        dataTable = this.handleDataAutoComplete(res.data,fromSqlite,controlAs);
-                    }
-                    this.$refs.autocompleteInput.setAliasControl(aliasControl);
-                    this.$refs.autocompleteInput.setData(dataTable);
-                    if(dataTable.hasOwnProperty('headers')){
-                        try {
-                            let dataInput = JSON.parse(res.parameter.data_input);
-                            let groupKey = [];
-                            for(let controlName in dataInput){
-                                groupKey.push(dataInput[controlName]);      
-                            }
-                            groupKey = groupKey.join("-");
-                            let itemData = {};
-                            let itemHeader = {};
-                            itemData[groupKey] = dataTable.dataBody;
-                            itemHeader[groupKey] = dataTable.headers;
-                            this.$store.commit("document/cacheDataAutocomplete",{
-                                instance: this.keyInstance,
-                                controlName:aliasControl,
-                                header:itemHeader,
-                                cacheData:itemData,
-                            })    
-                        } catch (error) {
-                            console.log(error,'errorerror');
-                        }
-                        
-                    }
+            if(res.data){
+                let dataTable = {};
+                if(fromSqlite){
+                    dataTable = this.handleDataAutoComplete(res.data,fromSqlite,controlAs);
                 }
                 else{
-                    this.$refs.autocompleteInput.setData([]);
+                    dataTable = this.handleDataAutoComplete(res.data.data,fromSqlite,controlAs);
+                }
+                
+                this.$refs.autocompleteInput.setAliasControl(aliasControl);
+                this.$refs.autocompleteInput.setData(dataTable);
+                if(!controlTitle){
+                    this.$refs.autocompleteInput.hideHeader();
+                }
+                if(dataTable.hasOwnProperty('headers')){
+                    try {
+                        let dataInput = res.data.dataInput;
+                        let groupKey = [];
+                        for(let controlName in dataInput){
+                            groupKey.push(dataInput[controlName]);      
+                        }
+                        groupKey = groupKey.join("-");
+                        let itemData = {};
+                        let itemHeader = {};
+                        itemData[groupKey] = dataTable.dataBody;
+                        itemHeader[groupKey] = dataTable.headers;
+                        this.$store.commit("document/cacheDataAutocomplete",{
+                            instance: this.keyInstance,
+                            controlName:aliasControl,
+                            header:itemHeader,
+                            cacheData:itemData,
+                        })    
+                    } catch (error) {
+                        console.log(error,'errorerror');
+                    }
+                    
                 }
             }
             else{
-                let dataTable = this.handleDataAutoComplete(res,true,controlAs);
-                this.$refs.autocompleteInput.setAliasControl(aliasControl);
-                this.$refs.autocompleteInput.setData(dataTable);
-                this.$refs.autocompleteInput.hideHeader();
+                this.$refs.autocompleteInput.setData([]);
             }
+          
+            
         },
         /**
          * Hàm bind dữ liệu cho control, và control trong bảng khi chọn apply trên timepicker
@@ -2077,20 +2073,19 @@ export default {
                         type: "success",
                         title: "Submit document success!"
                     });        
+                    
+                    // nếu có công thức nút submit
+                    if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
+                        let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
+                        thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
+                    }
                     // nếu submit từ form sub submit thì ko rediect trang
                     // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
                     
                     if(thisCpn.$getRouteName() == 'submitDocument' && thisCpn.$route.params.id == thisCpn.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                     }
-                    else{
-                        thisCpn.resetDataSubmit();
-                    }
-                    // nếu có công thức nút submit
-                    if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
-                        let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
-                        thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
-                    }
+                    
                 }
                 else{
                     thisCpn.$snotify({
@@ -2327,7 +2322,7 @@ export default {
         handleControlInputChange(controlName){
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
             if(controlInstance.checkValidValueLength()){
-                let controlUnique = checkDbOnly(this.keyInstance,controlName);
+                let controlUnique = checkControlPropertyProp(this.keyInstance,controlName,'isDBOnly');
                 if(controlUnique != false){
                     this.handlerBeforeRunFormulasValue(controlUnique.controlFormulas.uniqueDB.instance,controlUnique.id,controlUnique.name,'uniqueDB');
                 }
@@ -2339,7 +2334,7 @@ export default {
                 let controlValidateEffected = controlInstance.getEffectedValidateControl();
                 this.runFormulasControlEffected(controlName,controlEffected);
                 this.runOtherFormulasEffected(controlName,controlHiddenEffected,'hidden');
-                this.runOtherFormulasEffected(controlName,controlReadonlyEffected,'readonly');
+                this.runOtherFormulasEffected(controlName,controlReadonlyEffected,'readOnly');
                 this.runOtherFormulasEffected(controlName,controlRequireEffected,'require');
                 this.runOtherFormulasEffected(controlName,controlLinkEffected,'linkConfig');
                 this.runOtherFormulasEffected(controlName,controlValidateEffected,'validate');
@@ -2404,7 +2399,8 @@ export default {
             let control = getControlInstanceFromStore(this.keyInstance,controlName);
             if(control.inTable != false){
                 let tableInstance = getControlInstanceFromStore(this.keyInstance,control.inTable);
-                let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulasInstance,tableInstance.name)
+                let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulasInstance,tableInstance.name);
+               
                 tableInstance.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataIn,formulasInstance);
             }
             formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
@@ -2493,7 +2489,7 @@ export default {
                                 this.handlerDataAfterRunFormulasHidden(controlInstance,value,controlId);
                                 break;
                             case "readOnly":
-                                this.handlerDataAfterRunFormulasReadonly(value,controlId);
+                                controlInstance.handlerDataAfterRunFormulasReadonly(value);
                                 break;
                             case "uniqueDB":
                                 controlInstance.handlerDataAfterRunFormulasUniqueDB(value);
@@ -2855,7 +2851,7 @@ export default {
                 url
             );
         },
-        handleInputChangeByUser(locale, controlInstance, valueControl){
+        handleInputChangeByUser( controlInstance, valueControl){
             if(controlInstance.type == 'number'){
                 valueControl = valueControl.replace(/=/g,"");
                 valueControl = eval(valueControl);
@@ -2875,7 +2871,7 @@ export default {
                 valueControl = moment(valueControl,'DD-MM-YYYY').format('YYYY-MM-DD');
             }
             this.updateListInputInDocument(
-                locale.controlName,
+                controlInstance.name,
                 "value",
                 valueControl
             );
@@ -2883,14 +2879,14 @@ export default {
             // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
             if(controlInstance.isRequiredControl()){
                 if(controlInstance.isEmpty()){
-                    controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+locale.controlName)
+                    controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+controlInstance.name)
                 }
                 else{
                     controlInstance.removeValidateIcon();
                 }
             }
             resetImpactedFieldsList(this.keyInstance);
-            this.handleControlInputChange(locale.controlName);
+            this.handleControlInputChange(controlInstance.name);
         },
         /**
          * Hàm nhận sự kiên sau khi đóng pop up validate

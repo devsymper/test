@@ -434,22 +434,15 @@ export default class Formulas {
 
 
     // Hàm chạy công thức cho autocomplete
-    handleRunAutoCompleteFormulas(dataInput = false) {
-            let listSyql = this.refFormulas;
-            if (listSyql != null && listSyql.length > 0) {
-                let syql = listSyql[0].trim();
-                syql = syql.replace(/(REF|ref)\s*\(/g, '');
-                syql = syql.substring(0, syql.length - 1);
-                return this.runSyql(syql, dataInput);
-            } else {
-                let formulas = this.replaceParamsToData(dataInput, this.formulas);
-                return this.runSQLLiteFormulas(formulas, true);
-            }
-        }
-        /**
-         * Hàm chỉ ra control nào được alias để binding vào giá trị control sau khi chọn từ autocomplete
-         * @param {*} alias 
-         */
+    async handleRunAutoCompleteFormulas(dataInput = false) {
+        let res = await this.handleBeforeRunFormulas(dataInput);
+        res.data.dataInput = dataInput;
+        return res
+    }
+    /**
+     * Hàm chỉ ra control nào được alias để binding vào giá trị control sau khi chọn từ autocomplete
+     * @param {*} alias 
+     */
     autocompleteDetectAliasControl(alias = true) {
             let formulas = this.getFormulas();
             formulas = formulas.replace(/\r?\n|\r/g, ' ');
