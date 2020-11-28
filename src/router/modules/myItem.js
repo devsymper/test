@@ -12,7 +12,7 @@ export default [{
 },
 {
     path: "/myitem/:type",
-    name: "myItem",
+    name: "myItemByType",
     component: () =>
     import ('../../views/myItem/index.vue'),
 },

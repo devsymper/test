@@ -1731,7 +1731,7 @@ let allAttrs = {
                 type: 'text',
             },
             {
-                title: 'Description',
+                title: 'Name',
                 name: 'name',
                 type: 'text'
             },
@@ -1772,7 +1772,7 @@ let allAttrs = {
                     if(item.id && item.id.trim()){
                         rsl.push({
                             id: item.id,
-                            name: item.id,
+                            name: item.name,
                             symper_symper_scope_tag: item.symper_symper_scope_tag
                         });
                     }

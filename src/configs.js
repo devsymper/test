@@ -16,7 +16,7 @@ var configs = {
         core: 'https://v2hoangnd.dev.symper.vn/',
         bpmne: {
             general: 'https://workflow.symper.vn/',
-            models: 'https://workflow-modeler.symper.vn',
+            models: 'https://workflow-modeler.symper.vn/workflow-modeler/',
             postTasksHistory: 'https://workflow.symper.vn/symper-rest/service/query/historic-task-instances',
             deployments: "https://workflow.symper.vn/symper-rest/service/repository/deployments",
             definitions: "https://workflow.symper.vn/symper-rest/service/repository/process-definitions",

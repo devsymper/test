@@ -1,25 +1,21 @@
 <template>
 	<div class="w-100 h-100">
-		<div class="d-flex w-100">
-			<span> Chọn ứng dụng:</span>
+		<div class="d-flex w-100 mt-1">
+			<span class="fs-15 font-weight-bold"> Chọn ứng dụng:</span>
 			<ListItemSelector
 				:listItem='allApp'
 				@item-selected="handleItemSelected"
-
+				@list-item-selected="handleListItemSelected"
+				:values="listApp"
 			 />
 		</div>
 		<div class="d-flex w-100 mr-2 children-application">
-			<div 
-				v-for="(item,i) in childrenTypeOfApp"  
-				:key="i" 
-				class="p-2 title-children-application fs-13 w-100"
-				@click="handleChildTypeClick(item.value)" 
-				:class="{'title-children-application-active': active == item.value}"
-			>
-				<span style="margin-left:auto;margin-right:auto">
-					{{item.title}}
-				</span>
-			</div>
+			<ObjectInApplication 
+				:idApplication="selectedApplication"
+				:tableDataDefinition="tableDataDefinition"
+				:commonTableSetting="commonTableSetting"
+				@app-detail-get="translateAppObjectIdToTableData"
+			/>
 		</div>
 		<div>
 			<OrgchartSelector 
@@ -38,12 +34,15 @@ import OrgchartSelector from "./OrgchartSelector"
 import ListItemSelector from "./ListItemSelector.vue"
 import {accessControlApi} from '@/api/accessControl'
 import {appManagementApi} from '@/api/AppManagement.js'
+import {uiConfigApi} from "@/api/uiConfig";
+import ObjectInApplication from "./../actionPackPanel/ObjectInApplication"
 export default {
 	data(){
 		return {
 			active: "",
 			selectedApplication: "",
 			allApp:[],
+			values:[],
 			checkboxes:[],
 			childrenTypeOfApp:[
 				{
@@ -66,9 +65,23 @@ export default {
 			]
 		}
 	},
+	props:{
+		
+		listApp:{
+			type: Array,
+			default(){
+				return []
+			}
+		},
+		tableDataDefinition:{
+		},
+		commonTableSetting:{
+		}
+	},
 	components:{
 		ListItemSelector,
-		OrgchartSelector
+		OrgchartSelector,
+		ObjectInApplication
 	},
 	created(){
 		this.getActiveApp()
@@ -79,10 +92,12 @@ export default {
 		},
 		handleItemSelected(value){
 			this.selectedApplication = value
-			appManagementApi.getAppDetailBa(value).then(res=>{
-			}).catch(err=>{
-			})
-			
+		},
+		translateAppObjectIdToTableData(data){
+			this.$emit( 'app-detail-get', data)
+		},
+		handleListItemSelected(lists){
+			this.$emit('list-item-selected' , lists)
 		},
 		handlePermissionSelected(value){
 			this.checkboxes = value
@@ -102,6 +117,8 @@ export default {
 				
 			})
 		}
+	},
+	watch:{
 	}
 
 }
