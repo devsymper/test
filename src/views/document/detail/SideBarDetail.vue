@@ -39,17 +39,15 @@
 									<td style="width:70px">{{$t('document.detail.sidebar.body.general.userRole')}}</td>
 									<td>{{userRoleInfo}}</td>
 								</tr>
-								<tr>
+								<tr v-if="this.listHistoryControl.length > 0">
 
 									<td>{{$t('document.detail.sidebar.body.general.history')}}</td>
-									<td @click="showHistory" style="text-decoration: underline;cursor:pointer;color:#F1853B;">Đã sửa 2 lần</td>
+									<td @click="showHistory" style="text-decoration: underline;cursor:pointer;color:#F1853B;">Đã sửa {{countModify}} lần</td>
 								</tr>
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.comment')}}</td>
 									<td style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showComment">
-										{{$t('document.detail.sidebar.body.general.has')}} 
-										{{countCommentNotResolve}} 
-										{{$t('document.detail.sidebar.body.general.commentNotResolve')}}
+										{{commentNotResolveMessage}} 
 										</td>
 								</tr>
 							</table>
@@ -176,14 +174,12 @@ export default {
 			taskName:"",
 			listApprovalUser:[],
 			listRelatedUser:[],
-			listHistoryControl:[
-                {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:2, controls:[{id:'s-control-id-1596780634836',data:[]},{id:'s-control-id-1596780602772',data:[]},{id:'s-control-id-1596780611212',data:[]}]},
-                {date:'18/08/2020 11:20', userUpdate:'Nguyễn Đình Hoang', historyid:1, controls:[{id:'s-control-id-1596780602772',data:[]}]},
-			],
+			listHistoryControl:[],
 			displaySidebar:'none',
 			showMainInfo:false,
 			showHistoryInfo:false,
 			showCommentInfo:false,
+			countModify:0
 		}
 	},
 	props:{
@@ -271,8 +267,14 @@ export default {
 		allUsers(){
             return this.$store.state.app.allUsers;
 		},
-		countCommentNotResolve(){
-			return this.$store.state.comment.listComment.length
+		commentNotResolveMessage(){
+			let size = this.$store.state.comment.listComment.length;
+			if(size == 0){
+				return this.$t('document.detail.sidebar.body.general.noComment')
+			}
+			else{
+				return this.$t('document.detail.sidebar.body.general.has') + size + this.$t('document.detail.sidebar.body.general.commentNotResolve')
+			}
 		}
 	},
 	created(){
@@ -328,6 +330,7 @@ export default {
 			if(res.status == 200){
 				let list = [];
 				this.listHistoryControl = this.getFormattedUpdateHistory(res.data);
+				this.countModify = this.listHistoryControl.length;
 				let param = {
 					instance: this.keyInstance, 
 					data: this.listHistoryControl

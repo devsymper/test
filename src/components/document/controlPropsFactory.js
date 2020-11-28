@@ -610,7 +610,7 @@ const controlTypes = {
         html: `<input class="s-control s-control-percent" contenteditable="false" title="Percent" s-control-type="percent" type="number" step="0.01">&nbsp;`,
         title: "Percent",
         notInProps: ['isQuickSubmit', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatDate', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['formulas', 'hidden', 'readOnly']
+        formulas: ['formulas', 'hidden', 'readOnly','validate']
     },
     user: {
         icon: "/icon/ic_user.png",
