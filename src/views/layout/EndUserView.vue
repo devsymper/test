@@ -29,15 +29,15 @@
                         </v-tabs>
                     </div>
                     <div
-                        class="float-right app-header-bg-color d-flex justify-end "
+                        class="float-right app-header-bg-color mr-2 d-flex justify-end "
                         style="widh:500px;height:40px; line-height:40px;"
                     >
                      <!-- search -->
-                    <div v-show="showSearchInput" class="d-flex justify-center align-items-center">
-                        <transition name="slide-fade">
-                            <SearchInput v-show="showSearchInput" class="mr-2" style="width:330px"/>
-                        </transition>
-                    </div>
+                        <div v-show="showSearchInput" class="d-flex justify-center align-items-center">
+                            <transition name="slide-fade">
+                                <SearchInput v-show="showSearchInput" class="mr-2" style="width:330px"/>
+                            </transition>
+                        </div>
                         <v-menu
                             v-model="isShowDialog"
                             :close-on-content-click="false"
@@ -45,7 +45,7 @@
                             :max-height="700"
        				   	    :nudge-width="570"
                             offset-y
-                            style="z-index:1000"
+                            style="z-index:1000; margin-top: 2px"
                             >
                             <template v-slot:activator="{ on }">
                                 <v-btn icon v-on="on">
@@ -54,7 +54,7 @@
                             </template>
                             <EndUserPopup style="z-index:1000 !important"   />
                         </v-menu>
-                        <v-btn icon @click="showSearchInput = !showSearchInput">
+                        <v-btn icon @click="showSearchInput = !showSearchInput" style="margin-top: 2px">
                             <v-icon class="mdi-18px">mdi-magnify</v-icon>
                         </v-btn>
                         <v-menu  v-model="isShowDialogNotification"
@@ -65,7 +65,7 @@
                             :max-height="700"
                             offset-y>
                             <template v-slot:activator="{ on }">
-                                <v-btn v-on="on" icon v-if="unreadNotification > 0">
+                                <v-btn v-on="on" icon v-if="unreadNotification > 0" style="margin-top: 2px">
                                     <v-badge
                                         class="sym-small-size"
                                         
@@ -83,7 +83,6 @@
                             </template>
                             <list-notification></list-notification>
                         </v-menu>
-					<!--  -->
                     </div>
                 </div>
                 <v-layout style="height:calc(100% - 41px)" class="w-100" justify-center>
