@@ -1554,10 +1554,12 @@ export default class Table {
         if (control.isCheckbox) {
             td.style.textAlign = "center";
         }
+       
         let map = thisObj.validateValueMap[row + '_' + column];
         let controlTitle = (control.title == "") ? control.name : control.title;
+        let ele = $(td);
+        
         if (map) {
-            let ele = $(td);
             for (let index = 0; index < map.length; index++) {
                 const cellValidateInfo = map[index];
                 if (cellValidateInfo.type === 'linkControl') {
@@ -1580,14 +1582,28 @@ export default class Table {
                         ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(cellValidateInfo.msg, controlTitle));
                     }
                 }
-            }
-            ele.off('click', '.validate-icon')
-            ele.on('click', '.validate-icon', function(e) {
-                let msg = $(this).attr('title');
-                e.msg = msg;
-                SYMPER_APP.$evtBus.$emit('document-submit-open-validate-message', e)
-            })
+            }            
         }
+        ele.off('click', '.validate-icon')
+        ele.on('click', '.validate-icon', function(e) {
+            let msg = $(this).attr('title');
+            e.msg = msg;
+            SYMPER_APP.$evtBus.$emit('document-submit-open-validate-message', e)
+        })
+        if(control.checkProps('isRequired')){
+            if(!value){
+                if(ele.find('.validate-icon').length > 0){
+                    ele.find('.validate-icon').attr("Không được bỏ trống");
+                }
+                else{
+                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti('Không được bỏ trống', controlTitle));
+                }
+            }
+        }
+        if(thisObj.tableHasRowSum && row == hotInstance.countRows() - 1){
+            ele.find('.validate-icon').remove()
+        }
+        
     }
 
     /**
