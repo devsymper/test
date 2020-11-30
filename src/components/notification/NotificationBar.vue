@@ -340,6 +340,7 @@ import icon from "../common/SymperIcon";
 import listObject from "../../views/apps/singleObject";
 import { appConfigs } from '../../configs';
 import Vue from "vue";
+import dayjs from 'dayjs';
 import SymperAvatar from "@/components/common/SymperAvatar";
 export default {
     name: "listApp",
@@ -352,7 +353,6 @@ export default {
         return {
             deadLine:'',
             img:'',
-            today: this.$moment().format("DD/MM/YYYY"),
             listSource:{},
             overlay: true,
             checkToday: false,
@@ -377,6 +377,9 @@ export default {
         this.$evtBus.$on("app-receive-remote-msg", data => {
             this.getListNoticication();
         })
+    },
+    computed:{
+        today:()=> dayjs().format('DD/MM/YYYY'),
     },
     methods: {
         checkIcon(icon){
@@ -443,12 +446,12 @@ export default {
             return result;
         },
         changeDate(value){
-            return this.$moment.unix(value).format('DD/MM/YYYY')
+            return dayjs.unix(value).format('DD/MM/YYYY')
         },
         checkListToday(){
             for (let i = 0;i<this.listNotification.length;i++){
-                let dayListNotification = this.$moment.unix(this.listNotification[i].createTime).format('DD/MM/YYYY') ;
-                let today = this.$moment().format('DD/MM/YYYY') ;
+                let dayListNotification = dayjs.unix(this.listNotification[i].createTime).format('DD/MM/YYYY') ;
+                let today = dayjs().format('DD/MM/YYYY') ;
                 if(today==dayListNotification){
                     this.checkToday = true;
                 }   

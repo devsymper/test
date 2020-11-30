@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import dayjs from 'dayjs';
 import { mapState } from 'vuex';
 import { orgchartApi } from '../../api/orgchart.js';
 
@@ -101,26 +102,26 @@ export default {
 
         },
         pre() {
-            this.$store.commit('timesheet/updateCalendarShowDate', this.$moment(this.showDate).subtract(1, dayjsTypeMapper[this.type]).format('YYYY-MM-DD'));
+            this.$store.commit('timesheet/updateCalendarShowDate', dayjs(this.showDate).subtract(1, dayjsTypeMapper[this.type]).format('YYYY-MM-DD'));
             if (this.type === 'month') {
                 this.$store.commit('timesheet/adjustCalendar', this.$store.state.timesheet.calendarAdjustment - 1);
             }
         },
         next() {
-            this.$store.commit('timesheet/updateCalendarShowDate', this.$moment(this.showDate).add(1, dayjsTypeMapper[this.type]).format('YYYY-MM-DD'));
+            this.$store.commit('timesheet/updateCalendarShowDate', dayjs(this.showDate).add(1, dayjsTypeMapper[this.type]).format('YYYY-MM-DD'));
             if (this.type === 'month') {
                 this.$store.commit('timesheet/adjustCalendar', this.$store.state.timesheet.calendarAdjustment + 1);
             }
         },
         changeActions(newType) {
-            this.$store.commit('timesheet/updateCalendarShowDate', this.$moment().format('YYYY-MM-DD'));
+            this.$store.commit('timesheet/updateCalendarShowDate', dayjs().format('YYYY-MM-DD'));
             newType = newType.replace('weekday', 'week');
             switch (newType) {
                 case 'month':
                     const monthAction = (month) => ({
-                        label: this.$moment().subtract(month, 'M').format('MMM'),
+                        label: dayjs().subtract(month, 'M').format('MMM'),
                         action: () => {
-                            this.$store.commit('timesheet/updateCalendarShowDate', this.$moment().subtract(month, 'month').format('YYYY-MM-DD'));
+                            this.$store.commit('timesheet/updateCalendarShowDate', dayjs().subtract(month, 'month').format('YYYY-MM-DD'));
                             this.$store.commit('timesheet/adjustCalendar', -month);
                         }
                     });
@@ -134,7 +135,7 @@ export default {
                         ].map(({label, adjust}, idx) => ({
                             label,
                             action: () => {
-                                this.$store.commit('timesheet/updateCalendarShowDate', this.$moment().add(adjust, newType).format('YYYY-MM-DD'))
+                                this.$store.commit('timesheet/updateCalendarShowDate', dayjs().add(adjust, newType).format('YYYY-MM-DD'))
                                 this.$store.commit('timesheet/adjustCalendar', 0);
                             }
                         }));

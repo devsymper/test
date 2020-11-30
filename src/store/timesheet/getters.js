@@ -1,4 +1,12 @@
-import moment from 'moment';
+import dayjs from 'dayjs';
+dayjs.extend(weekOfYear);
+import weekOfYear from 'dayjs/plugin/weekOfYear';
+import quarterOfYear from 'dayjs/plugin/quarterOfYear';
+
+dayjs.extend(quarterOfYear);
+import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
+dayjs.extend(isSameOrBefore);
+
 const dayOfWeekMap = {
     'Sunday': 0,
     'Monday': 1,
@@ -17,7 +25,7 @@ const dayOfWeekMap = {
 };
 
 function getStartEndBy(adjustment, range, type, firstDoM) {
-    let adjustedToday = moment().add(adjustment, range);
+    let adjustedToday = dayjs().add(adjustment, range);
     const monthDist = range === 'month' ? 1 : (range === 'quarter' ? 3 : 12);
 
     const start = adjustedToday.startOf(range).add(firstDoM - 1, 'day');
@@ -60,7 +68,7 @@ function manageTableColumns(state) {
                 const id = _start + " " + _end;
                 week_start = week_start.add(1, 'week');
                 return {
-                    "headerName": "Week " + moment(week_start).week(),
+                    "headerName": "Week " + dayjs(week_start).week(),
                     "field": id,
                     "width": 50,
                     "colId": id,
@@ -105,7 +113,7 @@ function submitStartEndDate(state) {
         adjustment *= 2;
     }
 
-    let adjustedToday = moment().add(adjustment, type);
+    let adjustedToday = dayjs().add(adjustment, type);
 
     let start;
     if (type === 'month') {
@@ -144,7 +152,7 @@ function submitTableColumns(state) {
         adjustment *= 2;
     }
 
-    let adjustedToday = moment().add(adjustment, type);
+    let adjustedToday = dayjs().add(adjustment, type);
 
     let start, end;
     if (type === 'month') {
@@ -212,7 +220,7 @@ function getTotalHoursBy(state, getters) {
     return function(view) {
         let _type = '';
         let multiplier = 1;
-        let adjustedToday = moment();
+        let adjustedToday = dayjs();
 
         if (view === 'timesheet') {
             _type = state.calendarType.replace('weekday', 'week');
