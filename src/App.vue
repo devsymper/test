@@ -57,12 +57,12 @@ import AppSidebar from "./components/common/AppSidebar.vue";
 import Content from "./components/common/Content.vue";
 import GeneralNotification from "./components/common/GeneralNotification.vue";
 import { appConfigs } from "./configs.js";
-var firebase = require("firebase/app");
+var firebase = require("@firebase/app");
 import { IndexedDB } from "./plugins/utilModules/indexedDB.js";
 import ResolveBacklogRequest from "./components/app/ResolveBacklogRequest";
 import { util } from './plugins/util.js';
 require("@/assets/css/handsontable.min.css");
-require("firebase/messaging");
+require("@firebase/messaging");
 require('@/assets/css/kh.css')
 const firebaseConfig = appConfigs.firebaseConfig;
 
