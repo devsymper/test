@@ -9,6 +9,15 @@ export const accessControlApi = {
 	},
 	getAllApp(){
 		return appApi.get('application')
+	},
+	getNodePermission(id){
+		return api.get('roles/'+id+'/permissions')
+	},
+	savePermission(data){
+		return api.post('roles/set-permissions', 
+		{
+			permissions: data
+		})
 	}
 	
 }

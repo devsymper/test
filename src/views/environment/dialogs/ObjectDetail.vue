@@ -98,6 +98,7 @@ export default {
 			listItemSelected: {},
 			showBtnAddCheckbox: true,
 			showDialogRelateData: false,
+			showList: false,
 			dependencies: {},
 			showDialog:false,
 			tableContextMenu:{
@@ -135,6 +136,7 @@ export default {
 	},
 	watch:{
 		getListUrl(val){
+			this.$refs.listObject.refreshList()
 			this.listItemSelected = {},
 			this.showBtnAddCheckbox = true
 		}

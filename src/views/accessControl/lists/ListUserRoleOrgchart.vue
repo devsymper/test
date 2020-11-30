@@ -1,34 +1,55 @@
 <template>
 	<ListItem 
+		ref="listOrgchart"
 		:pageTitle="'Danh sách orgchart'"
 		:containerHeight="containerHeight"
 		:useDefaultContext="false"
 		:tableContextMenu="tableContextMenu"
 		:getDataUrl="getListUrl"
 		:customAPIResult="customAPIResult"
-		:useActionPanel="false"
+		:useActionPanel="true"
 		:showExportButton="false"
 		:headerPrefixKeypath="'common'"
-	/>
+		:actionPanelWidth="650"
+		:showButtonAdd="false"
+		:dialogMode="false"
+	>
+		<template slot="right-panel-content" slot-scope="{}">
+			<UserRoleOrgchartPanel 
+				:idOrgchart="idOrgchart"
+				@close-form="handleCloseForm"
+			/>
+		</template>
+	
+	</ListItem>
 
 </template>
 
 <script>
+import UserRoleOrgchartPanel from "./../panels/UserRoleOrgchartPanel"
 import Handsontable from 'handsontable';
 import { appConfigs } from "@/configs.js";
 import ListItem from "@/components/common/ListItems.vue"
 export default {
 	components:{
-		ListItem
+		ListItem,
+		UserRoleOrgchartPanel
 	},
 	props:{
 		containerHeight:{
 			type: Number,
 		}
 	},
+	methods:{
+		handleCloseForm(){
+			this.$refs.listOrgchart.actionPanel = false
+		}
+	},
 	data(){
+		let self = this
 		return{
 			getListUrl: appConfigs.apiDomain.orgchart+'orgchart',
+			idOrgchart:null,
 			customAPIResult:{
 				reformatData(res){
                    	return{
@@ -64,6 +85,8 @@ export default {
 					name: "set",
 					text: "Phân quyền",
 					callback: (row, callback) => {
+						self.idOrgchart = row.id
+						self.$refs.listOrgchart.actionPanel = true
 					}
 				},
 			

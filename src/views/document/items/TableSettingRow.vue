@@ -1,4 +1,4 @@
-<template>
+    <template>
     <tr id="rowDrag" class="sortableRow">
         <td><input 
             class="column-name"
@@ -55,7 +55,6 @@
             placeholder="Tiêu đề"
             v-model="rowData.title"></td>
         <td style="text-align:end;">
-            <button style="cursor: move" class="sortHandle"><v-icon>mdi-menu</v-icon></button>
             <button @click="removeRow()"><v-icon>mdi-close</v-icon></button>
         </td>
         

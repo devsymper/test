@@ -14,7 +14,6 @@
             :customAPIResult="customAPIResult"
             :commonActionProps="commonActionProps"
 			:showExportButton="false"
-            :showActionPanelInDisplayConfig="true"
             @row-selected="onRowSelected"
         > 
             <template slot="right-panel-content" slot-scope="{itemData}">
@@ -237,6 +236,7 @@ export default {
         },
         handleSavedItem(){
             this.$refs.listPermission.refreshList();
+            this.$refs.listPermission.actionPanel = false
         },
         handleAddItem(){
             this.actionOnItem = 'create';

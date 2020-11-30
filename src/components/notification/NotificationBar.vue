@@ -443,7 +443,7 @@ export default {
                 }
             }catch (error){
             }
-            return result        
+            return result;
         },
         changeDate(value){
             return dayjs.unix(value).format('DD/MM/YYYY')

@@ -1,20 +1,27 @@
 <template>
 	<div class="h-100 w-100">
 		<ListItems
-			ref="listService"
+			ref="listVersionOfService"
 			:pageTitle="'Danh sách version'"
 			:containerHeight="containerHeight"
 			:getDataUrl="getListUrl"
 			:headerPrefixKeypath="'table'"
 			:useDefaultContext="false"
 			:showExportButton="false"	
-			:showButtonAdd="false"
 			:tableContextMenu="tableContextMenu"
 			:customAPIResult="customAPIResult"
+			@on-add-item-clicked="handleAddClick"
 		/>
 		<DialogDeloy 
 			:showDialog="showDialog"
 			@cancel="showDialog = false"
+		/>
+		<AddVersion 
+			:showDialog="showDialogAdd"
+			@cancel="showDialogAdd = false"
+			@add-success="handleAddSuccess"
+			:mode="'listItem'"
+			:routerSerViceId="routerSerViceId"
 		/>
 	</div>
 </template>
@@ -24,10 +31,12 @@ import ListItems from "@/components/common/ListItems"
 import { appConfigs } from "@/configs.js";
 import { util } from "@/plugins/util.js";
 import DialogDeloy from './dialogs/DialogDeloy'
+import AddVersion from './dialogs/AddVersion'
 export default {
 	components:{
 		ListItems,
-		DialogDeloy
+		DialogDeloy,
+		AddVersion
 	},
 	mounted(){
 		this.containerHeight = util.getComponentSize(this).h
@@ -36,6 +45,7 @@ export default {
 		let self = this
 		return{
 			showDialog: false,
+			showDialogAdd: false,
 			containerHeight:0,
 			tableContextMenu: {
 				deploy: {
@@ -93,6 +103,19 @@ export default {
 		getListUrl(){
 			let serviceId = this.$route.params.serviceId
 			return appConfigs.apiDomain.environmentManagement+"services/"+serviceId+'/versions'
+		},
+		routerSerViceId(){
+			return  this.$route.params.serviceId
+		}
+	},
+	methods:{
+		handleAddClick(){
+			this.showDialogAdd = true
+			this.$refs.listVersionOfService.actionPanel = false
+		},
+		handleAddSuccess(){
+			this.showDialogAdd = false
+			this.$refs.listVersionOfService.refreshList()
 		}
 	}
 }

@@ -2,13 +2,15 @@
     <div class="orgchart-element-selector" :style="{height: height }" >
 		<VuePerfectScrollbar
 			:style="{height:height  }"
-		>	
+		>
 			<v-treeview
 				class="fs-13"
 				activatable
 				:items="treeData"
-				dense>
-				<template v-slot:label="{ item }">
+				dense
+				open-all
+			>
+				<template v-slot:label="{ item }" >
 					<v-checkbox
 						@change="handleChangeSelectedNode(item)"
 						v-if="checkboxMode.includes(item.type)"
@@ -16,9 +18,12 @@
 						:label="item.name"
 						dense
 					></v-checkbox>
-					<span v-else>
+					<div v-else style="cursor:pointer" @click="handleDepartmentClick(item)">
+						<v-icon class="fs-13 mr-1">
+							{{ item.type == "position" ? 'mdi-briefcase-outline' : 'mdi-office-building-outline' }}
+						</v-icon>
 						{{item.name}}
-					</span>
+					</div>
 				</template>
 			</v-treeview>
 		</VuePerfectScrollbar>
@@ -27,9 +32,10 @@
 </template>
 
 <script>
-import { util } from '../../plugins/util';
+import { util } from '@/plugins/util';
 import { orgchartApi } from '@/api/orgchart.js';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import {accessControlApi} from "@/api/accessControl"
 export default {
     created(){
         this.$store.dispatch('orgchart/getAllOrgchartStruct');
@@ -43,13 +49,20 @@ export default {
             default(){
                 return []
             }
-        },
+		},
+		idOrgchart:{
+			type: String
+		},
         /**
          * Hiển thị checkbox ở loại node nào trong orgchart: position, department hoặc all (cả hai loại node trên)
          */
         checkboxMode: {
             type: Array,
-            default: ['position'] // Hiển thị ô check ở những loại node nào: position, department
+            default(){
+				return [
+
+				]
+			}  // Hiển thị ô check ở những loại node nào: position, department
         },
         searchKey:{
             type:String,
@@ -73,11 +86,23 @@ export default {
                 }
             }
            
-        }
+		},
+		idOrgchart(val){
+			let self = this
+			self.treeData = []
+			let tree = this.$store.state.orgchart.allOrgchartStruct.tree;
+			tree.forEach(function(e){
+				if(e.id == val ){
+					self.treeData.push(e)
+				}
+			})
+		}
     },
     data(){
         return{
-            res: []
+			res: [],
+			treeData:[],
+			currentNode: ""
         }
 	},
 	components:{
@@ -90,16 +115,7 @@ export default {
                 return map;
             }, {});
         },
-        treeData(){
-            let tree = this.$store.state.orgchart.allOrgchartStruct.tree;
-            if(this.searchKey == ""){
-                  return tree;
-            }else{
-                this.res = []
-                let res = this.searchItem(tree,this.searchKey)
-                return res;
-            }
-        }
+      
     },
 
     methods: {
@@ -137,7 +153,13 @@ export default {
             }
             return self.res
         },
-      
+		handleDepartmentClick(item){
+			this.currentNode = 'orgchart:'+this.idOrgchart+':'+item.vizId
+			this.$emit('current-node', this.currentNode, item.type)
+			// if(item.type == 'position'){
+				
+			// }
+		}
     }
 }
 </script>

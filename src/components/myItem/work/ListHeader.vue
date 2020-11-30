@@ -332,15 +332,15 @@ export default {
         .catch(err => {});
     },
     selectProcess(process) {
-      this.selectedProcess = process;
-      this.openCreateTaskDialog();
+        this.selectedProcess = process;
+        this.openCreateTaskDialog();
     },
     showError() {
-      this.$snotify({
-        type: "error",
-        title: this.$t("notification.errorTitle"),
-        text: this.$t("notification.error")
-      });
+        this.$snotify({
+            type: "error",
+            title: this.$t("notification.errorTitle"),
+            text: this.$t("notification.error")
+        });
     },
     async saveTask() {
         if (!this.taskObject.assignee) {

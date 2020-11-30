@@ -29,28 +29,26 @@
                  <v-tabs-items v-model="tab">
                     <v-tab-item>
                         <div id="setting-control-table" class="setting-control-table">
-                            <div class="content-setting-control-table scroll-thin">
-                                <v-simple-table fixed-header height="100%" >
-                                    <template v-slot:default>
-                                        <thead>
-                                            <tr>
-                                                <th class="text-left">Thông tin cột</th>
-                                                <th class="text-center">Loại control</th>
-                                                <th class="text-left">Tên control</th>
-                                                <th class="text-left">Tiêu đề control</th>
-                                                <th></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody id="table-body-drag">
-                                            <s-row-table-setting
-                                            v-for="row in listRows"
-                                            :key="row.key"
-                                            :row="row"
-                                            @remove-row="removeRow"
-                                            />
-                                        </tbody>
+                            <div class="content-setting-control-table">
+                                <v-data-table hide-default-footer :headers="headers" fixed-header height="100%" >
+                                    <template v-slot:body>
+                                        <draggable
+                                                :list="listRows"
+                                                tag="tbody"
+                                                :animation="200"
+                                                >
+                                                <s-row-table-setting
+                                                    v-for="row in listRows"
+                                                    :key="row.key"
+                                                    :row="row"
+                                                    @remove-row="removeRow"
+                                                    />
+                                                
+                                                <!-- the row will go here -->
+                                            </draggable>
                                     </template>
-                                </v-simple-table>
+                                </v-data-table>
+                                 
                                 
                             </div>
                         </div>
@@ -156,14 +154,14 @@
 </template>
 <script>
 import TableSettingRow  from "./TableSettingRow.vue";
+import draggable from "vuedraggable";
 import { str } from "./../../../plugins/utilModules/str.js"
-import Sortable from 'sortablejs';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-let sortable = null;
 export default {
     components:{
         's-row-table-setting' : TableSettingRow,
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
+        draggable
     },
     props:{
         defaultRow:{
@@ -216,7 +214,18 @@ export default {
             'Cài đặt chung', 'Pivot table',
             ],
             tablePivotConfig:{rows:[],cols:[],values:[]},
-            isSetDrag:false
+            isSetDrag:false,
+            headers: [
+                {
+                    text: 'Thông tin cột',
+                    align: 'start',
+                    value: 'columnName',
+                },
+                { text: 'Loại control', value: 'type' },
+                { text: 'Tên control', value: 'name' },
+                { text: 'Tiêu đề control', value: 'title' },
+                { text: '', value: '' },
+            ],
         }
     },
     methods:{
@@ -308,7 +317,6 @@ export default {
         },
         setListRow(listRows){
             this.listRows = listRows;
-            this.setOnDrag();
         },
         showDialog(){
             this.tablePivotConfig = {rows:[],cols:[],values:[]}
@@ -319,7 +327,6 @@ export default {
         },
         addNewRow(){
             this.listRows.push({columnName :'', name:'',type:'',title:'',key:'s-control-id'+Date.now()})
-            this.setOnDrag();
         },
         removeRow(row){
             this.listRows.splice(this.listRows.findIndex(v => v.key === row.key), 1);
@@ -345,33 +352,6 @@ export default {
                 return row.type != ''
             })
         },
-        //update lại listrow khi drop
-        dragReorder (oldIndex, newIndex) {
-            const movedItem = this.listRows.splice(oldIndex, 1)[0]
-            this.listRows.splice(newIndex, 0, movedItem)
-        },
-        // drag row
-        setOnDrag(){
-            setTimeout((self) => {
-                var el = $('#table-body-drag')[0];
-                if(self.sortable == null)
-                self.sortable = Sortable.create(
-                    el,
-                    {
-                        draggable: "#setting-control-table #rowDrag",
-                        handle: '#setting-control-table .sortHandle',
-                        animation: 150,
-                        easing: "cubic-bezier(1, 0, 0, 1)",
-                        sort: true,  // sorting inside list
-                        delay: 0,
-                        onEnd: function (/**Event*/evt) {
-                            var itemEl = evt.item;  // dragged HTMLElement
-                            self.dragReorder(evt.oldIndex,evt.newIndex);
-                        },
-                    }
-                ) 
-            }, 500, this);
-        }
     },
 }
 </script>

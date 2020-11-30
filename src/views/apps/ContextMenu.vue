@@ -91,7 +91,7 @@ export default {
 		setAppId(appId){
 			this.appId = appId
 		},
-		clickAction(action,sideBySide = false,allAppMode = false){
+		clickAction(action,sideBySide = false, allAppMode = false){
 			$(".v-menu__content").css("display", "none")
 			let appId
 			if(allAppMode == true){
@@ -99,7 +99,6 @@ export default {
 			}else{
 				appId = this.$store.state.appConfig.currentAppId
 			}
-			
 			this.defineAction[this.type].action = action;
 			this.hide()
 			if(this.targetItem.objectIdentifier.includes("document_definition:")){
@@ -114,7 +113,7 @@ export default {
 			if(this.targetItem.objectIdentifier.includes("workflow_definition:")){
 				this.targetItem.id = this.targetItem.objectIdentifier.replace("workflow_definition:","")
 			}
-				let targetItem = this.targetItem
+			let targetItem = this.targetItem
 			if(action == 'unfavorite'){
 				    let userId = this.$store.state.app.endUserInfo.id
 					appManagementApi.addFavoriteItem(userId,this.targetItem.id,this.type,0).then(res => {

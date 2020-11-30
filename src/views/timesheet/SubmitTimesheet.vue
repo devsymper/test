@@ -233,6 +233,10 @@ export default {
 </script>
 
 <style>
+.ag-theme-balham .ag-cell{
+    border:none!important;
+    line-height:22px!important
+}
 </style><style lang="scss" scoped>
 .v-btn:not(.v-btn--round).v-size--small {
     padding: 0 4px !important;

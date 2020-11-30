@@ -18,7 +18,7 @@
                     @changeObjectType="changeObjectType"
                     @filter-change-value="handleChangeFilterValue"
                     @create-task="getData({})"
-                    @refresh-task-list="getData()"
+                    @refresh-task-list="getData({})"
                     @goToPageApproval="goToPageApproval"
                 ></listHeader>
                 <v-divider v-if="!sideBySideMode"></v-divider>
@@ -307,7 +307,7 @@
             :cols="!sideBySideMode ? 0 : 8"
             :md="!sideBySideMode ? 0 : 9"
             v-show="sideBySideMode"
-            class="pa-0 ma-0"
+            class="pa-0 ma-0 h-100"
             height="30"
             style="border-left: 1px solid #e0e0e0;"
         >
@@ -898,12 +898,12 @@ export default {
             selectedTask.originData.createTime=selectedTask.originData.startTime;
             this.$set(this.selectedTask, "originData", selectedTask.originData);  
             this.$set(this.selectedTask, "taskInfo", selectedTask.taskInfo);  
+
             for (let i = 0; i < this.groupFlatTasks.length; i++) {
                 for (let j = 0; j < this.groupFlatTasks[i].tasks.length; j++) {
                     let task=this.groupFlatTasks[i].tasks[j];
                     if (task.id==selectedTask.originData.id) {
-                        this.groupFlatTasks[i].tasks[j].createTime = selectedTask.originData.startTime;
-                        this.groupFlatTasks[i].tasks[j].endTime = selectedTask.originData.endTime;
+                        this.groupFlatTasks[i].tasks[j].endTime = this.$moment(selectedTask.originData.endTime).format('DD/MM/YY HH:mm:ss') ;
                         this.groupFlatTasks[i].tasks[j].description = selectedTask.originData.description;
                         return;
                     }

@@ -199,9 +199,10 @@
             text
             small
             :disabled="taskObject.name.length == 0 ||
-                                    taskObject.dueDate.length == 0 ||
-                                    taskObject.assignee.length == 0"
+                      taskObject.dueDate.length == 0 ||
+                      taskObject.assignee.length == 0"
             @click="saveTask"
+            :loading="loading"
           >{{$t('common.add')}}</v-btn>
           <v-btn text small @click="dialog = false" class="mr-2">{{$t('common.close')}}</v-btn>
         </v-card-actions>
@@ -286,6 +287,7 @@ export default {
   },
   data: function() {
     return {
+      loading:false,
       closeOnClick: true,
       taskStatus: "notDone",
       searchTaskKey: "",
@@ -417,6 +419,7 @@ export default {
         });
     },
     async saveTask() {
+        this.loading=true;
         if (!this.taskObject.assignee) {
             this.$snotifyError(
             {},
@@ -454,14 +457,16 @@ export default {
         }
         data.description = JSON.stringify(description);
         let res = await BPMNEngine.addTask(JSON.stringify(data));
-            if (res.id != undefined) {
+        if (res.id != undefined) {
             this.selectedProcess = null;
             this.dialog = false;
             this.$emit("create-task", res);
             this.$snotifySuccess(this.$t("tasks.created"));
-            } else {
-                this.showError();
-            }
+        } else {
+            this.showError();
+        }
+        this.loading=false;
+
         }
     }
 };
