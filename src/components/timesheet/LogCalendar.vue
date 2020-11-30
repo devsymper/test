@@ -209,7 +209,13 @@ import LogTimeView from "./../../components/timesheet/LogTimeView";
 import DeleteLogView from "./../../components/timesheet/DeleteLogView";
 import timesheetApi from '../../api/timesheet';
 import { mapState} from 'vuex';
+<<<<<<< HEAD
 import _ from 'lodash';
+=======
+
+import _groupBy from 'lodash/groupBy';
+
+>>>>>>> 9a92392ce2a6a620892db070156479083766cf11
 export default {
     name: "LogCalendar",
     components: {
@@ -673,7 +679,7 @@ export default {
         },
         monthEvents() {
             if (this.events) {
-                return _.groupBy(this.events, 'date');
+                return _groupBy(this.events, 'date');
             } else {
                 return [];
             }

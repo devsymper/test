@@ -45,6 +45,8 @@ import PermissionSelector from "@/components/permission/PermissionSelector"
 import OrgchartElement from './../helpers/OrgchartElement'
 import {accessControlApi} from "@/api/accessControl"
 import { permissionApi } from '@/api/permissionPack';
+import _debounce from "lodash/debounce";
+
 export default {
 	props:{
 		idOrgchart:{
@@ -101,7 +103,7 @@ export default {
 			}
 			
 		},
-		debounceSave: _.debounce(function(e){
+		debounceSave: _debounce(function(e){
 			this.handleSaveClick()
 		}, 300,this),
 		handleSaveClick(){

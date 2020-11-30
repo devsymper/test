@@ -102,6 +102,8 @@
 </template>
 <script>
 import { userApi } from "./../../api/user.js";
+import _groupBy from "lodash/groupBy";
+
 export default {
     props:['rolesList','permission','allRole','viewDetail','roleName'],
     methods:{
@@ -123,7 +125,7 @@ export default {
 			const self = this;
 			if (res.status === 200) {
 				self.listActionAndObj = res.data;	
-				self.listActionAndObj =  _.groupBy(self.listActionAndObj, 'objectType');
+				self.listActionAndObj =  _groupBy(self.listActionAndObj, 'objectType');
 				self.setMenu();
 			}
 		},
@@ -134,7 +136,7 @@ export default {
 			const self = this;
 			if (res.status === 200) {
 				self.listActionAndObj = res.data;	
-				self.listActionAndObj =  _.groupBy(self.listActionAndObj, 'objectType');
+				self.listActionAndObj =  _groupBy(self.listActionAndObj, 'objectType');
 				self.setMenu();
 			}
 		},
@@ -163,7 +165,7 @@ export default {
 		// },
 		getListObjectIdentifier(object){
 			let objIdentifier =[];
-			objIdentifier = _.groupBy(this.listActionAndObj[object],'objectIdentifier' );
+			objIdentifier = _groupBy(this.listActionAndObj[object],'objectIdentifier' );
 			let formatObjIdentifier = Object.keys(objIdentifier);
 			this.listRoleObj = formatObjIdentifier.filter(x=>x.indexOf(':')>0);
 			this.getNameObjByRoles(this.listRoleObj);
@@ -213,7 +215,7 @@ export default {
 		},
 		//loc những action k dùng đến và k đúng chuẩn 
 		filterAction(){
-			let action =_.groupBy(this.nameObject,'action');
+			let action =_groupBy(this.nameObject,'action');
 			let arrAction = Object.keys(action);
 			for(let i= 0; i<arrAction.length;i++){
 				for(let j = 0; j<this.allListAction[this.menuTitle].action.length;j++){
@@ -226,7 +228,7 @@ export default {
 		//group những loại đối tượng dạng document_de: trùng tên với nhau 
 		groupNameObj(){
 			this.nameObject;
-			let group = _.groupBy(this.nameObject,'name');
+			let group = _groupBy(this.nameObject,'name');
 			this.objAndAction = group;
 		},
 		// lấy ra nhưng danh sách tên title 

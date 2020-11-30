@@ -1557,7 +1557,6 @@ export default class Table {
         let map = thisObj.validateValueMap[row + '_' + column];
         let controlTitle = (control.title == "") ? control.name : control.title;
         let ele = $(td);
-        
         if (map) {
             for (let index = 0; index < map.length; index++) {
                 const cellValidateInfo = map[index];
@@ -1571,14 +1570,16 @@ export default class Table {
                 if (cellValidateInfo.type === 'readOnly') {
                     hotInstance.setCellMeta(row, column, 'readOnly', cellValidateInfo.value);
                 }
-                if (cellValidateInfo.value) {
-                    if(ele.find('.validate-icon').length > 0){
-                        let curMsg = ele.find('.validate-icon').attr('title');
-                        curMsg = (curMsg) ? cellValidateInfo.msg : curMsg + "|||" + cellValidateInfo.msg;
-                        ele.find('.validate-icon').attr(curMsg);
-                    }
-                    else{
-                        ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(cellValidateInfo.msg, controlTitle));
+                else{
+                    if (cellValidateInfo.value) {
+                        if(ele.find('.validate-icon').length > 0){
+                            let curMsg = ele.find('.validate-icon').attr('title');
+                            curMsg = (curMsg) ? cellValidateInfo.msg : curMsg + "|||" + cellValidateInfo.msg;
+                            ele.find('.validate-icon').attr(curMsg);
+                        }
+                        else{
+                            ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(cellValidateInfo.msg, controlTitle));
+                        }
                     }
                 }
             }            

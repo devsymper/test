@@ -3,7 +3,6 @@
  *  Licensed under the MIT License. See License.txt in the project root for license information.
  *--------------------------------------------------------------------------------------------*/
 import { languages } from 'monaco-editor';
-console.log(languages, '_.contribution.js,   xxxxxxxxxxxxxxx');
 var languageDefinitions = {};
 var lazyLanguageLoaders = {};
 var LazyLanguageLoader = /** @class */ (function () {
