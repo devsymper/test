@@ -44,7 +44,6 @@
 <script>
 
 import SubmitTimesheetForm from "./../../components/timesheet/SubmitTimesheetForm";
-import dayjs from 'dayjs';
 
  export default {
 //   name: 'ViewDetailMonth',
@@ -84,7 +83,7 @@ import dayjs from 'dayjs';
             this.dialog=false;
         },
         formatTime(time){
-            return dayjs(time).format('HH:mm');
+            return this.$moment(time).format('HH:mm');
         },
     }
 
