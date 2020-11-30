@@ -4,7 +4,6 @@ import sDocument from './../../../store/document'
 import { SYMPER_APP } from './../../../main.js'
 import Util from './util'
 var numbro = require("numbro");
-import moment from "moment-timezone";
 import { appConfigs } from "@/configs.js";
 import { documentApi } from "../../../api/Document";
 let sDocumentManagementUrl = appConfigs.apiDomain.sdocumentManagement;
@@ -306,7 +305,7 @@ export default class BasicControl extends Control {
             } else if (this.type == 'richText') {
                 $('#' + this.id).html(value);
             } else if (this.type == 'date') {
-                $('#' + this.id).val(moment(value).format(this.formatDate));
+                $('#' + this.id).val(SYMPER_APP.$moment(value).format(this.formatDate));
             } else if (this.type == 'checkbox') {
                 if (value)
                     $('#' + this.id).attr('checked', 'checked');
@@ -347,7 +346,7 @@ export default class BasicControl extends Control {
                 value = numbro(Number(value)).format(this.numberFormat)
 
         } else if (this.type == 'date') {
-            value = moment(value).format(this.formatDate);
+            value = SYMPER_APP.$moment(value).format(this.formatDate);
         }
         if (this.type == 'label') {
             this.ele.text(value)
@@ -722,7 +721,7 @@ export default class BasicControl extends Control {
             for (let index = 0; index < data.length; index++) {
                 let value = data[index];
                 if(value){
-                    newData.push(moment(value,dateFormat).format('YYYY-MM-DD'))
+                    newData.push(SYMPER_APP.$moment(value,dateFormat).format('YYYY-MM-DD'))
                 }
                 else{
                     newData.push("");
@@ -732,7 +731,7 @@ export default class BasicControl extends Control {
             return newData;
         }
         else{
-            return moment(data,dateFormat).format('YYYY-MM-DD')
+            return SYMPER_APP.$moment(data,dateFormat).format('YYYY-MM-DD')
         }
     }
 }

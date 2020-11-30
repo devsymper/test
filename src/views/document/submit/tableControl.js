@@ -1,6 +1,5 @@
 import Control from "./control";
 import { util } from "@/plugins/util.js";
-import moment from "moment-timezone";
 import sDocument from './../../../store/document'
 import {
     SYMPER_APP
@@ -150,7 +149,7 @@ export default class TableControl extends Control {
                     let key = Object.keys(data)[i];
                     let control = this.controlInTable[key];
                     if (control && control.type == 'date') {
-                        data[key][index] = moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
+                        data[key][index] = SYMPER_APP.$moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
                     }
                     rowData[key] = data[key][index];
                 }
@@ -171,7 +170,7 @@ export default class TableControl extends Control {
                     let key = Object.keys(data)[i];
                     let control = this.controlInTable[key];
                     if (control && control.type == 'date') {
-                        data[key][index] = moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
+                        data[key][index] = SYMPER_APP.$moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
                     }
                     rowData[key] = data[key][index];
                 }

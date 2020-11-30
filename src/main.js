@@ -13,7 +13,6 @@ import EndUserView from "./views/layout/EndUserView";
 import ContentOnlyView from "./views/layout/ContentOnlyView";
 import Notifications from 'vue-notification'
 import VueMoment from "vue-moment";
-import moment from "moment-timezone";
 import {
     appConfigs
 } from "./configs";

@@ -207,7 +207,6 @@ import Util from './util';
 import SidebarTraceFormulas from './SidebarTraceFormulas.vue';
 import './customControl.css';
 import ErrMessagePanel from "./../../../views/document/items/ErrMessagePanel.vue";
-import moment from "moment-timezone";
 import EmbedDataflow from "@/components/dataflow/EmbedDataflow";
 // import Loader from './../../../components/common/Loader';
 import Preloader from './../../../components/common/Preloader';
@@ -1366,7 +1365,7 @@ export default {
             }
             // cần format lại giá trị date về năm tháng ngày để lưu vào store, tránh lỗi khi submit
             if(controlInstance.type == 'date'){
-                valueControl = moment(valueControl).format('YYYY-MM-DD');
+                valueControl = this.$moment(valueControl).format('YYYY-MM-DD');
             }
           
             this.updateListInputInDocument(
@@ -2229,7 +2228,7 @@ export default {
                     for (let index = 0; index < dataCol.length; index++) {
                         let rowValue = dataCol[index];
                         if(rowValue != "" && rowValue != null){
-                            let newValue = moment(rowValue, listInput[i].controlProperties.formatDate.value).format('YYYY-MM-DD');
+                            let newValue = this.$moment(rowValue, listInput[i].controlProperties.formatDate.value).format('YYYY-MM-DD');
                             dataCol[index] = newValue;
                         }
                     }
@@ -2868,7 +2867,7 @@ export default {
                 if(valueControl == undefined) valueControl = 0;
             }
             if(controlInstance.type == 'date'){
-                valueControl = moment(valueControl,'DD-MM-YYYY').format('YYYY-MM-DD');
+                valueControl = this.$moment(valueControl,'DD-MM-YYYY').format('YYYY-MM-DD');
             }
             this.updateListInputInDocument(
                 controlInstance.name,
