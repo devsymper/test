@@ -209,9 +209,7 @@ import LogTimeView from "./../../components/timesheet/LogTimeView";
 import DeleteLogView from "./../../components/timesheet/DeleteLogView";
 import timesheetApi from '../../api/timesheet';
 import { mapState} from 'vuex';
-
 import _ from 'lodash';
-
 export default {
     name: "LogCalendar",
     components: {

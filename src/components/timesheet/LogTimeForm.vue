@@ -426,7 +426,6 @@ export default {
              // this.loadTaskList();
         },
         newEvent(val) {
-            debugger
             this.getAllTask(val.task);
             this.inputs.startTime = val ? this.$moment(val.start).format('HH:mm') : "08:00";
             this.inputs.endTime = val ? this.$moment(val.end).format('HH:mm') : "08:40";
@@ -434,7 +433,6 @@ export default {
             this.displayDate = this.inputs.date;
             this.inputs.description = val.desc;
             this.categoryTask = val.category;
-              debugger
             this.task = val.task?val.task:getIdTask(val.task);
             this.items.push({name:val.task});
             // hiển thị nút plan và log theo từng giờ
@@ -487,12 +485,10 @@ export default {
             }
         },
          findNameTask(id){
-             debugger
              this.nameTask=this.items.filter(x=>x.id==id)[0].name;
              return this.nameTask
         },
         getCategoryId(taskId){
-            debugger
            let cateId = this.items.filter(x=>x.id==taskId)[0].categoryId;
            if(cateId){
                 this.categoryTask = this.getFullNameCategory(cateId)
@@ -509,12 +505,16 @@ export default {
             this.items = [];
            await timesheetApi.getTaskDB()
             .then(res => {
-                self.items.push(...res.data.task);
+             self.items.push(...res.data.task);
                 })
                 .catch(console.log);
-            await timesheetApi.getTask({nameLike:'%'+nameTask+'%'})
+            await timesheetApi.getTask(nameTask)
             .then(res => {
-                self.items.push(...res.data);
+                let name = res.data.listObject;
+                name.map(x=>{
+                    x.name = JSON.parse(x.description).content
+                })
+                self.items.push(...res.data.listObject);
                 })
                 .catch(console.log);
 
