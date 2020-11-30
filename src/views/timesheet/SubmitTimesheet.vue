@@ -81,7 +81,7 @@ import ActionButtons from "./../../components/timesheet/ActionButtons";
 import SubmitTimesheetForm from "./../../components/timesheet/SubmitTimesheetForm";
 import timesheetApi from '../../api/timesheet';
 
-import _groupBy from 'lodash';
+import _groupBy from 'lodash/groupBy';
 
 export default {
     components: {
