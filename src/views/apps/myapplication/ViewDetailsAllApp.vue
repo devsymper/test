@@ -153,7 +153,8 @@ export default {
 
             for(let i = 0; i < appArr.length; i++){
                 rsl[i%2][appArr[i].id] = appArr[i];
-            }
+			}
+			debugger
             return rsl;
         }
     },
@@ -438,7 +439,7 @@ export default {
         }
     },
     created(){
-        if(!this.listApp[0].length && !this.listApp[1].length){
+        if(!Object.keys(this.listApp[0]).length && !Object.keys(this.listApp[1]).length){
            this.getActiveapps()
         }else{
             this.loadingApp = false
@@ -447,7 +448,7 @@ export default {
   
     watch:{
         searchItemKey(val){
-                this.filterObj(val)
+			this.filterObj(val)
         }
     }
 }
