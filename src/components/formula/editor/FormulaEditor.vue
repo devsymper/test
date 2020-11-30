@@ -60,8 +60,6 @@
     </div>
 </template>
 <script>
-import 'brace';
-import 'brace/ext/language_tools';
 import customMode from './customFormula';
 import defaultKeywords from "./defaultKeywords";
 import { documentApi } from "./../../../api/Document";
@@ -161,7 +159,6 @@ export default {
         }
     },
     components : {
-        'code-editor': require('vue2-ace-editor'),
         VuePerfectScrollbar,
         'data-table' : AgDataTable,
         Pagination,

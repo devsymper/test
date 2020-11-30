@@ -10,7 +10,7 @@
             <ActionButtons refs="action" />
         </div>
     </v-row>
-    <v-dialog v-model="logtimeDialog" width="357">
+    <v-dialog v-model="logtimeDialog" width="357" @click:outside="deleteLog()">
         <LogTimeForm v-show="showTask==false"
             @showTaskForm="showTaskForm"
             @showCategoryForm="showCategoryForm"
@@ -139,6 +139,12 @@ export default {
         })
     },
     methods: {
+        // khi click ra ngoài log form
+        deleteLog(){
+            if(!this.update){
+              this.$refs.logCalendar.events.pop()
+            }
+        },
         doneCate(){
             this.updateAPICate = false
         },

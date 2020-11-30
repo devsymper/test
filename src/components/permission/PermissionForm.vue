@@ -26,7 +26,7 @@
         <div class="mt-2" v-if="action != 'detail' ">
             <v-btn
                 class="float-right mr-1"
-                @click="savePermission"
+                @click="debounceSavePermission"
                 small
                 depressed
                 color="primary"
@@ -47,6 +47,9 @@ import { permissionApi } from '../../api/permissionPack';
 
 export default {
     methods: {
+		debounceSavePermission: _.debounce(function(e){
+			this.savePermission()
+		}, 300,this),
         async savePermission(){
             let listActionPacks = this.itemData.actionPacks.reduce((arr, el) => {
                 arr.push(el.id);

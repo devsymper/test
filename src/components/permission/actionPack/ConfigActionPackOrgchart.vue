@@ -1,7 +1,6 @@
 <template>
   <div>
-      <h3>Thao tác với đối tượng </h3>
-       <p>{{ selectedPermission }}</p>
+      <div class="fs-15 font-weight-bold">Thao tác với đối tượng </div>
       <div class="fs-13">
           <v-list v-for="(permission,i) in permissions" :key="i">
             <v-list-item>

@@ -14,7 +14,6 @@
             :customAPIResult="customAPIResult"
             :commonActionProps="commonActionProps"
 			:showExportButton="false"
-            :showActionPanelInDisplayConfig="true"
             @row-selected="onRowSelected"
         > 
             <template slot="right-panel-content" slot-scope="{itemData}">
@@ -31,7 +30,6 @@
 
 <script>
 import ListItems from "@/components/common/ListItems";
-import grandPermission from "@/views/permissions/grandPermission";
 import UpdatePermission from "@/views/permissions/Update";
 import Api from "@/api/api.js";
 import accountApi from "@/api/account";
@@ -51,7 +49,6 @@ export default {
     name: "ListPermissions",
     components: {
         ListItems,
-        grandPermission,
         UpdatePermission,
         PermissionForm
     },
@@ -239,6 +236,7 @@ export default {
         },
         handleSavedItem(){
             this.$refs.listPermission.refreshList();
+            this.$refs.listPermission.actionPanel = false
         },
         handleAddItem(){
             this.actionOnItem = 'create';

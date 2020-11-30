@@ -10,6 +10,7 @@
             :useActionPanel="true"
             :headerPrefixKeypath="'common'"
             :currentItemData="currentItemData"
+			:showExportButton="false"
             @after-open-add-panel="handleAddItem"
             :commonActionProps="commonActionProps"
         >
@@ -18,7 +19,6 @@
                     @saved-item-data="handleSavedItem"
                     :action="actionOnItem"
                     :itemData="itemData">
-
                 </SystemRoleForm>
             </template>
         </list-items>
@@ -128,6 +128,7 @@ export default {
         },
         handleSavedItem(){
             this.$refs.listSystemRole.refreshList();
+            this.$refs.listSystemRole.actionPanel = false;
         },
         handleAddItem(){
             this.actionOnItem = 'create';

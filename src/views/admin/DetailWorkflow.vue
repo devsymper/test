@@ -87,13 +87,12 @@
 								>
 								n
 							</v-chip>
-							<span>Chưa hoàn thành</span>
+							<span>Đang chạy</span>
 						</div>
 						<div >
 							 <v-chip
 								class="ma-2"
 								color="green"
-								
 								text-color="white"
 								small
 								>
@@ -108,11 +107,6 @@
 		<div class="list-workflow-instance d-flex flex-column h-100 mt-8" >
 			<ListProcessInstance :showSwitchBtn="true" />
 		</div>
-		<!-- <ConfirmDelete 
-			:showDialog="showDialog"
-			@cancel="cancel"
-			@confirm="deleteProcessInstance"
-			 /> -->
 	</div>
 </template>
 

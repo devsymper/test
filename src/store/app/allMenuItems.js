@@ -184,7 +184,7 @@ export default {
         }
     },
     accessManager: {
-        title: "demo Management",
+        title: "accessControl",
         icon: "mdi-shield-key",
         group: "Administrator",
         children: {
@@ -206,7 +206,7 @@ export default {
         }
 	},
 	access_control: {
-		title: "accessControl",
+		title: "accessControlBeta",
         icon: "mdi mdi-shield-key-outline",
 		group: "Administrator",
 		link: "/access-control"

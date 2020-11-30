@@ -1,96 +1,100 @@
 <template>
     <div class="w-100 h-100 view-role">
         <v-row style="margin-top:-13px; margin-left:-20px" class="mb-2">
-            <v-col >
-                 <v-icon class="fs-16 fw-430 mr-1 ml-1 fw-400 ">mdi mdi-account-circle-outline</v-icon>
+            <v-col>
+                <v-icon class="fs-16 fw-430 mr-1 ml-1 fw-400 ">mdi mdi-account-circle-outline</v-icon>
                 <span class="fw-430 fs-16">Chi tiết phân quyền cho user</span>
             </v-col>
         </v-row>
-		<v-row style="margin-top:-20px">
-			<v-col class="col-md-2">
-					<span class="fs-13">Permission:</span>
-					
+		<v-row v-if="!viewDetail" style="margin-top:-20px">
+			<v-col class="col-md-3">
+				<span class="fs-13">Permission có quyền: </span>
 			</v-col>
-			<v-col class="col-md-10" >
-				<v-sheet style="float:right" max-width="90%" class="mb-3">
-                <v-slide-group multiple  prev-icon="mdi-minus">
-                    <template v-slot:next>
-                        <div class="slider-user-button slider-button-right"> 
-                           <v-icon> mdi mdi-chevron-right</v-icon>
-                        </div>
-                    </template>
-                    <template v-slot:prev >
-                        <div class="slider-user-button">
-                           <v-icon> mdi mdi-chevron-left</v-icon>
-                        </div>
-                    </template>
-                    <v-slide-item class="item-user"
-                        v-for="(item, permissionIdx) in  permission.orgchart"  
-                        :key="permissionIdx">
-                        <div class="d-flex justify-start ml-3 mr-3 slider-user ">
-							  <v-list-item-group multiple >
-                            <v-list-item dense style="background:rgba(27,24,111,0.1); border-radius:4px">
-                                <v-list-item-content style="margin-left: 0.5; color:black" 
-								class="item-title fs-13">
-								{{item.name}}
-                                </v-list-item-content>
-                            </v-list-item>
-							</v-list-item-group>
-                        </div>
-                    </v-slide-item>
-                </v-slide-group>
-            </v-sheet>
+			<v-col class="col-md-9" style="float:right; ">
+				<v-sheet  max-width="90%" class="mb-3" >
+					<v-slide-group multiple prev-icon="mdi-minus">
+						<template v-slot:next>
+							<div class="slider-user-button slider-button-right"> 
+							<v-icon> mdi mdi-chevron-right</v-icon>
+							</div>
+						</template>
+						<template v-slot:prev >
+							<div class="slider-user-button">
+							<v-icon> mdi mdi-chevron-left</v-icon>
+							</div>
+						</template>
+						<v-slide-item class="item-user"
+							v-for="(item, permissionIdx) in allPermission "  
+							:key="permissionIdx">
+							<div class="d-flex justify-start ml-3 mr-3 slider-user ">
+								<v-list-item-group multiple v-if="item.active" >
+								<v-list-item dense style="background:rgba(27,24,111,0.1); border-radius:4px">
+									<v-list-item-content 
+										@click="getActionAndObject(item.id)" 
+										style="margin-left: 0.5; color:black" 
+										class="item-title fs-13">
+										{{item.name}}
+									</v-list-item-content>
+								</v-list-item>
+								</v-list-item-group>
+							</div>
+						</v-slide-item>
+					</v-slide-group>
+           		</v-sheet>
 			</v-col>
+		</v-row> 
+		<v-row v-else>
+			<span class="ml-1 mb-5 fs-13 ">Permission: 	
+				<v-chip style="background:rgba(27,24,111,0.1)" class="ml-2">
+					{{roleName}}
+				</v-chip>
+			</span>
 		</v-row>
-		  <v-tabs 
-		  		style="margin-left: -65px; margin-top:-20px" class="mb-5"
-				v-model="tab"
-				background-color="#fff"
-				dark
-			>
-				<v-tab
+		<v-tabs 
+			style="margin-left:-15px; margin-top:-20px" class="mb-5"
+			v-model="tab"
+			background-color="#fff"
+			dark >
+			<v-tab
 				@click="detailView(item)"
-				 v-for="(item,menuIdx) in menu" :key="menuIdx" 
-				
-				>
+				v-for="(item,menuIdx) in menu" :key="menuIdx">
 				<span style="color:black" class="fw-400" @click="detailView(item)">
 					{{$t('objects.'+item)}}
 				</span>
-				</v-tab>
-			</v-tabs>
-			<v-tabs-items v-model="tab">
-			 <v-row class="w-100 h-100" style="border:1px solid rgba(0,0,0,0.1); margin-top:-10px" >
-            <v-col cols="md-12" class=" left-table">
-                <v-row style="border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-7px; padding-top:3px">
-                    <v-col cols="md-3" class="fw-430 fs-13">
-                        {{menuTitle.length==0?"Chọn":$t('objects.'+menuTitle)}}
-                    </v-col>
-                    <v-col 
-                        style="width: 40px!important;" 
-                        v-for="(action,actionIdx) in action" 
-                        :key="actionIdx" 
-                        class="fs-13 ">
-                        {{$t('actions.listActions.'+menuTitle+"."+action)}}
-                    </v-col>
-                </v-row>
-				<div >
-                    <v-row 
-                        v-for="(nameObj,nameObjIdx) in titleAllNameObject" 
-                        :key="nameObjIdx"
-                     >
-                        <v-col cols="md-3" class="fw-400 fs-13">
-                           {{nameObj.objectIdentifier.split(':')[1]}}- {{nameObj.title}}
-                        </v-col>
-                        <v-col style="width:40px!important; " 
-                            v-for="(action2,actionIdx2) in action" 
-                            :key="actionIdx2" 
-                            class="fs-13 " >
-                            <span v-if="checkRole(nameObj.objectIdentifier,action2)">
-                                <v-icon style="color:green; font-size:16px">mdi mdi-check</v-icon>
-                            </span>
-                        </v-col>
-                </v-row>
-				</div>
+			</v-tab>
+		</v-tabs>
+		<v-tabs-items v-model="tab">
+			<v-row class="w-100 h-100 table-permission" >
+				<v-col cols="md-12" class=" left-table">
+					<v-row style="border-bottom:1px solid rgba(0,0,0,0.1); margin-top:-7px; padding-top:3px">
+						<v-col cols="md-3" class="fw-430 fs-13">
+							{{menuTitle.length==0?"Chọn":$t('objects.'+menuTitle)}}
+						</v-col>
+						<v-col 
+							style="width: 40px!important;" 
+							v-for="(action,actionIdx) in action" 
+							:key="actionIdx" 
+							class="fs-13 ">
+							{{$t('actions.listActions.'+menuTitle+"."+action)}}
+						</v-col>
+					</v-row>
+					<div>
+						<v-row 
+							v-for="(nameObj,nameObjIdx) in titleAllNameObject" 
+							:key="nameObjIdx">
+							<v-col cols="md-3" class="fw-400 fs-13">
+								{{nameObj.objectIdentifier.split(':')[1]}}- {{nameObj.title}}
+							</v-col>
+							<v-col style="width:40px!important; " 
+								v-for="(action2,actionIdx2) in action" 
+								:key="actionIdx2" 
+								class="fs-13 " >
+								<span v-if="checkRole(nameObj.objectIdentifier,action2)">
+									<v-icon style="color:green; font-size:16px">mdi mdi-check</v-icon>
+								</span>
+							</v-col>
+						</v-row>
+					</div>
             </v-col>
         </v-row>
       </v-tabs-items>
@@ -99,8 +103,7 @@
 <script>
 import { userApi } from "./../../api/user.js";
 export default {
-
-    props:['rolesList','permission','allRole'],
+    props:['rolesList','permission','allRole','viewDetail','roleName'],
     methods:{
         showUserInfo(){
             this.$emit("show-userInfo")
@@ -115,6 +118,16 @@ export default {
 			}
 			return check
 		},
+			async getActionAndObject(role){
+            let res = await userApi.getActionAndObject(role);
+			const self = this;
+			if (res.status === 200) {
+				self.listActionAndObj = res.data;	
+				self.listActionAndObj =  _.groupBy(self.listActionAndObj, 'objectType');
+				self.setMenu();
+			}
+		},
+
 		// lấy ra tất cả action và object 
 			async getActionAndObject(){
             let res = await userApi.getActionAndObject(this.rolesList);
@@ -133,8 +146,21 @@ export default {
 					 this.menu.push(listObject[i]);
 				}
                 
-            };
+			};
+			this.detailView(listObject[0])
+			
 		},
+		//check xem menu có dữ liệu không
+		// checkDataMenu(obj){
+		// 	debugger
+		// 	let check = false;
+		// 	this.getListObjectIdentifier(obj);
+		// 	let lengthTitle = this.titleAllNameObject.length;
+		// 	if(lengthTitle){
+		// 		check = true
+		// 	}
+		// 	return check;
+		// },
 		getListObjectIdentifier(object){
 			let objIdentifier =[];
 			objIdentifier = _.groupBy(this.listActionAndObj[object],'objectIdentifier' );
@@ -237,7 +263,7 @@ export default {
 		// xử lý chuyển tên object    
     },
     created(){
-		
+		this.allPermission = [...this.permission.orgchart, ...this.permission.systemRole];
 		this.getActionAndObject();
 		this.getListActionAllObj();
 	},
@@ -250,12 +276,14 @@ export default {
 	},
 	data(){
 		return {
+			allPermission:[],
 			allListAction:{},
 			titleAllNameObject:[],
 			listRoleObj:[],
 			objAndAction:{},
 			listActionAndObj:[],
 			menu:[],
+			tab:null,
 			action:[],
 			menuTitle:[],
 			nameObject:[]
@@ -264,6 +292,12 @@ export default {
 }
 </script>
 <style scoped>
+	.table-permission{
+		border-top:1px solid rgba(0,0,0,0.1);
+		border-right:1px solid rgba(0,0,0,0.1);
+		border-bottom:1px solid rgba(0,0,0,0.1);
+		margin-top:-10px
+	}
     .left-table{
         border-left: 1px solid rgba(0,0,0,0.1);
         padding-top:0px
@@ -271,16 +305,16 @@ export default {
     .fw-430{
         font-weight:430
 	}
-	.view-role ::v-deep .v-icon{
+ 	.view-role ::v-deep .v-icon{
 		color:black
 	}
 	.view-role ::v-deep  .v-tabs-slider{
 		color:grey
 	}
-	.view-role ::v-deep .v-slide-group__prev{
-		margin-left:32px
-	}
-	.view-role ::v-deep .v-slide-group__wrapper{
+	/* .view-role ::v-deep .v-slide-group__prev{
+	
+	} */
+	/* .view-role ::v-deep .v-slide-group__wrapper{
 		margin-left:-25px
-	}
+	}  */
 </style>

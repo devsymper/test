@@ -1,6 +1,5 @@
 import Control from "./control";
 import { util } from "@/plugins/util.js";
-import moment from "moment-timezone";
 import sDocument from './../../../store/document'
 import {
     SYMPER_APP
@@ -54,10 +53,11 @@ export default class TableControl extends Control {
                     let curColIndex = this.tableInstance.colName2Idx[controlLink];
                     for (let key in listLinkInCol) {
                         let rowIdx = key.replace(/linkConfig_(.+)_/g, "");
-                        rowIdx = Number(rowIdx)
-                        this.tableInstance.validateValueMap[rowIdx + "_" + curColIndex] = {
+                        rowIdx = Number(rowIdx);
+                        let cellPos = rowIdx + "_" + curColIndex;
+                        this.tableInstance.addToValueMap(cellPos, {
                             type: 'linkControl',
-                        };
+                        })
                     }
                 }
             }
@@ -149,7 +149,7 @@ export default class TableControl extends Control {
                     let key = Object.keys(data)[i];
                     let control = this.controlInTable[key];
                     if (control && control.type == 'date') {
-                        data[key][index] = moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
+                        data[key][index] = SYMPER_APP.$moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
                     }
                     rowData[key] = data[key][index];
                 }
@@ -170,7 +170,7 @@ export default class TableControl extends Control {
                     let key = Object.keys(data)[i];
                     let control = this.controlInTable[key];
                     if (control && control.type == 'date') {
-                        data[key][index] = moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
+                        data[key][index] = SYMPER_APP.$moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
                     }
                     rowData[key] = data[key][index];
                 }

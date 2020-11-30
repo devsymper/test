@@ -4,7 +4,6 @@ import sDocument from './../../../store/document'
 import { SYMPER_APP } from './../../../main.js'
 import Util from './util'
 var numbro = require("numbro");
-import moment from "moment-timezone";
 import { appConfigs } from "@/configs.js";
 import { documentApi } from "../../../api/Document";
 let sDocumentManagementUrl = appConfigs.apiDomain.sdocumentManagement;
@@ -53,22 +52,13 @@ export default class BasicControl extends Control {
     render() {
             this.ele.wrap('<span style="position:relative;display:inline-block">');
             this.ele.attr('key-instance', this.curParentInstance);
-            // if (this.checkDetailView() &&
-            //     this.controlProperties['isSaveToDB'] !== undefined &&
-            //     (this.controlProperties['isSaveToDB'].value !== "1" ||
-            //         this.controlProperties['isSaveToDB'].value !== 1)) {
-            //     this.ele.css({ display: 'none' })
-            // }
             if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
                 this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
             }
             if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
                 this.ele.attr('disabled', 'disabled');
+                this.ele.css({ background: 'rgba(0,0,0,0.05)' })
             }
-            // if (this.checkViewType('print') && this.checkProps('isBorderPrint')) {
-            //     this.ele.css('border-bottom', '0.5px solid rgb(230, 229, 229)')
-            // }
-
             if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
                 this.ele.css({ 'display': 'none' })
             }
@@ -205,7 +195,7 @@ export default class BasicControl extends Control {
                     valueChange = $(e.target).prop("checked");
                 }
                 thisObj.value = valueChange;
-                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.name, val: valueChange });
+                SYMPER_APP.$evtBus.$emit('document-submit-input-change', thisObj);
             })
             this.ele.on('focus', function(e) {
                 store.commit("document/addToDocumentSubmitStore", {
@@ -315,7 +305,7 @@ export default class BasicControl extends Control {
             } else if (this.type == 'richText') {
                 $('#' + this.id).html(value);
             } else if (this.type == 'date') {
-                $('#' + this.id).val(moment(value).format(this.formatDate));
+                $('#' + this.id).val(SYMPER_APP.$moment(value).format(this.formatDate));
             } else if (this.type == 'checkbox') {
                 if (value)
                     $('#' + this.id).attr('checked', 'checked');
@@ -356,7 +346,7 @@ export default class BasicControl extends Control {
                 value = numbro(Number(value)).format(this.numberFormat)
 
         } else if (this.type == 'date') {
-            value = moment(value).format(this.formatDate);
+            value = SYMPER_APP.$moment(value).format(this.formatDate);
         }
         if (this.type == 'label') {
             this.ele.text(value)
@@ -731,7 +721,7 @@ export default class BasicControl extends Control {
             for (let index = 0; index < data.length; index++) {
                 let value = data[index];
                 if(value){
-                    newData.push(moment(value,dateFormat).format('YYYY-MM-DD'))
+                    newData.push(SYMPER_APP.$moment(value,dateFormat).format('YYYY-MM-DD'))
                 }
                 else{
                     newData.push("");
@@ -741,7 +731,7 @@ export default class BasicControl extends Control {
             return newData;
         }
         else{
-            return moment(data,dateFormat).format('YYYY-MM-DD')
+            return SYMPER_APP.$moment(data,dateFormat).format('YYYY-MM-DD')
         }
     }
 }

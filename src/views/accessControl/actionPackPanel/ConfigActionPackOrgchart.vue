@@ -1,25 +1,26 @@
 <template>
-  <div>
-      <h3>Thao tác với đối tượng </h3>
-       <p>{{ selectedPermission }}</p>
-      <div class="fs-13">
-          <v-list v-for="(permission,i) in permissions" :key="i">
-            <v-list-item>
-                <v-checkbox :value="permission.value" 
-                            :key="permission.title"
-                            @change="handleChange"
-                            :label="permission.title"
-                            v-model="selectedPermission">
-                </v-checkbox>
-            </v-list-item>
-        </v-list>
-      </div>
-         <OrgchartElementSelector 
-          v-if="showTreeOrgchart"
-          :value="departmentSelected"
-          :checkboxMode="checkboxMode"
-          @change-node-selected="handleChangeNodeSelected"
-        />
+  <div class="mt-1">
+      <div class="fs-15 font-weight-bold">Thao tác với đối tượng </div>
+		<div class="fs-13 d-flex flex-wrap permission-selector">
+			<v-list v-for="(permission,i) in permissions" :key="i">
+				<v-list-item style="width:290px">
+					<v-checkbox 
+						:value="permission.value" 
+						:key="permission.title"
+						@change="handleChange"
+						:label="permission.title"
+						v-model="selectedPermission">
+					</v-checkbox>
+				</v-list-item>
+			</v-list>
+		</div>
+		<OrgchartElementSelector 
+			v-if="showTreeOrgchart"
+			:value="departmentSelected"
+			:height="'320px'"
+			:checkboxMode="checkboxMode"
+			@change-node-selected="handleChangeNodeSelected"
+		/>
   </div>
 </template>
 

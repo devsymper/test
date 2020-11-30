@@ -16,7 +16,7 @@ var configs = {
         core: 'https://v2hoangnd.dev.symper.vn/',
         bpmne: {
             general: 'https://workflow.symper.vn/',
-            models: 'https://workflow-modeler.symper.vn',
+            models: 'https://workflow-modeler.symper.vn/workflow-modeler/',
             postTasksHistory: 'https://workflow.symper.vn/symper-rest/service/query/historic-task-instances',
             deployments: "https://workflow.symper.vn/symper-rest/service/repository/deployments",
             definitions: "https://workflow.symper.vn/symper-rest/service/repository/process-definitions",
@@ -24,6 +24,7 @@ var configs = {
             historyInstances: "https://workflow.symper.vn/symper-rest/service/query/historic-process-instances",
             history: "https://workflow.symper.vn/symper-rest/service/history",
             tasks: "https://workflow.symper.vn/symper-rest/service/runtime/tasks",
+            task: "https://workflow.symper.vn/symper-rest/service/query/tasks",
             tasksHistory: "https://workflow.symper.vn/symper-rest/service/history/historic-task-instances",
             validateModel: "https://workflow.symper.vn/symper-modeler/api/editor/validate-model",
             timerJob: "https://workflow.symper.vn/symper-rest/service/management/timer-jobs"
@@ -48,8 +49,8 @@ var configs = {
         appManagement: "https://apps-management.symper.vn/",
         commnent: "https://comment-service.symper.vn",
         fileManagement: 'https://file.symper.vn/',
+        timesheet: 'https://timesheet-service.symper.vn/',
         knowledge: 'https://kh-service.symper.vn/',
-        timesheet: 'https://timesheet-service.dev.symper.vn/',
         search: "https://search.symper.vn/",
         importExcel: 'https://io.symper.vn/',
         viewHistoryImport: "https://io.symper.vn/history/document",

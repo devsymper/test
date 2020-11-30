@@ -8,6 +8,8 @@
         :pageTitle="$t('document.title')"
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
+        :showExportButton="false"
+        :showImportButton="false"
         @after-open-add-panel="addDocument"
         :headerPrefixKeypath="'document'"
         :commonActionProps="commonActionProps"

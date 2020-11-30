@@ -3,12 +3,10 @@ import Handsontable from 'handsontable';
 import sDocument from './../../../store/document'
 import store from './../../../store'
 import ClientSQLManager from './clientSQLManager';
-import { checkDbOnly, getControlType, getSDocumentSubmitStore } from './../common/common'
+import { checkControlPropertyProp, getControlType, getSDocumentSubmitStore } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
-import { Date } from 'core-js';
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
 import { util } from '../../../plugins/util';
-import moment from "moment-timezone";
 
 class UserEditor extends Handsontable.editors.TextEditor {
     createElements() {
@@ -458,11 +456,7 @@ export default class Table {
                     data: this.getSourceData(),
                     tableName:thisObj.tableName
                 });
-                console.log('ákjdaskdasd',changes,source);
-
-                if (thisObj.isAutoCompleting) {
-                    return;
-                }
+                
                 if (!changes) {
                     return
                 }
@@ -480,15 +474,18 @@ export default class Table {
                 if (/=SUM(.*)/.test(changes[0][2]) || /=SUM(.*)/.test(changes[0][3])) {
                     return;
                 }
-
                 let controlName = changes[0][1];
+
+                if (thisObj.isAutoCompleting) {
+                    return;
+                }
+
                 let colIndex = this.propToCol(controlName);
                 let columns = thisObj.columnsInfo.columns;
                 let currentRowData = thisObj.tableInstance.getDataAtRow(changes[0][0]);
 
                 // nếu có sự thay đổi cell mà là id của row sqlite thì ko thực hiện update
                 if (controlName != 's_table_id_sql_lite') {
-
                     thisObj.checkUniqueTable(controlName, columns);
                     if (source != AUTO_SET) {
                         store.commit("document/addToDocumentSubmitStore", {
@@ -527,12 +524,7 @@ export default class Table {
                     } else {
                         thisObj.handlerAfterChangeCellByAutoSet(changes, columns, controlName);
                     }
-                    let controlUnique = checkDbOnly(thisObj.keyInstance, controlName);
-                    if (controlUnique != false) {
-                        let dataInput = {}
-                        dataInput[controlName] = [changes[0][3]]
-                        thisObj.handlerRunFormulasForControlInTable('uniqueDB', controlUnique, dataInput, controlUnique.controlFormulas.uniqueDB.instance);
-                    }
+                    thisObj.handeRunUniqueDBFormula(controlName, changes);
                     thisObj.isAutoCompleting = false;
 
                 }
@@ -541,10 +533,21 @@ export default class Table {
         }
         listTableInstance[this.tableName] = this;
     }
-        /**
-         * Hàm xử lí thêm và xóa dòng sau khi bấm shift + enter, shift + delete
-         * @param {*} e 
-         */
+
+    handeRunUniqueDBFormula(controlName, changes){
+        let dataInput = {}
+        dataInput[controlName] = [changes[0][3]]
+        let controlUniqueFormula = checkControlPropertyProp(this.keyInstance, controlName, 'isDBOnly');
+        if (controlUniqueFormula != false) {
+            this.handlerRunFormulasForControlInTable('uniqueDB', controlUniqueFormula, dataInput, controlUniqueFormula.controlFormulas.uniqueDB.instance);
+        }
+        
+    }
+
+    /**
+     * Hàm xử lí thêm và xóa dòng sau khi bấm shift + enter, shift + delete
+     * @param {*} e 
+     */
 
     checkEnterInsertRowEvent(e, cellMeta) {
         if (!e) {
@@ -738,7 +741,7 @@ export default class Table {
             let controlLinkEffected = controlInstance.getEffectedLinkControl();
             let controlValidateEffected = controlInstance.getEffectedValidateControl();
             this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
-            this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readonly');
+            this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readOnly');
             this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
             this.handlerRunOtherFormulasControl(controlLinkEffected, 'linkConfig');
             this.handlerRunOtherFormulasControl(controlValidateEffected, 'validate');
@@ -1286,8 +1289,14 @@ export default class Table {
         }
 
     }
+    getSourceData(){
+        return this.tableInstance.getSourceData(); 
+    }
 
-
+    setCellReadOnly(row, col, status){
+        this.tableInstance.setCellMeta(row, 0, 'readOnly', status);
+        
+    }
     // Hàm set data cho table
     // hàm gọi sau khi chạy công thức 
     setData(vls, dateFormat = true) {
@@ -1316,7 +1325,7 @@ export default class Table {
                     }
                     let controlIns = this.getControlInstance(controlName);
                     if (dateFormat && controlIns.type == 'date') {
-                        data[index][controlName] = moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
+                        data[index][controlName] = SYMPER_APP.$moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
                     }
                     if (data[index] != undefined)
                         dataToStore[controlName].push(data[index][controlName]);
@@ -1505,7 +1514,6 @@ export default class Table {
             rsl.dateFormat = ctrl.controlProperties.formatDate.value;
             rsl.correctFormat = true;
         }
-
         if (ctrl.controlProperties.isReadOnly && ctrl.controlProperties.isReadOnly.value == true) {
             rsl.readOnly = true;
         }
@@ -1545,39 +1553,77 @@ export default class Table {
         if (control.isCheckbox) {
             td.style.textAlign = "center";
         }
+       
         let map = thisObj.validateValueMap[row + '_' + column];
         let controlTitle = (control.title == "") ? control.name : control.title;
+        let ele = $(td);
+        
         if (map) {
-            let sign = prop + '____' + row;
-            let ele = $(td);
-            if (map.type === 'linkControl') {
-                ele.css({ 'position': 'relative' }).append(Util.renderInfoBtn());
-                ele.off('click', '.info-control-btn')
-                ele.on('click', '.info-control-btn', function(e) {
-                    SYMPER_APP.$evtBus.$emit('on-info-btn-in-table-click', { e: e, row: row, controlName: control.name })
-                })
-            }
-            if (map.vld === true) {
-                ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
-            }
-            if (map.validate === true) {
-                ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
-            }
-            if (map.uniqueDB === true) {
-                ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(map.msg, sign, controlTitle));
-            }
-            if (map.require === true && (value === '' || value == null)) {
-                ele.css({ 'position': 'relative' }).append(Util.makeErrNoti("Không được bỏ trống", sign, controlTitle));
-            }
-            ele.off('click', '.validate-icon')
-            ele.on('click', '.validate-icon', function(e) {
-                let msg = $(this).attr('title');
-                e.msg = msg;
-                SYMPER_APP.$evtBus.$emit('document-submit-open-validate-message', e)
-            })
+            for (let index = 0; index < map.length; index++) {
+                const cellValidateInfo = map[index];
+                if (cellValidateInfo.type === 'linkControl') {
+                    ele.css({ 'position': 'relative' }).append(Util.renderInfoBtn());
+                    ele.off('click', '.info-control-btn')
+                    ele.on('click', '.info-control-btn', function(e) {
+                        SYMPER_APP.$evtBus.$emit('on-info-btn-in-table-click', { e: e, row: row, controlName: control.name })
+                    })
+                }
+                if (cellValidateInfo.type === 'readOnly') {
+                    hotInstance.setCellMeta(row, column, 'readOnly', cellValidateInfo.value);
+                }
+                if (cellValidateInfo.value) {
+                    if(ele.find('.validate-icon').length > 0){
+                        let curMsg = ele.find('.validate-icon').attr('title');
+                        curMsg = (curMsg) ? cellValidateInfo.msg : curMsg + "|||" + cellValidateInfo.msg;
+                        ele.find('.validate-icon').attr(curMsg);
+                    }
+                    else{
+                        ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(cellValidateInfo.msg, controlTitle));
+                    }
+                }
+            }            
         }
+        ele.off('click', '.validate-icon')
+        ele.on('click', '.validate-icon', function(e) {
+            let msg = $(this).attr('title');
+            e.msg = msg;
+            SYMPER_APP.$evtBus.$emit('document-submit-open-validate-message', e)
+        })
+        if(control.checkProps('isRequired')){
+            if(!value){
+                if(ele.find('.validate-icon').length > 0){
+                    ele.find('.validate-icon').attr("Không được bỏ trống");
+                }
+                else{
+                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti('Không được bỏ trống', controlTitle));
+                }
+            }
+        }
+        if(thisObj.tableHasRowSum && row == hotInstance.countRows() - 1){
+            ele.find('.validate-icon').remove()
+        }
+        
     }
 
+    /**
+     * Hàm set các cell được validate
+     * @param {*} key 
+     * @param {*} value 
+     */
+    addToValueMap(key,value){
+        if(!this.validateValueMap[key]){
+            this.validateValueMap[key] = [];
+        }
+        for (let index = 0; index < this.validateValueMap[key].length; index++) {
+            const cellVld = this.validateValueMap[key][index];
+            if(cellVld.type == value.type){
+                this.validateValueMap[key][index] = value;
+                return;
+            }
+            
+        }
+        this.validateValueMap[key].push(value);
+    }
     /**
      * validate time đúng định dạng hay k
      * @param {*} str 
