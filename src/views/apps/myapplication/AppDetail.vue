@@ -171,7 +171,8 @@ export default {
 		},
 		filterItem(){
 			let self = this
-			let listItem = this.$store.state.appConfig.listItemSelected;
+			let appS = this.$store.state.appConfig
+			let listItem = appS.listAppsSideBySide[appS.currentAppId];
 			self.objFilter.document_major.item = []
 			self.objFilter.document_category.item = []
 			self.objFilter.orgchart.item = []
