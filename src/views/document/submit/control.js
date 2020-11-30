@@ -271,7 +271,7 @@ export default class Control {
                 tableControlInstance.tableInstance.addToValueMap(cellPos, {
                     msg: msg,
                     type: "validate",
-                    value: msg != null && msg != "",
+                    value: msg == true,
                 });
             }
             tableControlInstance.tableInstance.tableInstance.render()
