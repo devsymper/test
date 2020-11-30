@@ -1,7 +1,3 @@
-import {
-    database
-} from "firebase";
-
 const updateCommentTarget = (state, data) => {
     Vue.set(state, 'commentTarget', data)
 };
