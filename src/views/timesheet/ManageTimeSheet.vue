@@ -55,7 +55,7 @@ import timesheetApi from '../../api/timesheet';
 import dayjs from "dayjs";
 import isBetween from 'dayjs/plugin/isBetween';
 dayjs.extend(isBetween);
-import _ from 'lodash';
+import _groupBy from 'lodash/groupBy';
 
 export default {
     components: {
@@ -139,7 +139,7 @@ export default {
                 .then(res => {
                     if (res.status === 200) {
                         const ranges = self.allColumns.slice(2, self.allColumns.length).map(c => c.colId);
-                        const logTimeListByAccount = _.groupBy(res.data.listLogTime, 'account_id');
+                        const logTimeListByAccount = _groupBy(res.data.listLogTime, 'account_id');
                         let userName = res.data.userName;
                          console.log(userName);
                         // console.log('ádádjádaksdjkádj');

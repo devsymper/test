@@ -117,7 +117,9 @@ import Api from "./../../api/api.js";
 import iconPicker from "../../components/common/iconPicker";
 import SearchModal from './SearchModal.vue';
 import AppDetailVue from './AppDetail.vue';
-import {appManagementApi} from './../../api/AppManagement.js'
+import {appManagementApi} from './../../api/AppManagement.js';
+import _debounce from "lodash/debounce";
+
 export default {
     name: "UpdateApp",
     components: {
@@ -224,7 +226,7 @@ export default {
 		selectedItem(data){
 			this.listSelectedItem = data;
 		},
-		debounceAddApp: _.debounce(function(e){
+		debounceAddApp: _debounce(function(e){
 			this.addApp()
 		}, 300,this),
         addApp() {

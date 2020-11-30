@@ -1,4 +1,3 @@
-import { functions } from "lodash";
 import { util } from "./../../../plugins/util.js";
 import { SYMPER_APP } from "@/main.js";
 import Api from "@/api/api.js";
