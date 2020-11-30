@@ -3,11 +3,10 @@ import Handsontable from 'handsontable';
 import sDocument from './../../../store/document'
 import store from './../../../store'
 import ClientSQLManager from './clientSQLManager';
-import { checkControlFormulaProp,checkControlPropertyProp, getControlType, getSDocumentSubmitStore } from './../common/common'
+import { checkControlPropertyProp, getControlType, getSDocumentSubmitStore } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
 import { util } from '../../../plugins/util';
-import moment from "moment-timezone";
 
 class UserEditor extends Handsontable.editors.TextEditor {
     createElements() {
@@ -1326,7 +1325,7 @@ export default class Table {
                     }
                     let controlIns = this.getControlInstance(controlName);
                     if (dateFormat && controlIns.type == 'date') {
-                        data[index][controlName] = moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
+                        data[index][controlName] = SYMPER_APP.$moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
                     }
                     if (data[index] != undefined)
                         dataToStore[controlName].push(data[index][controlName]);
