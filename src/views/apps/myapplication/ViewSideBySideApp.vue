@@ -42,7 +42,14 @@
 					append-icon="mdi-magnify"
 					v-model="searchKey"
 				></v-text-field>
-                <AppDetail ref="appDetail"  :isMyApplication="true" :isEndUserCpn="true" :searchKey="searchKey" :sideBySide="true" />
+                <AppDetail 
+					ref="appDetail"  
+					:isMyApplication="true" 
+					:isEndUserCpn="true" 
+					:searchKey="searchKey" 
+					:sideBySide="true"
+					:loadingApp="loadingApp"	
+				/>
           </div>
          <div v-else class="favorite-area-item">
               <h4>Danh sách yêu thích</h4>
@@ -73,7 +80,7 @@
 
 <script>
 import {appManagementApi} from '@/api/AppManagement.js';
-import AppDetail from './../AppDetail.vue'
+import AppDetail from './AppDetail.vue'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue'
 import SymperActionView from '@/action/SymperActionView.vue'
@@ -298,22 +305,38 @@ x				}
 			});
         },
         clickDetails(item){
-            this.activeIndex = item.id
-            this.showFavorite = false
+			this.activeIndex = item.id
+			this.loadingApp = true
+			this.showFavorite = false
+			let self = this
 			this.$store.commit("appConfig/updateCurrentAppId",item.id);
 			this.$store.commit("appConfig/updateCurrentAppName",item.name);
 			this.$store.commit('appConfig/showDetailAppArea')
 			this.$store.commit('appConfig/emptyItemSelected')
-			appManagementApi.getAppDetails(item.id).then(res => {
-				if (res.status == 200) {
-					if(Object.keys(res.data.listObject.childrenApp).length > 0){
-						this.checkChildrenApp(res.data.listObject.childrenApp)
-					}else{
-						this.$store.commit('appConfig/emptyItemSelected')
+			let appStore = this.$store.state.appConfig
+			if(!appStore.listAppsSideBySide[appStore.currentAppId]){
+				appManagementApi.getAppDetails(item.id).then(res => {
+					if (res.status == 200) {
+						if(Object.keys(res.data.listObject.childrenApp).length > 0){
+							this.checkChildrenApp(res.data.listObject.childrenApp)
+						}else{
+							this.$store.commit('appConfig/emptyItemSelected')
+						}
 					}
-				}
-			}).catch((err) => {
-			});
+					self.loadingApp = false
+
+				}).catch((err) => {
+					self.$notify({
+						type: "error",
+						title: "Không thể lấy dữ liệu"
+					})
+					self.loadingApp = false
+				});
+			}else{
+				this.loadingApp = false
+			}
+
+			
         },
         checkChildrenApp(data){
 			let self = this 
@@ -373,7 +396,7 @@ x				}
 			}).then(res=>{
 				if(type == 'orgchart'){
 					this.updateFavoriteItem(self.mapId.orgchart,res.data)
-					this.$store.commit('appConfig/updateChildrenApps',{obj:res.data,type:'orgchart'});
+					this.$store.commit('appConfig/updateChildrenAppsSBS',{obj:res.data,type:'orgchart'});
 				}
 				if(type == 'document_definition'){
 					this.updateFavoriteItem(self.mapId.document_definition,res.data)
@@ -386,16 +409,16 @@ x				}
 							arrCategory.push(e)
 						}
 					})
-					this.$store.commit('appConfig/updateChildrenApps',{obj:arrMajor,type:'document_major'});
-					this.$store.commit('appConfig/updateChildrenApps',{obj:arrCategory,type:'document_category'});
+					this.$store.commit('appConfig/updateChildrenAppsSBS',{obj:arrMajor,type:'document_major'});
+					this.$store.commit('appConfig/updateChildrenAppsSBS',{obj:arrCategory,type:'document_category'});
 				}
 				if(type == 'workflow_definition'){
 					this.updateFavoriteItem(self.mapId.workflow_definition,res.data)
-					this.$store.commit('appConfig/updateChildrenApps',{obj:res.data,type:'workflow_definition'});
+					this.$store.commit('appConfig/updateChildrenAppsSBS',{obj:res.data,type:'workflow_definition'});
 				}
 				if(type == 'dashboard'){
 					this.updateFavoriteItem(self.mapId.dashboard,res.data)
-					this.$store.commit('appConfig/updateChildrenApps',{obj:res.data,type:'dashboard'});
+					this.$store.commit('appConfig/updateChildrenAppsSBS',{obj:res.data,type:'dashboard'});
 				}
 			}).catch(err=>{
 			})
@@ -407,6 +430,7 @@ x				}
             apps: [],
             listApps: [],
 			activeIndex: '',
+			loadingApp: true,
             showDetailDiv:false,
             searchKey: '',
             listFavorite:[],
