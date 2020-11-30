@@ -3,11 +3,10 @@ import Handsontable from 'handsontable';
 import sDocument from './../../../store/document'
 import store from './../../../store'
 import ClientSQLManager from './clientSQLManager';
-import { checkControlFormulaProp,checkControlPropertyProp, getControlType, getSDocumentSubmitStore } from './../common/common'
+import { checkControlPropertyProp, getControlType, getSDocumentSubmitStore } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
 import { util } from '../../../plugins/util';
-import moment from "moment-timezone";
 
 class UserEditor extends Handsontable.editors.TextEditor {
     createElements() {
@@ -1326,7 +1325,7 @@ export default class Table {
                     }
                     let controlIns = this.getControlInstance(controlName);
                     if (dateFormat && controlIns.type == 'date') {
-                        data[index][controlName] = moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
+                        data[index][controlName] = SYMPER_APP.$moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
                     }
                     if (data[index] != undefined)
                         dataToStore[controlName].push(data[index][controlName]);
@@ -1554,10 +1553,12 @@ export default class Table {
         if (control.isCheckbox) {
             td.style.textAlign = "center";
         }
+       
         let map = thisObj.validateValueMap[row + '_' + column];
         let controlTitle = (control.title == "") ? control.name : control.title;
+        let ele = $(td);
+        
         if (map) {
-            let ele = $(td);
             for (let index = 0; index < map.length; index++) {
                 const cellValidateInfo = map[index];
                 if (cellValidateInfo.type === 'linkControl') {
@@ -1580,14 +1581,28 @@ export default class Table {
                         ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(cellValidateInfo.msg, controlTitle));
                     }
                 }
-            }
-            ele.off('click', '.validate-icon')
-            ele.on('click', '.validate-icon', function(e) {
-                let msg = $(this).attr('title');
-                e.msg = msg;
-                SYMPER_APP.$evtBus.$emit('document-submit-open-validate-message', e)
-            })
+            }            
         }
+        ele.off('click', '.validate-icon')
+        ele.on('click', '.validate-icon', function(e) {
+            let msg = $(this).attr('title');
+            e.msg = msg;
+            SYMPER_APP.$evtBus.$emit('document-submit-open-validate-message', e)
+        })
+        if(control.checkProps('isRequired')){
+            if(!value){
+                if(ele.find('.validate-icon').length > 0){
+                    ele.find('.validate-icon').attr("Không được bỏ trống");
+                }
+                else{
+                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti('Không được bỏ trống', controlTitle));
+                }
+            }
+        }
+        if(thisObj.tableHasRowSum && row == hotInstance.countRows() - 1){
+            ele.find('.validate-icon').remove()
+        }
+        
     }
 
     /**
