@@ -128,7 +128,6 @@ import { userApi } from "./../../api/user.js";
 import { orgchartApi } from "./../../api/orgchart.js";
 import { systemRoleApi } from "./../../api/systemRole.js";
 import avatarDefault from "@/assets/image/avatar_default.jpg";
-import _ from 'lodash';
 
 export default {
 	components:{

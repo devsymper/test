@@ -50,6 +50,8 @@ import { appConfigs } from '../../../configs.js';
 import { documentApi } from "./../../../api/Document.js";
 import ListItems from "./../../../components/common/ListItems.vue";
 import { util } from "./../../../plugins/util.js";
+import _groupBy from "lodash/groupBy";
+
 export default {
     name:"History",
     components: {
@@ -80,7 +82,7 @@ export default {
                         }
                         return arr;
                     },[]);
-                    var allRow = _.groupBy(listObject, function(obj) {
+                    var allRow = _groupBy(listObject, function(obj) {
                         return obj.deletedAt;
                     });
                     let rowId = 0;

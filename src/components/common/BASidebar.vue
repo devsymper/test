@@ -328,7 +328,7 @@
     </v-navigation-drawer>
 </template>
 <script>
-import _ from 'lodash';
+import _groupBy from 'lodash/groupBy';
 import { util } from "./../../plugins/util.js";
 import { userApi } from "./../../api/user.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
@@ -413,7 +413,7 @@ export default {
              this.menu = this.userMenuItems;
              let menuItem = [];
              let allMenuItem = [];
-             this.menu =  _.groupBy(this.menu, 'group');
+             this.menu =  _groupBy(this.menu, 'group');
             Object.keys(this.menu).forEach(type => {
                 let name = type;
                 menuItem.push({titleGroup: name });
