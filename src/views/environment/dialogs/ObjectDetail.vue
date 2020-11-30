@@ -53,6 +53,7 @@
 			style="margin-left:10px"
 			:useDefaultContext="false"
 			:tableContextMenu="tableContextMenu"
+			:customAPIResult="customAPIResult"
 			:isTablereadOnly="false"
 			@after-selected-row="afterSelectedRow"
 		/>
@@ -110,6 +111,15 @@ export default {
 						self.dependencies = row.dependencies
                     }
                 },
+			},
+			customAPIResult:{
+				reformatData(res){
+                   return{
+                       columns:res.data.columns ? res.data.columns : [],
+                       listObject:res.data.listObject ? res.data.listObject : [],
+                       total: res.data.listObject ? res.data.listObject.length : 0,
+                   }
+                }
 			}
 		}
 	},

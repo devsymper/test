@@ -1298,7 +1298,6 @@ export default {
 					this.restoreAttrValueFromJsonConfig(modelData.configValue);
 					this.plotHeatmap()
 					// this.$refs.symperBpmnHeatMap.focus();
-
                 }
             } catch (error) {
                 this.$snotifyError(
