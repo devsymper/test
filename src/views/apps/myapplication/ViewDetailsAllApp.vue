@@ -32,12 +32,9 @@
         </div>
         <VuePerfectScrollbar :style="{height: menuItemsHeight}">
         <div class="content-view-details-all-app h-100 w-100">
-            <v-skeleton-loader
-                    ref="skeleton"
-                    v-if="loadingApp"
-                    type="table-tbody"
-                    class="mx-auto w-100 h-100"
-            ></v-skeleton-loader>
+           	<Preloader hidden
+				v-if="loadingApp"   
+			/>
                
             <template v-else  >
                 <v-expansion-panels
@@ -138,12 +135,14 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue';
 import DialogCreateTask from '@/components/myItem/work/DialogCreateTask.vue'
 import MenuConfigTypeView from './MenuConfigTypeView'
+import Preloader from "@/components/common/Preloader"
 export default {
     components:{
         VuePerfectScrollbar,
         ContextMenu,
         DialogCreateTask,
-        MenuConfigTypeView
+		MenuConfigTypeView,
+		Preloader
     },
     computed:{
         listApp(){

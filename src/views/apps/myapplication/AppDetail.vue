@@ -1,7 +1,10 @@
 <template>
   <div class="app-details">
 	  	 <VuePerfectScrollbar :style="{height: listItemHeight}">
-			<div v-for="(itemT,i) in sAppModule" :key="i" class="app-item">
+			<Preloader
+				v-if="loadingApp"
+			 />
+			<div v-else v-for="(itemT,i) in sAppModule" :key="i" class="app-item">
 					<div class="title-app" v-if="itemT.item.length >0"><v-icon style="font-size:13px">{{itemT.icon}}</v-icon> <h4> {{$t(itemT.title) }} <span> {{'('+itemT.item.length +')' }}</span> </h4></div>
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
 							<li  v-if="isEndUserCpn == true" 
@@ -74,6 +77,7 @@
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue';
 import {appManagementApi} from '@/api/AppManagement.js'
+import Preloader from "@/components/common/Preloader"
 export default {
  data: function() {
         return {
@@ -118,7 +122,8 @@ export default {
 	},
 	components:{
 		ContextMenu,
-		VuePerfectScrollbar
+		VuePerfectScrollbar,
+		Preloader
 	},
 	mounted(){
    },
@@ -159,6 +164,10 @@ export default {
 		},
 		sideBySide:{
 			type: Boolean,
+			default: false
+		},
+		loadingApp:{
+			type: Boolean, 
 			default: false
 		}
     },

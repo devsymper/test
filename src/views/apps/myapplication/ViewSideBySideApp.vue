@@ -42,7 +42,14 @@
 					append-icon="mdi-magnify"
 					v-model="searchKey"
 				></v-text-field>
-                <AppDetail ref="appDetail"  :isMyApplication="true" :isEndUserCpn="true" :searchKey="searchKey" :sideBySide="true" />
+                <AppDetail 
+					ref="appDetail"  
+					:isMyApplication="true" 
+					:isEndUserCpn="true" 
+					:searchKey="searchKey" 
+					:sideBySide="true"
+					:loadingApp="loadingApp"	
+				/>
           </div>
          <div v-else class="favorite-area-item">
               <h4>Danh sách yêu thích</h4>
@@ -298,8 +305,10 @@ x				}
 			});
         },
         clickDetails(item){
-            this.activeIndex = item.id
-            this.showFavorite = false
+			this.activeIndex = item.id
+			this.loadingApp = true
+			this.showFavorite = false
+			let self = this
 			this.$store.commit("appConfig/updateCurrentAppId",item.id);
 			this.$store.commit("appConfig/updateCurrentAppName",item.name);
 			this.$store.commit('appConfig/showDetailAppArea')
@@ -314,9 +323,19 @@ x				}
 							this.$store.commit('appConfig/emptyItemSelected')
 						}
 					}
+					self.loadingApp = false
+
 				}).catch((err) => {
+					self.$notify({
+						type: "error",
+						title: "Không thể lấy dữ liệu"
+					})
+					self.loadingApp = false
 				});
+			}else{
+				this.loadingApp = false
 			}
+
 			
         },
         checkChildrenApp(data){
@@ -411,6 +430,7 @@ x				}
             apps: [],
             listApps: [],
 			activeIndex: '',
+			loadingApp: true,
             showDetailDiv:false,
             searchKey: '',
             listFavorite:[],
