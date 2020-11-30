@@ -68,7 +68,7 @@
                                 <v-icon
                                     class="close-btn float-right "
                                     v-on="on"
-                                    @click="$copyTextToClipboard(showableUserInfo['email'])"  
+                                    v-clipboard:copy="showableUserInfo['email']"  
                                     size="15"
                                     >mdi-content-copy
                                 </v-icon>
@@ -120,7 +120,7 @@
                                     style="margin-top:-10px"
                                     class="close-btn float-right mr-3"
                                     v-on="on"
-                                    @click="$copyTextToClipboard(showableUserInfo[key])" 
+                                    v-clipboard:copy="showableUserInfo[key]"  
                                     size="15"
                                     >mdi-content-copy
                                 </v-icon>
@@ -225,10 +225,12 @@ import SymperAvatar from "@/components/common/SymperAvatar";
 import { appConfigs } from '../../../configs';
 import UploadFile from "./../../../components/common/UploadFile";
 import { util } from '../../../plugins/util';
+import VueClipboard from 'vue-clipboard2';
 import ViewRoles from "../../../views/users/ViewRoles";
 import NotificationChangePass from "./../../../components/notification/notificationChangeFirstPass";
 import Vue from "vue";
 import { userApi } from '../../../api/user';
+Vue.use(VueClipboard)
 export default {
     components: {
         SymperAvatar,

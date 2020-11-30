@@ -57,7 +57,8 @@
                         <v-btn  
                             icon
                             tile
-                            @click="$copyTextToClipboard(linkTask)" 
+                            v-clipboard:copy="linkTask"  
+                            v-clipboard:success="onCopySuccess" 
                             v-on="on" text small>
                                 <v-icon  small>mdi-page-next-outline</v-icon>
                         </v-btn>
@@ -130,9 +131,11 @@ import { documentApi } from '../../api/Document';
 import { appManagementApi } from '@/api/AppManagement';
 import { extractTaskInfoFromObject, addMoreInfoToTask } from '@/components/process/processAction';
 
+import VueClipboard from 'vue-clipboard2';
 import { util } from '../../plugins/util';
 
 
+Vue.use(VueClipboard)
 export default {
     name: "taskDetail",
     props: {

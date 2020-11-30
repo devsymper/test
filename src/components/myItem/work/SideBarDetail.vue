@@ -54,7 +54,8 @@
 											<v-btn  
 												icon
 												tile
-                            					@click="$copyTextToClipboard(workInfo.id)" 
+												v-clipboard:copy="workInfo.id"  
+												v-clipboard:success="onCopySuccess" 
 												class="ml-7"
 												v-on="on" text x-small>
 													<v-icon  x-small>mdi-page-next-outline</v-icon>

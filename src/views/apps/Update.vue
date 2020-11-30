@@ -115,6 +115,7 @@
 <script>
 import Api from "./../../api/api.js";
 import iconPicker from "../../components/common/iconPicker";
+import vClickOutside from 'v-click-outside';
 import SearchModal from './SearchModal.vue';
 import AppDetailVue from './AppDetail.vue';
 import {appManagementApi} from './../../api/AppManagement.js'
@@ -139,6 +140,9 @@ export default {
 		sApp(){
 			return this.$store.state.appConfig.listItemSelected
 		},
+	},
+    directives: {
+        clickOutside: vClickOutside.directive
     },
     data: function() {
         return {

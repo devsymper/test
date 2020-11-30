@@ -5,12 +5,12 @@ import { serviceWorker } from "./utilModules/serviceWorker.js";
 import { str } from "./utilModules/str.js";
 
 
-import _ from 'lodash';
+let cloneDeep = require("lodash.clonedeep");
 /**
  * Các hàm trong store sẽ được đưa ra ngoài cùng của cây phân cấp.
  */
 export const util = Object.assign(store, {
-    cloneDeep: _.cloneDeep,
+    cloneDeep: cloneDeep,
     auth: authUtil,
     cookie: cookie,
     serviceWorker: serviceWorker,

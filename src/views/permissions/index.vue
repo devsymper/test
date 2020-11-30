@@ -31,6 +31,7 @@
 
 <script>
 import ListItems from "../../components/common/ListItems";
+import grandPermission from "./grandPermission";
 import UpdatePermission from "./Update";
 import Api from "./../../api/api.js";
 import accountApi from "./../../api/account";
@@ -50,6 +51,7 @@ export default {
     name: "ListPermissions",
     components: {
         ListItems,
+        grandPermission,
         UpdatePermission,
         PermissionForm
     },
