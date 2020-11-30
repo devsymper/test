@@ -20,8 +20,6 @@ import actionMap from './action/index'
 import uploader from 'vue-simple-uploader'
 import VueRx from 'vue-rx'
 import iconMap from "./icon";
-//thu vien slider thumbnails
-
 //Anhtger import html2canvas
 import VueHtml2Canvas from 'vue-html2canvas';
 Vue.use(VueHtml2Canvas);
@@ -68,7 +66,7 @@ Vue.mixin({
 
             }
         },
-
+        $copyTextToClipboard: util.copyTextToClipboard,
         $i(pathToIcon) {
             if (pathToIcon) {
                 try {

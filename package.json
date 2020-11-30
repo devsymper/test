@@ -35,8 +35,6 @@
         "sql.js": "^1.4.0",
         "tinymce": "^5.4.1",
         "vue": "^2.6.11",
-        "vue-cli-plugin-webpack-bundle-analyzer": "^2.0.0",
-        "vue-clipboard2": "^0.3.1",
         "vue-html2canvas": "0.0.4",
         "vue-i18n": "^8.17.6",
         "vue-moment": "^4.1.0",
