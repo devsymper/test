@@ -30,7 +30,6 @@
         "jquery": "^3.4.1",
         "lodash": "^4.17.15",
         "monaco-editor": "^0.21.2",
-        "sortablejs": "^1.10.2",
         "sql.js": "^1.4.0",
         "tinymce": "^5.4.1",
         "vue": "^2.6.11",
