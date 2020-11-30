@@ -68,6 +68,12 @@ const emptyItemSelected = (state) => {
 const updateChildrenApps = (state, data) => {
     state.listItemSelected[data.type].item = data.obj
 }
+const updateChildrenAppsSBS = (state, data) => {
+	// let clone = util.cloneDeep(state.listItemSelected)
+	state.listItemSelected[data.type].item = data.obj
+	// state.listAppsSideBySide[state.currentAppId] = state.listItemSelected
+	Vue.set(state.listAppsSideBySide, state.currentAppId,  state.listItemSelected )
+}
 const updateListFavorite = (state, data) => {
     Vue.set(state, 'listFavorite', data)
 }
@@ -139,5 +145,6 @@ export {
     updateSelectingItemType,    
     updateActiveChildItem,
     updateCurrentAppName,
-    setTypeView
+	setTypeView,
+	updateChildrenAppsSBS
 };

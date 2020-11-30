@@ -79,7 +79,6 @@ import LogTimeForm from "../../components/timesheet/LogTimeForm";
 import DeleteLogView from "../../components/timesheet/DeleteLogView";
 import CategoryForm from "../../components/timesheet/CategoryForm";
 import timesheetApi from '../../api/timesheet';
-import dayjs from 'dayjs';
 
 export default {
     name: "showLogTime",
@@ -181,7 +180,7 @@ export default {
           
         },
         getNow: function() {
-            let current = dayjs().format('HH:mm');
+            let current = this.$moment().format('HH:mm');
             if (this.check_daily === true && current === this.time_remind_daily_log) {
                 this.remindDialog = true;
             }

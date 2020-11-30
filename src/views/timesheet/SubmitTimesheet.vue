@@ -82,7 +82,6 @@ import SubmitTimesheetForm from "./../../components/timesheet/SubmitTimesheetFor
 import timesheetApi from '../../api/timesheet';
 
 import _groupBy from 'lodash';
-import dayjs from 'dayjs';
 
 export default {
     components: {

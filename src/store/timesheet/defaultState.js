@@ -1,11 +1,11 @@
-import dayjs from 'dayjs';
+import moment from 'moment';
 
 export default {
     // timesheet
     calendarType: 'week',
-    calendarStartDate: dayjs().format('YYYY-MM-DD'),
-    calendarEndDate: dayjs().format('YYYY-MM-DD'),
-    calendarShowDate: dayjs().format('YYYY-MM-DD'),
+    calendarStartDate: moment().format('YYYY-MM-DD'),
+    calendarEndDate: moment().format('YYYY-MM-DD'),
+    calendarShowDate: moment().format('YYYY-MM-DD'),
     calendarAdjustment: 0,
     totalHours: '0',
 
