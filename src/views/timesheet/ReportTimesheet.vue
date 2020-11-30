@@ -48,7 +48,7 @@ import ActionButtons from "./../../components/timesheet/ActionButtons";
 import SubmitTimesheetForm from "./../../components/timesheet/SubmitTimesheetForm";
 import timesheetApi from '../../api/timesheet';
 
-import _ from 'lodash';
+import _groupBy from 'lodash/groupBy';
 import dayjs from 'dayjs';
 
 export default {
@@ -117,9 +117,9 @@ export default {
                     if (res.status === 200) {
                         self.dataTest = res.data;
                         const ranges = self.allColumns.slice(2, self.allColumns.length).map(c => c.colId);
-                        const logTimeList = _.groupBy(res.data.listLogTime, 'id');
-                        const dateList = _.groupBy(res.data.listLogTime, 'date');
-                        const userName = _.groupBy(res.data.listLogTime, 'account_id');
+                        const logTimeList = _groupBy(res.data.listLogTime, 'id');
+                        const dateList = _groupBy(res.data.listLogTime, 'date');
+                        const userName = _groupBy(res.data.listLogTime, 'account_id');
                          let nameUser = self.nameUser;
                         //console.log(dateList);
                         const rows = Object.keys(logTimeList).map(k => {
@@ -141,7 +141,7 @@ export default {
 
                         // tính tổng theo từng ngày 
                         Object.keys(userName).forEach(key => {
-                            let time =  _.groupBy(userName[key], 'date');
+                            let time =  _groupBy(userName[key], 'date');
                             let totalByDays = {name:[this.getName(key)]};
                             let totalByUser = 0;
                             Object.keys(time).forEach(day => {

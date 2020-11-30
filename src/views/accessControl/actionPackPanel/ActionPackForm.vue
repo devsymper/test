@@ -135,7 +135,9 @@ import ConfigActionPackOrgchart from "./ConfigActionPackOrgchart.vue" ;
 import ObjectInApplication from "./ObjectInApplication";
 import {uiConfigApi} from "@/api/uiConfig";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import ApplicationDefinitionForm from "./../helpers/ApplicationDefinitionForm"
+import ApplicationDefinitionForm from "./../helpers/ApplicationDefinitionForm";
+import _debounce from "lodash/debounce";
+
 let defaultTabConfig = {
     tableData: [],
     columns: [],
@@ -797,7 +799,7 @@ export default {
         handleEditorShow(data){
             this.isEditingCell = data;
 		},
-		debounceSaveActionPack: _.debounce(function(e){
+		debounceSaveActionPack: _debounce(function(e){
 			this.saveActionPack()
 		}, 300,this),
         async getObjectsOfObjectType(objectType = null){
