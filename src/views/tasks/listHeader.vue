@@ -204,7 +204,6 @@
 import BPMNEngine from "./../../api/BPMNEngine";
 import icon from "../../components/common/SymperIcon";
 import datePicker from "../../components/common/datePicker";
-import vClickOutside from "v-click-outside";
 import userSelector from "./userSelector";
 import TaskListFilter from "@/components/tasks/list/TaskListFilter.vue";
 import SymperDocSelect from "@/components/common/symperInputs/SymperDocumentSelect.vue";
@@ -333,9 +332,6 @@ export default {
             },
             filterList: {}
         };
-    },
-    directives: {
-        clickOutside: vClickOutside.directive
     },
     mounted() {
         this.getProcessInstance();
