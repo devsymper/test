@@ -143,8 +143,8 @@ export default {
 								var radius = Math.floor(Math.random()*70);
 								let pos = e.di.bounds
 								var point = {
-									x: pos.x + 20,
-									y: pos.y + 25,
+									x: pos.x + 20 ,
+									y: pos.y + 25 ,
 									value: val,
 									radius: 80
 								}
@@ -222,6 +222,7 @@ export default {
 					data: points
 				};
 				heatmapInstance.setData(data);
+				// this.focusCanvas()
 			}
 		},
         /**
@@ -1289,7 +1290,8 @@ export default {
                 if(modelData.configValue){
 					this.restoreAttrValueFromJsonConfig(modelData.configValue);
 					this.plotHeatmap()
-					// this.$refs.symperBpmnHeatMap.focus();
+					this.$refs.symperBpmnHeatMap.focus();
+					this.focusCanvas()
                 }
             } catch (error) {
                 this.$snotifyError(
@@ -1297,7 +1299,24 @@ export default {
                     this.$t("process.editror.err.get_xml")
                 );
             }
-        },
+		},
+		focusCanvas(){
+			var res = '';
+			var str = $('.djs-overlay-container')[0].style['-ms-transform']
+
+			var x = str.split(',');
+			let newFour = Number(x[4]) - 60
+			var last = x[5].split(')')
+			let newLast = Number(last[0]) - 25
+			last.join()
+			x[4] = newFour
+			x[5] = newLast
+			let newStr = x.join()
+			setTimeout((self) => {
+				var canvas = document.getElementsByClassName("heatmap-canvas");
+				$(canvas).css('transform',newStr)
+			}, 100, this);
+		},
         restoreAttrValueFromJsonConfig(jsonStr){
 			let processTracking = this.$store.state.admin.currentTrackingProcess
 			let self = this

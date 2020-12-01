@@ -25,6 +25,7 @@
 					<v-btn
 						tile 
 						icon
+						v-show="tab == 'tab-1'"
 						x-small
 						class="mr-2"
 						@click="handleZoomOut"
@@ -35,6 +36,7 @@
 						tile 
 						icon
 						x-small
+						v-show="tab == 'tab-1'"
 						class="mr-2"
 						@click="handleZoomIn"
 					>
@@ -44,6 +46,7 @@
 						tile 
 						icon
 						x-small
+						v-show="tab == 'tab-1'"
 						class="mr-2"
 						@click="handleFocus"
 					>

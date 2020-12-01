@@ -428,7 +428,6 @@ export default {
              // this.loadTaskList();
         },
         newEvent(val) {
-            debugger
             this.getAllTask(val.task);
             this.inputs.startTime = val ? dayjs(val.start).format('HH:mm') : "08:00";
             this.inputs.endTime = val ? dayjs(val.end).format('HH:mm') : "08:40";
@@ -436,7 +435,6 @@ export default {
             this.displayDate = this.inputs.date;
             this.inputs.description = val.desc;
             this.categoryTask = val.category;
-              debugger
             this.task = val.task?val.task:getIdTask(val.task);
             this.items.push({name:val.task});
             // hiển thị nút plan và log theo từng giờ
@@ -488,13 +486,11 @@ export default {
                 }
             }
         },
-         findNameTask(id){
-             debugger
+		findNameTask(id){
              this.nameTask=this.items.filter(x=>x.id==id)[0].name;
              return this.nameTask
         },
         getCategoryId(taskId){
-            debugger
            let cateId = this.items.filter(x=>x.id==taskId)[0].categoryId;
            if(cateId){
                 this.categoryTask = this.getFullNameCategory(cateId)

@@ -152,7 +152,6 @@ export default {
 		},
 		//check xem menu có dữ liệu không
 		// checkDataMenu(obj){
-		// 	debugger
 		// 	let check = false;
 		// 	this.getListObjectIdentifier(obj);
 		// 	let lengthTitle = this.titleAllNameObject.length;

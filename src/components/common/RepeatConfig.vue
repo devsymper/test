@@ -600,7 +600,6 @@ export default {
             deep: true,
             immediate: true,
             handler(newValue){
-                debugger
                 this.crobTabValue[3]= '?';
                 this.crobTabValue[5]=this.dOM+'#'+newValue.value;
                 // this.crobTabValue[4]= '1/1';
