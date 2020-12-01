@@ -1278,5 +1278,35 @@
         "reply": "Reply",
         "edited": "Edited",
         "search": "Search"
+    },
+    "taskManagement":{
+        "table":{
+            "name": "Name",
+            "description": "Description",
+            "lead": "Lead",
+            "category": "Category",
+            "createAt":"Create time",
+            "email":"Email",
+            "role":"Role",
+            "workflow":"Workflow"
+        },
+        "listMember":"List member",
+        "listCategory":"List category",
+        "listIssueType":"List Issue type",
+        "detailProject":"Detail project",
+        "requiredField":"Indicates required field",
+        "addPeople":"Add people",
+        "managerRole":"Manager roles",
+        "createRole":"Create role",
+        "dialog":{
+            "removeUser": "You will remove members from this project?",
+            "removeRole": "You will remove role from this rols.",
+            "removeCategory": "You will remove category from this rols."
+
+        },
+        "settingBoard":"Board setting"
+
+
+
     }
 }

@@ -1402,5 +1402,32 @@
         "reply": "Trả lời",
         "edited": "Đã chỉnh sửa",
         "search": "Tìm kiếm"
+    },
+    "taskManagement":{
+        "table":{
+            "name": "Tên",
+            "description": "Mô tả",
+            "lead": "Lead",
+            "category": "Danh mục",
+            "createAt":"Ngày tạo",
+            "email":"Email",
+            "role":"Quyền",
+            "workflow":"Workflow"
+        },
+        "listMember":"Danh sách thành viên",
+        "listCategory":"Danh sách danh mục",
+        "listIssueType":"Danh sách Issue type",
+        "requiredField":"Trường bắt buộc nhập",
+        "detailProject":"Thông tin project",
+        "addPeople":"Thêm thành viên",
+        "managerRole":"Quản lý phân quyền",
+        "createRole":"Tạo role",
+        "dialog":{
+            "removeUser": "Bạn sẽ xóa thành viên khỏi project này",
+            "removeRole": "Bạn sẽ xóa role này khỏi danh sách.",
+            "removeCategory": "Bạn sẽ xóa danh mục này khỏi danh sách."
+        },
+        "settingBoard":"Cài đặt Board"
+
     }
 }
