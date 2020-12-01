@@ -109,6 +109,8 @@ export default {
     data(){
         return {
             listRows:[],
+            isValidNote:true,
+            isValideTitleFml:true,
             isShowModelSaveDoc:false,
             isValidName :true,
             isValidTitle :true,
@@ -123,6 +125,33 @@ export default {
     methods:{
         checkNameDocument(){
             this.$emit('check-name-document');
+        },
+         checkRequiredTitleObjFml(){
+            let message = ""
+            if(!this.documentProps.titleObjectFormulas.value){
+                this.isValideTitleFml = false;
+                message = this.$t('document.validate.emptyTitle');
+            }
+            else{
+                this.isValideTitleFml = true;
+                message = ""
+            }
+            this.documentProps.titleObjectFormulas.validateStatus.isValid = this.isValideTitleFml;
+            this.documentProps.titleObjectFormulas.validateStatus.message = message;
+        },
+        checkRequiredNote(){
+            let message = ""
+            if(!this.documentProps.note.value){
+                debugger
+                this.isValidNote = false;
+                message = this.$t('document.validate.emptyNote');
+            }
+            else{
+                this.isValidNote = true;
+                message = ""
+            }
+            this.documentProps.note.validateStatus.isValid = this.isValidNote;
+            this.documentProps.note.validateStatus.message = message;
         },
         //Hàm kiểm tra tên document đã tồn tai hay chưa
         handleChangeInput(name, input, data){
@@ -189,19 +218,20 @@ export default {
                     this.$refs.validate.show(false);
                 }
                 else{
-                    if(this.isValidName && this.isValidTitle){
+                    if(this.isValidName && this.isValidTitle && this.isValidNote && this.isValideTitleFml){
                         this.saveFormulasForRecord();
                     }
                     else{
                         this.checkValidateNameDocument(this.documentProps.name.value);
                         this.checkTitleDocument();
+                        this.checkRequiredNote();
+                        this.checkRequiredTitleObjFml()
                     }
                 }
             }
         },
 
         async saveFormulasForRecord(){
-            
             if(this.$getRouteName() == 'editDocument'){
                 this.$refs.systemDataMapping.editMapping(this.$route.params.id);
             }
@@ -259,6 +289,18 @@ export default {
             else{
                 this.isValidTitle = true
             }
+            if(!props.note){
+                this.isValidNote = false
+            }
+            else{
+                 this.isValidNote = true
+            }
+            if(!props.titleObjectFormulas){
+                this.isValideTitleFml = false
+            }
+            else{
+                 this.isValideTitleFml = true
+            }
             let self = this;
             let docProps = {
                 name : { 
@@ -315,10 +357,24 @@ export default {
                     title: this.$t('document.editor.dialog.saveDoc.note'),
                     type: "textarea",
                     value: (props.note != undefined) ? props.note : '',
+                     validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    validate(){
+                        self.checkRequiredNote(this.value)
+                    }
                 },
                 titleObjectFormulas: {
                     title: this.$t('document.editor.dialog.saveDoc.titleObject'),
                     value: "",
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    validate(){
+                        self.checkRequiredTitleObjFml(this.value)
+                    },
                     formulasId: (props.titleObjectFormulasId != undefined) ? props.titleObjectFormulasId : 0,
                     type: "script",
                     groupType: "formulas"
