@@ -733,13 +733,17 @@ export default class Table {
             if (controlInstance == null || controlInstance == undefined) {
                 return;
             }
-
             let controlEffected = controlInstance.getEffectedControl();
             let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
             let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
             let controlRequireEffected = controlInstance.getEffectedRequireControl();
             let controlLinkEffected = controlInstance.getEffectedLinkControl();
             let controlValidateEffected = controlInstance.getEffectedValidateControl();
+            controlRequireEffected[controlName] = true;
+            controlValidateEffected[controlName] = true;
+            controlReadonlyEffected[controlName] = true;
+            controlHiddenEffected[controlName] = true;
+
             this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
             this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readOnly');
             this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
@@ -1557,7 +1561,6 @@ export default class Table {
         let map = thisObj.validateValueMap[row + '_' + column];
         let controlTitle = (control.title == "") ? control.name : control.title;
         let ele = $(td);
-        
         if (map) {
             for (let index = 0; index < map.length; index++) {
                 const cellValidateInfo = map[index];
@@ -1571,31 +1574,34 @@ export default class Table {
                 if (cellValidateInfo.type === 'readOnly') {
                     hotInstance.setCellMeta(row, column, 'readOnly', cellValidateInfo.value);
                 }
-                if (cellValidateInfo.value) {
-                    if(ele.find('.validate-icon').length > 0){
-                        let curMsg = ele.find('.validate-icon').attr('title');
-                        curMsg = (curMsg) ? cellValidateInfo.msg : curMsg + "|||" + cellValidateInfo.msg;
-                        ele.find('.validate-icon').attr(curMsg);
-                    }
-                    else{
-                        ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(cellValidateInfo.msg, controlTitle));
+                else{
+                    if (cellValidateInfo.value) {
+                        if(ele.find('.validate-icon').length > 0){
+                            let curMsg = ele.find('.validate-icon').attr('title');
+                            curMsg = (curMsg) ? cellValidateInfo.msg : curMsg + "\n" + cellValidateInfo.msg;
+                            ele.find('.validate-icon').attr('msg',curMsg);
+                        }
+                        else{
+                            ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(control.name, cellValidateInfo.msg));
+                        }
                     }
                 }
             }            
         }
         ele.off('click', '.validate-icon')
         ele.on('click', '.validate-icon', function(e) {
-            let msg = $(this).attr('title');
+            let msg = $(this).attr('msg');
+
             e.msg = msg;
             SYMPER_APP.$evtBus.$emit('document-submit-open-validate-message', e)
         })
         if(control.checkProps('isRequired')){
             if(!value){
                 if(ele.find('.validate-icon').length > 0){
-                    ele.find('.validate-icon').attr("Không được bỏ trống");
+                    ele.find('.validate-icon').attr('msg',"Không được bỏ trống");
                 }
                 else{
-                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti('Không được bỏ trống', controlTitle));
+                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(control.name,'Không được bỏ trống'));
                 }
             }
         }

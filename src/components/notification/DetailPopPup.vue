@@ -61,6 +61,7 @@
 <script>
 
 import notification from "./../../api/settingNotification";
+import _groupBy from "lodash/groupBy";
 export default {
     props:['name','objType'],
       data () {
@@ -207,7 +208,7 @@ export default {
                     format.push(listModules[i])
                 }
             }
-            let formatListModules = _.groupBy(format, 'objectType');
+            let formatListModules = _groupBy(format, 'objectType');
             let name = Object.keys(formatListModules);
             for(let i=0;i<formatListModules[self.objType].length;i++){
                 self.items.push({

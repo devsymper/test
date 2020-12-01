@@ -4,6 +4,7 @@
         "number_instance": "Number of process instance",
         "select_lang": "Select language",
         "KH": "Knowledge Management",
+        "taskManagement": "Task Management",
         "structureManagement": "Structure management",
         "reports": "Reports",
         "workflows": "Workflows",
@@ -129,6 +130,7 @@
             "apps": "My apps",
             "Account management": "Account manager",
             "Access Management": "Access management",
+            "Task Management": "Task management",
             "Applications": "Applications",
             "Lists to do": "Lists to do",
             "My application": "My application",
@@ -1278,5 +1280,35 @@
         "reply": "Reply",
         "edited": "Edited",
         "search": "Search"
+    },
+    "taskManagement":{
+        "table":{
+            "name": "Name",
+            "description": "Description",
+            "lead": "Lead",
+            "category": "Category",
+            "createAt":"Create time",
+            "email":"Email",
+            "role":"Role",
+            "workflow":"Workflow"
+        },
+        "listMember":"List member",
+        "listCategory":"List category",
+        "listIssueType":"List Issue type",
+        "detailProject":"Detail project",
+        "requiredField":"Indicates required field",
+        "addPeople":"Add people",
+        "managerRole":"Manager roles",
+        "createRole":"Create role",
+        "dialog":{
+            "removeUser": "You will remove members from this project?",
+            "removeRole": "You will remove role from this rols.",
+            "removeCategory": "You will remove category from this rols."
+
+        },
+        "settingBoard":"Board setting"
+
+
+
     }
 }

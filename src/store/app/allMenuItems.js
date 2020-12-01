@@ -143,6 +143,12 @@ export default {
         link: '/knowledge',
         group: "Applications"
     },
+    taskManagement: {
+        title: 'Task Management',
+        icon: 'mdi-lock-outline',
+        link: '/task-management',
+        group: "Applications"
+    },
     fileManagement: {
         title: 'File',
         icon: 'mdi-upload-outline',

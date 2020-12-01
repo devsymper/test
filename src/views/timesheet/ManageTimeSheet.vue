@@ -50,7 +50,11 @@ import AgDataTable from "./../../components/common/agDataTable/AgDataTable";
 import CheckBoxRenderer from "./../../components/common/agDataTable/CheckBoxRenderer";
 import Config from "../../components/timesheet/Config";
 import timesheetApi from '../../api/timesheet';
-import _ from 'lodash';
+
+import dayjs from "dayjs";
+import isBetween from 'dayjs/plugin/isBetween';
+dayjs.extend(isBetween);
+import _groupBy from 'lodash/groupBy';
 
 export default {
     components: {
@@ -134,7 +138,7 @@ export default {
                 .then(res => {
                     if (res.status === 200) {
                         const ranges = self.allColumns.slice(2, self.allColumns.length).map(c => c.colId);
-                        const logTimeListByAccount = _.groupBy(res.data.listLogTime, 'account_id');
+                        const logTimeListByAccount = _groupBy(res.data.listLogTime, 'account_id');
                         let userName = res.data.userName;
                          console.log(userName);
                         // console.log('ádádjádaksdjkádj');

@@ -211,7 +211,7 @@ import timesheetApi from '../../api/timesheet';
 
 import { mapState} from 'vuex';
 
-import _ from 'lodash';
+import _groupBy from 'lodash/groupBy';
 
 export default {
     name: "LogCalendar",
@@ -674,7 +674,7 @@ export default {
         },
         monthEvents() {
             if (this.events) {
-                return _.groupBy(this.events, 'date');
+                return _groupBy(this.events, 'date');
             } else {
                 return [];
             }
