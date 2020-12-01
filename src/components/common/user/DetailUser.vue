@@ -229,6 +229,8 @@ import ViewRoles from "../../../views/users/ViewRoles";
 import NotificationChangePass from "./../../../components/notification/notificationChangeFirstPass";
 import Vue from "vue";
 import { userApi } from '../../../api/user';
+import _groupBy from "lodash/groupBy";
+
 export default {
     components: {
         SymperAvatar,
@@ -340,7 +342,7 @@ export default {
             this.$emit('closePanel')
         },
         editOrgRole(ogrRole){
-            let nameOrgchart = _.groupBy(ogrRole, 'orgchartName');
+            let nameOrgchart = _groupBy(ogrRole, 'orgchartName');
             this.orgRole= [];
             Object.keys(nameOrgchart).forEach(type => {
                 this.orgRole.push({titleGroup: type });

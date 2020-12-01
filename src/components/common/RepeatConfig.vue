@@ -410,7 +410,6 @@
     </div>
 </template>
 <script>
-import dayjs from 'dayjs';
 
 export default {
     props:{
@@ -639,7 +638,7 @@ export default {
             immediate: true,
             handler(newValue){
                 if(newValue.type=='daily'){
-                    let day = dayjs().format('d');
+                    let day = this.$moment().format('d');
                     this.crobTabValue[5] = day+'/'+newValue.times;
                     this.$emit('value',this.crobTabValue)
                 }

@@ -44,10 +44,11 @@ import UserSelector from "@/views/tasks/userSelector.vue";
 import { systemRoleApi } from "@/api/systemRole.js";
 import ActionPackSelector from "@/components/permission/ActionPackSelector.vue";
 import { permissionApi } from '../../api/permissionPack';
+import _debounce from "lodash/debounce";
 
 export default {
     methods: {
-		debounceSavePermission: _.debounce(function(e){
+		debounceSavePermission: _debounce(function(e){
 			this.savePermission()
 		}, 300,this),
         async savePermission(){

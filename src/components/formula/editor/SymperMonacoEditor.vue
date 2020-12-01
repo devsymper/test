@@ -205,6 +205,7 @@ export default {
         },
     },
     created(){
+        this.$store.commit('formulaEditor/setGlobalMonacoEditorLanuages', languages);
         this.$store.dispatch('document/setListDocuments');
     }
 }

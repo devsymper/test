@@ -96,6 +96,7 @@ import MenuTagUser from './MenuTagUser.vue'
 import UploadFile from '@/components/common/UploadFile.vue';
 import {commentApi} from '@/api/Comment.js'
 import { util } from '../../../plugins/util';
+import _debounce from "lodash/debounce";
 
 export default {
 	data(){
@@ -266,7 +267,7 @@ export default {
                 text: this.$t('notification.error')
             })
 		},
-		debounceAddCommnent: _.debounce(function(e){
+		debounceAddCommnent: _debounce(function(e){
 			this.addComment()
 		}, 200,this),
 		addComment(){

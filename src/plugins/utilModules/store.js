@@ -1,7 +1,6 @@
 /**
  * Các hàm phục vụ cho việc xác thực, lưu trữ dữ liệu đăng nhập cho người dùng
  */
-import { lte } from "lodash";
 import { cookie } from "./cookie.js";
 export const store = {
     getComponentSize(comp) {

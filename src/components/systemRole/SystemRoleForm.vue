@@ -67,10 +67,11 @@ import UserSelector from "@/views/tasks/userSelector.vue";
 import { systemRoleApi } from "@/api/systemRole.js";
 import PermissionSelector from "@/components/permission/PermissionSelector.vue";
 import ListUserSelector from "@/views/accessControl/helpers/ListUserSelector"
+import _debounce from "lodash/debounce";
 
 export default {
     methods: {
-		debounceSaveSystemRole: _.debounce(function(e){
+		debounceSaveSystemRole: _debounce(function(e){
 			this.saveSystemRole()
 		}, 200,this),
         async saveSystemRole(){
