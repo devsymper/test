@@ -336,6 +336,7 @@ export default {
 	watch:{
 		processKey(val){
 			this.listItemSelected = []
+			this.tab = 'tab-1'
 		},
 		listItemSelected:{
 			deep: true,

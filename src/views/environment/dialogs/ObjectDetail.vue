@@ -114,12 +114,12 @@ export default {
 			},
 			customAPIResult:{
 				reformatData(res){
-                   return{
-                       columns:res.data.columns ? res.data.columns : [],
-                       listObject:res.data.listObject ? res.data.listObject : [],
-                       total: res.data.listObject ? res.data.listObject.length : 0,
-                   }
-                }
+					return{
+						columns:res.data.columns ? res.data.columns : [],
+						listObject:res.data.listObject ? res.data.listObject : [],
+						total: res.data.listObject ? res.data.listObject.length : 0,
+					}
+				}
 			}
 		}
 	},

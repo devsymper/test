@@ -101,8 +101,7 @@ export default {
 		/**
 		 * Ve  heatmap 
 		 */
-
-		plotHeatmap() {
+		plotHeatmap(){
 			let allNodes = this.$refs.symperBpmnHeatMap.getAllNodes()
 			let sumProcess = this.$store.state.admin.sumProcess
 			let currentTrackingProcess = this.$store.state.admin.currentTrackingProcess
@@ -223,15 +222,8 @@ export default {
 					data: points
 				};
 				heatmapInstance.setData(data);
-				// var canvas = document.getElementsByClassName('heatmap-canvas');
-				// let ctx = canvas[0].getContext('2d')
-				// ctx.save();
-				// ctx.translate(15, 0);
-				// ctx.transform(1, 0, 0, 1, 0, 0)
 			}
-			
 		},
-
         /**
          * Tìm và đặt các control cho việc lựa chọn cho phép edit trong lúc duyệt
          */
