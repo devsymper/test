@@ -2,8 +2,8 @@
     
     <div class="h-100 w-100 list-object-component">
         <list-items
-        :getDataUrl="'https://sdocument-management.symper.vn/documents/'+docId+'/objects'"
-        :exportLink="'https://sdocument-management.symper.vn/documents/'+docId+'/export-excel'" 
+        :getDataUrl="sDocumentManagementUrl+'documents/'+docId+'/objects'"
+        :exportLink="sDocumentManagementUrl+'documents/'+docId+'/export-excel'" 
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('documentObject.title')"
@@ -12,7 +12,7 @@
         :actionPanelType="'elastic'"
         :showActionPanelInDisplayConfig="true"
         :showExportButton="true"
-        :showImportButton="true"
+        :showImportButton="false"
         :isTablereadOnly="false"
         :conditionByFormula="formulasInput.formula.value"
         @after-open-add-panel="submitDocument"
@@ -206,6 +206,7 @@
     </div>
 </template>
 <script>
+import { appConfigs } from "@/configs.js";
 import ListItems from "./../../../components/common/ListItems.vue";
 import BottomSheet from './../../../components/common/BottomSheet'
 import PrintView from "./../print/PrintView";
@@ -231,6 +232,7 @@ export default {
     },
     data(){
         return {
+            sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
             dialog:false,
             showProgress:false,
             actionOnRightSidebar: 'detail',
@@ -258,7 +260,7 @@ export default {
                     return{
                         columns:res.data.columns,
                         listObject:res.data.listObject,
-                        total:res.data.listObject.length,
+                        total:res.data.total,
                     }
                 }
             },
@@ -411,7 +413,7 @@ export default {
         }).catch(err => {}).always(() => {});
     },
     activated(){
-        if(this.$refs.listObject.isShowCheckedRow()){
+        if(this.$refs.listObject && this.$refs.listObject.isShowCheckedRow()){
             if(this.isDeleteMultiple){
                 // for(let row in this.recordSelected){
                 //     this.$refs.listObject.getHotInstance().setDataAtCell(row,0,true,'edit');

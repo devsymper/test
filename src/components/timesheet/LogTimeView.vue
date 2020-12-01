@@ -43,7 +43,6 @@
 </v-card>
 </template>
 <script>
-import dayjs from 'dayjs';
 import SymperAvatar from "./../../components/common/SymperAvatar";
 export default {
   created () {
@@ -62,10 +61,10 @@ export default {
     },
       methods: {
           changeTime(time){
-              return dayjs(time).format('HH:mm')
+              return this.$moment(time).format('HH:mm')
           },
           changeDate(date){
-              return dayjs(date).format('DD/MM/YYYY')
+              return this.$moment(date).format('DD/MM/YYYY')
           },
            changeDuration(duration) {
             let hour = duration / 60;
@@ -84,8 +83,8 @@ export default {
             //co//nsole.log(hour + minutes);
         },
          findDuration(startTime, endTime) {
-            let startFormatted = dayjs(startTime);
-            let endFormatted = dayjs(endTime);
+            let startFormatted = this.$moment(startTime);
+            let endFormatted = this.$moment(endTime);
             let start = startFormatted.get('hour') * 60 + startFormatted.get('minute');
             let end = endFormatted.get('hour') * 60 + endFormatted.get('minute');
             let duration = end - start;

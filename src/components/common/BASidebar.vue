@@ -293,7 +293,7 @@
                 </div>
                     <v-menu top nudge-top='40' nudge-left='60'>
                     <template v-slot:activator="{ on: menu }">
-                        <v-btn style="margin-left:140px" icon tile v-on="menu">
+                        <v-btn style="position: absolute;right: 10px;" icon tile v-on="menu">
                             <v-icon style="font-size:18px">mdi-cog-outline</v-icon>
                         </v-btn>
                     </template>
@@ -328,7 +328,7 @@
     </v-navigation-drawer>
 </template>
 <script>
-import _ from 'lodash';
+import _groupBy from 'lodash/groupBy';
 import { util } from "./../../plugins/util.js";
 import { userApi } from "./../../api/user.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
@@ -413,7 +413,7 @@ export default {
              this.menu = this.userMenuItems;
              let menuItem = [];
              let allMenuItem = [];
-             this.menu =  _.groupBy(this.menu, 'group');
+             this.menu =  _groupBy(this.menu, 'group');
             Object.keys(this.menu).forEach(type => {
                 let name = type;
                 menuItem.push({titleGroup: name });
@@ -438,7 +438,7 @@ export default {
             }, 400, this);
         },
         reCalcSidebarHeight(){
-            this.menuItemsHeight = (util.getComponentSize(this).h - 200)+'px';
+            this.menuItemsHeight = (util.getComponentSize(this).h - 160)+'px';
         },
         logout(){
             util.auth.logout();

@@ -30,7 +30,7 @@
 							<table class="general-info">
 								<tr>
 									<td>{{$t('document.detail.sidebar.body.general.dateCreate')}}</td>
-									<td class="pl-2">{{originData.createTime ? $moment(originData.createTime).format('DD/MM/YY HH:mm:ss'):$moment(originData.endTime).format('DD/MM/YY HH:mm:ss')}}</td>
+									<td class="pl-2">{{originData.createTime ? $moment(originData.createTime).format('DD/MM/YY HH:mm:ss'):$moment(originData.startTime).format('DD/MM/YY HH:mm:ss')}}</td>
 								</tr>
 								<tr>
 									<td>{{$t('tasks.header.dueDate')}}</td>
@@ -751,7 +751,9 @@ export default {
 		},
 		getData(){
 			let data = {};
-			data.objectIdentifier = this.taskInfo.action.parameter.taskId;
+			if (this.taskInfo.action) {
+				data.objectIdentifier = this.taskInfo.action.parameter.taskId;
+			}
 			data.objectType = "task";
 			this.$store.dispatch("task/getArrFileAttachment", data);
     	}

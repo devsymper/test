@@ -2,12 +2,14 @@
 <div style="width:100%">
     <list-items
         ref="listDocument"
-        :getDataUrl="'https://sdocument-management.symper.vn/documents'"  
+        :getDataUrl="sDocumentManagementUrl+'documents'"  
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('document.title')"
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
+        :showExportButton="false"
+        :showImportButton="false"
         @after-open-add-panel="addDocument"
         :headerPrefixKeypath="'document'"
         :commonActionProps="commonActionProps"
@@ -37,6 +39,7 @@ import ActionPanel from "./../../views/users/ActionPanel.vue";
 import ChangePassPanel from "./../../views/users/ChangePass.vue";
 import Submit from './submit/Submit'
 import { util } from "./../../plugins/util.js";
+import { appConfigs } from '../../configs';
 export default {
     components: {
         ImportExcelPanel: ImportExcelPanel,
@@ -46,6 +49,7 @@ export default {
     },
     data(){
         return {
+            sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
             documentId:0,
             options:{
             },

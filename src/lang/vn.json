@@ -1,5 +1,6 @@
 {
     "common": {
+        "number_instance": "Tổng số instance",
         "id": "Id",
         "select_lang": "Thay đổi ngôn ngữ",
         "KH": "Knowledge Management",
@@ -17,7 +18,8 @@
         "import_excel_history": "Lịch sử Import",
         "edit": "Sửa",
         "cancel": "Hủy",
-        "update": "Cập nhật",
+		"update": "Cập nhật",
+		"create":"Thêm mới",
         "delete": "Xóa",
         "refresh": "Làm mới",
         "userDeletedName": "Email người xóa",
@@ -97,7 +99,11 @@
         "not_always_show_sidebar": "Ẩn sidebar",
         "import_excel": "Nhập bằng excel",
         "isDefault": "SĐTC mặc định",
-        "restore": "Khôi phục",
+		"restore": "Khôi phục",
+		"userCreateName": "Người tạo",
+		"userUpdateName": "Người cập nhật",
+		"createAt": "Thời gian tạo",
+		"updateAt": "Thời gian cập nhật",
         "sidebar": {
             "Notification Config BA": "Cài đặt thông báo",
             "Setting": "Cài đặt",
@@ -109,6 +115,7 @@
             "tasks": "Tasks",
             "works": "Works",
             "My work": "Tác vụ của tôi",
+            "My work timesheet": "Ghi công",
             "myWork": "Lịch làm việc",
             "Manage timesheet": "Quản lý  thời gian biểu",
             "Timesheet report": "Báo cáo thời gian biểu",
@@ -117,6 +124,8 @@
             "Administrator": "Quản trị viên",
             "Account management": "Quản lý tài khoản",
             "Access Management": "Quản lý truy cập",
+            "accessControl": "Quản lý truy cập",
+            "accessControlBeta": "Quản lý truy cập beta",
             "users": "Tài khoản người dùng",
             "baAccount": "Tài khoản BA",
             "actionPack": "Action Pack",
@@ -143,7 +152,8 @@
             "listTrashOrgchart": "Danh sách SĐTC đã xóa",
             "viewOrgchart": "Xem SĐTC mặc định",
             "list_workflow": "Danh sách quy trình",
-            "list_work": "Danh sách công việc"
+            "list_work": "Danh sách công việc",
+            "environment": "Quản lí môi trường"
         },
         "system": "Vai trò người dùng",
         "copy": "Sao chép"
@@ -163,13 +173,28 @@
         }
     },
     "table": {
+		"id": "ID",
+		"name": "Tên Service",
+		"description": "Mô tả",
+		"lastVersion": "Version mới nhất",
+		"language": "Ngôn ngữ",
+		"status": "Trạng thái",
+		"userCreate": "Người tạo",
+		"userUpdate": "Người cập nhât",
+		"createAt": "Thời gian tạo",
+		"updateAt": "Thời gian cập nhât",
+		"releaseAt": "Thời gian release",
+		"versionName": "Tên version",
         "wrap_text_mode": "Chế độ xuống dòng",
         "display_density": "Mật độ hiển thị dòng",
         "column_config": "Cấu hình cột",
-        "freeze_column": "Cố định cột này",
+		"freeze_column": "Cố định cột này",
+		"environmentIdentifier": "Định danh môi trường",
+		"environmentName": "Tên môi trường",
         "unfreeze_column": "Bỏ cố định cột này",
         "hide_column": "Ẩn cột này",
-        "show_column": "Hiện cột này",
+		"show_column": "Hiện cột này",
+		"git": "Link git",
         "wrap_tex_mode": {
             "wrap": "Xuống dòng",
             "clip": "Cắt bớt"
@@ -217,7 +242,8 @@
             "startUserId": "Người bắt đầu",
             "startTime": "Thời gian bắt đầu",
             "tenantId": "ID",
-            "suspended": "Trạng thái"
+			"suspended": "Trạng thái",
+			"number_instance":"Tổng số instance"
         }
     },
     "validate": {
@@ -348,7 +374,7 @@
         },
         "myInfo": {
             "title": "Thông tin của tôi",
-            "generalInfo": "Thông tin chung",
+            "generalInfo": "Thông tin chi tiết",
             "myPosition": "Vị trí của tôi"
         }
     },
@@ -386,6 +412,7 @@
         "grandPermission": "Phân quyền chi tiết",
         "apps": "Apps",
         "contextMenu": {
+			"viewDetails":"Xem chi tiết",
             "edit": "Sửa",
             "grantPermission": "Phân quyền",
             "remove": "Xóa"
@@ -502,6 +529,7 @@
         "submit": "Gửi",
         "date": "Ngày",
         "task_form": "Tạo task",
+        "task_logform": "Task",
         "time_invalid": "Thời gian không hợp lệ",
         "required_value": "Không được để trống",
         "of": "từ",
@@ -529,7 +557,7 @@
         "department": "Phòng ban"
     },
     "objectType": {
-
+        "time_sheet": "Lịch làm việc",
         "Document definition": "Văn bản",
         "Document instance": "Danh sách bản ghi",
         "Orgchart": "Sơ đồ tổ chức",
@@ -553,6 +581,7 @@
         "Timesheet": "Thời gian biểu"
     },
     "objects": {
+        "time_sheet": "Lịch làm việc",
         "import": "Import",
         "task": "Task",
         "role": "Role",
@@ -748,8 +777,10 @@
                         "userRole": "Vai trò",
                         "history": "Lịch sử",
                         "comment": "Bình luận",
-                        "has": "Có",
-                        "commentNotResolve": "bình luận chưa được giải quyết"
+                        "has": "Có ",
+                        "commentNotResolve": " bình luận chưa được giải quyết",
+                        "noComment": "Không có bình luận nào",
+                        "id": "Định danh"
                     },
                     "worflowInfo": "THÔNG TIN QUY TRÌNH",
                     "userRelated": {
@@ -1094,19 +1125,6 @@
                 "update": "Sửa",
                 "create": "Tạo ",
                 "execute": "Thực thi"
-            },
-            "account": {
-                "change_avatar": "Đổi ava",
-                "add": "Thêm",
-                "update": "Cập nhật",
-                "info": "Thông tin",
-                "detail": "Chi tiết",
-                "change_pass": "Đổi pass",
-                "disable": "Ẩn",
-                "set_role": "Cài role"
-
-
-
             },
             "application_definition": {
                 "update": "Sửa",

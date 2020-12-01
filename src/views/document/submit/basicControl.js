@@ -4,9 +4,9 @@ import sDocument from './../../../store/document'
 import { SYMPER_APP } from './../../../main.js'
 import Util from './util'
 var numbro = require("numbro");
-import moment from "moment-timezone";
-
+import { appConfigs } from "@/configs.js";
 import { documentApi } from "../../../api/Document";
+let sDocumentManagementUrl = appConfigs.apiDomain.sdocumentManagement;
 const fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
     'txt': 'mdi-file-document-outline',
@@ -52,22 +52,13 @@ export default class BasicControl extends Control {
     render() {
             this.ele.wrap('<span style="position:relative;display:inline-block">');
             this.ele.attr('key-instance', this.curParentInstance);
-            // if (this.checkDetailView() &&
-            //     this.controlProperties['isSaveToDB'] !== undefined &&
-            //     (this.controlProperties['isSaveToDB'].value !== "1" ||
-            //         this.controlProperties['isSaveToDB'].value !== 1)) {
-            //     this.ele.css({ display: 'none' })
-            // }
             if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
                 this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
             }
             if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
                 this.ele.attr('disabled', 'disabled');
+                this.ele.css({ background: 'rgba(0,0,0,0.05)' })
             }
-            // if (this.checkViewType('print') && this.checkProps('isBorderPrint')) {
-            //     this.ele.css('border-bottom', '0.5px solid rgb(230, 229, 229)')
-            // }
-
             if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
                 this.ele.css({ 'display': 'none' })
             }
@@ -127,7 +118,7 @@ export default class BasicControl extends Control {
             }
             this.setDefaultValue();
             this.setEvent();
-            if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete')) {
+            if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete') && this.controlFormulas.autocomplete.instance) {
                 let allTable = this.controlFormulas.autocomplete.instance.detectTableQuery();
                 let columnBinding = this.controlFormulas.autocomplete.instance.autocompleteDetectAliasControl(false);
                 this.columnBindingSubForm = columnBinding;
@@ -204,7 +195,7 @@ export default class BasicControl extends Control {
                     valueChange = $(e.target).prop("checked");
                 }
                 thisObj.value = valueChange;
-                SYMPER_APP.$evtBus.$emit('document-submit-input-change', { controlName: thisObj.name, val: valueChange });
+                SYMPER_APP.$evtBus.$emit('document-submit-input-change', thisObj);
             })
             this.ele.on('focus', function(e) {
                 store.commit("document/addToDocumentSubmitStore", {
@@ -314,7 +305,7 @@ export default class BasicControl extends Control {
             } else if (this.type == 'richText') {
                 $('#' + this.id).html(value);
             } else if (this.type == 'date') {
-                $('#' + this.id).val(moment(value).format(this.formatDate));
+                $('#' + this.id).val(SYMPER_APP.$moment(value).format(this.formatDate));
             } else if (this.type == 'checkbox') {
                 if (value)
                     $('#' + this.id).attr('checked', 'checked');
@@ -355,7 +346,7 @@ export default class BasicControl extends Control {
                 value = numbro(Number(value)).format(this.numberFormat)
 
         } else if (this.type == 'date') {
-            value = moment(value).format(this.formatDate);
+            value = SYMPER_APP.$moment(value).format(this.formatDate);
         }
         if (this.type == 'label') {
             this.ele.text(value)
@@ -443,8 +434,9 @@ export default class BasicControl extends Control {
                     let element = valueArr[index];
                     let fileExt = Util.getFileExtension(element);
                     let icon = fileTypes[fileExt];
+                    api
                     let file = `<div title="${element}" class="file-item">
-                            <i  onclick="window.open('https://sdocument-management.symper.vn/file/public/` + element + `');" class="mdi ` + icon + ` file-view" ></i>
+                            <i  onclick="window.open('`+sDocumentManagementUrl+`file/public/` + element + `');" class="mdi ` + icon + ` file-view" ></i>
                         </div>`
                     addTpl += file;
                 }
@@ -466,7 +458,7 @@ export default class BasicControl extends Control {
                 }
                 let file = `<div  class="file-item">
                                 ` + deleteFileIcon + `
-                                <i onclick="window.open('https://sdocument-management.symper.vn/file/public` + fileName + `');" class="mdi ` + icon + ` file-view" ></i>
+                                <i onclick="window.open('`+sDocumentManagementUrl+`file/public` + fileName + `');" class="mdi ` + icon + ` file-view" ></i>
                             </div>`
                 addTpl += file;
             }
@@ -483,7 +475,7 @@ export default class BasicControl extends Control {
         let icon = fileTypes[type];
         let thisObj = this;
         $.ajax({
-            url: 'https://sdocument-management.symper.vn/uploadFile',
+            url: '`+sDocumentManagementUrl+`uploadFile',
             dataType: 'json',
             processData: false,
             contentType: false,
@@ -493,7 +485,7 @@ export default class BasicControl extends Control {
                 if (response.status == 200) {
                     let file = `<div title="${response.data.path}" class="file-item">
                                 <span data-file-name="${response.data.path}" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
-                                <i  onclick="window.open('https://sdocument-management.symper.vn/file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
+                                <i  onclick="window.open('`+sDocumentManagementUrl+`file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
                             </div>`
                     thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name)
                     thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
@@ -622,7 +614,7 @@ export default class BasicControl extends Control {
     }
     renderUserControl() {
         let listUser = store.state.app.allUsers;
-        if (this.checkViewType('detail') || this.checkViewType('print')) {
+        if (!this.checkViewType('submit')) {
             if (this.value != null && this.value != "" && !isNaN(this.value)) {
                 let user = listUser.filter(u => {
                     return u.id == this.value
@@ -729,7 +721,7 @@ export default class BasicControl extends Control {
             for (let index = 0; index < data.length; index++) {
                 let value = data[index];
                 if(value){
-                    newData.push(moment(value,dateFormat).format('YYYY-MM-DD'))
+                    newData.push(SYMPER_APP.$moment(value,dateFormat).format('YYYY-MM-DD'))
                 }
                 else{
                     newData.push("");
@@ -739,7 +731,7 @@ export default class BasicControl extends Control {
             return newData;
         }
         else{
-            return moment(value,dateFormat).format('YYYY-MM-DD')
+            return SYMPER_APP.$moment(data,dateFormat).format('YYYY-MM-DD')
         }
     }
 }

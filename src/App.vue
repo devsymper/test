@@ -55,15 +55,14 @@
 import Api from "./api/api.js";
 import AppSidebar from "./components/common/AppSidebar.vue";
 import Content from "./components/common/Content.vue";
-import appWorker from "@/worker";
 import GeneralNotification from "./components/common/GeneralNotification.vue";
 import { appConfigs } from "./configs.js";
-var firebase = require("firebase/app");
+var firebase = require("@firebase/app").firebase;
 import { IndexedDB } from "./plugins/utilModules/indexedDB.js";
 import ResolveBacklogRequest from "./components/app/ResolveBacklogRequest";
 import { util } from './plugins/util.js';
 require("@/assets/css/handsontable.min.css");
-require("firebase/messaging");
+require("@firebase/messaging");
 require('@/assets/css/kh.css')
 const firebaseConfig = appConfigs.firebaseConfig;
 
@@ -220,9 +219,11 @@ export default {
         initFirebase() {
             var app = firebase.initializeApp(firebaseConfig);
             var messaging = firebase.messaging();
+            this.$store.commit('app/updateSystemMessaging', {messageObj: messaging});
             messaging.usePublicVapidKey(
                 "BNnZfegBztDE4pakIBFZa6GGqcy56WBZhrZ7nUP4R7JPGVyR77zEGFdKwcq4N15NlcamOxNMZKwIMSMQml5KTro"
             );
+
             messaging.onMessage(payload => {
                 this.$snotify({"title":payload.data.title,"text":payload.data.body});
                 this.$evtBus.$emit(
@@ -230,11 +231,14 @@ export default {
                     payload
                 );
             });
+
+
             messaging
                 .getToken()
                 .then(currentToken => {
                     if (currentToken) {
-                        this.setTokenFireBase(currentToken);
+                        // this.setTokenFireBase(currentToken);
+                        this.$store.dispatch('app/setSystemMessagingToken', currentToken);
                         console.log("Token create: ", currentToken);
                     } else {
                         console.log(
@@ -253,24 +257,26 @@ export default {
                 messaging
                     .getToken()
                     .then(refreshedToken => {
-                        this.setTokenFireBase(currentToken);
+                        // this.setTokenFireBase(currentToken);
+                        this.$store.dispatch('app/resetSystemMessagingToken', currentToken);
                         console.log("Token refreshed: ", refreshedToken);
                     })
                     .catch(err => {
                         console.log("Unable to retrieve refreshed token ", err);
                     });
             });
+            // this.$store.state.app.firebaseMessaging = messaging;
         },
-        setTokenFireBase(token){
-            let req = new Api(appConfigs.apiDomain.nofitication);
-            req.post("/users/set-token",{"token":token})
-            .then(res => {
-                console.log(res);
-                if (res.status == 200) {
+        // setTokenFireBase(token){
+        //     let req = new Api(appConfigs.apiDomain.nofitication);
+        //     req.post("/users/set-token",{"token":token})
+        //     .then(res => {
+        //         console.log(res);
+        //         if (res.status == 200) {
                     
-                }
-            });
-        }
+        //         }
+        //     });
+        // }
     },
     computed: {
         layout() {

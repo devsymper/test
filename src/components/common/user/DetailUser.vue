@@ -68,7 +68,7 @@
                                 <v-icon
                                     class="close-btn float-right "
                                     v-on="on"
-                                    v-clipboard:copy="showableUserInfo['email']"  
+                                    @click="$copyTextToClipboard(showableUserInfo['email'])"  
                                     size="15"
                                     >mdi-content-copy
                                 </v-icon>
@@ -120,7 +120,7 @@
                                     style="margin-top:-10px"
                                     class="close-btn float-right mr-3"
                                     v-on="on"
-                                    v-clipboard:copy="showableUserInfo[key]"  
+                                    @click="$copyTextToClipboard(showableUserInfo[key])" 
                                     size="15"
                                     >mdi-content-copy
                                 </v-icon>
@@ -225,12 +225,12 @@ import SymperAvatar from "@/components/common/SymperAvatar";
 import { appConfigs } from '../../../configs';
 import UploadFile from "./../../../components/common/UploadFile";
 import { util } from '../../../plugins/util';
-import VueClipboard from 'vue-clipboard2';
 import ViewRoles from "../../../views/users/ViewRoles";
 import NotificationChangePass from "./../../../components/notification/notificationChangeFirstPass";
 import Vue from "vue";
 import { userApi } from '../../../api/user';
-Vue.use(VueClipboard)
+import _groupBy from "lodash/groupBy";
+
 export default {
     components: {
         SymperAvatar,
@@ -342,7 +342,7 @@ export default {
             this.$emit('closePanel')
         },
         editOrgRole(ogrRole){
-            let nameOrgchart = _.groupBy(ogrRole, 'orgchartName');
+            let nameOrgchart = _groupBy(ogrRole, 'orgchartName');
             this.orgRole= [];
             Object.keys(nameOrgchart).forEach(type => {
                 this.orgRole.push({titleGroup: type });

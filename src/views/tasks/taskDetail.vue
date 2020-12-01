@@ -20,9 +20,8 @@
                 <!-- <v-text-field class="d-none"  v-model="linkTask"></v-text-field> -->
                 <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
-                        <v-btn  
-                            v-clipboard:copy="linkTask"  
-                            v-clipboard:success="onCopySuccess" 
+                        <v-btn
+                            @click="$copyTextToClipboard(linkTask)" 
                             v-on="on" text small>
                                 <v-icon  small>mdi-page-next-outline</v-icon>
                         </v-btn>
@@ -97,8 +96,7 @@ import BPMNEngine from '../../api/BPMNEngine';
 import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../components/process/processAction';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
-import VueClipboard from 'vue-clipboard2';
-Vue.use(VueClipboard)
+import { util } from '../../plugins/util';
 export default {
     name: "taskDetail",
     props: {
@@ -266,7 +264,7 @@ export default {
         changeTaskDetailInfo(taskId){
             let hostname=window.location.hostname;
             let copyText = this.taskInfo.action.parameter.taskId;
-            copyText='https://'+hostname+'/#/tasks/'+copyText;
+            copyText= util.addEnvToUrl('https://'+hostname+'/#/tasks/'+copyText);
             this.linkTask=copyText;
 
             if(!taskId){

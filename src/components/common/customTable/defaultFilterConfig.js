@@ -1,4 +1,3 @@
-import { functions } from "lodash";
 import { util } from "./../../../plugins/util.js";
 import { SYMPER_APP } from "@/main.js";
 import Api from "@/api/api.js";
@@ -160,6 +159,10 @@ export const getDataFromConfig = function(url, configs, columns, filterData, suc
     let options = {};
     if(!configs.emptyOption){
         options = getOptionForGetList(configs, columns, filterData);
+    }
+
+    if(configs.customDataForApi){
+        options = configs.customDataForApi(configs, columns, filterData);
     }
     apiObj.callApi(method, url, options, header, {})
     .then(data => {

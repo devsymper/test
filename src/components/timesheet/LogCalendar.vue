@@ -208,16 +208,9 @@ import ViewDetailMonth from "./../../components/timesheet/ViewDetailMonth";
 import LogTimeView from "./../../components/timesheet/LogTimeView";
 import DeleteLogView from "./../../components/timesheet/DeleteLogView";
 import timesheetApi from '../../api/timesheet';
-
 import { mapState} from 'vuex';
-import dayjs from 'dayjs';
-dayjs.extend(isBetween);
-dayjs.extend(isSameOrBefore);
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import isBetween from 'dayjs/plugin/isBetween';
 
-
-import _ from 'lodash';
+import _groupBy from 'lodash/groupBy';
 
 export default {
     name: "LogCalendar",
@@ -239,19 +232,13 @@ export default {
             extendOriginal: null,
             startDate: '1',
             focus: '',
-            colors: ['blue', 'indigo', 'deep-purple', 'cyan', 'green', 'orange', 'grey darken-1'],
             internalCalendarType: 'week',
             value: '',
             extend : false,
             sum: [],
             events: [],
-            // monthEvents: [],
             dialog: false,
-            dialogType: '',
-            viewEvent: false,
-            creatingEvent: false,
             hoursRequired: '',
-            checkLog:true,
         };
     },
 
@@ -259,6 +246,25 @@ export default {
         this.load();
     },
     methods: {
+        // lấy log time đầu tiên của mảng
+        resizeLogtime(){
+            let taskLength = 60*60*1000;
+            let padding = 60*60*300;
+            let lastDate, lastEnd;
+            let newTasks = this.events.map(task=>{
+                if(task.date!== lastDate){
+                    lastDate = task.date;
+                    task.start = this.$moment(task.start).startOf('day').hour(1).toDate().getTime()
+                    task.end = task.start + taskLength;
+                    lastEnd = task.end
+                }else{
+                    task.start = lastEnd+padding;
+                    task.end = task.start + taskLength;
+                    lastEnd = task.end
+                }
+                return task;
+            })
+        },
          getCurrentTime () {
             return this.cal ? this.cal.times.now.hour * 60 + this.cal.times.now.minute : 0
         },
@@ -274,7 +280,6 @@ export default {
             this.$emit('showLog',date);   
         },
          getLogByUserId(id){
-            debugger
              const self = this;
             timesheetApi.getLogByUserId({userId:id})
                 .then(res => {
@@ -305,24 +310,25 @@ export default {
                 })
         },
         copyLogTime(event){
+            
               timesheetApi.createLogTime({
-                        start:dayjs(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm"),
-                        end: dayjs(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm"),
-                        duration:event.duration,
-                        task: event.task,
-                        type: event.type,
-                        id: event.id,
-                        date: event.date,
-                        categoryTask: event.category,
-                        desc: event.desc || ""
-                    })
-                    .then(res => {
-                        if (res.status === 200) {
-                            //console.log(res);
-                           this.load()
-                        }
-                    })
-                    .catch(console.log);
+                start:this.$moment(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm"),
+                end: this.$moment(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm"),
+                duration:event.duration,
+                task: event.task,
+                type: event.type,
+                id: event.id,
+                date: event.date,
+                categoryTask: event.category,
+                desc: event.desc || ""
+            })
+            .then(res => {
+                if (res.status === 200) {
+                    //console.log(res);
+                    this.load()
+                }
+            })
+            .catch(console.log);
                  
         },
         // tính tổng thời gian của cả tháng
@@ -375,8 +381,8 @@ export default {
             return hour + minutes
         },
         findDuration(startTime, endTime) {
-            let startFormatted = dayjs(startTime);
-            let endFormatted = dayjs(endTime);
+            let startFormatted = this.$moment(startTime);
+            let endFormatted = this.$moment(endTime);
             let start = startFormatted.get('hour') * 60 + startFormatted.get('minute');
             let end = endFormatted.get('hour') * 60 + endFormatted.get('minute');
             let duration = end - start;
@@ -446,18 +452,6 @@ export default {
         },
         startTime(tms) {
              const mouse = this.toTime(tms);
-            // console.log('ádád');
-            // let now = dayjs(this.roundTime(mouse)); 
-            // let today = dayjs();
-            // console.log(now);
-            // let start = dayjs(this.$refs['calendar'].lastStart.date);
-            // let end = dayjs(this.$refs['calendar'].lastEnd.date);
-            // console.log(start);
-            // console.log('ád');
-            
-            // console.log(now.isAfter(today));
-            // let checkBt = today.isBetween(end, start);
-            // if(checkBt||now.isAfter(today)){
             if (this.dragEvent && this.dragTime === null) {
                 const start = this.dragEvent.start
                 this.dragTime = mouse - start
@@ -471,11 +465,7 @@ export default {
                     end: this.createStart,
                 }
                 this.events.push(this.createEvent);
-                // this.creatingEvent = true;
             }
-
-            // }else{
-            // }
         },
         mouseMove(tms) {
             const mouse = this.toTime(tms);
@@ -491,7 +481,6 @@ export default {
                 this.dragEvent.end = newEnd
 
             } else if (this.createEvent && this.createStart !== null) {
-                // this.creatingEvent = true;
                 const mouseRounded = this.roundTime(mouse, false)
                 const min = Math.min(mouseRounded, this.createStart)
                 const max = Math.max(mouseRounded, this.createStart)
@@ -500,9 +489,10 @@ export default {
             }
         },
         async endDrag() {
+            let self = this;
             async function updateEvent(event, duration) {
-                let start = dayjs(event.start);
-                let end = dayjs(event.end);
+                let start = self.$moment(event.start);
+                let end = self.$moment(event.end);
                 let res = await timesheetApi.updateLogTime({
                     start: start.format("YYYY-MM-DD HH:mm"),
                     end: end.format("YYYY-MM-DD HH:mm"),
@@ -546,36 +536,6 @@ export default {
                     console.log(e);
                 }
             }
-            
-            // if (this.creatingEvent || this.dragEvent || !this.viewEvent) {
-            //     if (this.createEvent && !this.extend) {
-            //         this.openLogTimeDialog(this.createEvent);
-            //     }
-            //     if(this.extend) {
-            //         let start = dayjs(this.createEvent.start);
-            //         let end = dayjs(this.createEvent.end);
-            //         let duration = this.findDuration(start,end);
-            //         timesheetApi.updateLogTime({
-            //             start: start.format("YYYY-MM-DD HH:mm"),
-            //             end: end.format("YYYY-MM-DD HH:mm"),
-            //             duration: duration,
-            //             task: this.createEvent.task,
-            //             type: this.createEvent.type,
-            //             id: this.createEvent.id,
-            //             date: this.createEvent.date,
-            //             categoryTask: this.createEvent.category,
-            //             desc: this.createEvent.desc || ""
-            //         })
-            //         .then(res => {
-            //             if (res.status === 200) {
-            //                 //console.log(res);
-            //             this.load()
-            //             }
-            //         })
-            //         .catch(console.log);
-            //         this.extend=false
-            //     }
-            // }
             this.dragEvent = null
             this.createEvent = null
             this.createStart = null
@@ -589,6 +549,7 @@ export default {
             this.extend = true;
         }, 
         cancelDrag() {
+            
             if (this.createEvent) {
                 if (this.extendOriginal) {
                     this.createEvent.end = this.extendOriginal
@@ -645,17 +606,23 @@ export default {
                     div.setAttribute('data-init', 'true');
                 }
             })
+            if(!self.timeView){
+                this.resizeLogtime();
+            }else{
+                 this.getLogByUserId(this.userId);
+            }
+            
         },
         onChangeCalendar() {
             this.$store.commit('timesheet/updateCalendarStartEnd', {
-                start: dayjs(this.$refs.calendar.lastStart.date).format('DD/MM'),
-                end: dayjs(this.$refs.calendar.lastEnd.date).format('DD/MM/YY'),
+                start: this.$moment(this.$refs.calendar.lastStart.date).format('DD/MM'),
+                end: this.$moment(this.$refs.calendar.lastEnd.date).format('DD/MM/YY'),
             });
             this.createCalendarHoverEvent();
         },
         updateTotalHours() {
-            let start = dayjs(this.$refs['calendar'].lastStart.date);
-            const end = dayjs(this.$refs['calendar'].lastEnd.date);
+            let start = this.$moment(this.$refs['calendar'].lastStart.date);
+            const end = this.$moment(this.$refs['calendar'].lastEnd.date);
             let totalInMinutes = 0;
             while (start.isSameOrBefore(end)) {
                 const date = start.format('YYYY-MM-DD');
@@ -708,7 +675,7 @@ export default {
         },
         monthEvents() {
             if (this.events) {
-                return _.groupBy(this.events, 'date');
+                return _groupBy(this.events, 'date');
             } else {
                 return [];
             }
@@ -716,18 +683,10 @@ export default {
     },
     watch: {
          userId(){
-            this.getLogByUserId(this.userId)
-
+            this.getLogByUserId(this.userId);
         },
-        // events(val) {
-        //     if (val) {
-        //         this.monthEvents = _.groupBy(val, 'date');
-        //     } else {
-        //         return this.monthEvents = [];
-        //     }
-        // },
         calendarType(newType) {
-               this.load();
+            this.getLogByUserId(this.userId);
             if (newType === 'weekday') {
                 this.internalCalendarType = 'week';
             } else {
@@ -736,7 +695,7 @@ export default {
              this.$nextTick(() => {
                 this.$nextTick(this.onChangeCalendar);
                 this.updateTotalHours();
-                this.load()
+                this.getLogByUserId(this.userId);
             });   
         },
         calendarShowDate() {

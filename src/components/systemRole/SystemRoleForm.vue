@@ -11,11 +11,11 @@
             :allInputs="allInputs"
         >
         </FormTpl>
-        <div class="w-100 mt-2">
+        <div class="w-100 mt-2 mb-10">
             <span
-                class="fs-12"
+                class="fs-12 mb-2"
             >Select user</span>
-            <UserSelector
+            <!-- <UserSelector
                 ref="userSelector"
                 :isMulti="true"
                 :disabled="action == 'detail'"
@@ -23,22 +23,33 @@
                 :color="'grey lighten-3'"
                 :flat="true"
                 v-model="itemData.users"
-            ></UserSelector>
+            ></UserSelector> -->
+			<ListUserSelector 
+				v-model="itemData.users"
+				:listItem="allUser"
+				:columnInfor="'displayName'"
+				style="margin-top:10px;"
+				:action="action"
+			/>
         </div>
         <div class="w-100 mt-3">
-            <span
-                class="fs-12 mb-2 "
-            >Select permissions</span>
-
+            <div
+                class="fs-12 mb-2"
+            >
+				Chọn permissions
+			</div>
             <PermissionSelector 
-            v-model="itemData.permissions">
-
+            	v-model="itemData.permissions"
+				:disabled="action == 'detail'"
+				:height="'calc(100vh - 350px)'"
+				:action="action"
+			>
             </PermissionSelector>
         </div>
-        <div class="mt-2" v-if="action != 'view' ">
+        <div class="mt-2" v-if="action != 'detail' ">
             <v-btn
                 class="float-right mr-1"
-                @click="saveSystemRole"
+                @click="debounceSaveSystemRole"
                 small
                 depressed
                 color="primary"
@@ -55,9 +66,14 @@ import FormTpl from "@/components/common/FormTpl.vue";
 import UserSelector from "@/views/tasks/userSelector.vue";
 import { systemRoleApi } from "@/api/systemRole.js";
 import PermissionSelector from "@/components/permission/PermissionSelector.vue";
+import ListUserSelector from "@/views/accessControl/helpers/ListUserSelector"
+import _debounce from "lodash/debounce";
 
 export default {
     methods: {
+		debounceSaveSystemRole: _debounce(function(e){
+			this.saveSystemRole()
+		}, 200,this),
         async saveSystemRole(){
             let dataToSave = {
                 name: this.allInputs.name.value,
@@ -95,7 +111,8 @@ export default {
     components: {
         FormTpl,
         UserSelector,
-        PermissionSelector
+		PermissionSelector,
+		ListUserSelector
     },
     computed: {
         allInputs(){
@@ -113,6 +130,9 @@ export default {
                     "info": "",
                 }
             };
+		},
+		allUser(){
+            return this.$store.state.app.allUsers;
         },
         title(){
             let map = {

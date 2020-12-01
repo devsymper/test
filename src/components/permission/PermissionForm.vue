@@ -19,15 +19,14 @@
             <span
                 class="fs-12 mb-2 "
             >Select action pack</span>
-
             <ActionPackSelector 
-                v-model="itemData.actionPacks">
+                v-model="itemData.actionPacks" :action="action" >
             </ActionPackSelector>
         </div>
-        <div class="mt-2" v-if="action != 'view' ">
+        <div class="mt-2" v-if="action != 'detail' ">
             <v-btn
                 class="float-right mr-1"
-                @click="savePermission"
+                @click="debounceSavePermission"
                 small
                 depressed
                 color="primary"
@@ -45,9 +44,13 @@ import UserSelector from "@/views/tasks/userSelector.vue";
 import { systemRoleApi } from "@/api/systemRole.js";
 import ActionPackSelector from "@/components/permission/ActionPackSelector.vue";
 import { permissionApi } from '../../api/permissionPack';
+import _debounce from "lodash/debounce";
 
 export default {
     methods: {
+		debounceSavePermission: _debounce(function(e){
+			this.savePermission()
+		}, 300,this),
         async savePermission(){
             let listActionPacks = this.itemData.actionPacks.reduce((arr, el) => {
                 arr.push(el.id);
@@ -64,7 +67,6 @@ export default {
 
             let res;
             try {
-                
                 if(this.action == 'update'){
                     res = await permissionApi.updatePermission(this.itemData.id, dataToSave);
                     if(res.status == '200'){

@@ -755,3 +755,19 @@ body {
 .list-sbs .symper-list-item-current-row-sbs + .current.highlight {
     background-color:#4c89fc33!important;
 }
+
+.symper-monaco-editor .editor-widget.suggest-widget{
+    max-width: 80%!important;
+}
+.fade-enter-active, .fade-leave-active {
+    transition: opacity .5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active below version 2.1.8 */ {
+    opacity: 0;
+}
+
+.hidden-textarea-for-copy{
+    position: fixed;
+    top: -1000px;
+    left: -1000px;
+}

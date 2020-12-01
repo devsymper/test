@@ -3,7 +3,7 @@
         <list-items
         class="history-document"
         ref="listItem"
-        :getDataUrl="'https://trash.symper.vn/items?type=document_instance'"   
+        :getDataUrl="trashDomain + 'items?type=document_instance'"   
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
         :pageTitle="$t('document.title')"
@@ -46,9 +46,12 @@
     </div>
 </template>
 <script>
+import { appConfigs } from '../../../configs.js';
 import { documentApi } from "./../../../api/Document.js";
 import ListItems from "./../../../components/common/ListItems.vue";
 import { util } from "./../../../plugins/util.js";
+import _groupBy from "lodash/groupBy";
+
 export default {
     name:"History",
     components: {
@@ -56,6 +59,7 @@ export default {
     },
     data(){
         return {
+            trashDomain: appConfigs.apiDomain.trash,
             dialog:false,
             dataRestore:null,
             countRestore:null,
@@ -78,7 +82,7 @@ export default {
                         }
                         return arr;
                     },[]);
-                    var allRow = _.groupBy(listObject, function(obj) {
+                    var allRow = _groupBy(listObject, function(obj) {
                         return obj.deletedAt;
                     });
                     let rowId = 0;

@@ -4,7 +4,7 @@
 			<div class="action-diagram-bpmn d-flex ">
 				<div class="fs-15 flex-grow-1 text-uppercase font-weight-bold mt-2" >Thông tin chi tiết</div>
 				<div class="d-flex mt-1">
-					<v-btn
+					<!-- <v-btn
 						tile 
 						icon
 						x-small
@@ -12,8 +12,8 @@
 						@click="changeTab('tab-1')"
 					>
 						<v-icon small >mdi-numeric-2-box-outline</v-icon>
-					</v-btn>
-					<v-btn
+					</v-btn> -->
+					<!-- <v-btn
 						tile 
 						icon
 						x-small
@@ -21,7 +21,7 @@
 						@click="changeTab('tab-2')"
 					>
 						<v-icon x-small >mdi-coolant-temperature</v-icon>
-					</v-btn>
+					</v-btn> -->
 					<v-btn
 						tile 
 						icon
@@ -51,7 +51,22 @@
 					</v-btn>
 				</div>
 			</div>
-			<v-tabs
+				<symper-bpmn
+					v-show="tab == 'tab-1'"
+					@node-clicked="handleNodeSelected"
+					@node-changed="handleNodeChangeProps"
+					ref="symperBpmn"
+					:height="diagramHeight"
+					:width="600"
+					:diagramXML="diagramXML"
+					:customModules="customRender"
+				></symper-bpmn>
+				<ModelerWithHeatMap 
+				 	v-show="tab == 'tab-2'"
+					:tab="tab"
+					:handleAction="handleAction"
+				/>
+			<!-- <v-tabs
 			v-model="tab"
 			v-show="false"
 			>
@@ -73,17 +88,19 @@
 				<v-tab-item
 				value='tab-2'
 				>
-					 <symper-bpmn
+				ahihis -->
+					<!-- <symper-bpmn
 						@node-clicked="handleNodeSelected"
 						@node-changed="handleNodeChangeProps"
 						ref="symperBpmn"
 						:height="diagramHeight"
 						:width="600"
 						:diagramXML="diagramXML"
-						:customModules="customRenderHeatMap"
-					></symper-bpmn>
-				</v-tab-item>
-			</v-tabs-items>
+						:customModules="customRender"
+					></symper-bpmn> -->
+					<!-- <ModelerWithHeatMap v-if="tab == 'tab-2'" /> -->
+				<!-- </v-tab-item>
+			</v-tabs-items> -->
            
         </div>
 
@@ -107,7 +124,7 @@ import Api from "@/api/api.js";
 import { appConfigs } from '@/configs';
 import serviceTaskDefinitions from "@/components/process/elementDefinitions/serviceTaskDefinitions";
 import CustomRenderProcessCount from '@/components/process/CustomRenderProcessCount'
-import CustomRenderHeatMap from '@/components/process/CustomRenderHeatMap'
+import ModelerWithHeatMap from "./ModelerWithHeatMap"
 
 const apiCaller = new Api('');
 
@@ -176,12 +193,15 @@ export default {
             this.diagramHeight = window.innerHeight - 400;
 		},
 		handleZoomOut(){
+			this.handleAction = 'handleZoomOut'
             this.$refs.symperBpmn.zoomOut();
 		},
 		handleZoomIn(){
+			this.handleAction = 'handleZoomIn'
             this.$refs.symperBpmn.zoomIn();
 		},
 		handleFocus(){
+			this.handleAction = 'handleFocus'
             this.$refs.symperBpmn.focus();
 		},
 		
@@ -1257,7 +1277,8 @@ export default {
                     this.$t("process.editror.err.get_xml")
                 );
             }
-        },
+		},
+	
         restoreAttrValueFromJsonConfig(jsonStr){
 			let processTracking = this.$store.state.admin.currentTrackingProcess
 			let self = this
@@ -1438,6 +1459,7 @@ export default {
     data() {
         return {
 			tab:'tab-1',
+			handleAction: "",
             instanceKey: null, // key của instance hiện tại
             attrPannelHeight: "300px", // chiều cao của panel cấu hình các element
             modelAction: "create", // hành động đối với model này là gì: create | clone | edit
@@ -1447,12 +1469,6 @@ export default {
                 {
                     __init__: ["customRenderer"],
                     customRenderer: ["type", CustomRenderProcessCount]
-                }
-            ],
-			customRenderHeatMap: [
-                {
-                    __init__: ["customRenderer"],
-                    customRenderer: ["type", CustomRenderHeatMap]
                 }
             ],
             diagramHeight: 300,
@@ -1504,7 +1520,7 @@ export default {
         "form-tpl": FormTpl,
 		VuePerfectScrollbar,
 		CustomRenderProcessCount,
-		CustomRenderHeatMap
+		ModelerWithHeatMap
     },
     props: {
         // Hành động cho editor này, nhận một trong các giá trị: create, edit, view, clone
@@ -1570,16 +1586,16 @@ export default {
 	},
 	watch:{
 		processId(val){
-			this.instanceKey = Date.now();
-			this.$store.commit(
-				"process/initInstance",
-				this.instanceKey
-			);
-			this.$store.dispatch("app/getAllOrgChartData");
-			this.$store.dispatch("app/getAllUsers");
-			this.$store.dispatch("process/getLastestProcessDefinition");
-			this.$store.dispatch('process/getAllDefinitions');
-			// this.applySavedData(this.processId)
+			this.tab = 'tab-1'
+			// this.instanceKey = Date.now();
+			// this.$store.commit(
+			// 	"process/initInstance",
+			// 	this.instanceKey
+			// );
+			// this.$store.dispatch("app/getAllOrgChartData");
+			// this.$store.dispatch("app/getAllUsers");
+			// this.$store.dispatch("process/getLastestProcessDefinition");
+			// this.$store.dispatch('process/getAllDefinitions');
 			this.applySavedData(val);
 		},
 		tab(){
@@ -1592,9 +1608,8 @@ export default {
 			this.$store.dispatch("app/getAllUsers");
 			this.$store.dispatch("process/getLastestProcessDefinition");
 			this.$store.dispatch('process/getAllDefinitions');
-			this.applySavedData(this.processId)
+			this.applySavedData(this.processId);
 		}
-
 	}
 };
 </script>

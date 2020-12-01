@@ -13,7 +13,7 @@
                         Dropdown
                     </v-btn>
                     </template>
-               <NotificationPopUp @close="close" style="background:white" :name="'Đơn bán hàng'" :objType="'comment'" />
+               <NotificationPopUp @close="close" style="background:white" :name="'Đơn bán hàng'" :objType="'account'" />
                 </v-menu> -->
                     <span class="fs-15 fw-430" v-if="showMain">Cài đặt thông báo</span>
                 <span class="fs-15 fw-430" v-if="showFollow">Danh sách đối tượng đang theo dõi</span>
@@ -48,8 +48,7 @@
     </div>
 </template>
 <script>
-import _ from 'lodash';
-import dayjs from 'dayjs';
+import _groupBy from 'lodash/groupBy';
 import NotificationPopUp from "./../../components/notification/DetailPopPup.vue";
 import { documentApi } from "./../../api/Document.js";
 import UserPopUp from "./../../components/user/UserPopUp";
@@ -89,6 +88,15 @@ export default {
     }
   },
   methods: {
+      renameReceiver(nameModule,receiver){
+            let name = receiver;
+            for(let i = 0; i<this.listSource[nameModule].receiver.length;i++){
+                if(this.listSource[nameModule].receiver[i].value==receiver){
+                name = this.listSource[nameModule].receiver[i].text;
+                }
+            }
+            return name
+        },
       searchList(){
         this.listSubcribed = [];
         this.listUnsubcribed=[];
@@ -108,7 +116,7 @@ export default {
                         format.push(listModules[i])
                     }
                 }
-                let formatListModules = _.groupBy(format, 'objectType');
+                let formatListModules = _groupBy(format, 'objectType');
                 let name = Object.keys(formatListModules);
                 for(let i=0;i<name.length;i++){
                     if(subscribe){
@@ -164,17 +172,17 @@ export default {
                      format.push(listModules[i])
                  }
              }
-             let formatListModules = _.groupBy(format, 'objectType');
+             let formatListModules = _groupBy(format, 'objectType');
              let name = Object.keys(formatListModules);
              for(let i=0;i<name.length;i++){
-                 //let a = name[i];
                 self.items.push({
                 title: name[i],
                 subTitle: [],
                 items: [],
+                // defaultUser:
                 icon:name[i]
             })      
-            let groupByEvent= Object.keys(_.groupBy(formatListModules[name[i]], 'event'));
+            let groupByEvent= Object.keys(_groupBy(formatListModules[name[i]], 'event'));
                 for(let k=0;k<groupByEvent.length;k++){
                     self.items[i].items.push({
                         title: groupByEvent[k],
@@ -228,8 +236,8 @@ export default {
         notification.showListsSubcribed({subscribed:isSubcribed}).then(res=>{
             if(res.status==200){
              let listSubcribed = res.data;
-             // let grouplistByObjId = _.groupBy(listSubcribed, 'objectIdentifier');
-             let grouplistByObjId = _.groupBy(listSubcribed, 'objectType');
+             // let grouplistByObjId = _groupBy(listSubcribed, 'objectIdentifier');
+             let grouplistByObjId = _groupBy(listSubcribed, 'objectType');
               let objId = Object.keys(grouplistByObjId);
                 for(let j = 0; j<objId.length;j++){
                     self.listSubcribed.push({
@@ -242,6 +250,7 @@ export default {
                     for(let i = 0; i<grouplistByObjId[objId[j]].length;i++){
                         self.listSubcribed[j].items.push({
                             title: grouplistByObjId[objId[j]][i].event,
+                            defaultUser:self.renameReceiver(objId[j],grouplistByObjId[objId[j]][i].defaultUser),
                             active:true,
                             name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
                             id:grouplistByObjId[objId[j]][i].id,
@@ -257,9 +266,9 @@ export default {
         for(let i = 0; i<this.allListChanel.length;i++){
             if(this.allListChanel[i].event==event&&this.allListChanel[i].objectType==nameModule){
                if(isFollow){
-                   date =  dayjs(this.allListChanel[i].createAt).format('DD/MM/YYYY hh:mm');
+                   date =  this.$moment(this.allListChanel[i].createAt).format('DD/MM/YYYY hh:mm');
                }else{
-                   date = dayjs(this.allListChanel[i].userFilterAt).format('DD/MM/YYYY hh:mm');
+                   date = this.$moment(this.allListChanel[i].userFilterAt).format('DD/MM/YYYY hh:mm');
                }
             }
         }
@@ -272,7 +281,7 @@ export default {
         notification.showListsSubcribed({subscribed:isSubcribed}).then(res=>{
             if(res.status==200){
              let listSubcribed = res.data;
-              let grouplistByObjId = _.groupBy(listSubcribed, 'objectType');
+              let grouplistByObjId = _groupBy(listSubcribed, 'objectType');
               let objId = Object.keys(grouplistByObjId).filter(x=>x!=''&&x!='null');
                 for(let j = 0; j<objId.length;j++){
                     self.listUnsubcribed.push({
@@ -287,6 +296,7 @@ export default {
                             title: grouplistByObjId[objId[j]][i].event,
                             name: self.rename(objId[j],grouplistByObjId[objId[j]][i].event),
                             active:  false,
+                             defaultUser:self.renameReceiver(objId[j],grouplistByObjId[objId[j]][i].defaultUser),
                             id:grouplistByObjId[objId[j]][i].id,
                         });
                         self.listUnsubcribed[j].userFilterAt= self.getDateFollow(objId[j],grouplistByObjId[objId[j]][i].event, false)

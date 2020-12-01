@@ -39,7 +39,7 @@
                             class="pa-0"
                             active-class="v-item--active"
                             dense
-                            @click="doubleClick(item.hash)"
+                            @dblclick="doubleClick(item.hash)"
                             @contextmenu="show($event,item.path,item.name)"
                             >
                             <v-tooltip bottom>

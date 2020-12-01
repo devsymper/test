@@ -1,12 +1,5 @@
 <template>
     <div class="home h-100 w-100">
-        <!-- <v-text-field
-            label="Prepend"
-            prepend-icon="mdi-map-marker"
-            v-model="searchKey"
-          ></v-text-field>
-        <OrgchartElementSelector v-model="testData" :searchKey="searchKey"/> -->
-        <!-- <v-btn @click="runDataflow" color="primary">Primary</v-btn> -->
          <v-dialog
             v-model="dialog"
             width="397"
@@ -14,34 +7,12 @@
             <NotificationChangePass @cancel="cancelDialog()"/>
         </v-dialog>
         <Dashboard></Dashboard>
-        <!-- <SymperActionView 
-            :actionDef="{
-                module: 'document',
-                resource: 'document_definition',
-                scope: 'document',
-                action: 'edit'
-            }"
-            :param="{
-                id: 1944,
-                title: 'xxxx',
-                name: 'yyyy'
-            }" /> -->
     </div>
 </template>
 <script>
-import FormTpl from "./../components/common/FormTpl.vue";
-import OrgchartElementSelector from "./../components/common/OrgchartElementSelector.vue";
-import OrgchartSelector from "./../components/user/OrgchartSelector.vue";
-import TimelineTreeview from "./../components/common/TimelineTreeview";
-import Handsontable from 'handsontable';
-import FormulaEditor from "./../components/formula/editor/FormulaEditor";
-import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicker.vue";
-import PermissionSelector from "@/components/permission/PermissionSelector.vue";
 import Dashboard from "@/views/dashboard/Dashboard.vue";
-import EmbedDataflow from "./../components/dataflow/EmbedDataflow";
 import NotificationChangePass from "./../components/notification/notificationChangeFirstPass";
 import { userApi } from "./../../src/api/user";
-import SymperActionView from "./../action/SymperActionView";
 
 export default {
     name: "Home",
@@ -107,6 +78,7 @@ export default {
     },
     data() {
         return {
+            editorTest: 'abc xys',
             testData: [],
             detailInfoUser:{},
             dialog:false,
@@ -163,17 +135,8 @@ export default {
         };
     },
     components: {
-        OrgchartElementSelector,
-        "form-tpl": FormTpl,
-        'orgchart-selector': OrgchartSelector,
-        TimelineTreeview,
         NotificationChangePass,
-        FormulaEditor: FormulaEditor,
-        SymperColorPicker: SymperColorPicker,
-        PermissionSelector,
         Dashboard,
-        EmbedDataflow,
-        SymperActionView
     }
 };
 </script>

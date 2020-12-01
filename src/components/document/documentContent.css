@@ -539,3 +539,102 @@ button:hover {
     background: #f2f2f2;
     border-radius: 4px;
 }
+.ag-theme-alpine .ag-cell-wrapper > *:not(.ag-cell-value):not(.ag-group-value){
+    height: 22px !important;       
+}
+.ag-theme-alpine .ag-cell-wrapper{
+    font-size: 12px;
+}
+.ag-theme-alpine .ag-cell-wrapper > .ag-group-value{
+    font-family: "Roboto", sans-serif;
+}
+.ag-theme-alpine .ag-cell-wrapper > *:not(.ag-cell-value):not(.ag-group-value) .ag-icon-tree-closed,
+.ag-theme-alpine .ag-cell-wrapper > *:not(.ag-cell-value):not(.ag-group-value) .ag-icon-tree-open{
+    margin-top: 0px;
+    font-size: 13px;
+}
+.ag-theme-alpine .ag-header{
+    background: white !important;
+    font-size: 12;
+    font-family: "Roboto", sans-serif;
+}
+.ag-theme-alpine .ag-header  .ag-header-row{
+    color: #212529 !important;
+    font-weight: 500;
+}
+.ag-theme-alpine .ag-row{
+    background: white !important;
+}
+.ag-theme-alpine .ag-cell{
+    line-height: 22px !important;
+}
+.ag-pivot-action{
+    position: absolute;
+    top: 0px;
+    left: 25px;
+    padding: 4px 6px;
+    margin: 1px;
+    background: var(--symper-background-default);
+    border: 4px;
+    opacity: 0.6;
+    z-index: 1;
+}
+  
+  .dropdown {
+    position: absolute;
+  }
+  
+  .dropdown-content {
+    display: none;
+    position: absolute;
+    background-color: #f1f1f1;
+    min-width: 120px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    z-index: 1;
+    left: 50px;
+    z-index: 2;
+    top: 4px;
+  }
+  
+  .dropdown-content a {
+    color: black;
+    padding: 4px 8px;
+    text-decoration: none;
+    display: block;
+  }
+  
+  .dropdown-content a:hover {background-color: #ddd;}
+  
+  .dropdown:hover .dropdown-content {display: block;}
+  
+  .dropdown:hover .ag-pivot-action {
+    background: var(--symper-background-hover);
+  }
+  .input-pivot{
+      position: fixed;
+      height: 24px;
+      display: none;
+      padding: 0 8px;
+      background: var(--symper-background-default);
+  }
+  .input-pivot:focus{
+      outline: none;
+  }
+  .swap-table-btn{
+    border: 4px;
+    opacity: 0.6;
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      height: 24px;
+      width: 24px;
+      z-index: 200;
+      font-size: 18px;
+      background: var(--symper-background-default);
+  }
+  .swap-table-btn:focus{
+      outline: none;
+  }
+ .sym-form-submit div:empty, .sym-form-Detail div:empty{
+     height: 12px;
+ }

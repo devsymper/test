@@ -2,7 +2,6 @@
  * Các hàm phục vụ cho việc xác thực, lưu trữ dữ liệu đăng nhập cho người dùng
  */
 import { cookie } from "./cookie.js";
-import env  from "@/../env.json";
 export const store = {
     getComponentSize(comp) {
         if (!comp) {
@@ -99,29 +98,25 @@ export const store = {
     isPromise(value) {
         return value && value.then && typeof value.then === 'function';
     },
-    addEnvToUrl(url){
+    addEnvToUrl(url) {
         url = url.trim();
-        if(url.indexOf('https://') === 0){
-            if(env.environment != ''){
-                url = url.replace('https://', `https://${env.environment}.`);                
+        if (url.indexOf('https://') === 0) {
+            if (SYMPER_ENV.environment != '') {
+                url = url.replace('https://', `https://${SYMPER_ENV.environment}.`);
             }
-        }else{
+        } else {
             console.error("url must start with https://");
         }
         return url;
+    },
+    copyTextToClipboard(text) {
+        let textArea = document.createElement("textarea");
+        textArea.classList = 'hidden-textarea-for-copy';
+        textArea.value = text;
+        document.body.appendChild(textArea);
+        textArea.focus();
+        textArea.select();
+        document.execCommand('copy');
+        document.body.removeChild(textArea);
     }
-    
 }
-
-
-// namespace Library;
-// class Environment{
-//     public static function getPrefixEnvironment(){
-//         if($GLOBALS['env']['environment']!=""){
-//             return $GLOBALS['env']['environment'].".";
-//         }
-//         else{
-//             return "";
-//         }
-//     }
-// }
