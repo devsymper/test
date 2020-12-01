@@ -733,13 +733,17 @@ export default class Table {
             if (controlInstance == null || controlInstance == undefined) {
                 return;
             }
-
             let controlEffected = controlInstance.getEffectedControl();
             let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
             let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
             let controlRequireEffected = controlInstance.getEffectedRequireControl();
             let controlLinkEffected = controlInstance.getEffectedLinkControl();
             let controlValidateEffected = controlInstance.getEffectedValidateControl();
+            controlRequireEffected[controlName] = true;
+            controlValidateEffected[controlName] = true;
+            controlReadonlyEffected[controlName] = true;
+            controlHiddenEffected[controlName] = true;
+
             this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
             this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readOnly');
             this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
