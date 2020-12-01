@@ -93,6 +93,82 @@ var configs = {
             }
         }
     },
+    sideBar:{
+        home:{
+            workspace1:{
+                isWorkSpace:true,
+                title:"CÔNG VIỆC",
+                items:[
+                    {
+                        title:"Test board",
+                        subTitle:'Board',
+                        type:'select',
+                        component:'SelectBoard',
+                        icon: 'mdi-view-dashboard-variant-outline',
+                    },
+                    {
+                        title:"RoadMap",
+                        icon: 'mdi-view-dashboard-variant-outline',
+                        url:"/projects/:id/kanban-board"
+                    },
+                    {
+                        title:"Kanban board",
+                        icon: 'mdi-view-week-outline',
+                        url:"/projects/:id/kanban-board"
+                    },
+                    {
+                        title:"Report",
+                        icon: 'mdi-chart-bar',
+                        url:"/projects/:id/report"
+                    },
+                ]
+            },
+            workspace2:{
+                isWorkSpace:true,
+                title:"BÁO CÁO",
+                items:[
+                    {
+                        name:'hoang_child',
+                        title:"RoadMap",
+                        icon: 'mdi-chart-bar',
+                        url:"/projects/:id/settings/access"
+                    },
+                    {
+                        name:'hoang_child',
+                        title:"Report",
+                        icon: 'mdi-chart-bell-curve-cumulative',
+                        url:"/report"
+                    }
+                ]
+            },
+            item3:{
+                isWorkSpace:false,
+                title:"Project Setting",
+                url:"/projects/:id/settings/details",
+                icon: 'mdi-cog-outline'
+            }
+        },
+        projectSetting:{
+            workspaceProject:{
+                isWorkSpace:true,
+                title:"Project setting",
+                items:[
+                    {
+                        name:'detail',
+                        title:"Detail",
+                        icon: 'mdi-view-column-outline',
+                        url:"/projects/:id/settings/details"
+                    },
+                    {
+                        name:'access',
+                        title:"Access",
+                        icon: 'mdi-view-week-outline',
+                        url:"/projects/:id/settings/access"
+                    }
+                ]
+            }
+        }
+    },
     reformatUrl(obj) {
         for (let key in obj) {
             if (obj[key]) {

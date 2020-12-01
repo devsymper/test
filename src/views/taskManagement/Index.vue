@@ -1,11 +1,20 @@
 <template>
-    <div class="w-100 h-100">
-        HEllo
+    <div id="task-management-wrapper" class="w-100 h-100">
+        <Sidebar />
+         <div class="w-100 h-100">
+            <Header />
+
+            HEllo
+        </div>
     </div>
+   
 </template>
 
 <script>
+import Sidebar from './layout/Sidebar'
+import Header from './layout/Header'
 export default {
+  components: { Sidebar,Header },
     name:"TaskManagement",
     // computed:{
     //     sTaskManagement() {
@@ -29,6 +38,8 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+    #task-management-wrapper{
+        display: flex;
+    }
 </style>
