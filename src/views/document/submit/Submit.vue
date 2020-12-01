@@ -1523,6 +1523,9 @@ export default {
                 })
                 .always(() => {});
         },
+        /**
+         * Hàm chuyển kích thước view sang full size và ngược lại
+         */
         togglePageSize() {
             this.docSize = this.docSize == "21cm" ? "100%" : "21cm";
             let listInputInDocument = this.sDocumentSubmit.listInputInDocument;
@@ -1538,6 +1541,10 @@ export default {
                 
             }
         },
+        /**
+         * Khởi tạo các đối tượng control từ html
+         * các control được đánh dâu bởi id có frefix: s-contorl-timestamp
+         */
         processHtml(content) {
             $("#sym-submit-" + this.keyInstance).find('.page-content').addClass('d-block');
             $("#sym-submit-" + this.keyInstance).find('.list-page-content').addClass('d-flex');
@@ -1745,6 +1752,10 @@ export default {
             this.hidePreloader();            
         },
 
+        /**
+         * Lưu thông tin liên quan đến luồng chạy công thức và các thông tin về các control root(ko bị ảnh hưởng bởi control nào)
+         */
+
         pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl){
             this.$store.commit("document/addToDocumentSubmitStore", {
                         key: 'impactedFieldsList',
@@ -1929,6 +1940,9 @@ export default {
             .always(() => {
             });
         },
+        /**
+         * CLick submit doc thì kiểm tra validate 
+         */
         handlerSubmitDocumentClick(isContinueSubmit = false){
             this.isContinueSubmit = isContinueSubmit;
             if($('#sym-submit-'+this.keyInstance+' .validate-icon').length == 0 && $('#sym-submit-'+this.keyInstance+' .error').length == 0){
@@ -1973,6 +1987,7 @@ export default {
             return controlIdentifier;
             
         },
+
         handleRefreshDataBeforeSubmit(){
             this.$store.commit("document/addToDocumentSubmitStore", {
                             key: 'docStatus',
@@ -2291,9 +2306,9 @@ export default {
                             { name: name, control: control ,instance: this.keyInstance}
                         );
         },
-
-
-
+        /**
+         * chạy công thức input filter
+         */
         runInputFilterFormulas(controlName,search=""){
             let controlInstance = this.sDocumentSubmit.listInputInDocument[controlName];
             let controlId = controlInstance.id
