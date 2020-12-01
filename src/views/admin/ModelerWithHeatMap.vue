@@ -123,13 +123,15 @@ export default {
 							if(k.act_id_ == e.id ){
 								let sum = parseInt(k.count_end) +  parseInt(k.count_running)
 								var val = Math.floor(sum/sumProcess * 100);
-								var radius = Math.floor(Math.random()*70);
 								let pos = e.di.bounds
 								var point = {
 									x: pos.x + 50,
 									y: pos.y + 40,
 									value: val,
-									radius: 100
+									radius: val,
+									maxOpacity: .5,
+									minOpacity: 0,
+									blur: .75
 								}
 								points.push(point);
 							}
@@ -1305,9 +1307,9 @@ export default {
 			var str = $('.djs-overlay-container')[0].style['-ms-transform']
 
 			var x = str.split(',');
-			let newFour = Number(x[4]) - 60
+			let newFour = Number(x[4]) 
 			var last = x[5].split(')')
-			let newLast = Number(last[0]) - 25
+			let newLast = Number(last[0]) 
 			last.join()
 			x[4] = newFour
 			x[5] = newLast
@@ -1315,6 +1317,7 @@ export default {
 			setTimeout((self) => {
 				var canvas = document.getElementsByClassName("heatmap-canvas");
 				$(canvas).css('transform',newStr)
+				$(canvas).css('transform-origin','left top')
 			}, 100, this);
 		},
         restoreAttrValueFromJsonConfig(jsonStr){
