@@ -424,7 +424,6 @@ export default {
             }
             thisCpn.messageValidate = msg;
             thisCpn.$refs.validate.show(e);
-
         });
         $(document).find('#sym-submit-'+this.keyInstance).off('click','.run-dataflow')
         $(document).find('#sym-submit-'+this.keyInstance).on('click','.run-dataflow',function(e){
