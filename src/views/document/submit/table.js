@@ -1304,7 +1304,11 @@ export default class Table {
     // Hàm set data cho table
     // hàm gọi sau khi chạy công thức 
     setData(vls, dateFormat = true) {
-        ClientSQLManager.delete(this.keyInstance, this.tableName, false);
+        try {
+            ClientSQLManager.delete(this.keyInstance, this.tableName, false);            
+        } catch (error) {
+            console.warn(error);
+        }
         if (vls != false) {
             let data = vls;
             let controlBinding = Object.keys(data[0]);
