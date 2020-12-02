@@ -44,17 +44,8 @@
 				
 			</div>
 			<div style="width: 600px !important">
-				<div v-if="objectActive == 'application_definition'" class="d-flex flex-column">
-					<ApplicationDefinitionForm 
-						v-if="objectActive == 'application_definition'"
-						@list-item-selected="handleListAppSelected"
-						:listApp="listAppSelected"
-						:commonTableSetting="commonTableSetting"
-						:tableDataDefinition="multipleLevelObjects.application_definition"
-						@app-detail-get="translateAppObjectIdToTableData"
-					/>
-				</div>
-				<div v-else-if="objectActive== 'department'">
+				
+				<div v-if="objectActive== 'department'">
 					 <ConfigActionPackOrgchart 
 						@permission-selected="handlePermissionSelected"
 						@department-selected="handleDepartmentSelected"
@@ -78,6 +69,7 @@
 					</div>
 				<div v-else>	
 					<div class="w-100">
+					
 						<div class="my-2 fs-12">
 							{{$t('permissions.actionPack.operation')}}
 						</div>
@@ -91,6 +83,16 @@
 							class="fs-13"
 							ref="dataTable">
 						</hot-table>
+						<div v-if="objectActive == 'application_definition'" class="d-flex flex-column">
+							<ApplicationDefinitionForm 
+								v-if="objectActive == 'application_definition'"
+								@list-item-selected="handleListAppSelected"
+								:listApp="listAppSelected"
+								:commonTableSetting="commonTableSetting"
+								:tableDataDefinition="multipleLevelObjects.application_definition"
+								@app-detail-get="translateAppObjectIdToTableData"
+							/>
+						</div>
 					</div>
 				</div>
 			</div>
@@ -380,7 +382,7 @@ export default {
             }
         },
         async translateAppObjectIdToTableData(data){
-            let appId = data.id;
+			let appId = data.id;
             let objs = data.objects;
 			let actionPackId = this.itemData.id;
             let initOperations = {}; // các operation mà có action rỗng để đảm bảo luôn hiển thị các object của app ngay cả khi các object này chưa có quyền
@@ -428,8 +430,10 @@ export default {
             }
 
             for(let objectType in objectTypeDataTable){
-                this.multipleLevelObjects.application_definition[objectType].tableData = objectTypeDataTable[objectType];
-            }
+				this.multipleLevelObjects.application_definition[objectType].tableData = objectTypeDataTable[objectType];
+			}
+			this.multipleLevelObjects.application_definition.orgchart.colHeaders.splice(5,3)
+			this.multipleLevelObjects.application_definition.orgchart.columns.splice(5,3)
         },
         setConfigForApplicationObjects(){
             let appDef = this.multipleLevelObjects.application_definition;
@@ -1038,7 +1042,12 @@ export default {
 				this.getAppInActionPack()
 				this.objectActive = "document_definition"
             }
-        },
+		},
+		objectActive(val){
+			if(val == 'application_definition'){
+				this.tableHeight = 140
+			}
+		},
         listAction: {
             immediate: true,
             deep: true,

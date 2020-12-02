@@ -17,13 +17,13 @@
 			</v-tab>
 		</v-tabs>
         <hot-table
-            :height="'auto'"
+            :height="200"
             :settings="tableSettings"
             :data="tableDataDefinition[openingTabKey].tableData"
             :columns="tableDataDefinition[openingTabKey].columns"
             :colHeaders="tableDataDefinition[openingTabKey].colHeaders"
             :dataSchema="tableDataDefinition[openingTabKey].dataSchema"
-            class="fs-13 mt-2 h-100 w-100"
+            class="fs-13 mt-2 "
             ref="dataTable">
         </hot-table>
     </div>
@@ -79,7 +79,15 @@ export default {
                     objects: data
                 });
             }
-        }
+		},
+		tableDataDefinition:{
+			deep: true,
+			immediate: true,
+			handler(obj){
+				// obj.orgchart.colHeaders.splice(5,3)
+				// obj.orgchart.columns.splice(5,3)
+			}
+		}
     },
     components: {
         HotTable,
