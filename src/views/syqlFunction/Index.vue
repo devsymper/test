@@ -1,5 +1,5 @@
 <template>
-    <div class="w-100 h-100">
+    <div class="w-100 h-100" >
         <list-items
             ref="listSyqlFunction"
             :useDefaultContext="false"
@@ -11,10 +11,11 @@
             :headerPrefixKeypath="'common'"
 			:showExportButton="false"
 			:actionPanelWidth="1000"
-			:actionPanelType="'elastic'"
 			@after-open-add-panel="handleAdd"
 			:showActionPanelInDisplayConfig="true"
         >
+			<!-- :actionPanelType="'elastic'" -->
+
 			<template slot="right-panel-content">  
 				<SyqlFunctionForm
 					:action="action"
