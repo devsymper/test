@@ -1304,7 +1304,11 @@ export default class Table {
     // Hàm set data cho table
     // hàm gọi sau khi chạy công thức 
     setData(vls, dateFormat = true) {
-        ClientSQLManager.delete(this.keyInstance, this.tableName, false);
+        try {
+            ClientSQLManager.delete(this.keyInstance, this.tableName, false);            
+        } catch (error) {
+            console.warn(error);
+        }
         if (vls != false) {
             let data = vls;
             let controlBinding = Object.keys(data[0]);
@@ -1328,7 +1332,7 @@ export default class Table {
                         dataToStore[controlName] = [];
                     }
                     let controlIns = this.getControlInstance(controlName);
-                    if (dateFormat && controlIns.type == 'date') {
+                    if (controlIns && dateFormat && controlIns.type == 'date') {
                         data[index][controlName] = SYMPER_APP.$moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
                     }
                     if (data[index] != undefined)
@@ -1578,11 +1582,11 @@ export default class Table {
                     if (cellValidateInfo.value) {
                         if(ele.find('.validate-icon').length > 0){
                             let curMsg = ele.find('.validate-icon').attr('title');
-                            curMsg = (curMsg) ? cellValidateInfo.msg : curMsg + "|||" + cellValidateInfo.msg;
-                            ele.find('.validate-icon').attr(curMsg);
+                            curMsg = (curMsg) ? cellValidateInfo.msg : curMsg + "\n" + cellValidateInfo.msg;
+                            ele.find('.validate-icon').attr('msg',curMsg);
                         }
                         else{
-                            ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(cellValidateInfo.msg, controlTitle));
+                            ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(control.name, cellValidateInfo.msg));
                         }
                     }
                 }
@@ -1590,17 +1594,18 @@ export default class Table {
         }
         ele.off('click', '.validate-icon')
         ele.on('click', '.validate-icon', function(e) {
-            let msg = $(this).attr('title');
+            let msg = $(this).attr('msg');
+
             e.msg = msg;
             SYMPER_APP.$evtBus.$emit('document-submit-open-validate-message', e)
         })
         if(control.checkProps('isRequired')){
             if(!value){
                 if(ele.find('.validate-icon').length > 0){
-                    ele.find('.validate-icon').attr("Không được bỏ trống");
+                    ele.find('.validate-icon').attr('msg',"Không được bỏ trống");
                 }
                 else{
-                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti('Không được bỏ trống', controlTitle));
+                    ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(control.name,'Không được bỏ trống'));
                 }
             }
         }
