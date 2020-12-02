@@ -48,7 +48,7 @@ export default {
         this.$store.commit("app/addToAppStore",{key:'currentPage',value:'projectSetting'});
     },
     activated(){
-        this.toggleMainContentLoader(false);
+        //this.toggleMainContentLoader(false);
         let breadcrumbs = [
                 {
                     text: 'Dashboard',

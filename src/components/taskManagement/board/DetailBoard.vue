@@ -1,0 +1,107 @@
+<template>
+    <div class="w-100 h-100">
+        <div class="symper-title" >Thông tin board</div>
+        <form-tpl
+            style="width:500px"
+            :allInputs="infoBoardProps"/>
+        <span class="mt-3 fs-11">Project</span>
+        <v-text-field
+            style="width:500px"
+            v-model="currentProject.name"
+            dense
+            readonly
+            class="input-project"
+            outlined
+            prepend-inner-icon="mdi-map-marker"
+        >
+            <template v-slot:prepend-inner>
+                <v-fade-transition leave-absolute>
+                    <v-icon v-if="!!currentProject.icon && currentProject.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:24px">{{currentProject.icon}}</v-icon>
+                    <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!currentProject.icon && currentProject.icon.indexOf('mdi-') < 0" :src="currentProject.icon" width="24" height="24">
+                        
+                </v-fade-transition>
+            </template>
+        </v-text-field>
+
+    </div>
+</template>
+
+<script>
+import FormTpl from "@/components/common/FormTpl.vue";
+
+export default {
+    name:"detailBoard",
+    components:{
+        FormTpl
+    },
+    props:{
+        infoBoard:{
+            type:Object,
+            default() {
+                return {};
+            }
+        }
+    },
+    watch:{
+        infoBoard(newVl){
+            debugger
+            this.getData();
+        }
+    },
+    data(){
+        return{
+            currentProject:{},
+            infoBoardProps:{
+                name : { 
+                    title: "Name",
+                    type: "text",
+                    value: '',
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
+                    validate(){
+                        if (this.value=="") {
+                            this.validateStatus.isValid=false;
+                            this.validateStatus.message="Không bỏ trống";
+                        }else{
+                            this.validateStatus.isValid=true;
+                            this.validateStatus.message="";
+                        }
+                    }
+                },
+                description : {
+                    title: "Mô tả",
+                    type: "text",
+                    value: '',
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    validate(){
+                    }
+                },
+
+            },
+        }
+    },
+    methods:{
+        getData(){
+            if (this.infoBoard.id) {
+                this.infoBoardProps.name.value=this.infoBoard.name;
+                this.infoBoardProps.description.value=this.infoBoard.description;
+                this.currentProject=this.$store.state.taskManagement.currentProject;
+            }
+        }
+    },
+    created(){
+        this.getData()
+    }
+}
+</script>
+
+<style scoped>
+.input-project >>> fieldset  {
+    border-color: #eeeeee;
+}
+</style>

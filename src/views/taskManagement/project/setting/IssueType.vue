@@ -45,7 +45,7 @@ export default {
         this.getListIssueTypeInProject();
     },
     activated(){
-        this.toggleMainContentLoader(false);
+        //this.toggleMainContentLoader(false);
     }
 
 }

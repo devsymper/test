@@ -49,7 +49,7 @@ export default [
 
     //report
     {
-        path: "/report",
+        path: "/projects/:id/report",
         name: "Report",
         meta:{group:'home'},
         component: () =>
@@ -63,6 +63,13 @@ export default [
         meta:{group:'home'},
         component: () =>
             import ('../../views/taskManagement/board/KanbanBoard.vue')
+    },
+    {
+        path: "/projects/:id/kanban-board/settings/:idBoard",
+        name: "kanbanBoardSetting",
+        meta:{group:'home'},
+        component: () =>
+            import ('../../views/taskManagement/board/SettingBoard.vue')
     },
 
 ]
