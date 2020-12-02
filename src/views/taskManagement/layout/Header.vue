@@ -6,6 +6,9 @@
                     <v-icon>mdi-chevron-right</v-icon>
                 </template>
             </v-breadcrumbs>
+            <div class="app-header_left--content">
+
+            </div>
         </div>
         <div class="app-header_right">
              <v-btn
@@ -181,6 +184,9 @@ export default {
         width: 250px;
         padding: 10px;
 
+    }
+    .app-header_left--content{
+        display: flex;
     }
 
 </style>

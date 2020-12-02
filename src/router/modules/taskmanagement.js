@@ -26,6 +26,14 @@ export default [
                 }
             },
             {
+                path: "projects/:id/workflow",
+                meta:{group:'projectSetting'},
+                name: "issueTypeWorkflow",
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/projectSetting/Workflow.vue')
+                }
+            },
+            {
                 path: "projects/:id/kanban-board/settings/:idBoard",
                 name: "kanbanBoardSetting",
                 meta:{group:'home'},
@@ -80,18 +88,4 @@ export default [
             
         ]   
     },
-  
-    
-    
-
-    //board
-    // {
-    //     path: "/projects/:id/kanban-board",
-    //     name: "kanbanBoard",
-    //     meta:{group:'home'},
-    //     component: () =>
-    //         import ('../../views/taskManagement/board/KanbanBoard.vue')
-    // },
-    
-
 ]

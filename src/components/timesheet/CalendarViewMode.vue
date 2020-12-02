@@ -160,7 +160,7 @@ button {
 
 .viewmode ::v-deep .v-input__slot:after {
     border-color: transparent !important;
-    height:25px!important;margin-top:3px;
+    margin-top:3px;
 }
 
 .viewmode-item {

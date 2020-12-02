@@ -126,7 +126,6 @@ export default {
 			showBtnAddCheckbox: true,
 			customAPIResult:{
 				reformatData(res){
-					debugger
 					if(res.data.listObject.length > 0){
 						let arr = []
 						res.data.listObject.forEach(function(e){

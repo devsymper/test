@@ -49,7 +49,6 @@
 </template>
 <script>
 import _groupBy from 'lodash/groupBy';
-import dayjs from 'dayjs';
 import NotificationPopUp from "./../../components/notification/DetailPopPup.vue";
 import { documentApi } from "./../../api/Document.js";
 import UserPopUp from "./../../components/user/UserPopUp";

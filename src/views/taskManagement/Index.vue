@@ -1,9 +1,9 @@
 <template>
     <div id="task-management-wrapper" class="w-100 h-100">
-        <Sidebar />
-         <div class="w-100 h-100">
+        <Sidebar  @after-toggle-sidebar="afterToggleSideBar"/>
+         <div :style="{'width':(isExpand) ? 'calc(100% - 256px)' : 'calc(100% - 56px)'}" class="h-100">
             <Header />
-            <router-view name="TaskManagement"/>
+            <router-view name="TaskManagement" style="padding:0 8px"/>
         </div>
     </div>
    
@@ -34,6 +34,17 @@ export default {
             ]
         this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
     },
+    methods:{
+        afterToggleSideBar(vl){
+            this.isExpand = !vl
+        }
+    },
+    data(){
+        return {
+            isExpand:false,
+
+        }
+    }
 }
 </script>
 
