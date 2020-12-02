@@ -2,7 +2,7 @@
     <div class="h-100" style="width:60%;margin:auto;">
         <div class="d-flex  justify-space-between" style="height:40px">
             <h1 class="ml-4">Access</h1>
-            <div>
+            <div class="mt-2">
                  <v-btn color="primary" small class="mr-2 px-2"  @click="handleClickAddPeople" >
                     {{$t("taskManagement.addPeople")}}
                 </v-btn>

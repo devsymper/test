@@ -1,16 +1,20 @@
 <template>
     <div class="h-100" style="width:40%;margin:auto">
-        <v-card style="box-shadow: none;">
-          <v-card-title>
+        <v-card class="h-100" style="box-shadow: none;">
+          <v-card-title  style="height:45px">
             <span class="headline ml-6">{{$t("taskManagement.detailProject")}}</span>
           </v-card-title>
-          <v-card-text>
-            <v-container>
+          <v-card-text style="height:calc(100% - 90px)">
+            <v-container class="h-100">
                 <v-form
+                    class="h-100"
                     ref="formEdit"
                     v-model="valid"
                     lazy-validation
                 >
+                <VuePerfectScrollbar
+                    style="height:100%"
+                    >
                     <v-col
                         cols="12"
                     >
@@ -90,10 +94,11 @@
                             @input="inputLeader"
                         ></userSelector>
                     </v-col>
+                    </VuePerfectScrollbar>
                 </v-form>
             </v-container>
           </v-card-text>
-          <v-card-actions>
+          <v-card-actions  style="height:45px">
             <v-spacer></v-spacer>
             <v-btn
                 v-if="statusEdit"
@@ -115,12 +120,14 @@ import userSelector from "@/components/user/UserSelector.vue";
 import pickIcon from "@/components/common/iconPicker";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import { util } from "@/plugins/util";
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 export default {
     components:{
         infoUser,
         pickIcon,
-        userSelector
+        userSelector,
+        VuePerfectScrollbar
     },
     data(){
         return{

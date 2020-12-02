@@ -32,7 +32,7 @@
                             <v-list-item
                                 v-for="(item, index) in items"
                                 :key="index"
-                                @click="item.menuAction(item.title)"
+                                @click="item.menuAction(item)"
                             >
                             <v-list-item-title>{{ item.title }}</v-list-item-title>
                             </v-list-item>
@@ -100,7 +100,12 @@ export default {
                 { 
                     title: this.$t("taskManagement.settingBoard"),
                     menuAction: action => {
-                       alert("helo")
+                       if (Object.keys(this.currentBoard).length >0) {
+                            let id=this.$route.params.id;
+                            this.$router.push("/projects/"+id+"/kanban-board/settings/" + this.currentBoard.id);
+                       }else{
+                           console.log("Chưa có data");
+                       }
                     },
                 },
             
@@ -296,32 +301,27 @@ export default {
         };
     },
     methods:{
-        getListBoard(){
+        async getListBoard(){
             let self=this;
             let id=this.$route.params.id;
             if (id) {
-                taskManagementApi
-                    .getListBoardInProject(id)
-                    .then(res => {
-                        if (res.status == 200) {
-                            self.$store.commit("taskManagement/setListBoardInProject", res.data.listObject);
-                        }else{
-                            self.$snotifyError("", "Can not get list board!");
-                        }
-                    })
-                    .catch(err => {
-                        self.$snotifyError("", "Can not get list board!",err);
-                    });
+                let listBoard =await taskManagementApi.getListBoardInProject(id);
+                if (listBoard.status==200) {
+                    self.$store.commit("taskManagement/setListBoardInProject", listBoard.data.listObject);
+                }
             }
         },
         setBoardCurrent(){
-            let allBoard=this.$store.state.taskManagement.listBoardInProject;
-            if (allBoard.length>0) {
-                this.currentBoard=allBoard[0];  
-            }
+            setTimeout((self) => {
+                let allBoard=self.$store.state.taskManagement.listBoardInProject;
+                if (allBoard.length>0) {
+                    self.currentBoard=allBoard[0];  
+                }
+            }, 300,this);
+           
         }
     },
-    created(){
+    async created(){
         let self = this;
         this.$evtBus.$on('selected-item-board', (data) =>{
 			if (data.id) {
@@ -329,18 +329,14 @@ export default {
 			}else{
 			}
         });
-        this.getListBoard();
-        if (Object.keys(this.currentBoard).length==0) {
-            setTimeout((self) => {
-                self.setBoardCurrent();
-                
-            }, 500,this);
-        }
+        await this.getListBoard();
+        this.setBoardCurrent();
+       
   
         
     },
     activated(){
-        this.toggleMainContentLoader(false);
+       // this.toggleMainContentLoader(false);
         let breadcrumbs = [
                 {
                     text: 'Dashboard',

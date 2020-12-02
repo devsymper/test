@@ -77,7 +77,7 @@ export default {
         this.getListRole();
     },
     activated(){
-        this.toggleMainContentLoader(false);
+        //this.toggleMainContentLoader(false);
     }
 
 }

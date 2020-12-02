@@ -267,9 +267,9 @@ export default {
         for(let i = 0; i<this.allListChanel.length;i++){
             if(this.allListChanel[i].event==event&&this.allListChanel[i].objectType==nameModule){
                if(isFollow){
-                   date =  dayjs(this.allListChanel[i].createAt).format('DD/MM/YYYY hh:mm');
+                   date =  this.$moment(this.allListChanel[i].createAt).format('DD/MM/YYYY hh:mm');
                }else{
-                   date = dayjs(this.allListChanel[i].userFilterAt).format('DD/MM/YYYY hh:mm');
+                   date = this.$moment(this.allListChanel[i].userFilterAt).format('DD/MM/YYYY hh:mm');
                }
             }
         }

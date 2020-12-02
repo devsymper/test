@@ -13,7 +13,7 @@ export default {
         
     },
     activated(){
-        this.toggleMainContentLoader(false);
+        //this.toggleMainContentLoader(false);
     }
     
 };

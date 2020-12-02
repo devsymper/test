@@ -48,7 +48,7 @@ export default {
         this.$store.commit("taskManagement/addToTaskManagementStore",{key:'currentPage',value:'projectSetting'});
     },
     activated(){
-        this.toggleMainContentLoader(false);
+        //this.toggleMainContentLoader(false);
         let breadcrumbs = [
                 {
                     text: 'Dashboard',

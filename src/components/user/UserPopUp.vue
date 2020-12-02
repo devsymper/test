@@ -56,7 +56,6 @@
 <script>
 import { orgchartApi } from "./../../api/orgchart.js";
 import symperAvatar from './../../components/common/SymperAvatar';
-import dayjs from 'dayjs';
 import {userApi} from './../../api/user'
 export default {
     props:['userId'],
@@ -100,7 +99,7 @@ export default {
         let res = await userApi.getDetailUser(this.userId);
             if(res.status==200){
                 self.detailUser = res.data.user;
-                self.detailUser.createAt = dayjs(self.detailUser.createAt).format('DD/MM/YYYY');
+                self.detailUser.createAt = this.$moment(self.detailUser.createAt).format('DD/MM/YYYY');
                 self.detailUser.status= self.reNameStatus(self.detailUser.status);
             }               
         }

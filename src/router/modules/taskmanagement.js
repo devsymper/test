@@ -26,6 +26,14 @@ export default [
                 }
             },
             {
+                path: "projects/:id/kanban-board/settings/:idBoard",
+                name: "kanbanBoardSetting",
+                meta:{group:'home'},
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/board/SettingBoard.vue')
+                }
+            },
+            {
                 path: "projects/:id/settings/details",
                 meta:{group:'projectSetting'},
                 name: "projectDetail",
@@ -78,11 +86,12 @@ export default [
 
     //board
     // {
-    //     path: "/kanban-board",
+    //     path: "/projects/:id/kanban-board",
     //     name: "kanbanBoard",
     //     meta:{group:'home'},
     //     component: () =>
     //         import ('../../views/taskManagement/board/KanbanBoard.vue')
     // },
+    
 
 ]

@@ -49,7 +49,6 @@
 import AgDataTable from "./../../components/common/agDataTable/AgDataTable";
 import CheckBoxRenderer from "./../../components/common/agDataTable/CheckBoxRenderer";
 import Config from "../../components/timesheet/Config";
-
 import timesheetApi from '../../api/timesheet';
 
 import dayjs from "dayjs";
@@ -161,7 +160,7 @@ export default {
                                         }
                                     }
                                     let checked = false;
-                                    if (dayjs(log.date).isBetween(start, end, 'day', '[]')) {
+                                    if (this.$moment(log.date).isBetween(start, end, 'day', '[]')) {
                                         const duration = (log.duration / 60);                        
                                         returnObj[r] = (returnObj[r] || 0) + duration;
                                         logged += duration;

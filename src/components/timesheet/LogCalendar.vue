@@ -210,12 +210,6 @@ import DeleteLogView from "./../../components/timesheet/DeleteLogView";
 import timesheetApi from '../../api/timesheet';
 
 import { mapState} from 'vuex';
-import dayjs from 'dayjs';
-dayjs.extend(isBetween);
-dayjs.extend(isSameOrBefore);
-import isSameOrBefore from 'dayjs/plugin/isSameOrBefore';
-import isBetween from 'dayjs/plugin/isBetween';
-
 
 import _groupBy from 'lodash/groupBy';
 
@@ -261,7 +255,7 @@ export default {
             let newTasks = this.events.map(task=>{
                 if(task.date!== lastDate){
                     lastDate = task.date;
-                    task.start = dayjs(task.start).startOf('day').hour(1).toDate().getTime()
+                    task.start = this.$moment(task.start).startOf('day').hour(1).toDate().getTime()
                     task.end = task.start + taskLength;
                     lastEnd = task.end
                 }else{
@@ -318,8 +312,8 @@ export default {
         },
         copyLogTime(event){
               timesheetApi.createLogTime({
-                start:dayjs(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm"),
-                end: dayjs(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm"),
+                start:this.$moment(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm"),
+                end: this.$moment(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm"),
                 duration:event.duration,
                 task: event.task,
                 type: event.type,
@@ -387,8 +381,8 @@ export default {
             return hour + minutes
         },
         findDuration(startTime, endTime) {
-            let startFormatted = dayjs(startTime);
-            let endFormatted = dayjs(endTime);
+            let startFormatted = this.$moment(startTime);
+            let endFormatted = this.$moment(endTime);
             let start = startFormatted.get('hour') * 60 + startFormatted.get('minute');
             let end = endFormatted.get('hour') * 60 + endFormatted.get('minute');
             let duration = end - start;
@@ -496,8 +490,8 @@ export default {
         },
         async endDrag() {
             async function updateEvent(event, duration) {
-                let start = dayjs(event.start);
-                let end = dayjs(event.end);
+                let start = this.$moment(event.start);
+                let end = this.$moment(event.end);
                 let res = await timesheetApi.updateLogTime({
                     start: start.format("YYYY-MM-DD HH:mm"),
                     end: end.format("YYYY-MM-DD HH:mm"),
@@ -620,14 +614,14 @@ export default {
         },
         onChangeCalendar() {
             this.$store.commit('timesheet/updateCalendarStartEnd', {
-                start: dayjs(this.$refs.calendar.lastStart.date).format('DD/MM'),
-                end: dayjs(this.$refs.calendar.lastEnd.date).format('DD/MM/YY'),
+                start: this.$moment(this.$refs.calendar.lastStart.date).format('DD/MM'),
+                end: this.$moment(this.$refs.calendar.lastEnd.date).format('DD/MM/YY'),
             });
             this.createCalendarHoverEvent();
         },
         updateTotalHours() {
-            let start = dayjs(this.$refs['calendar'].lastStart.date);
-            const end = dayjs(this.$refs['calendar'].lastEnd.date);
+            let start = this.$moment(this.$refs['calendar'].lastStart.date);
+            const end = this.$moment(this.$refs['calendar'].lastEnd.date);
             let totalInMinutes = 0;
             while (start.isSameOrBefore(end)) {
                 const date = start.format('YYYY-MM-DD');

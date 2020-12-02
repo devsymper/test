@@ -1,7 +1,9 @@
 const defaultState = {
     allCategory: [],
     allProject: [],
-    headerBreadcrumbs:[]
+    headerBreadcrumbs:[],
+    currentProject:{},
+    listBoardInProject:[]
 };
 
 export default defaultState;
