@@ -823,7 +823,12 @@ export default {
          * Sự kiện bắn ra khi ấn f2 vào 1 control để trace formulas
          */
         this.$evtBus.$on('document-submit-show-trace-control',data=>{
-            data.control.renderCurrentTraceControlColor();
+            if(!data.isTable){
+                 data.control.renderCurrentTraceControlColor();
+            }
+            else{
+                data.control = getControlInstanceFromStore(this.keyInstance, data.tableName)
+            }
             thisCpn.controlTrace = data.control.name;
             let controlFormulas = data.control.controlFormulas;
             thisCpn.listFormulasTrace = controlFormulas;
