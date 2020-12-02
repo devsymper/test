@@ -1328,7 +1328,7 @@ export default class Table {
                         dataToStore[controlName] = [];
                     }
                     let controlIns = this.getControlInstance(controlName);
-                    if (dateFormat && controlIns.type == 'date') {
+                    if (controlIns && dateFormat && controlIns.type == 'date') {
                         data[index][controlName] = SYMPER_APP.$moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
                     }
                     if (data[index] != undefined)
