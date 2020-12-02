@@ -25,8 +25,8 @@
                         :label="`Hiển thị nhãn link`"
                         dense   
                     ></v-checkbox>
-                    <add-status-view ref="popupAddStatusView"/>
-                    <add-link-view ref="popupAddLinkView"/>
+                    <add-status-view ref="popupAddStatusView" @after-add-status-click="afterAddStatusClick"/>
+                    <add-link-view ref="popupAddLinkView" @after-add-link-click="afterAddLinkClick"/>
                 </div>
                 <div id="task-workflow"></div>
             </div>
@@ -58,11 +58,60 @@ export default {
         },
         showPopupAddLinkView(){
             this.$refs.popupAddLinkView.show()
+        },
+        afterAddStatusClick(status){
+            this.listNode.push(status);
+            var rectReview = new joint.shapes.standard.Rectangle();
+            rectReview.position(500, 230);
+            rectReview.resize(100, 40);
+            rectReview.attr({
+                body: {
+                    fill: '#00875a',
+                    strokeWidth: 0
+                },
+                label:{
+                    text:'Done',
+                    fill:'white',
+                    fontWeight:500
+                }
+            
+            });
+            rectReview.addTo(this.graph);
+        },
+        afterAddLinkClick(linkInfo){
+            this.listLink.push(linkInfo);
+            let link1 = new joint.shapes.standard.Link({
+                source: { id: rectStart.id },
+                target: { id: rectEnd.id },
+                attrs: {
+                    line: {
+                        connection: true,
+                        stroke: '#333333',
+                        strokeWidth: 1,
+                        strokeLinejoin: 'round',
+                        targetMarker: {
+                            'type': 'path',
+                            'd': 'M 10 -5 0 0 10 5 z'
+                        }
+                    }
+                },
+            });
+            link1.appendLabel({
+                attrs: {
+                    text: {
+                        text: 'all'
+                    }
+                }
+            });
+            link1.addTo(this.graph);
         }
     },
     data(){
         return {
             showPopUpAddStatus:false,
+            graph:null,
+            listNode:[],
+            listLink:[],
             nodeConfig:{
                 name : { 
                     title: "Name",
@@ -102,13 +151,13 @@ export default {
         }
     },
     mounted() {
-        let graph = new joint.dia.Graph;
+        this.graph = new joint.dia.Graph;
 
         let paper = new joint.dia.Paper({
             el: $('#task-workflow'),
             width: '100%',
             height: 'calc(100% - 50px)',
-            model: graph,
+            model: this.graph,
             gridSize: 1,
             drawGrid: true,
             background: {
@@ -130,16 +179,7 @@ export default {
                 },
             
             });
-            rectStart.addTo(graph);
-
-
-            
-            // let linkStart = new joint.shapes.standard.Link({
-            //     source: { id: rect.id },
-            //     target: { id: rect2.id }
-            // });
-
-            // linkStart.addTo(graph);
+            rectStart.addTo(this.graph);
             var rectBacklog = new joint.shapes.standard.Rectangle();
             rectBacklog.position(250, 130);
             rectBacklog.resize(100, 40);
@@ -155,59 +195,59 @@ export default {
                 }
             
             });
-            rectBacklog.addTo(graph);
+            rectBacklog.addTo(this.graph);
 
 
 
-            let rect = new joint.shapes.standard.Rectangle({
-                position: { x: 600, y: 130 },
-                size: { width: 100, height: 40 },
-                attrs: {
-                    label: { text: 'In progress', fill: 'white',fontWeight:500 },
-                    body:{
-                        fill:'#0052cc',
-                        strokeWidth: 0
+        //     let rect = new joint.shapes.standard.Rectangle({
+        //         position: { x: 600, y: 130 },
+        //         size: { width: 100, height: 40 },
+        //         attrs: {
+        //             label: { text: 'In progress', fill: 'white',fontWeight:500 },
+        //             body:{
+        //                 fill:'#0052cc',
+        //                 strokeWidth: 0
 
-                    }
+        //             }
                     
-                }
-            });
+        //         }
+        //     });
 
 
-            var rectReview = new joint.shapes.standard.Rectangle();
-            rectReview.position(800, 130);
-            rectReview.resize(100, 40);
-            rectReview.attr({
-                body: {
-                    fill: '#00875a',
-                    strokeWidth: 0
-                },
-                label:{
-                    text:'Done',
-                    fill:'white',
-                    fontWeight:500
-                }
+        //     var rectReview = new joint.shapes.standard.Rectangle();
+        //     rectReview.position(800, 130);
+        //     rectReview.resize(100, 40);
+        //     rectReview.attr({
+        //         body: {
+        //             fill: '#00875a',
+        //             strokeWidth: 0
+        //         },
+        //         label:{
+        //             text:'Done',
+        //             fill:'white',
+        //             fontWeight:500
+        //         }
             
-            });
-            rectReview.addTo(graph);
+        //     });
+        //     rectReview.addTo(this.graph);
 
 
-        let link = new joint.shapes.standard.Link({
-            source: { id: rectBacklog.id },
-            target: { id: rect.id },
-            attrs: {
-                line: {
-                    connection: true,
-                    stroke: '#333333',
-                    strokeWidth: 1,
-                    strokeLinejoin: 'round',
-                    targetMarker: {
-                        'type': 'path',
-                        'd': 'M 10 -5 0 0 10 5 z'
-                    }
-                },
-            },
-        });
+        // let link = new joint.shapes.standard.Link({
+        //     source: { id: rectBacklog.id },
+        //     target: { id: rect.id },
+        //     attrs: {
+        //         line: {
+        //             connection: true,
+        //             stroke: '#333333',
+        //             strokeWidth: 1,
+        //             strokeLinejoin: 'round',
+        //             targetMarker: {
+        //                 'type': 'path',
+        //                 'd': 'M 10 -5 0 0 10 5 z'
+        //             }
+        //         },
+        //     },
+        // });
         let link1 = new joint.shapes.standard.Link({
             source: { id: rectStart.id },
             target: { id: rectBacklog.id },
@@ -231,26 +271,26 @@ export default {
                 }
             }
         });
-        let link2 = new joint.shapes.standard.Link({
-            source: { id: rect.id },
-            attrs: {
-                line: {
-                    connection: true,
-                    stroke: '#333333',
-                    strokeWidth: 1,
-                    strokeLinejoin: 'round',
-                    targetMarker: {
-                        'type': 'path',
-                        'd': 'M 10 -5 0 0 10 5 z'
-                    }
-                },
-            },
-            target: { id: rectReview.id }
-        });
+        // let link2 = new joint.shapes.standard.Link({
+        //     source: { id: rect.id },
+        //     attrs: {
+        //         line: {
+        //             connection: true,
+        //             stroke: '#333333',
+        //             strokeWidth: 1,
+        //             strokeLinejoin: 'round',
+        //             targetMarker: {
+        //                 'type': 'path',
+        //                 'd': 'M 10 -5 0 0 10 5 z'
+        //             }
+        //         },
+        //     },
+        //     target: { id: rectReview.id }
+        // });
         
 
 
-        graph.addCells([rect, link,link1, link2]);
+        this.graph.addCells([rectBacklog, link1]);
     }
 }
 </script>

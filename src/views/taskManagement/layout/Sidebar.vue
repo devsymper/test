@@ -1,7 +1,18 @@
 <template>
     <div style="position:relative;font-size:13px;" class="h-100">
+        <v-btn
+            class="collapse-sidebar-icon"
+            icon
+            @click.stop="toggleSidebar"
+            >
+            <div class="hamburger sb-menu-icon">
+                <span class="line"></span>
+                <span class="line"></span>
+                <span class="line"></span>
+            </div>
+        </v-btn>
         <v-navigation-drawer
-        class="h-100"
+        class="h-100 wrapper-sidebar"
         v-model="drawer"
         :mini-variant.sync="mini"
         permanent
@@ -70,18 +81,6 @@
                     </transition>
                 </v-list>
             </VuePerfectScrollbar>
-            <div class="sidebar-bottom">
-                <v-btn
-                    icon
-                    @click.stop="toggleSidebar"
-                    >
-                    <div class="hamburger sb-menu-icon">
-                        <span class="line"></span>
-                        <span class="line"></span>
-                        <span class="line"></span>
-                    </div>
-                </v-btn>
-            </div>
         </v-navigation-drawer>
         <SelectBoard ref="SelectBoard"/>
         <ProjectPopup ref="projectPopupView" v-if="!mini"/>
@@ -184,8 +183,8 @@ export default {
             selectingItem: {},
             selectingChildItem: {},
             isShowSidebar:true,
-            drawer: true,
-            mini: true,
+            drawer: false,
+            mini: false,
         };
     }
 };
@@ -306,6 +305,14 @@ export default {
     text-overflow: ellipsis;
     white-space: nowrap;
     color: rgb(0,0,0,0.6);
+}
+.collapse-sidebar-icon{
+    
+}
+.wrapper-sidebar{
+    border-right: unset;
+    box-shadow: var(--symper-box-shadow);
+    height: calc(100% - 100px) !important;
 }
 </style>
 

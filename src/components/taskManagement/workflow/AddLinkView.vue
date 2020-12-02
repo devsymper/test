@@ -10,7 +10,7 @@
           <span>Thêm trạng thái của task</span>
         </v-card-title>
         <v-card-text class="p-2">
-          <form-tpl :allInputs="statusInfo"/>
+          <form-tpl :allInputs="linkInfo"/>
         </v-card-text>
 
         <v-divider></v-divider>
@@ -55,7 +55,7 @@ export default {
     data(){
         return{
             isShow:false,
-            statusInfo:{
+            linkInfo:{
                 from : { 
                     title: "Bắt đầu từ trạng thái",
                     type: "select",
@@ -113,7 +113,7 @@ export default {
             this.isShow=true;
         },
         actionClick(type){
-            this.$emit('after-add-status-link',type);
+            this.$emit('after-add-link-click',linkInfo);
         }
         
     },

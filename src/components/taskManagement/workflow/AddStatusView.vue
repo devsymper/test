@@ -20,7 +20,7 @@
           <v-btn
             color="blue darken-1" 
             text
-            @click="isShow = false"
+            @click="beforeAddStatus"
           >
             {{$t('common.save')}}
           </v-btn>
@@ -104,10 +104,11 @@ export default {
     },
     methods:{
         show(){
-            this.isShow=true;
+            this.isShow = true;
         },
-        actionClick(type){
-            this.$emit('after-action-click',type);
+        beforeAddStatus(){
+            this.isShow = false;
+            this.$emit('after-add-status-click',this.statusInfo);
         }
         
     },
