@@ -574,6 +574,9 @@ const deleteControlTemplate = (state, params) => {
 const setDetailTrackChange = (state, params) => {
     Vue.set(state.detail[params.instance], 'trackChange', params.data);
 }
+const setCurrentTitle = (state, data) => {
+    Vue.set(state, 'currentTitle', data);
+}
 
 
 
@@ -612,6 +615,7 @@ export {
     deleteControlTemplate,
     setDetailTrackChange,
     updateDataForLinkControl,
-    updateDocumentState
+	updateDocumentState,
+	setCurrentTitle
 
 };

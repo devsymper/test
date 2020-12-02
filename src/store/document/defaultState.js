@@ -111,7 +111,8 @@ const defaultState = {
     },
     documentStyle: {
 
-    }
+	},
+	currentTitle:''
 };
 
 export default defaultState;
