@@ -113,6 +113,14 @@ function cleanContent(content, configValue) {
             rsl = rsl.replace(cdataStr, newCdataStr);
         });
     }
+    // Thay đổi các ký tự trong condition thành các ký tự chưa mã hóa
+    symperMatches = rsl.match(/\<condition(.*?)\<\/condition>/g);
+    if (symperMatches) {
+        symperMatches.forEach(cdataStr => {
+            let newCdataStr = cdataStr.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+            rsl = rsl.replace(cdataStr, newCdataStr);
+        });
+    }
 
     return rsl;
 }

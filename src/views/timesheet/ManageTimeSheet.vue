@@ -50,10 +50,6 @@ import AgDataTable from "./../../components/common/agDataTable/AgDataTable";
 import CheckBoxRenderer from "./../../components/common/agDataTable/CheckBoxRenderer";
 import Config from "../../components/timesheet/Config";
 import timesheetApi from '../../api/timesheet';
-
-import dayjs from "dayjs";
-import isBetween from 'dayjs/plugin/isBetween';
-dayjs.extend(isBetween);
 import _groupBy from 'lodash/groupBy';
 
 export default {

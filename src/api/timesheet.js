@@ -4,6 +4,7 @@ import { appConfigs } from "./../configs.js";
 let api = new Api(appConfigs.apiDomain.timesheet);
 var bpmneApi = new Api(appConfigs.apiDomain.bpmne.models);
 var userApi = new Api(appConfigs.apiDomain.user);
+let taskApi = new Api(appConfigs.apiDomain.workflowExtend);
 
 // Phục vụ cho việc test API task
 let fullCookieTest = "abc=xyz;FLOWABLE_REMEMBER_ME=YWNLNEUwTHlxbGNoQThEcUV4RTlpQSUzRCUzRDpsZUJRVTlTOSUyQnF5YzBCblNFZzdLQ3clM0QlM0Q";
@@ -125,8 +126,11 @@ export default {
             weekRemind
         })
     },
+    // getTask(filter) {
+    //     return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, filter, testHeader);
+    // },
     getTask(filter) {
-        return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks, filter, testHeader);
+        return taskApi.get('tasks?sort[0][column]=createTime&sort[0][type]=desc&search=%' + filter + '%');
     },
     updateLogTime({ start, end, task, date, duration, type, categoryTask, accountId, desc, id }) {
         return api.put('log-time-update' + '/' + id, {
