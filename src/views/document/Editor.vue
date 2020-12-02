@@ -104,6 +104,7 @@ import ControlNameRelated from "./../../views/document/items/ControlNameRelated.
 import AllControlInDoc from "./../../views/document/items/AllControlInDoc.vue";
 import MaterialIcon from "@/components/common/MaterialIcon.vue";
 import { GetControlProps,mappingOldVersionControlProps,
+        propsNotChangeForTaskManager,
         mappingOldVersionControlFormulas,getAPropsControl,
         getIconFromType,listControlNotNameProp } from "./../../components/document/controlPropsFactory.js";
 import { documentApi } from "./../../api/Document.js";
@@ -1535,6 +1536,15 @@ export default {
                 properties['dataFlowId'].value = curDataFlow[0];
                 properties['dataFlowId'].options = this.listDataFlow;
             }
+            if(this.$getRouteName() == 'editDocument'){
+                properties.isPreventedConfig.hidden = true;
+            }
+            if(properties.isPreventedConfig.value){
+                for (let index = 0; index < propsNotChangeForTaskManager.length; index++) {
+                    const prop = propsNotChangeForTaskManager[index];
+                    properties[prop].disabled = true;
+                }
+            }
             this.$store.commit(
                 "document/addCurrentControl",
                 {properties:properties,
@@ -2804,6 +2814,7 @@ export default {
                
                 let tableId = table.attr('id');
                 let control = this.editorStore.allControl[tableId]['listFields'][controlId];
+                
                 if(!control){
                     this.showDialogEditor("",this.$t('document.validate.controlNotExist'));
                     return;
