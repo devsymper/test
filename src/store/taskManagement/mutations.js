@@ -67,6 +67,18 @@ const updateProjectToStore = (state, item) => {
     }
     Vue.set(state, 'allProject', currentListProject);
 }
+const updateBoardToStore = (state, item) => {
+    let currentListBoard = state.listBoardInProject;
+
+    let obj = currentListBoard.find(data => data.id === item.id)
+    var index = currentListBoard.indexOf(obj);
+    if (index > -1) {
+        currentListBoard[index].name = item.name;
+        currentListBoard[index].description = item.description;
+    }
+    Vue.set(state, 'listBoardInProject', currentListBoard);
+}
+
 
 const updateCategoryToStore = (state, item) => {
     let currentListCategory = state.allCategory;
@@ -108,6 +120,7 @@ export {
     setCurrentProject,
     setListBoardInProject,
     addBoardToStore,
-    addToTaskManagementStore
+    addToTaskManagementStore,
+    updateBoardToStore
 
 };
