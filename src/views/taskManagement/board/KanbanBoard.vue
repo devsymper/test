@@ -50,8 +50,8 @@
                 >
                     <p class="title-column">{{column.title}}</p>
                     <!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
-                    <VuePerfectScrollbar style="max-height: calc(100vh - 210px);">
-                        <draggable :list="column.tasks" :animation="200" ghost-class="ghost-card" group="tasks">
+                    <VuePerfectScrollbar style="max-height: calc(100vh - 250px);">
+                        <draggable :list="column.tasks" :animation="250" ghost-class="ghost-card" group="tasks">
                             <!-- Each element from here will be draggable and animated. Note :key is very important here to be unique both for draggable and animations to be smooth & consistent. -->
                             <task-card
                                 v-for="(task) in column.tasks"
