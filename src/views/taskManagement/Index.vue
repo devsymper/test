@@ -3,8 +3,7 @@
         <Sidebar />
          <div class="w-100 h-100">
             <Header />
-
-            HEllo
+            <router-view name="TaskManagement"/>
         </div>
     </div>
    
@@ -33,7 +32,7 @@ export default {
                 href: 'breadcrumbs_dashboard',
                 }
             ]
-        this.$store.commit("app/addToAppStore",{key:"headerBreadcrumbs",value:breadcrumbs})
+        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
     },
 }
 </script>

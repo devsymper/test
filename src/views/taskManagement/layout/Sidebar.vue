@@ -111,6 +111,7 @@ export default {
             }
         });
         
+        
     },
     components: {
         VuePerfectScrollbar,
@@ -118,9 +119,7 @@ export default {
         SelectBoard
     },
     computed: {
-        sapp() {
-            return this.$store.state.app;
-        },
+        
     },
     watch:{
         mini(vl){
@@ -138,6 +137,9 @@ export default {
             }         
         },
     },
+    mounted(){
+        this.menu = appConfigs.sideBar[this.$route.meta.group];
+    },
     
     methods: {
         showAllProject(){
@@ -146,21 +148,6 @@ export default {
         toggleSidebar(){
             this.mini = !this.mini
         },
-        logout(){
-            util.auth.logout();
-            location.reload();
-        },
-        changeLocale(item) {
-            let locale = item.key;
-            let currentLocale = util.getSavedLocale();
-            if (currentLocale != locale) {
-                this.$i18n.locale = locale;
-                this.$moment.locale(util.str.mapLanguageToMoment[locale])
-                util.setSavedLocale(locale);
-                userApi.setUserLocale(locale);
-                this.$evtBus.$emit("change-user-locale", locale);
-            }
-        },
         onClickItem(item, event){
             if(item.url){
                 this.gotoLink(item.url,{id:'5fb7324b-0a85-57f8-cd00-5bc50ea2ab8b'});
@@ -168,7 +155,25 @@ export default {
             else{
                 this.$refs[item.component].show(event);
             }
-        }
+        },
+        gotoLink(link, params = {}){
+            let listParams = link.match(/:\w+/g);
+            if(listParams && listParams.length > 0){
+                for (let index = 0; index < listParams.length; index++) {
+                    let param = listParams[index];
+                    param = param.replace(":",'').trim();
+                    if(Object.keys(params).includes(param)){
+                        link = link.replace(listParams[index],params[param])
+                    }
+                    else{
+                        return;
+                    }
+                }
+            }
+            if(this.$route.path != link){
+                this.$router.push(link);
+            }
+        },
       
     },
     data() {

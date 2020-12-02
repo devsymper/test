@@ -114,7 +114,7 @@ var configs = {
                     {
                         title:"Kanban board",
                         icon: 'mdi-view-week-outline',
-                        url:"/projects/:id/kanban-board"
+                        url:"/task-management/projects/:id/kanban-board"
                     },
                     {
                         title:"Report",

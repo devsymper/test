@@ -69,6 +69,7 @@
                 <v-row
                     v-for="(obj, idx) in listProject"
                     :key="idx"
+                    @click="onProjectItemClick(obj)"
                     :class="{
                         'mr-0 ml-0 single-row': true ,
                     }"
@@ -311,6 +312,12 @@ export default {
         }
     },
     methods:{
+        /**
+         * hoangnd:chuyển view mở chi tiết 1 project
+         */
+        onProjectItemClick(obj){
+            this.$router.push('/task-management/projects/'+obj.id+'/kanban-board')
+        },
         validateAddProject () {
             this.$refs.form.validate();
             setTimeout((self) => {

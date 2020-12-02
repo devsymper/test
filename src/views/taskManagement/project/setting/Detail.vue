@@ -45,7 +45,7 @@ export default {
             }
         }
         this.$store.dispatch("taskManagement/getAllCategory");
-        this.$store.commit("app/addToAppStore",{key:'currentPage',value:'projectSetting'});
+        this.$store.commit("taskManagement/addToTaskManagementStore",{key:'currentPage',value:'projectSetting'});
     },
     activated(){
         this.toggleMainContentLoader(false);
@@ -66,7 +66,7 @@ export default {
                     to: 'breadcrumbs_link_2',
                 },
             ]
-        this.$store.commit("app/addToAppStore",{key:"headerBreadcrumbs",value:breadcrumbs})
+        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
     }
 
 }

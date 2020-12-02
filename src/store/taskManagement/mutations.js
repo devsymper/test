@@ -91,6 +91,11 @@ const removeCategoryToStore = (state, id) => {
     }
     Vue.set(state, 'allCategory', currentListCategory);
 }
+const addToTaskManagementStore = (state, data) =>{
+    let key = data.key;
+    let value = data.value;
+    Vue.set(state, key, value)
+}
 export {
     setAllCategory,
     setAllProject,
@@ -102,6 +107,7 @@ export {
     removeCategoryToStore,
     setCurrentProject,
     setListBoardInProject,
-    addBoardToStore
+    addBoardToStore,
+    addToTaskManagementStore
 
 };
