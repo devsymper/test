@@ -81,8 +81,9 @@ export const userApi = {
         });
         return Promise.all(deleteArr);
     },
-    updateBAAccountPassword(data) {
-        return api.post('supporter/change-password', data);
+
+    updateBAAccountPassword(id, data) {
+        return coreApi.put('supporters/' + id + '/password', data);
     },
 
     // Lấy các operation của user ở role hiện tại
@@ -105,5 +106,8 @@ export const userApi = {
     updateRole(data) {
         return systemRoleApi.put('/set-users-to-roles', data)
     },
+    getPermission(role) {
+        return permissionApi.get('/roles/' + role + '/permissions')
+    }
 
 };
