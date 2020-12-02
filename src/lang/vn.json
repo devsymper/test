@@ -1409,7 +1409,7 @@
         "table":{
             "name": "Tên",
             "description": "Mô tả",
-            "lead": "Lead",
+            "lead": "Leader",
             "category": "Danh mục",
             "createAt":"Ngày tạo",
             "email":"Email",
@@ -1418,6 +1418,7 @@
         },
         "listMember":"Danh sách thành viên",
         "listCategory":"Danh sách danh mục",
+        "listComponent":"Danh sách component",
         "listIssueType":"Danh sách Issue type",
         "requiredField":"Trường bắt buộc nhập",
         "detailProject":"Thông tin project",
@@ -1427,7 +1428,8 @@
         "dialog":{
             "removeUser": "Bạn sẽ xóa thành viên khỏi project này",
             "removeRole": "Bạn sẽ xóa role này khỏi danh sách.",
-            "removeCategory": "Bạn sẽ xóa danh mục này khỏi danh sách."
+            "removeCategory": "Bạn sẽ xóa danh mục này khỏi danh sách.",
+            "removeComponent": "Bạn sẽ xóa component này khỏi danh sách."
         },
         "settingBoard":"Cài đặt Board"
 

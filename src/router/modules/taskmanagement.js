@@ -85,6 +85,16 @@ export default [
                     TaskManagement: () => import ('../../views/taskManagement/report/Report.vue')
                 }
             },
+
+            //component
+            {
+                path: "projects/:id/components",
+                name: "Component",
+                meta:{group:'home'},
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/component/List.vue')
+                }
+            },
             
         ]   
     },

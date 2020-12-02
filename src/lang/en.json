@@ -1285,7 +1285,7 @@
         "table":{
             "name": "Name",
             "description": "Description",
-            "lead": "Lead",
+            "lead": "Leader",
             "category": "Category",
             "createAt":"Create time",
             "email":"Email",
@@ -1294,6 +1294,7 @@
         },
         "listMember":"List member",
         "listCategory":"List category",
+        "listComponent":"List component",
         "listIssueType":"List Issue type",
         "detailProject":"Detail project",
         "requiredField":"Indicates required field",
@@ -1303,7 +1304,8 @@
         "dialog":{
             "removeUser": "You will remove members from this project?",
             "removeRole": "You will remove role from this rols.",
-            "removeCategory": "You will remove category from this rols."
+            "removeCategory": "You will remove category from this rols.",
+            "removeComponent": "You will remove component from this rols."
 
         },
         "settingBoard":"Board setting"

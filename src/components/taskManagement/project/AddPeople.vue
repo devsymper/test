@@ -11,6 +11,7 @@
             </v-card-title>
             <v-card-text>
                 <v-container>
+                    <span class="fs-11">Thành viên</span>
                      <userSelector
                         class="selectUser"
                         :isMulti="true"

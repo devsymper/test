@@ -109,7 +109,6 @@ export default {
                        }
                     },
                 },
-            
             ],
             columns: [
                 {
@@ -307,7 +306,7 @@ export default {
             let id=this.$route.params.id;
             if (id) {
                 let listBoard =await taskManagementApi.getListBoardInProject(id);
-                if (listBoard.status==200) {
+                if (listBoard.status==200 && listBoard.data) {
                     self.$store.commit("taskManagement/setListBoardInProject", listBoard.data.listObject);
                 }
             }

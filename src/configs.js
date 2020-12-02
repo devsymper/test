@@ -117,9 +117,14 @@ var configs = {
                         url:"/task-management/projects/:id/kanban-board"
                     },
                     {
+                        title:"Component",
+                        icon: 'mdi-view-week-outline',
+                        url:"/task-management/projects/:id/components"
+                    },
+                    {
                         title:"Report",
                         icon: 'mdi-chart-bar',
-                        url:"/projects/:id/report"
+                        url:"/task-management/projects/:id/report"
                     },
                 ]
             },
@@ -144,7 +149,7 @@ var configs = {
             item3:{
                 isWorkSpace:false,
                 title:"Project Setting",
-                url:"/projects/:id/settings/details",
+                url:"/task-management/projects/:id/settings/details",
                 icon: 'mdi-cog-outline'
             }
         },
@@ -157,13 +162,13 @@ var configs = {
                         name:'detail',
                         title:"Detail",
                         icon: 'mdi-view-column-outline',
-                        url:"/projects/:id/settings/details"
+                        url:"/task-management/projects/:id/settings/details"
                     },
                     {
                         name:'access',
                         title:"Access",
                         icon: 'mdi-view-week-outline',
-                        url:"/projects/:id/settings/access"
+                        url:"/task-management/projects/:id/settings/access"
                     }
                 ]
             }

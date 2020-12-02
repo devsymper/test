@@ -76,4 +76,18 @@ export const taskManagementApi = {
         return taskManagement.put("boards/"+id,data);
     },
 
+
+    ///////component
+    getListComponent(projectId){
+        return taskManagement.get("components/"+projectId);
+    },
+    addComponentForProject(data){
+        return taskManagement.post("components",data);
+    },
+    updateComponentForProject(id,data){
+        return taskManagement.put("components/"+id,data);
+    },
+    removeComponent(id){
+        return taskManagement.delete("components/"+id);
+    }
 }

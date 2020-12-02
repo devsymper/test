@@ -38,43 +38,26 @@ export default {
         removeMember(){
             this.getUserInProject();
         },
-        getListRole(){
-            let self=this;
-            taskManagementApi
-                .getListRole()
-                .then(res => {
-                    if (res.status == 200) {
-                        self.roles=res.data.listObject;
-                    }else{
-                        self.$snotifyError("", "Can not get list role!!!");
-                    }
-                })
-                .catch(err => {
-                    self.$snotifyError("", "Can not get list role!!!");
-                })
-                .always(() => {});
+        async getListRole(){
+            let self = this;
+            let allRole = await taskManagementApi.getListRole();
+            if (allRole.status == 200 && allRole.data) {
+                self.roles = allRole.data.listObject;
+            }
+               
         },
-        getUserInProject(){
+        async getUserInProject(){
             let self=this;
             let projectId=this.$route.params.id;
-            taskManagementApi
-                .getUserInProject(projectId)
-                .then(res => {
-                    if (res.status == 200) {
-                        self.listUser=res.data.listObject;
-                    }else{
-                        self.$snotifyError("", "Can not get list user in project!!!");
-                    }
-                })
-                .catch(err => {
-                    self.$snotifyError("", "Can not get list project!!!");
-                })
-                .always(() => {});
+            let list = await taskManagementApi.getUserInProject(projectId);
+            if (list.status == 200 && list.data) {
+                self.listUser = list.data.listObject;
+            }
         }
     },
-    created(){
-        this.getUserInProject();
-        this.getListRole();
+    async created(){
+        await this.getUserInProject();
+        await this.getListRole();
     },
     activated(){
         //this.toggleMainContentLoader(false);

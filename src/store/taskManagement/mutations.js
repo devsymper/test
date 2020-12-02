@@ -14,6 +14,11 @@ const setAllProject = (state, allProject) => {
 const setListBoardInProject = (state, listBoardInProject) => {
     Vue.set(state, 'listBoardInProject', listBoardInProject);
 }
+const setListComponent = (state, listComponentInProject) => {
+    Vue.set(state, 'listComponentInProject', listComponentInProject);
+}
+
+
 const setCurrentProject = (state, currentProject) => {
     Vue.set(state, 'currentProject', currentProject);
 }
@@ -121,6 +126,7 @@ export {
     setListBoardInProject,
     addBoardToStore,
     addToTaskManagementStore,
-    updateBoardToStore
+    updateBoardToStore,
+    setListComponent
 
 };

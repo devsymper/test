@@ -2,8 +2,8 @@
     <div class="h-100" style="width:60%;margin:auto;">
         <div class="d-flex  justify-space-between" style="height:40px">
             <h1 class="ml-4">Access</h1>
-            <div class="mt-2">
-                 <v-btn color="primary" small class="mr-2 px-2"  @click="handleClickAddPeople" >
+            <div class="mt-2 pr-4">
+                 <v-btn color="primary" depressed small class="mr-2 px-2"  @click="handleClickAddPeople" >
                     {{$t("taskManagement.addPeople")}}
                 </v-btn>
                   <v-btn depressed color="#eee" class="px-2" style="color:#111" @click="handleRoleManager" small >
@@ -16,10 +16,9 @@
              <v-card style="box-shadow:none">
                 <v-card-title>
                     <div>
-                        {{$t("taskManagement.listMember")}}
+                        {{$t("taskManagement.listMember")}} của {{currentProject.name}}
                         <div><span class="fs-13 grey--text">Tổng số thành viên: {{allUserInProject.length}}</span></div>
                     </div>
-                    
                     <v-spacer></v-spacer>
                     <v-text-field
                         v-model="search"
@@ -74,7 +73,6 @@
                 </v-data-table>
             </v-card>
         </div>
-
         <!-- dialog show list role -->
         <v-dialog
             v-model="dialogRole"
@@ -362,6 +360,7 @@ export default {
     },
     data(){
         return{
+            currentProject:this.$store.state.taskManagement.currentProject,
             dialogRemoveRole:false,
             memberSelected:{},
             roleSelected:{},
