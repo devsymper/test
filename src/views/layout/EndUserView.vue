@@ -132,20 +132,16 @@ export default {
     mounted(){
         const self = this;
         this.$evtBus.$on("close-edit-document",(isCloseTab) => {
-            this.isClose = isCloseTab;
-            if(isCloseTab){
-                self.closeTab(this.idx);
-            }
+            self.isClose = !isCloseTab;
         });
     },
     methods: {
         handleCloseTab(idx){
+            const self = this;
             this.idx = idx;
             this.$evtBus.$emit("before-close-app-tab", idx);
-            if(this.isClose){
-                this.closeTab(idx);
-            }else{
-
+            if(!self.isClose){
+                self.closeTab(idx);
             }
         },
         /**
