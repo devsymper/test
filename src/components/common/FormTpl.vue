@@ -85,7 +85,7 @@
                     :class="'sym-small-size sym-style-input d-inline-block '+(inputInfo.classes ? inputInfo.classes : '') "
                     :key="name"
                     single-line
-                    :disabled="viewOnly"
+                    :disabled="inputInfo.disabled || viewOnly"
                     v-bind="getInputProps(inputInfo)"
                     v-model="inputInfo.value"
                     :append-icon="(inputInfo.appendIcon) ? inputInfo.appendIcon : ''"

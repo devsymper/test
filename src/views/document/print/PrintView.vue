@@ -77,14 +77,14 @@ export default {
             for (const node of [...document.querySelectorAll('link, style')]) {
             stylesHtml += node.outerHTML;
             }
+            let contentHeight = $('.content-scroll')[0].scrollHeight;
             let cstyle = `<style type="text/css">
                          @media print {
                                 html, body{
-                                height:auto;
+                                height:`+contentHeight+`px;
                                 width:100%;
                           
                                 }
-                                * { overflow: visible !important; } 
                                 .ag-root-wrapper, .ag-root-wrapper-body, .ag-root, .ag-body-viewport, .ag-center-cols-container, .ag-center-cols-viewport, .ag-center-cols-clipper, .ag-body-horizontal-scroll-viewport, .ag-virtual-list-viewport{
                                     height: 100% !important;
                                     overflow: hidden !important;
@@ -112,9 +112,11 @@ export default {
                                 tfoot { display:table-footer-group }
                                 .wrap-print-multiple table{
                                     width:100% !important;
+                                    height:100% !important;
                                 }
                                 .wrap-print-multiple{
                                     width:100%;
+                                    height:100% !important;
                                 }
                             }
                              .content-print-document{
