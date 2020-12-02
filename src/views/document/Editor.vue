@@ -329,6 +329,7 @@ export default {
                 self.initEditor()
             },
         });
+        this.handleCloseChrome();
     },
     created() {
         this.currentTabIndex = this.$store.state.app.currentTabIndex;        
@@ -354,9 +355,13 @@ export default {
             let elControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body #'+locale.id);
             this.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
         });
+        const self = this;
         this.$evtBus.$on("before-close-app-tab", (data) => {
             if(this._inactive == true) return;
             if(this.routeName == 'editDocument'){
+                const message = self.$t('document.notification.leavePage');
+                let confirm = window.confirm(message);
+                self.$evtBus.$emit("close-edit-document", confirm);
                 documentApi.setEdittingDocument({id:this.documentId,status:0});
                 clearInterval(this.intervalSetEditting);
             }
@@ -455,7 +460,8 @@ export default {
             for(let docName in data){
                 this.listDocument.push({name:docName,id:data[docName].id,title:data[docName].title});
             }
-        }
+        },
+        
     },
     methods:{
         /**
@@ -473,7 +479,6 @@ export default {
                 }
             })
         },
-        
         showDialogEditor(type,title){
             this.dialog = true;
             this.typeDialog = type;
@@ -3019,8 +3024,17 @@ export default {
         },
         beforeCloseSubmit(){
             this.isShowPreviewSubmit = false;
-        }
+        },
+         // xử lý khi tắt tab chrome
+        handleCloseChrome(){
+            $(window).on("beforeunload", function(e) {
+                let dialogText = 'Are you sure you want to close the Window?';
+                e.returnValue = dialogText;
+                return dialogText;
 
+            });
+        }
+       
     },
     
 }

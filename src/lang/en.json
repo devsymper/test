@@ -603,6 +603,9 @@
             "controlNotExist": "Control does not exist, please create new control",
             "docNameExist": "Document name exist",
             "checkNameRelate": "The name of this document can be used in formulas on objects in the system. Select Test to re-check the object"
+        },
+        "notification": {
+            "leavePage": "Are you sure you want to leave this page?"
         }
     },
     "documentObject": {

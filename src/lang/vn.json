@@ -811,6 +811,9 @@
             "docNameExist": "Tên document đã tồn tại",
             "checkNameRelate": "Tên của văn bản này có thể được sử dụng trong công thức ở các đối tượng trong hệ thống. Chọn kiểm tra để kiểm tra lại các đối tượng"
 
+        },
+        "notification": {
+            "leavePage": "Bạn có muốn rời khỏi trang?"
         }
     },
     "documentObject": {
