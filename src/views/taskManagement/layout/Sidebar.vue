@@ -195,11 +195,11 @@ export default {
     margin-left: auto;
 }
 .sb-menu-icon .line{
-  width: 22px;
+  width: 18px;
   height: 2px;
   background-color: black;
   display: block;
-  margin: 5px auto;
+  margin: 4px auto;
   -webkit-transition: all 0.3s ease-in-out;
   -o-transition: all 0.3s ease-in-out;
   transition: all 0.3s ease-in-out;
@@ -245,7 +245,7 @@ export default {
     padding: 7px;
 }
 .sidebar-content{
-    height: calc(100% - 83px);
+    height: calc(100% - 40px);
 }
 .sidebar-content .v-list-item-project-info{
     padding: 0 !important;
