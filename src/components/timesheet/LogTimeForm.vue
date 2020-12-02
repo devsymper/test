@@ -236,8 +236,6 @@
 </template>
 
 <script>
-import dayjs from 'dayjs';
-import customParseFormat from 'dayjs/plugin/customParseFormat';
 import timesheetApi from '../../api/timesheet';
 import TaskForm from '../timesheet/TaskForm';
 
@@ -326,7 +324,7 @@ export default {
                 } else {
                     return this.duration + "m";
                 }
-                return dayjs(this.event.start).format('HH:mm');
+                return this.$moment(this.event.start).format('HH:mm');
             } else {
                 return '';
             }
@@ -346,8 +344,8 @@ export default {
             let year = this.datePicker.slice(0,4);
             let month = Number(this.datePicker.slice(5,7))-1;
             let date = this.datePicker.slice(8,10);
-            this.newEvent.start = dayjs(this.newEvent.start).date(date).month(month).year(year).valueOf();
-            this.newEvent.end = dayjs(this.newEvent.end).date(date).month(month).year(year).valueOf();
+            this.newEvent.start = this.$moment(this.newEvent.start).date(date).month(month).year(year).valueOf();
+            this.newEvent.end = this.$moment(this.newEvent.end).date(date).month(month).year(year).valueOf();
 
             this.inputs.date = this.datePicker;
             this.displayDate= this.datePicker
@@ -428,22 +426,20 @@ export default {
              // this.loadTaskList();
         },
         newEvent(val) {
-            debugger
             this.getAllTask(val.task);
-            this.inputs.startTime = val ? dayjs(val.start).format('HH:mm') : "08:00";
-            this.inputs.endTime = val ? dayjs(val.end).format('HH:mm') : "08:40";
-            this.inputs.date = val ? dayjs(val.date).format('YYYY-MM-DD') : dayjs().format('YYYY-MM-DD');
+            this.inputs.startTime = val ? this.$moment(val.start).format('HH:mm') : "08:00";
+            this.inputs.endTime = val ? this.$moment(val.end).format('HH:mm') : "08:40";
+            this.inputs.date = val ? this.$moment(val.date).format('YYYY-MM-DD') : this.$moment().format('YYYY-MM-DD');
             this.displayDate = this.inputs.date;
             this.inputs.description = val.desc;
             this.categoryTask = val.category;
-              debugger
             this.task = val.task?val.task:getIdTask(val.task);
             this.items.push({name:val.task});
             // hiển thị nút plan và log theo từng giờ
-            let now = dayjs();
-            let dateLog = dayjs(this.newEvent.start).format('DD/MMM/YYYY h:mm A');
-            this.showLog =  dayjs(dateLog).isAfter(now)==true?false:true;
-            this.showPlan = dayjs(dateLog).isAfter(now);
+            let now = this.$moment();
+            let dateLog = this.$moment(this.newEvent.start).format('DD/MMM/YYYY h:mm A');
+            this.showLog =  this.$moment(dateLog).isAfter(now)==true?false:true;
+            this.showPlan = this.$moment(dateLog).isAfter(now);
             this.filterTaskByCategory();
         },
     },
@@ -470,9 +466,9 @@ export default {
             hour = duration.indexOf('h')>-1?duration.split('h')[0]:0;
             minutes = duration.indexOf('h')>-1?duration.split('m')[0].split('h')[1]:duration.split('m')[0];
             if(this.inputs.startTime){
-                this.inputs.endTime = dayjs(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).add(hour,'h').add(minutes,'m').format("HH:mm")
+                this.inputs.endTime = this.$moment(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).add(hour,'h').add(minutes,'m').format("HH:mm")
             }else{
-                this.input.startTime = dayjs(this.newEvent.end).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).subtract(hour,'h').subtract(minutes,'m').format("HH:mm")
+                this.input.startTime = this.$moment(this.newEvent.end).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).subtract(hour,'h').subtract(minutes,'m').format("HH:mm")
             }
         },
         caculateDuration(event){
@@ -489,12 +485,10 @@ export default {
             }
         },
          findNameTask(id){
-             debugger
              this.nameTask=this.items.filter(x=>x.id==id)[0].name;
              return this.nameTask
         },
         getCategoryId(taskId){
-            debugger
            let cateId = this.items.filter(x=>x.id==taskId)[0].categoryId;
            if(cateId){
                 this.categoryTask = this.getFullNameCategory(cateId)
@@ -511,12 +505,16 @@ export default {
             this.items = [];
            await timesheetApi.getTaskDB()
             .then(res => {
-                self.items.push(...res.data.task);
+             self.items.push(...res.data.task);
                 })
                 .catch(console.log);
-            await timesheetApi.getTask({nameLike:'%'+nameTask+'%'})
+            await timesheetApi.getTask(nameTask)
             .then(res => {
-                self.items.push(...res.data);
+                let name = res.data.listObject;
+                name.map(x=>{
+                    x.name = JSON.parse(x.description).content
+                })
+                self.items.push(...res.data.listObject);
                 })
                 .catch(console.log);
 
@@ -531,18 +529,18 @@ export default {
             this.inputs.description = '';
             this.categoryTask = '';
             this.task ='';
-            let now = dayjs();
-            let dateLog = dayjs(date).format('DD/MMM/YYYY');
-            this.showLog =  dayjs(dateLog).isAfter(now)==true?false:true;
-            this.showPlan = dayjs(dateLog).isAfter(now);
-            this.inputs.date = dayjs(date).format('YYYY-MM-DD')
+            let now = this.$moment();
+            let dateLog = this.$moment(date).format('DD/MMM/YYYY');
+            this.showLog =  this.$moment(dateLog).isAfter(now)==true?false:true;
+            this.showPlan = this.$moment(dateLog).isAfter(now);
+            this.inputs.date = this.$moment(date).format('YYYY-MM-DD')
            
         },
         // đổi giờ thành ngày giờ trong màn hình month
          changeTimeToDate(time){
             let hour = Number(time.split(":")[0]);
             let minutes = Number(time.split(":")[1]);
-            let dateTime = dayjs(this.dateLogMonthView).hour(hour).minute(minutes).format("YYYY-MM-DD HH:mm");
+            let dateTime = this.$moment(this.dateLogMonthView).hour(hour).minute(minutes).format("YYYY-MM-DD HH:mm");
             return dateTime;
         },
         //lấy danh sách category
@@ -638,8 +636,8 @@ export default {
                 start = this.changeTimeToDate(this.inputs.startTime);
                 end = this.changeTimeToDate(this.inputs.endTime);
             }else{
-                start = dayjs(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
-                end  = dayjs(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
+                start = this.$moment(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
+                end  = this.$moment(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm");
             }
             if (!check){}
             else{
@@ -706,8 +704,8 @@ export default {
                 let taskId = Number(this.task)?this.task:this.items.filter(x=>x.name==this.task)[1].id;
                // let test = this.items.filter(x=>x.name==this.task)[0].id;
                 timesheetApi.updateLogTime({
-                        start: dayjs(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
-                        end: dayjs(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
+                        start: this.$moment(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
+                        end: this.$moment(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
                         duration: this.duration,
                         task: this.findNameTask(taskId),
                         type: type,
