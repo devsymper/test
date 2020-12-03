@@ -27,7 +27,6 @@
 						icon
 						v-show="tab == 'tab-1'"
 						x-small
-						v-show="tab == 'tab-1'"
 						class="mr-2"
 						@click="handleZoomOut"
 					>
