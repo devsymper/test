@@ -1,36 +1,45 @@
 <template>
-    <v-card>
-        <div class="w-100">
-            <div class="w-100">
-            <form-tpl
-                    :allInputs="roleSelect"/>
-            </div>
-            <div class="d-flex actions">
-                <v-spacer></v-spacer>
-                <v-btn
-                    color="blue darken-1"
-                    text
-                    class="btn-add"
-                    @click="actionClick('access')"
-                >
-                    {{$t("common.add")}}
-                </v-btn>
-                <v-btn
-                color="red darken-1"
-                text
-                @click="actionClick('cancel')"
-                >
-                    {{$t("common.close")}}
-                </v-btn>
-            </div>
-        </div>
-    </v-card>
+     <v-dialog
+      v-model="isShow"
+      width="500"
+      scrollable
+      :content-class="'overflow-hidden'"
+    >
+      <v-card>
+        <v-card-title class="p-2">
+          <span>Thêm trạng thái của task</span>
+        </v-card-title>
+        <v-card-text class="p-2">
+          <form-tpl :allInputs="statusInfo"/>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions class="p-1">
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue darken-1" 
+            text
+            @click="beforeAddStatus"
+          >
+            {{$t('common.save')}}
+          </v-btn>
+          <v-btn
+            color="red darken-1"
+            text
+            @click="isShow = false"
+          >
+            {{$t('common.close')}}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
 
 </template>
 
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
-
+import {getAllStatusCategory} from './config.js'
 export default {
     components:{
         'form-tpl' : FormTpl,
@@ -43,11 +52,15 @@ export default {
             }
         },
     },
+    mounted(){
+        this.statusInfo.statusCategory.options = getAllStatusCategory()
+    },
     data(){
         return{
-            roleSelect:{
-                roles : { 
-                    title: "Role",
+            isShow:false,
+            statusInfo:{
+                name : { 
+                    title: "Tên",
                     type: "text",
                     value:"",
                     validateStatus:{
@@ -57,6 +70,28 @@ export default {
                     validate(){
                     
                     }
+                },
+                desscription : { 
+                    title: "Mô tả",
+                    type: "text",
+                    value:"",
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
+                    validate(){
+                    
+                    }
+                },
+                statusCategory : { 
+                    title: "Chọn loại",
+                    type: "select",
+                    value:"",
+                    options: [],
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
                 },
                 allowAll : { 
                     title: "Cho phép tất cả thay đổi",
@@ -69,10 +104,11 @@ export default {
     },
     methods:{
         show(){
-            this.isShow=true;
+            this.isShow = true;
         },
-        actionClick(type){
-            this.$emit('after-action-click',type);
+        beforeAddStatus(){
+            this.isShow = false;
+            this.$emit('after-add-status-click',this.statusInfo);
         }
         
     },

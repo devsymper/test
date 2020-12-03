@@ -1,48 +1,45 @@
 <template>
-    <v-dialog
-            v-if="isShow"
-            v-model="isShow"
-            persistent
-            max-width="500px"
-        >
-        <v-card>
-            <v-card-title>
-                <span class="fs-16">Add people</span>
-            </v-card-title>
-            <v-card-text>
-                <v-container>
-                    <form-tpl
-                        :allInputs="roleSelect"/>
-                </v-container>
-            </v-card-text>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn
-                    color="blue darken-1"
-                    text
-                    :loading="isLoadingAdd"
-                    class="btn-add"
-                    @click="addPeopleToProject"
-                >
-                    {{$t("common.add")}}
-                </v-btn>
-                <v-btn
-                color="red darken-1"
-                text
-                @click="isShow = false"
-                >
-                    {{$t("common.close")}}
-                </v-btn>
-           
-            </v-card-actions>
-        </v-card>
+     <v-dialog
+      v-model="isShow"
+      width="500"
+      scrollable
+      :content-class="'overflow-hidden'"
+    >
+      <v-card>
+        <v-card-title class="p-2">
+          <span>Thêm trạng thái của task</span>
+        </v-card-title>
+        <v-card-text class="p-2">
+          <form-tpl :allInputs="linkInfo"/>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions class="p-1">
+          <v-spacer></v-spacer>
+          <v-btn
+            color="blue darken-1" 
+            text
+            @click="isShow = false"
+          >
+            {{$t('common.save')}}
+          </v-btn>
+          <v-btn
+            color="red darken-1"
+            text
+            @click="isShow = false"
+          >
+            {{$t('common.close')}}
+          </v-btn>
+        </v-card-actions>
+      </v-card>
     </v-dialog>
 
 </template>
 
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
-
+import {getAllStatusCategory} from './config.js'
 export default {
     components:{
         'form-tpl' : FormTpl,
@@ -57,11 +54,34 @@ export default {
     },
     data(){
         return{
-            isLoadingAdd:false,
             isShow:false,
-            roleSelect:{
-                roles : { 
-                    title: "Role",
+            linkInfo:{
+                from : { 
+                    title: "Bắt đầu từ trạng thái",
+                    type: "select",
+                    value:"",
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
+                    validate(){
+                    
+                    }
+                },
+                to : { 
+                    title: "Kết thúc đến trạng thái",
+                    type: "select",
+                    value:"",
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
+                    validate(){
+                    
+                    }
+                },
+                name : { 
+                    title: "Tên",
                     type: "text",
                     value:"",
                     validateStatus:{
@@ -72,10 +92,17 @@ export default {
                     
                     }
                 },
-                allowAll : { 
-                    title: "Cho phép tất cả thay đổi",
-                    type: "checkbox",
-                    value:false,
+                desscription : { 
+                    title: "Mô tả",
+                    type: "text",
+                    value:"",
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
+                    validate(){
+                    
+                    }
                 },
             },
             userSelect:[]
@@ -85,6 +112,9 @@ export default {
         show(){
             this.isShow=true;
         },
+        actionClick(type){
+            this.$emit('after-add-link-click',linkInfo);
+        }
         
     },
     created(){
@@ -103,5 +133,8 @@ export default {
 }
 .selectUser >>> .v-input__slot{
     min-height: 30px!important;
+}
+.actions button{
+    font-size: 13px;
 }
 </style>
