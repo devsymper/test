@@ -1,5 +1,5 @@
 <template>
-    <div :style="{'position':isExpand ? 'relative' :'absolute'}" class="h-100 task-manager-sidebar" @mouseenter="drawer = true" @mouseleave="drawer = false">
+    <div :style="{'position':isExpand ? 'relative' :'absolute'}" class="task-manager-sidebar" @mouseenter="drawer = true" @mouseleave="drawer = false">
         <v-btn
             :class="{'collapse-sidebar-icon':true,'btn-collapsing':isExpand}"
             icon
@@ -53,7 +53,7 @@
                                     v-for="(menuItem,index) in item.items"
                                     :key="index"
                                     @click="onClickItem(menuItem, $event)"
-                                    :class="{'select-item':menuItem.type == 'select0'}"
+                                    :class="{'select-item':menuItem.type == 'select','task-sidebar-item':true}"
                                     >
                                     <v-list-item-icon>
                                         <v-icon>{{ menuItem.icon }}</v-icon>
@@ -355,9 +355,13 @@ export default {
     opacity: 0;
 }
 .task-manager-sidebar{
+    height: calc(100%);
     left: 0;
     font-size:13px;
     z-index: 1;
+}
+.task-sidebar-item{
+    padding: 0 !important;
 }
 </style>
 
