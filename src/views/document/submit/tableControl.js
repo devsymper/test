@@ -177,11 +177,7 @@ export default class TableControl extends Control {
                 dataTable.push(rowData)
 
             }
-
-            if (this.tableInstance.tableHasRowSum) { // trường hợp có dòng tính tổng thì thêm dòng ở cuối hiển thị tổng cột
-                dataTable.push({})
-            }
-            this.tableInstance.tableInstance.loadData(dataTable);
+            this.tableInstance.setData(dataTable);
             setTimeout((self) => {
                 self.tableInstance.tableInstance.render();
                 SYMPER_APP.$evtBus.$emit('document-on-table-change', {
