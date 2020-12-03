@@ -70,13 +70,11 @@
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
 import { taskManagementApi } from "@/api/taskManagement.js";
-import pickIcon from "@/components/common/iconPicker";
 import userSelector from "@/components/user/UserSelector.vue";
 
 export default {
     components:{
         FormTpl,
-        pickIcon,
         userSelector
     },
     props:{

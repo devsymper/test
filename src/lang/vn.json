@@ -1414,11 +1414,16 @@
             "createAt":"Ngày tạo",
             "email":"Email",
             "role":"Quyền",
-            "workflow":"Workflow"
+            "workflow":"Workflow",
+            "startDate":"Ngày bắt đầu",
+            "releaseDate":"Ngày phát hành",
+            "unreleased":"Chưa phát hành",
+            "released":"Đã phát hành"
         },
         "listMember":"Danh sách thành viên",
         "listCategory":"Danh sách danh mục",
         "listComponent":"Danh sách component",
+        "listVersion":"Danh sách version",
         "listIssueType":"Danh sách Issue type",
         "requiredField":"Trường bắt buộc nhập",
         "detailProject":"Thông tin project",

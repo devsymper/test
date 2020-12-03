@@ -3,7 +3,7 @@
         <div class="w-100 justify-space-between d-flex" style="height:40px">
             <div class="symper-title pl-2">{{title}}</div>
             <div class="d-flex mt-2 mr-4">
-                <v-btn class="px-1" small solo depressed @click="handleCreate" color="#0052CC">
+                <v-btn class="px-1" small solo depressed @click="handleCreate" color="#1976d2">
                     <v-icon color="white" size="18">mdi-plus</v-icon>
                     <span  style="color:white">Create project</span>
                 </v-btn>
@@ -316,7 +316,7 @@ export default {
          * hoangnd:chuyển view mở chi tiết 1 project
          */
         onProjectItemClick(obj){
-            this.$router.push('/task-management/projects/'+obj.id+'/kanban-board')
+            this.$router.push('/task-management/projects/'+obj.id+'/kanban-board');
         },
         validateAddProject () {
             this.$refs.form.validate();

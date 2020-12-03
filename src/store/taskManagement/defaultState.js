@@ -5,6 +5,8 @@ const defaultState = {
     currentProject:{},
     listBoardInProject:[],
     listComponentInProject:[],
+    listVersionInProject:[],
+    infoVersionCurrent:{}
 };
 
 export default defaultState;

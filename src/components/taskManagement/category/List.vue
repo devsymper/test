@@ -3,7 +3,7 @@
         <div class="w-100 justify-space-between d-flex" style="height:40px">
             <div class="symper-title pl-2">{{title}}</div>
             <div class="d-flex pt-2 pr-4">
-                <v-btn small class="px-1" solo depressed @click="handleCreate" color="#0052CC">
+                <v-btn small class="px-1" solo depressed @click="handleCreate" color="#1976d2">
                     <v-icon color="white" size="18">mdi-plus</v-icon>
                     <span style="color:white">Create category</span>
                 </v-btn>
@@ -32,7 +32,7 @@
                     :items="allCategory"
                     :search="search"
                     hide-default-footer
-                    class="table-list-user"
+                    class="table-list-category"
                     @click:row="handelDetailCategory"
                 >
                     <template v-slot:[`item.name`]="{ item }">
@@ -218,5 +218,8 @@ export default {
 .name-project:hover{
     cursor: pointer;
     text-decoration: underline;
+}
+.table-list-category >>> td{
+    font-size: 13px!important;
 }
 </style>

@@ -96,6 +96,24 @@ export default [
                 }
             },
             
+
+            ///////version
+            {
+                path: "projects/:id/versions",
+                name: "Version",
+                meta:{group:'home'},
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/version/List.vue')
+                }
+            },
+            {
+                path: "projects/:id/versions/:idVersion",
+                name: "VersionDetail",
+                meta:{group:'home'},
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/version/DetailVersion.vue')
+                }
+            },
         ]   
     },
 ]

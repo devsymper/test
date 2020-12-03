@@ -89,5 +89,19 @@ export const taskManagementApi = {
     },
     removeComponent(id){
         return taskManagement.delete("components/"+id);
-    }
+    }, 
+
+    //// version
+    getListVersion(projectId){
+        return taskManagement.get("versions/"+projectId);
+    },
+    addVersionForProject(data){
+        return taskManagement.post("versions",data);
+    },
+    updateVersionForProject(id,data){
+        return taskManagement.put("versions/"+id,data);
+    },
+    removeVersion(id){
+        return taskManagement.delete("versions/"+id);
+    }, 
 }

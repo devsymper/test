@@ -122,6 +122,11 @@ var configs = {
                         url:"/task-management/projects/:id/components"
                     },
                     {
+                        title:"Version",
+                        icon: 'mdi-shield-check-outline',
+                        url:"/task-management/projects/:id/versions"
+                    },
+                    {
                         title:"Report",
                         icon: 'mdi-chart-bar',
                         url:"/task-management/projects/:id/report"
