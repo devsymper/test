@@ -41,7 +41,7 @@ var configs = {
         permission: "https://accesscontrol.symper.vn/",
         dashboard: "https://bi-service.symper.vn/report-and-dashboard/",
         search: 'https://search.symper.vn/',
-        biService: "https://bi-service.symper.vn",
+        biService: "https://bi-service.symper.vn/",
         permissionPacks: "https://accesscontrol.symper.vn/permission_packs",
         actionPacks: "https://accesscontrol.symper.vn/action_packs",
         operations: "https://accesscontrol.symper.vn/operations",

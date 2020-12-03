@@ -324,5 +324,6 @@ export default {
 }
 .symper-bpm-canvas-heat-map{
 	position: relative;
+	pointer-events: none;
 }
 </style>

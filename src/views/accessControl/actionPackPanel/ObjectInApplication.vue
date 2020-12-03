@@ -17,7 +17,7 @@
 			</v-tab>
 		</v-tabs>
         <hot-table
-            :height="200"
+            :height="390"
             :settings="tableSettings"
             :data="tableDataDefinition[openingTabKey].tableData"
             :columns="tableDataDefinition[openingTabKey].columns"

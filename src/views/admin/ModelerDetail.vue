@@ -4,7 +4,7 @@
 			<div class="action-diagram-bpmn d-flex ">
 				<div class="fs-15 flex-grow-1 text-uppercase font-weight-bold mt-2" >Thông tin chi tiết</div>
 				<div class="d-flex mt-1">
-					<!-- <v-btn
+					<v-btn
 						tile 
 						icon
 						x-small
@@ -12,8 +12,8 @@
 						@click="changeTab('tab-1')"
 					>
 						<v-icon small >mdi-numeric-2-box-outline</v-icon>
-					</v-btn> -->
-					<!-- <v-btn
+					</v-btn>
+					<v-btn
 						tile 
 						icon
 						x-small
@@ -21,10 +21,11 @@
 						@click="changeTab('tab-2')"
 					>
 						<v-icon x-small >mdi-coolant-temperature</v-icon>
-					</v-btn> -->
+					</v-btn>
 					<v-btn
 						tile 
 						icon
+						v-show="tab == 'tab-1'"
 						x-small
 						class="mr-2"
 						@click="handleZoomOut"
@@ -35,6 +36,7 @@
 						tile 
 						icon
 						x-small
+						v-show="tab == 'tab-1'"
 						class="mr-2"
 						@click="handleZoomIn"
 					>
@@ -44,6 +46,7 @@
 						tile 
 						icon
 						x-small
+						v-show="tab == 'tab-1'"
 						class="mr-2"
 						@click="handleFocus"
 					>
@@ -66,42 +69,6 @@
 					:tab="tab"
 					:handleAction="handleAction"
 				/>
-			<!-- <v-tabs
-			v-model="tab"
-			v-show="false"
-			>
-			</v-tabs>
-			<v-tabs-items v-model="tab">
-				<v-tab-item
-				value='tab-1'
-				>
-					<symper-bpmn
-						@node-clicked="handleNodeSelected"
-						@node-changed="handleNodeChangeProps"
-						ref="symperBpmn"
-						:height="diagramHeight"
-						:width="600"
-						:diagramXML="diagramXML"
-						:customModules="customRender"
-					></symper-bpmn>
-				</v-tab-item>
-				<v-tab-item
-				value='tab-2'
-				>
-				ahihis -->
-					<!-- <symper-bpmn
-						@node-clicked="handleNodeSelected"
-						@node-changed="handleNodeChangeProps"
-						ref="symperBpmn"
-						:height="diagramHeight"
-						:width="600"
-						:diagramXML="diagramXML"
-						:customModules="customRender"
-					></symper-bpmn> -->
-					<!-- <ModelerWithHeatMap v-if="tab == 'tab-2'" /> -->
-				<!-- </v-tab-item>
-			</v-tabs-items> -->
-           
         </div>
 
     </div>
