@@ -7,6 +7,7 @@
             :tableContextMenu="tableContextMenu"
             :containerHeight="containerHeight"
             :getDataUrl="getListUrl"
+			:customAPIResult="customAPIResult"
             :useActionPanel="true"
             :headerPrefixKeypath="'common'"
 			:showExportButton="false"
@@ -29,13 +30,72 @@ import { util } from "@/plugins/util.js";
 import { appConfigs } from "@/configs.js";
 import ListItems from "@/components/common/ListItems.vue";
 import SyqlFunctionForm from './SyqlFunctionForm'
+import Handsontable from 'handsontable';
+
 export default {
+	created(){
+		this.$store.dispatch("app/getAllBA");
+	},
     data() {
         let self = this;
         return {
-			getListUrl: appConfigs.apiDomain.systemRole+'system-role',
+			getListUrl: appConfigs.apiDomain.syqlFunction+'functions',
 			action:'',
 			containerHeight:null,
+			customAPIResult:{
+				reformatData(res){
+					let listBA = self.$store.state.app.allBA;
+					res.data.listObject.forEach(function(e){
+						if(!e.userCreate){
+							e.userCreateName = ""  
+						}else{
+							listBA.forEach(function(k){
+								if(k.id == e.userCreate){
+									e.userCreateName =  k.name
+								}
+							})
+						}
+						if(!e.userUpdate){
+							e.userUpdateName =""
+						}else{
+							listBA.forEach(function(k){
+								if(k.id == e.userUpdate){
+									e.userUpdateName =  k.name
+								}
+							})
+						}
+					})
+					return{
+						columns:[
+							{name: "id", title: "id", type: "text"},
+							{name: "name", title: "name", type: "text"},
+							{name: "parameter", title: "parameter", type: "text"},
+							{name: "description", title: "description", type: "text"},
+							{name: "content", title: "content", type: "text"},
+							{name: "createAt", title: "createAt", type: "date"},
+							{name: "updateAt", title: "updateAt", type: "date"},
+							{name: "userCreateName", title: "userCreateName", type: "text"},
+							{name: "userUpdateName", title: "userUpdateName", type: "text"},
+							{name: "status", title: "status", type: "numeric",
+								renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+									let span;
+									Handsontable.dom.empty(td);
+									span = document.createElement('span')
+									if(value === "1"){
+										$(span).text('Kích hoạt')
+									}else{
+										$(span).text('Không kich hoạt')
+									}
+									td.appendChild(span);
+									return td
+								},
+							}
+						],
+						listObject: res.data.listObject,
+						total: res.data.total
+					}
+				}
+			},
             tableContextMenu: {
                 update: {
                     name: "edit",
@@ -80,7 +140,7 @@ export default {
 		}
 	},
     mounted() {
-		this.containerHeight = util.getComponentSize(this).h - 50
+		this.containerHeight = util.getComponentSize(this).h 
     },
     components: {
 		ListItems: ListItems,
