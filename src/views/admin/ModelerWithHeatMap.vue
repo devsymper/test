@@ -114,6 +114,7 @@ export default {
 				var heatmapInstance = h337.create({
 					container: document.querySelector('.symper-bpm-canvas-heat-map')
 				});
+				
 				var points = [];
 				var max = 0;
 				var width = 600;
@@ -222,12 +223,16 @@ export default {
 					max: max,
 					data: points
 				};
-				heatmapInstance.setData(data);
-				// var canvas = document.getElementsByClassName('heatmap-canvas');
-				// let ctx = canvas[0].getContext('2d')
-				// ctx.save();
-				// ctx.translate(15, 0);
-				// ctx.transform(1, 0, 0, 1, 0, 0)
+				var canvas = document.getElementsByClassName('heatmap-canvas')[0];
+				
+				setTimeout((self) => {
+					self.focusCanvas()
+					canvas.height = 500
+					canvas.width = 1200
+					setTimeout(() => {
+						heatmapInstance.setData(data);
+					}, 200,this);
+				}, 1000, this);
 			}
 			
 		},
@@ -1296,9 +1301,8 @@ export default {
                 let afterRender = await this.$refs.symperBpmnHeatMap.renderFromXML(xml);
                 if(modelData.configValue){
 					this.restoreAttrValueFromJsonConfig(modelData.configValue);
-					this.plotHeatmap()
 					this.$refs.symperBpmnHeatMap.focus();
-					this.focusCanvas()
+					this.plotHeatmap()
                 }
             } catch (error) {
                 this.$snotifyError(
@@ -1314,9 +1318,10 @@ export default {
 		focusCanvas(){
 			var res = '';
 			var str = $('.djs-overlay-container')[0].style['-ms-transform']
+			var strs = $('.djs-overlay-container')[1].style['-ms-transform']
 			var canvas = document.getElementsByClassName("heatmap-canvas");
 			setTimeout((self) => {
-				$(canvas).css('transform',str)
+				$(canvas).css('transform',strs)
 				$(canvas).css('transform-origin','left top')
 			}, 100, this);
 		},
