@@ -112,6 +112,114 @@ export default {
             ],
             columns: [
                 {
+                title: "Backlog2",
+                tasks: [
+                    {
+                    id: 1312,
+                    title: "Add discount code to checkout page",
+                    date: "Sep 14",
+                    issueType:{
+                        icon:'mdi-chevron-down-box'
+                    },
+                    priority:{
+                        icon:'mdi-chevron-double-down'
+                    }
+                    },
+                    {
+                    id: 212,
+                    title: "Provide documentation on integrations",
+                    date: "Sep 12"
+                    },
+                    {
+                    id: 32,
+                    title: "Design shopping cart dropdown",
+                    date: "Sep 9",
+                    issueType:{
+                        icon:'mdi-chevron-down-box'
+                    },
+                    priority:{
+                        icon:'mdi-chevron-double-down'
+                    }
+                    },
+                    {
+                    id: 443,
+                    title: "Add discount code to checkout page",
+                    date: "Sep 14",
+                    issueType:{
+                        icon:'mdi-chevron-down-box'
+                    },
+                    priority:{
+                        icon:'mdi-chevron-double-down'
+                    }
+                    },
+                    {
+                    id: 52,
+                    title: "Test checkout flow",
+                    date: "Sep 15",
+                    issueType:{
+                        icon:'mdi-chevron-down-box'
+                    },
+                    priority:{
+                        icon:'mdi-chevron-double-down'
+                    }
+                    }
+                ]
+                },
+                {
+                title: "Backlog1",
+                tasks: [
+                    {
+                    id: 1312,
+                    title: "Add discount code to checkout page",
+                    date: "Sep 14",
+                    issueType:{
+                        icon:'mdi-chevron-down-box'
+                    },
+                    priority:{
+                        icon:'mdi-chevron-double-down'
+                    }
+                    },
+                    {
+                    id: 212,
+                    title: "Provide documentation on integrations",
+                    date: "Sep 12"
+                    },
+                    {
+                    id: 32,
+                    title: "Design shopping cart dropdown",
+                    date: "Sep 9",
+                    issueType:{
+                        icon:'mdi-chevron-down-box'
+                    },
+                    priority:{
+                        icon:'mdi-chevron-double-down'
+                    }
+                    },
+                    {
+                    id: 443,
+                    title: "Add discount code to checkout page",
+                    date: "Sep 14",
+                    issueType:{
+                        icon:'mdi-chevron-down-box'
+                    },
+                    priority:{
+                        icon:'mdi-chevron-double-down'
+                    }
+                    },
+                    {
+                    id: 52,
+                    title: "Test checkout flow",
+                    date: "Sep 15",
+                    issueType:{
+                        icon:'mdi-chevron-down-box'
+                    },
+                    priority:{
+                        icon:'mdi-chevron-double-down'
+                    }
+                    }
+                ]
+                },
+                {
                 title: "Backlog",
                 tasks: [
                     {

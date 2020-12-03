@@ -1,7 +1,7 @@
 <template>
     <div id="task-management-wrapper" class="w-100 h-100">
         <Sidebar  @after-toggle-sidebar="afterToggleSideBar"/>
-         <div :style="{'width':(isExpand) ? 'calc(100% - 256px)' : 'calc(100% - 56px)'}" class="h-100">
+         <div :style="{'width':(isExpand) ? 'calc(100% - 210px)' : 'calc(100%)'}" class="h-100">
             <Header />
             <router-view name="TaskManagement" style="padding:0 8px"/>
         </div>

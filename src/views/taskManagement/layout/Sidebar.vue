@@ -1,87 +1,80 @@
 <template>
-    <div style="position:relative;font-size:13px;" class="h-100">
+    <div :style="{'position':isExpand ? 'relative' :'absolute'}" class="h-100 task-manager-sidebar" @mouseenter="drawer = true" @mouseleave="drawer = false">
         <v-btn
-            class="collapse-sidebar-icon"
+            :class="{'collapse-sidebar-icon':true,'btn-collapsing':isExpand}"
             icon
-            @click.stop="toggleSidebar"
+            @click="expandSidebar"
             >
-            <div class="hamburger sb-menu-icon">
-                <span class="line"></span>
-                <span class="line"></span>
-                <span class="line"></span>
-            </div>
+            <v-icon v-if="!isExpand && !drawer">mdi-menu</v-icon>
+            <v-icon v-else-if="isExpand">mdi-chevron-double-left</v-icon>
+            <v-icon v-else-if="drawer">mdi-chevron-double-right</v-icon>
+            
         </v-btn>
-        <v-navigation-drawer
-        class="h-100 wrapper-sidebar"
-        v-model="drawer"
-        :mini-variant.sync="mini"
-        permanent
-        >
-            <!-- <div class="sidebar-header">
-                <img v-if="!mini" height="25px" src="/img/symper-full-logo.png" />
-                <img v-else height="25px" src="/img/symper-short-logo.png" />
-            </div> -->
-            <VuePerfectScrollbar class="sidebar-content">
-                <v-list dense>
-                    <v-list-item class="v-list-item-project-info">
-                        <div class="project-info" @click="showAllProject">
-                            <img height="25px" src="https://symperv01.atlassian.net/secure/projectavatar?pid=10035&avatarId=10416&size=xxlarge" />
-                            <div class="project-name" v-if="!mini">
-                                <div>hoang tesst</div>
-                                <div>đây là 1 project</div>
+        <transition name="slide">
+            <div v-show="checkShowSideBar()" :class="{'wrapper-sidebar':true,'wrapper-sidebar-mini':!isExpand,'wrapper-sidebar-full':isExpand}">
+                <VuePerfectScrollbar class="sidebar-content">
+                    <v-list dense>
+                        <v-list-item class="v-list-item-project-info">
+                            <div class="project-info" @click="showAllProject">
+                                <img height="25px" src="https://symperv01.atlassian.net/secure/projectavatar?pid=10035&avatarId=10416&size=xxlarge" />
+                                <div class="project-name" v-if="!mini">
+                                    <div>hoang tesst</div>
+                                    <div>đây là 1 project</div>
+                                </div>
+                                <!-- <v-icon style="height:24px;" v-if="!mini">mdi-chevron-down</v-icon> -->
                             </div>
-                            <v-icon style="height:24px;" v-if="!mini">mdi-chevron-down</v-icon>
-                        </div>
-                    </v-list-item>
-                    <transition v-for="(item,key) in menu"
-                        :key="key">
-                        <v-list-item
-                            link
-                            v-if="!item.isWorkSpace"
-                            @click="onClickItem(item, $event)"
-                            >
-                            <v-list-item-icon>
-                                <v-icon>{{ item.icon }}</v-icon>
-                            </v-list-item-icon>
-
-                            <v-list-item-content>
-                                <v-list-item-title>{{ item.title }}</v-list-item-title>
-                                <v-list-item-subtitle v-if="item.type == 'select'">{{item.subTitle}} </v-list-item-subtitle>
-                            </v-list-item-content>
-                            <v-list-item-icon v-if="item.type == 'select'">
-                                <v-icon>mdi-chevron-down</v-icon>
-                            </v-list-item-icon>
-                            
                         </v-list-item>
-                        <div v-if="item.isWorkSpace" class="sidebar-group-item" :style="{'padding' : (mini) ? '' : '1px 16px'}">
-                            <transition name="fade">
-                                <div class="title-workspace" v-if="!mini">{{ item.title }}</div>
-                            </transition>
+                        <transition v-for="(item,key) in menu"
+                            :key="key">
                             <v-list-item
                                 link
-                                v-for="(menuItem,index) in item.items"
-                                :key="index"
-                                @click="onClickItem(menuItem, $event)"
-                                :class="{'select-item':menuItem.type == 'select0'}"
+                                v-if="!item.isWorkSpace"
+                                @click="onClickItem(item, $event)"
                                 >
                                 <v-list-item-icon>
-                                    <v-icon>{{ menuItem.icon }}</v-icon>
+                                    <v-icon>{{ item.icon }}</v-icon>
                                 </v-list-item-icon>
 
                                 <v-list-item-content>
-                                    <v-list-item-title>{{ menuItem.title }}</v-list-item-title>
-                                    <v-list-item-subtitle v-if="menuItem.type == 'select'">{{menuItem.subTitle}} </v-list-item-subtitle>
+                                    <v-list-item-title>{{ item.title }}</v-list-item-title>
+                                    <v-list-item-subtitle v-if="item.type == 'select'">{{item.subTitle}} </v-list-item-subtitle>
                                 </v-list-item-content>
-                                <v-list-item-icon v-if="menuItem.type == 'select'">
+                                <v-list-item-icon v-if="item.type == 'select'">
                                     <v-icon>mdi-chevron-down</v-icon>
                                 </v-list-item-icon>
                                 
                             </v-list-item>
-                        </div>
-                    </transition>
-                </v-list>
-            </VuePerfectScrollbar>
-        </v-navigation-drawer>
+                            <div v-if="item.isWorkSpace" class="sidebar-group-item" :style="{'padding' : (mini) ? '' : '1px 16px'}">
+                                <transition name="fade">
+                                    <div class="title-workspace" v-if="!mini">{{ item.title }}</div>
+                                </transition>
+                                <v-list-item
+                                    link
+                                    v-for="(menuItem,index) in item.items"
+                                    :key="index"
+                                    @click="onClickItem(menuItem, $event)"
+                                    :class="{'select-item':menuItem.type == 'select0'}"
+                                    >
+                                    <v-list-item-icon>
+                                        <v-icon>{{ menuItem.icon }}</v-icon>
+                                    </v-list-item-icon>
+
+                                    <v-list-item-content>
+                                        <v-list-item-title>{{ menuItem.title }}</v-list-item-title>
+                                        <v-list-item-subtitle v-if="menuItem.type == 'select'">{{menuItem.subTitle}} </v-list-item-subtitle>
+                                    </v-list-item-content>
+                                    <v-list-item-icon v-if="menuItem.type == 'select'">
+                                        <v-icon>mdi-chevron-down</v-icon>
+                                    </v-list-item-icon>
+                                    
+                                </v-list-item>
+                            </div>
+                        </transition>
+                    </v-list>
+                </VuePerfectScrollbar>
+            </div>
+        </transition>
+        
         <SelectBoard ref="SelectBoard"/>
         <ProjectPopup ref="projectPopupView" v-if="!mini"/>
     </div>
@@ -128,7 +121,6 @@ export default {
             else{
                 $('.sb-menu-icon').removeClass("is-active");
             }
-            this.$emit('after-toggle-sidebar',vl)
         },
         '$route' (to, old) {
             if(to.meta.group){
@@ -141,6 +133,16 @@ export default {
     },
     
     methods: {
+        checkShowSideBar(){
+            if(!this.isExpand){
+                return this.drawer
+            }
+            return true
+        },
+        expandSidebar(){
+            this.isExpand = !this.isExpand;
+            this.$emit('after-toggle-sidebar',!this.isExpand)
+        },
         showAllProject(){
             this.$refs.projectPopupView.show();
         },
@@ -177,6 +179,7 @@ export default {
     },
     data() {
         return {
+            isExpand:false,
             menu:null,
             showChevIcon:false,
             menuItemsHeight: '200px',
@@ -190,9 +193,7 @@ export default {
 };
 </script>
 <style scoped>
-.sb-menu-icon{
-    margin-left: auto;
-}
+
 .sb-menu-icon .line{
   width: 18px;
   height: 2px;
@@ -307,12 +308,55 @@ export default {
     color: rgb(0,0,0,0.6);
 }
 .collapse-sidebar-icon{
-    
+    position: absolute;
+    transition: all 200ms cubic-bezier(.42,0,.58,1);
+}
+.btn-collapsing{
+    right: 0px;
+    z-index: 1;
+    transition: all 250ms ease-in-out;
+}
+.btn-collapsing:hover{
+    background: beige;
 }
 .wrapper-sidebar{
-    border-right: unset;
+    width: 210px !important;
+    transition: all 200ms cubic-bezier(.42,0,.58,1);
+}
+.wrapper-sidebar-mini{
+    background: white;
+    z-index: 1;
+    border-right: var(--symper-border);
+    border-top: var(--symper-border);
+    border-bottom: var(--symper-border);
     box-shadow: var(--symper-box-shadow);
     height: calc(100% - 100px) !important;
+    margin-top: 38px;
+}
+.wrapper-sidebar-full{
+    background: white;
+    border-right: var(--symper-border);
+    height: 100%;
+}
+.slide-leave-active,
+.slide-enter-active {
+  transition: 0.3s cubic-bezier(.42,0,.58,1);
+}
+.slide-enter {
+  transform: translate(-100%, 0);
+  opacity: 1;
+}
+.slide-enter-to {
+    transform: translate(0,0px);
+}
+.slide-leave-to {
+    transform: translate(-100%, 0);
+    opacity: 0;
+}
+.task-manager-sidebar{
+    left: 0;
+    font-size:13px;
+    z-index: 1;
 }
 </style>
 
