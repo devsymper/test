@@ -11,6 +11,7 @@
 							<div class="d-flex mt-1">
 								<div style="width: 200px">
 									<v-text-field
+										v-model="formData.valueName"
 										single-line
 										class="fs-13"
 										solo
@@ -89,14 +90,14 @@
 										></v-text-field>
 									</div>
 									<div class="d-flex">
-										<div class="ml-1" style="width:190px"> 
+										<div class="ml-1" style="width:170px"> 
 											<v-autocomplete
 												solo
 												v-model="formData.agruments[i].valueArgType"
 												:items="dataAutocomplete.returnForm.formReturns"
 											></v-autocomplete>
 										</div>
-										<div class="ml-1" style="width:50px"> 
+										<div class="ml-1" style="width:70px"> 
 											<v-autocomplete
 												solo
 												:items="dataAutocomplete.returnForm.formArray"
@@ -168,6 +169,7 @@
 								x-small
 								icon
 								tile
+								@click="showDebugDialog"
 								depressed
 							>
 								<v-icon>
@@ -180,6 +182,7 @@
 							class="mt-1"
 						>
 							<FomulaEditor
+								v-model="formData.valueDefinition"
 							 	:height="'130px'"
 							/>
 						</div>
@@ -269,16 +272,23 @@
                 {{action == 'add' ? $t('common.save') : $t('common.update')}}
 			</v-btn>
 		</div>
+		<DebugDialog 
+			:showDialog="showDialog"
+			@cancel="showDialog = false"
+		/>
 	</div>
 </template>
 
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import FomulaEditor from '@/components/formula/editor/FormulaEditor'
+import DebugDialog from "./DebugDialog"
+import {syqlFunctionApi} from '@/api/SyqlFunction'
 export default {
 	components:{
 		VuePerfectScrollbar,
-		FomulaEditor
+		FomulaEditor,
+		DebugDialog
 	},
 	props:{
 		action:{
@@ -286,7 +296,39 @@ export default {
 			default: ""
 		}
 	},
+	watch:{
+		action(val){
+			if(val == 'add'){
+				this.formData = {
+					valueName: "",
+					valueSetOf:"",
+					valueReturns: '',
+					valueArray:'',
+					agruments:[
+						{
+							valueArgModes:"",
+							valueArgName:"",
+							valueArgType:'',
+							valueArgArray:'',
+						},
+					],
+					valueDefinition: '',
+					executionCost: '',
+					resultRows: '',
+					properties:{
+						0:"",
+						1:"",
+						2:""
+					}
+				}
+			}
+		}
+	},
 	methods:{
+		showDebugDialog(){
+			this.showDialog = true
+		},
+		
 		addAnotherAgrument(){
 			let obj = {
 				valueArgModes:"",
@@ -309,12 +351,71 @@ export default {
 		},
 		saveSyqlFunction(){
 			this.formData
-			debugger
+			if(this.formData.valueName == ""){
+				this.$snotify({
+					type: "error",
+					title: "Không được bỏ trống tên funtion"
+				})
+				return
+			}
+			// if(this.formData.valueDefinition == ""){
+			// 	this.$snotify({
+			// 		type: "error",
+			// 		title: "Không được bỏ trống definition"
+			// 	})
+			// 	return
+			// }
+			let strAgruments = ""
+			let arr = []
+			if( this.formData.agruments.length > 0){
+				this.formData.agruments.forEach(function(e){
+					let str = e.valueArgModes+" "+e.valueArgName+' '+e.valueArgType+e.valueArgArray
+					arr.push(e.valueArgName)
+					strAgruments += str + ","
+				})
+				strAgruments = strAgruments.slice(0,-1)
+			}	
+			let costStr = this.formData.executionCost != "" ? 'COST '+this.formData.executionCost+ ' ' : ''
+			let rowStr = this.formData.resultRows != "" ? 'ROWS '+ this.formData.resultRows + ' ' : ''
+			// let sql = `CREATE FUNCTION "public"."${this.formData.valueName}" (${strAgruments}) RETURNS ${this.formData.valueSetOf} ${this.formData.valueReturns}${this.formData.valueArray}
+			// AS '${this.formData.valueDefinition}' LANGUAGE "sql" COST ${this.formData.executionCost} ROWS ${this.formData.resultRows}
+			//  ${this.formData.properties[0]} ${this.formData.properties[1]} ${this.formData.properties[2]}`
+			let sqls = 'CREATE FUNCTION "public"."'+this.formData.valueName+'" ('+strAgruments+') RETURNS '+this.formData.valueSetOf+' '+this.formData.valueReturns+this.formData.valueArray
+			+' AS '+this.formData.valueDefinition+' LANGUAGE "sql" '+ costStr + rowStr + this.formData.properties[0]+' '+this.formData.properties[1]+ ' ' +this.formData.properties[2] 
+			let self = this
+			let form = {
+				name: this.formData.valueName,
+				parameter: arr.length > 0 ? arr.toString() : "",
+				content:sqls,
+				description: "test",
+				status:1
+			}
+			syqlFunctionApi.addFunction(form).then(res=>{
+				if(res.status == 200){
+					self.$emit('add-success')
+					self.$snotify({
+						type: "success",
+						title: "Thêm function thành công"
+					})
+				}else{
+					self.$snotify({
+						type: "error",
+						title: res.message
+					})
+				}
+			}).catch(err=>{
+				self.$snotify({
+					type: "error",
+					title: err
+				})
+			})
 		}
 	},
 	data(){
 		return {
+			showDialog: false,
 			formData:{
+				valueName: "",
 				valueSetOf:"",
 				valueReturns: '',
 				valueArray:'',
@@ -326,6 +427,7 @@ export default {
 						valueArgArray:'',
 					},
 				],
+				valueDefinition: '',
 				executionCost: '',
 				resultRows: '',
 				properties:{
@@ -343,7 +445,7 @@ export default {
 						},
 						{
 							title: "SETOF",
-							value: "setof"
+							value: "SETOF"
 						},
 					],
 					formReturns:[
@@ -380,7 +482,7 @@ export default {
 					formArray:[
 						{
 							title: "",
-							value: 'selected'
+							value: ''
 						},
 						{
 							title: "[]",

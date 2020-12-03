@@ -20,6 +20,7 @@
 			<template slot="right-panel-content">  
 				<SyqlFunctionForm
 					:action="action"
+					@add-success="handleAddSuccess"
 				/>
 			</template>
         </list-items>
@@ -152,6 +153,10 @@ export default {
 		openPanel(action){
 			this.$refs.listSyqlFunction.actionPanel = true
 			this.action = action
+		},
+		handleAddSuccess(){
+			this.$refs.listSyqlFunction.actionPanel = false
+			this.$refs.listSyqlFunction.refreshList()
 		}
 	},
     mounted() {
