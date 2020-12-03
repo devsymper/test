@@ -1,5 +1,5 @@
 <template>
-    <div :style="{'position':isExpand ? 'relative' :'absolute'}" class="h-100 task-manager-sidebar" @mouseenter="drawer = true" @mouseleave="drawer = false">
+    <div :style="{'position':isExpand ? 'relative' :'absolute'}" class="task-manager-sidebar" @mouseenter="drawer = true" @mouseleave="drawer = false">
         <v-btn
             :class="{'collapse-sidebar-icon':true,'btn-collapsing':isExpand}"
             icon
@@ -354,6 +354,7 @@ export default {
     opacity: 0;
 }
 .task-manager-sidebar{
+    height: calc(100%);
     left: 0;
     font-size:13px;
     z-index: 1;

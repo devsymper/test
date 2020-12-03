@@ -51,5 +51,6 @@ export default {
 <style scoped>
     #task-management-wrapper{
         display: flex;
+        position: relative;
     }
 </style>
