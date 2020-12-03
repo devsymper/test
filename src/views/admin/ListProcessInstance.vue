@@ -129,6 +129,9 @@ export default {
 					if(res.data.listObject.length > 0){
 						let arr = []
 						res.data.listObject.forEach(function(e){
+							if(e.status == '3'){
+								res.data.listObject.splice(res.data.listObject.indexOf(e),1)
+							}
 							arr.push(e.id)
 						})
 						let obj = res.data.listObject
