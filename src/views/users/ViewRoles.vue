@@ -164,6 +164,16 @@ export default {
 			this.detailView(listObject[0])
 			
 		},
+		//check xem menu có dữ liệu không
+		// checkDataMenu(obj){
+		// 	let check = false;
+		// 	this.getListObjectIdentifier(obj);
+		// 	let lengthTitle = this.titleAllNameObject.length;
+		// 	if(lengthTitle){
+		// 		check = true
+		// 	}
+		// 	return check;
+		// },
 		getListObjectIdentifier(object){
 			let objIdentifier =[];
 			objIdentifier = _groupBy(this.listActionAndObj[object],'objectIdentifier' );
