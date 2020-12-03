@@ -48,7 +48,7 @@ Handsontable.renderers.PercentRenderer = function(instance, td, row, col, prop, 
     Handsontable.renderers.NumericRenderer.apply(this, arguments);
     td.style.textAlign = 'left'
     let table = store.state.document.submit[instance.keyInstance];
-    td.textContent = (td.textContent == "" || td.textContent == null || !/\d/.test(td.textContent)) ? 0 + " %" : td.textContent + " %";
+    td.textContent = (td.textContent == "" || td.textContent == null || !/\d/.test(td.textContent)) ? "" : td.textContent + " %";
     if (row == instance.countRows() - 1 && table != undefined && instance.hasOwnProperty('tableName')) {
         let tableControl = table.listInputInDocument[instance.tableName];
         if (tableControl != undefined && tableControl.hasOwnProperty('tableInstance')) {
@@ -1350,7 +1350,7 @@ export default class Table {
                 });
             }
             // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
-            if (this.tableHasRowSum && ['submit', 'update'].includes(sDocument.state.viewType[this.keyInstance])) {
+            if (this.tableHasRowSum) {
                 data.push({})
             }
 
@@ -1563,7 +1563,6 @@ export default class Table {
         }
        
         let map = thisObj.validateValueMap[row + '_' + column];
-        let controlTitle = (control.title == "") ? control.name : control.title;
         let ele = $(td);
         if (map) {
             for (let index = 0; index < map.length; index++) {
@@ -1599,8 +1598,8 @@ export default class Table {
             e.msg = msg;
             SYMPER_APP.$evtBus.$emit('document-submit-open-validate-message', e)
         })
-        if(control.checkProps('isRequired')){
-            if(!value){
+        if(sDocument.state.viewType[thisObj.keyInstance] != 'detail' && control.checkProps('isRequired')){
+            if(value === "" || value === undefined || value === null){
                 if(ele.find('.validate-icon').length > 0){
                     ele.find('.validate-icon').attr('msg',"Không được bỏ trống");
                 }

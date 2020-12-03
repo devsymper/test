@@ -577,6 +577,9 @@ const deleteControlTemplate = (state, params) => {
 const setDetailTrackChange = (state, params) => {
     Vue.set(state.detail[params.instance], 'trackChange', params.data);
 }
+const setCurrentTitle = (state, data) => {
+    Vue.set(state, 'currentTitle', data);
+}
 
 /**
  * Hàm thêm xóa các control vi phạm dữ liệu validate
@@ -629,6 +632,7 @@ export {
     setDetailTrackChange,
     updateDataForLinkControl,
     updateDocumentState,
-    updateValidateControlSubmit
+	updateValidateControlSubmit,
+	setCurrentTitle
 
 };

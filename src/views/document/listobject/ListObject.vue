@@ -1,30 +1,34 @@
 <template>
     
     <div class="h-100 w-100 list-object-component">
+		<AutocompleteDoc 
+			style="position:absolute; top: 15px ; left: 150px"
+			@change="handleChange"
+		/>
         <list-items
-        :getDataUrl="sDocumentManagementUrl+'documents/'+docId+'/objects'"
-        :exportLink="sDocumentManagementUrl+'documents/'+docId+'/export-excel'" 
-        :useDefaultContext="false"
-        :tableContextMenu="tableContextMenu"
-        :pageTitle="$t('documentObject.title')"
-        :containerHeight="containerHeight"
-        :actionPanelWidth="actionPanelWidth"
-        :actionPanelType="'elastic'"
-        :showActionPanelInDisplayConfig="true"
-        :showExportButton="true"
-        :showImportButton="false"
-        :isTablereadOnly="false"
-        :conditionByFormula="formulasInput.formula.value"
-        @after-open-add-panel="submitDocument"
-        @data-get="afterGetData"
-        @before-keydown="afterRowSelected"
-        @after-cell-mouse-down="afterRowSelected"
-        @after-selected-row="afterSelectedRow"
-        @row-selected="afterCellSelection"
-        :commonActionProps="commonActionProps"
-        :customAPIResult="customAPIResult"
-        ref="listObject"
-    >
+			:getDataUrl="sDocumentManagementUrl+'documents/'+docId+'/objects'"
+			:exportLink="sDocumentManagementUrl+'documents/'+docId+'/export-excel'" 
+			:useDefaultContext="false"
+			:tableContextMenu="tableContextMenu"
+			:pageTitle="$t('documentObject.title')"
+			:containerHeight="containerHeight"
+			:actionPanelWidth="actionPanelWidth"
+			:actionPanelType="'elastic'"
+			:showActionPanelInDisplayConfig="true"
+			:showExportButton="true"
+			:showImportButton="false"
+			:isTablereadOnly="false"
+			:conditionByFormula="formulasInput.formula.value"
+			@after-open-add-panel="submitDocument"
+			@data-get="afterGetData"
+			@before-keydown="afterRowSelected"
+			@after-cell-mouse-down="afterRowSelected"
+			@after-selected-row="afterSelectedRow"
+			@row-selected="afterCellSelection"
+			:commonActionProps="commonActionProps"
+			:customAPIResult="customAPIResult"
+			ref="listObject"
+		>
         <div slot="right-panel-content" class="h-100">
             <div v-if="isDeleteMultiple" class="h-100">
                 <div class="d-flex">
@@ -217,7 +221,7 @@ import { documentApi } from "./../../../api/Document.js";
 import { util } from "./../../../plugins/util.js";
 import Detail from './../detail/Detail.vue';
 import DocumentSubmit from "@/views/document/submit/Submit.vue";
-
+import AutocompleteDoc from './AutocompleteDoc'
 export default {
     components: {
         "list-items": ListItems,
@@ -227,7 +231,8 @@ export default {
         BottomSheet,
         PrintView,
         DocumentSubmit,
-        FormTpl
+		FormTpl,
+		AutocompleteDoc
 
     },
     data(){
@@ -246,17 +251,7 @@ export default {
                 reformatData(res){
                     let thisCpn = util.getClosestVueInstanceFromDom(document.querySelector('.list-object-component'));
                     let listObject = res.data.listObject;
-                    // if(Object.keys(thisCpn.recordSelected).length > 0){
-                    //     for (let index = 0; index < listObject.length; index++) {
-                    //         let row = listObject[index];
-                    //         let rowChecked = Object.values(thisCpn.recordSelected).filter(r=>{
-                    //             return r.document_object_id == row.document_object_id
-                    //         })
-                    //         if(rowChecked.length > 0){
-                    //             listObject[index]['checkbox_select_item'] = true;
-                    //         }
-                    //     }
-                    // }
+                  
                     return{
                         columns:res.data.columns,
                         listObject:res.data.listObject,
@@ -427,7 +422,10 @@ export default {
     methods:{
          onDocumentUpdateSuccess(){
             this.actionOnRightSidebar = 'detail';
-        },
+		},
+		handleChange(docId){
+			this.docId = docId
+		},
         updateCurrentRecord(){
             this.actionOnRightSidebar = 'update';
         },
@@ -648,6 +646,9 @@ export default {
         color: #757575;
         margin-top: -3px;
     }
+	.list-object-component{
+		position: absolute
+	}
     .panel-header .mdi:hover{
         color: rgba(0,0,0 / 0.6);
     }

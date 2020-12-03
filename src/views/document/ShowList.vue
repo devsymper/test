@@ -108,7 +108,8 @@ export default {
                         return " <i class= 'mdi mdi-format-list-checkbox' > </i>&nbsp; Danh sách bản ghi";
                     },
                     callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
+						this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
+						this.$store.commit('document/setCurrentTitle',document.title)
                     },
                 },
                 list_draft: {
