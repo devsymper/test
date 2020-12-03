@@ -25,6 +25,7 @@
 					<v-btn
 						tile 
 						icon
+						v-show="tab == 'tab-1'"
 						x-small
 						v-show="tab == 'tab-1'"
 						class="mr-2"
@@ -46,6 +47,7 @@
 						tile 
 						icon
 						x-small
+						v-show="tab == 'tab-1'"
 						class="mr-2"
 						@click="handleFocus"
 					>
@@ -68,42 +70,6 @@
 					:tab="tab"
 					:handleAction="handleAction"
 				/>
-			<!-- <v-tabs
-			v-model="tab"
-			v-show="false"
-			>
-			</v-tabs>
-			<v-tabs-items v-model="tab">
-				<v-tab-item
-				value='tab-1'
-				>
-					<symper-bpmn
-						@node-clicked="handleNodeSelected"
-						@node-changed="handleNodeChangeProps"
-						ref="symperBpmn"
-						:height="diagramHeight"
-						:width="600"
-						:diagramXML="diagramXML"
-						:customModules="customRender"
-					></symper-bpmn>
-				</v-tab-item>
-				<v-tab-item
-				value='tab-2'
-				>
-				ahihis -->
-					<!-- <symper-bpmn
-						@node-clicked="handleNodeSelected"
-						@node-changed="handleNodeChangeProps"
-						ref="symperBpmn"
-						:height="diagramHeight"
-						:width="600"
-						:diagramXML="diagramXML"
-						:customModules="customRender"
-					></symper-bpmn> -->
-					<!-- <ModelerWithHeatMap v-if="tab == 'tab-2'" /> -->
-				<!-- </v-tab-item>
-			</v-tabs-items> -->
-           
         </div>
 
     </div>

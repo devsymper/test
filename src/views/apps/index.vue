@@ -357,7 +357,7 @@ export default {
 			}
 			if(self.arrType.dashboard.length > 0){
 				let dataRep = self.arrType.dashboard;
-				dashboardApi.getDashboards({
+				dashboardApi.getDashboardsApp({
 								search:'',
 								pageSize:50,
 								filter: [

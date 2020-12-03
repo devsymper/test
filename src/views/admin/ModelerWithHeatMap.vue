@@ -101,8 +101,7 @@ export default {
 		/**
 		 * Ve  heatmap 
 		 */
-
-		plotHeatmap() {
+		plotHeatmap(){
 			let allNodes = this.$refs.symperBpmnHeatMap.getAllNodes()
 			let sumProcess = this.$store.state.admin.sumProcess
 			let currentTrackingProcess = this.$store.state.admin.currentTrackingProcess
@@ -125,13 +124,15 @@ export default {
 							if(k.act_id_ == e.id ){
 								let sum = parseInt(k.count_end) +  parseInt(k.count_running)
 								var val = Math.floor(sum/sumProcess * 100);
-								var radius = Math.floor(Math.random()*70);
 								let pos = e.di.bounds
 								var point = {
 									x: pos.x + 50,
 									y: pos.y + 40,
 									value: val,
-									radius: 100
+									radius: val,
+									maxOpacity: .5,
+									minOpacity: 0,
+									blur: .75
 								}
 								points.push(point);
 							}
@@ -145,8 +146,8 @@ export default {
 								var radius = Math.floor(Math.random()*70);
 								let pos = e.di.bounds
 								var point = {
-									x: pos.x + 20,
-									y: pos.y + 25,
+									x: pos.x + 20 ,
+									y: pos.y + 25 ,
 									value: val,
 									radius: 80
 								}
@@ -231,9 +232,7 @@ export default {
 					heatmapInstance.setData(data);
 				}, 1000, this);
 			}
-			
 		},
-
         /**
          * Tìm và đặt các control cho việc lựa chọn cho phép edit trong lúc duyệt
          */

@@ -150,7 +150,7 @@ export default {
 				this.checkChildrenItem(res.data.listObject,self.sAppManagement.workflow_definition.item)
 				this.listItems.workflow_definition.item = res.data.listObject;
 			});
-			dashboardApi.getDashboards({search:value,pageSize:50}).then(res => {
+			dashboardApi.getDashboardsApp({search:value,pageSize:50}).then(res => {
 				this.checkChildrenItem(res.data.listObject,self.sAppManagement.dashboard.item)
 				this.listItems.dashboard.item = res.data.listObject;
 			});
