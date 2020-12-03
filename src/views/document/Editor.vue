@@ -1536,10 +1536,10 @@ export default {
                 properties['dataFlowId'].value = curDataFlow[0];
                 properties['dataFlowId'].options = this.listDataFlow;
             }
-            if(this.$getRouteName() == 'editDocument'){
+            if(this.$getRouteName() == 'editDocument' && properties.isPreventedConfig){
                 properties.isPreventedConfig.hidden = true;
             }
-            if(properties.isPreventedConfig.value){
+            if(properties.isPreventedConfig && properties.isPreventedConfig.value){
                 for (let index = 0; index < propsNotChangeForTaskManager.length; index++) {
                     const prop = propsNotChangeForTaskManager[index];
                     properties[prop].disabled = true;
