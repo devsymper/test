@@ -53,7 +53,7 @@
                                     v-for="(menuItem,index) in item.items"
                                     :key="index"
                                     @click="onClickItem(menuItem, $event)"
-                                    :class="{'select-item':menuItem.type == 'select0'}"
+                                    :class="{'select-item':menuItem.type == 'select','task-sidebar-item':true}"
                                     >
                                     <v-list-item-icon>
                                         <v-icon>{{ menuItem.icon }}</v-icon>
@@ -357,6 +357,9 @@ export default {
     left: 0;
     font-size:13px;
     z-index: 1;
+}
+.task-sidebar-item{
+    padding: 0 !important;
 }
 </style>
 
