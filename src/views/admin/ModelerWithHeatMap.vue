@@ -224,14 +224,11 @@ export default {
 					data: points
 				};
 				var canvas = document.getElementsByClassName('heatmap-canvas')[0];
-				
 				setTimeout((self) => {
 					self.focusCanvas()
 					canvas.height = 500
 					canvas.width = 1200
-					setTimeout(() => {
-						heatmapInstance.setData(data);
-					}, 200,this);
+					heatmapInstance.setData(data);
 				}, 1000, this);
 			}
 			
