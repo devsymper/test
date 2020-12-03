@@ -28,6 +28,17 @@
 		<div class="d-flex mt-2 " style="height: calc(100% - 170px) !important">
 			<div class="d-flex flex-column mt-1" style="width:170px">
 				<h4 class="mb-2 fs-15">
+					Nhóm đối tượng
+				</h4>
+				<div
+					:class="{'pt-1  pb-1 mb-3 pl-1 fs-13 mr-3 action-pack-object':true,  'action-pack-object-active': objectActive == 'application'}"
+					@click="handleAppClick"
+				>  
+					<span class="pl-2">
+						Application
+					</span>
+				</div>
+				<h4 class="mb-2 fs-15">
 					Đối tượng
 				</h4>
 				<VuePerfectScrollbar style="height: 90% !important">
@@ -44,8 +55,17 @@
 				
 			</div>
 			<div style="width: 600px !important">
-				
-				<div v-if="objectActive== 'department'">
+				<div v-if="objectActive == 'application'" class="d-flex flex-column">
+					<ApplicationDefinitionForm 
+						v-if="objectActive == 'application'"
+						@list-item-selected="handleListAppSelected"
+						:listApp="listAppSelected"
+						:commonTableSetting="commonTableSetting"
+						:tableDataDefinition="multipleLevelObjects.application_definition"
+						@app-detail-get="translateAppObjectIdToTableData"
+					/>
+				</div>
+				<div v-else-if="objectActive== 'department'">
 					 <ConfigActionPackOrgchart 
 						@permission-selected="handlePermissionSelected"
 						@department-selected="handleDepartmentSelected"
@@ -83,16 +103,7 @@
 							class="fs-13"
 							ref="dataTable">
 						</hot-table>
-						<div v-if="objectActive == 'application_definition'" class="d-flex flex-column">
-							<ApplicationDefinitionForm 
-								v-if="objectActive == 'application_definition'"
-								@list-item-selected="handleListAppSelected"
-								:listApp="listAppSelected"
-								:commonTableSetting="commonTableSetting"
-								:tableDataDefinition="multipleLevelObjects.application_definition"
-								@app-detail-get="translateAppObjectIdToTableData"
-							/>
-						</div>
+					
 					</div>
 				</div>
 			</div>
@@ -549,14 +560,17 @@ export default {
             this.setTableData();
             this.setTableDataForObjectType();
             this.reCaculateTableHeight();
-        },
+		},
+		handleAppClick(){
+			this.objectActive = 'application'
+		},
         reCaculateTableHeight(){
             let h = util.getComponentSize(this).h - util.getComponentSize(this.$refs.comonAttr).h - 200;
-            if(this.objectActive == 'application_definition'){
-                h = h*2/3;
-            }else if(this.objectActive == 'document_definition'){
-                h = h/2;
-            }
+            // if(this.objectActive == 'application_definition'){
+            //     h = h*2/3;
+            // }else if(this.objectActive == 'document_definition'){
+            //     h = h/2;
+            // }
             this.tableHeight = h;
         },
         setTableData(){
@@ -588,7 +602,7 @@ export default {
         createNewOperations(){
             let self = this;
             return new Promise(async (resolve, reject) => {
-                let newOperations = this.getNewOperationData();
+				let newOperations = this.getNewOperationData();
                 let data = {
                    operations : JSON.stringify(newOperations)
                 };
@@ -746,9 +760,22 @@ export default {
                         }
                     }
                 }
-            }
+			}
+			this.createAppOperation(newOperations)
             return newOperations;
-        },
+		},
+		createAppOperation(newOperations){
+			this.listAppSelected.forEach(function(e){
+				let obj = {
+					action: "view",
+					name: "view application definition "+ e.id,
+					objectIdentifier: "application_definition:"+e.id,
+					objectType: "application_definition"
+				}
+				newOperations.push(obj)
+			})
+			return newOperations
+		},
         switchToUpdateForm(){
             this.$emit('trigger-update-action-pack', this.itemData);
         },
@@ -1043,11 +1070,7 @@ export default {
 				this.objectActive = "document_definition"
             }
 		},
-		objectActive(val){
-			if(val == 'application_definition'){
-				this.tableHeight = 140
-			}
-		},
+		
         listAction: {
             immediate: true,
             deep: true,
