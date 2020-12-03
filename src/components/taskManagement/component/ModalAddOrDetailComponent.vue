@@ -8,22 +8,25 @@
     >
         <v-card>
         <v-card-title>
-            <span class="fs-16">Category</span>
+            <span class="fs-16">Component</span>
         </v-card-title>
         <v-card-text>
             <v-container>
-                <div style="text-align:center">
-                    <v-icon v-if="!!infoCategory.icon && infoCategory.icon.indexOf('mdi-') > -1" class="display-3 pt-0">{{infoCategory.icon}}</v-icon>
-                    <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!infoCategory.icon && infoCategory.icon.indexOf('mdi-') < 0" :src="infoCategory.icon" width="80" height="80">
-                    <pick-icon
-                        @selected="selectedIcon"
-                        class="mt-3"
-                    />
-                </div>
                 <div>
                     <form-tpl
-                    :allInputs="dataCategoryProps"/>
+                    :allInputs="dataComponentProps"/>
                 </div>
+                <span class="fs-11">Component lead</span>
+                <userSelector
+                    class="selectUser"
+                    :isMulti="false"
+                    :compactChip="true"
+                    :color="'transparent'"
+                    :textColor="''"
+                    :flat="true"
+                    :valueObj="currentUserLeader"
+                    @input="inputUser"
+                ></userSelector>
                 
             </v-container>
         </v-card-text>
@@ -35,7 +38,7 @@
                 v-if="!statusDetail"
                 :loading="isLoadingAdd"
                 class="btn-add"
-                @click="handleAddCategory"
+                @click="handleAddComponent"
             >
                 {{$t("common.add")}}
             </v-btn>
@@ -46,7 +49,7 @@
                 :loading="isLoadingAdd"
                 :disabled="disabled"
                 class="btn-add"
-                @click="handleUpdateCategory()"
+                @click="handleUpdateComponent()"
             >
                 {{$t("common.update")}}
             </v-btn>
@@ -67,15 +70,15 @@
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
 import { taskManagementApi } from "@/api/taskManagement.js";
-import pickIcon from "@/components/common/iconPicker";
+import userSelector from "@/components/user/UserSelector.vue";
 
 export default {
     components:{
         FormTpl,
-        pickIcon
+        userSelector
     },
     props:{
-        dataCategoryProps: {
+        dataComponentProps: {
             type: Object,
             default() {
                 return {
@@ -111,29 +114,37 @@ export default {
                 }
             }
         },
-        infoCategory: {
+        infoComponent: {
             type: Object,
             default() {
                 return {
                     id:"",
                     name: "",
                     description: "",
-                    icon: "",
+                    userLeader: "",
                 }
             }
         },
         statusDetail:{
             type:Boolean,
             default:false,
+        },
+        currentUserLeader:{
+            type: Object,
+            default() {
+                return {
+                    id:""
+                }
+            }
         }
     },
     watch: {
-        dataCategoryProps: {
+        dataComponentProps: {
             deep: true,
             immediate:true,
             handler(newVl){
-                if (newVl.name.value == this.infoCategory.name &&
-                    newVl.description.value == this.infoCategory.description )
+                if (newVl.name.value == this.infoComponent.name &&
+                    newVl.description.value == this.infoComponent.description )
                 {
                     this.disabled=true;
                 }else{
@@ -141,83 +152,94 @@ export default {
                 }
             }
         },
+        currentUserLeader:{
+            deep: true,
+            immediate:true,
+            handler(newVl){
+                if (newVl.id == this.infoComponent.userLeader)
+                {
+                    this.disabled=true;
+                }else{
+                    this.disabled=false;
+                }
+            }
+        }
     },
     data(){
         return{
             isLoadingAdd:false,
             disabled:true,
             isShow:false,
+        
         }
     },
     methods:{
-        handleAddCategory(){
+        inputUser(userId){
+            this.$set(this.currentUserLeader,"id",userId);
+        },
+        handleAddComponent(){
             this.isLoadingAdd = true;
             let isValid = this.validateData();
             if (isValid) {
                 let data={};
-                data.name=this.dataCategoryProps.name.value;
-                data.description=this.dataCategoryProps.description.value;
-                data.icon=this.infoCategory.icon;
+                let projectId=this.$route.params.id;
+                data.name=this.dataComponentProps.name.value;
+                data.description=this.dataComponentProps.description.value;
+                data.projectId=projectId;
+                if (this.currentUserLeader.id) {
+                    data.userLeader=this.currentUserLeader.id;
+                }
                 taskManagementApi
-                    .addCategory(data)
+                    .addComponentForProject(data)
                     .then(res => {
                         if (res.status == 200) {
-                            this.$snotifySuccess("Add category completed!");
-                            this.$store.dispatch("taskManagement/addCategoryToStore", res.data);
+                            this.$emit("add-component");
+                            this.$snotifySuccess("Add component completed!");
                             this.isShow=false;
                         }else{
-                            this.$snotifyError("", "Can not update category!");
+                            this.$snotifyError("", "Can not add component!");
                         }
                     })
                     .catch(err => {
-                        this.$snotifyError("", "Can not update category!", err);
-                    })
-                    .always(() => {});
-                
-            }else{
-                this.$snotifyError("", "Have error!");
+                        this.$snotifyError("", "Can not add component!", err);
+                    });
             }
             this.isLoadingAdd=false;
 
         },
-        handleUpdateCategory(){
+        handleUpdateComponent(){
             this.isLoadingAdd = true;
             let isValid = this.validateData();
             if (isValid) {
                 let data={};
-                data.name=this.dataCategoryProps.name.value;
-                data.description=this.dataCategoryProps.description.value;
-                data.icon=this.infoCategory.icon;
-
+                data.name=this.dataComponentProps.name.value;
+                data.description=this.dataComponentProps.description.value;
+                data.userLeader=this.currentUserLeader.id;
                 taskManagementApi
-                    .updateCategory(this.infoCategory.id,data)
+                    .updateComponentForProject(this.infoComponent.id,data)
                     .then(res => {
                         if (res.status == 200) {
-                            this.$snotifySuccess("Update category success!");
-                            data.id=this.infoCategory.id;
-                            this.$store.dispatch("taskManagement/updateCategoryToStore",data);
+                            this.$snotifySuccess("Update Component success!");
+                            data.id=this.infoComponent.id;
+                            this.$emit("add-component"); // emit sự kiện để reload data
                             this.isShow=false;
                         }else{
-                            this.$snotifyError("", "Can not update category!");
+                            this.$snotifyError("", "Can not update Component!");
                         }
                     })
                     .catch(err => {
-                        this.$snotifyError("", "Can not update category!", err);
+                        this.$snotifyError("", "Can not update Component!", err);
                     });
             }else{
                 this.$snotifyError("", "Have error!");
             }
             this.isLoadingAdd=false;
         },
-        selectedIcon(data) {
-            this.disabled=false;
-            this.$set(this.infoCategory, 'icon', data.icon.trim() )
-        },
         show(){
             this.isShow=true;
         },
         validateData(){
-            let data=this.dataCategoryProps;
+            let data=this.dataComponentProps;
             for (var key in data) {
                 data[key].validate();
                 if (data[key].validateStatus.isValid==false) {

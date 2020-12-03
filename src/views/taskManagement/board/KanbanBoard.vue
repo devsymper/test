@@ -95,20 +95,20 @@ export default {
         },
     },
     data() {
+        let self=this;
         return {
             items: [
                 { 
                     title: this.$t("taskManagement.settingBoard"),
                     menuAction: action => {
-                       if (Object.keys(this.currentBoard).length >0) {
-                            let id=this.$route.params.id;
-                            this.$router.push("/projects/"+id+"/kanban-board/settings/" + this.currentBoard.id);
+                       if (Object.keys(self.currentBoard).length > 0) {
+                            let id=self.$route.params.id;
+                            self.$router.push("/task-management/projects/"+id+"/kanban-board/settings/" + self.currentBoard.id);
                        }else{
                            console.log("Chưa có data");
                        }
                     },
                 },
-            
             ],
             columns: [
                 {
@@ -414,7 +414,7 @@ export default {
             let id=this.$route.params.id;
             if (id) {
                 let listBoard =await taskManagementApi.getListBoardInProject(id);
-                if (listBoard.status==200) {
+                if (listBoard.status==200 && listBoard.data) {
                     self.$store.commit("taskManagement/setListBoardInProject", listBoard.data.listObject);
                 }
             }

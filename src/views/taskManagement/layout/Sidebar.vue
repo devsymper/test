@@ -151,7 +151,8 @@ export default {
         },
         onClickItem(item, event){
             if(item.url){
-                this.gotoLink(item.url,{id:'5fb7324b-0a85-57f8-cd00-5bc50ea2ab8b'});
+                let projectId= this.$route.params.id;
+                this.gotoLink(item.url,{id:projectId});
             }
             else{
                 this.$refs[item.component].show(event);

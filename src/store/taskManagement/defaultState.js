@@ -3,7 +3,10 @@ const defaultState = {
     allProject: [],
     headerBreadcrumbs:[],
     currentProject:{},
-    listBoardInProject:[]
+    listBoardInProject:[],
+    listComponentInProject:[],
+    listVersionInProject:[],
+    infoVersionCurrent:{}
 };
 
 export default defaultState;

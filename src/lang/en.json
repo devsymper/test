@@ -1285,15 +1285,21 @@
         "table":{
             "name": "Name",
             "description": "Description",
-            "lead": "Lead",
+            "lead": "Leader",
             "category": "Category",
             "createAt":"Create time",
             "email":"Email",
             "role":"Role",
-            "workflow":"Workflow"
+            "workflow":"Workflow",
+            "startDate":"Start date",
+            "releaseDate":"Release date",
+            "unreleased":"Unreleased",
+            "released":"Released"
         },
         "listMember":"List member",
         "listCategory":"List category",
+        "listComponent":"List component",
+        "listVersion":"List version",
         "listIssueType":"List Issue type",
         "detailProject":"Detail project",
         "requiredField":"Indicates required field",
@@ -1303,7 +1309,8 @@
         "dialog":{
             "removeUser": "You will remove members from this project?",
             "removeRole": "You will remove role from this rols.",
-            "removeCategory": "You will remove category from this rols."
+            "removeCategory": "You will remove category from this rols.",
+            "removeComponent": "You will remove component from this rols."
 
         },
         "settingBoard":"Board setting"

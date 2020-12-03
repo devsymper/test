@@ -22,12 +22,24 @@
                 </v-fade-transition>
             </template>
         </v-text-field>
-
+        <div style="width:500px; text-align:right">
+            <v-btn
+                :loading="isLoading"
+                v-if="statusEdit"
+                color="blue darken-1"
+                text
+                @click="updateBoard"
+            >
+                {{$t("common.save")}}
+            </v-btn>
+        </div>
+      
     </div>
 </template>
 
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
+import { taskManagementApi } from "@/api/taskManagement.js";
 
 export default {
     name:"detailBoard",
@@ -44,12 +56,22 @@ export default {
     },
     watch:{
         infoBoard(newVl){
-            debugger
             this.getData();
-        }
+        },
+        infoBoardProps: {
+            deep: true,
+            immediate: true,
+            handler(after) {
+                if (Object.keys(after).length>0) {
+                    this.checkChangeValueEdit(after);
+                }
+            }
+        },
     },
     data(){
         return{
+            isLoading:false,
+            statusEdit:false,
             currentProject:{},
             infoBoardProps:{
                 name : { 
@@ -86,13 +108,61 @@ export default {
         }
     },
     methods:{
+        updateBoard(){
+            this.isLoading = true;
+            let isValid = this.validateData();
+            if (isValid) {
+                let data={};
+                data.name=this.infoBoardProps.name.value;
+                data.description=this.infoBoardProps.description.value;
+
+                taskManagementApi
+                    .updateBoard(this.infoBoard.id,data)
+                    .then(res => {
+                        if (res.status == 200) {
+                            data.id=this.infoBoard.id;
+                            this.$store.commit("taskManagement/updateBoardToStore", data);
+                            this.$snotifySuccess("Update board success!");
+                            this.statusEdit=false;
+                        }else{
+                            this.$snotifyError("", "Can not update board!");
+                        }
+                    })
+                    .catch(err => {
+                        this.$snotifyError("", "Can not update board!", err);
+                    })
+                    .always(() => {});
+                
+            }else{
+                this.$snotifyError("", "Have error!");
+            }
+            this.isLoading=false;
+        },
+        checkChangeValueEdit(newVl){
+            let oldVl=this.infoBoard;
+            if (newVl.name.value != oldVl.name ||newVl.description.value!= oldVl.description ) {
+                this.statusEdit=true;
+            }else{
+                this.statusEdit=false;
+            }
+        },
         getData(){
             if (this.infoBoard.id) {
                 this.infoBoardProps.name.value=this.infoBoard.name;
                 this.infoBoardProps.description.value=this.infoBoard.description;
                 this.currentProject=this.$store.state.taskManagement.currentProject;
             }
-        }
+        },
+        validateData(){
+            let data=this.infoBoardProps;
+            for (var key in data) {
+                data[key].validate();
+                if (data[key].validateStatus.isValid==false) {
+                    return false
+                }
+            }
+            return true;
+        },
     },
     created(){
         this.getData()

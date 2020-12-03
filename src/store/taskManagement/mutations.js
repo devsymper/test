@@ -14,8 +14,19 @@ const setAllProject = (state, allProject) => {
 const setListBoardInProject = (state, listBoardInProject) => {
     Vue.set(state, 'listBoardInProject', listBoardInProject);
 }
+const setListComponent = (state, listComponentInProject) => {
+    Vue.set(state, 'listComponentInProject', listComponentInProject);
+}
+const setListVersion = (state, listVersionInProject) => {
+    Vue.set(state, 'listVersionInProject', listVersionInProject);
+}
+
+
 const setCurrentProject = (state, currentProject) => {
     Vue.set(state, 'currentProject', currentProject);
+}
+const setInfoVersionCurrent = (state, infoVersionCurrent) => {
+    Vue.set(state, 'infoVersionCurrent', infoVersionCurrent);
 }
 
 const addProjectToStore = (state, item) => {
@@ -67,6 +78,18 @@ const updateProjectToStore = (state, item) => {
     }
     Vue.set(state, 'allProject', currentListProject);
 }
+const updateBoardToStore = (state, item) => {
+    let currentListBoard = state.listBoardInProject;
+
+    let obj = currentListBoard.find(data => data.id === item.id)
+    var index = currentListBoard.indexOf(obj);
+    if (index > -1) {
+        currentListBoard[index].name = item.name;
+        currentListBoard[index].description = item.description;
+    }
+    Vue.set(state, 'listBoardInProject', currentListBoard);
+}
+
 
 const updateCategoryToStore = (state, item) => {
     let currentListCategory = state.allCategory;
@@ -108,6 +131,10 @@ export {
     setCurrentProject,
     setListBoardInProject,
     addBoardToStore,
-    addToTaskManagementStore
+    addToTaskManagementStore,
+    updateBoardToStore,
+    setListComponent,
+    setListVersion,
+    setInfoVersionCurrent
 
 };

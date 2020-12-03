@@ -85,7 +85,35 @@ export default [
                     TaskManagement: () => import ('../../views/taskManagement/report/Report.vue')
                 }
             },
+
+            //component
+            {
+                path: "projects/:id/components",
+                name: "Component",
+                meta:{group:'home'},
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/component/List.vue')
+                }
+            },
             
+
+            ///////version
+            {
+                path: "projects/:id/versions",
+                name: "Version",
+                meta:{group:'home'},
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/version/List.vue')
+                }
+            },
+            {
+                path: "projects/:id/versions/:idVersion",
+                name: "VersionDetail",
+                meta:{group:'home'},
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/version/DetailVersion.vue')
+                }
+            },
         ]   
     },
 ]
