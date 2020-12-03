@@ -19,6 +19,10 @@
 								<div class="ml-1" style="width: 100px">
 									<v-autocomplete
 										solo
+										v-model="formData.valueSetOf"
+										:items="dataAutocomplete.returnForm.formSetOf"
+										item-text="title"
+										item-value="value"
 									></v-autocomplete>
 								</div>
 							</div>
@@ -31,11 +35,17 @@
 								<div style="width:250px">
 									<v-autocomplete
 										solo
+										v-model="formData.valueReturns"
+										:items="dataAutocomplete.returnForm.formReturns"
 									></v-autocomplete>
 								</div>
-								<div class="ml-1" style="width: 50px">
+								<div class="ml-1" style="width: 70px">
 									<v-autocomplete
 										solo
+										v-model="formData.valueArray"
+										:items="dataAutocomplete.returnForm.formArray"
+										item-text="title"
+										item-value="value"
 									></v-autocomplete>
 								</div>
 							</div>
@@ -62,16 +72,19 @@
 								</div>
 							</div>
 							<VuePerfectScrollbar class=" mt-1" style="height:130px; margin-right: -6px">
-								<div class="d-flex" v-for=" i in 5" :key="i">
+								<div class="d-flex" v-for="(item,i) in formData.agruments" :key="i">
 									<div style="width:120px">
 										<v-autocomplete
 											solo
+											v-model="formData.agruments[i].valueArgModes"
+											:items="dataAutocomplete.formArgModes"
 										></v-autocomplete>
 									</div>
 									<div class="ml-1" style="width:210px">
 										<v-text-field
 											single-line
 											class="fs-13"
+											v-model="formData.agruments[i].valueArgName"
 											solo
 										></v-text-field>
 									</div>
@@ -79,11 +92,17 @@
 										<div class="ml-1" style="width:190px"> 
 											<v-autocomplete
 												solo
+												v-model="formData.agruments[i].valueArgType"
+												:items="dataAutocomplete.returnForm.formReturns"
 											></v-autocomplete>
 										</div>
 										<div class="ml-1" style="width:50px"> 
 											<v-autocomplete
 												solo
+												:items="dataAutocomplete.returnForm.formArray"
+												item-text="title"
+												v-model="formData.agruments[i].valueArgArray"
+												item-value="value"
 											></v-autocomplete>
 										</div>
 									</div>
@@ -92,6 +111,7 @@
 											icon
 											tile
 											x-small
+											@click="up(i)"
 										>
 											<v-icon>
 												mdi-chevron-up
@@ -101,6 +121,7 @@
 											icon
 											tile
 											x-small
+											@click="down(i)"
 										>
 											<v-icon>
 													mdi-chevron-down
@@ -110,6 +131,7 @@
 											icon
 											tile
 											x-small
+											@click="removeAgrument(i)"
 										>
 											<v-icon>
 												mdi-close
@@ -175,6 +197,7 @@
 									<div style="width: 200px">
 										<v-text-field
 											single-line
+											v-model="formData.executionCost"
 											class="fs-13"
 											solo
 										></v-text-field>
@@ -191,6 +214,7 @@
 										<v-text-field
 											single-line
 											class="fs-13"
+											v-model="formData.resultRows"
 											solo
 										></v-text-field>
 									</div>
@@ -206,16 +230,22 @@
 							<div style="width: 200px">
 								<v-autocomplete
 									solo
+									v-model="formData.properties[0]"
+									:items="dataAutocomplete.properties[0]"
 								></v-autocomplete>
 							</div>
 							<div class="ml-1" style="width: 200px">
 								<v-autocomplete
 									solo
+									v-model="formData.properties[1]"
+									:items="dataAutocomplete.properties[1]"
 								></v-autocomplete>
 							</div>
 							<div class="ml-1" style="width: 200px">
 								<v-autocomplete
 									solo
+									v-model="formData.properties[2]"
+									:items="dataAutocomplete.properties[2]"
 								></v-autocomplete>
 							</div>
 						</div>
@@ -233,6 +263,7 @@
 				v-if="action != 'view'"
                 depressed
                 color="primary"
+				@click="saveSyqlFunction"
 			>
                 <v-icon class="mr-2" primary>mdi-content-save</v-icon>
                 {{action == 'add' ? $t('common.save') : $t('common.update')}}
@@ -257,14 +288,55 @@ export default {
 	},
 	methods:{
 		addAnotherAgrument(){
-
+			let obj = {
+				valueArgModes:"",
+				valueArgName:"",
+				valueArgType:'',
+				valueArgArray:'',
+			}
+			this.formData.agruments.push(obj)
+		},
+		removeAgrument(index){
+			this.formData.agruments.splice(index,1)
+		},
+		up(index){
+			var f = this.formData.agruments.splice(index, 1)[0];
+			this.formData.agruments.splice(index - 1, 0, f);
+		},
+		down(index){
+			var f = this.formData.agruments.splice(index, 1)[0];
+			this.formData.agruments.splice(index + 1, 0, f);
+		},
+		saveSyqlFunction(){
+			this.formData
+			debugger
 		}
 	},
 	data(){
 		return {
-			autocompleteItem:{
-				return:{
-					header:[
+			formData:{
+				valueSetOf:"",
+				valueReturns: '',
+				valueArray:'',
+				agruments:[
+					{
+						valueArgModes:"",
+						valueArgName:"",
+						valueArgType:'',
+						valueArgArray:'',
+					},
+				],
+				executionCost: '',
+				resultRows: '',
+				properties:{
+					0:"",
+					1:"",
+					2:""
+				}
+			},
+			dataAutocomplete:{
+				returnForm:{
+					formSetOf:[
 						{
 							title: "",
 							value: ""
@@ -274,12 +346,61 @@ export default {
 							value: "setof"
 						},
 					],
-					type:[
+					formReturns:[
 						'abstime','aclitem', '"any"','anyarray','anyelement','anyenum','anynonarray',
 						'anyrange','bigint','bit','bit varying','boolean','box','bytea','"char"','character',
 						'character varying','cid','cidr','circle','cstring','date','daterange','double precision',
 						'event_trigger','favorite','favorite_file','favorite_folder','fdw_handler','file','folder',
-						'gtsvector', 'history','index_am_handler','inet	'
+						'gtsvector', 'history','index_am_handler','inet','information_schema.administrable_role_authorizations',
+						'information_schema.applicable_roles','information_schema.attributes','information_schema.cardinal_number',
+						'information_schema.character_data','information_schema.character_sets','information_schema.check_constraint_routine_usage',
+						'information_schema.check_constraints','information_schema.collation_character_set_applicability','information_schema.collations',
+						'information_schema.column_domain_usage','information_schema.column_options','information_schema.column_privileges',
+						'information_schema.columns','information_schema.column_udt_usage','information_schema.constraint_column_usage',
+						'information_schema.constraint_table_usage','information_schema.data_type_privileges','information_schema.domain_constraints',
+						'information_schema.domains','information_schema.domain_udt_usage','information_schema.element_types','information_schema.enabled_roles',
+						'information_schema.foreign_data_wrapper_options','information_schema.foreign_data_wrappers','information_schema.foreign_server_options',
+						'information_schema.foreign_servers','information_schema.foreign_table_options','information_schema.foreign_tables','information_schema.information_schema_catalog_name',
+						'information_schema.key_column_usage','information_schema.parameters','information_schema.referential_constraints','information_schema.role_column_grants',
+						'information_schema.role_routine_grants','information_schema.role_table_grants','information_schema.role_udt_grants','information_schema.role_usage_grants',
+						'information_schema.routine_privileges','information_schema.routines','information_schema.schemata','information_schema.sequences',
+						'information_schema.sql_features','information_schema.sql_identifier','information_schema.sql_implementation_info','information_schema.sql_languages',
+						'information_schema.sql_packages','information_schema.sql_parts','information_schema.sql_sizing','information_schema.sql_sizing_profiles',
+						'information_schema.table_constraints','information_schema.table_privileges','information_schema.tables','information_schema.time_stamp',
+						'information_schema.transforms','information_schema.triggered_update_columns','information_schema.triggers','information_schema.udt_privileges',
+						'information_schema.usage_privileges','information_schema.user_defined_types','information_schema.user_mapping_options','information_schema.user_mappings',
+						'information_schema.view_column_usage','information_schema.view_routine_usage','information_schema.views','information_schema.view_table_usage','information_schema.yes_or_no',
+						'int2vector','int4range','int8range','integer','internal','interval','json','jsonb','language_handler','line','link',
+						'lseg','macaddr','macaddr8','money','name','numeric','numrange','oid','oidvector','opaque','path','permission','pg_ddl_command',
+						'pg_dependencies','pg_lsn','pg_ndistinct','pg_node_tree','point','polygon','real','record','refcursor','regclass','regconfig','regdictionary',
+						'regnamespace','regoper','regoperator','regproc','regprocedure','regrole','regtype','reltime','smallint','smgr','tag_file','tag_folder','text',
+						'tid','timestamp without time zone','timestamp with time zone','time without time zone','time with time zone','tinterval','trigger','tsm_handler','tsquery',
+						'tsrange','tstzrange','tsvector','txid_snapshot','unknown','"user"','uuid','void','xid','xml'
+					],
+					formArray:[
+						{
+							title: "",
+							value: 'selected'
+						},
+						{
+							title: "[]",
+							value: '[]'
+						},
+					],
+					
+				},
+				formArgModes:[
+					'IN','OUT','INOUT'
+				],
+				properties:{
+					0:[
+						'','VOLATILE','IMMUTABLE','STABLE'
+					],
+					1:[
+						'','CALLED ON NULL INPUT','RETURNS NULL ON NULL INPUT'
+					],
+					2:[
+						'','SECURITY INVOKER','SECURITY DEFINER'
 					]
 				}
 			}
@@ -303,6 +424,9 @@ export default {
 	box-shadow: unset !important;
 	background-color: #f7f7f7 !important;
 	min-height: unset !important;
+}
+.form-syql-function >>> .v-input__slot input{
+	font-size: 13px !important;
 }
 .form-syql-function >>> .v-input__control{
 	min-height: unset !important;

@@ -31,7 +31,7 @@ import { appConfigs } from "@/configs.js";
 import ListItems from "@/components/common/ListItems.vue";
 import SyqlFunctionForm from './SyqlFunctionForm'
 import Handsontable from 'handsontable';
-
+import {syqlFunctionApi} from '@/api/SyqlFunction'
 export default {
 	created(){
 		this.$store.dispatch("app/getAllBA");
@@ -107,10 +107,25 @@ export default {
                 remove: {
                     name: "remove",
                     text: this.$t("common.delete"),
-                    callback: async (rows, refreshList) => {
-						self.$snotify({
-							type: "success",
-							title: "Xóa thành công"
+                    callback:  (row, refreshList) => {
+						syqlFunctionApi.deleteFunction(row[0].id).then(res=>{
+							if(res.status == 200){
+								refreshList()
+								self.$snotify({
+									type: "success",
+									title: "Xóa thành công"
+								})
+							}else{
+								self.$snotify({
+									type: "error",
+									title: "Đã xảy ra lỗi"
+								})
+							}
+						}).catch(err=>{
+							self.$snotify({
+								type: "error",
+								title: err
+							})
 						})
                     }
                 },
