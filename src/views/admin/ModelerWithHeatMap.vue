@@ -5,7 +5,7 @@
 		</v-btn>
 		<symper-bpmn
 			ref="symperBpmnHeatMap"
-			@viewport-change="plotHeatmap"
+			@viewport-change="handleViewPortChange"
 			:height="diagramHeight"
 			:width="600"
 			:diagramXML="diagramXML"
@@ -1297,8 +1297,8 @@ export default {
                 if(modelData.configValue){
 					this.restoreAttrValueFromJsonConfig(modelData.configValue);
 					this.plotHeatmap()
-					// this.$refs.symperBpmnHeatMap.focus();
-
+					this.$refs.symperBpmnHeatMap.focus();
+					this.focusCanvas()
                 }
             } catch (error) {
                 this.$snotifyError(
@@ -1306,7 +1306,20 @@ export default {
                     this.$t("process.editror.err.get_xml")
                 );
             }
-        },
+		},
+		handleViewPortChange(){
+			// this.plotHeatmap()
+			// this.focusCanvas()
+		},
+		focusCanvas(){
+			var res = '';
+			var str = $('.djs-overlay-container')[0].style['-ms-transform']
+			var canvas = document.getElementsByClassName("heatmap-canvas");
+			setTimeout((self) => {
+				$(canvas).css('transform',str)
+				$(canvas).css('transform-origin','left top')
+			}, 100, this);
+		},
         restoreAttrValueFromJsonConfig(jsonStr){
 			let processTracking = this.$store.state.admin.currentTrackingProcess
 			let self = this
@@ -1462,17 +1475,7 @@ export default {
     },
 
     created() {
-        // let self = this;
-        // this.instanceKey = Date.now();
-        // this.$store.commit(
-        //     "process/initInstance",
-        //     this.instanceKey
-        // );
-        // this.$store.dispatch("app/getAllOrgChartData");
-        // this.$store.dispatch("app/getAllUsers");
-        // this.$store.dispatch("process/getLastestProcessDefinition");
-		// this.$store.dispatch('process/getAllDefinitions');
-		// this.applySavedData(this.processId)
+       
     },
     mounted(){
 		
