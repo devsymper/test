@@ -417,6 +417,9 @@ const setDefaultSubmitStore = (state, params) => {
             tableName:"",
             key:"",
             data:{}
+        },
+        validateMessage:{
+
         }
     }
     let instance = params.instance;
@@ -578,6 +581,19 @@ const setCurrentTitle = (state, data) => {
     Vue.set(state, 'currentTitle', data);
 }
 
+/**
+ * Hàm thêm xóa các control vi phạm dữ liệu validate
+ * mục đích validate khi submit
+ * @param {*} state 
+ * @param {*} params 
+ */
+const updateValidateControlSubmit = (state, params) => {
+    let controlName = params.controlName;
+    let value = params.value;
+    let instance = params.instance;
+    Vue.set(state.submit[instance].validateMessage, controlName, value);
+        
+}
 
 
 export {
@@ -615,7 +631,8 @@ export {
     deleteControlTemplate,
     setDetailTrackChange,
     updateDataForLinkControl,
-	updateDocumentState,
+    updateDocumentState,
+	updateValidateControlSubmit,
 	setCurrentTitle
 
 };

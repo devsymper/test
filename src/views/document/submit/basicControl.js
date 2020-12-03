@@ -53,7 +53,7 @@ export default class BasicControl extends Control {
             this.ele.wrap('<span style="position:relative;display:inline-block">');
             this.ele.attr('key-instance', this.curParentInstance);
             if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
-                this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
+                this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title, 'Require');
             }
             if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
                 this.ele.attr('disabled', 'disabled');
