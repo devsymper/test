@@ -103,6 +103,7 @@ export default {
                     text: this.$t("common.edit"),
                     callback: (row, callback) => {
 						self.handleEdit()
+						self.$store.dispatch('SyqlFunction/getFunctionDetail',row.id)
                     }
                 },
                 remove: {
@@ -135,6 +136,7 @@ export default {
                     text: this.$t("common.detail"),
                     callback: (row, callback) => {
 						self.handleView()
+						self.$store.dispatch('syqlFunction/getFunctionDetail',row[0].id)
                     }
                 },
             }

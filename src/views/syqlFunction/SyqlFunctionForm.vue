@@ -296,7 +296,22 @@ export default {
 			default: ""
 		}
 	},
+	computed:{
+		sDetailFuntion(){
+			let sData = this.$store.state.SyqlFunction
+			return sData.detailFunction[sData.currentFunctionId]
+		}
+	},
 	watch:{
+		sDetailFuntion:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				if(arr.config){
+					this.restoreFormdata(arr.config)
+				}
+			}
+		},
 		action(val){
 			if(val == 'add'){
 				this.formData = {
@@ -328,7 +343,9 @@ export default {
 		showDebugDialog(){
 			this.showDialog = true
 		},
-		
+		restoreFormdata(config){
+			this.formData = JSON.parse(config)
+		},
 		addAnotherAgrument(){
 			let obj = {
 				valueArgModes:"",
@@ -350,7 +367,6 @@ export default {
 			this.formData.agruments.splice(index + 1, 0, f);
 		},
 		saveSyqlFunction(){
-			this.formData
 			if(this.formData.valueName == ""){
 				this.$snotify({
 					type: "error",
@@ -377,25 +393,52 @@ export default {
 			}	
 			let costStr = this.formData.executionCost != "" ? 'COST '+this.formData.executionCost+ ' ' : ''
 			let rowStr = this.formData.resultRows != "" ? 'ROWS '+ this.formData.resultRows + ' ' : ''
-			// let sql = `CREATE FUNCTION "public"."${this.formData.valueName}" (${strAgruments}) RETURNS ${this.formData.valueSetOf} ${this.formData.valueReturns}${this.formData.valueArray}
-			// AS '${this.formData.valueDefinition}' LANGUAGE "sql" COST ${this.formData.executionCost} ROWS ${this.formData.resultRows}
-			//  ${this.formData.properties[0]} ${this.formData.properties[1]} ${this.formData.properties[2]}`
 			let sqls = 'CREATE FUNCTION "public"."'+this.formData.valueName+'" ('+strAgruments+') RETURNS '+this.formData.valueSetOf+' '+this.formData.valueReturns+this.formData.valueArray
-			+' AS '+this.formData.valueDefinition+' LANGUAGE "sql" '+ costStr + rowStr + this.formData.properties[0]+' '+this.formData.properties[1]+ ' ' +this.formData.properties[2] 
+			+' AS "'+"'"+this.formData.valueDefinition+"'"+' LANGUAGE "sql" '+ costStr + rowStr + this.formData.properties[0]+' '+this.formData.properties[1]+ ' ' +this.formData.properties[2] 
 			let self = this
 			let form = {
 				name: this.formData.valueName,
 				parameter: arr.length > 0 ? arr.toString() : "",
 				content:sqls,
 				description: "test",
-				status:1
+				status:1,
+				config: JSON.stringify(this.formData)
 			}
+			if(this.action == 'add'){
+				this.addFunction(form)
+			}else{
+				this.editFunction(form)
+			}
+		},
+		addFunction(){
 			syqlFunctionApi.addFunction(form).then(res=>{
 				if(res.status == 200){
 					self.$emit('add-success')
 					self.$snotify({
 						type: "success",
 						title: "Thêm function thành công"
+					})
+				}else{
+					self.$snotify({
+						type: "error",
+						title: res.message
+					})
+				}
+			}).catch(err=>{
+				self.$snotify({
+					type: "error",
+					title: err
+				})
+			})
+		},
+		editFUnction(){
+			let id = this.$store.state.SyqlFunction.currentFunctionId
+			syqlFunctionApi.editFunction(id,form).then(res=>{
+				if(res.status == 200){
+					self.$emit('add-success')
+					self.$snotify({
+						type: "success",
+						title: "Sửa function thành công"
 					})
 				}else{
 					self.$snotify({
