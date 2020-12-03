@@ -640,6 +640,8 @@ export default {
         });
         this.$evtBus.$on("document-submit-date-input-click", e => {
             if(this._inactive == true) return;
+            let controlIns = getControlInstanceFromStore(this.keyInstance,e.controlName);
+            this.$refs.datePicker.setRange(controlIns.minDate,controlIns.maxDate);
             this.$refs.datePicker.openPicker(e);
             this.$store.commit("document/updateCurrentControlEditByUser", {
                 currentControl: e.controlName,
@@ -1628,6 +1630,7 @@ export default {
                                 control.setEffectedData(prepareData);
                                 this.addToListInputInDocument(controlName,control);
                             }
+                            // trường hợp những control ở ngoài table dạng input
                             else{
                                 let control = new BasicControl(
                                     idField,
@@ -2349,6 +2352,8 @@ export default {
                 let controlRequireEffected = controlInstance.getEffectedRequireControl();
                 let controlLinkEffected = controlInstance.getEffectedLinkControl();
                 let controlValidateEffected = controlInstance.getEffectedValidateControl();
+                let controlMinDateEffected = controlInstance.getEffectedMinDateControl();
+                let controlMaxDateEffected = controlInstance.getEffectedMaxDateControl();
                 controlRequireEffected[controlName] = true;
                 controlHiddenEffected[controlName] = true;
                 controlReadonlyEffected[controlName] = true;
@@ -2359,6 +2364,8 @@ export default {
                 this.runOtherFormulasEffected(controlRequireEffected,'require');
                 this.runOtherFormulasEffected(controlLinkEffected,'linkConfig');
                 this.runOtherFormulasEffected(controlValidateEffected,'validate');
+                this.runOtherFormulasEffected(controlMinDateEffected,'minDate');
+                this.runOtherFormulasEffected(controlMaxDateEffected,'maxDate');
             }
         },
         /**
@@ -2471,7 +2478,9 @@ export default {
             }
             return value;
         },
-        
+        /**
+         * Hàm xử lí dữ liệu sau khi chạy xong công thức
+         */
         handleAfterRunFormulas(rs,controlId,controlName,formulasType,from){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
             if(formulasType === 'formulasDefaulRow'){
@@ -2489,6 +2498,9 @@ export default {
                         this.setDataToTable(controlId,rs.data)
                     }
                 }
+                /**
+                 * con trol ở ngoài
+                 */
                 else{
                     let value = this.getValueFromDataResponse(rs);
                     if(formulasType.includes('linkConfig')){
@@ -2499,7 +2511,6 @@ export default {
                             case "formulas":
                                 this.handleInputChangeBySystem(controlName,value);
                                 break;
-                            
                             case "validate":
                                 this.handlerDataAfterRunFormulasValidate(value,controlName);
                                 break;
@@ -2514,6 +2525,12 @@ export default {
                                 break;
                             case "uniqueDB":
                                 controlInstance.handlerDataAfterRunFormulasUniqueDB(value);
+                                break;
+                            case "minDate":
+                                controlInstance.handlerDataAfterRunFormulasMinDate(value);
+                                break;
+                             case "maxDate":
+                                controlInstance.handlerDataAfterRunFormulasMaxDate(value);
                                 break;
                             case "uniqueTable":
                                 break;

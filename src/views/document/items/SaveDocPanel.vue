@@ -1,5 +1,4 @@
 <template>
-    
     <div>
         <v-dialog
         scrollable
@@ -142,7 +141,6 @@ export default {
         checkRequiredNote(){
             let message = ""
             if(!this.documentProps.note.value){
-                debugger
                 this.isValidNote = false;
                 message = this.$t('document.validate.emptyNote');
             }
