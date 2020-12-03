@@ -6,7 +6,14 @@ const defaultState = {
     listBoardInProject:[],
     listComponentInProject:[],
     listVersionInProject:[],
-    infoVersionCurrent:{}
+    infoVersionCurrent:{},
+    workFlowData:{
+        allNode:[
+            
+        ],
+        allLink:[],
+        currentNodeSelected:{},
+    }
 };
 
 export default defaultState;

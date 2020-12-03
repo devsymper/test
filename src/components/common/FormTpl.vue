@@ -168,7 +168,8 @@ import {
     VCheckbox,
     VRadio,
     VSwitch,
-    VTextarea
+    VTextarea,
+    VColorPicker
 } from "vuetify/lib";
 import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl.vue";
 import ConfigTime from "./../common/ConfigTime.vue";;
@@ -234,6 +235,17 @@ const inputTypeConfigs = {
         props(config) {
             return {
                 label: config.title
+            };
+        }
+    },
+    color: {
+        tag: "v-color-picker",
+        props(config) {
+            return {
+                label: config.title,
+                'dot-size':"17",
+                'mode':"hexa",
+                'swatches-max-height':"116"
             };
         }
     },
@@ -341,14 +353,6 @@ const inputTypeConfigs = {
     },
     numberFormat:{
         tag:"number-format",
-        props(config){
-            return{
-                value:config.value
-            }
-        }
-    },
-    color:{
-        tag:"symper-color-picker",
         props(config){
             return{
                 value:config.value
@@ -675,6 +679,7 @@ export default {
     },
     components: {
         VTextField,
+        VColorPicker,
         VSelect,
         VCheckbox,
         VRadio,

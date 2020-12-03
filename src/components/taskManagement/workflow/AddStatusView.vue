@@ -10,7 +10,7 @@
           <span>Thêm trạng thái của task</span>
         </v-card-title>
         <v-card-text class="p-2">
-          <form-tpl :allInputs="statusInfo"/>
+          <form-tpl :allInputs="status"/>
         </v-card-text>
 
         <v-divider></v-divider>
@@ -39,7 +39,7 @@
 
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
-import {getAllStatusCategory} from './config.js'
+import {getAllStatusCategory,getStatusDefault} from './../config'
 export default {
     components:{
         'form-tpl' : FormTpl,
@@ -52,54 +52,19 @@ export default {
             }
         },
     },
+    computed:{
+        allInput(){
+            return
+        }
+    },
     mounted(){
-        this.statusInfo.statusCategory.options = getAllStatusCategory()
+        this.status = getStatusDefault();
+        this.status.statusCategory.options = getAllStatusCategory()
     },
     data(){
         return{
             isShow:false,
-            statusInfo:{
-                name : { 
-                    title: "Tên",
-                    type: "text",
-                    value:"",
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                    validate(){
-                    
-                    }
-                },
-                desscription : { 
-                    title: "Mô tả",
-                    type: "text",
-                    value:"",
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                    validate(){
-                    
-                    }
-                },
-                statusCategory : { 
-                    title: "Chọn loại",
-                    type: "select",
-                    value:"",
-                    options: [],
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                },
-                allowAll : { 
-                    title: "Cho phép tất cả thay đổi",
-                    type: "checkbox",
-                    value:false,
-                },
-            },
-            userSelect:[]
+            status:null,
         }
     },
     methods:{
@@ -108,7 +73,7 @@ export default {
         },
         beforeAddStatus(){
             this.isShow = false;
-            this.$emit('after-add-status-click',this.statusInfo);
+            this.$emit('after-add-status-click',this.status);
         }
         
     },
