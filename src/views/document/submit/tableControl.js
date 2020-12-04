@@ -83,9 +83,11 @@ export default class TableControl extends Control {
                 let switchTableButton = $(`<button onclick="switchTableMode(this)" view-type="`+viewType+`" table-name="`+this.name+`" class="swap-table-btn"><span class="mdi mdi-swap-horizontal"></button>`)[0];
                 this.ele.before(switchTableButton);
             }
-            this.ele.detach().hide();
             this.switchTable();
-
+            if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
+                this.ele.closest('.wrap-table').css({ 'display': 'none' })
+            }
+            this.ele.detach().hide();
         }
     }
     /**
