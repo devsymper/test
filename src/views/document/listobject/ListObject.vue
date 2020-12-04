@@ -47,6 +47,11 @@
                 <v-btn small @click="showDialog" class="delete-record-btn">
                     <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
                 </v-btn>
+                <!-- test -->
+                 <v-btn small @click="showDialog" class="delete-record-btn">
+                    <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
+                </v-btn>
+                <!-- test -->
             </div>
             <div v-else>
                 <div class="panel-header" v-if="actionOnRightSidebar == 'detail'">

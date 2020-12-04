@@ -560,8 +560,12 @@ button:hover {
 
 .ag-theme-alpine .ag-header {
     background: white !important;
-    font-size: 12;
+    font-size: 12px;
     font-family: "Roboto", sans-serif;
+}
+
+.ag-theme-alpine .ag-cell-wrap-text {
+    font-size: 12px!important;
 }
 
 .ag-theme-alpine .ag-header .ag-header-row {
