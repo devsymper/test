@@ -619,7 +619,7 @@ export default {
             }
             if (count == Object.keys(obj.children).length) {
                 obj.isAllow=true;
-            }else if (count==0) {
+            }else {
                 obj.isAllow=false;
             }
         },

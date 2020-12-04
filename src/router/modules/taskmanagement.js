@@ -95,6 +95,14 @@ export default [
                     TaskManagement: () => import ('../../views/taskManagement/component/List.vue')
                 }
             },
+            {
+                path: "projects/:id/components/:idVersion",
+                name: "ComponentDetail",
+                meta:{group:'home'},
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/component/DetailComponent.vue')
+                }
+            },
             
 
             ///////version

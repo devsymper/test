@@ -34,6 +34,7 @@
                     :search="search"
                     hide-default-footer
                     class="table-list-component"
+                    @click:row="handleClickRow"
                 >
                     <template v-slot:[`item.name`]="{ item }">
                         <span class="name-title">{{item.name}}</span>
@@ -167,6 +168,13 @@ export default {
         }
     },
     methods:{
+        handleClickRow(item){ 
+            if (item.id) {
+                let projectId=this.$route.params.id;
+                this.$store.commit("taskManagement/setInfoComponentCurrent", item);
+                //this.$router.push('/task-management/projects/'+projectId+'/components/'+item.id);
+            }
+        },
         addComponent(){
             this.$emit("add-component");
         },

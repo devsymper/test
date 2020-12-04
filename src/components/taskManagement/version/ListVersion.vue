@@ -125,7 +125,7 @@ export default {
                 total:10,
                 item:{
                     todo:{
-                        value:3,
+                        value:2,
                         color:'grey'
                     },
                     inprogress:{
@@ -133,7 +133,7 @@ export default {
                         color:'blue'
                     },
                     done:{
-                        value:4,
+                        value:5,
                         color:'green'
                     }
                 }

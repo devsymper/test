@@ -29,6 +29,9 @@ const setInfoVersionCurrent = (state, infoVersionCurrent) => {
     Vue.set(state, 'infoVersionCurrent', infoVersionCurrent);
 }
 
+const setInfoComponentCurrent = (state, infoComponentCurrent) => {
+    Vue.set(state, 'infoComponentCurrent', infoComponentCurrent);
+}
 const addProjectToStore = (state, item) => {
     let currentListProject = state.allProject;
     currentListProject.unshift(item)
@@ -135,6 +138,7 @@ export {
     updateBoardToStore,
     setListComponent,
     setListVersion,
-    setInfoVersionCurrent
+    setInfoVersionCurrent,
+    setInfoComponentCurrent,
 
 };
