@@ -243,7 +243,17 @@
 				</div>
 			</div>
 			<div class="comment-area">
-				comment
+				<div class="mt-2 ml-2 mb-1">
+					<v-icon class="fs-13">
+						mdi-comment-outline
+					</v-icon>
+					Comment
+				</div>
+				<div class="ml-1 comment-content  mb-10" >
+					<form-tpl 
+						:allInputs="boxComment"
+					/>
+				</div>
 			</div>
 		</div>
 		<div>
@@ -455,6 +465,14 @@ export default {
 	data(){
 		return {
 			showDialog: false,
+			boxComment:{
+				boxComment:{
+					"title": '',
+					"type": "editor",
+					"value": '',
+					"info": "",
+				}
+			},
 			formData:{
 				valueName: "",
 				valueSetOf:"",
@@ -565,7 +583,8 @@ export default {
 }
 .comment-area{
 	width:300px;
-
+	border:1px solid lightgray;
+	border-left: unset !important;
 }
 .form-syql-function >>> .v-text-field__details{
 	display:none !important;
@@ -586,6 +605,10 @@ export default {
 }
 .form-syql-function >>> .title-type{
 	font-weight: 500;
+}
+.form-syql-function >>> .comment-content{
+	border: 1px solid lightgray;
+	height: calc(100vh - 106px);
 }
 .form-syql-function >>> .v-list-item__title{
 	font-size: 13px !important;
