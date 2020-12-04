@@ -1421,6 +1421,7 @@
             "released":"Đã phát hành"
         },
         "listMember":"Danh sách thành viên",
+        "listProject":"Danh sách project",
         "listCategory":"Danh sách danh mục",
         "listComponent":"Danh sách component",
         "listVersion":"Danh sách version",

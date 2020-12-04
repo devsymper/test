@@ -4,112 +4,49 @@
           <v-card-title  style="height:45px">
             <span class="headline ml-6">{{$t("taskManagement.detailProject")}}</span>
           </v-card-title>
-          <v-card-text style="height:calc(100% - 90px)">
+          <v-card-text style="height:calc(100% - 45px)">
             <v-container class="h-100">
-                <v-form
-                    class="h-100"
-                    ref="formEdit"
-                    v-model="valid"
-                    lazy-validation
-                >
-                <VuePerfectScrollbar
-                    style="height:100%"
+                <div style="text-align:center">
+                    <v-icon v-if="!!projectNew.icon && projectNew.icon.indexOf('mdi-') > -1" class="display-3 pt-0">{{projectNew.icon}}</v-icon>
+                    <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!projectNew.icon && projectNew.icon.indexOf('mdi-') < 0" :src="projectNew.icon" width="60" height="60">
+                    <pick-icon
+                        @selected="selectedIcon"
+                        class="mt-2 pick-icon"
+                    />
+                </div>
+                <div>
+                    <form-tpl
+                    :allInputs="dataProjectProps"/>
+                </div>
+                <span class="fs-11">Leader</span>
+                <userSelector
+                    class="selectUser"
+                    ref="userSelector"
+                    :label="`Leader`"
+                    :solo="true"
+                    :isMulti="false"
+                    :compactChip="true"
+                    :color="'transparent'"
+                    :textColor="''"
+                    :flat="true"
+                    :valueObj="currentUserLeader"
+                    @input="inputLeader"
+                ></userSelector>
+                <div style="text-align:right">
+                    <v-btn
+                        v-if="statusEdit"
+                        class="mt-2 pa-2"
+                        :loading="isLoadingAdd"
+                        color="blue darken-1"
+                        text
+                        @click="validateEditProject"
                     >
-                    <v-col
-                        cols="12"
-                    >
-                        <div style="text-align:center">
-                            <v-icon v-if="!!projectNew.icon && projectNew.icon.indexOf('mdi-') > -1" class="display-3 pt-0">{{projectNew.icon}}</v-icon>
-                            <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!projectNew.icon && projectNew.icon.indexOf('mdi-') < 0" :src="projectNew.icon" width="128" height="128">
-                            <pick-icon
-                                @selected="selectedIcon"
-                                class="mt-3"
-                            />
-                        </div>
-
-                      
-                    </v-col>
-                    <v-col
-                        cols="12"
-                    >
-                        <v-text-field
-                            v-model="projectNew.name"
-                            :rules="nameRules"
-                            label="Name*"
-                            outlined
-                            dense
-                            required
-                        ></v-text-field>
-                    </v-col>
-                    <v-col
-                        cols="12"
-                    >
-                        <v-text-field
-                            label="Key*"
-                            outlined
-                            dense
-                            v-model="projectNew.key"
-                            :rules="keyRules"
-                        ></v-text-field>
-                    </v-col>
-                 
-                    <v-col cols="12">
-                        <v-text-field
-                            label="Description"
-                            outlined
-                            dense
-                            v-model="projectNew.description"
-                        ></v-text-field>
-                    </v-col>
-                    <v-col
-                        cols="12"
-                    >
-                        <v-autocomplete
-                            :items="allCategory"
-                            v-model="currentCategory"
-                            return-object
-                            label="Category*"
-                            outlined
-                            dense
-                            item-text="name"
-                            item-value="id"
-                            :multiple="false"
-                            :rules="[v => !!v || 'Category is required']"
-                            @change="applyChangeValue"
-                        ></v-autocomplete>
-                    </v-col>
-                    <v-col cols="12">
-                        <userSelector
-                            class="selectUser"
-                            ref="userSelector"
-                            :outlined="true"
-                            :label="`Leader`"
-                            :solo="false"
-                            :isMulti="false"
-                            :compactChip="true"
-                            :color="'transparent'"
-                            :textColor="''"
-                            :flat="true"
-                            :valueObj="currentUserLeader"
-                            @input="inputLeader"
-                        ></userSelector>
-                    </v-col>
-                    </VuePerfectScrollbar>
-                </v-form>
+                        {{$t("common.save")}}
+                    </v-btn>
+                </div>
+               
             </v-container>
           </v-card-text>
-          <v-card-actions  style="height:45px">
-            <v-spacer></v-spacer>
-            <v-btn
-                v-if="statusEdit"
-                class="mr-4"
-                color="blue darken-1"
-                text
-                @click="validateEditProject"
-            >
-                {{$t("common.save")}}
-            </v-btn>
-          </v-card-actions>
         </v-card>
     </div>
 </template>
@@ -121,37 +58,109 @@ import pickIcon from "@/components/common/iconPicker";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import { util } from "@/plugins/util";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import FormTpl from "@/components/common/FormTpl.vue";
 
 export default {
     components:{
         infoUser,
         pickIcon,
         userSelector,
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
+        FormTpl
     },
     data(){
         return{
+            isLoadingAdd:false,
             statusEdit:false,
-            valid: false,
-            nameRules: [
-                v => !!v || 'Name is required',
-                v => (v && v.length >= 3) || 'Name must be less than 10 characters',
-            ],
-            keyRules: [
-                v => !!v || 'Key is required'
-            ],
-            currentCategory:{id:'',name:'Workflow'},
             currentUserLeader:{id:''},
             projectNew:{},
+            dataProjectProps:{
+                name : { 
+                    title: "Name",
+                    type: "text",
+                    value: '',
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
+                    validate(){
+                        if (this.value=="") {
+                            this.validateStatus.isValid=false;
+                            this.validateStatus.message="Không bỏ trống";
+                        }else{
+                            this.validateStatus.isValid=true;
+                            this.validateStatus.message="";
+                        }
+                    }
+                },
+                key : { 
+                    title: "Key",
+                    type: "text",
+                    value: '',
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
+                    validate(){
+                        if (this.value=="") {
+                            this.validateStatus.isValid=false;
+                            this.validateStatus.message="Không bỏ trống";
+                        }else{
+                            this.validateStatus.isValid=true;
+                            this.validateStatus.message="";
+                        }
+                    }
+                },
+                description : {
+                    title: "Mô tả",
+                    type: "text",
+                    value: '',
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    validate(){
+                    }
+                },
+                categories : { 
+                    title: "Category",
+                    type: "select",
+                    value:"",
+                    options: [
+                    ],
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
+                    validate(){
+                        if (this.value=="") {
+                            this.validateStatus.isValid=false;
+                            this.validateStatus.message="Không bỏ trống";
+                        }else{
+                            this.validateStatus.isValid=true;
+                            this.validateStatus.message="";
+                        }
+                    }
+                },
+            },
         }
     },
     watch:{
-        projectNew: {
+        dataProjectProps: {
             deep: true,
             immediate: true,
             handler(after) {
                 if (Object.keys(after).length>0) {
                     this.checkChangeValueEdit(after);
+                }
+            }
+        },
+        projectNew: {
+            deep: true,
+            immediate: true,
+            handler(after) {
+                if (Object.keys(after).length>0) {
+                    this.checkChangeValueEdit(after,"checkIconAndLeader");
                 }
             }
         },
@@ -174,54 +183,75 @@ export default {
             console.log("userId", data);
             this.$set(this.projectNew,"userLeader",data);
         },
-        checkChangeValueEdit(newVl){
+        checkChangeValueEdit(newVl,str=''){
             let oldVl=this.infoProject;
-            if (newVl.name != oldVl.name || newVl.key!= oldVl.key||newVl.description!= oldVl.description||newVl.categoryId!= oldVl.categoryId ||newVl.icon!= oldVl.icon ||newVl.userLeader!= oldVl.userLeader ) {
-                this.statusEdit=true;
+            if (str=="checkIconAndLeader") {
+                if (newVl.userLeader!= oldVl.userLeader || newVl.icon!= oldVl.icon  ) {
+                    this.statusEdit=true;
+                }else{
+                    this.statusEdit=false;
+                }
+                
             }else{
-                this.statusEdit=false;
+                if (newVl.name.value != oldVl.name || newVl.key.value!= oldVl.key||newVl.description.value!= oldVl.description||newVl.categories.value!= oldVl.categoryId ) {
+                    this.statusEdit=true;
+                }else{
+                    this.statusEdit=false;
+                }
             }
+        
+
+        },
+        validateData(){
+            let data=this.dataProjectProps;
+            for (var key in data) {
+                data[key].validate();
+                if (data[key].validateStatus.isValid==false) {
+                    return false
+                }
+            }
+            return true;
         },
         validateEditProject () {
-            this.$refs.formEdit.validate();
-               setTimeout((self) => {
-                if (self.valid) {
-                    if (!self.projectNew.name || !self.projectNew.key ||!self.projectNew.categoryId || !self.projectNew.userLeader ) {
-                        self.$snotifyError("", "Can not add project!");
-                    }else{
-                        let data = {};
-                        data.name = self.projectNew.name;
-                        data.description =self.projectNew.description;
-                        data.categoryId = self.projectNew.categoryId;
-                        data.icon = self.projectNew.icon;
-                        data.key = self.projectNew.key;
-                        data.userLeader = self.projectNew.userLeader;
-                        taskManagementApi
-                            .updateProject(self.projectNew.id,data)
-                            .then(res => {
-                                if (res.status == 200) {
-                                    self.$snotifySuccess("Update project completed!");
-                                    data.id=self.projectNew.id;
-                                    self.$store.dispatch("taskManagement/updateProjectToStore", data);
-                                    self.infoProject.name=data.name;
-                                    self.infoProject.description=data.description;
-                                    self.infoProject.categoryId=data.categoryId;
-                                    self.infoProject.icon=data.icon;
-                                    self.infoProject.key=data.key;
-                                    self.infoProject.userLeader=data.userLeader;
-                                    
-                                }else{
-                                    self.$snotifyError("", "Can not update project!");
-                                }
-                            })
-                            .catch(err => {
-                                self.$snotifyError("", "Can not update project!", err);
-                            })
-                            .always(() => {});
-                    }
+            this.isLoadingAdd = true;
+            let self=this;
+            let isValid = this.validateData();
+            if (isValid) {
+                if (!self.dataProjectProps.name.value || !self.dataProjectProps.key.value ||!self.dataProjectProps.categories.value || !self.projectNew.userLeader ) {
+                    self.$snotifyError("", "Can not add project!");
+                }else{
+                    let data = {};
+                    data.name = self.dataProjectProps.name.value;
+                    data.description =self.dataProjectProps.description.value;
+                    data.categoryId = self.dataProjectProps.categories.value;
+                    data.icon = self.projectNew.icon;
+                    data.key = self.dataProjectProps.key.value;
+                    data.userLeader = self.projectNew.userLeader;
+                    taskManagementApi
+                        .updateProject(self.projectNew.id,data)
+                        .then(res => {
+                            if (res.status == 200) {
+                                self.$snotifySuccess("Update project completed!");
+                                data.id=self.projectNew.id;
+                                self.$store.dispatch("taskManagement/updateProjectToStore", data);
+                                self.infoProject.name=data.name;
+                                self.infoProject.description=data.description;
+                                self.infoProject.categoryId=data.categoryId;
+                                self.infoProject.icon=data.icon;
+                                self.infoProject.key=data.key;
+                                self.infoProject.userLeader=data.userLeader;
+                                
+                            }else{
+                                self.$snotifyError("", "Can not update project!");
+                            }
+                        })
+                        .catch(err => {
+                            self.$snotifyError("", "Can not update project!", err);
+                        })
+                        .always(() => {});
                 }
-            }, 200,this);
-          
+            }
+            this.isLoadingAdd = false;
         },
         selectedIcon(data) {
             this.$set(this.projectNew, 'icon', data.icon.trim() )
@@ -229,20 +259,30 @@ export default {
         applyChangeValue(vl){
             this.$set(this.projectNew,"categoryId",vl.id);
         },
-        getNameCategory(){
-            let allCategories=this.$store.state.taskManagement.allCategory;
-            let item=allCategories.find(ele => ele.id == this.infoProject.categoryId);
-            if (item) {
-                this.currentCategory=item;
-            }
+        getDataProps(infoProject){
+            this.dataProjectProps.name.value=infoProject.name;
+            this.dataProjectProps.key.value=infoProject.key;
+            this.dataProjectProps.description.value=infoProject.description;
+        },
+        setCategorySelect(){
+            setTimeout((self) => {
+                let category = this.$store.state.taskManagement.allCategory;
+                category = category.reduce((arr, obj)=>{
+                    let newObj = {text:obj.name,value:obj.id};
+                    arr.push(newObj);
+                    return arr
+                },[]);
+                    self.dataProjectProps.categories.options = category;
+                    self.dataProjectProps.categories.value = self.infoProject.categoryId;
+            }, 500,this);
         }
     },
     created(){
+        this.setCategorySelect();
         this.projectNew=util.cloneDeep(this.infoProject);
+        this.getDataProps(util.cloneDeep(this.infoProject));
         this.currentUserLeader.id=this.projectNew.userLeader;
-        setTimeout((self) => {
-            self.getNameCategory();
-        }, 150,this);
+    
     }
 
 

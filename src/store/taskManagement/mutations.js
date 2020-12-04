@@ -117,6 +117,16 @@ const removeCategoryToStore = (state, id) => {
     }
     Vue.set(state, 'allCategory', currentListCategory);
 }
+const removeProjectToStore = (state, id) => {
+    let currentListProject = state.allProject;
+    let obj = currentListProject.find(data => data.id === id)
+    var index = currentListProject.indexOf(obj);
+    if (index > -1) {
+        currentListProject.splice(index, 1);
+    }
+    Vue.set(state, 'allProject', currentListProject);
+}
+
 const addToTaskManagementStore = (state, data) =>{
     let key = data.key;
     let value = data.value;
@@ -140,5 +150,6 @@ export {
     setListVersion,
     setInfoVersionCurrent,
     setInfoComponentCurrent,
+    removeProjectToStore,
 
 };

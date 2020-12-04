@@ -24,6 +24,9 @@ export const taskManagementApi = {
     addProject(data){
         return taskManagement.post("projects",data);
     },
+    removeProject(id){
+        return taskManagement.delete("projects/"+id);
+    },
     getDetailProject(id){
         return taskManagement.get("projects/"+id);
     },

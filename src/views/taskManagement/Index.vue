@@ -3,7 +3,9 @@
         <Sidebar  @after-toggle-sidebar="afterToggleSideBar"/>
          <div :style="{'width':(isExpand) ? 'calc(100% - 210px)' : 'calc(100%)'}" class="h-100">
             <Header />
-            <router-view name="TaskManagement" style="padding:0 8px"/>
+            <div style="padding:0 8px;height:calc(100% - 45px)">
+                <router-view name="TaskManagement" />
+            </div>
         </div>
     </div>
    

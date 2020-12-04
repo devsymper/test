@@ -1298,6 +1298,7 @@
         },
         "listMember":"List member",
         "listCategory":"List category",
+        "listProject":"List project",
         "listComponent":"List component",
         "listVersion":"List version",
         "listIssueType":"List Issue type",

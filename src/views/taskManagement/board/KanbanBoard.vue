@@ -101,12 +101,15 @@ export default {
                 { 
                     title: this.$t("taskManagement.settingBoard"),
                     menuAction: action => {
-                       if (Object.keys(self.currentBoard).length > 0) {
-                            let id=self.$route.params.id;
+                        let id=self.$route.params.id;
+                        if (Object.keys(self.currentBoard).length > 0) {
                             self.$router.push("/task-management/projects/"+id+"/kanban-board/settings/" + self.currentBoard.id);
-                       }else{
-                           console.log("Chưa có data");
-                       }
+                        }else{
+                            self.setBoardCurrent();
+                            setTimeout(() => {
+                                self.$router.push("/task-management/projects/"+id+"/kanban-board/settings/" + self.currentBoard.id);
+                            }, 500);
+                        }
                     },
                 },
             ],
@@ -425,7 +428,7 @@ export default {
                 if (allBoard.length>0) {
                     self.currentBoard=allBoard[0];  
                 }
-            }, 300,this);
+            }, 500,this);
            
         }
     },

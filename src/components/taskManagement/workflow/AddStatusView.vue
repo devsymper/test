@@ -51,6 +51,22 @@ export default {
                 return [];
             }
         },
+        listRole:{
+           type: Array,
+            default() {
+                return [];
+            }
+        }
+    },
+    watch:{
+        listRole: {
+            deep: true,
+            immediate:true,
+            handler(newVl){
+                if(this.status)
+                this.status.roleAcess.options =newVl;
+            }
+        },
     },
     computed:{
         allInput(){
@@ -59,7 +75,8 @@ export default {
     },
     mounted(){
         this.status = getStatusDefault();
-        this.status.statusCategory.options = getAllStatusCategory()
+        this.status.statusCategory.options = getAllStatusCategory();
+        this.status.roleAcess.options = this.listRole;
     },
     data(){
         return{

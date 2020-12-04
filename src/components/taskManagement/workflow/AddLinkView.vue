@@ -20,7 +20,7 @@
           <v-btn
             color="blue darken-1" 
             text
-            @click="isShow = false"
+            @click="actionClick"
           >
             {{$t('common.save')}}
           </v-btn>
@@ -57,7 +57,7 @@ export default {
             let allOption = [];
             for (let index = 0; index < vl.length; index++) {
                 let node = vl[index];
-                allOption.push({text:node.name.value,value:node.name.value})
+                allOption.push({text:node.name.value,value:node.id.value})
             }
             this.$set(this.linkInfo.from,'options',allOption);
             this.$set(this.linkInfo.to,'options',allOption);
@@ -124,7 +124,7 @@ export default {
             this.isShow=true;
         },
         actionClick(type){
-            this.$emit('after-add-link-click',linkInfo);
+            this.$emit('after-add-link-click',this.linkInfo);
         }
         
     },

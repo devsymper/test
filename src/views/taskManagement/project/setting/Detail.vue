@@ -27,6 +27,7 @@ export default {
             let project=allProject.find(element => element.id==id);
             if (project) {
                 self.infoProject=project;
+                self.$store.commit("taskManagement/setCurrentProject", project);
             }else{ // call api get detail project
                 taskManagementApi
                     .getDetailProject(id)
@@ -48,7 +49,6 @@ export default {
         this.$store.commit("taskManagement/addToTaskManagementStore",{key:'currentPage',value:'projectSetting'});
     },
     activated(){
-        //this.toggleMainContentLoader(false);
         let breadcrumbs = [
                 {
                     text: 'Dashboard',

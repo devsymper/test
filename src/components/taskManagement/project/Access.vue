@@ -309,6 +309,9 @@ export default {
     },
     name:"Access",
     computed:{
+        sTaskManagement() {
+            return this.$store.state.taskManagement;
+        },
         allUserInProject(){
             let users=this.listUser;
             let allUser=this.$store.state.app.allUsers;

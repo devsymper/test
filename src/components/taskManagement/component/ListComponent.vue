@@ -1,16 +1,6 @@
 <template>
     <div class="w-100 h-100">
-        <div class="w-100 justify-space-between d-flex" style="height:40px">
-            <div class="symper-title pl-2">{{title}}</div>
-            <div class="d-flex pt-2 pr-4">
-                <v-btn small class="px-1" solo depressed @click="handleCreate" color="#1976d2">
-                    <v-icon color="white" size="18">mdi-plus</v-icon>
-                    <span style="color:white">Create component</span>
-                </v-btn>
-            </div>
-        </div>
-            <!-- list category -->
-        <div style="height:calc(100% - 40px)">
+        <div style="height:100%">
             <v-card style="box-shadow:none">
                 <v-card-title>
                     {{$t("taskManagement.listComponent")}}
@@ -26,6 +16,10 @@
                         hide-details
                         class="sym-small-size sym-style-input"
                     ></v-text-field>
+                    <v-btn small class="ml-1 px-1" solo depressed @click="handleCreate" color="#1976d2">
+                        <v-icon color="white" size="18">mdi-plus</v-icon>
+                        <span style="color:white">Create component</span>
+                    </v-btn>
                 </v-card-title>
                 <v-data-table
                     v-if="allComponent.length>0"
