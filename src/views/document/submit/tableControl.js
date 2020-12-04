@@ -177,7 +177,7 @@ export default class TableControl extends Control {
                 dataTable.push(rowData)
 
             }
-            this.tableInstance.setData(dataTable);
+            this.tableInstance.setData(dataTable, false);
             setTimeout((self) => {
                 self.tableInstance.tableInstance.render();
                 SYMPER_APP.$evtBus.$emit('document-on-table-change', {
