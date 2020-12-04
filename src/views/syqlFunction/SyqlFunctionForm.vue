@@ -304,7 +304,7 @@ export default {
 	computed:{
 		sDetailFuntion(){
 			let sData = this.$store.state.SyqlFunction
-			return sData.detailFunction[sData.currentFunctionId]
+			return sData.detailFunction[sData.currentFunctionId] ? sData.detailFunction[sData.currentFunctionId] : {}
 		}
 	},
 	watch:{
@@ -312,13 +312,14 @@ export default {
 			deep: true,
 			immediate: true,
 			handler(arr){
-				if(arr){
+				if(arr.config){
 					this.restoreFormdata(arr.config)
 				}
 			}
 		},
 		action(val){
 			if(val == 'add'){
+				this.$refs.editorBox.setData("")
 				this.formData = {
 					valueName: "",
 					valueSetOf:"",
@@ -356,8 +357,9 @@ export default {
 			this.$refs.fomulaEditor.toggleDebugView()
 		},
 		restoreFormdata(config){
-			this.formData = JSON.parse(config.formData)
-			this.$refs.editorBox.setData(config.contentComment)
+			let configs = JSON.parse(config)
+			this.formData = configs.formData
+			this.$refs.editorBox.setData(configs.contentComment)
 		},
 		addAnotherAgrument(){
 			let obj = {
@@ -451,7 +453,8 @@ export default {
 			})
 		},
 		editFunction(form){
-				let self = this
+			debugger
+			let self = this
 			let id = this.$store.state.SyqlFunction.currentFunctionId
 			syqlFunctionApi.editFunction(id,form).then(res=>{
 				if(res.status == 200){
