@@ -26,7 +26,7 @@
                         dense   
                     ></v-checkbox>
                     <add-status-view ref="popupAddStatusView" @after-add-status-click="afterAddStatusClick"/>
-                    <add-link-view ref="popupAddLinkView" @after-add-link-click="afterAddLinkClick"/>
+                    <add-link-view :listNode="listNode" ref="popupAddLinkView" @after-add-link-click="afterAddLinkClick"/>
                 </div>
                 <div id="task-workflow"></div>
             </div>
@@ -42,6 +42,10 @@
 import FormTpl from '@/components/common/FormTpl.vue';
 import AddStatusView from '@/components/taskManagement/workflow/AddStatusView.vue';
 import AddLinkView from '../../../components/taskManagement/workflow/AddLinkView.vue';
+import {getStatusDefault} from '../../../components/taskManagement/config.js'
+import {
+    util
+} from "@/plugins/util.js";
 require('@/components/common/rappid/jointjs');
 export default {
     components:{
@@ -59,18 +63,27 @@ export default {
         showPopupAddLinkView(){
             this.$refs.popupAddLinkView.show()
         },
+        getTextWidth(text){
+            let ele = $('<span style="position:absolute;opacity:0">'+text+'</span>').appendTo($('.wrap-workflow-config'));
+            let eleWidth = ele.width();
+            ele.remove();
+            return eleWidth;
+        },
         afterAddStatusClick(status){
-            this.listNode.push(status);
+            let newStatus = util.cloneDeep(status);
+            this.nodeConfig = newStatus;
+            this.listNode.push(newStatus);
+            let nodeWidth = this.getTextWidth(newStatus.name.value) + 20;
             var rectReview = new joint.shapes.standard.Rectangle();
             rectReview.position(500, 230);
-            rectReview.resize(100, 40);
+            rectReview.resize(nodeWidth, 40);
             rectReview.attr({
                 body: {
-                    fill: '#00875a',
+                    fill: newStatus.colorStatus.value,
                     strokeWidth: 0
                 },
                 label:{
-                    text:'Done',
+                    text:newStatus.name.value,
                     fill:'white',
                     fontWeight:500
                 }
@@ -112,45 +125,13 @@ export default {
             graph:null,
             listNode:[],
             listLink:[],
-            nodeConfig:{
-                name : { 
-                    title: "Name",
-                    type: "text",
-                    value: '',
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                    validate(){
-                        
-                    }
-                },
-                description : {
-                    title: "Mô tả",
-                    type: "textarea",
-                    value: '',
-                    validateStatus:{
-                        isValid:true,
-                        message:""
-                    },
-                    validate(){
-                    }
-                },
-                roleAcess : {
-                    title: "Vai trò được truy cập",
-                    type: "select",
-                    value: '',
-                    validateStatus:{
-                        isValid:true,
-                        message:""
-                    },
-                    validate(){
-                    }
-                },
-            }
+            nodeConfig:{}
         }
     },
     mounted() {
+        let nodeDefaultInfo = getStatusDefault();
+        nodeDefaultInfo.name.value = "Back log"
+        this.listNode.push(nodeDefaultInfo);
         this.graph = new joint.dia.Graph;
 
         let paper = new joint.dia.Paper({

@@ -11,7 +11,7 @@
         </div>
             <!-- list category -->
         <div style="height:calc(100% - 40px)">
-             <v-card style="box-shadow:none">
+            <v-card style="box-shadow:none">
                 <v-card-title>
                     {{$t("taskManagement.listCategory")}}
                     <v-spacer></v-spacer>

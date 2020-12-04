@@ -76,7 +76,7 @@
         </transition>
         
         <SelectBoard ref="SelectBoard"/>
-        <ProjectPopup ref="projectPopupView" v-if="!mini"/>
+        <ProjectPopup ref="projectPopupView"/>
     </div>
 </template>
 <script>
@@ -127,6 +127,12 @@ export default {
                 this.menu = appConfigs.sideBar[to.meta.group];
             }         
         },
+        drawer(vl){
+            if(!vl){
+                this.$refs.projectPopupView.hide();
+                this.$refs.SelectBoard.hide();
+            }
+        }
     },
     mounted(){
         this.menu = appConfigs.sideBar[this.$route.meta.group];

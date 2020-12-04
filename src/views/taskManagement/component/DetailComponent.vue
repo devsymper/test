@@ -1,20 +1,20 @@
 <template>
-    <detail-version
-        :infoVersion="infoVersion"
+    <detail-component
+        :infoComponent="infoComponent"
     />
+
 </template>
 
 <script>
-import detailVersion from '../../../components/taskManagement/version/DetailVersion.vue';
+import detailComponent from '@/components/taskManagement/component/DetailComponent.vue';
 export default {
-    components: { detailVersion },
+    components: { detailComponent },
     computed:{
-        infoVersion(){
-            return this.$store.state.taskManagement.infoVersionCurrent;
+        infoComponent(){
+            return this.$store.state.taskManagement.infoComponentCurrent;
         }
     },
    
-
 }
 </script>
 

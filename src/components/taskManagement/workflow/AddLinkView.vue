@@ -39,18 +39,29 @@
 
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
-import {getAllStatusCategory} from './config.js'
+import {getAllStatusCategory} from './../config.js'
 export default {
     components:{
         'form-tpl' : FormTpl,
     },
     props:{
-        roles: {
+        listNode: {
             type: Array,
             default() {
                 return [];
             }
         },
+    },
+    watch:{
+        listNode(vl){
+            let allOption = [];
+            for (let index = 0; index < vl.length; index++) {
+                let node = vl[index];
+                allOption.push({text:node.name.value,value:node.name.value})
+            }
+            this.$set(this.linkInfo.from,'options',allOption);
+            this.$set(this.linkInfo.to,'options',allOption);
+        }
     },
     data(){
         return{

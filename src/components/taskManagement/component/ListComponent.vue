@@ -11,7 +11,7 @@
         </div>
             <!-- list category -->
         <div style="height:calc(100% - 40px)">
-             <v-card style="box-shadow:none">
+            <v-card style="box-shadow:none">
                 <v-card-title>
                     {{$t("taskManagement.listComponent")}}
                     <v-spacer></v-spacer>
@@ -172,7 +172,7 @@ export default {
             if (item.id) {
                 let projectId=this.$route.params.id;
                 this.$store.commit("taskManagement/setInfoComponentCurrent", item);
-                //this.$router.push('/task-management/projects/'+projectId+'/components/'+item.id);
+                this.$router.push('/task-management/projects/'+projectId+'/components/'+item.id);
             }
         },
         addComponent(){

@@ -8,6 +8,13 @@ const defaultState = {
     listVersionInProject:[],
     infoVersionCurrent:{},
     infoComponentCurrent:{},
+    workFlowData:{
+        allNode:[
+            
+        ],
+        allLink:[],
+        currentNodeSelected:{},
+    }
 };
 
 export default defaultState;

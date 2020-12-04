@@ -96,7 +96,7 @@ export default [
                 }
             },
             {
-                path: "projects/:id/components/:idVersion",
+                path: "projects/:id/components/:idComponent",
                 name: "ComponentDetail",
                 meta:{group:'home'},
                 components:{
