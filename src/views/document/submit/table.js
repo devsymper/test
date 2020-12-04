@@ -1350,7 +1350,7 @@ export default class Table {
                 });
             }
             // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
-            if (this.tableHasRowSum && ['submit', 'update'].includes(sDocument.state.viewType[this.keyInstance])) {
+            if (this.tableHasRowSum) {
                 data.push({})
             }
 
