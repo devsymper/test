@@ -160,6 +160,7 @@ const makeDelay = function(ms) {
 };
 var delay = makeDelay(1000);
 var delayTypingEnter = makeDelay(500);
+var delayTypingDelete = makeDelay(500);
 var delayAfterInsertRow = makeDelay(1000);;
 
 
@@ -226,9 +227,6 @@ export default class Table {
          * Biến đánh dấu table có dòng tính tổng hay không
          */
         this.tableHasRowSum = false;
-
-        /**Tổng số dòng trong table */
-        this.rowCount = 0;
         this.tableInstance = null;
         this.columnsInfo = null;
         this.keyInstance = keyInstance;
@@ -456,7 +454,6 @@ export default class Table {
                     data: this.getSourceData(),
                     tableName:thisObj.tableName
                 });
-                
                 if (!changes) {
                     return
                 }
@@ -557,10 +554,10 @@ export default class Table {
         if (this.tableHasRowSum && cellMeta[0][0] == this.tableInstance.countRows() - 1) {
             return;
         }
+        let thisObj = this;
         if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
             this.tableInstance.alter('insert_row', cellMeta[0][0] + 1, 1, 'auto_set');
             this.dataInsertRows.push([]);
-            let thisObj = this;
             delayTypingEnter(function() {
                 let listRootTable = sDocument.state.submit[thisObj.keyInstance]['listTableRootControl'];
                 if (listRootTable.hasOwnProperty(thisObj.tableName)) {
@@ -579,6 +576,29 @@ export default class Table {
             e.stopImmediatePropagation();
             e.preventDefault();
             e.stopPropagation();
+            let index = cellMeta[0][0];
+            // chặn không được xóa dòng cuối cùng
+            if(index == 0 && (this.tableInstance.countRows() == 1 || (this.tableInstance.countRows() == 2 && this.tableHasRowSum))){
+                return;
+            }
+            let listInput = this.getListInputInDocument();
+            let rowData = this.tableInstance.getDataAtRow(index);
+            console.log(rowData,index, 'rowDatarowData');
+            let rowId = rowData[rowData.length - 1]
+            for (let controlName in this.controlObj.listInsideControls) {
+                let controlInstance = listInput[controlName];
+                let controlValue = util.cloneDeep(controlInstance.value);
+                if (Array.isArray(controlValue)) {
+                    controlValue.splice(index, 1);
+                    store.commit("document/updateListInputInDocument", {
+                        controlName: controlName,
+                        key: 'value',
+                        value: controlValue,
+                        instance: this.keyInstance
+                    });
+                }
+            }
+            ClientSQLManager.deleteRow(this.keyInstance, this.tableName, 'where s_table_id_sql_lite = ' + rowId);
             this.tableInstance.alter('remove_row', cellMeta[0][0], 1);
         }
     }
@@ -1184,31 +1204,20 @@ export default class Table {
                         let cellValue = colData[index];
                         if(!cellValue){
                             vls.push([index, 's_table_id_sql_lite', id]);
+                            ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, ['s_table_id_sql_lite'], [id]);
                         }
                     }
                     thisObj.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
                 });
             },
             afterRemoveRow: function(index, amount, physicalRows, source) {
-                let listInput = thisObj.getListInputInDocument();
-                let rowData = this.getDataAtRow(index);
-                console.log(rowData, 'rowDatarowData');
-                let rowId = rowData[rowData.length - 1]
-                for (let controlName in thisObj.controlObj.listInsideControls) {
-                    let controlInstance = listInput[controlName];
-                    let controlValue = util.cloneDeep(controlInstance.value);
-                    if (Array.isArray(controlValue)) {
-                        controlValue.splice(index, 1);
-                        store.commit("document/updateListInputInDocument", {
-                            controlName: controlName,
-                            key: 'value',
-                            value: controlValue,
-                            instance: thisObj.keyInstance
-                        });
-
+                if (thisObj.tableHasRowSum) {
+                    thisObj.setDataForSumRow()
+                    for (let index = 0; index < this.getDataAtRow(0).length; index++) {
+                        this.setCellMeta(this.countRows() - 1, index, 'readOnly', true);
+                        this.setCellMeta(this.countRows() - 2, index, 'readOnly', false);
                     }
                 }
-                ClientSQLManager.deleteRow(thisObj.keyInstance, thisObj.tableName, 'where s_table_id_sql_lite = ' + rowId);
                 let pattern = index + '_\\d';
                 let reg = new RegExp(pattern, 'g');
                 for (let key in thisObj.validateValueMap) {
