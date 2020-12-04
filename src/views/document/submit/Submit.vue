@@ -173,7 +173,7 @@
             ref="traceControlView" 
             v-show="isShowTraceControlSidebar" />
         </v-navigation-drawer>
-    <PopupPivotTable ref="popupPivotTableView" :dataColPivot="dataColPivot" :data="dataPivotMode" @before-add-pivot-data="beforeAddPivotData"/>
+    <PopupPivotTable ref="popupPivotTableView" :instance="keyInstance" :dataColPivot="dataColPivot" :data="dataPivotMode" @before-add-pivot-data="beforeAddPivotData"/>
     <input type="text" class="input-pivot" @keyup="afterKeyupInputPivot" @blur="afterBlurInputPivot" v-if="dataPivotTable">
     
     </div>
