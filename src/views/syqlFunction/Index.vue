@@ -14,8 +14,9 @@
 			:actionPanelWidth="1000"
 			@after-open-add-panel="handleAdd"
 			:showActionPanelInDisplayConfig="true"
+			:actionPanelType="'elastic'"
         >
-			<!-- :actionPanelType="'elastic'" -->
+			<!--  -->
 
 			<template slot="right-panel-content">  
 				<SyqlFunctionForm

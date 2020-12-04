@@ -1,10 +1,13 @@
 <template>
-	<div class="w-100 h-100 d-flex flex-column form-syql-function ">
+	<div 
+		class="w-100 h-100 d-flex flex-column form-syql-function "
+		:class="{'form-syql-function-disable': action == 'view'}"
+		>
 		<div class="d-flex fs-13" style="height: calc(100vh - 70px)">
 			<div class=" content-function  flex-grow-1">
 				<div class="p-2 d-flex flex-column">
 					<div class="d-flex w-100">
-						<div style="width: 50%" class="d-flex flex-column">
+						<div style="width: 30%" class="d-flex flex-column">
 							<span class="title-type" >
 								Name
 							</span>
@@ -17,6 +20,14 @@
 										solo
 									></v-text-field>
 								</div>
+								
+							</div>
+						</div>
+						<div style="width: 70%" class="d-flex flex-column ml-1">
+							<div class="title-type ml-1" >
+								Returns
+							</div>
+							<div class="d-flex mt-1">
 								<div class="ml-1" style="width: 100px">
 									<v-autocomplete
 										solo
@@ -26,14 +37,7 @@
 										item-value="value"
 									></v-autocomplete>
 								</div>
-							</div>
-						</div>
-						<div style="width: 50%" class="d-flex flex-column">
-							<span class="title-type" >
-								Returns
-							</span>
-							<div class="d-flex mt-1">
-								<div style="width:250px">
+								<div class="ml-1" style="width:250px">
 									<v-autocomplete
 										solo
 										v-model="formData.valueReturns"
@@ -160,30 +164,13 @@
 						
 					</div>
 					<div>
-						<div class="d-flex" >
-							<div class="title-type flex-grow-1" >
-								Definition
-							</div>
-							<v-btn 
-								class="float-right mr-2 "
-								x-small
-								icon
-								tile
-								@click="showDebugDialog"
-								depressed
-							>
-								<v-icon>
-									mdi-bug-outline
-								</v-icon>
-							</v-btn>
-						</div>
+						
 						<div 
 							style="height:150px"
 							class="mt-1"
 						>
-							<FomulaEditor
-								v-model="formData.valueDefinition"
-							 	:height="'130px'"
+							<FormTpl 
+								:allInputs="formData.definition"
 							/>
 						</div>
 					</div>
@@ -284,11 +271,13 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import FomulaEditor from '@/components/formula/editor/FormulaEditor'
 import DebugDialog from "./DebugDialog"
 import {syqlFunctionApi} from '@/api/SyqlFunction'
+import FormTpl from '@/components/common/FormTpl'
 export default {
 	components:{
 		VuePerfectScrollbar,
 		FomulaEditor,
-		DebugDialog
+		DebugDialog,
+		FormTpl
 	},
 	props:{
 		action:{
@@ -307,7 +296,7 @@ export default {
 			deep: true,
 			immediate: true,
 			handler(arr){
-				if(arr.config){
+				if(arr){
 					this.restoreFormdata(arr.config)
 				}
 			}
@@ -327,7 +316,14 @@ export default {
 							valueArgArray:'',
 						},
 					],
-					valueDefinition: '',
+					definition:{
+						definition:{
+							"title": 'Deninition',
+							"type": "script",
+							"value": '',
+							"info": "",
+						}
+					},
 					executionCost: '',
 					resultRows: '',
 					properties:{
@@ -341,7 +337,7 @@ export default {
 	},
 	methods:{
 		showDebugDialog(){
-			this.showDialog = true
+			this.$refs.fomulaEditor.toggleDebugView()
 		},
 		restoreFormdata(config){
 			this.formData = JSON.parse(config)
@@ -394,7 +390,7 @@ export default {
 			let costStr = this.formData.executionCost != "" ? 'COST '+this.formData.executionCost+ ' ' : ''
 			let rowStr = this.formData.resultRows != "" ? 'ROWS '+ this.formData.resultRows + ' ' : ''
 			let sqls = 'CREATE FUNCTION "public"."'+this.formData.valueName+'" ('+strAgruments+') RETURNS '+this.formData.valueSetOf+' '+this.formData.valueReturns+this.formData.valueArray
-			+' AS "'+"'"+this.formData.valueDefinition+"'"+' LANGUAGE "sql" '+ costStr + rowStr + this.formData.properties[0]+' '+this.formData.properties[1]+ ' ' +this.formData.properties[2] 
+			+' AS "'+"'"+this.formData.definition.definition.value+"'"+' LANGUAGE "sql" '+ costStr + rowStr + this.formData.properties[0]+' '+this.formData.properties[1]+ ' ' +this.formData.properties[2] 
 			let self = this
 			let form = {
 				name: this.formData.valueName,
@@ -410,7 +406,8 @@ export default {
 				this.editFunction(form)
 			}
 		},
-		addFunction(){
+		addFunction(form){
+			let self = this
 			syqlFunctionApi.addFunction(form).then(res=>{
 				if(res.status == 200){
 					self.$emit('add-success')
@@ -431,7 +428,8 @@ export default {
 				})
 			})
 		},
-		editFUnction(){
+		editFunction(form){
+				let self = this
 			let id = this.$store.state.SyqlFunction.currentFunctionId
 			syqlFunctionApi.editFunction(id,form).then(res=>{
 				if(res.status == 200){
@@ -470,7 +468,14 @@ export default {
 						valueArgArray:'',
 					},
 				],
-				valueDefinition: '',
+				definition:{
+                   definition:{
+						"title": 'Deninition',
+						"type": "script",
+						"value": '',
+						"info": "",
+					}
+				},
 				executionCost: '',
 				resultRows: '',
 				properties:{
@@ -569,6 +574,9 @@ export default {
 	box-shadow: unset !important;
 	background-color: #f7f7f7 !important;
 	min-height: unset !important;
+}
+.form-syql-function-disable >>>  .v-input__slot{
+	pointer-events: none;
 }
 .form-syql-function >>> .v-input__slot input{
 	font-size: 13px !important;
