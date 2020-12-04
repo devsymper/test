@@ -58,6 +58,7 @@ var configs = {
         workflowExtend: "https://workflow-extend.symper.vn/",
         trash: "https://trash.symper.vn/",
 		log: "https://log.symper.vn",
+		syqlFunction:'https://syql.symper.vn/'
     },
     // nơi chứa domain của các api mà ko bị phụ thuộc vào môi trường 
 	uniqueApiDomain: {

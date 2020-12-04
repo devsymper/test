@@ -24,6 +24,8 @@
         "refresh": "Làm mới",
         "userDeletedName": "Email người xóa",
         "roleDeleted": "Role người xóa",
+        "parameter": "Tham số",
+        "content": "Nội dung",
         "userAgent": "Trình duyệt xóa",
         "deletedAt": "Thời gian xóa",
         "export_excel": "Xuất excel",
@@ -153,6 +155,7 @@
             "viewOrgchart": "Xem SĐTC mặc định",
             "list_workflow": "Danh sách quy trình",
             "list_work": "Danh sách công việc",
+            "syqlFunction": "SYQL Function",
             "environment": "Quản lí môi trường"
         },
         "system": "Vai trò người dùng",
