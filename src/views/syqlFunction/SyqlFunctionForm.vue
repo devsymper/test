@@ -250,8 +250,12 @@
 					Comment
 				</div>
 				<div class="ml-1 comment-content  mb-10" >
-					<form-tpl 
+					<!-- <form-tpl 
 						:allInputs="boxComment"
+						ref="formTpl"
+					/> -->
+					<Editor 
+						ref="editorBox"
 					/>
 				</div>
 			</div>
@@ -282,12 +286,14 @@ import FomulaEditor from '@/components/formula/editor/FormulaEditor'
 import DebugDialog from "./DebugDialog"
 import {syqlFunctionApi} from '@/api/SyqlFunction'
 import FormTpl from '@/components/common/FormTpl'
+import Editor from "@/components/common/editor/Editor"
 export default {
 	components:{
 		VuePerfectScrollbar,
 		FomulaEditor,
 		DebugDialog,
-		FormTpl
+		FormTpl,
+		Editor
 	},
 	props:{
 		action:{
@@ -350,7 +356,8 @@ export default {
 			this.$refs.fomulaEditor.toggleDebugView()
 		},
 		restoreFormdata(config){
-			this.formData = JSON.parse(config)
+			this.formData = JSON.parse(config.formData)
+			this.$refs.editorBox.setData(config.contentComment)
 		},
 		addAnotherAgrument(){
 			let obj = {
@@ -402,13 +409,18 @@ export default {
 			let sqls = 'CREATE FUNCTION "public"."'+this.formData.valueName+'" ('+strAgruments+') RETURNS '+this.formData.valueSetOf+' '+this.formData.valueReturns+this.formData.valueArray
 			+' AS "'+"'"+this.formData.definition.definition.value+"'"+' LANGUAGE "sql" '+ costStr + rowStr + this.formData.properties[0]+' '+this.formData.properties[1]+ ' ' +this.formData.properties[2] 
 			let self = this
+			let contentComment = this.$refs.editorBox.getData()
+			let config = {
+				formData: this.formData,
+				contentComment: contentComment
+			}
 			let form = {
 				name: this.formData.valueName,
 				parameter: arr.length > 0 ? arr.toString() : "",
 				content:sqls,
 				description: "test",
 				status:1,
-				config: JSON.stringify(this.formData)
+				config: JSON.stringify(config)
 			}
 			if(this.action == 'add'){
 				this.addFunction(form)
@@ -469,7 +481,6 @@ export default {
 				boxComment:{
 					"title": '',
 					"type": "editor",
-					"value": '',
 					"info": "",
 				}
 			},
