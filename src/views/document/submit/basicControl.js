@@ -204,6 +204,12 @@ export default class BasicControl extends Control {
                     instance: thisObj.curParentInstance
                 });
             })
+            // cần xóa dữ liệu của auto complete trong thuộc tính của input nếu un focus
+            this.ele.on('blur', function(e) {
+                if(thisObj.checkAutoCompleteControl()){
+                    $('#'+thisObj.id).removeAttr('data-autocomplete');
+                }
+            })
 
             this.ele.on('keyup', function(e) {
                 if (e.key == 'F2' && store.state.app.baInfo && Object.keys(store.state.app.baInfo).length > 0) {
