@@ -197,16 +197,21 @@ export default {
     },
 
     conditionExpressionMethod(el, elKey, attr, bpmnModeler, attrName) {
-        if (el.businessObject && attr.value.trim() != '') {
+        if (el.businessObject) {
             let moddle = bpmnModeler.get('moddle');
             let bizObj = el.businessObject;
             let elTagName = attr.toXML.name;
-            let value = attr.value.replace(/\n|\r\n/g,' ');
-            let newEl = moddle.create("bpmn:FormalExpression");
-            newEl['xsi:type'] = "tFormalExpression";
-            newEl.text = "<![CDATA[" + value + "]]>";
-            newEl.body = "<![CDATA[" + value + "]]>";
-            bizObj[elTagName] = newEl;
+
+            if(attr.value.trim() != ''){
+                let value = attr.value.replace(/\n|\r\n/g,' ');
+                let newEl = moddle.create("bpmn:FormalExpression");
+                newEl['xsi:type'] = "tFormalExpression";
+                newEl.text = "<![CDATA[" + value + "]]>";
+                newEl.body = "<![CDATA[" + value + "]]>";
+                bizObj[elTagName] = newEl;
+            }else if(bizObj[elTagName]){
+                delete bizObj[elTagName];
+            }
         }
     },
     // giống với formPropertyMethod
