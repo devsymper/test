@@ -235,7 +235,7 @@ export default {
 			deep: true,
             immediate: true,
             handler(obj){
-				this.showBtnAddCheckbox = true
+				// this.showBtnAddCheckbox = true
 				if(Object.keys(obj).length == 0){
 					this.disableBtn = true
 				}else{
@@ -277,6 +277,7 @@ export default {
 								}
 							)
 						}
+						this.showBtnAddCheckbox = true
 						self.$refs.listWorkFlow.refreshList()
 					}).catch(err=>{
 						self.$snotify(
@@ -308,6 +309,7 @@ export default {
 								title:" Chạy tác vụ thành công"
 							}
 						)
+						this.showBtnAddCheckbox = true
 						self.$refs.listWorkFlow.refreshList()
 					}).catch(err=>{
 						self.$snotify(
@@ -363,6 +365,7 @@ export default {
 				})
 			}
 			for(let i in this.listItemSelected){
+				
 				adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
 					self.$snotify(
 						{
@@ -370,6 +373,9 @@ export default {
 							title:" Xóa tác vụ thành công"
 						}
 					)
+					adminApi.deleteTask(this.listItemSelected[i].id).then(res=>{
+					}).catch(err=>{})
+					this.showBtnAddCheckbox = true
 					self.$refs.listWorkFlow.refreshList()
 				}).catch(err=>{
 					self.$snotify(
