@@ -48,8 +48,8 @@
                     <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
                 </v-btn>
                 <!-- test -->
-                 <v-btn small @click="showDialog" class="delete-record-btn">
-                    <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
+                 <v-btn small @click="deleteAll" class="delete-all-record-btn">
+                    <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.deleteAll')}}
                 </v-btn>
                 <!-- test -->
             </div>
@@ -430,7 +430,28 @@ export default {
         }
     },
     methods:{
-         onDocumentUpdateSuccess(){
+        deleteAll(){
+            let dataDoc = {
+                type:'all',
+                documentId:this.docId
+            };
+            const self = this;
+            documentApi.deleteAll(dataDoc).then(res=>{
+                if (res.status == 200) {
+                    self.$snotify({
+                        type: "success",
+                        title: "Delete all success!"
+                    });  
+                }
+                else{
+                    self.$snotify({
+                        type: "error",
+                        title: res.message
+                    });  
+                }
+            })
+        },
+        onDocumentUpdateSuccess(){
             this.actionOnRightSidebar = 'detail';
         },
         updateCurrentRecord(){
@@ -720,6 +741,11 @@ export default {
         position: absolute;
         bottom: 16px;
         right: 16px;
+    }
+    .delete-all-record-btn{
+        position: absolute;
+        bottom: 16px;
+        right: 106px;
     }
 
 </style>

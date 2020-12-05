@@ -2,6 +2,7 @@
     "common": {
         "number_instance": "Tổng số instance",
         "id": "Id",
+        "deleteAll": "Xóa tất cả",
         "required": "Bắt buộc",
         "select_lang": "Thay đổi ngôn ngữ",
         "KH": "Knowledge Management",
