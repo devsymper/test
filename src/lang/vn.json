@@ -679,6 +679,7 @@
             "userCreate": "Người tạo",
             "userUpdate": "Người cập nhật",
             "countRecord": "Số lượng bản ghi",
+            "allowSubmitOutsideWorkflow": "Submit ngoài quy trình",
             "history": {
                 "id": "STT",
                 "name": "Tên văn bản",

@@ -332,6 +332,11 @@ export default {
                     type: "checkbox",
                     value: (parseInt(props.isFullSize) === 0) ? false : true,
                 },
+                allowSubmitOutsideWorkflow  : {
+                    title: "Cho phép submit ngoài quy trình",
+                    type: "checkbox",
+                    value: (parseInt(props.isFullSize) === 0) ? false : true,
+                },
                 type : {
                     title: this.$t('document.editor.dialog.saveDoc.type'),
                     type: "select",
