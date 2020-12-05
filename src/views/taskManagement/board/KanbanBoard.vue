@@ -43,33 +43,36 @@
         </div>
         <VuePerfectScrollbar class="wrap-scroll">
             <div class="wrap-kanban-board py-4 h-100">
-                <div
-                    v-for="column in columns"
-                    :key="column.title"
-                    class="px-3 board-column-item rounded mr-4"
-                >
-                    <p class="title-column">{{column.title}}</p>
-                    <!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
-                    <VuePerfectScrollbar style="max-height: calc(100vh - 250px);">
-                        <draggable :list="column.tasks" :animation="250" ghost-class="ghost-card" group="tasks">
-                            <!-- Each element from here will be draggable and animated. Note :key is very important here to be unique both for draggable and animations to be smooth & consistent. -->
-                            <task-card
-                                v-for="(task) in column.tasks"
-                                :key="task.id"
-                                :task="task"
-                                class="mt-3 cursor-move"
-                            ></task-card>
-                            <!-- </transition-group> -->
-                        </draggable>
+                <draggable :list="columns" :animation="250">
+                     <div
+                        v-for="column in columns"
+                        :key="column.title"
+                        class="px-3 board-column-item rounded mr-4"
+                    >
+                        <p class="title-column">{{column.title}}</p>
+                        <!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
+                        <VuePerfectScrollbar style="max-height: calc(100vh - 250px);">
+                            <draggable :list="column.tasks" :animation="250" ghost-class="ghost-card" group="tasks">
+                                <!-- Each element from here will be draggable and animated. Note :key is very important here to be unique both for draggable and animations to be smooth & consistent. -->
+                                <task-card
+                                    v-for="(task) in column.tasks"
+                                    :key="task.id"
+                                    :task="task"
+                                    class="mt-3 cursor-move"
+                                ></task-card>
+                                <!-- </transition-group> -->
+                            </draggable>
+                            
+                        </VuePerfectScrollbar>
+                        <div class="text-center mt-2">
+                            <v-btn depressed height="25">
+                            <v-icon>mdi-plus</v-icon>
+                            </v-btn>
+                        </div>
                         
-                    </VuePerfectScrollbar>
-                    <div class="text-center mt-2">
-                        <v-btn depressed height="25">
-                        <v-icon>mdi-plus</v-icon>
-                        </v-btn>
                     </div>
-                    
-                </div>
+                </draggable>
+               
             </div>
         </VuePerfectScrollbar>
     </div>
