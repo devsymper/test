@@ -706,7 +706,7 @@ export default {
                 
                 
             } catch (error) {
-                
+                console.warn(error);
             }
             
         });
