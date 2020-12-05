@@ -1,5 +1,6 @@
 import Formulas from "./formulas";
-import sDocument from './../../../store/document'
+import sDocument from './../../../store/document';
+import Util from './util';
 import {
     markBinedField
 } from './handlerCheckRunFormulas';
@@ -271,8 +272,9 @@ export default class Control {
                 tableControlInstance.tableInstance.addToValueMap(cellPos, {
                     msg: msg,
                     type: "validate",
-                    value: msg != null && msg != "",
+                    value: (msg != '' && msg != null && msg != undefined && msg != 'f'),
                 });
+                
             }
             tableControlInstance.tableInstance.tableInstance.render()
         }
@@ -431,9 +433,9 @@ export default class Control {
     handlerDataAfterRunFormulasUniqueDB(data, dataInput) {
         if (this.inTable == false) {
             if (data == 't' || data === true) {
-                this.renderValidateIcon('Dữ liệu đã tồn tại');
+                this.renderValidateIcon('Dữ liệu trường thông tin '+this.title+' đã tồn tại','UniqueDB');
             } else {
-                this.removeValidateIcon();
+                this.removeValidateIcon('UniqueDB');
             }
         } else {
             let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
@@ -457,13 +459,37 @@ export default class Control {
             tableControl.tableInstance.tableInstance.render();
         }
     }
-    renderValidateIcon(message) {
-        let controlTitle = (this.title == "") ? this.name : this.title;
-        let icon = `<span class="mdi mdi-checkbox-blank-circle validate-icon" controlTitle="` + controlTitle + `" title="` + message + `"></span>`
-        this.ele.parent().append(icon);
+    getCurrentValidate(){
+        return this.getDataStoreSubmit()['validateMessage'][this.nane]
     }
-    removeValidateIcon() {
-        this.ele.parent().find('.validate-icon').remove();
+    renderValidateIcon(message, type) {
+        let iconEl = Util.makeErrNoti(this.name);
+        this.ele.parent().append(iconEl);
+        let currentValidate = this.getCurrentValidate();
+        if(!currentValidate){
+            currentValidate = {};
+        }
+        currentValidate[type] = message;
+        store.commit("document/updateValidateControlSubmit", {
+            controlName: this.name,
+            value: currentValidate,
+            instance: this.curParentInstance
+        });
+    }
+    removeValidateIcon(type) {
+        let currentValidate = this.getCurrentValidate();
+        if(currentValidate && currentValidate[type]){
+            delete currentValidate[type];
+            store.commit("document/updateValidateControlSubmit", {
+                controlName: this.name,
+                value: currentValidate,
+                instance: this.curParentInstance
+            });
+        }
+        else{
+            this.ele.parent().find('.validate-icon').remove();
+        }
+        
     }
     isEmpty() {
             return this.ele.val() == ""
@@ -554,17 +580,17 @@ export default class Control {
         } else {
             let checkMax = false;
             if (this.controlProperties.maxValue.value != "") {
-                this.removeValidateIcon();
+                this.removeValidateIcon('MaxLength');
                 if (this.value.length > this.controlProperties.maxValue.value) {
                     checkMax = true;
-                    this.renderValidateIcon('Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự");
+                    this.renderValidateIcon('Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự", 'MaxLength');
                     rs = false;
                 }
             }
             if (this.controlProperties.minValue.value != "" && !checkMax) {
-                this.removeValidateIcon()
+                this.removeValidateIcon('MinLength');
                 if (this.value.length < this.controlProperties.minValue.value) {
-                    this.renderValidateIcon('Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự");
+                    this.renderValidateIcon('Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự", 'MinLength');
                     rs = false;
                 }
             }

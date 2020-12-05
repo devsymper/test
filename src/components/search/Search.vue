@@ -79,7 +79,8 @@
     </v-combobox>
 </template>
 <script>
-import _ from 'lodash';
+import _debounce from 'lodash/debounce';
+import _groupBy from 'lodash/groupBy';
 import SymperAvatar from '../../components/common/SymperAvatar'
 import searchApi from "../../api/search.js";
 export default {
@@ -136,7 +137,7 @@ export default {
         };
     },
      created: function () {
-        this.debouncedGetValueSearch = _.debounce(this.getValueSearch, 250)
+        this.debouncedGetValueSearch = _debounce(this.getValueSearch, 250)
     },
      watch: {
         value(){
@@ -252,7 +253,7 @@ export default {
                                
                                 return returnObjSearch;
                             })
-                            const groupByType = _.groupBy(normalizedData, 'type');
+                            const groupByType = _groupBy(normalizedData, 'type');
                             const searchData = [];
                             const allData = [];
                             Object.keys(groupByType).forEach(type => {

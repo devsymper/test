@@ -286,7 +286,16 @@ const getAndSetUserOperations = async function(context) {
             }
 
             let sections = op.objectIdentifier.split(':');
-            let id = sections[2] ? sections[1]+':'+sections[2]+':'+sections[3] : sections[1];
+            let id = '';
+            if(sections[2]){
+                id = sections[1]+':'+sections[2];
+                if(sections[3]){
+                    id += (':' + sections[3])
+                }
+            }else{
+                id = sections[1];
+            }
+            // let id = sections[2] ? sections[1]+':'+sections[2]+':'+sections[3] : sections[1];
 
             if (!id || id == '0') { // xét các trường hợp từ trước đến nay là set cho tất cả các object trong danh sách
                 id = 0;

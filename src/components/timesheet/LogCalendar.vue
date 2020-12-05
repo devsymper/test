@@ -208,10 +208,9 @@ import ViewDetailMonth from "./../../components/timesheet/ViewDetailMonth";
 import LogTimeView from "./../../components/timesheet/LogTimeView";
 import DeleteLogView from "./../../components/timesheet/DeleteLogView";
 import timesheetApi from '../../api/timesheet';
-
 import { mapState} from 'vuex';
 
-import _ from 'lodash';
+import _groupBy from 'lodash/groupBy';
 
 export default {
     name: "LogCalendar",
@@ -311,6 +310,7 @@ export default {
                 })
         },
         copyLogTime(event){
+            
               timesheetApi.createLogTime({
                 start:this.$moment(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm"),
                 end: this.$moment(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm"),
@@ -489,9 +489,10 @@ export default {
             }
         },
         async endDrag() {
+            let self = this;
             async function updateEvent(event, duration) {
-                let start = this.$moment(event.start);
-                let end = this.$moment(event.end);
+                let start = self.$moment(event.start);
+                let end = self.$moment(event.end);
                 let res = await timesheetApi.updateLogTime({
                     start: start.format("YYYY-MM-DD HH:mm"),
                     end: end.format("YYYY-MM-DD HH:mm"),
@@ -674,7 +675,7 @@ export default {
         },
         monthEvents() {
             if (this.events) {
-                return _.groupBy(this.events, 'date');
+                return _groupBy(this.events, 'date');
             } else {
                 return [];
             }

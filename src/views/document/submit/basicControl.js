@@ -53,7 +53,7 @@ export default class BasicControl extends Control {
             this.ele.wrap('<span style="position:relative;display:inline-block">');
             this.ele.attr('key-instance', this.curParentInstance);
             if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
-                this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title);
+                this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title, 'Require');
             }
             if (!this.checkDetailView() && this.checkProps('isReadOnly')) {
                 this.ele.attr('disabled', 'disabled');
@@ -203,6 +203,12 @@ export default class BasicControl extends Control {
                     value: thisObj.name,
                     instance: thisObj.curParentInstance
                 });
+            })
+            // cần xóa dữ liệu của auto complete trong thuộc tính của input nếu un focus
+            this.ele.on('blur', function(e) {
+                if(thisObj.checkAutoCompleteControl()){
+                    $('#'+thisObj.id).removeAttr('data-autocomplete');
+                }
             })
 
             this.ele.on('keyup', function(e) {

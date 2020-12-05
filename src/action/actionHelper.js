@@ -15,7 +15,9 @@ export const actionHelper = {
         let opsMap = SYMPER_APP.$store.state.app.userOperations;
         let userInfo = util.auth.getSavedUserInfo();
         let userType = userInfo.profile.type;
-
+        if(objectType == 'document_instance'){
+            objId = objId+':0'
+        }
         if (userType == 'ba') {
             return returnArr ? Object.values(collection) : collection;
         } else {

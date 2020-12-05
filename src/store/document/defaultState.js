@@ -86,6 +86,17 @@ const defaultState = {
                 tableName:"",
                 key:"",
                 data:{}
+            },
+            /**
+             * lưu các control vi phạm trong submit
+             * key:controlName
+             * value:{ require:{
+             *      isValid:false,
+             *      message:'khong được bỏ trống'
+             * }}
+             */
+            validateMessage:{
+
             }
         }
     },
@@ -111,7 +122,8 @@ const defaultState = {
     },
     documentStyle: {
 
-    }
+	},
+	currentTitle:''
 };
 
 export default defaultState;
