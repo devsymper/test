@@ -20,7 +20,9 @@ const setListComponent = (state, listComponentInProject) => {
 const setListVersion = (state, listVersionInProject) => {
     Vue.set(state, 'listVersionInProject', listVersionInProject);
 }
-
+const setListColumnInBoard = (state, listColumnInBoard) => {
+    Vue.set(state, 'listColumnInBoard', listColumnInBoard);
+}
 
 const setCurrentProject = (state, currentProject) => {
     Vue.set(state, 'currentProject', currentProject);
@@ -151,5 +153,6 @@ export {
     setInfoVersionCurrent,
     setInfoComponentCurrent,
     removeProjectToStore,
+    setListColumnInBoard,
 
 };

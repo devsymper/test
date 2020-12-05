@@ -94,6 +94,11 @@ export default {
             return this.$store.state.taskManagement;
         },
     },
+    watch:{
+        currentBoard: function(newVl) {
+            this.getColumnInBoard(newVl.id);
+        }
+    },
     data() {
         let self=this;
         return {
@@ -408,7 +413,8 @@ export default {
                 ]
                 }
             ],
-            currentBoard:{}
+            currentBoard:{},
+            columnInBoard:[]
         };
     },
     methods:{
@@ -422,6 +428,17 @@ export default {
                 }
             }
         },
+        getColumnInBoard(){
+           let idBoard = this.currentBoard.id;
+           if (idBoard) {
+               let res = taskManagementApi.getListColumn(idBoard);
+               if (res.status==200 && res.data) {
+                    this.columnInBoard=res.data.listObject;
+                    this.$store.commit("taskManagement/setListColumnInBoard", res.data.listObject);
+               }
+
+           }
+        },
         setBoardCurrent(){
             setTimeout((self) => {
                 let allBoard=self.$store.state.taskManagement.listBoardInProject;
@@ -429,7 +446,6 @@ export default {
                     self.currentBoard=allBoard[0];  
                 }
             }, 500,this);
-           
         }
     },
     async created(){
@@ -442,8 +458,7 @@ export default {
         });
         await this.getListBoard();
         this.setBoardCurrent();
-       
-  
+        this.getColumnInBoard();
         
     },
     activated(){

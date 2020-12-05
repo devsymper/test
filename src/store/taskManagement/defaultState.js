@@ -14,7 +14,8 @@ const defaultState = {
         ],
         allLink:[],
         currentNodeSelected:{},
-    }
+    },
+    listColumnInBoard:[]
 };
 
 export default defaultState;

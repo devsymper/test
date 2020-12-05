@@ -107,4 +107,12 @@ export const taskManagementApi = {
     removeVersion(id){
         return taskManagement.delete("versions/"+id);
     }, 
+
+    //// column in board
+    getListColumn(boardId){
+        return taskManagement.get("columns/"+boardId);
+    },
+    addColumn(data){
+        return taskManagement.post("columns",data);
+    },
 }
