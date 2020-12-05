@@ -223,5 +223,17 @@ export default {
         filter= JSON.stringify(filter);
         return bpmneApi.post(appConfigs.apiDomain.bpmne.postTasksHistory , filter, testHeader);
     },
-
+    getXMLFromProcessDefId(defId){
+        let self = this;
+        return new Promise(async (resolve, reject) => {
+            let defData = await bpmneApi.get(appConfigs.apiDomain.bpmne.definitions + '/' + defId, {}, testHeader);
+            if(!defData.exception){
+                let resourceDataUrl = appConfigs.apiDomain.bpmne.general + 'symper-rest/service/repository/deployments/'+defData.deploymentId+'/resourcedata/process_draft.bpmn';
+                let prveXML = await self.getDefinitionXML(resourceDataUrl);
+                resolve(prveXML);
+            }else{
+                reject(defData);
+            }
+        });
+    }
 };
