@@ -115,4 +115,12 @@ export const taskManagementApi = {
     addColumn(data){
         return taskManagement.post("columns",data);
     },
+
+    /// workflow
+    getListWorkflow(){
+        return taskManagement.get("task-life-circle");
+    },
+    addWorkflow(data){
+        return taskManagement.post("task-life-circle",data);
+    },
 }

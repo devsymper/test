@@ -3,6 +3,9 @@
         <h1>Workflow</h1>
         <div class="py-2">
             Cấu hình quy trình hoàn thành task
+            <v-btn small class="ml-1 px-1" solo depressed @click="dialogSave = true" color="#1976d2">
+                <span style="color:white">{{$t('common.save')}}</span>
+            </v-btn>
         </div>
         
         <div class="wrap-workflow-config__content">
@@ -35,6 +38,44 @@
             </div>
 
         </div>
+        <v-dialog
+            v-model="dialogSave"
+            persistent
+            max-width="500px"
+        >
+            <v-card>
+                <v-card-title>
+                    <span class="headline">Create workflow</span>
+                </v-card-title>
+                <v-card-text>
+                    <v-container>
+                        <div>
+                            <form-tpl
+                            :allInputs="dataWorkflowProps"/>
+                        </div>
+                        <small style="color:red">*{{$t("taskManagement.requiredField")}}</small>
+                    </v-container>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                        <v-btn
+                            color="blue darken-1"
+                            text
+                            :loading="isLoading"
+                            @click="addWorkflow"
+                        >
+                            {{$t("common.add")}}
+                        </v-btn>
+                        <v-btn
+                            color="red darken-1"
+                            text
+                            @click="dialogSave = false"
+                        >
+                            {{$t("common.close")}}
+                        </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -59,6 +100,49 @@ export default {
        await this.getListRole();
     },
     methods:{
+        validateData(){
+            let data=this.dataWorkflowProps;
+            for (var key in data) {
+                data[key].validate();
+                if (data[key].validateStatus.isValid==false) {
+                    return false
+                }
+            }
+            return true;
+        },
+        addWorkflow(){
+            this.isLoading= true;
+            let self=this;
+            let isValid = this.validateData();
+            if (isValid) {
+                if (!self.dataWorkflowProps.name.value  ) {
+                    self.$snotifyError("", "Can not add workflow!");
+                }else{
+                    let data = {};
+                    data.name = self.dataWorkflowProps.name.value;
+                    data.description =self.dataWorkflowProps.description.value;
+                    data.nodes = JSON.stringify(self.listNode);
+                    data.links = JSON.stringify(self.listLink);
+                    data.data  = JSON.stringify(self.dataWorkflow);
+                    taskManagementApi
+                        .addWorkflow(data)
+                        .then(res => {
+                            if (res.status == 200) {
+                                self.$snotifySuccess("Add workflow completed!");
+                                self.dialogSave=false;
+                            }else if(res.status==400){
+                                self.$snotifyError("", "Validate key error",res.message);
+                            }
+                        })
+                        .catch(err => {
+                            self.$snotifyError("", "Can not add workflow!", err);
+                        })
+                        .always(() => {});
+                }
+            }
+            this.isLoading = false;
+
+        },
         async getListRole(){
             let self = this;
             let allRole = await taskManagementApi.getListRole();
@@ -103,6 +187,8 @@ export default {
                 }
             
             });
+            this.dataWorkflow.nodes.push(rectReview);
+
             rectReview.addTo(this.graph);
             this.$set(newStatus.id,"value",rectReview.id);
             this.nodeConfig = newStatus;
@@ -110,7 +196,6 @@ export default {
 
         },
         afterAddLinkClick(linkInfo){
-            this.listLink.push(linkInfo);
             let link1 = new joint.shapes.standard.Link({
                 source: { id: linkInfo.from.value },
                 target: { id: linkInfo.to.value },
@@ -134,11 +219,16 @@ export default {
                     }
                 }
             });
+            this.$set(linkInfo.id,"value",link1.id);
+            this.listLink.push(linkInfo);
+            this.dataWorkflow.links.push(link1);
             link1.addTo(this.graph);
         }
     },
     data(){
         return {
+            isLoading:false,
+            dialogSave:false,
             showPopUpAddStatus:false,
             graph:null,
             listNode:[],
@@ -201,6 +291,42 @@ export default {
                     }
                 },
             },
+            dataWorkflowProps:{
+                name : { 
+                    title: "Name",
+                    type: "text",
+                    value: '',
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
+                    validate(){
+                        if (this.value=="") {
+                            this.validateStatus.isValid=false;
+                            this.validateStatus.message="Không bỏ trống";
+                        }else{
+                            this.validateStatus.isValid=true;
+                            this.validateStatus.message="";
+                        }
+                    }
+                },
+                description : {
+                    title: "Mô tả",
+                    type: "text",
+                    value: '',
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    validate(){
+                    }
+                },
+            },
+            dataWorkflow:{
+                links:[],
+                nodes:[]
+            }
+
         }
     },
     mounted() {
@@ -253,6 +379,7 @@ export default {
 
 
         var rectStart = new joint.shapes.standard.Rectangle();
+
         rectStart.position(100, 130);
         rectStart.resize(40, 40);
         rectStart.attr({
@@ -264,6 +391,8 @@ export default {
             },
         
         });
+        this.dataWorkflow.nodes.push(rectStart);
+
         rectStart.addTo(this.graph);
         var rectBacklog = new joint.shapes.standard.Rectangle();
         rectBacklog.position(250, 130);
@@ -280,6 +409,7 @@ export default {
             }
         
         });
+        this.dataWorkflow.nodes.push(rectBacklog);
         rectBacklog.addTo(this.graph);
         this.$set(nodeDefaultInfo.id,"value",rectBacklog.id);
         this.listNode.push(nodeDefaultInfo);
@@ -309,11 +439,11 @@ export default {
                 }
             }
         });
-
         this.$set(this.linkDefaultInfo.from,"value",rectStart.id);
         this.$set(this.linkDefaultInfo.to,"value",rectBacklog.id);
         this.$set(this.linkDefaultInfo.id,"value",link1.id);
         this.listLink.push(this.linkDefaultInfo);
+        this.dataWorkflow.links.push(link1);
 
         this.graph.addCells([rectBacklog, link1]);
 

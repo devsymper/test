@@ -1302,6 +1302,7 @@
         "listComponent":"List component",
         "listVersion":"List version",
         "listIssueType":"List Issue type",
+        "listWorkflow":"List Workflow",
         "detailProject":"Detail project",
         "requiredField":"Indicates required field",
         "addPeople":"Add people",
@@ -1310,8 +1311,9 @@
         "dialog":{
             "removeUser": "You will remove members from this project?",
             "removeRole": "You will remove role from this rols.",
-            "removeCategory": "You will remove category from this rols.",
-            "removeComponent": "You will remove component from this rols."
+            "removeCategory": "You will remove category from this list.",
+            "removeComponent": "You will remove component from this list.",
+            "removeWorkflow": "You will remove workflow from this list."
 
         },
         "settingBoard":"Board setting"

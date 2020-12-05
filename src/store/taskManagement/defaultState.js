@@ -15,7 +15,8 @@ const defaultState = {
         allLink:[],
         currentNodeSelected:{},
     },
-    listColumnInBoard:[]
+    listColumnInBoard:[],
+    allWorkflow:[],
 };
 
 export default defaultState;

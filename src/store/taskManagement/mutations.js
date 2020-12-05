@@ -24,6 +24,9 @@ const setListColumnInBoard = (state, listColumnInBoard) => {
     Vue.set(state, 'listColumnInBoard', listColumnInBoard);
 }
 
+const setAllWorkflow = (state, allWorkflow) => {
+    Vue.set(state, 'allWorkflow', allWorkflow);
+}
 const setCurrentProject = (state, currentProject) => {
     Vue.set(state, 'currentProject', currentProject);
 }
@@ -154,5 +157,6 @@ export {
     setInfoComponentCurrent,
     removeProjectToStore,
     setListColumnInBoard,
+    setAllWorkflow,
 
 };

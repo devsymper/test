@@ -50,20 +50,20 @@ export default [
                     TaskManagement: () => import ('../../views/taskManagement/project/setting/Access.vue')
                 }
             },
-            // {
-            //     path: "workflow",
-            //     meta:{group:'projectSetting'},
-            //     name: "issueTypeWorkflow",
-            //     components:{
-            //         TaskManagement: () => import ('../../views/taskManagement/projectSetting/Workflow.vue')
-            //     }
-            // },
+            {
+                path: "workflow",
+                meta:{group:'projectSetting'},
+                name: "listWorkflow",
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/workflow/List.vue')
+                }
+            },
             {
                 path: "workflow/create",
                 meta:{group:'projectSetting'},
                 name: "issueTypeWorkflow",
                 components:{
-                    TaskManagement: () => import ('../../views/taskManagement/projectSetting/Workflow.vue')
+                    TaskManagement: () => import ('../../views/taskManagement/workflow/Workflow.vue')
                 }
             },
             {

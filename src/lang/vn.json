@@ -1426,6 +1426,7 @@
         "listComponent":"Danh sách component",
         "listVersion":"Danh sách version",
         "listIssueType":"Danh sách Issue type",
+        "listWorkflow":"Danh sách Workflow",
         "requiredField":"Trường bắt buộc nhập",
         "detailProject":"Thông tin project",
         "addPeople":"Thêm thành viên",
@@ -1435,7 +1436,8 @@
             "removeUser": "Bạn sẽ xóa thành viên khỏi project này",
             "removeRole": "Bạn sẽ xóa role này khỏi danh sách.",
             "removeCategory": "Bạn sẽ xóa danh mục này khỏi danh sách.",
-            "removeComponent": "Bạn sẽ xóa component này khỏi danh sách."
+            "removeComponent": "Bạn sẽ xóa component này khỏi danh sách.",
+            "removeWorkflow": "Bạn sẽ xóa workflow này khỏi danh sách."
         },
         "settingBoard":"Cài đặt Board"
 
