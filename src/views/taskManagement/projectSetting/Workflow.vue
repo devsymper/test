@@ -25,7 +25,7 @@
                         :label="`Hiển thị nhãn link`"
                         dense   
                     ></v-checkbox>
-                    <add-status-view ref="popupAddStatusView" @after-add-status-click="afterAddStatusClick"/>
+                    <add-status-view ref="popupAddStatusView" :listRole="listRole" @after-add-status-click="afterAddStatusClick"/>
                     <add-link-view :listNode="listNode" ref="popupAddLinkView" @after-add-link-click="afterAddLinkClick"/>
                 </div>
                 <div id="task-workflow"></div>
@@ -42,7 +42,9 @@
 import FormTpl from '@/components/common/FormTpl.vue';
 import AddStatusView from '@/components/taskManagement/workflow/AddStatusView.vue';
 import AddLinkView from '../../../components/taskManagement/workflow/AddLinkView.vue';
-import {getStatusDefault} from '../../../components/taskManagement/config.js'
+import {getStatusDefault} from '../../../components/taskManagement/config.js';
+import { taskManagementApi } from "@/api/taskManagement.js";
+
 import {
     util
 } from "@/plugins/util.js";
@@ -53,10 +55,24 @@ export default {
         AddStatusView,
         AddLinkView
     },
-    created(){
-       
+    async created(){
+       await this.getListRole();
     },
     methods:{
+        async getListRole(){
+            let self = this;
+            let allRole = await taskManagementApi.getListRole();
+            if (allRole.status == 200 && allRole.data) {
+                let listRole=allRole.data.listObject;
+                listRole = listRole.reduce((arr, obj)=>{
+                    let newObj = {text:obj.name,value:obj.id};
+                    arr.push(newObj);
+                    return arr
+                },[]);
+
+                this.listRole=listRole;
+            }
+        },
         showPopupAddStatusView(){
             this.$refs.popupAddStatusView.show()
         },
@@ -71,8 +87,6 @@ export default {
         },
         afterAddStatusClick(status){
             let newStatus = util.cloneDeep(status);
-            this.nodeConfig = newStatus;
-            this.listNode.push(newStatus);
             let nodeWidth = this.getTextWidth(newStatus.name.value) + 20;
             var rectReview = new joint.shapes.standard.Rectangle();
             rectReview.position(500, 230);
@@ -90,12 +104,16 @@ export default {
             
             });
             rectReview.addTo(this.graph);
+            this.$set(newStatus.id,"value",rectReview.id);
+            this.nodeConfig = newStatus;
+            this.listNode.push(newStatus);
+
         },
         afterAddLinkClick(linkInfo){
             this.listLink.push(linkInfo);
             let link1 = new joint.shapes.standard.Link({
-                source: { id: rectStart.id },
-                target: { id: rectEnd.id },
+                source: { id: linkInfo.from.value },
+                target: { id: linkInfo.to.value },
                 attrs: {
                     line: {
                         connection: true,
@@ -112,7 +130,7 @@ export default {
             link1.appendLabel({
                 attrs: {
                     text: {
-                        text: 'all'
+                        text: linkInfo.name.value
                     }
                 }
             });
@@ -125,13 +143,70 @@ export default {
             graph:null,
             listNode:[],
             listLink:[],
-            nodeConfig:{}
+            listRole:[],
+            nodeConfig:{},
+            linkDefaultInfo:{
+                id : { 
+                    title: "Bắt đầu từ trạng thái",
+                    type: "select",
+                    value:"",
+                    hidden:true
+                },
+                from : { 
+                    title: "Bắt đầu từ trạng thái",
+                    type: "select",
+                    value:"",
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
+                    validate(){
+                    
+                    }
+                },
+                to : { 
+                    title: "Kết thúc đến trạng thái",
+                    type: "select",
+                    value:"",
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
+                    validate(){
+                    
+                    }
+                },
+                name : { 
+                    title: "Tên",
+                    type: "text",
+                    value:"",
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
+                    validate(){
+                    
+                    }
+                },
+                desscription : { 
+                    title: "Mô tả",
+                    type: "text",
+                    value:"all",
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
+                    validate(){
+                    
+                    }
+                },
+            },
         }
     },
     mounted() {
+        let self=this;
         let nodeDefaultInfo = getStatusDefault();
-        nodeDefaultInfo.name.value = "Back log"
-        this.listNode.push(nodeDefaultInfo);
+        nodeDefaultInfo.name.value = "Back log";
         this.graph = new joint.dia.Graph;
 
         let paper = new joint.dia.Paper({
@@ -145,90 +220,72 @@ export default {
                 color: '#fff'
             }
         });
+        paper.on('blank:pointerclick', function() {
+           // resetAll(this);
 
+            // info.attr('body/visibility', 'hidden');
+            // info.attr('label/visibility', 'hidden');
+
+            // this.drawBackground({
+            //     color: 'orange'
+            // })
+        });
+
+        paper.on('element:pointerclick', function(elementView) {
+            let idNode=elementView.model.id;
+            let node=self.listNode.find(ele => ele.id.value == idNode);
+            if (node) {
+                self.nodeConfig=node;
+            }
+            //resetAll(this);
+
+            // var currentElement = elementView.model;
+            // currentElement.attr('body/stroke', 'orange')
+        });
+
+        paper.on('link:pointerclick', function(linkView) {
+            let idLink=linkView.model.id;
+            let link=self.listLink.find(ele => ele.id.value == idLink);
+            if (link) {
+                self.nodeConfig=link;
+            }
+        });
 
 
         var rectStart = new joint.shapes.standard.Rectangle();
-            rectStart.position(100, 130);
-            rectStart.resize(40, 40);
-            rectStart.attr({
-                body: {
-                    fill: 'gray',
-                    rx: 20,
-                    ry: 20,
-                    strokeWidth: 0
-                },
-            
-            });
-            rectStart.addTo(this.graph);
-            var rectBacklog = new joint.shapes.standard.Rectangle();
-            rectBacklog.position(250, 130);
-            rectBacklog.resize(100, 40);
-            rectBacklog.attr({
-                body: {
-                    fill: '#dfe1e6',
-                    strokeWidth: 0
-                },
-                label:{
-                    text:'Back log',
-                    fontWeight:500,
-                    fill:'black'
-                }
-            
-            });
-            rectBacklog.addTo(this.graph);
+        rectStart.position(100, 130);
+        rectStart.resize(40, 40);
+        rectStart.attr({
+            body: {
+                fill: 'gray',
+                rx: 20,
+                ry: 20,
+                strokeWidth: 0
+            },
+        
+        });
+        rectStart.addTo(this.graph);
+        var rectBacklog = new joint.shapes.standard.Rectangle();
+        rectBacklog.position(250, 130);
+        rectBacklog.resize(100, 40);
+        rectBacklog.attr({
+            body: {
+                fill: '#dfe1e6',
+                strokeWidth: 0
+            },
+            label:{
+                text:'Back log',
+                fontWeight:500,
+                fill:'black'
+            }
+        
+        });
+        rectBacklog.addTo(this.graph);
+        this.$set(nodeDefaultInfo.id,"value",rectBacklog.id);
+        this.listNode.push(nodeDefaultInfo);
 
 
-
-        //     let rect = new joint.shapes.standard.Rectangle({
-        //         position: { x: 600, y: 130 },
-        //         size: { width: 100, height: 40 },
-        //         attrs: {
-        //             label: { text: 'In progress', fill: 'white',fontWeight:500 },
-        //             body:{
-        //                 fill:'#0052cc',
-        //                 strokeWidth: 0
-
-        //             }
-                    
-        //         }
-        //     });
-
-
-        //     var rectReview = new joint.shapes.standard.Rectangle();
-        //     rectReview.position(800, 130);
-        //     rectReview.resize(100, 40);
-        //     rectReview.attr({
-        //         body: {
-        //             fill: '#00875a',
-        //             strokeWidth: 0
-        //         },
-        //         label:{
-        //             text:'Done',
-        //             fill:'white',
-        //             fontWeight:500
-        //         }
-            
-        //     });
-        //     rectReview.addTo(this.graph);
-
-
-        // let link = new joint.shapes.standard.Link({
-        //     source: { id: rectBacklog.id },
-        //     target: { id: rect.id },
-        //     attrs: {
-        //         line: {
-        //             connection: true,
-        //             stroke: '#333333',
-        //             strokeWidth: 1,
-        //             strokeLinejoin: 'round',
-        //             targetMarker: {
-        //                 'type': 'path',
-        //                 'd': 'M 10 -5 0 0 10 5 z'
-        //             }
-        //         },
-        //     },
-        // });
+    
         let link1 = new joint.shapes.standard.Link({
             source: { id: rectStart.id },
             target: { id: rectBacklog.id },
@@ -252,26 +309,14 @@ export default {
                 }
             }
         });
-        // let link2 = new joint.shapes.standard.Link({
-        //     source: { id: rect.id },
-        //     attrs: {
-        //         line: {
-        //             connection: true,
-        //             stroke: '#333333',
-        //             strokeWidth: 1,
-        //             strokeLinejoin: 'round',
-        //             targetMarker: {
-        //                 'type': 'path',
-        //                 'd': 'M 10 -5 0 0 10 5 z'
-        //             }
-        //         },
-        //     },
-        //     target: { id: rectReview.id }
-        // });
-        
 
+        this.$set(this.linkDefaultInfo.from,"value",rectStart.id);
+        this.$set(this.linkDefaultInfo.to,"value",rectBacklog.id);
+        this.$set(this.linkDefaultInfo.id,"value",link1.id);
+        this.listLink.push(this.linkDefaultInfo);
 
         this.graph.addCells([rectBacklog, link1]);
+
     }
 }
 </script>

@@ -25,14 +25,7 @@ export default [
                     TaskManagement: () => import ('../../views/taskManagement/board/KanbanBoard.vue'),
                 }
             },
-            {
-                path: "projects/:id/workflow",
-                meta:{group:'projectSetting'},
-                name: "issueTypeWorkflow",
-                components:{
-                    TaskManagement: () => import ('../../views/taskManagement/projectSetting/Workflow.vue')
-                }
-            },
+          
             {
                 path: "projects/:id/kanban-board/settings/:idBoard",
                 name: "kanbanBoardSetting",
@@ -57,8 +50,16 @@ export default [
                     TaskManagement: () => import ('../../views/taskManagement/project/setting/Access.vue')
                 }
             },
+            // {
+            //     path: "workflow",
+            //     meta:{group:'projectSetting'},
+            //     name: "issueTypeWorkflow",
+            //     components:{
+            //         TaskManagement: () => import ('../../views/taskManagement/projectSetting/Workflow.vue')
+            //     }
+            // },
             {
-                path: "workflow",
+                path: "workflow/create",
                 meta:{group:'projectSetting'},
                 name: "issueTypeWorkflow",
                 components:{
@@ -93,6 +94,14 @@ export default [
                 meta:{group:'home'},
                 components:{
                     TaskManagement: () => import ('../../views/taskManagement/component/List.vue')
+                }
+            },
+            {
+                path: "projects/:id/components/:idComponent",
+                name: "ComponentDetail",
+                meta:{group:'home'},
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/component/DetailComponent.vue')
                 }
             },
             

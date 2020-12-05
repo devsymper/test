@@ -20,6 +20,12 @@ const statusCategory = [
     
 ]
 const statusInfo = {
+    id : { 
+        title: "id",
+        type: "text",
+        value: '',
+        hidden:true
+    },
     name : { 
         title: "Name",
         type: "text",

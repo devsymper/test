@@ -309,6 +309,9 @@ export default {
     },
     name:"Access",
     computed:{
+        sTaskManagement() {
+            return this.$store.state.taskManagement;
+        },
         allUserInProject(){
             let users=this.listUser;
             let allUser=this.$store.state.app.allUsers;
@@ -619,7 +622,7 @@ export default {
             }
             if (count == Object.keys(obj.children).length) {
                 obj.isAllow=true;
-            }else if (count==0) {
+            }else {
                 obj.isAllow=false;
             }
         },

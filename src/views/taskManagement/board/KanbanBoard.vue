@@ -97,6 +97,11 @@ export default {
             return this.$store.state.taskManagement;
         },
     },
+    watch:{
+        currentBoard: function(newVl) {
+            this.getColumnInBoard(newVl.id);
+        }
+    },
     data() {
         let self=this;
         return {
@@ -104,12 +109,15 @@ export default {
                 { 
                     title: this.$t("taskManagement.settingBoard"),
                     menuAction: action => {
-                       if (Object.keys(self.currentBoard).length > 0) {
-                            let id=self.$route.params.id;
+                        let id=self.$route.params.id;
+                        if (Object.keys(self.currentBoard).length > 0) {
                             self.$router.push("/task-management/projects/"+id+"/kanban-board/settings/" + self.currentBoard.id);
-                       }else{
-                           console.log("Chưa có data");
-                       }
+                        }else{
+                            self.setBoardCurrent();
+                            setTimeout(() => {
+                                self.$router.push("/task-management/projects/"+id+"/kanban-board/settings/" + self.currentBoard.id);
+                            }, 500);
+                        }
                     },
                 },
             ],
@@ -118,7 +126,7 @@ export default {
                 title: "Backlog2",
                 tasks: [
                     {
-                    id: 1312,
+                    id: 13121,
                     title: "Add discount code to checkout page",
                     date: "Sep 14",
                     issueType:{
@@ -172,7 +180,7 @@ export default {
                 title: "Backlog1",
                 tasks: [
                     {
-                    id: 1312,
+                    id: 13122,
                     title: "Add discount code to checkout page",
                     date: "Sep 14",
                     issueType:{
@@ -183,7 +191,7 @@ export default {
                     }
                     },
                     {
-                    id: 212,
+                    id: 2121,
                     title: "Provide documentation on integrations",
                     date: "Sep 12"
                     },
@@ -199,7 +207,7 @@ export default {
                     }
                     },
                     {
-                    id: 443,
+                    id: 444,
                     title: "Add discount code to checkout page",
                     date: "Sep 14",
                     issueType:{
@@ -237,7 +245,7 @@ export default {
                     }
                     },
                     {
-                    id: 212,
+                    id: 216,
                     title: "Provide documentation on integrations",
                     date: "Sep 12"
                     },
@@ -408,7 +416,8 @@ export default {
                 ]
                 }
             ],
-            currentBoard:{}
+            currentBoard:{},
+            columnInBoard:[]
         };
     },
     methods:{
@@ -422,14 +431,24 @@ export default {
                 }
             }
         },
+        getColumnInBoard(){
+           let idBoard = this.currentBoard.id;
+           if (idBoard) {
+               let res = taskManagementApi.getListColumn(idBoard);
+               if (res.status==200 && res.data) {
+                    this.columnInBoard=res.data.listObject;
+                    this.$store.commit("taskManagement/setListColumnInBoard", res.data.listObject);
+               }
+
+           }
+        },
         setBoardCurrent(){
             setTimeout((self) => {
                 let allBoard=self.$store.state.taskManagement.listBoardInProject;
                 if (allBoard.length>0) {
                     self.currentBoard=allBoard[0];  
                 }
-            }, 300,this);
-           
+            }, 500,this);
         }
     },
     async created(){
@@ -442,8 +461,7 @@ export default {
         });
         await this.getListBoard();
         this.setBoardCurrent();
-       
-  
+        this.getColumnInBoard();
         
     },
     activated(){

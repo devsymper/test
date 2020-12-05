@@ -2,11 +2,13 @@
     <compSettingBoard
         v-if="Object.keys(infoBoard).length>0"
         :infoBoard="infoBoard"
+        :listColumn="listColumn"
      />
 </template>
 
 <script>
 import compSettingBoard from '../../../components/taskManagement/board/SettingBoard.vue';
+import { taskManagementApi } from "@/api/taskManagement.js";
 
 export default {
     components: { compSettingBoard },
@@ -19,6 +21,22 @@ export default {
     data(){
         return{
             infoBoard:{},
+            listColumn:[],
+        }
+    },
+    methods:{
+        async getListColumn(){
+            if (this.sTaskManagement.listColumnInBoard.length > 0 ) {
+                this.listColumn = this.sTaskManagement.listColumnInBoard;
+            }else{
+                debugger
+                let idBoard = this.$route.params.idBoard;
+                let res = await taskManagementApi.getListColumn(idBoard);
+                if (res.status==200 && res.data) {
+                    this.listColumn=res.data.listObject;
+                    this.$store.commit("taskManagement/setListColumnInBoard", res.data.listObject);
+                }
+            }
         }
     },
     created(){
@@ -30,6 +48,7 @@ export default {
                 this.infoBoard=currentBoard;
             }
         }
+        this.getListColumn();
     }
 }
 </script>
