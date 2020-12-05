@@ -16,8 +16,6 @@
 			:showActionPanelInDisplayConfig="true"
 			:actionPanelType="'elastic'"
         >
-			<!--  -->
-
 			<template slot="right-panel-content">  
 				<SyqlFunctionForm
 					:action="action"
@@ -25,6 +23,7 @@
 				/>
 			</template>
         </list-items>
+	
     </div>
 </template>
 <script>
@@ -43,6 +42,7 @@ export default {
         return {
 			getListUrl: appConfigs.apiDomain.syqlFunction+'functions',
 			action:'',
+			showDialog: false,
 			containerHeight:null,
 			customAPIResult:{
 				reformatData(res){
@@ -137,7 +137,7 @@ export default {
                     text: this.$t("common.detail"),
                     callback: (row, callback) => {
 						self.handleView()
-						self.$store.dispatch('syqlFunction/getFunctionDetail',row[0].id)
+						self.$store.dispatch('SyqlFunction/getFunctionDetail',row.id)
                     }
                 },
             }

@@ -304,7 +304,7 @@ export default {
 	computed:{
 		sDetailFuntion(){
 			let sData = this.$store.state.SyqlFunction
-			return sData.detailFunction[sData.currentFunctionId]
+			return sData.detailFunction[sData.currentFunctionId] ? sData.detailFunction[sData.currentFunctionId] : {}
 		}
 	},
 	watch:{
@@ -312,13 +312,14 @@ export default {
 			deep: true,
 			immediate: true,
 			handler(arr){
-				if(arr){
+				if(arr.config){
 					this.restoreFormdata(arr.config)
 				}
 			}
 		},
 		action(val){
 			if(val == 'add'){
+				this.$refs.editorBox.setData("")
 				this.formData = {
 					valueName: "",
 					valueSetOf:"",
@@ -356,8 +357,9 @@ export default {
 			this.$refs.fomulaEditor.toggleDebugView()
 		},
 		restoreFormdata(config){
-			this.formData = JSON.parse(config.formData)
-			this.$refs.editorBox.setData(config.contentComment)
+			let configs = JSON.parse(config)
+			this.formData = configs.formData
+			this.$refs.editorBox.setData(configs.contentComment)
 		},
 		addAnotherAgrument(){
 			let obj = {
@@ -379,13 +381,30 @@ export default {
 			var f = this.formData.agruments.splice(index, 1)[0];
 			this.formData.agruments.splice(index + 1, 0, f);
 		},
-		saveSyqlFunction(){
+		validateForm(){
+			let self = this
 			if(this.formData.valueName == ""){
 				this.$snotify({
 					type: "error",
 					title: "Không được bỏ trống tên funtion"
 				})
-				return
+				return false
+			}
+			else if(this.formData.agruments.length > 0){
+				let flag = true
+				this.formData.agruments.forEach(function(e){
+					if(e.valueArgModes == "" || e.valueArgName == "" || e.valueArgType == ""){
+						self.$snotify({
+							type: "error",
+							title: "Không được bỏ trống các field trong agruments"
+						})
+						flag = false
+					}
+				})
+				return flag
+			}
+			else{
+				return true
 			}
 			// if(this.formData.valueDefinition == ""){
 			// 	this.$snotify({
@@ -394,39 +413,46 @@ export default {
 			// 	})
 			// 	return
 			// }
-			let strAgruments = ""
-			let arr = []
-			if( this.formData.agruments.length > 0){
-				this.formData.agruments.forEach(function(e){
-					let str = e.valueArgModes+" "+e.valueArgName+' '+e.valueArgType+e.valueArgArray
-					arr.push(e.valueArgName)
-					strAgruments += str + ","
-				})
-				strAgruments = strAgruments.slice(0,-1)
-			}	
-			let costStr = this.formData.executionCost != "" ? 'COST '+this.formData.executionCost+ ' ' : ''
-			let rowStr = this.formData.resultRows != "" ? 'ROWS '+ this.formData.resultRows + ' ' : ''
-			let sqls = 'CREATE FUNCTION "public"."'+this.formData.valueName+'" ('+strAgruments+') RETURNS '+this.formData.valueSetOf+' '+this.formData.valueReturns+this.formData.valueArray
-			+' AS "'+"'"+this.formData.definition.definition.value+"'"+' LANGUAGE "sql" '+ costStr + rowStr + this.formData.properties[0]+' '+this.formData.properties[1]+ ' ' +this.formData.properties[2] 
-			let self = this
-			let contentComment = this.$refs.editorBox.getData()
-			let config = {
-				formData: this.formData,
-				contentComment: contentComment
+		},
+		saveSyqlFunction(){
+			let flag 
+			flag = this.validateForm()
+			if(flag == true){
+				let strAgruments = ""
+				let arr = []
+				if( this.formData.agruments.length > 0){
+					this.formData.agruments.forEach(function(e){
+						let str = e.valueArgModes+" "+e.valueArgName+' '+e.valueArgType+e.valueArgArray
+						arr.push(e.valueArgName)
+						strAgruments += str + ","
+					})
+					strAgruments = strAgruments.slice(0,-1)
+				}	
+				let costStr = this.formData.executionCost != "" ? 'COST '+this.formData.executionCost+ ' ' : ''
+				let rowStr = this.formData.resultRows != "" ? 'ROWS '+ this.formData.resultRows + ' ' : ''
+				let sqls = 'CREATE FUNCTION "public"."'+this.formData.valueName+'" ('+strAgruments+') RETURNS '+this.formData.valueSetOf+' '+this.formData.valueReturns+this.formData.valueArray
+				+' AS '+`'`+this.formData.definition.definition.value+"'"+' LANGUAGE "sql" '+ costStr + rowStr + this.formData.properties[0]+' '+this.formData.properties[1]+ ' ' +this.formData.properties[2] 
+				let self = this
+				let contentComment = this.$refs.editorBox.getData()
+				let config = {
+					formData: this.formData,
+					contentComment: contentComment
+				}
+				let form = {
+					name: this.formData.valueName,
+					parameter: arr.length > 0 ? arr.toString() : "",
+					content:sqls,
+					description: "test",
+					status:1,
+					config: JSON.stringify(config)
+				}
+				if(this.action == 'add'){
+					this.addFunction(form)
+				}else{
+					this.editFunction(form)
+				}
 			}
-			let form = {
-				name: this.formData.valueName,
-				parameter: arr.length > 0 ? arr.toString() : "",
-				content:sqls,
-				description: "test",
-				status:1,
-				config: JSON.stringify(config)
-			}
-			if(this.action == 'add'){
-				this.addFunction(form)
-			}else{
-				this.editFunction(form)
-			}
+			
 		},
 		addFunction(form){
 			let self = this
@@ -451,7 +477,8 @@ export default {
 			})
 		},
 		editFunction(form){
-				let self = this
+			debugger
+			let self = this
 			let id = this.$store.state.SyqlFunction.currentFunctionId
 			syqlFunctionApi.editFunction(id,form).then(res=>{
 				if(res.status == 200){
@@ -602,11 +629,16 @@ export default {
 }
 .form-syql-function >>> .v-input__slot{
 	box-shadow: unset !important;
-	background-color: #f7f7f7 !important;
 	min-height: unset !important;
+	border:1px solid lightgray
 }
-.form-syql-function-disable >>>  .v-input__slot{
+.form-syql-function-disable >>>  .v-input__slot,
+.form-syql-function-disable >>>  .tox-tinymce{
 	pointer-events: none;
+}
+.form-syql-function-disable >>>  .symper-form-input{
+	font: 13px !important;
+	font-weight: 500 !important;
 }
 .form-syql-function >>> .v-input__slot input{
 	font-size: 13px !important;
@@ -620,6 +652,9 @@ export default {
 .form-syql-function >>> .comment-content{
 	border: 1px solid lightgray;
 	height: calc(100vh - 106px);
+}
+.form-syql-function >>> .tox-tinymce{
+	height: calc(100vh - 112px) !important;
 }
 .form-syql-function >>> .v-list-item__title{
 	font-size: 13px !important;
