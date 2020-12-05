@@ -44,7 +44,7 @@
 										:items="dataAutocomplete.returnForm.formReturns"
 									></v-autocomplete>
 								</div>
-								<div class="ml-1" style="width: 70px">
+								<div class="ml-1 fixed-autocomplete" style="width: 70px">
 									<v-autocomplete
 										solo
 										v-model="formData.valueArray"
@@ -101,7 +101,7 @@
 												:items="dataAutocomplete.returnForm.formReturns"
 											></v-autocomplete>
 										</div>
-										<div class="ml-1" style="width:70px"> 
+										<div class="ml-1 fixed-autocomplete" style="width:70px "> 
 											<v-autocomplete
 												solo
 												:items="dataAutocomplete.returnForm.formArray"
@@ -247,13 +247,9 @@
 					<v-icon class="fs-13">
 						mdi-comment-outline
 					</v-icon>
-					Comment
+					Chú thích
 				</div>
 				<div class="ml-1 comment-content  mb-10" >
-					<!-- <form-tpl 
-						:allInputs="boxComment"
-						ref="formTpl"
-					/> -->
 					<Editor 
 						ref="editorBox"
 					/>
@@ -477,7 +473,6 @@ export default {
 			})
 		},
 		editFunction(form){
-			debugger
 			let self = this
 			let id = this.$store.state.SyqlFunction.currentFunctionId
 			syqlFunctionApi.editFunction(id,form).then(res=>{
@@ -650,11 +645,16 @@ export default {
 	font-weight: 500;
 }
 .form-syql-function >>> .comment-content{
-	border: 1px solid lightgray;
 	height: calc(100vh - 106px);
 }
+.form-syql-function >>> .fixed-autocomplete .v-icon{
+	display: none;
+}
 .form-syql-function >>> .tox-tinymce{
-	height: calc(100vh - 112px) !important;
+	height: calc(100vh - 106px) !important;
+}
+.form-syql-function >>> .tox-statusbar__path{
+	display: none !important;	
 }
 .form-syql-function >>> .v-list-item__title{
 	font-size: 13px !important;
