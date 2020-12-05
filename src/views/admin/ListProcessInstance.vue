@@ -68,6 +68,12 @@
 					<span>Xem toàn màn hình</span>
 				</v-tooltip>	
 		</div>
+			<ConfirmDelete 
+				:showDialog="showDialog"
+				v-if="showDialog"
+				@cancel="cancel"
+				@confirm="deleteProcessInstance"
+			 />
 			<ListItems 
 				ref="listWorkFlow"
 				:pageTitle="'Danh sách các quy trình con'"
@@ -87,11 +93,7 @@
 				:showPagination="false"
 				:showActionPanelInDisplayConfig="false"
 			/>
-		<ConfirmDelete 
-			:showDialog="showDialog"
-			@cancel="cancel"
-			@confirm="deleteProcessInstance"
-			 />
+	
   </div>
 </template>
 
