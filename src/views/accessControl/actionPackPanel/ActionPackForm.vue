@@ -169,13 +169,14 @@ let commonTableSetting = {
     manualColumnMove: true,
     manualColumnResize: true,
     manualRowResize: true,
-    stretchH: "all",
+	stretchH: "all",
+	contextMenu: ['remove_row'],
     rowHeaders: true,
     licenseKey: "non-commercial-and-evaluation",
 }
 export default {
     mounted(){
-        this.reCaculateTableHeight();
+		this.reCaculateTableHeight();
     },
     created(){
 		this.genAllInputForFormTpl();
@@ -1044,7 +1045,10 @@ export default {
     computed: {
         mapObjectTypesAndAction() {
             return this.$store.getters["actionPack/listActionByObjectType"];
-        },
+		},
+		htItemWrapper(){
+			return document.getElementsByClassName('htItemWrapper')
+		},
         listAction() {
             return this.$store.getters['actionPack/listActionByObjectType'];
         },
@@ -1070,7 +1074,13 @@ export default {
 				this.objectActive = "document_definition"
             }
 		},
-		
+		htItemWrapper:{
+			deep: true,
+            immediate: true,
+            handler(vl){
+				$(document.getElementsByClassName('htItemWrapper')).text("Xóa Dòng")
+            }
+		},
         listAction: {
             immediate: true,
             deep: true,
