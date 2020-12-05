@@ -126,13 +126,13 @@ export default {
 			showBtnAddCheckbox: true,
 			customAPIResult:{
 				reformatData(res){
+					debugger
 					if(res.data.listObject.length > 0){
 						let arr = []
 						res.data.listObject.forEach(function(e){
-							if(e.status == '3'){
-								res.data.listObject.splice(res.data.listObject.indexOf(e),1)
-							}
 							arr.push(e.id)
+							let processDefId = e.processDefinitionId.split(':')
+							e.nameVersion = processDefId[1]
 						})
 						let obj = res.data.listObject
 						adminApi.getStartUserName(arr).then(resA=>{
@@ -148,6 +148,11 @@ export default {
 							self.$refs.listWorkFlow.rerenderTable()
 						}).catch(err=>{
 
+						})
+						res.data.listObject.sort(function(a,b){
+							var c = new Date(a.startTime);
+							var d = new Date(b.startTime);
+							return d-c;
 						})
 					}
 					return{
@@ -181,7 +186,21 @@ export default {
 										}
 									},
 							},
-							{name: "endTime", title: "endTime", type: "date", noFilter:true,
+							{name: "nameVersion", title: "nameVersion", type: "text"},
+							{name: "startTime", title: "startTime", type: "text",
+								renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+									Handsontable.dom.empty(td);
+									let span;
+									span = document.createElement('span');	
+									if(value != null){
+										let data =  self.$moment(value).format('YYYY-MM-DD HH:mm:ss')
+										$(span).text(data)
+									}	
+									td.appendChild(span);
+									return td;
+								},
+							},
+							{name: "endTime", title: "endTime", type: "text",
 								renderer:  function(instance, td, row, col, prop, value, cellProperties) {
 									Handsontable.dom.empty(td);
 									let span;
@@ -223,7 +242,7 @@ export default {
 		},
 	},
 	mounted(){
-		this.containerHeight = util.getComponentSize(this).h 
+		this.containerHeight = util.getComponentSize(this).h - 50
 		this.$refs.listWorkFlow.addCheckBoxColumn()
 	},
 	watch:{
@@ -365,28 +384,38 @@ export default {
 				})
 			}
 			for(let i in this.listItemSelected){
-				
-				adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
-					self.$snotify(
-						{
-							type: "success",
-							title:" Xóa tác vụ thành công"
-						}
-					)
+
+				if(this.listItemSelected[i].status == '3'){
 					adminApi.deleteTask(this.listItemSelected[i].id).then(res=>{
+						self.notifysuccess()
 					}).catch(err=>{})
-					this.showBtnAddCheckbox = true
-					self.$refs.listWorkFlow.refreshList()
-				}).catch(err=>{
-					self.$snotify(
-							{
-								type: "error",
-								title:"Đã có lỗi xảy ra"
-							}
-						)
-				})
+				}else{
+					adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
+						adminApi.deleteTask(this.listItemSelected[i].id).then(res=>{
+						}).catch(err=>{})
+						self.notifysuccess()
+					}).catch(err=>{
+						self.$snotify(
+								{
+									type: "error",
+									title:"Đã có lỗi xảy ra"
+								}
+							)
+					})
+				}
+				
 			}
 			
+		},
+		notifysuccess(){
+			this.$snotify(
+				{
+					type: "success",
+					title:" Xóa tác vụ thành công"
+				}
+			)
+			this.showBtnAddCheckbox = true
+			this.$refs.listWorkFlow.refreshList()
 		},
 		cancel(){
 			this.showDialog = false

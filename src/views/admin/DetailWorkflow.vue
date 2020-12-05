@@ -138,6 +138,7 @@ export default {
 			isShowDonutChart: false,
 			customAPIResult:{
 				reformatData(res){
+					
 					return{
                          columns: [
 							{name: "checkbox_select_item",data:"checkbox_select_item",title:"selected",type:"checkbox", noFilter:true},

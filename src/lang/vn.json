@@ -248,7 +248,8 @@
 			"suspended": "Trạng thái",
 			"number_instance":"Tổng số instance",
 			"status":"Trạng thái",
-			"endTime":"Thời gian hoàn thành"
+			"endTime":"Thời gian hoàn thành",
+			"nameVersion": "Phiên bản"	
         }
     },
     "validate": {
