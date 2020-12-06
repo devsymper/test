@@ -40,12 +40,22 @@
 				<v-btn
 					:class="{'mr-2 white--text':true, 'mr-8':showSwitchBtn == false}"
 					depressed
-					color="success"
+					color="primary"
 					small
 					:disabled="disableBtn"
 					@click="activeProcessInstance"
 				>
 				Chạy
+				</v-btn>
+				<v-btn
+					:class="{'mr-2 white--text':true, 'mr-8':showSwitchBtn == false}"
+					depressed
+					color="success"
+					small
+					:disabled="disableBtn"
+					@click="endProcessInstance"
+				>
+				Hoàn thành
 				</v-btn>
 				
 				 <v-tooltip bottom v-if="showSwitchBtn">
@@ -311,7 +321,32 @@ export default {
 				}
 				
 			}
- 		},
+		 },
+		endProcessInstance(){
+			let self = this
+			for(let i in this.listItemSelected){
+				if(this.listItemSelected[i].status == "3"){
+					self.$snotify(
+						{
+							type: "infor",
+							title:" Tác vụ này đã hoàn thành"
+						}
+					)
+				}else{
+					adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
+						self.notifysuccess("Hoàn thành tác vụ thành công")
+					}).catch(err=>{
+						self.$snotify(
+								{
+									type: "error",
+									title:"Đã có lỗi xảy ra"
+								}
+							)
+					})
+				}
+				
+			}
+		},
 		activeProcessInstance(){
 			let self = this
 			for(let i in this.listItemSelected){
@@ -409,11 +444,11 @@ export default {
 			}
 			
 		},
-		notifysuccess(){
+		notifysuccess(title = " Xóa tác vụ thành công"){
 			this.$snotify(
 				{
 					type: "success",
-					title:" Xóa tác vụ thành công"
+					title: title
 				}
 			)
 			this.showBtnAddCheckbox = true
