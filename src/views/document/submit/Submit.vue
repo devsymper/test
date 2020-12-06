@@ -2091,16 +2091,14 @@ export default {
                         let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
                         thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
                     }
-                    if(thisCpn.sDocumentSubmit.updateFormulas != undefined){
-                        let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.updateFormulas);
-                        thisCpn.sDocumentSubmit.updateFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
-                    }
+                    
                     // nếu submit từ form sub submit thì ko rediect trang
                     // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
                     
                     if(thisCpn.$getRouteName() == 'submitDocument' && thisCpn.$route.params.id == thisCpn.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                     }
+                    
                     
                 }
                 else{
@@ -2143,6 +2141,10 @@ export default {
                         type: "success",
                         title: "update document success!"
                     });        
+                    if(thisCpn.sDocumentSubmit.updateFormulas != undefined){
+                        let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.updateFormulas);
+                        thisCpn.sDocumentSubmit.updateFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
+                    }
                     if(thisCpn.$getRouteName() == 'updateDocumentObject')
                      thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
