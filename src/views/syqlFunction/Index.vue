@@ -23,7 +23,11 @@
 				/>
 			</template>
         </list-items>
-	
+		<DialogShowContent 
+			:showDialog="showDialog"
+			:content="content"
+			@cancel="showDialog = false"
+		/>
     </div>
 </template>
 <script>
@@ -33,6 +37,7 @@ import ListItems from "@/components/common/ListItems.vue";
 import SyqlFunctionForm from './SyqlFunctionForm'
 import Handsontable from 'handsontable';
 import {syqlFunctionApi} from '@/api/SyqlFunction'
+import DialogShowContent from './DialogShowContent'
 export default {
 	created(){
 		this.$store.dispatch("app/getAllBA");
@@ -42,6 +47,7 @@ export default {
         return {
 			getListUrl: appConfigs.apiDomain.syqlFunction+'functions',
 			action:'',
+			content:'',
 			showDialog: false,
 			containerHeight:null,
 			customAPIResult:{
@@ -73,7 +79,6 @@ export default {
 							{name: "name", title: "name", type: "text"},
 							{name: "parameter", title: "parameter", type: "text"},
 							{name: "description", title: "description", type: "text"},
-							{name: "content", title: "content", type: "text"},
 							{name: "createAt", title: "createAt", type: "date"},
 							{name: "updateAt", title: "updateAt", type: "date"},
 							{name: "userCreateName", title: "userCreateName", type: "text"},
@@ -105,6 +110,14 @@ export default {
                     callback: (row, callback) => {
 						self.handleEdit()
 						self.$store.dispatch('SyqlFunction/getFunctionDetail',row.id)
+                    }
+                },
+                viewContent: {
+                    name: "viewContent",
+                    text:'Xem nội dung',
+                    callback: (row, callback) => {
+						self.showDialog = true
+						self.content = row.content
                     }
                 },
                 remove: {
@@ -167,7 +180,8 @@ export default {
     },
     components: {
 		ListItems: ListItems,
-		SyqlFunctionForm
+		SyqlFunctionForm,
+		DialogShowContent
     }
 };
 </script>
