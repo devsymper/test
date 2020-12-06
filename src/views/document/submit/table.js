@@ -1520,7 +1520,7 @@ export default class Table {
             rsl.numericFormat = {
                 pattern: ctrl.controlProperties.formatNumber.value
             };
-        } else if (type == 'label' || type == 'select') {
+        } else if (type == 'label') {
             rsl.readOnly = true;
 
         } else if (type == 'time') {

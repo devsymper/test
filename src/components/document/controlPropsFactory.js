@@ -521,7 +521,7 @@ const controlTypes = {
     },
     richText: {
         icon: "/icon/ic_richtext.png",
-        html: `<textarea class="s-control s-control-rich-text" contenteditable="false"  title="Rich-text" s-control-type="richText" type="text"></textarea>&nbsp;&nbsp;`,
+        html: `<input class="s-control s-control-rich-text" contenteditable="false"  s-control-type="richText" type="text" title="Rich text">&nbsp;&nbsp;`,
         title: "Rich text",
         notInProps: ['isVarchar','isQuickSubmit', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'formatDate', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['linkConfig', 'formulas', 'hidden', 'readOnly', 'require']
