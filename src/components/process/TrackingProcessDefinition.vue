@@ -1,18 +1,17 @@
 <template>
     <div 
-        class="symper-tracking-workflow-definition" 
+        class="symper-tracking-workflow-definition w-100 h-100" 
         :style="{
             position: 'relative',
-            height: '100%',
-            width: '100%',
             overflow: 'hidden'
         }">
+        <Preloader class="position-absolute" v-show="loadingData"/>
         <div 
             :class="{
                 'symper-bpm-canvas-heat-map d-block': true,
                 'hidden': useHeatMap && hideHeatMap,
                 'position-absolute': !hideHeatMap
-            }" 
+            }"
             ref="heatmapCanvasWrapper"></div>
         <symper-bpmn
             ref="symperBpmn"
@@ -31,10 +30,11 @@ import BPMNEngine from '../../api/BPMNEngine';
 import {cleanXMLBeforeRenderInEditor} from "@/components/process/processAction.js";
 import h337  from 'heatmap.js';
 import {adminApi} from '@/api/Admin.js';
-
+import Preloader from "@/components/common/Preloader";
 export default {
     data(){
         return {
+            loadingData: true,
             diagramHeight: 200,
             customRender: [
                 {
@@ -73,9 +73,65 @@ export default {
             this.hideHeatMap = true;
             this.render();
         },
+        translateCoordinates(xml){
+            xml  = xml.replace(/\n|\r\n/g,' ');
+            let displaySection = xml.match(/<bpmndi:BPMNDiagram(.*?)<\/bpmndi:BPMNDiagram>/g)[0];
+            let oldDisplaySection = displaySection;
+
+            let minX = 0; 
+            let minY = 0;
+            let x,y;
+            let map = {
+                x: {},
+                y: {}
+            };
+            
+            let xCoords = displaySection.match(/ x="([0-9\-]+)"/g);
+            for(let coord of xCoords){
+                if(!map.x.hasOwnProperty(coord)){
+                    x = Number(coord.slice(4, coord.length - 1));
+                    minX = Math.min(x, minX);
+                    map.x[coord] = x;
+                }
+            }
+
+
+            let yCoords = displaySection.match(/ y="([0-9\-]+)"/g);
+            for(let coord of yCoords){
+                if(!map.y.hasOwnProperty(coord)){
+                    y = Number(coord.slice(4, coord.length - 1));
+                    minY = Math.min(y, minY);
+                    map.y[coord] = y;
+                }
+            }
+
+            if(minX < 0){
+                minX -= this.pointRadius;
+                for(let coord in map.x){
+                    let newX = map.x[coord] - minX;
+                    newX = ` x="${newX}s_s_s_s"`;
+                    displaySection = displaySection.replace(new RegExp(coord, "g"), newX);
+                }
+            }
+
+
+            if(minY < 0){
+                for(let coord in map.y){
+                    let newY = map.y[coord] - minY;
+                    newY = ` y="${newY}s_s_s_s"`;
+                    displaySection = displaySection.replace(new RegExp(coord, "g"), newY);
+                }
+            }
+
+            let newDisplaySection = displaySection.replace(new RegExp('s_s_s_s', "g"),'');
+            let newXml = xml.replace(oldDisplaySection, newDisplaySection);
+            return newXml;
+        },
         async render(){
+            this.loadingData = true;
             this.hideHeatMap = true;
             let xml = await BPMNEngine.getXMLFromProcessDefId(this.procesDefId);
+            xml = this.translateCoordinates(xml);
             await this.$refs.symperBpmn.renderFromXML(xml);
             let countNodeInstance = await adminApi.trackingProcess(this.procesDefId);
             this.$refs.symperBpmn.focus();
@@ -101,17 +157,22 @@ export default {
                 self.hideHeatMap = false;
 
                 self.watchViewportChange();
-                setTimeout(() => {
-                    self.rePositionHeatmap($(self.$el).find('.viewport')[0]);
-                }, 1000);
-            }, 0, this);
+                self.rePositionHeatmap($(self.$el).find('.viewport')[0]);
+                this.loadingData = false;
+            }, 100, this);
         },
         drawHeatMap(){
             this.initHeatmap();
             let bpmnElements = this.$refs.symperBpmn.getAllNodes(false);
             let statsElemente = this.mapNodeToInstanceCount;
+            let allMarkPoints = [];
             let mapElements = bpmnElements.reduce((map, el) => {
                 map[el.id] = el;
+                if(el.type == 'bpmn:SequenceFlow'){
+                    allMarkPoints = allMarkPoints.concat(el.waypoints);
+                }else{
+                    allMarkPoints.push(el);
+                }
                 return map;
             }, {});
             let points  = [];
@@ -134,7 +195,6 @@ export default {
                 // }else if(el.type.includes('Event')){
                 //     dots = this.getDotsInRect(el.businessObject.di.bounds, r/2, weight);
                 // }
-                console.log(el.businessObject.di.bounds,'     ',el.type,'     ', el.id,'     ', dots);
                 points = points.concat(dots);
             }
             
@@ -144,7 +204,8 @@ export default {
             });
         },
         rePositionHeatmap(viewportDOM){
-            this.$refs.heatmapCanvasWrapper.style.transform = $(viewportDOM).attr('transform');
+            let transformValue = $(viewportDOM).attr('transform').replace(/\s+/g,',');
+            this.$refs.heatmapCanvasWrapper.style.transform = transformValue;
         },
         watchViewportChange(){
             let self = this;
@@ -170,8 +231,8 @@ export default {
             let viewport = $(this.$el).find('g.viewport')[0];
             let viewportSize = viewport.getBoundingClientRect();
 
-            let diagramHeight = viewportSize.height * 2;
-            let diagramWidth = viewportSize.width * 2;
+            let diagramHeight = viewportSize.height * 5;
+            let diagramWidth = viewportSize.width * 5;
             this.heatmapElement = $(this.$refs.heatmapCanvasWrapper).width(diagramWidth).height(diagramHeight);
             var config = {
                 "radius": this.pointRadius, 
@@ -203,7 +264,23 @@ export default {
 
                 dots = dots.concat(this.getDotsBetweenTwoPoints(startPoint, endPoint, distance, weight));
             }
+            let dotsForUpperBound = this.getDotsBetweenTwoPoints({
+                x: bounds.x ,
+                y: bounds.y 
+            }, {
+                x: bounds.x  + bounds.width,
+                y: bounds.y 
+            }, distance, weight / 2);
 
+
+            let dotsForBottomBound = this.getDotsBetweenTwoPoints({
+                x: bounds.x ,
+                y: bounds.y + bounds.height
+            }, {
+                x: bounds.x  + bounds.width,
+                y: bounds.y + bounds.height
+            }, distance, weight / 2);
+            dots = dots.concat(dotsForUpperBound, dotsForBottomBound);
             return dots;
         },
         getDotsOnPath(wayPoints, distance, weight){
@@ -300,7 +377,8 @@ export default {
         }
     },
     components: {
-        SymperBpmn
+        SymperBpmn,
+        Preloader
     }
 }
 </script>
