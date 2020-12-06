@@ -2091,12 +2091,14 @@ export default {
                         let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
                         thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
                     }
+                    
                     // nếu submit từ form sub submit thì ko rediect trang
                     // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
                     
                     if(thisCpn.$getRouteName() == 'submitDocument' && thisCpn.$route.params.id == thisCpn.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                     }
+                    
                     
                 }
                 else{
@@ -2139,6 +2141,10 @@ export default {
                         type: "success",
                         title: "update document success!"
                     });        
+                    if(thisCpn.sDocumentSubmit.updateFormulas != undefined){
+                        let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.updateFormulas);
+                        thisCpn.sDocumentSubmit.updateFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
+                    }
                     if(thisCpn.$getRouteName() == 'updateDocumentObject')
                      thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
@@ -2654,10 +2660,10 @@ export default {
             let impactedFieldsListWhenStart = {}
             let listTableRootControl = {};
             let listRootControl = [];
-			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0 && false){
+			if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
 				impactedFieldsList = this.preDataSubmit.impactedFieldsList;
 				impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
-				listRootControl = this.preDataSubmit.rootControl;
+                listRootControl = this.preDataSubmit.rootControl;
 				listTableRootControl = this.preDataSubmit.tableRootControl;
 				for (let index = 0; index < listRootControl.length; index++) {
 					const controlName = listRootControl[index];
@@ -2689,7 +2695,7 @@ export default {
 				for(let controlName in listInput){
 					this.setAllImpactedFieldsList(controlName);
                     let controlInstance = listInput[controlName];
-					if(controlInstance.type != "inputFilter"){
+					if(!['inputFilter','submit','reset'].includes(controlInstance.type)){
 						if(Object.keys(controlInstance.controlFormulas).length > 0){
 							let controlFormulas = controlInstance.controlFormulas;
 							for(let formulasType in controlFormulas){
@@ -2711,7 +2717,6 @@ export default {
                                             this.getRootControlData(controlInstance, formulasInstance, listTableRootControl, listRootControl, impactedFieldsListWhenStart, formulasType);
                                         }
                                     }
-									
 								}
 							}
 						}

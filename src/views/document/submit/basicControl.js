@@ -107,6 +107,8 @@ export default class BasicControl extends Control {
                 this.renderSelectControl(false);
             } else if (this.ele.hasClass('s-control-label')) {
                 this.renderLabelControl();
+            } else if (this.ele.hasClass('s-control-rich-text')) {
+                this.renderRichTextControl();
             }
 
             if (this.checkDetailView()) {
@@ -684,6 +686,11 @@ export default class BasicControl extends Control {
     renderTimeControl() {
         if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
+
+    }
+    renderRichTextControl() {
+        let style = this.ele.attr('style');
+        this.ele.replaceWith('<div style="'+style+'" contenteditable="true" id="'+this.id+'" class="s-control s-control-rich-text" contenteditable="false"  title="Rich-text" s-control-type="richText" type="text"></div>');
 
     }
     getDefaultValue() {

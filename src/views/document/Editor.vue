@@ -45,7 +45,7 @@
         :instance="keyInstance" 
         ref="saveDocPanel" 
         @check-name-document="checkBeforeDocumentNameChange"
-        @save-doc-action="validateControl"
+        @save-doc-action="validateControlAfterSave"
         @save-form-print-action="saveFormPrint"/>
         
         <FormModal 
@@ -474,12 +474,18 @@ export default {
                 }
             })
         },
-        
+        /**
+         * Mở 1 dialog: 
+         * input: type - loại dialog (đánh dấu để kiểm tra lúc accept)
+         */
         showDialogEditor(type,title){
             this.dialog = true;
             this.typeDialog = type;
             this.titleDialog = title;
         },
+        /**
+         * Sự kiện khi ấn accept dialog
+         */
         acceptDialog(){
             this.dialog = false;
             if(this.typeDialog == 'deletePage'){
@@ -491,7 +497,8 @@ export default {
         },
 
         /**
-         * Hàm xử lí khi drag control
+         * Hàm xử lí khi drag control trong doc thì cần cập nhật lại state của store khi kéo vào trong table
+         * bao gồm quá trình drag và drop
          */
         handleDragControlInEditor(e){
             this.editorCore.undoManager.add();
@@ -534,6 +541,8 @@ export default {
         },
         /**
          * Hàm xử lí khi paste nội dung vào editor
+         * nếu paste nội dung từ document editor version 1 thì tự động convert các thuộc tính, html...
+         * nếu copy/ paste các control trong doc hiện tại thì tự động nhân bản các thuộc tính (riêng id phải tạo mới) 
          */
         handlePasteContent(e){
             e.preventDefault();
@@ -618,7 +627,7 @@ export default {
             }  
         },
         /**
-         * Hàm xử lí kiểm tra xem tên của control hiện tại đang ở trong những công thức của các control nào doc nao
+         * Hàm xử lí kiểm tra xem tên của control hiện tại đang ở trong những công thức của các control nào document nào
          */
         checkBeforeControlNameChange(){
             let currentControl = this.editorStore.currentSelectedControl;
@@ -648,6 +657,9 @@ export default {
                 self.$refs.controlNameRelated.showDialog();
             }, 100,this);
         },
+        /**
+         * Hàm callback khi đóng panel check tên control, document liên quan đến các công thức
+         */
         afterClosePanel(from){
             if(from == "document")
             setTimeout((self) => {
@@ -673,6 +685,9 @@ export default {
             localStorage.setItem(HTML_CONTENT,content);
             localStorage.setItem(CODUMENT_PROPS,JSON.stringify(documentProperties));
         },
+        /**
+         * Xóa data ra khỏi local storage
+         */
         deleteLocalStorage(){
             localStorage.removeItem(ALL_CONTROL);
             localStorage.removeItem(HTML_CONTENT);
@@ -703,13 +718,16 @@ export default {
                 }
             }  
         },
+        /**
+         * Xóa control trong doc, xóa luôn trong store
+         */
         deleteControl(){
             let control = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.on-selected');
             this.resetSelectControl()
             control.remove();
 
         },
-        // ham tạo dialog của tinymce để cấu hình padding doc
+        // hàm tạo dialog của tinymce để cấu hình padding doc
         showPaddingPageConfig(ed){
             let self = this;
                 var left = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-left').slice(0, -2);
@@ -806,7 +824,7 @@ export default {
             }
         },
         /**
-         * Hàm xem trước submit form
+         * Hàm xử lí xem trước submit form
          */
         previewSubmitDocument(){
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.on-selected').removeClass('on-selected');
@@ -815,6 +833,7 @@ export default {
             this.prepareDataForPreview(fieldForSubmit);
             this.dataPreviewSubmit = {fields:fieldForSubmit,content:this.editorCore.getContent()}
         },
+        // xử lí dữ liệu để đẩy vào form submit
         prepareDataForPreview(fieldForSubmit){
             for(let controlId in fieldForSubmit){
                 for(let prop in fieldForSubmit[controlId].properties){
@@ -916,7 +935,10 @@ export default {
             }
             
         },
-        
+        /**
+         * Khi ấn lưu doc -> Hàm kiểm tra các control đã đẩy đủ thông tin về tên và tiêu đề hay chưa
+         * nếu chưa thì ko được phép lưu
+         */
         validateControlBeforeSave(allControl,tableId){
             let controlPrimaryKey = {};
             for(let controlId in allControl){
@@ -952,6 +974,7 @@ export default {
         },
         /**
          * Hàm xử lí lấy dữ liệu các công thức để insert vào formulas service trước khi lưu
+         * output: dataPost cho syql service
          */
         getDataToSaveMultiFormulas(listControl){
             let listControlFormulas = {insert:{},update:{}};
@@ -998,8 +1021,6 @@ export default {
            return listControlFormulas;
             
         },
-
-
         setFormulasDataPost(listFormulasUpdate, listFormulas, formulaId, formulaValue, controlName, formulaType){
              if(formulaId != 0){
                 let item = {};
@@ -1085,7 +1106,11 @@ export default {
             
         },
    
-        // hoangnd: hàm gửi request lưu doc
+        /**
+         * Hàm thực thi api để lưu các công thức và lưu document sau khi check validate hợp lệ
+         * update formulas -> insert formulas -> done -> save document
+         * các công thức thêm mới sẽ được bind ngược lại vào dữ liệu đẩy lên để lưu doc
+         */
         async saveDocument(){
             let minimizeControl = this.minimizeControlEL(this.editorStore.allControl);
             let allControl = minimizeControl.minimizeControl;
@@ -1251,15 +1276,16 @@ export default {
             .always(() => {
             });
         },
-      
-        validateControl(){
+        /**
+         * hàm validate lại cntrol lần nữa sau khi ấn lưu doc ở modal save doc
+         */
+        validateControlAfterSave(){
             let thisCpn = this;
             let listControlName = [];
             this.listMessageErr = [];
             //check trung ten control
             $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('.on-selected').removeClass('on-selected');
             if($('#document-editor-'+thisCpn.keyInstance+'_ifr').contents().find('.s-control-error').length == 0){
-                
                 this.saveDocument();
             }
             else{
@@ -1272,28 +1298,7 @@ export default {
             }
         },
         
-       
-        // hàm kiểm tra xem trong công thức có trỏ đến control ko tồn tại hay ko
-        validateFormulasInControl(control,listControlName){
-            // check control Name trong cong thức
-            for(let f in control.formulas){
-                if(control.formulas[f].value != ""){
-                    let formula = control.formulas[f].value;
-                    let controlName = formula.match(/(?<=f.)(\w+)/g);
-                    if(controlName != null)
-                        for(let i = 0; i< controlName.length; i++){
-                            if(listControlName.indexOf(controlName[i]) === -1){
-                                let message = "Không tồn tại control "+controlName[i]+" trong công thức "+f+" của control "+control.properties.name.value;
-                                if(this.listMessageErr.indexOf(message) === -1){
-                                    this.listMessageErr.push(message);
-                                }
-                            }
-                        }
-                }
-                
-            }
-        },
-        // hàm xử lí thêm các cột vào trong control table khi lưu ở tablesetting
+        // hàm xử lí thêm các cột vào trong control table khi lưu ở popup tablesetting
         addColumnTable(data){
             let listRowData = data.listRows;
             let tablePivotConfig = data.tablePivotConfig;
@@ -1332,7 +1337,7 @@ export default {
             elements.find('tbody tr').html(tbody);
         },
 
-        // ham drag table trong editor
+        // Hàm hiển thị khung drag table trong editor
         showDragTable(e){
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected').closest('.s-control-table');
             if(elements.is('.s-control-table')){
@@ -1599,6 +1604,7 @@ export default {
             
         },
         // hoangnd: hàm nhận sự kiện keyup của editor 
+        // gõ // để mở autocomplete thêm control
         // 191: / để thêm control
         
         keyHandler(event)
@@ -1958,7 +1964,7 @@ export default {
 
 
         /**
-         * Hàm set style cho form th lưu trên db
+         * Hàm set style cho form
          */
         setDefaultStyle(defaultStyle){
             if(defaultStyle){
@@ -1975,12 +1981,9 @@ export default {
                     });
                     this.setPageSize(this.contentStyle.width, this.contentStyle.height, this.contentStyle.type)
                 } catch (error) {
-                    
+                    console.warn(error);
                 }
-                
             }
-            
-
         },
         async checkAllowEditDocument(document){
             let updateTime = new Date(document.lastEditAt).getTime();
@@ -2018,7 +2021,10 @@ export default {
             }
             return true;
         },
-        // hàm gọi request lấy thông tin của document khi vào edit doc
+        /**
+         * hàm gọi request lấy thông tin của document khi vào edit doc
+         * Thông tin bao gồm cấu trúc html của doc, các thuộc tính và công thức của control
+         */
         async getContentDocument(){
             if(this.documentId != 0){
                 let res = await documentApi.detailDocument(this.documentId);
@@ -2846,10 +2852,6 @@ export default {
                 this.selectControl(control.properties, control.formulas,controlId,'tabPage');
             }
         },
-
-
-
-
         // ************************* Các hàm xử lí liên quan đến cấu hình in *******************************//
         // hàm xử lí thêm các cột vào trong control table khi lưu ở tablesetting
         configColumnTablePrint(listRowData){
