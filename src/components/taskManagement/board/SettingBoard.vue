@@ -29,7 +29,6 @@
                         class="h-100"
                     />
                 </v-tab-item>
-             
             </v-tabs>
         </div>
     </div>

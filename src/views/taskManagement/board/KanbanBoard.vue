@@ -43,36 +43,33 @@
         </div>
         <VuePerfectScrollbar class="wrap-scroll">
             <div class="wrap-kanban-board py-4 h-100">
-                <draggable :list="columns" :animation="250">
-                     <div
-                        v-for="column in columns"
-                        :key="column.title"
-                        class="px-3 board-column-item rounded mr-4"
-                    >
-                        <p class="title-column">{{column.title}}</p>
-                        <!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
-                        <VuePerfectScrollbar style="max-height: calc(100vh - 250px);">
-                            <draggable :list="column.tasks" :animation="250" ghost-class="ghost-card" group="tasks">
-                                <!-- Each element from here will be draggable and animated. Note :key is very important here to be unique both for draggable and animations to be smooth & consistent. -->
-                                <task-card
-                                    v-for="(task) in column.tasks"
-                                    :key="task.id"
-                                    :task="task"
-                                    class="mt-3 cursor-move"
-                                ></task-card>
-                                <!-- </transition-group> -->
-                            </draggable>
-                            
-                        </VuePerfectScrollbar>
-                        <div class="text-center mt-2">
-                            <v-btn depressed height="25">
-                            <v-icon>mdi-plus</v-icon>
-                            </v-btn>
-                        </div>
+                <div
+                    v-for="column in columns"
+                    :key="column.title"
+                    class="px-3 board-column-item rounded mr-4"
+                >
+                    <p class="title-column">{{column.title}}</p>
+                    <!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
+                    <VuePerfectScrollbar style="max-height: calc(100vh - 250px);">
+                        <draggable :list="column.tasks" :animation="250" ghost-class="ghost-card" group="tasks">
+                            <!-- Each element from here will be draggable and animated. Note :key is very important here to be unique both for draggable and animations to be smooth & consistent. -->
+                            <task-card
+                                v-for="(task) in column.tasks"
+                                :key="task.id"
+                                :task="task"
+                                class="mt-3 cursor-move"
+                            ></task-card>
+                            <!-- </transition-group> -->
+                        </draggable>
                         
+                    </VuePerfectScrollbar>
+                    <div class="text-center mt-2">
+                        <v-btn depressed height="25">
+                        <v-icon>mdi-plus</v-icon>
+                        </v-btn>
                     </div>
-                </draggable>
-               
+                    
+                </div>
             </div>
         </VuePerfectScrollbar>
     </div>
@@ -97,11 +94,6 @@ export default {
             return this.$store.state.taskManagement;
         },
     },
-    watch:{
-        currentBoard: function(newVl) {
-            this.getColumnInBoard(newVl.id);
-        }
-    },
     data() {
         let self=this;
         return {
@@ -109,15 +101,12 @@ export default {
                 { 
                     title: this.$t("taskManagement.settingBoard"),
                     menuAction: action => {
-                        let id=self.$route.params.id;
-                        if (Object.keys(self.currentBoard).length > 0) {
+                       if (Object.keys(self.currentBoard).length > 0) {
+                            let id=self.$route.params.id;
                             self.$router.push("/task-management/projects/"+id+"/kanban-board/settings/" + self.currentBoard.id);
-                        }else{
-                            self.setBoardCurrent();
-                            setTimeout(() => {
-                                self.$router.push("/task-management/projects/"+id+"/kanban-board/settings/" + self.currentBoard.id);
-                            }, 500);
-                        }
+                       }else{
+                           console.log("Chưa có data");
+                       }
                     },
                 },
             ],
@@ -126,7 +115,7 @@ export default {
                 title: "Backlog2",
                 tasks: [
                     {
-                    id: 13121,
+                    id: 1312,
                     title: "Add discount code to checkout page",
                     date: "Sep 14",
                     issueType:{
@@ -180,7 +169,7 @@ export default {
                 title: "Backlog1",
                 tasks: [
                     {
-                    id: 13122,
+                    id: 1312,
                     title: "Add discount code to checkout page",
                     date: "Sep 14",
                     issueType:{
@@ -191,7 +180,7 @@ export default {
                     }
                     },
                     {
-                    id: 2121,
+                    id: 212,
                     title: "Provide documentation on integrations",
                     date: "Sep 12"
                     },
@@ -207,7 +196,7 @@ export default {
                     }
                     },
                     {
-                    id: 444,
+                    id: 443,
                     title: "Add discount code to checkout page",
                     date: "Sep 14",
                     issueType:{
@@ -245,7 +234,7 @@ export default {
                     }
                     },
                     {
-                    id: 216,
+                    id: 212,
                     title: "Provide documentation on integrations",
                     date: "Sep 12"
                     },
@@ -416,8 +405,7 @@ export default {
                 ]
                 }
             ],
-            currentBoard:{},
-            columnInBoard:[]
+            currentBoard:{}
         };
     },
     methods:{
@@ -431,24 +419,14 @@ export default {
                 }
             }
         },
-        getColumnInBoard(){
-           let idBoard = this.currentBoard.id;
-           if (idBoard) {
-               let res = taskManagementApi.getListColumn(idBoard);
-               if (res.status==200 && res.data) {
-                    this.columnInBoard=res.data.listObject;
-                    this.$store.commit("taskManagement/setListColumnInBoard", res.data.listObject);
-               }
-
-           }
-        },
         setBoardCurrent(){
             setTimeout((self) => {
                 let allBoard=self.$store.state.taskManagement.listBoardInProject;
                 if (allBoard.length>0) {
                     self.currentBoard=allBoard[0];  
                 }
-            }, 500,this);
+            }, 300,this);
+           
         }
     },
     async created(){
@@ -461,7 +439,8 @@ export default {
         });
         await this.getListBoard();
         this.setBoardCurrent();
-        this.getColumnInBoard();
+       
+  
         
     },
     activated(){
