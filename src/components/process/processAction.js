@@ -569,3 +569,8 @@ export const getLastestDefinition = function(row, needDeploy = false) {
         }
     });
 }
+
+export const cleanXMLBeforeRenderInEditor = function(xml){
+    xml = xml.replace(/<symper:(.*?)<\/symper:(.*?)>/g,''); // Loại bỏ toàn bộ các thẻ của symper
+    return xml;
+}

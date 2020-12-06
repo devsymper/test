@@ -87,8 +87,8 @@ Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, v
     let div = `<div class="select-cell" style="position:relative;height:22px;width:100%;">` + value + `
                     <span class="select-chervon-bottom" style="position: absolute;right:8px;top:2px;font-size: 10px;color: #eee;">▼</span>
                 </div>`
-    $(td).off('click')
-    $(td).on('click', function(e) {
+    $(td).off('click','.select-chervon-bottom')
+    $(td).on('click','.select-chervon-bottom', function(e) {
         let tableControl = store.state.document.submit[instance.keyInstance].listInputInDocument[instance.tableName];
         let tableInstance = tableControl.tableInstance;
         tableInstance.setSelectCell(e)
@@ -1520,7 +1520,7 @@ export default class Table {
             rsl.numericFormat = {
                 pattern: ctrl.controlProperties.formatNumber.value
             };
-        } else if (type == 'label' || type == 'select') {
+        } else if (type == 'label') {
             rsl.readOnly = true;
 
         } else if (type == 'time') {
@@ -1570,7 +1570,7 @@ export default class Table {
         if (control.isCheckbox) {
             td.style.textAlign = "center";
         }
-       
+        
         let map = thisObj.validateValueMap[row + '_' + column];
         let ele = $(td);
         if (map) {
@@ -1615,6 +1615,11 @@ export default class Table {
                 else{
                     ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(control.name,'Không được bỏ trống'));
                 }
+            }
+        }
+        else{
+            if(control.type == 'number' && (value === "" || value === undefined || value === null)){
+                td.textContent = 0;
             }
         }
         if(thisObj.tableHasRowSum && row == hotInstance.countRows() - 1){
