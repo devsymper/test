@@ -1,0 +1,63 @@
+<template>
+    <workflow-model
+        :statusDetail="true"
+        :infoWorkflow="infoWorkflow"
+        :listNode="listNode"
+        :listLink="listLink"
+    />
+</template>
+
+<script>
+import { taskManagementApi } from "@/api/taskManagement.js";
+import WorkflowModel from '../../../components/taskManagement/workflow/WorkflowModel.vue';
+import {convertFormatNode ,convertFormatLink} from '@/components/taskManagement/config.js';
+
+
+export default {
+  components: { WorkflowModel },
+    data(){
+        return{
+            infoWorkflow:{},
+            listNode:[],
+            listLink:[],
+        }
+    },
+    created(){
+        let self=this;
+        let id=this.$route.params.id;
+        taskManagementApi
+            .getDetailWorkflow(id)
+            .then(res => {
+                if (res.status == 200) {
+                    self.infoWorkflow=res.data;
+                    if (res.data.nodes.length > 0) {
+                        let nodes =res.data.nodes;
+                        for (let i = 0; i < nodes.length; i++) {
+                            let node = convertFormatNode(nodes[i]);
+                            self.listNode.push(node);                            
+                        }
+                    }
+
+                    if (res.data.links.length > 0) {
+                        let links =res.data.links;
+                        for (let i = 0; i < links.length; i++) {
+                            let link = convertFormatLink(links[i]);
+                            self.listLink.push(link);                            
+                        }
+                    }
+                }else{
+                    self.$snotifyError("", "Can not get detail workflow with id:"+id);
+                }
+            })
+            .catch(err => {
+                self.$snotifyError("", "Can not get detail workflow with id="+id);
+            })
+            .always(() => {});
+    }
+
+}
+</script>
+
+<style>
+
+</style>

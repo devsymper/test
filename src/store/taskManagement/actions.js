@@ -33,6 +33,35 @@ const getAllProject = async(context) => {
     }
 }
 
+const getAllStatusCategory = async(context) => {
+    if (context.state.allStatusCategory.length==0) {
+        try {
+            let res = await taskManagementApi.getAllStatusCategory();
+            if (res.status == 200) {
+                context.commit('setAllStatusCategory', res.data.listObject);
+            } else {
+                SYMPER_APP.$snotifyError(error, "Can not get all StatusCategory!");
+            }
+        } catch (error) {
+            SYMPER_APP.$snotifyError(error, "Can not get all StatusCategory!");
+        }
+    }
+}
+const getAllRole = async(context) => {
+    if (context.state.allRole.length==0) {
+        try {
+            let res = await taskManagementApi.getListRole();
+            if (res.status == 200) {
+                context.commit('setAllRole', res.data.listObject);
+            } else {
+                SYMPER_APP.$snotifyError(error, "Can not get all role!");
+            }
+        } catch (error) {
+            SYMPER_APP.$snotifyError(error, "Can not get all role!");
+        }
+    }
+}
+
 const addProjectToStore = async(context, item) => {
     context.commit('addProjectToStore', item);
 }
@@ -55,7 +84,9 @@ export {
     addProjectToStore,
     updateProjectToStore,
     addCategoryToStore,
-    updateCategoryToStore
+    updateCategoryToStore,
+    getAllStatusCategory,
+    getAllRole
 
 
 };

@@ -52,7 +52,7 @@ export default [
             },
             {
                 path: "workflow",
-                meta:{group:'projectSetting'},
+                // meta:{group:'projectSetting'},
                 name: "listWorkflow",
                 components:{
                     TaskManagement: () => import ('../../views/taskManagement/workflow/List.vue')
@@ -60,10 +60,18 @@ export default [
             },
             {
                 path: "workflow/create",
-                meta:{group:'projectSetting'},
+                // meta:{group:'projectSetting'},
                 name: "issueTypeWorkflow",
                 components:{
                     TaskManagement: () => import ('../../views/taskManagement/workflow/Workflow.vue')
+                }
+            },
+            {
+                path: "workflow/:id",
+                // meta:{group:'projectSetting'},
+                name: "detailworkflow",
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/workflow/DetailWorkflow.vue')
                 }
             },
             {

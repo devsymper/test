@@ -109,18 +109,6 @@ export default {
                     
                     }
                 },
-                desscription : { 
-                    title: "Mô tả",
-                    type: "text",
-                    value:"",
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                    validate(){
-                    
-                    }
-                },
             },
             userSelect:[]
         }

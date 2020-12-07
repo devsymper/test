@@ -27,6 +27,7 @@
                     :search="search"
                     hide-default-footer
                     class="table-list-category"
+                    @click:row="handleClickRow"
                 >
                     <template v-slot:[`item.name`]="{ item }">
                         <span class="name-project pt-1 pl-2" style="color:#0000aa">
@@ -55,7 +56,7 @@
             <v-card-text>{{$t("taskManagement.dialog.removeWorkflow")}}</v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="red darken-1" text @click="removeCategory">Xóa</v-btn>
+                <v-btn color="red darken-1" text @click="removeWorkflow">Xóa</v-btn>
                 <v-btn color="green darken-1" text @click="dialogRemove = false">Hủy</v-btn>
             </v-card-actions>
             </v-card>
@@ -91,34 +92,39 @@ export default {
 
         }
     },
+    computed:{
+        listWorkflow(){
+            return this.$store.state.taskManagement.allWorkflow;
+        }
+    },
     props:{
-        listWorkflow: {
-            type: Array,
-            default() {
-                return [];
-            }
-        },
+  
     },
     methods:{
-        removeCategory(){
-            // taskManagementApi
-            //     .removeCategory(this.workflowSelected.id)
-            //     .then(res => {
-            //         if (res.status == 200) {
-            //             this.$snotifySuccess("Remove category success!");
-            //             this.$store.commit("taskManagement/removeCategoryToStore",this.workflowSelected.id);
-            //         }else{
-            //             this.$snotifyError("", "Error! Have error !!!");
-            //         }
-            //     })
-            //     .catch(err => {
-            //         this.$snotifyError("", "Error! Have error !!!", err);
-            //     });
-            // this.dialogRemove=false;  
+        handleClickRow(item){ 
+            if (item.id) {
+                this.$router.push('/task-management/workflow/'+item.id);
+            }
+        },
+        removeWorkflow(){
+            taskManagementApi
+                .removeWorkflow(this.workflowSelected.id)
+                .then(res => {
+                    if (res.status == 200) {
+                        this.$snotifySuccess("Remove category success!");
+                        this.$store.commit("taskManagement/removeWorkflowToStore",this.workflowSelected.id);
+                    }else{
+                        this.$snotifyError("", "Error! Have error !!!");
+                    }
+                })
+                .catch(err => {
+                    this.$snotifyError("", "Error! Have error !!!", err);
+                });
+            this.dialogRemove=false;  
         },
         handleDeleteWorkflow(item){
             this.workflowSelected=item;
-            this.dialogRemoveCate=true;
+            this.dialogRemove=true;
         },
         handleCreate(){
             this.$router.push('/task-management/workflow/create');

@@ -103,7 +103,10 @@ export default {
         
     },
     created(){
+        this.$store.dispatch("taskManagement/getAllStatusCategory");
+        this.$store.dispatch("taskManagement/getAllRole");
         this.getListWorkflow();
+
     },
     computed:{
         currentUserAvatar(){

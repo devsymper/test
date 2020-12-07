@@ -122,7 +122,6 @@
 </template>
 
 <script>
-import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "@/plugins/util";
 import infoUser from "@/components/common/user/InfoUser";
 import pickIcon from "@/components/common/iconPicker";
@@ -131,7 +130,6 @@ import FormTpl from "@/components/common/FormTpl.vue";
 
 export default {
     components:{
-        VuePerfectScrollbar: VuePerfectScrollbar,
         infoUser,
         pickIcon,
         FormTpl

@@ -1,6 +1,5 @@
 <template>
     <listWorkflow
-        :listWorkflow="listWorkflow"
     />
 
 </template>
@@ -43,6 +42,7 @@ export default {
     },
     created(){
         this.getListWorkflow();
+        this.$store.dispatch("taskManagement/getAllStatusCategory");
     }
 
 }

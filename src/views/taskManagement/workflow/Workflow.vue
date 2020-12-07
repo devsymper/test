@@ -278,18 +278,6 @@ export default {
                     
                     }
                 },
-                desscription : { 
-                    title: "Mô tả",
-                    type: "text",
-                    value:"all",
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                    validate(){
-                    
-                    }
-                },
             },
             dataWorkflowProps:{
                 name : { 

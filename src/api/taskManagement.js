@@ -123,4 +123,19 @@ export const taskManagementApi = {
     addWorkflow(data){
         return taskManagement.post("task-life-circle",data);
     },
+    getDetailWorkflow(id){
+        return taskManagement.get("task-life-circle/"+id);
+    },
+    removeWorkflow(id){
+        return taskManagement.delete("task-life-circle/"+id);
+    }, 
+    updateWorkflow(id,data){
+        return taskManagement.put("task-life-circle/"+id,data);
+    },
+
+    // status category
+    getAllStatusCategory(){
+        return taskManagement.get("status-category");
+    },
+
 }

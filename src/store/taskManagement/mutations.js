@@ -7,6 +7,9 @@ const setAllCategory = (state, allCategory) => {
         Vue.set(state, 'allCategory', allCategory);
 }
 
+const setAllStatusCategory = (state, allStatusCategory) => {
+    Vue.set(state, 'allStatusCategory', allStatusCategory);
+}
 const setAllProject = (state, allProject) => {
     Vue.set(state, 'allProject', allProject);
 }
@@ -27,6 +30,10 @@ const setListColumnInBoard = (state, listColumnInBoard) => {
 const setAllWorkflow = (state, allWorkflow) => {
     Vue.set(state, 'allWorkflow', allWorkflow);
 }
+const setAllRole = (state, allRole) => {
+    Vue.set(state, 'allRole', allRole);
+}
+
 const setCurrentProject = (state, currentProject) => {
     Vue.set(state, 'currentProject', currentProject);
 }
@@ -98,6 +105,17 @@ const updateBoardToStore = (state, item) => {
     Vue.set(state, 'listBoardInProject', currentListBoard);
 }
 
+const updateWorkflowToStore = (state, item) => {
+    let currentAllWorkflow = state.allWorkflow;
+    let obj = currentAllWorkflow.find(data => data.id === item.id)
+    var index = currentAllWorkflow.indexOf(obj);
+    if (index > -1) {
+        currentAllWorkflow[index].name = item.name;
+        currentAllWorkflow[index].description = item.description;
+    }
+    Vue.set(state, 'allWorkflow', currentAllWorkflow);
+}
+
 
 const updateCategoryToStore = (state, item) => {
     let currentListCategory = state.allCategory;
@@ -131,6 +149,15 @@ const removeProjectToStore = (state, id) => {
     }
     Vue.set(state, 'allProject', currentListProject);
 }
+const removeWorkflowToStore = (state, id) => {
+    let currentAllWorkflow = state.allWorkflow;
+    let obj = currentAllWorkflow.find(data => data.id === id)
+    var index = currentAllWorkflow.indexOf(obj);
+    if (index > -1) {
+        currentAllWorkflow.splice(index, 1);
+    }
+    Vue.set(state, 'allWorkflow', currentAllWorkflow);
+}
 
 const addToTaskManagementStore = (state, data) =>{
     let key = data.key;
@@ -158,5 +185,9 @@ export {
     removeProjectToStore,
     setListColumnInBoard,
     setAllWorkflow,
+    removeWorkflowToStore,
+    setAllStatusCategory,
+    updateWorkflowToStore,
+    setAllRole
 
 };

@@ -1,6 +1,8 @@
 const defaultState = {
     allCategory: [],
     allProject: [],
+    allStatusCategory: [],
+    allRole: [],
     headerBreadcrumbs:[],
     currentProject:{},
     listBoardInProject:[],
