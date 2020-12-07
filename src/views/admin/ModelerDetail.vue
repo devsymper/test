@@ -92,6 +92,7 @@ import { appConfigs } from '@/configs';
 import serviceTaskDefinitions from "@/components/process/elementDefinitions/serviceTaskDefinitions";
 import CustomRenderProcessCount from '@/components/process/CustomRenderProcessCount'
 import ModelerWithHeatMap from "./ModelerWithHeatMap"
+import {cleanXMLBeforeRenderInEditor} from "@/components/process/processAction.js";
 
 const apiCaller = new Api('');
 
@@ -1221,10 +1222,6 @@ export default {
                 this.$refs.symperBpmn[ac]();
             }
         },
-        cleanXMLBeforeRender(xml){
-            xml = xml.replace(/<symper:(.*?)<\/symper:(.*?)>/g,''); // Loại bỏ toàn bộ các thẻ của symper
-            return xml;
-        },
         /**
          * Lấy data từ server và áp dụng data này để hiển thị lên process
          */
@@ -1232,7 +1229,7 @@ export default {
             try {
                 let modelData = await bpmnApi.getModelData(idProcess);
                 modelData = modelData.data;
-                let xml = this.cleanXMLBeforeRender(modelData.content);
+                let xml = cleanXMLBeforeRenderInEditor(modelData.content);
                 let afterRender = await this.$refs.symperBpmn.renderFromXML(xml);
                 if(modelData.configValue){
 					this.restoreAttrValueFromJsonConfig(modelData.configValue);
