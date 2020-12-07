@@ -1,3 +1,3 @@
 var SYMPER_ENV = {
-    "environment":""
+    "environment":"dev"
 };
