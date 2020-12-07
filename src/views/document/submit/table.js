@@ -454,8 +454,6 @@ export default class Table {
                     data: this.getSourceData(),
                     tableName:thisObj.tableName
                 });
-                debugger
-
                 if (!changes) {
                     return
                 }
@@ -744,7 +742,6 @@ export default class Table {
      * @param {*} rowIndex 
      */
     handlerCheckEffectedControlInTable(controlName, rowIndex = "") {
-        debugger
         if (controlName == "") {
             return
         }
@@ -851,12 +848,25 @@ export default class Table {
         let dataInput = {};
         let listInputInDocument = this.getListInputInDocument();
         for (let inputControlName in inputControl) {
-            if (listInputInDocument.hasOwnProperty(inputControlName)){
-                dataInput[inputControlName] = listInputInDocument[inputControlName].value;
-                if(listInputInDocument[inputControlName].type == 'date'){
-                    dataInput[inputControlName] = listInputInDocument[inputControlName].convertDateToStandard(listInputInDocument[inputControlName].value)
+            let controlIns = listInputInDocument[inputControlName];
+            if(controlIns.inTable != false){
+                let colIndex = this.tableInstance.propToCol(inputControlName);
+                let currentColData = this.tableInstance.getDataAtCol(colIndex);
+                if(this.tableHasRowSum){
+                    currentColData.pop();
+                }
+                dataInput[inputControlName] = currentColData;
+            }
+            else{
+                if (listInputInDocument.hasOwnProperty(inputControlName)){
+                    dataInput[inputControlName] = controlIns.value;
+                    
                 }
             }
+            if(controlIns.type == 'date'){
+                dataInput[inputControlName] = controlIns.convertDateToStandard(controlIns.value)
+            }
+            
         }
         return dataInput;
     }
