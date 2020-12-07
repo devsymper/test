@@ -701,9 +701,13 @@ export default class BasicControl extends Control {
         return false;
     }
     renderInfoIconToControl(controlName) {
+            // debugger
             if (this.ele.parent().find('.info-control-btn').length == 0) {
-                let icon = `<span class="mdi mdi-information info-control-btn" data-control="` + controlName + `"></span>`
-                this.ele.parent().append(icon);
+
+                // let icon = `<span class="mdi mdi-information info-control-btn" data-control="` + controlName + `"></span>`
+                this.ele.addClass("info-control-btn");
+                this.ele.attr('data-control', controlName)
+                    //  this.ele.parent().append(icon);
             }
         }
         /**

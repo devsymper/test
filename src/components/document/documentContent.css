@@ -165,7 +165,7 @@ input.s-control {
 
 .handsontable td,
 .handsontable th {
-    color: #212529 !important;
+    color: #212529;
     font-size: 12px;
     border-color: #bbb;
     border-right: 0;
@@ -523,16 +523,9 @@ button:hover {
     position: relative;
 }
 
-.wrap-table .info-control-btn {
-    right: 4px !important;
-    top: 0!important;
-}
-
 .info-control-btn {
-    right: 0;
-    color: blue;
-    position: absolute;
-    top: 4px;
+    color: #e67e23 !important;
+    text-decoration-line: underline;
 }
 
 .s-control.s-control-image {

@@ -91,14 +91,14 @@ export default {
                     },
                     callback: (document, callback) => {
                         const self = this;
-                        if(document.allowSubmitOutsideWorkflow==1){
+                       //if(document.allowSubmitOutsideWorkflow==1){
                              self.$goToPage('/documents/'+document.id+'/submit',document.title);
-                        }else{
-                            self.$snotify({
-                                type: "error",
-                                title: "Không cho phép nhập liệu"
-                            })
-                        }
+                        // }else{
+                        //     self.$snotify({
+                        //         type: "error",
+                        //         title: "Không cho phép nhập liệu"
+                        //     })
+                        // }
                        
                     },
                 },
@@ -109,15 +109,15 @@ export default {
                     },
                     callback: (document, callback) => {
                          const self = this;
-                        if(document.allowSubmitOutsideWorkflow==1){
-                            this.$refs.listDocument.openactionPanel();
-                            this.documentId = parseInt(document.id)
-                        }else{
+                        // if(document.allowSubmitOutsideWorkflow==1){
+                        //     this.$refs.listDocument.openactionPanel();
+                        //     this.documentId = parseInt(document.id)
+                        // }else{
                             self.$snotify({
                                 type: "error",
                                 title: "Không cho phép nhập liệu nhanh"
                             })
-                        }
+                       // }
                        
                     },
                 },
@@ -240,16 +240,17 @@ export default {
             },
             customAPIResult:{
                  reformatData(data){
-                     data.data.columns[11].title= "table.allowSubmitOutsideWorkflow"
-                     let listDocuments = data.data.listObject; 
-                     listDocuments.map(doc=>{
-                         if(doc.allowSubmitOutsideWorkflow==1){
-                             doc.allowSubmitOutsideWorkflow="Cho phép"
-                         }
-                         else{
-                             doc.allowSubmitOutsideWorkflow="Không cho phép"
-                         }
-                     })
+                    
+                    //  data.data.columns[11].title= "table.allowSubmitOutsideWorkflow"
+                    //  let listDocuments = data.data.listObject; 
+                    //  listDocuments.map(doc=>{
+                    //      if(doc.allowSubmitOutsideWorkflow==1){
+                    //          doc.allowSubmitOutsideWorkflow="Cho phép"
+                    //      }
+                    //      else{
+                    //          doc.allowSubmitOutsideWorkflow="Không cho phép"
+                    //      }
+                    //  })
                     return data.data
 
                  }

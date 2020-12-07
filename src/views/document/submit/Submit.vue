@@ -1461,20 +1461,20 @@ export default {
 							thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
                             thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
                             thisCpn.dataPivotTable = res.data.pivotConfig;
-                            if(res.data.document.allowSubmitOutsideWorkflow==1){
+                            //if(res.data.document.allowSubmitOutsideWorkflow==1){
                                 setDataForPropsControl(res.data.fields,thisCpn.keyInstance,'submit'); // ddang chay bat dong bo
                                 setTimeout(() => {
                                     thisCpn.processHtml(content);
                                 }, 100);
-                            }else{
-                                thisCpn.$snotify({
-                                    type: "error",
-                                    title: "Không cho phép nhập liệu"
-                                }); 
-                                setTimeout(() => {
-                                     thisCpn.$goToPage('/documents/');
-                                }, 100);
-                            }
+                            // }else{
+                            //     thisCpn.$snotify({
+                            //         type: "error",
+                            //         title: "Không cho phép nhập liệu"
+                            //     }); 
+                            //     setTimeout(() => {
+                            //          thisCpn.$goToPage('/documents/');
+                            //     }, 100);
+                            // }
                            
                         }
                         else{

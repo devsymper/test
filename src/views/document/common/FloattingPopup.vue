@@ -163,6 +163,7 @@ export default {
                 .find(".s-control");
             if ($(e.target).closest(".handsontable").length > 0) {
                 inputOffset = $(e.delegateTarget).offset();
+                input = $(e.delegateTarget)
             }
             //nêu là ngoài bảng
             else {
@@ -175,9 +176,9 @@ export default {
             let cardHeight = $(".s-floatting-popup").height();
             let inputWidth = input.width();
             let top = inputOffset.top - detailFormOffset.top + 26;
-            this.style.top = top + "px"
+            this.style.top = top + "px";
             if (cardWidth + leftDiff > detailFormWidth) {
-                this.style.left = Math.abs(leftDiff + inputWidth - cardWidth) + "px"
+                this.style.left = Math.abs(leftDiff) + "px"
             } else {
                 this.style.left = Math.abs(leftDiff) + "px"
             }
