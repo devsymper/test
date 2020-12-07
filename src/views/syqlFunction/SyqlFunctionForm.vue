@@ -244,14 +244,33 @@
 			</div>
 			<div class="comment-area">
 				<div class="mt-2 ml-2 mb-1">
-					<v-icon class="fs-13">
+					Chú thích
+					<v-icon 
+						class="fs-13 float-right mr-2"
+						@click="showCommentArea"
+						v-show="action != 'add'"
+					>
 						mdi-comment-outline
 					</v-icon>
-					Chú thích
 				</div>
 				<div class="ml-1 comment-content  mb-10" >
 					<Editor 
 						ref="editorBox"
+					/>
+				</div>
+				<div 
+					v-show="showComment && action != 'add'"
+					class="syql-comment-wrapper"
+					style="transform:translateX(400px)"
+				>
+					<Comment 
+						:showComment="true" 
+						:objectIdentifier="syqlId" 
+						:objectType="'syql-function'" 
+						:height="'95%'"
+						:width="'350px'"
+						:buttonClose="true" 
+						@close-comment="hideComment"
 					/>
 				</div>
 			</div>
@@ -283,17 +302,23 @@ import DebugDialog from "./DebugDialog"
 import {syqlFunctionApi} from '@/api/SyqlFunction'
 import FormTpl from '@/components/common/FormTpl'
 import Editor from "@/components/common/editor/Editor"
+import Comment from "@/components/common/comment/Comment"
 export default {
 	components:{
 		VuePerfectScrollbar,
 		FomulaEditor,
 		DebugDialog,
 		FormTpl,
-		Editor
+		Editor,
+		Comment
 	},
 	props:{
 		action:{
 			type: String, 
+			default: ""
+		},
+		syqlId:{
+			type: String,
 			default: ""
 		}
 	},
@@ -349,6 +374,17 @@ export default {
 		}
 	},
 	methods:{
+		showCommentArea(){
+			this.showComment = true
+			setTimeout((self) => {
+				$('.syql-comment-wrapper').css({transform:'translateX(0px)'});
+			}, 10, this);
+		},
+		hideComment(){
+			setTimeout((self) => {
+				self.showComment = false;
+			}, 250, this);
+		},
 		showDebugDialog(){
 			this.$refs.fomulaEditor.toggleDebugView()
 		},
@@ -498,6 +534,7 @@ export default {
 	},
 	data(){
 		return {
+			showComment: false,
 			showDialog: false,
 			boxComment:{
 				boxComment:{
@@ -661,6 +698,21 @@ export default {
 }
 .form-syql-function >>> .add-another-agrument{
 	cursor: pointer;
+}
+.form-syql-function >>> .syql-comment-wrapper{
+	border: 1px solid lightgray;
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 380px;
+	height: 100%;
+	background: white;
+	z-index: 9999;
+	padding: 12px 6px 6px 11px;
+	transition: all ease-in-out 250ms;
+	/* -webkit-box-shadow: -9px 1px 16px 0px rgba(0,0,0,0.75); */
+	/* -moz-box-shadow: -9px 1px 16px 0px rgba(0,0,0,0.75); */
+	/* box-shadow: -9px 1px 16px 0px rgba(0,0,0,0.75); */
 }
 </style>
 <style>

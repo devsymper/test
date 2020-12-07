@@ -20,6 +20,7 @@
 				<SyqlFunctionForm
 					:action="action"
 					@add-success="handleAddSuccess"
+					:syqlId="syqlId"
 				/>
 			</template>
         </list-items>
@@ -47,6 +48,7 @@ export default {
         return {
 			getListUrl: appConfigs.apiDomain.syqlFunction+'functions',
 			action:'',
+			syqlId: '',
 			content:'',
 			showDialog: false,
 			containerHeight:null,
@@ -108,7 +110,7 @@ export default {
                     name: "edit",
                     text: this.$t("common.edit"),
                     callback: (row, callback) => {
-						self.handleEdit()
+						self.handleEdit(row)
 						self.$store.dispatch('SyqlFunction/getFunctionDetail',row.id)
                     }
                 },
@@ -149,7 +151,7 @@ export default {
                     name: "detail",
                     text: this.$t("common.detail"),
                     callback: (row, callback) => {
-						self.handleView()
+						self.handleView(row)
 						self.$store.dispatch('SyqlFunction/getFunctionDetail',row.id)
                     }
                 },
@@ -157,10 +159,12 @@ export default {
         };
 	},
 	methods:{
-		handleView(){
+		handleView(row){
+			this.syqlId = row.id
 			this.openPanel('view')
 		},
-		handleEdit(){
+		handleEdit(row){
+			this.syqlId = row.id
 			this.openPanel('edit')
 		},
 		handleAdd(){
