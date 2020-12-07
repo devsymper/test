@@ -461,7 +461,7 @@ export default class Table {
                 if (changes[0][2] == changes[0][3] && source == 'edit') {
                     return;
                 }
-                if (!changes[0][2] && !changes[0][3]) {
+                if (changes[0][2] === changes[0][3] && source == 'auto_set') {
                     return;
                 }
                 if (getSDocumentSubmitStore(thisObj.keyInstance).docStatus == 'init' &&

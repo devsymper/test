@@ -307,7 +307,10 @@ export default {
                     self.detectBlurEditorEvent(e)
                 });
                 ed.on('keyup', function(e) {
-                    self.keyHandler(e)
+                    self.keyHandler(e, ed)
+                });
+                ed.on('keydown', function(e) {
+                    self.keyDownHandler(e, ed)
                 });
                 ed.on('paste', function(e) {
                     self.handlePasteContent(e);
@@ -723,9 +726,17 @@ export default {
          */
         deleteControl(){
             let control = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.on-selected');
-            this.resetSelectControl()
-            control.remove();
-
+            let currentControl = this.editorStore.currentSelectedControl;
+            if(currentControl.properties.display.isPreventedConfig && currentControl.properties.display.isPreventedConfig.value){
+                this.$snotify({
+                                type: "warn",
+                                title: "Không thể xóa control này"
+                            }); 
+            }
+            else{
+                this.resetSelectControl();
+                control.remove();
+            }
         },
         // hàm tạo dialog của tinymce để cấu hình padding doc
         showPaddingPageConfig(ed){
@@ -1541,6 +1552,7 @@ export default {
                 properties['dataFlowId'].value = curDataFlow[0];
                 properties['dataFlowId'].options = this.listDataFlow;
             }
+            console.log(properties,'propertiesproperties');
             if(this.$getRouteName() == 'editDocument' && properties.isPreventedConfig){
                 properties.isPreventedConfig.hidden = true;
             }
@@ -1607,7 +1619,7 @@ export default {
         // gõ // để mở autocomplete thêm control
         // 191: / để thêm control
         
-        keyHandler(event)
+        keyHandler(event, ed)
         {
             let thisCpn = this;
             if ( event.keyCode == 191 )
@@ -1641,6 +1653,34 @@ export default {
                 }
                 this.lastKeypressTime = thisKeypressTime;
             }
+           
+            
+        },
+         /**
+             * detect keyup delete
+             * không cho xóa các control đã được đánh dấu ko được chỉnh sửa
+             */
+        keyDownHandler(e,ed){
+            if(event.keyCode == 8){
+                let allData = this.editorCore.undoManager.data;
+                let dataDeleted = allData[allData.length - 1];
+                let curNode = $(ed.selection.getNode());
+                let allControlInNode = curNode.find('.s-control:not(.s-control-table .s-control)');
+                for (let index = 0; index < allControlInNode.length; index++) {
+                    let controlEl = $(allControlInNode[index]);
+                    let controlId = controlEl.attr('id');
+                    let controlStore = this.editorStore.allControl[controlId];
+                    if(controlStore.properties.isPreventedConfig && controlStore.properties.isPreventedConfig.value){
+                         this.$snotify({
+                                type: "warn",
+                                title: "Không thể xóa nội dung chứa control hệ thống"
+                            }); 
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+            }
+            
         },
         /**
          * Hàm xử lí sự kiên click vào tab bên trên header của control tab/page để chuyển tab
