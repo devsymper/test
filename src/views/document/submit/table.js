@@ -454,14 +454,13 @@ export default class Table {
                     data: this.getSourceData(),
                     tableName:thisObj.tableName
                 });
+                debugger
+
                 if (!changes) {
                     return
                 }
                 // check nếu ko có thay đổi trong cell thì return
                 if (changes[0][2] == changes[0][3] && source == 'edit') {
-                    return;
-                }
-                if (changes[0][2] === changes[0][3] && source == 'auto_set') {
                     return;
                 }
                 if (getSDocumentSubmitStore(thisObj.keyInstance).docStatus == 'init' &&
@@ -745,6 +744,7 @@ export default class Table {
      * @param {*} rowIndex 
      */
     handlerCheckEffectedControlInTable(controlName, rowIndex = "") {
+        debugger
         if (controlName == "") {
             return
         }
