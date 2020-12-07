@@ -774,3 +774,8 @@ body {
     top: -1000px;
     left: -1000px;
 }
+.codicon-symbol-enum:before {
+	content: "\F0DC9" !important;
+	font: normal normal normal 15px/1 "Material Design Icons" !important;
+	color: unset	 !important;
+}

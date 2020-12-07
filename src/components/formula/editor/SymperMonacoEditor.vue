@@ -17,6 +17,7 @@
 import {languages, editor} from 'monaco-editor';
 import staticCompletionItems from "./modules/sql/staticCompletionItems";
 import { documentApi } from '../../../api/Document';
+import "@/assets/css/monacoEditor.css";
 export default {
     methods: {
         focus(){
@@ -35,7 +36,10 @@ export default {
             this.editor.onDidChangeModelContent((e) => {
                 let vl = self.getValue();
                 self.selfChange = true;
-                self.$emit('input', vl);
+				self.$emit('input', vl);
+				setTimeout(() => {
+					debugger
+				}, 2000);
                 self.$emit('change', vl);
                 if(this.completionDiv){
                     this.completionDiv.css('visibility', 'hidden');
@@ -127,7 +131,7 @@ export default {
                 });
                 this.$store.state.formulaEditor.didSetStaticCompletionItems = true;
             }
-        }
+		},
     },
     mounted(){
         setTimeout((self) => {
@@ -142,7 +146,7 @@ export default {
             self.setStaticCompletionItems();
             self.$emit('init', self.editor);
             self.listenEditorEvents();
-            self.model = self.editor.getModel();
+			self.model = self.editor.getModel();
         }, 50, this);
     },
     props: {
@@ -211,6 +215,6 @@ export default {
 }
 </script>
 
-<style>
+<style >
 
 </style>
