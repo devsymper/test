@@ -1350,9 +1350,7 @@ export default {
          */
         handleInputChangeBySystem(controlName,valueControl, fromAutocomplete = false, isRunChange = true){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
-            if(controlInstance.getValue() == valueControl && this.sDocumentSubmit.docStatus != 'beforeSubmit'){ // kiểm tra ko có sự thay đổi giá trị của control thì return
-                return;
-            }
+            markBinedField(this.keyInstance,controlName);
             controlInstance.setValue(valueControl);
             if(!isRunChange){
                 controlInstance.triggerOnChange()
@@ -1361,7 +1359,6 @@ export default {
             if(fromAutocomplete){
                 $('#'+controlInstance.id).attr('data-autocomplete',valueControl);
             }
-            markBinedField(this.keyInstance,controlName);
             if(controlInstance.type == 'user'){
                 valueControl = $('#'+controlInstance.id).attr('user-id');
                 if(valueControl == undefined) valueControl = 0;
