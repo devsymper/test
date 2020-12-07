@@ -75,6 +75,9 @@ export const taskManagementApi = {
     getListBoardInProject(projectId){
         return taskManagement.get("boards/"+projectId);
     },
+    getDetailBoard(id){
+        return taskManagement.get("boards-detail/"+id);
+    },
     updateBoard(id,data){
         return taskManagement.put("boards/"+id,data);
     },

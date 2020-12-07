@@ -29,14 +29,20 @@ export default {
             if (this.sTaskManagement.listColumnInBoard.length > 0 ) {
                 this.listColumn = this.sTaskManagement.listColumnInBoard;
             }else{
-                debugger
                 let idBoard = this.$route.params.idBoard;
                 let res = await taskManagementApi.getListColumn(idBoard);
                 if (res.status==200 && res.data) {
                     this.listColumn=res.data.listObject;
-                    this.$store.commit("taskManagement/setListColumnInBoard", res.data.listObject);
                 }
             }
+            this.listColumn.reduce((arr,obj)=>{
+                obj.statusInColumn = [];
+                obj.isHidden = obj.isHidden == 1;
+                obj.isBacklog = obj.isBacklog == 1;
+                arr.push(obj);
+                return arr
+            },[])
+            this.$store.commit("taskManagement/setListColumnInBoard", this.listColumn);
         }
     },
     created(){
@@ -47,6 +53,13 @@ export default {
             if (currentBoard) {
                 this.infoBoard=currentBoard;
             }
+        }
+        else{
+            taskManagementApi.getDetailBoard(idBoard).then(res=>{
+                if(res.status == 200){
+                    this.infoBoard = res.data;
+                }
+            }).always({}).catch({})
         }
         this.getListColumn();
     }

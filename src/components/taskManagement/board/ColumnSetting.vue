@@ -9,24 +9,38 @@
             </div>
         </div>
         <div class="d-flex">
-            <draggable :list="listColumn" :animation="250" class="py-4 h-100 w-100" ghost-class="ghost-columns" group="people">
+            <draggable :list="columns" :animation="250" class="py-4 h-100 w-100" ghost-class="ghost-columns" group="people">
                 <transition-group type="transition" name="flip-list" class="wrap-kanban-board">
                     <div
-                        v-for="column in listColumn"
+                        v-for="column in columns"
                         :key="column.name"
                         :style="getColWidth()"
                         class=" board-column-item mr-4"
                     >
                         <div class="column-header">
-                            <input class="title-column" v-model="column.name">
+                            <v-text-field
+                            class="sym-small-size sym-style-input"
+                            v-model="column.name"
+                                solo
+                            ></v-text-field>
+                            <div class="d-flex">
+                                <v-checkbox
+                                    v-model="column.isHidden"
+                                    class="sym-small-size sym-style-input mr-2"
+                                    label="ẩn"
+                                ></v-checkbox>
+                                <v-checkbox
+                                    v-model="column.isBacklog"
+                                    class="sym-small-size sym-style-input"
+                                    label="backlog"
+                                ></v-checkbox>
+                            </div>
                         </div>
                         <div class="h-100">
-                            <draggable  :animation="250" ghost-class="ghost-card" class="h-100" group="status">
-                                <!-- Each element from here will be draggable and animated. Note :key is very important here to be unique both for draggable and animations to be smooth & consistent. -->
-                                <div class="status-item">
-                                    hello
+                            <draggable :list="column.statusInColumn" :animation="250" ghost-class="ghost-card" class="h-100 list-group" group="status">
+                                 <div class="status-item" v-for="status in column.statusInColumn" :key="status.id">
+                                    {{status.name}}
                                 </div>
-                                <!-- </transition-group> -->
                             </draggable>
                         </div>
                      
@@ -38,10 +52,10 @@
                 <div class="p-2 all-status__header">
                     Tất cả trạng thái
                 </div>
-                <draggable  :animation="250" ghost-class="ghost-card" class="h-100" group="status">
+                <draggable :list="listStatus"  :animation="250" ghost-class="ghost-card" class="h-100 list-group" group="status">
                     <!-- Each element from here will be draggable and animated. Note :key is very important here to be unique both for draggable and animations to be smooth & consistent. -->
-                    <div class="status-item">
-                        hello
+                    <div class="status-item" v-for="status in listStatus" :key="status.id">
+                        {{status.name}}
                     </div>
                     <!-- </transition-group> -->
                 </draggable>
@@ -53,7 +67,9 @@
 <script>
 import draggable from "vuedraggable";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-
+import {
+    util
+} from "@/plugins/util.js";
 export default {
     name:"columnSetting",
     props:{
@@ -70,22 +86,23 @@ export default {
     },
     data(){
         return{
-            headers: ["id", "name", "sport"],
-            list: [
-                { id: 1, name: "Abby", sport: "basket" },
-                { id: 2, name: "Brooke", sport: "foot" },
-                { id: 3, name: "Courtenay", sport: "volley" },
-                { id: 4, name: "David", sport: "rugby" }
-            ],
+            listStatus:[{name:'heli',id:'123653f'},{name:'he43li',id:'qwasd'},{name:'hel1i',id:'123653qwf'}],
+            columns:[]
         }
+    },
+    mounted(){
+        this.columns = util.cloneDeep(this.listColumn)
     },
     methods:{
         getColWidth(){
-            let colLength = this.listColumn.length;
+            let colLength = this.columns.length;
             return {width:100/colLength + '%'};
         },
         addColumn(){
-            this.listColumn.push({name:'new column'})
+            this.columns.push({name:'new column'})
+        },
+        onKeyDown(){
+            
         }
     }
 }
@@ -127,5 +144,8 @@ export default {
     padding: 8px;
     border: var(--symper-border);
     box-shadow: var(--symper-box-shadow);
+}
+.sym-style-input >>> .v-input__slot{
+    box-shadow: none !important;
 }
 </style>

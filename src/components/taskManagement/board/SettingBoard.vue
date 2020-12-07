@@ -1,6 +1,14 @@
 <template>
     <div class="w-100 h-100">
-        <div class="symper-title pt-2 pl-2" style="height:40px">Setting for Board XXX</div>
+        <div class="d-flex">
+            <div class="symper-title pt-2 pl-2" style="height:40px">Setting for Board XXX</div>
+            <v-btn
+                class="save-setting-btn"
+                depressed
+                >
+                {{$t('common.save')}}
+            </v-btn>
+        </div>
         <div  style="height:calc(100% - 40px); width:100%; background:#333">
             <v-tabs 
                 class="w-100 h-100 fs-13 tab-board" 
@@ -66,5 +74,9 @@ export default {
 <style scoped>
 .tab-board >>>.v-slide-group__wrapper{
     width:200px;
+}
+.save-setting-btn{
+    margin-left: auto;
+    margin-right: 12px;
 }
 </style>
