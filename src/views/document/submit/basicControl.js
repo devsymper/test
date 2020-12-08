@@ -398,6 +398,7 @@ export default class BasicControl extends Control {
         } else if (this.type == 'date') {
             value = SYMPER_APP.$moment(value).format(this.formatDate);
         }
+       
         if (this.type == 'image') {
             this.ele.empty();
             let w = this.controlProperties.width.value;
@@ -410,10 +411,12 @@ export default class BasicControl extends Control {
             }
             let image = '<img height="' + h + '" width="' + w + '" src="' + value + '">';
             this.ele.append(image);
-        } else {
+        }
+        else{
             let currentStyle = this.ele.attr('style');
             this.ele.replaceWith('<div  class="s-control s-control-text" contenteditable="false" style="'+currentStyle+';background:none;padding: 5px 5px !important;">'+value+'</div>');
         }
+        
         
     }
     formatNumberValue(data) {
@@ -727,7 +730,12 @@ export default class BasicControl extends Control {
     renderRichTextControl() {
         let style = this.ele.attr('style');
         this.ele.replaceWith('<textarea style="'+style+'" id="'+this.id+'" class="s-control s-control-rich-text" title="Rich-text" s-control-type="richText" type="text"></textarea>');
-        this.ele = $('#sym-submit-'+this.curParentInstance).find("textarea#"+this.id);
+        if(this.checkViewType('submit') || this.checkViewType('update')){
+            this.ele = $('#sym-submit-'+this.curParentInstance).find("textarea#"+this.id);
+        }
+        else{
+            this.ele = $('#sym-Detail-'+this.curParentInstance).find("textarea#"+this.id);
+        }
     }
     getDefaultValue() {
         if (this.isCheckbox) {
