@@ -114,7 +114,7 @@ export default {
 			this.$refs.listVersionOfService.actionPanel = false
 		},
 		handleAddSuccess(){
-			this.showDialogAdd = false
+			this.showDialogAdd = false	
 			this.$refs.listVersionOfService.refreshList()
 		}
 	}

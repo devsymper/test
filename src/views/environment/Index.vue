@@ -17,6 +17,10 @@
 				v-if="active == 'serviceManagement' "
 				:containerHeight="containerHeight"
 			/>
+			<ListServer 
+				v-if="active == 'serverManagement' "
+				:containerHeight="containerHeight"
+			/>
 			<EnvManagement 
 				v-if="active == 'envManagement'"
 				:active="active"
@@ -30,10 +34,12 @@
 import { util } from "@/plugins/util.js";
 import EnvManagement from './EnvManagement'
 import ListService from './ListService'
+import ListServer from './ListServer'
 export default {
 	components:{
 		EnvManagement,
-		ListService
+		ListService,
+		ListServer
 	},
 	created(){
 		this.$store.dispatch("app/getAllBA");
@@ -52,6 +58,11 @@ export default {
 					title: "Quản lí service",
 					subTitle: "Service  là tập hợp các service trong hệ thống. Mỗi service đảm nhiệm một chức năng riêng trong hệ thống ",
 					action: "serviceManagement"
+				},
+				{
+					title: "Quản lí server",
+					subTitle: "Service là tập hợp các service trong hệ thống. Mỗi service đảm nhiệm một chức năng riêng trong hệ thống ",
+					action: "serverManagement"
 				},
 				{
 					title: "Quản lí môi trường",
