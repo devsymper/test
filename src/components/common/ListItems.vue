@@ -1776,8 +1776,8 @@ i.applied-filter {
 .symper-list-item .ht_clone_top_left_corner thead tr th:nth-last-child(2)  {
     border-right-width: 0px !important;
 }
-.handsontable td,
-.handsontable th {
+.symper-list-item .handsontable td,
+.symper-list-item .handsontable th {
     color: #212529 !important;
     border-color: #bbb;
     border-right: 0;
