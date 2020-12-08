@@ -34,14 +34,14 @@
 					class="mr-2 ml-2"
 					full-width
 					solo
-					:items="Object.keys(sDoc.listAllDocument)"
+					:items="sAllDoc"
 					background-color="grey lighten-4"
 					flat
 					dense
 					color="blue-grey lighten-2"
 					item-text="title"
+					return-object
 					@change="changeDocument"
-					item-value="id"
 				>
 					<template v-slot:append>
 						<v-icon style= "font-size:18px;">mdi mdi-magnify</v-icon>
@@ -49,11 +49,11 @@
 					<template v-slot:label>
 						<span class="fs-13">{{$t('common.search')}}</span>
 					</template>
-					<!-- <template v-slot:item="data">
+					<template v-slot:item="data">
 						<div class="fs-13 py-1" >
-							<span  class="fs-13 ml-1"> {{data.title}}</span>
+							<span  class="fs-13 ml-1"> {{data.item.title}}</span>
 						</div>
-					</template> -->
+					</template>
 				</v-autocomplete>
 				</div>
 		</v-menu>
@@ -68,6 +68,13 @@ export default {
 		sDoc() {
             return this.$store.state.document;
 		},
+		sAllDoc(){
+			let arr = []
+			for(let i in this.$store.state.document.listAllDocument){
+				arr.push(this.$store.state.document.listAllDocument[i])
+			}
+			return arr
+		},
 		id(){
 			return this.$route.params.id
 		},
@@ -80,8 +87,8 @@ export default {
 	},
 	methods:{
 		changeDocument(value){
-			let id = this.sDoc.listAllDocument[value].id
-			this.$store.commit('document/setCurrentTitle',this.sDoc.listAllDocument[value].title)
+			let id = value.id
+			this.$store.commit('document/setCurrentTitle',value.title)
 			this.$router.push('/documents/'+id+'/objects')
 			this.$emit('change',id )
 		}
