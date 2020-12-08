@@ -81,6 +81,12 @@ export default {
 			dbName:""
 		}
 	},
+	watch:{
+		instanceId(val){
+			this.serverId = "",
+			this.dbName  = ""
+		}
+	},
 	methods:{
 		cancel(){
 			this.$emit('cancel')
