@@ -92,7 +92,6 @@ export default {
 			this.appId = appId
 		},
 		clickAction(action,sideBySide = false, allAppMode = false){
-			debugger
 			$(".v-menu__content").css("display", "none")
 			let appId
 			if(allAppMode == true){

@@ -58,6 +58,7 @@ const addCompletionItemsForDocControls = (state, data) => {
     let item = {};
 
     for(let ctrl of controls){
+		debugger
         word = `${docName}.${ctrl.name} (${ctrl.title})`;
         if(!state.addedCompletionItems[ctrl.name]){
             item = {
