@@ -566,11 +566,6 @@ export default {
 		},
         reCaculateTableHeight(){
             let h = util.getComponentSize(this).h - util.getComponentSize(this.$refs.comonAttr).h - 200;
-            // if(this.objectActive == 'application_definition'){
-            //     h = h*2/3;
-            // }else if(this.objectActive == 'document_definition'){
-            //     h = h/2;
-            // }
             this.tableHeight = h;
         },
         setTableData(){
@@ -965,7 +960,7 @@ export default {
                         this.alter('insert_row', lastIndex + 1, 1, 'add_row_on_enter');
                     }
                     setTimeout(function() {
-                        let objectType = self.allInputs.objectType.value;
+                        let objectType = self.objectActive;
                         htIst.selectCell(lastIndex, htIst.propToCol(changes[0][1]));
                         self.itemData.mapActionAndObjects[objectType] = htIst.getSourceData();
 
@@ -975,7 +970,7 @@ export default {
                     }, 0);
                 },
                 afterSelectionEnd(rowNum, column, row2 , column2 , preventScrolling, selectionLayerLevel){
-                    let objectType = self.allInputs.objectType.value;
+                    let objectType = self.objectActive;
                     if(objectType == 'application_definition'){
                         let object = this.getDataAtRow(rowNum)[0];
                         if(object){
