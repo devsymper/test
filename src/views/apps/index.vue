@@ -180,6 +180,7 @@ export default {
 			this.$refs.listApp.closeactionPanel();
 		},
 		openUpdateApp(app){
+			this.$store.commit('appConfig/emptyItemSelected')
 			appManagementApi.getAppDetailBa(app.id).then(res => {
 				if (res.status == 200) {
 					if(Object.keys(res.data.listObject.childrenApp).length > 0){
