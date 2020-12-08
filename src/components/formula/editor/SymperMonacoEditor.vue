@@ -17,7 +17,6 @@
 import {languages, editor} from 'monaco-editor';
 import staticCompletionItems from "./modules/sql/staticCompletionItems";
 import { documentApi } from '../../../api/Document';
-import "@/assets/css/monacoEditor.css";
 export default {
     methods: {
         focus(){
