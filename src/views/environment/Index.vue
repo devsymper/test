@@ -56,12 +56,12 @@ export default {
 			listType:[
 				{
 					title: "Quản lí service",
-					subTitle: "Service  là tập hợp các service trong hệ thống. Mỗi service đảm nhiệm một chức năng riêng trong hệ thống ",
+					subTitle: "Danh sách tập trung các service trong hệ thống. Mỗi service đảm nhiệm một chức năng riêng trong hệ thống ",
 					action: "serviceManagement"
 				},
 				{
 					title: "Quản lí server",
-					subTitle: "Service là tập hợp các service trong hệ thống. Mỗi service đảm nhiệm một chức năng riêng trong hệ thống ",
+					subTitle: "Danh sách tập trung các server trong hệ thống. Mỗi server đảm nhiệm chức năng lưu trữ các service trong hệ thống ",
 					action: "serverManagement"
 				},
 				{
