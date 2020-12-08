@@ -34,6 +34,12 @@ export const adminApi = {
 			testHeader
 		)
 	},
+	deleteTask(id){
+		return bpmneApi.delete(appConfigs.apiDomain.bpmne.historyInstancesDel+'/'+id ,
+			{},
+			testHeader
+		)
+	},
 	stopProcessDefinition(id){
 		return bpmneApi.put(appConfigs.apiDomain.bpmne.definitions+'/'+id,
 			JSON.stringify({
