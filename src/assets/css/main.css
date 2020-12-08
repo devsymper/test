@@ -783,3 +783,15 @@ body {
 	content: "\F0DC9" !important;
 	font: normal normal normal 15px/1 "Material Design Icons" !important;
 }
+.codicon-symbol-file:before {
+    content: "\F0679" !important;
+	font: normal normal normal 15px/1 "Material Design Icons" !important;
+}
+.codicon-symbol-enum-member:before {
+	content: "\F03A0" !important;
+	font: normal normal normal 15px/1 "Material Design Icons" !important;
+}
+.codicon-symbol-text:before {
+	content: "\F07F5" !important;
+	font: normal normal normal 15px/1 "Material Design Icons" !important;
+}

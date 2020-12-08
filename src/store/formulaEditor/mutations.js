@@ -28,6 +28,11 @@ var monacoCompletionItemKind = {
     Issue : 26,
 	Snippet : 27,
 };
+var mappingDocControlWithKind = {
+	textInput: monacoCompletionItemKind.Text,
+	date: monacoCompletionItemKind.File,
+	number: monacoCompletionItemKind.EnumMember
+};
 
 const addCompletionItemsForDocs = (state, docs) => {
     let items = [];
@@ -55,16 +60,21 @@ const addCompletionItemsForDocControls = (state, data) => {
     let docName = data.docName;
     let items = [];
     let word = '';
-    let item = {};
-
+	let item = {};
+	debugger
     for(let ctrl of controls){
-		debugger
+		let kind
+		if(mappingDocControlWithKind[ctrl.type]){
+			kind = mappingDocControlWithKind[ctrl.type]
+		}else{
+			kind = monacoCompletionItemKind.Keyword
+		}
         word = `${docName}.${ctrl.name} (${ctrl.title})`;
         if(!state.addedCompletionItems[ctrl.name]){
             item = {
                 label: word,
                 symperKind: 'control',
-                kind: monacoCompletionItemKind.EnumMember,
+                kind: kind,
                 insertText: ctrl.name
             };
             items.push(item);
