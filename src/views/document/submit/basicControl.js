@@ -315,7 +315,7 @@ export default class BasicControl extends Control {
             if (this.type == 'label') {
                 $('#' + this.id).text(value);
             } else if (this.type == 'richText') {
-                $('#' + this.id).html(value);
+                $('#' + this.id).val(value);
             } else if (this.type == 'date') {
                 $('#' + this.id).val(SYMPER_APP.$moment(value).format(this.formatDate));
             } else if (this.type == 'checkbox') {
@@ -363,7 +363,7 @@ export default class BasicControl extends Control {
         if (this.type == 'label') {
             this.ele.text(value)
         } else if (this.type == 'richText') {
-            $('#' + this.id).html(value);
+            $('#' + this.id).val(value);
         } else if (this.type == 'image') {
             this.ele.empty();
             let w = this.controlProperties.width.value;
@@ -726,8 +726,8 @@ export default class BasicControl extends Control {
     }
     renderRichTextControl() {
         let style = this.ele.attr('style');
-        this.ele.replaceWith('<div style="'+style+'" contenteditable="true" id="'+this.id+'" class="s-control s-control-rich-text" contenteditable="false"  title="Rich-text" s-control-type="richText" type="text"></div>');
-
+        this.ele.replaceWith('<textarea style="'+style+'" id="'+this.id+'" class="s-control s-control-rich-text" title="Rich-text" s-control-type="richText" type="text"></textarea>');
+        this.ele = $('#sym-submit-'+this.curParentInstance).find("textarea#"+this.id);
     }
     getDefaultValue() {
         if (this.isCheckbox) {
