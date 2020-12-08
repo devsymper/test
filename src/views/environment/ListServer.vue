@@ -1,7 +1,7 @@
 <template>
 	<div>
 		<ListItems
-			ref="listService"
+			ref="listServer"
 			:pageTitle="'Danh sách server'"
 			:containerHeight="containerHeight"
 			:getDataUrl="getListUrl"
@@ -55,45 +55,47 @@ export default {
 		return{
 			showDialog: false,
 			tableContextMenu: {
-                detail: {
-                    name: "detail",
-                    text: "Danh sách version",
-                    callback: (row, callback) => {
-						self.$goToPage( "/service/"+row.id+"/versions",
-                            "Chi tiết " + (row.name ? row.name : "")
-                        );
-                    }
-                },
                 viewInstance: {
                     name: "viewInstance",
                     text: "Danh sách instance",
                     callback: (row, callback) => {
-						self.$goToPage( "/service/"+row.id+"/instances",
+						self.$goToPage( "/server/"+row.id+"/instances",
                             "Danh sách instance "
 						);
-						self.$store.dispatch('environmentManagement/getAllVersionOfService', row)
+						// self.$store.dispatch('environmentManagement/getAllVersionOfService', row)
                     }
                 },
-                addVersion: {
-                    name: "addVersion",
-                    text: "Thêm version",
-                    callback: (row, callback) => {
-						self.$store.commit('environmentManagement/setCurrentServieId', row.id)
-						self.showDialog = true
-                    }
-                }
+               
             },
 			customAPIResult:{
 				reformatData(res){
-					debugger
+					let listBA = self.$store.state.app.allBA;
+					res.data.listObject.forEach(function(e){
+						if(!e.userCreate){
+							e.userCreateName = ""  
+						}else{
+							listBA.forEach(function(k){
+								if(k.id == e.userCreate){
+									e.userCreateName =  k.name
+								}
+							})
+						}
+						if(!e.userUpdate){
+							e.userUpdateName =""
+						}else{
+							listBA.forEach(function(k){
+								if(k.id == e.userUpdate){
+									e.userUpdateName =  k.name
+								}
+							})
+						}
+					})
 					return {
 						columns:[
 							{name: "id", title: "id", type: "text"},
-							{name: "name", title: "name", type: "text"},
+							{name: "ip", title: "ip", type: "text"},
 							{name: "description", title: "description", type: "text"},
-							{name: "lastVersion", title: "lastVersion", type: "text"},
-							{name: "language", title: "language", type: "text"},
-							{name: "status", title: "status", type: "numeric"},
+							{name: "os", title: "os", type: "text"},
 							{name: "userCreateName", title: "userCreate", type: "text"},
 							{name: "userUpdateName", title: "userUpdate", type: "text"},
 							{name: "createAt", title: "createAt", type: "text"},

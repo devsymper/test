@@ -44,9 +44,9 @@ export default {
 			currentInstance:{},
 			containerHeight:0,
 			customDataForApi(configs, columns, filterData){
-				let serviceId = self.$route.params.serviceId
+				let serverId = self.$route.params.serverId
 				return {
-					serviceId:serviceId
+					serverId:serverId
 				}
 			},
 			tableContextMenu: {
