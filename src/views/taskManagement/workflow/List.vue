@@ -43,6 +43,7 @@ export default {
     created(){
         this.getListWorkflow();
         this.$store.dispatch("taskManagement/getAllStatusCategory");
+        this.$store.dispatch("taskManagement/getAllRole");
     }
 
 }

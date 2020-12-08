@@ -55,6 +55,12 @@ const addCategoryToStore = (state, item) => {
     currentListCategory.unshift(item)
     Vue.set(state, 'allCategory', currentListCategory);
 }
+
+const addWorkflowToStore = (state, item) => {
+    let currentAllWorkflow = state.allWorkflow;
+    currentAllWorkflow.unshift(item)
+    Vue.set(state, 'allWorkflow', currentAllWorkflow);
+}
 const addBoardToStore = (state, item) => {
     let currentListBoard = state.listBoardInProject;
     currentListBoard.unshift(item)
@@ -188,6 +194,7 @@ export {
     removeWorkflowToStore,
     setAllStatusCategory,
     updateWorkflowToStore,
-    setAllRole
+    setAllRole,
+    addWorkflowToStore
 
 };

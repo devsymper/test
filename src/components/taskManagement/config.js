@@ -34,6 +34,7 @@ const linkInfo = {
         title: "Bắt đầu từ trạng thái",
         type: "select",
         value:"",
+        options: [],
         validateStatus:{
             isValid:true,
             message:"Error"
@@ -46,6 +47,7 @@ const linkInfo = {
         title: "Kết thúc đến trạng thái",
         type: "select",
         value:"",
+        options: [],
         validateStatus:{
             isValid:true,
             message:"Error"
@@ -90,6 +92,7 @@ const statusInfo = {
         title: "Mô tả",
         type: "textarea",
         value: '',
+        hidden:true
     },
     statusCategory : { 
         title: "Chọn loại",

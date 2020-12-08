@@ -63,7 +63,7 @@ export default [
                 // meta:{group:'projectSetting'},
                 name: "issueTypeWorkflow",
                 components:{
-                    TaskManagement: () => import ('../../views/taskManagement/workflow/Workflow.vue')
+                    TaskManagement: () => import ('../../views/taskManagement/workflow/CreateWorkflow.vue')
                 }
             },
             {

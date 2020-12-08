@@ -23,6 +23,8 @@ export default {
         }
     },
     created(){
+        this.$store.dispatch("taskManagement/getAllStatusCategory");
+        this.$store.dispatch("taskManagement/getAllRole");
         let self=this;
         let id=this.$route.params.id;
         taskManagementApi

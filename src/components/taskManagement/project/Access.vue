@@ -1,5 +1,5 @@
 <template>
-    <div class="h-100" style="width:60%;margin:auto;">
+    <div class="h-100" style="width:80%;margin:auto;">
         <div class="d-flex  justify-space-between" style="height:40px">
             <h1 class="ml-4">Access</h1>
             <div class="mt-2 pr-4">

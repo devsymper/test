@@ -31,14 +31,24 @@
                         :label="`Hiển thị nhãn link`"
                         dense   
                     ></v-checkbox>
-                    <add-status-view ref="popupAddStatusView" :listRole="listRole" @after-add-status-click="afterAddStatusClick"/>
+                    <add-status-view ref="popupAddStatusView"  @after-add-status-click="afterAddStatusClick"/>
                     <add-link-view :listNode="listNode" ref="popupAddLinkView" @after-add-link-click="afterAddLinkClick"/>
                 </div>
-                <div id="task-workflow"></div>
+                <div id='paperView' style="width: 100%; height: calc(100% - 50px)">
+                    <div id="task-workflow" >
+
+                    </div>
+                    <!-- <div id='minimap' style="width: 300px; height: 300px"></div> -->
+                </div>
+               
             </div>
             <div class="config__content--sidebar p-2 h-100">
                 <VuePerfectScrollbar  :style="{height:'100%'}">
-                    <form-tpl style="overflow:hidden" :allInputs="nodeConfig"/>
+                    <form-tpl 
+                        style="overflow:hidden" 
+                        :allInputs="nodeConfig"
+                        @input-value="handleInputValue"
+                    />
                 </VuePerfectScrollbar>
 
             </div>
@@ -107,6 +117,9 @@ import {
     util
 } from "@/plugins/util.js";
 require('@/components/common/rappid/jointjs');
+
+import minimap from "jointjs-minimap";
+
 export default {
     components:{
         FormTpl,
@@ -137,8 +150,6 @@ export default {
                 return {};
             }
         },
-        
-
     },
     watch:{
         infoWorkflow:function(vl){
@@ -149,11 +160,12 @@ export default {
     },
     data(){
         return {
+            delayTimer:null,
+            paper:null,
             isLoading:false,
             dialogSaveOrUpdate:false,
             showPopUpAddStatus:false,
             graph:null,
-            listRole:[],
             nodeConfig:{},
             linkDefaultInfo:{
                 id : { 
@@ -251,12 +263,48 @@ export default {
     },
  
     created(){
-        this.getListRole();
         if (Object.keys(this.infoWorkflow).length > 0) {
             this.getDataDetailWorkflow(this.infoWorkflow);
         }
     },
     methods:{
+        handleInputValue(name, inputInfo, data) {
+            if(this.delayTimer){
+                clearTimeout(this.delayTimer);
+            }
+            this.delayTimer = setTimeout((self) => {
+                if (self.nodeConfig.from || self.nodeConfig.to) {
+                    var links = self.paper.model.getLinks();
+                    let linkId = self.nodeConfig.id.value;
+                    let link = links.find(ele => ele.id == linkId);
+                    if (link) {
+                        var currentLink = link;
+                        if (name == 'name') {
+                            currentLink.label(0, {
+                                attrs: {
+                                    text: {
+                                        text: data
+                                    }
+                                }
+                            })
+                        }
+                    }
+                    
+                }else{
+                    var elements = self.paper.model.getElements();
+                    let nodeId = self.nodeConfig.id.value;
+                    let node = elements.find(ele => ele.id == nodeId);
+                    if (node) {
+                        var currentElement = node;
+                        if (name == 'name') {
+                            currentElement.attr('label/text', data);
+                        }else if (name == 'colorStatus') {
+                            currentElement.attr('body/fill', data);
+                        }
+                    }
+                }
+            }, 500,this);
+        },
         updateWorkflow(){
             this.isLoading = true;
             let isValid = this.validateData();
@@ -345,15 +393,16 @@ export default {
                         .then(res => {
                             if (res.status == 200) {
                                 self.$snotifySuccess("Add workflow completed!");
+                                self.$store.commit("taskManagement/addWorkflowToStore",res.data);
                                 self.dialogSaveOrUpdate=false;
+                                self.$router.push('/task-management/workflow/'+res.data.id);
                             }else if(res.status==400){
                                 self.$snotifyError("", "Validate key error",res.message);
                             }
                         })
                         .catch(err => {
                             self.$snotifyError("", "Can not add workflow!", err);
-                        })
-                        .always(() => {});
+                        });
                 }
             }
             this.isLoading = false;
@@ -394,7 +443,9 @@ export default {
             rectReview.attr({
                 body: {
                     fill: newStatus.colorStatus.value,
-                    strokeWidth: 0
+                    strokeWidth: 0,
+                    rx: 5,
+                    ry: 5,
                 },
                 label:{
                     text:newStatus.name.value,
@@ -439,19 +490,16 @@ export default {
             this.listLink.push(linkInfo);
             this.dataWorkflow.links.push(link1);
             link1.addTo(this.graph);
-        }
+        },
     },
  
     mounted() {
         let self=this;
-        let nodeDefaultInfo = getStatusDefault();
-        nodeDefaultInfo.name.value = "Back log";
-
         this.graph = new joint.dia.Graph;
-        let paper = new joint.dia.Paper({
+        this.paper = new joint.dia.Paper({
             el: $('#task-workflow'),
             width: '100%',
-            height: 'calc(100% - 50px)',
+            height: '100%',
             model: this.graph,
             gridSize: 1,
             drawGrid: true,
@@ -459,7 +507,24 @@ export default {
                 color: '#fff'
             }
         });
-        paper.on('blank:pointerclick', function() {
+        // var paperScroller = new joint.ui.PaperScroller({
+        //     paper: paper
+        // });
+
+        // $('#task-workflow').append(paperScroller.render().el);
+        // minimap({
+        //     el: '#minimap'
+        //     joint,
+        //     paper,
+        //     graph,
+        //     jquery: $,
+        //     paperViewEl: '#paperView',
+        //     extra: {
+        //         background: {  color: '#eee' }
+        //     },
+        //     mapViewColor: '#1890ff'
+        //     })
+        self.paper.on('blank:pointerclick', function() {
            // resetAll(this);
 
             // info.attr('body/visibility', 'hidden');
@@ -469,97 +534,145 @@ export default {
             //     color: 'orange'
             // })
         });
+        function resetAll(paper) {
+            paper.drawBackground({
+                color: 'white'
+            })
 
-        paper.on('element:pointerclick', function(elementView) {
+            var elements = paper.model.getElements();
+            for (var i = 0, ii = elements.length; i < ii; i++) {
+                var currentElement = elements[i];
+                currentElement.attr('body/stroke', 'black');
+                currentElement.attr('body/strokeWidth',0);     
+            }
+
+            var links = paper.model.getLinks();
+            for (var j = 0, jj = links.length; j < jj; j++) {
+                var currentLink = links[j];
+                currentLink.attr('line/stroke', 'black');
+                currentLink.label(0, {
+                    attrs: {
+                        body: {
+                            stroke: 'black'
+                        }
+                    }
+                })
+            }
+        }
+
+        self.paper.on('element:pointerclick', function(elementView) {
             let idNode=elementView.model.id;
             let node=self.listNode.find(ele => ele.id.value == idNode);
             if (node) {
                 self.nodeConfig=node;
             }
-            //resetAll(this);
-
-            // var currentElement = elementView.model;
-            // currentElement.attr('body/stroke', 'orange')
+            resetAll(this);
+            var currentElement = elementView.model;
+            currentElement.attr('body/stroke', '#f58634');     
+            currentElement.attr('body/strokeWidth',1);     
         });
 
-        paper.on('link:pointerclick', function(linkView) {
+        self.paper.on('link:pointerclick', function(linkView) {
             let idLink=linkView.model.id;
             let link=self.listLink.find(ele => ele.id.value == idLink);
             if (link) {
+                let allOption = [];
                 self.nodeConfig=link;
+                for (let index = 0; index < self.listNode.length; index++) {
+                    let node = self.listNode[index];
+                    allOption.push({text:node.name.value,value:node.id.value})
+                }
+                self.$set(self.nodeConfig.from,'options',allOption);
+                self.$set(self.nodeConfig.to,'options',allOption);
             }
+
+            resetAll(this);
+            var currentLink = linkView.model;
+            currentLink.attr('line/stroke', '#f58634')
+            currentLink.label(0, {
+                attrs: {
+                    body: {
+                        stroke: '#f58634'
+                    }
+                }
+            })
         });
 
+        if (!this.statusDetail) {
+            var rectStart = new joint.shapes.standard.Rectangle();
+            rectStart.position(100, 130);
+            rectStart.resize(40, 40);
+            rectStart.attr({
+                body: {
+                    fill: '#dfe1e6',
+                    rx: 20,
+                    ry: 20,
+                    strokeWidth: 0
+                },
+            
+            });
+            this.dataWorkflow.nodes.push(rectStart);
 
-        // var rectStart = new joint.shapes.standard.Rectangle();
+            rectStart.addTo(this.graph);
+            var rectBacklog = new joint.shapes.standard.Rectangle();
+            rectBacklog.position(250, 130);
+            rectBacklog.resize(100, 40);
+            rectBacklog.attr({
+                body: {
+                    fill: '#dfe1e6',
+                    strokeWidth: 0,
+                    rx: 5,
+                    ry: 5,
+                },
+                label:{
+                    text:'To Do',
+                    fontWeight:500,
+                    fill:'black'
+                }
+            
+            });
+            this.dataWorkflow.nodes.push(rectBacklog);
+            rectBacklog.addTo(this.graph);
 
-        // rectStart.position(100, 130);
-        // rectStart.resize(40, 40);
-        // rectStart.attr({
-        //     body: {
-        //         fill: 'gray',
-        //         rx: 20,
-        //         ry: 20,
-        //         strokeWidth: 0
-        //     },
-        
-        // });
-        // this.dataWorkflow.nodes.push(rectStart);
+            let nodeDefaultInfo = getStatusDefault();
+            nodeDefaultInfo.name.value = "To Do";
+            this.$set(nodeDefaultInfo.id,"value",rectBacklog.id);
+            this.$set(nodeDefaultInfo.statusCategory,"value",'5fcdec71-74cf-d435-e3dd-afcc0ea2ab8b');
+            this.listNode.push(nodeDefaultInfo);
 
-        // rectStart.addTo(this.graph);
-        // var rectBacklog = new joint.shapes.standard.Rectangle();
-        // rectBacklog.position(250, 130);
-        // rectBacklog.resize(100, 40);
-        // rectBacklog.attr({
-        //     body: {
-        //         fill: '#dfe1e6',
-        //         strokeWidth: 0
-        //     },
-        //     label:{
-        //         text:'Back log',
-        //         fontWeight:500,
-        //         fill:'black'
-        //     }
-        
-        // });
-        // this.dataWorkflow.nodes.push(rectBacklog);
-        // rectBacklog.addTo(this.graph);
-        // this.$set(nodeDefaultInfo.id,"value",rectBacklog.id);
-        // this.listNode.push(nodeDefaultInfo);
+            let link1 = new joint.shapes.standard.Link({
+                source: { id: rectStart.id },
+                target: { id: rectBacklog.id },
+                attrs: {
+                    line: {
+                        connection: true,
+                        stroke: '#333333',
+                        strokeWidth: 1,
+                        strokeLinejoin: 'round',
+                        targetMarker: {
+                            'type': 'path',
+                            'd': 'M 10 -5 0 0 10 5 z'
+                        }
+                    }
+                },
+            });
+            link1.appendLabel({
+                attrs: {
+                    text: {
+                        text: 'all'
+                    }
+                }
+            });
+            this.$set(this.linkDefaultInfo.from,"value",rectStart.id);
+            this.$set(this.linkDefaultInfo.to,"value",rectBacklog.id);
+            this.$set(this.linkDefaultInfo.id,"value",link1.id);
+            this.listLink.push(this.linkDefaultInfo);
+            this.dataWorkflow.links.push(link1);
 
+            this.graph.addCells([rectBacklog, link1]);
 
+        }
     
-        // let link1 = new joint.shapes.standard.Link({
-        //     source: { id: rectStart.id },
-        //     target: { id: rectBacklog.id },
-        //     attrs: {
-        //         line: {
-        //             connection: true,
-        //             stroke: '#333333',
-        //             strokeWidth: 1,
-        //             strokeLinejoin: 'round',
-        //             targetMarker: {
-        //                 'type': 'path',
-        //                 'd': 'M 10 -5 0 0 10 5 z'
-        //             }
-        //         }
-        //     },
-        // });
-        // link1.appendLabel({
-        //     attrs: {
-        //         text: {
-        //             text: 'all'
-        //         }
-        //     }
-        // });
-        // this.$set(this.linkDefaultInfo.from,"value",rectStart.id);
-        // this.$set(this.linkDefaultInfo.to,"value",rectBacklog.id);
-        // this.$set(this.linkDefaultInfo.id,"value",link1.id);
-        // this.listLink.push(this.linkDefaultInfo);
-        // this.dataWorkflow.links.push(link1);
-
-        // this.graph.addCells([rectBacklog, link1]);
-
     }
 }
 </script>
