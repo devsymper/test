@@ -1380,14 +1380,17 @@ export default class Table {
                 self.tableInstance.render()
             }, 50, this);
             // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
-            if (!this.checkDetailView())
+            if (!this.checkDetailView()){
+                if(this.checkViewType('update') && getSDocumentSubmitStore(this.keyInstance).docStatus == 'init'){
+                    return;
+                }
                 setTimeout((self) => {
                     for (let index = 0; index < controlBinding.length; index++) {
                         self.handlerCheckEffectedControlInTable(controlBinding[index], 'all');
                     }
                     self.setDataForSumRow();
                 }, 50, this);
-
+            }
         } else {
             let defaultRow = this.getDefaultData(false);
             this.tableInstance.loadData(defaultRow);
@@ -1414,6 +1417,13 @@ export default class Table {
      */
     checkDetailView() {
         if (sDocument.state.viewType[this.keyInstance] == 'detail') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    checkViewType(type) {
+        if (sDocument.state.viewType[this.keyInstance] == type) {
             return true;
         } else {
             return false;
