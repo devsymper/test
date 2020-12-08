@@ -3,9 +3,9 @@ import Handsontable from 'handsontable';
 import sDocument from './../../../store/document'
 import store from './../../../store'
 import ClientSQLManager from './clientSQLManager';
-import { checkControlPropertyProp, getControlType, getSDocumentSubmitStore } from './../common/common'
+import { checkControlPropertyProp, getControlInstanceFromStore, getControlType, getSDocumentSubmitStore } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
-import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
+import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
 import { util } from '../../../plugins/util';
 
 class UserEditor extends Handsontable.editors.TextEditor {
@@ -457,6 +457,11 @@ export default class Table {
                 if (!changes) {
                     return
                 }
+                let controlName = changes[0][1];
+                if(source == 'edit'){
+                    let controlIns = getControlInstanceFromStore(thisObj.keyInstance, controlName);
+                    setDataInputBeforeChange(thisObj.keyInstance, controlIns);
+                }
                 // check nếu ko có thay đổi trong cell thì return
                 if (changes[0][2] == changes[0][3] && source == 'edit') {
                     return;
@@ -468,18 +473,17 @@ export default class Table {
                 if (/=SUM(.*)/.test(changes[0][2]) || /=SUM(.*)/.test(changes[0][3])) {
                     return;
                 }
-                let controlName = changes[0][1];
-
+                
                 if (thisObj.isAutoCompleting) {
                     return;
                 }
-
                 let colIndex = this.propToCol(controlName);
                 let columns = thisObj.columnsInfo.columns;
                 let currentRowData = thisObj.tableInstance.getDataAtRow(changes[0][0]);
 
                 // nếu có sự thay đổi cell mà là id của row sqlite thì ko thực hiện update
                 if (controlName != 's_table_id_sql_lite') {
+                    
                     thisObj.checkUniqueTable(controlName, columns);
                     if (source != AUTO_SET) {
                         store.commit("document/addToDocumentSubmitStore", {
@@ -878,6 +882,9 @@ export default class Table {
      * @param {*} formulasInstance  Object cua formulas giá trị của control bị ảnh hưởng
      */
     async handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance) {
+        if(!checkDataInputChange(this.keyInstance, dataInput)){
+            return;
+        }
         let listIdRow = this.tableInstance.getDataAtCol(this.tableInstance.getDataAtRow(0).length - 1);
         if (this.tableHasRowSum) {
             listIdRow.pop();
@@ -1404,7 +1411,7 @@ export default class Table {
                     let colIndex = self.getColumnIndexFromControlName(controlName);
                     let CharAt = String.fromCharCode(65 + self.columnHasSum[controlName]);
                     let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (self.tableInstance.countRows() - 1) + ')';
-                    self.tableInstance.setDataAtCell(self.tableInstance.countRows() - 1, colIndex, sumValue);
+                    self.tableInstance.setDataAtCell(self.tableInstance.countRows() - 1, colIndex, sumValue, 'auto_set');
                 }
             }, 300, this);
         }
