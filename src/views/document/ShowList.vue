@@ -8,6 +8,8 @@
         :pageTitle="$t('document.title')"
         :containerHeight="containerHeight"
         :actionPanelWidth="actionPanelWidth"
+        :showExportButton="false"
+        :showImportButton="false"
         @after-open-add-panel="addDocument"
         :headerPrefixKeypath="'document'"
         :commonActionProps="commonActionProps"
@@ -106,7 +108,8 @@ export default {
                         return " <i class= 'mdi mdi-format-list-checkbox' > </i>&nbsp; Danh sách bản ghi";
                     },
                     callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
+						this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
+						this.$store.commit('document/setCurrentTitle',document.title)
                     },
                 },
                 list_draft: {
@@ -204,6 +207,25 @@ export default {
                         .always(() => {});
                     },
                 },
+                templateExcel:{
+                    name: "templateExcel",
+                    text: function() {
+                        return " <i class= 'mdi mdi-file-upload-outline' > </i>&nbsp; Lấy mẫu Import Excel";
+                    },
+                    callback: (document, callback) => {
+                        this.documentId = Number(document.id);
+                        let exportUrl = this.sDocumentManagementUrl+'documents/'+this.documentId+'/export-excel?isTemplate="1"'
+                        if(!exportUrl){
+                            if(this.getDataUrl[this.getDataUrl.length - 1] == '/'){
+                                exportUrl = this.getDataUrl+'export';
+                            }else{
+                                exportUrl = this.getDataUrl+'/export';
+                            }
+                        }
+                        
+                        window.open(exportUrl,'_blank');
+                    },
+                },
                 importExcel:{
                     name: "importExcel",
                     text: function() {
@@ -213,7 +235,6 @@ export default {
                         const self = this;
                         self.showImportPanel = !self.showImportPanel; 
                         self.documentId = Number(document.id);
-                       // this.documentId = 1729;
                     },
                 },
             },

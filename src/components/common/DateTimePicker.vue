@@ -99,14 +99,15 @@ export default {
                 let cardWidth = $('.card-datetime-picker').width();
                 let cardHeight = $('.card-datetime-picker').height();
                 let inputWidth = $(e.target).width();
+                let scrollTop = $('#sym-submit-'+this.keyInstance).closest('.scroll-content')[0].scrollTop
                 if(cardWidth + leftDiff > submitFormWidth){
-                    this.position = {'top':inputOffset.top - submitFormOffset.top + 26 +'px','left':Math.abs(inputOffset.left + inputWidth - 10 - cardWidth)+'px'};
+                    this.position = {'top':inputOffset.top - submitFormOffset.top + 26 +'px','left':Math.abs(leftDiff + inputWidth - cardWidth)+'px'};
                 }
                 else{
-                    this.position = {'top':inputOffset.top - submitFormOffset.top + 26 +'px','left':Math.abs(inputOffset.left - submitFormOffset.left)+'px'};
+                    this.position = {'top':inputOffset.top - submitFormOffset.top + 26 +'px','left':Math.abs(leftDiff)+'px'};
                 }
                 if(window.innerHeight < inputOffset.top + $('.card-datetime-picker').height() + 40){
-                    this.position.top = Math.abs(inputOffset.top - submitFormOffset.top - cardHeight) + 'px'
+                    this.position.top = Math.abs(inputOffset.top  - submitFormOffset.top - cardHeight) + 'px'
                 }
             }
         },

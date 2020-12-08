@@ -63,6 +63,7 @@ const defaultState = {
             currentControlActive: null, // biến chỉ ra control nào đang active
             currentControlAutoComplete: null, // biến chỉ ra control nào đang autocomplete
             submitFormulas: null,
+            updateFormulas:null,
             listUser: null,
             localRelated: {},
             workflowVariable: {}, // các tham số của workflow khi submit doc
@@ -86,7 +87,17 @@ const defaultState = {
                 tableName:"",
                 key:"",
                 data:{}
-            }
+            },
+            /**
+             * lưu các control vi phạm trong submit
+             * key:controlName
+             * value:{ require:{
+             *      isValid:false,
+             *      message:'khong được bỏ trống'
+             * }}
+             */
+            validateMessage:{},
+            dataInputBeforeChange:{}
         }
     },
     detail: {
@@ -111,7 +122,8 @@ const defaultState = {
     },
     documentStyle: {
 
-    }
+	},
+	currentTitle:''
 };
 
 export default defaultState;

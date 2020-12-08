@@ -113,6 +113,14 @@ function cleanContent(content, configValue) {
             rsl = rsl.replace(cdataStr, newCdataStr);
         });
     }
+    // Thay đổi các ký tự trong condition thành các ký tự chưa mã hóa
+    symperMatches = rsl.match(/\<condition(.*?)\<\/condition>/g);
+    if (symperMatches) {
+        symperMatches.forEach(cdataStr => {
+            let newCdataStr = cdataStr.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+            rsl = rsl.replace(cdataStr, newCdataStr);
+        });
+    }
 
     return rsl;
 }
@@ -236,6 +244,13 @@ function moreInfoForInstanceVars() {
             "valueUrl": "",
             "scope": "global"
         },
+        {
+            "name": 'symper_last_executor_name',
+            "type": 'string',
+            "value": SYMPER_APP.$store.state.app.endUserInfo.displayName,
+            "valueUrl": "",
+            "scope": "global"
+        }
     ];
     if (SYMPER_APP.$route.params.extraData && SYMPER_APP.$route.params.extraData.appId) {
         rsl.push({
@@ -364,6 +379,13 @@ export const getVarsFromSubmitedDoc = async(docData, elId, docId) => {
                 name: 'symper_last_executor_id',
                 type: 'string',
                 value: SYMPER_APP.$store.state.app.endUserInfo.id+":"+SYMPER_APP.$store.state.app.endUserInfo.currentRole.id,
+                valueUrl: "",
+                scope: "global"
+            });
+            vars.push({
+                name: 'symper_last_executor_name',
+                type: 'string',
+                value: SYMPER_APP.$store.state.app.endUserInfo.displayName,
                 valueUrl: "",
                 scope: "global"
             });
@@ -546,4 +568,9 @@ export const getLastestDefinition = function(row, needDeploy = false) {
             }
         }
     });
+}
+
+export const cleanXMLBeforeRenderInEditor = function(xml){
+    xml = xml.replace(/<symper:(.*?)<\/symper:(.*?)>/g,''); // Loại bỏ toàn bộ các thẻ của symper
+    return xml;
 }

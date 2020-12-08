@@ -48,8 +48,7 @@
     </div>
 </template>
 <script>
-import _ from 'lodash';
-import dayjs from 'dayjs';
+import _groupBy from 'lodash/groupBy';
 import NotificationPopUp from "./../../components/notification/DetailPopPup.vue";
 import { documentApi } from "./../../api/Document.js";
 import UserPopUp from "./../../components/user/UserPopUp";
@@ -117,7 +116,7 @@ export default {
                         format.push(listModules[i])
                     }
                 }
-                let formatListModules = _.groupBy(format, 'objectType');
+                let formatListModules = _groupBy(format, 'objectType');
                 let name = Object.keys(formatListModules);
                 for(let i=0;i<name.length;i++){
                     if(subscribe){
@@ -173,7 +172,7 @@ export default {
                      format.push(listModules[i])
                  }
              }
-             let formatListModules = _.groupBy(format, 'objectType');
+             let formatListModules = _groupBy(format, 'objectType');
              let name = Object.keys(formatListModules);
              for(let i=0;i<name.length;i++){
                 self.items.push({
@@ -183,7 +182,7 @@ export default {
                 // defaultUser:
                 icon:name[i]
             })      
-            let groupByEvent= Object.keys(_.groupBy(formatListModules[name[i]], 'event'));
+            let groupByEvent= Object.keys(_groupBy(formatListModules[name[i]], 'event'));
                 for(let k=0;k<groupByEvent.length;k++){
                     self.items[i].items.push({
                         title: groupByEvent[k],
@@ -237,8 +236,8 @@ export default {
         notification.showListsSubcribed({subscribed:isSubcribed}).then(res=>{
             if(res.status==200){
              let listSubcribed = res.data;
-             // let grouplistByObjId = _.groupBy(listSubcribed, 'objectIdentifier');
-             let grouplistByObjId = _.groupBy(listSubcribed, 'objectType');
+             // let grouplistByObjId = _groupBy(listSubcribed, 'objectIdentifier');
+             let grouplistByObjId = _groupBy(listSubcribed, 'objectType');
               let objId = Object.keys(grouplistByObjId);
                 for(let j = 0; j<objId.length;j++){
                     self.listSubcribed.push({
@@ -267,9 +266,9 @@ export default {
         for(let i = 0; i<this.allListChanel.length;i++){
             if(this.allListChanel[i].event==event&&this.allListChanel[i].objectType==nameModule){
                if(isFollow){
-                   date =  dayjs(this.allListChanel[i].createAt).format('DD/MM/YYYY hh:mm');
+                   date =  this.$moment(this.allListChanel[i].createAt).format('DD/MM/YYYY hh:mm');
                }else{
-                   date = dayjs(this.allListChanel[i].userFilterAt).format('DD/MM/YYYY hh:mm');
+                   date = this.$moment(this.allListChanel[i].userFilterAt).format('DD/MM/YYYY hh:mm');
                }
             }
         }
@@ -282,7 +281,7 @@ export default {
         notification.showListsSubcribed({subscribed:isSubcribed}).then(res=>{
             if(res.status==200){
              let listSubcribed = res.data;
-              let grouplistByObjId = _.groupBy(listSubcribed, 'objectType');
+              let grouplistByObjId = _groupBy(listSubcribed, 'objectType');
               let objId = Object.keys(grouplistByObjId).filter(x=>x!=''&&x!='null');
                 for(let j = 0; j<objId.length;j++){
                     self.listUnsubcribed.push({

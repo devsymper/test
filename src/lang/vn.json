@@ -24,6 +24,8 @@
         "refresh": "Làm mới",
         "userDeletedName": "Email người xóa",
         "roleDeleted": "Role người xóa",
+        "parameter": "Tham số",
+        "content": "Nội dung",
         "userAgent": "Trình duyệt xóa",
         "deletedAt": "Thời gian xóa",
         "export_excel": "Xuất excel",
@@ -115,6 +117,7 @@
             "tasks": "Tasks",
             "works": "Works",
             "My work": "Tác vụ của tôi",
+            "My work timesheet": "Ghi công",
             "myWork": "Lịch làm việc",
             "Manage timesheet": "Quản lý  thời gian biểu",
             "Timesheet report": "Báo cáo thời gian biểu",
@@ -124,6 +127,7 @@
             "Account management": "Quản lý tài khoản",
             "Access Management": "Quản lý truy cập",
             "accessControl": "Quản lý truy cập",
+            "accessControlBeta": "Quản lý truy cập beta",
             "users": "Tài khoản người dùng",
             "baAccount": "Tài khoản BA",
             "actionPack": "Action Pack",
@@ -151,6 +155,7 @@
             "viewOrgchart": "Xem SĐTC mặc định",
             "list_workflow": "Danh sách quy trình",
             "list_work": "Danh sách công việc",
+            "syqlFunction": "SYQL Function",
             "environment": "Quản lí môi trường"
         },
         "system": "Vai trò người dùng",
@@ -241,7 +246,9 @@
             "startTime": "Thời gian bắt đầu",
             "tenantId": "ID",
 			"suspended": "Trạng thái",
-			"number_instance":"Tổng số instance"
+			"number_instance":"Tổng số instance",
+			"status":"Trạng thái",
+			"endTime":"Thời gian hoàn thành"
         }
     },
     "validate": {
@@ -372,7 +379,7 @@
         },
         "myInfo": {
             "title": "Thông tin của tôi",
-            "generalInfo": "Thông tin chung",
+            "generalInfo": "Thông tin chi tiết",
             "myPosition": "Vị trí của tôi"
         }
     },
@@ -527,6 +534,7 @@
         "submit": "Gửi",
         "date": "Ngày",
         "task_form": "Tạo task",
+        "task_logform": "Task",
         "time_invalid": "Thời gian không hợp lệ",
         "required_value": "Không được để trống",
         "of": "từ",
@@ -774,8 +782,9 @@
                         "userRole": "Vai trò",
                         "history": "Lịch sử",
                         "comment": "Bình luận",
-                        "has": "Có",
-                        "commentNotResolve": "bình luận chưa được giải quyết",
+                        "has": "Có ",
+                        "commentNotResolve": " bình luận chưa được giải quyết",
+                        "noComment": "Không có bình luận nào",
                         "id": "Định danh"
                     },
                     "worflowInfo": "THÔNG TIN QUY TRÌNH",

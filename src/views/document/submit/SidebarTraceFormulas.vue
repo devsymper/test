@@ -18,6 +18,10 @@
                             <td>{{controlInfo.name}}</td>
                         </tr>
                         <tr>
+                            <td style="width:70px">Kiểu control:</td>
+                            <td>{{controlInfo.type}}</td>
+                        </tr>
+                        <tr>
 
                             <td>Tiêu đề control: </td>
                             <td>{{controlInfo.title}}</td>
@@ -84,7 +88,7 @@ export default {
             effectedControl:{},
             inputControl:{},
             controlNameTrace:null,
-            controlInfo:{name:"",title:"",userUpdate:""}
+            controlInfo:{name:"",title:"",userUpdate:"",type:''}
         }
     },
     computed:{
@@ -175,6 +179,7 @@ export default {
                 this.controlInfo.name = curControl.name;
                 this.controlInfo.title = curControl.title;
                 this.controlInfo.userUpdate = curControl.lastUserUpdate;
+                this.controlInfo.type = curControl.type;
             }
         },
         

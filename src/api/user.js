@@ -106,5 +106,8 @@ export const userApi = {
     updateRole(data) {
         return systemRoleApi.put('/set-users-to-roles', data)
     },
+    getPermission(role) {
+        return permissionApi.get('/roles/' + role + '/permissions')
+    }
 
 };

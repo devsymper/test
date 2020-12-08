@@ -10,7 +10,7 @@
             <ActionButtons refs="action" />
         </div>
     </v-row>
-    <v-dialog v-model="logtimeDialog" width="357">
+    <v-dialog v-model="logtimeDialog" width="357" @click:outside="deleteLog()">
         <LogTimeForm v-show="showTask==false"
             @showTaskForm="showTaskForm"
             @showCategoryForm="showCategoryForm"
@@ -79,7 +79,6 @@ import LogTimeForm from "../../components/timesheet/LogTimeForm";
 import DeleteLogView from "../../components/timesheet/DeleteLogView";
 import CategoryForm from "../../components/timesheet/CategoryForm";
 import timesheetApi from '../../api/timesheet';
-import dayjs from 'dayjs';
 
 export default {
     name: "showLogTime",
@@ -139,6 +138,12 @@ export default {
         })
     },
     methods: {
+        // khi click ra ngoài log form
+        deleteLog(){
+            if(!this.update){
+              this.$refs.logCalendar.events.pop()
+            }
+        },
         doneCate(){
             this.updateAPICate = false
         },
@@ -175,7 +180,7 @@ export default {
           
         },
         getNow: function() {
-            let current = dayjs().format('HH:mm');
+            let current = this.$moment().format('HH:mm');
             if (this.check_daily === true && current === this.time_remind_daily_log) {
                 this.remindDialog = true;
             }

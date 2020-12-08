@@ -11,11 +11,12 @@
 		:useDefaultContext="false"
 		:headerPrefixKeypath="'admin.table'"
 		:useActionPanel="true"
-		@row-selected="onRowSelected"
+		@row-selected="getDetails"
 		:actionPanelWidth="1000"
+		:actionPanelType="'elastic'"
 		:containerHeight="containerHeight"
 		:showImportHistoryBtn="false"
-		:showActionPanelInDisplayConfig="false"
+		:showActionPanelInDisplayConfig="true"
 	> 
 		<template slot="right-panel-content">  
 			<DetailWorkflow 
@@ -82,29 +83,7 @@ export default {
                     name: "View details",
                     text: "Xem chi tiết",
                     callback: (obj, callback) => {
-						self.$store.commit('admin/setProcessKey', obj.processKey)
-						self.$refs.listWorkFlow.actionPanel = true;
-						adminApi.getLatestWD(obj.processKey).then(res=>{
-							if(res.data[0]){
-								self.$store.commit('admin/setProcessDefination', res.data[0]);
-								self.$store.commit('admin/setProcessId', obj.id);
-								self.showPanel = true;
-								adminApi.trackingProcess(res.data[0].id).then(res=>{
-									if(res.status == 200){
-											self.$store.commit('admin/setCurrentTrackingProcess', res.data);
-										}
-								}).catch(err=>{
-								})
-								adminApi.aggregateWorkflow(res.data[0].id).then(res=>{
-									if(res.status == 200){
-										self.$store.commit('admin/setCurrentAggregateWorkflow', res.data);
-									}
-								}).catch(err=>{
-								})
-							}
-							
-						}).catch(err=>{
-						})
+						self.getDetails(obj)
                     },
                 },
             },
@@ -122,6 +101,32 @@ export default {
 			res.map(x=>listKey.push(x.processKey));
 			return listKey
 		},
+		getDetails(obj){
+			let self = this
+			self.$store.commit('admin/setProcessKey', obj.processKey)
+			self.$refs.listWorkFlow.actionPanel = true;
+			adminApi.getLatestWD(obj.processKey).then(res=>{
+				if(res.data[0]){
+					self.$store.commit('admin/setProcessDefination', res.data[0]);
+					self.$store.commit('admin/setProcessId', obj.id);
+					self.showPanel = true;
+					adminApi.trackingProcess(res.data[0].id).then(res=>{
+						if(res.status == 200){
+								self.$store.commit('admin/setCurrentTrackingProcess', res.data);
+							}
+					}).catch(err=>{
+					})
+					adminApi.aggregateWorkflow(res.data[0].id).then(res=>{
+						if(res.status == 200){
+							self.$store.commit('admin/setCurrentAggregateWorkflow', res.data);
+						}
+					}).catch(err=>{
+					})
+				}
+				
+			}).catch(err=>{
+			})
+		}
 	}
 }
 </script>

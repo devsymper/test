@@ -5,7 +5,7 @@
         <v-card-text> {{content}} </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
-          <v-btn color="red darken-1" text @click="showDialog = false">Hủy</v-btn>
+          <v-btn color="red darken-1" text @click="cancel">Hủy</v-btn>
           <v-btn color="green darken-1" text @click="confirm">Đồng ý</v-btn>
         </v-card-actions>
       </v-card>
@@ -31,6 +31,9 @@ export default {
    methods:{
        confirm(){
            this.$emit('confirm')
+       },
+       cancel(){
+           this.$emit('cancel')
        },
    }
 }

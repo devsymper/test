@@ -51,7 +51,6 @@
 </template>
 
 <script>
-import dayjs from 'dayjs';
 import timesheetApi from '../../api/timesheet';
 
 export default {
@@ -63,8 +62,8 @@ export default {
     },
     methods: {
         getDuration(startTime, endTime) {
-            let startFormatted = dayjs(startTime);
-            let endFormatted = dayjs(endTime);
+            let startFormatted = this.$moment(startTime);
+            let endFormatted = this.$moment(endTime);
             let start = startFormatted.get('hour') * 60 + startFormatted.get('minute');
             let end = endFormatted.get('hour') * 60 + endFormatted.get('minute');
             let duration = end - start;
@@ -104,10 +103,10 @@ export default {
         deleteEvent() {
             this.formattedDeleteEvent = {
                 ...this.deleteEvent,
-                date: dayjs(this.deleteEvent.start).format('DD/MM/YYYY'),
+                date: this.$moment(this.deleteEvent.start).format('DD/MM/YYYY'),
                 duration: this.getDuration(this.deleteEvent.start, this.deleteEvent.end),
-                start: dayjs(this.deleteEvent.start).format('HH:mm'),
-                end: dayjs(this.deleteEvent.end).format('HH:mm'),
+                start: this.$moment(this.deleteEvent.start).format('HH:mm'),
+                end: this.$moment(this.deleteEvent.end).format('HH:mm'),
             }
         }
     }

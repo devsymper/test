@@ -161,7 +161,6 @@
 </template>
 
 <script>
-import PerfectScrollbar from "vue2-perfect-scrollbar";
 import { util } from "./../../../plugins/util.js";
 import { getDefaultFilterConfig } from "./defaultFilterConfig.js";
 import Vue from "vue";
@@ -361,7 +360,6 @@ export default {
         };
     },
     components: {
-        // PerfectScrollbar: PerfectScrollbar,
         VuePerfectScrollbar: VuePerfectScrollbar
     },
     props: {

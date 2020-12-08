@@ -14,7 +14,7 @@
 										<template v-slot:activator="{ on, attrs }">
 											<div class="title-document-enduser" 	
 												v-bind="attrs"
-												v-on="on" >
+												v-on="on">
 												<span >{{childItem.title}}</span> 
 											</div>
 										</template>
@@ -64,7 +64,10 @@
 					</ul>
 			</div>	
 		</VuePerfectScrollbar>
-		<ContextMenu ref="contextMenu" :sideBySide="sideBySide" />	
+		<ContextMenu ref="contextMenu" 
+			:sideBySide="sideBySide"
+			:allAppMode="false"
+		/>	
   </div>
 </template>
 <script>
@@ -194,6 +197,7 @@ export default {
 					}
 				})
 			}
+			 
 			if(listItem.dashboard.item.length > 0){
 				listItem.dashboard.item.filter(function(item){
 					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){

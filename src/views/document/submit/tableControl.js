@@ -1,6 +1,5 @@
 import Control from "./control";
 import { util } from "@/plugins/util.js";
-import moment from "moment-timezone";
 import sDocument from './../../../store/document'
 import {
     SYMPER_APP
@@ -54,10 +53,11 @@ export default class TableControl extends Control {
                     let curColIndex = this.tableInstance.colName2Idx[controlLink];
                     for (let key in listLinkInCol) {
                         let rowIdx = key.replace(/linkConfig_(.+)_/g, "");
-                        rowIdx = Number(rowIdx)
-                        this.tableInstance.validateValueMap[rowIdx + "_" + curColIndex] = {
+                        rowIdx = Number(rowIdx);
+                        let cellPos = rowIdx + "_" + curColIndex;
+                        this.tableInstance.addToValueMap(cellPos, {
                             type: 'linkControl',
-                        };
+                        })
                     }
                 }
             }
@@ -83,9 +83,11 @@ export default class TableControl extends Control {
                 let switchTableButton = $(`<button onclick="switchTableMode(this)" view-type="`+viewType+`" table-name="`+this.name+`" class="swap-table-btn"><span class="mdi mdi-swap-horizontal"></button>`)[0];
                 this.ele.before(switchTableButton);
             }
-            this.ele.detach().hide();
             this.switchTable();
-
+            if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
+                this.ele.closest('.wrap-table').css({ 'display': 'none' })
+            }
+            this.ele.detach().hide();
         }
     }
     /**
@@ -149,7 +151,7 @@ export default class TableControl extends Control {
                     let key = Object.keys(data)[i];
                     let control = this.controlInTable[key];
                     if (control && control.type == 'date') {
-                        data[key][index] = moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
+                        data[key][index] = SYMPER_APP.$moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
                     }
                     rowData[key] = data[key][index];
                 }
@@ -170,18 +172,14 @@ export default class TableControl extends Control {
                     let key = Object.keys(data)[i];
                     let control = this.controlInTable[key];
                     if (control && control.type == 'date') {
-                        data[key][index] = moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
+                        data[key][index] = SYMPER_APP.$moment(data[key][index], 'YYYY-MM-DD').format(control.controlProperties.formatDate.value);
                     }
                     rowData[key] = data[key][index];
                 }
                 dataTable.push(rowData)
 
             }
-
-            if (this.tableInstance.tableHasRowSum) { // trường hợp có dòng tính tổng thì thêm dòng ở cuối hiển thị tổng cột
-                dataTable.push({})
-            }
-            this.tableInstance.tableInstance.loadData(dataTable);
+            this.tableInstance.setData(dataTable, false);
             setTimeout((self) => {
                 self.tableInstance.tableInstance.render();
                 SYMPER_APP.$evtBus.$emit('document-on-table-change', {

@@ -104,7 +104,7 @@
             color="primary"
 			style="margin-bottom:24px"
             class="btn-fixed-bottom update-btn"
-            @click="addApp"
+            @click="debounceAddApp"
             :disabled="!!!currentApp.name"
         >
             <v-icon class="mr-2">mdi-content-save-outline</v-icon>
@@ -114,11 +114,12 @@
 </template>
 <script>
 import Api from "./../../api/api.js";
-import iconPicker from "../../components/common/pickIcon";
-import vClickOutside from 'v-click-outside';
+import iconPicker from "../../components/common/iconPicker";
 import SearchModal from './SearchModal.vue';
 import AppDetailVue from './AppDetail.vue';
-import {appManagementApi} from './../../api/AppManagement.js'
+import {appManagementApi} from './../../api/AppManagement.js';
+import _debounce from "lodash/debounce";
+
 export default {
     name: "UpdateApp",
     components: {
@@ -140,9 +141,6 @@ export default {
 		sApp(){
 			return this.$store.state.appConfig.listItemSelected
 		},
-	},
-    directives: {
-        clickOutside: vClickOutside.directive
     },
     data: function() {
         return {
@@ -228,6 +226,9 @@ export default {
 		selectedItem(data){
 			this.listSelectedItem = data;
 		},
+		debounceAddApp: _debounce(function(e){
+			this.addApp()
+		}, 300,this),
         addApp() {
             if(this.isEdit) {
                 this.updateApp();

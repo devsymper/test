@@ -43,9 +43,16 @@
           <span style= "color:black!important; padding-left:4px"> {{format(type)}}</span>
         </template>
     </v-select>
-     <v-btn class="mt-1 ml-1" style="float:right" small text @click="$router.push('/category')">
-        <v-icon class="mdi-18px">mdi mdi-cog-outline</v-icon>
-    </v-btn>
+     <v-tooltip top>
+        <template v-slot:activator="{ on }">
+                <v-btn class="mt-1 ml-1"  v-on="on" style="float:right" small text @click="$router.push('/category')">
+                <v-icon class="mdi-18px">mdi mdi-cog-outline</v-icon>
+            </v-btn>
+        </template>
+        <span>
+            Category
+        </span>
+    </v-tooltip>
 </div>
 </template>
 
@@ -153,7 +160,7 @@ button {
 
 .viewmode ::v-deep .v-input__slot:after {
     border-color: transparent !important;
-    height:25px!important;margin-top:3px;
+    margin-top:3px;
 }
 
 .viewmode-item {

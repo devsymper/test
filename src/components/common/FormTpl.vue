@@ -85,7 +85,7 @@
                     :class="'sym-small-size sym-style-input d-inline-block '+(inputInfo.classes ? inputInfo.classes : '') "
                     :key="name"
                     single-line
-                    :disabled="viewOnly"
+                    :disabled="inputInfo.disabled || viewOnly"
                     v-bind="getInputProps(inputInfo)"
                     v-model="inputInfo.value"
                     :append-icon="(inputInfo.appendIcon) ? inputInfo.appendIcon : ''"
@@ -176,6 +176,7 @@ import LinkConfig from "./../../views/document/sideright/items/LinkConfig.vue";
 import FormAutoComplete from "./../../views/document/sideright/items/FormAutoComplete";
 import FormulaEditor from "./../formula/editor/FormulaEditor";
 import DateFormat from "./../common/DateFormat";
+import Editor from "./../common/editor/Editor";
 import NumberFormat from "./../common/NumberFormat";
 import DataTable from "./../common/customTable/DataTable";
 import SymperDragPanel from "./SymperDragPanel";
@@ -365,6 +366,14 @@ const inputTypeConfigs = {
     },
     configTime:{
         tag: "configTime",
+        props(config) {
+            return {
+                label: config.title,
+            };
+        }
+    },
+    editor:{
+        tag: "symper-editor",
         props(config) {
             return {
                 label: config.title,
@@ -696,6 +705,7 @@ export default {
         "datetime-picker" : DateTimePicker,
         SymperColorPicker: SymperColorPicker,
         "default-control-document":SymperDefaultControlDocument,
+        'symper-editor':Editor
 
 
     }

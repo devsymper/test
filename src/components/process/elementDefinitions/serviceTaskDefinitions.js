@@ -50,13 +50,13 @@ export default {
             saveResponseParameters: true,
             resultVariablePrefix: '',
             saveResponseParametersTransient: false,
-            saveResponseVariableAsJson: true,
+            saveResponseVariableAsJson: false,
         },
         makeRequestBody(nodeAttr) {
             this.params.responseVariableName = 'symper_'+nodeAttr.idNode+'_notification_response';
             let title = nodeAttr.serviceNotificationTitle.value;
             let description = nodeAttr.serviceNotificationDescription.value;
-            let receiver =userAssignmentToXMLValue(nodeAttr.serviceNotificationReceiver.value,true);
+            let receiver =userAssignmentToXMLValue(nodeAttr.serviceNotificationReceiver.value);
             let nodeAction=nodeAttr.serviceNotificationActionForElement.value;
             let action={
                 module:'workflow',
@@ -95,7 +95,7 @@ export default {
             saveResponseParameters: true,
             resultVariablePrefix: '',
             saveResponseParametersTransient: false,
-            saveResponseVariableAsJson: true,
+            saveResponseVariableAsJson: false,
         },
         makeRequestBody(nodeAttr) {
             this.params.responseVariableName = 'symper_'+nodeAttr.idNode+'_throw_signal_response';

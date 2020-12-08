@@ -17,7 +17,9 @@
         "add": "Add",
         "edit": "Edit",
         "cancel": "Cancel",
-        "update": "Update",
+		"update": "Update",
+		"parameter": "Parameter",
+        "content": "Content",
         "delete": "Delete",
         "refresh": "Refresh",
         "userDeletedName": "User deleted email",
@@ -573,7 +575,8 @@
                         "history": "History",
                         "comment": "Comment",
                         "has": "Has",
-                        "commentNotResolve": "comment Not Resolve"
+                        "commentNotResolve": "comment Not Resolve",
+                        "noComment": "No comment"
                     },
                     "worflowInfo": "Workflow infomation",
                     "userRelated": {

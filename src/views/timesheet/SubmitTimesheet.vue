@@ -81,8 +81,7 @@ import ActionButtons from "./../../components/timesheet/ActionButtons";
 import SubmitTimesheetForm from "./../../components/timesheet/SubmitTimesheetForm";
 import timesheetApi from '../../api/timesheet';
 
-import _ from 'lodash';
-import dayjs from 'dayjs';
+import _groupBy from 'lodash/groupBy';
 
 export default {
     components: {
@@ -112,9 +111,9 @@ export default {
                 .then(res => {
                     if (res.status === 200) {
                         const ranges = self.allColumns.slice(2, self.allColumns.length).map(c => c.colId);
-                        const logTimeList = _.groupBy(res.data.listLogTime, 'task_id');
-                        const dateList = _.groupBy(res.data.listLogTime, 'date');
-                        const userName = _.groupBy(res.data.listLogTime, 'account_id');
+                        const logTimeList = _groupBy(res.data.listLogTime, 'task_id');
+                        const dateList = _groupBy(res.data.listLogTime, 'date');
+                        const userName = _groupBy(res.data.listLogTime, 'account_id');
                         //console.log(dateList);
                         const rows = Object.keys(logTimeList).map(k => {
                             const returnObj = {
@@ -233,6 +232,10 @@ export default {
 </script>
 
 <style>
+.ag-theme-balham .ag-cell{
+    border:none!important;
+    line-height:22px!important
+}
 </style><style lang="scss" scoped>
 .v-btn:not(.v-btn--round).v-size--small {
     padding: 0 4px !important;

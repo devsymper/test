@@ -33,10 +33,11 @@
 			/>
         </div>
         <div class="w-100 mt-3">
-            <span
-                class="fs-12 mb-2 "
-            >Chọn permissions</span>
-
+            <div
+                class="fs-12 mb-2"
+            >
+				Chọn permissions
+			</div>
             <PermissionSelector 
             	v-model="itemData.permissions"
 				:disabled="action == 'detail'"
@@ -48,7 +49,7 @@
         <div class="mt-2" v-if="action != 'detail' ">
             <v-btn
                 class="float-right mr-1"
-                @click="saveSystemRole"
+                @click="debounceSaveSystemRole"
                 small
                 depressed
                 color="primary"
@@ -66,10 +67,13 @@ import UserSelector from "@/views/tasks/userSelector.vue";
 import { systemRoleApi } from "@/api/systemRole.js";
 import PermissionSelector from "@/components/permission/PermissionSelector.vue";
 import ListUserSelector from "@/views/accessControl/helpers/ListUserSelector"
+import _debounce from "lodash/debounce";
 
 export default {
     methods: {
-	
+		debounceSaveSystemRole: _debounce(function(e){
+			this.saveSystemRole()
+		}, 200,this),
         async saveSystemRole(){
             let dataToSave = {
                 name: this.allInputs.name.value,

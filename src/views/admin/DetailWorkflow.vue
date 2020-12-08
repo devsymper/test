@@ -2,8 +2,7 @@
 	<div class="detail-workflow w-100  h-100 d-flex flex-column">
 		<div class="d-flex" style="height:50%">
 			<div class="modeler-workflow mr-2 w-100 h-100">
-				<ModelerDetail 
-				/>
+				<TrackingProcessDefinition :procesDefId="processDefination.id"/>
 			</div>
 			<div class="summary-workflow d-flex flex-column">
 				<div class="d-flex pt-2">
@@ -71,7 +70,7 @@
 					</span>
 					<span class="value-summary">
 						{{processDefination.version ? processDefination.version  : ""}}
-					</span>
+					</span> 
 				</div>
 				<div  class="d-flex" style="margin-top:16px">	
 					<div style="width:150px; height:150px" >
@@ -87,13 +86,12 @@
 								>
 								n
 							</v-chip>
-							<span>Chưa hoàn thành</span>
+							<span>Đang chạy</span>
 						</div>
 						<div >
 							 <v-chip
 								class="ma-2"
 								color="green"
-								
 								text-color="white"
 								small
 								>
@@ -108,11 +106,6 @@
 		<div class="list-workflow-instance d-flex flex-column h-100 mt-8" >
 			<ListProcessInstance :showSwitchBtn="true" />
 		</div>
-		<!-- <ConfirmDelete 
-			:showDialog="showDialog"
-			@cancel="cancel"
-			@confirm="deleteProcessInstance"
-			 /> -->
 	</div>
 </template>
 
@@ -125,13 +118,16 @@ import { reformatGetListInstances } from "@/components/process/reformatGetListDa
 import ModelerDetail from "./ModelerDetail"
 import ConfirmDelete from "./ConfirmDelete"
 import Handsontable from 'handsontable';
-import ListProcessInstance from "./ListProcessInstance"
+import ListProcessInstance from "./ListProcessInstance";
+import TrackingProcessDefinition from "@/components/process/TrackingProcessDefinition";
+
 export default {
 	components:{
 		ListItems,
 		ModelerDetail,
 		ConfirmDelete,
-		ListProcessInstance
+		ListProcessInstance,
+		TrackingProcessDefinition
 	},
 	data(){
 		let self = this
@@ -342,6 +338,7 @@ export default {
 	watch:{
 		processKey(val){
 			this.listItemSelected = []
+			this.tab = 'tab-1'
 		},
 		listItemSelected:{
 			deep: true,

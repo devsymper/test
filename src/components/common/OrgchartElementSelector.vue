@@ -2,7 +2,7 @@
     <div class="orgchart-element-selector" :style="{height: height }" >
 		<VuePerfectScrollbar
 			:style="{height:height  }"
-		>
+		>	
 			<v-treeview
 				class="fs-13"
 				activatable

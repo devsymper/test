@@ -1,29 +1,29 @@
 <template>
-    <div >
-        <div class="my-2 fs-12">
-            Chọn hành động cho các đối tượng trong ứng dụng
-        </div>
+    <div  class="h-100 w-100"
+		
+	>
         <v-tabs
             hide-slider
             :height="35"
             active-class="symper-tab-active"
             v-model="tabIndex"
-            color="grey darken-4">
-            <v-tab
-                class="symper-app-tab"
-                v-for="(item) in objectTypes"
-                :key="item.key">
-                {{ item.text }}
-            </v-tab>
-        </v-tabs>
+            color="grey darken-4"
+		>
+			<v-tab
+				class="symper-app-tab h-100 w-100	"
+				v-for="(item) in objectTypes"
+				:key="item.key">
+				{{ item.text }}
+			</v-tab>
+		</v-tabs>
         <hot-table
-            :height="'auto'"
+            :height="390"
             :settings="tableSettings"
             :data="tableDataDefinition[openingTabKey].tableData"
             :columns="tableDataDefinition[openingTabKey].columns"
             :colHeaders="tableDataDefinition[openingTabKey].colHeaders"
             :dataSchema="tableDataDefinition[openingTabKey].dataSchema"
-            class="fs-13 mt-2"
+            class="fs-13 mt-2 "
             ref="dataTable">
         </hot-table>
     </div>
@@ -79,7 +79,15 @@ export default {
                     objects: data
                 });
             }
-        }
+		},
+		tableDataDefinition:{
+			deep: true,
+			immediate: true,
+			handler(obj){
+				// obj.orgchart.colHeaders.splice(5,3)
+				// obj.orgchart.columns.splice(5,3)
+			}
+		}
     },
     components: {
         HotTable,
@@ -132,7 +140,7 @@ export default {
             }
         },
         idApplication: {
-            default: 0
+            default: "0"
         },
         /**
          *  các action ứng với từng loại object type, có dạng khớp với định dạng của handson 
