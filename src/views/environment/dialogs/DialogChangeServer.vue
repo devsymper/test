@@ -1,13 +1,134 @@
 <template>
-  
+	<div class="dialog-deploy">
+		<v-dialog
+			v-model="showDialog"
+			persistent
+			max-width="400"
+		>
+			<v-card>
+			<v-card-title class="fs-15">
+				Đổi server
+			</v-card-title>
+			<v-card-text>
+				<div class="content-deploy-dialog d-flex flex-column ml-2 fs-13">
+					<div class="fs-13 mb-2 mt-2 ">
+						Chọn server bạn muốn đổi
+					</div>
+					<v-autocomplete
+						v-model="serverId"
+						:items="allServer"
+						item-text="ip"
+						item-value="id"
+						solo-inverted
+						class="fs-13"
+					></v-autocomplete>
+					<div class="fs-13 mb-2 mt-2 ">
+						Tên database (tùy chọn)
+					</div>
+					<v-text-field
+						v-model="dbName"
+						single-line
+						class="fs-13"
+						solo
+					></v-text-field>
+					<div class="text-wrap">
+						Nhấn Đồng ý để đổi server
+					</div>
+				</div>
+
+			</v-card-text>
+			<v-card-actions>
+				<v-spacer></v-spacer>
+				<v-btn
+					color="red darken-1"
+					text
+					@click="cancel"
+				>
+					Hủy
+				</v-btn>
+					<v-btn
+					color="green darken-1"
+					text
+					@click="changeServer"
+				>
+					Đồng ý
+				</v-btn>
+			</v-card-actions>
+			</v-card>
+		</v-dialog>
+	</div>
 </template>
 
 <script>
+import {environmentManagementApi} from '@/api/EnvironmentManagement'
 export default {
-
+	props:{
+		showDialog:{
+			type: Boolean,
+			default: false,
+		},
+		allServer:{
+			type: Array,
+		},
+		instanceId:{
+			type: String,
+			default: ""
+		}
+	},
+	data(){
+		return{
+			serverId:"",
+			dbName:""
+		}
+	},
+	methods:{
+		cancel(){
+			this.$emit('cancel')
+		},
+		changeServer(){
+			let data = {
+				instanceId: this.instanceId,
+				serverId: this.serverId,
+				dbName: this.dbName
+			}
+			let self = this
+			environmentManagementApi.changeServer(data).then(res=>{
+				if(res.status == 200){
+					self.$emit('success')
+					self.$snotify({
+						type: "success",
+						title: "Đổi server thành công"
+					})
+				}else{
+					self.$snotify({
+					type: "error",
+					title: err
+				})
+				}
+			}).catch(err=>{
+				self.$snotify({
+					type: "error",
+					title: err
+				})
+			})
+		}
+	},
 }
 </script>
 
-<style>
-
+<style scoped>
+.content-deploy-dialog >>>  .v-text-field__details{
+	display: none !important;
+}
+.content-deploy-dialog >>> .v-input__slot{
+	box-shadow: unset !important;
+	min-height: unset !important;
+	background-color: #F0F0F0 !important;
+}
+.content-deploy-dialog >>> input{
+	font-size: 13px !important;
+}
+.content-deploy-dialog >>> .v-menu{
+	font-size: 13px !important;
+}
 </style>

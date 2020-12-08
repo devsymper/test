@@ -42,5 +42,14 @@ export const environmentManagementApi = {
 	},
 	migrateData(data){
 		return api.post('instances/migrate',data)
+	},
+	getAllServer(){
+		return api.get('servers')
+	},
+	changeServer(data){
+		return api.post('instances/'+data.instanceId+'/change-server', {
+			serverId: data.serverId,
+			dbName: data.dbName
+		})
 	}
 };

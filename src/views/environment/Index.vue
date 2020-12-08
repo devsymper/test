@@ -8,7 +8,7 @@
 					</v-icon>
 					<span class="ml-2">{{item.title}}</span>
 				</div>
-				<span class="fs-10" style="position:absolute;left:9px; top:11px">{{i+1}}</span>
+				<span class="fs-10" style="position:absolute;left:9px; top:10px">{{i+1}}</span>
 				<span class="fs-10 font-weight-light mt-1 "><v-icon x-small> mdi-information-outline</v-icon> <span class="ml-1">{{item.subTitle}}</span></span>
 			</div>
 		</div>

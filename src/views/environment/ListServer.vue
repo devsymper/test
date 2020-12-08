@@ -14,29 +14,17 @@
 			:showButtonAdd="false"	
 		>
 		 <template slot="right-panel-content" slot-scope="{}">
-			 <AddServiceForm 
-				@add-success="handleAddSuccess"
-			 />
 		</template>
 	</ListItems>
-	<AddVersion 
-		:showDialog="showDialog"
-		@add-success="handleAddSuccess"
-		@cancel="showDialog = false"
-	/>
 	</div>
 </template>
 
 <script>
 import ListItems from "@/components/common/ListItems"
 import { appConfigs } from "@/configs.js";
-import AddServiceForm from './panels/AddServiceForm'
-import AddVersion from './dialogs/AddVersion'
 export default {
 	components:{
 		ListItems,
-		AddServiceForm,
-		AddVersion
 	},
 	methods:{
 		handleAddSuccess(){
@@ -62,7 +50,6 @@ export default {
 						self.$goToPage( "/server/"+row.id+"/instances",
                             "Danh sách instance "
 						);
-						// self.$store.dispatch('environmentManagement/getAllVersionOfService', row)
                     }
                 },
                

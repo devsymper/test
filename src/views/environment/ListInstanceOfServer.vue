@@ -1,7 +1,7 @@
 <template>
 	<div class="h-100 w-100">
 		<ListItems
-			ref="listService"
+			ref="listInstance"
 			:pageTitle="'Danh sách instance'"
 			:containerHeight="containerHeight"
 			:getDataUrl="getListUrl"
@@ -14,10 +14,12 @@
 			:apiMethod="'POST'"
 			:customDataForApi="customDataForApi"
 		/>
-		<DialogUpgrade 
+		<DialogChangeServer 
 			:showDialog="showDialog"
-			:currentInstance="currentInstance"
+			:allServer="allServer"
+			:instanceId="instanceId"
 			@cancel="showDialog = false"
+			@success="handleSuccess"
 		/>
 	</div>
 </template>
@@ -26,21 +28,38 @@
 import ListItems from "@/components/common/ListItems"
 import { appConfigs } from "@/configs.js";
 import { util } from "@/plugins/util.js";
-import DialogUpgrade from './dialogs/DialogUpgrade'
-import DialogDeloy from './dialogs/DialogDeloy'
+import {environmentManagementApi} from '@/api/EnvironmentManagement'
+import DialogChangeServer from './dialogs/DialogChangeServer'
+
 export default {
 	components:{
 		ListItems,
-		DialogDeloy,
-		DialogUpgrade
+		DialogChangeServer
+	},
+	methods:{
+		handleSuccess(){
+			this.showDialog = false
+			this.$refs.listInstance.refreshList()
+		}
 	},
 	mounted(){
+		let self = this
 		this.containerHeight = util.getComponentSize(this).h
+		environmentManagementApi.getAllServer().then(res=>{
+			if(res.status == 200){
+				self.allServer = res.data.listObject
+			}
+		}).catch(err=>{
+
+		})
+		
 	},
 	data(){
 		let self = this
 		return{
 			showDialog: false,
+			allServer:[],
+			instanceId:'',
 			currentInstance:{},
 			containerHeight:0,
 			customDataForApi(configs, columns, filterData){
@@ -50,13 +69,12 @@ export default {
 				}
 			},
 			tableContextMenu: {
-				upgrade: {
-					name: "upgrade",
-					text: "Upgrade",
+				changeServer: {
+					name: "changeServer",
+					text: "Đổi server",
 					callback: (row, callback) => {
-						// self.$store.commit('environmentManagement/setCurrentVersionId', row.id)
-						self.currentInstance = row
 						self.showDialog = true
+						self.instanceId = row.id
 					}
 				},
             },
