@@ -198,6 +198,8 @@
         "hide_column": "Ẩn cột này",
 		"show_column": "Hiện cột này",
 		"git": "Link git",
+		"os": "Hệ điểu hành",
+		"ip": "Địa chỉ IP",
         "wrap_tex_mode": {
             "wrap": "Xuống dòng",
             "clip": "Cắt bớt"
@@ -248,7 +250,8 @@
 			"suspended": "Trạng thái",
 			"number_instance":"Tổng số instance",
 			"status":"Trạng thái",
-			"endTime":"Thời gian hoàn thành"
+			"endTime":"Thời gian hoàn thành",
+			"nameVersion": "Phiên bản"	
         }
     },
     "validate": {

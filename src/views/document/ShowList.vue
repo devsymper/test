@@ -207,6 +207,25 @@ export default {
                         .always(() => {});
                     },
                 },
+                templateExcel:{
+                    name: "templateExcel",
+                    text: function() {
+                        return " <i class= 'mdi mdi-file-upload-outline' > </i>&nbsp; Lấy mẫu Import Excel";
+                    },
+                    callback: (document, callback) => {
+                        this.documentId = Number(document.id);
+                        let exportUrl = this.sDocumentManagementUrl+'documents/'+this.documentId+'/export-excel?isTemplate="1"'
+                        if(!exportUrl){
+                            if(this.getDataUrl[this.getDataUrl.length - 1] == '/'){
+                                exportUrl = this.getDataUrl+'export';
+                            }else{
+                                exportUrl = this.getDataUrl+'/export';
+                            }
+                        }
+                        
+                        window.open(exportUrl,'_blank');
+                    },
+                },
                 importExcel:{
                     name: "importExcel",
                     text: function() {
@@ -216,7 +235,6 @@ export default {
                         const self = this;
                         self.showImportPanel = !self.showImportPanel; 
                         self.documentId = Number(document.id);
-                       // this.documentId = 1729;
                     },
                 },
             },

@@ -22,4 +22,10 @@ export default [{
 		component: () =>
 			import ('../../views/environment/ListInstanceOfService.vue'),
 	},
+	{
+		path: "/server/:serverId/instances",
+		name: "instanceOfServer",
+		component: () =>
+			import ('../../views/environment/ListInstanceOfServer.vue'),
+	},
 ]

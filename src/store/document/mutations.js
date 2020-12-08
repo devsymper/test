@@ -418,9 +418,8 @@ const setDefaultSubmitStore = (state, params) => {
             key:"",
             data:{}
         },
-        validateMessage:{
-
-        }
+        validateMessage:{},
+        dataInputBeforeChange:{}
     }
     let instance = params.instance;
     Vue.set(state.submit, instance, value);
