@@ -49,7 +49,8 @@ export default class CustomRenderer extends BaseRenderer {
 				svgAttr(rect, {
 					transform: `translate(24, -16)`
 				});
-				insertText(parentNode,countEnd ,STATUS_COLORS['end'])
+				let x = countEnd > 9 ? 3 : 7
+				insertText(parentNode,countEnd ,STATUS_COLORS['end'],x)
 			}
 			if(countRunning){
 				let rect = drawRect(parentNode, r+5, r, 2, STATUS_COLORS['running']);
@@ -57,7 +58,8 @@ export default class CustomRenderer extends BaseRenderer {
 				svgAttr(rect, {
 					transform: `translate(${offset}, -16)`
 				});
-				insertText(parentNode,countRunning ,STATUS_COLORS['running'], true)
+				let x = countRunning > 9 ? 27 : 31
+				insertText(parentNode,countRunning ,STATUS_COLORS['running'],x)
 			}
           
           
@@ -107,12 +109,12 @@ function drawRect(parentNode, width, height, borderRadius, color) {
 }
 
 
-function insertText(parentNode,countInfor,colorSet=null , running = false) {
+function insertText(parentNode,countInfor,colorSet=null , x) {
     const text = svgCreate('text');
     const textRole = svgCreate('text');
     svgAttr(text, {
-        x:running == false ? 7 : 30,
-        y:-4,
+        x: x,
+        y:-3,
         fill:colorSet?colorSet.stroke:"#52B415"
     });
     svgAttr(textRole, {
