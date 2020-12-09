@@ -16,7 +16,7 @@
 		:actionPanelType="'elastic'"
 		:containerHeight="containerHeight"
 		:showImportHistoryBtn="false"
-		:showActionPanelInDisplayConfig="false"
+		:showActionPanelInDisplayConfig="true"
 	> 
 		<template slot="right-panel-content">  
 			<DetailWorkflow 
@@ -112,8 +112,8 @@ export default {
 					self.showPanel = true;
 					adminApi.trackingProcess(res.data[0].id).then(res=>{
 						if(res.status == 200){
-								self.$store.commit('admin/setCurrentTrackingProcess', res.data);
-							}
+							self.$store.commit('admin/setCurrentTrackingProcess', res.data);
+						}
 					}).catch(err=>{
 					})
 					adminApi.aggregateWorkflow(res.data[0].id).then(res=>{

@@ -113,6 +113,14 @@ function cleanContent(content, configValue) {
             rsl = rsl.replace(cdataStr, newCdataStr);
         });
     }
+    // Thay đổi các ký tự trong condition thành các ký tự chưa mã hóa
+    symperMatches = rsl.match(/\<condition(.*?)\<\/condition>/g);
+    if (symperMatches) {
+        symperMatches.forEach(cdataStr => {
+            let newCdataStr = cdataStr.replace(/&lt;/g, '<').replace(/&gt;/g, '>');
+            rsl = rsl.replace(cdataStr, newCdataStr);
+        });
+    }
 
     return rsl;
 }
@@ -560,4 +568,9 @@ export const getLastestDefinition = function(row, needDeploy = false) {
             }
         }
     });
+}
+
+export const cleanXMLBeforeRenderInEditor = function(xml){
+    xml = xml.replace(/<symper:(.*?)<\/symper:(.*?)>/g,''); // Loại bỏ toàn bộ các thẻ của symper
+    return xml;
 }

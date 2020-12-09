@@ -238,14 +238,14 @@
             :temporary="reComputeActionPanelType == 'temporary'"
         >
             <slot name="right-panel-content" :itemData="currentItemDataClone">
-                <v-card flat>
+                <!-- <v-card flat>
                     <v-card-title class="pa-0 pl-2" primary-title>{{itemActionTitle}}</v-card-title>
                     <v-card-text>
                         <form-tpl :allInputs="itemInputs"></form-tpl>
                     </v-card-text>
 
                     <v-divider></v-divider>
-                </v-card>
+                </v-card> -->
             </slot>
         </component>
         <symper-drag-panel
@@ -257,12 +257,12 @@
             :dragPanelWidth="actionPanelWidth">
             <template slot="drag-panel-content" slot-scope="{panelData}">
                 <slot name="right-panel-content" :itemData="panelData">
-                    <v-card flat>
+                    <!-- <v-card flat>
                         <v-card-text>
                             <form-tpl :allInputs="itemInputs"></form-tpl>
                         </v-card-text>
                         <v-divider></v-divider>
-                    </v-card>
+                    </v-card> -->
                 </slot>
             </template>
         </symper-drag-panel>
@@ -321,7 +321,7 @@
 import { HotTable } from "@handsontable/vue";
 import { util } from "./../../plugins/util.js";
 import Handsontable from 'handsontable';
-import FormTpl from "./FormTpl.vue";
+// import FormTpl from "./FormTpl.vue";
 import { VDialog, VNavigationDrawer } from "vuetify/lib";
 import TableFilter from "./customTable/TableFilter.vue";
 import { getDataFromConfig, getDefaultFilterConfig } from "./../common/customTable/defaultFilterConfig.js";
@@ -551,11 +551,6 @@ export default {
     },
     created() {
         let thisCpn = this;
-        // this.$evtBus.$on("change-user-locale", locale => {
-        //     if (thisCpn.$refs.dataTable) {
-        //         thisCpn.$refs.dataTable.hotInstance.render();
-        //     }
-        // });
         this.getData();
         this.restoreTableDisplayConfig();
         document.addEventListener('keyup', function (evt) {
@@ -1685,7 +1680,7 @@ export default {
     },
     components: {
         HotTable,
-        "form-tpl": FormTpl,
+        // "form-tpl": FormTpl,
         VDialog,
         VNavigationDrawer,
         TableFilter,

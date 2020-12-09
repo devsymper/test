@@ -17,7 +17,9 @@
         "add": "Add",
         "edit": "Edit",
         "cancel": "Cancel",
-        "update": "Update",
+		"update": "Update",
+		"parameter": "Parameter",
+        "content": "Content",
         "delete": "Delete",
         "refresh": "Refresh",
         "userDeletedName": "User deleted email",
@@ -193,7 +195,9 @@
         "freeze_column": "Freeze this column",
         "unfreeze_column": "Don't freeze this column",
         "hide_column": "Hide this column",
-        "show_column": "Show this column",
+		"show_column": "Show this column",
+		"os": "Os",
+		"ip": "IP address",
         "wrap_tex_mode": {
             "wrap": "Wrap",
             "clip": "Clip"

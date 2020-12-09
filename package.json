@@ -33,7 +33,6 @@
         "sql.js": "^1.4.0",
         "tinymce": "^5.4.1",
         "vue": "^2.6.11",
-        "vue-cli-plugin-webpack-bundle-analyzer": "^2.0.0",
         "vue-html2canvas": "0.0.4",
         "vue-i18n": "^8.17.6",
         "vue-moment": "^4.1.0",
@@ -47,7 +46,7 @@
         "vue-simple-uploader": "^0.7.5",
         "vuedraggable": "^2.24.3",
         "vuejs-clipper": "^3.0.1",
-        "vuetify": "^2.2.11",
+        "vuetify": "^2.3.19",
         "vuex": "^3.1.2"
     },
     "devDependencies": {

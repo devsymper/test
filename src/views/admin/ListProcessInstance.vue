@@ -40,12 +40,22 @@
 				<v-btn
 					:class="{'mr-2 white--text':true, 'mr-8':showSwitchBtn == false}"
 					depressed
-					color="success"
+					color="primary"
 					small
 					:disabled="disableBtn"
 					@click="activeProcessInstance"
 				>
 				Chạy
+				</v-btn>
+				<v-btn
+					:class="{'mr-2 white--text':true, 'mr-8':showSwitchBtn == false}"
+					depressed
+					color="success"
+					small
+					:disabled="disableBtn"
+					@click="endProcessInstance"
+				>
+				Hoàn thành
 				</v-btn>
 				
 				 <v-tooltip bottom v-if="showSwitchBtn">
@@ -68,6 +78,12 @@
 					<span>Xem toàn màn hình</span>
 				</v-tooltip>	
 		</div>
+			<ConfirmDelete 
+				:showDialog="showDialog"
+				v-if="showDialog"
+				@cancel="cancel"
+				@confirm="deleteProcessInstance"
+			 />
 			<ListItems 
 				ref="listWorkFlow"
 				:pageTitle="'Danh sách các quy trình con'"
@@ -87,11 +103,7 @@
 				:showPagination="false"
 				:showActionPanelInDisplayConfig="false"
 			/>
-		<ConfirmDelete 
-			:showDialog="showDialog"
-			@cancel="cancel"
-			@confirm="deleteProcessInstance"
-			 />
+	
   </div>
 </template>
 
@@ -126,10 +138,13 @@ export default {
 			showBtnAddCheckbox: true,
 			customAPIResult:{
 				reformatData(res){
+					debugger
 					if(res.data.listObject.length > 0){
 						let arr = []
 						res.data.listObject.forEach(function(e){
 							arr.push(e.id)
+							let processDefId = e.processDefinitionId.split(':')
+							e.nameVersion = processDefId[1]
 						})
 						let obj = res.data.listObject
 						adminApi.getStartUserName(arr).then(resA=>{
@@ -145,6 +160,11 @@ export default {
 							self.$refs.listWorkFlow.rerenderTable()
 						}).catch(err=>{
 
+						})
+						res.data.listObject.sort(function(a,b){
+							var c = new Date(a.startTime);
+							var d = new Date(b.startTime);
+							return d-c;
 						})
 					}
 					return{
@@ -178,7 +198,21 @@ export default {
 										}
 									},
 							},
-							{name: "endTime", title: "endTime", type: "date", noFilter:true,
+							{name: "nameVersion", title: "nameVersion", type: "text"},
+							{name: "startTime", title: "startTime", type: "text",
+								renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+									Handsontable.dom.empty(td);
+									let span;
+									span = document.createElement('span');	
+									if(value != null){
+										let data =  self.$moment(value).format('YYYY-MM-DD HH:mm:ss')
+										$(span).text(data)
+									}	
+									td.appendChild(span);
+									return td;
+								},
+							},
+							{name: "endTime", title: "endTime", type: "text",
 								renderer:  function(instance, td, row, col, prop, value, cellProperties) {
 									Handsontable.dom.empty(td);
 									let span;
@@ -220,7 +254,7 @@ export default {
 		},
 	},
 	mounted(){
-		this.containerHeight = util.getComponentSize(this).h 
+		this.containerHeight = util.getComponentSize(this).h - 50
 		this.$refs.listWorkFlow.addCheckBoxColumn()
 	},
 	watch:{
@@ -232,7 +266,7 @@ export default {
 			deep: true,
             immediate: true,
             handler(obj){
-				this.showBtnAddCheckbox = true
+				// this.showBtnAddCheckbox = true
 				if(Object.keys(obj).length == 0){
 					this.disableBtn = true
 				}else{
@@ -274,6 +308,7 @@ export default {
 								}
 							)
 						}
+						this.showBtnAddCheckbox = true
 						self.$refs.listWorkFlow.refreshList()
 					}).catch(err=>{
 						self.$snotify(
@@ -286,7 +321,32 @@ export default {
 				}
 				
 			}
- 		},
+		 },
+		endProcessInstance(){
+			let self = this
+			for(let i in this.listItemSelected){
+				if(this.listItemSelected[i].status == "3"){
+					self.$snotify(
+						{
+							type: "infor",
+							title:" Tác vụ này đã hoàn thành"
+						}
+					)
+				}else{
+					adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
+						self.notifysuccess("Hoàn thành tác vụ thành công")
+					}).catch(err=>{
+						self.$snotify(
+								{
+									type: "error",
+									title:"Đã có lỗi xảy ra"
+								}
+							)
+					})
+				}
+				
+			}
+		},
 		activeProcessInstance(){
 			let self = this
 			for(let i in this.listItemSelected){
@@ -305,6 +365,7 @@ export default {
 								title:" Chạy tác vụ thành công"
 							}
 						)
+						this.showBtnAddCheckbox = true
 						self.$refs.listWorkFlow.refreshList()
 					}).catch(err=>{
 						self.$snotify(
@@ -360,24 +421,38 @@ export default {
 				})
 			}
 			for(let i in this.listItemSelected){
-				adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
-					self.$snotify(
-						{
-							type: "success",
-							title:" Xóa tác vụ thành công"
-						}
-					)
-					self.$refs.listWorkFlow.refreshList()
-				}).catch(err=>{
-					self.$snotify(
-							{
-								type: "error",
-								title:"Đã có lỗi xảy ra"
-							}
-						)
-				})
+
+				if(this.listItemSelected[i].status == '3'){
+					adminApi.deleteTask(this.listItemSelected[i].id).then(res=>{
+						self.notifysuccess()
+					}).catch(err=>{})
+				}else{
+					adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
+						adminApi.deleteTask(this.listItemSelected[i].id).then(res=>{
+						}).catch(err=>{})
+						self.notifysuccess()
+					}).catch(err=>{
+						self.$snotify(
+								{
+									type: "error",
+									title:"Đã có lỗi xảy ra"
+								}
+							)
+					})
+				}
+				
 			}
 			
+		},
+		notifysuccess(title = " Xóa tác vụ thành công"){
+			this.$snotify(
+				{
+					type: "success",
+					title: title
+				}
+			)
+			this.showBtnAddCheckbox = true
+			this.$refs.listWorkFlow.refreshList()
 		},
 		cancel(){
 			this.showDialog = false

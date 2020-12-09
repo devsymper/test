@@ -5,7 +5,7 @@
 		</v-btn>
 		<symper-bpmn
 			ref="symperBpmnHeatMap"
-			@viewport-change="plotHeatmap"
+			@viewport-change="handleViewPortChange"
 			:height="diagramHeight"
 			:width="600"
 			:diagramXML="diagramXML"
@@ -101,8 +101,7 @@ export default {
 		/**
 		 * Ve  heatmap 
 		 */
-
-		plotHeatmap() {
+		plotHeatmap(){
 			let allNodes = this.$refs.symperBpmnHeatMap.getAllNodes()
 			let sumProcess = this.$store.state.admin.sumProcess
 			let currentTrackingProcess = this.$store.state.admin.currentTrackingProcess
@@ -114,6 +113,7 @@ export default {
 				var heatmapInstance = h337.create({
 					container: document.querySelector('.symper-bpm-canvas-heat-map')
 				});
+				
 				var points = [];
 				var max = 0;
 				var width = 600;
@@ -124,13 +124,15 @@ export default {
 							if(k.act_id_ == e.id ){
 								let sum = parseInt(k.count_end) +  parseInt(k.count_running)
 								var val = Math.floor(sum/sumProcess * 100);
-								var radius = Math.floor(Math.random()*70);
 								let pos = e.di.bounds
 								var point = {
 									x: pos.x + 50,
 									y: pos.y + 40,
 									value: val,
-									radius: 100
+									radius: val,
+									maxOpacity: .5,
+									minOpacity: 0,
+									blur: .75
 								}
 								points.push(point);
 							}
@@ -144,8 +146,8 @@ export default {
 								var radius = Math.floor(Math.random()*70);
 								let pos = e.di.bounds
 								var point = {
-									x: pos.x + 20,
-									y: pos.y + 25,
+									x: pos.x + 20 ,
+									y: pos.y + 25 ,
 									value: val,
 									radius: 80
 								}
@@ -222,16 +224,15 @@ export default {
 					max: max,
 					data: points
 				};
-				heatmapInstance.setData(data);
-				// var canvas = document.getElementsByClassName('heatmap-canvas');
-				// let ctx = canvas[0].getContext('2d')
-				// ctx.save();
-				// ctx.translate(15, 0);
-				// ctx.transform(1, 0, 0, 1, 0, 0)
+				var canvas = document.getElementsByClassName('heatmap-canvas')[0];
+				setTimeout((self) => {
+					self.focusCanvas()
+					canvas.height = 500
+					canvas.width = 1200
+					heatmapInstance.setData(data);
+				}, 1000, this);
 			}
-			
 		},
-
         /**
          * Tìm và đặt các control cho việc lựa chọn cho phép edit trong lúc duyệt
          */
@@ -1296,9 +1297,8 @@ export default {
                 let afterRender = await this.$refs.symperBpmnHeatMap.renderFromXML(xml);
                 if(modelData.configValue){
 					this.restoreAttrValueFromJsonConfig(modelData.configValue);
+					this.$refs.symperBpmnHeatMap.focus();
 					this.plotHeatmap()
-					// this.$refs.symperBpmnHeatMap.focus();
-
                 }
             } catch (error) {
                 this.$snotifyError(
@@ -1306,7 +1306,21 @@ export default {
                     this.$t("process.editror.err.get_xml")
                 );
             }
-        },
+		},
+		handleViewPortChange(){
+			// this.plotHeatmap()
+			// this.focusCanvas()
+		},
+		focusCanvas(){
+			var res = '';
+			var str = $('.djs-overlay-container')[0].style['-ms-transform']
+			var strs = $('.djs-overlay-container')[1].style['-ms-transform']
+			var canvas = document.getElementsByClassName("heatmap-canvas");
+			setTimeout((self) => {
+				$(canvas).css('transform',strs)
+				$(canvas).css('transform-origin','left top')
+			}, 100, this);
+		},
         restoreAttrValueFromJsonConfig(jsonStr){
 			let processTracking = this.$store.state.admin.currentTrackingProcess
 			let self = this
@@ -1462,17 +1476,7 @@ export default {
     },
 
     created() {
-        // let self = this;
-        // this.instanceKey = Date.now();
-        // this.$store.commit(
-        //     "process/initInstance",
-        //     this.instanceKey
-        // );
-        // this.$store.dispatch("app/getAllOrgChartData");
-        // this.$store.dispatch("app/getAllUsers");
-        // this.$store.dispatch("process/getLastestProcessDefinition");
-		// this.$store.dispatch('process/getAllDefinitions');
-		// this.applySavedData(this.processId)
+       
     },
     mounted(){
 		

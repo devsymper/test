@@ -2574,6 +2574,9 @@ for (let name in allAttrs) {
 
     if (typeof attr.getValue != 'function') {
         attr.getValue = function(value) {
+            if(typeof value == 'string'){
+                value = value.replace(/\n|\r\n/g,' ').replace(/\s+/g,' ');
+            }
             return value;
         }
     }
