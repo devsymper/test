@@ -1094,11 +1094,18 @@ export default {
 .symper-orgchart-paper .link-tools,
 .symper-orgchart-paper .marker-vertex-group,
 .symper-orgchart-view .symper-orgchart-paper .orgchart-action {
-    display: none!important;
+    display: block !important;
+}
+.symper-orgchart-view  .line-action{
+    display: none !important;
 }
 
 .symper-orgchart-active-editor .symper-orgchart-paper .orgchart-action {
-    display: none;
+    display: block!important;
+}
+.symper-orgchart-active-editor .show-infor-department,
+.symper-orgchart-active-editor .show-infor-user{
+    display: none !important;
 }
 
 .symper-orgchart-active-editor .symper-orgchart-paper .symper-orgchart-node:hover .orgchart-action {

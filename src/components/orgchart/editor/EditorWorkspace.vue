@@ -79,10 +79,23 @@ export default {
             this.$refs.jointPaper.actionOnToolbar(action);
         },
         loadDiagramFromJson(cells){
-             let treeLayout = this.$refs.jointPaper.treeLayout;
+			cells = this.customShowDepartmentInfor(cells)
+			let treeLayout = this.$refs.jointPaper.treeLayout;
             this.$refs.jointPaper.graph.fromJSON(cells);
-            treeLayout.layout();
-        },
+			treeLayout.layout();
+			this.getAllDiagramCells()
+		},
+		customShowDepartmentInfor(cells){
+			let self = this
+			let allNodes = self.getAllNode()
+			cells.cells.forEach(function(e){
+				if(e.type == 'Symper.Department'){
+					allNodes
+					debugger
+				}
+			})
+				return cells
+		},
         getAllDiagramCells(){
             return this.$refs.jointPaper.graph.toJSON();
         },
@@ -91,6 +104,7 @@ export default {
                 name: '.name/text',
                 border: '.card',
                 managerName: '.manager-name/text',
+                managerEmail: '.manager-email/text',
                 managerAvartar: 'image/xlink:href',
                 userInPositionAvartar: 'image/xlink:href',
                 accountNumberPlus: '.account-number-plus/text',
@@ -111,12 +125,25 @@ export default {
 						cell.attr(mapName[attrName], value,
 					);
                     }else{
-						if(value){
+						if(value && attrName == 'name'){
+							let newValue =   joint.util.breakText(
+									value, 
+									{
+										width: 165,
+										height: 20
+									},
+									{ 'font-size': 13 },
+									{ ellipsis: true  }
+								)
+							cell.attr(mapName[attrName], newValue,
+							);
+						}
+						else if(value){
  							let newValue =   joint.util.breakText(
 								value, 
 								{
-									width: 130,
-									height: 30
+									width: 160,
+									height: 20
 								},
 								{ 'font-size': 13 },
 								{ ellipsis: true  }
@@ -148,7 +175,11 @@ export default {
 				treeLayout.layout();
 				self.$emit('delete-node')
             });
-            
+            paper.on('element:view', function(elementView, evt, x, y) {
+				  self.$emit('cell-contextmenu', elementView.model.id);
+				  evt.stopPropagation()
+				  evt.preventDefault()
+            });
             paper.on('element:add', function(elementView, evt) {
                 evt.stopPropagation();
                 let countDepartment = graph.getCells().filter((el) => {
@@ -312,6 +343,7 @@ export default {
             if(this.context == 'department'){
                 if(!lastUserInfo) return;
                 this.updateCellAttrs(this.selectingNode.id, 'managerName', lastUserInfo.displayName );
+                this.updateCellAttrs(this.selectingNode.id, 'managerEmail', lastUserInfo.email );
                 this.updateCellAttrs( this.selectingNode.id, 'managerAvartar', avatarUser);
             }else if(this.context == 'position' && this.selectingNode.id != 'SYMPER_HOME_ORGCHART' ){
                 if(userIdList.length == 0){
@@ -403,5 +435,15 @@ export default {
 </script>
 
 <style>
-
+.name{
+	text-transform: uppercase !important;
+	/* font-weight: bold; */
+}
+.img-manager{
+	height: 35px !important;
+	width: 35px !important;
+}
+.view:hover{
+	border-bottom: 1px solid black;
+}
 </style>
