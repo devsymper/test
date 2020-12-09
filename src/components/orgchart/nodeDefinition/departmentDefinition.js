@@ -337,10 +337,10 @@ export const departmentMarkup =
 			</g>
 		
 			<g class="btn show-infor-user">
-				${icon.user}<text class="count-infor-user">23</text>
+				${icon.user}<text >countUser</text>
             </g>
 			<g class="btn  show-infor-department">
-				${icon.department}<text class="count-infor-department">255</text>
+				${icon.department}<text >countDepartment</text>
 			</g>
 			
            

@@ -79,22 +79,21 @@ export default {
             this.$refs.jointPaper.actionOnToolbar(action);
         },
         loadDiagramFromJson(cells){
-			cells = this.customShowDepartmentInfor(cells)
+			let cellsReduce = this.customDepartmentInfor(cells)
 			let treeLayout = this.$refs.jointPaper.treeLayout;
-            this.$refs.jointPaper.graph.fromJSON(cells);
+            this.$refs.jointPaper.graph.fromJSON(cellsReduce);
 			treeLayout.layout();
 			this.getAllDiagramCells()
 		},
-		customShowDepartmentInfor(cells){
+		customDepartmentInfor(cells){
 			let self = this
-			let allNodes = self.getAllNode()
 			cells.cells.forEach(function(e){
 				if(e.type == 'Symper.Department'){
-					allNodes
-					debugger
+					e.markup = e.markup.replace('countUser', '50')
+					e.markup = e.markup.replace('countDepartment', '100')
 				}
 			})
-				return cells
+			return cells
 		},
         getAllDiagramCells(){
             return this.$refs.jointPaper.graph.toJSON();
