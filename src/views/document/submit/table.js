@@ -1102,6 +1102,7 @@ export default class Table {
             autoRowSize: false,
             autoColSize: true,
             width: '100%',
+            formulas:true,
             fixedRowsBottom: (thisObj.tableHasRowSum) ? 1 : 0,
             height: 'auto',
             afterRender: function(isForced) {
