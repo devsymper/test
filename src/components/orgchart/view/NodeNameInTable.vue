@@ -34,7 +34,7 @@ export default {
         this.params.data.orgchartId = this.$route.params.id
         let type = this.params.data ? this.params.data.nodeType : 'none';
         this.text = this.getValue();
-        this.$store.dispatch('orgchart/getUserByVizId', this.params.data)
+		this.$store.dispatch('orgchart/getUserByVizId', this.params.data)
         let listUser = this.$store.getters['orgchart/listUserInCurrentNode']
         this.count = listUser.length
 		this.permission = this.checkPermission()

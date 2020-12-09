@@ -435,6 +435,10 @@ export default {
             try {
                 let res = await orgchartApi.getOrgchartDetail(id);
                 if(res.status == 200){
+					this.$store.commit('orgchart/setDataOrgchartSideBySide',{
+						orgchartId: res.data.orgchart.id,
+						object:res.data
+					})
                     this.$refs.editorWorkspace.createFirstVizNode()
                     let savedData = res.data;
                     let departments = this.correctDiagramDisplay(savedData.orgchart.content);

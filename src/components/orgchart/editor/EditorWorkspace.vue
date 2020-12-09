@@ -86,11 +86,23 @@ export default {
 			this.getAllDiagramCells()
 		},
 		customDepartmentInfor(cells){
+			let orgChartData = this.$store.state.orgchart.orgChartData
+			let orgchartId = this.$route.params.id	
+			let countUser 
+			let countDepartment
 			let self = this
 			cells.cells.forEach(function(e){
 				if(e.type == 'Symper.Department'){
-					e.markup = e.markup.replace('countUser', '50')
-					e.markup = e.markup.replace('countDepartment', '100')
+					orgChartData[orgchartId].departments.forEach(function(k){
+						if(e.id == k.vizId){
+							self.$store.dispatch('orgchart/getUserByVizId', k)
+							let listUser = self.$store.getters['orgchart/listUserInCurrentNode']
+							countDepartment = self.$store.state.orgchart.listChildInCurrentNode.length - 1
+       						countUser = listUser.length	
+						}
+					})
+					e.markup = e.markup.replace('countUser', countUser)
+					e.markup = e.markup.replace('countDepartment', countDepartment)
 				}
 			})
 			return cells
