@@ -462,7 +462,6 @@ export default class Table {
                     sDocument.state.viewType[thisObj.keyInstance] == 'update') {
                     return;
                 }
-                let controlName = changes[0][1];
 
                 if (thisObj.isAutoCompleting) {
                     return;
