@@ -218,7 +218,7 @@ export default class BasicControl extends Control {
             })
 
             this.ele.on('keyup', function(e) {
-                if (e.key == 'F2' && store.state.app.baInfo && Object.keys(store.state.app.baInfo).length > 0) {
+                if (e.key == 'F2' && store.state.app.baInfo && store.state.app.baInfo.id) {
                     if (thisObj.type == 'number' && thisObj.formulaValue) {
                         thisObj.ele.val(thisObj.formulaValue);
                     }
