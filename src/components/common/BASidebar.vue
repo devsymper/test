@@ -172,7 +172,7 @@
                         no-action
                         :class="{'menu-group': true , 'menu-group-active': item.active == true }"
                         :symper-action="$bindAction(item.action?item.action:'')"
-                        @click="handlerItemClick(item)">
+                        @click="gotoPage(item)">
                        <template v-slot:prependIcon>
                             <v-icon class="ml-1 icon-group">
                                 {{ item.icon }}
@@ -224,7 +224,7 @@
                         link
                         no-action
                         :symper-action="$bindAction(item.action?item.action:'')"
-                        @click="handlerItemClick(item)">
+                        @click="gotoPage(item)">
                        <template v-slot:prependIcon>
                            <v-menu 
                                 right offset-y
