@@ -112,10 +112,12 @@
 <script>
 import ModelerDetail from "./ModelerDetail"
 import ListProcessInstance from "./ListProcessInstance"
+import TrackingProcessDefinition from '@/components/process/TrackingProcessDefinition'
 export default {
 	components:{
 		ModelerDetail,
-		ListProcessInstance
+		ListProcessInstance,
+		TrackingProcessDefinition
 	},
 	data(){
 		let self = this
@@ -238,5 +240,11 @@ export default {
 .description-summary{
 	margin-top:45px;
 	margin-left:16px;
+}
+.modeler-workflow{
+	border: 1px solid lightgray;
+}
+.djs-visual{
+	pointer-events: none !important;
 }
 </style>
