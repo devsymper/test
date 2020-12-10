@@ -41,7 +41,7 @@
                     <template  v-slot:[`item.action`]="{ item }">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
-                                <v-icon v-on="on" @click.prevent.stop="handleDeleteWorkflow(item)" style="font-size:24px">mdi-delete-outline</v-icon>
+                                <v-icon v-on="on" @click.prevent.stop="handleDeleteWorkflow(item)" style="font-size:20px">mdi-delete-outline</v-icon>
                             </template>
                             <span>Delete</span>
                         </v-tooltip>

@@ -43,6 +43,8 @@ export default {
     },
     created(){
         this.getListIssueTypeInProject();
+        this.$store.dispatch("taskManagement/getAllWorkflow");
+
     },
     activated(){
         //this.toggleMainContentLoader(false);

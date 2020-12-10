@@ -33,6 +33,7 @@
                     :search="search"
                     hide-default-footer
                     class="table-list-user"
+                    @click:row="handelDetailIssueType"
                 >
                     <template v-slot:[`item.name`]="{ item }">
                         <div class="d-flex">
@@ -40,7 +41,7 @@
                                 <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:24px">{{item.icon}}</v-icon>
                                 <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="24" height="24">
                             </div>
-                            <span class="name-project pt-1 pl-2" style="color:#0000aa">
+                            <span class="name-object pt-1 pl-2" style="color:#0000aa">
                                 {{item.name}}
                             </span>
                         </div>
@@ -56,6 +57,17 @@
                             <span>Delete</span>
                         </v-tooltip>
                     </template>
+                    <template  v-slot:[`item.taskLifeCircleId`]="{ item }">
+                        <div v-if="!item.taskLifeCircleId">
+                            <v-btn x-small class="px-1" solo depressed  @click.prevent.stop="handleShowPopupWorkflow(item)">
+                                <v-icon color="blue" size="16">mdi-plus</v-icon>
+                            </v-btn>
+                        </div>
+                        <div v-else>
+                            <span class="name-object" style="color:blue" @click.prevent.stop="goToWorkflow(item)" v-if="item.workflowName">{{item.workflowName}}</span>
+                        </div>
+                    </template>
+                    
                 </v-data-table>
             </v-card>
         </div>
@@ -89,8 +101,19 @@
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
+                    color="green darken-1"
+                    text
+                    v-if="isDetail"
+                    :loading="isLoadingAdd"
+                    class="btn-add"
+                    @click="handleUpdateIssueType"
+                >
+                    {{$t("common.update")}}
+                </v-btn>
+                <v-btn
                     color="blue darken-1"
                     text
+                    v-else
                     :loading="isLoadingAdd"
                     class="btn-add"
                     @click="handleAddIssueType"
@@ -109,7 +132,69 @@
             </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog
+            v-model="dialogAddWorkflow"
+            persistent
+            max-width="400px"
+            scrollable
+        >
+            <v-card>
+            <v-card-title>
+                <span class="fs-16">Select workflow</span>
+            </v-card-title>
+            <v-card-text>
+                <v-container>
+                    <div>
+                        <form-tpl
+                        style="width:300px"
+                        :allInputs="selectWorkflowProps"/>
+                    </div>
+                </v-container>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                    color="green darken-1"
+                    text
+                    :loading="isLoadingAdd"
+                    class="btn-add"
+                    @click="handleCreateWorkflow"
+                >
+                    Create workflow
+                </v-btn>
+                <v-btn
+                    color="blue darken-1"
+                    text
+                    :loading="isLoadingAdd"
+                    class="btn-add"
+                    @click="handleUpdateIssueWorkflow"
+                >
+                    {{$t("common.add")}}
+                </v-btn>
 
+                <v-btn
+                color="red darken-1"
+                text
+                @click="dialogAddWorkflow = false"
+                >
+                    {{$t("common.close")}}
+                </v-btn>
+           
+            </v-card-actions>
+            </v-card>
+        </v-dialog>
+
+        <v-dialog v-model="dialogRemove" max-width="350">
+            <v-card>
+            <v-card-title class="headline">{{$t("common.remove_confirm_title")}}</v-card-title>
+            <v-card-text>{{$t("taskManagement.dialog.removeCategory")}}</v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn color="red darken-1" text @click="removeIssue">Xóa</v-btn>
+                <v-btn color="green darken-1" text @click="dialogRemove = false">Hủy</v-btn>
+            </v-card-actions>
+            </v-card>
+        </v-dialog>
     </div>
 </template>
 
@@ -139,14 +224,29 @@ export default {
     computed:{
         listIssue(){
             let listIssueType=util.cloneDeep(this.listIssueType);
+            let allWorkflow = this.$store.state.taskManagement.allWorkflow;
+            if (allWorkflow.length > 0) {
+                for (let i = 0; i < listIssueType.length; i++) {
+                    if (listIssueType[i].taskLifeCircleId) {
+                        let workflow = allWorkflow.find(ele => ele.id == listIssueType[i].taskLifeCircleId);
+                        if (workflow) {
+                            listIssueType[i].workflowName=workflow.name;
+                        }
+                    }                    
+                }
+            }
             console.log("listIssueType",listIssueType);
             return listIssueType; 
         },
     },
     data(){
         return{
+            isDetail:false,
+            dialogRemove:false,
             isLoadingAdd:false,
             dialogAddIssueType:false,
+            dialogAddWorkflow:false,
+            issueTypeSelected:{},
             search:'',
             title:"Issue Type",
             headers: [
@@ -192,21 +292,136 @@ export default {
                     }
                 },
             },
+            selectWorkflowProps:{
+                workflow : { 
+                    title: "workflow",
+                    type: "autocomplete",
+                    value: '',
+                    multipleSelection:false,
+                    showId:false,
+                    options:[],
+                },
+            },
             infoIssueType:{
+                id:"",
                 name: "",
                 description: "",
                 icon: "",
+                taskLifeCircleId:""
             },
           
         }
     },
     methods:{
+        handleUpdateIssueType(){
+            this.isLoadingAdd = true;
+            let isValid = this.validateData();
+            if (isValid) {
+                let data={};
+                data.name=this.dataIssueTypeProps.name.value;
+                data.icon=this.infoIssueType.icon;
+                data.description=this.dataIssueTypeProps.description.value;
+                data.taskLifeCircleId=this.infoIssueType.taskLifeCircleId;
+
+                taskManagementApi
+                    .updateIssueType(this.infoIssueType.id,data)
+                    .then(res => {
+                        if (res.status == 200) {
+                            this.$emit("add-issuetype");
+                            this.$snotifySuccess("Add issue type success!");
+                            this.dialogAddIssueType=false;
+                        }else{
+                            this.$snotifyError("", "Can not update issue type!");
+                        }
+                    })
+                    .catch(err => {
+                        this.$snotifyError("", "Can not update issue type!", err);
+                    })
+                    .always(() => {});
+                
+            }else{
+                this.$snotifyError("", "Have error!");
+            }
+            this.isLoadingAdd=false;
+        },
+        handelDetailIssueType(item){
+            this.dataIssueTypeProps.name.value = item.name;
+            this.dataIssueTypeProps.description.value = item.description;
+            this.infoIssueType.icon=item.icon;
+            this.infoIssueType.id=item.id;
+            this.infoIssueType.taskLifeCircleId=item.taskLifeCircleId;
+            this.isDetail = true;
+            this.dialogAddIssueType = true;
+
+        },
+        removeIssue(){
+            taskManagementApi
+                .deleteIssueType(this.issueTypeSelected.id)
+                .then(res => {
+                    if (res.status == 200) {
+                        this.$emit("add-issuetype"); // emit sự kiện cho reload data
+                        this.$snotifySuccess("Remove category success!");
+                    }else{
+                        this.$snotifyError("", "Error! Have error !!!");
+                    }
+                })
+                .catch(err => {
+                    this.$snotifyError("", "Error! Have error !!!", err);
+                });
+            this.dialogRemove=false;  
+        },
+        goToWorkflow(item){
+            if (item.taskLifeCircleId) {
+                this.$router.push("/task-management/workflow/"+item.taskLifeCircleId);
+            }
+        },
+        handleUpdateIssueWorkflow(){
+            let id = this.issueTypeSelected.id;
+            let worflfowId = this.selectWorkflowProps.workflow.value;
+            if (id && worflfowId) {
+                let data={};
+                data.name = this.issueTypeSelected.name;
+                data.icon = this.issueTypeSelected.icon;
+                data.description = this.issueTypeSelected.description;
+                data.taskLifeCircleId = worflfowId;
+
+                taskManagementApi
+                    .updateIssueType(id,data)
+                    .then(res => {
+                        if (res.status == 200) {
+                            this.$emit("add-issuetype"); // emit sự kiện cho reload data
+                            this.dialogAddWorkflow=false;
+                        }else{
+                            this.$snotifyError("", "Can not add workflow for issue type!");
+                        }
+                    })
+                    .catch(err => {
+                        this.$snotifyError("", "Can not add workflow for issue type!", err);
+                    })
+                    .always(() => {});
+            }
+        },
+        handleShowPopupWorkflow(item){
+            this.issueTypeSelected=item;
+            this.$set(this.selectWorkflowProps.workflow,"options",this.$store.state.taskManagement.allWorkflow);
+            this.dialogAddWorkflow = true;
+        },
+        handleCreateWorkflow(){
+            this.$router.push("/task-management/workflow/create");
+        },
         handleCreate(){
-            this.dialogAddIssueType=true;
+            this.dataIssueTypeProps.name.value = "";
+            this.dataIssueTypeProps.description.value = "";
+            this.infoIssueType.icon="";
+            this.infoIssueType.id="";
+            this.infoIssueType.taskLifeCircleId="";
+            this.isDetail = false;
+            this.dialogAddIssueType = true;
 
         },
         handleDeleteIssueType(item){
-
+            this.issueTypeSelected = item;
+            this.dialogRemove = true;
         },
         handleAddIssueType(){
             this.isLoadingAdd = true;
@@ -223,7 +438,6 @@ export default {
                     .then(res => {
                         if (res.status == 200) {
                             this.$emit("add-issuetype");
-
                             this.$snotifySuccess("Add issue type success!");
                             this.dialogAddIssueType=false;
                         }else{
@@ -258,7 +472,7 @@ export default {
    
     },
     created(){
-        console.log("aa",this.listIssueType);
+
     },
   
 }
@@ -266,7 +480,7 @@ export default {
 
 <style scoped>
 
-.name-project:hover{
+.name-object:hover{
     cursor: pointer;
     text-decoration: underline;
 }

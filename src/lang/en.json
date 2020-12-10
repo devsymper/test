@@ -1303,6 +1303,7 @@
         "listVersion":"List version",
         "listIssueType":"List Issue type",
         "listWorkflow":"List Workflow",
+        "listPriority":"List Priority",
         "detailProject":"Detail project",
         "requiredField":"Indicates required field",
         "addPeople":"Add people",
@@ -1313,7 +1314,8 @@
             "removeRole": "You will remove role from this rols.",
             "removeCategory": "You will remove category from this list.",
             "removeComponent": "You will remove component from this list.",
-            "removeWorkflow": "You will remove workflow from this list."
+            "removeWorkflow": "You will remove workflow from this list.",
+            "removePriority": "You will remove priority from this list."
 
         },
         "settingBoard":"Board setting"

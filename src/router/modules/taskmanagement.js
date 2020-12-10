@@ -112,8 +112,6 @@ export default [
                     TaskManagement: () => import ('../../views/taskManagement/component/DetailComponent.vue')
                 }
             },
-            
-
             ///////version
             {
                 path: "projects/:id/versions",
@@ -129,6 +127,14 @@ export default [
                 meta:{group:'home'},
                 components:{
                     TaskManagement: () => import ('../../views/taskManagement/version/DetailVersion.vue')
+                }
+            },
+            // priority
+            {
+                path: "priorities",
+                name: "priority",
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/priority/List.vue')
                 }
             },
         ]   

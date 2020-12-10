@@ -13,7 +13,7 @@
         </div>
         
         <div class="wrap-workflow-config__content">
-            <div style="width: calc(100% - 200px);">
+            <div style="width: calc(100% - 200px);" >
                 <div class="wrap-workflow-config__header">
                     <v-btn class="add-status-btn" text @click="showPopupAddStatusView">
                         <v-icon left>
@@ -38,7 +38,6 @@
                     <div id="task-workflow" >
 
                     </div>
-                    <!-- <div id='minimap' style="width: 300px; height: 300px"></div> -->
                 </div>
                
             </div>
@@ -287,6 +286,10 @@ export default {
                                     }
                                 }
                             })
+                        }else if(name == 'from'){
+                            currentLink.source({ id: data });
+                        }else if(name == 'to'){
+                            currentLink.target({ id: data });
                         }
                     }
                     
@@ -507,23 +510,10 @@ export default {
                 color: '#fff'
             }
         });
-        // var paperScroller = new joint.ui.PaperScroller({
-        //     paper: paper
-        // });
+     
+        
+       // self.paper.on('blank:pointerdown', paperScroller.startPanning);
 
-        // $('#task-workflow').append(paperScroller.render().el);
-        // minimap({
-        //     el: '#minimap'
-        //     joint,
-        //     paper,
-        //     graph,
-        //     jquery: $,
-        //     paperViewEl: '#paperView',
-        //     extra: {
-        //         background: {  color: '#eee' }
-        //     },
-        //     mapViewColor: '#1890ff'
-        //     })
         self.paper.on('blank:pointerclick', function() {
            // resetAll(this);
 
@@ -562,6 +552,10 @@ export default {
 
         self.paper.on('element:pointerclick', function(elementView) {
             let idNode=elementView.model.id;
+            if (elementView.model.attributes.attrs.isDefault) {
+                self.$set(self,'nodeConfig',{});
+                return;
+            }
             let node=self.listNode.find(ele => ele.id.value == idNode);
             if (node) {
                 self.nodeConfig=node;
@@ -574,6 +568,10 @@ export default {
 
         self.paper.on('link:pointerclick', function(linkView) {
             let idLink=linkView.model.id;
+            if (linkView.model.attributes.isDefault) {
+                self.$set(self,'nodeConfig',{});
+                return;
+            }
             let link=self.listLink.find(ele => ele.id.value == idLink);
             if (link) {
                 let allOption = [];
@@ -609,6 +607,7 @@ export default {
                     ry: 20,
                     strokeWidth: 0
                 },
+                isDefault:true
             
             });
             this.dataWorkflow.nodes.push(rectStart);
@@ -655,11 +654,12 @@ export default {
                         }
                     }
                 },
+                isDefault:true
             });
             link1.appendLabel({
                 attrs: {
                     text: {
-                        text: 'all'
+                        text: 'create'
                     }
                 }
             });

@@ -3,6 +3,7 @@ const defaultState = {
     allProject: [],
     allStatusCategory: [],
     allRole: [],
+    allPriority: [],
     headerBreadcrumbs:[],
     currentProject:{},
     listBoardInProject:[],

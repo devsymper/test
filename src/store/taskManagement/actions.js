@@ -2,7 +2,7 @@ import { taskManagementApi } from "./../../api/taskManagement.js";
 import { SYMPER_APP } from "./../../main.js";
 
 const getAllCategory = async(context) => {
-    if (context.state.allCategory.length==0) {
+    if (context.state.allCategory.length==0 ) {
         try {
             let res = await taskManagementApi.getAllCategory();
             if (res.status == 200) {
@@ -62,6 +62,36 @@ const getAllRole = async(context) => {
     }
 }
 
+const getAllWorkflow = async(context) => {
+    if (context.state.allWorkflow.length==0) {
+        try {
+            let res = await taskManagementApi.getListWorkflow();
+            if (res.status == 200) {
+                context.commit('setAllWorkflow', res.data.listObject);
+            } else {
+                SYMPER_APP.$snotifyError(error, "Can not get all Workflow role!");
+            }
+        } catch (error) {
+            SYMPER_APP.$snotifyError(error, "Can not get all Workflow role!");
+        }
+    }
+}
+
+const getAllPriority = async(context,isResetData=false) => {
+    if (context.state.allPriority.length==0 || isResetData) {
+        try {
+            let res = await taskManagementApi.getListPriority();
+            if (res.status == 200) {
+                context.commit('setAllPriority', res.data.listObject);
+            } else {
+                SYMPER_APP.$snotifyError(error, "Can not get all priority!");
+            }
+        } catch (error) {
+            SYMPER_APP.$snotifyError(error, "Can not get all priority!");
+        }
+    }
+}
+
 const addProjectToStore = async(context, item) => {
     context.commit('addProjectToStore', item);
 }
@@ -86,7 +116,9 @@ export {
     addCategoryToStore,
     updateCategoryToStore,
     getAllStatusCategory,
-    getAllRole
+    getAllRole,
+    getAllWorkflow,
+    getAllPriority
 
 
 };

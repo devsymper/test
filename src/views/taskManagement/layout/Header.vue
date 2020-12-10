@@ -81,32 +81,13 @@ export default {
         }
     },
     methods:{
-        getListWorkflow(){
-            let self=this;
-            if (this.$store.state.taskManagement.allWorkflow.length == 0 ) {
-                taskManagementApi
-                .getListWorkflow()
-                .then(res => {
-                    if (res.status == 200) {
-                        self.$store.commit("taskManagement/setAllWorkflow", res.data.listObject);
-                    }else{
-                        self.$snotifyError("", "Can not get all workflow");
-                    }
-                })
-                .catch(err => {
-                    self.$snotifyError("", "Can not get all workflow");
-                });
-            }
-          
-        }
-        
         
     },
     created(){
         this.$store.dispatch("taskManagement/getAllStatusCategory");
         this.$store.dispatch("taskManagement/getAllRole");
-        this.getListWorkflow();
-
+        this.$store.dispatch("taskManagement/getAllWorkflow");
+        this.$store.dispatch("taskManagement/getAllPriority");
     },
     computed:{
         currentUserAvatar(){
@@ -115,6 +96,9 @@ export default {
         },
         headerBreadcrumbs(){
             return this.$store.state.app.headerBreadcrumbs;
+        },
+        sTaskManagement(){
+            return this.$store.state.taskManagement;
         }
     }
 }

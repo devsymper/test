@@ -67,6 +67,12 @@ export const taskManagementApi = {
     addIssueTypeForProject(data){
         return taskManagement.post("issue-types",data);
     },
+    updateIssueType(id,data){
+        return taskManagement.put("issue-types/"+id,data);
+    },
+    deleteIssueType(id){
+        return taskManagement.delete("issue-types/"+id);
+    },
 
     /////////////////// board
     addBoardForProject(data){
@@ -137,5 +143,17 @@ export const taskManagementApi = {
     getAllStatusCategory(){
         return taskManagement.get("status-category");
     },
-
+    // priority
+    getListPriority(){
+        return taskManagement.get("priorities");
+    },
+    addPriority(data){
+        return taskManagement.post("priorities",data);
+    },
+    removePriority(id){
+        return taskManagement.delete("priorities/"+id);
+    },
+    updatePriority(id,data){
+        return taskManagement.put("priorities/"+id,data);
+    },
 }
