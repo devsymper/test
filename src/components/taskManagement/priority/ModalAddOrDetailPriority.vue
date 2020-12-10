@@ -32,17 +32,7 @@
             <v-btn
                 color="blue darken-1"
                 text
-                v-if="!statusDetail"
-                :loading="isLoadingAdd"
-                class="btn-add"
-                @click="handleAddPriority"
-            >
-                {{$t("common.add")}}
-            </v-btn>
-            <v-btn
-                color="blue darken-1"
-                text
-                v-else
+                v-if="statusDetail && infoPriority.common == 0"
                 :loading="isLoadingAdd"
                 :disabled="disabled"
                 class="btn-add"
@@ -50,7 +40,16 @@
             >
                 {{$t("common.update")}}
             </v-btn>
-
+            <v-btn
+                color="blue darken-1"
+                text
+                v-else-if="!statusDetail"
+                :loading="isLoadingAdd"
+                class="btn-add"
+                @click="handleAddPriority"
+            >
+                {{$t("common.add")}}
+            </v-btn>
             <v-btn
             color="red darken-1"
             text
@@ -131,6 +130,7 @@ export default {
                     description: "",
                     icon: "mdi-arrow-up",
                     color: "",
+                    common: 0
                 }
             }
         },
@@ -212,7 +212,7 @@ export default {
                         if (res.status == 200) {
                             this.$snotifySuccess("Update priority success!");
                             data.id=this.infoPriority.id;
-                            this.$store.dispatch("taskManagement/updatePriorityToStore",data);
+                            this.$store.commit("taskManagement/updatePriorityToStore",data);
                             this.isShow=false;
                         }else{
                             this.$snotifyError("", "Can not update priority!");

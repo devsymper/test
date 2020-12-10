@@ -156,4 +156,8 @@ export const taskManagementApi = {
     updatePriority(id,data){
         return taskManagement.put("priorities/"+id,data);
     },
+    updateLevelPriority(data){
+        return taskManagement.put("priorities-level",data);
+    },
+    
 }
