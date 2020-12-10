@@ -1304,6 +1304,7 @@
         "listIssueType":"List Issue type",
         "listWorkflow":"List Workflow",
         "listPriority":"List Priority",
+        "listActionPack":"List ActionPack",
         "detailProject":"Detail project",
         "requiredField":"Indicates required field",
         "addPeople":"Add people",

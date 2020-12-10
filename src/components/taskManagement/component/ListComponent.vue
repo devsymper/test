@@ -16,9 +16,8 @@
                         hide-details
                         class="sym-small-size sym-style-input"
                     ></v-text-field>
-                    <v-btn small class="ml-1 px-1" solo depressed @click="handleCreate" color="#1976d2">
-                        <v-icon color="white" size="18">mdi-plus</v-icon>
-                        <span style="color:white">Create component</span>
+                    <v-btn small class="ml-1 px-1" solo depressed @click="handleCreate">
+                        <span>Create component</span>
                     </v-btn>
                 </v-card-title>
                 <v-data-table

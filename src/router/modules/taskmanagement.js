@@ -47,7 +47,7 @@ export default [
                 meta:{group:'projectSetting'},
                 name: "projectAccess",
                 components:{
-                    TaskManagement: () => import ('../../views/taskManagement/project/setting/Access.vue')
+                    TaskManagement: () => import ('../../views/taskManagement/project/setting/AccessControl.vue')
                 }
             },
             {

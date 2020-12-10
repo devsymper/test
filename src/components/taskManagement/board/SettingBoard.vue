@@ -68,4 +68,8 @@ export default {
 .tab-board >>>.v-slide-group__wrapper{
     width:200px;
 }
+.tab-board >>>.v-tab
+{
+    justify-content: left;
+}
 </style>
