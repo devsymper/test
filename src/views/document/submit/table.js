@@ -107,14 +107,6 @@ Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, v
     }
 }
 
-Handsontable.renderers.ValidateRenderer = function(instance, td, row, col, prop, value, cellProperties) {
-    Handsontable.renderers.TextRenderer.apply(this, arguments);
-    if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
-        let listUser = store.state.document.submit[instance.keyInstance];
-
-    }
-}
-
 Handsontable.cellTypes.registerCellType('select', {
     renderer: Handsontable.renderers.SelectRenderer,
     editor: SelectEditor
@@ -470,10 +462,7 @@ export default class Table {
                     sDocument.state.viewType[thisObj.keyInstance] == 'update') {
                     return;
                 }
-                if (/=SUM(.*)/.test(changes[0][2]) || /=SUM(.*)/.test(changes[0][3])) {
-                    return;
-                }
-                
+
                 if (thisObj.isAutoCompleting) {
                     return;
                 }
@@ -864,13 +853,11 @@ export default class Table {
             else{
                 if (listInputInDocument.hasOwnProperty(inputControlName)){
                     dataInput[inputControlName] = controlIns.value;
-                    
                 }
             }
             if(controlIns.type == 'date'){
                 dataInput[inputControlName] = controlIns.convertDateToStandard(controlIns.value)
             }
-            
         }
         return dataInput;
     }
@@ -1055,8 +1042,6 @@ export default class Table {
                 break;
         }
     }
-
-
     /**
      * Hàm lấy formulas của cell select -> chạy -> gán lại data cho autocomplete component
      */
@@ -1090,7 +1075,6 @@ export default class Table {
             return false
         }
         return column.type;
-
     }
 
     render() {
@@ -1099,7 +1083,6 @@ export default class Table {
         thisObj.controlObj.ele.before(tableContainer);
         thisObj.tableContainer = $(tableContainer);
         thisObj.columnsInfo = this.getColumnsInfo();
-
         let colHeaders = thisObj.columnsInfo.headerNames;
         thisObj.colHeaders = colHeaders;
         let defaultData = this.getDefaultData();
@@ -1126,28 +1109,15 @@ export default class Table {
             autoRowSize: false,
             autoColSize: true,
             width: '100%',
+            formulas:true,
             fixedRowsBottom: (thisObj.tableHasRowSum) ? 1 : 0,
-            formulas: true,
             height: 'auto',
             afterRender: function(isForced) {
-
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
                 if (tbHeight < MAX_TABLE_HEIGHT) {
                     $(this.rootElement).css('height', 'auto');
                 } else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
-                }
-                if (!this.reRendered) {
-                    this.reRendered = true;
-                    setTimeout((hotTb) => {
-                        if (thisObj.tableHasRowSum) {
-                            thisObj.setDataForSumRow();
-                            for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
-                                hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
-                            }
-                        }
-                        hotTb.render();
-                    }, 500, this);
                 }
             },
             afterGetRowHeader: function(row, TH) {
@@ -1156,23 +1126,7 @@ export default class Table {
                 }
             },
 
-            /**
-             * Trường hợp có dòng tính tổng trong table thì cần đặt lại công thức cho dòng cuối cùng tính tổng
-             * @param {*} i 
-             * @param {*} amount 
-             */
-            beforeCreateRow: function(i, amount) {
-                let hotTb = this;
-                delay(function(e) {
-                    if (thisObj.tableHasRowSum) {
-                        thisObj.setDataForSumRow()
-                        for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
-                            hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
-                            hotTb.setCellMeta(hotTb.countRows() - 2, index, 'readOnly', false);
-                        }
-                    }
-                });
-            },
+        
             /**
              * Sau khi set data cho 1 cell thì cần insert data này vào bảng sql lite
              * set xong chạy công thức cho control bị ảnh hưởng
@@ -1190,19 +1144,11 @@ export default class Table {
                         columns = columns.map(function(c) {
                             return c.data;
                         });
-
                         ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
                             thisObj.handlerCheckEffectedControlInTable(thisObj.controlNameAfterChange, changes[0][0]);
                         })
                     }, 10);
-                } else if (source == 'timeValidator') {
-
-                } else if (isNaN(changes[0][3]) && changes[0][3].includes("=SUM")) {
-                    setTimeout((self) => {
-                        self.render()
-                    }, 500, this);
-                }
-
+                } 
             },
             /**
              * Sau khi create row thì set id cho dòng đó (cột id này là cột ẩn)
@@ -1228,13 +1174,6 @@ export default class Table {
                 });
             },
             afterRemoveRow: function(index, amount, physicalRows, source) {
-                if (thisObj.tableHasRowSum) {
-                    thisObj.setDataForSumRow()
-                    for (let index = 0; index < this.getDataAtRow(0).length; index++) {
-                        this.setCellMeta(this.countRows() - 1, index, 'readOnly', true);
-                        this.setCellMeta(this.countRows() - 2, index, 'readOnly', false);
-                    }
-                }
                 let pattern = index + '_\\d';
                 let reg = new RegExp(pattern, 'g');
                 for (let key in thisObj.validateValueMap) {
@@ -1243,11 +1182,8 @@ export default class Table {
                     }
                 }
                 this.render();
-
             },
-
         });
-
         this.tableInstance.keyInstance = this.keyInstance;
         this.tableInstance.tableName = this.tableName;
         if (!this.checkDetailView()) {
@@ -1322,11 +1258,6 @@ export default class Table {
     getSourceData(){
         return this.tableInstance.getSourceData(); 
     }
-
-    setCellReadOnly(row, col, status){
-        this.tableInstance.setCellMeta(row, 0, 'readOnly', status);
-        
-    }
     // Hàm set data cho table
     // hàm gọi sau khi chạy công thức 
     setData(vls, dateFormat = true) {
@@ -1379,7 +1310,6 @@ export default class Table {
             if (this.tableHasRowSum) {
                 data.push({})
             }
-
             this.tableInstance.updateSettings({
                 data: data
             })
@@ -1387,33 +1317,19 @@ export default class Table {
                 self.tableInstance.render()
             }, 50, this);
             // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
-            if (!this.checkDetailView())
+            if (!this.checkDetailView()){
+                if(this.checkViewType('update') && getSDocumentSubmitStore(this.keyInstance).docStatus == 'init'){
+                    return;
+                }
                 setTimeout((self) => {
                     for (let index = 0; index < controlBinding.length; index++) {
                         self.handlerCheckEffectedControlInTable(controlBinding[index], 'all');
                     }
-                    self.setDataForSumRow();
                 }, 50, this);
-
+            }
         } else {
             let defaultRow = this.getDefaultData(false);
             this.tableInstance.loadData(defaultRow);
-            this.setDataForSumRow();
-        }
-    }
-    /**
-     * Hàm đặt lại giá trị cho hàm tính tổng khi có thay đổi về giá trị cũng như số row của table
-     */
-    setDataForSumRow() {
-        if (this.tableHasRowSum) {
-            setTimeout((self) => {
-                for (let controlName in self.columnHasSum) {
-                    let colIndex = self.getColumnIndexFromControlName(controlName);
-                    let CharAt = String.fromCharCode(65 + self.columnHasSum[controlName]);
-                    let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (self.tableInstance.countRows() - 1) + ')';
-                    self.tableInstance.setDataAtCell(self.tableInstance.countRows() - 1, colIndex, sumValue, 'auto_set');
-                }
-            }, 300, this);
         }
     }
     /**
@@ -1421,6 +1337,13 @@ export default class Table {
      */
     checkDetailView() {
         if (sDocument.state.viewType[this.keyInstance] == 'detail') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    checkViewType(type) {
+        if (sDocument.state.viewType[this.keyInstance] == type) {
             return true;
         } else {
             return false;
@@ -1639,12 +1562,33 @@ export default class Table {
                 td.textContent = 0;
             }
         }
-        if(thisObj.tableHasRowSum && row == hotInstance.countRows() - 1){
-            ele.find('.validate-icon').remove()
-        }
-        
+        thisObj.getColumnSum(hotInstance, row, column, td, ele, prop)
     }
 
+    /**
+     * Hàm tính tổng của 1 cột được tích vào thuộc tính tính tổng
+     * @param {*} hotInstance 
+     * @param {*} row 
+     * @param {*} column 
+     * @param {*} td 
+     * @param {*} ele 
+     * @param {*} prop 
+     */
+    getColumnSum(hotInstance, row, column, td, ele, prop){
+        if(this.tableHasRowSum && row == hotInstance.countRows() - 1){
+            ele.find('.validate-icon').remove();
+            if(Object.keys(this.columnHasSum).includes(prop)){
+                let colData = hotInstance.getDataAtCol(column);
+                colData.pop();
+                let sum = colData.reduce((a, b)=>{
+                    a = Number(a);
+                    b = Number(b);
+                    return a+b;
+                },0)
+                td.textContent = sum;
+            }
+        }
+    }
     /**
      * Hàm set các cell được validate
      * @param {*} key 
