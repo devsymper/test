@@ -7,6 +7,9 @@ const defaultState = {
 	listApps:{},
 	selectingItemType: '',
 	activeChildItem: '',
+	param: {
+		title: ""
+	},
 	listAppsSideBySide:{},
 	listItemSelected: {
 		workflow_definition: {

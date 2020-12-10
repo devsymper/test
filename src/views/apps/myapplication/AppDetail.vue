@@ -228,6 +228,7 @@ export default {
 			this.$store.commit('appConfig/updateActiveChildItem', item.objectIdentifier )
 			let define
 			if(type.includes('document')){
+				this.$store.commit('document/setCurrentTitle',item.title)
 				define ={
 					"module": "document",
 					"resource": "document_definition",
