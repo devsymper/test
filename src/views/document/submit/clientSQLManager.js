@@ -19,6 +19,7 @@ export default class ClientSQLManager {
                 locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.4.0/dist/sql-wasm.wasm`
             });
             let db = new SQL.Database();
+            console.log("ádasdasd",db);
             this.addSQLInstanceDBToStore(keyInstance, db);
         }
         /**

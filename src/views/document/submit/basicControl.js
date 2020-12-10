@@ -313,38 +313,35 @@ export default class BasicControl extends Control {
         this.value = value;
         if (this.inTable === false) {
             if (this.type == 'label') {
-                $('#' + this.id).text(value);
+                this.ele.text(value);
             } else if (this.type == 'richText') {
-                $('#' + this.id).val(value);
+                this.ele.val(value);
             } else if (this.type == 'date') {
-                $('#' + this.id).val(SYMPER_APP.$moment(value).format(this.formatDate));
+                this.ele.val(SYMPER_APP.$moment(value).format(this.formatDate));
             } else if (this.type == 'checkbox') {
                 if (value)
-                    $('#' + this.id).attr('checked', 'checked');
+                    this.ele.attr('checked', 'checked');
                 else {
-                    $('#' + this.id).removeAttr('checked');
+                    this.ele.removeAttr('checked');
                 }
             } else if (this.type == 'number') {
                 let v = parseInt(value);
                 if (!isNaN(v))
-                    $('#' + this.id).val(numbro(value).format(this.numberFormat));
+                    this.ele.val(numbro(value).format(this.numberFormat));
                 else {
-                    $('#' + this.id).val("");
+                    this.ele.val("");
                 }
             } else {
-                $('#' + this.id).val(value);
+                this.ele.val(value);
             }
         }
         if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
             this.defaultValue = value;
         }
-
-
     }
     getValue() {
         return this.value;
     }
-
 
     setValueControl(vl = undefined) {
         let value = vl;
@@ -363,7 +360,7 @@ export default class BasicControl extends Control {
         if (this.type == 'label') {
             this.ele.text(value)
         } else if (this.type == 'richText') {
-            $('#' + this.id).val(value);
+            this.ele.val(value);
         } else if (this.type == 'image') {
             this.ele.empty();
             let w = this.controlProperties.width.value;
