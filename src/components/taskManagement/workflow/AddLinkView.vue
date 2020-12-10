@@ -67,6 +67,12 @@ export default {
         return{
             isShow:false,
             linkInfo:{
+                id : { 
+                    title: "Bắt đầu từ trạng thái",
+                    type: "select",
+                    value:"",
+                    hidden:true
+                },
                 from : { 
                     title: "Bắt đầu từ trạng thái",
                     type: "select",
@@ -103,18 +109,6 @@ export default {
                     
                     }
                 },
-                desscription : { 
-                    title: "Mô tả",
-                    type: "text",
-                    value:"",
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                    validate(){
-                    
-                    }
-                },
             },
             userSelect:[]
         }
@@ -125,6 +119,7 @@ export default {
         },
         actionClick(type){
             this.$emit('after-add-link-click',this.linkInfo);
+            this.isShow=false;
         }
         
     },

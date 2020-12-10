@@ -1,6 +1,9 @@
 const defaultState = {
     allCategory: [],
     allProject: [],
+    allStatusCategory: [],
+    allRole: [],
+    allPriority: [],
     headerBreadcrumbs:[],
     currentProject:{},
     listBoardInProject:[],
@@ -15,7 +18,8 @@ const defaultState = {
         allLink:[],
         currentNodeSelected:{},
     },
-    listColumnInBoard:[]
+    listColumnInBoard:[],
+    allWorkflow:[],
 };
 
 export default defaultState;

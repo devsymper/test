@@ -7,10 +7,15 @@ const setAllCategory = (state, allCategory) => {
         Vue.set(state, 'allCategory', allCategory);
 }
 
+const setAllStatusCategory = (state, allStatusCategory) => {
+    Vue.set(state, 'allStatusCategory', allStatusCategory);
+}
 const setAllProject = (state, allProject) => {
     Vue.set(state, 'allProject', allProject);
 }
-
+const setAllPriority = (state, allPriority) => {
+    Vue.set(state, 'allPriority', allPriority);
+}
 const setListBoardInProject = (state, listBoardInProject) => {
     Vue.set(state, 'listBoardInProject', listBoardInProject);
 }
@@ -22,6 +27,13 @@ const setListVersion = (state, listVersionInProject) => {
 }
 const setListColumnInBoard = (state, listColumnInBoard) => {
     Vue.set(state, 'listColumnInBoard', listColumnInBoard);
+}
+
+const setAllWorkflow = (state, allWorkflow) => {
+    Vue.set(state, 'allWorkflow', allWorkflow);
+}
+const setAllRole = (state, allRole) => {
+    Vue.set(state, 'allRole', allRole);
 }
 
 const setCurrentProject = (state, currentProject) => {
@@ -45,12 +57,23 @@ const addCategoryToStore = (state, item) => {
     currentListCategory.unshift(item)
     Vue.set(state, 'allCategory', currentListCategory);
 }
+
+const addWorkflowToStore = (state, item) => {
+    let currentAllWorkflow = state.allWorkflow;
+    currentAllWorkflow.unshift(item)
+    Vue.set(state, 'allWorkflow', currentAllWorkflow);
+}
 const addBoardToStore = (state, item) => {
     let currentListBoard = state.listBoardInProject;
     currentListBoard.unshift(item)
     Vue.set(state, 'listBoardInProject', currentListBoard);
 }
 
+const addPriorityToStore = (state, item) => {
+    let currentAllPriority = state.allPriority;
+    currentAllPriority.push(item); // đẩy vào vị trí cuối
+    Vue.set(state, 'allPriority', currentAllPriority);
+}
 const updateStatusFavoriteProject = (state, id) => {
     let currentListProject = state.allProject;
 
@@ -95,6 +118,17 @@ const updateBoardToStore = (state, item) => {
     Vue.set(state, 'listBoardInProject', currentListBoard);
 }
 
+const updateWorkflowToStore = (state, item) => {
+    let currentAllWorkflow = state.allWorkflow;
+    let obj = currentAllWorkflow.find(data => data.id === item.id)
+    var index = currentAllWorkflow.indexOf(obj);
+    if (index > -1) {
+        currentAllWorkflow[index].name = item.name;
+        currentAllWorkflow[index].description = item.description;
+    }
+    Vue.set(state, 'allWorkflow', currentAllWorkflow);
+}
+
 
 const updateCategoryToStore = (state, item) => {
     let currentListCategory = state.allCategory;
@@ -108,6 +142,21 @@ const updateCategoryToStore = (state, item) => {
         currentListCategory[index].icon = item.icon;
     }
     Vue.set(state, 'allCategory', currentListCategory);
+}
+
+const updatePriorityToStore = (state, item) => {
+    let currentAllPriority = state.allPriority;
+
+    let obj = currentAllPriority.find(data => data.id === item.id)
+    var index = currentAllPriority.indexOf(obj);
+
+    if (index > -1) {
+        currentAllPriority[index].name = item.name;
+        currentAllPriority[index].description = item.description;
+        currentAllPriority[index].icon  = item.icon;
+        currentAllPriority[index].color = item.color;
+    }
+    Vue.set(state, 'allPriority', currentAllPriority);
 }
 
 const removeCategoryToStore = (state, id) => {
@@ -128,7 +177,25 @@ const removeProjectToStore = (state, id) => {
     }
     Vue.set(state, 'allProject', currentListProject);
 }
+const removeWorkflowToStore = (state, id) => {
+    let currentAllWorkflow = state.allWorkflow;
+    let obj = currentAllWorkflow.find(data => data.id === id)
+    var index = currentAllWorkflow.indexOf(obj);
+    if (index > -1) {
+        currentAllWorkflow.splice(index, 1);
+    }
+    Vue.set(state, 'allWorkflow', currentAllWorkflow);
+}
 
+const removePriorityToStore = (state, id) => {
+    let currentAllPriority = state.allPriority;
+    let obj = currentAllPriority.find(data => data.id === id)
+    var index = currentAllPriority.indexOf(obj);
+    if (index > -1) {
+        currentAllPriority.splice(index, 1);
+    }
+    Vue.set(state, 'allPriority', currentAllPriority);
+}
 const addToTaskManagementStore = (state, data) =>{
     let key = data.key;
     let value = data.value;
@@ -154,5 +221,15 @@ export {
     setInfoComponentCurrent,
     removeProjectToStore,
     setListColumnInBoard,
+    setAllWorkflow,
+    removeWorkflowToStore,
+    setAllStatusCategory,
+    updateWorkflowToStore,
+    setAllRole,
+    addWorkflowToStore,
+    setAllPriority,
+    addPriorityToStore,
+    removePriorityToStore,
+    updatePriorityToStore
 
 };

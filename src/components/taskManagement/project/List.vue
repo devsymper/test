@@ -26,8 +26,7 @@
                     :items="listProject"
                     :search="search"
                     hide-default-footer
-                    class="table-list-category"
-                    @click:row="onProjectItemClick"
+                    class="table-list-project"
                 >
                     <template v-slot:[`item.isFavorite`]="{ item }">
                         <v-icon v-if="item.isFavorite==1" class="ml-2 favorite" color="yellow" @click="updateFavorite(item)">mdi-star</v-icon>
@@ -40,7 +39,7 @@
                                 <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:24px">{{item.icon}}</v-icon>
                                 <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="24" height="24">
                             </div>
-                            <span class="name-project pt-1 pl-2" style="color:#0000aa">
+                            <span  @click.stop="onProjectItemClick(item)" class="name-project pt-1 pl-2" style="color:#0000aa">
                                 {{item.name}}
                             </span>
                         </div>
@@ -49,10 +48,16 @@
                         <infoUser class="userInfo fs-13" :userId="item.userLeader" :roleInfo="{}" />
                     </template>
 
+                    <template v-slot:[`item.categoryName`]="{ item }">
+                        <span  @click.stop="onClickCategory(item)" class="name-project" style="color:#0000aa">
+                            {{item.categoryName}}
+                        </span>
+                    </template>
+
                     <template  v-slot:[`item.action`]="{ item }">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
-                                <v-icon v-on="on" @click.prevent.stop="handleDeleteProject(item)" style="font-size:24px">mdi-delete-outline</v-icon>
+                                <v-icon v-on="on" @click.prevent.stop="handleDeleteProject(item)" style="font-size:20px">mdi-delete-outline</v-icon>
                             </template>
                             <span>Delete</span>
                         </v-tooltip>
@@ -122,7 +127,6 @@
 </template>
 
 <script>
-import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "@/plugins/util";
 import infoUser from "@/components/common/user/InfoUser";
 import pickIcon from "@/components/common/iconPicker";
@@ -131,7 +135,6 @@ import FormTpl from "@/components/common/FormTpl.vue";
 
 export default {
     components:{
-        VuePerfectScrollbar: VuePerfectScrollbar,
         infoUser,
         pickIcon,
         FormTpl
@@ -270,10 +273,12 @@ export default {
             },
             projectSelected:{},
             dialogRemove:false,
-          
         }
     },
     methods:{
+        onClickCategory(item){
+            this.$router.push('/task-management/categories');
+        },
         handleDeleteProject(item){
             this.projectSelected=item;
             this.dialogRemove=true;
@@ -416,5 +421,8 @@ export default {
     padding: 0 6px!important;
     font-size: 11px;
 
+}
+.table-list-project >>> td{
+    font-size: 13px!important;
 }
 </style>

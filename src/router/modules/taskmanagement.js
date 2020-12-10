@@ -50,20 +50,28 @@ export default [
                     TaskManagement: () => import ('../../views/taskManagement/project/setting/Access.vue')
                 }
             },
-            // {
-            //     path: "workflow",
-            //     meta:{group:'projectSetting'},
-            //     name: "issueTypeWorkflow",
-            //     components:{
-            //         TaskManagement: () => import ('../../views/taskManagement/projectSetting/Workflow.vue')
-            //     }
-            // },
+            {
+                path: "workflow",
+                // meta:{group:'projectSetting'},
+                name: "listWorkflow",
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/workflow/List.vue')
+                }
+            },
             {
                 path: "workflow/create",
-                meta:{group:'projectSetting'},
+                // meta:{group:'projectSetting'},
                 name: "issueTypeWorkflow",
                 components:{
-                    TaskManagement: () => import ('../../views/taskManagement/projectSetting/Workflow.vue')
+                    TaskManagement: () => import ('../../views/taskManagement/workflow/CreateWorkflow.vue')
+                }
+            },
+            {
+                path: "workflow/:id",
+                // meta:{group:'projectSetting'},
+                name: "detailworkflow",
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/workflow/DetailWorkflow.vue')
                 }
             },
             {
@@ -104,8 +112,6 @@ export default [
                     TaskManagement: () => import ('../../views/taskManagement/component/DetailComponent.vue')
                 }
             },
-            
-
             ///////version
             {
                 path: "projects/:id/versions",
@@ -121,6 +127,14 @@ export default [
                 meta:{group:'home'},
                 components:{
                     TaskManagement: () => import ('../../views/taskManagement/version/DetailVersion.vue')
+                }
+            },
+            // priority
+            {
+                path: "priorities",
+                name: "priority",
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/priority/List.vue')
                 }
             },
         ]   

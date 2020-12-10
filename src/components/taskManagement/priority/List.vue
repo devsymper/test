@@ -1,9 +1,9 @@
 <template>
-    <div class="w-100 h-100">
+       <div class="w-100 h-100">
         <div style="height:100%">
             <v-card style="box-shadow:none">
                 <v-card-title>
-                    {{$t("taskManagement.listCategory")}}
+                    {{$t("taskManagement.listPriority")}}
                     <v-spacer></v-spacer>
                     <v-text-field
                         v-model="search"
@@ -18,36 +18,41 @@
                     ></v-text-field>
                     <v-btn small class="px-1 ml-1" solo depressed @click="handleCreate" color="#1976d2">
                         <v-icon color="white" size="18">mdi-plus</v-icon>
-                        <span style="color:white">Create category</span>
+                        <span style="color:white">Create priority</span>
                     </v-btn>
                 </v-card-title>
                 <v-data-table
                     :headers="headers"
-                    :items="allCategory"
+                    :items="listPriority"
                     :search="search"
                     hide-default-footer
-                    class="table-list-category"
-                    @click:row="handelDetailCategory"
+                    class="table-list-priority"
                 >
                     <template v-slot:[`item.name`]="{ item }">
-                        <div class="d-flex">
-                            <div class="d-flex">
-                                <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:24px">{{item.icon}}</v-icon>
-                                <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="24" height="24">
-                            </div>
-                            <span class="name-project pt-1 pl-2" style="color:#0000aa">
-                                {{item.name}}
-                            </span>
-                        </div>
+                        <span class="name-project" style="color:#0000aa">
+                            {{item.name}}
+                        </span>
                     </template>
                     <template v-slot:[`item.user`]="{ item }">
                         <infoUser class="userInfo fs-13" :userId="item.userCreate" :roleInfo="{}" />
                     </template>
-
+                    <template v-slot:[`item.icon`]="{ item }">
+                        <v-icon :color="item.color" v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:18px">{{item.icon}}</v-icon>
+                        <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="18" height="18">
+                    </template>
+                    <template v-slot:[`item.color`]="{ item}">
+                        <div :style="{ 'background': item.color ,'width':'50px','height':'20px'}" ></div>
+                    </template>
                     <template  v-slot:[`item.action`]="{ item }">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
-                                <v-icon v-on="on" @click.prevent.stop="handleDeleteCategory(item)" style="font-size:20px">mdi-delete-outline</v-icon>
+                                <v-icon v-on="on" @click.prevent.stop="handleDetail(item)" style="font-size:20px">mdi-file-document-edit-outline</v-icon>
+                            </template>
+                            <span>Detail</span>
+                        </v-tooltip>
+                        <v-tooltip bottom>
+                            <template v-slot:activator="{ on }">
+                                <v-icon class="ml-2" v-if="item.common == 0" v-on="on" @click.prevent.stop="handleDelete(item)" style="font-size:20px">mdi-delete-outline</v-icon>
                             </template>
                             <span>Delete</span>
                         </v-tooltip>
@@ -55,21 +60,21 @@
                 </v-data-table>
             </v-card>
         </div>
-        <modalAddOrDetailCategory
-            ref="modalAddOrDetailCategory"
-            :dataCategoryProps="dataCategoryProps"
-            :infoCategory="infoCategory"
+        <modalAddOrDetailPriority
+            ref="modalAddOrDetailPriority"
+            :dataPriorityProps="dataPriorityProps"
+            :infoPriority="infoPriority"
             :statusDetail="statusDetail"
         />
 
-        <v-dialog v-model="dialogRemoveCate" max-width="350">
+        <v-dialog v-model="dialogRemove" max-width="350">
             <v-card>
             <v-card-title class="headline">{{$t("common.remove_confirm_title")}}</v-card-title>
-            <v-card-text>{{$t("taskManagement.dialog.removeCategory")}}</v-card-text>
+            <v-card-text>{{$t("taskManagement.dialog.removePriority")}}</v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="red darken-1" text @click="removeCategory">Xóa</v-btn>
-                <v-btn color="green darken-1" text @click="dialogRemoveCate = false">Hủy</v-btn>
+                <v-btn color="red darken-1" text @click="removePriority">Xóa</v-btn>
+                <v-btn color="green darken-1" text @click="dialogRemove = false">Hủy</v-btn>
             </v-card-actions>
             </v-card>
         </v-dialog>
@@ -78,32 +83,28 @@
 </template>
 
 <script>
-import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "@/plugins/util";
 import infoUser from "@/components/common/user/InfoUser";
 import { taskManagementApi } from "@/api/taskManagement.js";
-import modalAddOrDetailCategory from "./ModalAddOrDetailCategory";
+import modalAddOrDetailPriority from "./ModalAddOrDetailPriority";
 
 export default {
-    name:"list-category",
     components:{
-        VuePerfectScrollbar: VuePerfectScrollbar,
         infoUser,
-        modalAddOrDetailCategory
+        modalAddOrDetailPriority
     },
+    name:"listPriority",
     computed:{
-        allCategory(){
-            let categories=this.$store.state.taskManagement.allCategory;
-            console.log("categories",categories);
-            return categories; 
-        },
+        listPriority(){
+            return this.$store.state.taskManagement.allPriority;
+        }
+
     },
     data(){
         return{
             statusDetail:false,
-            dialogRemoveCate:false,
+            dialogRemove:false,
             search:'',
-            title:"Category",
             headers: [
                 {
                 text: this.$t("taskManagement.table.name"),
@@ -111,11 +112,13 @@ export default {
                 value: "name"
                 },
                 { text: this.$t("taskManagement.table.description"), value: "description" },
+                { text: "Icon", value: "icon" },
+                { text: "Color", value: "color" },
                 { text: this.$t("common.created_by"), value: "user" },
                 { text: this.$t("taskManagement.table.createAt"), value: "createAt" },
                 { text: "", value: "action" },
             ],
-            dataCategoryProps:{
+            dataPriorityProps:{
                 name : { 
                     title: "Name",
                     type: "text",
@@ -145,51 +148,68 @@ export default {
                     validate(){
                     }
                 },
+                color : {
+                    title: "Color",
+                    type: "color",
+                    value: '',
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    validate(){
+                    }
+                },
             },
-            infoCategory:{
+            infoPriority:{
+                id:"",
                 name: "",
                 description: "",
                 icon: "",
+                color: "",
             },
-            categorySelected:{}
-          
+            prioritySelected:{}
+
         }
     },
     methods:{
         handleCreate(){
-            this.dataCategoryProps.name.value="";
-            this.dataCategoryProps.description.value="";
-            this.infoCategory.id='';
-            this.infoCategory.icon="";
-            this.infoCategory.description="";
-            this.infoCategory.name="";
+            this.dataPriorityProps.name.value="";
+            this.dataPriorityProps.description.value="";
+            this.infoPriority.id='';
+            this.infoPriority.icon="mdi-arrow-up";
+            this.infoPriority.description="";
+            this.infoPriority.name="";
+            this.infoPriority.color="";
             this.statusDetail=false;
 
-            this.$refs.modalAddOrDetailCategory.show();
+            this.$refs.modalAddOrDetailPriority.show();
         },
-        handelDetailCategory(item){
-            this.dataCategoryProps.name.value=item.name;
-            this.dataCategoryProps.description.value=item.description;
+        handleDetail(item){
+            this.dataPriorityProps.name.value=item.name;
+            this.dataPriorityProps.description.value=item.description;
+            this.dataPriorityProps.color.value=item.color;
 
-            this.infoCategory.id=item.id;
-            this.infoCategory.icon=item.icon;
-            this.infoCategory.description=item.description;
-            this.infoCategory.name=item.name;
+            this.infoPriority.id=item.id;
+            this.infoPriority.icon=item.icon;
+            this.infoPriority.description=item.description;
+            this.infoPriority.name=item.name;
+            this.infoPriority.color=item.color;
+
             this.statusDetail=true;
-            this.$refs.modalAddOrDetailCategory.show();
+            this.$refs.modalAddOrDetailPriority.show();
 
         },
-        handleDeleteCategory(item){
-            this.categorySelected=item;
-            this.dialogRemoveCate=true;
+        handleDelete(item){
+            this.prioritySelected=item;
+            this.dialogRemove=true;
         },
-        removeCategory(){
+        removePriority(){
             taskManagementApi
-                .removeCategory(this.categorySelected.id)
+                .removePriority(this.prioritySelected.id)
                 .then(res => {
                     if (res.status == 200) {
-                        this.$snotifySuccess("Remove category success!");
-                        this.$store.commit("taskManagement/removeCategoryToStore",this.categorySelected.id);
+                        this.$snotifySuccess("Remove priority success!");
+                        this.$store.commit("taskManagement/removePriorityToStore",this.prioritySelected.id);
                     }else{
                         this.$snotifyError("", "Error! Have error !!!");
                     }
@@ -197,23 +217,18 @@ export default {
                 .catch(err => {
                     this.$snotifyError("", "Error! Have error !!!", err);
                 });
-            this.dialogRemoveCate=false;  
+            this.dialogRemove=false;  
         }
    
     },
-    created(){
-    },
-  
+
+
+
 }
 </script>
 
 <style scoped>
-
-.name-project:hover{
-    cursor: pointer;
-    text-decoration: underline;
-}
-.table-list-category >>> td{
+.table-list-priority >>> td{
     font-size: 13px!important;
 }
 </style>

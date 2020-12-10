@@ -66,6 +66,8 @@
 </template>
 <script>
 import { appConfigs } from '../../../configs.js';
+import { taskManagementApi } from "@/api/taskManagement.js";
+
 export default {
     data(){
         return {
@@ -80,7 +82,12 @@ export default {
     },
     methods:{
         
-        
+    },
+    created(){
+        this.$store.dispatch("taskManagement/getAllStatusCategory");
+        this.$store.dispatch("taskManagement/getAllRole");
+        this.$store.dispatch("taskManagement/getAllWorkflow");
+        this.$store.dispatch("taskManagement/getAllPriority");
     },
     computed:{
         currentUserAvatar(){
@@ -89,6 +96,9 @@ export default {
         },
         headerBreadcrumbs(){
             return this.$store.state.app.headerBreadcrumbs;
+        },
+        sTaskManagement(){
+            return this.$store.state.taskManagement;
         }
     }
 }

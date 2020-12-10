@@ -67,6 +67,12 @@ export const taskManagementApi = {
     addIssueTypeForProject(data){
         return taskManagement.post("issue-types",data);
     },
+    updateIssueType(id,data){
+        return taskManagement.put("issue-types/"+id,data);
+    },
+    deleteIssueType(id){
+        return taskManagement.delete("issue-types/"+id);
+    },
 
     /////////////////// board
     addBoardForProject(data){
@@ -117,5 +123,40 @@ export const taskManagementApi = {
     },
     addColumn(data){
         return taskManagement.post("columns",data);
+    },
+
+    /// workflow
+    getListWorkflow(){
+        return taskManagement.get("task-life-circle");
+    },
+    addWorkflow(data){
+        return taskManagement.post("task-life-circle",data);
+    },
+    getDetailWorkflow(id){
+        return taskManagement.get("task-life-circle/"+id);
+    },
+    removeWorkflow(id){
+        return taskManagement.delete("task-life-circle/"+id);
+    }, 
+    updateWorkflow(id,data){
+        return taskManagement.put("task-life-circle/"+id,data);
+    },
+
+    // status category
+    getAllStatusCategory(){
+        return taskManagement.get("status-category");
+    },
+    // priority
+    getListPriority(){
+        return taskManagement.get("priorities");
+    },
+    addPriority(data){
+        return taskManagement.post("priorities",data);
+    },
+    removePriority(id){
+        return taskManagement.delete("priorities/"+id);
+    },
+    updatePriority(id,data){
+        return taskManagement.put("priorities/"+id,data);
     },
 }
