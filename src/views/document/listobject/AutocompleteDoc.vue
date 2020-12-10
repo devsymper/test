@@ -15,9 +15,9 @@
 							v-bind="attrs"
 							depressed
 							v-on="{ ...tooltip, ...menu }">
-							<span class="fs-13" style="font-weight: 400!important ;color: orange">
+							<div class=" title-document-autocomplete fs-13" style="font-weight: 400!important ;color: orange">
 								{{sDoc.currentTitle}}
-							</span>
+							</div>
 						</v-btn>
 					</template>
 					<span>Switch document</span>
@@ -103,5 +103,10 @@ export default {
 </script>
 
 <style>
-
+.title-document-autocomplete{
+	white-space: nowrap; 
+	width: 250px; 
+	overflow: hidden;
+	text-overflow: ellipsis; 
+}
 </style>

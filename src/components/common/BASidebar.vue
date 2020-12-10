@@ -172,7 +172,7 @@
                         no-action
                         :class="{'menu-group': true , 'menu-group-active': item.active == true }"
                         :symper-action="$bindAction(item.action?item.action:'')"
-                        @click="gotoPage(item)">
+                        @click="handlerItemCLick(item)">
                        <template v-slot:prependIcon>
                             <v-icon class="ml-1 icon-group">
                                 {{ item.icon }}
@@ -224,7 +224,7 @@
                         link
                         no-action
                         :symper-action="$bindAction(item.action?item.action:'')"
-                        @click="gotoPage(item)">
+                        @click="handlerItemCLick(item)">
                        <template v-slot:prependIcon>
                            <v-menu 
                                 right offset-y
@@ -394,6 +394,11 @@ export default {
         this.reCalcSidebarHeight();
     },
     methods: {
+		handlerItemClick(item){
+			if(item.children){
+				this.gotoPage(item)
+			}
+		},
         isBorderTop(titleGroup){
             if(titleGroup=='Administrator'||titleGroup=='Applications'||titleGroup=='Setting'){
                 return true
