@@ -39,14 +39,14 @@
                         </v-list-item-title>
                            <v-list-item-title v-else
                             class="item-title" >
-                            <span v-if="item.searchField!=undefined&&item.type!='account'" v-html="item.searchField"></span>
+                            <span v-if="item.searchField != undefined && item.type != 'account'" v-html="item.searchField"></span>
                             <span v-else v-html="item.displayName"></span>
                         </v-list-item-title>
-                        <v-list-item-subtitle v-if="item.type!= 'document_definition'&&item.type!='workflow_definition'&&item.type!='account'"
+                        <v-list-item-subtitle v-if="item.type != 'document_definition' && item.type!='workflow_definition' && item.type!='account'"
                             :style="{'margin-left': item.type === 'account' ? '0' : '0.5rem'}"
                             class="item-subtitle mt-1" v-html="item.searchField">
                         </v-list-item-subtitle>
-                          <v-list-item-title v-else-if="item.type!='account'"
+                          <v-list-item-title v-else-if="item.type != 'account'"
                             :style="{'margin-left': item.type === 'account' ? '0' : '0.5rem'}" 
                             class="item-subtitle" v-html="item.description">
                         </v-list-item-title>
@@ -54,7 +54,10 @@
                             class="item-subtitle" v-html="item.email">
                         </v-list-item-title>
                     </v-list-item-content>
-                    <v-list-item-action v-show="item.enable && item.actions.length>0" class="dot">
+                    <v-list-item-action 
+						v-show="item.actions.length > 0" 
+						class="dot"
+					>
                         <v-menu
                             bottom offset-y 
                             transition="scale-transition" >
@@ -66,9 +69,11 @@
                             </template>
                             <v-list>
                                  <v-list-item-title v-for="(itemsAction,index) in item.actions" :key="index" 
-                                        class="fm fs-13 mt-1 action-button ml-2" style="width:130px!important" 
+                                        class="fm fs-13 mr-1 mt-1 action-button ml-2" style="width:130px!important" 
                                         @click="gotoPage(itemsAction,item.type,item.id,item.displayName)">
-                                             {{$t('objects.listAction.'+itemsAction)}}
+                                             <div  style="cursor: pointer; padding:4px">
+												 {{$t('objects.listAction.'+itemsAction)}}
+											 </div>
                                     </v-list-item-title>
                             </v-list>
                         </v-menu>
@@ -85,7 +90,7 @@ import SymperAvatar from '../../components/common/SymperAvatar'
 import searchApi from "../../api/search.js";
 export default {
     components:{
-        SymperAvatar
+		SymperAvatar,
     },
      data: function () {
         return {
@@ -359,7 +364,7 @@ export default {
     margin-top: 0 !important;
     padding-top: 6px !important;
 }
-.dot:hover{
+.dot{
  color:black;
 }
 .action-button:hover{

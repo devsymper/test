@@ -107,16 +107,23 @@ export default class BasicControl extends Control {
                 this.renderSelectControl(false);
             } else if (this.ele.hasClass('s-control-label')) {
                 this.renderLabelControl();
+            } else if (this.ele.hasClass('s-control-rich-text')) {
+                this.renderRichTextControl();
             }
 
             if (this.checkDetailView()) {
                 // this.ele.addClass('detail-view');
                 this.ele.attr('disabled', 'disabled');
             }
-            if (sDocument.state.viewType[this.curParentInstance] != 'submit') {
+            if (this.checkViewType('submit')) {
+                this.setDefaultValue()
+            }
+            else if(this.checkViewType('print')){
+                this.setPrintValueControl();
+            }
+            else{
                 this.setValueControl();
             }
-            this.setDefaultValue();
             this.setEvent();
             if (this.checkProps('isQuickSubmit') && this.checkEmptyFormulas('autocomplete') && this.controlFormulas.autocomplete.instance) {
                 let allTable = this.controlFormulas.autocomplete.instance.detectTableQuery();
@@ -151,8 +158,7 @@ export default class BasicControl extends Control {
          * Trường hợp có điền vào giá trị defaul trong editor thì gọi hàm này để set giá trị
          */
     setDefaultValue() {
-        if (['submit'].includes(sDocument.state.viewType[this.curParentInstance]) &&
-            this.controlProperties['defaultValue'] != undefined) {
+        if (this.controlProperties['defaultValue'] != undefined) {
             if (typeof this.controlProperties['defaultValue'].value == 'object') {
                 return;
             }
@@ -204,9 +210,15 @@ export default class BasicControl extends Control {
                     instance: thisObj.curParentInstance
                 });
             })
+            // cần xóa dữ liệu của auto complete trong thuộc tính của input nếu un focus
+            this.ele.on('blur', function(e) {
+                if(thisObj.checkAutoCompleteControl()){
+                    $('#'+thisObj.id).removeAttr('data-autocomplete');
+                }
+            })
 
             this.ele.on('keyup', function(e) {
-                if (e.key == 'F2' && store.state.app.baInfo && Object.keys(store.state.app.baInfo).length > 0) {
+                if (e.key == 'F2' && store.state.app.baInfo && store.state.app.baInfo.id) {
                     if (thisObj.type == 'number' && thisObj.formulaValue) {
                         thisObj.ele.val(thisObj.formulaValue);
                     }
@@ -303,7 +315,7 @@ export default class BasicControl extends Control {
             if (this.type == 'label') {
                 $('#' + this.id).text(value);
             } else if (this.type == 'richText') {
-                $('#' + this.id).html(value);
+                $('#' + this.id).val(value);
             } else if (this.type == 'date') {
                 $('#' + this.id).val(SYMPER_APP.$moment(value).format(this.formatDate));
             } else if (this.type == 'checkbox') {
@@ -351,7 +363,7 @@ export default class BasicControl extends Control {
         if (this.type == 'label') {
             this.ele.text(value)
         } else if (this.type == 'richText') {
-            $('#' + this.id).html(value);
+            $('#' + this.id).val(value);
         } else if (this.type == 'image') {
             this.ele.empty();
             let w = this.controlProperties.width.value;
@@ -371,6 +383,41 @@ export default class BasicControl extends Control {
         if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
             this.defaultValue = value;
         }
+    }
+    setPrintValueControl(vl = undefined) {
+        let value = vl;
+        if (vl == undefined) {
+            value = this.value;
+        }
+        if (!value) {
+            value = "";
+        } else if (this.type == 'number') {
+            if (!isNaN(Number(value)))
+                value = numbro(Number(value)).format(this.numberFormat)
+
+        } else if (this.type == 'date') {
+            value = SYMPER_APP.$moment(value).format(this.formatDate);
+        }
+       
+        if (this.type == 'image') {
+            this.ele.empty();
+            let w = this.controlProperties.width.value;
+            let h = this.controlProperties.height.value;
+            if (!w) {
+                w = 'auto';
+            }
+            if (!h) {
+                h = '70';
+            }
+            let image = '<img height="' + h + '" width="' + w + '" src="' + value + '">';
+            this.ele.append(image);
+        }
+        else{
+            let currentStyle = this.ele.attr('style');
+            this.ele.replaceWith('<div  class="s-control s-control-text" contenteditable="false" style="'+currentStyle+';background:none;padding: 5px 5px !important;">'+value+'</div>');
+        }
+        
+        
     }
     formatNumberValue(data) {
         let value = data;
@@ -679,6 +726,16 @@ export default class BasicControl extends Control {
         if (this.checkDetailView()) return;
         this.ele.attr('type', 'text');
 
+    }
+    renderRichTextControl() {
+        let style = this.ele.attr('style');
+        this.ele.replaceWith('<textarea style="'+style+'" id="'+this.id+'" class="s-control s-control-rich-text" title="Rich-text" s-control-type="richText" type="text"></textarea>');
+        if(this.checkViewType('submit') || this.checkViewType('update')){
+            this.ele = $('#sym-submit-'+this.curParentInstance).find("textarea#"+this.id);
+        }
+        else{
+            this.ele = $('#sym-Detail-'+this.curParentInstance).find("textarea#"+this.id);
+        }
     }
     getDefaultValue() {
         if (this.isCheckbox) {

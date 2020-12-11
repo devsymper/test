@@ -18,6 +18,9 @@ export const dashboardApi = {
 	// }
 	getDashboards(filter) {
 		return api.get(appConfigs.apiDomain.dashboard, filter)
+	},
+	getDashboardsApp(filter) {
+		return api.get(appConfigs.apiDomain.biService+'dashboards', filter)
 	}
 
 };

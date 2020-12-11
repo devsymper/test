@@ -438,6 +438,13 @@ let commonFormulas = {
         type: "script",
         groupType: "formulas"
     },
+    update: {
+        title: "Công thức sau update",
+        value: "",
+        formulasId: 0,
+        type: "script",
+        groupType: "formulas"
+    },
     linkConfig: {
         title: "Link đến đối tượng hệ thống",
         value: "",
@@ -514,7 +521,7 @@ const controlTypes = {
     },
     richText: {
         icon: "/icon/ic_richtext.png",
-        html: `<textarea class="s-control s-control-rich-text" contenteditable="false"  title="Rich-text" s-control-type="richText" type="text"></textarea>&nbsp;&nbsp;`,
+        html: `<input class="s-control s-control-rich-text" contenteditable="false"  s-control-type="richText" type="text" title="Rich text">&nbsp;&nbsp;`,
         title: "Rich text",
         notInProps: ['isVarchar','isQuickSubmit', 'autoHeight', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatNumber', 'formatDate', 'isSumTable', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['linkConfig', 'formulas', 'hidden', 'readOnly', 'require']
@@ -748,8 +755,8 @@ const controlTypes = {
         icon: "/icon/ic_submit.png",
         html: `<span type="button" class="s-control s-control-submit" contenteditable="false" s-control-type="submit" value="Submit" style="display: inline;font-size: 13px;color:green;">Submit</span>&nbsp;`,
         title: "Submit",
-        inProps: ['mobileProps', 'isPrimary', 'formatDate', 'formatNumber', 'isMobile', 'isSumTable', 'isRequired', 'isDBOnly', 'isTableOnly', 'isHidden', 'isAllowUpdate', 'isReadOnly', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['submit']
+        inProps: ['mobileProps'],
+        formulas: ['submit','update']
     },
     reset: {
         icon: "/icon/ic_reset.png",
@@ -871,9 +878,9 @@ export const mappingOldVersionControlFormulas = {
 }
 
 export const listControlNotNameProp = ['approvalHistory', 'submit', 'reset', 'draft', 'tabPage']
-    // hàm lấy tất cac thuoc tinh và các trường công thức của control
-    // input : type của control
-    // output : data control  : {icon,html,title,formulas,properties}
+// hàm lấy tất cả thuộc tính và các trường công thức của 1 control
+// input : type của control
+// output : data control  : {icon,html,title,formulas,properties}
 export const GetControlProps = function(type) {
     let control = util.cloneDeep(controlTypes[type]);
 
@@ -907,31 +914,30 @@ export const GetControlProps = function(type) {
 
 // hàm lấy tất cả thông tin các control
 export const getAllTypeControl = function() {
-        let allControl = util.cloneDeep(controlTypes);
-        let result = Object.keys(allControl).map(function(key) {
-            return {
-                type: key,
-                prop: allControl[key]
-            };
-        });
-        return result;
-    }
-    // hàm lấy tất cả thông tin các control trong tablesetting
+    let allControl = util.cloneDeep(controlTypes);
+    let result = Object.keys(allControl).map(function(key) {
+        return {
+            type: key,
+            prop: allControl[key]
+        };
+    });
+    return result;
+}
+// hàm lấy tất cả thông tin các control trong tablesetting
 export const getAllControlForTableSetting = function(inType) {
+    let allControl = util.cloneDeep(controlTypes);
 
-        let allControl = util.cloneDeep(controlTypes);
-
-        let result = Object.keys(allControl).map(function(key) {
-            return {
-                type: key,
-                prop: allControl[key]
-            };
-        });
-        let controlInTableSetting = result.filter(control => {
-            return $.inArray(control.type, inType) != -1;
-        })
-        return controlInTableSetting;
-    }
+    let result = Object.keys(allControl).map(function(key) {
+        return {
+            type: key,
+            prop: allControl[key]
+        };
+    });
+    let controlInTableSetting = result.filter(control => {
+        return $.inArray(control.type, inType) != -1;
+    })
+    return controlInTableSetting;
+}
     //hàm trả về 1 control
 export const getControlElement = function(type) {
     return util.cloneDeep(controlTypes[type]);
@@ -963,6 +969,7 @@ export const getControlElementForTableSetting = function(type) {
 }
 
 // hàm lấy tất cả thuộc tính control nhóm theo grouptype
+// mục đích hiển thị trên sidebar phải khi click vào 1 control
 export const getAllPropsControl = function() {
     let allProp = util.cloneDeep(commonProps);
     let allFormulas = util.cloneDeep(commonFormulas);

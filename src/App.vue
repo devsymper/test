@@ -90,7 +90,7 @@ export default {
         "resolve-backlog-request": ResolveBacklogRequest
     },
     mounted() {
-        this.checkBacklogRequest();
+        // this.checkBacklogRequest();
     },
     methods: {
         reloadPage(){

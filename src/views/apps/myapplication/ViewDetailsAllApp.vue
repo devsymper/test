@@ -153,7 +153,6 @@ export default {
             for(let i = 0; i < appArr.length; i++){
                 rsl[i%2][appArr[i].id] = appArr[i];
 			}
-			debugger
             return rsl;
         }
     },
@@ -168,7 +167,8 @@ export default {
         },
         hideContextMenu(){
             this.$refs.contextMenu.hide()	
-        },
+		},
+		
         rightClickHandler(event,item,type,app){
 			event.stopPropagation();
 			event.preventDefault();

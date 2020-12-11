@@ -32,6 +32,9 @@ body {
 /* .symper-app .v-menu__content{
 	overflow:hidden
 }  */
+.d-block {
+    display: block!important;
+}
 
 .sym-tab-slider {
     height: 100%;
@@ -774,4 +777,25 @@ body {
 }
 .overflow-hidden{
     overflow: hidden;
+}
+ /*
+	dev create: dungna
+	date create: 2020/08/12
+	description: customicon cho monaco-editor icon 
+ */
+.codicon-symbol-enum:before {
+	content: "\F0DC9" !important;
+	font: normal normal normal 15px/1 "Material Design Icons" !important;
+}
+.codicon-symbol-file:before {
+    content: "\F0679" !important;
+	font: normal normal normal 15px/1 "Material Design Icons" !important;
+}
+.codicon-symbol-enum-member:before {
+	content: "\F03A0" !important;
+	font: normal normal normal 15px/1 "Material Design Icons" !important;
+}
+.codicon-symbol-text:before {
+	content: "\F07F5" !important;
+	font: normal normal normal 15px/1 "Material Design Icons" !important;
 }
