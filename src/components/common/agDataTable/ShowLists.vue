@@ -210,20 +210,19 @@
                             'list-sbs': alwaysShowActionPanel
                         }"
                 >
-                    <hot-table
-                        :height="tableHeight"
-                        :settings="tableSettings"
-                        :data="data"
-                        :rowHeights="21"
-                        :renderAllRows="true"
-                        :columns="tableColumns"
-                        :colHeaders="colHeaders"
-                        :hiddenColumns="{
-                            columns: tableDisplayConfig.value.hiddenColumns
-                        }"
-                        ref="dataTable"
-                        :fixedColumnsLeft="fixedColumnsCount"
-                    ></hot-table>
+                   <ag-grid-vue :style="{
+						width: '100%',
+						height: tableHeight
+					}"
+						:class="{'ag-theme-balham': true}"
+						:defaultColDef="defaultColDef"
+						:gridOptions="gridOptions"
+						:frameworkComponents="frameworkComponents"
+						:columnDefs="columnDefs"
+						:rowData="rowData"
+						@grid-ready="onGridReady"
+					>
+					</ag-grid-vue>
                 </v-col>
             </v-row>
             <v-row v-show="showPagination" no-gutters ref="bottomBar" class="pt-3">
@@ -239,6 +238,7 @@
             :is="actionPanelWrapper"
             :width="actionPanelWidth"
             :max-width="actionPanelWidth"
+            v-model="actionPanel"
             class="pa-3"
             absolute
             right
@@ -247,14 +247,7 @@
             :temporary="reComputeActionPanelType == 'temporary'"
         >
             <slot name="right-panel-content" :itemData="currentItemDataClone">
-                <!-- <v-card flat>
-                    <v-card-title class="pa-0 pl-2" primary-title>{{itemActionTitle}}</v-card-title>
-                    <v-card-text>
-                        <form-tpl :allInputs="itemInputs"></form-tpl>
-                    </v-card-text>
-
-                    <v-divider></v-divider>
-                </v-card> -->
+               
             </slot>
         </component>
         <symper-drag-panel
@@ -266,12 +259,7 @@
             :dragPanelWidth="actionPanelWidth">
             <template slot="drag-panel-content" slot-scope="{panelData}">
                 <slot name="right-panel-content" :itemData="panelData">
-                    <!-- <v-card flat>
-                        <v-card-text>
-                            <form-tpl :allInputs="itemInputs"></form-tpl>
-                        </v-card-text>
-                        <v-divider></v-divider>
-                    </v-card> -->
+                   
                 </slot>
             </template>
         </symper-drag-panel>
@@ -327,20 +315,26 @@
 </template>
 
 <script>
+import {AgGridVue} from "ag-grid-vue";
+import { MenuModule } from '@ag-grid-enterprise/menu';
+import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
+import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
+import '@ag-grid-community/core/dist/styles/ag-grid.css';
+import '@ag-grid-community/core/dist/styles/ag-theme-balham.css'
 import { HotTable } from "@handsontable/vue";
-import { util } from "./../../plugins/util.js";
+import { util } from "@/plugins/util.js";
 import Handsontable from 'handsontable';
 // import FormTpl from "./FormTpl.vue";
 import { VDialog, VNavigationDrawer } from "vuetify/lib";
-import TableFilter from "./customTable/TableFilter.vue";
-import { getDataFromConfig, getDefaultFilterConfig } from "./../common/customTable/defaultFilterConfig.js";
-import Api from "./../../api/api.js";
-import { userApi } from "./../../api/user.js";
-import SymperDragPanel from "./SymperDragPanel.vue";
-import DisplayConfig from "./../common/listItemComponents/DisplayConfig";
-import Pagination from './../common/Pagination'
-import { actionHelper } from "./../../action/actionHelper";
-import {uiConfigApi} from "./../../api/uiConfig";
+import TableFilter from "@/components/common/customTable/TableFilter.vue";
+import { getDataFromConfig, getDefaultFilterConfig } from "@/components/common/customTable/defaultFilterConfig.js";
+import Api from "@/api/api.js";
+import { userApi } from "@/api/user.js";
+import SymperDragPanel from "@/components/common/SymperDragPanel.vue";
+import DisplayConfig from "@/components/common/listItemComponents/DisplayConfig";
+import Pagination from '@/components/common/Pagination'
+import { actionHelper } from "@/action/actionHelper";
+import {uiConfigApi} from "@/api/uiConfig";
 
 
 var apiObj = new Api("");
@@ -388,6 +382,8 @@ export default {
     data() {
         let self = this;
         return {
+			frameworkComponents: null,
+			gridOptions:null,
 			showSearchBox: true,
             tmpTableContextMenu: null,
             deleteDialogShow: false, // có hiển thị cảnh báo xóa hay không
@@ -422,7 +418,11 @@ export default {
             currentAction: {
                 // hành động hiện tại đang thực thi trong listitem (edit, remove, create ...)
                 key: ""
-            },
+			},
+			columnDefs:[
+			],
+           	rowData: [
+			],
             pageSize: 50,
             tableSettings: {
                 // các setting cho handsontable
@@ -832,7 +832,7 @@ export default {
                     util.getComponentSize(ref.topBar).h +
                     util.getComponentSize(ref.bottomBar).h + 14;
             }
-            return tbHeight - 15 ;
+            return tbHeight - 15;
         },
         /**
          * Tạo cấu hình cho hiển thị header của table
@@ -1283,7 +1283,6 @@ export default {
                     resData.forEach(function(e){
                         thisCpn.data.push(e)
                     })
-                    // thisCpn.data.concat(resData)
                 }else{
                     thisCpn.data = resData;
                 }

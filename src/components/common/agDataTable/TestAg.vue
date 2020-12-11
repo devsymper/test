@@ -1,10 +1,12 @@
 <template>
 	<div class="h-100 w-100">
 		<AgDataTable
-			:tableHeight="'calc(100% - 100px)'"
+			:containerHeight="containerHeight"
 			ref="displayTable" 
 			:allColumns="allColumns"
 			:editable="false"
+			:getDataUrl="apiUrl"
+			:useActionPanel="true"
 		>
 		</AgDataTable>
 	</div>
@@ -12,10 +14,16 @@
 
 <script>
 import AgDataTable from './ListItems'
+import {
+    appConfigs
+} from "@/configs";
+import { util } from "@/plugins/util.js";
 
 export default {
 	data(){
 		return {
+			apiUrl: appConfigs.apiDomain.bpmne.models,
+			containerHeight: null,
 			allColumns:[
 				{
 					colId: "code",
@@ -45,6 +53,10 @@ export default {
 	},
 	components:{
 		AgDataTable
+	},
+	mounted(){
+		  this.containerHeight = util.getComponentSize(this).h
+		  debugger
 	}
 }
 </script>

@@ -70,10 +70,10 @@
                         <div
                             class="fs-13 column-drag-pos"
                             v-for="(column,idx) in tableColumnsClone"
-                            :key="column.data"
+                            :key="idx"
                         >
                             <v-icon size="18" class="mr-2">{{getDataTypeIcon(column.type)}}</v-icon>
-                            <span class="fw-400">{{columnTitle(column.columnTitle)}}</span>
+                            <span class="fw-400">{{columnTitle(column.headerName)}}</span>
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
                                     <v-btn
@@ -146,7 +146,7 @@ export default {
         tableColumns: {
             deep: true,
             handler(){
-                this.tableColumnsClone = util.cloneDeep(this.tableColumns);
+				this.tableColumnsClone = util.cloneDeep(this.tableColumns);
             }
         }
     },
