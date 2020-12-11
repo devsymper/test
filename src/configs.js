@@ -174,6 +174,12 @@ var configs = {
                         title:"Access",
                         icon: 'mdi-view-week-outline',
                         url:"/task-management/projects/:id/settings/access"
+                    },
+                    {
+                        name:'issueType',
+                        title:"Issue type",
+                        icon: 'mdi-view-week-outline',
+                        url:"/task-management/projects/:id/settings/issuetypes"
                     }
                 ]
             }

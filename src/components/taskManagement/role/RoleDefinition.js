@@ -112,22 +112,32 @@ const objectActionControls = { // mức ngoài cùng là group
         "children":{
             "project":{
                 "title":"Project",
-                "icon":"",
+                "icon":"mdi-file-table-box-outline",
                 "action":actionDefault
             },
             "projectCategory":{
                 "title":"Project category",
-                "icon":"",
+                "icon":"mdi-file-tree-outline",
                 "action":actionDefault
             },
             "projectSetting":{
                 "title":"Project setting",
-                "icon":"",
+                "icon":"mdi-cog-outline",
+                "action":actionDefault
+            },
+            "people":{
+                "title":"People",
+                "icon":"mdi-account-multiple-outline",
                 "action":actionDefault
             },
             "kanbanBoard":{
                 "title":"Kanban board",
-                "icon":"",
+                "icon":"mdi-bulletin-board",
+                "action":actionDefault
+            },
+            "sprint":{
+                "title":"Sprint",
+                "icon":"mdi-animation-outline",
                 "action":actionDefault
             },
         }
@@ -137,12 +147,12 @@ const objectActionControls = { // mức ngoài cùng là group
         "children":{
             "issueType":{
                 "title":"Issue type",
-                "icon":"",
+                "icon":"mdi-clipboard-text-outline",
                 "action":actionDefault
             },
             "subTask":{
                 "title":"Sub task",
-                "icon":"",
+                "icon":"mdi-subtitles-outline",
                 "action":actionDefault
             },
             "taskLifeCycle":{

@@ -1,16 +1,6 @@
 <template>
     <div class="w-100 h-100">
-        <div class="w-100 justify-space-between d-flex" style="height:40px">
-            <div class="symper-title pl-2">{{title}}</div>
-            <div class="d-flex pt-2 pr-4">
-                <v-btn small class="px-1" solo depressed  @click="handleCreate" color="#0052CC">
-                    <v-icon color="white" size="18">mdi-plus</v-icon>
-                    <span style="color:white">Create Issue Type</span>
-                </v-btn>
-            </div>
-        </div>
-            <!-- list category -->
-        <div style="height:calc(100% - 40px)">
+        <div class="h-100">
              <v-card style="box-shadow:none">
                 <v-card-title>
                     {{$t("taskManagement.listIssueType")}}
@@ -26,6 +16,9 @@
                         hide-details
                         class="sym-small-size sym-style-input"
                     ></v-text-field>
+                    <v-btn small class="mx-1" solo depressed  @click="handleCreate">
+                        <span>Create Issue Type</span>
+                    </v-btn>
                 </v-card-title>
                 <v-data-table
                     :headers="headers"
@@ -65,6 +58,12 @@
                         </div>
                         <div v-else>
                             <span class="name-object" style="color:blue" @click.prevent.stop="goToWorkflow(item)" v-if="item.workflowName">{{item.workflowName}}</span>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-icon v-on="on" @click.prevent.stop="handleChangeWorkflow(item)" class="ml-1" size="16" color="blue">mdi-autorenew</v-icon>
+                                </template>
+                                <span>Change</span>
+                            </v-tooltip>
                         </div>
                     </template>
                     
@@ -313,6 +312,14 @@ export default {
         }
     },
     methods:{
+        handleChangeWorkflow(item){
+            this.selectWorkflowProps.workflow.value = item.taskLifeCircleId;
+            this.issueTypeSelected=item;
+            if (this.selectWorkflowProps.workflow.options.length == 0) {
+                this.$set(this.selectWorkflowProps.workflow,"options",this.$store.state.taskManagement.allWorkflow);
+            }
+            this.dialogAddWorkflow = true;
+        },
         handleUpdateIssueType(){
             this.isLoadingAdd = true;
             let isValid = this.validateData();
