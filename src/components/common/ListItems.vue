@@ -353,6 +353,9 @@ export default {
             if (this.actionPanel == true) {
                 this.$emit("open-panel");
             }
+            else{
+                this.$emit("close-panel");
+            }
         },
         getDataUrl(){   
 			this.page = 1
