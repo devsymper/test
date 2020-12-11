@@ -816,8 +816,6 @@ export default {
                 ) {
                     thisCpn.$refs.validate.hide();
                 }
-               
-                
             } catch (error) {
                 
             }
@@ -2101,6 +2099,7 @@ export default {
                     }
                 }
                 else{
+                    thisCpn.$emit('submit-document-error');
                     thisCpn.$snotify({
                         type: "error",
                         title: res.message
@@ -2109,6 +2108,7 @@ export default {
                 }
             })
             .catch(err => {
+                thisCpn.$emit('submit-document-error');
                 thisCpn.$snotify({
                         type: "error",
                         title: "error from submit document api!!!"
