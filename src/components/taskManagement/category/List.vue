@@ -16,9 +16,8 @@
                         hide-details
                         class="sym-small-size sym-style-input"
                     ></v-text-field>
-                    <v-btn small class="px-1 ml-1" solo depressed @click="handleCreate" color="#1976d2">
-                        <v-icon color="white" size="18">mdi-plus</v-icon>
-                        <span style="color:white">Create category</span>
+                    <v-btn small class="px-1 ml-1" solo depressed @click="handleCreate">
+                        <span>Create category</span>
                     </v-btn>
                 </v-card-title>
                 <v-data-table
@@ -103,7 +102,6 @@ export default {
             statusDetail:false,
             dialogRemoveCate:false,
             search:'',
-            title:"Category",
             headers: [
                 {
                 text: this.$t("taskManagement.table.name"),

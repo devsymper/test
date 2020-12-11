@@ -16,46 +16,66 @@
                         hide-details
                         class="sym-small-size sym-style-input"
                     ></v-text-field>
-                    <v-btn small class="px-1 ml-1" solo depressed @click="handleCreate" color="#1976d2">
-                        <v-icon color="white" size="18">mdi-plus</v-icon>
-                        <span style="color:white">Create priority</span>
+                    <v-btn small class="px-1 ml-1" solo depressed @click="handleCreate" >
+                        <span>Create priority</span>
                     </v-btn>
                 </v-card-title>
                 <v-data-table
                     :headers="headers"
-                    :items="listPriority"
                     :search="search"
                     hide-default-footer
                     class="table-list-priority"
                 >
-                    <template v-slot:[`item.name`]="{ item }">
-                        <span class="name-project" style="color:#0000aa">
-                            {{item.name}}
-                        </span>
-                    </template>
-                    <template v-slot:[`item.user`]="{ item }">
-                        <infoUser class="userInfo fs-13" :userId="item.userCreate" :roleInfo="{}" />
-                    </template>
-                    <template v-slot:[`item.icon`]="{ item }">
-                        <v-icon :color="item.color" v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:18px">{{item.icon}}</v-icon>
-                        <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="18" height="18">
-                    </template>
-                    <template v-slot:[`item.color`]="{ item}">
-                        <div :style="{ 'background': item.color ,'width':'50px','height':'20px'}" ></div>
-                    </template>
-                    <template  v-slot:[`item.action`]="{ item }">
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on }">
-                                <v-icon v-on="on" @click.prevent.stop="handleDetail(item)" style="font-size:20px">mdi-file-document-edit-outline</v-icon>
-                            </template>
-                            <span>Detail</span>
-                        </v-tooltip>
-                        <v-tooltip bottom>
-                            <template v-slot:activator="{ on }">
-                                <v-icon class="ml-2" v-if="item.common == 0" v-on="on" @click.prevent.stop="handleDelete(item)" style="font-size:20px">mdi-delete-outline</v-icon>
-                            </template>
-                            <span>Delete</span>
-                        </v-tooltip>
+                    <template v-slot:body>
+                        <draggable
+                            :list="listPriority"
+                            tag="tbody"
+                            :animation="200"
+                            @change="handleChangeLevel"
+                            >
+                            <tr v-for="item in listPriority" :key="item.id">
+                                <td>
+                                    <span class="name-project" style="color:#0000aa">
+                                        {{item.name}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <span>
+                                        {{item.description}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <v-icon :color="item.color" v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:18px">{{item.icon}}</v-icon>
+                                    <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="18" height="18">
+                                </td>
+                                <td>
+                                    <div :style="{ 'background': item.color ,'width':'50px','height':'20px'}" ></div>
+                                </td>
+                                <td>
+                                    <infoUser class="userInfo fs-13" :userId="item.userCreate" :roleInfo="{}" />
+                                </td>
+                                
+                                <td>
+                                    <span>
+                                        {{item.createAt}}
+                                    </span>
+                                </td>
+                                <td>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <v-icon v-on="on" @click.prevent.stop="handleDetail(item)" style="font-size:20px">mdi-file-document-edit-outline</v-icon>
+                                        </template>
+                                        <span>Detail</span>
+                                    </v-tooltip>
+                                    <v-tooltip bottom>
+                                        <template v-slot:activator="{ on }">
+                                            <v-icon class="ml-2" v-if="item.common == 0" v-on="on" @click.prevent.stop="handleDelete(item)" style="font-size:20px">mdi-delete-outline</v-icon>
+                                        </template>
+                                        <span>Delete</span>
+                                    </v-tooltip>
+                                </td>
+                            </tr>
+                        </draggable>
                     </template>
                 </v-data-table>
             </v-card>
@@ -87,11 +107,13 @@ import { util } from "@/plugins/util";
 import infoUser from "@/components/common/user/InfoUser";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import modalAddOrDetailPriority from "./ModalAddOrDetailPriority";
+import draggable from "vuedraggable";
 
 export default {
     components:{
         infoUser,
-        modalAddOrDetailPriority
+        modalAddOrDetailPriority,
+        draggable
     },
     name:"listPriority",
     computed:{
@@ -166,12 +188,53 @@ export default {
                 description: "",
                 icon: "",
                 color: "",
+                common: 0
             },
             prioritySelected:{}
 
         }
     },
     methods:{
+        handleChangeLevel(data){
+            let dataChange=[];
+            let min =0, max =0;
+            if (data.moved.oldIndex > data.moved.newIndex) {
+                min = data.moved.newIndex;
+                max = data.moved.oldIndex;
+            }else{
+                min = data.moved.oldIndex;
+                max = data.moved.newIndex;
+            }
+            
+            for (let i = min; i <= max ; i++) {
+                let item={};
+                item.id=this.listPriority[i].id;
+                item.level=i+1;
+                this.$set(this.listPriority[i],'level',i+1);
+                dataChange.push(item);
+            }
+
+            if (dataChange.length > 0) {
+                taskManagementApi
+                .updateLevelPriority({data:JSON.stringify(dataChange)})
+                .then(res => {
+                    if (res.status == 200) {
+                        let data={};
+                        data.key = "allPriority";
+                        data.value = this.listPriority;
+
+                        this.$snotifySuccess("Update level priority success!");
+                        this.$store.commit("taskManagement/addToTaskManagementStore",data); 
+                    }else{
+                        this.$snotifyError("", "Error! Have error !!!");
+                    }
+                })
+                .catch(err => {
+                    this.$snotifyError("", "Error! Have error !!!", err);
+                });
+            }
+
+        },
         handleCreate(){
             this.dataPriorityProps.name.value="";
             this.dataPriorityProps.description.value="";
@@ -194,6 +257,7 @@ export default {
             this.infoPriority.description=item.description;
             this.infoPriority.name=item.name;
             this.infoPriority.color=item.color;
+            this.infoPriority.common=item.common;
 
             this.statusDetail=true;
             this.$refs.modalAddOrDetailPriority.show();

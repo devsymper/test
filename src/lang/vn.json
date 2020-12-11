@@ -1428,6 +1428,7 @@
         "listIssueType":"Danh sách Issue type",
         "listWorkflow":"Danh sách Workflow",
         "listPriority":"Danh sách Priority",
+        "listActionPack":"Danh sách ActionPack",
         "requiredField":"Trường bắt buộc nhập",
         "detailProject":"Thông tin project",
         "addPeople":"Thêm thành viên",

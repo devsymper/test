@@ -1,18 +1,6 @@
 <template>
-    <div class="h-100" style="width:80%;margin:auto;">
-        <div class="d-flex  justify-space-between" style="height:40px">
-            <h1 class="ml-4">Access</h1>
-            <div class="mt-2 pr-4">
-                 <v-btn color="primary" depressed small class="mr-2 px-2"  @click="handleClickAddPeople" >
-                    {{$t("taskManagement.addPeople")}}
-                </v-btn>
-                  <v-btn depressed color="#eee" class="px-2" style="color:#111" @click="handleRoleManager" small >
-                    {{$t("taskManagement.managerRole")}}
-                </v-btn>
-            </div>
-        </div>
-        <!-- list user -->
-        <div style="height:calc(100% - 40px)">
+    <div class="h-100 w-100" >
+        <div style="height:100%">
              <v-card style="box-shadow:none">
                 <v-card-title>
                     <div>
@@ -31,6 +19,12 @@
                         hide-details
                         class="sym-small-size sym-style-input"
                     ></v-text-field>
+                    <v-btn color="primary" depressed small class="mx-2"  @click="handleClickAddPeople" >
+                        {{$t("taskManagement.addPeople")}}
+                    </v-btn>
+                    <v-btn depressed color="#eee" style="color:#111" @click="handleRoleManager" small >
+                        {{$t("taskManagement.managerRole")}}
+                    </v-btn>
                 </v-card-title>
                 <v-data-table
                     :headers="headers"

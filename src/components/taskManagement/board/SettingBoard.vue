@@ -79,4 +79,8 @@ export default {
     margin-left: auto;
     margin-right: 12px;
 }
+.tab-board >>>.v-tab
+{
+    justify-content: left;
+}
 </style>
