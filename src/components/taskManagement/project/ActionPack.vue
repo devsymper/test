@@ -31,11 +31,10 @@
 
         <v-dialog
             v-model="isShow"
-            persistent
             max-width="600px"
             scrollable
         >
-            <v-card>
+            <v-card min-height="500">
             <v-card-title>
                 <span class="fs-16">Thêm action pack</span>
             </v-card-title>
@@ -63,7 +62,7 @@
                     <div class="d-flex mt-2">
                         <div style="width:300px">
                             <span class="font-weight-medium">Đối tượng</span>
-                            <VuePerfectScrollbar style="height:200px" >
+                            <VuePerfectScrollbar style=" height:250px" >
                                 <div class="list-control-autocomplete" v-for="(obj,key) in listActionPackObject" :key="key">
                                     <div >{{obj.title}}</div>
                                     <v-list
@@ -78,8 +77,9 @@
                                             :key="i"
                                             @click="clickShowAction(item)"
                                             class="sym-control"
+                                            style="height: 30px;"
                                         >
-                                            <v-list-item-icon class="mr-2">
+                                            <v-list-item-icon class="mr-2" style="height:15px">
                                                 <v-icon size="15" v-if="item.icon">{{item.icon}}</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-content>
@@ -93,7 +93,7 @@
                         </div>
                         <div style="width:250px">
                             <span class="font-weight-medium">Hành động</span>
-                            <VuePerfectScrollbar style="height:200px" >
+                            <VuePerfectScrollbar style=" height:250px" >
                                 <v-list dense height="20">
                                         <v-list-item
                                             v-for="(item, i) in selectedItem.actions"

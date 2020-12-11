@@ -15,6 +15,7 @@
                 class="add-task-btn"
                 depressed
                 color="primary"
+                @click="showPopupCreateIssue"
                 >
                 Create
             </v-btn>
@@ -60,15 +61,21 @@
                 </v-list>
                 </v-menu>
             </div> -->
-
         </div>
+        <popup-issue
+            ref="popupIssue"
+        />
+        
     </div>
 </template>
 <script>
 import { appConfigs } from '../../../configs.js';
 import { taskManagementApi } from "@/api/taskManagement.js";
-
+import popupIssue from "../../../components/taskManagement/issue/popupIssue"
 export default {
+    components:{
+        popupIssue
+    },
     data(){
         return {
             items: [
@@ -81,6 +88,10 @@ export default {
         }
     },
     methods:{
+        showPopupCreateIssue(){
+            this.$refs.popupIssue.show();
+        }
+
         
     },
     created(){

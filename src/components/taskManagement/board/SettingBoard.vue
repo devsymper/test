@@ -70,6 +70,8 @@ export default {
 }
 .tab-board >>>.v-tab
 {
+    height: 35px;
     justify-content: left;
+    text-transform: unset;
 }
 </style>
