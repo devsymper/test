@@ -19,7 +19,7 @@ export default [
         children: [
             {
                 path: "projects/:id/kanban-board",
-                name: "TaskManagement-KanbanBoard",
+                name: "KanbanBoard",
                 meta:{group:'home'},
                 components:{
                     TaskManagement: () => import ('../../views/taskManagement/board/KanbanBoard.vue'),
@@ -52,7 +52,7 @@ export default [
             },
             {
                 path: "workflow",
-                // meta:{group:'projectSetting'},
+                meta:{group:'projectSetting'},
                 name: "listWorkflow",
                 components:{
                     TaskManagement: () => import ('../../views/taskManagement/workflow/List.vue')
@@ -133,6 +133,8 @@ export default [
             {
                 path: "priorities",
                 name: "priority",
+                meta:{group:'projectSetting'},
+
                 components:{
                     TaskManagement: () => import ('../../views/taskManagement/priority/List.vue')
                 }

@@ -34,7 +34,7 @@
                                 <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:24px">{{item.icon}}</v-icon>
                                 <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="24" height="24">
                             </div>
-                            <span class="name-project pt-1 pl-2" style="color:#0000aa">
+                            <span class="name-project pt-1 pl-2" style="color:#0000aa" @click.prevent.stop="onCategoryClick(item.id)">
                                 {{item.name}}
                             </span>
                         </div>
@@ -176,6 +176,12 @@ export default {
             this.statusDetail=true;
             this.$refs.modalAddOrDetailCategory.show();
 
+        },
+        /**
+         * Click vào name của category để mở chi tiết các project trong category đó
+         */
+        onCategoryClick(id){
+            this.$router.push("/task-management/projects")
         },
         handleDeleteCategory(item){
             this.categorySelected=item;

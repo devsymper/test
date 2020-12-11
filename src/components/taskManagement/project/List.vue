@@ -16,7 +16,7 @@
                         hide-details
                         class="sym-small-size sym-style-input"
                     ></v-text-field>
-                    <v-btn class="px-1 ml-1" small solo depressed @click="handleCreate" >
+                    <v-btn class="px-2 ml-1" small solo depressed @click="handleCreate" >
                         <span>Create project</span>
                     </v-btn>
                 </v-card-title>

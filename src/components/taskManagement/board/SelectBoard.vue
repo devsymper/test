@@ -144,6 +144,7 @@ export default {
         },
         onItemClick(item){
             this.$evtBus.$emit("selected-item-board", item);
+            this.$emit("selected-item-board", item);
             this.hide();
         },
         handleAddBoard(){

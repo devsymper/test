@@ -17,6 +17,7 @@ export default {
         }
     },
     created(){
+        
         this.$store.dispatch("taskManagement/getAllCategory");
         this.$store.dispatch("taskManagement/getAllProject");
     }

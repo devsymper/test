@@ -413,10 +413,12 @@ export default {
             let self=this;
             let id=this.$route.params.id;
             if (id) {
-                let listBoard =await taskManagementApi.getListBoardInProject(id);
-                if (listBoard.status==200 && listBoard.data) {
-                    self.$store.commit("taskManagement/setListBoardInProject", listBoard.data.listObject);
-                }
+                taskManagementApi.getListBoardInProject(id).then(res=>{
+                    if (res.status == 200) {
+                        self.$store.commit("taskManagement/setListBoardInProject", res.data.listObject);
+                    }
+                });
+                
             }
         },
         setBoardCurrent(){
@@ -429,7 +431,7 @@ export default {
            
         }
     },
-    async created(){
+    created(){
         let self = this;
         this.$evtBus.$on('selected-item-board', (data) =>{
 			if (data.id) {
@@ -437,13 +439,12 @@ export default {
 			}else{
 			}
         });
-        await this.getListBoard();
         this.setBoardCurrent();
-       
-  
+
         
     },
     activated(){
+        this.getListBoard();
        // this.toggleMainContentLoader(false);
         let breadcrumbs = [
                 {
@@ -463,6 +464,29 @@ export default {
                 },
             ]
         this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
+        let id=this.$route.params.id;
+        let self = this;
+        if (id) {
+            let allProject=this.$store.state.taskManagement.allProject;
+            let project=allProject.find(element => element.id==id);
+            if (project) {
+                self.$store.commit("taskManagement/setCurrentProject", project);
+            }else{ // call api get detail project
+                taskManagementApi
+                    .getDetailProject(id)
+                    .then(res => {
+                        if (res.status == 200) {
+                            self.$store.commit("taskManagement/setCurrentProject", res.data);
+                        }else{
+                            self.$snotifyError("", "Can not get detail project with id:"+id);
+                        }
+                    })
+                    .catch(err => {
+                        self.$snotifyError("", "Can not get detail project with id:"+id);
+                    })
+                    .always(() => {});
+            }
+        }
     }
 };
 </script>

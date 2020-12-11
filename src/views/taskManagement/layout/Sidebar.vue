@@ -18,8 +18,8 @@
                             <div class="project-info" @click="showAllProject">
                                 <img height="25px" src="https://symperv01.atlassian.net/secure/projectavatar?pid=10035&avatarId=10416&size=xxlarge" />
                                 <div class="project-name" v-if="!mini">
-                                    <div>hoang tesst</div>
-                                    <div>đây là 1 project</div>
+                                    <div>{{sCurrentProject.name}}</div>
+                                    <div>{{sCurrentProject.description}}</div>
                                 </div>
                                 <!-- <v-icon style="height:24px;" v-if="!mini">mdi-chevron-down</v-icon> -->
                             </div>
@@ -75,7 +75,7 @@
             </div>
         </transition>
         
-        <SelectBoard ref="SelectBoard"/>
+        <SelectBoard ref="SelectBoard" @selected-item-board="afterSelectBoard"/>
         <ProjectPopup ref="projectPopupView"/>
     </div>
 </template>
@@ -111,7 +111,12 @@ export default {
         SelectBoard
     },
     computed: {
-        
+        sCurrentProject(){
+            return this.$store.state.taskManagement.currentProject
+        },
+        sTaskManagement(){
+            return this.$store.state.taskManagement
+        }
     },
     watch:{
         mini(vl){
@@ -139,6 +144,9 @@ export default {
     },
     
     methods: {
+        afterSelectBoard(board){
+            this.menu.workspace1.items[0].title = board.name
+        },
         checkShowSideBar(){
             if(!this.isExpand){
                 return this.drawer

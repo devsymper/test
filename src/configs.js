@@ -107,11 +107,6 @@ var configs = {
                         icon: 'mdi-view-dashboard-variant-outline',
                     },
                     {
-                        title:"RoadMap",
-                        icon: 'mdi-view-dashboard-variant-outline',
-                        url:"/projects/:id/kanban-board"
-                    },
-                    {
                         title:"Kanban board",
                         icon: 'mdi-view-week-outline',
                         url:"/task-management/projects/:id/kanban-board"
@@ -125,11 +120,6 @@ var configs = {
                         title:"Version",
                         icon: 'mdi-shield-check-outline',
                         url:"/task-management/projects/:id/versions"
-                    },
-                    {
-                        title:"Report",
-                        icon: 'mdi-chart-bar',
-                        url:"/task-management/projects/:id/report"
                     },
                 ]
             },
@@ -180,6 +170,18 @@ var configs = {
                         title:"Issue type",
                         icon: 'mdi-view-week-outline',
                         url:"/task-management/projects/:id/settings/issuetypes"
+                    },
+                    {
+                        name:'workflow',
+                        title:"workflow",
+                        icon: 'mdi-view-week-outline',
+                        url:"/task-management/workflow"
+                    },
+                    {
+                        name:'priority',
+                        title:"Priority",
+                        icon: 'mdi-view-week-outline',
+                        url:"/task-management/priorities"
                     }
                 ]
             }

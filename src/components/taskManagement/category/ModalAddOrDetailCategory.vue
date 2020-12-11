@@ -2,7 +2,6 @@
     <v-dialog
         v-if="isShow"
         v-model="isShow"
-        persistent
         max-width="500px"
         scrollable
     >
