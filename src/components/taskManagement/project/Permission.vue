@@ -2,7 +2,7 @@
     <div class="w-100 h-100 pl-1">
         <v-card style="box-shadow:none">
             <v-card-title>
-                {{$t("taskManagement.listActionPack")}}
+                {{$t("taskManagement.listPermission")}}
                 <v-spacer></v-spacer>
                 <v-text-field
                     v-model="search"
@@ -16,38 +16,37 @@
                     class="sym-small-size sym-style-input"
                 ></v-text-field>
                 <v-btn small class="px-1 ml-1" solo depressed @click="handleCreate">
-                    <span>Create action pack</span>
+                    <span>Create permission</span>
                 </v-btn>
             </v-card-title>
-            <v-data-table
+            <!-- <v-data-table
                 :headers="headers"
                 :items="listActionPack"
                 :search="search"
                 hide-default-footer
                 class="table-list-category"
             >
-            </v-data-table>
+            </v-data-table> -->
         </v-card>
 
         <v-dialog
             v-model="isShow"
-            persistent
             max-width="600px"
             scrollable
         >
             <v-card>
             <v-card-title>
-                <span class="fs-16">Thêm action pack</span>
+                <span class="fs-16">Thêm permission</span>
             </v-card-title>
             <v-card-text class="pb-0">
                 <v-container class="p-0">
                     <div>
                         <form-tpl
-                        :allInputs="actionPackProps"/>
+                        :allInputs="permissionProps"/>
                     </div>
                     <!-- div search -->
                     <div class=" mt-2 d-flex justify-space-between">
-                        <span class="font-weight-medium pt-1">Cấu hình quyền truy cập</span>
+                        <span class="font-weight-medium pt-1">Lựa chọn action pack</span>
                         <v-text-field
                             v-on:input="onSearch($event)"
                             append-icon="mdi-layers-search-outline"
@@ -60,63 +59,28 @@
                             class="sym-small-size sym-style-input"
                         ></v-text-field>
                     </div>
-                    <div class="d-flex mt-2">
-                        <div style="width:300px">
-                            <span class="font-weight-medium">Đối tượng</span>
-                            <VuePerfectScrollbar style="height:200px" >
-                                <div class="list-control-autocomplete" v-for="(obj,key) in listActionPackObject" :key="key">
-                                    <div >{{obj.title}}</div>
-                                    <v-list
-                                        dense
-                                    >
-                                        <v-list-item-group
-                                        v-model="selectedIndexItem"
-                                        color="primary"
-                                        >
-                                        <v-list-item
-                                            v-for="(item, i) in obj.children"
-                                            :key="i"
-                                            @click="clickShowAction(item)"
-                                            class="sym-control"
-                                        >
-                                            <v-list-item-icon class="mr-2">
-                                                <v-icon size="15" v-if="item.icon">{{item.icon}}</v-icon>
-                                            </v-list-item-icon>
-                                            <v-list-item-content>
-                                            <v-list-item-title v-text="item.title"></v-list-item-title>
-                                            </v-list-item-content>
-                                        </v-list-item>
-                                        </v-list-item-group>
-                                    </v-list>
-                                </div>
-                            </VuePerfectScrollbar>
-                        </div>
-                        <div style="width:250px">
-                            <span class="font-weight-medium">Hành động</span>
-                            <VuePerfectScrollbar style="height:200px" >
-                                <v-list dense height="20">
-                                        <v-list-item
-                                            v-for="(item, i) in selectedItem.actions"
-                                            :key="i"
-                                            dense
-                                        >
-                                        <v-tooltip bottom>
-                                            <template v-slot:activator="{ on }">
-                                                <v-list-item-content v-on="on" class="pa-0" style="font-size:13px">
-                                                    <v-checkbox
-                                                        dense
-                                                        class="checkBox"
-                                                        v-model="item.isCheck"
-                                                        :label="item.title"
-                                                    ></v-checkbox>
-                                                </v-list-item-content>
-                                            </template>
-                                            <span>{{item.title}}</span>
-                                        </v-tooltip>
-                                        </v-list-item>
-                                </v-list>
-                            </VuePerfectScrollbar>
-                        </div>
+                    <div class="mt-2">
+                        <v-list dense>
+                            <v-list-item-group
+                                color="primary"
+                                class="list-control-autocomplete"
+                            >
+                                <v-list-item
+                                    v-for="(item, i) in listActionPack"
+                                    :key="i"
+                                    class="sym-control pl-0"
+                                >
+                                    <v-list-item-content style="font-size:13px">
+                                        <v-checkbox
+                                            class="checkBox"
+                                            v-model="item.isCheck"
+                                            :label="item.name"
+                                        ></v-checkbox>
+                                        <div class="pa-0 pl-8 " style="color:#888">{{item.description}}</div>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list-item-group>
+                        </v-list>
                     </div>
                 </v-container>
             </v-card-text>
@@ -149,7 +113,6 @@
                 >
                     {{$t("common.close")}}
                 </v-btn>
-            
             </v-card-actions>
             </v-card>
         </v-dialog>
@@ -169,11 +132,39 @@ export default {
         infoUser,
         VuePerfectScrollbar
     },
+    computed:{
+        listActionPack(){
+            let allActionPack = [
+                {
+                    id  : 1,
+                    name : "Nhóm hành động của admin",
+                    description : "Các hành động về việc config quản lý hệ thống task management",
+                    isCheck : false
+                },
+                {
+                    id  :2,
+                    name : "Nhóm hành động của admin",
+                    description : "Các hành động về việc config quản lý hệ thống task management",
+                    isCheck : false
+                },
+                {
+                    id  : 3,
+                    name : "Nhóm hành động của admin",
+                    description : "Các hành động về việc config quản lý hệ thống task management",
+                    isCheck : false
+                },
+                {
+                    id  : 4,
+                    name : "Nhóm hành động của admin",
+                    description : "Các hành động về việc config quản lý hệ thống task management",
+                    isCheck : false
+                },
+            ]
+            return allActionPack
+        },
+    },
     data(){
         return{
-            selectedIndexItem:0,
-            selectedItem:{},
-            listActionPackObject:{},
             isLoading:false,
             isShow:false,
             search:'',
@@ -189,10 +180,9 @@ export default {
                 { text: this.$t("taskManagement.table.createAt"), value: "createAt" },
                 { text: "", value: "action" },
             ],
-            listActionPack:[],
-            actionPackProps:{
+            permissionProps:{
                 name : { 
-                    title: "Tên action pack",
+                    title: "Tên permission",
                     type: "text",
                     value: '',
                     validateStatus:{
@@ -226,9 +216,6 @@ export default {
         }
     },
     methods:{
-        clickShowAction(item){
-            this.selectedItem = item;
-        },
         handleCreate(){
             this.isShow = true;
         },
@@ -241,10 +228,7 @@ export default {
         },
     },
     created(){
-        this.listActionPackObject = cloneObjectActionControls();
-        this.selectedItem = this.listActionPackObject['project']['children']['project'];
-    },
-
+    }
 
 }
 </script>

@@ -1305,6 +1305,7 @@
         "listWorkflow":"List Workflow",
         "listPriority":"List Priority",
         "listActionPack":"List ActionPack",
+        "listPermission":"List Permission",
         "detailProject":"Detail project",
         "requiredField":"Indicates required field",
         "addPeople":"Add people",

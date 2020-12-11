@@ -4,6 +4,7 @@ const defaultState = {
     allStatusCategory: [],
     allRole: [],
     allPriority: [],
+    listActionPack:[],
     headerBreadcrumbs:[],
     currentProject:{},
     listBoardInProject:[],
