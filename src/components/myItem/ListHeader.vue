@@ -2,7 +2,6 @@
   <div class="w-100 d-flex justify-space-between py-2">
     <div class="pl-3 symper-title" v-if="!sideBySideMode">
       {{headerTitle}}
-      <span class="fs-13" style="color:#00000060">({{$t("myItem.totalTask")}}: {{totalObject}})</span>
     </div>
     <div
       :class="{
@@ -253,11 +252,7 @@ export default {
     TaskListFilter: TaskListFilter,
     "symper-document-selec": SymperDocSelect
   },
-  props: {
-    totalObject:{
-      type:Number,
-      default:0
-    },
+  props: {    
     changeStatusMoreApproval:{
       type:Boolean,
       default:false,

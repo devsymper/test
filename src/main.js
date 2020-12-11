@@ -11,6 +11,7 @@ import {
 import BaView from "./views/layout/BAView";
 import EndUserView from "./views/layout/EndUserView";
 import ContentOnlyView from "./views/layout/ContentOnlyView";
+import Preloader from "@/components/common/Preloader";
 import Notifications from 'vue-notification'
 import VueMoment from "vue-moment";
 import {
@@ -28,6 +29,7 @@ Vue.component('end-user-view', EndUserView);
 Vue.component('content-only-view', ContentOnlyView);
 Vue.use(VueRx)
 Vue.use(uploader)
+Vue.component('preloader', Preloader);
 Vue.mixin({
     methods: {
         $bindAction(actionDef, param = {}) {
