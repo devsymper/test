@@ -19,7 +19,7 @@
                         hide-details
                         class="sym-small-size sym-style-input"
                     ></v-text-field>
-                    <v-btn color="primary" depressed small class="mx-2"  @click="handleClickAddPeople" >
+                    <v-btn depressed small class="mx-2"  @click="handleClickAddPeople" >
                         {{$t("taskManagement.addPeople")}}
                     </v-btn>
                     <v-btn depressed color="#eee" style="color:#111" @click="handleRoleManager" small >

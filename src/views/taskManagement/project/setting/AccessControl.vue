@@ -27,7 +27,7 @@
                 />
             </v-tab-item>
             <v-tab-item>
-                
+                <permission />
             </v-tab-item>
             <v-tab-item>
                 <accessProject 
@@ -43,19 +43,19 @@
             
         </v-tabs>
     </div>
- 
-
 </template>
 
 <script>
 import accessProject from "@/components/taskManagement/project/Access";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import ActionPack from '../../../../components/taskManagement/project/ActionPack.vue';
+import Permission from '../../../../components/taskManagement/project/Permission.vue';
 
 export default {
     components:{
         accessProject,
         ActionPack,
+        Permission,
     },
     data(){
         return{

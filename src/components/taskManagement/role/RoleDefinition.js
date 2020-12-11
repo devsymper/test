@@ -3,7 +3,7 @@ import { util } from "@/plugins/util.js";
 const actionDefault = [
     {
         "name":"add",
-        "title":"Add",
+        "title":"Thêm",
         "isCheck":false
     },
     {
@@ -25,7 +25,7 @@ const actionDefault = [
 const actionDefaultIssue = [
     {
         "name":"add",
-        "title":"Add",
+        "title":"Thêm",
         "isCheck":false
     },
     {
@@ -113,32 +113,32 @@ const objectActionControls = { // mức ngoài cùng là group
             "project":{
                 "title":"Project",
                 "icon":"mdi-file-table-box-outline",
-                "action":actionDefault
+                "actions":util.cloneDeep(actionDefault)
             },
             "projectCategory":{
                 "title":"Project category",
                 "icon":"mdi-file-tree-outline",
-                "action":actionDefault
+                "actions":util.cloneDeep(actionDefault)
             },
             "projectSetting":{
                 "title":"Project setting",
                 "icon":"mdi-cog-outline",
-                "action":actionDefault
+                "actions":util.cloneDeep(actionDefault)
             },
             "people":{
                 "title":"People",
                 "icon":"mdi-account-multiple-outline",
-                "action":actionDefault
+                "actions":util.cloneDeep(actionDefault)
             },
             "kanbanBoard":{
                 "title":"Kanban board",
                 "icon":"mdi-bulletin-board",
-                "action":actionDefault
+                "actions":util.cloneDeep(actionDefault)
             },
             "sprint":{
                 "title":"Sprint",
                 "icon":"mdi-animation-outline",
-                "action":actionDefault
+                "actions":util.cloneDeep(actionDefault)
             },
         }
     },
@@ -148,27 +148,27 @@ const objectActionControls = { // mức ngoài cùng là group
             "issueType":{
                 "title":"Issue type",
                 "icon":"mdi-clipboard-text-outline",
-                "action":actionDefault
+                "actions":util.cloneDeep(actionDefault)
             },
             "subTask":{
                 "title":"Sub task",
                 "icon":"mdi-subtitles-outline",
-                "action":actionDefault
+                "actions":util.cloneDeep(actionDefault)
             },
             "taskLifeCycle":{
                 "title":"Task life cycle",
                 "icon":"",
-                "action":actionDefault
+                "actions":util.cloneDeep(actionDefault)
             },
             "field":{
                 "title":"Field",
                 "icon":"",
-                "action":actionDefault
+                "actions":util.cloneDeep(actionDefault)
             },
             "timeTracking":{
                 "title":"Time tracking",
                 "icon":"",
-                "action":[
+                "actions":[
                     {
                         "name":"config",
                         "title":"Config",
@@ -179,27 +179,27 @@ const objectActionControls = { // mức ngoài cùng là group
             "issueLink":{
                 "title":"Issue link",
                 "icon":"",
-                "action":actionDefault
+                "actions":util.cloneDeep(actionDefault)
             },
             "statuses":{
                 "title":"Status",
                 "icon":"",
-                "action":actionDefault
+                "actions":util.cloneDeep(actionDefault)
             },
             "priorities":{
                 "title":"Priorities",
                 "icon":"",
-                "action":actionDefault
+                "actions":util.cloneDeep(actionDefault)
             },
             "issue":{
                 "title":"Issue",
                 "icon":"",
-                "action":actionDefaultIssue
+                "actions":util.cloneDeep(actionDefaultIssue)
             },
             "issueFieldConfig":{
                 "title":"issue field config",
                 "icon":"",
-                "action":[
+                "actions":[
                     {
                         "name":"config",
                         "title":"Config",
@@ -216,12 +216,12 @@ const objectActionControls = { // mức ngoài cùng là group
             "projectRole":{
                 "title":"Project role",
                 "icon":"",
-                "action":actionDefault
+                "actions":util.cloneDeep(actionDefault)
             },
             "permission":{
                 "title":"Permission",
                 "icon":"",
-                "action":actionDefaultIssue
+                "actions":util.cloneDeep(actionDefault)
             },
         }
 
@@ -232,7 +232,7 @@ const objectActionControls = { // mức ngoài cùng là group
             "reportConfig":{
                 "title":"Report config",
                 "icon":"",
-                "action":[
+                "actions":[
                     {
                         "name":"config",
                         "title":"Config",
