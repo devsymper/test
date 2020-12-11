@@ -347,6 +347,10 @@ export default {
             return this.$store.state.document.submit[this.keyInstance].validateMessage   
         }
     },
+    
+    destroyed(){
+        ClientSQLManager.closeDB(this.keyInstance);
+    },
     data() {
         return {
             controlInfinity:[],
@@ -798,13 +802,12 @@ export default {
                     thisCpn.$refs.datePicker.closePicker();
                 }
                 if (
+                    thisCpn.$refs.timeInput &&
                     !$(evt.target).hasClass("s-control-time") &&
                     !$(evt.target).hasClass("card-time-picker") &&
                     $(evt.target).closest(".card-time-picker").length == 0
                 ) { 
-                    setTimeout(() => {
                         thisCpn.$refs.timeInput.hide();
-                    }, 20);
                 }
                 if (
                     !$(evt.target).hasClass("validate-icon") &&
@@ -2091,12 +2094,11 @@ export default {
                     
                     // nếu submit từ form sub submit thì ko rediect trang
                     // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
+                    ClientSQLManager.closeDB(thisCpn.keyInstance);
                     
                     if(thisCpn.$getRouteName() == 'submitDocument' && thisCpn.$route.params.id == thisCpn.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                     }
-                    
-                    
                 }
                 else{
                     thisCpn.$snotify({
@@ -2142,6 +2144,7 @@ export default {
                         let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.updateFormulas);
                         thisCpn.sDocumentSubmit.updateFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
                     }
+                    ClientSQLManager.closeDB(thisCpn.keyInstance);
                     if(thisCpn.$getRouteName() == 'updateDocumentObject')
                      thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
@@ -2295,12 +2298,7 @@ export default {
                 instance: this.keyInstance
             });
         },
-        addSQLInstanceDBToStore(SQLDBInstance) {
-            this.$store.commit("document/addInstanceSubmitDB", {
-                instance: this.keyInstance,
-                sqlLite: SQLDBInstance
-            });
-        },
+        
         addToListInputInDocument(name,control){
              this.$store.commit(
                             "document/addToListInputInDocument",
