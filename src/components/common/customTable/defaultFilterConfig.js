@@ -97,7 +97,7 @@ function getFilterConfigs(getDataMode = '', filterData) {
 }
 
 function getOptionForGetList(configs, columns, filterData) {
-    return {
+    let options = {
         filter: getFilterConfigs(configs.getDataMode, filterData),
         sort: getSortConfigs(filterData),
         search: configs.searchKey,
@@ -107,6 +107,11 @@ function getOptionForGetList(configs, columns, filterData) {
         distinct: configs.distinct ? configs.distinct : false,
         formulaCondition: configs.conditionByFormula
     };
+
+    if(configs.moreApiParam){
+        options = Object.assign(options, configs.moreApiParam); 
+    }
+    return options;
 }
 
 

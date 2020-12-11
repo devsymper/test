@@ -1,6 +1,5 @@
 <template>
     <div  class="w-100">
-        
         <v-select
             class="s-select-page-size  float-left"
             style="width:75px"
@@ -28,7 +27,7 @@
                 @input="onInputPage"
             ></v-pagination>
         </div>
-        <div class="mr-2 fs-13  float-right" style="line-height: 25px">
+        <div class="mr-2 fs-13  float-right" style="line-height: 25px" v-show="showRange">
             {{$t('common.display')}} 
             <span class="font-weight-medium">{{rowRange}}</span> 
             {{$t('common.of')}} 
@@ -76,6 +75,10 @@ export default {
         totalVisible:{
             type:Number,
             default:7
+        },
+        showRange: {
+            type: Boolean,
+            default: true
         }
     },
     watch:{
