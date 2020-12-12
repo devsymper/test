@@ -2439,17 +2439,20 @@ export default {
             let inputControl = formulasInstance.getInputControl();
             let dataInput = {};
             for(let inputControlName in inputControl){
-                if(inputControlName == e.controlName){
-                    dataInput[inputControlName] = $(e.e.target).val();
-                }
-                else{
-                    if(this.sDocumentSubmit.listInputInDocument.hasOwnProperty(inputControlName)){
-                        let controlIns = getControlInstanceFromStore(this.keyInstance,inputControlName)
-                        let valueInputControl = controlIns.value;
-                        if(controlIns.type == 'inputFilter'){
-                            valueInputControl = valueInputControl.split(',')
+                if(inputControlName == 'document_object_id'){
+                    dataInput[inputControlName]=this.docObjId;
+                }else{
+                    if(inputControlName == e.controlName){
+                        dataInput[inputControlName] = $(e.e.target).val();
+                    } else {
+                        if(this.sDocumentSubmit.listInputInDocument.hasOwnProperty(inputControlName)){
+                            let controlIns = getControlInstanceFromStore(this.keyInstance,inputControlName)
+                            let valueInputControl = controlIns.value;
+                            if(controlIns.type == 'inputFilter'){
+                                valueInputControl = valueInputControl.split(',')
+                            }
+                            dataInput[inputControlName] = valueInputControl;
                         }
-                        dataInput[inputControlName] = valueInputControl;
                     }
                 }
             }
