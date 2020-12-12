@@ -254,7 +254,6 @@ export default {
                 }
             }
             if (data.length > 0) {
-                let 
             }
 
             console.log("data",data);
