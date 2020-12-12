@@ -552,6 +552,9 @@ export default {
             }
         });
     },
+    activated(){
+        this.getData(false, false,true,true,false);
+    },
     methods: {
         getListByPage(data){
             this.page = data.page;
