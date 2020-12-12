@@ -3,6 +3,7 @@
         <v-dialog
         scrollable
         v-model="isShowModelSaveDoc"
+        persistent
         width="800"
         content-class="s-dialog"
         >
@@ -255,7 +256,7 @@ export default {
                 
             }
             this.$emit("save-doc-action");
-            this.hideDialog();
+            this.isShowModelSaveDoc = false;
         },
         /**
          * Hàm kiểm tra tiêu đề của doc đã điền hay chưa, nếu chưa thì báo lỗi

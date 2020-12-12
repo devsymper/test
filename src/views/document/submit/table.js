@@ -7,6 +7,7 @@ import { checkControlPropertyProp, getControlInstanceFromStore, getControlType, 
 import { SYMPER_APP } from './../../../main.js'
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
 import { util } from '../../../plugins/util';
+var numbro = require("numbro");
 
 class UserEditor extends Handsontable.editors.TextEditor {
     createElements() {
@@ -1569,6 +1570,7 @@ export default class Table {
         else{
             if(control.type == 'number' && (value === "" || value === undefined || value === null)){
                 td.textContent = 0;
+                td.style.textAlign = 'right'
             }
         }
         thisObj.getColumnSum(hotInstance, row, column, td, ele, prop)
@@ -1576,6 +1578,7 @@ export default class Table {
             ele.find('.validate-icon').remove();
         }
 
+        // thisObj.getColumnSum(hotInstance, row, column, td, ele, prop,control)
     }
 
     /**
@@ -1587,7 +1590,7 @@ export default class Table {
      * @param {*} ele 
      * @param {*} prop 
      */
-    getColumnSum(hotInstance, row, column, td, ele, prop){
+    getColumnSum(hotInstance, row, column, td, ele, prop, control){
         if(this.tableHasRowSum && row == hotInstance.countRows() - 1){
             ele.find('.validate-icon').remove();
             if(Object.keys(this.columnHasSum).includes(prop)){
@@ -1598,6 +1601,8 @@ export default class Table {
                     b = Number(b);
                     return a+b;
                 },0)
+                sum = control.formatNumberValue(sum);
+                td.style.textAlign = 'right'
                 td.textContent = sum;
             }
         }

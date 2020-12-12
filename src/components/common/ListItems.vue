@@ -364,6 +364,9 @@ export default {
 				this.$emit("open-panel");
 				this.showSearchBox = false
             }
+            else{
+                this.$emit("close-panel");
+            }
         },
         getDataUrl(){   
 			this.page = 1

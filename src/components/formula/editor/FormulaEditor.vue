@@ -74,7 +74,6 @@ import SymperMonacoEditor from "./SymperMonacoEditor";
 export default {
     created(){
         this.$store.dispatch('document/setListDocuments');
-        ClientSQLManager.createDB(this.instance);
     },
     data(){
         return {
@@ -197,6 +196,12 @@ export default {
     methods:{
         toggleDebugView(){
             this.showDebugView = !this.showDebugView;
+            if(this.showDebugView){
+                ClientSQLManager.createDB(this.instance);
+            }
+            else{
+                ClientSQLManager.closeDB(this.instance);
+            }
             this.debugResultHeight = "calc(100% - "+this.height+" - 30px)"
             this.inputViewHeight = this.height;
             this.columnDefs = [];
