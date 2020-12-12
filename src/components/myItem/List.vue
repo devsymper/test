@@ -546,6 +546,11 @@ export default {
     mounted() {
         let self = this;
         self.reCalcListTaskHeight();
+        this.$evtBus.$on('app-receive-remote-msg', (payload) => {
+            if(!self._inactive){
+                self.getData(false, false,true,true,false);
+            }
+        });
     },
     methods: {
         getListByPage(data){
@@ -844,11 +849,14 @@ export default {
          * @param {Boolean} cache có ưu tiên dữ liệu từ cache hay ko
          *
          */
-        getData(columns = false, cache = false, applyFilter = true, lazyLoad = true ) {
+        getData(columns = false, cache = false, applyFilter = true, lazyLoad = true, showLoading = true ) {
             if (this.loadingTaskList) {
                 return;
             }
-            this.loadingTaskList = true;
+
+            if(showLoading){
+                this.loadingTaskList = true;
+            }
             let self = this;
 
             if (Object.keys(this.tableFilter.allColumn).length==0 ) {
