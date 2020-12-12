@@ -8,13 +8,17 @@
 					</v-icon>
 					<span class="ml-2">{{item.title}}</span>
 				</div>
-				<span class="fs-10" style="position:absolute;left:9px; top:11px">{{i+1}}</span>
+				<span class="fs-10" style="position:absolute;left:9px; top:10px">{{i+1}}</span>
 				<span class="fs-10 font-weight-light mt-1 "><v-icon x-small> mdi-information-outline</v-icon> <span class="ml-1">{{item.subTitle}}</span></span>
 			</div>
 		</div>
 		<div class="list-item flex-grow-1 w-100 h-100">
 			<ListService 
 				v-if="active == 'serviceManagement' "
+				:containerHeight="containerHeight"
+			/>
+			<ListServer 
+				v-if="active == 'serverManagement' "
 				:containerHeight="containerHeight"
 			/>
 			<EnvManagement 
@@ -30,10 +34,12 @@
 import { util } from "@/plugins/util.js";
 import EnvManagement from './EnvManagement'
 import ListService from './ListService'
+import ListServer from './ListServer'
 export default {
 	components:{
 		EnvManagement,
-		ListService
+		ListService,
+		ListServer
 	},
 	created(){
 		this.$store.dispatch("app/getAllBA");
@@ -50,8 +56,13 @@ export default {
 			listType:[
 				{
 					title: "Quản lí service",
-					subTitle: "Service  là tập hợp các service trong hệ thống. Mỗi service đảm nhiệm một chức năng riêng trong hệ thống ",
+					subTitle: "Danh sách tập trung các service trong hệ thống. Mỗi service đảm nhiệm một chức năng riêng trong hệ thống ",
 					action: "serviceManagement"
+				},
+				{
+					title: "Quản lí server",
+					subTitle: "Danh sách tập trung các server trong hệ thống. Mỗi server đảm nhiệm chức năng lưu trữ các service trong hệ thống ",
+					action: "serverManagement"
 				},
 				{
 					title: "Quản lí môi trường",

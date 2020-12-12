@@ -20,6 +20,14 @@ export default class ActionControl extends Control {
                     instance: this.curParentInstance
                 });
             }
+            if (this.controlFormulas.hasOwnProperty('update')) {
+                let formulas = this.controlFormulas.update.instance;
+                store.commit("document/addToDocumentSubmitStore", {
+                    key: 'updateFormulas',
+                    value: formulas,
+                    instance: this.curParentInstance
+                });
+            }
         } else {
             this.ele.addClass('d-none');
         }

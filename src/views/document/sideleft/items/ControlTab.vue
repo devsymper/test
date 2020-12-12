@@ -143,7 +143,7 @@ export default {
         panel: [0, 1, 2, 3, 4],
         listControlPrint:   ['labelPrint'],
         listControlDisplay: ['label','image','qrCode'],
-        listControlInput:   ['textInput','number','date','dateTime','time','month','select','combobox','department','documentSelect','phone','email','currency','radio','checkbox','color','percent','user','inputFilter','hidden'],
+        listControlInput:   ['textInput','richText','number','date','dateTime','time','month','select','combobox','department','documentSelect','phone','email','currency','radio','checkbox','color','percent','user','inputFilter','hidden'],
         listControlLayout:  ['table','panel','fileUpload','tabPage'],
         listControlReport:  ['dataFlow','report','approvalHistory','trackingValue'],
         listControlAction:  ['submit','reset','draft']

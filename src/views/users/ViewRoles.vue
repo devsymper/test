@@ -3,15 +3,19 @@
         <v-row style="margin-top:-13px; margin-left:-20px" class="mb-2">
             <v-col>
                 <v-icon class="fs-16 fw-430 mr-1 ml-1 fw-400 ">mdi mdi-account-circle-outline</v-icon>
-                <span class="fw-430 fs-16">Chi tiết phân quyền cho user</span>
+                <span class="fw-430 fs-16">Chi tiết phân quyền cho vị trí: 
+					<span style="color: rgb(211, 109, 36)">
+						{{roleName}}
+					</span>
+				</span>
             </v-col>
         </v-row>
-		<v-row v-if="!viewDetail" style="margin-top:-20px">
+		<v-row  style="margin-top:-15px; margin-bottom:-15px">
 			<v-col class="col-md-3">
 				<span class="fs-13">Permission có quyền: </span>
 			</v-col>
-			<v-col class="col-md-9" style="float:right; ">
-				<v-sheet  max-width="90%" class="mb-3" >
+			<v-col class="col-md-9" style="margin-top:-5px" >
+				<v-sheet  max-width="99%" class="mb-3" >
 					<v-slide-group multiple prev-icon="mdi-minus">
 						<template v-slot:next>
 							<div class="slider-user-button slider-button-right"> 
@@ -24,13 +28,13 @@
 							</div>
 						</template>
 						<v-slide-item class="item-user"
-							v-for="(item, permissionIdx) in allPermission "  
-							:key="permissionIdx">
+							v-for="item in allPermission "  
+							:key="item.id">
 							<div class="d-flex justify-start ml-3 mr-3 slider-user ">
-								<v-list-item-group multiple v-if="item.active" >
+								<v-list-item-group multiple >
 								<v-list-item dense style="background:rgba(27,24,111,0.1); border-radius:4px">
 									<v-list-item-content 
-										@click="getActionAndObject(item.id)" 
+										@
 										style="margin-left: 0.5; color:black" 
 										class="item-title fs-13">
 										{{item.name}}
@@ -43,15 +47,8 @@
            		</v-sheet>
 			</v-col>
 		</v-row> 
-		<v-row v-else>
-			<span class="ml-1 mb-5 fs-13 ">Permission: 	
-				<v-chip style="background:rgba(27,24,111,0.1)" class="ml-2">
-					{{roleName}}
-				</v-chip>
-			</span>
-		</v-row>
 		<v-tabs 
-			style="margin-left:-15px; margin-top:-20px" class="mb-5"
+			style="margin-left:-15px; " class="mb-5"
 			v-model="tab"
 			background-color="#fff"
 			dark >
@@ -107,6 +104,21 @@ import _groupBy from "lodash/groupBy";
 export default {
     props:['rolesList','permission','allRole','viewDetail','roleName'],
     methods:{
+		getPermission(){
+			const self = this;
+			userApi.getPermission(this.rolesList).then(res=>{
+				if(res.status==200){
+					self.allPermission = res.data;
+					self.allPermission.map(permission=>{
+						self.allNamePermission.map(namePermission=>{
+							if(permission.permissionPackId == namePermission.id){
+								permission.name= namePermission.name
+							}
+						})
+					})
+				}
+			})
+		},
         showUserInfo(){
             this.$emit("show-userInfo")
         },
@@ -154,7 +166,6 @@ export default {
 		},
 		//check xem menu có dữ liệu không
 		// checkDataMenu(obj){
-		// 	debugger
 		// 	let check = false;
 		// 	this.getListObjectIdentifier(obj);
 		// 	let lengthTitle = this.titleAllNameObject.length;
@@ -265,7 +276,8 @@ export default {
 		// xử lý chuyển tên object    
     },
     created(){
-		this.allPermission = [...this.permission.orgchart, ...this.permission.systemRole];
+		this.$store.dispatch('permission/getAllPermission');
+		this.getPermission();
 		this.getActionAndObject();
 		this.getListActionAllObj();
 	},
@@ -275,6 +287,11 @@ export default {
 			this.getActionAndObject();
 			this.getListActionAllObj();
 		}
+	},
+	computed:{
+		allNamePermission(){
+            return Object.values(this.$store.state.permission.allPermissionPack);
+        },
 	},
 	data(){
 		return {

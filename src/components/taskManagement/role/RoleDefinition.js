@@ -110,32 +110,32 @@ const objectActionControls = { // mức ngoài cùng là group
     "project" : { 
         "title":"Project",
         "children":{
-            "project":{
+            "task_manager_project":{
                 "title":"Project",
                 "icon":"mdi-file-table-box-outline",
                 "actions":util.cloneDeep(actionDefault)
             },
-            "projectCategory":{
+            "task_manager_project_category":{
                 "title":"Project category",
                 "icon":"mdi-file-tree-outline",
                 "actions":util.cloneDeep(actionDefault)
             },
-            "projectSetting":{
+            "task_manager_project_setting":{
                 "title":"Project setting",
                 "icon":"mdi-cog-outline",
                 "actions":util.cloneDeep(actionDefault)
             },
-            "people":{
+            "task_manager_access":{
                 "title":"People",
                 "icon":"mdi-account-multiple-outline",
                 "actions":util.cloneDeep(actionDefault)
             },
-            "kanbanBoard":{
+            "task_manager_kanban_board":{
                 "title":"Kanban board",
                 "icon":"mdi-bulletin-board",
                 "actions":util.cloneDeep(actionDefault)
             },
-            "sprint":{
+            "task_manager_sprint":{
                 "title":"Sprint",
                 "icon":"mdi-animation-outline",
                 "actions":util.cloneDeep(actionDefault)
@@ -145,27 +145,27 @@ const objectActionControls = { // mức ngoài cùng là group
     "issue" : {
         "title":"Issue",
         "children":{
-            "issueType":{
+            "task_manager_issue_type":{
                 "title":"Issue type",
                 "icon":"mdi-clipboard-text-outline",
                 "actions":util.cloneDeep(actionDefault)
             },
-            "subTask":{
+            "task_manager_sub_task":{
                 "title":"Sub task",
                 "icon":"mdi-subtitles-outline",
                 "actions":util.cloneDeep(actionDefault)
             },
-            "taskLifeCycle":{
+            "task_manager_task_life_cycle":{
                 "title":"Task life cycle",
                 "icon":"",
                 "actions":util.cloneDeep(actionDefault)
             },
-            "field":{
+            "task_manager_field":{
                 "title":"Field",
                 "icon":"",
                 "actions":util.cloneDeep(actionDefault)
             },
-            "timeTracking":{
+            "task_manager_time_tracking":{
                 "title":"Time tracking",
                 "icon":"",
                 "actions":[
@@ -176,27 +176,27 @@ const objectActionControls = { // mức ngoài cùng là group
                     },
                 ]
             },
-            "issueLink":{
+            "task_manager_issue_link":{
                 "title":"Issue link",
                 "icon":"",
                 "actions":util.cloneDeep(actionDefault)
             },
-            "statuses":{
+            "task_manager_status":{
                 "title":"Status",
                 "icon":"",
                 "actions":util.cloneDeep(actionDefault)
             },
-            "priorities":{
+            "task_manager_priority":{
                 "title":"Priorities",
                 "icon":"",
                 "actions":util.cloneDeep(actionDefault)
             },
-            "issue":{
+            "task_manager_issue":{
                 "title":"Issue",
                 "icon":"",
                 "actions":util.cloneDeep(actionDefaultIssue)
             },
-            "issueFieldConfig":{
+            "task_manager_issue_field_config":{
                 "title":"issue field config",
                 "icon":"",
                 "actions":[
@@ -213,12 +213,12 @@ const objectActionControls = { // mức ngoài cùng là group
     "system" : {
         "title":"System",
         "children":{
-            "projectRole":{
+            "task_manager_role":{
                 "title":"Project role",
                 "icon":"",
                 "actions":util.cloneDeep(actionDefault)
             },
-            "permission":{
+            "task_manager_permission":{
                 "title":"Permission",
                 "icon":"",
                 "actions":util.cloneDeep(actionDefault)
@@ -229,7 +229,7 @@ const objectActionControls = { // mức ngoài cùng là group
     "report" : {
         "title":"Report",
         "children":{
-            "reportConfig":{
+            "task_manager_report_config":{
                 "title":"Report config",
                 "icon":"",
                 "actions":[

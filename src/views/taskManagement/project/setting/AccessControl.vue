@@ -112,5 +112,6 @@ export default {
 {
     height: 35px;
     justify-content: left;
+    text-transform: unset;
 }
 </style>

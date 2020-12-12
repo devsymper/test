@@ -9,7 +9,7 @@
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
 							<li  v-if="isEndUserCpn == true" 
 								v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)"
-								v-on:click="rightClickHandler($event,childItem,itemT.name)"
+								v-on:click="clickHandler(itemT.name,childItem)"
 								:class="{'child-item-active': childItem.objectIdentifier == activeIndexChild}"
 							>
 								<div style="position:relative">
@@ -223,6 +223,44 @@ export default {
 					}
 				})
 			}
+		},
+		clickHandler(type,item){
+			this.$store.commit('appConfig/updateActiveChildItem', item.objectIdentifier )
+			let define
+			if(type.includes('document')){
+				this.$store.commit('document/setCurrentTitle',item.title)
+				define ={
+					"module": "document",
+					"resource": "document_definition",
+					"scope": "document",
+					"action": "list_instance"
+				}
+			}
+			if(type == 'orgchart'){
+				define ={
+					"module": "orgchart",
+					"resource": "orgchart",
+					"scope": "orgchart",
+					"action": "detail"
+				}
+			}
+			if(type == 'dashboard'){
+				define ={
+					"module": "dashboard",
+					"resource": "dashboard",
+					"scope": "dashboard",
+					"action": "view"
+				}
+			}
+			if(type == 'workflow_definition'){
+				define ={
+					"module": "workflow",
+					"resource": "workflow_definition",
+					"scope": "workflow",
+					"action": "list_instance"
+				}
+			}
+			this.$store.commit('appConfig/updateActionDef', define)
 		},
 		rightClickHandler(event,item,type){
 			event.stopPropagation();

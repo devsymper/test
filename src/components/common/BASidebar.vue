@@ -85,7 +85,7 @@
                                     </div>
                                     <v-autocomplete
                                         ref="selectDelegateUser"
-                                         :menu-props="{ maxHeight:300, minWidth:251,maxWidth:251, nudgeLeft:8, nudgeBottom:3}"
+										:menu-props="{ maxHeight:300, minWidth:251,maxWidth:251, nudgeLeft:8, nudgeBottom:3}"
                                         return-object
                                         class="mr-2 ml-2"
                                         full-width

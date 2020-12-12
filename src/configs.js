@@ -22,6 +22,7 @@ var configs = {
             definitions: "https://workflow.symper.vn/symper-rest/service/repository/process-definitions",
             instances: "https://workflow.symper.vn/symper-rest/service/runtime/process-instances",
             historyInstances: "https://workflow.symper.vn/symper-rest/service/query/historic-process-instances",
+            historyInstancesDel: "https://workflow.symper.vn/symper-rest/service/history/historic-process-instances",
             history: "https://workflow.symper.vn/symper-rest/service/history",
             tasks: "https://workflow.symper.vn/symper-rest/service/runtime/tasks",
             task: "https://workflow.symper.vn/symper-rest/service/query/tasks",
@@ -41,7 +42,7 @@ var configs = {
         permission: "https://accesscontrol.symper.vn/",
         dashboard: "https://bi-service.symper.vn/report-and-dashboard/",
         search: 'https://search.symper.vn/',
-        biService: "https://bi-service.symper.vn",
+        biService: "https://bi-service.symper.vn/",
         permissionPacks: "https://accesscontrol.symper.vn/permission_packs",
         actionPacks: "https://accesscontrol.symper.vn/action_packs",
         operations: "https://accesscontrol.symper.vn/operations",
@@ -58,8 +59,8 @@ var configs = {
         workflowExtend: "https://workflow-extend.symper.vn/",
         trash: "https://trash.symper.vn/",
         log: "https://log.symper.vn",
-        taskManagement: "https://task-management-service.symper.vn/"
-        
+        taskManagement: "https://task-management-service.symper.vn/",
+		syqlFunction:'https://syql.symper.vn/'
     },
     // nơi chứa domain của các api mà ko bị phụ thuộc vào môi trường 
 	uniqueApiDomain: {

@@ -31,11 +31,10 @@
 
         <v-dialog
             v-model="isShow"
-            persistent
             max-width="600px"
             scrollable
         >
-            <v-card>
+            <v-card min-height="500">
             <v-card-title>
                 <span class="fs-16">Thêm action pack</span>
             </v-card-title>
@@ -63,7 +62,7 @@
                     <div class="d-flex mt-2">
                         <div style="width:300px">
                             <span class="font-weight-medium">Đối tượng</span>
-                            <VuePerfectScrollbar style="height:200px" >
+                            <VuePerfectScrollbar style=" height:250px" >
                                 <div class="list-control-autocomplete" v-for="(obj,key) in listActionPackObject" :key="key">
                                     <div >{{obj.title}}</div>
                                     <v-list
@@ -78,8 +77,9 @@
                                             :key="i"
                                             @click="clickShowAction(item)"
                                             class="sym-control"
+                                            style="height: 30px;"
                                         >
-                                            <v-list-item-icon class="mr-2">
+                                            <v-list-item-icon class="mr-2" style="height:15px">
                                                 <v-icon size="15" v-if="item.icon">{{item.icon}}</v-icon>
                                             </v-list-item-icon>
                                             <v-list-item-content>
@@ -93,7 +93,7 @@
                         </div>
                         <div style="width:250px">
                             <span class="font-weight-medium">Hành động</span>
-                            <VuePerfectScrollbar style="height:200px" >
+                            <VuePerfectScrollbar style=" height:250px" >
                                 <v-list dense height="20">
                                         <v-list-item
                                             v-for="(item, i) in selectedItem.actions"
@@ -128,6 +128,7 @@
                     v-if="!statusDetail"
                     :loading="isLoading"
                     class="btn-add"
+                    @click="addActionPack"
                 >
                     {{$t("common.add")}}
                 </v-btn>
@@ -226,6 +227,57 @@ export default {
         }
     },
     methods:{
+        async addActionPack(){
+            let listOperation = this.listActionPackObject;
+            let data = [];
+            let projectId = this.$route.params.id;
+            for (const key in listOperation) {
+                let itemInGroup = listOperation[key]['children'];
+                for (const key2 in itemInGroup) {
+                    if (itemInGroup[key2]['actions'].length > 0) {
+                        let actions = itemInGroup[key2]['actions'];
+                        for (let i = 0; i < actions.length; i++) {
+                            if (actions[i]['isCheck'] == true) {
+                                let item = {};
+                                item.name ="Task manager " +itemInGroup[key2]['title']+' '+ actions[i]['title'];
+                                item.description ="Task manager " + itemInGroup[key2]['title']+' '+ actions[i]['title'];
+                                item.action = actions[i]['name'];
+                                item.objectName ="Task manager "+ itemInGroup[key2]['title'] ;
+                                item.objectType = key2;
+                                item.objectIdentifier = key2+':'+projectId;
+                                item.status = 1;
+
+                                data.push(item);
+                            }                         
+                        }
+                    }
+                }
+            }
+            if (data.length > 0) {
+            }
+
+            console.log("data",data);
+        },
+        async saveListOperation(data){
+            // return new Promise(async (resolve, reject) => {
+            //     try {
+            //         let data = {};
+
+            //         let result = await BPMNEngine.actionOnTask(taskId, taskData);   
+            //         self.$snotifySuccess("Task completed!");
+            //         resolve(result);
+            //     } catch (error) {
+            //         let detail = '';
+            //         if(error.responseText){
+            //             detail = JSON.parse(error.responseText);
+            //             detail = detail.exception;
+            //         }
+            //         self.$snotifyError(error, "Can not submit task!", detail);
+            //         reject(error);
+            //     }
+            // });
+        },
+
         clickShowAction(item){
             this.selectedItem = item;
         },
@@ -242,7 +294,7 @@ export default {
     },
     created(){
         this.listActionPackObject = cloneObjectActionControls();
-        this.selectedItem = this.listActionPackObject['project']['children']['project'];
+        this.selectedItem = this.listActionPackObject['project']['children']['task_manager_project'];
     },
 
 

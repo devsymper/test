@@ -31,7 +31,7 @@
 										</template>
 										<span style="font:13px roboto">{{childItem.name}}</span> 
 									</v-tooltip>
-									<v-icon  @click="changeFavorite(childItem,itemT.name)" :class="{'icon-star-active' : childItem.favorite==true, 'icon-star': true}" >mdi-star</v-icon>	
+									<v-icon  @click="changeFavorite(childItem,itemT.name)" :class="{'icon-star-active' : childItem.favorite == true, 'icon-star': true}" >mdi-star</v-icon>	
 								</div>
 							</li>
 							<li v-else>

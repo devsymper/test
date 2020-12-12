@@ -1,6 +1,7 @@
 import Api from "./api";
 import { appConfigs } from "./../configs.js";
 let taskManagement = new Api(appConfigs.apiDomain.taskManagement);
+let permission = new Api(appConfigs.apiDomain.permission);
 
 export const taskManagementApi = {
     //danh mục category
@@ -162,5 +163,10 @@ export const taskManagementApi = {
     updateLevelPriority(data){
         return taskManagement.put("priorities-level",data);
     },
+    // access
+    addActionPack(data){
+        return permission.post("operations/save-batch",data);
+    }
+
     
 }

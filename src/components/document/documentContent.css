@@ -113,8 +113,19 @@ p {
     border-top: 1px solid rgb(230, 230, 230);
     border-bottom: 1px solid rgb(230, 230, 230);
 }
-
-.s-control:not(.s-control-tab-page):not(.s-control-image):not(button):not(.page-item):not(.s-control-approval-history):not(.s-control-label):not(.s-control-submit):not(.s-control-draft):not(.s-control-reset):not(.s-control-file-upload):not(.s-control-table):not(.s-control-data-flow):not(.s-control-panel) {
+.s-control-rich-text{
+    padding: 2px 5px !important;
+    background: transparent;
+    box-shadow: none !important;
+    border-top: none !important;
+    border-right: none !important;
+    border-left: none !important;
+    border-bottom: 0.5px solid #ccc;
+    border-radius: 0 !important;
+    font-weight: normal; 
+    min-height: 25px;
+}
+.s-control:not(.s-control-tab-page):not(.s-control-rich-text):not(.s-control-image):not(button):not(.page-item):not(.s-control-approval-history):not(.s-control-label):not(.s-control-submit):not(.s-control-draft):not(.s-control-reset):not(.s-control-file-upload):not(.s-control-table):not(.s-control-data-flow):not(.s-control-panel) {
     padding: 0 5px !important;
     background: transparent;
     box-shadow: none !important;
