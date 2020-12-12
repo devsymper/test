@@ -128,6 +128,7 @@
                     v-if="!statusDetail"
                     :loading="isLoading"
                     class="btn-add"
+                    @click="addActionPack"
                 >
                     {{$t("common.add")}}
                 </v-btn>
@@ -226,6 +227,58 @@ export default {
         }
     },
     methods:{
+        async addActionPack(){
+            let listOperation = this.listActionPackObject;
+            let data = [];
+            let projectId = this.$route.params.id;
+            for (const key in listOperation) {
+                let itemInGroup = listOperation[key]['children'];
+                for (const key2 in itemInGroup) {
+                    if (itemInGroup[key2]['actions'].length > 0) {
+                        let actions = itemInGroup[key2]['actions'];
+                        for (let i = 0; i < actions.length; i++) {
+                            if (actions[i]['isCheck'] == true) {
+                                let item = {};
+                                item.name ="Task manager " +itemInGroup[key2]['title']+' '+ actions[i]['title'];
+                                item.description ="Task manager " + itemInGroup[key2]['title']+' '+ actions[i]['title'];
+                                item.action = actions[i]['name'];
+                                item.objectName ="Task manager "+ itemInGroup[key2]['title'] ;
+                                item.objectType = key2;
+                                item.objectIdentifier = key2+':'+projectId;
+                                item.status = 1;
+
+                                data.push(item);
+                            }                         
+                        }
+                    }
+                }
+            }
+            if (data.length > 0) {
+                let 
+            }
+
+            console.log("data",data);
+        },
+        async saveListOperation(data){
+            // return new Promise(async (resolve, reject) => {
+            //     try {
+            //         let data = {};
+
+            //         let result = await BPMNEngine.actionOnTask(taskId, taskData);   
+            //         self.$snotifySuccess("Task completed!");
+            //         resolve(result);
+            //     } catch (error) {
+            //         let detail = '';
+            //         if(error.responseText){
+            //             detail = JSON.parse(error.responseText);
+            //             detail = detail.exception;
+            //         }
+            //         self.$snotifyError(error, "Can not submit task!", detail);
+            //         reject(error);
+            //     }
+            // });
+        },
+
         clickShowAction(item){
             this.selectedItem = item;
         },
@@ -242,7 +295,7 @@ export default {
     },
     created(){
         this.listActionPackObject = cloneObjectActionControls();
-        this.selectedItem = this.listActionPackObject['project']['children']['project'];
+        this.selectedItem = this.listActionPackObject['project']['children']['task_manager_project'];
     },
 
 
