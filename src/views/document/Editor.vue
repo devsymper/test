@@ -136,6 +136,8 @@ import 'tinymce/plugins/preview';
 import 'tinymce/plugins/fullscreen';
 import 'tinymce/plugins/paste';
 import 'tinymce/plugins/hr';
+import 'tinymce/plugins/charmap';
+
                                 
 // biến lưu chiều rộng editor trước khi resize 
 const ALL_CONTROL = "allControl"
@@ -202,13 +204,14 @@ export default {
             plugins: [
             'advlist autolink lists link image table print preview',
             ' fullscreen',
+            'charmap',
             'table paste hr'
             ],
             contextmenu: 'inserttable table | settingtable | dragTable',
             toolbar:
             'undo redo | fontselect fontsizeselect formatselect pageSize| bold italic forecolor backcolor | \
             alignleft aligncenter alignright alignjustify | \
-            bullist numlist indent hr | removeformat  table |  preview margin rotatePage mdiIcon',
+            bullist numlist indent hr | removeformat  table |  preview margin rotatePage mdiIcon |charmap',
             fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
             font_formats: 'Roboto=Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times,serif;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
             valid_elements: '*[*]',
@@ -333,6 +336,7 @@ export default {
                 self.initEditor()
             },
         });
+        this.handleCloseChrome();
     },
     created() {
         this.currentTabIndex = this.$store.state.app.currentTabIndex;        
@@ -358,9 +362,13 @@ export default {
             let elControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body #'+locale.id);
             this.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
         });
+        const self = this;
         this.$evtBus.$on("before-close-app-tab", (data) => {
             if(this._inactive == true) return;
             if(this.routeName == 'editDocument'){
+                const message = self.$t('document.notification.leavePage');
+                let confirm = window.confirm(message);
+                self.$evtBus.$emit("close-edit-document", confirm);
                 documentApi.setEdittingDocument({id:this.documentId,status:0});
                 clearInterval(this.intervalSetEditting);
             }
@@ -459,7 +467,8 @@ export default {
             for(let docName in data){
                 this.listDocument.push({name:docName,id:data[docName].id,title:data[docName].title});
             }
-        }
+        },
+        
     },
     methods:{
         /**
@@ -3072,8 +3081,16 @@ export default {
         },
         beforeCloseSubmit(){
             this.isShowPreviewSubmit = false;
+        },
+         // xử lý khi tắt tab chrome
+        handleCloseChrome(){
+            $(window).on("beforeunload", function(e) {
+                let dialogText = 'Are you sure you want to close the Window?';
+                e.returnValue = dialogText;
+                return dialogText;
+            });
         }
-
+       
     },
     
 }

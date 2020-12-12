@@ -3,6 +3,7 @@
         "id": "Id",
         "number_instance": "Number of process instance",
         "select_lang": "Select language",
+        "required": "required",
         "KH": "Knowledge Management",
         "structureManagement": "Structure management",
         "reports": "Reports",
@@ -100,11 +101,11 @@
         "not_show_sidebar": "Disable show sidebar",
         "import_excel": "Import excel",
         "isDefault": "Default orgchart",
-		"restore": "Restore",
-		"userCreateName": "User Create Name",
-		"userUpdateName": "User Update Name",
-		"createAt": "Create At",
-		"updateAt": "Update At",
+        "restore": "Restore",
+        "userCreateName": "User Create Name",
+        "userUpdateName": "User Update Name",
+        "createAt": "Create At",
+        "updateAt": "Update At",
         "sidebar": {
             "Setting": "Setting",
             "action_pack": "Action Pack",
@@ -178,17 +179,17 @@
         }
     },
     "table": {
-		"id": "ID",
-		"name": " Service Name",
-		"description": "Description",
-		"lastVersion": "Last Version ",
-		"language": "Language",
-		"status": "Status",
-		"userCreate": "User Create",
-		"userUpdate": "UserUpdate",
-		"createAt": "Create At",
-		"updateAt": "Update At",
-		"versionName": "Version Name",
+        "id": "ID",
+        "name": " Service Name",
+        "description": "Description",
+        "lastVersion": "Last Version ",
+        "language": "Language",
+        "status": "Status",
+        "userCreate": "User Create",
+        "userUpdate": "UserUpdate",
+        "createAt": "Create At",
+        "updateAt": "Update At",
+        "versionName": "Version Name",
         "wrap_text_mode": "Wrap text mode",
         "display_density": "Row display density",
         "column_config": "Column configs",
@@ -390,7 +391,7 @@
         "editPermissionPack": "Edit permission packge",
         "apps": "Apps",
         "contextMenu": {
-			"viewDetails":"View detail",
+            "viewDetails": "View detail",
             "edit": "Edit",
             "grantPermission": "Grant Permission",
             "remove": "Remove"
@@ -438,7 +439,6 @@
         "error": "Error"
     },
     "document": {
-
         "instance": {
             "showlist": {
                 "select": "Selected",
@@ -462,6 +462,7 @@
         "edit": "Edit document",
         "title": "List Document",
         "table": {
+            "allowSubmitOutsideWorkflow": "Allow Submit Outside Workflow",
             "id": "Id",
             "name": "Name",
             "title": "Title",
@@ -598,6 +599,8 @@
             }
         },
         "validate": {
+            "emptyNote": "Note must not be blank",
+            "emptyTitleFml": "Title must not be blank",
             "emptyTitle": "Title must not be blank",
             "emptyName": "Name must not be blank",
             "nameNotValid": "Name not valid",
@@ -605,6 +608,9 @@
             "controlNotExist": "Control does not exist, please create new control",
             "docNameExist": "Document name exist",
             "checkNameRelate": "The name of this document can be used in formulas on objects in the system. Select Test to re-check the object"
+        },
+        "notification": {
+            "leavePage": "Are you sure you want to leave this page?"
         }
     },
     "documentObject": {

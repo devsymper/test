@@ -129,10 +129,20 @@ export default {
         }
 
     },
+    mounted(){
+        const self = this;
+        this.$evtBus.$on("close-edit-document",(isCloseTab) => {
+            self.isClose = !isCloseTab;
+        });
+    },
     methods: {
         handleCloseTab(idx){
+            const self = this;
+            this.idx = idx;
             this.$evtBus.$emit("before-close-app-tab", idx);
-            this.closeTab(idx);
+            if(!self.isClose){
+                self.closeTab(idx);
+            }
         },
         /**
          * Xử lý các tab
@@ -252,6 +262,8 @@ export default {
     },
     data: function() {
         return {
+            isClose:false,
+            idx:0,
             showConfigNotification:false,
             isExpand:false,
             showSearchInput: false,
