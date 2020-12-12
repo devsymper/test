@@ -105,12 +105,12 @@
                                     >
                                         <v-icon
                                             size="18"
-                                        >{{column.symperHide ? 'mdi-eye-off-outline': 'mdi-eye-outline'}}</v-icon>
+                                        >{{column.symperHide ? 'mdi-eye-outline': 'mdi-eye-off-outline'}}</v-icon>
                                     </v-btn>
                                 </template>
                                 <span
                                     class="fw-400"
-                                >{{ column.symperHide ? $t('table.show_column') : $t('table.hide_column') }}</span>
+                                >{{ column.symperHide ? $t('table.hide_column') : $t('table.show_column') }}</span>
                             </v-tooltip>
                         </div>
                     </transition-group>

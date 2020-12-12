@@ -56,7 +56,6 @@ export default {
 	},
 	mounted(){
 		  this.containerHeight = util.getComponentSize(this).h
-		  debugger
 	}
 }
 </script>

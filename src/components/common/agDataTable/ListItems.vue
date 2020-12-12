@@ -458,7 +458,6 @@ export default {
 				tbHeight = util.getComponentSize(this).h;
 			}
 			tbHeight -= 74
-			debugger
 			return tbHeight - 15;
 		},
 		actionPanelWrapper() {
@@ -491,17 +490,36 @@ export default {
             }else{
                 this.closeactionPanel();
             }
-        },
+		},
+		'tableDisplayConfig.value.densityMode'(value){
+			debugger
+			switch(value){
+				case 0:
+					this.gridOptions.rowHeight  = 70
+					this.agApi.resetRowHeights()
+					break;
+				case 1:
+					this.gridOptions.rowHeight  = 50
+					this.agApi.resetRowHeights()
+					break;
+				case 2:
+					this.gridOptions.rowHeight  = 30
+					this.agApi.resetRowHeights()
+					break;	
+			}
+		}
 	},
     data(){
 		let self = this
         return {
 			totalObject:0,
 			pageSize: 50,
+			agApi: null,
 			frameworkComponents: null,
             actionPanel: false, // có hiển thị action pannel (create, detail, edit) hay không
             page: 1, // trang hiện tại
 			gridOptions:null,
+			rowHeight: 30,
             allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
 			defaultColDef:null,
 			tableDisplayConfig: {
@@ -558,12 +576,61 @@ export default {
 			headerComponentParams: { menuIcon: 'fa-bars' },
         };
 		this.gridOptions = {};
+		this.gridOptions.rowHeight =  this.rowHeight
 	
     },
 	methods:{
 		onGridReady(params){
 			params.api.sizeColumnsToFit()
+			this.agApi = params.api
 		},
+		configColumnDisplay(type, idx) {
+            let column = this.columnDefs[idx];
+            column[type] = !column[type];
+            let isValue = column[type];
+            if (type == "symperHide") {
+				this.resetHiddenColumns(column.field,idx);
+            } else {
+                this.reOrderFixedCols();
+            }
+		},
+		resetHiddenColumns(field ,idx){
+            let hiddenColumns = {};
+            this.columnDefs.forEach((col, idx) => {
+                if (col.symperHide) {
+                    hiddenColumns[idx] = true;
+                }
+            });
+            hiddenColumns = Object.keys(hiddenColumns).reduce((newArr, el) => {
+                newArr.push(Number(el));
+                return newArr;
+			}, []);
+			this.$set(this.tableDisplayConfig.value, "hiddenColumns", hiddenColumns);
+			let value  =  this.tableDisplayConfig.value.hiddenColumns.includes(idx) ? true : false
+			this.gridOptions.columnApi.setColumnVisible(field, value)
+        },
+		reOrderFixedCols() {
+            let fixedCols = [];
+            let noneFixedCols = [];
+            for (let col of this.tableColumns) {
+                if (col.symperFixed) {
+                    fixedCols.push(col);
+                } else {
+                    noneFixedCols.push(col);
+                }
+            }
+            if (fixedCols.length > 0) {
+                this.tableColumns = fixedCols.concat(noneFixedCols);
+            }
+            this.fixedColumnsCount = fixedCols.length;
+            setTimeout(
+                thisCpn => {
+                    thisCpn.savedTableDisplayConfig = thisCpn.tableColumns;
+                },
+                1000,
+                this
+            );
+        },
 		openTableDisplayConfigPanel() {
             this.tableDisplayConfig.show = !this.tableDisplayConfig.show;
 		},
@@ -679,20 +746,12 @@ export default {
 				obj.field = e.name
 				obj.type = e.type
 				obj.suppressMenu = true
+				obj.symperHide = true
 				columnsReduce.push(obj)
 			})
 			return columnsReduce
 		},
-		 configColumnDisplay(type, idx) {
-            let column = this.tableColumns[idx];
-            column[type] = !column[type];
-            let isValue = column[type];
-            if (type == "symperHide") {
-                this.resetHiddenColumns();
-            } else {
-                this.reOrderFixedCols();
-            }
-		},
+		
 		/**
          * Lưu lại cấu hình hiển thị của table
          */
@@ -736,7 +795,28 @@ export default {
     
 </script>
 <style>
-   .ag-row{
-        border-top-style:unset !important;
-    }
+.ag-row{
+	border-top-style:unset !important;
+}
+.symper-custom-table.clip-text .ht_master.handsontable .htCore td,
+.symper-custom-table.clip-text .ht_clone_left.handsontable .htCore td {
+    text-overflow: ellipsis !important;
+    white-space: nowrap !important;
+}
+.symper-custom-table.loosen-row .ag-center-cols-container .ag-row,
+.symper-custom-table.loosen-row .ag-center-cols-container .ag-row {
+    height: 40px !important;
+    line-height: 40px !important;
+}
+.symper-custom-table.medium-row .ht_master.handsontable .htCore td,
+.symper-custom-table.medium-row .ht_clone_left.handsontable .htCore td {
+    height: 30px !important;
+    line-height: 30px !important;
+}
+.symper-custom-table.compact-row .ht_master.handsontable .htCore td,
+.symper-custom-table.compact-row .ht_clone_left.handsontable .htCore td {
+    height: 20px !important;
+    line-height: 20px !important;
+    font-size: 12px !important;
+}
 </style>
