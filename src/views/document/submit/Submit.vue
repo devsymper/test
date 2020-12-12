@@ -1962,6 +1962,7 @@ export default {
                     let message = $(v).attr('valid');
                     listErr.push(message);
                 })
+                thisCpn.$emit('submit-document-error');
                 this.listMessageErr = listErr;
                 this.$refs.errMessage.showDialog();
             }
