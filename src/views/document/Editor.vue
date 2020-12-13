@@ -898,7 +898,6 @@ export default {
                     let allControl = this.editorStore.allControl;
                     let controlPrimaryKey = this.validateControlBeforeSave(allControl,'0');
                     if(Object.keys(controlPrimaryKey).length > 1){
-                        this.$evtBus.$emit('document-editor-save-doc-callback')
                         let allKey = Object.keys(controlPrimaryKey);
                         this.$snotify({
                                         type: "error",
@@ -934,7 +933,6 @@ export default {
                                 
                                 listName.push(name);
                             })
-                            this.$evtBus.$emit('document-editor-save-doc-callback');
                             this.$snotify({
                                             type: "error",
                                             title: "Tên một số control chưa hợp lệ",
@@ -1167,7 +1165,7 @@ export default {
                         }
                     }
                     else{
-                        this.$evtBus.$emit('document-editor-save-doc-callback')
+                        this.$refs.actionView.hideLoading();
                         this.$snotify({
                                 type: "error",
                                 title: "error from formulas serice, can't not save into formulas service!!!",
@@ -1185,8 +1183,8 @@ export default {
                 }
                 
             } catch (error) {
+                thisCpn.$refs.actionView.hideLoading();
                 console.log('errorerror',error);
-                thisCpn.$evtBus.$emit('document-editor-save-doc-callback')
                 thisCpn.$snotify({
                             type: "error",
                             title: "error from formulas serice, can't not save into formulas service!!!",
@@ -1203,7 +1201,7 @@ export default {
                 dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
             }
             documentApi.saveDocument(dataPost).then(res => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 if (res.status == 200) {
                     thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
@@ -1222,7 +1220,7 @@ export default {
                 }
             })
             .catch(err => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 thisCpn.$snotify({
                         type: "error",
                         title: "can not save document",
@@ -1240,7 +1238,7 @@ export default {
             }
             let thisCpn = this;
             documentApi.editDocument(dataPost).then(res => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 if (res.status == 200) {
                     thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
@@ -1276,7 +1274,7 @@ export default {
                 
             })
             .catch(err => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 thisCpn.$snotify({
                     type: "error",
                     title: "error from edit document api",
@@ -1291,6 +1289,7 @@ export default {
          * hàm validate lại cntrol lần nữa sau khi ấn lưu doc ở modal save doc
          */
         validateControlAfterSave(){
+            this.$refs.actionView.showLoading();
             let thisCpn = this;
             let listControlName = [];
             this.listMessageErr = [];
@@ -1300,7 +1299,7 @@ export default {
                 this.saveDocument();
             }
             else{
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                this.$refs.actionView.hideLoading();
                 this.$snotify({
                                 type: "error",
                                 title: "Thông tin control chưa hợp lệ",
@@ -2952,12 +2951,13 @@ export default {
         },
         // mở modal lưu , edit doc
         saveFormPrint(docProps){
+            this.$refs.actionView.showLoading();
             if(this.printConfigId != 0 && this.printConfigId != undefined && this.printConfigId != null){
                 let dataPost = {documentId:this.documentId,title:docProps.title.value,
                                 content:this.editorCore.getContent(),printConfigId:this.printConfigId, size:JSON.stringify(this.contentStyle)}
                 let thisCpn = this;
                 documentApi.updatePrintConfig(dataPost).then(res => {
-                    this.$evtBus.$emit('document-editor-save-doc-callback')
+                    thisCpn.$refs.actionView.hideLoading();
                     if (res.status == 200) {
                         thisCpn.editorCore.remove();
                         thisCpn.$router.push('/documents');
@@ -2975,7 +2975,7 @@ export default {
                     }
                 })
                 .catch(err => {
-                    this.$evtBus.$emit('document-editor-save-doc-callback')
+                    thisCpn.$refs.actionView.hideLoading();
                     thisCpn.$snotify({
                             type: "error",
                             title: "can not save form print document",
