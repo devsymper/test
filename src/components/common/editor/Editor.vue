@@ -1,8 +1,7 @@
 <template>
     <div>
         <textarea :id="'editor-'+instance">
-
-    </textarea>
+    	</textarea>
     </div>
 </template>
 <script>
@@ -34,11 +33,12 @@ export default {
         getData(){
             return this.editorCore.getContent();
         },
-        setData(){
-            return this.editorCore.setContent('<h2>hihi</h2>');
+        setData(content){
+            return this.editorCore.setContent(content);
         }
     },
     mounted(){
+		let self = this
         tinymce.init({
             theme: 'silver',
             skin: 'oxide',

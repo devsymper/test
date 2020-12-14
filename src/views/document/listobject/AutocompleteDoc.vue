@@ -15,33 +15,33 @@
 							v-bind="attrs"
 							depressed
 							v-on="{ ...tooltip, ...menu }">
-							<span class="fs-13" style="font-weight: 400!important ;color: orange">
-								{{sDoc.currentTitle}}
-							</span>
+							<div class=" title-document-autocomplete fs-13" style="font-weight: 400!important ;color: orange">
+								{{sDoc.currentTitle == "" ? param : sDoc.currentTitle}}
+							</div>
 						</v-btn>
 					</template>
 					<span>Switch document</span>
 				</v-tooltip>
 			</template>
-			<div class="bg-white" style="width: 251px">
-				<div>
-					<v-icon class="ml-3 fs-16">mdi mdi-account-check-outline</v-icon>
+			<div class="bg-white" style='width: 270px'>
+				<div class="mt-1 mb-1">
+					<v-icon class="ml-3 fs-15">mdi-file-document-edit-outline</v-icon>
 					<span class="fs-13 mt-3 mb-2 ml-4"> Chọn document </span>
 				</div>
 				<v-autocomplete
 					ref="selectDelegateUser"
-					:menu-props="{ maxHeight:300, minWidth:251,maxWidth:251, nudgeLeft:8, nudgeBottom:3}"
+					:menu-props="{ maxHeight:300,width:270, minWidth:270,maxWidth:270, nudgeLeft:8, nudgeBottom:3}"
 					class="mr-2 ml-2"
 					full-width
 					solo
-					:items="Object.keys(sDoc.listAllDocument)"
+					:items="sAllDoc"
 					background-color="grey lighten-4"
 					flat
 					dense
 					color="blue-grey lighten-2"
 					item-text="title"
+					return-object
 					@change="changeDocument"
-					item-value="id"
 				>
 					<template v-slot:append>
 						<v-icon style= "font-size:18px;">mdi mdi-magnify</v-icon>
@@ -49,11 +49,22 @@
 					<template v-slot:label>
 						<span class="fs-13">{{$t('common.search')}}</span>
 					</template>
-					<!-- <template v-slot:item="data">
+					<template v-slot:item="data">
 						<div class="fs-13 py-1" >
-							<span  class="fs-13 ml-1"> {{data.title}}</span>
+							<v-tooltip bottom>
+								<template v-slot:activator="{ on, attrs }">
+									<div 
+										v-bind="attrs"
+										v-on="on" 
+										class="fs-13 ml-1 title-document-switch"
+									> 
+										{{data.item.title}}
+									</div>
+								</template>
+								<span>{{data.item.title}}</span>
+							</v-tooltip>
 						</div>
-					</template> -->
+					</template>
 				</v-autocomplete>
 				</div>
 		</v-menu>
@@ -68,10 +79,19 @@ export default {
 		sDoc() {
             return this.$store.state.document;
 		},
+		sAllDoc(){
+			let arr = []
+			for(let i in this.$store.state.document.listAllDocument){
+				arr.push(this.$store.state.document.listAllDocument[i])
+			}
+			return arr
+		},
 		id(){
 			return this.$route.params.id
 		},
-		
+		param(){
+			return this.$store.state.appConfig.param.title
+		}
 	},
 	data(){
 		return {
@@ -80,8 +100,8 @@ export default {
 	},
 	methods:{
 		changeDocument(value){
-			let id = this.sDoc.listAllDocument[value].id
-			this.$store.commit('document/setCurrentTitle',this.sDoc.listAllDocument[value].title)
+			let id = value.id
+			this.$store.commit('document/setCurrentTitle',value.title)
 			this.$router.push('/documents/'+id+'/objects')
 			this.$emit('change',id )
 		}
@@ -90,11 +110,42 @@ export default {
 		this.$store.dispatch('document/setListDocuments')
 	},
 	watch:{
-		
+		id(val){
+			let self = this
+			if(val){
+				this.sAllDoc.forEach(function(e){
+					if(e.id == val){
+						self.$store.commit('document/setCurrentTitle',e.title)
+					}
+				})
+			}
+			
+		},
+		param(val){
+			debugger
+			if(val){
+				this.$store.commit('document/setCurrentTitle',val)
+			}
+		}
 	}
 }
 </script>
 
 <style>
+.title-document-autocomplete{
+	white-space: nowrap; 
+	max-width: 250px; 
+	overflow: hidden;
+	text-overflow: ellipsis; 
+}
+.v-input__control input {
+	font-size: 13px !important
+}
+.title-document-switch{
+	white-space: nowrap; 
+	width: 215px; 
+	overflow: hidden;
+	text-overflow: ellipsis; 
+}
 
 </style>

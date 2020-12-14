@@ -12,6 +12,7 @@
                     <div :class="{'float-right': true, 'overline' : true , 'show-panel-mode': actionPanel } ">
                         <v-text-field
                             @input="bindToSearchkey"
+							v-if="showSearchBox"
                             class="d-inline-block mr-2 sym-small-size"
                             single-line
                             :append-icon="$i('input.search')"
@@ -20,6 +21,15 @@
                             label="Search"
                             :placeholder="$t('common.search')"
                         ></v-text-field>
+						<v-btn
+                            depressed
+                            small
+                            class="mr-2"
+                            v-if="actionPanel "
+                            @click="showSearchBox = !showSearchBox"
+                        >
+                            <v-icon small dark> {{ showSearchBox ? 'mdi-close' : 'mdi-magnify'}} </v-icon>
+                        </v-btn>
                          <v-btn
                             v-show="showButtonAdd && !actionPanel && !dialogMode"
                             depressed
@@ -351,7 +361,11 @@ export default {
     watch: {
         actionPanel(){
             if (this.actionPanel == true) {
-                this.$emit("open-panel");
+				this.$emit("open-panel");
+				this.showSearchBox = false
+            }
+            else{
+                this.$emit("close-panel");
             }
         },
         getDataUrl(){   
@@ -380,6 +394,7 @@ export default {
     data() {
         let self = this;
         return {
+			showSearchBox: true,
             tmpTableContextMenu: null,
             deleteDialogShow: false, // có hiển thị cảnh báo xóa hay không
             deleteItems: [], // danh sách các row cần xóa
@@ -1693,6 +1708,9 @@ export default {
 };
 </script>
 <style scoped>
+	.list-item-common-symper >>> .v-input__control{
+		background-color: #ffffff !important;
+	}
     .group-action-list >>> .v-list-item {
         min-height:unset;
         height:30px;
@@ -1778,8 +1796,8 @@ i.applied-filter {
 .symper-list-item .ht_clone_top_left_corner thead tr th:nth-last-child(2)  {
     border-right-width: 0px !important;
 }
-.handsontable td,
-.handsontable th {
+.symper-list-item .handsontable td,
+.symper-list-item .handsontable th {
     color: #212529 !important;
     border-color: #bbb;
     border-right: 0;

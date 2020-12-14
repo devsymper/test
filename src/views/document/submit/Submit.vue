@@ -173,7 +173,7 @@
             ref="traceControlView" 
             v-show="isShowTraceControlSidebar" />
         </v-navigation-drawer>
-    <PopupPivotTable ref="popupPivotTableView" :dataColPivot="dataColPivot" :data="dataPivotMode" @before-add-pivot-data="beforeAddPivotData"/>
+    <PopupPivotTable ref="popupPivotTableView" :instance="keyInstance" :dataColPivot="dataColPivot" :data="dataPivotMode" @before-add-pivot-data="beforeAddPivotData"/>
     <input type="text" class="input-pivot" @keyup="afterKeyupInputPivot" @blur="afterBlurInputPivot" v-if="dataPivotTable">
     
     </div>
@@ -346,6 +346,10 @@ export default {
         validateControl(){
             return this.$store.state.document.submit[this.keyInstance].validateMessage   
         }
+    },
+    
+    destroyed(){
+        ClientSQLManager.closeDB(this.keyInstance);
     },
     data() {
         return {
@@ -640,6 +644,8 @@ export default {
         });
         this.$evtBus.$on("document-submit-date-input-click", e => {
             if(this._inactive == true) return;
+            let controlIns = getControlInstanceFromStore(this.keyInstance,e.controlName);
+            this.$refs.datePicker.setRange(controlIns.minDate,controlIns.maxDate);
             this.$refs.datePicker.openPicker(e);
             this.$store.commit("document/updateCurrentControlEditByUser", {
                 currentControl: e.controlName,
@@ -798,13 +804,12 @@ export default {
                     thisCpn.$refs.datePicker.closePicker();
                 }
                 if (
+                    thisCpn.$refs.timeInput &&
                     !$(evt.target).hasClass("s-control-time") &&
                     !$(evt.target).hasClass("card-time-picker") &&
                     $(evt.target).closest(".card-time-picker").length == 0
                 ) { 
-                    setTimeout(() => {
                         thisCpn.$refs.timeInput.hide();
-                    }, 20);
                 }
                 if (
                     !$(evt.target).hasClass("validate-icon") &&
@@ -813,8 +818,6 @@ export default {
                 ) {
                     thisCpn.$refs.validate.hide();
                 }
-               
-                
             } catch (error) {
                 
             }
@@ -823,7 +826,12 @@ export default {
          * Sự kiện bắn ra khi ấn f2 vào 1 control để trace formulas
          */
         this.$evtBus.$on('document-submit-show-trace-control',data=>{
-            data.control.renderCurrentTraceControlColor();
+            if(!data.isTable){
+                 data.control.renderCurrentTraceControlColor();
+            }
+            else{
+                data.control = getControlInstanceFromStore(this.keyInstance, data.tableName)
+            }
             thisCpn.controlTrace = data.control.name;
             let controlFormulas = data.control.controlFormulas;
             thisCpn.listFormulasTrace = controlFormulas;
@@ -1451,10 +1459,21 @@ export default {
 							thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
                             thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
                             thisCpn.dataPivotTable = res.data.pivotConfig;
-                            setDataForPropsControl(res.data.fields,thisCpn.keyInstance,'submit'); // ddang chay bat dong bo
-                            setTimeout(() => {
-                                thisCpn.processHtml(content);
-                            }, 100);
+                            //if(res.data.document.allowSubmitOutsideWorkflow==1){
+                                setDataForPropsControl(res.data.fields,thisCpn.keyInstance,'submit'); // ddang chay bat dong bo
+                                setTimeout(() => {
+                                    thisCpn.processHtml(content);
+                                }, 100);
+                            // }else{
+                            //     thisCpn.$snotify({
+                            //         type: "error",
+                            //         title: "Không cho phép nhập liệu"
+                            //     }); 
+                            //     setTimeout(() => {
+                            //          thisCpn.$goToPage('/documents/');
+                            //     }, 100);
+                            // }
+                           
                         }
                         else{
                             thisCpn.$snotify({
@@ -1620,6 +1639,7 @@ export default {
                                 control.setEffectedData(prepareData);
                                 this.addToListInputInDocument(controlName,control);
                             }
+                            // trường hợp những control ở ngoài table dạng input
                             else{
                                 let control = new BasicControl(
                                     idField,
@@ -2091,14 +2111,14 @@ export default {
                     
                     // nếu submit từ form sub submit thì ko rediect trang
                     // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
+                    ClientSQLManager.closeDB(thisCpn.keyInstance);
                     
                     if(thisCpn.$getRouteName() == 'submitDocument' && thisCpn.$route.params.id == thisCpn.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                     }
-                    
-                    
                 }
                 else{
+                    thisCpn.$emit('submit-document-error');
                     thisCpn.$snotify({
                         type: "error",
                         title: res.message
@@ -2107,6 +2127,7 @@ export default {
                 }
             })
             .catch(err => {
+                thisCpn.$emit('submit-document-error');
                 thisCpn.$snotify({
                         type: "error",
                         title: "error from submit document api!!!"
@@ -2142,6 +2163,7 @@ export default {
                         let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.updateFormulas);
                         thisCpn.sDocumentSubmit.updateFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
                     }
+                    ClientSQLManager.closeDB(thisCpn.keyInstance);
                     if(thisCpn.$getRouteName() == 'updateDocumentObject')
                      thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
@@ -2295,12 +2317,7 @@ export default {
                 instance: this.keyInstance
             });
         },
-        addSQLInstanceDBToStore(SQLDBInstance) {
-            this.$store.commit("document/addInstanceSubmitDB", {
-                instance: this.keyInstance,
-                sqlLite: SQLDBInstance
-            });
-        },
+        
         addToListInputInDocument(name,control){
              this.$store.commit(
                             "document/addToListInputInDocument",
@@ -2347,6 +2364,8 @@ export default {
                 let controlRequireEffected = controlInstance.getEffectedRequireControl();
                 let controlLinkEffected = controlInstance.getEffectedLinkControl();
                 let controlValidateEffected = controlInstance.getEffectedValidateControl();
+                let controlMinDateEffected = controlInstance.getEffectedMinDateControl();
+                let controlMaxDateEffected = controlInstance.getEffectedMaxDateControl();
                 controlRequireEffected[controlName] = true;
                 controlHiddenEffected[controlName] = true;
                 controlReadonlyEffected[controlName] = true;
@@ -2357,6 +2376,8 @@ export default {
                 this.runOtherFormulasEffected(controlRequireEffected,'require');
                 this.runOtherFormulasEffected(controlLinkEffected,'linkConfig');
                 this.runOtherFormulasEffected(controlValidateEffected,'validate');
+                this.runOtherFormulasEffected(controlMinDateEffected,'minDate');
+                this.runOtherFormulasEffected(controlMaxDateEffected,'maxDate');
             }
         },
         /**
@@ -2439,17 +2460,20 @@ export default {
             let inputControl = formulasInstance.getInputControl();
             let dataInput = {};
             for(let inputControlName in inputControl){
-                if(inputControlName == e.controlName){
-                    dataInput[inputControlName] = $(e.e.target).val();
-                }
-                else{
-                    if(this.sDocumentSubmit.listInputInDocument.hasOwnProperty(inputControlName)){
-                        let controlIns = getControlInstanceFromStore(this.keyInstance,inputControlName)
-                        let valueInputControl = controlIns.value;
-                        if(controlIns.type == 'inputFilter'){
-                            valueInputControl = valueInputControl.split(',')
+                if(inputControlName == 'document_object_id'){
+                    dataInput[inputControlName]=this.docObjId;
+                }else{
+                    if(inputControlName == e.controlName){
+                        dataInput[inputControlName] = $(e.e.target).val();
+                    } else {
+                        if(this.sDocumentSubmit.listInputInDocument.hasOwnProperty(inputControlName)){
+                            let controlIns = getControlInstanceFromStore(this.keyInstance,inputControlName)
+                            let valueInputControl = controlIns.value;
+                            if(controlIns.type == 'inputFilter'){
+                                valueInputControl = valueInputControl.split(',')
+                            }
+                            dataInput[inputControlName] = valueInputControl;
                         }
-                        dataInput[inputControlName] = valueInputControl;
                     }
                 }
             }
@@ -2473,7 +2497,9 @@ export default {
             }
             return value;
         },
-        
+        /**
+         * Hàm xử lí dữ liệu sau khi chạy xong công thức
+         */
         handleAfterRunFormulas(rs,controlId,controlName,formulasType,from){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
             if(formulasType === 'formulasDefaulRow'){
@@ -2491,6 +2517,9 @@ export default {
                         this.setDataToTable(controlId,rs.data)
                     }
                 }
+                /**
+                 * con trol ở ngoài
+                 */
                 else{
                     let value = this.getValueFromDataResponse(rs);
                     if(formulasType.includes('linkConfig')){
@@ -2501,7 +2530,6 @@ export default {
                             case "formulas":
                                 this.handleInputChangeBySystem(controlName,value);
                                 break;
-                            
                             case "validate":
                                 this.handlerDataAfterRunFormulasValidate(value,controlName);
                                 break;
@@ -2516,6 +2544,12 @@ export default {
                                 break;
                             case "uniqueDB":
                                 controlInstance.handlerDataAfterRunFormulasUniqueDB(value);
+                                break;
+                            case "minDate":
+                                controlInstance.handlerDataAfterRunFormulasMinDate(value);
+                                break;
+                             case "maxDate":
+                                controlInstance.handlerDataAfterRunFormulasMaxDate(value);
                                 break;
                             case "uniqueTable":
                                 break;

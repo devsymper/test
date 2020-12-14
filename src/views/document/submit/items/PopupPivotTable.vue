@@ -3,6 +3,7 @@
         v-model="isShow"
         width="350"
         scrollable
+        class="pivotTable"
         style="overflow:hidden;"
         >
         <v-card :height="250">
@@ -29,20 +30,31 @@
                     <div>
                         Giá trị cho {{item.controlTitle}}
                     </div>
-                    <v-text-field
-                    class="sym-small-size sym-style-input"
-                        dense
-                        solo
-                        hide-details
-                        v-model="item.selected"
-                        
-                    ></v-text-field>
+                    <v-menu nudge-top="-40" content-class="elevation-0">
+                        <template v-slot:activator="{on}">
+                            <v-text-field
+                            class="sym-small-size sym-style-input"
+                                @click="afterClickInput(item,i)"
+                                dense
+                                :readonly="isShowDatePicker"
+                                solo
+                                v-on="on"
+                                hide-details
+                                v-model="item.selected"
+                            ></v-text-field>
+                        </template>
+                        <v-date-picker
+                            style="border:1px solid lightgrey"
+                            v-if="isShowDatePicker"
+                            @input="handleClickDatePicker"
+                            v-model="item.date"
+                            no-title
+                            scrollable>
+                     </v-date-picker>
+                    </v-menu>
                 </div>
-                
-                
             </v-card-text>
             <v-divider></v-divider>
-
             <v-card-actions>
             <v-spacer></v-spacer>
             <v-btn
@@ -67,6 +79,7 @@
     </v-dialog>
 </template>
 <script>
+import {getControlInstanceFromStore} from '../../common/common'
 export default {
     props:{
         data:{
@@ -75,20 +88,40 @@ export default {
         dataColPivot:{
             type:Array,
         },
+        instance:{
+            type:Number,
+            default:0
+        },
     },
     watch:{
         isShow(vl){
             this.selected = null;
-        }
+        },
     },
     data(){
         return {
+            isShowDatePicker:false,
             isShow:false,
             type:null,
+            date:'',
             tableName:null
         }
     },
     methods:{
+        handleClickDatePicker(value){
+            this.dataColPivot.map(data=>{
+                if(data.date==value){
+                    data.selected = this.$moment(value).format(data.formatDate);
+                }
+            })
+        },
+        afterClickInput(input,index){
+           let control = getControlInstanceFromStore(this.instance, input.controlName);
+           if(control.type=='date'){
+               this.dataColPivot[index].formatDate=control.controlProperties.formatDate.value;
+               this.isShowDatePicker = true;
+           }
+        },
         saveData(){
             this.$emit('before-add-pivot-data',{tableName:this.tableName, type:this.type,dataColPivot:this.dataColPivot,dataRowGroup:this.data})
         },
@@ -115,5 +148,8 @@ export default {
     .sym-small-size >>> .v-input__slot{
         box-shadow: unset !important;
         font-size: 12px;
+    }
+    .pivotTable >>> .v-menu__content{
+        z-index: 900!important
     }
 </style>

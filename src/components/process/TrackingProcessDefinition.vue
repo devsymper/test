@@ -390,4 +390,12 @@ export default {
 .symper-bpm-canvas-heat-map, .symper-bpm-canvas-heat-map canvas {
     transform-origin: 0px 0px!important;
 }
+.djs-hit{
+	pointer-events: none !important;
+}
+</style>
+<style scoped>
+.symper-tracking-workflow-definition >>> .djs-hit{
+	pointer-events: none !important;
+}
 </style>
