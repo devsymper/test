@@ -371,7 +371,7 @@ export default {
         getDataUrl(){   
 			this.page = 1
 			if(this.refreshListWhenChangeUrl){
-        		self.refreshList();
+        		this.refreshList();
 			}	
         },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
