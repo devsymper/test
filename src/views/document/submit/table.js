@@ -70,18 +70,18 @@ Handsontable.cellTypes.registerCellType('percent', {
 
 //renderer user
 Handsontable.renderers.UserRenderer = function(instance, td, row, col, prop, value, cellProperties) {
-        Handsontable.renderers.TextRenderer.apply(this, arguments);
-        if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
-            let listUser = store.state.app.allUsers;
-            let user = listUser.filter(user => {
-                return user.id === value
-            })
-            if (user.length > 0) {
-                td.textContent = user[0].displayName
-            }
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+    if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
+        let listUser = store.state.app.allUsers;
+        let user = listUser.filter(user => {
+            return user.id === value
+        })
+        if (user.length > 0) {
+            td.textContent = user[0].displayName
         }
     }
-    //renderer user
+}
+//renderer user
 Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     if (value == null) value = ""
@@ -1582,6 +1582,7 @@ export default class Table {
                 },0)
                 sum = control.formatNumberValue(sum);
                 td.style.textAlign = 'right'
+                td.style.fontWeight = "600";
                 td.textContent = sum;
             }
         }

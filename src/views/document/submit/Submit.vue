@@ -220,6 +220,7 @@ import PopupPivotTable from './items/PopupPivotTable'
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
 import {checkControlPropertyProp,getControlInstanceFromStore,getControlTitleFromName, getListInputInDocument,mapTypeToEffectedControl} from './../common/common'
 import Formulas from './formulas.js';
+import { startWorkflowBySubmitedDoc } from '../../../components/process/processAction.js';
 let impactedFieldsList = {};
 let impactedFieldsArr = {};
 
@@ -932,6 +933,12 @@ export default {
     },
     
     methods: {
+        checkUpdateByWorkflow(){
+            let updateByWorkflowId = this.documentInfo.updateByWorkflowId;
+            if(updateByWorkflowId && this.$getRouteName() == 'updateDocumentObject'){
+                startWorkflowBySubmitedDoc(updateByWorkflowId, {document_id:this.docId})
+            }
+        },
         afterBlurInputPivot(event){
             $(event.target).css({display:'none'});
             this.updateDataAfterChangePivot($(event.target));
@@ -1443,6 +1450,7 @@ export default {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
                             thisCpn.documentInfo = res.data.document;
+                            thisCpn.checkUpdateByWorkflow();
                             thisCpn.getTitleObjectFormulas(res.data.document.titleObjectFormulasId)
                             thisCpn.docSize = (parseInt(res.data.document.isFullSize) == 1) ? "100%":"21cm";
                             thisCpn.contentDocument = content;
@@ -1942,7 +1950,8 @@ export default {
          */
         handlerSubmitDocumentClick(isContinueSubmit = false){
             this.isContinueSubmit = isContinueSubmit;
-            if($('#sym-submit-'+this.keyInstance+' .validate-icon').length == 0 && $('#sym-submit-'+this.keyInstance+' .error').length == 0){
+            let x = this.validateControl
+            if(Object.keys(this.validateControl).length == 0){
                 if(this.viewType == 'submit'){
                     this.handleRefreshDataBeforeSubmit();
                 }
@@ -1951,17 +1960,19 @@ export default {
                 }
             }
             else{
-                let controlNotValid = $('#sym-submit-'+this.keyInstance+' .validate-icon');
                 let controlError = $('#sym-submit-'+this.keyInstance+' .error');
                 let listErr = []
-                $.each(controlNotValid,function(k,v){
-                    let message = $(v).attr('title');
-                    listErr.push(message);
-                })
+               
                 $.each(controlError,function(k,v){
                     let message = $(v).attr('valid');
                     listErr.push(message);
                 })
+                for(let key in this.validateControl){
+                    for(let type in this.validateControl[key]){
+                        listErr.push(key+" : "+type + " - "+ this.validateControl[key][type])
+                    }
+                }
+                this.$emit('submit-document-error');
                 this.listMessageErr = listErr;
                 this.$refs.errMessage.showDialog();
             }
