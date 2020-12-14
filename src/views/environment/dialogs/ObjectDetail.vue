@@ -114,6 +114,7 @@ export default {
 			},
 			customAPIResult:{
 				reformatData(res){
+					self.$refs.listObject.rerenderTable();
 					return{
 						columns:res.data.columns ? res.data.columns : [],
 						listObject:res.data.listObject ? res.data.listObject : [],
@@ -142,11 +143,16 @@ export default {
 		},
 		handleCheckClick(){
 			this.showDialogRelateData = true
+		},
+		refreshList(){
+			this.$refs.listObject.refreshList()
 		}
 	},
 	watch:{
 		getListUrl(val){
-			this.$refs.listObject.refreshList()
+			setTimeout((self) => {
+				self.$refs.listObject.getData()
+			}, 200,this);
 			this.listItemSelected = {},
 			this.showBtnAddCheckbox = true
 		}

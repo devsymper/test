@@ -356,7 +356,9 @@ export default {
         },
         getDataUrl(){   
 			this.page = 1
-        	this.refreshList();
+			setTimeout((self)=>{
+        		self.refreshList();
+			},100,this)
         },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
             if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
