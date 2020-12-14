@@ -114,9 +114,9 @@
 				:class="{'ag-theme-balham': true}"
 				:defaultColDef="defaultColDef"
 				:gridOptions="gridOptions"
-				:frameworkComponents="frameworkComponents"
 				:columnDefs="columnDefs"
 				:rowData="rowData"
+				:frameworkComponents="frameworkComponents"
 				:modules="modules"
 				:getContextMenuItems="getContextMenuItems"
 				@grid-ready="onGridReady"
@@ -520,7 +520,6 @@ export default {
             }
 		},
 		'tableDisplayConfig.value.densityMode'(value){
-			debugger
 			switch(value){
 				case 0:
 					this.gridOptions.rowHeight  = 70
@@ -554,7 +553,8 @@ export default {
 			modules:[
 				MenuModule
 			],
-			
+			MedalCellRenderer(){
+			},	
 			tableDisplayConfig: {
                 show: false, // có hiển thị panel cấu hình ko
                 width: 300, // Chiều rộng của panel cấu hình
@@ -613,10 +613,18 @@ export default {
 		this.frameworkComponents = {};
         for(let key in this.customComponents){
             this.frameworkComponents[key] = Vue.extend(this.customComponents[key])
-        }
-	
+		}
     },
 	methods:{
+		createImageSpan(imageMultiplier, image) {
+			var resultElement = document.createElement("span");
+			for (var i = 0; i < imageMultiplier; i++) {
+				var imageElement = document.createElement("img");
+				imageElement.src = "https://raw.githubusercontent.com/ag-grid/ag-grid/master/grid-packages/ag-grid-docs/src/images/" + image;
+				resultElement.appendChild(imageElement);
+			}
+			return resultElement;
+		},
 		onGridReady(params){
 			params.api.sizeColumnsToFit()
 			this.agApi = params.api
@@ -645,6 +653,7 @@ export default {
 			this.$set(this.tableDisplayConfig.value, "hiddenColumns", hiddenColumns);
 			let value  =  this.tableDisplayConfig.value.hiddenColumns.includes(idx) ? true : false
 			this.gridOptions.columnApi.setColumnVisible(field, value)
+			this.agApi.sizeColumnsToFit()
         },
 		reOrderFixedCols(column){
 			let pinValue 
@@ -780,6 +789,9 @@ export default {
 				obj.symperFixed = false
 				if(e.cellRenderer){
 					obj.cellRenderer = e.cellRenderer
+				}
+				if(e.cellRendererParams){
+					obj.cellRendererParams = e.cellRendererParams
 				}
 				columnsReduce.push(obj)
 			})

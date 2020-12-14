@@ -7,7 +7,6 @@
 			:pageTitle="'Danh sách demo'"
 			:customAPIResult="customAPIResult"
 			:getDataUrl="apiUrl"
-			:customComponents="customAgComponents"
 			:getContextMenuItems="getContextMenuItems"
 			:useActionPanel="true"
 		>
@@ -21,16 +20,17 @@ import {
     appConfigs
 } from "@/configs";
 import { util } from "@/plugins/util.js";
-import TestCellRenderer from './TestCellRenderer'
 
 export default {
 	data(){
 		return {
 			apiUrl: appConfigs.apiDomain.bpmne.models,
 			containerHeight: null,
-			customAgComponents: {
-                rendererName: TestCellRenderer,
-            },
+			
+			countryCellRenderer(params) {
+				let flag = "<img border='0' width='15' height='10' style='margin-bottom: 2px' src='https://raw.githubusercontent.com/ag-grid/ag-grid-docs/master/src/images/flags/" + RefData.COUNTRY_CODES[params.value] + ".png'>";
+				return flag + " " + params.value;
+			},
 			getContextMenuItems(params) {
 				var result = [
 					{
@@ -42,14 +42,18 @@ export default {
 					},
 				];
 				return result;
-			},	
+			},
 			customAPIResult:{
 				reformatData(res){
 					return{
 						columns:[
 							{name: "id", title: "id", type: "numeric"},
 							{name: "processKey", title: "key", type: "text"},
-							{name: "name", title: "name", type: "text", cellRenderer: 'rendererName'},
+							{name: "name", title: "name", type: "text", 
+							 	cellRenderer: function(params) {
+									return '<span class="mdi mdi-car-lifted-pickup"></span> <span>'+params.value+'</span>';
+								}
+							},
 							{name: "userCreate", title: "user_create", type: "text"},
 							{name: "lastUserUpdate", title: "last_user_update", type: "text"},
 							{name: "description", title: "description", type: "text"},
@@ -67,11 +71,18 @@ export default {
 	},
 	components:{
 		AgDataTable,
-		TestCellRenderer
 	},
 	mounted(){
-		  this.containerHeight = util.getComponentSize(this).h
-		}
+		this.containerHeight = util.getComponentSize(this).h
+		// this.MedalCellRenderer.prototype.init = function(params) {
+		// 	this.eGui = document.createElement('span');
+		// 	this.eGui.innerHTML = '#######';
+		// };
+
+		// this.MedalCellRenderer.prototype.getGui = function() {
+		// 	return this.eGui;
+		// };
+	}
 }
 </script>
 
