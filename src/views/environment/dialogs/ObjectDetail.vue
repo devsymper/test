@@ -149,6 +149,7 @@ export default {
 	},
 	watch:{
 		getListUrl(val){
+			this.$refs.listObject.emptyShowList()
 			setTimeout((self)=>{
 				self.$refs.listObject.getData()
 			},200,this)

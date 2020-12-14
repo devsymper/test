@@ -1269,7 +1269,11 @@ export default {
                 this.$delete(this.tableFilter.allColumn, colName);
                 icon.removeClass("applied-filter");
             }
-        },
+		},
+		emptyShowList(){
+			this.tableColumns = []
+			this.data = []
+		},
         /**
          * Lấy data từ server
          * @param {Array} columns chứa thông tin của các cột cần trả về.
