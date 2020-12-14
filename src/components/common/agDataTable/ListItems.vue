@@ -1,7 +1,7 @@
 <template>
      <div class="h-100 w-100 d-flex flex-column p-2">
 		 <div class="d-flex mb-2 " ref="topBar">
-			 <div class="fs-17 ml-1 mt-1 font-weight-bold align-items-center flex-grow-1">Danh sách demo</div>
+			 <div class="fs-17 ml-1 mt-1 font-weight-bold align-items-center flex-grow-1">{{pageTitle}}</div>
 			 <div>
 				  <v-text-field
 					@input="bindToSearchkey"
@@ -117,6 +117,8 @@
 				:frameworkComponents="frameworkComponents"
 				:columnDefs="columnDefs"
 				:rowData="rowData"
+				:modules="modules"
+				:getContextMenuItems="getContextMenuItems"
 				@grid-ready="onGridReady"
 			>
 			</ag-grid-vue>
@@ -201,10 +203,36 @@ import SymperDragPanel from "@/components/common/SymperDragPanel.vue";
 import { VDialog, VNavigationDrawer } from "vuetify/lib";
 
 
-
 export default {
     props:{
+		 // Đăng ký các component phục vụ việc custom render cell trong table
+        customComponents: {
+            default(){
+                return {}
+            }
+        },
 		 /**
+         * Hàm truyền vào context menu 
+         */
+		getContextMenuItems:{
+			type: Function,
+			default: null
+			// (params) {
+			// 	var result = [
+			// 		{
+			// 			name: 'Alert ' + params.value,
+			// 			action: function () {
+
+			// 				window.alert('Alerting about ' + params.value);
+			// 				debugger
+			// 			},
+			// 			cssClasses: ['redFont', 'bold'],
+			// 		},
+			// 	];
+			// 	return result;
+			// },	
+		},
+		/**
          * Hàm phục vụ cho việc dev tự định nghĩa data khi gọi API để lấy dữ liệu
          * thay vì sử dụng hàm có sẵn, các tham số truyền vào giống như hàm getOptionForGetList trong defaultFilterConfig
          */
@@ -300,29 +328,29 @@ export default {
             type:Boolean,
             default:false
         },
-        /**
-         * * Các contextmenu cho các item trong list, có dạng:
-         * [
-         *      {
-         *          name: 'action1' // Tên của context menu để phân biệt với các context menu khác.
-         *          text: ' Action 1' // Text hiển thị lên .
-         *      }
-         * ]
-         * Khi một menu item được click,
-         * nó sẽ emit sự kiện tên là: context-selection-tên của menu item
-         */
-        tableContextMenu: {
-            default() {
-                return [];
-            }
-        },
-        /**
-         * Mặc định context menu chứa các options: remove, view, edit
-         */
-        useDefaultContext: {
-            type: Boolean,
-            default: true
-        },
+        // /**
+        //  * * Các contextmenu cho các item trong list, có dạng:
+        //  * [
+        //  *      {
+        //  *          name: 'action1' // Tên của context menu để phân biệt với các context menu khác.
+        //  *          text: ' Action 1' // Text hiển thị lên .
+        //  *      }
+        //  * ]
+        //  * Khi một menu item được click,
+        //  * nó sẽ emit sự kiện tên là: context-selection-tên của menu item
+        //  */
+        // tableContextMenu: {
+        //     default() {
+        //         return [];
+        //     }
+        // },
+        // /**
+        //  * Mặc định context menu chứa các options: remove, view, edit
+        //  */
+        // useDefaultContext: {
+        //     type: Boolean,
+        //     default: true
+        // },
         // Chiều rộng của pannel bên phải
         actionPanelWidth: {
             type: Number,
@@ -520,8 +548,13 @@ export default {
             page: 1, // trang hiện tại
 			gridOptions:null,
 			rowHeight: 30,
+			fixedCols:[],
             allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
 			defaultColDef:null,
+			modules:[
+				MenuModule
+			],
+			
 			tableDisplayConfig: {
                 show: false, // có hiển thị panel cấu hình ko
                 width: 300, // Chiều rộng của panel cấu hình
@@ -577,6 +610,10 @@ export default {
         };
 		this.gridOptions = {};
 		this.gridOptions.rowHeight =  this.rowHeight
+		this.frameworkComponents = {};
+        for(let key in this.customComponents){
+            this.frameworkComponents[key] = Vue.extend(this.customComponents[key])
+        }
 	
     },
 	methods:{
@@ -591,7 +628,7 @@ export default {
             if (type == "symperHide") {
 				this.resetHiddenColumns(column.field,idx);
             } else {
-                this.reOrderFixedCols();
+                this.reOrderFixedCols(column);
             }
 		},
 		resetHiddenColumns(field ,idx){
@@ -609,27 +646,20 @@ export default {
 			let value  =  this.tableDisplayConfig.value.hiddenColumns.includes(idx) ? true : false
 			this.gridOptions.columnApi.setColumnVisible(field, value)
         },
-		reOrderFixedCols() {
-            let fixedCols = [];
-            let noneFixedCols = [];
-            for (let col of this.tableColumns) {
-                if (col.symperFixed) {
-                    fixedCols.push(col);
-                } else {
-                    noneFixedCols.push(col);
-                }
-            }
-            if (fixedCols.length > 0) {
-                this.tableColumns = fixedCols.concat(noneFixedCols);
-            }
-            this.fixedColumnsCount = fixedCols.length;
-            setTimeout(
-                thisCpn => {
-                    thisCpn.savedTableDisplayConfig = thisCpn.tableColumns;
-                },
-                1000,
-                this
-            );
+		reOrderFixedCols(column){
+			let pinValue 
+			if(!this.fixedCols.includes(column)){
+				this.fixedCols.push(column)
+				column.symperFixed = true
+				this.$set(column, 'pinned', 'left')
+				pinValue = 'pinned'
+			}else{
+				this.fixedCols.splice(this.fixedCols.indexOf(column),1)
+				pinValue = 'unpinned'
+				delete column.pinned
+				column.symperFixed = false
+			}
+			this.gridOptions.columnApi.setColumnPinned(column.field, pinValue)
         },
 		openTableDisplayConfigPanel() {
             this.tableDisplayConfig.show = !this.tableDisplayConfig.show;
@@ -747,6 +777,10 @@ export default {
 				obj.type = e.type
 				obj.suppressMenu = true
 				obj.symperHide = true
+				obj.symperFixed = false
+				if(e.cellRenderer){
+					obj.cellRenderer = e.cellRenderer
+				}
 				columnsReduce.push(obj)
 			})
 			return columnsReduce
