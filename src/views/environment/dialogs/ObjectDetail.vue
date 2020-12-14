@@ -144,9 +144,7 @@ export default {
 		handleCheckClick(){
 			this.showDialogRelateData = true
 		},
-		refreshList(){
-			this.$refs.listObject.refreshList()
-		}
+	
 	},
 	watch:{
 		getListUrl(val){
