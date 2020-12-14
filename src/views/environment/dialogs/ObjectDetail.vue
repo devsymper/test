@@ -51,6 +51,7 @@
 			:getDataUrl="getListUrl"
 			@close-popup="handleCloseEvent"
 			style="margin-left:10px"
+			:refreshListWhenChangeUrl="false"
 			:useDefaultContext="false"
 			:tableContextMenu="tableContextMenu"
 			:customAPIResult="customAPIResult"
@@ -148,9 +149,9 @@ export default {
 	},
 	watch:{
 		getListUrl(val){
-			setTimeout((self) => {
+			setTimeout((self)=>{
 				self.$refs.listObject.getData()
-			}, 200,this);
+			},200,this)
 			this.listItemSelected = {},
 			this.showBtnAddCheckbox = true
 		}
