@@ -1,66 +1,32 @@
 <template>
-    <div class="w-100 h-100">
-        <v-tabs 
-            class="w-100 h-100 fs-13 tab-board" 
-            style="text-align:left"
-            vertical>
-            <v-tab class="fs-13">
-                <v-icon class="fs-15" left>
-                mdi-package-variant-closed
-                </v-icon>
-                Action pack
-            </v-tab>
-            <v-tab class="fs-13">
-                <v-icon class="fs-15" left>
-                mdi-shield-key-outline
-                </v-icon>
-                Permission
-            </v-tab>
-            <v-tab class="fs-13">
-                <v-icon class="fs-15" left>
-                mdi-account-circle-outline
-                </v-icon>
-                Role
-            </v-tab>
-            <v-tab-item>
-                <action-pack 
-                />
-            </v-tab-item>
-            <v-tab-item>
-                <permission />
-            </v-tab-item>
-            <v-tab-item>
-                <accessProject 
-                    :roles="roles"
-                    :listUser="listUser"
-                    @add-role-success="getListRole"
-                    @change-role-user="changeRoleUser"
-                    @remove-member="removeMember"
-                    @add-people-success="addPeopleSuccess"
-                    @remove-role-success="removeRoleSuccess"
-                />
-            </v-tab-item>
-            
-        </v-tabs>
-    </div>
+        <accessProject 
+            :roles="roles"
+            :listUser="listUser"
+            @add-role-success="getListRole"
+            @change-role-user="changeRoleUser"
+            @remove-member="removeMember"
+            @add-people-success="addPeopleSuccess"
+            @remove-role-success="removeRoleSuccess"
+        />
 </template>
 
 <script>
 import accessProject from "@/components/taskManagement/project/Access";
 import { taskManagementApi } from "@/api/taskManagement.js";
-import ActionPack from '../../../../components/taskManagement/project/ActionPack.vue';
-import Permission from '../../../../components/taskManagement/project/Permission.vue';
 
 export default {
     components:{
         accessProject,
-        ActionPack,
-        Permission,
     },
     data(){
         return{
             roles:[],
-            listUser:[]
+            listUser:[],
+            filter:{
+                pageSize: 100,
+                distinct: true,
+                page: 1
+            },
         }
     },
     methods:{
@@ -78,11 +44,10 @@ export default {
         },
         async getListRole(){
             let self = this;
-            let allRole = await taskManagementApi.getListRole();
+            let allRole = await taskManagementApi.getListRole(this.filter);
             if (allRole.status == 200 && allRole.data) {
                 self.roles = allRole.data.listObject;
             }
-               
         },
         async getUserInProject(){
             let self=this;

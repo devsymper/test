@@ -1,4 +1,5 @@
 import { util } from "@/plugins/util.js";
+import { forIn } from "lodash";
 
 const actionDefault = [
     {
@@ -316,4 +317,32 @@ export const convertRoleWithAction=function(action){
 
     return roles;
 };
+
+export const convertObjectActionControlFromListOperator=function(operators){
+    let actionPackObject = util.cloneDeep(objectActionControls);
+    for (let i = 0; i < operators.length; i++) {
+        let objectType = operators[i].objectType;
+        let action = operators[i].action;
+        for (const key in actionPackObject) {
+            let objChild = actionPackObject[key]['children'];
+            for (const key2 in objChild) {
+                if (key2 == objectType) {
+                    let arrAction = objChild[key2]['actions'];
+                    for (let j = 0; j < arrAction.length; j++) {
+                        if (arrAction[j]['name'] == action) {
+                            arrAction[j]['isCheck'] = true;
+                            continue;
+                        }
+                    }
+                    continue;
+                }
+            }
+            
+        }
+    }
+
+    return actionPackObject ;
+}
+
+
 

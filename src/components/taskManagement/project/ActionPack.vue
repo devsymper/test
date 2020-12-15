@@ -1,42 +1,13 @@
 <template>
-    <div class="w-100 h-100 pl-1">
-        <v-card style="box-shadow:none">
-            <v-card-title>
-                {{$t("taskManagement.listActionPack")}}
-                <v-spacer></v-spacer>
-                <v-text-field
-                    v-model="search"
-                    append-icon="mdi-magnify"
-                    label="Tìm kiếm"
-                    dense
-                    solo
-                    style="max-width:255px;"
-                    single-line
-                    hide-details
-                    class="sym-small-size sym-style-input"
-                ></v-text-field>
-                <v-btn small class="px-1 ml-1" solo depressed @click="handleCreate">
-                    <span>Create action pack</span>
-                </v-btn>
-            </v-card-title>
-            <v-data-table
-                :headers="headers"
-                :items="listActionPack"
-                :search="search"
-                hide-default-footer
-                class="table-list-category"
-            >
-            </v-data-table>
-        </v-card>
-
+    <div>
         <v-dialog
             v-model="isShow"
-            max-width="600px"
+            max-width="800px"
             scrollable
         >
             <v-card min-height="500">
             <v-card-title>
-                <span class="fs-16">Thêm action pack</span>
+                <span class="fs-16">{{statusDetail != true ? 'Thêm action pack' :'Thông tin action pack' }}</span>
             </v-card-title>
             <v-card-text class="pb-0">
                 <v-container class="p-0">
@@ -60,16 +31,15 @@
                         ></v-text-field>
                     </div>
                     <div class="d-flex mt-2">
-                        <div style="width:300px">
+                        <div style="width:400px">
                             <span class="font-weight-medium">Đối tượng</span>
-                            <VuePerfectScrollbar style=" height:250px" >
+                            <VuePerfectScrollbar style=" height:280px" >
                                 <div class="list-control-autocomplete" v-for="(obj,key) in listActionPackObject" :key="key">
                                     <div >{{obj.title}}</div>
                                     <v-list
                                         dense
                                     >
                                         <v-list-item-group
-                                        v-model="selectedIndexItem"
                                         color="primary"
                                         >
                                         <v-list-item
@@ -91,9 +61,9 @@
                                 </div>
                             </VuePerfectScrollbar>
                         </div>
-                        <div style="width:250px">
+                        <div style="width:300px">
                             <span class="font-weight-medium">Hành động</span>
-                            <VuePerfectScrollbar style=" height:250px" >
+                            <VuePerfectScrollbar style=" height:280px" >
                                 <v-list dense height="20">
                                         <v-list-item
                                             v-for="(item, i) in selectedItem.actions"
@@ -139,6 +109,7 @@
                     :loading="isLoading"
                     :disabled="disabled"
                     class="btn-add"
+                    @click="handleUpdateActionPack"
                 >
                     {{$t("common.update")}}
                 </v-btn>
@@ -158,7 +129,7 @@
 </template>
 
 <script>
-import { cloneObjectActionControls } from "./../role/RoleDefinition";
+import { cloneObjectActionControls,convertObjectActionControlFromListOperator } from "./../role/RoleDefinition";
 import FormTpl from "@/components/common/FormTpl.vue";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import infoUser from "@/components/common/user/InfoUser";
@@ -170,15 +141,42 @@ export default {
         infoUser,
         VuePerfectScrollbar
     },
+    props:{
+        statusDetail:{
+            type:Boolean,
+            default:false,
+        },
+        infoActionPack:{
+            type: Object,
+            default(){
+                return {}
+            }
+        },
+        listOperatorInActionPack:{
+            type: Array,
+            default(){
+                return []
+            }
+        }
+    },
+    watch:{
+        infoActionPack:function(vl){
+            if (Object.keys(vl).length > 0) {
+                this.setDataForActionPackDetail();
+            }
+        },
+        listOperatorInActionPack:function(vl){
+            this.setListOperatorInActionPack();
+        }
+    },
     data(){
         return{
-            selectedIndexItem:0,
             selectedItem:{},
             listActionPackObject:{},
             isLoading:false,
             isShow:false,
+            disabled:false,
             search:'',
-            statusDetail:false,
             headers: [
                 {
                 text: this.$t("taskManagement.table.name"),
@@ -227,57 +225,203 @@ export default {
         }
     },
     methods:{
-        async addActionPack(){
-            let listOperation = this.listActionPackObject;
-            let data = [];
-            let projectId = this.$route.params.id;
-            for (const key in listOperation) {
-                let itemInGroup = listOperation[key]['children'];
-                for (const key2 in itemInGroup) {
-                    if (itemInGroup[key2]['actions'].length > 0) {
-                        let actions = itemInGroup[key2]['actions'];
-                        for (let i = 0; i < actions.length; i++) {
-                            if (actions[i]['isCheck'] == true) {
-                                let item = {};
-                                item.name ="Task manager " +itemInGroup[key2]['title']+' '+ actions[i]['title'];
-                                item.description ="Task manager " + itemInGroup[key2]['title']+' '+ actions[i]['title'];
-                                item.action = actions[i]['name'];
-                                item.objectName ="Task manager "+ itemInGroup[key2]['title'] ;
-                                item.objectType = key2;
-                                item.objectIdentifier = key2+':'+projectId;
-                                item.status = 1;
+        /**
+         * Function set trạng thái isCheck cho list operator in action pack
+         */
+        setListOperatorInActionPack(){
+            if (this.listOperatorInActionPack.length > 0) {
+                this.listActionPackObject = convertObjectActionControlFromListOperator(this.listOperatorInActionPack)
+            }
+        },
+        /**
+         * function set name và mô tả cho action pack khi click detail
+         */
+        setDataForActionPackDetail(){
+            this.actionPackProps.name.value = this.infoActionPack.name;
+            this.actionPackProps.description.value = this.infoActionPack.description;
+            this.setListOperatorInActionPack();
+        },
+        async handleUpdateActionPack(){
+            let self = this;
+            this.isLoading = true;
+            let isValid = this.validateData();
+            if (isValid) {
+                let listOperation = this.listActionPackObject;
+                let data = [];
+               // let projectId = this.$route.params.id;
+                for (const key in listOperation) {
+                    let itemInGroup = listOperation[key]['children'];
+                    for (const key2 in itemInGroup) {
+                        if (itemInGroup[key2]['actions'].length > 0) {
+                            let actions = itemInGroup[key2]['actions'];
+                            for (let i = 0; i < actions.length; i++) {
+                                if (actions[i]['isCheck'] == true) {
+                                    let item = {};
+                                    item.name ="Task manager " +itemInGroup[key2]['title']+' '+ actions[i]['title'];
+                                    item.description ="Task manager " + itemInGroup[key2]['title']+' '+ actions[i]['title'];
+                                    item.action = actions[i]['name'];
+                                    item.objectName ="Task manager "+ itemInGroup[key2]['title'] ;
+                                    item.objectType = key2;
+                                    item.objectIdentifier = key2;
+                                    item.status = 1;
 
-                                data.push(item);
-                            }                         
+                                    data.push(item);
+                                }                         
+                            }
                         }
                     }
                 }
+                // call api save operations
+                if (data.length > 0) {
+                    let res =  await this.saveListOperation(data);
+                    if (res.status == 200) {
+                        if (res.data) {
+                            let operations = res.data;
+                            let arrId = operations.reduce((arr, obj)=>{
+                                arr.push(obj.id);
+                                return arr
+                            },[]);
+
+                            let name = self.actionPackProps.name.value;
+                            let description = self.actionPackProps.description.value;
+                            res =  await this.updateActionPack(name,description,arrId,1);
+                            if (res.status == 200) {
+                                self.$snotifySuccess("update action pack success!");
+                                self.$emit("list-actionpack-change");
+                            }
+                            self.isLoading=false;
+                            self.isShow = false;
+                        }
+                    }else{
+                        self.isLoading=false;
+                    }
+
+                }
+            }else{
+                self.isLoading=false;
             }
-            if (data.length > 0) {
+
+        },
+        async addActionPack(){
+            let self = this;
+            this.isLoading = true;
+            let isValid = this.validateData();
+            if (isValid) {
+                let listOperation = this.listActionPackObject;
+                let data = [];
+               // let projectId = this.$route.params.id;
+                for (const key in listOperation) {
+                    let itemInGroup = listOperation[key]['children'];
+                    for (const key2 in itemInGroup) {
+                        if (itemInGroup[key2]['actions'].length > 0) {
+                            let actions = itemInGroup[key2]['actions'];
+                            for (let i = 0; i < actions.length; i++) {
+                                if (actions[i]['isCheck'] == true) {
+                                    let item = {};
+                                    item.name ="Task manager " +itemInGroup[key2]['title']+' '+ actions[i]['title'];
+                                    item.description ="Task manager " + itemInGroup[key2]['title']+' '+ actions[i]['title'];
+                                    item.action = actions[i]['name'];
+                                    item.objectName ="Task manager "+ itemInGroup[key2]['title'] ;
+                                    item.objectType = key2;
+                                    item.objectIdentifier = key2;
+                                    item.status = 1;
+
+                                    data.push(item);
+                                }                         
+                            }
+                        }
+                    }
+                }
+                // call api save operations
+                if (data.length > 0) {
+                    let res =  await this.saveListOperation(data);
+                    if (res.status == 200) {
+                        if (res.data) {
+                            let operations = res.data;
+                            let arrId = operations.reduce((arr, obj)=>{
+                                arr.push(obj.id);
+                                return arr
+                            },[]);
+
+                            let name = self.actionPackProps.name.value;
+                            let description = self.actionPackProps.description.value;
+                            res =  await this.saveActionPack(name,description,arrId,1);
+                            if (res.status == 200) {
+                                self.$snotifySuccess("Add action pack success!");
+                                self.$emit("list-actionpack-change");
+                            }
+                            self.isLoading=false;
+                            self.isShow = false;
+                        }
+                    }else{
+                        self.isLoading=false;
+                    }
+
+                }
+            }else{
+                self.isLoading=false;
             }
 
-            console.log("data",data);
         },
-        async saveListOperation(data){
-            // return new Promise(async (resolve, reject) => {
-            //     try {
-            //         let data = {};
-
-            //         let result = await BPMNEngine.actionOnTask(taskId, taskData);   
-            //         self.$snotifySuccess("Task completed!");
-            //         resolve(result);
-            //     } catch (error) {
-            //         let detail = '';
-            //         if(error.responseText){
-            //             detail = JSON.parse(error.responseText);
-            //             detail = detail.exception;
-            //         }
-            //         self.$snotifyError(error, "Can not submit task!", detail);
-            //         reject(error);
-            //     }
-            // });
+        async saveActionPack(name,description,listOperations,status=1){
+            return new Promise(async (resolve, reject) => {
+                try {
+                    let data = {};
+                    data.name = name;
+                    data.description = description;
+                    data.listOperations =JSON.stringify(listOperations);
+                    data.status = status;
+                    let result = await taskManagementApi.addActionPack(data);
+                    resolve(result);
+                } catch (error) {
+                    this.$snotifyError(error, "Can not add action pack!", error);
+                    this.isLoading=false;
+                    reject(error);
+                }
+            });
         },
-
+        async updateActionPack(name,description,listOperations,status=1){
+            return new Promise(async (resolve, reject) => {
+                try {
+                    let data = {};
+                    data.name = name;
+                    data.description = description;
+                    data.listOperations =JSON.stringify(listOperations);
+                    data.status = status;
+                    let result = await taskManagementApi.updateActionPack(this.infoActionPack.id,data);
+                    resolve(result);
+                } catch (error) {
+                    this.$snotifyError(error, "Can not update action pack!", error);
+                    this.isLoading=false;
+                    reject(error);
+                }
+            });
+        },
+        
+        async saveListOperation(operations){
+            return new Promise(async (resolve, reject) => {
+                try {
+                    let data = {};
+                    data.operations = JSON.stringify(operations);
+                    let result = await taskManagementApi.addOperations(data);
+                    resolve(result);
+                } catch (error) {
+                    this.$snotifyError(error, "Can not add operation!", error);
+                    this.isLoading=false;
+                    reject(error);
+                }
+            });
+        },
+        validateData(){
+            let data=this.actionPackProps;
+            for (var key in data) {
+                data[key].validate();
+                if (data[key].validateStatus.isValid==false) {
+                    return false
+                }
+            }
+            return true;
+        },
         clickShowAction(item){
             this.selectedItem = item;
         },
@@ -291,10 +435,12 @@ export default {
             $('.list-control-autocomplete .sym-control:not(:Contains("' + val + '"))').addClass('d-none');
             $('.list-control-autocomplete .sym-control:Contains("' + val + '")').first().addClass('first-active')
         },
+        show(){
+            this.isShow=true;
+        },
     },
     created(){
         this.listActionPackObject = cloneObjectActionControls();
-        this.selectedItem = this.listActionPackObject['project']['children']['task_manager_project'];
     },
 
 
