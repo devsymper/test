@@ -1,13 +1,20 @@
 <template>
     <v-card class="card-datetime-picker"
-    
-    :style="position"
-    v-show="isShow" ref="symperDateTimePicker">
+        :style="position"
+        v-show="isShow" ref="symperDateTimePicker">
         <h4 class="heading">{{title}}</h4>
         <v-divider></v-divider>
-        <v-date-picker class="date-picker" @click:date="dateSelected" v-model="date" no-title></v-date-picker>
-       
-        <sym-time-picker v-if="isTime"></sym-time-picker>
+        <v-date-picker 
+            class="date-picker"
+            :min="minDate"
+            :max="maxDate"
+            @click:date="dateSelected" 
+            v-model="date"
+            no-title
+        >
+        </v-date-picker>
+        <sym-time-picker v-if="isTime">
+        </sym-time-picker>
         <button v-if="isTime" v-on:click="applyDateTime" class="apply-time">
             Áp dụng
         </button>
@@ -38,12 +45,12 @@ export default {
         let thisCpn = this;
         this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
             if (this.keyInstance == 0 && !$(evt.target).hasClass("input-item-func") && 
-
                 (!$(evt.target).hasClass("card-datetime-picker") &&
                 $(evt.target).closest(".card-datetime-picker").length == 0) &&
                 (!$(evt.target).hasClass("v-list-item") &&
                 $(evt.target).closest(".v-list-item").length == 0)
-            ) {
+            ) 
+            {
                 thisCpn.closePicker();
             }
         });
@@ -53,16 +60,22 @@ export default {
             date:null,
             isShow:false,
             position:null,
+            minDate:'',
+            maxDate:''
         }
     },
     beforeMount(){
         this.position = {
-                        top:'26px',
-                        left:'0px'
-                    }
+            top:'26px',
+            left:'0px'
+        }
     },
   
     methods:{
+        setRange(min, max){
+            this.minDate = min;
+            this.maxDate = max;
+        },
         closePicker() {
             this.isShow = false;
         },

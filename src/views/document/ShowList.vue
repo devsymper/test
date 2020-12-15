@@ -2,6 +2,7 @@
 <div style="width:100%">
     <list-items
         ref="listDocument"
+        :customAPIResult="customAPIResult"
         :getDataUrl="sDocumentManagementUrl+'documents'"  
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
@@ -11,11 +12,13 @@
         :showExportButton="false"
         :showImportButton="false"
         @after-open-add-panel="addDocument"
+        @close-panel="closePanel"
         :headerPrefixKeypath="'document'"
         :commonActionProps="commonActionProps"
     >
         <div slot="right-panel-content" class="h-100">
             <submit-view 
+                v-if="isShowQuickSubmit"
                 ref="submitView" 
                 :isQickSubmit="true" 
                 :action="'submit'" 
@@ -63,6 +66,7 @@ export default {
             showImportPanel:false,
             actionPanelWidth:830,
             containerHeight: 200,
+            isShowQuickSubmit:false,
             tableContextMenu:{
                 edit: {
                     name: "editdoc",
@@ -89,7 +93,16 @@ export default {
                         return " <i class= 'mdi mdi-file-document-outline' > </i>&nbsp; Nhập liệu";
                     },
                     callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/submit',document.title);
+                        const self = this;
+                       //if(document.allowSubmitOutsideWorkflow==1){
+                             self.$goToPage('/documents/'+document.id+'/submit',document.title);
+                        // }else{
+                        //     self.$snotify({
+                        //         type: "error",
+                        //         title: "Không cho phép nhập liệu"
+                        //     })
+                        // }
+                       
                     },
                 },
                 quick_submit :{
@@ -98,6 +111,7 @@ export default {
                         return " <i class= 'mdi mdi-text-box-plus-outline' > </i>&nbsp; Nhập liệu nhanh";
                     },
                     callback: (document, callback) => {
+                        this.isShowQuickSubmit = true
                         this.$refs.listDocument.openactionPanel();
                         this.documentId = parseInt(document.id)
                     },
@@ -238,6 +252,23 @@ export default {
                     },
                 },
             },
+            customAPIResult:{
+                 reformatData(data){
+                    
+                    //  data.data.columns[11].title= "table.allowSubmitOutsideWorkflow"
+                    //  let listDocuments = data.data.listObject; 
+                    //  listDocuments.map(doc=>{
+                    //      if(doc.allowSubmitOutsideWorkflow==1){
+                    //          doc.allowSubmitOutsideWorkflow="Cho phép"
+                    //      }
+                    //      else{
+                    //          doc.allowSubmitOutsideWorkflow="Không cho phép"
+                    //      }
+                    //  })
+                    return data.data
+
+                 }
+            }
         }
     },
     mounted() {
@@ -258,6 +289,9 @@ export default {
         }
     },
     methods:{
+        closePanel(){
+            this.isShowQuickSubmit = false;
+        },
         getApiDocument(){
             const self = this;
             documentApi.detailDocument(this.documentId)

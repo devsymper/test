@@ -546,6 +546,14 @@ export default {
     mounted() {
         let self = this;
         self.reCalcListTaskHeight();
+        this.$evtBus.$on('app-receive-remote-msg', (payload) => {
+            if(!self._inactive){
+                self.getData(false, false,true,true,false);
+            }
+        });
+    },
+    activated(){
+        this.getData(false, false,true,true,false);
     },
     methods: {
         getListByPage(data){
@@ -692,6 +700,10 @@ export default {
                 let tableFilter = this.tableFilter;
                 tableFilter.allColumnInTable = [];
                 configs.emptyOption = emptyOption;
+                configs.moreApiParam = {
+                    variables : 'symper_last_executor_id,symper_user_id_start_workflow,symper_last_executor_name',
+                }
+                
                 getDataFromConfig(url, configs, columns, tableFilter, success, 'GET', header);
             }
         },
@@ -807,10 +819,10 @@ export default {
             } else {
                 this.selectedTask.idx = idx;
                 if (!this.compackMode) {
-                this.sideBySideMode = true;
-                let taskInfo = extractTaskInfoFromObject(obj);
-                this.$set(this.selectedTask, "taskInfo", taskInfo);
-                this.$emit("change-height", "calc(100vh - 88px)");
+                    this.sideBySideMode = true;
+                    let taskInfo = extractTaskInfoFromObject(obj);
+                    this.$set(this.selectedTask, "taskInfo", taskInfo);
+                    this.$emit("change-height", "calc(100vh - 88px)");
                 }
             }
         },
@@ -827,7 +839,7 @@ export default {
             try {
                 let taskData = JSON.parse(task.description);
                 if (taskData) {
-                rsl = taskData;
+                    rsl = taskData;
                 }
             } catch (error) {
                 rsl.content = task.description;
@@ -840,11 +852,14 @@ export default {
          * @param {Boolean} cache có ưu tiên dữ liệu từ cache hay ko
          *
          */
-        getData(columns = false, cache = false, applyFilter = true, lazyLoad = true ) {
+        getData(columns = false, cache = false, applyFilter = true, lazyLoad = true, showLoading = true ) {
             if (this.loadingTaskList) {
                 return;
             }
-            this.loadingTaskList = true;
+
+            if(showLoading){
+                this.loadingTaskList = true;
+            }
             let self = this;
 
             if (Object.keys(this.tableFilter.allColumn).length==0 ) {
@@ -870,13 +885,8 @@ export default {
                         taskIden.push('task:'+e.id);
                         e.taskData = thisCpn.getTaskData(e);
                         addMoreInfoToTask(e);
+                        thisCpn.setDueDateInfoDisplay(e);
                         newListTask.push(e);
-                        let dueDateInfo = thisCpn.getDueDateInfo(e);
-
-                        e.dueDateClass = dueDateInfo.class;
-                        e.dueDateText = dueDateInfo.text;
-                        e.createTimeDisplay = e.createTime ? thisCpn.$moment(e.createTime).format('DD/MM/YY HH:mm') : thisCpn.$moment(e.endTime).format('DD/MM/YY HH:mm');
-                        e.dueDateFromNow = e.dueDate ? thisCpn.$moment(e.dueDate).fromNow() : '';
                     })
                     this.data = newListTask;
                 }
@@ -893,14 +903,21 @@ export default {
             }
             this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
         },
+        setDueDateInfoDisplay(e){
+            let dueDateInfo = this.getDueDateInfo(e);
+            e.dueDateClass = dueDateInfo.class;
+            e.dueDateText = dueDateInfo.text;
+            e.createTimeDisplay = e.createTime ? this.$moment(e.createTime).format('DD/MM/YY HH:mm') : this.$moment(e.endTime).format('DD/MM/YY HH:mm');
+            e.dueDateFromNow = e.dueDate ? this.$moment(e.dueDate).fromNow() : '';
+        },
         getDueDateInfo(obj){
-            let inDue = this.checkTimeDueDate(obj);
+            let overDue = this.checkTimeDueDate(obj);
             if(obj.endTime){
                 return {
                     class: 'task-done' ,
                     text: this.$t('common.done'),
                 }
-            }else if(obj.createTime && inDue){
+            }else if(obj.createTime && !overDue){
                 return {
                     class: 'task-to-do' ,
                     text: this.$t('myItem.unfinished'),
@@ -921,9 +938,10 @@ export default {
             for (let i = 0; i < this.groupFlatTasks.length; i++) {
                 for (let j = 0; j < this.groupFlatTasks[i].tasks.length; j++) {
                     let task=this.groupFlatTasks[i].tasks[j];
-                    if (task.id==selectedTask.originData.id) {
+                    if (task.id == selectedTask.originData.id) {
                         this.groupFlatTasks[i].tasks[j].endTime = this.$moment(selectedTask.originData.endTime).format('DD/MM/YY HH:mm:ss') ;
                         this.groupFlatTasks[i].tasks[j].description = selectedTask.originData.description;
+                        this.setDueDateInfoDisplay(this.groupFlatTasks[i].tasks[j]);
                         return;
                     }
                 }

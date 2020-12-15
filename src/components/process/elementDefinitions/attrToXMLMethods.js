@@ -73,7 +73,7 @@ export default {
         }
         console.log(attrName, value, value !== '');
 
-        if (value !== '' && attrName != 'overrideid') {
+        if (attrName != 'overrideid') {
             let objToUpdate = {};
             if (typeof value != 'number' && typeof value != 'string') {
                 value = JSON.stringify(value);
