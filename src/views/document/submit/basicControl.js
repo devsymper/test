@@ -675,7 +675,7 @@ export default class BasicControl extends Control {
         })
         this.ele.on('focus', function(e) {
             if (/^[-0-9,.]+$/.test($(this).val())) {
-                $(this).val($(this).val())
+                $(this).val(numbro($(this).val()).format())
             }
         })
     }
