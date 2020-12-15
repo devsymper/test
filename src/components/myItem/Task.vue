@@ -109,6 +109,7 @@
                     :action="'update'"
                     :editableControls="taskInfo.approvalEditableControls"
                     :documentObjectId="converstNumber(documentObjectId)"
+                    @submit-document-error="onSubmitError"
                     @submit-document-success="onDocumentUpdateSuccess"/>
             </div>
         </v-dialog>
