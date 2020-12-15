@@ -13,7 +13,7 @@
 			@row-selected="handlerRowClicked"
 		>
 			 <template slot="right-panel-content" slot-scope="{}">  
-				 <div class="fs-20 font-weight-bold">
+				 <div class="fs-50 font-weight-bold h-100 w-100">
 					 {{ title }}
 				 </div>
             </template>

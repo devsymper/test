@@ -12,6 +12,7 @@
 					@input="bindToSearchkey"
 					class="d-inline-block mr-2 sym-small-size"
 					single-line
+					v-if="showSearchBox"
 					:append-icon="$i('input.search')"
 					outlined
 					dense
@@ -209,7 +210,7 @@
 		 >
 			<ag-grid-vue :style="{
 				width: '100%',
-				height:tableHeight - 5 + 'px',
+				height:tableHeight+ 'px',
 			}"
 				:class="{'ag-theme-balham': true}"
 				:defaultColDef="defaultColDef"
@@ -613,7 +614,8 @@ export default {
             if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
                 this.openactionPanel();
             }else{
-                this.closeactionPanel();
+				this.closeactionPanel();
+				this.showSearchBox = true
             }
 		},
 		'tableDisplayConfig.value.densityMode'(value){
@@ -636,6 +638,7 @@ export default {
     data(){
 		let self = this
         return {
+			showSearchBox: true,
             loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
             loadingExportExcel: false, // có đang chạy export hay ko
 			totalObject:0,
