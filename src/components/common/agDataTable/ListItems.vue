@@ -295,8 +295,8 @@ import SymperDragPanel from "@/components/common/SymperDragPanel.vue";
 import { VDialog, VNavigationDrawer } from "vuetify/lib";
 import TableFilter from '@/components/common/customTable/TableFilter'
 import {uiConfigApi} from "@/api/uiConfig";
-
-console.log(CustomHeader, 'CustomHeaderCustomHeaderCustomHeaderCustomHeaderCustomHeader');
+console.log(PerfectScrollbar,'PerfectScrollbarPerfectScrollbarPerfectScrollbarPerfectScrollbarPerfectScrollbar')
+import PerfectScrollbar from "perfect-scrollbar";
 
 let CustomHeaderVue = Vue.extend(CustomHeader);
 
@@ -930,6 +930,16 @@ export default {
 		onGridReady(params){
 			params.api.sizeColumnsToFit()
 			this.agApi = params.api
+			const agBodyViewport = this.elementRef.nativeElement.querySelector('.ag-theme-balham .ag-body-viewport');
+			const agBodyHorizontalViewport = this.elementRef.nativeElement.querySelector('.ag-theme-balham .ag-body-horizontal-scroll-viewport');
+			if (agBodyViewport) {
+			const ps = new PerfectScrollbar(agBodyViewport);
+				ps.update();
+			}
+			if (agBodyHorizontalViewport) {
+			const ps = new PerfectScrollbar(agBodyHorizontalViewport);
+				ps.update();
+			}
 		},
 		configColumnDisplay(type, idx) {
             let column = this.columnDefs[idx];
