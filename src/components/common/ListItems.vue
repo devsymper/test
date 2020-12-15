@@ -369,7 +369,9 @@ export default {
         },
         getDataUrl(){   
 			this.page = 1
-        	this.refreshList();
+			if(this.refreshListWhenChangeUrl){
+        		this.refreshList();
+			}	
         },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
             if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
@@ -395,7 +397,8 @@ export default {
             tmpTableContextMenu: null,
             deleteDialogShow: false, // có hiển thị cảnh báo xóa hay không
             deleteItems: [], // danh sách các row cần xóa
-            savingConfigs: false, // có đang lưu cấu hình của showlist hay không
+			savingConfigs: false, // có đang lưu cấu hình của showlist hay không
+			
             // các cấu hình cho việc hiển thị và giá trị của panel cấu hình hiển thị của bảng
             tableDisplayConfig: {
                 show: false, // có hiển thị panel cấu hình ko
@@ -574,6 +577,10 @@ export default {
         });
     },
     props: {
+		refreshListWhenChangeUrl:{
+			type: Boolean, 
+			default: true
+		},
         /**
          * Hàm phục vụ cho việc dev tự định nghĩa data khi gọi API để lấy dữ liệu
          * thay vì sử dụng hàm có sẵn, các tham số truyền vào giống như hàm getOptionForGetList trong defaultFilterConfig
@@ -1259,7 +1266,11 @@ export default {
                 this.$delete(this.tableFilter.allColumn, colName);
                 icon.removeClass("applied-filter");
             }
-        },
+		},
+		emptyShowList(){
+			this.tableColumns = []
+			this.data = []
+		},
         /**
          * Lấy data từ server
          * @param {Array} columns chứa thông tin của các cột cần trả về.
