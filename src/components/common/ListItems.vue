@@ -922,8 +922,6 @@ export default {
         rerenderTable(){
             this.$refs.dataTable.hotInstance.render();
         },
-        myFunctionScroll(e){
-        },
         importExcel(){
             this.$emit('import-excel');
         },

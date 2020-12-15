@@ -9,6 +9,7 @@
 			:getDataUrl="apiUrl"
 			:getContextMenuItems="getContextMenuItems"
 			:useActionPanel="true"
+			:showActionPanelInDisplayConfig="true"
 		>
 		</AgDataTable>
 	</div>

@@ -41,7 +41,6 @@ import ImageRenderer from './ImageRenderer';
 import CheckBoxRenderer from './CheckBoxRenderer';
 import Vue from "vue";
 
-
 export default {
     props:{
         tableHeight: {

@@ -1,5 +1,5 @@
 <template>
-     <div class="h-100 w-100 d-flex flex-column p-2">
+     <div :style="{width:contentWidth}" class="h-100 w-100 d-flex flex-column p-2">
 		 <div v-if="showToolbar" class="d-flex mb-2 " ref="topBar">
 			<div 
 			 	class="fs-17 ml-1 mt-1 font-weight-bold align-items-center flex-grow-1" 
@@ -18,12 +18,24 @@
 					label="Search"
 					:placeholder="$t('common.search')"
 				></v-text-field>
-						
-                         <v-btn
+					<v-btn
                             depressed
                             small
                             class="mr-2"
-							 @click="addItem"
+                            v-if="actionPanel "
+                            @click="showSearchBox = !showSearchBox"
+                        >
+                            <v-icon small dark> {{ showSearchBox ? 'mdi-close' : 'mdi-magnify'}} </v-icon>
+                        </v-btn>
+                         <v-btn
+                            v-show="showButtonAdd && !actionPanel && !dialogMode"
+                            depressed
+                            small
+                            :loading="loadingRefresh"
+                            :disabled="loadingRefresh"
+                            class="mr-2"
+                            @click="addItem"
+                            v-if="checkShowCreateButton()"
                         >
                             <v-icon left dark>mdi-plus</v-icon>
                             <span >{{$t('common.add')}}</span>
@@ -31,29 +43,37 @@
                         <v-btn
                             depressed
                             small
+                            :loading="loadingRefresh"
+                            :disabled="loadingRefresh"
                             class="mr-2"
-							 @click="refreshList"
+                            v-if="!isCompactMode && !actionPanel && !dialogMode"
+                            @click="refreshList"
                         >
                             <v-icon left dark>mdi-refresh</v-icon>
                             <span >{{$t('common.refresh')}}</span>
                         </v-btn>
-						
+
                       
-                        <!-- <v-btn
+                        <v-btn
                             depressed
                             small
                             @click="exportExcel()"
+                            :loading="loadingExportExcel"
                             class="mr-2"
+                            :disabled="loadingExportExcel"
+                            v-if="!isCompactMode && showExportButton && !actionPanel && !dialogMode"
                         >
                             <v-icon left dark>mdi-microsoft-excel</v-icon>
-							<span >{{$t('common.export_excel')}}</span>
+                            <span v-show="!actionPanel">{{$t('common.export_excel')}}</span>
                         </v-btn>
 
                         
                         <v-btn
                             depressed
                             small
+                            @click="importExcel()"
                             class="mr-2"
+                            v-if="showImportButton && !actionPanel && !dialogMode"
                         >
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel')}}</span>
@@ -65,16 +85,92 @@
                             small
                             @click="showImportHistory()"
                             class="mr-2"
+                            v-if="showImportHistoryBtn && !actionPanel && !dialogMode"
                         >
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel_history')}}</span>
-                        </v-btn> -->
-						 <v-tooltip top>
+                        </v-btn>
+                        <v-btn
+                            depressed
+                            small
+							icon
+							tile
+                            @click="handleCloseClick"
+                            class="mr-2"
+                            v-if="dialogMode"
+                        >
+                            <v-icon dark>mdi-close</v-icon>
+                        </v-btn>
+                         <v-menu
+                            
+                            bottom
+                            left
+                            >
+                            <template v-slot:activator="{ on, attrs }">
+                                 <v-btn 
+                                    icon
+                                    tile 
+                                    v-show="actionPanel"
+                                    v-bind="attrs"
+                                    v-on="on"
+                                    style="width:29px;height:29px;margin:0px 4px"    
+                                >
+                                        <v-icon>
+                                            mdi-dots-vertical
+                                        </v-icon>
+                                </v-btn>
+                            </template>
+                            <v-list class="group-action-list">
+                                <v-list-item  v-show="showButtonAdd"  @click="addItem">
+                                    <v-list-item-icon>
+                                         <v-icon>mdi-plus</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title> {{$t('common.add')}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item  v-show="!isCompactMode"  @click="refreshList">
+                                    <v-list-item-icon>
+                                         <v-icon>mdi-refresh</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title> {{$t('common.refresh')}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item  v-show="!isCompactMode && showExportButton"  @click="exportExcel()">
+                                    <v-list-item-icon>
+                                         <v-icon>mdi-microsoft-excel</v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title>{{$t('common.export_excel')}}</v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                                <v-list-item  v-show="showImportButton"  @click="importExcel()">
+                                    <v-list-item-icon>
+                                         <v-icon>
+                                             mdi-database-import
+                                         </v-icon>
+                                    </v-list-item-icon>
+                                    <v-list-item-content>
+                                         <v-list-item-title> 
+                                             {{$t('common.import_excel')}}
+                                        </v-list-item-title>
+                                    </v-list-item-content>
+                                </v-list-item>
+                            </v-list>
+                        </v-menu>
+                        <component
+                            :is="'span'"
+                        >
+                            <slot name="extra-button"></slot>
+                        </component>
+                        <v-tooltip top>
                             <template v-slot:activator="{ on }">
                                 <v-btn
                                     @click="openTableDisplayConfigPanel"
                                     depressed
                                     small
+									v-if="!dialogMode"
                                     v-on="on"
                                 >
                                     <v-icon left dark class="ml-1 mr-0 ">mdi-table-cog</v-icon>
@@ -97,7 +193,6 @@
                             </template>
                             <span>{{alwaysShowActionPanel ? $t('common.not_always_show_sidebar') : $t('common.always_show_sidebar')}}</span>
                         </v-tooltip>
-                      
 			 </div>
 		 </div>
 		 <div
@@ -193,16 +288,12 @@ import CustomHeader from './CustomAgGrid/CustomHeader'
 import DisplayConfig from "@/components/common/listItemComponents/DisplayConfig";
 import SymperDragPanel from "@/components/common/SymperDragPanel.vue";
 import { VDialog, VNavigationDrawer } from "vuetify/lib";
-
-
+import TableFilter from '@/components/common/customTable/TableFilter'
+console.log(CustomHeader, 'CustomHeaderCustomHeaderCustomHeaderCustomHeaderCustomHeader');
+let CustomHeaderVue = Vue.extend(CustomHeader);
 export default {
     props:{
-		 // Đăng ký các component phục vụ việc custom render cell trong table
-        customComponents: {
-            default(){
-                return {}
-            }
-        },
+		
 		 /**
          * Hàm truyền vào context menu 
          */
@@ -531,6 +622,8 @@ export default {
     data(){
 		let self = this
         return {
+            loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
+            loadingExportExcel: false, // có đang chạy export hay ko
 			totalObject:0,
 			pageSize: 50,
 			agApi: null,
@@ -585,29 +678,61 @@ export default {
     components: {
 		AgGridVue,
 		Pagination,
-		CustomHeader,
 		DisplayConfig,
 		"symper-drag-panel": SymperDragPanel,
 		VNavigationDrawer,
-		VDialog
+		VDialog,
+		TableFilter
 
     },
     beforeMount(){
 		this.defaultColDef = {
             minWidth: 100,
-            filter: true,
-            sortable: true,
-			resizable: true,
-			headerComponentParams: { menuIcon: 'fa-bars' },
+			filter: true,
+			suppressMenu : true,
+			sortable: true,
+            resizable: true,
         };
 		this.gridOptions = {};
 		this.gridOptions.rowHeight =  this.rowHeight
-		this.frameworkComponents = {};
-        for(let key in this.customComponents){
-            this.frameworkComponents[key] = Vue.extend(this.customComponents[key])
-		}
+		this.frameworkComponents = {
+			agColumnHeader: CustomHeaderVue,
+		};
     },
 	methods:{
+		importExcel(){
+            this.$emit('import-excel');
+		},
+		async exportExcel(){
+            let exportUrl = this.exportLink
+            if(!exportUrl){
+                if(this.getDataUrl[this.getDataUrl.length - 1] == '/'){
+                    exportUrl = this.getDataUrl+'export';
+                }else{
+                    exportUrl = this.getDataUrl+'/export';
+                }
+            }
+            
+            window.open(exportUrl,'_blank');
+        },
+       
+        showImportHistory(){
+            this.$router.push("/viewHistory");
+        },
+		changeAlwayShowSBSState(){
+            this.tableDisplayConfig.value.alwaysShowSidebar = !this.tableDisplayConfig.value.alwaysShowSidebar;
+        },
+		checkShowCreateButton(){
+            let rsl = !this.isCompactMode;
+            let objectType = this.commonActionProps.resource;
+            let objectTypePermission = this.$store.state.app.userOperations[objectType];
+
+            let hasCreatePermission = true;
+            if(!util.auth.isSupportter()){
+                hasCreatePermission = objectTypePermission && objectTypePermission[0] && objectTypePermission[0]['create'];
+            }
+            return rsl && hasCreatePermission;
+        },
 		createImageSpan(imageMultiplier, image) {
 			var resultElement = document.createElement("span");
 			for (var i = 0; i < imageMultiplier; i++) {
@@ -675,11 +800,15 @@ export default {
                 self.getData();
             }, 300, this);
         },
-		 refreshList(){
+		refreshList(){
 			this.allRowChecked = {}
 			this.$emit('after-selected-row', this.allRowChecked)
             this.getData();
             this.$emit("refresh-list", {});
+		},
+		removeItem() {
+            // Phát sự kiện khi xóa danh sách các item trong list
+            this.$emit("remove-item", []);
         },
 		changePageSize(vl){
             this.pageSize = vl.pageSize
