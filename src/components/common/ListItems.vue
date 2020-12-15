@@ -348,7 +348,7 @@ var testSelectData = [ ];
 window.tableDropdownClickHandle = function(el, event) {
     event.preventDefault();
     event.stopPropagation();
-    let thisListItem = util.getClosestVueInstanceFromDom(el, "SymperListItem");
+	let thisListItem = util.getClosestVueInstanceFromDom(el, "SymperListItem");
     thisListItem.showTableDropdownMenu(
         event.pageX,
         event.pageY,
@@ -854,7 +854,7 @@ export default {
                 return headers;
             }, []);
             return function(col) {
-                let colName = colNames[col];
+				let colName = colNames[col];
                 let markFilter = "";
                 if (thisCpn.filteredColumns[colName]) {
                     markFilter = "applied-filter";
@@ -1327,7 +1327,7 @@ export default {
                 if(this.customDataForApi){
                     configs.customDataForApi = this.customDataForApi;
                 }
-                getDataFromConfig(url, configs, columns, tableFilter, success, method, header);
+				getDataFromConfig(url, configs, columns, tableFilter, success, method, header);
             }
         },
         /**

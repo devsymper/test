@@ -269,7 +269,12 @@
                 </slot>
             </template>
         </symper-drag-panel>
-	
+		<table-filter
+            ref="tableFilter"
+            :columnFilter="tableFilter.currentColumn.colFilter"
+            @apply-filter-value="applyFilter"
+            @search-autocomplete-items="searchAutocompleteItems"
+        ></table-filter>
 	 </div>
 </template>
 <script>
@@ -289,11 +294,36 @@ import DisplayConfig from "@/components/common/listItemComponents/DisplayConfig"
 import SymperDragPanel from "@/components/common/SymperDragPanel.vue";
 import { VDialog, VNavigationDrawer } from "vuetify/lib";
 import TableFilter from '@/components/common/customTable/TableFilter'
+import {uiConfigApi} from "@/api/uiConfig";
+
 console.log(CustomHeader, 'CustomHeaderCustomHeaderCustomHeaderCustomHeaderCustomHeader');
+
 let CustomHeaderVue = Vue.extend(CustomHeader);
+
+var apiObj = new Api("");
+var testSelectData = [ ];
+window.tableDropdownClickHandle = function(el, event) {
+    event.preventDefault();
+    event.stopPropagation();
+	let thisListItem = util.getClosestVueInstanceFromDom(el, "SymperListItem");
+    thisListItem.showTableDropdownMenu(
+        event.pageX,
+        event.pageY,
+        $(el).attr("col-name")
+    );
+};
+
 export default {
+    name: "SymperListItem",
     props:{
-		
+		/**
+		 * Truyeenf vao row height
+		 * 
+		 */
+		rowHeight:{
+			type: Number,
+			default:21
+		},
 		 /**
          * Hàm truyền vào context menu 
          */
@@ -411,29 +441,6 @@ export default {
             type:Boolean,
             default:false
         },
-        // /**
-        //  * * Các contextmenu cho các item trong list, có dạng:
-        //  * [
-        //  *      {
-        //  *          name: 'action1' // Tên của context menu để phân biệt với các context menu khác.
-        //  *          text: ' Action 1' // Text hiển thị lên .
-        //  *      }
-        //  * ]
-        //  * Khi một menu item được click,
-        //  * nó sẽ emit sự kiện tên là: context-selection-tên của menu item
-        //  */
-        // tableContextMenu: {
-        //     default() {
-        //         return [];
-        //     }
-        // },
-        // /**
-        //  * Mặc định context menu chứa các options: remove, view, edit
-        //  */
-        // useDefaultContext: {
-        //     type: Boolean,
-        //     default: true
-        // },
         // Chiều rộng của pannel bên phải
         actionPanelWidth: {
             type: Number,
@@ -534,7 +541,8 @@ export default {
         }
 	},
 	created(){
-        this.getData();
+		this.getData();
+        this.restoreTableDisplayConfig();
 	},
 	computed:{
 		alwaysShowActionPanel(){
@@ -594,7 +602,11 @@ export default {
 			this.page = 1
         	this.refreshList();
 		},
-		
+		'tableDisplayConfig.show'(value){
+			if(value = false){
+				this.agApi.sizeColumnsToFit()
+			}
+		},
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
             if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
                 this.openactionPanel();
@@ -605,15 +617,15 @@ export default {
 		'tableDisplayConfig.value.densityMode'(value){
 			switch(value){
 				case 0:
-					this.gridOptions.rowHeight  = 70
-					this.agApi.resetRowHeights()
-					break;
-				case 1:
 					this.gridOptions.rowHeight  = 50
 					this.agApi.resetRowHeights()
 					break;
+				case 1:
+					this.gridOptions.rowHeight  = 35
+					this.agApi.resetRowHeights()
+					break;
 				case 2:
-					this.gridOptions.rowHeight  = 30
+					this.gridOptions.rowHeight  = 21
 					this.agApi.resetRowHeights()
 					break;	
 			}
@@ -631,7 +643,6 @@ export default {
             actionPanel: false, // có hiển thị action pannel (create, detail, edit) hay không
             page: 1, // trang hiện tại
 			gridOptions:null,
-			rowHeight: 30,
 			fixedCols:[],
             allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
 			defaultColDef:null,
@@ -656,7 +667,8 @@ export default {
                     ghostClass: "ghost-item"
                 },
                 drag: false,
-            },
+			},
+            filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
 			tableFilter: {
 				// cấu hình filter của danh sách này
 				allColumn: {
@@ -695,14 +707,187 @@ export default {
         };
 		this.gridOptions = {};
 		this.gridOptions.rowHeight =  this.rowHeight
+		this.gridOptions.getRowStyle = function(params) {
+			if (params.node.rowIndex % 2 != 0) {
+				return { background: '#fbfbfb' };
+			}
+		}
 		this.frameworkComponents = {
 			agColumnHeader: CustomHeaderVue,
 		};
     },
 	methods:{
+		 /**
+         * Tạo ra các item có check box với trạng thái đã check hay chưa 
+         * @param items danh sách các value dạng ['ccc','xxc', ....]
+         */
+        createSelectableItems(items){
+            let colFilter = this.tableFilter.currentColumn.colFilter;
+            let selectableItems = [];
+            if(colFilter.clickedSelectAll){ // chọn tất cả
+                selectableItems = items.reduce((arr, el) => {
+                    arr.push({
+                        value: el,
+                        checked: true
+                    });
+                    return arr;
+                }, []);
+            }else if(colFilter.selectAll){ // not in
+                selectableItems = items.reduce((arr, el) => {
+                    arr.push({
+                        value: el,
+                        checked: colFilter.valuesNotIn[el] ? false : true
+                    });
+                    return arr;
+                }, []);
+            }else{ // in
+                selectableItems = items.reduce((arr, el) => {
+                    arr.push({
+                        value: el,
+                        checked: colFilter.valuesIn[el] ? true : false
+                    });
+                    return arr;
+                }, []);
+			}  
+            return selectableItems;
+		},
+		searchAutocompleteItems(vl){
+            this.tableFilter.currentColumn.colFilter.searchKey = vl;
+            this.getItemForValueFilter();
+		},
+		handleCloseDragPanel() {
+            this.actionPanel = false;
+        },
+		 /**
+         * Thực hiện filter khi người dùng click vào nút apply của filter
+         */
+        applyFilter(filter, source = "filter") {
+			this.page = 1
+			let colName = this.tableFilter.currentColumn.name;
+            this.$set(this.tableFilter.allColumn, colName, filter);
+            let hasFilter = this.checkColumnHasFilter(colName, filter);
+            this.filteredColumns[colName] = hasFilter;
+            let icon = $(this.$el).find(
+                ".symper-table-dropdown-button[col-name=" + colName + "]"
+			);
+            this.getData(false,false,true);
+            if(hasFilter && source != "clear-filter"){
+                icon.addClass("applied-filter");
+            }else{
+                this.$delete(this.tableFilter.allColumn, colName);
+                icon.removeClass("applied-filter");
+            }
+		},
+		/**
+         * Kiểm tra xem một cột trong table có đang áp dụng filter hay ko
+         */
+        checkColumnHasFilter(colName, filter = false) {
+            if (!filter) {
+                filter = this.tableFilter.allColumn[colName];
+            }
+            if (!filter) {
+                return false;
+            } else {
+                if (
+                    filter.sort == "" &&
+                    $.isEmptyObject(filter.valuesIn) &&
+                    $.isEmptyObject(filter.valuesNotIn) &&
+                    filter.conditionFilter.items[0].type == "none" &&
+                    filter.searchKey == ''
+                ) {
+                    return false;
+                } else {
+                    return true;
+                }
+            }
+		},
+		closeactionPanel() {
+            this.actionPanel = false;
+		},
+		openactionPanel() {
+            this.actionPanel = true;
+		},
+		saveDataAction() {
+            this.closeactionPanel();
+            this.$emit("save-item", {});
+		},
+		refreshList(){
+			// Phát sự kiện khi click vào refresh dữ liệu
+			this.allRowChecked = {}
+			this.$emit('after-selected-row', this.allRowChecked)
+            this.getData();
+            this.$emit("refresh-list", {});
+        },
+		showTableDropdownMenu(x, y, colName) {
+			debugger
+            var windowWidth = $(window).width()/1.1;
+            if(x > windowWidth){
+                x -= 190;
+            }
+            let filterDom = $(this.$refs.tableFilter.$el);
+            filterDom.css("left", x + "px").css("top", y + 10 + "px");
+            this.$refs.tableFilter.show();
+			let colFilter = this.tableFilter.allColumn[colName];
+            if (!colFilter) {
+                colFilter = getDefaultFilterConfig();
+                this.$set(this.tableFilter.allColumn, colName, colFilter);
+            }
+            for (let col of this.columnDefs) {
+                if (col.data == colName) {
+                    colFilter.dataType = col.type;
+                    break;
+                }
+            }
+            this.$set(this.tableFilter, "currentColumn", {
+                name: colName,
+                colFilter: colFilter
+            });
+            this.setSelectItemForFilter();
+            $("#symper-platform-app").append(filterDom[0]);
+			this.getItemForValueFilter();
+		},
+		/**
+         * Lấy danh sách các giá trị cần đưa vào danh sách lựa chọn autocomplete từ server nếu chưa có danh sách này
+         */
+        async setSelectItemForFilter(){
+            let colFilter = this.tableFilter.currentColumn.colFilter;
+            if(colFilter.selectItems.length == 0){
+                let textItems = testSelectData;
+                colFilter.selectItems = this.createSelectableItems(textItems);
+            }
+        },
+		 /**
+         * Lấy các item phục vụ cho việc lựa chọn trong autocomplete cuar filter
+         */
+        getItemForValueFilter(){
+			let columns = [this.tableFilter.currentColumn.name];
+			debugger
+            let self = this;
+            let options = {
+                pageSize: 300,
+                getDataMode: 'autocomplete',
+                distinct: true,
+                page: 1
+            };
+            let success = (data) => {
+                if(data.status == 200){
+                    self.tableFilter.currentColumn.colFilter.selectItems = null;
+                    let items = data.data.listObject.reduce((arr, el) => {
+                        arr.push(el[columns[0]]);
+                        return arr;
+					}, []);
+                    self.tableFilter.currentColumn.colFilter.selectItems = self.createSelectableItems(items);
+                }
+			}
+            this.prepareFilterAndCallApi(columns , false, true, success, options);
+        },
 		importExcel(){
             this.$emit('import-excel');
 		},
+		cancelImport(){
+            this.$emit('cancel-import');
+		},
+		
 		async exportExcel(){
             let exportUrl = this.exportLink
             if(!exportUrl){
@@ -800,15 +985,27 @@ export default {
                 self.getData();
             }, 300, this);
         },
-		refreshList(){
-			this.allRowChecked = {}
-			this.$emit('after-selected-row', this.allRowChecked)
-            this.getData();
-            this.$emit("refresh-list", {});
-		},
+		filterList() {
+            // Phát sự kiện khi có filter danh sách
+            this.$emit("filter-list", {});
+        },
 		removeItem() {
             // Phát sự kiện khi xóa danh sách các item trong list
             this.$emit("remove-item", []);
+		},
+		searchAll() {
+            // Phát sự kiện khi người dùng gõ vào ô tìm kiếm
+            this.$emit("search-all", {});
+		},
+		isShowSidebar(){
+            return this.alwaysShowActionPanel
+        },
+		// Hàm trả về các dòng được selected
+        getAllRowChecked(){
+            return this.allRowChecked;
+        },
+        removeAllRowChecked(){
+            this.allRowChecked = []
         },
 		changePageSize(vl){
             this.pageSize = vl.pageSize
@@ -827,7 +1024,10 @@ export default {
                 this.$emit("after-open-add-panel", {});
             }
             this.$emit('on-add-item-clicked', {});
-        },
+		},
+		handleCloseClick(){
+			this.$emit('close-popup')
+		},
 		nextPage(lazyLoad = false){
             this.page += 1
             this.getData(false , false , true ,lazyLoad);
@@ -902,7 +1102,7 @@ export default {
 			let columnsReduce = []
 			columns.forEach(function(e){
 				let obj = {}
-				obj.headerName = e.title
+				obj.headerName = e.name
 				obj.field = e.name
 				obj.type = e.type
 				obj.suppressMenu = true
@@ -918,13 +1118,65 @@ export default {
 			})
 			return columnsReduce
 		},
-		
+		 /**
+         * Khôi phục lại cấu hình của hiển thị của table từ dữ liệu được lưu
+         */
+        restoreTableDisplayConfig() {
+            let widgetIdentifier = this.getWidgetIdentifier();
+            uiConfigApi.getUiConfig(widgetIdentifier).then((res)=>{
+                if(res.status == 200){
+                    let savedConfigs = JSON.parse(res.data.detail);
+                    this.tableDisplayConfig.value.wrapTextMode =  savedConfigs.wrapTextMode;
+                    this.tableDisplayConfig.value.densityMode =  savedConfigs.densityMode;
+                    this.tableDisplayConfig.value.alwaysShowSidebar =  savedConfigs.alwaysShowSidebar;
+                    
+                    this.savedTableDisplayConfig = savedConfigs.columns;
+                    if(this.tableColumns.length > 0){
+                        this.tableColumns = this.getTableColumns(this.tableColumns, true);
+                        this.handleStopDragColumn();
+                    }
+                }
+            }).catch((err) => {
+                console.warn(err, 'error when get user view config');
+                thisCpn.$snotify({
+                    type: 'error',
+                    'title': thisCpn.$t('table.error.get_config'),
+                });
+            });
+		},
+		getWidgetIdentifier(){
+            let widgetIdentifier = '';
+            if(this.widgetIdentifier){
+                widgetIdentifier =  this.widgetIdentifier;
+            }else{
+                widgetIdentifier =  this.$route.path;
+            }
+			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'');
+            return widgetIdentifier;
+        },
+		getTableDisplayConfigData(){
+            let configs = util.cloneDeep(this.tableDisplayConfig.value);
+			configs.columns = [];
+            let rsl = {
+                widgetIdentifier: this.getWidgetIdentifier(),
+                detail: '{}',
+            };
+            for (let col of this.columnDefs) {
+                configs.columns.push({
+                    data: col.data,
+                    symperFixed: col.symperFixed,
+                    symperHide: col.symperHide
+                });
+            }
+            rsl.detail = JSON.stringify(configs);
+            return rsl;
+        },
 		/**
          * Lưu lại cấu hình hiển thị của table
          */
         saveTableDisplayConfig() {
             this.savingConfigs = true;
-            let thisCpn = this;
+			let thisCpn = this;
             let dataToSave = this.getTableDisplayConfigData();
             uiConfigApi
             .saveUiConfig(dataToSave)
@@ -965,25 +1217,27 @@ export default {
 .ag-row{
 	border-top-style:unset !important;
 }
-.symper-custom-table.clip-text .ht_master.handsontable .htCore td,
-.symper-custom-table.clip-text .ht_clone_left.handsontable .htCore td {
-    text-overflow: ellipsis !important;
-    white-space: nowrap !important;
+.ag-theme-balham .ag-root-wrapper{
+	border: unset !important;
 }
-.symper-custom-table.loosen-row .ag-center-cols-container .ag-row,
-.symper-custom-table.loosen-row .ag-center-cols-container .ag-row {
-    height: 40px !important;
-    line-height: 40px !important;
+.ag-header{
+	border: unset !important;
 }
-.symper-custom-table.medium-row .ht_master.handsontable .htCore td,
-.symper-custom-table.medium-row .ht_clone_left.handsontable .htCore td {
-    height: 30px !important;
-    line-height: 30px !important;
+.ag-row{
+	border-radius: 4px;
 }
-.symper-custom-table.compact-row .ht_master.handsontable .htCore td,
-.symper-custom-table.compact-row .ht_clone_left.handsontable .htCore td {
-    height: 20px !important;
-    line-height: 20px !important;
-    font-size: 12px !important;
+.ag-row:hover{
+	border-radius: 4px;
+}
+.ag-theme-balham .ag-cell{
+	line-height: unset !important
+}
+.ag-header {
+	height: 28px !important;
+	min-height: unset !important;
+	border-radius: 4px !important;
+}
+.ag-theme-balham .ag-header-row {
+    height: 24px !important;
 }
 </style>

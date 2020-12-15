@@ -1,27 +1,30 @@
 <template>
 	<div class="header-ag-grid d-flex  w-100" >
-		<div class="customHeaderLabel flex-grow-1">{{params.displayName}}</div> 
-		<v-btn icon tile x-small >
-			<v-icon class="fs-13" small @click="handlerFilterClick(params)">mdi-filter-variant</v-icon>
-		</v-btn>
+		<div class="customHeaderLabel flex-grow-1">{{$t('table.'+params.displayName)}}</div> 
+		<v-icon class="fs-13" :col-name="params.displayName" small onclick="tableDropdownClickHandle(this,event)">mdi-filter-variant</v-icon>
 	</div>
 
 </template>
 
 <script>
+import { util } from '@/plugins/util';
+
 export default {
 	data: function () {
 		return {
 			
 		}
 	},
+	computed:{
+		colName(){
+
+		}
+	},
 	beforeMount() {},
 	mounted() {
 	},
 	methods: {
-		handlerFilterClick(params){
-			debugger	
-		}
+		
 	}
 }	
 </script>

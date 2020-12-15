@@ -24,22 +24,23 @@ import { util } from "@/plugins/util.js";
 
 export default {
 	data(){
+		let self = this
 		return {
 			apiUrl: appConfigs.apiDomain.bpmne.models,
 			containerHeight: null,
 			getContextMenuItems(params) {
 				var result = [
 					{
-						name: 'Alert ' + params.node.data.id,
+						name: 'Alert Param',
 						action: function () {
 							window.alert('Alerting about ' + params.node.data.id);
 						},
 						cssClasses: ['redFont', 'bold'],
 					},
 					{
-						name: 'click ' + params.node.data.id,
+						name: 'Show Panel ',
 						action: function () {
-							window.alert('Alerting about ' + params.node.data.id);
+							self.$refs.displayTable.actionPanel = true
 						},
 						cssClasses: ['redFont', 'bold'],
 					},
@@ -51,17 +52,17 @@ export default {
 					return{
 						columns:[
 							{name: "id", title: "id", type: "numeric"},
-							{name: "processKey", title: "key", type: "text"},
+							{name: "processKey", title: "processKey", type: "text"},
 							{name: "name", title: "name", type: "text", 
 							 	cellRenderer: function(params) {
 									return '<span class="mdi mdi-car-lifted-pickup"></span> <span>'+params.value+'</span>';
 								}
 							},
-							{name: "userCreate", title: "user_create", type: "text"},
-							{name: "lastUserUpdate", title: "last_user_update", type: "text"},
+							{name: "userCreate", title: "userCreate", type: "text"},
+							{name: "lastUserUpdate", title: "lastUserUpdate", type: "text"},
 							{name: "description", title: "description", type: "text"},
-							{name: "createAt", title: "create_at", type: "date"},
-							{name: "lastUpdateTime", title: "last_update_at", type: "date"},
+							{name: "createAt", title: "createAt", type: "date"},
+							{name: "lastUpdateTime", title: "lastUpdateTime", type: "date"},
 						],
 						listObject:res.data.listObject,
 						total: res.data.total

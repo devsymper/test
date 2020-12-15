@@ -137,7 +137,7 @@ export default {
         title: "admin",
         icon: "mdi-cog-transfer-outline",
 		group: "Administrator",
-		link: "/test/testAg",
+		link: "/admin",
     },
     userManager: {
         title: "Account management",
