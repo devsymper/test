@@ -1,9 +1,14 @@
 <template>
      <div class="h-100 w-100 d-flex flex-column p-2">
-		 <div class="d-flex mb-2 " ref="topBar">
-			 <div class="fs-17 ml-1 mt-1 font-weight-bold align-items-center flex-grow-1">{{pageTitle}}</div>
+		 <div v-if="showToolbar" class="d-flex mb-2 " ref="topBar">
+			<div 
+			 	class="fs-17 ml-1 mt-1 font-weight-bold align-items-center flex-grow-1" 
+				:class="{'ml-4': dialogMode == true }"
+			>
+				{{pageTitle}}
+			</div>
 			 <div>
-				  <v-text-field
+				<v-text-field
 					@input="bindToSearchkey"
 					class="d-inline-block mr-2 sym-small-size"
 					single-line
@@ -154,14 +159,6 @@
             :temporary="reComputeActionPanelType == 'temporary'"
         >
             <slot name="right-panel-content" :itemData="currentItemDataClone">
-                <!-- <v-card flat>
-                    <v-card-title class="pa-0 pl-2" primary-title>{{itemActionTitle}}</v-card-title>
-                    <v-card-text>
-                        <form-tpl :allInputs="itemInputs"></form-tpl>
-                    </v-card-text>
-
-                    <v-divider></v-divider>
-                </v-card> -->
             </slot>
         </component>
         <symper-drag-panel
@@ -173,16 +170,11 @@
             :dragPanelWidth="actionPanelWidth">
             <template slot="drag-panel-content" slot-scope="{panelData}">
                 <slot name="right-panel-content" :itemData="panelData">
-                    <!-- <v-card flat>
-                        <v-card-text>
-                            <form-tpl :allInputs="itemInputs"></form-tpl>
-                        </v-card-text>
-                        <v-divider></v-divider>
-                    </v-card> -->
+                   
                 </slot>
             </template>
         </symper-drag-panel>
- 
+	
 	 </div>
 </template>
 <script>

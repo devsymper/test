@@ -26,15 +26,17 @@ export default {
 		return {
 			apiUrl: appConfigs.apiDomain.bpmne.models,
 			containerHeight: null,
-			
-			countryCellRenderer(params) {
-				let flag = "<img border='0' width='15' height='10' style='margin-bottom: 2px' src='https://raw.githubusercontent.com/ag-grid/ag-grid-docs/master/src/images/flags/" + RefData.COUNTRY_CODES[params.value] + ".png'>";
-				return flag + " " + params.value;
-			},
 			getContextMenuItems(params) {
 				var result = [
 					{
 						name: 'Alert ' + params.node.data.id,
+						action: function () {
+							window.alert('Alerting about ' + params.node.data.id);
+						},
+						cssClasses: ['redFont', 'bold'],
+					},
+					{
+						name: 'click ' + params.node.data.id,
 						action: function () {
 							window.alert('Alerting about ' + params.node.data.id);
 						},
