@@ -167,6 +167,9 @@ export default class Formulas {
      */
     async getDataMultiple(dataInput) {
         let formulas = this.formulas;
+        if(!formulas){
+            return;
+        }
         let listLocal = this.localFormulas;
         if (listLocal != null && listLocal.length > 0) {
             for (let index = 0; index < listLocal.length; index++) {

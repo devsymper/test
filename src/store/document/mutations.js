@@ -595,6 +595,31 @@ const updateValidateControlSubmit = (state, params) => {
         
 }
 
+const removeValidateControlSubmit = (state, params) => {
+    let controlName = params.controlName;
+    let type = params.type;
+    let rowIndex = params.rowIndex;
+    let instance = params.instance;
+    let controlValidate = state.submit[instance].validateMessage[controlName];
+    if(rowIndex != undefined && controlValidate){
+        if(controlValidate[rowIndex]){
+            Vue.delete(state.submit[instance].validateMessage[controlName][rowIndex], type);
+            if(Object.keys(state.submit[instance].validateMessage[controlName][rowIndex])){
+                Vue.delete(state.submit[instance].validateMessage[controlName],rowIndex);
+            }
+        }
+    }
+    else{
+        if(controlValidate){
+            Vue.delete(state.submit[instance].validateMessage[controlName], type);
+            if(Object.keys(state.submit[instance].validateMessage[controlName].length == 0)){
+                Vue.delete(state.submit[instance].validateMessage,controlName);
+            }
+        }
+
+    }
+        
+}
 
 export {
     addControl,
@@ -632,7 +657,8 @@ export {
     setDetailTrackChange,
     updateDataForLinkControl,
     updateDocumentState,
-	updateValidateControlSubmit,
+    updateValidateControlSubmit,
+    removeValidateControlSubmit,
 	setCurrentTitle
 
 };

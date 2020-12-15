@@ -397,7 +397,7 @@ export default {
             listFormulasTrace:{},
             controlTrace:null,
             listFileControl:[],
-            currentImageControl:null,
+            currentFileControl:null,
             currentControlDataflow:null,
             dataPivotTable:{},
             dataColPivot:[],
@@ -411,15 +411,6 @@ export default {
     mounted() {
         this.editorDoc = $(".sym-form-submit");
         let thisCpn = this;
-        $("#file-upload-alter-" + this.keyInstance).on("change", function(e) {
-            let name = $(this).attr("data-control-name");
-            let rowId = $(this).attr("data-rowid");
-            thisCpn.sDocumentSubmit.listInputInDocument[name].addFile(
-                $(this).prop("files")[0],
-                rowId
-            );
-            $(this).val('')
-        });
         $('#sym-submit-'+this.keyInstance).on('click','.validate-icon',function(e){
             let controlName = $(this).attr('control-name');
             let validate = thisCpn.validateControl[controlName];
@@ -609,7 +600,12 @@ export default {
          */
         this.$evtBus.$on("document-submit-image-click", data => {
             if(thisCpn._inactive == true) return;
-            this.currentImageControl = {el:$(data.e.target).closest('.s-control-image'),controlName:data.e.controlName, controlIns:data.controlIns};
+            this.currentFileControl = {controlIns:data.control};
+            this.$refs.fileUploadView.onButtonClick();
+        });
+        this.$evtBus.$on("document-submit-add-file-click", data => {
+            if(thisCpn._inactive == true) return;
+            this.currentFileControl = {controlIns:data.control};
             this.$refs.fileUploadView.onButtonClick();
         });
         var delayTimer;
@@ -1950,7 +1946,6 @@ export default {
          */
         handlerSubmitDocumentClick(isContinueSubmit = false){
             this.isContinueSubmit = isContinueSubmit;
-            let x = this.validateControl
             if(Object.keys(this.validateControl).length == 0){
                 if(this.viewType == 'submit'){
                     this.handleRefreshDataBeforeSubmit();
@@ -2204,6 +2199,9 @@ export default {
                         if(listInput[controlName].type == 'checkbox'){
                             dataControl[controlName] = (value) ? 1 : 0;
                         } 
+                        if(listInput[controlName].type == 'fileUpload'){
+                            dataControl[controlName] = JSON.stringify(value)
+                        }
                        
                     }
                     
@@ -2871,11 +2869,12 @@ export default {
         },
         afterFileUpload(data){
             let url = data.serverPath;
-            this.currentImageControl.controlIns.setValueControl(url);
+            this.currentFileControl.controlIns.setValue(url);
+            let value = this.currentFileControl.controlIns.value;
             this.updateListInputInDocument(
-                this.currentImageControl.controlName,
+                this.currentFileControl.controlIns.name,
                 "value",
-                url
+                value
             );
         },
         handleInputChangeByUser( controlInstance, valueControl){
