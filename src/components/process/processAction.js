@@ -570,6 +570,57 @@ export const getLastestDefinition = function(row, needDeploy = false) {
     });
 }
 
+export const startWorkflowBySubmitedDoc = function(idWorkflow, submitedDocData,  openNewTab = true, prefixParam = ''){
+    return new Promise( async(resolve, reject) => {
+        idWorkflow = idWorkflow + '';
+        let res = await BPMNEngine.getModelData(idWorkflow);
+        let docId = submitedDocData.document_id;
+        if(res.status == 200){
+            let defData = await getLastestDefinition(res.data, true);
+            if(defData.data[0]){
+                defData = defData.data[0];
+                if(openNewTab){
+                    resolve({
+                        message: "Chuyển đến trang khởi tạo quy trình"
+                    });
+                    SYMPER_APP.$goToPage(`/workflow/process-definition/${defData.id}/run`,'Bắt đầu quy trình ' + res.data.name);
+                }else{
+                    let vars = []; // các biến cần đưa vào process instance
+                    let startNodeId = prefixParam + '_';
+                    let dataInputForFormula = {};
+
+                    try {
+
+                        let varsForBackend = await getVarsFromSubmitedDoc(submitedDocData, startNodeId, docId);
+                        vars = varsForBackend.vars;
+                        dataInputForFormula = varsForBackend.nameAndValueMap;
+
+                        // let instanceName = await this.getInstanceName(dataInputForFormula);
+                        let instanceName = res.data.name;
+                        let newProcessInstance = await runProcessDefinition(SYMPER_APP, defData, vars, instanceName);
+                        resolve({
+                            message: "Bắt đầu quy trình " + res.data.name + " thành công",
+                            data: newProcessInstance
+                        });
+                    } catch (error) {
+                        SYMPER_APP.$snotifyError(error ,"Error on run process definition ");
+                    }
+                }
+            }else {
+                reject({
+                    message: "Can not get lastest definition info",
+                    data: defData
+                });
+            }
+        }else{
+            reject({
+                message: "Can not get workflow info",
+                data: res
+            });
+        }
+    });
+}
+
 export const cleanXMLBeforeRenderInEditor = function(xml){
     xml = xml.replace(/<symper:(.*?)<\/symper:(.*?)>/g,''); // Loại bỏ toàn bộ các thẻ của symper
     return xml;
