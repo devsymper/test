@@ -239,6 +239,7 @@
             :is="actionPanelWrapper"
             :width="actionPanelWidth"
             :max-width="actionPanelWidth"
+			v-model="actionPanel"
             class="pa-3"
             absolute
             right
