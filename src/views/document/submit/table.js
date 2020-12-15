@@ -127,9 +127,7 @@ Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, val
         $(td).off('click', '.file-add');
         if (sDocument.state.viewType[instance.keyInstance] != 'detail') {
             $(td).on('click', '.file-add', function(e) {
-                let el = $(e.target).closest('.file-add');
-                $("#file-upload-alter-" + instance.keyInstance).attr('data-rowid', row).attr('data-control-name', el.attr('data-ctrlname'));
-                $("#file-upload-alter-" + instance.keyInstance).click();
+                SYMPER_APP.$evtBus.$emit('document-submit-add-file-click', { control: table.listInputInDocument[prop] });
             })
             $(td).off('click', '.remove-file')
             table.listInputInDocument[prop].setDeleteFileEvent($(td), prop)
@@ -235,6 +233,7 @@ export default class Table {
         this.currentControlSelected = null;
         this.cellSelected = null;
         this.listAutoCompleteColumns = {};
+        this.matrixCellRender = []; // biến đánh dấu có thay dổi trong table hay không. để tối ưu cho việc renderer
         this.event = {
             afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
                 store.commit("document/addToDocumentSubmitStore", {

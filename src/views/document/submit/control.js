@@ -269,6 +269,12 @@ export default class Control {
                 let msg = values[rowId];
                 let rowIndex = this.findIndexByRowId(dataTable, rowId);
                 let cellPos = rowIndex + "_" + colIndex;
+                // if(msg != '' && msg != null && msg != undefined && msg != 'f'){
+                //     this.addToValidateTable(rowIndex,'Validate',msg)
+                // }
+                // else{
+                //     this.removeValidateOnCellTable(rowIndex,'Validate')
+                // }
                 tableControlInstance.tableInstance.addToValueMap(cellPos, {
                     msg: msg,
                     type: "validate",
@@ -350,6 +356,39 @@ export default class Control {
                 $('#'+this.id).removeAttr('disabled');
             }
         }
+    }
+
+    /**
+     * Hàm thêm giá trị validate từng cell trong table vào store
+     * @param {*} row 
+     * @param {*} type 
+     * @param {*} message 
+     */
+
+    addToValidateTable(row, type, message){
+        let currentValidate = this.getCurrentValidate();
+        if(!currentValidate){
+            currentValidate = {};
+        }
+        if(!currentValidate[row]){
+            currentValidate[row] = {};
+
+        }
+        currentValidate[row][type] = message;
+        console.log(currentValidate,'currentValidatecurrentValidate');
+        store.commit("document/updateValidateControlSubmit", {
+            controlName: this.name,
+            value: currentValidate,
+            instance: this.curParentInstance
+        });
+    }
+    removeValidateOnCellTable(row, type){
+        store.commit("document/removeValidateControlSubmit", {
+            controlName: this.name,
+            type: type,
+            rowIndex: row,
+            instance: this.curParentInstance
+        });
     }
 
     handlerDataAfterRunFormulasValue(values) {
@@ -460,7 +499,7 @@ export default class Control {
         }
     }
     getCurrentValidate(){
-        return this.getDataStoreSubmit()['validateMessage'][this.nane]
+        return this.getDataStoreSubmit()['validateMessage'][this.name]
     }
     renderValidateIcon(message, type) {
         let iconEl = Util.makeErrNoti(this.name);
@@ -479,16 +518,13 @@ export default class Control {
     removeValidateIcon(type) {
         let currentValidate = this.getCurrentValidate();
         if(currentValidate && currentValidate[type]){
-            delete currentValidate[type];
-            store.commit("document/updateValidateControlSubmit", {
+            store.commit("document/removeValidateControlSubmit", {
                 controlName: this.name,
-                value: currentValidate,
+                type: type,
                 instance: this.curParentInstance
             });
         }
-        else{
-            this.ele.parent().find('.validate-icon').remove();
-        }
+        this.ele.parent().find('.validate-icon').remove();
         
     }
     isEmpty() {
