@@ -2452,6 +2452,9 @@ export default {
                         if(controlIns.type == 'inputFilter'){
                             valueInputControl = valueInputControl.split(',')
                         }
+                        if(controlIns.type == 'time'){
+                            valueInputControl = controlIns.convertTimeToStandard(valueInputControl)
+                        }
                         dataInput[inputControlName] = valueInputControl;
                     }
                 }

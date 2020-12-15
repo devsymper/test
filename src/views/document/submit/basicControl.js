@@ -822,4 +822,29 @@ export default class BasicControl extends Control {
             return SYMPER_APP.$moment(data,dateFormat).format('YYYY-MM-DD')
         }
     }
+     /**
+     * Hàm chuyển định dạng time sang dạng sql hiểu được HH:mm:ss
+     */
+    convertTimeToStandard(data){
+        if(!data){
+            return "";
+        }
+        if(typeof data == 'object'){
+            let newData = [];
+            for (let index = 0; index < data.length; index++) {
+                let value = data[index];
+                if(value){
+                    newData.push(SYMPER_APP.$moment(value,'hh:mm A').format('HH:mm:ss'))
+                }
+                else{
+                    newData.push("");
+                }
+                
+            }
+            return newData;
+        }
+        else{
+            return SYMPER_APP.$moment(data,'hh:mm A').format('HH:mm:ss')
+        }
+    }
 }
