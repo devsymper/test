@@ -215,7 +215,9 @@
 				:defaultColDef="defaultColDef"
 				:gridOptions="gridOptions"
 				:columnDefs="columnDefs"
+				@rowClicked="handlerRowClicked"
 				:rowData="rowData"
+                :rowSelection="rowSelection"
 				:frameworkComponents="frameworkComponents"
 				:modules="modules"
 				:getContextMenuItems="getContextMenuItems"
@@ -646,6 +648,7 @@ export default {
 			fixedCols:[],
             allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
 			defaultColDef:null,
+    	  	rowSelection: null,
 			modules:[
 				MenuModule
 			],
@@ -699,7 +702,7 @@ export default {
     },
     beforeMount(){
 		this.defaultColDef = {
-            minWidth: 100,
+            minWidth: 40,
 			filter: true,
 			suppressMenu : true,
 			sortable: true,
@@ -715,6 +718,7 @@ export default {
 		this.frameworkComponents = {
 			agColumnHeader: CustomHeaderVue,
 		};
+		this.rowSelection = 'single';
     },
 	methods:{
 		 /**
@@ -927,11 +931,24 @@ export default {
 			}
 			return resultElement;
 		},
+		handlerRowClicked(params){
+			this.$emit('row-selected', params.data);
+			// var selectedRows = this.agApi.getSelectedRows();
+			// if(document.querySelector('#selectedRows')){
+			// 		document.querySelector('#selectedRows').innerHTML =
+			// 	selectedRows.length === 1 ? selectedRows[0].athlete : '';
+			// }
+		},
 		onGridReady(params){
 			params.api.sizeColumnsToFit()
 			this.agApi = params.api
-			const agBodyViewport = this.elementRef.nativeElement.querySelector('.ag-theme-balham .ag-body-viewport');
-			const agBodyHorizontalViewport = this.elementRef.nativeElement.querySelector('.ag-theme-balham .ag-body-horizontal-scroll-viewport');
+			/**
+			 * Create perfect scrollbar cho ag grid
+			 * Dev-create: dungna
+			 * Time Create: 2020/12/15
+			 */
+			const agBodyViewport = document.querySelector('.ag-theme-balham .ag-body-viewport');
+			const agBodyHorizontalViewport = document.querySelector('.ag-theme-balham .ag-body-horizontal-scroll-viewport');
 			if (agBodyViewport) {
 			const ps = new PerfectScrollbar(agBodyViewport);
 				ps.update();
@@ -1245,7 +1262,9 @@ export default {
 .ag-header {
 	height: 28px !important;
 	min-height: unset !important;
-	border-radius: 4px !important;
+	background-color: #ffffff !important;
+	border-top: 1px solid lightgray !important;
+	border-bottom: 1px solid lightgray !important;
 }
 .ag-theme-balham .ag-header-row {
     height: 24px !important;

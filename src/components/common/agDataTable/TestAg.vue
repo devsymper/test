@@ -10,7 +10,13 @@
 			:getContextMenuItems="getContextMenuItems"
 			:useActionPanel="true"
 			:showActionPanelInDisplayConfig="true"
+			@row-selected="handlerRowClicked"
 		>
+			 <template slot="right-panel-content" slot-scope="{}">  
+				 <div class="fs-20 font-weight-bold">
+					 {{ title }}
+				 </div>
+            </template>
 		</AgDataTable>
 	</div>
 </template>
@@ -26,6 +32,7 @@ export default {
 	data(){
 		let self = this
 		return {
+			title: '',
 			apiUrl: appConfigs.apiDomain.bpmne.models,
 			containerHeight: null,
 			getContextMenuItems(params) {
@@ -86,6 +93,12 @@ export default {
 		// this.MedalCellRenderer.prototype.getGui = function() {
 		// 	return this.eGui;
 		// };
+	},
+	methods:{
+		handlerRowClicked(params){
+			this.$refs.displayTable.actionPanel = true
+			this.title = params.id
+		}
 	}
 }
 </script>
