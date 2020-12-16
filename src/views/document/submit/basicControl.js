@@ -384,6 +384,17 @@ export default class BasicControl extends Control {
             }
             this.setFileControlValue(value, true)
         }
+        else if(this.type == 'user'){
+            let listUser = store.state.app.allUsers;
+            if (this.value != null && this.value != "" && !isNaN(this.value)) {
+                let user = listUser.filter(u => {
+                    return u.id == this.value
+                });
+                if (user[0]) {
+                    this.ele.val(user[0].displayName)
+                }
+            }
+        }
         else {
             this.ele.val(value)
         }
@@ -675,7 +686,7 @@ export default class BasicControl extends Control {
         })
         this.ele.on('focus', function(e) {
             if (/^[-0-9,.]+$/.test($(this).val())) {
-                $(this).val($(this).val())
+                $(this).val(numbro($(this).val()).format())
             }
         })
     }
@@ -691,23 +702,8 @@ export default class BasicControl extends Control {
 
     }
     renderUserControl() {
-        let listUser = store.state.app.allUsers;
-        if (!this.checkViewType('submit')) {
-            if (this.value != null && this.value != "" && !isNaN(this.value)) {
-                let user = listUser.filter(u => {
-                    return u.id == this.value
-                });
-                if (user[0]) {
-                    this.value = user[0].displayName;
-                    this.ele.val(this.value)
-                } else {
-                    this.ele.val(this.value)
-                }
-            }
-        } else {
-            this.ele.attr('type', 'text');
-            this.ele.parent().css({ display: 'block' })
-        }
+        this.ele.attr('type', 'text');
+        this.ele.parent().css({ display: 'block' })
     }
     renderLabelControl() {
         this.ele.text('').css({ border: 'none' })

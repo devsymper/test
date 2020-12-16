@@ -3,11 +3,10 @@ import Handsontable from 'handsontable';
 import sDocument from './../../../store/document'
 import store from './../../../store'
 import ClientSQLManager from './clientSQLManager';
-import { checkControlPropertyProp, getControlType, getSDocumentSubmitStore } from './../common/common'
+import { checkControlPropertyProp, getControlType, getSDocumentSubmitStore,getControlInstanceFromStore } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
-import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
+import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
 import { util } from '../../../plugins/util';
-var numbro = require("numbro");
 
 class UserEditor extends Handsontable.editors.TextEditor {
     createElements() {
@@ -449,15 +448,20 @@ export default class Table {
                 if (!changes) {
                     return
                 }
+                let controlName = changes[0][1];
+                
                 // check nếu ko có thay đổi trong cell thì return
                 if (changes[0][2] == changes[0][3] && source == 'edit') {
                     return;
+                }
+                let controlIns = getControlInstanceFromStore(thisObj.keyInstance, controlName);
+                if(source == 'edit' && changes[0][1] != 's_table_id_sql_lite'){
+                    setDataInputBeforeChange(thisObj.keyInstance, controlIns);
                 }
                 if (getSDocumentSubmitStore(thisObj.keyInstance).docStatus == 'init' &&
                     sDocument.state.viewType[thisObj.keyInstance] == 'update') {
                     return;
                 }
-                let controlName = changes[0][1];
 
                 if (thisObj.isAutoCompleting) {
                     return;
@@ -505,7 +509,8 @@ export default class Table {
                     if (source == "edit") {
                         thisObj.handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName);
                     } else {
-                        thisObj.handlerAfterChangeCellByAutoSet(changes, columns, controlName);
+                        console.log(changes,'changeschangeschanges');
+                        // thisObj.handlerAfterChangeCellByAutoSet(changes, columns, controlName);
                     }
                     thisObj.handeRunUniqueDBFormula(controlName, changes);
                     thisObj.isAutoCompleting = false;
@@ -517,6 +522,12 @@ export default class Table {
         listTableInstance[this.tableName] = this;
     }
 
+    checkDateFormated(value, controlIns){
+        if(value){
+            return SYMPER_APP.$moment(value, controlIns.controlProperties.formatDate.value, true).isValid();
+        }
+        return false;
+    }
     handeRunUniqueDBFormula(controlName, changes){
         let dataInput = {}
         dataInput[controlName] = [changes[0][3]]
@@ -868,6 +879,9 @@ export default class Table {
      * @param {*} formulasInstance  Object cua formulas giá trị của control bị ảnh hưởng
      */
     async handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance) {
+        if(!checkDataInputChange(this.keyInstance, dataInput)){
+            return;
+        }
         let listIdRow = this.tableInstance.getDataAtCol(this.tableInstance.getDataAtRow(0).length - 1);
         if (this.tableHasRowSum) {
             listIdRow.pop();
@@ -948,9 +962,17 @@ export default class Table {
                     let vls = [];
                     for (let index = 0; index < listIdRow.length; index++) {
                         const element = listIdRow[index];
-                        vls.push([index, controlInstance.name, data[element]]);
+                        let cellValue = data[element];
+                        if(controlInstance.type == 'date'){
+                            if(cellValue){
+                                cellValue = SYMPER_APP.$moment(cellValue, 'YYYY-MM-DD').format(controlInstance.controlProperties.formatDate.value);
+                            }
+                            else{
+                                cellValue = "";
+                            }
+                        }
+                        vls.push([index, controlInstance.name, cellValue]);
                     }
-
                     thisObj.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
                     /**
                      * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
@@ -969,8 +991,6 @@ export default class Table {
         } catch (error) {
             console.log(error,'errorerror');
         }
-
-
     }
     /**
      * Hàm lấy dữ liệu hiện tại của table và insert vào sql lite table
@@ -986,7 +1006,6 @@ export default class Table {
                 }
             } else {
                 result = rs.data.data;
-
             }
         } else {
             if (!rs.server) {
