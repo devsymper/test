@@ -509,8 +509,7 @@ export default class Table {
                     if (source == "edit") {
                         thisObj.handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName);
                     } else {
-                        console.log(changes,'changeschangeschanges');
-                        // thisObj.handlerAfterChangeCellByAutoSet(changes, columns, controlName);
+                        thisObj.handlerAfterChangeCellByAutoSet(changes, columns, controlName);
                     }
                     thisObj.handeRunUniqueDBFormula(controlName, changes);
                     thisObj.isAutoCompleting = false;
