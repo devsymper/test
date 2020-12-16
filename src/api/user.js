@@ -17,6 +17,13 @@ export const userApi = {
         };
         return coreApi.post(appConfigs.apiDomain.account + "auth/login", data);
     },
+    changePassBA(oldPass, newPass) {
+        let data = {
+            oldPassword: oldPass,
+            newPassword: newPass
+        };
+        return coreApi.post('supporter/change-password', data)
+    },
     changePassUser(oldPass, newPass) {
         let data = {
             oldPassword: oldPass,
