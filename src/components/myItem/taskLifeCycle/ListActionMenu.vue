@@ -82,7 +82,6 @@ export default {
 	methods:{
 		handlerItemClick(item){
 			this.$emit('action-clicked', item.value)
-			debugger
 		}
 	}
 }
@@ -96,9 +95,11 @@ export default {
 	min-height: unset !important;
 	height: 20px !important;
 	cursor: pointer;
-	padding: 8px 4px;
-	margin: 8px 8px;
+	padding: 16px 8px;
+	margin: 2px 8px;
 }
 .v-list-item:hover{
+	background-color: #f5f5f5;
+	border-radius: 4px;
 }
 </style>

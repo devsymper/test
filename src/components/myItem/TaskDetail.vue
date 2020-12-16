@@ -11,12 +11,33 @@
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
                     <div v-on="on" class="fs-13 pl-2 pt-1 float-left text-ellipsis" :style="{'width':widthInfoTask+'px'}"> 
-                        {{taskBreadcrumb}}
+                       <span>
+						    {{taskBreadcrumb}}
+					   </span>
+					   <v-chip
+					   		small
+							label
+							class="ma-2"
+							:color="taskStatus.color"
+							text-color="white"
+						>
+							<span class="fs-13">
+								{{taskStatus.title}}
+							</span>
+						</v-chip>
                     </div>
                 </template>
                 <span>{{taskBreadcrumb}}</span>
             </v-tooltip>
             <div id="action-task" class="text-right pt-1 pb-1 pr-0 float-right ">
+				<!-- <v-btn  
+						text small
+						disabled
+						class="mr-16"
+						v-if="showSubmitSuccessBtn"
+					>
+						<v-icon small color="success">mdi-information-outline</v-icon> Submit
+				</v-btn> -->
                 <span v-if="!originData.endTime && !hideActionTask " class="mr-10">
                     <span v-if="originData.assigneeInfo && checkRole(originData.assigneeInfo.id) == true">
                         <v-btn 
@@ -42,6 +63,7 @@
                     </span>
                   
                 </span>
+				
 				<ListActionMenu 
 					id="action-task-life-cycle" 
 					@action-clicked="handlerActionClick"
@@ -124,6 +146,34 @@
 			@edit-clicked="showUpdateSubmitedDocument"
 			@action-clicked="handlerActionClick"
 		 />
+		<AssignDialog
+			:showDialog="modelDialog.reAssignShowDialog"
+			@cancel="modelDialog.reAssignShowDialog = false"
+		/> 
+		<ClaimDialog
+			:showDialog="modelDialog.claimShowDialog"
+			@cancel="modelDialog.claimShowDialog = false"
+
+		/> 
+		<CompleteDialog 
+			:showDialog="modelDialog.completeShowDialog"
+			@cancel="modelDialog.completeShowDialog = false"
+
+		/> 
+		<DelegateDialog 
+			:showDialog="modelDialog.delegateShowDialog"
+			@cancel="modelDialog.delegateShowDialog = false"
+		
+		/> 
+		<ResolveDialog 
+			:showDialog="modelDialog.resolveShowDialog"
+			@cancel="modelDialog.resolveShowDialog = false"
+		
+		/> 
+		<UnClaimDialog
+			:showDialog="modelDialog.unClaimShowDialog"
+			@cancel="modelDialog.unClaimShowDialog = false"
+		/> 
     </div>
 </template>
 
@@ -146,7 +196,12 @@ import { extractTaskInfoFromObject, addMoreInfoToTask } from '@/components/proce
 import ListActionMenu from './taskLifeCycle/ListActionMenu'
 import SnackBarSubmit from './taskLifeCycle/SnackBarSubmit'
 import { util } from '../../plugins/util';
-
+import AssignDialog from './taskLifeCycle/Dialogs/AssignDialog'
+import ClaimDialog from './taskLifeCycle/Dialogs/ClaimDialog'
+import CompleteDialog from './taskLifeCycle/Dialogs/CompleteDialog'
+import DelegateDialog from './taskLifeCycle/Dialogs/DelegateDialog'
+import ResolveDialog from './taskLifeCycle/Dialogs/ResolveDialog'
+import UnClaimDialog from './taskLifeCycle/Dialogs/UnClaimDialog'
 
 export default {
     name: "taskDetail",
@@ -201,7 +256,8 @@ export default {
             deep: true,
             immediate:true,
             handler(valueAfter){
-                this.changeTaskDetail();
+				this.changeTaskDetail();
+				this.showSubmitSuccessBtn = false
                 this.setCustomDocControls();
             }
         },
@@ -211,6 +267,7 @@ export default {
         "sapp.collapseSideBar": function(newVl) {
             this.getWidthHeaderTask();
 		},
+		
 		taskActionBtns:{
 			deep: true,
 			immediate: true,
@@ -228,17 +285,24 @@ export default {
         attachment, comment, flow, info, people, relatedItems, subtask, task,
 		VuePerfectScrollbar,
 		ListActionMenu,
-		SnackBarSubmit
+		SnackBarSubmit,
+		AssignDialog ,
+		ClaimDialog ,
+		CompleteDialog ,
+		DelegateDialog ,
+		ResolveDialog ,
+		UnClaimDialog 
     },
     data: function() {
         return {
+			showSubmitSuccessBtn:false,
 			modelDialog:{
 				unClaimShowDialog: false,
 				claimShowDialog: false,
 				resolveShowDialog: false,
 				completeShowDialog: false,
 				delegateShowDialog: false,
-				assignShowDialog: false,
+				reAssignShowDialog: false,
 			},
 			showSnackbar: false,
 			rightAction: 120,
@@ -287,7 +351,26 @@ export default {
         },
         sapp() {
             return this.$store.state.app;
-        },
+		},
+		taskStatus(){
+			let obj ={
+				color: "",
+				title: "",
+			}
+			if(this.originData.isDone == '1'){
+				obj.color = 'success'
+				obj.title = 'Hoàn thành'
+			}else{
+				if(this.originData.assignee){
+					obj.color = 'primary'
+					obj.title = 'Assign'
+				}else{
+					obj.color = 'primary'
+					obj.title = 'Un assign'
+				}
+			}
+			return obj
+		},
         usersMap(){
             return this.$store.state.app.allUsers.reduce((map, el) => {
                 map[el.id] = el;
@@ -496,65 +579,65 @@ export default {
             this.$emit("close-detail", {});
         },
 		async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
-			this.$refs.snackbar.clickShowSnackbar()
-            // //check xem user có phải assignee
-            // // kiểm tra xem user hiện tại có role được phân quyền trong task không? 
-            // if (this.$store.state.app.endUserInfo.id != this.originData.assigneeInfo.id) {
-            //     this.showDialogAlert=true;
-            // }else if(this.checkRoleUser(this.originData)){
-            //     this.loadingActionTask=true;
-            //         if(this.taskAction == 'submit' || this.taskAction == 'update' ){
-            //             this.$refs.task.submitForm(value);
-            //         }else if(this.taskAction == 'approval'){
-            //             let elId = this.originData.taskDefinitionKey;
-            //             let taskData = {
-            //                 // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
-            //                 "action": "complete",
-            //                 "assignee": "1",
-            //                 // "formDefinitionId": "12345",
-            //                 "outcome": value,
-            //                 "variables": [
-            //                     {
-            //                         name: elId+'_outcome',
-            //                         type: 'string',
-            //                         value: value
-            //                     },
-            //                     {
-            //                         name: elId+'_executor_fullname',
-            //                         type: 'string',
-            //                         value: this.$store.state.app.endUserInfo.displayName
-            //                     },
-            //                     {
-            //                         name: elId+'_executor_id',
-            //                         type: 'string',
-            //                         value: this.$store.state.app.endUserInfo.id
-            //                     },
-            //                 ],
-            //                 // "transientVariables": []
-            //             }
-            //             let res = await this.submitTask(taskData);
-            //             this.saveApprovalHistory(value);
-            //             if (this.reload) {
-            //                 this.$emit('task-submited', res);
-            //             }else{
-            //                 this.reloadDetailTask();
-            //             }
-            //         }else if(this.taskAction == '' ||this.taskAction==undefined ||this.taskAction == 'submitAdhocTask'){
-            //             let taskData = {
-            //                 "action": "complete",
-            //                 "outcome": value,
-            //             }
-            //             let res = await this.submitTask(taskData);
-            //             if (this.reload) {
-            //                 this.$emit('task-submited', res);
-            //             }else{
-            //                 this.reloadDetailTask();
-            //             }
-            //         }
-            // }else{
-            //     this.showDialogAlert=true;
-            // }
-            // this.loadingActionTask=false;
+            //check xem user có phải assignee
+            // kiểm tra xem user hiện tại có role được phân quyền trong task không? 
+            if (this.$store.state.app.endUserInfo.id != this.originData.assigneeInfo.id) {
+                this.showDialogAlert=true;
+            }else if(this.checkRoleUser(this.originData)){
+                this.loadingActionTask=true;
+                    if(this.taskAction == 'submit' || this.taskAction == 'update' ){
+						
+                        this.$refs.task.submitForm(value);
+                    }else if(this.taskAction == 'approval'){
+                        let elId = this.originData.taskDefinitionKey;
+                        let taskData = {
+                            // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
+                            "action": "complete",
+                            "assignee": "1",
+                            // "formDefinitionId": "12345",
+                            "outcome": value,
+                            "variables": [
+                                {
+                                    name: elId+'_outcome',
+                                    type: 'string',
+                                    value: value
+                                },
+                                {
+                                    name: elId+'_executor_fullname',
+                                    type: 'string',
+                                    value: this.$store.state.app.endUserInfo.displayName
+                                },
+                                {
+                                    name: elId+'_executor_id',
+                                    type: 'string',
+                                    value: this.$store.state.app.endUserInfo.id
+                                },
+                            ],
+                            // "transientVariables": []
+                        }
+                        let res = await this.submitTask(taskData);
+                        this.saveApprovalHistory(value);
+                        if (this.reload) {
+                            this.$emit('task-submited', res);
+                        }else{
+                            this.reloadDetailTask();
+                        }
+                    }else if(this.taskAction == '' ||this.taskAction==undefined ||this.taskAction == 'submitAdhocTask'){
+                        let taskData = {
+                            "action": "complete",
+                            "outcome": value,
+                        }
+                        let res = await this.submitTask(taskData);
+                        if (this.reload) {
+                            this.$emit('task-submited', res);
+                        }else{
+                            this.reloadDetailTask();
+                        }
+                    }
+            }else{
+                this.showDialogAlert=true;
+            }
+			this.loadingActionTask=false;
         },
         saveApprovalHistory(value){
             let title = this.taskActionBtns.reduce((tt, el) => {
@@ -636,31 +719,33 @@ export default {
             return BPMNEngine.updateTask(taskId,data);
         },
         async handleTaskSubmited(data){
-            if(this.isInitInstance){
-                if (this.reload) {
-                    this.$emit('task-submited', data);            
-                }
-            }else{
-                let elId = this.taskInfo.action.parameter.activityId;
-                let docId = data.document_id;
-                if(!docId){
-                    docId = this.taskInfo.action.parameter.documentId;
-                }
-                let varsForBackend = await getVarsFromSubmitedDoc(data, elId, docId);
-                let taskData = { 
-                    // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
-                    "action": "complete", 
-                    "assignee": "1",
-                    "outcome": 'submit',
-                    "variables": varsForBackend.vars,
-                }
-                let res =  await this.submitTask(taskData);
-                if (this.reload) {
-                    this.$emit('task-submited', res);
-                }else{
-                    this.reloadDetailTask();
-                }
-            }
+			this.$refs.snackbar.clickShowSnackbar()
+			this.showSubmitSuccessBtn = true
+            // if(this.isInitInstance){
+            //     if (this.reload) {
+            //         this.$emit('task-submited', data);            
+            //     }
+            // }else{
+            //     let elId = this.taskInfo.action.parameter.activityId;
+            //     let docId = data.document_id;
+            //     if(!docId){
+            //         docId = this.taskInfo.action.parameter.documentId;
+            //     }
+            //     let varsForBackend = await getVarsFromSubmitedDoc(data, elId, docId);
+            //     // let taskData = { 
+            //     //     // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
+            //     //     "action": "complete", 
+            //     //     "assignee": "1",
+            //     //     "outcome": 'submit',
+            //     //     "variables": varsForBackend.vars,
+            //     // }
+            //     // let res =  await this.submitTask(taskData);
+            //     // if (this.reload) {
+            //     //     this.$emit('task-submited', res);
+            //     // }else{
+            //     //     this.reloadDetailTask();
+            //     // }
+            // }
         },
         showApprovalOutcomes(approvalActions){
             if(typeof approvalActions == 'string'){
