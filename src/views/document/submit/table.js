@@ -551,8 +551,12 @@ export default class Table {
         if (this.tableHasRowSum && cellMeta[0][0] == this.tableInstance.countRows() - 1) {
             return;
         }
+        
         let thisObj = this;
         if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            e.stopPropagation();
             this.tableInstance.alter('insert_row', cellMeta[0][0] + 1, 1, 'auto_set');
             this.dataInsertRows.push([]);
             delayTypingEnter(function() {
@@ -569,6 +573,7 @@ export default class Table {
                 }
                 thisObj.dataInsertRows = []
             });
+            
         } else if (e.key === 'Delete' && e.shiftKey == true) {
             e.stopImmediatePropagation();
             e.preventDefault();
