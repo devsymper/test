@@ -1351,20 +1351,26 @@ export default {
                     }
                     formKeyToNodeIdMap[formKey].push(elName);
                 }
-
+            }
+            this.setColumnsForNodes();
+            this.setInitItemsForFormReferences(formKeyToNodeIdMap);
+        },
+        setColumnsForNodes(){
+            for(let name in this.stateAllElements){
+                let el = this.stateAllElements[name];
                 if(el.type.includes('StartNoneEvent') && el.attrs.formreference.value){
                     this.setControlsForBizKey(el.attrs.formreference.value);
                 }
 
-                if(el.type.includes('UserTask') 
+                if( el.type.includes('UserTask')
                     && el.attrs.taskAction.value == 'approval'){
                     this.setEditableControlsForNode(el, this.stateAllElements[el.attrs.approvalForElement.value]);
                 }
-                 if(el.type.includes('ServiceTask') ){
+                
+                if(el.type.includes('ServiceTask') ){
                     this.setEditableControlsForNode(el, this.stateAllElements[el.attrs.serviceNotificationActionForElement.value]);
                 }
             }
-            this.setInitItemsForFormReferences(formKeyToNodeIdMap);
         },
         async setInitItemsForFormReferences(map){
             let self = this;
