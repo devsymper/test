@@ -112,17 +112,14 @@
 import icon from "../../components/common/SymperIcon";
 import attachment from "./Attachment";
 import comment from "./Comment";
-import flow from "./Flow";
 import info from "./Info";
 import people from "./People";
 import relatedItems from "./RelatedItems";
-import subtask from "./Subtask";
 import task from "./Task";
 import BPMNEngine from '../../api/BPMNEngine';
-import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../components/process/processAction';
+import { getVarsFromSubmitedDoc } from '../../components/process/processAction';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
-import { appManagementApi } from '@/api/AppManagement';
 import { extractTaskInfoFromObject, addMoreInfoToTask } from '@/components/process/processAction';
 import { util } from '../../plugins/util';
 
@@ -192,7 +189,7 @@ export default {
     },
     components: {
         icon: icon,
-        attachment, comment, flow, info, people, relatedItems, subtask, task,
+        attachment, comment,info, people, relatedItems, task,
         VuePerfectScrollbar
     },
     data: function() {
@@ -269,7 +266,6 @@ export default {
         },
     },
     created(){
-        this.checkAndSwitchToTab();
     },
     methods: {
         submitError(){
@@ -325,27 +321,6 @@ export default {
         },
         toggleSidebar(){
             this.isShowSidebar = !this.isShowSidebar;
-        },
-        checkAndSwitchToTab(){
-            if(this.$route.params.extraData && this.$route.params.extraData.subAction){
-                let tabAction = {
-                    'view_comment': 'comment'
-                };
-                let tab = tabAction[this.$route.params.extraData.subAction];
-                for(let i = 0; i < this.items.length; i++){
-                    if(this.items[i].tab == tab){
-                        this.tab = i;
-                        break;
-                    }
-                }
-            }
-        },
-        onCopySuccess(){
-           this.$snotify({
-                type: 'success',
-                title: "Copy to clipboard",
-                text: "Copy success"
-                });
         },
         changeTaskDetailInfo(taskId){
             let hostname=window.location.hostname;

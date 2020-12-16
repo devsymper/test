@@ -230,13 +230,14 @@
                     </v-row>
                 </div>
             </VuePerfectScrollbar>
-            <v-skeleton-loader v-else ref="skeleton" :type="'table-tbody'" class="mx-auto"></v-skeleton-loader>
-            <v-skeleton-loader
-            v-if="loadingMoreTask"
-            ref="skeleton"
-            :type="'table-tbody'"
-            class="mx-auto"
-            ></v-skeleton-loader>
+            <preloader 
+                v-else
+                :style="{height: (listTaskHeight - 30)+'px!important'}"
+                class="mx-auto" />
+            <preloader 
+               v-if="loadingMoreTask"
+                :style="{height: (listTaskHeight - 30)+'px!important'}"
+                class="mx-auto" />
         </v-col>
         <v-col
             :cols="!sideBySideMode ? 0 : 8"
@@ -267,10 +268,8 @@
 
 <script>
 import BPMNEngine from "@/api/BPMNEngine";
-import icon from "@/components/common/SymperIcon";
 import workDetail from "./WorkDetail";
 import listHeader from "./ListHeader";
-import userSelector from "./UserSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../../plugins/util";
 import { appConfigs } from "../../../configs";
@@ -283,7 +282,6 @@ import {
   addMoreInfoToTask
 } from "@/components/process/processAction";
 import infoUser from "./../InfoUser";
-import ShowListTrashVue from '../../../views/document/trash/ShowListTrash.vue';
 export default {
     computed: {
         fileCountPerTask(){
@@ -355,9 +353,7 @@ export default {
     },
     name: "listWork",
     components: {
-        icon: icon,
         listHeader: listHeader,
-        userSelector: userSelector,
         VuePerfectScrollbar: VuePerfectScrollbar,
         workDetail,
         infoUser,
@@ -686,9 +682,6 @@ export default {
                 return {};
             }
         },  
-        changeUpdateAsignee(){
-            this.handleTaskSubmited();
-        },
         getDateFormNow(time){
             var today = this.$moment().format('YYYY-MM-DD');
             if (time===today) {
@@ -709,10 +702,6 @@ export default {
                 this.page +=1;
                 this.getData();
             }
-        },
-        handleTaskSubmited() {
-            this.sideBySideMode = false;
-            this.getData();
         },
         handleChangeFilterValue(data) {
             // for (let key in data) {
