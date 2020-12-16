@@ -217,7 +217,7 @@ import PopupPivotTable from './items/PopupPivotTable'
 
 
 
-import { checkCanBeBind, resetImpactedFieldsList, markBinedField } from './handlerCheckRunFormulas';
+import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
 import {checkControlPropertyProp,getControlInstanceFromStore,getControlTitleFromName, getListInputInDocument,mapTypeToEffectedControl} from './../common/common'
 import Formulas from './formulas.js';
 import { startWorkflowBySubmitedDoc } from '../../../components/process/processAction.js';
@@ -2422,16 +2422,18 @@ export default {
         
         handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType,from=false){
             let dataInput = this.getDataInputFormulas(formulasInstance);
-            let control = getControlInstanceFromStore(this.keyInstance,controlName);
-            if(control.inTable != false){
-                let tableInstance = getControlInstanceFromStore(this.keyInstance,control.inTable);
-                let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulasInstance,tableInstance.name);
-               
-                tableInstance.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataIn,formulasInstance);
+            if(checkDataInputChange(this.keyInstance, dataInput)){
+                let control = getControlInstanceFromStore(this.keyInstance,controlName);
+                if(control.inTable != false){
+                    let tableInstance = getControlInstanceFromStore(this.keyInstance,control.inTable);
+                    let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulasInstance,tableInstance.name);
+                
+                    tableInstance.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataIn,formulasInstance);
+                }
+                formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
+                    this.handleAfterRunFormulas(rs,controlId,controlName,formulasType,from)
+                });
             }
-            formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
-                this.handleAfterRunFormulas(rs,controlId,controlName,formulasType,from)
-            });
         },
         /**
          * Hàm lấy dữ liệu của các control trong store để chuân bị cho việc run formulas
@@ -2888,6 +2890,7 @@ export default {
                     return;
                 }
             }
+            setDataInputBeforeChange(this.keyInstance, controlInstance);
             if($('#'+controlInstance.id).attr('data-autocomplete') != "" && $('#'+controlInstance.id).attr('data-autocomplete') != undefined){
                 $('#'+controlInstance.id).attr('data-autocomplete',"");
                 return;
