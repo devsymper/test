@@ -854,6 +854,9 @@ export default class Table {
             if(controlIns.type == 'date'){
                 dataInput[inputControlName] = controlIns.convertDateToStandard(controlIns.value)
             }
+            if(controlIns.type == 'time'){
+                dataInput[inputControlName] = controlIns.convertTimeToStandard(controlIns.value)
+            }
         }
         return dataInput;
     }
