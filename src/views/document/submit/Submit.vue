@@ -2422,7 +2422,6 @@ export default {
         
         handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType,from=false){
             let dataInput = this.getDataInputFormulas(formulasInstance);
-            console.log('formulasTypeformulasType',formulasType);
             if(checkDataInputChange(this.keyInstance, dataInput)){
                 let control = getControlInstanceFromStore(this.keyInstance,controlName);
                 if(control.inTable != false){
