@@ -8,8 +8,27 @@
         <v-card-title>
             <div class="w-100 d-flex justify-space-between">
                 <span class="fs-16">Create Issues</span>
-                <div >
-                    <v-btn>aa</v-btn>
+                <div class="d-flex">
+                    <v-autocomplete 
+                    return-object
+                    item-text="name"
+                    item-value="id"
+                    :items="allProject" 
+                    solo
+                    class="project-select sym-small-size sym-style-input">
+
+                        <template v-slot:selection="{item}">
+                           <img :src="item.icon" height="15" width="15" alt="" class="mr-2">
+                           <div class="project-name">{{item.name}}</div>
+                        </template>
+                        <template v-slot:item="{item}">
+                            <template>
+                                <img :src="item.icon" height="15" width="15" alt="" class="mr-2">
+                                <div class="fs-13">{{item.name}}</div>
+                            </template>
+                        </template>
+                    </v-autocomplete>
+                    <v-autocomplete solo class="task-type-select sym-small-size sym-style-input"></v-autocomplete>
                 </div>
             </div>
 
@@ -47,6 +66,7 @@
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
 import { taskManagementApi } from "@/api/taskManagement.js";
+import { util } from '../../../plugins/util';
 
 export default {
     name: "issue",
@@ -127,6 +147,16 @@ export default {
             },
         }
     },
+    computed:{
+        allProject(){
+            let projects = util.cloneDeep(this.$store.state.taskManagement.allProject);
+            projects = projects.reduce((arr,obj)=>{
+                arr.push({id:obj.id, name: obj.name, icon:obj.icon});
+                return arr;
+            },[])
+            return projects;
+        }
+    },
     methods:{
         show(){
             this.isShow=true;
@@ -136,6 +166,25 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+   
+    .project-select{
+        width: 160px;
+        margin-right: 8px;
+    }
+    .task-type-select{
+        width: 140px;
+    }
+    .project-name{
+        font-size: 13px;
+        white-space: nowrap;
+        text-overflow: ellipsis;
+        overflow: hidden;
+    }
+    .project-select >>> .v-select__selections input{
+        min-width: 1px;
+    }
+    ::v-deep .v-input__slot{
+        box-shadow: none !important;
+    }
 </style>

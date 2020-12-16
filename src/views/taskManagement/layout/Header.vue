@@ -62,8 +62,8 @@
                 </v-menu>
             </div> -->
         </div>
-        <popup-issue
-            ref="popupIssue"
+        <PopupIssue
+            ref="popupIssueView"
         />
         
     </div>
@@ -71,10 +71,10 @@
 <script>
 import { appConfigs } from '../../../configs.js';
 import { taskManagementApi } from "@/api/taskManagement.js";
-import popupIssue from "../../../components/taskManagement/issue/popupIssue"
+import PopupIssue from "../../../components/taskManagement/issue/PopupIssue"
 export default {
     components:{
-        popupIssue
+        PopupIssue
     },
     data(){
         return {
@@ -89,7 +89,7 @@ export default {
     },
     methods:{
         showPopupCreateIssue(){
-            this.$refs.popupIssue.show();
+            this.$refs.popupIssueView.show();
         }
 
         
