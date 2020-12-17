@@ -370,7 +370,6 @@ export default {
             if (index > -1) {
                 this.listActionPackSelected.splice(index, 1);
             }
-            console.log(this.listActionPackSelected,"aaaaa");
             let itemInListActionPack = this.listActionPack.find(ele => ele.id == item.id);
             if (itemInListActionPack) {
                 itemInListActionPack.isCheck = false;

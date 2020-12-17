@@ -27,11 +27,7 @@
                         </v-icon>
                         Thêm link
                     </v-btn>
-                     <v-checkbox class="checkbox-show-all-label"
-                        :label="`Hiển thị nhãn link`"
-                        dense   
-                    ></v-checkbox>
-                    <add-status-view ref="popupAddStatusView"  @after-add-status-click="afterAddStatusClick"/>
+                    <add-status-view ref="popupAddStatusView" :allStatus="allStatus"  @after-add-status-click="afterAddStatusClick"/>
                     <add-link-view :listNode="listNode" ref="popupAddLinkView" @after-add-link-click="afterAddLinkClick"/>
                 </div>
                 <div id='paperView' style="width: 100%; height: calc(100% - 50px)">
@@ -132,6 +128,12 @@ export default {
             default: false
         },
         listNode:{
+           type: Array,
+            default() {
+                return [];
+            }
+        },
+        allStatus:{
            type: Array,
             default() {
                 return [];
@@ -300,7 +302,7 @@ export default {
                     if (node) {
                         var currentElement = node;
                         if (name == 'name') {
-                            currentElement.attr('label/text', data);
+                            currentElement.attr('label/text', data.name);
                         }else if (name == 'colorStatus') {
                             currentElement.attr('body/fill', data);
                         }
@@ -439,7 +441,7 @@ export default {
         },
         afterAddStatusClick(status){
             let newStatus = util.cloneDeep(status);
-            let nodeWidth = this.getTextWidth(newStatus.name.value) + 20;
+            let nodeWidth = this.getTextWidth(newStatus.name.value.name) + 20;
             var rectReview = new joint.shapes.standard.Rectangle();
             rectReview.position(500, 230);
             rectReview.resize(nodeWidth, 40);
@@ -451,7 +453,7 @@ export default {
                     ry: 5,
                 },
                 label:{
-                    text:newStatus.name.value,
+                    text:newStatus.name.value.name,
                     fill:'white',
                     fontWeight:500
                 }
@@ -558,6 +560,9 @@ export default {
             }
             let node=self.listNode.find(ele => ele.id.value == idNode);
             if (node) {
+                if (node.colorStatus.value == "") {
+                    self.$set(node.colorStatus,"value","#dfe1e6");
+                }
                 self.nodeConfig=node;
             }
             resetAll(this);
@@ -633,10 +638,13 @@ export default {
             this.dataWorkflow.nodes.push(rectBacklog);
             rectBacklog.addTo(this.graph);
 
-            let nodeDefaultInfo = getStatusDefault();
-            nodeDefaultInfo.name.value = "To Do";
+            let nodeDefaultInfo = getStatusDefault(); // cấu hình mặc định node
+            nodeDefaultInfo.name.value.name = "To Do";
+            nodeDefaultInfo.name.value.id = "5fdb259d-7aca-2f28-91d0-e0750ea2ab8b";
+            nodeDefaultInfo.common.value = 1;
+            nodeDefaultInfo.colorStatus.value = "#dfe1e6";
             this.$set(nodeDefaultInfo.id,"value",rectBacklog.id);
-            this.$set(nodeDefaultInfo.statusCategory,"value",'5fcdec71-74cf-d435-e3dd-afcc0ea2ab8b');
+            this.$set(nodeDefaultInfo.statusCategory,"value",'5785e38c-814f-4746-884d-f4939bf25173');
             this.listNode.push(nodeDefaultInfo);
 
             let link1 = new joint.shapes.standard.Link({

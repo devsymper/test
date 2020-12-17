@@ -144,6 +144,12 @@ export const taskManagementApi = {
     getAllStatusCategory(){
         return taskManagement.get("status-category");
     },
+    getAllStatus(){
+        return taskManagement.get("status");
+    },
+    checkNameStatusExists(vl){
+        return taskManagement.get("status-name",{name:vl});
+    },
     // priority
     getListPriority(){
         return taskManagement.get("priorities");
@@ -190,6 +196,7 @@ export const taskManagementApi = {
         return permission.get("roles/"+roleIdentifier+"/permissions",{detail:1});
     },
     setPermissionForRole(data){
+        data.replace_all = 1;
         return permission.post("roles/set-permissions",data);
     },
     getListActionPackInPermissionPack(permissionId){

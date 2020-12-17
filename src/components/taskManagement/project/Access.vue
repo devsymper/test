@@ -681,6 +681,7 @@ export default {
                     .updateRole(this.roleSelected.id,data)
                     .then(res => {
                         if (res.status == 200) {
+                            this.setPermissionForRole(this.roleSelected,listIdPermissionPack);
                             this.$snotifySuccess("Update role success!");
                             this.$emit("add-role-success"); // emit sự kiện coi như là update role :))
                             this.dialogAddRole=false;

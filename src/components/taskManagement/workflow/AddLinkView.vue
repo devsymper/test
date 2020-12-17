@@ -57,7 +57,7 @@ export default {
             let allOption = [];
             for (let index = 0; index < vl.length; index++) {
                 let node = vl[index];
-                allOption.push({text:node.name.value,value:node.id.value})
+                allOption.push({text:node.name.value.name,value:node.id.value})
             }
             this.$set(this.linkInfo.from,'options',allOption);
             this.$set(this.linkInfo.to,'options',allOption);
