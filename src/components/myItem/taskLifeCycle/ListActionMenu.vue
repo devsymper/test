@@ -15,7 +15,7 @@
 			</template>
 			<v-list>
 			<v-list-item
-				v-for="(item, index) in items"
+				v-for="(item, index) in listActions"
 				:key="index"
 				@click="handlerItemClick(item)"
 			>
@@ -40,6 +40,49 @@ export default {
 		snackbarMode:{
 			type: Boolean,
 			default: false
+		},
+		userType:{
+			type: String,
+			default: ""
+		},
+		taskType:{
+			type: String,
+			default: ""
+		}
+	},
+	computed:{
+		listActions(){
+			let lists = []
+			debugger
+				if(this.userType == 'assignee' && this.taskType == 'assign'){
+				this.items.forEach(function(e){
+					if(e.value == 'reAssign' || e.value == 'delegate' || e.value == 'complete'){
+						lists.push(e)
+					}
+				})
+			}
+			if(this.userType == 'assignee' && this.taskType == 'delegate'){
+				this.items.forEach(function(e){
+					if(e.value == 'resolve' ){
+						lists.push(e)
+					}
+				})
+			}
+			if(this.userType == 'owner' && this.taskType == 'assign'){
+				this.items.forEach(function(e){
+					if(e.value == 'reAssign' || e.value == 'delegate' || e.value == 'complete' || e.value == 'unClaim'){
+						lists.push(e)
+					}
+				})
+			}
+			if(this.userType == 'candidate' && this.taskType == 'unAssign'){
+				this.items.forEach(function(e){
+					if(e.value == 'claim'){
+						lists.push(e)
+					}
+				})
+			}
+			return lists
 		}
 	},
 	data(){

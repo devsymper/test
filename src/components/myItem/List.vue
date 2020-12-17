@@ -305,6 +305,7 @@
                 style="border-left: 1px solid #e0e0e0;"
             >
                 <taskDetail
+					:delegationState="delegationState"
                     :parentHeight="listTaskHeight"
                     :taskInfo="selectedTask.taskInfo"
                     :originData="selectedTask.originData"
@@ -337,6 +338,7 @@ import { util } from "../../plugins/util";
 import { appConfigs } from "../../configs";
 import listTaskApproval from "./featureApproval/List";
 import { taskApi } from "./../../api/task.js";
+import workFlowApi  from "./../../api/BPMNEngine.js";
 import infoUser from "./InfoUser";
 import { getDataFromConfig, getDefaultFilterConfig } from "@/components/common/customTable/defaultFilterConfig.js";
 import TableFilter from "@/components/common/customTable/TableFilter.vue";
@@ -507,7 +509,8 @@ export default {
             },
             tableColumns: [],
             index: -1,
-            dataIndex:-1,
+			dataIndex:-1,
+			delegationState:null,
             changeStatusMoreApproval:false,
             loadingTaskList: false,
             listTaskHeight: 300,
@@ -810,7 +813,7 @@ export default {
             this.listTaskHeight =
                 util.getComponentSize(this.$el.parentElement).h - 130;
         },
-        selectObject(obj, idx,idex) {
+        async selectObject(obj, idx,idex) {
             this.index = idx;
             this.dataIndex = idex;
             this.$set(this.selectedTask, "originData", obj);
@@ -820,7 +823,18 @@ export default {
                 this.selectedTask.idx = idx;
                 if (!this.compackMode) {
                     this.sideBySideMode = true;
-                    let taskInfo = extractTaskInfoFromObject(obj);
+					let taskInfo = extractTaskInfoFromObject(obj);
+					console.log(taskInfo,'taskInfotaskInfotaskInfotaskInfotaskInfo');
+					if(this.selectedTask.originData.isDone != '1'){
+						let self = this
+						await workFlowApi.getTaskDetail(obj.id).then(res=>{
+							self.delegationState = res.delegationState
+							debugger
+						}).catch(err=>{
+
+						})
+					}
+					
                     this.$set(this.selectedTask, "taskInfo", taskInfo);
                     this.$emit("change-height", "calc(100vh - 88px)");
                 }

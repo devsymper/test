@@ -1174,7 +1174,8 @@ export default {
                     symperHide: col.symperHide
                 });
             }
-            rsl.detail = JSON.stringify(configs);
+			rsl.detail = JSON.stringify(configs);
+			debugger
             return rsl;
         },
         /**

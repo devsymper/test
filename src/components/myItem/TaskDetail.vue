@@ -55,7 +55,7 @@
                             {{action.text}}
                         </v-btn>
                     </span>
-                    <span v-else>
+                    <span v-else class="mr-14">
                         <v-btn small depressed disabled v-for="(action, idx) in taskActionBtns"  :key="idx" :color="action.color"  class="mr-2">
                             {{action.text}}
                         </v-btn>
@@ -67,6 +67,8 @@
 				<ListActionMenu 
 					id="action-task-life-cycle" 
 					@action-clicked="handlerActionClick"
+					:userType="userType"
+					:taskType="taskStatus.value"
 					:style="{position: 'absolute', right: rightAction+'px ',top: '4px'}"
 				/>
                 <v-tooltip bottom>
@@ -163,6 +165,8 @@
 		<DelegateDialog 
 			:showDialog="modelDialog.delegateShowDialog"
 			@cancel="modelDialog.delegateShowDialog = false"
+			:taskStatus="taskStatus"
+			:taskId="originData.id"
 		
 		/> 
 		<ResolveDialog 
@@ -212,7 +216,10 @@ export default {
             default: () => {
                 return {}
             }
-        },
+		},
+		delegationState:{
+			default: null
+		},
         originData: {
             type: Object,
             default: () => {
@@ -259,6 +266,18 @@ export default {
 				this.changeTaskDetail();
 				this.showSubmitSuccessBtn = false
                 this.setCustomDocControls();
+            }
+		},
+		delegationState(val){
+			// if(val == 'pending'){
+			// 	this.taskStatus = this.getTaskStatus('#8E2D8C', 'Ủy quyền', 'delegate')
+			// }
+		},
+        originData: {
+            deep: true,
+            immediate:true,
+            handler(valueAfter){
+				this.checkActionOfUser(valueAfter)
             }
         },
         taskBreadcrumb:function(){
@@ -331,7 +350,8 @@ export default {
                 comment: {},
                 info: {},
                 'related-items': {}
-            },
+			},
+			userType: '',
             linkTask:'',
             taskActionBtns: [
                 {
@@ -353,21 +373,22 @@ export default {
             return this.$store.state.app;
 		},
 		taskStatus(){
-			let obj ={
-				color: "",
-				title: "",
-			}
+			let obj 
 			if(this.originData.isDone == '1'){
-				obj.color = 'success'
-				obj.title = 'Hoàn thành'
+				obj = this.getTaskStatus('success', 'Hoàn thành','complete')
 			}else{
-				if(this.originData.assignee){
-					obj.color = 'primary'
-					obj.title = 'Assign'
+				if(!this.delegationState){
+					if(this.originData.assignee){
+						obj = this.getTaskStatus('#F59324', 'Đã giao','assign')
+					}else{
+						obj = this.getTaskStatus('primary', 'Un assign','unAssign')
+					}
 				}else{
-					obj.color = 'primary'
-					obj.title = 'Un assign'
+					if(this.delegationState == 'pending'){
+						obj = this.getTaskStatus('#8E2D8C', 'Ủy quyền','delegate')
+					}
 				}
+				
 			}
 			return obj
 		},
@@ -400,6 +421,31 @@ export default {
         this.checkAndSwitchToTab();
     },
     methods: {
+		getTaskStatus(color,title,value){
+			let obj = {
+				color: color,
+				title: title,
+				value: value
+			}
+			return obj
+		},
+		checkActionOfUser(originData){
+			let userInfor = this.$store.state.app.endUserInfo
+			if(this.originData.assignee){
+				if(this.originData.owner == null){
+					if(userInfor.id == this.originData.assigneeInfo.id){
+						this.userType = 'assignee'
+					}
+				}else{
+					if(userInfor.id == this.originData.owner){
+						this.userType = 'owner'
+					}
+				}
+				
+			}else{
+
+			}
+		},
 		handlerActionClick(action){
 			this.modelDialog[action+'ShowDialog'] = true
 		},
