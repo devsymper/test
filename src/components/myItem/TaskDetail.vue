@@ -151,6 +151,7 @@
 		<AssignDialog
 			:showDialog="modelDialog.reAssignShowDialog"
 			@cancel="modelDialog.reAssignShowDialog = false"
+			:originData="originData"
 		/> 
 		<ClaimDialog
 			:showDialog="modelDialog.claimShowDialog"
@@ -168,7 +169,7 @@
 			:taskStatus="taskStatus"
 			@success="handlerDelegateSuccess"
 			:taskId="originData.id"
-		
+			:originData="originData"
 		/> 
 		<ResolveDialog 
 			:showDialog="modelDialog.resolveShowDialog"
@@ -379,6 +380,7 @@ export default {
 			if(this.originData.isDone == '1'){
 				obj = this.getTaskStatus('success', 'Hoàn thành','complete')
 			}else{
+				debugger
 				if(!this.delegationState){
 					if(this.originData.assignee){
 						obj = this.getTaskStatus('#F59324', 'Đã giao','assign')
@@ -389,8 +391,10 @@ export default {
 					if(this.delegationState == 'pending'){
 						obj = this.getTaskStatus('#8E2D8C', 'Ủy quyền','delegate')
 					}
+					if(this.delegationState == 'resolved'){
+						obj = this.getTaskStatus('#F59324', 'Đã giao','assign')
+					}
 				}
-				
 			}
 			return obj
 		},
@@ -437,20 +441,17 @@ export default {
 		},
 		checkActionOfUser(originData){
 			let userInfor = this.$store.state.app.endUserInfo
-			if(this.originData.assignee){
-				if(this.originData.owner == null){
-					if(userInfor.id == this.originData.assigneeInfo.id){
-						this.userType = 'assignee'
-					}
-				}else{
-					if(userInfor.id == this.originData.owner){
-						this.userType = 'owner'
-					}
+			if(this.originData.assigneeInfo){
+				if(userInfor.id == this.originData.assigneeInfo.id){
+					this.userType = 'assignee'
 				}
-				
-			}else{
-
 			}
+			if(this.originData.ownerInfo){
+				if(userInfor.id == this.originData.ownerInfo.id){
+					this.userType = 'owner'
+				}
+			}	
+
 		},
 		handlerActionClick(action){
 			this.modelDialog[action+'ShowDialog'] = true

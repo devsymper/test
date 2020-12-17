@@ -7,6 +7,7 @@
 					v-bind="attrs"
 					v-on="on"
 					small
+					:disabled="listActions.length == 0"
 				>
 					Action 
 					<v-icon small right dark style="border-left:2px solid lightgrey;padding-left:8px">mdi-plus</v-icon>

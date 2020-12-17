@@ -7,13 +7,64 @@
 		>
 			<v-card>
 			<v-card-title class="fs-15">
-				Assign task
+				Giao lại việc
 			</v-card-title>
 			<v-card-text>
 				<div class="content-assign-dialog d-flex flex-column ml-2 fs-13">
 						
 					<div class="text-wrap">
-						Nhấn Đồng ý để assign task này
+						Công việc sẽ được giao cho người khác thực hiện, người thực hiện có toàn quyền với công việc
+					</div>
+					<div class="text-wrap d-flex align-center">
+						Trạng thái hiện tại 
+						<v-chip
+							small
+							label
+							class="ma-2"
+							color="orange"
+							text-color="white"
+						>
+							<span class="fs-13">
+								Đã giao
+							</span>
+						</v-chip>
+					</div>
+					<div class="text-wrap font-weight-light">
+						Công việc đã được giao cho 
+						<span style="color:blue">
+							 {{ originData.assigneeInfo ? originData.assigneeInfo.displayName : ""  }}
+						</span>
+					</div>
+					<div class="text-wrap d-flex align-center mt-2">
+						<div class="mb-4 mr-2">
+							Người được giao việc
+						</div>
+						<div>
+							<v-autocomplete
+								solo
+								v-model="userInforId"
+								:items="$store.state.app.allUsers"
+								item-text="displayName"
+								item-value="id"
+							></v-autocomplete>
+						</div>
+					</div>
+					<div class="text-wrap mt-2">
+						Người được giao việc sẽ có quyền xem và thực thi công việc
+					</div>
+					<div class="text-wrap d-flex align-center">
+						Công việc sẽ được chuyển sang trạng thái 
+						<v-chip
+							small
+							label
+							class="ma-2"
+							color="orange"
+							text-color="white"
+						>
+							<span class="fs-13">
+								Đã giao
+							</span>
+						</v-chip>
 					</div>
 				</div>
 
@@ -46,19 +97,13 @@ export default {
 			type: Boolean,
 			default: false,
 		},
-		currentInstance:{
-			type: Object,
-			default(){
-				return {
-
-				}
-			},
+		originData:{
+			type: Object
 		}
 	},
 	data(){
 		return{
-			selected:"",
-			verId:""
+			userInforId: ""
 		}
 	},
 	created(){
@@ -80,6 +125,7 @@ export default {
 .content-assign-dialog >>> .v-input__slot{
 	box-shadow: unset !important;
 	min-height: unset !important;
+	border: 1px solid lightgray;
 }
 .content-assign-dialog >>> input{
 	font-size: 13px !important;

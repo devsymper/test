@@ -7,13 +7,41 @@
 		>
 			<v-card>
 			<v-card-title class="fs-15">
-				Complete task
+				Hoàn thành công việc
 			</v-card-title>
 			<v-card-text>
 				<div class="content-assign-dialog d-flex flex-column ml-2 fs-13">
 					
 					<div class="text-wrap">
-						Nhấn Đồng ý để complete này
+						Nhấn áp dụng để hoàn thành công việc này 
+					</div>
+					<div class="text-wrap   d-flex align-center">
+						Trạng thái hiện tại
+						<v-chip
+							small
+							label
+							class="ma-2"
+							color="#8E2D8C"
+							text-color="white"
+						>
+							<span class="fs-13">
+								Ủy quyền
+							</span>
+						</v-chip>
+					</div>
+					<div class="text-wrap   d-flex align-center">
+						Trạng thái mới
+						<v-chip
+							small
+							label
+							class="ma-2"
+							color="success"
+							text-color="white"
+						>
+							<span class="fs-13">
+								Hoàn thành
+							</span>
+						</v-chip>
 					</div>
 				</div>
 
@@ -31,7 +59,7 @@
 					color="green darken-1"
 					text
 				>
-					Đồng ý
+					Áp dụng
 				</v-btn>
 			</v-card-actions>
 			</v-card>

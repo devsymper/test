@@ -29,7 +29,10 @@
 						</v-chip>
 					</div>
 					<div class="text-wrap font-weight-light">
-						Công việc đã được giao cho {{ $store.state.app.endUserInfo.displayName}}
+						Công việc đã được giao cho 
+						<span style="color: blue">
+							{{ originData.assigneeInfo ? originData.assigneeInfo.displayName : ""  }}
+						</span>
 					</div>
 					<div class="text-wrap d-flex align-center mt-2">
 						<div class="mb-4 mr-2">
