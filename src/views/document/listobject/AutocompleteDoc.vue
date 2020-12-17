@@ -122,7 +122,6 @@ export default {
 			
 		},
 		param(val){
-			debugger
 			if(val){
 				this.$store.commit('document/setCurrentTitle',val)
 			}

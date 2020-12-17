@@ -305,6 +305,7 @@
                 style="border-left: 1px solid #e0e0e0;"
             >
                 <taskDetail
+					@reload-data="getData"
 					:delegationState="delegationState"
                     :parentHeight="listTaskHeight"
                     :taskInfo="selectedTask.taskInfo"
@@ -829,7 +830,6 @@ export default {
 						let self = this
 						await workFlowApi.getTaskDetail(obj.id).then(res=>{
 							self.delegationState = res.delegationState
-							debugger
 						}).catch(err=>{
 
 						})

@@ -7,13 +7,59 @@
 		>
 			<v-card>
 			<v-card-title class="fs-15">
-				Resolve task
+				Thực thi công việc
 			</v-card-title>
 			<v-card-text>
 				<div class="content-assign-dialog d-flex flex-column ml-2 fs-13">
 					
 					<div class="text-wrap">
-						Nhấn Đòng ý để resolve task này
+						Công việc sẽ được thực thi và trả về cho chủ sở hữu của công việc 
+					</div>
+					<div class="text-wrap d-flex">
+						<v-icon x-small>
+							mdi-account-check-outline
+						</v-icon> 
+						<span class="mr-1 ml-1">
+							Công việc đã được ủy quyền
+						</span>
+						<span style="color: blue"> {{originData.assigneeInfo.displayName}}</span>
+					</div>
+					<div class="text-wrap d-flex">
+						<v-icon x-small>
+							mdi-account-tie-outline
+						</v-icon> 
+						<span class="ml-1 mr-1">
+							Chủ sở hữu công việc
+						</span>
+						<span style="color: blue">{{originData.ownerInfo.displayName}}</span>
+					</div>
+					<div class="text-wrap   d-flex align-center">
+						Trạng thái hiện tại
+						<v-chip
+							small
+							label
+							class="ma-2"
+							color="#8E2D8C"
+							text-color="white"
+						>
+							<span class="fs-13">
+								Ủy quyền
+							</span>
+						</v-chip>
+					</div>
+					<div class="text-wrap   d-flex align-center">
+						Công việc sẽ được trở về trạng thái
+						<v-chip
+							small
+							label
+							class="ma-2"
+							color="orange"
+							text-color="white"
+						>
+							<span class="fs-13">
+								Đã giao
+							</span>
+						</v-chip>
 					</div>
 				</div>
 
@@ -30,8 +76,9 @@
 					<v-btn
 					color="green darken-1"
 					text
+					@click="resolveTask"
 				>
-					Đồng ý
+					Áp dụng
 				</v-btn>
 			</v-card-actions>
 			</v-card>
@@ -40,20 +87,20 @@
 </template>
 
 <script>
+import workFlowApi  from "@/api/BPMNEngine.js";
 export default {
 	props:{
 		showDialog:{
 			type: Boolean,
 			default: false,
 		},
-		currentInstance:{
+		taskId:{
+			type: String,
+			default: ""
+		},
+		originData:{
 			type: Object,
-			default(){
-				return {
-
-				}
-			},
-		}
+		},
 	},
 	data(){
 		return{
@@ -63,11 +110,33 @@ export default {
 	},
 	created(){
 	},
+	watch:{
+		originData:{
+			deep: true,
+			immediate: true,
+			handler(obj){
+			}
+		}
+	},
 	
 	methods:{
 		cancel(){
 			this.$emit('cancel')
 		},
+		resolveTask(){
+			let data = {
+				action: "resolve"
+			}
+			let self = this
+			workFlowApi.changeTaskAction(this.taskId, data).then(res=>{
+			}).catch(err=>{
+			})
+			this.$emit('cancel')
+			self.$snotify({
+				type: "success",
+				title: "Thực thi công việc thành công"
+			})
+		}
 		
 	},
 }

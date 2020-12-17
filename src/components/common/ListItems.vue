@@ -1175,7 +1175,6 @@ export default {
                 });
             }
 			rsl.detail = JSON.stringify(configs);
-			debugger
             return rsl;
         },
         /**

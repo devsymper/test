@@ -108,6 +108,9 @@ export default {
 		taskId:{
 			type: String,
 			default: ""
+		},
+		originData:{
+			type : Object
 		}
 	},
 	data(){
@@ -118,9 +121,17 @@ export default {
 	watch:{
 		showDialog(val){
 			this.userInforId  = ""
+		},
+		originData:{
+			deep: true,
+			immediate: true,
+			handler(obj){
+			}
 		}
 	},
-	
+	computed:{
+
+	},
 	methods:{
 		cancel(){
 			this.$emit('cancel')
@@ -137,7 +148,7 @@ export default {
 				type: "success",
 				title: "Ủy quyền thành công "
 			})
-			this.$emit('cancel')
+			this.$emit('success')
 		}
 		
 	},

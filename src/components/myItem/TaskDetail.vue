@@ -166,13 +166,15 @@
 			:showDialog="modelDialog.delegateShowDialog"
 			@cancel="modelDialog.delegateShowDialog = false"
 			:taskStatus="taskStatus"
+			@success="handlerDelegateSuccess"
 			:taskId="originData.id"
 		
 		/> 
 		<ResolveDialog 
 			:showDialog="modelDialog.resolveShowDialog"
 			@cancel="modelDialog.resolveShowDialog = false"
-		
+			:originData="originData"
+			:taskId="originData.id"
 		/> 
 		<UnClaimDialog
 			:showDialog="modelDialog.unClaimShowDialog"
@@ -421,6 +423,10 @@ export default {
         this.checkAndSwitchToTab();
     },
     methods: {
+		handlerDelegateSuccess(){
+			this.modelDialog.delegateShowDialog = false
+			this.$emit('reload-data')
+		},
 		getTaskStatus(color,title,value){
 			let obj = {
 				color: color,
