@@ -231,6 +231,7 @@
 				@drag-columns-stopped="handleStopDragColumn"
 				@change-colmn-display-config="configColumnDisplay"
 				@save-list-display-config="saveTableDisplayConfig"
+				@re-render="reRender"
 				:tableDisplayConfig="tableDisplayConfig"
 				:tableColumns="columnDefs"
 				:headerPrefixKeypath="headerPrefixKeypath"
@@ -600,7 +601,21 @@ export default {
 				this.$emit("open-panel");
 				this.showSearchBox = false
             }
-        },
+		},
+		columnDefs:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				let self = this
+				if(arr.length > 0){
+					arr.forEach(function(e){
+						if(e.symperFixed && !self.fixedCols.includes(e.field)){
+							self.fixedCols.push(e.field)
+						}
+					})
+				}
+			}
+		},
         getDataUrl(){   
 			this.page = 1
         	this.refreshList();
@@ -638,6 +653,7 @@ export default {
     data(){
 		let self = this
         return {
+            savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
 			showSearchBox: true,
             loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
             loadingExportExcel: false, // có đang chạy export hay ko
@@ -724,6 +740,9 @@ export default {
 		this.rowSelection = 'single';
     },
 	methods:{
+		reRender(){
+			this.agApi.sizeColumnsToFit()
+		},
 		 /**
          * Tạo ra các item có check box với trạng thái đã check hay chưa 
          * @param items danh sách các value dạng ['ccc','xxc', ....]
@@ -945,7 +964,9 @@ export default {
 			document.querySelector('.ag-row-selected').innerHTML = selectedRows.length === 1 ? selectedRows[0].athlete : ''
    		 },
 		onGridReady(params){
-			params.api.sizeColumnsToFit()
+			setTimeout((self)=>{
+				params.api.sizeColumnsToFit()
+			},1000)
 			this.agApi = params.api
 			/**
 			 * Create perfect scrollbar cho ag grid
@@ -974,10 +995,11 @@ export default {
             }
 		},
 		resetHiddenColumns(field ,idx){
+			let value  =  this.tableDisplayConfig.value.hiddenColumns.includes(idx) ? true : false
             let hiddenColumns = {};
             this.columnDefs.forEach((col, idx) => {
                 if (col.symperHide) {
-                    hiddenColumns[idx] = true;
+                    hiddenColumns[idx] = value;
                 }
             });
             hiddenColumns = Object.keys(hiddenColumns).reduce((newArr, el) => {
@@ -985,23 +1007,23 @@ export default {
                 return newArr;
 			}, []);
 			this.$set(this.tableDisplayConfig.value, "hiddenColumns", hiddenColumns);
-			let value  =  this.tableDisplayConfig.value.hiddenColumns.includes(idx) ? true : false
 			this.gridOptions.columnApi.setColumnVisible(field, value)
 			this.agApi.sizeColumnsToFit()
         },
 		reOrderFixedCols(column){
 			let pinValue 
-			if(!this.fixedCols.includes(column)){
-				this.fixedCols.push(column)
-				column.symperFixed = true
-				this.$set(column, 'pinned', 'left')
-				pinValue = 'pinned'
-			}else{
-				this.fixedCols.splice(this.fixedCols.indexOf(column),1)
+			if(this.fixedCols.includes(column.field)){
+				this.fixedCols.splice(this.fixedCols.indexOf(column.field),1)
 				pinValue = 'unpinned'
 				delete column.pinned
 				column.symperFixed = false
+			}else{
+				this.fixedCols.push(column.field)
+				column.symperFixed = true
+				this.$set(column, 'pinned', 'left')
+				pinValue = 'pinned'
 			}
+			debugger
 			this.gridOptions.columnApi.setColumnPinned(column.field, pinValue)
         },
 		openTableDisplayConfigPanel() {
@@ -1130,25 +1152,58 @@ export default {
 				getDataFromConfig(url, configs, columns, tableFilter, success, method, header);
 			}
 		},
-		getTableColumns(columns){
-			let columnsReduce = []
-			columns.forEach(function(e){
-				let obj = {}
-				obj.headerName = e.name
-				obj.field = e.name
-				obj.type = e.type
-				obj.suppressMenu = true
-				obj.symperHide = true
-				obj.symperFixed = false
-				if(e.cellRenderer){
-					obj.cellRenderer = e.cellRenderer
-				}
-				if(e.cellRendererParams){
-					obj.cellRendererParams = e.cellRendererParams
-				}
-				columnsReduce.push(obj)
-			})
-			return columnsReduce
+		getTableColumns(columns, forcedReOrder = false){
+			let savedOrderCols = this.savedTableDisplayConfig;
+            let colMap = {};
+			let self = this;
+			if (forcedReOrder) {
+                for (let item of columns) {
+					colMap[item.field] = item;
+                }
+            } else {
+                for (let item of columns) {
+                    colMap[item.name] = {
+                        headerName: item.name,
+                        field: item.name,
+                        type: item.type, // lưu ý khi loại dữ liệu của cột là number (cần format) và dạng html
+                        editor: false,
+                        symperFixed: false,
+                        symperHide: false,
+						columnTitle: item.title,
+						cellRenderer: item.cellRenderer ? item.cellRenderer : null,
+						cellRendererParams: item.cellRendererParams ? item.cellRendererParams : null,
+                        noFilter: item.noFilter ? item.noFilter : false
+					};
+				}	
+				
+			}
+			if (savedOrderCols.length > 0) {
+                let orderedCols = [];
+                let noneOrderedCols = [];
+                for (let col of savedOrderCols) {
+                    if(colMap[col.data]){
+                        colMap[col.data].checkedOrder = true;
+                        if (colMap[col.data]) {
+                            colMap[col.data].symperFixed = col.symperFixed;
+                            colMap[col.data].symperHide = col.symperHide;
+                            colMap[col.data].hide = col.symperHide;
+                            colMap[col.data].pinned = col.symperFixed ? 'left': null;
+                            orderedCols.push(colMap[col.data]);
+                        } else {
+                            noneOrderedCols.push(colMap[col.data]);
+                        }
+                    }
+                }
+
+                for(let colName in colMap){
+                    if(!colMap[colName].checkedOrder){
+                        noneOrderedCols.push(colMap[colName]);
+                    }
+                }
+                return orderedCols.concat(noneOrderedCols);
+            } else {
+                return Object.values(colMap);
+            }
 		},
 		 /**
          * Khôi phục lại cấu hình của hiển thị của table từ dữ liệu được lưu
@@ -1163,9 +1218,9 @@ export default {
                     this.tableDisplayConfig.value.alwaysShowSidebar =  savedConfigs.alwaysShowSidebar;
                     
                     this.savedTableDisplayConfig = savedConfigs.columns;
-                    if(this.tableColumns.length > 0){
-                        this.tableColumns = this.getTableColumns(this.tableColumns, true);
-                        this.handleStopDragColumn();
+                    if(this.columnDefs.length > 0){
+                        this.columnDefs = this.getTableColumns(this.columnDefs, true);
+						this.handleStopDragColumn();
                     }
                 }
             }).catch((err) => {
@@ -1195,7 +1250,7 @@ export default {
             };
             for (let col of this.columnDefs) {
                 configs.columns.push({
-                    data: col.data,
+                    data: col.field,
                     symperFixed: col.symperFixed,
                     symperHide: col.symperHide
                 });
@@ -1233,10 +1288,10 @@ export default {
         handleStopDragColumn(tbCols) {
             this.tableDisplayConfig.drag = false;
             if(tbCols){
-                this.tableColumns = tbCols;
+                this.columnDefs = tbCols;
             }
             this.resetHiddenColumns();
-            this.reOrderFixedCols();
+            // this.reOrderFixedCols();
             this.$refs.tableDisplayConfig.resetTableColumnsData();
         },
 	},

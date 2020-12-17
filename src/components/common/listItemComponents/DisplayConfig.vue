@@ -12,7 +12,7 @@
                 {{$t('common.list_config')}}
                 <v-icon
                     class="close-btn float-right"
-                    @click="tableDisplayConfig.show = false"
+                    @click="handlerCloseClick"
                 >mdi-close</v-icon>
             </div>
             
@@ -70,10 +70,10 @@
                         <div
                             class="fs-13 column-drag-pos"
                             v-for="(column,idx) in tableColumnsClone"
-                            :key="idx"
+                            :key="column.data ? column.data : column.field"
                         >
                             <v-icon size="18" class="mr-2">{{getDataTypeIcon(column.type)}}</v-icon>
-                            <span class="fw-400">{{columnTitle(column.headerName)}}</span>
+                            <span class="fw-400">{{column.headerName ? columnTitle(column.headerName) : columnTitle(column.columnTitle)}}</span>
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
                                     <v-btn
@@ -87,10 +87,10 @@
                                     >
                                         <v-icon
                                             size="18"
-                                        >{{column.symperFixed ? 'mdi-roller-skate-off': 'mdi-roller-skate'}}</v-icon>
+                                        >{{!column.symperFixed ? 'mdi-roller-skate': 'mdi-roller-skate-off'}}</v-icon>
                                     </v-btn>
                                 </template>
-                                <span>{{ column.symperFixed ? $t('table.unfreeze_column') : $t('table.freeze_column') }}</span>
+                                <span>{{ !column.symperFixed ? $t('table.freeze_column') : $t('table.unfreeze_column') }}</span>
                             </v-tooltip>
                             <v-tooltip top>
                                 <template v-slot:activator="{ on }">
@@ -105,12 +105,12 @@
                                     >
                                         <v-icon
                                             size="18"
-                                        >{{column.symperHide ? 'mdi-eye-outline': 'mdi-eye-off-outline'}}</v-icon>
+                                        >{{!column.symperHide ? 'mdi-eye-outline': 'mdi-eye-off-outline'}}</v-icon>
                                     </v-btn>
                                 </template>
                                 <span
                                     class="fw-400"
-                                >{{ column.symperHide ? $t('table.hide_column') : $t('table.show_column') }}</span>
+                                >{{ !column.symperHide ? $t('table.hide_column') : $t('table.show_column') }}</span>
                             </v-tooltip>
                         </div>
                     </transition-group>
@@ -147,6 +147,7 @@ export default {
             deep: true,
             handler(){
 				this.tableColumnsClone = util.cloneDeep(this.tableColumns);
+				this.$emit('re-render')
             }
         }
     },
@@ -185,7 +186,11 @@ export default {
         },
         resetTableColumnsData(){
             // this.tableColumnsClone = util.cloneDeep(this.tableColumns);
-        },
+		},
+		handlerCloseClick(){
+			this.tableDisplayConfig.show = false
+			this.$emit('re-render')
+		},
         handleStopDragColumn(){
             this.$emit('drag-columns-stopped', this.tableColumnsClone);
         },
