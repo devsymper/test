@@ -54,7 +54,6 @@ export default {
 	computed:{
 		listActions(){
 			let lists = []
-			debugger
 			if(this.userType == 'assignee' && this.taskType == 'assign'){
 				this.items.forEach(function(e){
 					if(e.value == 'reAssign' || e.value == 'delegate' || e.value == 'complete'){

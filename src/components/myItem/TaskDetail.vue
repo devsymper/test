@@ -152,6 +152,7 @@
 			:showDialog="modelDialog.reAssignShowDialog"
 			@cancel="modelDialog.reAssignShowDialog = false"
 			:originData="originData"
+			@success="refreshMyItem('reAssign')"
 		/> 
 		<ClaimDialog
 			:showDialog="modelDialog.claimShowDialog"
@@ -161,13 +162,14 @@
 		<CompleteDialog 
 			:showDialog="modelDialog.completeShowDialog"
 			@cancel="modelDialog.completeShowDialog = false"
-
+			:taskId="originData.id"
+			@success="refreshMyItem('complete')"
 		/> 
 		<DelegateDialog 
 			:showDialog="modelDialog.delegateShowDialog"
 			@cancel="modelDialog.delegateShowDialog = false"
 			:taskStatus="taskStatus"
-			@success="handlerDelegateSuccess"
+			@success="refreshMyItem('delegate')"
 			:taskId="originData.id"
 			:originData="originData"
 		/> 
@@ -176,10 +178,12 @@
 			@cancel="modelDialog.resolveShowDialog = false"
 			:originData="originData"
 			:taskId="originData.id"
+			@success="refreshMyItem('resolve')"
 		/> 
 		<UnClaimDialog
 			:showDialog="modelDialog.unClaimShowDialog"
 			@cancel="modelDialog.unClaimShowDialog = false"
+			@success="refreshMyItem('unClaim')"
 		/> 
     </div>
 </template>
@@ -380,7 +384,6 @@ export default {
 			if(this.originData.isDone == '1'){
 				obj = this.getTaskStatus('success', 'Hoàn thành','complete')
 			}else{
-				debugger
 				if(!this.delegationState){
 					if(this.originData.assignee){
 						obj = this.getTaskStatus('#F59324', 'Đã giao','assign')
@@ -427,6 +430,10 @@ export default {
         this.checkAndSwitchToTab();
     },
     methods: {
+		refreshMyItem(type){
+			this.modelDialog[type+'ShowDialog'] = false
+			this.$router.go()
+		},
 		handlerDelegateSuccess(){
 			this.modelDialog.delegateShowDialog = false
 			this.$emit('reload-data')

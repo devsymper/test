@@ -242,4 +242,5 @@ export default {
 	changeTaskAction(id,data){
 		return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks + "/" + id, JSON.stringify(data), testHeader)
 	}
+	
 };

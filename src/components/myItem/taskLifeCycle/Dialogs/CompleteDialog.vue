@@ -21,11 +21,11 @@
 							small
 							label
 							class="ma-2"
-							color="#8E2D8C"
+							color="orange"
 							text-color="white"
 						>
 							<span class="fs-13">
-								Ủy quyền
+								Đã giao
 							</span>
 						</v-chip>
 					</div>
@@ -58,6 +58,7 @@
 					<v-btn
 					color="green darken-1"
 					text
+					@click="completeTask"
 				>
 					Áp dụng
 				</v-btn>
@@ -68,25 +69,21 @@
 </template>
 
 <script>
+import workFlowApi  from "@/api/BPMNEngine.js";
 export default {
 	props:{
 		showDialog:{
 			type: Boolean,
 			default: false,
 		},
-		currentInstance:{
-			type: Object,
-			default(){
-				return {
-
-				}
-			},
+		taskId:{
+			type: String,
+			default: ""
 		}
 	},
 	data(){
 		return{
-			selected:"",
-			verId:""
+			
 		}
 	},
 	created(){
@@ -96,7 +93,21 @@ export default {
 		cancel(){
 			this.$emit('cancel')
 		},
-		
+		completeTask(){
+			let data = {
+				action: 'complete'
+			}
+			workFlowApi.changeTaskAction(this.taskId, data).then(res=>{
+
+			}).catch(err=>{
+
+			})
+			this.$snotify({
+				type: "success",
+				title: "Hoàn thành công việc thành công"
+			})
+			this.$emit('success')
+		}
 	},
 }
 </script>

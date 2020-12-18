@@ -127,15 +127,15 @@ export default {
 			let data = {
 				action: "resolve"
 			}
-			let self = this
 			workFlowApi.changeTaskAction(this.taskId, data).then(res=>{
 			}).catch(err=>{
 			})
-			this.$emit('cancel')
-			self.$snotify({
+			this.$snotify({
 				type: "success",
 				title: "Thực thi công việc thành công"
 			})
+			this.$emit('success')
+
 		}
 		
 	},

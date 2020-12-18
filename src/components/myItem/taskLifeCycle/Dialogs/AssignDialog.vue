@@ -81,8 +81,9 @@
 					<v-btn
 					color="green darken-1"
 					text
+					@click="reAssignTask"
 				>
-					Đồng ý
+					Áp dụng
 				</v-btn>
 			</v-card-actions>
 			</v-card>
@@ -91,6 +92,7 @@
 </template>
 
 <script>
+import workFlowApi  from "@/api/BPMNEngine.js";
 export default {
 	props:{
 		showDialog:{
@@ -113,6 +115,21 @@ export default {
 		cancel(){
 			this.$emit('cancel')
 		},
+		reAssignTask(){
+			let data = {
+				owner: this.originData.ownerInfo.id,
+				assignee: this.userInforId
+			}
+			workFlowApi.updateTask(this.originData.id, data).then(res=>{
+				debugger
+			}).catch(err=>{
+			})
+			this.$snotify({
+				type: "success",
+				title: "Giao việc thành công"
+			})
+			this.$emit('success')
+		}
 		
 	},
 }
