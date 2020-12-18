@@ -22,7 +22,7 @@
 						<span class="mr-1 ml-1">
 							Công việc đã được ủy quyền
 						</span>
-						<span style="color: blue"> {{originData.assigneeInfo.displayName}}</span>
+						<span style="color: blue"> {{originData.assigneeInfo ? originData.assigneeInfo.displayName : ""}}</span>
 					</div>
 					<div class="text-wrap d-flex">
 						<v-icon x-small>
@@ -31,7 +31,7 @@
 						<span class="ml-1 mr-1">
 							Chủ sở hữu công việc
 						</span>
-						<span style="color: blue">{{originData.ownerInfo.displayName}}</span>
+						<span style="color: blue">{{ originData.ownerInfo ? originData.ownerInfo.displayName : ""}}</span>
 					</div>
 					<div class="text-wrap   d-flex align-center">
 						Trạng thái hiện tại
