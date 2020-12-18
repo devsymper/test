@@ -57,6 +57,7 @@
 					<v-btn
 					color="green darken-1"
 					text
+					@click="unClaimTask"
 				>
 					Áp dụng
 				</v-btn>
@@ -67,19 +68,16 @@
 </template>
 
 <script>
+import workFlowApi  from "@/api/BPMNEngine.js";
 export default {
 	props:{
 		showDialog:{
 			type: Boolean,
 			default: false,
 		},
-		currentInstance:{
-			type: Object,
-			default(){
-				return {
-
-				}
-			},
+		taskId:{
+			type: String,
+			default:" "
 		}
 	},
 	data(){
@@ -95,6 +93,20 @@ export default {
 		cancel(){
 			this.$emit('cancel')
 		},
+		unClaimTask(){
+			let data ={
+				assignee: null,
+				owner: null
+			}
+			let self = this
+			workFlowApi.updateTask(this.taskId, data).then(res=>{
+				self.$snotify({
+					type: "success",
+					title: "Hủy nhận công việc thành công"
+				})
+				self.$emit('success')
+			}).catch(err=>{})
+		}
 		
 	},
 }

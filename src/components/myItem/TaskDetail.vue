@@ -184,6 +184,7 @@
 			:showDialog="modelDialog.unClaimShowDialog"
 			@cancel="modelDialog.unClaimShowDialog = false"
 			@success="refreshMyItem('unClaim')"
+			:taskId="originData.id"
 		/> 
     </div>
 </template>

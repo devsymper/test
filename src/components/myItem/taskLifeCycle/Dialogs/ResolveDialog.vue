@@ -135,7 +135,6 @@ export default {
 				title: "Thực thi công việc thành công"
 			})
 			this.$emit('success')
-
 		}
 		
 	},
