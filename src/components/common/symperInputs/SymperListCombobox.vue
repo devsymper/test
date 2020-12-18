@@ -128,11 +128,11 @@ export default {
             deep: true,
             immediate: true,
             handler: function(after, before){
-                if (Object.keys(after) >0) {
+                // if (Object.keys(after) >0) {
                     this.myValue = after;
-                }else{
-                    this.myValue = {id:"",name:after,title:after};
-                }
+                // }else{
+                //     this.myValue = {id:"",name:after,title:after};
+                // }
             }
         },
         search(){
@@ -167,27 +167,25 @@ export default {
             isLoading: false,
             search: '',
             myItems: [],
-            myValue: {id:"",name:"",title:""},
+            myValue: "",
             delayTimer:null,
         };
     },
     methods: {
         applyChangeValue(vl){
-            if (vl) {
-                if (vl.id && Object.keys(vl).length >0) {
-                    this.$emit('input',vl);
-                    this.$emit('change', { // có thêm items là để set lại danh sách các option trong trường hợp load data từ server
-                        value: vl,
-                        items: this.myItems
-                    });
-                }else{
-                    this.$emit('input',{id:"",name:vl,title:vl});
-                    this.$emit('change', { // có thêm items là để set lại danh sách các option trong trường hợp load data từ server
-                        value: {id:vl.id,name:vl,title:vl},
-                        items: this.myItems
-                    });
-                }
+            let item ={};
+            if (typeof vl == 'string') {
+                item.id = "";
+                item.name = vl;
+            }else{
+                item = vl;
             }
+
+            this.$emit('input', item);
+            this.$emit('change', { // có thêm items là để set lại danh sách các option trong trường hợp load data từ server
+                value: item,
+                items: this.myItems
+            });
        
         },
         reAssignItems(){

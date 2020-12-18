@@ -583,7 +583,7 @@ export default {
                 self.nodeConfig=link;
                 for (let index = 0; index < self.listNode.length; index++) {
                     let node = self.listNode[index];
-                    allOption.push({text:node.name.value,value:node.id.value})
+                    allOption.push({text:node.name.value.name,value:node.id.value})
                 }
                 self.$set(self.nodeConfig.from,'options',allOption);
                 self.$set(self.nodeConfig.to,'options',allOption);

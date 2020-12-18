@@ -39,7 +39,7 @@
 
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
-import {getAllStatusCategory} from './../config.js'
+import {getAllStatusCategory, getLinkDefault} from './../config.js'
 export default {
     components:{
         'form-tpl' : FormTpl,
@@ -66,56 +66,15 @@ export default {
     data(){
         return{
             isShow:false,
-            linkInfo:{
-                id : { 
-                    title: "Bắt đầu từ trạng thái",
-                    type: "select",
-                    value:"",
-                    hidden:true
-                },
-                from : { 
-                    title: "Bắt đầu từ trạng thái",
-                    type: "select",
-                    value:"",
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                    validate(){
-                    
-                    }
-                },
-                to : { 
-                    title: "Kết thúc đến trạng thái",
-                    type: "select",
-                    value:"",
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                    validate(){
-                    
-                    }
-                },
-                name : { 
-                    title: "Tên",
-                    type: "text",
-                    value:"",
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                    validate(){
-                    
-                    }
-                },
-            },
+            linkInfo:{},
             userSelect:[]
         }
     },
     methods:{
         show(){
+            this.linkInfo = getLinkDefault();
             this.isShow=true;
+
         },
         actionClick(type){
             this.$emit('after-add-link-click',this.linkInfo);

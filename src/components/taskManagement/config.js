@@ -86,7 +86,7 @@ const statusInfo = {
     name : { 
         title: "Name",
         type: "combobox",
-        value: {id:"",name:"",title:""},
+        value: "",
         options:[],
         validateStatus:{
             isValid:true,
@@ -207,13 +207,23 @@ export const getAllStatusForCombobox = function(allStatus) {
 }
 export const getStatusDefault = function() {
     let status = util.cloneDeep(statusInfo);
+    status.name.value = {id:"",name:""};
+    status.name.value.name="";
+    status.name.value.id="";
+
     status.statusCategory.options=getAllStatusCategory();
     status.roleAcess.options=getAllRoleForAutocomplete();
     return status;
 }
 
+export const getLinkDefault =  function() {
+    let link = util.cloneDeep(linkInfo);
+    return link;
+}
+
 export const convertFormatNode = function(node) {
     let status = util.cloneDeep(statusInfo);
+    status.name.value = {id:"",name:""};
     status.name.value.name=node.name;
     status.name.value.id=node.statusId;
     status.id.value=node.nodeId;

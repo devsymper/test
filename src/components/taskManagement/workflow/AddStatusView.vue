@@ -111,7 +111,7 @@ export default {
             }
             this.delayTimer = setTimeout((self) => {
                 if (name == "name") {
-                    if (!inputInfo.value.id) {
+                    if (inputInfo.value && !inputInfo.value.id) {
                         taskManagementApi
                             .checkNameStatusExists(data.name)
                             .then(res => {
