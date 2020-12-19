@@ -102,7 +102,8 @@ export default {
     methods:{
         handleClickRow(item){ 
             if (item.id) {
-                this.$router.push('/task-management/workflow/'+item.id);
+                let projectId=this.$route.params.id;
+                this.$router.push('/task-management/projects/'+projectId+'/workflow/'+item.id);
             }
         },
         removeWorkflow(){
@@ -126,7 +127,8 @@ export default {
             this.dialogRemove=true;
         },
         handleCreate(){
-            this.$router.push('/task-management/workflow/create');
+            let projectId=this.$route.params.id;
+            this.$router.push('/task-management/projects/'+projectId+'/workflow/create');
         }
     }
 

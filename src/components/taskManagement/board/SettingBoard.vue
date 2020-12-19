@@ -2,12 +2,7 @@
     <div class="w-100 h-100">
         <div class="d-flex">
             <div class="symper-title pt-2 pl-2" style="height:40px">Setting for Board XXX</div>
-            <v-btn
-                class="save-setting-btn"
-                depressed
-                >
-                {{$t('common.save')}}
-            </v-btn>
+        
         </div>
         <div  style="height:calc(100% - 40px); width:100%; background:#333">
             <v-tabs 

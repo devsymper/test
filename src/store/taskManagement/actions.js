@@ -62,10 +62,10 @@ const getAllRole = async(context) => {
     }
 }
 
-const getAllWorkflow = async(context) => {
+const getListWorkflowInProject = async(context,projectId) => {
     if (context.state.allWorkflow.length==0) {
         try {
-            let res = await taskManagementApi.getListWorkflow();
+            let res = await taskManagementApi.getListWorkflowInProject(projectId);
             if (res.status == 200) {
                 context.commit('setAllWorkflow', res.data.listObject);
             } else {
@@ -117,7 +117,7 @@ export {
     updateCategoryToStore,
     getAllStatusCategory,
     getAllRole,
-    getAllWorkflow,
+    getListWorkflowInProject,
     getAllPriority
 
 

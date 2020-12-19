@@ -66,13 +66,20 @@ export default {
     data(){
         return{
             isShow:false,
-            linkInfo:{},
+            linkInfo:getLinkDefault(),
             userSelect:[]
         }
     },
     methods:{
         show(){
             this.linkInfo = getLinkDefault();
+            let allOption = [];
+            for (let index = 0; index < this.listNode.length; index++) {
+                let node = this.listNode[index];
+                allOption.push({text:node.name.value.name,value:node.id.value})
+            }
+            this.$set(this.linkInfo.from,'options',allOption);
+            this.$set(this.linkInfo.to,'options',allOption);
             this.isShow=true;
 
         },

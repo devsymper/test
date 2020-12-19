@@ -3,9 +3,18 @@
         <div style="height:40px">
             <div class="d-flex justify-space-between">
                 <h2 class="ml-4">Column manager</h2>
-                <v-btn small class="ml-1 px-1" solo depressed color="#999" @click="addColumn">
-                    <span style="color:white">Add column</span>
-                </v-btn>
+                <div>
+                    <v-btn small class="ml-1 px-1" solo depressed color="#999" @click="addColumn">
+                        <span style="color:white">Add column</span>
+                    </v-btn>
+                    <v-btn
+                        class="save-setting-btn"
+                        depressed
+                        small
+                        >
+                        {{$t('common.save')}}
+                    </v-btn>
+                </div>
             </div>
         </div>
         <div class="d-flex">

@@ -57,7 +57,7 @@ export default [
                 }
             },
             {
-                path: "workflow",
+                path: "projects/:id/workflow",
                 meta:{group:'projectSetting'},
                 name: "listWorkflow",
                 components:{
@@ -65,7 +65,7 @@ export default [
                 }
             },
             {
-                path: "workflow/create",
+                path: "projects/:id/workflow/create",
                 // meta:{group:'projectSetting'},
                 name: "issueTypeWorkflow",
                 components:{
@@ -73,7 +73,7 @@ export default [
                 }
             },
             {
-                path: "workflow/:id",
+                path: "projects/:id/workflow/:workflowId",
                 // meta:{group:'projectSetting'},
                 name: "detailworkflow",
                 components:{

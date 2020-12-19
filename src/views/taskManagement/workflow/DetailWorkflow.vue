@@ -45,7 +45,7 @@ export default {
         this.$store.dispatch("taskManagement/getAllStatusCategory");
         this.$store.dispatch("taskManagement/getAllRole");
         let self=this;
-        let id=this.$route.params.id;
+        let id=this.$route.params.workflowId;
         taskManagementApi
             .getDetailWorkflow(id)
             .then(res => {

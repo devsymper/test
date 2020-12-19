@@ -63,11 +63,7 @@
                         </div>
                         <div style="width:300px">
                             <span class="font-weight-medium">Hành động</span>
-<<<<<<< HEAD
-                            <VuePerfectScrollbar style=" height:250px" >
-=======
                             <VuePerfectScrollbar style=" height:280px" >
->>>>>>> 8f4909eb537bbcacc9fea0f4d4c4859edf9b19e6
                                 <v-list dense height="20">
                                         <v-list-item
                                             v-for="(item, i) in selectedItem.actions"

@@ -97,7 +97,6 @@ export default {
     created(){
         this.$store.dispatch("taskManagement/getAllStatusCategory");
         this.$store.dispatch("taskManagement/getAllRole");
-        this.$store.dispatch("taskManagement/getAllWorkflow");
         this.$store.dispatch("taskManagement/getAllPriority");
     },
     computed:{
