@@ -74,6 +74,9 @@ export default {
             if (vl.length>0) {
                 this.setRoleSelect();
             }
+        },
+        isShow:function(vl){
+            this.setRoleSelect();
         }
     },
     data(){
@@ -167,11 +170,10 @@ export default {
                     return arr
                 },[]);
                 self.roleSelect.roles.options = role
-            }, 200,this);
+            }, 300,this);
         }
     },
     created(){
-        this.setRoleSelect;
     }
 
 }

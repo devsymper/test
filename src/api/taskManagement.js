@@ -147,6 +147,12 @@ export const taskManagementApi = {
     getAllStatusCategory(){
         return taskManagement.get("status-category");
     },
+    getAllStatus(){
+        return taskManagement.get("status");
+    },
+    checkNameStatusExists(vl){
+        return taskManagement.get("status-name",{name:vl});
+    },
     // priority
     getListPriority(){
         return taskManagement.get("priorities");
@@ -164,9 +170,43 @@ export const taskManagementApi = {
         return taskManagement.put("priorities-level",data);
     },
     // access
-    addActionPack(data){
+    addOperations(data){
         return permission.post("operations/save-batch",data);
-    }
+    },
+    addActionPack(data){
+        return permission.post("action_packs",data);
+    },
+    updateActionPack(actionPackId,data){
+        return permission.put("action_packs/"+actionPackId,data);
+    },
+    getListOperatorInActionPack(actionPackId){
+        return permission.get("action_packs/"+actionPackId+"/operations");
+
+    },
+    getListActionPack(filter) {
+        return permission.get("action_packs",filter);
+    },
+    addPermissionPack(data){
+        return permission.post("permission_packs",data);
+    },
+    updatePermissionPack(permissionId,data){
+        return permission.put("permission_packs/"+permissionId,data);
+    },
+    getListPermissionPack(filter) {
+        return permission.get("permission_packs",filter);
+    },
+    getListPermissionInRole(roleIdentifier) {
+        return permission.get("roles/"+roleIdentifier+"/permissions",{detail:1});
+    },
+    setPermissionForRole(data){
+        data.replace_all = 1;
+        return permission.post("roles/set-permissions",data);
+    },
+    getListActionPackInPermissionPack(permissionId){
+        return permission.get("permission_packs/"+permissionId+"/action_packs",{detail:1});
+
+    },
+
 
     
 }

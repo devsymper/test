@@ -39,7 +39,7 @@
 
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
-import {getAllStatusCategory} from './../config.js'
+import {getAllStatusCategory, getLinkDefault} from './../config.js'
 export default {
     components:{
         'form-tpl' : FormTpl,
@@ -57,7 +57,7 @@ export default {
             let allOption = [];
             for (let index = 0; index < vl.length; index++) {
                 let node = vl[index];
-                allOption.push({text:node.name.value,value:node.id.value})
+                allOption.push({text:node.name.value.name,value:node.id.value})
             }
             this.$set(this.linkInfo.from,'options',allOption);
             this.$set(this.linkInfo.to,'options',allOption);
@@ -66,56 +66,15 @@ export default {
     data(){
         return{
             isShow:false,
-            linkInfo:{
-                id : { 
-                    title: "Bắt đầu từ trạng thái",
-                    type: "select",
-                    value:"",
-                    hidden:true
-                },
-                from : { 
-                    title: "Bắt đầu từ trạng thái",
-                    type: "select",
-                    value:"",
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                    validate(){
-                    
-                    }
-                },
-                to : { 
-                    title: "Kết thúc đến trạng thái",
-                    type: "select",
-                    value:"",
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                    validate(){
-                    
-                    }
-                },
-                name : { 
-                    title: "Tên",
-                    type: "text",
-                    value:"",
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                    validate(){
-                    
-                    }
-                },
-            },
+            linkInfo:{},
             userSelect:[]
         }
     },
     methods:{
         show(){
+            this.linkInfo = getLinkDefault();
             this.isShow=true;
+
         },
         actionClick(type){
             this.$emit('after-add-link-click',this.linkInfo);

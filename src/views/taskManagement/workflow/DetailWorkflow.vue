@@ -4,6 +4,7 @@
         :infoWorkflow="infoWorkflow"
         :listNode="listNode"
         :listLink="listLink"
+        :allStatus="allStatus"
     />
 </template>
 
@@ -20,6 +21,24 @@ export default {
             infoWorkflow:{},
             listNode:[],
             listLink:[],
+            allStatus:[],
+        }
+    },
+    methods:{
+        getAllStatus(){
+            taskManagementApi
+            .getAllStatus()
+            .then(res => {
+                if (res.status == 200) {
+                    this.allStatus = res.data.listObject;
+                    this.$store.commit("taskManagement/setAllStatus",res.data.listObject);
+                }else{
+                    self.$snotifyError("", "Can not get all status");
+                }
+            })
+            .catch(err => {
+                self.$snotifyError("", "Can not get all status");
+            });
         }
     },
     created(){
@@ -50,6 +69,7 @@ export default {
                 }else{
                     self.$snotifyError("", "Can not get detail workflow with id:"+id);
                 }
+                self.getAllStatus();
             })
             .catch(err => {
                 self.$snotifyError("", "Can not get detail workflow with id="+id);

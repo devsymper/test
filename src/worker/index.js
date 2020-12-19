@@ -9,6 +9,9 @@ const send = message =>
     message
   });
 
+promiseWorker.onmessage = ({ data }) => {
+    console.log("aaaaa",data);
+  };
 export default {
   send
 };

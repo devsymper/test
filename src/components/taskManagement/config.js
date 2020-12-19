@@ -74,16 +74,26 @@ const statusInfo = {
         title: "id",
         type: "text",
         value: '',
-        hidden:true
-    },
-    name : { 
-        title: "Name",
-        type: "text",
-        value: '',
+        hidden:true,
         validateStatus:{
             isValid:true,
             message:"Error"
         },
+        validate(){
+        
+        }
+    },
+    name : { 
+        title: "Name",
+        type: "combobox",
+        value: "",
+        options:[],
+        validateStatus:{
+            isValid:true,
+            message:"Error"
+        },
+        showId:false,
+        isSelectionChip:false,
         validate(){
             
         }
@@ -92,7 +102,14 @@ const statusInfo = {
         title: "Mô tả",
         type: "textarea",
         value: '',
-        hidden:true
+        hidden:true,
+        validateStatus:{
+            isValid:true,
+            message:"Error"
+        },
+        validate(){
+        
+        }
     },
     statusCategory : { 
         title: "Chọn loại",
@@ -113,13 +130,41 @@ const statusInfo = {
         value: '',
         multipleSelection:true,
         options:[],
-        showId:false
+        showId:false,
+        validateStatus:{
+            isValid:true,
+            message:"Error"
+        },
+        validate(){
+        
+        }
     },
     colorStatus : {
         title: "Chọn màu",
         type: "color",
         value: '',
+        validateStatus:{
+            isValid:true,
+            message:"Error"
+        },
+        validate(){
+        
+        }
     },
+    common :{
+        title: "Common",
+        type: "numeric",
+        value: 0,
+        hidden:true,
+        validateStatus:{
+            isValid:true,
+            message:"Error"
+        },
+        validate(){
+        
+        }
+    }
+
 }
 
 export const getAllStatusCategory = function() {
@@ -148,19 +193,42 @@ export const getAllRoleForAutocomplete = function() {
         return allRole;
     }
 }
+export const getAllStatusForCombobox = function(allStatus) {
+    let listStatus = allStatus;
+    if (listStatus.length > 0) {
+        listStatus = listStatus.reduce((arr, obj)=>{
+            let newObj = {name:obj.name,id:obj.id};
+            arr.push(newObj);
+            return arr
+        },[]);
 
+        return listStatus;
+    }
+}
 export const getStatusDefault = function() {
     let status = util.cloneDeep(statusInfo);
+    status.name.value = {id:"",name:""};
+    status.name.value.name="";
+    status.name.value.id="";
+
     status.statusCategory.options=getAllStatusCategory();
     status.roleAcess.options=getAllRoleForAutocomplete();
     return status;
 }
 
+export const getLinkDefault =  function() {
+    let link = util.cloneDeep(linkInfo);
+    return link;
+}
+
 export const convertFormatNode = function(node) {
     let status = util.cloneDeep(statusInfo);
-    status.name.value=node.name;
-    status.id.value=node.statusId;
+    status.name.value = {id:"",name:""};
+    status.name.value.name=node.name;
+    status.name.value.id=node.statusId;
+    status.id.value=node.nodeId;
     status.description.value=node.description;
+    status.common.value=1;
     status.statusCategory.value=node.statusCategoryId;
     status.statusCategory.options=getAllStatusCategory();
     if (node.roleIds) {

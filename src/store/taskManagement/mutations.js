@@ -10,6 +10,10 @@ const setAllCategory = (state, allCategory) => {
 const setAllStatusCategory = (state, allStatusCategory) => {
     Vue.set(state, 'allStatusCategory', allStatusCategory);
 }
+const setAllStatus = (state, allStatus) => {
+    Vue.set(state, 'allStatus', allStatus);
+}
+
 const setAllProject = (state, allProject) => {
     Vue.set(state, 'allProject', allProject);
 }
@@ -230,6 +234,7 @@ export {
     setAllPriority,
     addPriorityToStore,
     removePriorityToStore,
-    updatePriorityToStore
+    updatePriorityToStore,
+    setAllStatus,
 
 };

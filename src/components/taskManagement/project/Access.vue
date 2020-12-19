@@ -5,7 +5,23 @@
                 <v-card-title>
                     <div>
                         {{$t("taskManagement.listMember")}} của {{currentProject.name}}
-                        <div><span class="fs-13 grey--text">Tổng số thành viên: {{allUserInProject.length}}</span></div>
+                        <div class="d-flex justify-space-between"><span class="fs-13 grey--text">Tổng số thành viên: {{allUserInProject.length}}</span>
+                            <div class="list-button">
+                                <v-btn small depressed @click="handleCreateActionPack">
+                                    Create action pack
+                                </v-btn>
+                                <v-btn small  depressed @click="handleCreatePermission">
+                                    <span>Create permission</span>
+                                </v-btn>
+                                <v-btn depressed small class="mx-2"  @click="handleClickAddPeople" >
+                                    {{$t("taskManagement.addPeople")}}
+                                </v-btn>
+                                <v-btn depressed @click="handleRoleManager" small >
+                                    {{$t("taskManagement.managerRole")}}
+                                </v-btn>
+                         
+                            </div>
+                        </div>
                     </div>
                     <v-spacer></v-spacer>
                     <v-text-field
@@ -14,17 +30,12 @@
                         label="Tìm kiếm"
                         dense
                         solo
-                        style="max-width:255px;"
                         single-line
                         hide-details
                         class="sym-small-size sym-style-input"
+                        style="max-width:255px;position: absolute;right: 10px;top: 18px;"
                     ></v-text-field>
-                    <v-btn depressed small class="mx-2"  @click="handleClickAddPeople" >
-                        {{$t("taskManagement.addPeople")}}
-                    </v-btn>
-                    <v-btn depressed color="#eee" style="color:#111" @click="handleRoleManager" small >
-                        {{$t("taskManagement.managerRole")}}
-                    </v-btn>
+                   
                 </v-card-title>
                 <v-data-table
                     :headers="headers"
@@ -93,13 +104,12 @@
                                     <span style="color:#777" class="fs-12">{{item.description}}</span>
                                 </v-list-item-content>
                                 <v-list-item-icon>
-                                    <v-tooltip bottom>
+                                    <!-- <v-tooltip bottom>
                                         <template v-slot:activator="{ on }">
                                             <v-icon v-on="on" @click.prevent.stop="duplicateRole(item)" class="fs-16 mr-1">mdi-sticker-plus</v-icon>
                                         </template>
                                         <span>Duplicate role</span>
-                                    </v-tooltip>
-
+                                    </v-tooltip> -->
                                     <v-tooltip bottom>
                                         <template v-slot:activator="{ on }">
                                             <v-icon v-on="on" @click.prevent.stop="handleDeleteRole(item)" style="font-size:20px">mdi-delete-outline</v-icon>
@@ -135,83 +145,97 @@
         <v-dialog
             v-model="dialogAddRole"
             persistent
-            max-width="600px"
+            max-width="800px"
             scrollable
         >
             <v-card>
             <v-card-title>
-                <span class="fs-16">Create role</span>
+                <span class="fs-16">{{statusDetail != true ? 'Create role' :'Thông tin role' }}</span>
             </v-card-title>
-            <v-card-text>
-                <v-container>
+            <v-card-text class="pb-0">
+                    <v-container class="p-0">
                     <div>
                         <form-tpl
                         :allInputs="nameAndDescriptionProps"/>
                     </div>
-                    <div>
-                        <b>Project permissions</b>
-                        <!-- <p>People in this role can:</p> -->
-                        <VuePerfectScrollbar >
-                            <v-expansion-panels
-                                v-model="panel"
-                                multiple
-                                class="s-expansion-panels"
-                                style="overflow: hidden;"
-                            >
-                                <v-expansion-panel v-for="(obj, key) in statusDetail?detailActionRole:allActionRoles " :key="key"  class="pa-0">
-                                    <v-expansion-panel-header class="v-expand-header py-0 px-0">
-                                        <div  v-if="!obj.children" class="fs-13">
-                                            <v-checkbox
-                                                class="checkBox"
-                                                ref="listCheck"
-                                                v-model="obj.isAllow"
-                                                :label="obj.title"
-                                            ></v-checkbox>
-                                            <div class="pl-8">
-                                                <span style="color:#888">{{obj.description}}</span>
-                                            </div>
-                                        </div>
-                                        <div v-else class="fs-13">
-                                            <v-checkbox
-                                                class="checkBox"
-                                                ref="listCheck"
-                                                v-model="obj.isAllow"
-                                                @click="handleCheckAllActionIssue($event,obj)"
-                                                :label="obj.title"
-                                                :input-value="obj.isAllow"
-                                                :indeterminate="checkIndeterminate(obj)"
-                                            ></v-checkbox>
-                                            <div class="pl-8">
-                                                <span style="color:#888">{{obj.description}}</span>
-                                            </div>
-                                        </div>
-                                    </v-expansion-panel-header>
-
-                                    <v-expansion-panel-content v-if="obj.children" class="sym-v-expand-content">
-                                        <v-list dense>
-                                            <v-list-item-group
-                                                color="primary"
-                                            >
-                                                <v-list-item
-                                                    v-for="(item, i) in obj.children"
-                                                    :key="i"
-                                                >
-                                                    <v-list-item-content style="font-size:13px">
-                                                        <v-checkbox
-                                                            class="checkBox"
-                                                            v-model="item.isAllow"
-                                                            :label="item.title"
-                                                            @change="changeValueCheckBoxIssue(obj)"
-                                                        ></v-checkbox>
-                                                        <div class="pa-0 pl-8 " style="color:#888">{{item.description}}</div>
-                                                    </v-list-item-content>
-                                                </v-list-item>
-                                            </v-list-item-group>
-                                        </v-list>
-                                    </v-expansion-panel-content>
-                                </v-expansion-panel>
-                            </v-expansion-panels>
-                        </VuePerfectScrollbar>
+                    <div class=" mt-2 d-flex justify-space-between">
+                        <span class="font-weight-medium pt-1">Lựa chọn đối tượng permission</span>
+                        <v-text-field
+                            append-icon="mdi-layers-search-outline"
+                            placeholder="Tìm kiếm đối tượng"
+                            dense
+                            solo
+                            style="max-width:255px;"
+                            single-line
+                            hide-details
+                            class="sym-small-size sym-style-input"
+                        ></v-text-field>
+                    </div>
+                    <div class="d-flex mt-2">
+                        <div style="width:390px">
+                            <span class="font-weight-medium">Danh sách permission pack</span>
+                            <VuePerfectScrollbar style=" height:250px" >
+                                <v-list dense>
+                                    <v-list-item-group
+                                        color="primary"
+                                    >
+                                        <v-list-item
+                                            v-for="(item, i) in listPermissionPack"
+                                            :key="i"
+                                            class="sym-control pl-0"
+                                        >
+                                            <v-list-item-content style="font-size:13px">
+                                                <v-checkbox
+                                                    class="checkBox"
+                                                    v-model="item.isCheck"
+                                                    :label="item.name"
+                                                    @change="handleClickPermissionPack(item)"
+                                                ></v-checkbox>
+                                                <div class="pa-0 pl-8 " style="color:#888">{{item.description}}</div>
+                                            </v-list-item-content>
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                        <v-icon v-on="on" @click.prevent.stop="handleClickDetailPermission(item)" class="item-detail fs-15">mdi-file-document-multiple-outline</v-icon>
+                                                    </template>
+                                                <span>Detail</span>
+                                            </v-tooltip>
+                                        </v-list-item>
+                                    </v-list-item-group>
+                                </v-list>
+                            </VuePerfectScrollbar>
+                        </div>
+                        <div style="width:390px; border-left: var(--symper-border)">
+                            <span class="ml-1 font-weight-medium">Danh sách permission pack đã chọn</span>
+                            <VuePerfectScrollbar style=" height:250px" >
+                                <v-list dense>
+                                    <v-list-item-group
+                                        color="primary"
+                                    >
+                                        <v-list-item
+                                            v-for="(item, i) in listPermissionPackSelected"
+                                            :key="i"
+                                            class="sym-control pl-0"
+                                        >
+                                            <v-list-item-content class="item-check-box" style="font-size:13px;">
+                                                <v-checkbox
+                                                    class="checkBox"
+                                                    v-model="item.isCheck"
+                                                    :label="item.name"
+                                                    @change="handleRemovePermissionPack(item)"
+                                                ></v-checkbox>
+                                                <div class="pa-0 pl-8 " style="color:#888">{{item.description}}</div>
+                                            </v-list-item-content>
+                                            <v-tooltip bottom>
+                                                <template v-slot:activator="{ on }">
+                                                        <v-icon v-on="on" @click.prevent.stop="handleClickDetailPermission(item)" class="item-detail fs-15">mdi-file-document-multiple-outline</v-icon>
+                                                    </template>
+                                                <span>Detail</span>
+                                            </v-tooltip>
+                                        </v-list-item>
+                                    </v-list-item-group>
+                                </v-list>
+                            </VuePerfectScrollbar>
+                        </div>
                     </div>
                 </v-container>
             </v-card-text>
@@ -279,19 +303,31 @@
             </v-card-actions>
             </v-card>
         </v-dialog>
-
-
+    
+        <permission 
+            ref="permission"
+            @list-permission-change="changeListPermission"
+            :statusDetail="statusDetailPermission"
+            :infoPermission="infoPermission"
+            :listActionPackInPermissionPack="listActionPackInPermissionPack"
+        />
+        <action-pack 
+            ref="actionPack"
+            :statusDetail="false"
+        />
     </div>
 </template>
 
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
 import addPeople from "./AddPeople";
-import { getAllRole ,convertRoleWithAction } from "./../role/RoleDefinition";
+import { convertRoleWithAction } from "./../role/RoleDefinition";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import infoUser from "@/components/common/user/InfoUser";
 import { util } from "@/plugins/util";
+import Permission from './Permission.vue';
+import ActionPack from './ActionPack.vue';
 
 export default {
     name:"add people",
@@ -299,7 +335,9 @@ export default {
         'form-tpl' : FormTpl,
         VuePerfectScrollbar,
         addPeople,
-        infoUser
+        infoUser,
+        Permission,
+        ActionPack,
     },
     name:"Access",
     computed:{
@@ -357,6 +395,30 @@ export default {
     },
     data(){
         return{
+            statusDetailPermission:false,
+            listPermissionPack:[],
+            listPermissionPackOrigin:[],
+            listPermissionPackSelected:[],
+            infoPermission:{},
+            listActionPackInPermissionPack:[],
+            searchKey: "", //Từ khóa cần tìm kiếm trên tất cả các cột của actionpack,
+            filter:{
+                filter:[
+                    {
+                        column: 'type',
+                        operation: 'and',
+                        conditions: [
+                            {
+                                name: 'in',
+                                value: 'taskMangement'
+                            }
+                        ]
+                    }
+                ],
+                pageSize: 100,
+                distinct: true,
+                page: 1
+            },
             currentProject:this.$store.state.taskManagement.currentProject,
             dialogRemoveRole:false,
             memberSelected:{},
@@ -368,9 +430,7 @@ export default {
             isLoadingAdd:false,
             dialogRole:false,
             dialogAddRole:false,
-            allActionRoles:getAllRole(),
             detailActionRole:{},
-            panel: [0, 1, 2, 3, 4],
             nameAndDescriptionProps:{
                 name : { 
                     title: "Name",
@@ -417,6 +477,68 @@ export default {
         }
     },
     methods:{
+     
+        handleCreatePermission(){
+            this.statusDetailPermission = false;
+            this.infoPermission = {};
+            this.listActionPackInPermissionPack = [];
+            this.$refs.permission.show();
+        },
+        handleCreateActionPack(){
+            this.$refs.actionPack.show();
+        },
+        getListActionPackInPermissionPack(item){
+            taskManagementApi
+                .getListActionPackInPermissionPack(item.id)
+                .then(res => {
+                    if (res.status == 200) {
+                        this.listActionPackInPermissionPack = res.data;
+                    }else{
+                        this.$snotifyError("", "Error! Have error when get list action pack of permission pack !!!");
+                    }
+                })
+                .catch(err => {
+                    this.$snotifyError("", "Error! Have error when get list action pack of permission pack !!!", err);
+                });
+
+        },
+        /**
+         * Hành động khi click vào 1 permission pack -> show pupop detail permission pack
+         */
+        handleClickDetailPermission(item){
+            this.statusDetailPermission = true;
+            this.infoPermission = item;
+            this.getListActionPackInPermissionPack(item);
+            this.$refs.permission.show();
+        },
+        getIdsPermissionPack(){
+            let ids = [];
+            for (let i = 0; i < this.listPermissionPackSelected.length; i++) {
+                ids.push(this.listPermissionPackSelected[i].id);                
+            }
+            return ids;
+        },
+        handleRemovePermissionPack(item){
+            let index = this.listPermissionPackSelected.indexOf(item);
+            if (index > -1) {
+                this.listPermissionPackSelected.splice(index, 1);
+            }
+            let itemInListPermissionPack = this.listPermissionPack.find(ele => ele.id == item.id);
+            if (itemInListPermissionPack) {
+                itemInListPermissionPack.isCheck = false;
+            }
+        },
+        handleClickPermissionPack(item){
+            let itemCheck = this.listPermissionPackSelected.find(ele => ele.id == item.id);
+            if (itemCheck) {
+                var index = this.listPermissionPackSelected.indexOf(itemCheck);
+                if (index > -1) {
+                    this.listPermissionPackSelected.splice(index, 1);
+                }
+            }else{
+                this.listPermissionPackSelected.unshift(item);
+            }
+        },
         addPeopleSuccess(){
             this.$emit("add-people-success");
         },
@@ -492,13 +614,49 @@ export default {
             }
             this.loadingChangeRole=false;
         },
+        /**
+         * function set danh sách permission trong role detail
+         */
+        setListPermissionSelected(data){
+            this.listPermissionPackSelected = [];
+            this.listPermissionPack = util.cloneDeep(this.listPermissionPackOrigin);
+            if (data.length > 0) {
+                for (let i = 0; i < data.length; i++) {
+                    let permission = data[i];
+                    permission.isCheck = true;
+                    this.listPermissionPackSelected.push(permission);
+                    let item = this.listPermissionPack.find(ele => ele.id == permission.id);
+                    if (item) {
+                        item.isCheck = true ;
+                    }
+                }
+            }
+        },
+        /**
+         * Layas danh sách permission in detail role để set cho biến listPermissionPackSelected
+         */
+        getListPermissionInRole(role){
+            taskManagementApi
+                .getListPermissionInRole("taskManagement:"+role.id)
+                .then(res => {
+                    if (res.status == 200) {
+                        this.setListPermissionSelected(res.data);
+                    }else{
+                        this.$snotifyError("", "Can not get list permission in role!");
+                    }
+                })
+                .catch(err => {
+                    this.$snotifyError("", "Can not list permission in role!", err);
+                })
+                .always(() => {});
+        },
         handleClickAddPeople(){
             this.$refs.addPeopleView.show();
         },
         handleDetailRole(role){
             this.statusDetail = true;
             this.roleSelected=role;
-            this.detailActionRole = convertRoleWithAction(JSON.parse(role.action));
+            this.getListPermissionInRole(role);
             this.dialogAddRole  =   true;
             this.nameAndDescriptionProps.name.value=role.name;
             this.nameAndDescriptionProps.description.value=role.description;
@@ -506,6 +664,7 @@ export default {
         handleOpenAddRole(){
             this.dialogAddRole=true;
             this.statusDetail = false;
+            this.listPermissionPackSelected = [];
             this.nameAndDescriptionProps.name.value="";
             this.nameAndDescriptionProps.description.value="";
         },
@@ -514,14 +673,15 @@ export default {
             let isValid = this.validateData();
             if (isValid) {
                 let data={};
-                data.name=this.nameAndDescriptionProps.name.value;
-                data.description=this.nameAndDescriptionProps.description.value;
-                data.action=JSON.stringify(this.getActionRoleChecked("update"));
-
+                let listIdPermissionPack = this.getIdsPermissionPack();
+                data.name = this.nameAndDescriptionProps.name.value;
+                data.description = this.nameAndDescriptionProps.description.value;
+                data.permissionIds = listIdPermissionPack.length >0 ? JSON.stringify(listIdPermissionPack) : "";
                 taskManagementApi
                     .updateRole(this.roleSelected.id,data)
                     .then(res => {
                         if (res.status == 200) {
+                            this.setPermissionForRole(this.roleSelected,listIdPermissionPack);
                             this.$snotifySuccess("Update role success!");
                             this.$emit("add-role-success"); // emit sự kiện coi như là update role :))
                             this.dialogAddRole=false;
@@ -540,18 +700,22 @@ export default {
             this.isLoadingAdd=false;
         },
         handleAddRole(){
+            let self = this;
             this.isLoadingAdd = true;
             let isValid = this.validateData();
             if (isValid) {
+                let listIdPermissionPack = this.getIdsPermissionPack();
                 let data={};
-                data.name=this.nameAndDescriptionProps.name.value;
-                data.description=this.nameAndDescriptionProps.description.value;
-                data.action=JSON.stringify(this.getActionRoleChecked());
+                
+                data.name = this.nameAndDescriptionProps.name.value;
+                data.description = this.nameAndDescriptionProps.description.value;
+                data.permissionIds = listIdPermissionPack.length >0 ? JSON.stringify(listIdPermissionPack) : "";
 
                 taskManagementApi
                     .addRole(data)
                     .then(res => {
                         if (res.status == 200) {
+                            self.setPermissionForRole(res.data,listIdPermissionPack);
                             this.$snotifySuccess("Add role success!");
                             this.$emit("add-role-success");
                             this.dialogAddRole=false;
@@ -569,29 +733,49 @@ export default {
             }
             this.isLoadingAdd=false;
         },
-        getActionRoleChecked(isCheck="add"){ // ham conver action da chon theo format ["administer","issue:addComment"]
-            if (isCheck=="add") {
-                var data=this.allActionRoles;
-            }else if(isCheck=="update"){
-                var data=this.detailActionRole;
-            }
-            let actions=[];
-            for (var key in data) {
-                if (data[key].isAllow) {
-                    actions.push(key);
-                }else{
-                    if (data[key].children && Object.keys(data[key].children).length >0) {
-                        let item=data[key].children;
-                        for (var subKey in item) {
-                            if (item[subKey].isAllow) {
-                                let str=key+":"+subKey;
-                                actions.push(str);
-                            }   
-                        }
+        setPermissionForRole(role,listIdPermissionPack){
+            let item = {};
+            item.role_identifier = 'taskManagement:'+role.id;
+            item.role_type = "taskManagement";
+            item.permission_id = listIdPermissionPack;
+            let data = [];
+            data.push(item);
+            taskManagementApi
+                .setPermissionForRole({permissions:JSON.stringify(data)})
+                .then(res => {
+                    if (res.status == 200) {
+                    }else{
+                        this.$snotifyError("", "Can not add role!");
                     }
-                }
-            }
-            return actions;
+                })
+                .catch(err => {
+                    this.$snotifyError("", "Can not add role!", err);
+                })
+                .always(() => {});
+        },
+        getActionRoleChecked(isCheck="add"){ // ham conver action da chon theo format ["administer","issue:addComment"]
+            // if (isCheck=="add") {
+            //     var data=this.allActionRoles;
+            // }else if(isCheck=="update"){
+            //     var data=this.detailActionRole;
+            // }
+            // let actions=[];
+            // for (var key in data) {
+            //     if (data[key].isAllow) {
+            //         actions.push(key);
+            //     }else{
+            //         if (data[key].children && Object.keys(data[key].children).length >0) {
+            //             let item=data[key].children;
+            //             for (var subKey in item) {
+            //                 if (item[subKey].isAllow) {
+            //                     let str=key+":"+subKey;
+            //                     actions.push(str);
+            //                 }   
+            //             }
+            //         }
+            //     }
+            // }
+            // return actions;
         },
         validateData(){
             let data=this.nameAndDescriptionProps;
@@ -606,52 +790,30 @@ export default {
         handleRoleManager(){
             this.dialogRole=true;
         },
-        changeValueCheckBoxIssue(obj){
-            let count=0;
-            let data=obj.children;
-            for (var key in data) {
-                if (data[key].isAllow==true) {
-                    count++;
-                }
-            }
-            if (count == Object.keys(obj.children).length) {
-                obj.isAllow=true;
-            }else {
-                obj.isAllow=false;
-            }
+        getListPermissionPack(){
+            taskManagementApi
+                .getListPermissionPack(this.filter)
+                .then(res => {
+                    if (res.status == 200) {
+                        this.listPermissionPack = res.data ;
+                        this.listPermissionPackOrigin = util.cloneDeep(res.data);
+                    }else{
+                        this.$snotifyError("", "Error! Have error !!!");
+                    }
+                });
         },
-        checkIndeterminate(obj){
-            let count=0;
-            let data=obj.children;
-            for (var key in data) {
-                if (data[key].isAllow==true) {
-                    count++;
-                }
-            }
-            if (count>0 && count< Object.keys(obj.children).length) {
-                return true;
-            }else{
-                return false;
-            }
+        /**
+         * Do api khi add permission k trả về data vừa insert, nên phải call api set lại list permission
+         */
+        changeListPermission(){
+            this.dialogAddRole = false;
+            this.getListPermissionPack();
         },
-        handleCheckAllActionIssue(event,obj){
-            event.preventDefault();
-            event.stopPropagation();
-            if (!obj.isAllow) { // bỏ check
-                this.unCheckOrCheckObjAction(obj,false);
-            }else{
-                this.unCheckOrCheckObjAction(obj,true);
-            }
-        },
-        unCheckOrCheckObjAction(obj,isCheck){ // hàm check hoặc uncheck all obj
-            let data=obj.children;
-            for (var key in data) {
-                data[key].isAllow=isCheck
-            }
-
-        }
 
      
+    },
+    created(){
+        this.getListPermissionPack();
     },
     activated(){
         let breadcrumbs = [
@@ -686,8 +848,14 @@ export default {
 .checkBox >>> label{
     font-size: 13px;
     font-weight: bold;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 300px;
 }
-
+.checkBox >>> .v-input__control {
+    height: 24px;
+}
 .checkBox >>> .v-messages{
     display: none;
 }
@@ -733,4 +901,12 @@ export default {
     border-radius: 4px;
     padding: 6px;
 }
+.item-check-box {
+    position: relative;
+}
+.list-button {
+    position: absolute;
+    right: 10px;
+}
+
 </style>
