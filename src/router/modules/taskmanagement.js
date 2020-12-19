@@ -1,5 +1,11 @@
 export default [
     {
+        path: "/task-management/test-workers",
+        name: "worker",
+        component: () =>
+            import ('../../views/taskManagement/testWorker/RickText.vue')
+    },
+    {
         path: "/task-management/categories",
         name: "categories",
         component: () =>

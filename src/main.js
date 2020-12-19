@@ -23,6 +23,10 @@ import VueRx from 'vue-rx'
 import iconMap from "./icon";
 //Anhtger import html2canvas
 import VueHtml2Canvas from 'vue-html2canvas';
+import VueWorker from 'vue-worker';
+
+Vue.use(VueWorker);
+
 Vue.use(VueHtml2Canvas);
 Vue.component('ba-view', BaView);
 Vue.component('end-user-view', EndUserView);
@@ -123,7 +127,6 @@ Vue.prototype.$evtBus.$on('symper-app-call-action-handler', (action, context, ex
         console.error('[Symper action find failed]: can not find action with key :' + key, action);
     }
 })
-
 
 function checkCanAddTab(context) {
     let rsl = true;
