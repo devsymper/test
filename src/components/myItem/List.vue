@@ -198,7 +198,7 @@
                                     cols="2"
                                     class="fs-12 px-1 py-0 pt-2"
                                 >
-                                    <infoUser class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole?obj.assigneeRole:{}" />
+                                    <infoUser v-if="obj.assigneeInfo.id" class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole?obj.assigneeRole:{}" />
                                 </v-col>
                                 <v-col
                                     v-show="!sideBySideMode"
@@ -206,7 +206,7 @@
                                     class="fs-12 px-1 py-0 pt-2"
                                 >
                                     <infoUser v-if="obj.ownerInfo.id" class="userInfo" :userId="obj.ownerInfo.id" :roleInfo="obj.ownerRole ? obj.ownerRole:{}" />
-                                    <infoUser v-else class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole" />
+                                    <infoUser v-else-if="obj.assigneeInfo.id" class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole" />
                                 </v-col>
                                 <v-col
                                     v-show="!sideBySideMode"
@@ -864,7 +864,7 @@ export default {
                 this.tableFilter.allColumn["createTime"] = getDefaultFilterConfig();
                 this.tableFilter.allColumn.createTime.sort="desc";
             }
-            this.$store.dispatch('task/getAllAppActive'); 
+            this.$store.dispatch('task/getAllAppActive');
             let thisCpn = this;
             let handler = (data) => {
                 if(thisCpn.customAPIResult.reformatData){
@@ -877,7 +877,6 @@ export default {
 
                 let  taskIden = []; 
                 let newListTask = [];
-
                 if(lazyLoad){
                     resData.forEach(function(e){
                         taskIden.push('task:'+e.id);
