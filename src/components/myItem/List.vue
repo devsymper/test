@@ -160,7 +160,7 @@
                                     <div class="pt-1">
                                         <v-icon 
                                             class="fs-14"
-                                            v-if="obj.taskData.action"
+                                            v-if="objtask.assignee && objtask.assignee.indexOtaskData.action"
                                         >{{obj.taskData.action.action=='approval' ? 'mdi-seal-variant ': 'mdi-file-document-edit-outline'}}</v-icon>
                                         <i v-else class="fs-14 mdi mdi-checkbox-marked-circle-outline"></i>
                                     </div>
@@ -205,8 +205,8 @@
                                     cols="2"
                                     class="fs-12 px-1 py-0 pt-2"
                                 >
-                                    <infoUser v-if="obj.ownerInfo.id" class="userInfo" :userId="obj.ownerInfo.id" :roleInfo="obj.ownerRole ? obj.ownerRole:{}" />
-                                    <infoUser v-else class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole" />
+                                    <infoUser class="userInfo" :userId="obj.ownerInfo.id" :roleInfo="obj.ownerRole ? obj.ownerRole:{}" />
+                                    <infoUser class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole" />
                                 </v-col>
                                 <v-col
                                     v-show="!sideBySideMode"

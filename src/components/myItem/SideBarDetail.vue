@@ -22,8 +22,8 @@
 					tile 
 					x-small 
 					class="mr-1"
-					v-if="!showHistory"
-					@click="showHistory = true"
+					v-if="!showHistoryTask"
+					@click="showHistoryTask = true"
 				>
 					<v-icon small class="mr-1">
 						mdi-history
@@ -256,7 +256,7 @@
 			</VuePerfectScrollbar>
 			</div>
 			<div 
-				v-if="showHistory" 
+				v-if="showHistoryTask" 
 				style="width: 250px"
 				class="d-flex flex-column"
 			>
@@ -272,7 +272,7 @@
 					</v-icon>
 					Lịch sử
 				</v-btn>	
-				<v-icon @click="showHistory = false"> mdi-close</v-icon>
+				<v-icon @click="showHistoryTask = false"> mdi-close</v-icon>
 				</div>
 			</div>
 		</div>
@@ -370,7 +370,7 @@ export default {
 			createdDate:"",
 			workflowName:"",
 			workflowOtherName:"",
-			showHistory: false,
+			showHistoryTask: false,
 			listApprovalUser:[],
 			listRelatedUser:[],
 			listHistoryControl:[
@@ -567,7 +567,7 @@ export default {
 			this.getData();
 		},
 		isShow(){
-			this.showHistory = false
+			this.showHistoryTask = false
 		}
 		
 	},
@@ -576,7 +576,7 @@ export default {
 			return this.$store.state.comment.listComment.length
 		},
 		sidebarWidthReduce(){
-			if(!this.showHistory){
+			if(!this.showHistoryTask){
 				return this.sidebarWidth
 			}else{
 				return this.sidebarWidth + 250
