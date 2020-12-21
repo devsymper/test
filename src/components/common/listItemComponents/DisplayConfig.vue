@@ -223,4 +223,8 @@ export default {
 .column-drag-pos[draggable="true"] {
     background-color: #ffe6d2;
 }
+.column-drag-pos{
+	border: 1px solid lightgray;
+	padding-left: 2px;
+}
 </style>
