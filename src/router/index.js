@@ -31,6 +31,24 @@ const systemRoutes = [{
             import ('../views/Login.vue'),
     },
     {
+        path: "/login/reset-pass",
+        name: "login",
+        meta: {
+            layout: "content-only"
+        },
+        component: () =>
+            import ('../views/ResetPass.vue'),
+    },
+    {
+        path: "/login/forgot-pass",
+        name: "login",
+        meta: {
+            layout: "content-only"
+        },
+        component: () =>
+            import ('../views/ForgotPass.vue'),
+    },
+    {
         path: "/symper-hidden-redirect-component",
         name: "symperHiddenRedirectComponent",
         component: SymperHiddenRedirectComponent
