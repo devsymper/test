@@ -198,7 +198,7 @@
                                     cols="2"
                                     class="fs-12 px-1 py-0 pt-2"
                                 >
-                                    <infoUser class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole?obj.assigneeRole:{}" />
+                                    <infoUser v-if="obj.assigneeInfo.id" class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole?obj.assigneeRole:{}" />
                                 </v-col>
                                 <v-col
                                     v-show="!sideBySideMode"
@@ -206,7 +206,7 @@
                                     class="fs-12 px-1 py-0 pt-2"
                                 >
                                     <infoUser v-if="obj.ownerInfo.id" class="userInfo" :userId="obj.ownerInfo.id" :roleInfo="obj.ownerRole ? obj.ownerRole:{}" />
-                                    <infoUser v-else class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole" />
+                                    <infoUser v-else-if="obj.assigneeInfo.id" class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole" />
                                 </v-col>
                                 <v-col
                                     v-show="!sideBySideMode"
@@ -331,7 +331,6 @@ import BPMNEngine from "@/api/BPMNEngine";
 import icon from "@/components/common/SymperIcon";
 import taskDetail from "./TaskDetail";
 import listHeader from "./ListHeader";
-import userSelector from "./UserSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../plugins/util";
 import { appConfigs } from "../../configs";
@@ -414,7 +413,6 @@ export default {
         icon: icon,
         taskDetail: taskDetail,
         listHeader: listHeader,
-        userSelector: userSelector,
         VuePerfectScrollbar: VuePerfectScrollbar,
         listTaskApproval,
         infoUser,
@@ -879,7 +877,6 @@ export default {
 
                 let  taskIden = []; 
                 let newListTask = [];
-
                 if(lazyLoad){
                     resData.forEach(function(e){
                         taskIden.push('task:'+e.id);

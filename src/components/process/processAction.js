@@ -494,37 +494,42 @@ function getRoleUser(roleIdentify){
 export const addMoreInfoToTask = function(task) {
     let mapUser = SYMPER_APP.$store.getters['app/mapIdToUser'];
     task.assigneeInfo = {};
-    let assigneeId=task.assignee;
-    let roleInfo={};
-
-    if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
-        let arrDataAssignee=task.assignee.split(":");
-        assigneeId=arrDataAssignee[0];
-        if (arrDataAssignee.length>3) { // loại trừ trường hợp role=0
-            let roleIdentify=task.assignee.slice(assigneeId.length+1);
-            roleInfo=getRoleUser(roleIdentify);
+    if (task.assignee) {
+        task.assigneeInfo = {};
+        let assigneeId=task.assignee;
+        let roleInfo={};
+    
+        if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
+            let arrDataAssignee=task.assignee.split(":");
+            assigneeId=arrDataAssignee[0];
+            if (arrDataAssignee.length>3) { // loại trừ trường hợp role=0
+                let roleIdentify=task.assignee.slice(assigneeId.length+1);
+                roleInfo=getRoleUser(roleIdentify);
+            }
+        }
+        if (mapUser[assigneeId]) {
+            task.assigneeInfo = mapUser[assigneeId];
+            task.assigneeRole = roleInfo;
         }
     }
-    if (mapUser[assigneeId]) {
-        task.assigneeInfo = mapUser[assigneeId];
-        task.assigneeRole = roleInfo;
-    }
-
     task.ownerInfo = {};
-    let ownerId=task.owner;
-    roleInfo={};
-    if (task.owner && task.owner.indexOf(":")>0) {
-        let arrDataOwner=task.owner.split(":");
-        ownerId=arrDataOwner[0];
-        if (arrDataOwner.length>3) { // loại trừ trường hợp role=0
-            let roleIdentify=task.owner.slice(ownerId.length+1);
-            roleInfo=getRoleUser(roleIdentify);
+    if (task.owner) {
+        let ownerId=task.owner;
+        roleInfo={};
+        if (task.owner && task.owner.indexOf(":")>0) {
+            let arrDataOwner=task.owner.split(":");
+            ownerId=arrDataOwner[0];
+            if (arrDataOwner.length>3) { // loại trừ trường hợp role=0
+                let roleIdentify=task.owner.slice(ownerId.length+1);
+                roleInfo=getRoleUser(roleIdentify);
+            }
+        }
+        if (mapUser[ownerId]) {
+            task.ownerInfo = mapUser[ownerId];
+            task.ownerRole=roleInfo;
         }
     }
-    if (mapUser[ownerId]) {
-        task.ownerInfo = mapUser[ownerId];
-        task.ownerRole=roleInfo;
-    }
+  
 
     let allDefinitions = SYMPER_APP.$store.state.process.allDefinitions;
     let processDefinitionId = task.processDefinitionId;
