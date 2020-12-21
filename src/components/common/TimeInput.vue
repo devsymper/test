@@ -81,30 +81,18 @@ export default {
                 let rowActive = this.times[this.indexActive];
                 this.handleClickRow(rowActive);
             }
-            else{
-                this.checkValidTime(e)
-            }
-            
         },
     
         handleClickRow(item){
             this.curInput.off('keydown');
-            this.$emit('apply-time-selected',{input:this.curInput,value:item.time});
+            this.$emit('apply-time-selected',{controlName:this.controlName,value:item.time});
             if(this.indexActive != -1)
             this.times[this.indexActive].active = false;
             this.indexActive = this.times.indexOf(item);
             item.active = true;
-            this.$emit('after-check-input-time-valid',{input:this.curInput,controlName: this.controlName,isValid:true});   
             this.hide();
         },
-        checkValidTime(e){
-            let regex = /(1[012]|[1-9]):[0-5][0-9](\\s)?( |)(AM|PM)$/;
-            let isValid = false;
-            if(regex.test(this.curInput.val())){
-                isValid = true;
-            }
-            this.$emit('after-check-input-time-valid',{input:this.curInput,controlName: e.controlName,isValid:isValid,event:e});      
-        }
+        
     },
     beforeMount(){
         this.times = [
