@@ -3,6 +3,7 @@ import { appConfigs } from "./../configs.js";
 let fileManagement = new Api(appConfigs.apiDomain.fileManagement);
 let document = new Api(appConfigs.apiDomain.sdocumentManagement);
 let workfloweExtend = new Api(appConfigs.apiDomain.workflowExtend);
+let logService = new Api(appConfigs.apiDomain.log);
 
 export const taskApi = {
     getFileByList(data) {
@@ -45,6 +46,26 @@ export const taskApi = {
         return workfloweExtend.get("works", filter);
 	},
 	
+	getHistoryTask(id){
+		let data = {
+			"query": {
+				"bool": {
+				"must": [
+						{
+							"term": {
+								"logObjectType": "task"
+							}
+						},{
+							"term": {
+								"logObjectId": '65ad4f51'
+							}
+						}
+					]
+				}
+			}
+		}
+		return logService.post('query',data)
+	}
 
 
 

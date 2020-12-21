@@ -145,6 +145,8 @@
         </v-dialog>
 		<SnackBarSubmit
 			ref="snackbar"
+			:userType="userType"
+			:taskType="taskStatus.value"
 			@edit-clicked="showUpdateSubmitedDocument"
 			@action-clicked="handlerActionClick"
 		 />
@@ -513,7 +515,8 @@ export default {
             this.$emit('changeUpdateAsignee');
         },
         toggleSidebar(){
-            this.isShowSidebar = !this.isShowSidebar;
+			this.isShowSidebar = !this.isShowSidebar;
+			this.$store.dispatch('task/getTaskHistory',this.originData.id)
         },
         checkAndSwitchToTab(){
             if(this.$route.params.extraData && this.$route.params.extraData.subAction){

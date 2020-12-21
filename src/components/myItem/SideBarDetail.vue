@@ -261,18 +261,21 @@
 				class="d-flex flex-column"
 			>
 				<div class="d-flex">
-				<v-btn 
-					tile 
-					x-small 
-					class="mr-1"
-					disabled
-				>
-					<v-icon small class="mr-1">
-						mdi-history
-					</v-icon>
-					Lịch sử
-				</v-btn>	
-				<v-icon @click="showHistoryTask = false"> mdi-close</v-icon>
+					<v-btn 
+						tile 
+						x-small 
+						class="mr-1"
+						disabled
+					>
+						<v-icon small class="mr-1">
+							mdi-history
+						</v-icon>
+						Lịch sử
+					</v-btn>	
+					<v-icon @click="showHistoryTask = false"> mdi-close</v-icon>
+				</div>
+				<div>
+					<HistoryTask />
 				</div>
 			</div>
 		</div>
@@ -335,6 +338,7 @@ import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue
 import UploadFile from "@/components/common/UploadFile.vue";
 import RelatedItems from "./RelatedItems.vue";
 import infoUser from "./InfoUser";
+import HistoryTask from './taskLifeCycle/HistoryTask'
 
 export default {
 	components:{
@@ -344,7 +348,8 @@ export default {
 		trackingProcessInstance,
 		UploadFile,
 		RelatedItems,
-		infoUser
+		infoUser,
+		HistoryTask
 	},
 	data () {
 		return {

@@ -14,7 +14,9 @@ const defaultState = {
     isStatusSubmit:false,
     allAppActive:[],
     listNodeInProcess:[],
-    variableOfProcess:[],
+	variableOfProcess:[],
+	taskHistory:{},
+	currentTaskId: ""
 
 
 };

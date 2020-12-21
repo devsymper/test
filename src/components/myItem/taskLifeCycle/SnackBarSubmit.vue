@@ -16,6 +16,8 @@
 				</div>
 				<ListActionMenu  
 					:snackbarMode="true"
+					:userType="userType"
+					:taskType="taskType"
 					@action-clicked="handlerActionClick"
 				/>
 			</div>
@@ -43,6 +45,16 @@
 <script>
 import ListActionMenu from './ListActionMenu'
 export default {
+	props:{
+		userType:{
+			type: String,
+			default: ""
+		},
+		taskType:{
+			type: String,
+			default: ""
+		}
+	},
 	data(){
 		return{ 
 			showSnackbar: false
