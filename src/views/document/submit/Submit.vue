@@ -2416,7 +2416,7 @@ export default {
                 let control = getControlInstanceFromStore(this.keyInstance,controlName);
                 if(control.inTable != false){
                     let tableInstance = getControlInstanceFromStore(this.keyInstance,control.inTable);
-                    let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulasInstance,tableInstance.name);
+                    let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulasInstance,'all');
                     tableInstance.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataIn,formulasInstance, 'all');
                 }
                 formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
