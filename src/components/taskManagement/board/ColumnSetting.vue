@@ -21,8 +21,8 @@
             <draggable :list="columns" :animation="250" class="py-4 h-100 w-100" ghost-class="ghost-columns" group="people">
                 <transition-group type="transition" name="flip-list" class="wrap-kanban-board">
                     <div
-                        v-for="column in columns"
-                        :key="column.name"
+                        v-for="(column,index) in columns"
+                        :key="index"
                         :style="getColWidth()"
                         class=" board-column-item mr-4"
                     >
@@ -108,7 +108,7 @@ export default {
             return {width:100/colLength + '%'};
         },
         addColumn(){
-            this.columns.push({name:'new column'})
+            this.columns.push({name:'new column',statusInColumn:[]})
         },
         onKeyDown(){
             
