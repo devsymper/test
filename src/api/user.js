@@ -17,6 +17,19 @@ export const userApi = {
         };
         return coreApi.post(appConfigs.apiDomain.account + "auth/login", data);
     },
+    forgotBaPass(email){
+        let data = {email:email}
+        return coreApi.post(appConfigs.apiDomain.account + "auth/ba/forgot-password", data);
+    },
+    resetBaPass(email,expired,token,pass){
+        let data = {
+            email:email,
+            expired:expired,
+            token:token,
+            password:pass
+        }
+        return coreApi.post(appConfigs.apiDomain.account + "auth/ba/reset-password", data);
+    },
     changePassBA(oldPass, newPass) {
         let data = {
             oldPassword: oldPass,
