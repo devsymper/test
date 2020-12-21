@@ -653,6 +653,7 @@ export default {
     data(){
 		let self = this
         return {
+			gridApi: null,
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
 			showSearchBox: true,
             loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
@@ -718,7 +719,10 @@ export default {
 		VDialog,
 		TableFilter
 
-    },
+	},
+	mounted(){
+		this.gridApi = this.gridOptions.api;
+	},
     beforeMount(){
 		this.defaultColDef = {
             minWidth: 40,
@@ -1023,7 +1027,6 @@ export default {
 				this.$set(column, 'pinned', 'left')
 				pinValue = 'pinned'
 			}
-			debugger
 			this.gridOptions.columnApi.setColumnPinned(column.field, pinValue)
         },
 		openTableDisplayConfigPanel() {
@@ -1286,13 +1289,14 @@ export default {
          * Xử lý việc sau khi kết thúc kéo thả các cột ở thanh cấu hình hiển thị danh sách
          */
         handleStopDragColumn(tbCols) {
-            this.tableDisplayConfig.drag = false;
+            // this.tableDisplayConfig.drag = false;
             if(tbCols){
                 this.columnDefs = tbCols;
             }
-            this.resetHiddenColumns();
-            // this.reOrderFixedCols();
-            this.$refs.tableDisplayConfig.resetTableColumnsData();
+            // this.resetHiddenColumns();
+			// this.reOrderFixedCols();
+			this.gridOptions.api.setColumnDefs([]);
+			debugger
         },
 	},
 
