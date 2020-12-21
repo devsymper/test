@@ -881,10 +881,10 @@ export default {
                 nodeType = "EventSubProcess";
             }
 
-            nodeType = mapLibNameToFlowableName[nodeType]
+            let transltedNodeType = mapLibNameToFlowableName[nodeType]
                 ? mapLibNameToFlowableName[nodeType]
                 : nodeType;
-            return nodeType;
+            return transltedNodeType;
         },
         handleNodeChangeProps(nodeData) {
             let nodeId = nodeData.id;
@@ -1304,6 +1304,10 @@ export default {
                 if(modelData.configValue){
                     this.restoreAttrValueFromJsonConfig(modelData.configValue);
                 }
+                
+                if(this.routeName == "cloneProcess"){
+                    this.createUniqueIdentifyForWorkflow();
+                }
             } catch (error) {
                 this.$snotifyError(
                     error,
@@ -1438,8 +1442,9 @@ export default {
         createUniqueIdentifyForWorkflow(){
             setTimeout((self) => {
                 let allEls = self.$refs.symperBpmn.getAllNodes();
+                debugger
                 for(let el of allEls){
-                    if(el.$type == "bpmn:Process"){
+                    if(el.$type == "bpmn:Process" || el.$type == "bpmn:Collaboration"){
                         let uniqueId = util.str.randomString(6)+'_'+Date.now();
                         uniqueId = uniqueId.toLowerCase();
                         self.$refs.symperBpmn.updateElementProperties(
@@ -1487,10 +1492,8 @@ export default {
     mounted(){
         this.resetAttrPanelHeight();
         this.calcDiagramHeight();
-        let uniqueId = util.str.randomString(6)+'_'+Date.now();
-        console.log(uniqueId.toLowerCase(), 'uniqueIduniqueIduniqueId');
         
-        if(this.action == 'create' || this.action == 'clone' ){
+        if(this.action == 'create'){
             this.createUniqueIdentifyForWorkflow();
         }
     },
