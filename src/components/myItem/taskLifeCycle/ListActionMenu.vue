@@ -75,7 +75,7 @@ export default {
 					}
 				})
 			}
-			if(this.userType == 'candidate' && this.taskType == 'unAssign'){
+			if(this.taskType == 'unAssign'){
 				this.items.forEach(function(e){
 					if(e.value == 'claim'){
 						lists.push(e)

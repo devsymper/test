@@ -160,7 +160,7 @@
                                     <div class="pt-1">
                                         <v-icon 
                                             class="fs-14"
-                                            v-if="objtask.assignee && objtask.assignee.indexOtaskData.action"
+                                            v-if="obj.taskData.action"
                                         >{{obj.taskData.action.action=='approval' ? 'mdi-seal-variant ': 'mdi-file-document-edit-outline'}}</v-icon>
                                         <i v-else class="fs-14 mdi mdi-checkbox-marked-circle-outline"></i>
                                     </div>
@@ -198,15 +198,15 @@
                                     cols="2"
                                     class="fs-12 px-1 py-0 pt-2"
                                 >
-                                    <infoUser class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole?obj.assigneeRole:{}" />
+                                    <infoUser v-if="obj.assigneeInfo.id" class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole?obj.assigneeRole:{}" />
                                 </v-col>
                                 <v-col
                                     v-show="!sideBySideMode"
                                     cols="2"
                                     class="fs-12 px-1 py-0 pt-2"
                                 >
-                                    <infoUser class="userInfo" :userId="obj.ownerInfo.id" :roleInfo="obj.ownerRole ? obj.ownerRole:{}" />
-                                    <infoUser class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole" />
+                                    <infoUser v-if="obj.ownerInfo.id" class="userInfo" :userId="obj.ownerInfo.id" :roleInfo="obj.ownerRole ? obj.ownerRole:{}" />
+                                    <infoUser v-else-if="obj.assigneeInfo.id" class="userInfo" :userId="obj.assigneeInfo.id" :roleInfo="obj.assigneeRole" />
                                 </v-col>
                                 <v-col
                                     v-show="!sideBySideMode"
@@ -305,8 +305,6 @@
                 style="border-left: 1px solid #e0e0e0;"
             >
                 <taskDetail
-					@reload-data="getData"
-					:delegationState="delegationState"
                     :parentHeight="listTaskHeight"
                     :taskInfo="selectedTask.taskInfo"
                     :originData="selectedTask.originData"
@@ -339,7 +337,6 @@ import { util } from "../../plugins/util";
 import { appConfigs } from "../../configs";
 import listTaskApproval from "./featureApproval/List";
 import { taskApi } from "./../../api/task.js";
-import workFlowApi  from "./../../api/BPMNEngine.js";
 import infoUser from "./InfoUser";
 import { getDataFromConfig, getDefaultFilterConfig } from "@/components/common/customTable/defaultFilterConfig.js";
 import TableFilter from "@/components/common/customTable/TableFilter.vue";
@@ -510,8 +507,7 @@ export default {
             },
             tableColumns: [],
             index: -1,
-			dataIndex:-1,
-			delegationState:null,
+            dataIndex:-1,
             changeStatusMoreApproval:false,
             loadingTaskList: false,
             listTaskHeight: 300,
@@ -814,7 +810,7 @@ export default {
             this.listTaskHeight =
                 util.getComponentSize(this.$el.parentElement).h - 130;
         },
-        async selectObject(obj, idx,idex) {
+        selectObject(obj, idx,idex) {
             this.index = idx;
             this.dataIndex = idex;
             this.$set(this.selectedTask, "originData", obj);
@@ -824,17 +820,7 @@ export default {
                 this.selectedTask.idx = idx;
                 if (!this.compackMode) {
                     this.sideBySideMode = true;
-					let taskInfo = extractTaskInfoFromObject(obj);
-					console.log(taskInfo,'taskInfotaskInfotaskInfotaskInfotaskInfo');
-					if(this.selectedTask.originData.isDone != '1'){
-						let self = this
-						await workFlowApi.getTaskDetail(obj.id).then(res=>{
-							self.delegationState = res.delegationState
-						}).catch(err=>{
-
-						})
-					}
-					
+                    let taskInfo = extractTaskInfoFromObject(obj);
                     this.$set(this.selectedTask, "taskInfo", taskInfo);
                     this.$emit("change-height", "calc(100vh - 88px)");
                 }
@@ -893,7 +879,6 @@ export default {
 
                 let  taskIden = []; 
                 let newListTask = [];
-
                 if(lazyLoad){
                     resData.forEach(function(e){
                         taskIden.push('task:'+e.id);
@@ -1068,4 +1053,4 @@ export default {
 .task-to-do {
     background-color: #0760D9!important;
 }
-</style>
+</style>	

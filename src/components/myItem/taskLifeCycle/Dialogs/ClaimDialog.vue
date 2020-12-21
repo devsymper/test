@@ -7,12 +7,40 @@
 		>
 			<v-card>
 			<v-card-title class="fs-15">
-				Claim task
+				Nhận công việc
 			</v-card-title>
 			<v-card-text>
 				<div class="content-assign-dialog d-flex flex-column ml-2 fs-13">
 					<div class="text-wrap">
-						Nhấn Đồng ý để claim task này
+						Khi nhận công việc bạn sẽ có quyền sở hữu trường hợp này 
+					</div>
+					<div class="text-wrap   d-flex align-center">
+						Trạng thái hiện tại
+						<v-chip
+							small
+							label
+							class="ma-2"
+							color="#ED6A5E"
+							text-color="white"
+						>
+							<span class="fs-13">
+								Chưa được giao 
+							</span>
+						</v-chip>
+					</div>
+					<div class="text-wrap   d-flex align-center">
+						Trạng thái mới
+						<v-chip
+							small
+							label
+							class="ma-2"
+							color="orange"
+							text-color="white"
+						>
+							<span class="fs-13">
+								Đã giao
+							</span>
+						</v-chip>
 					</div>
 				</div>
 
@@ -29,8 +57,9 @@
 					<v-btn
 					color="green darken-1"
 					text
+					@click="claimTask"
 				>
-					Đồng ý
+					Áp dụng
 				</v-btn>
 			</v-card-actions>
 			</v-card>
@@ -39,19 +68,16 @@
 </template>
 
 <script>
+import workFlowApi  from "@/api/BPMNEngine.js";
 export default {
 	props:{
 		showDialog:{
 			type: Boolean,
 			default: false,
 		},
-		currentInstance:{
-			type: Object,
-			default(){
-				return {
-
-				}
-			},
+		taskId: {
+			type : String,
+			default: ""
 		}
 	},
 	data(){
@@ -67,7 +93,23 @@ export default {
 		cancel(){
 			this.$emit('cancel')
 		},
-		
+		claimTask(){
+			let userId = this.$store.state.app.endUserInfo.id
+			let data = {
+				owner: userId,
+				assignee: userId
+			}
+			let self = this
+			workFlowApi.updateTask(this.taskId, data).then(res=>{
+				self.$snotify({
+					type: "success",
+					title: "Nhận công việc thành công"
+				})
+				self.$emit('success')
+			}).catch(err=>{
+
+			})
+		}
 	},
 }
 </script>

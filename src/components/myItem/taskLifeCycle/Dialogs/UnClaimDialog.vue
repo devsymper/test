@@ -34,7 +34,7 @@
 							small
 							label
 							class="ma-2"
-							color="primary"
+							color="#ED6A5E"
 							text-color="white"
 						>
 							<span class="fs-13">

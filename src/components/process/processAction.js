@@ -493,38 +493,45 @@ function getRoleUser(roleIdentify){
 
 export const addMoreInfoToTask = function(task) {
     let mapUser = SYMPER_APP.$store.getters['app/mapIdToUser'];
-    task.assigneeInfo = {};
-    let assigneeId=task.assignee;
-    let roleInfo={};
+	task.assigneeInfo = {};
+	let roleInfo={};
 
-    if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
-        let arrDataAssignee=task.assignee.split(":");
-        assigneeId=arrDataAssignee[0];
-        if (arrDataAssignee.length>3) { // loại trừ trường hợp role=0
-            let roleIdentify=task.assignee.slice(assigneeId.length+1);
-            roleInfo=getRoleUser(roleIdentify);
-        }
-    }
-    if (mapUser[assigneeId]) {
-        task.assigneeInfo = mapUser[assigneeId];
-        task.assigneeRole = roleInfo;
-    }
+	if(task.assignee){
 
-    task.ownerInfo = {};
-    let ownerId=task.owner;
-    roleInfo={};
-    if (task.owner && task.owner.indexOf(":")>0) {
-        let arrDataOwner=task.owner.split(":");
-        ownerId=arrDataOwner[0];
-        if (arrDataOwner.length>3) { // loại trừ trường hợp role=0
-            let roleIdentify=task.owner.slice(ownerId.length+1);
-            roleInfo=getRoleUser(roleIdentify);
-        }
-    }
-    if (mapUser[ownerId]) {
-        task.ownerInfo = mapUser[ownerId];
-        task.ownerRole=roleInfo;
-    }
+		let assigneeId=task.assignee;
+
+		if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
+			let arrDataAssignee=task.assignee.split(":");
+			assigneeId=arrDataAssignee[0];
+			if (arrDataAssignee.length>3) { // loại trừ trường hợp role=0
+				let roleIdentify=task.assignee.slice(assigneeId.length+1);
+				roleInfo=getRoleUser(roleIdentify);
+			}
+		}
+		if (mapUser[assigneeId]) {
+			task.assigneeInfo = mapUser[assigneeId];
+			task.assigneeRole = roleInfo;
+		}
+	}
+
+	task.ownerInfo = {};
+	if(task.owner){
+		let ownerId=task.owner;
+		roleInfo={};
+		if (task.owner && task.owner.indexOf(":")>0) {
+			let arrDataOwner=task.owner.split(":");
+			ownerId=arrDataOwner[0];
+			if (arrDataOwner.length>3) { // loại trừ trường hợp role=0
+				let roleIdentify=task.owner.slice(ownerId.length+1);
+				roleInfo=getRoleUser(roleIdentify);
+			}
+		}
+		if (mapUser[ownerId]) {
+			task.ownerInfo = mapUser[ownerId];
+			task.ownerRole=roleInfo;
+		}
+	}
+   
 
     let allDefinitions = SYMPER_APP.$store.state.process.allDefinitions;
     let processDefinitionId = task.processDefinitionId;
@@ -566,57 +573,6 @@ export const getLastestDefinition = function(row, needDeploy = false) {
                     data: []
                 });
             }
-        }
-    });
-}
-
-export const startWorkflowBySubmitedDoc = function(idWorkflow, submitedDocData,  openNewTab = true, prefixParam = ''){
-    return new Promise( async(resolve, reject) => {
-        idWorkflow = idWorkflow + '';
-        let res = await BPMNEngine.getModelData(idWorkflow);
-        let docId = submitedDocData.document_id;
-        if(res.status == 200){
-            let defData = await getLastestDefinition(res.data, true);
-            if(defData.data[0]){
-                defData = defData.data[0];
-                if(openNewTab){
-                    resolve({
-                        message: "Chuyển đến trang khởi tạo quy trình"
-                    });
-                    SYMPER_APP.$goToPage(`/workflow/process-definition/${defData.id}/run`,'Bắt đầu quy trình ' + res.data.name);
-                }else{
-                    let vars = []; // các biến cần đưa vào process instance
-                    let startNodeId = prefixParam + '_';
-                    let dataInputForFormula = {};
-
-                    try {
-                        
-                        let varsForBackend = await getVarsFromSubmitedDoc(submitedDocData, startNodeId, docId);
-                        vars = varsForBackend.vars;
-                        dataInputForFormula = varsForBackend.nameAndValueMap;
-                        
-                        // let instanceName = await this.getInstanceName(dataInputForFormula);
-                        let instanceName = res.data.name;
-                        let newProcessInstance = await runProcessDefinition(SYMPER_APP, defData, vars, instanceName);
-                        resolve({
-                            message: "Bắt đầu quy trình " + res.data.name + " thành công",
-                            data: newProcessInstance
-                        });
-                    } catch (error) {
-                        SYMPER_APP.$snotifyError(error ,"Error on run process definition ");
-                    }
-                }
-            }else {
-                reject({
-                    message: "Can not get lastest definition info",
-                    data: defData
-                });
-            }
-        }else{
-            reject({
-                message: "Can not get workflow info",
-                data: res
-            });
         }
     });
 }

@@ -157,7 +157,8 @@
 		<ClaimDialog
 			:showDialog="modelDialog.claimShowDialog"
 			@cancel="modelDialog.claimShowDialog = false"
-
+			:taskId="originData.id"
+			@success="refreshMyItem('claim')"
 		/> 
 		<CompleteDialog 
 			:showDialog="modelDialog.completeShowDialog"
@@ -389,7 +390,7 @@ export default {
 					if(this.originData.assignee){
 						obj = this.getTaskStatus('#F59324', 'Đã giao','assign')
 					}else{
-						obj = this.getTaskStatus('primary', 'Un assign','unAssign')
+						obj = this.getTaskStatus('#ED6A5E', 'Chưa được giao','unAssign')
 					}
 				}else{
 					if(this.delegationState == 'pending'){
