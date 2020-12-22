@@ -830,6 +830,8 @@ export default {
 							self.delegationState = res.delegationState
 						}).catch(err=>{
 						})
+					}else{
+						this.delegationState = null
 					}
                     this.$set(this.selectedTask, "taskInfo", taskInfo);
                     this.$emit("change-height", "calc(100vh - 88px)");

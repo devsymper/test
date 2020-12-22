@@ -16,6 +16,7 @@
 				</div>
 				<ListActionMenu  
 					:snackbarMode="true"
+					:showResolveAction="showResolveAction"
 					:userType="userType"
 					:taskType="taskType"
 					@action-clicked="handlerActionClick"
@@ -53,6 +54,10 @@ export default {
 		taskType:{
 			type: String,
 			default: ""
+		},
+		showResolveAction:{
+			type: Boolean,
+			default: false
 		}
 	},
 	data(){

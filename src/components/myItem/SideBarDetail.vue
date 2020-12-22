@@ -23,7 +23,7 @@
 					x-small 
 					class="mr-1"
 					v-if="!showHistoryTask"
-					@click="showHistoryTask = true"
+					@click="handlerShowHistoryClick"
 				>
 					<v-icon small class="mr-1">
 						mdi-history
@@ -646,6 +646,10 @@ export default {
 		});
 	},
 	methods:{
+		handlerShowHistoryClick(){
+			this.showHistoryTask = true
+			this.$store.dispatch('task/getTaskHistory',this.originData.id)
+		},
 		handleShowMoreTask(){
 			this.showMoreTask=!this.showMoreTask;
 		},

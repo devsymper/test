@@ -69,6 +69,7 @@
 					@action-clicked="handlerActionClick"
 					:userType="userType"
 					:taskType="taskStatus.value"
+					:showResolveAction="!showSubmitBtn"
 					:style="{position: 'absolute', right: rightAction+'px ',top: '4px'}"
 				/>
                 <v-tooltip bottom>
@@ -148,6 +149,7 @@
 			:userType="userType"
 			:taskType="taskStatus.value"
 			@edit-clicked="showUpdateSubmitedDocument"
+			:showResolveAction="!showSubmitBtn"
 			@action-clicked="handlerActionClick"
 		 />
 		<AssignDialog
@@ -365,11 +367,11 @@ export default {
 			userType: '',
             linkTask:'',
             taskActionBtns: [
-                {
-                    text:"Submit",
-                    value:"submit",
-                    color:"blue"
-                },
+                // {
+                //     text:"Submit",
+                //     value:"submit",
+                //     color:"blue"
+                // },
             ],
             taskAction: undefined,
             tab: null,
@@ -379,7 +381,26 @@ export default {
     computed: {
         stask() {
             return this.$store.state.task;
-        },
+		},
+		// showResoleAction(){
+		// 	if(this.taskInfo.action.parameter.documentObjectId){
+		// 		return true
+		// 	}else{
+		// 		return false
+		// 	}
+		// },
+		showSubmitBtn(){
+			if(this.taskInfo.action){
+				if(this.taskInfo.action.parameter.documentObjectId ){
+					return false
+				}else{
+					return true
+				}
+			}else{
+				return true
+			}
+			
+		},
         sapp() {
             return this.$store.state.app;
 		},
@@ -437,6 +458,7 @@ export default {
 		refreshMyItem(type){
 			this.modelDialog[type+'ShowDialog'] = false
 			this.$router.go()
+			// this.reloadDetailTask()
 		},
 		handlerDelegateSuccess(){
 			this.modelDialog.delegateShowDialog = false
@@ -474,16 +496,18 @@ export default {
             }, 210,this);
         },
         checkShowEditRecord(){
-            let taskInfo = this.taskInfo;
-            if(this.originData){
+			let taskInfo = this.taskInfo;
+			if(this.delegationState == 'pending'){
+				return true
+			}else if(this.originData){
                 let isPendding = !this.originData.endTime;
                 if (taskInfo.action) {
                     let isApprovalTask = taskInfo.action.action == 'approval';
                     let hasEditableControls = !taskInfo.approvalEditableControls || (taskInfo.approvalEditableControls && taskInfo.approvalEditableControls.length);
                     return isPendding && isApprovalTask && hasEditableControls;
                 }
-            
-            }
+			}
+			
         },
         checkRole(assigneeId){
             
@@ -516,7 +540,6 @@ export default {
         },
         toggleSidebar(){
 			this.isShowSidebar = !this.isShowSidebar;
-			this.$store.dispatch('task/getTaskHistory',this.originData.id)
         },
         checkAndSwitchToTab(){
             if(this.$route.params.extraData && this.$route.params.extraData.subAction){
@@ -651,7 +674,7 @@ export default {
             }else if(this.checkRoleUser(this.originData)){
                 this.loadingActionTask=true;
                     if(this.taskAction == 'submit' || this.taskAction == 'update' ){
-						
+			
                         this.$refs.task.submitForm(value);
                     }else if(this.taskAction == 'approval'){
                         let elId = this.originData.taskDefinitionKey;
@@ -687,7 +710,7 @@ export default {
                         }else{
                             this.reloadDetailTask();
                         }
-                    }else if(this.taskAction == '' ||this.taskAction==undefined ||this.taskAction == 'submitAdhocTask'){
+                    }else if(this.taskAction == '' ||this.taskAction == undefined ||this.taskAction == 'submitAdhocTask'){
                         let taskData = {
                             "action": "complete",
                             "outcome": value,
@@ -729,9 +752,9 @@ export default {
             return new Promise(async (resolve, reject) => {
                 try {
                     let taskId = self.taskInfo.action.parameter.taskId;
-                    let result = await BPMNEngine.actionOnTask(taskId, taskData);   
-                    self.$snotifySuccess("Task completed!");
-                    resolve(result);
+                    // let result = await BPMNEngine.actionOnTask(taskId, taskData);   
+                    // self.$snotifySuccess("Task completed!");
+                    // resolve(result);
                 } catch (error) {
                     let detail = '';
                     if(error.responseText){
@@ -791,25 +814,22 @@ export default {
             //         this.$emit('task-submited', data);            
             //     }
             // }else{
-            //     let elId = this.taskInfo.action.parameter.activityId;
-            //     let docId = data.document_id;
-            //     if(!docId){
-            //         docId = this.taskInfo.action.parameter.documentId;
-            //     }
-            //     let varsForBackend = await getVarsFromSubmitedDoc(data, elId, docId);
-            //     // let taskData = { 
-            //     //     // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
-            //     //     "action": "complete", 
-            //     //     "assignee": "1",
-            //     //     "outcome": 'submit',
-            //     //     "variables": varsForBackend.vars,
-            //     // }
-            //     // let res =  await this.submitTask(taskData);
-            //     // if (this.reload) {
-            //     //     this.$emit('task-submited', res);
-            //     // }else{
-            //     //     this.reloadDetailTask();
-            //     // }
+			let elId = this.taskInfo.action.parameter.activityId;
+			let docId = data.document_id;
+			if(!docId){
+				docId = this.taskInfo.action.parameter.documentId;
+			}
+			let varsForBackend = await getVarsFromSubmitedDoc(data, elId, docId);
+			let taskData = { 
+				"outcome": 'submit',
+				"variables": varsForBackend.vars,
+			}
+			let res =  await this.submitTask(taskData);
+			if (this.reload) {
+				this.$emit('task-submited', res);
+			}else{
+				this.reloadDetailTask();
+			}
             // }
         },
         showApprovalOutcomes(approvalActions){
@@ -833,15 +853,23 @@ export default {
             self.taskAction = self.taskInfo.action.action;
             if(self.taskAction == 'approval'){
                 self.showApprovalOutcomes(JSON.parse(self.taskInfo.approvalActions));
-            }else if(self.taskAction == 'submit' || self.taskAction == 'submitAdhocTask'){
-                self.taskActionBtns = [
-                    {
-                    text:"Submit",
-                    value:"submit",
-                    color:"blue"
-                    }
-                ]
-            }else if(self.taskAction == 'undefined' ){
+            }else if(self.showSubmitBtn == true && self.taskAction == 'submit'  ){
+					self.taskActionBtns = [
+						{
+						text:"Submit",
+						value:"submit",
+						color:"blue"
+						}
+					]
+            }else if(self.taskAction == 'submitAdhocTask'){
+				self.taskActionBtns = [
+					{
+					text:"Submit",
+					value:"submit",
+					color:"blue"
+					}
+				]
+			}else if(self.taskAction == 'undefined' ){
                 self.taskActionBtns = [
                     {
                         text:"Complete",

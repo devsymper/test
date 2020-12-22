@@ -49,6 +49,10 @@ export default {
 		taskType:{
 			type: String,
 			default: ""
+		},
+		showResolveAction:{
+			type: Boolean,
+			default: false
 		}
 	},
 	computed:{
