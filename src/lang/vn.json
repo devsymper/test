@@ -723,6 +723,7 @@
                     },
                     "name": "Tên Document",
                     "title": "Tiêu đề Document",
+                    "updateByWorkflow": "Cập nhật bản ghi bằng quy trình",
                     "fullSize": "Hiển thị toàn màn hình Form Submit",
                     "type": "Loại văn bản",
                     "note": "Ghi chú (Phục vụ cho việc tìm kiếm)",

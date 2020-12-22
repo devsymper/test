@@ -1,11 +1,9 @@
 <template>
     <div class="h-100 w-100" style="position: relative">
-        <v-skeleton-loader
+        <preloader 
             v-if="loadingAction"
-            :type="'table-tbody'"
-            class="mx-auto"
-            width="100%" height="100%" 
-        ></v-skeleton-loader>
+            :style="{height: 100+'%'}"
+            class="mx-auto" />
         <v-row class="ml-0 mr-0 justify-space-between task-header" id="taskHeader" style="line-height: 36px;height:44px">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
@@ -315,7 +313,6 @@
 import icon from "@/components/common/SymperIcon";
 import BPMNEngine from "@/api/BPMNEngine.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import { appManagementApi } from '@/api/AppManagement';
 import listTask from "./ListTask";
 import workDetailSub from "./WorkDetailSub";
 import SideBarDetail from "./SideBarDetail";
@@ -338,19 +335,10 @@ export default {
                 return {}
             }
         },
-      
         isInitInstance: {
             type: Boolean,
             default: false
         },
-        parentHeight: {
-            type: Number,
-            default: 300
-		},
-		showTitle:{
-			type:Boolean,
-			default:false
-		}
     },
     watch: {
         workInfo: {

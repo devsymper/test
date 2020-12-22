@@ -595,11 +595,11 @@ export const startWorkflowBySubmitedDoc = function(idWorkflow, submitedDocData, 
                     let dataInputForFormula = {};
 
                     try {
-                        
+
                         let varsForBackend = await getVarsFromSubmitedDoc(submitedDocData, startNodeId, docId);
                         vars = varsForBackend.vars;
                         dataInputForFormula = varsForBackend.nameAndValueMap;
-                        
+
                         // let instanceName = await this.getInstanceName(dataInputForFormula);
                         let instanceName = res.data.name;
                         let newProcessInstance = await runProcessDefinition(SYMPER_APP, defData, vars, instanceName);

@@ -509,6 +509,7 @@
                     },
                     "name": "Document name",
                     "title": "Document title",
+                    "updateByWorkflow": "Update by workflow",
                     "fullSize": "Full size Form Submit",
                     "type": "Document type",
                     "note": "Note (Serve for searching)",

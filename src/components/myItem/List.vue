@@ -331,7 +331,6 @@ import BPMNEngine from "@/api/BPMNEngine";
 import icon from "@/components/common/SymperIcon";
 import taskDetail from "./TaskDetail";
 import listHeader from "./ListHeader";
-import userSelector from "./UserSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../plugins/util";
 import { appConfigs } from "../../configs";
@@ -414,7 +413,6 @@ export default {
         icon: icon,
         taskDetail: taskDetail,
         listHeader: listHeader,
-        userSelector: userSelector,
         VuePerfectScrollbar: VuePerfectScrollbar,
         listTaskApproval,
         infoUser,
