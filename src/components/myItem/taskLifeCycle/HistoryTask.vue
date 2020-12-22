@@ -1,6 +1,6 @@
 <template>
   <div class="d-flex flex-column mt-2">
-	  <div class="d-flex flex-column mb-2 pt-1 mr-1 ml-1 " v-for="i in 3" :key="i">
+	  <div class="d-flex flex-column mb-2 pt-1 mr-1 ml-1 " v-for="(item,i) in 5" :key="i">
 		  <div class="d-flex align-center"> 
 			  <v-icon small>mdi-account</v-icon>
 			 <span class="flex-grow-1">
