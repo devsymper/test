@@ -548,7 +548,6 @@ export default {
          * nếu copy/ paste các control trong doc hiện tại thì tự động nhân bản các thuộc tính (riêng id phải tạo mới) 
          */
         handlePasteContent(e){
-            e.preventDefault();
             var content = ((e.originalEvent || e).clipboardData || window.clipboardData).getData("text/html");
             content = content.replace(/((<|(<\/))html>)|((<|(<\/))body>)/g,"");
             content = content.replace(/<!--[^>]*-->/g,"");
@@ -556,6 +555,7 @@ export default {
             let contentEl = $(content);
             let listControls = contentEl.find('.s-control:not(.s-control-table .s-control)');
             if(listControls.length > 0){
+                e.preventDefault();
                 for (let index = 0; index < listControls.length; index++) {
                     const controlEl = listControls[index];
                     let controlId = $(controlEl).attr('id');
@@ -1911,8 +1911,10 @@ export default {
                 let style = $(value).attr('style');
                 if(type == 'text') type = 'textInput'
                 if(type == 'persent') type = 'percent'
+                if(type == 'datetime') type = 'dateTime'
+                if(type == 'file-upload') type = 'fileUpload'
                 let controlV2 = GetControlProps(type);
-                let controlEl = $(controlV2.html); 
+                let controlEl = $(controlV2.html);
                 var inputid = 's-control-id-' + Date.now();
                 controlEl.attr('id', inputid).attr('style',style);
                 controlEl.replaceAll($(value))
@@ -1950,6 +1952,7 @@ export default {
                         if(type == 'text') type = 'textInput'
                         if(type == 'persent') type = 'percent'
                         if(type == 'file-upload') type = 'fileUpload'
+                        if(type == 'datetime') type = 'dateTime'
                         console.log(type);
                         
                         let childControlV2 = GetControlProps(type);
