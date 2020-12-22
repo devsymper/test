@@ -27,6 +27,10 @@ module.exports = {
                     "sass-loader",
                 ],
             },
+            {
+                test: /\.worker\.js$/,
+                use: { loader: 'worker-loader' },
+            }
         ],
         loaders: [{
                 test: /\.vue$/,

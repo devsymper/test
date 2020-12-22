@@ -183,7 +183,7 @@ import { documentApi } from "./../../../api/Document.js";
 import { formulasApi } from "./../../../api/Formulas.js";
 import { userApi } from "./../../../api/user.js";
 import "./../../../components/document/documentContent.css";
-import { setDataForPropsControl,allControlNotSetData } from "./../../../components/document/dataControl";
+import {allControlNotSetData } from "./../../../components/document/dataControl";
 import BasicControl from "./basicControl";
 import TableControl from "./tableControl";
 import ActionControl from "./actionControl";
@@ -222,6 +222,10 @@ import {checkControlPropertyProp,getControlInstanceFromStore,
         mapTypeToEffectedControl, minimizeDataAfterRunFormula} from './../common/common'
 import Formulas from './formulas.js';
 import { startWorkflowBySubmitedDoc } from '../../../components/process/processAction.js';
+
+
+import ControlRelationWorker from 'worker-loader!@/worker/document/submit/ControlRelation.Worker.js';
+
 let impactedFieldsList = {};
 let impactedFieldsArr = {};
 
@@ -330,17 +334,24 @@ export default {
         sDocumentSubmit() {
             return this.$store.state.document.submit[this.keyInstance];
         },
+        sDocumentDetail(){
+            return this.$store.state.document.detail[this.keyInstance]
+        },
         endUserInfo(){
             return this.$store.state.app.endUserInfo;
         },
         viewType(){
             return this.$store.state.document.viewType[this.keyInstance]
         },
+        
         linkControl(){
             return this.$store.state.document.linkControl[this.keyInstance]
         },
         baInfo(){
             return this.$store.state.app.baInfo
+        },
+        isBa(){
+            return this.$store.state.app.baInfo.id
         },
         currentRowChangePivotMode(){
             return this.$store.state.document.submit[this.keyInstance].currentRowChangePivotMode
@@ -362,7 +373,6 @@ export default {
             documentId: null,
             documentName: null,
             docSize: null,
-            editorDoc: null,
             isShowSubFormSubmit: false,
             keyInstance: Date.now(),
             titleDragPanel: null,
@@ -403,6 +413,7 @@ export default {
             dataPivotTable:{},
             dataColPivot:[],
             dataPivotMode:[],
+            controlRelationWorker:null
         };
 
     },
@@ -410,8 +421,36 @@ export default {
         this.columnsSQLLiteDocument = {};
     },
     mounted() {
-        this.editorDoc = $(".sym-form-submit");
         let thisCpn = this;
+        this.controlRelationWorker = new ControlRelationWorker();
+        this.controlRelationWorker.addEventListener("message", function (event) {
+            let data = event.data;
+            switch (data.action) {
+                case 'setDataForPropsControl':
+                    let listControlToStore = data.dataAfter.listControlToStore;
+                    let controlMapDatasetDataflow = data.dataAfter.controlMapDatasetDataflow;
+                    for(let controlId in listControlToStore){
+                        thisCpn.$store.commit(
+                            "document/addControl", { id: controlId, props: listControlToStore[controlId], instance: thisCpn.keyInstance }
+                        );
+                    }
+                    thisCpn.$store.commit(
+                        "document/addToDocumentSubmitStore", { key: 'listControlMappingDatasets', value: controlMapDatasetDataflow, instance: thisCpn.keyInstance }
+                    );
+                    thisCpn.processHtml(thisCpn.contentDocument);
+                    break;
+            
+                case 'getMapControlEffected':
+                    console.log('data.dataAfter',data.dataAfter);
+                    // this.controlRelationWorker.postMessage({action:'checkInfinityControl',data:
+                    //     { mapControlEffected: this.mapControlEffected}
+                    // });
+                    break;
+            
+                default:
+                    break;
+            }
+        });
         $('#sym-submit-'+this.keyInstance).on('click','.validate-icon',function(e){
             let controlName = $(this).attr('control-name');
             let validate = thisCpn.validateControl[controlName];
@@ -919,12 +958,9 @@ export default {
                     return
                 }
                 this.contentDocument = vl.content;
-                setTimeout((self) => {
-                    setDataForPropsControl(vl.fields,self.keyInstance,'submit');
-                }, 500,this);
-                setTimeout(() => {
-                    this.processHtml(vl.content);
-                }, 700);
+                this.controlRelationWorker.postMessage({action:'setDataForPropsControl',data:
+                    { fields: vl.fields, viewType: this.viewType, allDataDetail: this.sDocumentDetail.allData}
+                });
             }
         }
     },
@@ -1446,10 +1482,10 @@ export default {
 							thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
                             thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
                             thisCpn.dataPivotTable = res.data.pivotConfig;
-                            setDataForPropsControl(res.data.fields,thisCpn.keyInstance,'submit'); // ddang chay bat dong bo
-                            setTimeout(() => {
-                                thisCpn.processHtml(content);
-                            }, 100);
+                            // đẩy phần xử lí data control xuống worker
+                            thisCpn.controlRelationWorker.postMessage({action:'setDataForPropsControl',data:
+                                { fields: res.data.fields, viewType: thisCpn.viewType, allDataDetail: thisCpn.sDocumentDetail.allData}
+                            });
                         }
                         else{
                             thisCpn.$snotify({
@@ -1561,7 +1597,7 @@ export default {
                     let idField = field.id;
                     let valueInput = field.value;
                     let prepareData = field.prepareData;
-                    if(prepareData != null && prepareData != ""){
+                    if(prepareData){
                         isSetEffectedControl = true;
                     }
                     if(valueInput == undefined || valueInput == null){
@@ -1671,7 +1707,7 @@ export default {
                                 thisCpn.checkOverrideFormulas(childControlName,childControlProp);
                                 let childValue = childControlProp.value;
                                 let childPrepareData = childControlProp.prepareData
-                                if(childPrepareData != null && childPrepareData != ""){
+                                if(childPrepareData){
                                     isSetEffectedControl = true;
                                 }
                                 let idFieldChild = childControlProp.id;
@@ -1702,9 +1738,17 @@ export default {
             }
             this.listDataFlow = listDataFlow;
             if(!isSetEffectedControl){
-                this.getEffectedControl();
+                this.controlRelationWorker.postMessage({action:'getMapControlEffected',data:
+                    { allControlObj: this.sDocumentSubmit.listInputInDocument}
+                });
             }
-            if(this.controlInfinity.length > 0 && this.baInfo && this.baInfo.id){
+            else{
+                this.handleBeforeLoadedDocument()
+            }
+            
+        },
+        handleAfterGetMapControlEffected(){
+            if(this.controlInfinity.length > 0 && this.isBa){
                 this.listMessageErr = [];
                 this.listMessageErr.push("Mối quan hệ giữa các control sau dẫn đến vòng lặp vô hạn");
                 for (let index = 0; index < this.controlInfinity.length; index++) {
@@ -1717,34 +1761,40 @@ export default {
                 this.$refs.errMessage.showDialog('checkInfinityControl');   
             }
             else{
-                if(this.docObjId == null){
-                    thisCpn.findRootControl();
-                }
-                else{   // trường hơp đã lưu cấu trúc root trên server
-                    if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
-                        impactedFieldsList = this.preDataSubmit.impactedFieldsList;
-                        let impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
-                        let listTableRootControl = this.preDataSubmit.tableRootControl;
-                        this.pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl);
-                        for(let tableName in listTableRootControl){
-                            let tableRootControl = listTableRootControl[tableName];
-                            for(let controlInTable in tableRootControl){
-                                let controlInstance = getControlInstanceFromStore(this.keyInstance,controlInTable);
-                                let controlFormulas = controlInstance.controlFormulas;
-                                if(controlFormulas.hasOwnProperty('formulas')){
-                                    let formulasInstance = controlFormulas['formulas'].instance;
-                                    // chạy công thức để lấy giá trị dòng mặc định trong table(phục vụ cho việc shift enter xuống dòng phải có dữ liệu mặc định)
-                                    if(formulasInstance){
-                                        this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
-                                    }
+                this.handleBeforeLoadedDocument()
+            }
+            this.hidePreloader();   
+        },
+        /**
+         * Hàm xử lí tìm các control được coi là root (các control không có đầu vào)
+         */
+        handleBeforeLoadedDocument(){
+            if(this.docObjId == null){
+                this.findRootControl();
+            }
+            else{   // trường hơp đã lưu cấu trúc root trên server
+                if(this.preDataSubmit != null && Object.keys(this.preDataSubmit).length > 0){
+                    impactedFieldsList = this.preDataSubmit.impactedFieldsList;
+                    let impactedFieldsListWhenStart = this.preDataSubmit.impactedFieldsListWhenStart;
+                    let listTableRootControl = this.preDataSubmit.tableRootControl;
+                    this.pushDataRootToStore(impactedFieldsList,impactedFieldsListWhenStart,listTableRootControl);
+                    for(let tableName in listTableRootControl){
+                        let tableRootControl = listTableRootControl[tableName];
+                        for(let controlInTable in tableRootControl){
+                            let controlInstance = getControlInstanceFromStore(this.keyInstance,controlInTable);
+                            let controlFormulas = controlInstance.controlFormulas;
+                            if(controlFormulas.hasOwnProperty('formulas')){
+                                let formulasInstance = controlFormulas['formulas'].instance;
+                                // chạy công thức để lấy giá trị dòng mặc định trong table(phục vụ cho việc shift enter xuống dòng phải có dữ liệu mặc định)
+                                if(formulasInstance){
+                                    this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlInTable,'formulasDefaulRow','root');
                                 }
-                                
                             }
+                            
                         }
                     }
                 }
             }
-            this.hidePreloader();            
         },
 
         /**
@@ -1793,11 +1843,11 @@ export default {
          */
         getEffectedControl() {
             let mapControlEffected = {};
-            let allControl = this.sDocumentSubmit.listInputInDocument;
-            for (let name in allControl) {
-                let type = allControl[name].type;
+            let allControlObj = this.sDocumentSubmit.listInputInDocument;
+            for (let name in allControlObj) {
+                let type = allControlObj[name].type;
                 if (type != "submit" && type != "reset" && type != "draft") {
-                    let formulas = allControl[name].controlFormulas;
+                    let formulas = allControlObj[name].controlFormulas;
                     for (let formulasType in formulas) {
                         if(formulasType == 'autocomplete'){
                             continue
