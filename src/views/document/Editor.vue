@@ -1330,7 +1330,6 @@ export default {
                     this.dataPivotTable = {};
                 }
                 this.dataPivotTable[currentControl.properties.name.name.value] = tablePivotConfig;
-
             }
             else{
                 if(this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
@@ -1343,6 +1342,12 @@ export default {
                 let row = listRowData[i];
                 let type = row.type;
                 let control = GetControlProps(type);
+                if(row.oldProps){
+                    control.properties = row.oldProps;
+                }
+                if(row.formulas){
+                    control.formulas = row.formulas;
+                }
                 control.properties.name.value = row.name;
                 control.properties.title.value = row.title;
                 let controlEl = $(control.html);
@@ -1522,9 +1527,14 @@ export default {
                         }
                         let idControl = $(tbody[i].outerHTML).find('.s-control').attr('id');
                         let typeControl = $(tbody[i].outerHTML).find('.s-control').attr('s-control-type');
-                        let name = this.editorStore.allControl[tableId]['listFields'][idControl].properties.name.value;
-                        let title = this.editorStore.allControl[tableId]['listFields'][idControl].properties.title.value;
-                        let row = {columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl}
+                        let controlObj = this.editorStore.allControl[tableId]['listFields'][idControl];
+                        let name = controlObj.properties.name.value;
+                        let title = controlObj.properties.title.value;
+                        let row = {
+                                    columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl, 
+                                    oldProps:controlObj.properties, formulas: controlObj.formulas
+
+                                }
                         listData.push(row)
 
                     }
