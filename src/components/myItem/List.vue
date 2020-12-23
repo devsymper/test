@@ -880,6 +880,7 @@ export default {
                 if(lazyLoad){
                     resData.forEach(function(e){
                         taskIden.push('task:'+e.id);
+
                         e.taskData = thisCpn.getTaskData(e);
                         addMoreInfoToTask(e);
                         thisCpn.setDueDateInfoDisplay(e);
