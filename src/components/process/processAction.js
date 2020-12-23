@@ -498,8 +498,6 @@ export const addMoreInfoToTask = function(task) {
     if (task.assignee) {
         task.assigneeInfo = {};
         let assigneeId=task.assignee;
-     
-    
         if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
             let arrDataAssignee=task.assignee.split(":");
             assigneeId=arrDataAssignee[0];
