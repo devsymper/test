@@ -183,7 +183,7 @@ import { documentApi } from "./../../../api/Document.js";
 import { formulasApi } from "./../../../api/Formulas.js";
 import { userApi } from "./../../../api/user.js";
 import "./../../../components/document/documentContent.css";
-import {allControlNotSetData } from "./../../../components/document/dataControl";
+import {allControlNotSetData,getMapControlEffected,checkInfinityControl } from "./../../../components/document/dataControl";
 import BasicControl from "./basicControl";
 import TableControl from "./tableControl";
 import ActionControl from "./actionControl";
@@ -214,8 +214,6 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import FloattingPopup from './../common/FloattingPopup'
 import PopupPivotTable from './items/PopupPivotTable'
 
-
-
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
 import {checkControlPropertyProp,getControlInstanceFromStore, 
         getControlTitleFromName, getListInputInDocument, 
@@ -225,6 +223,7 @@ import { startWorkflowBySubmitedDoc } from '../../../components/process/processA
 
 
 import ControlRelationWorker from 'worker-loader!@/worker/document/submit/ControlRelation.Worker.js';
+import FormulasWorker from 'worker-loader!@/worker/document/submit/Formulas.Worker.js';
 
 let impactedFieldsList = {};
 let impactedFieldsArr = {};
@@ -413,7 +412,8 @@ export default {
             dataPivotTable:{},
             dataColPivot:[],
             dataPivotMode:[],
-            controlRelationWorker:null
+            controlRelationWorker:null,
+            formulasWorker:null
         };
 
     },
@@ -423,6 +423,7 @@ export default {
     mounted() {
         let thisCpn = this;
         this.controlRelationWorker = new ControlRelationWorker();
+        this.formulasWorker = new FormulasWorker();
         this.controlRelationWorker.addEventListener("message", function (event) {
             let data = event.data;
             switch (data.action) {
@@ -445,6 +446,18 @@ export default {
                     // this.controlRelationWorker.postMessage({action:'checkInfinityControl',data:
                     //     { mapControlEffected: this.mapControlEffected}
                     // });
+                    break;
+            
+                default:
+                    break;
+            }
+        });
+        this.formulasWorker.addEventListener("message", function (event) {
+            let data = event.data;
+            switch (data.action) {
+                case 'afterRunFormulasSuccess':
+                    console.log('data.dataAfter',data.dataAfter);
+                   
                     break;
             
                 default:
@@ -610,7 +623,7 @@ export default {
                 let controlName = e.controlName;
                 let controlInstance = thisCpn.sDocumentSubmit.listInputInDocument[controlName];
                 let controlId = controlInstance.id
-                let dataInput = this.getDataInputFormulas(formulasInstance);
+                let dataInput = formulasInstance.getDataInputFormulas(thisCpn.sDocumentSubmit.listInputInDocument);
 
                 this.handlerBeforeRunFormulasValue(formulasInstance, controlId, controlName, 'formulas');
             } catch (error) {
@@ -1187,7 +1200,8 @@ export default {
         getDataOrgchart(e){
             let thisCpn = this;
             let aliasControl = e.formulasInstance.autocompleteDetectAliasControl();
-            let dataInput = this.getDataInputFormulas(e.formulasInstance,e);
+            let listInput = getListInputInDocument(this.keyInstance);
+            let dataInput = e.formulasInstance.getDataInputFormulas(listInput,e);
             for(let controlName in dataInput){
                 if(Array.isArray(dataInput[controlName])){
                     dataInput[controlName] = dataInput[controlName][e.e.rowIndex];
@@ -1209,15 +1223,16 @@ export default {
          */
         getDataForAutocomplete(e,type,aliasControl=""){ 
             let thisCpn = this
+            let listInput = getListInputInDocument(this.keyInstance);
             if(['select','combobox'].includes(type)){
-                let dataInput = this.getDataInputFormulas(e.selectFormulasInstance);  
+                let dataInput = e.selectFormulasInstance.getDataInputFormulas(listInput);  
                 e.selectFormulasInstance.handleRunAutoCompleteFormulas(dataInput).then(res=>{
                     thisCpn.setDataForControlAutocomplete(res,aliasControl)
                 });
             }
             else{
                 let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
-                let dataInput = this.getDataInputFormulas(e.autocompleteFormulasInstance,e);
+                let dataInput = e.autocompleteFormulasInstance.getDataInputFormulas(listInput,e);
                 for(let controlName in dataInput){
                     if(Array.isArray(dataInput[controlName])){
                         dataInput[controlName] = dataInput[controlName][e.e.rowIndex];
@@ -1738,14 +1753,15 @@ export default {
             }
             this.listDataFlow = listDataFlow;
             if(!isSetEffectedControl){
-                this.controlRelationWorker.postMessage({action:'getMapControlEffected',data:
-                    { allControlObj: this.sDocumentSubmit.listInputInDocument}
-                });
+                let listInput = getListInputInDocument(this.keyInstance);
+                let mapControlEffected = getMapControlEffected(listInput);
+                this.controlInfinity = checkInfinityControl(mapControlEffected)
+                this.updateEffectedControlToStore(mapControlEffected)
+                this.handleAfterGetMapControlEffected()
             }
             else{
                 this.handleBeforeLoadedDocument()
             }
-            
         },
         handleAfterGetMapControlEffected(){
             if(this.controlInfinity.length > 0 && this.isBa){
@@ -2023,7 +2039,9 @@ export default {
             let controlNameIdentifier = this.objectIdentifier['name'];
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlNameIdentifier);
             if(controlInstance != false && controlInstance.controlFormulas.hasOwnProperty('formulas')){
-                let dataInput = this.getDataInputFormulas(controlInstance.controlFormulas['formulas']['instance'])
+                let listInput = getListInputInDocument(this.keyInstance);
+                let formulaInstance = controlInstance.controlFormulas['formulas']['instance'];
+                let dataInput = formulaInstance.getDataInputFormulas(listInput)
                 controlIdentifier['dataInputIdentifier'] = dataInput;
             }
             return controlIdentifier;
@@ -2459,10 +2477,14 @@ export default {
                 }
             }
         },
-        
+        /**
+         * Xử lí call qua formulas object để chạy công thức
+         */
         handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType,from=false){
-            let dataInput = this.getDataInputFormulas(formulasInstance);
-            if(checkDataInputChange(this.keyInstance, dataInput)){
+            let self = this;
+            let listInput = getListInputInDocument(this.keyInstance);
+            let dataInput = formulasInstance.getDataInputFormulas(listInput);
+            if(checkDataInputChange(this.sDocumentSubmit.rootChangeFieldName, this.sDocumentSubmit.dataInputBeforeChange, dataInput)){
                 let control = getControlInstanceFromStore(this.keyInstance,controlName);
                 if(control.inTable != false){
                     let tableInstance = getControlInstanceFromStore(this.keyInstance,control.inTable);
@@ -2470,40 +2492,13 @@ export default {
                     tableInstance.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataIn,formulasInstance, 'all');
                 }
                 formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
-                    this.handleAfterRunFormulas(rs,controlId,controlName,formulasType,from)
+                    self.handleAfterRunFormulas(rs,controlId,controlName,formulasType,from)
                 });
             }
         },
         /**
-         * Hàm lấy dữ liệu của các control trong store để chuân bị cho việc run formulas
-         * dataInput : {controlName : value}
-         * rowIndex là lấy cell ở row hiện tại nếu là trong table
+         *  Hàm xử lí dứ liệu sau khi chạy công thức
          */
-        getDataInputFormulas(formulasInstance, e = false){
-            let inputControl = formulasInstance.getInputControl();
-            let dataInput = {};
-            for(let inputControlName in inputControl){
-                if(inputControlName == e.controlName){
-                    dataInput[inputControlName] = $(e.e.target).val();
-                }
-                else{
-                    if(this.sDocumentSubmit.listInputInDocument.hasOwnProperty(inputControlName)){
-                        let controlIns = getControlInstanceFromStore(this.keyInstance,inputControlName)
-                        let valueInputControl = controlIns.value;
-                        if(controlIns.type == 'inputFilter'){
-                            valueInputControl = valueInputControl.split(',')
-                        }
-                        if(controlIns.type == 'time'){
-                            valueInputControl = controlIns.convertTimeToStandard(valueInputControl)
-                        }
-                        dataInput[inputControlName] = valueInputControl;
-                    }
-                }
-            }
-            return dataInput;
-        },
-
-
         handleAfterRunFormulas(rs,controlId,controlName,formulasType,from){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
             let value = minimizeDataAfterRunFormula(rs);

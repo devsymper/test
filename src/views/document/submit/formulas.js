@@ -8,6 +8,8 @@ import {
     orgchartApi
 } from "./../../../api/orgchart";
 import Util from "./util";
+import FormulasEvent from "./formulasEvent";
+
 const BUILD_IN_FUNCTION = ['TODAY', 'BEGIN_WEEK', 'END_WEEK', 'BEGIN_MONTH', 'END_MONTH',
     'BEGIN_YEAR', 'END_YEAR', 'TIMESTAMP', 'PARENT_WORKFLOW', 'CURRENT_WORKFLOW',
     'CURRENT_USER_ID',
@@ -17,17 +19,9 @@ const BUILD_IN_FUNCTION = ['TODAY', 'BEGIN_WEEK', 'END_WEEK', 'BEGIN_MONTH', 'EN
     'CURRENT_USER_PHONE',
     'CURRENT_USER_PHONE_NUMBER'
 ]
-export default class Formulas {
+export default class Formulas extends FormulasEvent{
     constructor(keyInstance, formulas, type) {
-        /**
-         * chỉ ra đang ở instance của view submit nào, (trường hợp có sub form thì có 2 key)
-         */
-        this.keyInstance = keyInstance;
-        this.formulas = formulas;
-        /**
-         * Loại của công thức: validate, data, require, readonly..f
-         */
-        this.type = type;
+        super(keyInstance, formulas, type);
         this.inputControl = this.setInputControl();
         this.inputFromDatasets = this.getDatasetEffectedFormula();
         this.refFormulas = this.getReferenceFormulas();

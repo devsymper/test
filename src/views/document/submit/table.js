@@ -1063,7 +1063,8 @@ export default class Table {
      * 
      */
     handlerRunFormulasForControlInTable(formulasType, controlInstance, dataInput, formulasInstance, rowIndex = null) {
-        if(!checkDataInputChange(this.keyInstance, dataInput)){
+        let sDocumentSubmit = getSDocumentSubmitStore(this.keyInstance);
+        if(!checkDataInputChange(sDocumentSubmit.rootChangeFieldName, sDocumentSubmit.dataInputBeforeChange, dataInput)){
             return;
         }
         if(rowIndex != null && rowIndex != "all" && Number(rowIndex) >= 0){

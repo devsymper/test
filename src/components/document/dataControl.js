@@ -214,7 +214,7 @@ export const getMapControlEffected = (allControlObj) => {
                            }
                            mapControlEffected[formulasType][controlEffect][name] = true;
                        }
-                       detectControlEffectedInTableInDoc(mapControlEffected[formulasType], name, formulas[formulasType].instance);
+                    //    detectControlEffectedInTableInDoc(mapControlEffected[formulasType], name, formulas[formulasType].instance);
                    }
                }
            }
@@ -228,7 +228,7 @@ export const getMapControlEffected = (allControlObj) => {
  *  
 */       
 export const checkInfinityControl = (mapControlEffected) => {
-    controlInfinity = [];
+    let controlInfinity = [];
     for(let formulaType in mapControlEffected){
         if(['list','formulas'].includes(formulaType)){
             for(let controlName in mapControlEffected[formulaType]){
@@ -263,4 +263,59 @@ function search (controlCheck, effectedControl, mapControlEffected) {
  */
 function detectControlEffectedInTableInDoc(mapControlEffected,name,formulasInstance){
     formulasInstance.detectControlInTable(mapControlEffected,name,formulasInstance.formulas,this.sDocumentSubmit.listInputInDocument)  
+}
+
+export const minimizeDataAfterRunFormula = function(rs) {
+    let value = "";
+    if(!rs.server){
+        let data = rs.data; 
+        if(data.length > 0){
+            value=data[0].values[0][0];
+        }
+    }
+    else{
+        let data = rs.data.data;
+        if(data.length > 0){
+            value=data[0][Object.keys(data[0])[0]];
+        }
+    }
+    return value;
+}
+
+ /**
+ * Hàm kiểm tra xem có sự thay đổi của data input của 1 formula hay không
+ * nếu có thì mới thực thi công thức
+ * @param {*} instance state của phiên làm việc hiện tại
+ * @param {*} dataInput dữ liệu đầu vào của công thức đang check
+ * @param {*} rowIndex index của dòng trong bảng
+ */
+export const checkDataInputChange = function(rootChangeFieldName, dataInputBeforeChange, dataInput){
+    if(Object.keys(dataInput).length == 0){
+        return true;
+    }
+    for(let controlName in dataInput){
+        if(controlName == rootChangeFieldName){
+            return true;
+        }
+        if(dataInput[controlName] != null &&  typeof dataInput[controlName] == 'object'){
+            for (let index = 0; index < dataInput[controlName].length; index++) {
+                let cellValue = dataInput[controlName][index];
+                if(!dataInputBeforeChange[controlName]){
+                    continue;
+                }
+                if(!dataInputBeforeChange[controlName][index]){
+                    return true;
+                }
+                if(dataInputBeforeChange[controlName][index] != cellValue){
+                    return true;
+                }
+            }
+        }
+        else{
+            if(dataInputBeforeChange[controlName] != dataInput[controlName]){
+                return true;
+            }
+        }
+    }
+    return false;
 }

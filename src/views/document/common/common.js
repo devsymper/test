@@ -26,7 +26,7 @@ const getControlInstanceFromStore = function(instance, controlName) {
         return false
     }
 }
-const minimizeDataAfterRunFormula = function(rs) {
+export const minimizeDataAfterRunFormula = function(rs) {
     let value = "";
     if(!rs.server){
         let data = rs.data; 
@@ -227,6 +227,5 @@ export {
     getListInputInDocument,
     checkNameControl,
     checkTitleControl,
-    mapTypeToEffectedControl,
-    minimizeDataAfterRunFormula
+    mapTypeToEffectedControl
 }
