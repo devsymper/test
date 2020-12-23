@@ -42,7 +42,7 @@ const setListTaskInProcessSub = (state, listTaskInProcessSub) => {
     Vue.set(state, 'listTaskInProcessSub', listTaskInProcessSub);
 }
 const setTaskHistory = (state, params) => {
-    Vue.set(state.taskHistory, params.id, params.data);
+    Vue.set(state,'currentTaskHistory', params.data);
 }
 
 const setListTaskDoneInProcessInstance = (state, listTaskDoneInProcessInstance) => {

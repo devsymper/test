@@ -3,6 +3,7 @@
         <DocumentSubmit 
             v-if="showDoTaskComponent && (action == 'submit' || action=='update')"
             ref="submitComponent"
+			:showSnackbarSuccess="false"
             :docId="Number(docId)"
             :workflowVariable="workflowVariable"
             :showSubmitButton="false"
@@ -97,6 +98,7 @@
                 <DocumentSubmit 
                     v-if="showUpdateSubmitedDocument"
                     class="bg-white"
+					:showSnackbarSuccess="false"
                     ref="panelUpdateSubmitedDocument"
                     :docId="Number(docId)"
                     :appId="Number(appId)"

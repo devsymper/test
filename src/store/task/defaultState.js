@@ -16,7 +16,8 @@ const defaultState = {
     listNodeInProcess:[],
 	variableOfProcess:[],
 	taskHistory:{},
-	currentTaskId: ""
+	currentTaskId: "",
+	currentTaskHistory: []
 
 
 };

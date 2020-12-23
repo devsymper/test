@@ -57,7 +57,7 @@ export const taskApi = {
 							}
 						},{
 							"term": {
-								"logObjectId": '65ad4f51'
+								"logObjectId.keyword": id
 							}
 						}
 					]

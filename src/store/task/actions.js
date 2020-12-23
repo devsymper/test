@@ -23,19 +23,15 @@ const removeFileAttachToStore = async(context, id) => {
     context.commit('removeFileAttachToStore', id);
 }
 const getTaskHistory = async(context, id) => {
-	debugger
 	context.commit('setCurrentId', id);
-	if(!context.state.taskHistory.id){
-		let arr = id.split("-")
+	if(!context.state.taskHistory[id]){
 		let data = []
-		taskApi.getHistoryTask(arr[0]).then(res=>{
-			if(res.status == 200){
-				data = res.data
-				context.commit('setTaskHistory', {data:data, id: id });
-				debugger
-			}
-		}).catch(err=>{
-		})
+		let res = await taskApi.getHistoryTask(id)
+		if(res.status == 200){
+			data = res.data
+		}
+		context.commit('setTaskHistory', {data:data, id: id });
+
 	}
 }
 

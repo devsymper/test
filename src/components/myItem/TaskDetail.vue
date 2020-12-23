@@ -290,7 +290,13 @@ export default {
             deep: true,
             immediate:true,
             handler(valueAfter){
+				this.isShowSidebar = false
 				this.checkActionOfUser(valueAfter)
+				if(this.checkShowEditRecord()){
+					this.rightAction = 120
+				}else{
+					this.rightAction = 90
+				}
             }
         },
         taskBreadcrumb:function(){
@@ -825,10 +831,9 @@ export default {
 				"variables": varsForBackend.vars,
 			}
 			let res =  await this.submitTask(taskData);
+			this.reloadDetailTask();
 			if (this.reload) {
 				this.$emit('task-submited', res);
-			}else{
-				this.reloadDetailTask();
 			}
             // }
         },
@@ -869,15 +874,16 @@ export default {
 					color:"blue"
 					}
 				]
-			}else if(self.taskAction == 'undefined' ){
-                self.taskActionBtns = [
-                    {
-                        text:"Complete",
-                        value:"complete",
-                        color:"green"
-                    }
-                ]
-            }
+			}
+			// else if(self.taskAction == 'undefined' ){
+            //     self.taskActionBtns = [
+            //         {
+            //             text:"Complete",
+            //             value:"complete",
+            //             color:"green"
+            //         }
+            //     ]
+            // }
             self.changeTaskDetailInfo(self.taskInfo.action.parameter.taskId);
         },
         async reloadDetailTask(){
