@@ -1,15 +1,14 @@
-import sDocument from './../../../store/document'
-import store from './../../../store'
-import ClientSQLManager from "./clientSQLManager.js";
-import {
-    formulasApi
-} from "./../../../api/Formulas";
-import {
-    orgchartApi
-} from "./../../../api/orgchart";
-import Util from "./util";
-import FormulasEvent from "./formulasEvent";
+import { workerStore } from '@/worker/document/submit/WorkerStateManagement';
 
+import ClientSQLManager from "./clientSQLManager.js";
+// import {
+//     formulasApi
+// } from "./../../../api/Formulas";
+// import {
+//     orgchartApi
+// } from "./../../../api/orgchart";
+import Util from "./util";
+import FormulasEvent from './formulasEvent.js';
 const BUILD_IN_FUNCTION = ['TODAY', 'BEGIN_WEEK', 'END_WEEK', 'BEGIN_MONTH', 'END_MONTH',
     'BEGIN_YEAR', 'END_YEAR', 'TIMESTAMP', 'PARENT_WORKFLOW', 'CURRENT_WORKFLOW',
     'CURRENT_USER_ID',
@@ -21,31 +20,32 @@ const BUILD_IN_FUNCTION = ['TODAY', 'BEGIN_WEEK', 'END_WEEK', 'BEGIN_MONTH', 'EN
 ]
 export default class Formulas extends FormulasEvent{
     constructor(keyInstance, formulas, type) {
-        super(keyInstance, formulas, type);
-        this.inputControl = this.setInputControl();
-        this.inputFromDatasets = this.getDatasetEffectedFormula();
-        this.refFormulas = this.getReferenceFormulas();
-        this.orgChartFormulas = this.getOrgChartFormulas();
-        this.localFormulas = this.getLocalFormulas();
-        this.inputForLocalFormulas = this.setInputLocal();
-    }
-
-    /**
-     * Hàm loại bỏ comment khỏi công thức
-     */
-    clearCommentInFormula(formula){
-        let newFormula = formula.replace(/(--.*)|(((\/\*)+?[\w\W]+?(\*\/)+))/gm,"");
-        return newFormula;
-    }
+            super(keyInstance, formulas, type)
+            /**
+             * chỉ ra đang ở instance của view submit nào, (trường hợp có sub form thì có 2 key)
+             */
+          
+            this.inputControl = this.setInputControl();
+            this.inputFromDatasets = this.getDatasetEffectedFormula();
+            this.refFormulas = this.getReferenceFormulas();
+            this.orgChartFormulas = this.getOrgChartFormulas();
+            this.localFormulas = this.getLocalFormulas();
+            this.inputForLocalFormulas = this.setInputLocal();
+        }
+        /**
+         * Hàm xử lí thay các giá trị của input đầu vào để thực hiện truy vấn
+         * @param {} dataInput 
+         */
     checkExistFormulas() {
-        if (this.formulas == "" || this.formulas == false || this.formulas == undefined) {
-            return false;
-        } else return true;
-    }
-    /**
-     * Hàm xử lí việc thay các giá trị vào {control} và tách công thức server để chạy trước nếu có
-     * @param {Object} dataInput 
-     */
+
+            if (this.formulas == "" || this.formulas == false || this.formulas == undefined) {
+                return false;
+            } else return true;
+        }
+        /**
+         * Hàm xử lí việc thay các giá trị vào {control} và tách công thức server để chạy trước nếu có
+         * @param {Object} dataInput 
+         */
     async handleBeforeRunFormulas(dataInput, inject = "") {
         if (Object.keys(dataInput).length == 0) {
             dataInput = false;
@@ -116,49 +116,45 @@ export default class Formulas extends FormulasEvent{
         return formulas
     }
     async handleRunOrgChartFormulas(formulas, dataInput) {
-        let listOrgChartFormulas = this.orgChartFormulas;
-        if (listOrgChartFormulas != null && listOrgChartFormulas.length > 0) {
-            let item = {};
-            for (let i = 0; i < listOrgChartFormulas.length; i++) {
-                let reverseData = undefined
-                if (sDocument.state.submit[this.keyInstance]) {
-                    reverseData = sDocument.state.submit[this.keyInstance].orgchartTableSqlName[listOrgChartFormulas[i].trim()];
-                }
-                if (reverseData == undefined) {
-                    let orgChartFormulas = listOrgChartFormulas[i].trim();
-                    orgChartFormulas = orgChartFormulas.replace(/(role|ROLE)\s*\(/g, '');
-                    orgChartFormulas = orgChartFormulas.substring(0, orgChartFormulas.length - 1);
-                    if (Object.keys(dataInput).length == 0) {
-                        dataInput = false;
+            let listOrgChartFormulas = this.orgChartFormulas;
+            if (listOrgChartFormulas != null && listOrgChartFormulas.length > 0) {
+                let item = {};
+                for (let i = 0; i < listOrgChartFormulas.length; i++) {
+                    let reverseData = undefined
+                    if (workerStore['submit'][this.keyInstance]) {
+                        reverseData = workerStore['submit'][this.keyInstance].orgchartTableSqlName[listOrgChartFormulas[i].trim()];
                     }
-                    orgChartFormulas = this.replaceParamsToData(dataInput, orgChartFormulas)
-                    let res = await this.queryOrgchart(orgChartFormulas);
-                    let beforeStr = this.checkBeforeReferenceFormulas(formulas, listOrgChartFormulas[i].trim());
-                    if (!beforeStr) {
-                        return { isStop: true, data: res.data.fullInfo };
-                    } else {
-                        reverseData = await this.reverseDataToFormulas(res.data.fullInfo, beforeStr.trim().toLowerCase());
-                        item[listOrgChartFormulas[i].trim()] = reverseData;
-                        store.commit("document/addToDocumentSubmitStore", {
-                            key: 'orgchartTableSqlName',
-                            value: item,
-                            instance: this.keyInstance
-                        });
+                    if (reverseData == undefined) {
+                        let orgChartFormulas = listOrgChartFormulas[i].trim();
+                        orgChartFormulas = orgChartFormulas.replace(/(role|ROLE)\s*\(/g, '');
+                        orgChartFormulas = orgChartFormulas.substring(0, orgChartFormulas.length - 1);
+                        if (Object.keys(dataInput).length == 0) {
+                            dataInput = false;
+                        }
+                        orgChartFormulas = this.replaceParamsToData(dataInput, orgChartFormulas)
+                        let res = await this.queryOrgchart(orgChartFormulas);
+                        let beforeStr = this.checkBeforeReferenceFormulas(formulas, listOrgChartFormulas[i].trim());
+                        if (!beforeStr) {
+                            return { isStop: true, data: res.data.fullInfo };
+                        } else {
+                            reverseData = await this.reverseDataToFormulas(res.data.fullInfo, beforeStr.trim().toLowerCase());
+                            item[listOrgChartFormulas[i].trim()] = reverseData;
+                            workerStore['submit'][this.keyInstance]['orgchartTableSqlName'] = item;
+                        }
                     }
-                }
-                formulas = formulas.replace(listOrgChartFormulas[i].trim(), reverseData);
+                    formulas = formulas.replace(listOrgChartFormulas[i].trim(), reverseData);
 
 
+                }
             }
+            return formulas;
         }
-        return formulas;
-    }
-    /**
-     * Hàm xử lí chạy formulas cho các cột trong table 
-     * 1. chạy các công thức local() nếu có và thực hiện tạo ra 1 params mới thay thế cho công thức cùng data input của nó
-     * 
-     * @param {*} dataInput 
-     */
+        /**
+         * Hàm xử lí chạy formulas cho các cột trong table 
+         * 1. chạy các công thức local() nếu có và thực hiện tạo ra 1 params mới thay thế cho công thức cùng data input của nó
+         * 
+         * @param {*} dataInput 
+         */
     async getDataMultiple(dataInput) {
         let formulas = this.formulas;
         let listLocal = this.localFormulas;
@@ -195,12 +191,12 @@ export default class Formulas extends FormulasEvent{
                 syql = syql.replace(/(REF|ref)\s*\(/g, '');
                 syql = syql.substring(0, syql.length - 1);
                 syql = syql.replace(/\r?\n|\r/g, ' ');
-                syql = this.clearCommentInFormula(syql);
                 let dataPost = {
                     formula: syql,
                     dataInput: JSON.stringify(dataInput)
                 };
-                return formulasApi.getMultiData(dataPost);
+                return {}
+                // return formulasApi.getMultiData(dataPost);
             }
         } else {
             let dataRes = {};
@@ -413,10 +409,10 @@ export default class Formulas extends FormulasEvent{
     // Hàm kiểm tra các tham số của workflow và thay thế lại giá trị tương ứng
     // hàm này thực hiện khi chạy quy trình
     replaceWorkflowParams(formulas) {
-        if (!sDocument.state.submit[this.keyInstance]) {
+        if (!workerStore['submit'][this.keyInstance]) {
             return formulas;
         }
-        let workflowVariable = sDocument.state.submit[this.keyInstance].workflowVariable;
+        let workflowVariable = workerStore['submit'][this.keyInstance].workflowVariable;
         for (let param in workflowVariable) {
             let regex = new RegExp("{" + param + "}", "g");
             let value = workflowVariable[param];
@@ -536,19 +532,18 @@ export default class Formulas extends FormulasEvent{
     runSyql(formulas, dataInput = false) {
         let syql = formulas;
         syql = syql.replace(/\r?\n|\r/g, ' ');
-        syql = this.clearCommentInFormula(syql);
         let dataPost = {
             formula: syql
         };
         if (dataInput != false) {
             dataPost['data_input'] = JSON.stringify(dataInput);
         }
-        return formulasApi.execute(dataPost);
+        return {}
+        // return formulasApi.execute(dataPost);
     }
     queryOrgchart(formulas) {
             let syql = formulas;
             syql = syql.replace(/\r?\n|\r/g, ' ');
-            syql = this.clearCommentInFormula(syql);
             let dataPost = {
                 query: syql
             };
@@ -562,7 +557,6 @@ export default class Formulas extends FormulasEvent{
             sql = sql.replace('SELECT ', 'SELECT ' + inject + ',');
             sql = sql.replace('select ', 'select ' + inject + ',');
         }
-        sql = this.clearCommentInFormula(sql);
         if (returnPromise) {
             return new Promise((resolve, reject) => {
                 try {
@@ -578,8 +572,8 @@ export default class Formulas extends FormulasEvent{
     }
 
     getDataSubmitInStore() {
-        if (sDocument.state.submit.hasOwnProperty(this.keyInstance)) {
-            return sDocument.state.submit[this.keyInstance].listInputInDocument;
+        if ( workerStore['submit'].hasOwnProperty(this.keyInstance)) {
+            return workerStore['submit'][this.keyInstance]['inputData']
         } else {
             return false
         }
@@ -606,7 +600,7 @@ export default class Formulas extends FormulasEvent{
                             col = col.replace(/\)/g, "");
                             col = col.replace(/\(/g, "");
                             col = col.trim();
-                            if (listInput != false) {
+                            if (listInput) {
                                 if (Object.keys(listInput).includes(col)) {
                                     allInput[col] = true;
                                 }
@@ -669,16 +663,16 @@ export default class Formulas extends FormulasEvent{
             return {};
         }
         let inputDatasets = {};
-        let allMappingDatasets = sDocument.state.submit[this.keyInstance].listControlMappingDatasets;
-        let table = this.detectTableQuery();
-        for (let index = 0; index < table.length; index++) {
-            const tableName = table[index];
-            for (let dataflowName in allMappingDatasets) {
-                if (allMappingDatasets[dataflowName].includes(tableName)) {
-                    inputDatasets[dataflowName] = true;
-                }
-            }
-        }
+        // let allMappingDatasets =  workerStore['submit'][this.keyInstance].listControlMappingDatasets;
+        // let table = this.detectTableQuery();
+        // for (let index = 0; index < table.length; index++) {
+        //     const tableName = table[index];
+        //     for (let dataflowName in allMappingDatasets) {
+        //         if (allMappingDatasets[dataflowName].includes(tableName)) {
+        //             inputDatasets[dataflowName] = true;
+        //         }
+        //     }
+        // }
         return inputDatasets;
     }
     getInputControl() {
@@ -692,7 +686,7 @@ export default class Formulas extends FormulasEvent{
         let inputControl = this.getInputControl();
         let dataInput = {};
         for (let inputControlName in inputControl) {
-            let valueInputControlItem = sDocument.state.submit[this.keyInstance].listInputInDocument[inputControlName].value;
+            let valueInputControlItem = inputControl[inputControlName];
             dataInput[inputControlName] = valueInputControlItem;
         }
         return dataInput;

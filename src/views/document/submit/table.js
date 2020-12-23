@@ -2,7 +2,7 @@ import Util from './util'
 import Handsontable from 'handsontable';
 import sDocument from './../../../store/document'
 import store from './../../../store'
-import ClientSQLManager from './clientSQLManager';
+// import ClientSQLManager from './clientSQLManager';
 import { checkControlPropertyProp, getControlType, getSDocumentSubmitStore,getControlInstanceFromStore, minimizeDataAfterRunFormula } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
@@ -232,6 +232,7 @@ export default class Table {
         this.currentControlSelected = null;
         this.cellSelected = null;
         this.listAutoCompleteColumns = {};
+        this.formulasWorker = null;
         this.event = {
             afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
                 store.commit("document/addToDocumentSubmitStore", {
@@ -534,6 +535,9 @@ export default class Table {
         }
         listTableInstance[this.tableName] = this;
     }
+    setFormulasWorker(formulasWorker){
+        this.formulasWorker = formulasWorker;
+    }
 
     checkDateFormated(value, controlIns){
         if(value){
@@ -613,7 +617,12 @@ export default class Table {
                     });
                 }
             }
-            ClientSQLManager.deleteRow(this.keyInstance, this.tableName, 'where s_table_id_sql_lite = ' + rowId);
+            this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+                {
+                    func:'deleteRow',condition:'where s_table_id_sql_lite = ' + rowId,keyInstance:this.keyInstance, tableName: this.tableName
+                }
+            })
+            // ClientSQLManager.deleteRow(this.keyInstance, this.tableName, 'where s_table_id_sql_lite = ' + rowId);
             this.tableInstance.alter('remove_row', cellMeta[0][0], 1);
         }
     }
@@ -676,10 +685,31 @@ export default class Table {
                 let id = Date.now();
                 rowData[rowData.length - 1] = id;
                 thisObj.tableInstance.setDataAtCell(colChange[0], rowData.length - 1, id);
-                await ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, rowData, true);
+                this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+                    {
+                        func:'insertRow',
+                        columns:columns, 
+                        rowData:rowData,
+                        keyInstance:thisObj.keyInstance, 
+                        tableName: thisObj.tableName,
+                        isPromise:false
+                    }
+                })
+                // await ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, rowData, true);
             } else {
-                await ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, colChange[1], colChange[3],
-                    'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1], true);
+                this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+                    {
+                        func:'editRow',
+                        columns:colChange[1], 
+                        value:colChange[3],
+                        condition:'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1],
+                        keyInstance:thisObj.keyInstance, 
+                        tableName: thisObj.tableName,
+                        isPromise:true
+                    }
+                })
+                // await ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, colChange[1], colChange[3],
+                    // 'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1], true);
             }
         }
         let rowIndex = 'all';
@@ -708,8 +738,18 @@ export default class Table {
             thisObj.controlNameAfterChange = controlName
             thisObj.tableInstance.setDataAtCell(changes[0][0], currentRowData.length - 1, id);
         } else {
-            await ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[0][3],
-                'WHERE s_table_id_sql_lite = ' + currentRowData[currentRowData.length - 1], true)
+            this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+                {
+                    func:'editRow',
+                    columns:controlName, 
+                    value:changes[0][3],
+                    condition:'WHERE s_table_id_sql_lite = ' + currentRowData[currentRowData.length - 1],
+                    keyInstance:thisObj.keyInstance, 
+                    tableName: thisObj.tableName
+                }
+            })
+            // await ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, controlName, changes[0][3],
+            //     'WHERE s_table_id_sql_lite = ' + currentRowData[currentRowData.length - 1], true)
             thisObj.handlerCheckEffectedControlInTable(controlName, changes[0][0]);
 
         }
@@ -1267,7 +1307,16 @@ export default class Table {
                         let cellValue = colData[index];
                         if(!cellValue){
                             vls.push([index, 's_table_id_sql_lite', id]);
-                            ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, ['s_table_id_sql_lite'], [id]);
+                            this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+                                {
+                                    func:'insertRow',
+                                    columns:['s_table_id_sql_lite'], 
+                                    rowData:[id],
+                                    keyInstance:thisObj.keyInstance, 
+                                    tableName: thisObj.tableName
+                                }
+                            })
+                            // ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, ['s_table_id_sql_lite'], [id]);
                         }
                     }
                     thisObj.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
@@ -1378,11 +1427,19 @@ export default class Table {
     // Hàm set data cho table
     // hàm gọi sau khi chạy công thức 
     setData(vls, dateFormat = true) {
-        try {
-            ClientSQLManager.delete(this.keyInstance, this.tableName, false);            
-        } catch (error) {
-            console.warn(error);
-        }
+        // try {
+            
+        //      ClientSQLManager.delete(this.keyInstance, this.tableName, false);            
+        // } catch (error) {
+        //     console.warn(error);
+        // }
+        this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+            {
+                func:'delete',
+                keyInstance:this.keyInstance, 
+                tableName: this.tableName,
+            }
+        })
         if (vls != false) {
             let data = vls;
             let dataToStore = {};
@@ -1413,7 +1470,16 @@ export default class Table {
                 }
                 dataToSqlLite.push('(' + rowData.join() + ')');
             }
-            ClientSQLManager.insertDataToTable(this.keyInstance, this.tableName, columnInsert.join(), dataToSqlLite.join())
+            this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+                {
+                    func:'insertAll',
+                    keyInstance:this.keyInstance, 
+                    tableName: this.tableName,
+                    columns:columnInsert.join(),
+                    allData:dataToSqlLite.join()
+                }
+            })
+            // ClientSQLManager.insertDataToTable(this.keyInstance, this.tableName, columnInsert.join(), dataToSqlLite.join())
             for (let controlName in dataToStore) {
                 store.commit("document/updateListInputInDocument", {
                     controlName: controlName,
@@ -1471,7 +1537,17 @@ export default class Table {
             data.push([''])
         }
         if (!this.checkDetailView()) {
-            ClientSQLManager.insertRow(this.keyInstance, this.tableName, ['s_table_id_sql_lite'], [id], false);
+            this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+                {
+                    func:'insertRow',
+                    columns:['s_table_id_sql_lite'], 
+                    rowData:[id],
+                    keyInstance:this.keyInstance, 
+                    tableName: this.tableName,
+                    isPromise:false
+                }
+            })
+            // ClientSQLManager.insertRow(this.keyInstance, this.tableName, ['s_table_id_sql_lite'], [id], false);
         }
         return data;
     }
@@ -1492,7 +1568,15 @@ export default class Table {
             return str
         }, "")
         columns = columns.substring(0, columns.length - 1);
-        await ClientSQLManager.createTable(this.keyInstance, this.tableName, columns, "", "");
+        this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+            {
+                func:'createTable',
+                columns:columns, 
+                keyInstance:this.keyInstance, 
+                tableName: this.tableName,
+            }
+        })
+        // await ClientSQLManager.createTable(this.keyInstance, this.tableName, columns, "", "");
 
     }
 

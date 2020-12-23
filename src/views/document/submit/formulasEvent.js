@@ -1,4 +1,4 @@
-import {getControlInstanceFromStore} from './../common/common'
+// import {getControlInstanceFromStore} from './../common/common'
 export default class FormulasEvent{
     constructor(keyInstance, formulas, type) {
         /**
@@ -16,27 +16,27 @@ export default class FormulasEvent{
      * dataInput : {controlName : value}
      * rowIndex là lấy cell ở row hiện tại nếu là trong table
      */
-    getDataInputFormula(listInputInDocument, extraData = false){
-        let inputControl = this.getInputControl();
-        let dataInput = {};
-        for(let inputControlName in inputControl){
-            if(inputControlName == extraData.controlName){
-                dataInput[inputControlName] = extraData.e.target.value;
-            }
-            else{
-                if(listInputInDocument.hasOwnProperty(inputControlName)){
-                    let controlIns = getControlInstanceFromStore(this.keyInstance,inputControlName)
-                    let valueInputControl = controlIns.value;
-                    if(controlIns.type == 'inputFilter'){
-                        valueInputControl = valueInputControl.split(',')
-                    }
-                    if(controlIns.type == 'time'){
-                        valueInputControl = controlIns.convertTimeToStandard(valueInputControl)
-                    }
-                    dataInput[inputControlName] = valueInputControl;
-                }
-            }
-        }
-        return dataInput;
-    }
+    // getDataInputFormulas(listInputInDocument, extraData = false){
+    //     let inputControl = this.getInputControl();
+    //     let dataInput = {};
+    //     for(let inputControlName in inputControl){
+    //         if(inputControlName == extraData.controlName){
+    //             dataInput[inputControlName] = extraData.e.target.value;
+    //         }
+    //         else{
+    //             if(listInputInDocument.hasOwnProperty(inputControlName)){
+    //                 // let controlIns = getControlInstanceFromStore(this.keyInstance,inputControlName)
+    //                 // let valueInputControl = controlIns.value;
+    //                 // if(controlIns.type == 'inputFilter'){
+    //                 //     valueInputControl = valueInputControl.split(',')
+    //                 // }
+    //                 // if(controlIns.type == 'time'){
+    //                 //     valueInputControl = controlIns.convertTimeToStandard(valueInputControl)
+    //                 // }
+    //                 dataInput[inputControlName] = valueInputControl;
+    //             }
+    //         }
+    //     }
+    //     return dataInput;
+    // }
 }
