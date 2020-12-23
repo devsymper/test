@@ -1,12 +1,12 @@
 import { workerStore } from '@/worker/document/submit/WorkerStateManagement';
 
 import ClientSQLManager from "./clientSQLManager.js";
-// import {
-//     formulasApi
-// } from "./../../../api/Formulas";
-// import {
-//     orgchartApi
-// } from "./../../../api/orgchart";
+import {
+    formulasApi
+} from "./../../../api/Formulas";
+import {
+    orgchartApi
+} from "./../../../api/orgchart";
 import Util from "./util";
 import FormulasEvent from './formulasEvent.js';
 const BUILD_IN_FUNCTION = ['TODAY', 'BEGIN_WEEK', 'END_WEEK', 'BEGIN_MONTH', 'END_MONTH',
@@ -37,61 +37,71 @@ export default class Formulas extends FormulasEvent{
          * @param {} dataInput 
          */
     checkExistFormulas() {
-
-            if (this.formulas == "" || this.formulas == false || this.formulas == undefined) {
-                return false;
-            } else return true;
-        }
-        /**
-         * Hàm xử lí việc thay các giá trị vào {control} và tách công thức server để chạy trước nếu có
-         * @param {Object} dataInput 
-         */
-    async handleBeforeRunFormulas(dataInput, inject = "") {
-        if (Object.keys(dataInput).length == 0) {
-            dataInput = false;
-        }
-        var formulas = this.formulas;
-        formulas = await this.handleRunLocalFormulas(formulas, dataInput);
-        formulas = await this.handleRunOrgChartFormulas(formulas, dataInput);
-        if (typeof formulas == 'object' && formulas.isStop) {
-            return {
-                server: true,
-                data: { data: formulas.data }
-            };
-        }
-        let listSyql = this.getReferenceFormulas(formulas);
-        if (listSyql != null && listSyql.length > 0) {
-            for (let i = 0; i < listSyql.length; i++) {
-                let syql = listSyql[i].trim();
-                syql = syql.replace(/(REF|ref)\s*\(/g, '');
-                syql = syql.substring(0, syql.length - 1);
-                let res = await this.runSyql(syql, dataInput);
-                let beforeStr = this.checkBeforeReferenceFormulas(formulas, listSyql[i].trim());
-                if (!beforeStr) {
-                    return {
+        if (this.formulas == "" || this.formulas == false || this.formulas == undefined) {
+            return false;
+        } else return true;
+    }
+    /**
+     * Hàm xử lí việc thay các giá trị vào {control} và tách công thức server để chạy trước nếu có
+     * @param {Object} dataInput 
+     */
+    handleBeforeRunFormulas(dataInput, inject = "") {
+        return new Promise(async (resolve, reject) => {
+            try {
+                if (Object.keys(dataInput).length == 0) {
+                    dataInput = false;
+                }
+                var formulas = this.formulas;
+                formulas = await this.handleRunLocalFormulas(formulas, dataInput);
+                formulas = await this.handleRunOrgChartFormulas(formulas, dataInput);
+                if (typeof formulas == 'object' && formulas.isStop) {
+                    let data = {
                         server: true,
-                        data: res.data
+                        data: { data: formulas.data }
                     };
-                } else {
-                    let reverseData = await this.reverseDataToFormulas(res.data, beforeStr.trim().toLowerCase());
+                    resolve(data);
+                }
+                let listSyql = this.getReferenceFormulas(formulas);
+                if (listSyql != null && listSyql.length > 0) {
+                    for (let i = 0; i < listSyql.length; i++) {
+                        let syql = listSyql[i].trim();
+                        syql = syql.replace(/(REF|ref)\s*\(/g, '');
+                        syql = syql.substring(0, syql.length - 1);
+                        let res = await this.runSyql(syql, dataInput);
+                        let beforeStr = this.checkBeforeReferenceFormulas(formulas, listSyql[i].trim());
+                        if (!beforeStr) {
+                            let data = {
+                                server: true,
+                                data: res.data
+                            };
+                            resolve(data);
+                        } else {
+                            let reverseData = await this.reverseDataToFormulas(res.data, beforeStr.trim().toLowerCase());
 
-                    formulas = formulas.replace(listSyql[i], reverseData);
-                }
-                if (i == listSyql.length - 1) {
-                    let formulas = this.replaceParamsToData(dataInput, formulas);
-                    return {
+                            formulas = formulas.replace(listSyql[i], reverseData);
+                        }
+                        if (i == listSyql.length - 1) {
+                            let formulas = this.replaceParamsToData(dataInput, formulas);
+                            let data = {
+                                server: false,
+                                data: this.runSQLLiteFormulas(formulas)
+                            };
+                            resolve(data);
+                        }
+                    }
+                } else {
+                    let sql = this.replaceParamsToData(dataInput, formulas);
+                    let data = {
                         server: false,
-                        data: this.runSQLLiteFormulas(formulas)
+                        data: this.runSQLLiteFormulas(sql, false, inject)
                     };
+                    resolve(data);
                 }
+            } catch (error) {
+                reject(error);
             }
-        } else {
-            let sql = this.replaceParamsToData(dataInput, formulas);
-            return {
-                server: false,
-                data: this.runSQLLiteFormulas(sql, false, inject)
-            };
-        }
+        });
+        
 
     }
 
@@ -195,8 +205,7 @@ export default class Formulas extends FormulasEvent{
                     formula: syql,
                     dataInput: JSON.stringify(dataInput)
                 };
-                return {}
-                // return formulasApi.getMultiData(dataPost);
+                return formulasApi.getMultiData(dataPost);
             }
         } else {
             let dataRes = {};
@@ -369,16 +378,12 @@ export default class Formulas extends FormulasEvent{
     replaceParamsToData(dataInput, formulas) {
         // thay thế các tham số của workflow 
         formulas = this.replaceWorkflowParams(formulas);
-
         if (Object.keys(dataInput).length == 0 || dataInput == false) {
             return formulas;
         }
-        let listControlInDoc = {}
-        try {
-            listControlInDoc = this.getDataSubmitInStore();
-        } catch (error) {
-            console.log(error);
-        }
+        let listControlInDoc = this.getListControl();
+        console.log(listControlInDoc,'listControlInDoclistControlInDoc');
+        console.log(dataInput,'listControlInDoclistControlInDoc');
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
             let value = dataInput[controlName];
@@ -437,26 +442,26 @@ export default class Formulas extends FormulasEvent{
      * @param {*} alias 
      */
     autocompleteDetectAliasControl(alias = true) {
-            let formulas = this.getFormulas();
-            formulas = formulas.replace(/\r?\n|\r/g, ' ');
-            let selectColumn = formulas.match(/(?<=select|SELECT).*(?=from|FROM)/gi);
-            if (selectColumn == null) {
-                return 'column1';
-            }
-            let control = selectColumn[0].match(/([a-zA-Z0-9_]+)\s+(as|AS)\s+(([a-zA-Z0-9_]+))/gi);
-            if (control == null) {
-                return "column1";
-            }
-            let controlAlias = control[0].split(/(as|AS)/);
-            if (alias && controlAlias.length > 1) {
-                return controlAlias[2].trim();
-            } else {
-                return controlAlias[0].trim();
-            }
+        let formulas = this.getFormulas();
+        formulas = formulas.replace(/\r?\n|\r/g, ' ');
+        let selectColumn = formulas.match(/(?<=select|SELECT).*(?=from|FROM)/gi);
+        if (selectColumn == null) {
+            return 'column1';
         }
-        /**
-         * Hàm chỉ ra table trong công thức
-         */
+        let control = selectColumn[0].match(/([a-zA-Z0-9_]+)\s+(as|AS)\s+(([a-zA-Z0-9_]+))/gi);
+        if (control == null) {
+            return "column1";
+        }
+        let controlAlias = control[0].split(/(as|AS)/);
+        if (alias && controlAlias.length > 1) {
+            return controlAlias[2].trim();
+        } else {
+            return controlAlias[0].trim();
+        }
+    }
+    /**
+     * Hàm chỉ ra table trong công thức
+     */
     detectTableQuery() {
         let table = this.formulas.match(/(from|FROM)\s+(\w+\.)?(\w+)(?=\s+as)?(\s+\w+\n+)?/gim);
         if (table == null) {
@@ -538,8 +543,7 @@ export default class Formulas extends FormulasEvent{
         if (dataInput != false) {
             dataPost['data_input'] = JSON.stringify(dataInput);
         }
-        return {}
-        // return formulasApi.execute(dataPost);
+        return formulasApi.execute(dataPost);
     }
     queryOrgchart(formulas) {
             let syql = formulas;
@@ -571,7 +575,7 @@ export default class Formulas extends FormulasEvent{
         }
     }
 
-    getDataSubmitInStore() {
+    getListControl() {
         if ( workerStore['submit'].hasOwnProperty(this.keyInstance)) {
             return workerStore['submit'][this.keyInstance]['inputData']
         } else {
@@ -589,7 +593,7 @@ export default class Formulas extends FormulasEvent{
             if (this.checkExistFormulas()) {
                 let allRelateName = this.formulas.match(/{[A-Za-z0-9_]+}/gi);
                 let colSelect = this.getColumnsSelect(this.formulas);
-                let listInput = this.getDataSubmitInStore();
+                let listInput = this.getListControl();
                 if (colSelect && !/\*/.test(colSelect[0])) {
                     let colFromOtherTable = colSelect[0];
                     colFromOtherTable = colFromOtherTable.replace(/distinct|DISTINCT/, "");
@@ -676,18 +680,45 @@ export default class Formulas extends FormulasEvent{
         return inputDatasets;
     }
     getInputControl() {
-            return this.inputControl;
-        }
-        /** 
-         * Hàm lấy dữ liệu của các control trong store để chuân bị cho việc run formulas
-         * dataInput : {controlName : value}
-         */
-    getDataInputFormulas() {
+        return this.inputControl;
+    }
+    /** 
+     * Hàm lấy dữ liệu của các control đầu vào để chuân bị cho việc run formulas
+     * dataInput : {controlName : value}
+     */
+    getDataInputFormula(rowIndex = null, extraData = null, listInput = null) {
         let inputControl = this.getInputControl();
+        if(!listInput){
+            listInput = this.getListControl();
+        }
         let dataInput = {};
+        // if(extraData){
+        //     debugger
+        // }
         for (let inputControlName in inputControl) {
-            let valueInputControlItem = inputControl[inputControlName];
-            dataInput[inputControlName] = valueInputControlItem;
+            if(extraData && extraData[inputControlName]){
+                dataInput[inputControlName] = extraData[inputControlName];
+            }
+            else{
+                if(listInput.hasOwnProperty(inputControlName)){
+                    let controlIns = listInput[inputControlName];
+                    let valueInputControl = controlIns.value;
+                    if(controlIns.type == 'inputFilter'){
+                        valueInputControl = valueInputControl.split(',')
+                    }
+                    if(controlIns.type == 'time'){
+                        valueInputControl = controlIns.convertTimeToStandard(valueInputControl)
+                    }
+                    dataInput[inputControlName] = valueInputControl;
+                }
+            }
+        }
+        if(rowIndex != null){
+            for(let controlName in dataInput){
+                if(Array.isArray(dataInput[controlName])){
+                    dataInput[controlName] = dataInput[controlName][rowIndex];
+                }
+            }
         }
         return dataInput;
     }

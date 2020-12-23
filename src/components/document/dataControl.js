@@ -258,12 +258,6 @@ function search (controlCheck, effectedControl, mapControlEffected) {
     }
 }
 
-/**
- * Hàm lấy các control đầu vào là các cột của table sqllite
- */
-function detectControlEffectedInTableInDoc(mapControlEffected,name,formulasInstance){
-    formulasInstance.detectControlInTable(mapControlEffected,name,formulasInstance.formulas,this.sDocumentSubmit.listInputInDocument)  
-}
 
 export const minimizeDataAfterRunFormula = function(rs) {
     let value = "";

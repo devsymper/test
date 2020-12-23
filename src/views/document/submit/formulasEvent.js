@@ -16,7 +16,7 @@ export default class FormulasEvent{
      * dataInput : {controlName : value}
      * rowIndex là lấy cell ở row hiện tại nếu là trong table
      */
-    // getDataInputFormulas(listInputInDocument, extraData = false){
+    //  s(listInputInDocument, extraData = false){
     //     let inputControl = this.getInputControl();
     //     let dataInput = {};
     //     for(let inputControlName in inputControl){
@@ -25,14 +25,14 @@ export default class FormulasEvent{
     //         }
     //         else{
     //             if(listInputInDocument.hasOwnProperty(inputControlName)){
-    //                 // let controlIns = getControlInstanceFromStore(this.keyInstance,inputControlName)
-    //                 // let valueInputControl = controlIns.value;
-    //                 // if(controlIns.type == 'inputFilter'){
-    //                 //     valueInputControl = valueInputControl.split(',')
-    //                 // }
-    //                 // if(controlIns.type == 'time'){
-    //                 //     valueInputControl = controlIns.convertTimeToStandard(valueInputControl)
-    //                 // }
+    //                 let controlIns = getControlInstanceFromStore(this.keyInstance,inputControlName)
+    //                 let valueInputControl = controlIns.value;
+    //                 if(controlIns.type == 'inputFilter'){
+    //                     valueInputControl = valueInputControl.split(',')
+    //                 }
+    //                 if(controlIns.type == 'time'){
+    //                     valueInputControl = controlIns.convertTimeToStandard(valueInputControl)
+    //                 }
     //                 dataInput[inputControlName] = valueInputControl;
     //             }
     //         }
