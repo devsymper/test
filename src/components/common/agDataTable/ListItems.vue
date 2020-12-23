@@ -1023,7 +1023,6 @@ export default {
 				this.$set(column, 'pinned', 'left')
 				pinValue = 'pinned'
 			}
-			debugger
 			this.gridOptions.columnApi.setColumnPinned(column.field, pinValue)
         },
 		openTableDisplayConfigPanel() {
