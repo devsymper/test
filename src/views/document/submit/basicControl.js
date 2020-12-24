@@ -200,6 +200,15 @@ export default class BasicControl extends Control {
                 } else if (thisObj.type == 'checkbox') {
                     valueChange = $(e.target).prop("checked");
                 }
+                else if(thisObj.type == 'time'){
+                    if(!Util.checkTimeValid(valueChange)){
+                        thisObj.renderValidateIcon("Không đúng định dạng thời gian", 'TimeValid')
+                        return false
+                    }
+                    else{
+                        thisObj.removeValidateIcon('TimeValid')
+                    }
+                }
                 thisObj.value = valueChange;
                 SYMPER_APP.$evtBus.$emit('document-submit-input-change', thisObj);
             })
