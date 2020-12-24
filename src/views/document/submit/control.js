@@ -9,6 +9,7 @@ import {
 } from './../../../main.js'
 import store from './../../../store'
 import {
+    getControlInstanceFromStore,
     getListInputInDocument
 } from './../common/common'
 
@@ -265,6 +266,7 @@ export default class Control {
             let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
             let dataTable = tableControlInstance.tableInstance.tableInstance.getData();
             let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
+            console.log(values,'valuesvalues');
             for (let rowId in values) {
                 let msg = values[rowId];
                 let rowIndex = this.findIndexByRowId(dataTable, rowId);
@@ -387,18 +389,53 @@ export default class Control {
         });
     }
 
-    handlerDataAfterRunFormulasValue(values) {
+    handlerDataAfterRunFormulasValue(values,listIdRow = false, sqlRowId = null) {
         if (this.inTable != false) {
-            let vls = [];
-            for (let index = 0; index < values.length; index++) {
-                let row = values[index];
-                if (row == null || row == 'null')
-                    row = '';
-                vls.push([index, this.name, row]);
+            let tableIns = getControlInstanceFromStore(this.curParentInstance, this.inTable);
+            if(sqlRowId != null){
+                if(this.type == 'date'){
+                    values = SYMPER_APP.$moment(values, 'YYYY-MM-DD').format(this.controlProperties.formatDate.value);
+                }
+                /**
+                 * cần lấy lại vị trí cell ứng với id của row sau khi chạy công thức. bởi vì có thể có thao tác khác làm thay đổi vị trí cell trước khi chạy công thức
+                 */
+                let newListSqlRowId = tableIns.tableInstance.tableInstance.getDataAtProp('s_table_id_sql_lite');
+                let newColIndex = tableIns.tableInstance.tableInstance.propToCol(this.name);
+                let currentRowIndex = newListSqlRowId.indexOf(sqlRowId);
+                console.log(values,'valuesvaluesvalues');
+                tableIns.tableInstance.tableInstance.setDataAtCell(currentRowIndex, newColIndex, values, 'auto_set');
             }
-            let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
-
-            tableControl.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
+            else{ // trường hợp giá trị cho cả cột
+                let dataForStore = {};
+                dataForStore = Object.values(values);
+                let vls = [];
+                for (let index = 0; index < listIdRow.length; index++) {
+                    const element = listIdRow[index];
+                    let cellValue = values[element];
+                    if(this.type == 'date'){
+                        if(cellValue){
+                            cellValue = SYMPER_APP.$moment(cellValue, 'YYYY-MM-DD').format(this.controlProperties.formatDate.value);
+                        }
+                        else{
+                            cellValue = "";
+                        }
+                    }
+                    vls.push([index, this.name, cellValue]);
+                }
+                tableIns.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+                /**
+                 * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
+                 */
+                store.commit("document/updateListInputInDocument", {
+                    controlName: this.name,
+                    key: 'value',
+                    value: dataForStore,
+                    instance: this.curParentInstance
+                });
+            }
+            /**
+             * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
+             */
             markBinedField(this.curParentInstance, this.name);
             setTimeout(() => {
                 let controlEffected = this.getEffectedControl();
@@ -411,28 +448,10 @@ export default class Control {
             if (this.type == 'table') {
                 let vls = [];
                 if (values.columns == undefined) {
-                    // for (let index = 0; index < values.length; index++) {
-                    //     let row = values[index];
-                    //     if (row == null || row == 'null')
-                    //         row = '';
-                    //     vls.push([index, this.name, row]);
-                    // }
-
                     this.setDataTable(values)
                 } else {
                     //sqlite
                 }
-                // let tableControl = getListInputInDocument(this.curParentInstance)[this.name];
-                // tableControl.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
-
-                // markBinedField(this.name);
-                // setTimeout(() => {
-                //     let controlEffected = this.getEffectedControl();
-                //     for (let control in controlEffected) {
-                //         if (getListInputInDocument(this.curParentInstance)[control].inTable == false)
-                //             SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', getListInputInDocument(this.curParentInstance)[control])
-                //     }
-                // }, 100);
             } else {
                 if ($('#' + this.id).length > 0) {
                     $('#' + this.id).val(values);
@@ -465,7 +484,7 @@ export default class Control {
         }
 
     }
-    handlerDataAfterRunFormulasUniqueDB(data, dataInput) {
+    handlerDataAfterRunFormulasUniqueDB(data, rowIndex) {
         if (this.inTable == false) {
             if (data == 't' || data === true) {
                 this.renderValidateIcon('Dữ liệu trường thông tin '+this.title+' đã tồn tại','UniqueDB');
@@ -476,7 +495,6 @@ export default class Control {
             let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
             let colIndex = tableControl.tableInstance.getColumnIndexFromControlName(this.name);
             let dataAtCol = tableControl.tableInstance.tableInstance.getDataAtCol(colIndex);
-            let rowIndex = dataAtCol.indexOf(dataInput[Object.keys(dataInput)[0]][0]);
             let mess = {
                 msg: "",
                 type: "uniqueDB",
