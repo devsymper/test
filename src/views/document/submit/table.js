@@ -1286,7 +1286,7 @@ export default class Table {
                         let cellValue = colData[index];
                         if(!cellValue){
                             vls.push([index, 's_table_id_sql_lite', id]);
-                            this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+                            thisObj.formulasWorker.postMessage({action:'executeSQliteDB',data:
                                 {
                                     func:'insertRow',
                                     columns:['s_table_id_sql_lite'], 
