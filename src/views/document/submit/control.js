@@ -277,25 +277,22 @@ export default class Control {
             let colIndex = tableIns.tableInstance.getColumnIndexFromControlName(this.name);
             if(sqlRowId != null){
                 let msg = values;
-                console.log(values,'valuesvaluesvaluesvalues');
                 let newListSqlRowId = tableIns.tableInstance.tableInstance.getDataAtProp('s_table_id_sql_lite');
                 let currentRowIndex = newListSqlRowId.indexOf(sqlRowId);
                 let cellPos = currentRowIndex + "_" + colIndex;
                 tableIns.tableInstance.addToValueMap(cellPos, {
-                    msg: 'Validate' + msg,
+                    msg: 'Validate: ' + msg,
                     type: "validate",
                     value: (msg != '' && msg != null && msg != undefined && msg != 'f'),
                 });
             }
             else{ // trường hợp giá trị cho cả cột
-                console.log(values,'valuesvaluesvaluesvalues');
-
                 for (let index = 0; index < listIdRow.length; index++) {
                     const element = listIdRow[index];
                     let msg = values[element];
                     let cellPos = index + "_" + colIndex;
                     tableIns.tableInstance.addToValueMap(cellPos, {
-                        msg: 'Validate' + msg,
+                        msg: 'Validate: ' + msg,
                         type: "validate",
                         value: (msg != '' && msg != null && msg != undefined && msg != 'f'),
                     });
