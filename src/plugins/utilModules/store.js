@@ -2,6 +2,9 @@
  * Các hàm phục vụ cho việc xác thực, lưu trữ dữ liệu đăng nhập cho người dùng
  */
 import { cookie } from "./cookie.js";
+if(self.importScripts){
+	self.importScripts('./../env.js');
+}
 export const store = {
     getComponentSize(comp) {
         if (!comp) {
@@ -99,8 +102,8 @@ export const store = {
         return value && value.then && typeof value.then === 'function';
     },
     addEnvToUrl(url) {
-        url = url.trim();
-        if (url.indexOf('https://') === 0) {
+		url = url.trim();
+		if (url.indexOf('https://') === 0) {
             if (SYMPER_ENV.environment != '') {
                 url = url.replace('https://', `https://${SYMPER_ENV.environment}.`);
             }

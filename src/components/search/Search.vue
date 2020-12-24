@@ -3,7 +3,9 @@
         @keydown="enter" 
         class="auto-complete" 
         style="border-radius:4px"
-        :hide-no-data="true" no-filter :items="searchItems"
+        :hide-no-data="true" 
+        no-filter 
+        :items="searchItems"
         :menu-props="{ maxHeight:300, maxWidth:330, nudgeBottom:5}"
         :search-input.sync="value" label="Tìm kiếm">
          <template v-slot:append>
@@ -27,26 +29,29 @@
                     @mousemove="showDotButton(searchItems.indexOf(item))" 
                     class="pl-7 search-menu" 
                     :attrs="attrs">
-                    <SymperAvatar 
-                        v-if="item.type === 'account'" 
+                   <SymperAvatar 
+                        v-if="item.type == 'account'" 
                         style="height: 35px!important; width:35px!important; margin-left:-5px" 
                         class="mr-4" :userId="item.userId"/>
                     <v-list-item-content style="margin-left:-15px">
                         <v-list-item-title 
-                            v-if="item.type!= 'document_definition'&&item.type!='workflow_definition'&&item.type!='account'"
-                            style=" margin-left: 0.5rem" 
-                            class="item-title" v-html="item.displayName">
-                        </v-list-item-title>
-                           <v-list-item-title v-else
-                            class="item-title" >
-                            <span v-if="item.searchField != undefined && item.type != 'account'" v-html="item.searchField"></span>
+                            v-if="item.type=='account'"
+                            class="item-title"
+                            >
+                            <span v-if="item.searchField!=undefined&&item.type!='account'" v-html="item.searchField"></span>
                             <span v-else v-html="item.displayName"></span>
                         </v-list-item-title>
-                        <v-list-item-subtitle v-if="item.type != 'document_definition' && item.type!='workflow_definition' && item.type!='account'"
+                        <v-list-item-title v-else
+                        style=" margin-left: 0.5rem" 
+                            class="item-title" v-html="item.displayName"
+                             >
+                        </v-list-item-title>
+
+                        <v-list-item-subtitle v-if="item.type!= 'document_definition'&&item.type!='workflow_definition'&&item.type!='account'&&item.type!='knowledge'"
                             :style="{'margin-left': item.type === 'account' ? '0' : '0.5rem'}"
                             class="item-subtitle mt-1" v-html="item.searchField">
                         </v-list-item-subtitle>
-                          <v-list-item-title v-else-if="item.type != 'account'"
+                          <v-list-item-title v-else-if="item.type!='account'"
                             :style="{'margin-left': item.type === 'account' ? '0' : '0.5rem'}" 
                             class="item-subtitle" v-html="item.description">
                         </v-list-item-title>
@@ -88,6 +93,7 @@ import _debounce from 'lodash/debounce';
 import _groupBy from 'lodash/groupBy';
 import SymperAvatar from '../../components/common/SymperAvatar'
 import searchApi from "../../api/search.js";
+import { parseJSON } from 'jquery';
 export default {
     components:{
 		SymperAvatar,
@@ -95,8 +101,6 @@ export default {
      data: function () {
         return {
             value: '',
-            syqlId:{},
-            syqlIdInfo:'',
             menu:[],
             searchItemsAll:[],
             searchItems: [],
@@ -134,15 +138,13 @@ export default {
                 },
                 process_definition:{
                 },
-                syql:{
-                },
                 application_deninition:{
                 }
             }
         };
     },
      created: function () {
-        this.debouncedGetValueSearch = _debounce(this.getValueSearch, 250)
+        this.debouncedGetValueSearch = _debounce(this.getValueSearch, 200)
     },
      watch: {
         value(){
@@ -214,8 +216,16 @@ export default {
                                 }else if(data.type=='document_definition'){
                                      returnObjSearch.displayName = data.title?data.title:"Không có tên";
                                      returnObjSearch.description = data.note?data.note:'Chưa điền mô tả';
-                                     // lấy api của tên
-                                }else{
+                                }else if(data.type=='document_instance'){
+                                     let description = JSON.parse(JSON.parse(data.values).new);
+                                     returnObjSearch.displayName = data.values?JSON.parse(data.values).document_name:"Không có tên";
+                                     returnObjSearch.description = data.values?description.description:'Chưa điền mô tả';
+                                
+                                 }else if(data.type=='workflow_definition'||data.type=="knowledge"){
+                                     returnObjSearch.displayName = data.new?data.new.name:"Không có tên";
+                                     returnObjSearch.description = data.new?data.new.description:'Chưa điền mô tả';
+                                 }
+                                else{
                                      returnObjSearch.displayName = data.name? data.name:"Không có tên";
                                 }
                                 const keys = Object.keys(data);
@@ -234,7 +244,7 @@ export default {
                                 returnObjSearch.id = data.id;
                                 returnObjSearch.actions = data.actions;
                                 returnObjSearch.enable = false;
-                                if(data.type!='document_definition'){
+                                if(data.type!='document_definition'&&data.type!='workflow_definition'&&data.type!='knowledge'){
                                       returnObjSearch.description = data.description?data.description:(data.description==null||data.description==''?"Mô tả đang để trống":"Symper");
                                 }
                                 if(data.type=='file'){
@@ -248,14 +258,6 @@ export default {
                                      returnObjSearch.searchField = "Nguồn: "+data.objectType+ " -Ngày bình luận: " + (data.updatedAt?data.updatedAt:data.createdAt);
                                       returnObjSearch.description = "Nguồn: "+data.objectType+ " -Ngày bình luận: " + (data.updatedAt?data.updatedAt:data.createdAt);
                                 }
-                                if(data.type=='syql'){
-                                    self.getNameSyql(data.id);
-                                    //returnObjSearch.displayName ="Nguồn:" + self.syqlId.content;
-                                   returnObjSearch.displayName = "Nguồn: "+ (name.objectType?name.objectType:'')+ " -"+ (name.objectIdentifier?name.objectIdentifier:"") + "- Tên văn bản: " + (name.content?name.content:'');
-                                   returnObjSearch.description = data.lastContent?data.lastContent:"Không có công thức"; ;
-                                   returnObjSearch.searchField = returnObjSearch.description ;
-                                }
-                               
                                 return returnObjSearch;
                             })
                             const groupByType = _groupBy(normalizedData, 'type');
@@ -268,8 +270,8 @@ export default {
                                 searchData.push(...groupByType[type].slice(0, 3));
                                 allData.push(...groupByType[type]);
                             })
-                            self.searchItemsAll = allData;
-                            self.searchItems = searchData;
+                            self.searchItemsAll = allData.filter(data=>data.type!='syql'&&data.group!='syql');
+                            self.searchItems = searchData.filter(data=>data.type!='syql'&&data.group!='syql');
                             self.$store.commit('search/setSearch',  self.searchItems);
                             self.$store.commit('search/setSearchAll', allData);
                             self.$store.commit('search/setCountResult', self.searchItems.filter(x=>x.type).length);
@@ -290,15 +292,6 @@ export default {
             this.$store.commit('search/setWordSearch', newVal);  
         }
        },
-       async getNameSyql(id){
-         const self = this;
-           let res= await searchApi.getInfoSyql(id);
-            if (res.status == 200) {
-                self.syqlId.content= res.data[0].context;
-                self.syqlId.objectIdentifier = res.data[0].objectIdentifier;
-                self.syqlId.objectType = res.data[0].objectType!='workflow'?'Document':'Workflow'
-            }
-        },
     }
 }
 </script>

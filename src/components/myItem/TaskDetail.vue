@@ -1,11 +1,5 @@
 <template>
     <div class="w-100" style="height: 100%">
-        <v-skeleton-loader
-            v-if="loadingActionTask"
-            :type="'table-tbody'"
-            class="mx-auto"
-            width="100%" height="100%" 
-        ></v-skeleton-loader>
         <v-row class="ml-0 mr-0 justify-space-between task-header" id="taskHeader" style="line-height: 36px;height:44px">
             <v-tooltip bottom>
                 <template v-slot:activator="{ on }">
@@ -27,7 +21,7 @@
                             :color="action.color" 
                             @click="saveTaskOutcome(action.value)" 
                             class="mr-2"
-                            :loading="loadingActionTask"
+                            :loading="loadingAction"
                         >
                             {{action.text}}
                         </v-btn>
@@ -87,6 +81,7 @@
             <!-- <VuePerfectScrollbar :style="{height: parentHeight +'px'}" > -->
                 <task 
                     @task-submited="handleTaskSubmited" 
+                    @task-submit-error="submitError"
                     :is="`task`"
                     :taskInfo="taskInfo"
                     :appId="appId"
@@ -117,21 +112,16 @@
 import icon from "../../components/common/SymperIcon";
 import attachment from "./Attachment";
 import comment from "./Comment";
-import flow from "./Flow";
 import info from "./Info";
 import people from "./People";
 import relatedItems from "./RelatedItems";
-import subtask from "./Subtask";
 import task from "./Task";
 import BPMNEngine from '../../api/BPMNEngine';
-import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../components/process/processAction';
+import { getVarsFromSubmitedDoc } from '../../components/process/processAction';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
-import { appManagementApi } from '@/api/AppManagement';
 import { extractTaskInfoFromObject, addMoreInfoToTask } from '@/components/process/processAction';
-
 import { util } from '../../plugins/util';
-
 
 export default {
     name: "taskDetail",
@@ -199,16 +189,16 @@ export default {
     },
     components: {
         icon: icon,
-        attachment, comment, flow, info, people, relatedItems, subtask, task,
+        attachment, comment,info, people, relatedItems, task,
         VuePerfectScrollbar
     },
     data: function() {
         return {
+            loadingAction:false,
             showDialogAlert:false,
             isRole:false, //value =falses khi assignee = userId, =true khi assignee = userId:role
             widthInfoTask:330,
             isShowSidebar:false,
-            loadingActionTask:false,
             breadcrumb: {
                 appName:'',
                 definitionName: '',
@@ -276,9 +266,12 @@ export default {
         },
     },
     created(){
-        this.checkAndSwitchToTab();
     },
     methods: {
+        submitError(){
+            console.log("Error submit");
+            this.loadingAction = false;
+        },
         getWidthHeaderTask(){
             setTimeout((self) => {
                 let width=$("#taskHeader").width()-$("#action-task").width()-40;
@@ -328,27 +321,6 @@ export default {
         },
         toggleSidebar(){
             this.isShowSidebar = !this.isShowSidebar;
-        },
-        checkAndSwitchToTab(){
-            if(this.$route.params.extraData && this.$route.params.extraData.subAction){
-                let tabAction = {
-                    'view_comment': 'comment'
-                };
-                let tab = tabAction[this.$route.params.extraData.subAction];
-                for(let i = 0; i < this.items.length; i++){
-                    if(this.items[i].tab == tab){
-                        this.tab = i;
-                        break;
-                    }
-                }
-            }
-        },
-        onCopySuccess(){
-           this.$snotify({
-                type: 'success',
-                title: "Copy to clipboard",
-                text: "Copy success"
-                });
         },
         changeTaskDetailInfo(taskId){
             let hostname=window.location.hostname;
@@ -456,11 +428,12 @@ export default {
         },
         async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
             //check xem user có phải assignee
+            this.loadingAction=true;
             // kiểm tra xem user hiện tại có role được phân quyền trong task không? 
             if (this.$store.state.app.endUserInfo.id != this.originData.assigneeInfo.id) {
                 this.showDialogAlert=true;
+                this.loadingAction=false;
             }else if(this.checkRoleUser(this.originData)){
-                this.loadingActionTask=true;
                     if(this.taskAction == 'submit' || this.taskAction == 'update' ){
                         this.$refs.task.submitForm(value);
                     }else if(this.taskAction == 'approval'){
@@ -497,6 +470,7 @@ export default {
                         }else{
                             this.reloadDetailTask();
                         }
+                        this.loadingAction=false;
                     }else if(this.taskAction == '' ||this.taskAction==undefined ||this.taskAction == 'submitAdhocTask'){
                         let taskData = {
                             "action": "complete",
@@ -508,11 +482,12 @@ export default {
                         }else{
                             this.reloadDetailTask();
                         }
+                        this.loadingAction=false;
                     }
             }else{
                 this.showDialogAlert=true;
+                this.loadingAction=false;
             }
-            this.loadingActionTask=false;
         },
         saveApprovalHistory(value){
             let title = this.taskActionBtns.reduce((tt, el) => {
@@ -619,6 +594,7 @@ export default {
                     this.reloadDetailTask();
                 }
             }
+            this.loadingAction=false;
         },
         showApprovalOutcomes(approvalActions){
             if(typeof approvalActions == 'string'){

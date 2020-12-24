@@ -87,6 +87,7 @@ export default {
 							{name: "releaseAt", title: "releaseAt", type: "text"},
 							{name: "status", title: "status", type: "numeric"},
 							{name: "git", title: "git", type: "numeric"},
+							{name: "description", title: "description", type: "text"},
 							{name: "userCreateName", title: "userCreate", type: "text"},
 							{name: "userUpdateName", title: "userUpdate", type: "text"},
 							{name: "createAt", title: "createAt", type: "text"},

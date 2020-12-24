@@ -38,9 +38,7 @@ export default class Control {
         this.idField = idField;
         this.value = value;
         this.defaultValue = "";
-
         this.lastUserUpdate = controlProps.userUpdate
-
 
     }
     init() {
@@ -53,9 +51,10 @@ export default class Control {
         this.effectedReadonlyControl = {};
         this.effectedLinkControl = {};
         this.effectedValidateControl = {};
+        this.effectedMinDateControl = {};
+        this.effectedMaxDateControl = {};
         this.inTable = (this.controlProperties.inTable != undefined) ? this.controlProperties.inTable : false;
         this.docName = this.controlProperties.docName;
-
         /**
          * Tên của control
          */
@@ -118,6 +117,7 @@ export default class Control {
 
     // set các mối quan hệ của các control trường hợp đã được lưu trên server
     setEffectedData(effected) {
+        console.log(this.name, effected, 'effectedeffectedeffectedeffected');
         if (effected == "" || effected == null) {
             return;
         }
@@ -136,6 +136,10 @@ export default class Control {
                     this.effectedLinkControl = effected[type]
                 } else if (type == "effectedValidateControl") {
                     this.effectedValidateControl = effected[type]
+                } else if (type == "effectedMinDateControl") {
+                    this.effectedMinDateControl = effected[type]
+                } else if (type == "effectedMaxDateControl") {
+                    this.effectedMaxDateControl = effected[type]
                 }
             }
         } catch (error) {
@@ -221,6 +225,12 @@ export default class Control {
     getEffectedValidateControl() {
         return this.effectedValidateControl;
     }
+    getEffectedMinDateControl() {
+        return this.effectedMinDateControl;
+    }
+    getEffectedMaxDateControl() {
+        return this.effectedMaxDateControl;
+    }
 
     handlerDataAfterRunFormulasLink(values, formulasType) {
         if (this.inTable != false) {
@@ -269,12 +279,18 @@ export default class Control {
                 let msg = values[rowId];
                 let rowIndex = this.findIndexByRowId(dataTable, rowId);
                 let cellPos = rowIndex + "_" + colIndex;
+                // if(msg != '' && msg != null && msg != undefined && msg != 'f'){
+                //     this.addToValidateTable(rowIndex,'Validate',msg)
+                // }
+                // else{
+                //     this.removeValidateOnCellTable(rowIndex,'Validate')
+                // }
                 tableControlInstance.tableInstance.addToValueMap(cellPos, {
                     msg: msg,
                     type: "validate",
                     value: (msg != '' && msg != null && msg != undefined && msg != 'f'),
                 });
-                
+
             }
             tableControlInstance.tableInstance.tableInstance.render()
         }
@@ -299,7 +315,7 @@ export default class Control {
                 tableControlInstance.tableInstance.addToValueMap(cellPos, {
                     type: "require",
                     value: v,
-                    msg:'Không được bỏ trống'
+                    msg: 'Không được bỏ trống'
                 });
             }
         }
@@ -321,35 +337,68 @@ export default class Control {
         }
     }
     handlerDataAfterRunFormulasReadonly(values) {
-        if(this.inTable != false){
+        if (this.inTable != false) {
             let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
             let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
             let tableData = tableControlInstance.tableInstance.getSourceData();
             for (let index = 0; index < tableData.length; index++) {
                 const rowData = tableData[index];
                 let status = false;
-                if( rowData['s_table_id_sql_lite'] && values[rowData['s_table_id_sql_lite']]){
-                    if(values[rowData['s_table_id_sql_lite']] == 1 || values==true || values == 't' ){
+                if (rowData['s_table_id_sql_lite'] && values[rowData['s_table_id_sql_lite']]) {
+                    if (values[rowData['s_table_id_sql_lite']] == 1 || values == true || values == 't') {
                         status = true;
                     }
                 }
                 let cellPos = index + "_" + colIndex;
                 tableControlInstance.tableInstance.addToValueMap(cellPos, {
-                    type:'readOnly',value:status
+                    type: 'readOnly',
+                    value: status
                 });
-                
+
+            }
+        } else {
+            if (Array.isArray(values)) {
+                values = values[0]
+            }
+            if (values == 1 || values == true || values == 't') {
+                $('#' + this.id).attr('disabled', 'disabled');
+            } else {
+                $('#' + this.id).removeAttr('disabled');
             }
         }
-        else{
-            if(Array.isArray(values)){
-                values=values[0]
-            }
-            if(values == 1 || values==true || values == 't' ){
-                $('#'+this.id).attr('disabled','disabled');
-            }else{
-                $('#'+this.id).removeAttr('disabled');
-            }
+    }
+
+    /**
+     * Hàm thêm giá trị validate từng cell trong table vào store
+     * @param {*} row 
+     * @param {*} type 
+     * @param {*} message 
+     */
+
+    addToValidateTable(row, type, message){
+        let currentValidate = this.getCurrentValidate();
+        if(!currentValidate){
+            currentValidate = {};
         }
+        if(!currentValidate[row]){
+            currentValidate[row] = {};
+
+        }
+        currentValidate[row][type] = message;
+        console.log(currentValidate,'currentValidatecurrentValidate');
+        store.commit("document/updateValidateControlSubmit", {
+            controlName: this.name,
+            value: currentValidate,
+            instance: this.curParentInstance
+        });
+    }
+    removeValidateOnCellTable(row, type){
+        store.commit("document/removeValidateControlSubmit", {
+            controlName: this.name,
+            type: type,
+            rowIndex: row,
+            instance: this.curParentInstance
+        });
     }
 
     handlerDataAfterRunFormulasValue(values) {
@@ -433,7 +482,7 @@ export default class Control {
     handlerDataAfterRunFormulasUniqueDB(data, dataInput) {
         if (this.inTable == false) {
             if (data == 't' || data === true) {
-                this.renderValidateIcon('Dữ liệu trường thông tin '+this.title+' đã tồn tại','UniqueDB');
+                this.renderValidateIcon('Dữ liệu trường thông tin ' + this.title + ' đã tồn tại', 'UniqueDB');
             } else {
                 this.removeValidateIcon('UniqueDB');
             }
@@ -460,13 +509,13 @@ export default class Control {
         }
     }
     getCurrentValidate(){
-        return this.getDataStoreSubmit()['validateMessage'][this.nane]
+        return this.getDataStoreSubmit()['validateMessage'][this.name]
     }
     renderValidateIcon(message, type) {
         let iconEl = Util.makeErrNoti(this.name);
         this.ele.parent().append(iconEl);
         let currentValidate = this.getCurrentValidate();
-        if(!currentValidate){
+        if (!currentValidate) {
             currentValidate = {};
         }
         currentValidate[type] = message;
@@ -479,16 +528,13 @@ export default class Control {
     removeValidateIcon(type) {
         let currentValidate = this.getCurrentValidate();
         if(currentValidate && currentValidate[type]){
-            delete currentValidate[type];
-            store.commit("document/updateValidateControlSubmit", {
+            store.commit("document/removeValidateControlSubmit", {
                 controlName: this.name,
-                value: currentValidate,
+                type: type,
                 instance: this.curParentInstance
             });
         }
-        else{
-            this.ele.parent().find('.validate-icon').remove();
-        }
+        this.ele.parent().find('.validate-icon').remove();
         
     }
     isEmpty() {
@@ -515,92 +561,92 @@ export default class Control {
      */
 
     checkValidValueLength(rowIndex) {
-        if (this.type != "textInput") {
-            return true;
-        }
-        let rs = true;
-        if (this.inTable != false) {
-            let table = getListInputInDocument(this.curParentInstance)[this.inTable];
-            let colIndex = table.tableInstance.getColumnIndexFromControlName(this.name);
-            let dataAtCol = table.tableInstance.tableInstance.getDataAtCol(colIndex);
-            if (rowIndex == "all") {
-                for (let index = 0; index < dataAtCol.length; index++) {
-                    let cellPos = index + "_" + colIndex;
+            if (this.type != "textInput") {
+                return true;
+            }
+            let rs = true;
+            if (this.inTable != false) {
+                let table = getListInputInDocument(this.curParentInstance)[this.inTable];
+                let colIndex = table.tableInstance.getColumnIndexFromControlName(this.name);
+                let dataAtCol = table.tableInstance.tableInstance.getDataAtCol(colIndex);
+                if (rowIndex == "all") {
+                    for (let index = 0; index < dataAtCol.length; index++) {
+                        let cellPos = index + "_" + colIndex;
+                        let messValidate = {
+                            type: "valueLength",
+                            value: false
+                        }
+                        let row = dataAtCol[index];
+                        if (row == null) {
+                            row = "";
+                        }
+                        if (this.controlProperties.maxValue.value != "") {
+                            if (row.length > this.controlProperties.maxValue.value) {
+                                messValidate.value = true;
+                                messValidate.msg = 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự";
+                                rs = false;
+                            }
+                        }
+                        if (this.controlProperties.minValue.value != "") {
+                            if (row.length < this.controlProperties.minValue.value) {
+                                messValidate.value = true;
+                                messValidate.msg = 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự"
+                                rs = false;
+                            }
+                        }
+                        table.tableInstance.addToValueMap(cellPos, messValidate);
+                    }
+                } else {
+                    let value = dataAtCol[rowIndex];
+                    if (value == null) {
+                        value = "";
+                    }
+                    let cellPos = rowIndex + "_" + colIndex;
                     let messValidate = {
                         type: "valueLength",
-                        value:false
-                    }
-                    let row = dataAtCol[index];
-                    if (row == null) {
-                        row = "";
+                        value: false
                     }
                     if (this.controlProperties.maxValue.value != "") {
-                        if (row.length > this.controlProperties.maxValue.value) {
-                            messValidate.value =  true;
+                        if (value.length > this.controlProperties.maxValue.value) {
+                            messValidate.value = true;
                             messValidate.msg = 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự";
                             rs = false;
                         }
                     }
                     if (this.controlProperties.minValue.value != "") {
-                        if (row.length < this.controlProperties.minValue.value) {
-                            messValidate.value =  true;
-                            messValidate.msg = 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự"
+                        if (value.length < this.controlProperties.minValue.value) {
+                            messValidate.value = true;
+                            messValidate.msg = 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự";
                             rs = false;
                         }
                     }
                     table.tableInstance.addToValueMap(cellPos, messValidate);
                 }
+                table.tableInstance.tableInstance.render()
             } else {
-                let value = dataAtCol[rowIndex];
-                if (value == null) {
-                    value = "";
-                }
-                let cellPos = rowIndex + "_" + colIndex;
-                let messValidate = {
-                    type: "valueLength",
-                    value: false
-                }
+                let checkMax = false;
                 if (this.controlProperties.maxValue.value != "") {
-                    if (value.length > this.controlProperties.maxValue.value) {
-                        messValidate.value =  true;
-                        messValidate.msg = 'Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự";
+                    this.removeValidateIcon('MaxLength');
+                    if (this.value.length > this.controlProperties.maxValue.value) {
+                        checkMax = true;
+                        this.renderValidateIcon('Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự", 'MaxLength');
                         rs = false;
                     }
                 }
-                if (this.controlProperties.minValue.value != "") {
-                    if (value.length < this.controlProperties.minValue.value) {
-                        messValidate.value =  true;
-                        messValidate.msg = 'Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự";
+                if (this.controlProperties.minValue.value != "" && !checkMax) {
+                    this.removeValidateIcon('MinLength');
+                    if (this.value.length < this.controlProperties.minValue.value) {
+                        this.renderValidateIcon('Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự", 'MinLength');
                         rs = false;
                     }
                 }
-                table.tableInstance.addToValueMap(cellPos, messValidate);
             }
-            table.tableInstance.tableInstance.render()
-        } else {
-            let checkMax = false;
-            if (this.controlProperties.maxValue.value != "") {
-                this.removeValidateIcon('MaxLength');
-                if (this.value.length > this.controlProperties.maxValue.value) {
-                    checkMax = true;
-                    this.renderValidateIcon('Độ dài kí tự không được vượt quá ' + this.controlProperties.maxValue.value + " kí tự", 'MaxLength');
-                    rs = false;
-                }
-            }
-            if (this.controlProperties.minValue.value != "" && !checkMax) {
-                this.removeValidateIcon('MinLength');
-                if (this.value.length < this.controlProperties.minValue.value) {
-                    this.renderValidateIcon('Độ dài kí tự không được ít hơn ' + this.controlProperties.minValue.value + " kí tự", 'MinLength');
-                    rs = false;
-                }
-            }
-        }
 
-        return rs
-    }
-    /**
-     * thêm màu đánh dấu control là đầu vào của control đang được kiểm tra với F2
-     */
+            return rs
+        }
+        /**
+         * thêm màu đánh dấu control là đầu vào của control đang được kiểm tra với F2
+         */
     renderInputTraceControlColor() {
             if (this.inTable) {
                 this.traceInputTable();
@@ -641,10 +687,15 @@ export default class Control {
         }
 
     }
-
     traceInputTable(className, isRemove = false) {
         let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
         tableControl.tableInstance.traceInputTable(this.name, className, isRemove)
+    }
+    handlerDataAfterRunFormulasMinDate(value) {
+        this.minDate = value;
+    }
+    handlerDataAfterRunFormulasMaxDate(value) {
+        this.maxDate = value;
     }
 
 }

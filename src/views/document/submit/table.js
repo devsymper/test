@@ -3,7 +3,7 @@ import Handsontable from 'handsontable';
 import sDocument from './../../../store/document'
 import store from './../../../store'
 import ClientSQLManager from './clientSQLManager';
-import { checkControlPropertyProp, getControlInstanceFromStore, getControlType, getSDocumentSubmitStore } from './../common/common'
+import { checkControlPropertyProp, getControlType, getSDocumentSubmitStore,getControlInstanceFromStore } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
 import { util } from '../../../plugins/util';
@@ -69,18 +69,18 @@ Handsontable.cellTypes.registerCellType('percent', {
 
 //renderer user
 Handsontable.renderers.UserRenderer = function(instance, td, row, col, prop, value, cellProperties) {
-        Handsontable.renderers.TextRenderer.apply(this, arguments);
-        if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
-            let listUser = store.state.app.allUsers;
-            let user = listUser.filter(user => {
-                return user.id === value
-            })
-            if (user.length > 0) {
-                td.textContent = user[0].displayName
-            }
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+    if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
+        let listUser = store.state.app.allUsers;
+        let user = listUser.filter(user => {
+            return user.id === value
+        })
+        if (user.length > 0) {
+            td.textContent = user[0].displayName
         }
     }
-    //renderer user
+}
+//renderer user
 Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     if (value == null) value = ""
@@ -126,9 +126,7 @@ Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, val
         $(td).off('click', '.file-add');
         if (sDocument.state.viewType[instance.keyInstance] != 'detail') {
             $(td).on('click', '.file-add', function(e) {
-                let el = $(e.target).closest('.file-add');
-                $("#file-upload-alter-" + instance.keyInstance).attr('data-rowid', row).attr('data-control-name', el.attr('data-ctrlname'));
-                $("#file-upload-alter-" + instance.keyInstance).click();
+                SYMPER_APP.$evtBus.$emit('document-submit-add-file-click', { control: table.listInputInDocument[prop] });
             })
             $(td).off('click', '.remove-file')
             table.listInputInDocument[prop].setDeleteFileEvent($(td), prop)
@@ -234,6 +232,7 @@ export default class Table {
         this.currentControlSelected = null;
         this.cellSelected = null;
         this.listAutoCompleteColumns = {};
+        this.matrixCellRender = []; // biến đánh dấu có thay dổi trong table hay không. để tối ưu cho việc renderer
         this.event = {
             afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
                 store.commit("document/addToDocumentSubmitStore", {
@@ -444,19 +443,20 @@ export default class Table {
             afterChange: function(changes, source) {
                 SYMPER_APP.$evtBus.$emit('document-on-table-change', {
                     data: this.getSourceData(),
-                    tableName:thisObj.tableName
+                    tableName: thisObj.tableName
                 });
                 if (!changes) {
                     return
                 }
                 let controlName = changes[0][1];
-                if(source == 'edit'){
-                    let controlIns = getControlInstanceFromStore(thisObj.keyInstance, controlName);
-                    setDataInputBeforeChange(thisObj.keyInstance, controlIns);
-                }
+                
                 // check nếu ko có thay đổi trong cell thì return
                 if (changes[0][2] == changes[0][3] && source == 'edit') {
                     return;
+                }
+                let controlIns = getControlInstanceFromStore(thisObj.keyInstance, controlName);
+                if(source == 'edit' && changes[0][1] != 's_table_id_sql_lite'){
+                    setDataInputBeforeChange(thisObj.keyInstance, controlIns);
                 }
                 if (getSDocumentSubmitStore(thisObj.keyInstance).docStatus == 'init' &&
                     sDocument.state.viewType[thisObj.keyInstance] == 'update') {
@@ -521,14 +521,14 @@ export default class Table {
         listTableInstance[this.tableName] = this;
     }
 
-    handeRunUniqueDBFormula(controlName, changes){
+    handeRunUniqueDBFormula(controlName, changes) {
         let dataInput = {}
         dataInput[controlName] = [changes[0][3]]
         let controlUniqueFormula = checkControlPropertyProp(this.keyInstance, controlName, 'isDBOnly');
         if (controlUniqueFormula != false) {
             this.handlerRunFormulasForControlInTable('uniqueDB', controlUniqueFormula, dataInput, controlUniqueFormula.controlFormulas.uniqueDB.instance);
         }
-        
+
     }
 
     /**
@@ -544,8 +544,12 @@ export default class Table {
         if (this.tableHasRowSum && cellMeta[0][0] == this.tableInstance.countRows() - 1) {
             return;
         }
+        
         let thisObj = this;
         if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            e.stopPropagation();
             this.tableInstance.alter('insert_row', cellMeta[0][0] + 1, 1, 'auto_set');
             this.dataInsertRows.push([]);
             delayTypingEnter(function() {
@@ -557,11 +561,11 @@ export default class Table {
                         for (let i = 0; i < newRowData.length; i++) {
                             newRowData[i][0] = cellMeta[0][0] + index + 1;
                         }
-                        thisObj.tableInstance.setDataAtRowProp(newRowData, null, null, 'auto_set');
                     }
                 }
                 thisObj.dataInsertRows = []
             });
+            
         } else if (e.key === 'Delete' && e.shiftKey == true) {
             e.stopImmediatePropagation();
             e.preventDefault();
@@ -592,81 +596,81 @@ export default class Table {
             this.tableInstance.alter('remove_row', cellMeta[0][0], 1);
         }
     }
-    // kiểm tra nếu đang edit ở cell cuối cùng mà ấn enter thì cho cell selected về dòng đầu tiên (lỗi do control hidden)
+        // kiểm tra nếu đang edit ở cell cuối cùng mà ấn enter thì cho cell selected về dòng đầu tiên (lỗi do control hidden)
     checkLastCell(cellMeta, hotTb) {
-        if (!this.showPopupTime && !this.showPopupUser) {
-            let colLength = hotTb.getDataAtRow(0).length;
-            let rowLength = hotTb.countRows();
-            if (cellMeta[0][1] == colLength - 3 && rowLength - 1 == cellMeta[0][0]) {
-                hotTb.selectCell(0, 0, 0, 0, true);
-                return true
+            if (!this.showPopupTime && !this.showPopupUser) {
+                let colLength = hotTb.getDataAtRow(0).length;
+                let rowLength = hotTb.countRows();
+                if (cellMeta[0][1] == colLength - 3 && rowLength - 1 == cellMeta[0][0]) {
+                    hotTb.selectCell(0, 0, 0, 0, true);
+                    return true
+                }
+                return false
             }
             return false
         }
-        return false
-    }
-    // kiểm tra nếu đang edit ở cell cuối cùng mà ấn enter thì cho cell selected về dòng đầu tiên (lỗi do control hidden)
+        // kiểm tra nếu đang edit ở cell cuối cùng mà ấn enter thì cho cell selected về dòng đầu tiên (lỗi do control hidden)
     checkLastCellInRow(cellMeta, hotTb) {
-        if (!this.showPopupTime && !this.showPopupUser) {
-            let colLength = hotTb.getDataAtRow(0).length;
-            if (cellMeta[0][1] == colLength - 3) {
-                hotTb.selectCell(cellMeta[0][0], 0, 0, 0, true);
-                return true
+            if (!this.showPopupTime && !this.showPopupUser) {
+                let colLength = hotTb.getDataAtRow(0).length;
+                if (cellMeta[0][1] == colLength - 3) {
+                    hotTb.selectCell(cellMeta[0][0], 0, 0, 0, true);
+                    return true
+                }
+                return false
             }
             return false
         }
-        return false
-    }
-    // chuyển giá trị control time về dạng HH:MM:ss để lưu vào db
+        // chuyển giá trị control time về dạng HH:MM:ss để lưu vào db
     getTimeValueToStore(colData) {
-        for (let index = 0; index < colData.length; index++) {
-            let cellData = colData[index];
-            if (cellData == null) {
-                continue;
-            }
-            cellData = cellData.replace(' AM', ":00");
-            cellData = cellData.replace(' PM', ":00");
-            colData[index] = cellData
+            for (let index = 0; index < colData.length; index++) {
+                let cellData = colData[index];
+                if (cellData == null) {
+                    continue;
+                }
+                cellData = cellData.replace(' AM', ":00");
+                cellData = cellData.replace(' PM', ":00");
+                colData[index] = cellData
 
+            }
+            return colData
         }
-        return colData
-    }
-    /**
-     * Hàm xử lí dữ liệu thay đổi ở cell bởi hệ thống (hàm set data của handson)
-     */
+        /**
+         * Hàm xử lí dữ liệu thay đổi ở cell bởi hệ thống (hàm set data của handson)
+         */
     async handlerAfterChangeCellByAutoSet(changes, columns, controlName) {
-        let thisObj = this;
-        for (let index = 0; index < changes.length; index++) {
-            let colChange = changes[index];
-            let rowData = thisObj.tableInstance.getDataAtRow(colChange[0]);
-            for (let index = 0; index < rowData.length; index++) {
-                let cell = rowData[index];
-                if (cell == "" || cell == null) {
-                    rowData[index] = 'NULL';
+            let thisObj = this;
+            for (let index = 0; index < changes.length; index++) {
+                let colChange = changes[index];
+                let rowData = thisObj.tableInstance.getDataAtRow(colChange[0]);
+                for (let index = 0; index < rowData.length; index++) {
+                    let cell = rowData[index];
+                    if (cell == "" || cell == null) {
+                        rowData[index] = 'NULL';
+                    } else {
+                        rowData[index] = '"' + rowData[index] + '"'
+                    }
+                }
+                if (rowData[rowData.length - 1] == 'NULL') {
+                    let id = Date.now();
+                    rowData[rowData.length - 1] = id;
+                    thisObj.tableInstance.setDataAtCell(colChange[0], rowData.length - 1, id);
+                    await ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, rowData, true);
+                    if (index == changes.length - 1) {
+                        thisObj.handlerCheckEffectedControlInTable(controlName, "all");
+                    }
                 } else {
-                    rowData[index] = '"' + rowData[index] + '"'
-                }
-            }
-            if (rowData[rowData.length - 1] == 'NULL') {
-                let id = Date.now();
-                rowData[rowData.length - 1] = id;
-                thisObj.tableInstance.setDataAtCell(colChange[0], rowData.length - 1, id);
-                await ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, rowData, true);
-                if (index == changes.length - 1) {
-                    thisObj.handlerCheckEffectedControlInTable(controlName, "all");
-                }
-            } else {
-                await ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, colChange[1], colChange[3],
-                    'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1], true);
-                if (index == changes.length - 1) {
-                    thisObj.handlerCheckEffectedControlInTable(controlName, "all");
+                    await ClientSQLManager.editRow(thisObj.keyInstance, thisObj.tableName, colChange[1], colChange[3],
+                        'WHERE s_table_id_sql_lite = ' + rowData[rowData.length - 1], true);
+                    if (index == changes.length - 1) {
+                        thisObj.handlerCheckEffectedControlInTable(controlName, "all");
+                    }
                 }
             }
         }
-    }
-    /**
-     * Hàm xử lí dữ liệu thay đổi ở cell bởi User edit (hàm set data của handson)
-     */
+        /**
+         * Hàm xử lí dữ liệu thay đổi ở cell bởi User edit (hàm set data của handson)
+         */
     async handlerAfterChangeCellByUser(changes, currentRowData, columns, controlName) {
         let thisObj = this;
         for (let index = 0; index < currentRowData.length; index++) {
@@ -697,22 +701,22 @@ export default class Table {
      * @param {*} col 
      */
     checkControlType(type, col) {
-        let columns = this.columnsInfo.columns;
-        if (columns[col] == undefined) {
-            return false;
+            let columns = this.columnsInfo.columns;
+            if (columns[col] == undefined) {
+                return false;
+            }
+            let controlName = columns[col].data;
+            let controlInstance = this.getControlInstance(controlName);
+            if (controlInstance.type == type) {
+                return true;
+            } else {
+                return false;
+            }
         }
-        let controlName = columns[col].data;
-        let controlInstance = this.getControlInstance(controlName);
-        if (controlInstance.type == type) {
-            return true;
-        } else {
-            return false;
-        }
-    }
-    /**
-     * Hàm kiểm tra xem cell có công thức autocomplete hay không
-     * @param {String} controlName 
-     */
+        /**
+         * Hàm kiểm tra xem cell có công thức autocomplete hay không
+         * @param {String} controlName 
+         */
 
     checkIsAutocompleteCell(controlName) {
         let controlInstance = this.getControlInstance(controlName);
@@ -735,65 +739,66 @@ export default class Table {
      * @param {*} rowIndex 
      */
     handlerCheckEffectedControlInTable(controlName, rowIndex = "") {
-        if (controlName == "") {
-            return
-        }
-        let controlInstance = this.getControlInstance(controlName);
-        if (controlInstance.checkValidValueLength(rowIndex)) {
-            if (controlInstance == null || controlInstance == undefined) {
-                return;
+            if (controlName == "") {
+                return
             }
-            let controlEffected = controlInstance.getEffectedControl();
-            let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
-            let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
-            let controlRequireEffected = controlInstance.getEffectedRequireControl();
-            let controlLinkEffected = controlInstance.getEffectedLinkControl();
-            let controlValidateEffected = controlInstance.getEffectedValidateControl();
-            controlRequireEffected[controlName] = true;
-            controlValidateEffected[controlName] = true;
-            controlReadonlyEffected[controlName] = true;
-            controlHiddenEffected[controlName] = true;
+            let controlInstance = this.getControlInstance(controlName);
+            if (controlInstance.checkValidValueLength(rowIndex)) {
+                if (controlInstance == null || controlInstance == undefined) {
+                    return;
+                }
+                let controlEffected = controlInstance.getEffectedControl();
+                let controlHiddenEffected = controlInstance.getEffectedHiddenControl();
+                let controlReadonlyEffected = controlInstance.getEffectedReadonlyControl();
+                let controlRequireEffected = controlInstance.getEffectedRequireControl();
+                let controlLinkEffected = controlInstance.getEffectedLinkControl();
+                let controlValidateEffected = controlInstance.getEffectedValidateControl();
+                controlRequireEffected[controlName] = true;
+                controlValidateEffected[controlName] = true;
+                controlReadonlyEffected[controlName] = true;
+                controlHiddenEffected[controlName] = true;
 
-            this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
-            this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readOnly');
-            this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
-            this.handlerRunOtherFormulasControl(controlLinkEffected, 'linkConfig');
-            this.handlerRunOtherFormulasControl(controlValidateEffected, 'validate');
-            if (Object.keys(controlEffected).length > 0) {
-                for (let i in controlEffected) {
-                    this.handlerCheckCanBeRunFormulas(i);
+                this.handlerRunOtherFormulasControl(controlHiddenEffected, 'hidden');
+                this.handlerRunOtherFormulasControl(controlReadonlyEffected, 'readOnly');
+                this.handlerRunOtherFormulasControl(controlRequireEffected, 'require');
+                this.handlerRunOtherFormulasControl(controlLinkEffected, 'linkConfig');
+                this.handlerRunOtherFormulasControl(controlValidateEffected, 'validate');
+                if (Object.keys(controlEffected).length > 0) {
+                    for (let i in controlEffected) {
+                        this.handlerCheckCanBeRunFormulas(i);
+                    }
                 }
             }
-        }
 
-    }
-    /**
-     * chạy các công thức khác bị ảnh hưởng trong table
-     * @param {*} controlEffected 
-     * @param {*} formulasType 
-     */
+        }
+        /**
+         * chạy các công thức khác bị ảnh hưởng trong table
+         * @param {*} controlEffected 
+         * @param {*} formulasType 
+         */
     handlerRunOtherFormulasControl(controlEffected, formulasType) {
-        if (Object.keys(controlEffected).length > 0) {
-            for (let i in controlEffected) {
-                let controlEffectedInstance = this.getControlInstance(i);
-                let allFormulas = controlEffectedInstance.controlFormulas;
-                if (allFormulas.hasOwnProperty(formulasType)) {
-                    if (formulasType == 'linkConfig') { // nếu có cấu hình công thức link thì cũng chạy các công thức của nó
-                        let configData = allFormulas[formulasType].configData;
-                        for (let ind = 0; ind < configData.length; ind++) {
-                            let config = configData[ind];
-                            let formulasInstance = config.instance;
-                            let dataInput = this.getDataInputForFormulas(formulasInstance, controlEffectedInstance.inTable);
-                            let fType = formulasType + "_" + config.formula.instance;
-                            this.handlerRunFormulasForControlInTable(fType, controlEffectedInstance, dataInput, formulasInstance)
-                        }
-                    } else {
-                        if (allFormulas[formulasType].hasOwnProperty('instance')) {
-                            let formulasInstance = allFormulas[formulasType].instance;
-                            let dataInput = this.getDataInputForFormulas(formulasInstance, controlEffectedInstance.inTable);
-                            if (controlEffectedInstance.hasOwnProperty('inTable')) {
-                                if (controlEffectedInstance.inTable == this.tableName) {
-                                    this.handlerRunFormulasForControlInTable(formulasType, controlEffectedInstance, dataInput, formulasInstance);
+            if (Object.keys(controlEffected).length > 0) {
+                for (let i in controlEffected) {
+                    let controlEffectedInstance = this.getControlInstance(i);
+                    let allFormulas = controlEffectedInstance.controlFormulas;
+                    if (allFormulas.hasOwnProperty(formulasType)) {
+                        if (formulasType == 'linkConfig') { // nếu có cấu hình công thức link thì cũng chạy các công thức của nó
+                            let configData = allFormulas[formulasType].configData;
+                            for (let ind = 0; ind < configData.length; ind++) {
+                                let config = configData[ind];
+                                let formulasInstance = config.instance;
+                                let dataInput = this.getDataInputForFormulas(formulasInstance, controlEffectedInstance.inTable);
+                                let fType = formulasType + "_" + config.formula.instance;
+                                this.handlerRunFormulasForControlInTable(fType, controlEffectedInstance, dataInput, formulasInstance)
+                            }
+                        } else {
+                            if (allFormulas[formulasType].hasOwnProperty('instance')) {
+                                let formulasInstance = allFormulas[formulasType].instance;
+                                let dataInput = this.getDataInputForFormulas(formulasInstance, controlEffectedInstance.inTable);
+                                if (controlEffectedInstance.hasOwnProperty('inTable')) {
+                                    if (controlEffectedInstance.inTable == this.tableName) {
+                                        this.handlerRunFormulasForControlInTable(formulasType, controlEffectedInstance, dataInput, formulasInstance);
+                                    }
                                 }
                             }
                         }
@@ -801,41 +806,40 @@ export default class Table {
                 }
             }
         }
-    }
-    /**
-     * Hàm xử lí kiểm tra control đủ điều kiện chạy công thức hay chưa (checkCanBeBind) và lấy ra formulasInstance để chạy
-     * @param {String} control 
-     */
+        /**
+         * Hàm xử lí kiểm tra control đủ điều kiện chạy công thức hay chưa (checkCanBeBind) và lấy ra formulasInstance để chạy
+         * @param {String} control 
+         */
     handlerCheckCanBeRunFormulas(control) {
-        if (checkCanBeBind(this.keyInstance, control)) {
-            let controlInstance = this.getControlInstance(control);
-            if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {
-                let formulasInstance = controlInstance.controlFormulas['formulas'].instance;
-                if (controlInstance.type != 'table') {
-                    if (controlInstance.inTable == this.tableName) {
-                        let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.inTable);
-                        this.handlerRunFormulasForControlInTable('formulas', controlInstance, dataInput, formulasInstance);
+            if (checkCanBeBind(this.keyInstance, control)) {
+                let controlInstance = this.getControlInstance(control);
+                if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {
+                    let formulasInstance = controlInstance.controlFormulas['formulas'].instance;
+                    if (controlInstance.type != 'table') {
+                        if (controlInstance.inTable == this.tableName) {
+                            let dataInput = this.getDataInputForFormulas(formulasInstance, controlInstance.inTable);
+                            this.handlerRunFormulasForControlInTable('formulas', controlInstance, dataInput, formulasInstance);
+                        } else {
+                            SYMPER_APP.$evtBus.$emit('run-formulas-control-outside-table', {
+                                formulasInstance: formulasInstance,
+                                controlName: control
+                            });
+                        }
                     } else {
                         SYMPER_APP.$evtBus.$emit('run-formulas-control-outside-table', {
                             formulasInstance: formulasInstance,
                             controlName: control
                         });
                     }
-                } else {
-                    SYMPER_APP.$evtBus.$emit('run-formulas-control-outside-table', {
-                        formulasInstance: formulasInstance,
-                        controlName: control
-                    });
                 }
             }
+
+
         }
-
-
-    }
-    /**
-     * Hàm lấy các data input cho 1 công thức
-     * @param {Object} formulasInstance đối tượng của công thức 
-     */
+        /**
+         * Hàm lấy các data input cho 1 công thức
+         * @param {Object} formulasInstance đối tượng của công thức 
+         */
     getDataInputForFormulas(formulasInstance, tableName = false) {
         let inputControl = formulasInstance.getInputControl();
         let dataInput = {};
@@ -858,10 +862,13 @@ export default class Table {
             if(controlIns.type == 'date'){
                 dataInput[inputControlName] = controlIns.convertDateToStandard(controlIns.value)
             }
+            if(controlIns.type == 'time'){
+                dataInput[inputControlName] = controlIns.convertTimeToStandard(controlIns.value)
+            }
         }
         return dataInput;
     }
-    
+
     /**
      * Hàm xử lí query dữ liệu từ bảng sqllite
      * @param {*} controlEffectedInstance   Object của 1 control bị ảnh hưởng
@@ -952,9 +959,17 @@ export default class Table {
                     let vls = [];
                     for (let index = 0; index < listIdRow.length; index++) {
                         const element = listIdRow[index];
-                        vls.push([index, controlInstance.name, data[element]]);
+                        let cellValue = data[element];
+                        if(controlInstance.type == 'date'){
+                            if(cellValue){
+                                cellValue = SYMPER_APP.$moment(cellValue, 'YYYY-MM-DD').format(controlInstance.controlProperties.formatDate.value);
+                            }
+                            else{
+                                cellValue = "";
+                            }
+                        }
+                        vls.push([index, controlInstance.name, cellValue]);
                     }
-
                     thisObj.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
                     /**
                      * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
@@ -971,15 +986,14 @@ export default class Table {
                 }
             })
         } catch (error) {
-            console.log(error,'errorerror');
+            console.log(error, 'errorerror');
         }
-
-
     }
     /**
      * Hàm lấy dữ liệu hiện tại của table và insert vào sql lite table
      */
 
+    
     getDataResponseQuery(rs, controlType = "") {
         let result = "";
         if (controlType == 'table') {
@@ -990,7 +1004,6 @@ export default class Table {
                 }
             } else {
                 result = rs.data.data;
-
             }
         } else {
             if (!rs.server) {
@@ -1008,6 +1021,7 @@ export default class Table {
 
         return result;
     }
+    
     /**
      * Hàm xử lí dữ liệu sau khi chạy xong công thức của 1 cột, -> set data cho cột đó -> chạy công thức cho các control ngoài bảng bị ảnh hưởng
      * @param {Object} data 
@@ -1046,28 +1060,28 @@ export default class Table {
      * Hàm lấy formulas của cell select -> chạy -> gán lại data cho autocomplete component
      */
     setSelectCell(event) {
-        let controlInstance = this.getControlInstance(this.currentControlSelected);
-        if (controlInstance != null && controlInstance != undefined) {
-            let controlFormulas = controlInstance.controlFormulas;
-            if (controlFormulas.hasOwnProperty('list')) {
-                let formulasInstance = controlFormulas['list'].instance;
-                event.curTarget = event.target;
-                let cellActive = this.tableInstance.getSelected();
-                SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
-                    e: event,
-                    selectFormulasInstance: formulasInstance,
-                    alias: this.currentControlSelected,
-                    cellActive: cellActive,
-                    controlTitle: controlInstance.title,
-                    type: controlInstance.type,
-                    isSingleSelect: controlInstance.checkProps('isSingleSelect')
-                })
+            let controlInstance = this.getControlInstance(this.currentControlSelected);
+            if (controlInstance != null && controlInstance != undefined) {
+                let controlFormulas = controlInstance.controlFormulas;
+                if (controlFormulas.hasOwnProperty('list')) {
+                    let formulasInstance = controlFormulas['list'].instance;
+                    event.curTarget = event.target;
+                    let cellActive = this.tableInstance.getSelected();
+                    SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
+                        e: event,
+                        selectFormulasInstance: formulasInstance,
+                        alias: this.currentControlSelected,
+                        cellActive: cellActive,
+                        controlTitle: controlInstance.title,
+                        type: controlInstance.type,
+                        isSingleSelect: controlInstance.checkProps('isSingleSelect')
+                    })
+                }
             }
         }
-    }
-    /**
-     * Hàm lấy type của cột được select
-     */
+        /**
+         * Hàm lấy type của cột được select
+         */
     getCellSelectedType(col) {
         let columns = this.columnsInfo.columns;
         let column = columns[col];
@@ -1165,7 +1179,7 @@ export default class Table {
                     for (let index = 0; index < colData.length; index++) {
                         let id = Date.now() + index;
                         let cellValue = colData[index];
-                        if(!cellValue){
+                        if (!cellValue) {
                             vls.push([index, 's_table_id_sql_lite', id]);
                             ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, ['s_table_id_sql_lite'], [id]);
                         }
@@ -1255,8 +1269,8 @@ export default class Table {
         }
 
     }
-    getSourceData(){
-        return this.tableInstance.getSourceData(); 
+    getSourceData() {
+        return this.tableInstance.getSourceData();
     }
     // Hàm set data cho table
     // hàm gọi sau khi chạy công thức 
@@ -1292,8 +1306,20 @@ export default class Table {
                     if (controlIns && dateFormat && controlIns.type == 'date') {
                         data[index][controlName] = SYMPER_APP.$moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
                     }
-                    if (data[index] != undefined)
-                        dataToStore[controlName].push(data[index][controlName]);
+                    dataToSqlLite.push('(' + rowData.join() + ')');
+                }
+                ClientSQLManager.insertDataToTable(this.keyInstance, this.tableName, columnInsert.join(), dataToSqlLite.join())
+                for (let controlName in dataToStore) {
+                    store.commit("document/updateListInputInDocument", {
+                        controlName: controlName,
+                        key: 'value',
+                        value: dataToStore[controlName],
+                        instance: this.keyInstance
+                    });
+                }
+                // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
+                if (this.tableHasRowSum && ['submit', 'update'].includes(sDocument.state.viewType[this.keyInstance])) {
+                    data.push({})
                 }
                 dataToSqlLite.push('(' + rowData.join() + ')');
             }
@@ -1354,24 +1380,24 @@ export default class Table {
      * Hàm lấy data default lúc load table
      */
     getDefaultData(isCreateSqlTable = true) {
-        if (isCreateSqlTable && !this.checkDetailView())
-            this.createSqliteTable();
-        let data = [];
-        let firstRow = {};
-        let id = Date.now();
-        firstRow['s_table_id_sql_lite'] = id;
-        data.push(firstRow);
-        if (this.tableHasRowSum && sDocument.state.viewType[this.keyInstance] == 'submit') {
-            data.push([''])
+            if (isCreateSqlTable && !this.checkDetailView())
+                this.createSqliteTable();
+            let data = [];
+            let firstRow = {};
+            let id = Date.now();
+            firstRow['s_table_id_sql_lite'] = id;
+            data.push(firstRow);
+            if (this.tableHasRowSum && sDocument.state.viewType[this.keyInstance] == 'submit') {
+                data.push([''])
+            }
+            if (!this.checkDetailView()) {
+                ClientSQLManager.insertRow(this.keyInstance, this.tableName, ['s_table_id_sql_lite'], [id], false);
+            }
+            return data;
         }
-        if (!this.checkDetailView()) {
-            ClientSQLManager.insertRow(this.keyInstance, this.tableName, ['s_table_id_sql_lite'], [id], false);
-        }
-        return data;
-    }
-    /**
-     * Hàm khởi tạo bảng sql lite
-     */
+        /**
+         * Hàm khởi tạo bảng sql lite
+         */
     async createSqliteTable() {
         let columns = this.columnsInfo.columns;
         columns = columns.reduce((str, obj) => {
@@ -1517,28 +1543,26 @@ export default class Table {
             for (let index = 0; index < map.length; index++) {
                 const cellValidateInfo = map[index];
                 if (cellValidateInfo.type === 'linkControl') {
-                    ele.css({ 'position': 'relative' }).append(Util.renderInfoBtn());
-                    ele.off('click', '.info-control-btn')
-                    ele.on('click', '.info-control-btn', function(e) {
+                    ele.addClass('info-control-btn')
+                    ele.off('click')
+                    ele.on('click', function(e) {
                         SYMPER_APP.$evtBus.$emit('on-info-btn-in-table-click', { e: e, row: row, controlName: control.name })
                     })
                 }
                 if (cellValidateInfo.type === 'readOnly') {
                     hotInstance.setCellMeta(row, column, 'readOnly', cellValidateInfo.value);
-                }
-                else{
+                } else {
                     if (cellValidateInfo.value) {
-                        if(ele.find('.validate-icon').length > 0){
+                        if (ele.find('.validate-icon').length > 0) {
                             let curMsg = ele.find('.validate-icon').attr('title');
                             curMsg = (curMsg) ? cellValidateInfo.msg : curMsg + "\n" + cellValidateInfo.msg;
-                            ele.find('.validate-icon').attr('msg',curMsg);
-                        }
-                        else{
+                            ele.find('.validate-icon').attr('msg', curMsg);
+                        } else {
                             ele.css({ 'position': 'relative' }).append(Util.makeErrNoti(control.name, cellValidateInfo.msg));
                         }
                     }
                 }
-            }            
+            }
         }
         ele.off('click', '.validate-icon')
         ele.on('click', '.validate-icon', function(e) {
@@ -1560,9 +1584,15 @@ export default class Table {
         else{
             if(control.type == 'number' && (value === "" || value === undefined || value === null)){
                 td.textContent = 0;
+                td.style.textAlign = 'right'
             }
         }
         thisObj.getColumnSum(hotInstance, row, column, td, ele, prop)
+        if(thisObj.tableHasRowSum && row == hotInstance.countRows() - 1){
+            ele.find('.validate-icon').remove();
+        }
+
+        // thisObj.getColumnSum(hotInstance, row, column, td, ele, prop,control)
     }
 
     /**
@@ -1574,7 +1604,7 @@ export default class Table {
      * @param {*} ele 
      * @param {*} prop 
      */
-    getColumnSum(hotInstance, row, column, td, ele, prop){
+    getColumnSum(hotInstance, row, column, td, ele, prop, control){
         if(this.tableHasRowSum && row == hotInstance.countRows() - 1){
             ele.find('.validate-icon').remove();
             if(Object.keys(this.columnHasSum).includes(prop)){
@@ -1585,6 +1615,9 @@ export default class Table {
                     b = Number(b);
                     return a+b;
                 },0)
+                sum = control.formatNumberValue(sum);
+                td.style.textAlign = 'right'
+                td.style.fontWeight = "600";
                 td.textContent = sum;
             }
         }
@@ -1594,24 +1627,24 @@ export default class Table {
      * @param {*} key 
      * @param {*} value 
      */
-    addToValueMap(key,value){
-        if(!this.validateValueMap[key]){
-            this.validateValueMap[key] = [];
-        }
-        for (let index = 0; index < this.validateValueMap[key].length; index++) {
-            const cellVld = this.validateValueMap[key][index];
-            if(cellVld.type == value.type){
-                this.validateValueMap[key][index] = value;
-                return;
+    addToValueMap(key, value) {
+            if (!this.validateValueMap[key]) {
+                this.validateValueMap[key] = [];
             }
-            
+            for (let index = 0; index < this.validateValueMap[key].length; index++) {
+                const cellVld = this.validateValueMap[key][index];
+                if (cellVld.type == value.type) {
+                    this.validateValueMap[key][index] = value;
+                    return;
+                }
+
+            }
+            this.validateValueMap[key].push(value);
         }
-        this.validateValueMap[key].push(value);
-    }
-    /**
-     * validate time đúng định dạng hay k
-     * @param {*} str 
-     */
+        /**
+         * validate time đúng định dạng hay k
+         * @param {*} str 
+         */
     checkCellIsTime(str) {
             var patt = new RegExp("^([0-1]?[0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9]$", "g");
             return patt.test(str)
@@ -1708,11 +1741,11 @@ export default class Table {
         this.tableInstance.updateSettings(setting);
         this.tableInstance.scrollViewportTo(0, colIndex)
     }
-    show(){
+    show() {
         this.tableContainer[0].style.maxHeight = 'unset';
         this.tableContainer[0].style.opacity = '1';
     }
-    hide(){
+    hide() {
         this.tableContainer[0].style.opacity = '0';
         this.tableContainer[0].style.maxHeight = '0';
     }

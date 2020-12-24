@@ -1,6 +1,5 @@
 <template>
     <div class="wrap-content-detail" style="overflow:hidden;position: relative;">
-        
         <Preloader ref="preLoaderView"/>
         <div class="panel-header" v-if="!quickView && !isPrint">
             <div class="right-action">
@@ -38,10 +37,7 @@
                     :focusingControlName="focusingControlName"
                     :instance="keyInstance"/>
             </div>
-
         </VuePerfectScrollbar>
-        
-      
         <side-bar-detail 
             v-if="!isPrint"
             ref="sidebarView"
@@ -183,14 +179,6 @@ export default {
     beforeMount() {
         this.documentSize = "21cm";
     },
-    mounted(){
-        let self = this;
-        $(document).on('click','#sym-Detail-'+this.keyInstance+' .info-control-btn',function(e){
-            self.$refs.floattingPopup.show(e, $('#sym-Detail-'+self.keyInstance));
-            self.focusingControlName = $(e.target).attr('data-control');
-        })
-    },
-    
     created(){
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
@@ -215,20 +203,21 @@ export default {
             this.docObjId = Number(this.$route.params.id);
             this.loadDocumentObject(this.isPrint); 
         }
-
         this.$evtBus.$on('symper-app-wrapper-clicked',evt=>{
             if(thisCpn._inactive == true) return;
             if(this.$refs.historyView){
-                if($(evt.target).is('.highlight-history')){
+                if($(evt.target).is('.highlight-history') ){
                     this.$refs.historyView.show($(evt.target))    
+                }
+                else if($(evt.target).is('.info-control-btn')){
+                    this.$refs.floattingPopup.show(evt, $('#sym-Detail-'+this.keyInstance));
+                    this.focusingControlName = $(evt.target).attr('data-control');
                 }
                 else{
                     if(!$(evt.target).hasClass("v-data-table") &&
                         $(evt.target).closest(".v-data-table").length == 0){
                         this.$refs.historyView.hide() 
                     }
-
-                    
                     if(!$(evt.target).hasClass("s-floatting-popup") &&
                         $(evt.target).closest(".s-floatting-popup").length == 0){
                             this.focusingControlName = "";

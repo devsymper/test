@@ -1,6 +1,6 @@
 <template>
   <div class="app-details">
-	  	 <VuePerfectScrollbar :style="{height: listItemHeight}">
+	  	 <PerfectScrollbar :style="{height: listItemHeight}">
 			<Preloader
 				v-if="loadingApp"
 			 />
@@ -66,7 +66,7 @@
 							</li>
 					</ul>
 			</div>	
-		</VuePerfectScrollbar>
+		</PerfectScrollbar>
 		<ContextMenu ref="contextMenu" 
 			:sideBySide="sideBySide"
 			:allAppMode="false"
@@ -78,6 +78,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue';
 import {appManagementApi} from '@/api/AppManagement.js'
 import Preloader from "@/components/common/Preloader"
+import PerfectScrollbar from '@/components/common/PerfectScrollBar'
 export default {
  data: function() {
         return {
@@ -123,7 +124,8 @@ export default {
 	components:{
 		ContextMenu,
 		VuePerfectScrollbar,
-		Preloader
+		Preloader,
+		PerfectScrollbar
 	},
 	mounted(){
    },
