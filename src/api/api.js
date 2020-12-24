@@ -2,7 +2,7 @@ import {
     util
 } from "./../plugins/util.js";
 
-import {customApiCallWorker} from './customApiCallWorker.js'
+import {symperAjax} from './symperAjax.js'
 
 function makeCacheHeader(headers, url, data, options) {
     headers['Symper-Request-Name'] = options.requestName ? options.requestName : util.str.hashCode(JSON.stringify(['GET', url, data]));
@@ -135,7 +135,7 @@ export default class Api {
 		if(self.window){
 			return $.ajax(options);
 		}else{
-			return customApiCallWorker(options)
+			return symperAjax(options)
 		}
     }
 }

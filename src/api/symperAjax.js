@@ -3,7 +3,7 @@
 
 
 
-export const customApiCallWorker = async(options) =>{
+export const symperAjax = async(options) =>{
 	if(options.method == "GET"){
 		if(Object.keys(options.data).length > 0){
 			let str = new URLSearchParams(options.data).toString();
@@ -17,6 +17,5 @@ export const customApiCallWorker = async(options) =>{
 		}
 	}
 	const response = await fetch(options.url,options)
-	debugger
 	return  response.status == 204  ? null : response.json()   
 }
