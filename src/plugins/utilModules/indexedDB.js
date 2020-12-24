@@ -10,7 +10,7 @@ export const IndexedDB = class {
     setDBVersionNumber(_dbVersionNumber) {
         this.dbVersionNumber = _dbVersionNumber;
     }
-
+	
     open(objName, keyPath = false, objData = false, onsuccess = false, onerror = false, onupgradeneeded = false) {
         this.objName = objName;
         this.request = indexedDB.open(this.dbName, this.dbVersionNumber);
