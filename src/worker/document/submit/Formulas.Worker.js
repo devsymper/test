@@ -9,9 +9,9 @@ onmessage = function (event) {
     let action = workerDataReceive.action;
     let dataOfAction = workerDataReceive.data;
     let keyInstance = dataOfAction.keyInstance;
-    let controlName = dataOfAction.controlName;
     switch (action) {
         case 'runFormula':
+            let controlName = dataOfAction.controlName;
             let formulaInstance = dataOfAction.formulaInstance
             let from = dataOfAction.from
             let formulaIns = new Formulas(formulaInstance.keyInstance,formulaInstance.formulas,formulaInstance.type);
@@ -21,10 +21,17 @@ onmessage = function (event) {
             }
             let extraData = dataOfAction.extraData;
             let sqlRowId = dataOfAction.sqlRowId;
-            let dataInput = formulaIns.getDataInputFormula(rowIndex,extraData);
+            let dataInput = {}
+            if(dataOfAction.dataInput){
+                dataInput = dataOfAction.dataInput;
+            }
+            else{
+                dataInput = formulaIns.getDataInputFormula(rowIndex,extraData);
+            }
             if(['rowTable','columnTable'].includes(from)){
                 dataInput = dataOfAction.dataInput
             }
+            
             /**
              * Trương hợp chạy công thức cho cả cột trong table
              */
@@ -32,9 +39,11 @@ onmessage = function (event) {
                 let listIdRow = dataOfAction.listIdRow;
                 let dataPostForGetMultiple = prepareDataGetMultiple(dataInput, listIdRow, workerStore['submit'][keyInstance]['inputData']);
                 formulaIns.getDataMultiple(dataPostForGetMultiple).then(res=>{
-                    postMessage({action:'afterRunFormulasSuccess', dataAfter : 
-                        {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type, dataRowId:listIdRow}
-                    })
+                    if(res && res['data']){
+                        postMessage({action:'afterRunFormulasSuccess', dataAfter : 
+                            {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type, dataRowId:listIdRow}
+                        })
+                    }
                 })
             }
             else{
@@ -43,9 +52,11 @@ onmessage = function (event) {
                  */
                 if(['autocomplete','list'].includes(formulaInstance.type)){
                     formulaIns.handleRunAutoCompleteFormulas(dataInput).then(res=>{
-                        postMessage({action:'afterRunFormulasSuccess', dataAfter : 
-                            {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type}
-                        })
+                        if(res && res['data']){
+                            postMessage({action:'afterRunFormulasSuccess', dataAfter : 
+                                {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type}
+                            })
+                        }
                     })
                 }
                 /**
@@ -53,9 +64,11 @@ onmessage = function (event) {
                  */
                 else{
                     formulaIns.handleBeforeRunFormulas(dataInput).then(res=>{
-                        postMessage({action:'afterRunFormulasSuccess', dataAfter : 
-                            {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type,dataRowId:sqlRowId}
-                        })
+                        if(res && res['data']){
+                            postMessage({action:'afterRunFormulasSuccess', dataAfter : 
+                                {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type,dataRowId:sqlRowId}
+                            })
+                        }
                     })
                 }
             }
@@ -81,6 +94,9 @@ onmessage = function (event) {
             ClientSQLManager.createDB(keyInstance).then(res=>{
                 postMessage({action:'afterCreateSQLiteDB'})
             });
+            break;
+        case 'closeDB':
+            ClientSQLManager.closeDB(keyInstance);
             break;
             /**
              * Các hàm thực thi với sqlite

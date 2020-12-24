@@ -2,7 +2,6 @@ import Util from './util'
 import Handsontable from 'handsontable';
 import sDocument from './../../../store/document'
 import store from './../../../store'
-// import ClientSQLManager from './clientSQLManager';
 import { checkControlPropertyProp, getControlType, getSDocumentSubmitStore,getControlInstanceFromStore, minimizeDataAfterRunFormula } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
@@ -878,7 +877,6 @@ export default class Table {
     getDataInputForFormulas(formulasInstance, rowIndex = null) {
         let inputControl = formulasInstance.getInputControl();
         let dataInput = {};
-        console.log(formulasInstance,'formulasInstanceformulasInstance');
         let listInputInDocument = this.getListInputInDocument();
         for (let inputControlName in inputControl) {
             let controlIns = listInputInDocument[inputControlName];
@@ -1026,38 +1024,6 @@ export default class Table {
         }
         
     }
-    /**
-     * Hàm lấy dữ liệu hiện tại của table và insert vào sql lite table
-     */
-
-    
-    getDataResponseQuery(rs, controlType = "") {
-        let result = "";
-        if (controlType == 'table') {
-            if (!rs.server) {
-                let data = rs.data;
-                if (data.length > 0) {
-                    result = data[0]
-                }
-            } else {
-                result = rs.data.data;
-            }
-        } else {
-            if (!rs.server) {
-                let data = rs.data;
-                if (data.length > 0) {
-                    result = data[0].values[0][0];
-                }
-            } else {
-                let data = rs.data.data;
-                if (data.length > 0) {
-                    result = data[0][Object.keys(data[0])[0]];
-                }
-            }
-        }
-
-        return result;
-    }
     
     /**
      * Hàm xử lí dữ liệu sau khi chạy xong công thức của 1 cột, -> set data cho cột đó -> chạy công thức cho các control ngoài bảng bị ảnh hưởng
@@ -1130,12 +1096,12 @@ export default class Table {
 
     render() {
         let thisObj = this;
-        let tableContainer = $('<div id="' + thisObj.controlObj.id + '" s-control-type="table"></div>')[0];
-        thisObj.controlObj.ele.before(tableContainer);
-        thisObj.tableContainer = $(tableContainer);
-        thisObj.columnsInfo = this.getColumnsInfo();
-        let colHeaders = thisObj.columnsInfo.headerNames;
-        thisObj.colHeaders = colHeaders;
+        let tableContainer = $('<div id="' + this.controlObj.id + '" s-control-type="table"></div>')[0];
+        this.controlObj.ele.before(tableContainer);
+        this.tableContainer = $(tableContainer);
+        this.columnsInfo = this.getColumnsInfo();
+        let colHeaders = this.columnsInfo.headerNames;
+        this.colHeaders = colHeaders;
         let defaultData = this.getDefaultData();
         this.tableInstance = new Handsontable(tableContainer, {
             rowHeaders: true,
@@ -1159,7 +1125,7 @@ export default class Table {
             stretchH: 'all',
             autoRowSize: false,
             autoColSize: false,
-            viewportRowRenderingOffset:100,
+            viewportRowRenderingOffset:200,
             width: '100%',
             formulas:true,
             fixedRowsBottom: (thisObj.tableHasRowSum) ? 1 : 0,
@@ -1179,30 +1145,6 @@ export default class Table {
             },
 
         
-            /**
-             * Sau khi set data cho 1 cell thì cần insert data này vào bảng sql lite
-             * set xong chạy công thức cho control bị ảnh hưởng
-             * @param {*} changes 
-             * @param {*} source 
-             */
-            afterSetDataAtCell: function(changes, source) {
-                // if (changes.length == 0) {
-                //     return
-                // }
-                // if (changes[0][1] == 's_table_id_sql_lite' && !thisObj.checkDetailView()) {
-                //     setTimeout(() => {
-                //         let currentRowData = thisObj.tableInstance.getDataAtRow(changes[0][0]);
-                //         let columns = thisObj.columnsInfo.columns;
-                //         columns = columns.map(function(c) {
-                //             return c.data;
-                //         });
-                //         ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
-                //             debugger
-                //             thisObj.handlerCheckEffectedControlInTable(thisObj.controlNameAfterChange, changes[0][0]);
-                //         })
-                //     }, 10);
-                // } 
-            },
             /**
              * Sau khi create row thì set id cho dòng đó (cột id này là cột ẩn)
              * id ở đây là định danh trong bảng sql lite 
@@ -1229,7 +1171,6 @@ export default class Table {
                                     tableName: thisObj.tableName
                                 }
                             })
-                            // ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, ['s_table_id_sql_lite'], [id]);
                         }
                     }
                     thisObj.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
@@ -1340,12 +1281,6 @@ export default class Table {
     // Hàm set data cho table
     // hàm gọi sau khi chạy công thức 
     setData(vls, dateFormat = true) {
-        // try {
-            
-        //      ClientSQLManager.delete(this.keyInstance, this.tableName, false);            
-        // } catch (error) {
-        //     console.warn(error);
-        // }
         this.formulasWorker.postMessage({action:'executeSQliteDB',data:
             {
                 func:'delete',
@@ -1378,20 +1313,8 @@ export default class Table {
                     if (controlIns && dateFormat && controlIns.type == 'date') {
                         data[index][controlName] = SYMPER_APP.$moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
                     }
-                    dataToSqlLite.push('(' + rowData.join() + ')');
-                }
-                ClientSQLManager.insertDataToTable(this.keyInstance, this.tableName, columnInsert.join(), dataToSqlLite.join())
-                for (let controlName in dataToStore) {
-                    store.commit("document/updateListInputInDocument", {
-                        controlName: controlName,
-                        key: 'value',
-                        value: dataToStore[controlName],
-                        instance: this.keyInstance
-                    });
-                }
-                // nếu table có tính tổng thì thêm 1 dòng trống ở cuối
-                if (this.tableHasRowSum && ['submit', 'update'].includes(sDocument.state.viewType[this.keyInstance])) {
-                    data.push({})
+                    if (data[index] != undefined)
+                        dataToStore[controlName].push(data[index][controlName]);
                 }
                 dataToSqlLite.push('(' + rowData.join() + ')');
             }
@@ -1404,7 +1327,6 @@ export default class Table {
                     allData:dataToSqlLite.join()
                 }
             })
-            // ClientSQLManager.insertDataToTable(this.keyInstance, this.tableName, columnInsert.join(), dataToSqlLite.join())
             for (let controlName in dataToStore) {
                 store.commit("document/updateListInputInDocument", {
                     controlName: controlName,
@@ -1472,8 +1394,8 @@ export default class Table {
                     isPromise:false
                 }
             })
-            // ClientSQLManager.insertRow(this.keyInstance, this.tableName, ['s_table_id_sql_lite'], [id], false);
         }
+        return data;
     }
         /**
          * Hàm khởi tạo bảng sql lite
@@ -1500,7 +1422,6 @@ export default class Table {
                 tableName: this.tableName,
             }
         })
-        // await ClientSQLManager.createTable(this.keyInstance, this.tableName, columns, "", "");
 
     }
 
@@ -1674,12 +1595,10 @@ export default class Table {
                 td.style.textAlign = 'right'
             }
         }
-        thisObj.getColumnSum(hotInstance, row, column, td, ele, prop)
+        thisObj.getColumnSum(hotInstance, row, column, td, ele, prop, control)
         if(thisObj.tableHasRowSum && row == hotInstance.countRows() - 1){
             ele.find('.validate-icon').remove();
         }
-
-        // thisObj.getColumnSum(hotInstance, row, column, td, ele, prop,control)
     }
 
     /**

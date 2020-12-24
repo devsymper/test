@@ -361,7 +361,7 @@ export default {
     },
     
     destroyed(){
-        ClientSQLManager.closeDB(this.keyInstance);
+        this.closeFormulasWorker();
     },
     data() {
         return {
@@ -437,20 +437,17 @@ export default {
                     thisCpn.$store.commit(
                         "document/addToDocumentSubmitStore", { key: 'listControlMappingDatasets', value: controlMapDatasetDataflow, instance: thisCpn.keyInstance }
                     );
+                    thisCpn.formulasWorker.postMessage({action:'updateDocumentObjectId',data:{keyInstance:thisCpn.keyInstance,updateDocumentObjectId:thisCpn.docObjId}})
                     thisCpn.processHtml(thisCpn.contentDocument);
+                    thisCpn.controlRelationWorker.terminate();
                     break;
-            
-                case 'getMapControlEffected':
-                    console.log('data.dataAfter',data.dataAfter);
-                    // this.controlRelationWorker.postMessage({action:'checkInfinityControl',data:
-                    //     { mapControlEffected: this.mapControlEffected}
-                    // });
-                    break;
-            
                 default:
                     break;
             }
         });
+        /**
+         * Lắng nghe sự kiện từ luồng xử lí formulas
+         */
         this.formulasWorker.addEventListener("message", function (event) {
             let data = event.data;
             switch (data.action) {
@@ -468,7 +465,6 @@ export default {
                     thisCpn.handleAfterRunFormulas(res,controlName,formulaType,from);
                     break;
                 case 'afterCreateSQLiteDB':
-                    console.log('handlerBeforeRunFormulasValue');
                     thisCpn.handleLoadContentDocument();
                     break;
                 default:
@@ -529,7 +525,6 @@ export default {
         if(this.documentObjectId){
             this.docObjId = this.documentObjectId;
         }
-        this.formulasWorker.postMessage({action:'updateDocumentObjectId',data:{keyInstance:this.keyInstance,updateDocumentObjectId:this.docObjId}})
 
         // đặt trang thái của view là submit => isDetailView = false
         this.$store.commit("document/changeViewType", {
@@ -993,6 +988,10 @@ export default {
     },
     
     methods: {
+        closeFormulasWorker(){
+            this.formulasWorker.postMessage({action:'closeDB',data:{keyInstance:this.keyInstance}});
+            this.formulasWorker.terminate();
+        },
         handleLoadContentDocument(){
             if(this.documentId != null && this.documentId != 0){
                 this.loadDocumentData();
@@ -1247,7 +1246,7 @@ export default {
             let thisCpn = this
             let listInput = getListInputInDocument(this.keyInstance);
             if(['select','combobox'].includes(type)){
-                this.formulasWorker.postMessage({action:'runFormula',data:{formulaInstance:e.selectFormulasInstance, controlName:aliasControl}})
+                this.formulasWorker.postMessage({action:'runFormula',data:{formulaInstance:e.selectFormulasInstance, controlName:aliasControl, keyInstance:this.keyInstance}})
             }
             else{
                 
@@ -1262,7 +1261,8 @@ export default {
                             formulaInstance:e.autocompleteFormulasInstance, 
                             controlName:aliasControl, 
                             rowIndex:e.e.rowIndex,
-                            extraData:extraItem
+                            extraData:extraItem,
+                            keyInstance:this.keyInstance
                         }
                     })
                 }
@@ -2174,14 +2174,13 @@ export default {
                     
                     // nếu có công thức nút submit
                     if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
-                        let dataInput = thisCpn.getDataInputFormula(thisCpn.sDocumentSubmit.submitFormulas);
-                        thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
+                        // let dataInput = thisCpn.getDataInputFormula(thisCpn.sDocumentSubmit.submitFormulas);
+                        // thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
+                        thisCpn.formulasWorker.postMessage({action:'runFormula',data:{formulaInstance:thisCpn.sDocumentSubmit.submitFormulas,keyInstance:thisCpn.keyInstance}})
                     }
-                    
+                    thisCpn.closeFormulasWorker();
                     // nếu submit từ form sub submit thì ko rediect trang
                     // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
-                    ClientSQLManager.closeDB(thisCpn.keyInstance);
-                    
                     if(thisCpn.$getRouteName() == 'submitDocument' && thisCpn.$route.params.id == thisCpn.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                     }
@@ -2229,10 +2228,12 @@ export default {
                         title: "update document success!"
                     });        
                     if(thisCpn.sDocumentSubmit.updateFormulas != undefined){
-                        let dataInput = thisCpn.getDataInputFormula(thisCpn.sDocumentSubmit.updateFormulas);
-                        thisCpn.sDocumentSubmit.updateFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
+                        // let dataInput = thisCpn.getDataInputFormula(thisCpn.sDocumentSubmit.updateFormulas);
+                        thisCpn.formulasWorker.postMessage({action:'runFormula',data:{formulaInstance:thisCpn.sDocumentSubmit.updateFormulas, keyInstance:thisCpn.keyInstance}})
+
+                        // thisCpn.sDocumentSubmit.updateFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
                     }
-                    ClientSQLManager.closeDB(thisCpn.keyInstance);
+                    thisCpn.closeFormulasWorker();
                     if(thisCpn.$getRouteName() == 'updateDocumentObject')
                      thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
@@ -2522,10 +2523,7 @@ export default {
                     let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulaInstance,'all');
                     tableInstance.tableInstance.handlerRunFormulasForControlInTable(control,dataIn,formulaInstance, 'all');
                 }
-                this.formulasWorker.postMessage({action:'runFormula',data:{formulaInstance:formulaInstance, controlName:controlName, from:from}})
-                // formulaInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
-                //     self.handleAfterRunFormulas(rs,controlId,controlName,formulaType,from)
-                // });
+                this.formulasWorker.postMessage({action:'runFormula',data:{formulaInstance:formulaInstance, controlName:controlName, from:from, keyInstance:this.keyInstance}})
             }
         },
        
