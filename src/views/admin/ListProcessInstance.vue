@@ -267,6 +267,23 @@ export default {
                 case 'stopProcessInstance':
 					self.notifyMessage(data.dataAfter," Tác vụ này đã hoàn thành", "Dừng tác vụ thành công")
 					break;
+                case 'activeProcessInstance':
+					self.notifyMessage(data.dataAfter," Tác vụ này đã hoàn thành", "Chạy tác vụ thành công")
+					break;
+                case 'deleteProcessInstance':
+					if(data.dataAfter.resDoc == 'notFound'){
+						self.$snotify({
+							type: "error",
+							title: "Không tìm thấy bản ghi liên quan"
+						})
+					}else if(data.dataAfter.resDoc == 'done'){
+						self.$snotify({
+							type: "success",
+							title: "Xóa bản ghi liên quan thành công"
+						})
+					}
+					self.notifyMessage(data.dataAfter.newLists," Tác vụ này đã hoàn thành", "Xóa tác vụ thành công")
+					break;
                 default:
                     break;
             }
@@ -317,6 +334,11 @@ export default {
 						type: "error",
 						title: 'Tác vụ này đã được dừng'
 					})
+				}else if(e == "isRunning"){
+					self.$snotify({
+						type: "error",
+						title: 'Tác vụ này đang chạy'
+					})
 					
 				}
 			})
@@ -335,37 +357,6 @@ export default {
 					data:{listItemSelected: this.listItemSelected}
 				}
 			);
-			// for(let i in this.listItemSelected){
-			// 	if(this.listItemSelected[i].status == "3"){
-			// 		self.$snotify(
-			// 			{
-			// 				type: "infor",
-			// 				title:" Tác vụ này đã hoàn thành"
-			// 			}
-			// 		)
-			// 	}else{
-			// 		adminApi.stopProcessInstances(this.listItemSelected[i].id).then(res=>{
-			// 			if(res.suspended == true){
-			// 				self.$snotify(
-			// 					{
-			// 						type: "success",
-			// 						title:" Dừng tác vụ thành công"
-			// 					}
-			// 				)
-			// 			}
-			// 			this.showBtnAddCheckbox = true
-			// 			self.$refs.listWorkFlow.refreshList()
-			// 		}).catch(err=>{
-			// 			self.$snotify(
-			// 					{
-			// 						type: "error",
-			// 						title:"Tác vụ này đã được dừng"
-			// 					}
-			// 				)
-			// 		})
-			// 	}
-				
-			// }
 		 },
 		endProcessInstance(){
 			this.adminWorker.postMessage(
@@ -376,37 +367,12 @@ export default {
 			);
 		},
 		activeProcessInstance(){
-			let self = this
-			for(let i in this.listItemSelected){
-				if(this.listItemSelected[i].status == "3"){
-					self.$snotify(
-						{
-							type: "infor",
-							title:" Tác vụ này đã hoàn thành"
-						}
-					)
-				}else{
-					adminApi.activeProcessInstances(this.listItemSelected[i].id).then(res=>{
-						self.$snotify(
-							{
-								type: "success",
-								title:" Chạy tác vụ thành công"
-							}
-						)
-						this.showBtnAddCheckbox = true
-						self.$refs.listWorkFlow.refreshList()
-					}).catch(err=>{
-						self.$snotify(
-								{
-									type: "error",
-									title:"Tác vụ này đang chạy"
-								}
-							)
-					})
+			this.adminWorker.postMessage(
+				{
+					action:'activeProcessInstance',
+					data:{listItemSelected: this.listItemSelected}
 				}
-				
-			}
-			
+			);
 		},
 		confirmDelete(){
 			this.showDialog = true
@@ -417,59 +383,67 @@ export default {
 		},
 		deleteProcessInstance(value){
 			this.showDialog = false
-			let self = this
-			if(value == true){
-				let arr = []
-				for(let i in this.listItemSelected){
-					arr.push(this.listItemSelected[i].id)
-				}
-				documentApi.deleteDocumentObject({workflowObjectIds:JSON.stringify(arr)}).then(res=>{
-					if(res.status == 400){
-						self.$snotify(
-							{
-								type: "error",
-								title:" Không tìm thấy bản ghi liên quan"
-							}
-						)
-					}else if(res.status = 200){
-						self.$snotify(
-							{
-								type: "success",
-								title:" Xóa bản ghi liên quan hành công"
-							}
-						)
+			this.adminWorker.postMessage(
+				{
+					action:'deleteProcessInstance',
+					data:{
+						listItemSelected: this.listItemSelected,
+						isDeleteDoc: value
 					}
-				}).catch(err=>{
-					self.$snotify(
-						{
-							type: "error",
-							title:" Xóa bản ghi liên quan thất bại"
-						}
-					)
-				})
-			}
-			for(let i in this.listItemSelected){
-
-				if(this.listItemSelected[i].status == '3'){
-					adminApi.deleteTask(this.listItemSelected[i].id).then(res=>{
-						self.notifysuccess()
-					}).catch(err=>{})
-				}else{
-					adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
-						adminApi.deleteTask(this.listItemSelected[i].id).then(res=>{
-						}).catch(err=>{})
-						self.notifysuccess()
-					}).catch(err=>{
-						self.$snotify(
-								{
-									type: "error",
-									title:"Đã có lỗi xảy ra"
-								}
-							)
-					})
 				}
+			);
+			// let self = this
+			// if(value == true){
+			// 	let arr = []
+			// 	for(let i in this.listItemSelected){
+			// 		arr.push(this.listItemSelected[i].id)
+			// 	}
+			// 	documentApi.deleteDocumentObject({workflowObjectIds:JSON.stringify(arr)}).then(res=>{
+			// 		if(res.status == 400){
+			// 			self.$snotify(
+			// 				{
+			// 					type: "error",
+			// 					title:" Không tìm thấy bản ghi liên quan"
+			// 				}
+			// 			)
+			// 		}else if(res.status = 200){
+			// 			self.$snotify(
+			// 				{
+			// 					type: "success",
+			// 					title:" Xóa bản ghi liên quan hành công"
+			// 				}
+			// 			)
+			// 		}
+			// 	}).catch(err=>{
+			// 		self.$snotify(
+			// 			{
+			// 				type: "error",
+			// 				title:" Xóa bản ghi liên quan thất bại"
+			// 			}
+			// 		)
+			// 	})
+			// }
+			// for(let i in this.listItemSelected){
+			// 	if(this.listItemSelected[i].status == '3'){
+			// 		adminApi.deleteTask(this.listItemSelected[i].id).then(res=>{
+			// 			self.notifysuccess()
+			// 		}).catch(err=>{})
+			// 	}else{
+			// 		adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
+			// 			adminApi.deleteTask(this.listItemSelected[i].id).then(res=>{
+			// 			}).catch(err=>{})
+			// 			self.notifysuccess()
+			// 		}).catch(err=>{
+			// 			self.$snotify(
+			// 					{
+			// 						type: "error",
+			// 						title:"Đã có lỗi xảy ra"
+			// 					}
+			// 				)
+			// 		})
+			// 	}
 				
-			}
+			// }
 			
 		},
 		notifysuccess(title = " Xóa tác vụ thành công"){
