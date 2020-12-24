@@ -120,12 +120,15 @@ export default {
 			return resData	
 		},
 		getListSearch(value){
- 			let self = this
-			this.listItems.document_category.item = []
-			this.listItems.document_major.item = []
-			this.listItems.orgchart.item = []
-			this.listItems.workflow_definition.item = []
-			this.listItems.dashboard.item = []
+			let self = this
+			for(let i in this.listItems){
+				this.listItems[i].item = []
+			}
+			// this.listItems.document_category.item = []
+			// this.listItems.document_major.item = []
+			// this.listItems.orgchart.item = []
+			// this.listItems.workflow_definition.item = []
+			// this.listItems.dashboard.item = []
 			orgchartApi.getOrgchartList({search:value,pageSize:50}).then(res => {
 				this.checkChildrenItem(res.data.listObject,self.sAppManagement.orgchart.item)
 				this.listItems.orgchart.item = res.data.listObject;

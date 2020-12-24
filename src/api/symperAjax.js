@@ -12,7 +12,7 @@ export const symperAjax = async(options) =>{
 	}else{
 		if(options.dataType == "json"){
 			if(Object.keys(options.data).length > 0){
-				options.body = options.data
+				options.body = JSON.stringify(options.data)
 			}
 		}
 	}
