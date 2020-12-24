@@ -313,3 +313,58 @@ export const checkDataInputChange = function(rootChangeFieldName, dataInputBefor
     }
     return false;
 }
+
+
+export const prepareDataGetMultiple = (dataInput, listIdRow, listInput)=>{
+    let dataPost = {};
+    /***
+     * Chuẩn bị data để gọi api thực thi công thức cho các control trong table
+     */
+    if (Object.keys(dataInput).length > 0) {
+        let allRowDataInput = [];
+        for (let control in dataInput) {
+            let controlType = listInput[control].type;
+            let dataRow = dataInput[control];
+            if (!Array.isArray(dataRow)) {
+                for (let index = 0; index < listIdRow.length; index++) {
+                    if (allRowDataInput.length <= index) {
+                        allRowDataInput[index] = {};
+                    }
+                    if(['number','percent'].includes(controlType)){
+                        if (!dataRow) {
+                            dataRow = 0
+                        } else {
+                            dataRow = Number(dataRow);
+                        }
+                    }
+                   
+                    allRowDataInput[index][control] = dataRow;
+                }
+            } else {
+                for (let i = 0; i < dataRow.length; i++) {
+                    if (allRowDataInput.length <= i) {
+                        allRowDataInput[i] = {};
+                    }
+                    let value = dataRow[i];
+                    if(['number','percent'].includes(controlType)){
+                        if (!value) {
+                            value = 0
+                        } else {
+                            value = Number(value);
+                        }
+                    }
+                    allRowDataInput[i][control] = value;
+                }
+            }
+        }
+        for (let index = 0; index < allRowDataInput.length; index++) {
+            let rowInput = allRowDataInput[index];
+            dataPost[listIdRow[index]] = rowInput;
+        }
+    } else {
+        for (let index = 0; index < listIdRow.length; index++) {
+            dataPost[listIdRow[index]] = "";
+        }
+    }
+    return dataPost;
+}

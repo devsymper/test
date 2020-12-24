@@ -248,7 +248,7 @@ export default {
         },
         action:{ // submit hoặc update
             type:String,
-            default:''
+            default:'submit'
         },
         documentObjectWorkflowObjectId: {
             type: String,
@@ -459,6 +459,12 @@ export default {
                     let res = data.dataAfter.res;
                     let formulaType = data.dataAfter.formulaType;
                     let from = data.dataAfter.from;
+                    let dataRowId = data.dataAfter.dataRowId;
+                    let controlIns = getControlInstanceFromStore(thisCpn.keyInstance, controlName)
+                    if(['rowTable','columnTable'].includes(from)){
+                        let tableControl = getControlInstanceFromStore(thisCpn.keyInstance, controlIns.inTable);
+                        tableControl.tableInstance.afterRunFormula(res, formulaType , controlIns, dataRowId, from);
+                    }
                     thisCpn.handleAfterRunFormulas(res,controlName,formulaType,from);
                     break;
                 case 'afterCreateSQLiteDB':
@@ -525,9 +531,9 @@ export default {
         }
         // đặt trang thái của view là submit => isDetailView = false
         this.$store.commit("document/changeViewType", {
-                key: this.keyInstance,
-                value: this.action,
-            });
+            key: this.keyInstance,
+            value: this.action,
+        });
         
         /**
          * Nhận xử lí sự kiện click chuyển đổi dạng table <=> pivot mode
@@ -2502,7 +2508,7 @@ export default {
                 if(control.inTable != false){
                     let tableInstance = getControlInstanceFromStore(this.keyInstance,control.inTable);
                     let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulaInstance,'all');
-                    tableInstance.tableInstance.handlerRunFormulasForControlInTable(formulaType,control,dataIn,formulaInstance, 'all');
+                    tableInstance.tableInstance.handlerRunFormulasForControlInTable(control,dataIn,formulaInstance, 'all');
                 }
                 this.formulasWorker.postMessage({action:'runFormula',data:{formulaInstance:formulaInstance, controlName:controlName, from:from}})
                 // formulaInstance.handleBeforeRunFormulas(dataInput).then(rs=>{

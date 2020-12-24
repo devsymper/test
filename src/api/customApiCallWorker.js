@@ -5,7 +5,6 @@ export const customApiCallWorker = async(options) =>{
 			options.url.includes("?") ? options.url = options.url+"&"+str : options.url = options.url+"?"+str
 		}
 	}else{
-		console.log(options,'optionsoptions');	
 		if(options.dataType == "json"){
 			let data = new URLSearchParams(options.data)
 			options.body = data;

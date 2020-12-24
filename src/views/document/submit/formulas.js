@@ -382,8 +382,6 @@ export default class Formulas extends FormulasEvent{
             return formulas;
         }
         let listControlInDoc = this.getListControl();
-        console.log(listControlInDoc,'listControlInDoclistControlInDoc');
-        console.log(dataInput,'listControlInDoclistControlInDoc');
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
             let value = dataInput[controlName];
@@ -397,9 +395,9 @@ export default class Formulas extends FormulasEvent{
                 valueForArray = valueForArray.substring(0, valueForArray.length - 1);
                 value = valueForArray;
             }
-            if (value == undefined || typeof value == 'undefined' || value == null) {
+            if (!value) {
                 value = ""
-                if (listControlInDoc[controlName].type == 'number' || listControlInDoc[controlName].type == 'percent') {
+                if ( ['number','percent'].includes(listControlInDoc[controlName].type) ) {
                     value = 0;
                 }
             }
@@ -589,54 +587,54 @@ export default class Formulas extends FormulasEvent{
      * Đồng thời đẩy vào thông tin về việc control nào thay đổi dẫn đến các control khác thay đổi theo
      */
     setInputControl() {
-            let allInput = {}
-            if (this.checkExistFormulas()) {
-                let allRelateName = this.formulas.match(/{[A-Za-z0-9_]+}/gi);
-                let colSelect = this.getColumnsSelect(this.formulas);
-                let listInput = this.getListControl();
-                if (colSelect && !/\*/.test(colSelect[0])) {
-                    let colFromOtherTable = colSelect[0];
-                    colFromOtherTable = colFromOtherTable.replace(/distinct|DISTINCT/, "");
-                    colFromOtherTable = colFromOtherTable.match(/\([a-zA-Z0-9_]*\)/gm);
-                    if (colFromOtherTable) {
-                        for (let index = 0; index < colFromOtherTable.length; index++) {
-                            let col = colFromOtherTable[index];
-                            col = col.replace(/\)/g, "");
-                            col = col.replace(/\(/g, "");
-                            col = col.trim();
-                            if (listInput) {
-                                if (Object.keys(listInput).includes(col)) {
-                                    allInput[col] = true;
-                                }
-                            } else {
+        let allInput = {}
+        if (this.checkExistFormulas()) {
+            let allRelateName = this.formulas.match(/{[A-Za-z0-9_]+}/gi);
+            let colSelect = this.getColumnsSelect(this.formulas);
+            let listInput = this.getListControl();
+            if (colSelect && colSelect.length > 0 && !/\*/.test(colSelect[0])) {
+                let colFromOtherTable = colSelect[0];
+                colFromOtherTable = colFromOtherTable.replace(/distinct|DISTINCT/, "");
+                colFromOtherTable = colFromOtherTable.match(/\([a-zA-Z0-9_]*\)/gm);
+                if (colFromOtherTable) {
+                    for (let index = 0; index < colFromOtherTable.length; index++) {
+                        let col = colFromOtherTable[index];
+                        col = col.replace(/\)/g, "");
+                        col = col.replace(/\(/g, "");
+                        col = col.trim();
+                        if (listInput) {
+                            if (Object.keys(listInput).includes(col)) {
                                 allInput[col] = true;
                             }
-
+                        } else {
+                            allInput[col] = true;
                         }
-                    }
 
-                }
-                if (!allRelateName) {
-                    return {};
-                }
-                let names = allRelateName.reduce((obj, name) => {
-                    let controlName = name.match(/\w+/g);
-                    if (!BUILD_IN_FUNCTION.includes(controlName[0]) && !this.detectWorkflowParams(controlName[0]) && controlName[0] != 'search_value') {
-                        obj[controlName] = true;
                     }
-                    return obj;
-                }, {});
+                }
 
-                Object.assign(allInput, names);
-                return allInput;
             }
-            return {}
+            if (!allRelateName) {
+                return {};
+            }
+            let names = allRelateName.reduce((obj, name) => {
+                let controlName = name.match(/\w+/g);
+                if (!BUILD_IN_FUNCTION.includes(controlName[0]) && !this.detectWorkflowParams(controlName[0]) && controlName[0] != 'search_value') {
+                    obj[controlName] = true;
+                }
+                return obj;
+            }, {});
+
+            Object.assign(allInput, names);
+            return allInput;
         }
-        /**
-         * Hàm lấy các cột được select trong công thức local
-         * mục đích để đưa vào biến effeted của control đó (cột trong table)
-         * lúc nào có sự thay đổi của cột đó thì chạy lại công thức chứa local này
-         */
+        return {}
+    }
+    /**
+     * Hàm lấy các cột được select trong công thức local
+     * mục đích để đưa vào biến effeted của control đó (cột trong table)
+     * lúc nào có sự thay đổi của cột đó thì chạy lại công thức chứa local này
+     */
     setInputLocal() {
             let listLocalFormulas = this.localFormulas;
             let listInputLocal = {}
@@ -692,9 +690,6 @@ export default class Formulas extends FormulasEvent{
             listInput = this.getListControl();
         }
         let dataInput = {};
-        // if(extraData){
-        //     debugger
-        // }
         for (let inputControlName in inputControl) {
             if(extraData && extraData[inputControlName]){
                 dataInput[inputControlName] = extraData[inputControlName];
@@ -709,13 +704,20 @@ export default class Formulas extends FormulasEvent{
                     if(controlIns.type == 'time'){
                         valueInputControl = controlIns.convertTimeToStandard(valueInputControl)
                     }
+                    if(['number','percent'].includes(controlIns.type) && !valueInputControl){
+                        valueInputControl = 0
+                    }
                     dataInput[inputControlName] = valueInputControl;
                 }
             }
         }
         if(rowIndex != null){
             for(let controlName in dataInput){
+                let controlIns = listInput[controlName];
                 if(Array.isArray(dataInput[controlName])){
+                    if(['number','percent'].includes(controlIns.type) && !dataInput[controlName][rowIndex]){
+                        dataInput[controlName][rowIndex] = 0
+                    }
                     dataInput[controlName] = dataInput[controlName][rowIndex];
                 }
             }
@@ -761,11 +763,32 @@ export default class Formulas extends FormulasEvent{
             refFormulas = refFormulas.replace(regex, search);
             return refFormulas;
         }
-        // hàm lấy các column được query sau select và trước from
+
+    // hàm lấy các column được query sau select và trước from trong trường hợp select từ bảng local
 
     getColumnsSelect(syql) {
         syql = syql.replace(/[\s\r]+/gm, " ");
-        return syql.match(/(?<=SELECT|select).*(?=FROM|from)/gm);
+        let listSyql = this.getReferenceFormulas();
+        let listColumnSelect = syql.match(/(?<=SELECT|select).*(?=FROM|from)/gm);
+        if(listColumnSelect && listColumnSelect.length > 0){
+            if(listSyql){
+                for (let index = 0; index < listSyql.length; index++) {
+                    const refFormula = listSyql[index];
+                    for (let i = 0; i < listColumnSelect.length; i++) {
+                        const column = listColumnSelect[i];
+                        if(refFormula.includes(column)){
+                            listColumnSelect.splice(i,1)
+                        }
+                    }
+                }
+            }
+            else{
+                return listColumnSelect   
+            }
+        }
+        else{
+            return []
+        }
 
     }
     getColumnsQuery(syql) {

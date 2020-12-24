@@ -1,9 +1,8 @@
 
-// import { checkDataInputChange } from "@/views/document/submit/handlerCheckRunFormulas";
-// import { minimizeDataAfterRunFormula} from "@/views/document/common/common";
 import { workerStore } from '@/worker/document/submit/WorkerStateManagement';
 import ClientSQLManager from "@/views/document/submit/clientSQLManager";
 import Formulas from "@/views/document/submit/formulas";
+import { prepareDataGetMultiple } from '@/components/document/dataControl';
 
 onmessage = function (event) {
     var workerDataReceive = event.data;
@@ -21,26 +20,51 @@ onmessage = function (event) {
                 rowIndex = null
             }
             let extraData = dataOfAction.extraData;
+            let sqlRowId = dataOfAction.sqlRowId;
             let dataInput = formulaIns.getDataInputFormula(rowIndex,extraData);
-            if(['autocomplete','list'].includes(formulaInstance.type)){
-                formulaIns.handleRunAutoCompleteFormulas(dataInput).then(res=>{
+            if(['rowTable','columnTable'].includes(from)){
+                dataInput = dataOfAction.dataInput
+            }
+            /**
+             * Trương hợp chạy công thức cho cả cột trong table
+             */
+            if(from == 'columnTable'){
+                let listIdRow = dataOfAction.listIdRow;
+                let dataPostForGetMultiple = prepareDataGetMultiple(dataInput, listIdRow, workerStore['submit'][keyInstance]['inputData']);
+                formulaIns.getDataMultiple(dataPostForGetMultiple).then(res=>{
                     postMessage({action:'afterRunFormulasSuccess', dataAfter : 
-                        {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type}
+                        {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type, dataRowId:listIdRow}
                     })
                 })
             }
             else{
-                formulaIns.handleBeforeRunFormulas(dataInput).then(res=>{
-                    postMessage({action:'afterRunFormulasSuccess', dataAfter : 
-                        {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type}
+                /**
+                 * Trường hợp chạy công thức cho các công thưc dạng list như autocomplete hay list
+                 */
+                if(['autocomplete','list'].includes(formulaInstance.type)){
+                    formulaIns.handleRunAutoCompleteFormulas(dataInput).then(res=>{
+                        postMessage({action:'afterRunFormulasSuccess', dataAfter : 
+                            {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type}
+                        })
                     })
-                })
+                }
+                /**
+                 * trường hợp chạy công thức cho các trường hợp còn lại
+                 */
+                else{
+                    formulaIns.handleBeforeRunFormulas(dataInput).then(res=>{
+                        postMessage({action:'afterRunFormulasSuccess', dataAfter : 
+                            {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type,dataRowId:sqlRowId}
+                        })
+                    })
+                }
             }
-            
             break;
+            /**
+             * Có cập nhật input trên main thì worker cũng phải lưu lại giá trị
+             */
         case 'updateWorkerStore':
             let type = dataOfAction.type;
-            let value = dataOfAction.value;
             if(!workerStore[type][keyInstance]){
                 workerStore[type][keyInstance] = {}
             }
@@ -48,7 +72,6 @@ onmessage = function (event) {
                 workerStore[type][keyInstance]['inputData'] = {}
             }
             let controlIns = dataOfAction.controlIns;
-            console.log(controlIns,'controlInscontrolIns');
             workerStore[type][keyInstance]['inputData'][controlIns.name] = controlIns;
             break;
         case 'createSQLiteDB':
@@ -56,6 +79,9 @@ onmessage = function (event) {
                 postMessage({action:'afterCreateSQLiteDB'})
             });
             break;
+            /**
+             * Các hàm thực thi với sqlite
+             */
         case 'executeSQliteDB':
             let func = dataOfAction['func'];
             if(func == 'delete'){
@@ -68,7 +94,7 @@ onmessage = function (event) {
                 ClientSQLManager.insertRow(keyInstance, dataOfAction.tableName, dataOfAction.columns, dataOfAction.rowData, dataOfAction.isPromise);
             }
             else if(func == 'editRow'){
-                ClientSQLManager.editRow(keyInstance, dataOfAction.tableName, dataOfAction.column, dataOfAction.value,dataOfAction.condition, true);
+                ClientSQLManager.editRow(keyInstance, dataOfAction.tableName, dataOfAction.columns, dataOfAction.value,dataOfAction.condition, true);
             }
             else if(func == 'insertAll'){
                 ClientSQLManager.insertDataToTable(keyInstance, dataOfAction.tableName, dataOfAction.columns, dataOfAction.allData);

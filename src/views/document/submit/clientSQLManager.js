@@ -39,7 +39,6 @@ export default class ClientSQLManager {
      * @param {String} keyInstance 
      */
     static getInstanceDB(keyInstance) {
-        console.log(workerStore,'workerStore');
         return workerStore['submit'][keyInstance]['SQLiteDB'];
     }
     /**
