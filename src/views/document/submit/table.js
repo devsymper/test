@@ -1084,7 +1084,7 @@ export default class Table {
                 controlInstance.handlerDataAfterRunFormulasValue(data, listIdRow, rowIndex);
                 break;
             case "validate":
-                controlInstance.handlerDataAfterRunFormulasValidate(data);
+                controlInstance.handlerDataAfterRunFormulasValidate(data, listIdRow, rowIndex);
                 break;
             case "require":
                 controlInstance.handlerDataAfterRunFormulasRequire(data);
