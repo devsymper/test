@@ -13,6 +13,7 @@
             :customAPIResult="customAPIResult"
             :showActionPanelInDisplayConfig="true"
             :commonActionProps="commonActionProps"
+			:customRenderForFilter="customRenderForFilter"
             @row-selected="onRowSelected"
         >
             <div slot="right-panel-content" class="h-100">
@@ -63,7 +64,19 @@ export default {
                 "module": "application",
                 "resource": "application_definition",
                 "scope": "application",
-            },
+			},
+			customRenderForFilter(columnName,items){
+				if(columnName == 'status'){
+					items.forEach(function(e){
+						if(e.value == "0"){
+							e.label = "Không kích hoạt"
+						}else{
+							e.label = "Kích hoạt"
+						}
+					})
+				}
+				return items
+			},
             apiUrl: appConfigs.apiDomain.appManagement+"application",
             appUrl: "apps",
             isEdit: false,
