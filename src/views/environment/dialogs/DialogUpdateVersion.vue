@@ -7,12 +7,12 @@
 		>
 			<v-card>
 			<v-card-title class="fs-15">
-				Deploy version
+				Update version
 			</v-card-title>
 			<v-card-text>
 				<div class="content-deploy-dialog d-flex flex-column ml-2 fs-13">
 					<div class="fs-13 mb-2 mt-2 ">
-						Chọn môi trường bạn muốn deploy
+						Chọn môi trường bạn muốn update version
 					</div>
 					<v-autocomplete
 						v-model="envId"
@@ -23,7 +23,7 @@
 						class="fs-13"
 					></v-autocomplete>
 					<div class="text-wrap">
-						Nhấn Deploy để deploy version này
+						Nhấn Đồng ý  để update version này
 					</div>
 				</div>
 
@@ -42,7 +42,7 @@
 					text
 					@click="deloyVersion"
 				>
-					Deploy
+					Đồng ý 
 				</v-btn>
 			</v-card-actions>
 			</v-card>
@@ -86,10 +86,6 @@ export default {
 				environmentId: this.envId
 			}
 			self.$emit('cancel')
-			self.$snotify({
-				type: 'success',
-				title: "Đang xử lí. Vui lòng chờ kêt quả.... "
-			})
 			environmentManagementApi.getServerId(data).then(res=>{
 				if(res.data[0]){
 					let formData = {
@@ -97,11 +93,12 @@ export default {
 						versionId: versionId,
 						environmentId: self.envId
 					}
-					environmentManagementApi.deloy(formData).then(res=>{
+					environmentManagementApi.updateVersion(formData).then(res=>{
 						if(res.status == 200){
+							debugger
 							self.$snotify({
 								type: 'success',
-								title: "Thành công . Đã deploy"
+								title: "Thành công ."
 							})
 						}else{
 							self.$snotify({
