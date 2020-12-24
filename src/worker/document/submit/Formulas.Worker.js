@@ -74,6 +74,9 @@ onmessage = function (event) {
             let controlIns = dataOfAction.controlIns;
             workerStore[type][keyInstance]['inputData'][controlIns.name] = controlIns;
             break;
+        case 'updateDocumentObjectId':
+            workerStore['submit'][keyInstance]['document_object_id'] = dataOfAction.documentObjectId;
+            break;
         case 'createSQLiteDB':
             ClientSQLManager.createDB(keyInstance).then(res=>{
                 postMessage({action:'afterCreateSQLiteDB'})

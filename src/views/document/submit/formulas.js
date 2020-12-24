@@ -692,7 +692,7 @@ export default class Formulas extends FormulasEvent{
         let dataInput = {};
         for (let inputControlName in inputControl) {
             if(inputControlName == 'document_object_id'){
-                dataInput[inputControlName] = '';
+                dataInput[inputControlName] = workerStore['submit'][this.keyInstance]['document_object_id'];
             }else{
                 if(extraData && extraData[inputControlName]){
                     dataInput[inputControlName] = extraData[inputControlName];

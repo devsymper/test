@@ -529,6 +529,8 @@ export default {
         if(this.documentObjectId){
             this.docObjId = this.documentObjectId;
         }
+        this.formulasWorker.postMessage({action:'updateDocumentObjectId',data:{keyInstance:this.keyInstance,updateDocumentObjectId:this.docObjId}})
+
         // đặt trang thái của view là submit => isDetailView = false
         this.$store.commit("document/changeViewType", {
             key: this.keyInstance,
