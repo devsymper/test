@@ -494,11 +494,10 @@ function getRoleUser(roleIdentify){
 export const addMoreInfoToTask = function(task) {
     let mapUser = SYMPER_APP.$store.getters['app/mapIdToUser'];
     task.assigneeInfo = {};
+    let roleInfo={};
     if (task.assignee) {
         task.assigneeInfo = {};
         let assigneeId=task.assignee;
-        let roleInfo={};
-    
         if (task.assignee.indexOf(":")>0) {  //check assinee là userId hay userId:role
             let arrDataAssignee=task.assignee.split(":");
             assigneeId=arrDataAssignee[0];
@@ -595,11 +594,11 @@ export const startWorkflowBySubmitedDoc = function(idWorkflow, submitedDocData, 
                     let dataInputForFormula = {};
 
                     try {
-                        
+
                         let varsForBackend = await getVarsFromSubmitedDoc(submitedDocData, startNodeId, docId);
                         vars = varsForBackend.vars;
                         dataInputForFormula = varsForBackend.nameAndValueMap;
-                        
+
                         // let instanceName = await this.getInstanceName(dataInputForFormula);
                         let instanceName = res.data.name;
                         let newProcessInstance = await runProcessDefinition(SYMPER_APP, defData, vars, instanceName);

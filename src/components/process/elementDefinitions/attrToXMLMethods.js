@@ -71,7 +71,6 @@ export default {
         if (nodeAllAttrs.hasOwnProperty('getValueForXML')) {
             value = nodeAllAttrs.getValueForXML(attr.value);
         }
-        console.log(attrName, value, value !== '');
 
         if (attrName != 'overrideid') {
             let objToUpdate = {};

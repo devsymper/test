@@ -331,7 +331,6 @@ import BPMNEngine from "@/api/BPMNEngine";
 import icon from "@/components/common/SymperIcon";
 import taskDetail from "./TaskDetail";
 import listHeader from "./ListHeader";
-import userSelector from "./UserSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../plugins/util";
 import { appConfigs } from "../../configs";
@@ -414,7 +413,6 @@ export default {
         icon: icon,
         taskDetail: taskDetail,
         listHeader: listHeader,
-        userSelector: userSelector,
         VuePerfectScrollbar: VuePerfectScrollbar,
         listTaskApproval,
         infoUser,
@@ -882,6 +880,7 @@ export default {
                 if(lazyLoad){
                     resData.forEach(function(e){
                         taskIden.push('task:'+e.id);
+
                         e.taskData = thisCpn.getTaskData(e);
                         addMoreInfoToTask(e);
                         thisCpn.setDueDateInfoDisplay(e);

@@ -142,7 +142,7 @@ export default {
             let documentId = this.$route.params.id;
             systemDataMappingApi.getByDoc(documentId).then(res=>{ // call api lấy danh sách đối tượng
                 let data = res.data;
-                if(data.length > 0){
+                if(data && data.length > 0){
                     self.checkedMapping = true;
                     self.listMapping = [];
                     for (let index = 0; index < data.length; index++) {
