@@ -176,7 +176,7 @@ var configs = {
                         name:'workflow',
                         title:"workflow",
                         icon: 'mdi-view-week-outline',
-                        url:"/task-management/workflow"
+                        url:"/task-management/projects/:id/workflow"
                     },
                     {
                         name:'priority',

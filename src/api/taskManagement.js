@@ -130,6 +130,9 @@ export const taskManagementApi = {
     getListWorkflow(){
         return taskManagement.get("task-life-circle");
     },
+    getListWorkflowInProject(projectId){
+        return taskManagement.get("task-life-circle-in-project/"+projectId);
+    },
     addWorkflow(data){
         return taskManagement.post("task-life-circle",data);
     },

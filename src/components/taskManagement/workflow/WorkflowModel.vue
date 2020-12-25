@@ -388,8 +388,10 @@ export default {
                     self.$snotifyError("", "Can not add workflow!");
                 }else{
                     let data = {};
+                    let projectId=this.$route.params.id;
                     data.name = self.dataWorkflowProps.name.value;
-                    data.description =self.dataWorkflowProps.description.value;
+                    data.description =  self.dataWorkflowProps.description.value;
+                    data.projectId = projectId;
                     data.nodes = JSON.stringify(self.listNode);
                     data.links = JSON.stringify(self.listLink);
                     data.data  = JSON.stringify(self.dataWorkflow);
@@ -400,7 +402,7 @@ export default {
                                 self.$snotifySuccess("Add workflow completed!");
                                 self.$store.commit("taskManagement/addWorkflowToStore",res.data);
                                 self.dialogSaveOrUpdate=false;
-                                self.$router.push('/task-management/workflow/'+res.data.id);
+                                self.$router.push('/task-management/projects/'+projectId+'/workflow/'+res.data.id);
                             }else if(res.status==400){
                                 self.$snotifyError("", "Validate key error",res.message);
                             }

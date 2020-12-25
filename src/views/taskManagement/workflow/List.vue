@@ -18,11 +18,12 @@ export default {
         }
     },
     methods:{
-        getListWorkflow(){
+        getListWorkflowInProject(){
             let self=this;
+            let projectId=this.$route.params.id;
             if (this.$store.state.taskManagement.allWorkflow.length == 0 ) {
                 taskManagementApi
-                .getListWorkflow()
+                .getListWorkflowInProject(projectId)
                 .then(res => {
                     if (res.status == 200) {
                         self.listWorkflow = res.data.listObject;
@@ -41,7 +42,7 @@ export default {
         }
     },
     created(){
-        this.getListWorkflow();
+        this.getListWorkflowInProject();
         this.$store.dispatch("taskManagement/getAllStatusCategory");
         this.$store.dispatch("taskManagement/getAllRole");
     }
