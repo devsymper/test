@@ -96,6 +96,7 @@ export const updateListItem = function(listItemSelected, childrenAppData , curre
 export const updateApp = async function(data){
 	let dataApp = JSON.stringify(updateListItem(data.listItemSelected, data.childrenAppData, data.currentAppData))
 	let res =  await appManagementApi.updateApp(dataApp)
+
 	return res
 }
 export const createApp = async function(data){
