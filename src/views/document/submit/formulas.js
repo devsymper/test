@@ -178,8 +178,6 @@ export default class Formulas extends FormulasEvent{
                 let strBeforeSql = this.checkBeforeReferenceFormulas(formulas, listLocal[index].trim());
                 let reverse = this.reverseSqliteDataToFormulas(res[0], strBeforeSql.trim().toLowerCase());
                 formulas = formulas.replace(listLocal[index], reverse);
-
-
             }
         }
         let listSyql = this.getReferenceFormulas(formulas);
@@ -215,6 +213,7 @@ export default class Formulas extends FormulasEvent{
                 dataRes[rowId] = res[0].values[0][0];
             }
             return {
+                server:false,
                 data: dataRes
             }
         }

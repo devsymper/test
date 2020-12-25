@@ -118,7 +118,6 @@ export default class Control {
 
     // set các mối quan hệ của các control trường hợp đã được lưu trên server
     setEffectedData(effected) {
-        console.log(this.name, effected, 'effectedeffectedeffectedeffected');
         if (effected == "" || effected == null) {
             return;
         }
