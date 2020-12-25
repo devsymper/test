@@ -94,13 +94,14 @@ export const updateListItem = function(listItemSelected, childrenAppData , curre
 	return currentAppData
 }
 export const updateApp = async function(data){
-	let dataApp = JSON.stringify(updateListItem(data.listItemSelected, data.childrenAppData, data.currentAppData))
+	let dataApp = updateListItem(data.listItemSelected, data.childrenAppData, data.currentAppData)
+	dataApp.childrenApp = JSON.stringify(dataApp.childrenApp)
 	let res =  await appManagementApi.updateApp(dataApp)
-
 	return res
 }
 export const createApp = async function(data){
-	let dataApp = JSON.stringify(updateListItem(data.listItemSelected, data.childrenAppData, data.currentAppData))
+	let dataApp = updateListItem(data.listItemSelected, data.childrenAppData, data.currentAppData)
+	dataApp.childrenApp = JSON.stringify(dataApp.childrenApp)
 	let res =  await appManagementApi.addApp(dataApp)
 	return res
 }
@@ -125,67 +126,67 @@ export const getChildItemInApp = async function(data){
 							}
 			]})
 			obj.orgchart = resOrg.data.listObject
-		}
-		if(data.document_definition.length > 0){
-			let dataDoc = data.document_definition;
-			let resDoc = await documentApi.searchListDocuments(
+	}
+	if(data.document_definition.length > 0){
+		let dataDoc = data.document_definition;
+		let resDoc = await documentApi.searchListDocuments(
+			{
+				search:'',
+				pageSize:400,
+				filter: [
 				{
-					search:'',
-					pageSize:400,
-					filter: [
-					{
-						column: 'id',
-						valueFilter: {
-							operation: 'IN',
-							values: dataDoc						
-						}
+					column: 'id',
+					valueFilter: {
+						operation: 'IN',
+						values: dataDoc						
 					}
-					]
 				}
-			)
-			let arrCategory = []
-			let arrMajor = []
-			resDoc.data.listObject.forEach(function(e){
-				if(e.type == "Nghiệp vụ"){
-					arrMajor.push(e)
-				}else if( e.type == "Danh mục"){
-					arrCategory.push(e)
-				}
-			})
-			obj.document_major = arrMajor
-			obj.document_category = arrCategory
-		}
-		if(data.workflow_definition.length > 0){
-			let dataW = data.workflow_definition;
-			let resW = await BpmnEngine.getListModels({
-							search:'',
-							pageSize:50,
-							filter: [
-							{
-								column: 'id',
-								valueFilter: {
-									operation: 'IN',
-									values: dataW						
-								}
+				]
+			}
+		)
+		let arrCategory = []
+		let arrMajor = []
+		resDoc.data.listObject.forEach(function(e){
+			if(e.type == "Nghiệp vụ"){
+				arrMajor.push(e)
+			}else if( e.type == "Danh mục"){
+				arrCategory.push(e)
+			}
+		})
+		obj.document_major = arrMajor
+		obj.document_category = arrCategory
+	}
+	if(data.workflow_definition.length > 0){
+		let dataW = data.workflow_definition;
+		let resW = await BpmnEngine.getListModels({
+						search:'',
+						pageSize:50,
+						filter: [
+						{
+							column: 'id',
+							valueFilter: {
+								operation: 'IN',
+								values: dataW						
 							}
-			]})
-			obj.workflow_definition = resW.data.listObject
-		}
-		if(data.dashboard.length > 0){
-			let dataRep = data.dashboard;
-			let resRp = await dashboardApi.getDashboardsApp({
-							search:'',
-							pageSize:50,
-							filter: [
-							{
-								column: 'id',
-								valueFilter: {
-									operation: 'IN',
-									values: dataRep						
-								}
+						}
+		]})
+		obj.workflow_definition = resW.data.listObject
+	}
+	if(data.dashboard.length > 0){
+		let dataRep = data.dashboard;
+		let resRp = await dashboardApi.getDashboardsApp({
+						search:'',
+						pageSize:50,
+						filter: [
+						{
+							column: 'id',
+							valueFilter: {
+								operation: 'IN',
+								values: dataRep						
 							}
-			]})
-				obj.dashboard = resRp.data.listObject
-		}
+						}
+		]})
+			obj.dashboard = resRp.data.listObject
+	}
 	return obj
 }
