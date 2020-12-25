@@ -13,6 +13,9 @@ const setAllStatusCategory = (state, allStatusCategory) => {
 const setAllStatus = (state, allStatus) => {
     Vue.set(state, 'allStatus', allStatus);
 }
+const setListStautsInProject = (state, data) => {
+    Vue.set(state.listStatusInProjects, data.key , data.data);
+}
 
 const setAllProject = (state, allProject) => {
     Vue.set(state, 'allProject', allProject);
@@ -29,8 +32,11 @@ const setListComponent = (state, listComponentInProject) => {
 const setListVersion = (state, listVersionInProject) => {
     Vue.set(state, 'listVersionInProject', listVersionInProject);
 }
-const setListColumnInBoard = (state, listColumnInBoard) => {
-    Vue.set(state, 'listColumnInBoard', listColumnInBoard);
+const setListColumnInBoard = (state, data) => {
+    Vue.set(state.listColumnInBoard, data.key , data.data);
+}
+const setListStatusInColumnBoard = (state, data) => {
+    Vue.set(state.listStatusInColumnBoard, data.key , data.data);
 }
 
 const setAllWorkflow = (state, allWorkflow) => {
@@ -236,5 +242,7 @@ export {
     removePriorityToStore,
     updatePriorityToStore,
     setAllStatus,
+    setListStautsInProject,
+    setListStatusInColumnBoard
 
 };

@@ -642,11 +642,11 @@ export default {
 
             let nodeDefaultInfo = getStatusDefault(); // cấu hình mặc định node
             nodeDefaultInfo.name.value.name = "To Do";
-            nodeDefaultInfo.name.value.id = "5fdb259d-7aca-2f28-91d0-e0750ea2ab8b";
+            nodeDefaultInfo.name.value.id = "5fe44f1c-10aa-35e6-7f89-93300ea2ab8b";
             nodeDefaultInfo.common.value = 1;
             nodeDefaultInfo.colorStatus.value = "#dfe1e6";
             this.$set(nodeDefaultInfo.id,"value",rectBacklog.id);
-            this.$set(nodeDefaultInfo.statusCategory,"value",'5785e38c-814f-4746-884d-f4939bf25173');
+            this.$set(nodeDefaultInfo.statusCategory,"value",'5fe314fb-47f0-99a5-d682-7ae20ea2ab8b');
             this.listNode.push(nodeDefaultInfo);
 
             let link1 = new joint.shapes.standard.Link({

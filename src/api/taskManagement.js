@@ -19,8 +19,8 @@ export const taskManagementApi = {
     },
 
     // danh mục project
-    getAllProject(){
-        return taskManagement.get("projects");
+    getAllProject(filter){
+        return taskManagement.get("projects",filter);
     },
     addProject(data){
         return taskManagement.post("projects",data);
@@ -90,6 +90,7 @@ export const taskManagementApi = {
     },
 
 
+
     ///////component
     getListComponent(projectId){
         return taskManagement.get("components/"+projectId);
@@ -122,8 +123,14 @@ export const taskManagementApi = {
     getListColumn(boardId){
         return taskManagement.get("columns/"+boardId);
     },
-    addColumn(data){
+    addColumnInBoard(data){
         return taskManagement.post("columns",data);
+    },
+    updateColumnInBoard(data){
+        return taskManagement.put("columns/"+data.boardId,data);
+    },
+    getListStatusInColumnOfBoard(boardId){
+        return taskManagement.get("columns-status/"+boardId);
     },
 
     /// workflow
@@ -156,6 +163,10 @@ export const taskManagementApi = {
     checkNameStatusExists(vl){
         return taskManagement.get("status-name",{name:vl});
     },
+    getListStatusInProject(projectId){
+        return taskManagement.get("status-in-project/"+projectId);
+    },
+
     // priority
     getListPriority(){
         return taskManagement.get("priorities");
