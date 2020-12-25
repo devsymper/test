@@ -184,14 +184,13 @@ export default {
             this.currentApp = JSON.parse(JSON.stringify(app));
         },
         clickToAdd(){
-            this.$refs.searchModal.getListSearch('');
+            // this.$refs.searchModal.getListSearch('');
         },
 		updateListItem(data){
 			let self = this;
-			self.childrenApp.document_definition = []
-			self.childrenApp.orgchart = []
-			self.childrenApp.dashboard = []
-			self.childrenApp.workflow_definition = []
+			for(let i in self.childrenApp){
+				self.childrenApp[i] = []
+			}
 			if(data.document_category.item.length > 0){
 				data.document_category.item.forEach(function(e){
 					self.childrenApp.document_definition.push(e.id);

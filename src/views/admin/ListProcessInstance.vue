@@ -369,7 +369,6 @@ export default {
 			this.$goToPage('/workflow/process-key/'+processKey+'/list-instances', this.$t('process.instance.listModelInstance')+processKey)
 		},
 		stopProcessInstance(){
-			let self = this
 			this.adminWorker.postMessage(
 				{
 					action:'stopProcessInstance',

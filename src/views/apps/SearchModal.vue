@@ -36,10 +36,7 @@
 </template>
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import {documentApi} from './../../api/Document';
-import {orgchartApi} from './../../api/orgchart';
-import {dashboardApi} from './../../api/dashboard';
-import BpmnEngine from './../../api/BPMNEngine';
+import ApplicationWorker from 'worker-loader!@/worker/application/Application.Worker.js';
 var delayTimer;
 let self =  this;
 export default {
@@ -47,6 +44,7 @@ export default {
         return {
 			myValue: '',
 			menuItemsHeight: '450px',
+			applicationWorker: null,
             listItems:{
 			   document_category:{
 					icon : 'mdi-file-document-outline',
@@ -84,13 +82,27 @@ export default {
 	components: {
         VuePerfectScrollbar,
 	},
-	created(){
-		this.getListSearch('');
-	},
 	computed:{
 		sAppManagement(){
 			return this.$store.state.appConfig.listItemSelected
 		}
+	},
+	mounted(){
+		let self = this
+		this.applicationWorker = new ApplicationWorker();
+        this.applicationWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'search':
+					for(let i in data.dataAfter){
+						self.checkChildrenItem(data.dataAfter[i], self.sAppManagement[i].item)
+						self.listItems[i].item = data.dataAfter[i]
+					}
+					break;
+                default:
+                    break;
+            }
+        });
 	},
 	methods:{
 		clickItem(obj,type){
@@ -117,46 +129,21 @@ export default {
 					}
 				})
 			}
-			return resData	
+			return resData
 		},
 		getListSearch(value){
 			let self = this
 			for(let i in this.listItems){
 				this.listItems[i].item = []
 			}
-			// this.listItems.document_category.item = []
-			// this.listItems.document_major.item = []
-			// this.listItems.orgchart.item = []
-			// this.listItems.workflow_definition.item = []
-			// this.listItems.dashboard.item = []
-			orgchartApi.getOrgchartList({search:value,pageSize:50}).then(res => {
-				this.checkChildrenItem(res.data.listObject,self.sAppManagement.orgchart.item)
-				this.listItems.orgchart.item = res.data.listObject;
-			});
-			documentApi.searchListDocuments({search:value,pageSize:1000}).then(res => {
-				let arrCategory = []
-				let arrMajor = []
-				res.data.listObject.forEach(function(e){
-					if(e.type == "Nghiệp vụ"){
-						arrMajor.push(e)
-					}else if(e.type == "Danh mục"){
-						arrCategory.push(e)
-
+			this.applicationWorker.postMessage(
+				{
+					action:'search',
+					data:{
+						value: value,
 					}
-				})
-				self.checkChildrenItem(arrCategory,self.sAppManagement.document_category.item)
-				self.checkChildrenItem(arrMajor,self.sAppManagement.document_major.item)
-				this.listItems.document_category.item = arrCategory
-				this.listItems.document_major.item = arrMajor
-			});
-			BpmnEngine.getListModels({search:value,pageSize:50}).then(res => {
-				this.checkChildrenItem(res.data.listObject,self.sAppManagement.workflow_definition.item)
-				this.listItems.workflow_definition.item = res.data.listObject;
-			});
-			dashboardApi.getDashboardsApp({search:value,pageSize:50}).then(res => {
-				this.checkChildrenItem(res.data.listObject,self.sAppManagement.dashboard.item)
-				this.listItems.dashboard.item = res.data.listObject;
-			});
+				}
+			);
 		},
 	},
 	 watch: {
