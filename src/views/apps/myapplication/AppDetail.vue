@@ -184,46 +184,18 @@ export default {
 			let self = this
 			let appS = this.$store.state.appConfig
 			let listItem = appS.listAppsSideBySide[appS.currentAppId];
-			self.objFilter.document_major.item = []
-			self.objFilter.document_category.item = []
-			self.objFilter.orgchart.item = []
-			self.objFilter.dashboard.item = []
-			self.objFilter.workflow_definition.item = []
-			if(listItem.document_major.item.length > 0){
-				listItem.document_major.item.filter(function(item){
-						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
-							self.objFilter.document_major.item.push(item)
+			for(let i in self.objFilter){
+				self.objFilter[i].item = []
+			}
+			for(let i in listItem){
+				if(listItem[i].item.length > 0){
+					listItem[i].item.filter(function(k){
+						let field = k.title ? k.title : k.name
+						if(field.toLowerCase().includes(self.searchKey.toLowerCase())){
+							self.objFilter[i].item.push(k)
 						}
-				})
-			}
-			if(listItem.document_category.item.length > 0){
-				listItem.document_category.item.filter(function(item){
-						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
-							self.objFilter.document_category.item.push(item)
-						}
-				})
-			}
-			if(listItem.orgchart.item.length > 0){
-				listItem.orgchart.item.filter(function(item){
-					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
-						self.objFilter.orgchart.item.push(item)
-					}
-				})
-			}
-			 
-			if(listItem.dashboard.item.length > 0){
-				listItem.dashboard.item.filter(function(item){
-					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
-						self.objFilter.dashboard.item.push(item)
-					}
-				})
-			}
-			if(listItem.workflow_definition.item.length > 0){
-				listItem.workflow_definition.item.filter(function(item){
-					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
-						self.objFilter.workflow_definition.item.push(item)
-					}
-				})
+					})
+				}
 			}
 		},
 		clickHandler(type,item){

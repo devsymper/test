@@ -484,17 +484,12 @@ export default {
 	 width:40px;
 	 height:40px;
 	 margin:12px 8px 14px 16px;
-	 /* padding: 4px; */
-	 /* margin:13px 5px 0px 5px;padding:4px */
 }
 .end-user-popup >>> .list-app-cointaner .list-app-item .v-icon{
 	font-size:45px;
 	padding:12px;
 	opacity: 0.7;
 }
-/* .end-user-popup >>> .list-app-cointaner .list-app-item .v-icon {
-
-} */
 .end-user-popup >>> .list-app-cointaner .list-app-item h5{
 	margin-top: -12px;
 	font: 13px roboto;

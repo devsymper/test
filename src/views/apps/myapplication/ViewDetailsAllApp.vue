@@ -202,7 +202,7 @@ export default {
             })
             return i
         },
-         getActiveapps(){
+		getActiveapps(){
             let self = this
 			appManagementApi.getActiveAppSBS().then(res => {
 				if (res.status == 200) {
@@ -216,7 +216,7 @@ export default {
                             dashboard:{},
                         })
                         if(Object.keys(e.childrenApp).length > 0){
-                            self.checkChildrenApp(e.childrenApp,e.id)   
+                            self.checkChildrenApp(e.childrenApp , e.id)   
                         }
                     }
                     this.getByAccessControl(self.listIds)
@@ -253,7 +253,6 @@ export default {
 			let self = this
             for(let app in this.mapIdApp){
                 for(let typeT in this.mapIdApp[app]){
-
                     if(this.mapIdApp[app][typeT].length > 0){
                         let  obj = {}
                         let arr = []
@@ -276,7 +275,6 @@ export default {
                                         let types = "document_major"
 										self.$set(self.apps[app].childrenAppReduce, types ,obj)
                                     }
-                                  
                                 }else{
                                     obj = util.cloneDeep(self[typeT]);
                                     arr.push(t)
@@ -417,7 +415,6 @@ export default {
             listIds: [],
 			mapIdApp:[],
 			childItemReduce:{
-
 			},
             listType : ['orgchart', 'document_definition', 'workflow_definition', 'dashboard'],
             mapIdItem:{
