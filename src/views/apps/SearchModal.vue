@@ -102,7 +102,8 @@ export default {
                 default:
                     break;
             }
-        });
+		});
+		this.getListSearch('')
 	},
 	methods:{
 		clickItem(obj,type){

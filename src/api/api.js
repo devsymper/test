@@ -128,7 +128,6 @@ export default class Api {
             headers: headers
         };
 		options = Object.assign(defaultOptions, options);
-
 		/**
 		 * Hàm check nếu gọi api từ worker thì thêm 1 hàm mới gọi từ đó
 		 */

@@ -16,12 +16,19 @@ self.onmessage = async function (event) {
             break;
         case 'updateApp':
 			let updateAppData = await updateApp(data);
-			debugger
-            postMessage({action:'search', dataAfter : updateAppData})
+            postMessage({action:'updateApp', dataAfter : updateAppData})
             break;
         case 'createApp':
 			let createAppData = await createApp(data);
-            postMessage({action:'search', dataAfter : createAppData})
+            postMessage({action:'createApp', dataAfter : createAppData})
+            break;
+        case 'deleteApp':
+			let deleteAppData = await deleteApp(data.id);
+            postMessage({action:'deleteApp', dataAfter : deleteAppData})
+            break;
+        case 'getChildItemInApp':
+			let dataAfter = await getChildItemInApp(data.data);
+            postMessage({action:'getChildItemInApp', dataAfter : dataAfter})
             break;
        
         default:
@@ -89,16 +96,95 @@ export const updateListItem = function(listItemSelected, childrenAppData , curre
 export const updateApp = async function(data){
 	let dataApp = JSON.stringify(updateListItem(data.listItemSelected, data.childrenAppData, data.currentAppData))
 	let res =  await appManagementApi.updateApp(dataApp)
-	debugger
-	if(res.status == 200){
-		return 'success'
-	}else{
-		return 'false'
-	}
+	return res
 }
 export const createApp = async function(data){
 	let dataApp = JSON.stringify(updateListItem(data.listItemSelected, data.childrenAppData, data.currentAppData))
-	debugger
 	let res =  await appManagementApi.addApp(dataApp)
 	return res
+}
+export const deleteApp = async function(id){
+	let res =  await appManagementApi.deleteApp(id)
+	return res
+}
+export const getChildItemInApp = async function(data){
+	let obj = {}
+	if(data.orgchart.length > 0){
+			let dataOrg = data.orgchart;
+			let resOrg = await orgchartApi.getOrgchartList({
+							search:'',
+							pageSize:50,
+							filter: [
+							{
+								column: 'id',
+								valueFilter: {
+									operation: 'IN',
+									values: dataOrg						
+								}
+							}
+			]})
+			obj.orgchart = resOrg.data.listObject
+		}
+		if(data.document_definition.length > 0){
+			let dataDoc = data.document_definition;
+			let resDoc = await documentApi.searchListDocuments(
+				{
+					search:'',
+					pageSize:400,
+					filter: [
+					{
+						column: 'id',
+						valueFilter: {
+							operation: 'IN',
+							values: dataDoc						
+						}
+					}
+					]
+				}
+			)
+			let arrCategory = []
+			let arrMajor = []
+			resDoc.data.listObject.forEach(function(e){
+				if(e.type == "Nghiệp vụ"){
+					arrMajor.push(e)
+				}else if( e.type == "Danh mục"){
+					arrCategory.push(e)
+				}
+			})
+			obj.document_major = arrMajor
+			obj.document_category = arrCategory
+		}
+		if(data.workflow_definition.length > 0){
+			let dataW = data.workflow_definition;
+			let resW = await BpmnEngine.getListModels({
+							search:'',
+							pageSize:50,
+							filter: [
+							{
+								column: 'id',
+								valueFilter: {
+									operation: 'IN',
+									values: dataW						
+								}
+							}
+			]})
+			obj.workflow_definition = resW.data.listObject
+		}
+		if(data.dashboard.length > 0){
+			let dataRep = data.dashboard;
+			let resRp = await dashboardApi.getDashboardsApp({
+							search:'',
+							pageSize:50,
+							filter: [
+							{
+								column: 'id',
+								valueFilter: {
+									operation: 'IN',
+									values: dataRep						
+								}
+							}
+			]})
+				obj.dashboard = resRp.data.listObject
+		}
+	return obj
 }

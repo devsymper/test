@@ -171,9 +171,11 @@ export default {
 			let data = event.data;
             switch (data.action) {
                 case 'updateApp':
-					
+					debugger
+					self.$emit("update-app", data.dataAfter)
 					break;
                 case 'createApp':
+					debugger
 					self.$emit("add-app", data.dataAfter)
 					break;
                 default:
@@ -256,14 +258,6 @@ export default {
 					}
 				}
 			);
-			// this.updateListItem(this.$store.state.appConfig.listItemSelected)
-			// let data = JSON.stringify(this.currentApp);
-			// appManagementApi.addApp(data).then(res => {
-			// 	 this.$emit("add-app", res)
-			// }).catch(err => {
-			// 	this.showError()
-			// })
-			// .always(() => {});;
 				
         },
          updateApp() {
@@ -273,14 +267,25 @@ export default {
 			if(this.currentApp.status === null){
 				this.currentApp.status = 0
 			}
-			this.updateListItem(this.$store.state.appConfig.listItemSelected)
-			let data = JSON.stringify(this.currentApp);
-			appManagementApi.updateApp(data).then(res => {
-				  this.$emit("update-app", res)
-			}).catch(err => {
-				this.showError()
-			})
-			.always(() => {});;
+			let self = this
+			this.applicationWorker.postMessage(
+				{
+					action:'updateApp',
+					data:{
+						listItemSelected: self.$store.state.appConfig.listItemSelected,
+						childrenAppData: self.childrenApp,
+						currentAppData: self.currentApp
+					}
+				}
+			);
+			// this.updateListItem(this.$store.state.appConfig.listItemSelected)
+			// let data = JSON.stringify(this.currentApp);
+			// appManagementApi.updateApp(data).then(res => {
+			// 	  this.$emit("update-app", res)
+			// }).catch(err => {
+			// 	this.showError()
+			// })
+			// .always(() => {});;
         },
     },
 };
@@ -299,6 +304,9 @@ export default {
 }
 .update-app-symper >>>.button-add-item .v-btn__content{
 	font: 13px Roboto !important;
+}
+.update-app-symper >>>.row{
+	margin: unset !important
 }
 .update-app-symper >>> .v-card__title{
 	font-weight: 410 !important;
