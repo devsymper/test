@@ -8,7 +8,7 @@
 				</v-btn>
 				 <!-- <MenuConfigTypeView   :currentTypeView="1" :titleTypeView="'hellooo'" /> -->
 				</div>
-            <div>
+            <div class="mt-4">
                 <div :class="{'favorite-area': true , 'active': showFavorite == true}" @click="showListFavorite">
                     <v-icon style="font-size:16px" color="#F6BE4F"> mdi-star</v-icon>
                     <span style="font:13px roboto;padding-left:8px">Yêu thích</span>
@@ -84,10 +84,12 @@ import AppDetail from './AppDetail.vue'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue'
 import SymperActionView from '@/action/SymperActionView.vue'
+import MyApplicationWorker from 'worker-loader!@/worker/application/MyApplication.Worker.js';
 import {util} from '@/plugins/util'
 import MenuConfigTypeView from './MenuConfigTypeView'
     export default {
     created(){
+		this.myApplicationWorker = new MyApplicationWorker()
 		this.getFavorite()
 		this.getActiveApp()
     },
@@ -100,6 +102,24 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 	},
 	mounted(){
 		this.widthActionArea = "calc(100% - 520px)"
+		let self = this
+		this.myApplicationWorker.addEventListener("message", function (event) {
+			let data = event.data;
+			switch (data.action) {
+				case 'getFavorite':
+					self.handleGetFavorite(data.dataAfter)
+					break;
+				case 'getActiveApp':
+					self.handleGetActiveApp(data.dataAfter)
+					break;
+				case 'getAppDetails':
+					self.handlerGetAppDetals(data.dataAfter)
+					break;
+			
+				default:
+					break;
+			}
+		});
 	},
     computed:{
         sFavorite(){
@@ -124,20 +144,8 @@ import MenuConfigTypeView from './MenuConfigTypeView'
     },
     methods:{
 		getActiveApp(){
-			appManagementApi.getActiveApp().then(res=>{
-				if(res.status == 200){
-					this.listApps = res.data.listObject
-				}else{
-					this.$snotify({
-						type: "error",
-						title: "Không thể lấy danh sách application"
-					})
-				}
-			}).catch(err=>{
-					this.$snotify({
-						type: "error",
-						title: "Không thể lấy danh sách application"
-					})
+			this.myApplicationWorker.postMessage({
+				action: "getActiveApp"
 			})
 		},
         rightClickHandler(event,item,type){
@@ -156,26 +164,41 @@ import MenuConfigTypeView from './MenuConfigTypeView'
             this.showFavorite = true
             this.activeIndex = '000'
 			this.$store.commit('appConfig/showDetailAppArea')
-        },
+		},
+		handleGetActiveApp(res){
+			if(res.status == 200){
+				this.listApps = res.data.listObject
+			}else{
+				this.$snotify({
+					type: "error",
+					title: "Không thể lấy danh sách application"
+				})
+			}
+		},
+		handleGetFavorite(res){
+			let self = this
+			if (res.status == 200) {
+				res.data.listObject.forEach(function(e){
+					let arr = ['document_definition', 'orgchart', 'workflow_definition', 'dashboard']
+					arr.forEach(function(k){
+						if(e.objectType == k){
+							self.mapIdFavorite[k][k + ":" + e.objectIdentifier] = e
+						}  
+					})
+				})
+				this.checkTypeFavorite(res.data.listObject)
+				this.$store.commit('appConfig/updateListFavorite',self.listFavorite)
+			}
+		},
         getFavorite(){
-			this.listFavorite= []
-			let self = this 
+			this.listFavorite = []
 			let userId = this.$store.state.app.endUserInfo.id
-			appManagementApi.getItemFavorite(userId).then(res =>{
-				if (res.status == 200) {
-					res.data.listObject.forEach(function(e){
-						let arr = ['document_definition', 'orgchart', 'workflow_definition', 'dashboard']
-						arr.forEach(function(k){
-							if(e.objectType == k){
-								self.mapIdFavorite[k][k + ":" + e.objectIdentifier] = e
-							}  
-						})
-                    })
-					this.checkTypeFavorite(res.data.listObject)
-                    this.$store.commit('appConfig/updateListFavorite',self.listFavorite)
+			this.myApplicationWorker.postMessage({
+				action: "getFavorite",
+				data:{
+					userId: userId
 				}
-			}).catch((err) => {
-			});
+			})
         },
         checkTypeFavorite(data){
 			let self = this
@@ -242,14 +265,6 @@ import MenuConfigTypeView from './MenuConfigTypeView'
                  this.$refs.contextMenu.hide()	
             }
         },
-        getActiveapps(){
-			appManagementApi.getActiveApp().then(res => {
-				if (res.status == 200) {
-					this.apps = res.data.listObject
-				}
-			}).catch((err) => {
-			});
-        },
         clickDetails(item){
 			this.activeIndex = item.id
 			this.loadingApp = true
@@ -261,23 +276,12 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 			this.$store.commit('appConfig/emptyItemSelected')
 			let appStore = this.$store.state.appConfig
 			if(!appStore.listAppsSideBySide[appStore.currentAppId]){
-				appManagementApi.getAppDetails(item.id).then(res => {
-					if (res.status == 200) {
-						if(Object.keys(res.data.listObject.childrenApp).length > 0){
-							this.checkChildrenApp(res.data.listObject.childrenApp)
-						}else{
-							this.$store.commit('appConfig/emptyItemSelected')
-						}
+				this.myApplicationWorker.postMessage({
+					action: 'getAppDetails',
+					data:{
+						id: item.id
 					}
-					self.loadingApp = false
-
-				}).catch((err) => {
-					self.$notify({
-						type: "error",
-						title: "Không thể lấy dữ liệu"
-					})
-					self.loadingApp = false
-				});
+				})
 			}else{
 				this.loadingApp = false
 			}
@@ -295,7 +299,7 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 					self.mapId[i][i + ":"+e.id] = e;
 				})
 				let dataGet = self.arrType[i];
-				self.getByAccessControl(dataGet,i)
+				self.getItemByAccessControl(dataGet,i)
 			}
         },
         updateFavoriteItem(mapArray,array){
@@ -309,7 +313,7 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 			}
 			return array
 		},
-		getByAccessControl(ids,type){
+		getItemByAccessControl(ids,type){
 			let self = this
 			appManagementApi.getListObjectIdentifier({
 				pageSize:50,
@@ -318,6 +322,16 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 				self.handlerGetObjectSuccess(type,res)
 			}).catch(err=>{
 			})
+		},
+		handlerGetAppDetals(res){
+			if (res.status == 200) {
+				if(Object.keys(res.data.listObject.childrenApp).length > 0){
+					this.checkChildrenApp(res.data.listObject.childrenApp)
+				}else{
+					this.$store.commit('appConfig/emptyItemSelected')
+				}
+			}
+			this.loadingApp = false
 		},
 		handlerGetObjectSuccess(type,res){
 			let self = this
@@ -341,7 +355,7 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 		handlerGetObjectFavorite(type,res){
 			let self = this
 			if(res.data.length > 0){
-				this.updateActionItem(self.mapIdFavorite[type],res.data,type)
+				this.updateActionItem(self.mapIdFavorite[type], res.data, type)
 				res.data.forEach(function(e){
 					self.listFavorite.push(e)
 				})
@@ -355,7 +369,8 @@ import MenuConfigTypeView from './MenuConfigTypeView'
             listApps: [],
 			activeIndex: '',
 			loadingApp: true,
-            showDetailDiv:false,
+			showDetailDiv:false,
+			myApplicationWorker: null,
             searchKey: '',
             listFavorite:[],
             showFavorite:false,
