@@ -171,11 +171,9 @@ export default {
 			let data = event.data;
             switch (data.action) {
                 case 'updateApp':
-					debugger
 					self.$emit("update-app", data.dataAfter)
 					break;
                 case 'createApp':
-					debugger
 					self.$emit("add-app", data.dataAfter)
 					break;
                 default:
@@ -190,38 +188,38 @@ export default {
         setAppObject(app) {
             this.currentApp = JSON.parse(JSON.stringify(app));
         },
-		updateListItem(data){
-			let self = this;
-			for(let i in self.childrenApp){
-				self.childrenApp[i] = []
-			}
-			if(data.document_category.item.length > 0){
-				data.document_category.item.forEach(function(e){
-					self.childrenApp.document_definition.push(e.id);
-				});
-			}
-			if(data.document_major.item.length > 0){
-				data.document_major.item.forEach(function(e){
-					self.childrenApp.document_definition.push(e.id);
-				});
-			}
-			if(data.orgchart.item.length > 0){
-				data.orgchart.item.forEach(function(e){
-				self.childrenApp.orgchart.push(e.id);
-			});
-			}
-			if(data.dashboard.item.length > 0){
-				data.dashboard.item.forEach(function(e){
-				self.childrenApp.dashboard.push(e.id);
-			});
-			}
-			if(data.workflow_definition.item.length > 0){
-				data.workflow_definition.item.forEach(function(e){
-					self.childrenApp.workflow_definition.push(e.id);
-				});
-			}
-			self.currentApp.childrenApp = self.childrenApp
-		},
+		// updateListItem(data){
+		// 	let self = this;
+		// 	for(let i in self.childrenApp){
+		// 		self.childrenApp[i] = []
+		// 	}
+		// 	if(data.document_category.item.length > 0){
+		// 		data.document_category.item.forEach(function(e){
+		// 			self.childrenApp.document_definition.push(e.id);
+		// 		});
+		// 	}
+		// 	if(data.document_major.item.length > 0){
+		// 		data.document_major.item.forEach(function(e){
+		// 			self.childrenApp.document_definition.push(e.id);
+		// 		});
+		// 	}
+		// 	if(data.orgchart.item.length > 0){
+		// 		data.orgchart.item.forEach(function(e){
+		// 		self.childrenApp.orgchart.push(e.id);
+		// 	});
+		// 	}
+		// 	if(data.dashboard.item.length > 0){
+		// 		data.dashboard.item.forEach(function(e){
+		// 		self.childrenApp.dashboard.push(e.id);
+		// 	});
+		// 	}
+		// 	if(data.workflow_definition.item.length > 0){
+		// 		data.workflow_definition.item.forEach(function(e){
+		// 			self.childrenApp.workflow_definition.push(e.id);
+		// 		});
+		// 	}
+		// 	self.currentApp.childrenApp = self.childrenApp
+		// },
         pickIcon(data) {
             this.$set(this.currentApp, 'iconName', data.icon.trim() )
             this.$set(this.currentApp, 'iconType' , data.type)

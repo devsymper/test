@@ -49,9 +49,6 @@
 								<v-icon style="font-size:60px;padding-left:40px;margin-top:8px;opacity:0.3">
 									mdi-star-off
 								</v-icon>
-								<!-- <v-img
-								:src="urlEmptyApp">
-								</v-img> -->
 							</div>
 						</div>
 					</div>
@@ -121,61 +118,57 @@
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import AppDetail from './AppDetail.vue';
-import {appManagementApi} from './../../api/AppManagement.js';
-import {documentApi} from './../../api/Document';
-import {orgchartApi} from './../../api/orgchart';
-import {dashboardApi} from './../../api/dashboard';
-import BpmnEngine from './../../api/BPMNEngine';
+import {appManagementApi} from '@/api/AppManagement.js';
 import ContextMenu from './ContextMenu.vue'
 import emptyApp from "@/assets/image/empty_app.png";
 export default {
 	data: function() {
         return {
-		 listAppHeight: '200px',
-		 listFavoriteHeight:'100%',
-		 tab: 'tab-1',
-		 isEndUserCpn:true,
-		 searchKey:"",
-		 listIcon:{
-			 document_definition: 'mdi-file-document-outline',
-			 workflow_definition: 'mdi-lan',
-			 orgchart: 'mdi-widgets-outline',
-			 dashboard: 'mdi-view-dashboard'
-		 },
-		 apps:{},
-		 listFavorite:[],
-		 testListFavorite:[],
-		 loadingFavorite: true,
-		 loadingApp: true,
-		 urlEmptyApp: emptyApp,
-		 arrType:{
-			 document_definition:[],
-			 orgchart:[],
-			 dashboard:[],
-			 workflow_definition:[],
-		 },
-		 title:{
-		 },
-		 mapId:{
-			 orgchart:{
-			 },
-			 document_definition:{
-			 },
-			 dashboard:{
-			 },
-			 workflow_definition:{
-			 }
-		 },
-		 mapIdFavorite:{
-			 orgchart:{
-			 },
-			 document_definition:{
-			 },
-			 dashboard:{
-			 },
-			 workflow_definition:{
-			 }
-		 },
+			listAppHeight: '200px',
+			listFavoriteHeight:'100%',
+			tab: 'tab-1',
+			isEndUserCpn:true,
+			searchKey:"",
+			listIcon:{
+				document_definition: 'mdi-file-document-outline',
+				workflow_definition: 'mdi-lan',
+				orgchart: 'mdi-widgets-outline',
+				dashboard: 'mdi-view-dashboard'
+			},
+			apps:{},
+			listFavorite:[],
+			testListFavorite:[],
+			loadingFavorite: true,
+			loadingApp: true,
+			urlEmptyApp: emptyApp,
+			arrType:{
+				document_definition:[],
+				orgchart:[],
+				dashboard:[],
+				workflow_definition:[],
+			},
+			title:{
+			},
+			mapId:{
+				orgchart:{
+				},
+				document_definition:{
+				},
+				dashboard:{
+				},
+				workflow_definition:{
+				}
+			},
+			mapIdFavorite:{
+				orgchart:{
+				},
+				document_definition:{
+				},
+				dashboard:{
+				},
+				workflow_definition:{
+				}
+			},
 		 }
 	},
 	created(){
