@@ -1,15 +1,6 @@
 export const symperAjax = async(options) =>{
 	if(options.method == "GET"){
 		if(Object.keys(options.data).length > 0){
-			let subStr = ""
-			for(let i in options.data){
-				if(typeof options.data[i] == "object" ){
-					for(let j in options.data[i]){
-						subStr = subStr+"&"+ new URLSearchParams(options.data[i][j]).toString();
-					}
-					debugger
-				}
-			}
 			let str = new URLSearchParams(options.data).toString();
 			options.url.includes("?") ? options.url = options.url + "&" + str : options.url = options.url + "?" + str
 		}

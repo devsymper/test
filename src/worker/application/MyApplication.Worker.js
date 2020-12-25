@@ -26,6 +26,10 @@ self.onmessage = async function (event) {
 			let dataDetail = await getAppDetails(data.id);
 			await postMessage({action:'getAppDetails', dataAfter : dataDetail})
             break;
+        case 'getItemByType':
+			let dataByType = await getItemByType(data);
+			await postMessage({action:'getItemByType', dataAfter : dataByType})
+            break;
         default:
             break;
     }
@@ -44,6 +48,17 @@ export const getItemByAccessControl = async function(ids){
 		ids: ids
 	})
 	return res
+}
+export const getItemByType = async function(data){
+	let res = await appManagementApi.getListObjectIdentifier({
+		pageSize:1000,
+		ids: data.ids
+	})
+	let obj = {
+		type: data.type,
+		res: res
+	}
+	return obj
 }
 export const getFavorite = async function(userId){
 	let res = await appManagementApi.getItemFavorite(userId)

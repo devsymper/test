@@ -115,6 +115,9 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 				case 'getAppDetails':
 					self.handlerGetAppDetals(data.dataAfter)
 					break;
+				case 'getItemByType':
+					self.handlerGetObjectSuccess(data.dataAfter.type,data.dataAfter.res)
+					break;
 			
 				default:
 					break;
@@ -315,12 +318,12 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 		},
 		getItemByAccessControl(ids,type){
 			let self = this
-			appManagementApi.getListObjectIdentifier({
-				pageSize:50,
-				ids: ids
-			}).then(res=>{
-				self.handlerGetObjectSuccess(type,res)
-			}).catch(err=>{
+			this.myApplicationWorker.postMessage({
+				action: 'getItemByType',
+				data:{
+					ids: ids,
+					type: type
+				}
 			})
 		},
 		handlerGetAppDetals(res){

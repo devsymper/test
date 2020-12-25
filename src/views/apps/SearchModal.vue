@@ -87,9 +87,12 @@ export default {
 			return this.$store.state.appConfig.listItemSelected
 		}
 	},
+	created(){
+		this.applicationWorker = new ApplicationWorker();
+		this.getListSearch('')
+	},
 	mounted(){
 		let self = this
-		this.applicationWorker = new ApplicationWorker();
         this.applicationWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
@@ -103,7 +106,6 @@ export default {
                     break;
             }
 		});
-		this.getListSearch('')
 	},
 	methods:{
 		clickItem(obj,type){

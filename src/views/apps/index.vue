@@ -309,95 +309,95 @@ export default {
 					self.arrType[i].push(e.id)
 				})
 			}
-			// this.applicationWorker.postMessage(
-			// 	{
-			// 		action:'getChildItemInApp',
-			// 		data:{
-			// 			data: self.arrType
-			// 		}
-			// 	}
-			// );
-			if(self.arrType.orgchart.length > 0){
-				let dataOrg = self.arrType.orgchart;
-				orgchartApi.getOrgchartList({
-								search:'',
-								pageSize:50,
-								filter: [
-								{
-									column: 'id',
-									valueFilter: {
-										operation: 'IN',
-										values: dataOrg						
-									}
-								}
-				]}).then(resOrg => {
-					this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgchart'});
-				});
-			}
-			if(self.arrType.document_definition.length > 0){
-				let dataDoc = self.arrType.document_definition;
-				documentApi.searchListDocuments(
-					{
-						search:'',
-						pageSize:400,
-						filter: [
-						{
-							column: 'id',
-							valueFilter: {
-								operation: 'IN',
-								values: dataDoc						
-							}
-						}
-						]
+			this.applicationWorker.postMessage(
+				{
+					action:'getChildItemInApp',
+					data:{
+						data: self.arrType
 					}
-				).then(resDoc => {
-					let arrCategory = []
-					let arrMajor = []
-					resDoc.data.listObject.forEach(function(e){
-						if(e.type == "Nghiệp vụ"){
-							arrMajor.push(e)
-						}else if( e.type == "Danh mục"){
-							arrCategory.push(e)
-						}
-					})
-					this.$store.commit('appConfig/updateChildrenApps',{obj:arrMajor,type:'document_major'});
-					this.$store.commit('appConfig/updateChildrenApps',{obj:arrCategory,type:'document_category'});
-				});
-			}
-			if(self.arrType.workflow_definition.length > 0){
-				let dataW = self.arrType.workflow_definition;
-				BpmnEngine.getListModels({
-								search:'',
-								pageSize:50,
-								filter: [
-								{
-									column: 'id',
-									valueFilter: {
-										operation: 'IN',
-										values: dataW						
-									}
-								}
-				]}).then(resW => {
-					this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflow_definition'});
-				});
-			}
-			if(self.arrType.dashboard.length > 0){
-				let dataRep = self.arrType.dashboard;
-				dashboardApi.getDashboardsApp({
-								search:'',
-								pageSize:50,
-								filter: [
-								{
-									column: 'id',
-									valueFilter: {
-										operation: 'IN',
-										values: dataRep						
-									}
-								}
-				]}).then(resRp => {
-					this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'dashboard'});
-				});
-			}
+				}
+			);
+			// if(self.arrType.orgchart.length > 0){
+			// 	let dataOrg = self.arrType.orgchart;
+			// 	orgchartApi.getOrgchartList({
+			// 					search:'',
+			// 					pageSize:50,
+			// 					filter: [
+			// 					{
+			// 						column: 'id',
+			// 						valueFilter: {
+			// 							operation: 'IN',
+			// 							values: dataOrg						
+			// 						}
+			// 					}
+			// 	]}).then(resOrg => {
+			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgchart'});
+			// 	});
+			// }
+			// if(self.arrType.document_definition.length > 0){
+			// 	let dataDoc = self.arrType.document_definition;
+			// 	documentApi.searchListDocuments(
+			// 		{
+			// 			search:'',
+			// 			pageSize:400,
+			// 			filter: [
+			// 			{
+			// 				column: 'id',
+			// 				valueFilter: {
+			// 					operation: 'IN',
+			// 					values: dataDoc						
+			// 				}
+			// 			}
+			// 			]
+			// 		}
+			// 	).then(resDoc => {
+			// 		let arrCategory = []
+			// 		let arrMajor = []
+			// 		resDoc.data.listObject.forEach(function(e){
+			// 			if(e.type == "Nghiệp vụ"){
+			// 				arrMajor.push(e)
+			// 			}else if( e.type == "Danh mục"){
+			// 				arrCategory.push(e)
+			// 			}
+			// 		})
+			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:arrMajor,type:'document_major'});
+			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:arrCategory,type:'document_category'});
+			// 	});
+			// }
+			// if(self.arrType.workflow_definition.length > 0){
+			// 	let dataW = self.arrType.workflow_definition;
+			// 	BpmnEngine.getListModels({
+			// 					search:'',
+			// 					pageSize:50,
+			// 					filter: [
+			// 					{
+			// 						column: 'id',
+			// 						valueFilter: {
+			// 							operation: 'IN',
+			// 							values: dataW						
+			// 						}
+			// 					}
+			// 	]}).then(resW => {
+			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflow_definition'});
+			// 	});
+			// }
+			// if(self.arrType.dashboard.length > 0){
+			// 	let dataRep = self.arrType.dashboard;
+			// 	dashboardApi.getDashboardsApp({
+			// 					search:'',
+			// 					pageSize:50,
+			// 					filter: [
+			// 					{
+			// 						column: 'id',
+			// 						valueFilter: {
+			// 							operation: 'IN',
+			// 							values: dataRep						
+			// 						}
+			// 					}
+			// 	]}).then(resRp => {
+			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'dashboard'});
+			// 	});
+			// }
 			for(let i in self.arrType){
 				self.arrType[i] = []
 			}
