@@ -199,12 +199,15 @@ export default {
                         }else{
                             this.$snotifyError("", "Can not add component!");
                         }
+                        this.isLoadingAdd=false;
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not add component!", err);
+                        this.isLoadingAdd=false;
                     });
+            }else{
+                this.isLoadingAdd=false;
             }
-            this.isLoadingAdd=false;
 
         },
         handleUpdateComponent(){
@@ -226,14 +229,16 @@ export default {
                         }else{
                             this.$snotifyError("", "Can not update Component!");
                         }
+                        this.isLoadingAdd=false;
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not update Component!", err);
+                        this.isLoadingAdd=false;
                     });
             }else{
                 this.$snotifyError("", "Have error!");
+                this.isLoadingAdd=false;
             }
-            this.isLoadingAdd=false;
         },
         show(){
             this.isShow=true;

@@ -113,6 +113,8 @@ export default {
             this.isLoadingAdd=true;
             if (this.userSelect.length==0) {
                 this.$snotifyError("", "None user selected!");
+                this.isLoadingAdd=false;
+
             }else{
                 let isValid = this.validateData();
                 if (isValid) {
@@ -133,21 +135,19 @@ export default {
                             }else{
                                 this.$snotifyError("", "Can not add people!");
                             }
+                            this.isLoadingAdd=false;
                         })
                         .catch(err => {
                             this.$snotifyError("", "Can not add people!", err);
+                            this.isLoadingAdd=false;
                         }) ;
-
-                    console.log("aa",projectId);
-
-                    this.$snotifySuccess("Add people success!");
-                    
                 }else{
                     this.$snotifyError("", "Chưa có role nào được chọn!");
+                    this.isLoadingAdd=false;
                 }
+                this.isLoadingAdd=false;
             }
 
-            this.isLoadingAdd=false;
         },
         validateData(){
             let data=this.roleSelect;

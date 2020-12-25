@@ -2,6 +2,7 @@ import Api from "./api";
 import { appConfigs } from "./../configs.js";
 let taskManagement = new Api(appConfigs.apiDomain.taskManagement);
 let permission = new Api(appConfigs.apiDomain.permission);
+let document = new Api(appConfigs.apiDomain.sdocumentManagement);
 
 export const taskManagementApi = {
     //danh mục category
@@ -73,6 +74,9 @@ export const taskManagementApi = {
     },
     deleteIssueType(id){
         return taskManagement.delete("issue-types/"+id);
+    },
+    getListDocumentConfigFieldIssue(filter){
+        return document.get('documents', filter);
     },
 
     /////////////////// board

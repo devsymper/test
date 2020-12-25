@@ -167,16 +167,17 @@ export default {
                         }else{
                             this.$snotifyError("", "Can not update category!");
                         }
+                        this.isLoadingAdd=false;
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not update category!", err);
-                    })
-                    .always(() => {});
+                        this.isLoadingAdd=false;
+                    });
                 
             }else{
                 this.$snotifyError("", "Have error!");
+                this.isLoadingAdd=false;
             }
-            this.isLoadingAdd=false;
 
         },
         handleUpdateCategory(){
@@ -199,14 +200,16 @@ export default {
                         }else{
                             this.$snotifyError("", "Can not update category!");
                         }
+                        this.isLoadingAdd=false;
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not update category!", err);
+                        this.isLoadingAdd=false;
                     });
             }else{
                 this.$snotifyError("", "Have error!");
+                this.isLoadingAdd=false;
             }
-            this.isLoadingAdd=false;
         },
         selectedIcon(data) {
             this.disabled=false;

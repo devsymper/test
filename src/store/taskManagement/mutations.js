@@ -46,6 +46,9 @@ const setAllRole = (state, allRole) => {
     Vue.set(state, 'allRole', allRole);
 }
 
+const setListDocumentConfigFieldIssue = (state, listDocumentConfigFieldIssue) => {
+    Vue.set(state, 'listDocumentConfigFieldIssue', listDocumentConfigFieldIssue);
+}
 const setCurrentProject = (state, currentProject) => {
     Vue.set(state, 'currentProject', currentProject);
 }
@@ -243,6 +246,7 @@ export {
     updatePriorityToStore,
     setAllStatus,
     setListStautsInProject,
-    setListStatusInColumnBoard
+    setListStatusInColumnBoard,
+    setListDocumentConfigFieldIssue
 
 };

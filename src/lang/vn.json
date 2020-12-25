@@ -1426,7 +1426,8 @@
             "startDate":"Ngày bắt đầu",
             "releaseDate":"Ngày phát hành",
             "unreleased":"Chưa phát hành",
-            "released":"Đã phát hành"
+            "released":"Đã phát hành",
+            "configField":"Cấu hình field"
         },
         "listMember":"Danh sách thành viên",
         "listProject":"Danh sách project",

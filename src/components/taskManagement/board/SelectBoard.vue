@@ -166,16 +166,16 @@ export default {
                         }else{
                             this.$snotifyError("", "Can not add board type!");
                         }
+                        this.isLoadingAdd=false;
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not add board type!", err);
-                    })
-                    .always(() => {});
-                
+                        this.isLoadingAdd=false;
+                    });
             }else{
                 this.$snotifyError("", "Have error!");
+                this.isLoadingAdd=false;
             }
-            this.isLoadingAdd=false;
         },
         validateData(){
             let data=this.dataBoardProps;

@@ -322,16 +322,20 @@ export default {
                         }else{
                             this.$snotifyError("", "Can not add permisson pack!");
                         }
+                        this.isLoading=false;
+
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not add permisson pack!", err);
-                    })
-                    .always(() => {});
+                        this.isLoading=false;
+
+                    });
                 
             }else{
                 this.$snotifyError("", "Have error!");
+                this.isLoading=false;
+
             }
-            this.isLoading=false;
         },
         updatePermissionPack(){
             this.isLoading = true;
@@ -354,16 +358,17 @@ export default {
                         }else{
                             this.$snotifyError("", "Can not update permisson pack!");
                         }
+                        this.isLoading=false;
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not update permisson pack!", err);
-                    })
-                    .always(() => {});
+                        this.isLoading=false;
+                    });
                 
             }else{
                 this.$snotifyError("", "Have error!");
+                this.isLoading=false;
             }
-            this.isLoading=false;
         },
         handleRemoveActionPack(item){
             let index = this.listActionPackSelected.indexOf(item);

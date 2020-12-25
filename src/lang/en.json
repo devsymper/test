@@ -1298,7 +1298,8 @@
             "startDate":"Start date",
             "releaseDate":"Release date",
             "unreleased":"Unreleased",
-            "released":"Released"
+            "released":"Released",
+            "configField":"Config field"
         },
         "listMember":"List member",
         "listCategory":"List category",

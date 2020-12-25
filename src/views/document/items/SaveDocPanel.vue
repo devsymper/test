@@ -308,6 +308,10 @@ export default {
                             text: this.$t('document.editor.dialog.saveDoc.selectType.business'),
                             value: 1
                         },
+                        {
+                            text: "Document config field issue",
+                            value: 4
+                        },
                     ],
                 },
             
