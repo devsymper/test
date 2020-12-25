@@ -26,10 +26,11 @@
                         :infoBoard="infoBoard"
                     />
                 </v-tab-item>
-                <v-tab-item>
+                <v-tab-item class="tab-column">
                     <column-setting
                         :listColumn="listColumn"
-                        class="h-100"
+                        :listStatusColumn="listStatusColumn"
+                        class="h-100 column-setting"
                     />
                 </v-tab-item>
             </v-tabs>
@@ -55,7 +56,13 @@ export default {
             default() {
                 return [];
             }
-        }
+        },
+        listStatusColumn:{
+            type:Array,
+            default() {
+                return [];
+            }
+        },
     },
     methods:{
 
@@ -73,6 +80,12 @@ export default {
 .save-setting-btn{
     margin-left: auto;
     margin-right: 12px;
+}
+.tab-board >>>.v-window__container {
+    height: 100%;
+}
+.tab-column {
+    height: 100%;
 }
 .tab-board >>>.v-tab
 {

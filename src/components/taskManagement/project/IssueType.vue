@@ -378,8 +378,9 @@ export default {
             this.dialogRemove=false;  
         },
         goToWorkflow(item){
+            let projectId=this.$route.params.id;
             if (item.taskLifeCircleId) {
-                this.$router.push("/task-management/workflow/"+item.taskLifeCircleId);
+                this.$router.push("/task-management/projects/"+projectId+"/workflow/"+item.taskLifeCircleId);
             }
         },
         handleUpdateIssueWorkflow(){
@@ -414,7 +415,8 @@ export default {
             this.dialogAddWorkflow = true;
         },
         handleCreateWorkflow(){
-            this.$router.push("/task-management/workflow/create");
+            let projectId=this.$route.params.id;
+            this.$router.push('/task-management/projects/'+projectId+'/workflow/create');
         },
         handleCreate(){
             this.dataIssueTypeProps.name.value = "";

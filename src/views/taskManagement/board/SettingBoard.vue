@@ -1,14 +1,16 @@
 <template>
     <compSettingBoard
-        v-if="Object.keys(infoBoard).length>0"
+        v-if="infoBoard"
         :infoBoard="infoBoard"
         :listColumn="listColumn"
+        :listStatusColumn="listStatusColumn"
      />
 </template>
 
 <script>
 import compSettingBoard from '../../../components/taskManagement/board/SettingBoard.vue';
 import { taskManagementApi } from "@/api/taskManagement.js";
+import { util } from '../../../plugins/util';
 
 export default {
     components: { compSettingBoard },
@@ -16,38 +18,44 @@ export default {
     computed:{
         sTaskManagement(){
             return this.$store.state.taskManagement;
+        },
+        listColumn(){
+            let idBoard = this.$route.params.idBoard;
+            let arrColumn = [];
+            if (this.sTaskManagement.listColumnInBoard[idBoard] && this.sTaskManagement.listColumnInBoard[idBoard].length >= 0 ) {
+                let columns = util.cloneDeep(this.sTaskManagement.listColumnInBoard[idBoard]);
+                for (let i = 0; i < columns.length; i++) {
+                    let obj={};
+                    obj.statusInColumn = [];
+                    obj.name = columns[i].name;
+                    obj.id = columns[i].id;
+                    obj.isHidden = (columns[i].isHidden == 1) ? true : false ;
+                    obj.isBacklog = columns[i].isBacklog == 1 ? true : false;
+                    arrColumn.push(obj);
+                }
+            }
+            return arrColumn;
+        },
+        listStatusColumn(){
+            let idBoard=this.$route.params.idBoard;
+            if (this.sTaskManagement.listStatusInColumnBoard[idBoard]) {
+                return this.sTaskManagement.listStatusInColumnBoard[idBoard];
+            }else{
+                return [];
+            }
         }
     },
     data(){
         return{
             infoBoard:{},
-            listColumn:[],
         }
     },
     methods:{
-        async getListColumn(){
-            if (this.sTaskManagement.listColumnInBoard.length > 0 ) {
-                this.listColumn = this.sTaskManagement.listColumnInBoard;
-            }else{
-                let idBoard = this.$route.params.idBoard;
-                let res = await taskManagementApi.getListColumn(idBoard);
-                if (res.status==200 && res.data) {
-                    this.listColumn=res.data.listObject;
-                }
-            }
-            this.listColumn.reduce((arr,obj)=>{
-                obj.statusInColumn = [];
-                obj.isHidden = obj.isHidden == 1;
-                obj.isBacklog = obj.isBacklog == 1;
-                arr.push(obj);
-                return arr
-            },[])
-            this.$store.commit("taskManagement/setListColumnInBoard", this.listColumn);
-        }
     },
     created(){
         let idBoard=this.$route.params.idBoard;
         let allBoard=this.sTaskManagement.listBoardInProject;
+        let projectId=this.$route.params.id;
         if (allBoard.length>0) {
             let currentBoard=allBoard.find(ele => ele.id == idBoard);
             if (currentBoard) {
@@ -61,7 +69,15 @@ export default {
                 }
             }).always({}).catch({})
         }
-        this.getListColumn();
+        if (!this.$store.state.taskManagement.listStatusInProjects[projectId] || this.$store.state.taskManagement.listStatusInProjects[projectId].length == 0) {
+            this.$store.dispatch("taskManagement/getListStautsInProject", projectId);
+        }
+        if (!this.$store.state.taskManagement.listColumnInBoard[idBoard] || this.$store.state.taskManagement.listColumnInBoard[idBoard].length == 0) {
+            this.$store.dispatch("taskManagement/getListColumnInBoard",idBoard);
+        }
+        if (!this.$store.state.taskManagement.listStatusInColumnBoard[idBoard] || this.$store.state.taskManagement.listStatusInColumnBoard[idBoard].length == 0) {
+            this.$store.dispatch("taskManagement/getListStatusInColumnBoard",idBoard);
+        }
     }
 }
 </script>

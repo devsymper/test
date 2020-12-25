@@ -5,6 +5,7 @@ const defaultState = {
     allRole: [],
     allPriority: [],
     allStatus: [],
+    listStatusInProjects: {}, // có dạng {key : []} , key là projectId
     listActionPack:[],
     headerBreadcrumbs:[],
     currentProject:{},
@@ -20,7 +21,8 @@ const defaultState = {
         allLink:[],
         currentNodeSelected:{},
     },
-    listColumnInBoard:[],
+    listColumnInBoard:{}, // có dạng {key : []} , key là boardId
+    listStatusInColumnBoard:{}, // có dạng {key : []} , key là boardId
     allWorkflow:[],
 };
 

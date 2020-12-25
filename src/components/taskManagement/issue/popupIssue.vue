@@ -36,8 +36,16 @@
         <v-card-text class="pb-0">
             <v-container class="pa-0">
                 <div>
-                    <form-tpl
-                    :allInputs="dataInfoIssueProps"/>
+                    <!-- <form-tpl
+                    :allInputs="dataInfoIssueProps"/> -->
+                    <submit
+                        ref="submitComponent"
+                        class="doc_issue"
+                        :action="'submit'"
+                        :docId="Number(docId)"
+                        :showSubmitButton="false"
+                        @submit-document-success="onSubmitDone"
+                     />
                 </div>
             </v-container>
         </v-card-text>
@@ -48,6 +56,7 @@
                 text
                 :loading="isLoading"
                 class="btn-add"
+                @click="submitForm"
             >
                 {{$t("common.add")}}
             </v-btn>
@@ -67,16 +76,19 @@
 import FormTpl from "@/components/common/FormTpl.vue";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import { util } from '../../../plugins/util';
+import Submit from '../../../views/document/submit/Submit.vue';
 
 export default {
     name: "issue",
     components:{
         FormTpl,
+        Submit,
     },
     data(){
         return{
             isLoading:false,
             isShow:false,
+            docId:2131,
             dataInfoIssueProps:{
                 name : { 
                     title: "Tiêu đề công việc",
@@ -161,6 +173,15 @@ export default {
         show(){
             this.isShow=true;
         },
+        submitForm(){
+            this.isLoading = true;
+            this.$refs.submitComponent.handlerSubmitDocumentClick();
+        },
+        onSubmitDone(data){
+            this.isLoading = false;
+            this.$snotifySuccess("Add issue success!");
+
+        },
     }
 
 }
@@ -186,5 +207,14 @@ export default {
     }
     ::v-deep .v-input__slot{
         box-shadow: none !important;
+    }
+    .doc_issue >>> table td span{
+        width: 100%;
+    }
+    .doc_issue ::v-deep .s-control{
+        font-size: 13px!important;
+        margin-top: 0px;
+        border-top: 1px solid #efefef!important;
+        border: 1px solid #efefef!important;
     }
 </style>
