@@ -11,6 +11,7 @@
                         class="save-setting-btn"
                         v-if="listColumn.length > 0"
                         depressed
+                        :loading="isLoading"
                         small
                         @click="updateColumn"
                         >
@@ -19,6 +20,7 @@
                     <v-btn
                         class="save-setting-btn"
                         v-else
+                        :loading="isLoading"
                         depressed
                         small
                         @click="saveColumn"
@@ -151,6 +153,7 @@ export default {
     },
     data(){
         return{
+            isLoading:false,
             columns:[]
         }
     },
@@ -206,6 +209,7 @@ export default {
             
         },
         saveColumn(){
+            this.isLoading = true;
             let idBoard=this.$route.params.idBoard;
             let data={};
                 data.data = JSON.stringify(this.columns);
@@ -215,16 +219,22 @@ export default {
                     .then(res => {
                         if (res.status == 200) {
                             this.$snotifySuccess("Add column completed!");
+                            this.$store.dispatch("taskManagement/getListColumnInBoard",idBoard);
+
                         }else{
                             this.$snotifyError("", "Can not add column!");
                         }
+                        this.isLoading = false;
+
                     })
                     .catch(err => {
+                        this.isLoading = false;
                         this.$snotifyError("", "Can not add column!", err);
                     });
 
         },
         updateColumn(){
+            this.isLoading = true;
             let idBoard=this.$route.params.idBoard;
             let data={};
                 data.data = JSON.stringify(this.columns);
@@ -234,12 +244,15 @@ export default {
                     .then(res => {
                         if (res.status == 200) {
                             this.$snotifySuccess("Update column completed!");
+                            this.$store.dispatch("taskManagement/getListColumnInBoard",idBoard);
                         }else{
                             this.$snotifyError("", "Can not update column!");
                         }
+                        this.isLoading = false;
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not update column!", err);
+                        this.isLoading = false;
                     });
 
         }

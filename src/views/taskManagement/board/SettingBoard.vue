@@ -29,6 +29,7 @@ export default {
                     obj.statusInColumn = [];
                     obj.name = columns[i].name;
                     obj.id = columns[i].id;
+                    obj.position = columns[i].position;
                     obj.isHidden = (columns[i].isHidden == 1) ? true : false ;
                     obj.isBacklog = columns[i].isBacklog == 1 ? true : false;
                     arrColumn.push(obj);
