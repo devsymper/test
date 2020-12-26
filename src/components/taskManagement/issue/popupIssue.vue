@@ -15,6 +15,7 @@
                         item-text="name"
                         item-value="id"
                         :items="allProject"
+                        @change="onChangeProject"
                         solo
                         class="project-select sym-small-size sym-style-input">
 
@@ -38,6 +39,7 @@
                         item-value="id"
                         :items="allIssueTypeInProject"
                         solo
+                        @change="onChangeIssueType"
                         class="project-select sym-small-size sym-style-input">
 
                         <template v-slot:selection="{item}">
@@ -114,13 +116,14 @@ export default {
             isLoading:false,
             isShow:false,
             currentProject: {},
-            currentIssueType: {},
+            currentIssueType: null,
             workflowVariable:{
                 // "project_id" : "111111"
             }
         
         }
     },
+   
     computed:{
         allProject(){
             if (!this.$store.state.taskManagement.allProject || this.$store.state.taskManagement.allProject.length == 0) {
@@ -134,49 +137,41 @@ export default {
             return projects;
         },
         allIssueTypeInProject(){
-            if (this.currentProject) {
-                let currentProject = this.currentProject;
-                if (!this.$store.state.taskManagement.listIssueTypeInProjects[currentProject.id] || this.$store.state.taskManagement.listIssueTypeInProjects[currentProject.id].length == 0) {
-                    this.$store.dispatch("taskManagement/getListIssueTypeInProjects", currentProject.id);
-                }
-                return this.$store.state.taskManagement.listIssueTypeInProjects[currentProject.id];
-            }else{
-                return [];
-            }
-      
+            return this.$store.state.taskManagement.listIssueTypeInProjects[this.currentProject.id];
+        },
+        listIssueTypeInProjects(){
+            return this.$store.state.taskManagement.listIssueTypeInProjects;
         },
         sTaskManagement() {
             return this.$store.state.taskManagement;
         },
     },
-    watch:{
-        currentProject(newVl){
-            if (newVl && !this.$store.state.taskManagement.listIssueTypeInProjects[newVl.id] || this.$store.state.taskManagement.listIssueTypeInProjects[newVl.id].length == 0) {
-                this.$store.dispatch("taskManagement/getListIssueTypeInProjects", newVl.id);
-            }
-        },
-        // allIssueTypeInProject: {
-        //     deep: true,
-        //     immediate: true,
-        //     handler(after) {
-        //         if (after.length > 0) {
-        //             this.currentIssueType = after[0];
-        //         }
-        //     }
-        // }
-
-    },
     methods:{
+        // thay đổi document id ở đây
+        onChangeIssueType(){
+
+        },
+        onChangeProject(){
+            this.getListIssueType()
+        },
         returnDocumentId(){
             if (this.currentIssueType && this.currentIssueType.documentId) {
                 return Number(this.currentIssueType.documentId)
             }else{
-                //this.$snotifyError("", "Issue type chưa được cấu hình field.Hệ thống sẽ cấu hình field mặc định !!!");
                 return 2131;
             }
         },
         show(){
             this.isShow=true;
+            this.currentProject = this.allProject[0];
+            this.getListIssueType()
+           
+        },
+        async getListIssueType(){
+            if(!this.allIssueTypeInProject){
+                await this.$store.dispatch("taskManagement/getListIssueTypeInProjects", this.currentProject.id);
+            }
+            this.currentIssueType = this.allIssueTypeInProject.find(ele => ele.projectId == this.currentProject.id);
         },
         submitForm(){
             this.isLoading = true;
@@ -188,12 +183,6 @@ export default {
 
         },
     },
-    mounted(){
-        this.currentProject=this.allProject[0];
-        // if (this.listIssueTypeInProjects.length > 0) {
-        //     this.currentIssueType = this.listIssueTypeInProjects[0];
-        // }
-    }
 
 }
 </script>
