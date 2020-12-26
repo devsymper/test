@@ -448,7 +448,6 @@ export default {
 <style>
 .name{
 	text-transform: uppercase !important;
-	/* font-weight: bold; */
 }
 .img-manager{
 	height: 35px !important;
