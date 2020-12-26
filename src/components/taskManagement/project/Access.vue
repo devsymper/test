@@ -605,14 +605,17 @@ export default {
                         }else{
                             this.$snotifyError("", "Error! Have error !!!");
                         }
+                        this.loadingChangeRole=false;
                     })
                     .catch(err => {
                         this.$snotifyError("", "Error! Have error !!!", err);
-                    })
-                    .always(() => {});
+                        this.loadingChangeRole=false;
 
+                    });
+
+            }else{
+                this.loadingChangeRole=false;
             }
-            this.loadingChangeRole=false;
         },
         /**
          * function set danh sách permission trong role detail
@@ -688,16 +691,16 @@ export default {
                         }else{
                             this.$snotifyError("", "Can not update role!");
                         }
+                        this.isLoadingAdd=false;
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not update role!", err);
-                    })
-                    .always(() => {});
-                
+                        this.isLoadingAdd=false;
+                    });
             }else{
                 this.$snotifyError("", "Have error!");
+                this.isLoadingAdd=false;
             }
-            this.isLoadingAdd=false;
         },
         handleAddRole(){
             let self = this;
@@ -722,16 +725,17 @@ export default {
                         }else{
                             this.$snotifyError("", "Can not add role!");
                         }
+                        this.isLoadingAdd=false;
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not add role!", err);
-                    })
-                    .always(() => {});
+                        this.isLoadingAdd=false;
+                    });
                 
             }else{
                 this.$snotifyError("", "Have error!");
+                this.isLoadingAdd=false;
             }
-            this.isLoadingAdd=false;
         },
         setPermissionForRole(role,listIdPermissionPack){
             let item = {};
@@ -752,30 +756,6 @@ export default {
                     this.$snotifyError("", "Can not add role!", err);
                 })
                 .always(() => {});
-        },
-        getActionRoleChecked(isCheck="add"){ // ham conver action da chon theo format ["administer","issue:addComment"]
-            // if (isCheck=="add") {
-            //     var data=this.allActionRoles;
-            // }else if(isCheck=="update"){
-            //     var data=this.detailActionRole;
-            // }
-            // let actions=[];
-            // for (var key in data) {
-            //     if (data[key].isAllow) {
-            //         actions.push(key);
-            //     }else{
-            //         if (data[key].children && Object.keys(data[key].children).length >0) {
-            //             let item=data[key].children;
-            //             for (var subKey in item) {
-            //                 if (item[subKey].isAllow) {
-            //                     let str=key+":"+subKey;
-            //                     actions.push(str);
-            //                 }   
-            //             }
-            //         }
-            //     }
-            // }
-            // return actions;
         },
         validateData(){
             let data=this.nameAndDescriptionProps;

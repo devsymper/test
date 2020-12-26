@@ -5,7 +5,7 @@
         scrollable
     >
         <v-card>
-        <v-card-title>
+        <v-card-title class="px-4">
             <div class="w-100 d-flex justify-space-between">
                 <span class="fs-16">Create Issues</span>
                 <div class="d-flex">
@@ -18,13 +18,15 @@
                     class="project-select sym-small-size sym-style-input">
 
                         <template v-slot:selection="{item}">
-                           <img :src="item.icon" height="15" width="15" alt="" class="mr-2">
-                           <div class="project-name">{{item.name}}</div>
+                            <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="mr-1" style="font-size:18px">{{item.icon}}</v-icon>
+                            <img  v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" height="15" width="15" alt="" class="mr-2">
+                            <div class="project-name">{{item.name}}</div>
                         </template>
                         <template v-slot:item="{item}">
                             <template>
-                                <img :src="item.icon" height="15" width="15" alt="" class="mr-2">
-                                <div class="fs-13">{{item.name}}</div>
+                                <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="mr-1" style="font-size:18px">{{item.icon}}</v-icon>
+                                <img  v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" height="15" width="15" alt="" class="mr-2">
+                                <div class="project-name">{{item.name}}</div>
                             </template>
                         </template>
                     </v-autocomplete>
@@ -32,8 +34,8 @@
                 </div>
             </div>
 
-        </v-card-title>
-        <v-card-text class="pb-0">
+        </v-card-title >
+        <v-card-text class="pa-1 pb-0">
             <v-container class="pa-0">
                 <div>
                     <!-- <form-tpl

@@ -140,6 +140,36 @@ const getListWorkflowInProject = async(context,projectId) => {
     }
 }
 
+const getListDocumentConfigFieldIssue = async(context) => {
+        try {
+            let item={
+                column : "type",
+                operation : "and",
+                conditions : [
+                    {
+                        name : "in",
+                        value : [4],
+                    }
+                ],
+            }
+            let filter={};
+            filter.filter = [];
+            filter.filter.push(item);
+            filter.page = 1;
+            filter.pageSize = 500;
+            filter.distinct = false;
+
+            let res = await taskManagementApi.getListDocumentConfigFieldIssue(filter);
+            if (res.status == 200) {
+                context.commit('setListDocumentConfigFieldIssue', res.data.listObject);
+            } else {
+                SYMPER_APP.$snotifyError(error, "Can not get document config field!");
+            }
+        } catch (error) {
+            SYMPER_APP.$snotifyError(error, "Can not get document config field!");
+        }
+}
+
 const getAllPriority = async(context,isResetData=false) => {
     if (context.state.allPriority.length==0 || isResetData) {
         try {
@@ -184,7 +214,8 @@ export {
     getAllPriority,
     getListStautsInProject,
     getListColumnInBoard,
-    getListStatusInColumnBoard
+    getListStatusInColumnBoard,
+    getListDocumentConfigFieldIssue
 
 
 };

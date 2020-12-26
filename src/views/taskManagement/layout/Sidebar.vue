@@ -16,10 +16,10 @@
                     <v-list dense>
                         <v-list-item class="v-list-item-project-info">
                             <div class="project-info" @click="showAllProject">
-                                <img height="25px" src="https://symperv01.atlassian.net/secure/projectavatar?pid=10035&avatarId=10416&size=xxlarge" />
+                                <v-icon v-if="!!sCurrentProject.icon && sCurrentProject.icon.indexOf('mdi-') > -1" style="font-size:25px" class="pt-0">{{sCurrentProject.icon}}</v-icon>
+                                <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!sCurrentProject.icon && sCurrentProject.icon.indexOf('mdi-') < 0" :src="sCurrentProject.icon" width="23" height="23">
                                 <div class="project-name" v-if="!mini">
-                                    <div>{{sCurrentProject.name}}</div>
-                                    <div>{{sCurrentProject.description}}</div>
+                                    <div class="mt-2">{{sCurrentProject.name}}</div>
                                 </div>
                                 <!-- <v-icon style="height:24px;" v-if="!mini">mdi-chevron-down</v-icon> -->
                             </div>
@@ -266,7 +266,7 @@ export default {
     padding: 0 !important;
 }
 .project-info{
-    height: 45px;
+    height: 40px;
     width: 100%;
     display: flex;
     transition: all ease-in-out 250ms;
@@ -277,8 +277,7 @@ export default {
         background: var(--symper-background-hover);
     }
 .project-info img{
-    margin: 8px 18px 8px 0;
-    height: 19px;
+    margin: 5px 10px 5px 0;
 }
 .project-info .project-name{
     width: calc(100% - 45px);

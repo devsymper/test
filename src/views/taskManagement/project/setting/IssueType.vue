@@ -45,6 +45,8 @@ export default {
         let projectId=this.$route.params.id;
         this.getListIssueTypeInProject();
         this.$store.dispatch("taskManagement/getListWorkflowInProject",projectId);
+        this.$store.dispatch("taskManagement/getListDocumentConfigFieldIssue");
+
 
     },
     activated(){

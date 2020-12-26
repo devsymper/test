@@ -46,6 +46,7 @@ export default {
             }
         }
         this.$store.dispatch("taskManagement/getAllCategory");
+        this.$store.dispatch("taskManagement/getListDocumentConfigFieldIssue");
         this.$store.commit("taskManagement/addToTaskManagementStore",{key:'currentPage',value:'projectSetting'});
     },
     activated(){

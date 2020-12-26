@@ -184,16 +184,17 @@ export default {
                         }else{
                             this.$snotifyError("", "Can not update priority!");
                         }
+                        this.isLoadingAdd=false;
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not update priority!", err);
-                    })
-                    .always(() => {});
+                        this.isLoadingAdd=false;
+                    });
                 
             }else{
                 this.$snotifyError("", "Have error!");
+                this.isLoadingAdd=false;
             }
-            this.isLoadingAdd=false;
 
         },
         handleUpdatePriority(){
@@ -217,14 +218,16 @@ export default {
                         }else{
                             this.$snotifyError("", "Can not update priority!");
                         }
+                        this.isLoadingAdd=false;
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not update priority!", err);
+                        this.isLoadingAdd=false;
                     });
             }else{
                 this.$snotifyError("", "Have error!");
+                this.isLoadingAdd=false;
             }
-            this.isLoadingAdd=false;
         },
         selectedIcon(data) {
             this.disabled=false;

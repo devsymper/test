@@ -7,7 +7,7 @@
             <div class="project-info" @click="onClick">
                 <img height="25px" src="https://symperv01.atlassian.net/secure/projectavatar?pid=10035&avatarId=10416&size=xxlarge" />
                 <div class="project-name">
-                    <div>hoang tesst</div>
+                    <div>ABC tesst</div>
                     <div>đây là 1 project</div>
                 </div>
                 <v-icon style="font-size:18px;">mdi-star-outline</v-icon>
@@ -15,7 +15,7 @@
             <div class="project-info" @click="onClick1">
                 <img height="25px" src="https://symperv01.atlassian.net/secure/projectavatar?size=medium&s=medium&pid=10013&avatarId=10412" />
                 <div class="project-name">
-                    <div>hoang tesst</div>
+                    <div>ABC tesst</div>
                     <div>đây là 1 project</div>
                 </div>
                 <v-icon style="font-size:18px;">mdi-star-outline</v-icon>
@@ -23,7 +23,7 @@
             <div class="project-info">
                 <img height="25px" src="https://symperv01.atlassian.net/secure/projectavatar?size=medium&s=medium&pid=10036&avatarId=10424" />
                 <div class="project-name">
-                    <div>hoang tesst</div>
+                    <div>ABC tesst</div>
                     <div>đây là 1 project</div>
                 </div>
                 <v-icon style="font-size:18px;">mdi-star-outline</v-icon>
@@ -31,7 +31,7 @@
             <div class="project-info">
                 <img height="25px" src="https://symperv01.atlassian.net/secure/projectavatar?pid=10035&avatarId=10416&size=xxlarge" />
                 <div class="project-name">
-                    <div>hoang tesst</div>
+                    <div>ABC tesst</div>
                     <div>đây là 1 project</div>
                 </div>
                 <v-icon style="font-size:18px;">mdi-star-outline</v-icon>

@@ -66,6 +66,23 @@
                             </v-tooltip>
                         </div>
                     </template>
+
+                    <template  v-slot:[`item.documentId`]="{ item }">
+                        <div v-if="!item.documentId">
+                            <v-btn x-small class="px-1" solo depressed  @click.prevent.stop="handleShowPopupConfigField(item)">
+                                <v-icon color="blue" size="16">mdi-plus</v-icon>
+                            </v-btn>
+                        </div>
+                        <div v-else>
+                            <span class="name-object" style="color:blue" @click.prevent.stop="goToWorkflow(item)" v-if="item.documentName">{{item.documentName}}</span>
+                            <v-tooltip bottom>
+                                <template v-slot:activator="{ on }">
+                                    <v-icon v-on="on" @click.prevent.stop="handleChangeDocConfigField(item)" class="ml-1" size="16" color="blue">mdi-autorenew</v-icon>
+                                </template>
+                                <span>Change</span>
+                            </v-tooltip>
+                        </div>
+                    </template>
                     
                 </v-data-table>
             </v-card>
@@ -166,7 +183,7 @@
                     text
                     :loading="isLoadingAdd"
                     class="btn-add"
-                    @click="handleUpdateIssueWorkflow"
+                    @click="handleUpdateIssueWorkflowOrDocumentId"
                 >
                     {{$t("common.add")}}
                 </v-btn>
@@ -182,7 +199,58 @@
             </v-card-actions>
             </v-card>
         </v-dialog>
+        <v-dialog
+            v-model="dialogConfigField"
+            persistent
+            max-width="400px"
+            scrollable
+        >
+            <v-card>
+            <v-card-title>
+                <span class="fs-16">Select format field issue</span>
+            </v-card-title>
+            <v-card-text>
+                <v-container>
+                    <div>
+                        <form-tpl
+                        style="width:300px"
+                        :allInputs="selectFieldIssue"/>
+                    </div>
+                </v-container>
+            </v-card-text>
+            <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                    color="green darken-1"
+                    text
+                    :loading="isLoadingAdd"
+                    class="btn-add"
+                    @click="handleCreateDocConfigField"
+                >
+                    Create
+                </v-btn>
+                <v-btn
+                    color="blue darken-1"
+                    text
+                    :loading="isLoadingAdd"
+                    class="btn-add"
+                    @click="handleUpdateIssueWorkflowOrDocumentId('documentId')"
 
+                >
+                    {{$t("common.add")}}
+                </v-btn>
+
+                <v-btn
+                color="red darken-1"
+                text
+                @click="dialogConfigField = false"
+                >
+                    {{$t("common.close")}}
+                </v-btn>
+           
+            </v-card-actions>
+            </v-card>
+        </v-dialog>
         <v-dialog v-model="dialogRemove" max-width="350">
             <v-card>
             <v-card-title class="headline">{{$t("common.remove_confirm_title")}}</v-card-title>
@@ -224,6 +292,7 @@ export default {
         listIssue(){
             let listIssueType=util.cloneDeep(this.listIssueType);
             let allWorkflow = this.$store.state.taskManagement.allWorkflow;
+            let allDocConfigField = this.$store.state.taskManagement.listDocumentConfigFieldIssue;
             if (allWorkflow.length > 0) {
                 for (let i = 0; i < listIssueType.length; i++) {
                     if (listIssueType[i].taskLifeCircleId) {
@@ -231,7 +300,13 @@ export default {
                         if (workflow) {
                             listIssueType[i].workflowName=workflow.name;
                         }
-                    }                    
+                    }     
+                    if (listIssueType[i].documentId) {
+                        let document = allDocConfigField.find(ele => ele.id == listIssueType[i].documentId);
+                        if (document) {
+                            listIssueType[i].documentName=document.title;
+                        }
+                    }                  
                 }
             }
             console.log("listIssueType",listIssueType);
@@ -245,6 +320,7 @@ export default {
             isLoadingAdd:false,
             dialogAddIssueType:false,
             dialogAddWorkflow:false,
+            dialogConfigField:false,
             issueTypeSelected:{},
             search:'',
             title:"Issue Type",
@@ -258,6 +334,7 @@ export default {
                 { text: this.$t("common.created_by"), value: "user" },
                 { text: this.$t("taskManagement.table.createAt"), value: "createAt" },
                 { text: this.$t("taskManagement.table.workflow"), value: "taskLifeCircleId" },
+                { text: this.$t("taskManagement.table.configField"), value: "documentId" },
                 { text: "", value: "action" },
             ],
             dataIssueTypeProps:{
@@ -301,6 +378,15 @@ export default {
                     options:[],
                 },
             },
+            selectFieldIssue:{
+                document : { 
+                    title: "Issue type",
+                    type: "autocomplete",
+                    value: '',
+                    multipleSelection:false,
+                    options:[],
+                },
+            },
             infoIssueType:{
                 id:"",
                 name: "",
@@ -320,6 +406,14 @@ export default {
             }
             this.dialogAddWorkflow = true;
         },
+        handleChangeDocConfigField(item){
+            this.selectFieldIssue.document.value = item.documentId;
+            this.issueTypeSelected=item;
+            if (this.selectFieldIssue.document.options.length == 0) {
+                this.$set(this.selectFieldIssue.document,"options",this.$store.state.taskManagement.listDocumentConfigFieldIssue);
+            }
+            this.dialogConfigField = true;
+        },
         handleUpdateIssueType(){
             this.isLoadingAdd = true;
             let isValid = this.validateData();
@@ -329,6 +423,7 @@ export default {
                 data.icon=this.infoIssueType.icon;
                 data.description=this.dataIssueTypeProps.description.value;
                 data.taskLifeCircleId=this.infoIssueType.taskLifeCircleId;
+                data.documentId=this.infoIssueType.documentId;
 
                 taskManagementApi
                     .updateIssueType(this.infoIssueType.id,data)
@@ -340,16 +435,18 @@ export default {
                         }else{
                             this.$snotifyError("", "Can not update issue type!");
                         }
+                        this.isLoadingAdd=false;
+
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not update issue type!", err);
-                    })
-                    .always(() => {});
+                        this.isLoadingAdd=false;
+                    });
                 
             }else{
                 this.$snotifyError("", "Have error!");
+                this.isLoadingAdd=false;
             }
-            this.isLoadingAdd=false;
         },
         handelDetailIssueType(item){
             this.dataIssueTypeProps.name.value = item.name;
@@ -357,6 +454,7 @@ export default {
             this.infoIssueType.icon=item.icon;
             this.infoIssueType.id=item.id;
             this.infoIssueType.taskLifeCircleId=item.taskLifeCircleId;
+            this.infoIssueType.documentId=item.documentId;
             this.isDetail = true;
             this.dialogAddIssueType = true;
 
@@ -383,40 +481,65 @@ export default {
                 this.$router.push("/task-management/projects/"+projectId+"/workflow/"+item.taskLifeCircleId);
             }
         },
-        handleUpdateIssueWorkflow(){
+        handleUpdateIssueWorkflowOrDocumentId(typeUpdate = "workflow"){
+            this.isLoadingAdd = true;
             let id = this.issueTypeSelected.id;
-            let worflfowId = this.selectWorkflowProps.workflow.value;
-            if (id && worflfowId) {
+            if (typeUpdate == "workflow") {
+                var worflfowId = this.selectWorkflowProps.workflow.value;
+            }else if(typeUpdate == "documentId"){
+                var documentId = this.selectFieldIssue.document.value;
+            }
+            if (id && (worflfowId || documentId) ) {
                 let data={};
                 data.name = this.issueTypeSelected.name;
                 data.icon = this.issueTypeSelected.icon;
                 data.description = this.issueTypeSelected.description;
-                data.taskLifeCircleId = worflfowId;
-
+                if (typeUpdate == "workflow") {
+                    data.documentId = this.issueTypeSelected.documentId;
+                    data.taskLifeCircleId = worflfowId;
+                }else if(typeUpdate == "documentId"){
+                    data.documentId = documentId;
+                    data.taskLifeCircleId = this.issueTypeSelected.taskLifeCircleId;
+                }
                 taskManagementApi
                     .updateIssueType(id,data)
                     .then(res => {
                         if (res.status == 200) {
                             this.$emit("add-issuetype"); // emit sự kiện cho reload data
                             this.dialogAddWorkflow=false;
+                            this.dialogConfigField=false;
                         }else{
                             this.$snotifyError("", "Can not add workflow for issue type!");
                         }
+                        this.isLoadingAdd = false;
+
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not add workflow for issue type!", err);
-                    })
-                    .always(() => {});
+                        this.isLoadingAdd = false;
+
+                    });
+            }else{
+                this.isLoadingAdd = false;
             }
+
         },
         handleShowPopupWorkflow(item){
             this.issueTypeSelected=item;
             this.$set(this.selectWorkflowProps.workflow,"options",this.$store.state.taskManagement.allWorkflow);
             this.dialogAddWorkflow = true;
         },
+        handleShowPopupConfigField(item){
+            this.issueTypeSelected=item;
+            this.$set(this.selectFieldIssue.document,"options",this.$store.state.taskManagement.listDocumentConfigFieldIssue);
+            this.dialogConfigField = true;
+        },
         handleCreateWorkflow(){
             let projectId=this.$route.params.id;
             this.$router.push('/task-management/projects/'+projectId+'/workflow/create');
+        },
+        handleCreateDocConfigField(){
+            this.$router.push('/document/editor');
         },
         handleCreate(){
             this.dataIssueTypeProps.name.value = "";
@@ -449,19 +572,23 @@ export default {
                             this.$emit("add-issuetype");
                             this.$snotifySuccess("Add issue type success!");
                             this.dialogAddIssueType=false;
+
                         }else{
                             this.$snotifyError("", "Can not add issue type!");
+
                         }
+                        this.isLoadingAdd=false;
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not add issue type!", err);
-                    })
-                    .always(() => {});
+                        this.isLoadingAdd=false;
+
+                    });
                 
             }else{
                 this.$snotifyError("", "Have error!");
+                this.isLoadingAdd=false;
             }
-            this.isLoadingAdd=false;
 
         },
         selectedIcon(data) {

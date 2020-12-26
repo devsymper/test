@@ -127,16 +127,17 @@ export default {
                         }else{
                             this.$snotifyError("", "Can not update board!");
                         }
+                        this.isLoading=false;
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not update board!", err);
-                    })
-                    .always(() => {});
+                        this.isLoading=false;
+                    });
                 
             }else{
                 this.$snotifyError("", "Have error!");
+                this.isLoading=false;   
             }
-            this.isLoading=false;
         },
         checkChangeValueEdit(newVl){
             let oldVl=this.infoBoard;

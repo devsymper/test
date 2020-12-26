@@ -244,14 +244,16 @@ export default {
                             }else{
                                 self.$snotifyError("", "Can not update project!");
                             }
+                            this.isLoadingAdd = false;
                         })
                         .catch(err => {
                             self.$snotifyError("", "Can not update project!", err);
-                        })
-                        .always(() => {});
+                            this.isLoadingAdd = false;
+                        });
                 }
+            }else{
+                this.isLoadingAdd = false;
             }
-            this.isLoadingAdd = false;
         },
         selectedIcon(data) {
             this.$set(this.projectNew, 'icon', data.icon.trim() )
@@ -282,7 +284,6 @@ export default {
         this.projectNew=util.cloneDeep(this.infoProject);
         this.getDataProps(util.cloneDeep(this.infoProject));
         this.currentUserLeader.id=this.projectNew.userLeader;
-    
     }
 
 
