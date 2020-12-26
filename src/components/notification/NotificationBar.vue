@@ -337,7 +337,6 @@
 import notificationApi from '../../api/settingNotification'
 import Api from "../../api/api.js";
 import icon from "../common/SymperIcon";
-import listObject from "../../views/apps/singleObject";
 import { appConfigs } from '../../configs';
 import Vue from "vue";
 import SymperAvatar from "@/components/common/SymperAvatar";
@@ -345,7 +344,6 @@ export default {
     name: "listApp",
     components: {
         icon,
-        listObject,
         SymperAvatar
     },
     data: function() {
