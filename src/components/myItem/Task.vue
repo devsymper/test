@@ -14,6 +14,7 @@
             :action="action"
             :documentObjectId="converstNumber(documentObjectId)"
             :overrideControls="overrideControls"
+            @submit-document-error="onSubmitError"
             @submit-document-success="onSubmitDone">
         </DocumentSubmit>
         <Detail 
@@ -110,6 +111,7 @@
                     :action="'update'"
                     :editableControls="taskInfo.approvalEditableControls"
                     :documentObjectId="converstNumber(documentObjectId)"
+                    @submit-document-error="onSubmitError"
                     @submit-document-success="onDocumentUpdateSuccess"/>
             </div>
         </v-dialog>
@@ -327,6 +329,9 @@ export default {
             if(action == 'submit'){
                 this.docId = nodeData.formKey;
             }
+        },
+        onSubmitError(){
+            this.$emit('task-submit-error');
         },
         onSubmitDone(data){
             this.$emit('task-submited', data);

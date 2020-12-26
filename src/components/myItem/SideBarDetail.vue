@@ -324,14 +324,10 @@
 	</v-navigation-drawer>
 </template>
 <script>
-import user from "./User";
 
 import { taskApi } from "@/api/task.js";
-import { userApi } from "@/api/user.js";
-import { documentApi } from "@/api/Document";
 import BPMNEngine from "@/api/BPMNEngine.js";
 import { util } from "@/plugins/util.js";
-import { data } from 'jquery'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import Comment from './Comment'
 import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue";
@@ -344,7 +340,6 @@ export default {
 	components:{
 		VuePerfectScrollbar,
 		Comment,
-		user,
 		trackingProcessInstance,
 		UploadFile,
 		RelatedItems,
@@ -538,22 +533,6 @@ export default {
 			type:Boolean,
 			default:true
 		},
-		userId:{
-			type:String, 
-			default:"0"
-		},
-		taskId:{
-			type:String,
-			default:""
-		},
-		workflowId:{
-			type:String,
-			default:""
-		},
-		createTime:{
-			type:String,
-			default:""
-		},
 		documentObjectId:{
 			type:String,
 			default:""
@@ -619,24 +598,6 @@ export default {
 	created(){
 		let thisCpn = this;
 		this.getData();
-		documentApi.getListApprovalHistory(this.documentObjectId).then(res => {
-				if (res.status == 200) {
-					let listUser = []
-					for (let index = 0; index < res.data.length; index++) {
-						let user = res.data[index];
-						let userId = user.userId;
-						let userInfo = thisCpn.allUsers.filter(user=>{
-							return user.id == userId;
-						})
-						if(userInfo.length > 0){
-							user.displayName = userInfo[0].displayName
-							thisCpn.listApprovalUser.push(user);
-						}
-					}
-				}
-			})
-			.catch(err => {
-			})
 		this.$evtBus.$on('symper-app-wrapper-clicked', (evt) => {
             if(!($(evt.target).hasClass('symper-select-user-autocomplete') || $(evt.target).parents('.symper-select-user-autocomplete').length > 0)){
                 for(let key in  this.showDelegatedUser){

@@ -1,11 +1,5 @@
 <template>
     <div class="w-100" style="height: 100%">
-        <v-skeleton-loader
-            v-if="loadingActionTask"
-            :type="'table-tbody'"
-            class="mx-auto"
-            width="100%" height="100%" 
-        ></v-skeleton-loader>
         <v-row class="ml-0 mr-0 justify-space-between task-header" id="taskHeader" style="line-height: 36px;height:44px">
 
             <v-tooltip bottom>
@@ -49,8 +43,12 @@
                             :color="action.color" 
                             @click="saveTaskOutcome(action.value)" 
                             class="mr-2"
+<<<<<<< HEAD
 							:class="{'mr-16': action.value == 'submit' || action.value == 'complete' || action.value == 'update' }"
                             :loading="loadingActionTask"
+=======
+                            :loading="loadingAction"
+>>>>>>> 9c7b855cf982e25442625966e4af95990a48544c
                         >
                             {{action.text}}
                         </v-btn>
@@ -121,6 +119,7 @@
             <!-- <VuePerfectScrollbar :style="{height: parentHeight +'px'}" > -->
                 <task 
                     @task-submited="handleTaskSubmited" 
+                    @task-submit-error="submitError"
                     :is="`task`"
                     :taskInfo="taskInfo"
                     :appId="appId"
@@ -198,17 +197,14 @@
 import icon from "../../components/common/SymperIcon";
 import attachment from "./Attachment";
 import comment from "./Comment";
-import flow from "./Flow";
 import info from "./Info";
 import people from "./People";
 import relatedItems from "./RelatedItems";
-import subtask from "./Subtask";
 import task from "./Task";
 import BPMNEngine from '../../api/BPMNEngine';
-import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../components/process/processAction';
+import { getVarsFromSubmitedDoc } from '../../components/process/processAction';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
-import { appManagementApi } from '@/api/AppManagement';
 import { extractTaskInfoFromObject, addMoreInfoToTask } from '@/components/process/processAction';
 import ListActionMenu from './taskLifeCycle/ListActionMenu'
 import SnackBarSubmit from './taskLifeCycle/SnackBarSubmit'
@@ -320,7 +316,7 @@ export default {
     },
     components: {
         icon: icon,
-        attachment, comment, flow, info, people, relatedItems, subtask, task,
+        attachment, comment, info, people, relatedItems, task,
 		VuePerfectScrollbar,
 		ListActionMenu,
 		SnackBarSubmit,
@@ -348,7 +344,6 @@ export default {
             isRole:false, //value =falses khi assignee = userId, =true khi assignee = userId:role
             widthInfoTask:330,
             isShowSidebar:false,
-            loadingActionTask:false,
             breadcrumb: {
                 appName:'',
                 definitionName: '',
@@ -458,9 +453,12 @@ export default {
         },
     },
     created(){
-        this.checkAndSwitchToTab();
     },
     methods: {
+		submitError(){
+            console.log("Error submit");
+            this.loadingAction = false;
+        },
 		refreshMyItem(type){
 			this.modelDialog[type+'ShowDialog'] = false
 			this.$router.go()
@@ -547,27 +545,6 @@ export default {
         toggleSidebar(){
 			this.isShowSidebar = !this.isShowSidebar;
         },
-        checkAndSwitchToTab(){
-            if(this.$route.params.extraData && this.$route.params.extraData.subAction){
-                let tabAction = {
-                    'view_comment': 'comment'
-                };
-                let tab = tabAction[this.$route.params.extraData.subAction];
-                for(let i = 0; i < this.items.length; i++){
-                    if(this.items[i].tab == tab){
-                        this.tab = i;
-                        break;
-                    }
-                }
-            }
-        },
-        onCopySuccess(){
-           this.$snotify({
-                type: 'success',
-                title: "Copy to clipboard",
-                text: "Copy success"
-                });
-        },
         changeTaskDetailInfo(taskId){
             let hostname=window.location.hostname;
             let copyText = this.taskInfo.action.parameter.taskId;
@@ -580,7 +557,7 @@ export default {
             let self = this;
             let filter="notDone";
             if (this.originData) {
-                if (this.originData.endTime) {
+                if (this.originData.endTime || this.isSubmited) {
                     filter = "done";
                 }else{
                     filter = "notDone";
@@ -674,11 +651,12 @@ export default {
         },
 		async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
             //check xem user có phải assignee
+            this.loadingAction=true;
             // kiểm tra xem user hiện tại có role được phân quyền trong task không? 
             if (this.$store.state.app.endUserInfo.id != this.originData.assigneeInfo.id) {
                 this.showDialogAlert=true;
+                this.loadingAction=false;
             }else if(this.checkRoleUser(this.originData)){
-                this.loadingActionTask=true;
                     if(this.taskAction == 'submit' || this.taskAction == 'update' ){
 			
                         this.$refs.task.submitForm(value);
@@ -727,9 +705,11 @@ export default {
                         }else{
                             this.reloadDetailTask();
                         }
+                        this.loadingAction=false;
                     }
             }else{
                 this.showDialogAlert=true;
+                this.loadingAction=false;
             }
 			this.loadingActionTask=false;
         },
@@ -805,7 +785,11 @@ export default {
                 }else{
                     description=this.descriptionTask;
                 }
-                description.action.parameter.documentObjectId=taskData.variables[0].value;
+                if (this.isSubmited) {
+                    description.action.parameter.documentObjectId=this.documentObjectId;
+                }else{
+                    description.action.parameter.documentObjectId=taskData.variables[0].value;
+                }
                 data.description= JSON.stringify(description);
             }
           
@@ -851,6 +835,7 @@ export default {
         // lấy data mới dựa theo data của task
         async changeTaskDetail(){
             let self=this;
+            self.loadingAction = false;
             if(!self.taskInfo.action){
                 return
             }
@@ -906,6 +891,26 @@ export default {
                 infotTask.originData=task;
                 self.$emit("change-info-task",infotTask);
            
+            }
+        },
+        /**
+         * Hàm kiểm tra khi load task:
+         * 
+         * kiểm tra nếu task chưa hoàn thành sẽ call api sang document check xem có documentObject nào đc tạo 
+         * từ taskId chưa.. nếu có (trường hợp chưa đưa task life circle vào sử dụng) thì sẽ cho update documentObjectId vào task
+         * và complete task
+         */
+        async checkTaskSubmitedDocument(){
+            let taskId = this.originData.id;
+            let self = this;
+            this.descriptionTask=this.originData.description;
+            if(!this.originData.endTime){
+                let res = await taskApi.getDocumentObjectIdWithTaskId(taskId);
+                if (res.data != false) { // doc đã đc submit
+                    self.isSubmited = true;
+                    self.documentObjectId = res.data.id;
+                    self.handleTaskSubmited({});
+                }
             }
         }
     }
