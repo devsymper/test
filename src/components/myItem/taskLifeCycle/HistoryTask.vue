@@ -2,6 +2,7 @@
   <div class="d-flex flex-column mt-2">
 	  <div class="d-flex flex-column mb-2 pt-1 mr-1 ml-1 " v-for="(item,i) in allHistory" :key="i">
 		  <div class="d-flex align-center"> 
+			  <!-- <SymperAvatar :userId="item.userCreateActionId"/> -->
 			  <v-icon small> {{ item.userCreateActionType == 'owner' ? 'mdi-account-tie-outline' : 'mdi-account-check-outline'  }}</v-icon>
 			 <span class="flex-grow-1  ml-1">
 				  {{item.userCreateAction}}
@@ -47,7 +48,11 @@
 </template>
 
 <script>
+import SymperAvatar from "@/components/common/SymperAvatar";
 export default {
+	components:{
+		SymperAvatar
+	},
 	computed:{
 		historyTask(){
 			let sData =  this.$store.state.task
