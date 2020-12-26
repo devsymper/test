@@ -40,7 +40,7 @@
 					<v-btn
 					color="green darken-1"
 					text
-					@click="deloyVersion"
+					@click="updateVersion"
 				>
 					Đồng ý 
 				</v-btn>
@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import {environmentManagementApi} from '@/api/EnvironmentManagement'
+import EnvironmentWorker from 'worker-loader!@/worker/environment/Environment.Worker.js';
 export default {
 	props:{
 		showDialog:{
@@ -62,11 +62,27 @@ export default {
 	data(){
 		return{
 			selected:"",
+			environmentWorker: null,
 			envId:""
 		}
 	},
 	created(){
+		this.environmentWorker = new EnvironmentWorker()
 		this.$store.dispatch('environmentManagement/getAllEnvirontment')
+	},
+	mounted(){
+		let self = this
+        this.environmentWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'updateVersion':
+					self.handlerUpdateVersion(data.dataAfter)
+					break;
+                
+                default:
+                    break;
+            }
+        });
 	},
 	computed:{
 		allEnv(){
@@ -77,7 +93,21 @@ export default {
 		cancel(){
 			this.$emit('cancel')
 		},
-		deloyVersion(){
+		handlerUpdateVersion(res){
+			if(res.status == 200){
+				this.$snotify({
+					type: 'success',
+					title: "Thành công ."
+				})
+			}else{
+				this.$snotify({
+					type: 'error',
+					title: "Có lỗi xảy ra"
+				})
+			}
+			this.$emit('cancel')
+		},
+		updateVersion(){
 			let self = this
 			let serviceId = this.$route.params.serviceId
 			let versionId = this.$store.state.environmentManagement.currentVersionId
@@ -85,42 +115,15 @@ export default {
 				serviceId: serviceId,
 				environmentId: this.envId
 			}
-			self.$emit('cancel')
-			environmentManagementApi.getServerId(data).then(res=>{
-				if(res.data[0]){
-					let formData = {
-						serverId: res.data[0].serverId,
-						versionId: versionId,
-						environmentId: self.envId
-					}
-					environmentManagementApi.updateVersion(formData).then(res=>{
-						if(res.status == 200){
-							debugger
-							self.$snotify({
-								type: 'success',
-								title: "Thành công ."
-							})
-						}else{
-							self.$snotify({
-								type: 'error',
-								title: "Có lỗi xảy ra"
-							})
-						}
-					}).catch(
-						
-					)
-				}else{
-					self.$snotify({
-						type: 'error',
-						title: "Có lỗi xảy ra"
-					})
+			this.environmentWorker.postMessage({
+				action: "updateVersion",
+				data:{
+					versionId : versionId,
+					environmentId: self.envId,
+					dataGetServerId : data
 				}
-			}).catch(err=>{
-					self.$snotify({
-						type: 'error',
-						title: "Có lỗi xảy ra"
-					})
 			})
+			
 		}
 	},
 }
