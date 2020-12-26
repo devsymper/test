@@ -186,7 +186,7 @@ export const getChildItemInApp = async function(data){
 							}
 						}
 		]})
-			obj.dashboard = resRp.data.listObject
+		obj.dashboard = resRp.data.listObject
 	}
 	return obj
 }
