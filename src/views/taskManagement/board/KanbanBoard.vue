@@ -96,6 +96,12 @@ export default {
         VuePerfectScrollbar
     },
     computed:{
+        listBoard(){
+            return this.$store.state.taskManagement.listBoardInProject;
+        },
+        currentBoard(){
+            return this.boardCurrent;
+        },
         columns(){
             let columns = this.listColumn;
             let self = this;
@@ -164,6 +170,12 @@ export default {
         }
     },
     watch:{
+        async $route(to, from) {
+            if (to.params.id) {
+                await this.getListBoard();
+                await this.setBoardCurrent();
+            }
+        },
         
     },
     data() {
@@ -512,7 +524,7 @@ export default {
             //     ]
             //     }
             // ],
-            currentBoard:{}
+            boardCurrent:{},
         };
     },
     methods:{
@@ -520,49 +532,45 @@ export default {
             let self=this;
             let id=this.$route.params.id;
             if (id) {
-                taskManagementApi.getListBoardInProject(id).then(res=>{
-                    if (res.status == 200) {
-                        self.$store.commit("taskManagement/setListBoardInProject", res.data.listObject);
-                    }
-                });
-                
-            }
-        },
-        setBoardCurrent(){
-            let projectId=this.$route.params.id;
-            setTimeout((self) => {
-                let allBoard=self.$store.state.taskManagement.listBoardInProject;
-                if (allBoard.length>0) {
-                    self.currentBoard=allBoard[0];  
+                let res = await taskManagementApi.getListBoardInProject(id) ;
+                if (res.status == 200) {
+                    self.$store.commit("taskManagement/setListBoardInProject", res.data.listObject);
                 }
-            }, 300,this);
+            }
+        },
+        async setBoardCurrent(){
+            let projectId=this.$route.params.id;
+            let allBoard= this.listBoard;
+            if (allBoard.length>0) {
+                this.boardCurrent=allBoard[0];  
+            }
             if (!this.$store.state.taskManagement.listStatusInProjects[projectId] || this.$store.state.taskManagement.listStatusInProjects[projectId].length == 0) {
                 this.$store.dispatch("taskManagement/getListStautsInProject", projectId);
             }
-            this.getListStatusInProject();
-            this.getListColumn();
-            this.getListColumnStatus();
+            await this.getListStatusInProject();
+            await this.getListColumn();
+            await this.getListColumnStatus();
         },
-        getListStatusInProject(){
+        async getListStatusInProject(){
             let projectId=this.$route.params.id;
             if (!this.$store.state.taskManagement.listStatusInProjects[projectId] || this.$store.state.taskManagement.listStatusInProjects[projectId].length == 0) {
-                this.$store.dispatch("taskManagement/getListStautsInProject", projectId);
+                await this.$store.dispatch("taskManagement/getListStautsInProject", projectId);
             }
         },
-        getListColumn(){
-            if (this.currentBoard.id) {
-                let idBoard=this.currentBoard.id;
+        async getListColumn(){
+            if (this.boardCurrent.id) {
+                let idBoard=this.boardCurrent.id;
                 if (!this.$store.state.taskManagement.listColumnInBoard[idBoard] || this.$store.state.taskManagement.listColumnInBoard[idBoard].length == 0) {
-                    this.$store.dispatch("taskManagement/getListColumnInBoard",idBoard);
+                   await this.$store.dispatch("taskManagement/getListColumnInBoard",idBoard);
                 }
             }
       
         },
-        getListColumnStatus(){
-            if (this.currentBoard.id) {
-                let idBoard=this.currentBoard.id;
+        async getListColumnStatus(){
+            if (this.boardCurrent.id) {
+                let idBoard=this.boardCurrent.id;
                 if (!this.$store.state.taskManagement.listStatusInColumnBoard[idBoard] || this.$store.state.taskManagement.listStatusInColumnBoard[idBoard].length == 0) {
-                    this.$store.dispatch("taskManagement/getListStatusInColumnBoard",idBoard);
+                   await this.$store.dispatch("taskManagement/getListStatusInColumnBoard",idBoard);
                 }
             }
         }
@@ -571,18 +579,16 @@ export default {
         let self = this;
         this.$evtBus.$on('selected-item-board', (data) =>{
 			if (data.id) {
-                self.currentBoard=data;
+                self.boardCurrent=data;
                 self.getListStatusInProject();
                 self.getListColumn();
                 self.getListColumnStatus();
 			}else{
 			}
         });
-        this.setBoardCurrent();
         
     },
     activated(){
-        this.getListBoard();
        // this.toggleMainContentLoader(false);
         let breadcrumbs = [
                 {

@@ -93,6 +93,21 @@ const getListStautsInProject = async(context,projectId) => {
         SYMPER_APP.$snotifyError(error, "Can not get list status in project!");
     }
 }
+const getListIssueTypeInProjects = async(context,projectId) => {
+    try {
+        let res = await taskManagementApi.getListIssueTypeInProject(projectId);
+        if (res.status == 200) {
+            let data={};
+            data.key = projectId;
+            data.data = res.data.listObject;
+            context.commit('setListIssueTypeInProjects',data);
+        } else {
+            SYMPER_APP.$snotifyError(error, "Can not get list issuetype in project!");
+        }
+    } catch (error) {
+        SYMPER_APP.$snotifyError(error, "Can not get list issuetype in project!");
+    }
+}
 
 const getListColumnInBoard = async(context,boardId) => {
     try {
@@ -215,7 +230,8 @@ export {
     getListStautsInProject,
     getListColumnInBoard,
     getListStatusInColumnBoard,
-    getListDocumentConfigFieldIssue
+    getListDocumentConfigFieldIssue,
+    getListIssueTypeInProjects
 
 
 };

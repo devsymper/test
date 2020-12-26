@@ -10,12 +10,13 @@
                 <span class="fs-16">Create Issues</span>
                 <div class="d-flex">
                     <v-autocomplete 
-                    return-object
-                    item-text="name"
-                    item-value="id"
-                    :items="allProject" 
-                    solo
-                    class="project-select sym-small-size sym-style-input">
+                        v-model="currentProject"
+                        return-object
+                        item-text="name"
+                        item-value="id"
+                        :items="allProject"
+                        solo
+                        class="project-select sym-small-size sym-style-input">
 
                         <template v-slot:selection="{item}">
                             <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="mr-1" style="font-size:18px">{{item.icon}}</v-icon>
@@ -30,21 +31,42 @@
                             </template>
                         </template>
                     </v-autocomplete>
-                    <v-autocomplete solo class="task-type-select sym-small-size sym-style-input"></v-autocomplete>
+                    <v-autocomplete 
+                        v-model="currentIssueType"
+                        return-object
+                        item-text="name"
+                        item-value="id"
+                        :items="allIssueTypeInProject"
+                        solo
+                        class="project-select sym-small-size sym-style-input">
+
+                        <template v-slot:selection="{item}">
+                            <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="mr-1" style="font-size:18px">{{item.icon}}</v-icon>
+                            <img  v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" height="15" width="15" alt="" class="mr-2">
+                            <div class="project-name">{{item.name}}</div>
+                        </template>
+                        <template v-slot:item="{item}">
+                            <template>
+                                <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="mr-1" style="font-size:18px">{{item.icon}}</v-icon>
+                                <img  v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" height="15" width="15" alt="" class="mr-2">
+                                <div class="project-name">{{item.name}}</div>
+                            </template>
+                        </template>
+                    </v-autocomplete>
                 </div>
             </div>
 
         </v-card-title >
         <v-card-text class="pa-1 pb-0">
             <v-container class="pa-0">
-                <div>
-                    <!-- <form-tpl
-                    :allInputs="dataInfoIssueProps"/> -->
+                <div v-if="Object.keys(currentProject).length > 0">
                     <submit
                         ref="submitComponent"
                         class="doc_issue"
                         :action="'submit'"
-                        :docId="Number(docId)"
+                        :docId="returnDocumentId()"
+                        :projectId="currentProject.id"
+                        :workflowVariable="workflowVariable"
                         :showSubmitButton="false"
                         @submit-document-success="onSubmitDone"
                      />
@@ -87,91 +109,72 @@ export default {
         Submit,
     },
     data(){
+        let self = this;
         return{
             isLoading:false,
             isShow:false,
-            docId:2131,
-            dataInfoIssueProps:{
-                name : { 
-                    title: "Tiêu đề công việc",
-                    type: "text",
-                    value: '',
-                    validateStatus:{
-                        isValid:true,
-                        message:"Error"
-                    },
-                    validate(){
-                        if (this.value=="") {
-                            this.validateStatus.isValid=false;
-                            this.validateStatus.message="Không bỏ trống";
-                        }else{
-                            this.validateStatus.isValid=true;
-                            this.validateStatus.message="";
-                        }
-                    }
-                },
-                component : {
-                    title: "Component",
-                    type: "autocomplete",
-                    value: '',
-                    options: [
-                    ],
-                    validateStatus:{
-                        isValid:true,
-                        message:""
-                    },
-                    validate(){
-                    }
-                },
-                description : {
-                    title: "Mô tả",
-                    type: "editor",
-                    value: '',
-                    validateStatus:{
-                        isValid:true,
-                        message:""
-                    },
-                    validate(){
-                    }
-                },
-                priority : {
-                    title: "Priority",
-                    type: "autocomplete",
-                    value: '',
-                    options: [
-                    ],
-                    validateStatus:{
-                        isValid:true,
-                        message:""
-                    },
-                    validate(){
-                    }
-                },
-                dueDate : {
-                    title: "Due date",
-                    type: "dateFormat",
-                    value: '',
-                    validateStatus:{
-                        isValid:true,
-                        message:""
-                    },
-                    validate(){
-                    }
-                },
-            },
+            currentProject: {},
+            currentIssueType: {},
+            workflowVariable:{
+                // "project_id" : "111111"
+            }
+        
         }
     },
     computed:{
         allProject(){
+            if (!this.$store.state.taskManagement.allProject || this.$store.state.taskManagement.allProject.length == 0) {
+                this.$store.dispatch("taskManagement/getAllProject");
+            }
             let projects = util.cloneDeep(this.$store.state.taskManagement.allProject);
             projects = projects.reduce((arr,obj)=>{
                 arr.push({id:obj.id, name: obj.name, icon:obj.icon});
                 return arr;
             },[])
             return projects;
-        }
+        },
+        allIssueTypeInProject(){
+            if (this.currentProject) {
+                let currentProject = this.currentProject;
+                if (!this.$store.state.taskManagement.listIssueTypeInProjects[currentProject.id] || this.$store.state.taskManagement.listIssueTypeInProjects[currentProject.id].length == 0) {
+                    this.$store.dispatch("taskManagement/getListIssueTypeInProjects", currentProject.id);
+                }
+                return this.$store.state.taskManagement.listIssueTypeInProjects[currentProject.id];
+            }else{
+                return [];
+            }
+      
+        },
+        sTaskManagement() {
+            return this.$store.state.taskManagement;
+        },
+    },
+    watch:{
+        currentProject(newVl){
+            if (newVl && !this.$store.state.taskManagement.listIssueTypeInProjects[newVl.id] || this.$store.state.taskManagement.listIssueTypeInProjects[newVl.id].length == 0) {
+                this.$store.dispatch("taskManagement/getListIssueTypeInProjects", newVl.id);
+            }
+        },
+        // allIssueTypeInProject: {
+        //     deep: true,
+        //     immediate: true,
+        //     handler(after) {
+        //         if (after.length > 0) {
+        //             this.currentIssueType = after[0];
+        //         }
+        //     }
+        // }
+
     },
     methods:{
+        returnDocumentId(){
+            if (this.currentIssueType && this.currentIssueType.documentId) {
+                return Number(this.currentIssueType.documentId)
+            }else{
+                //this.$snotifyError("", "Issue type chưa được cấu hình field.Hệ thống sẽ cấu hình field mặc định !!!");
+                return 2131;
+            }
+        },
         show(){
             this.isShow=true;
         },
@@ -184,6 +187,12 @@ export default {
             this.$snotifySuccess("Add issue success!");
 
         },
+    },
+    mounted(){
+        this.currentProject=this.allProject[0];
+        // if (this.listIssueTypeInProjects.length > 0) {
+        //     this.currentIssueType = this.listIssueTypeInProjects[0];
+        // }
     }
 
 }

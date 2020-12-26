@@ -38,6 +38,9 @@ const setListColumnInBoard = (state, data) => {
 const setListStatusInColumnBoard = (state, data) => {
     Vue.set(state.listStatusInColumnBoard, data.key , data.data);
 }
+const setListIssueTypeInProjects = (state, data) => {
+    Vue.set(state.listIssueTypeInProjects, data.key , data.data);
+}
 
 const setAllWorkflow = (state, allWorkflow) => {
     Vue.set(state, 'allWorkflow', allWorkflow);
@@ -247,6 +250,7 @@ export {
     setAllStatus,
     setListStautsInProject,
     setListStatusInColumnBoard,
-    setListDocumentConfigFieldIssue
+    setListDocumentConfigFieldIssue,
+    setListIssueTypeInProjects
 
 };

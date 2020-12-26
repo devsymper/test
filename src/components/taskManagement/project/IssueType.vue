@@ -183,7 +183,7 @@
                     text
                     :loading="isLoadingAdd"
                     class="btn-add"
-                    @click="handleUpdateIssueWorkflowOrDocumentId"
+                    @click="handleUpdateIssueWorkflowOrDocumentId('workflow')"
                 >
                     {{$t("common.add")}}
                 </v-btn>
@@ -484,6 +484,7 @@ export default {
         handleUpdateIssueWorkflowOrDocumentId(typeUpdate = "workflow"){
             this.isLoadingAdd = true;
             let id = this.issueTypeSelected.id;
+            debugger
             if (typeUpdate == "workflow") {
                 var worflfowId = this.selectWorkflowProps.workflow.value;
             }else if(typeUpdate == "documentId"){
