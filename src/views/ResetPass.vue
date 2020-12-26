@@ -102,7 +102,6 @@ export default {
     },
     methods: {
         save() {
-            debugger
             let query = this.$route.query;
             let check = false;
             if (this.newPassword&&this.newPassword.length>=8&&this.newPassword.length<25&&this.newPassword==this.reNewPassword) {
@@ -112,7 +111,6 @@ export default {
             if(check){
                 userApi.resetBaPass(query.email,query.expired,query.token,this.newPassword).then(res=>{
                     if(res.status==200){
-                        debugger
                         self.showNotification=true;
                         self.isSuccess=true;
                     }else{
