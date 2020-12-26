@@ -14,40 +14,30 @@ export default {
     components:{
         issueType
     },
+    computed:{
+        listIssueType(){
+            let projectId = this.$route.params.id;
+            return this.$store.state.taskManagement.listIssueTypeInProjects[projectId];
+        }
+    },
     data(){
         return{
-            listIssueType:[]
         }
     },
     methods:{
         addIssueType(){
-            this.getListIssueTypeInProject();
-        },
-        getListIssueTypeInProject(){
-            let self=this;
             let projectId=this.$route.params.id;
-            taskManagementApi
-                .getListIssueTypeInProject(projectId)
-                .then(res => {
-                    if (res.status == 200) {
-                        self.listIssueType=res.data.listObject;
-                    }else{
-                        self.$snotifyError("", "Can not get list issue type in project!!!");
-                    }
-                })
-                .catch(err => {
-                    self.$snotifyError("", "Can not get list issue type in project!!", err);
-                })
-                .always(() => {});
-        }
+            this.$store.dispatch("taskManagement/getListIssueTypeInProjects", projectId);
+        },
     },
     created(){
         let projectId=this.$route.params.id;
-        this.getListIssueTypeInProject();
+        if (!this.$store.state.taskManagement.listIssueTypeInProjects[projectId] || this.$store.state.taskManagement.listIssueTypeInProjects[projectId].length == 0) {
+            this.$store.dispatch("taskManagement/getListIssueTypeInProjects", projectId);
+        }
         this.$store.dispatch("taskManagement/getListWorkflowInProject",projectId);
         this.$store.dispatch("taskManagement/getListDocumentConfigFieldIssue");
-
-
+        
     },
     activated(){
         //this.toggleMainContentLoader(false);

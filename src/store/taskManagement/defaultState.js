@@ -23,6 +23,7 @@ const defaultState = {
     },
     listColumnInBoard:{}, // có dạng {key : []} , key là boardId
     listStatusInColumnBoard:{}, // có dạng {key : []} , key là boardId,
+    listIssueTypeInProjects:{}, // có dạng {key : []} , key là boardId,
     listDocumentConfigFieldIssue:[],
     allWorkflow:[],
 };
