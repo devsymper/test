@@ -257,7 +257,7 @@
 			</div>
 			<div 
 				v-if="showHistoryTask" 
-				style="width: 250px"
+				style="width: 300px"
 				class="d-flex flex-column"
 			>
 				<div class="d-flex">
@@ -563,7 +563,7 @@ export default {
 			if(!this.showHistoryTask){
 				return this.sidebarWidth
 			}else{
-				return this.sidebarWidth + 250
+				return this.sidebarWidth + 300
 			}
 		},
 		sapp(){

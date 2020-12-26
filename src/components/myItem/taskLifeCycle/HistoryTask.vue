@@ -2,8 +2,8 @@
   <div class="d-flex flex-column mt-2">
 	  <div class="d-flex flex-column mb-2 pt-1 mr-1 ml-1 " v-for="(item,i) in allHistory" :key="i">
 		  <div class="d-flex align-center"> 
-			  <!-- <SymperAvatar :userId="item.userCreateActionId"/> -->
-			  <v-icon small> {{ item.userCreateActionType == 'owner' ? 'mdi-account-tie-outline' : 'mdi-account-check-outline'  }}</v-icon>
+			<SymperAvatar :userId="item.userCreateActionId" :size="20" />
+			  <v-icon small class="ml-1"> {{ item.userCreateActionType == 'owner' ? 'mdi-account-tie-outline' : 'mdi-account-check-outline'  }}</v-icon>
 			 <span class="flex-grow-1  ml-1">
 				  {{item.userCreateAction}}
 			 </span>
@@ -11,10 +11,10 @@
 				  {{item.date}} 
 			  </span>
 		  </div>
-		  <div class="d-flex mt-1"> 
+		  <div class="d-flex mt-1 ml-7"> 
 			 <span v-html="reduce(item.startStatus,item.endStatus)"></span> <span style="color: blue" class="ml-1"> {{item.userReceiveAction}} </span>
 		  </div>
-		  <div class="d-flex align-center">
+		  <div class="d-flex align-center ml-7">
 			  Status 
 			  <v-chip
 				x-small
@@ -75,8 +75,7 @@ export default {
 				for(let i = 0; i < data.length - 1 ; i++){
 					if(data[i].delegationState == 'PENDING'){
 						if(data[i+1].delegationState == "RESOLVED"){
-							let obj = self.createHistoryTask(data[i],data[i+1],"delegate","assign",'assigne')
-							obj.userCreateAction  = mapIdToUser[data[i].assignee].displayName
+							let obj = self.createHistoryTask(data[i],data[i+1],"delegate","assign",'assigne', data[i].assignee)
 							let arr = data[i+1].assignee.split(":")
 							obj.userReceiveAction  = mapIdToUser[arr[0]].displayName
 							newData.push(obj)
@@ -84,37 +83,31 @@ export default {
 					}
 					else if(data[i].delegationState == 'RESOLVED'){
 						if(data[i+1].delegationState == "PENDING"){
-							let obj = self.createHistoryTask(data[i],data[i+1],"assign","delegate",'owner')
 							let arr = data[i].assignee.split(":")
-							obj.userCreateAction  = mapIdToUser[arr[0]].displayName
+							let obj = self.createHistoryTask(data[i],data[i+1],"assign","delegate",'owner', arr[0])
 							obj.userReceiveAction  = mapIdToUser[data[i+1].assignee].displayName
 							newData.push(obj)
 						}else if(data[i+1].deleted){
-							let obj = self.createHistoryTask(data[i],data[i+1],"assign","complete",'owner')
 							let arr = data[i].assignee.split(":")
-							obj.userCreateAction  = mapIdToUser[arr[0]].displayName
+							let obj = self.createHistoryTask(data[i],data[i+1],"assign","complete",'owner', arr[0])
 							newData.push(obj)
 						}else if(data[i].assignee != data[i+1].assignne){
-							let obj = self.createHistoryTask(data[i],data[i+1],"assign","assign",'owner')
 							let arr = data[i].assignee.split(":")
-							obj.userCreateAction  = mapIdToUser[arr[0]].displayName
+							let obj = self.createHistoryTask(data[i],data[i+1],"assign","assign",'owner',arr[0])
 							obj.userReceiveAction  = mapIdToUser[data[i+1].assignee].displayName
 						}else if(!data[i+1].assignee && !data[i+1].owner){
-							let obj = self.createHistoryTask(data[i],data[i+1],"assign","unAssign",'owner')
 							let arr = data[i].assignee.split(":")
-							obj.userCreateAction  = mapIdToUser[arr[0]].displayName
+							let obj = self.createHistoryTask(data[i],data[i+1],"assign","unAssign",'owner', arr[0])
 						}
 					}
 					else if(!data[i].deleted && data[i+1].deleted){
-						let obj = self.createHistoryTask(data[i],data[i+1],"assign","delegate",'owner')
 						let arr = data[i].assignee.split(":")
-						obj.userCreateAction  = mapIdToUser[arr[0]].displayName
+						let obj = self.createHistoryTask(data[i],data[i+1],"assign","delegate",'owner', arr[0])
 						obj.userReceiveAction  = mapIdToUser[data[i+1].assignee].displayName
 						newData.push(obj)
 					}else if(!data[i].owner && ! data[i].assignee && data[i+1].assignee && data[i+1].owner){
-						let obj = self.createHistoryTask(data[i],data[i+1],"unAssign","assign",'assigne')
 						let arr = data[i].assignee.split(":")
-						obj.userCreateAction  = mapIdToUser[arr[0]].displayName
+						let obj = self.createHistoryTask(data[i],data[i+1],"unAssign","assign",'assigne' , arr[0])
 						obj.userReceiveAction  = mapIdToUser[data[i+1].assignee].displayName
 					}
 				}
@@ -126,7 +119,7 @@ export default {
 		return{
 			taskStatus:{
 				delegate:{
-					color: "primary",
+					color: "#8E2D8C",
 					title: "Ủy quyền"
 				},
 				unAssign:{
@@ -169,13 +162,16 @@ export default {
 				return "Hoàn thành công việc"
 			}
 		},
-		createHistoryTask(x,y,startStatus,endStatus,userCreateActionType){
+		createHistoryTask(x,y,startStatus,endStatus,userCreateActionType, userCreateActionId){
+			let mapIdToUser = this.$store.getters['app/mapIdToUser'];
 			let self = this
 			let obj = {}
 			obj.startStatus = startStatus
 			obj.endStatus = endStatus
 			obj.date = self.$moment(y.createTime).format('YYYY-MM-DD')
 			obj.userCreateActionType  = userCreateActionType
+			obj.userCreateAction  = mapIdToUser[userCreateActionId].displayName
+			obj.userCreateActionId = userCreateActionId
 
 			return obj
 		}
