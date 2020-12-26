@@ -169,15 +169,7 @@ export default {
             return listStatus;
         }
     },
-    watch:{
-        async $route(to, from) {
-            if (to.params.id) {
-                await this.getListBoard();
-                await this.setBoardCurrent();
-            }
-        },
-        
-    },
+    
     data() {
         let self=this;
         return {
@@ -232,6 +224,7 @@ export default {
             boardCurrent:{},
         };
     },
+   
     methods:{
         async getListBoard(){
             let self=this;
@@ -243,18 +236,15 @@ export default {
                 }
             }
         },
-        async setBoardCurrent(){
+        setBoardCurrent(){
             let projectId=this.$route.params.id;
             let allBoard= this.listBoard;
             if (allBoard.length>0) {
                 this.boardCurrent=allBoard[0];  
             }
-            if (!this.$store.state.taskManagement.listStatusInProjects[projectId] || this.$store.state.taskManagement.listStatusInProjects[projectId].length == 0) {
-                this.$store.dispatch("taskManagement/getListStautsInProject", projectId);
-            }
-            await this.getListStatusInProject();
-            await this.getListColumn();
-            await this.getListColumnStatus();
+            this.getListStatusInProject();
+            this.getListColumn();
+            this.getListColumnStatus();
         },
         async getListStatusInProject(){
             let projectId=this.$route.params.id;
@@ -278,6 +268,10 @@ export default {
                    await this.$store.dispatch("taskManagement/getListStatusInColumnBoard",idBoard);
                 }
             }
+        },
+        async loadData(){
+            await this.getListBoard();
+            await this.setBoardCurrent();
         }
     },
     created(){
@@ -295,6 +289,7 @@ export default {
     },
     activated(){
        // this.toggleMainContentLoader(false);
+       this.loadData();
         let breadcrumbs = [
                 {
                     text: 'Dashboard',
