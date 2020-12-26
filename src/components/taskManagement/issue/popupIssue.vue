@@ -155,15 +155,15 @@ export default {
                 this.$store.dispatch("taskManagement/getListIssueTypeInProjects", newVl.id);
             }
         },
-        // allIssueTypeInProject: {
-        //     deep: true,
-        //     immediate: true,
-        //     handler(after) {
-        //         if (after.length > 0) {
-        //             this.currentIssueType = after[0];
-        //         }
-        //     }
-        // }
+        allIssueTypeInProject: {
+            deep: true,
+            immediate: true,
+            handler(after) {
+                if (after && after.length > 0) {
+                    this.currentIssueType = after[0];
+                }
+            }
+        }
 
     },
     methods:{
@@ -171,7 +171,6 @@ export default {
             if (this.currentIssueType && this.currentIssueType.documentId) {
                 return Number(this.currentIssueType.documentId)
             }else{
-                //this.$snotifyError("", "Issue type chưa được cấu hình field.Hệ thống sẽ cấu hình field mặc định !!!");
                 return 2131;
             }
         },
@@ -190,9 +189,6 @@ export default {
     },
     mounted(){
         this.currentProject=this.allProject[0];
-        // if (this.listIssueTypeInProjects.length > 0) {
-        //     this.currentIssueType = this.listIssueTypeInProjects[0];
-        // }
     }
 
 }
