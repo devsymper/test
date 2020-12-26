@@ -43,12 +43,8 @@
                             :color="action.color" 
                             @click="saveTaskOutcome(action.value)" 
                             class="mr-2"
-<<<<<<< HEAD
 							:class="{'mr-16': action.value == 'submit' || action.value == 'complete' || action.value == 'update' }"
                             :loading="loadingActionTask"
-=======
-                            :loading="loadingAction"
->>>>>>> 9c7b855cf982e25442625966e4af95990a48544c
                         >
                             {{action.text}}
                         </v-btn>
