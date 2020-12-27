@@ -98,6 +98,7 @@
 				:tableContextMenu="tableContextMenu"
 				:showToolbar="false"
 				:isTablereadOnly="false"
+				:customRenderForFilter="customRenderForFilter"
 				@after-selected-row="afterSelectedRow"
 				:showImportHistoryBtn="false"
 				:showPagination="false"
@@ -135,6 +136,24 @@ export default {
 		return{
 			showDialog:false,
 			disableBtn: true,
+			customRenderForFilter(columnName,items){
+				if(columnName == 'status'){
+					items.forEach(function(e){
+						if(columnName == 'status'){
+							items.forEach(function(e){
+								if(e.value == "1"){
+									e.label = "Đang chạy"
+								}else if(e.value == '2'){
+									e.label = "Tạm dừng"
+								}else if(e.value == '3'){
+									e.label = "Hoàn thành"
+								}
+							})
+						}
+					})
+				}
+				return items
+			},
 			listItemSelected:[],
 			showBtnAddCheckbox: true,
 			customAPIResult:{
@@ -171,7 +190,7 @@ export default {
                          columns: [
                             {name: "id", title: "id", type: "numeric"},
 							{name: "name", title: "name", type: "text"},
-							{name: "startUserName", title: "startUserId", type: "text"},
+							{name: "startUserName", title: "startUserId", type: "text", noFilter: true},
 							{name: "status", title: "status", type: "date",
 								  renderer:  function(instance, td, row, col, prop, value, cellProperties) {
 										Handsontable.dom.empty(td);
@@ -198,7 +217,7 @@ export default {
 										}
 									},
 							},
-							{name: "nameVersion", title: "nameVersion", type: "text"},
+							{name: "nameVersion", title: "nameVersion", type: "text", noFilter: true},
 							{name: "startTime", title: "startTime", type: "text",
 								renderer:  function(instance, td, row, col, prop, value, cellProperties) {
 									Handsontable.dom.empty(td);
@@ -350,7 +369,6 @@ export default {
 			this.$goToPage('/workflow/process-key/'+processKey+'/list-instances', this.$t('process.instance.listModelInstance')+processKey)
 		},
 		stopProcessInstance(){
-			let self = this
 			this.adminWorker.postMessage(
 				{
 					action:'stopProcessInstance',

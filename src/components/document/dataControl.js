@@ -214,13 +214,17 @@ export const getMapControlEffected = (allControlObj) => {
                            }
                            mapControlEffected[formulasType][controlEffect][name] = true;
                        }
-                    //    detectControlEffectedInTableInDoc(mapControlEffected[formulasType], name, formulas[formulasType].instance);
+                       detectControlEffectedInTableInDoc(mapControlEffected[formulasType], name, formulas[formulasType].instance, allControlObj);
                    }
                }
            }
        }
    }
    return mapControlEffected
+}
+
+function detectControlEffectedInTableInDoc(mapControlEffected,name,formulaInstance, allControlObj){
+    formulaInstance.detectControlInTable(mapControlEffected,name,formulaInstance.formulas,allControlObj)  
 }
 
 /**

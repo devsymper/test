@@ -2,7 +2,9 @@ export const symperAjax = async(options) =>{
 	if(options.method == "GET"){
 		if(Object.keys(options.data).length > 0){
 			let str = new URLSearchParams(options.data).toString();
+			console.log(str);
 			options.url.includes("?") ? options.url = options.url + "&" + str : options.url = options.url + "?" + str
+
 		}
 	}else{
 		// if(options.dataType == "json"){
@@ -10,7 +12,6 @@ export const symperAjax = async(options) =>{
 		// 		options.body = typeof options.data == 'object' ? JSON.stringify(options.data) : options.data;
 		// 	}
 		// }
-
 		if(!options.contentType){
 			options.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
 			let data = new URLSearchParams(options.data)

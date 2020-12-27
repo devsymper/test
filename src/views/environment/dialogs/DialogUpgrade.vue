@@ -40,7 +40,7 @@
 					<v-btn
 					color="green darken-1"
 					text
-					@click="deloyVersion"
+					@click="upgradeVersion"
 				>
 					Upgrade
 				</v-btn>
@@ -51,7 +51,7 @@
 </template>
 
 <script>
-import {environmentManagementApi} from '@/api/EnvironmentManagement'
+import EnvironmentWorker from 'worker-loader!@/worker/environment/Environment.Worker.js';
 export default {
 	props:{
 		showDialog:{
@@ -70,11 +70,26 @@ export default {
 	data(){
 		return{
 			selected:"",
+			environmentWorker: null,
 			verId:""
 		}
 	},
 	created(){
+		this.environmentWorker = new EnvironmentWorker()
 		this.$store.dispatch('environmentManagement/getAllEnvirontment')
+	},
+	mounted(){
+		let self = this
+        this.environmentWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'upgradeVersion':
+					self.handlerUpgradeVersion(data.dataAfter)
+					break;
+                default:
+                    break;
+            }
+        });
 	},
 	computed:{
 		allVer(){
@@ -86,7 +101,20 @@ export default {
 		cancel(){
 			this.$emit('cancel')
 		},
-		deloyVersion(){
+		handlerUpgradeVersion(res){
+			if(res.status == 200){
+				this.$snotify({
+					type: 'success',
+					title: "Thành công . Đã deploy"
+				})
+			}else{
+				this.$snotify({
+					type: 'error',
+					title: "Có lỗi xảy ra"
+				})
+			}
+		},
+		upgradeVersion(){
 			let self = this
 			let formData = {
 				serverId: this.currentInstance.serverId,
@@ -98,23 +126,11 @@ export default {
 				type: 'success',
 				title: "Đang xử lí. Vui lòng chờ kêt quả.... "
 			})
-			environmentManagementApi.deloy(formData).then(res=>{
-				if(res.status == 200){
-					self.$snotify({
-						type: 'success',
-						title: "Thành công . Đang deploy.... "
-					})
-				}else{
-					self.$snotify({
-						type: 'error',
-						title: "Có lỗi xảy ra"
-					})
+			this.environmentWorker.postMessage({
+				action: 'upgradeVersion',
+				data:{
+					formData: formData
 				}
-			}).catch(err=>{
-				self.$snotify({
-					type: 'error',
-					title: "Có lỗi xảy ra"
-				})
 			})
 		}
 	},

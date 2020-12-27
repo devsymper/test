@@ -121,7 +121,6 @@ export const deleteProcessInstance = async function(isDeleteDoc , lists) {
 			let resTask = adminApi.deleteProcessInstances(lists[i].id)
 			adminApi.deleteTask(lists[i].id)
 			newLists.push('done')
-			debugger
 		}
 	}	
 	return {

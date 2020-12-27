@@ -13,7 +13,6 @@ onmessage = function (event) {
             console.log(dataForEachAction);
             dataForEachAction.allControlObj = JSON.parse(dataForEachAction.allControlObj);
             dataForEachAction.isBa = JSON.parse(dataForEachAction.isBa);
-            debugger
             let dataControlEffected =  getMapControlEffected(dataForEachAction.allControlObj, dataForEachAction.isBa);
             postMessage({action:'getMapControlEffected', dataAfter : dataControlEffected})
             break

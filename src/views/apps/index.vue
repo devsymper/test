@@ -13,6 +13,7 @@
             :customAPIResult="customAPIResult"
             :showActionPanelInDisplayConfig="true"
             :commonActionProps="commonActionProps"
+			:customRenderForFilter="customRenderForFilter"
             @row-selected="onRowSelected"
         >
             <div slot="right-panel-content" class="h-100">
@@ -28,16 +29,17 @@
     </div>
 </template>
 <script>
-import Api from "./../../api/api.js";
-import ListItems from "../../components/common/ListItems";
+import Api from "@/api/api.js";
+import ListItems from "@/components/common/ListItems";
 import UpdateApp from "./Update";
-import {appManagementApi} from './../../api/AppManagement.js'
-import {orgchartApi} from './../../api/orgchart';
-import {documentApi} from './../../api/Document';
-import {dashboardApi} from './../../api/dashboard';
-import BpmnEngine from './../../api/BPMNEngine';
+import {appManagementApi} from '@/api/AppManagement.js'
+import {orgchartApi} from '@/api/orgchart';
+import {documentApi} from '@/api/Document';
+import {dashboardApi} from '@/api/dashboard';
+import BpmnEngine from '@/api/BPMNEngine';
 import Handsontable from 'handsontable';
-import { util } from '../../plugins/util.js';
+import ApplicationWorker from 'worker-loader!@/worker/application/Application.Worker.js';
+import { util } from '@/plugins/util.js';
 import {
     appConfigs
 } from "@/configs";
@@ -47,13 +49,7 @@ export default {
         ListItems,
         UpdateApp,
     },
-    computed: {
-        baseUrl: function() {
-            return this.apiUrl + this.appUrl ;
-        }, 
-    },
     created(){
-		let self = this;
 		this.$store.dispatch('actionPack/getAllActionByObjectType')
     },
     data: function() {
@@ -63,10 +59,22 @@ export default {
                 "module": "application",
                 "resource": "application_definition",
                 "scope": "application",
-            },
+			},
+			customRenderForFilter(columnName,items){
+				if(columnName == 'status'){
+					items.forEach(function(e){
+						if(e.value == "0"){
+							e.label = "Không kích hoạt"
+						}else{
+							e.label = "Kích hoạt"
+						}
+					})
+				}
+				return items
+			},
             apiUrl: appConfigs.apiDomain.appManagement+"application",
-            appUrl: "apps",
-            isEdit: false,
+			isEdit: false,
+			applicationWorker: null,
             customAPIResult: {
                 reformatData(res){
                    return{
@@ -174,8 +182,41 @@ export default {
     },
     mounted() {
 		this.tableHeight = util.getComponentSize(this).h;
+		let self = this
+		this.applicationWorker = new ApplicationWorker();
+        this.applicationWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'deleteApp':
+					self.handlerDeleteAppMessage(data.dataAfter)
+					break;
+                case 'getChildItemInApp':
+					for(let i in data.dataAfter){
+						let newObj = {
+							obj:data.dataAfter[i],
+							type: i
+						}
+						self.$store.commit('appConfig/updateChildrenApps',newObj);
+					}
+					break;
+                default:
+                    break;
+            }
+        });
     },
     methods: {
+		handlerDeleteAppMessage(res){
+			if (res.status == 200) {
+				this.removeCallback(res);   
+				this.$snotify({
+					type: 'success',
+					title: this.$t('notification.successTitle'),
+					text: this.$t('apps.deleted')
+				})
+			} else {
+				this.showError()
+			}
+		},
 		closeAppForm(){
 			this.$refs.listApp.closeactionPanel();
 		},
@@ -188,7 +229,7 @@ export default {
 					}else{
 						this.$store.commit('appConfig/emptyItemSelected')
 					}
-						this.showEditAppPanel(res.data.listObject)   
+					this.showEditAppPanel(res.data.listObject)   
 				}else {
 					this.showError()
 				}
@@ -211,8 +252,6 @@ export default {
             this.isEdit = false;
             this.$refs.actionPanel.setAppObject({ 
                 name: "",
-                note: "",
-                icon: "",
                 status: false
 			});
 			this.$store.commit('appConfig/emptyItemSelected')
@@ -228,21 +267,14 @@ export default {
             })
         },
         deleteApp(app){
-            appManagementApi.deleteApp(app[0].id)
-            .then(res =>{
-                if (res.status == 200) {
-                    this.removeCallback(res);   
-                    this.$snotify({
-                        type: 'success',
-                        title: this.$t('notification.successTitle'),
-                        text: this.$t('apps.deleted')
-                    })
-                } else {
-                    this.showError()
-                }
-            }).catch((err) => {
-                this.showError()
-            });
+			this.applicationWorker.postMessage(
+				{
+					action:'deleteApp',
+					data:{
+						id: app[0].id
+					}
+				}
+			);
         },
         addApp(res) {
             if (res.status == 200) {
@@ -272,111 +304,103 @@ export default {
 		},
 		checkChildrenApp(data){
 			let self = this
-			if(data.hasOwnProperty('orgchart')){
-				data.orgchart.forEach(function(e){
-					self.arrType.orgchart.push(e.id)
-				});
+			for(let i in data){
+				data[i].forEach(function(e){
+					self.arrType[i].push(e.id)
+				})
 			}
-			if(data.hasOwnProperty('document_definition')){
-				data.document_definition.forEach(function(e){
-					self.arrType.document_definition.push(e.id)
-				});
+			this.applicationWorker.postMessage(
+				{
+					action:'getChildItemInApp',
+					data:{
+						data: self.arrType
+					}
+				}
+			);
+			// if(self.arrType.orgchart.length > 0){
+			// 	let dataOrg = self.arrType.orgchart;
+			// 	orgchartApi.getOrgchartList({
+			// 					search:'',
+			// 					pageSize:50,
+			// 					filter: [
+			// 					{
+			// 						column: 'id',
+			// 						valueFilter: {
+			// 							operation: 'IN',
+			// 							values: dataOrg						
+			// 						}
+			// 					}
+			// 	]}).then(resOrg => {
+			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgchart'});
+			// 	});
+			// }
+			// if(self.arrType.document_definition.length > 0){
+			// 	let dataDoc = self.arrType.document_definition;
+			// 	documentApi.searchListDocuments(
+			// 		{
+			// 			search:'',
+			// 			pageSize:400,
+			// 			filter: [
+			// 			{
+			// 				column: 'id',
+			// 				valueFilter: {
+			// 					operation: 'IN',
+			// 					values: dataDoc						
+			// 				}
+			// 			}
+			// 			]
+			// 		}
+			// 	).then(resDoc => {
+			// 		let arrCategory = []
+			// 		let arrMajor = []
+			// 		resDoc.data.listObject.forEach(function(e){
+			// 			if(e.type == "Nghiệp vụ"){
+			// 				arrMajor.push(e)
+			// 			}else if( e.type == "Danh mục"){
+			// 				arrCategory.push(e)
+			// 			}
+			// 		})
+			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:arrMajor,type:'document_major'});
+			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:arrCategory,type:'document_category'});
+			// 	});
+			// }
+			// if(self.arrType.workflow_definition.length > 0){
+			// 	let dataW = self.arrType.workflow_definition;
+			// 	BpmnEngine.getListModels({
+			// 					search:'',
+			// 					pageSize:50,
+			// 					filter: [
+			// 					{
+			// 						column: 'id',
+			// 						valueFilter: {
+			// 							operation: 'IN',
+			// 							values: dataW						
+			// 						}
+			// 					}
+			// 	]}).then(resW => {
+			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflow_definition'});
+			// 	});
+			// }
+			// if(self.arrType.dashboard.length > 0){
+			// 	let dataRep = self.arrType.dashboard;
+			// 	dashboardApi.getDashboardsApp({
+			// 					search:'',
+			// 					pageSize:50,
+			// 					filter: [
+			// 					{
+			// 						column: 'id',
+			// 						valueFilter: {
+			// 							operation: 'IN',
+			// 							values: dataRep						
+			// 						}
+			// 					}
+			// 	]}).then(resRp => {
+			// 		this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'dashboard'});
+			// 	});
+			// }
+			for(let i in self.arrType){
+				self.arrType[i] = []
 			}
-			if(data.hasOwnProperty('dashboard')){
-				data.dashboard.forEach(function(e){
-					self.arrType.dashboard.push(e.id)
-				});
-			}
-			if(data.hasOwnProperty('workflow_definition')){
-				data.workflow_definition.forEach(function(e){
-					self.arrType.workflow_definition.push(e.id)
-				});
-			}
-			if(self.arrType.orgchart.length > 0){
-				let dataOrg = self.arrType.orgchart;
-				orgchartApi.getOrgchartList({
-								search:'',
-								pageSize:50,
-								filter: [
-								{
-									column: 'id',
-									valueFilter: {
-										operation: 'IN',
-										values: dataOrg						
-									}
-								}
-				]}).then(resOrg => {
-					this.$store.commit('appConfig/updateChildrenApps',{obj:resOrg.data.listObject,type:'orgchart'});
-				});
-			}
-			if(self.arrType.document_definition.length > 0){
-						let dataDoc = self.arrType.document_definition;
-						documentApi.searchListDocuments(
-							{
-								search:'',
-								pageSize:400,
-								filter: [
-								{
-									column: 'id',
-									valueFilter: {
-										operation: 'IN',
-										values: dataDoc						
-									}
-								}
-								]
-							}
-						).then(resDoc => {
-							let arrCategory = []
-							let arrMajor = []
-							resDoc.data.listObject.forEach(function(e){
-								if(e.type == "Nghiệp vụ"){
-									arrMajor.push(e)
-								}else if( e.type == "Danh mục"){
-									arrCategory.push(e)
-								}
-							})
-							this.$store.commit('appConfig/updateChildrenApps',{obj:arrMajor,type:'document_major'});
-							this.$store.commit('appConfig/updateChildrenApps',{obj:arrCategory,type:'document_category'});
-						});
-			}
-			if(self.arrType.workflow_definition.length > 0){
-						let dataW = self.arrType.workflow_definition;
-						BpmnEngine.getListModels({
-										search:'',
-										pageSize:50,
-										filter: [
-										{
-											column: 'id',
-											valueFilter: {
-												operation: 'IN',
-												values: dataW						
-											}
-										}
-						]}).then(resW => {
-							this.$store.commit('appConfig/updateChildrenApps',{obj:resW.data.listObject,type:'workflow_definition'});
-						});
-			}
-			if(self.arrType.dashboard.length > 0){
-				let dataRep = self.arrType.dashboard;
-				dashboardApi.getDashboardsApp({
-								search:'',
-								pageSize:50,
-								filter: [
-								{
-									column: 'id',
-									valueFilter: {
-										operation: 'IN',
-										values: dataRep						
-									}
-								}
-				]}).then(resRp => {
-					this.$store.commit('appConfig/updateChildrenApps',{obj:resRp.data.listObject,type:'dashboard'});
-				});
-			}
-			self.arrType.orgchart = []
-			self.arrType.document_definition = []
-			self.arrType.workflow_definition = []
-			self.arrType.dashboard = []
 		}
     },
 };

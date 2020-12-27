@@ -16,6 +16,10 @@
 			:showDialog="showDialog"
 			@cancel="showDialog = false"
 		/>
+		<DialogUpdateVersion
+			:showDialog="showDialogUpdate"
+			@cancel="showDialogUpdate = false"
+		/>
 		<AddVersion 
 			:showDialog="showDialogAdd"
 			@cancel="showDialogAdd = false"
@@ -30,13 +34,15 @@
 import ListItems from "@/components/common/ListItems"
 import { appConfigs } from "@/configs.js";
 import { util } from "@/plugins/util.js";
+import DialogUpdateVersion from './dialogs/DialogUpdateVersion'
 import DialogDeloy from './dialogs/DialogDeloy'
 import AddVersion from './dialogs/AddVersion'
 export default {
 	components:{
 		ListItems,
 		DialogDeloy,
-		AddVersion
+		AddVersion,
+		DialogUpdateVersion
 	},
 	mounted(){
 		this.containerHeight = util.getComponentSize(this).h
@@ -44,6 +50,7 @@ export default {
 	data(){
 		let self = this
 		return{
+			showDialogUpdate: false,
 			showDialog: false,
 			showDialogAdd: false,
 			containerHeight:0,
@@ -54,6 +61,14 @@ export default {
 					callback: (row, callback) => {
 						self.$store.commit('environmentManagement/setCurrentVersionId', row.id)
 						self.showDialog = true
+					}
+				},
+				updateVersion: {
+					name: "Update",
+					text: "Update version",
+					callback: (row, callback) => {
+						self.$store.commit('environmentManagement/setCurrentVersionId', row.id)
+						self.showDialogUpdate = true
 					}
 				},
             },
