@@ -1098,7 +1098,13 @@ export default {
 
                                     if(formulaType != 'linkConfig'){
                                         if(childControlFormulas[formulaType].value.trim() == ""){
-                                            allControl[controlId].listFields[childControlId].formulas[formulaType].formulasId = 0;
+                                            // Khadm thêm việc check có childControlId trong listFields ko
+                                            // phục vụ trong trường hợp BA xóa một cột trong table
+                                            if(allControl[controlId].listFields[childControlId]){
+                                                allControl[controlId].listFields[childControlId].formulas[formulaType].formulasId = 0;
+                                            }else{
+                                                console.warn("SYMPER DOCUMENT EDITOR ERROR: can not find control with id " + childControlId);
+                                            }
                                         }
                                     }
                                 }

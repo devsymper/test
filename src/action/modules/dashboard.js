@@ -23,7 +23,11 @@ export default [{
         "action": "view",
         "handler": function(param) {
             let tabName = this.$t('dashboard.detail.title') + ' ' + param.name;
-            this.$goToPage('/dashboard/' + param.id + '/view', tabName);
+            let url = this.$getActionLink(param);
+            this.$goToPage(url, tabName);
+        },
+        $getActionLink: function(param){
+            return '/dashboard/' + param.id + '/view';
         }
     },
     {

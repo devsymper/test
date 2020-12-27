@@ -845,26 +845,33 @@ export default class Table {
         let dataInput = {};
         let listInputInDocument = this.getListInputInDocument();
         for (let inputControlName in inputControl) {
-            let controlIns = listInputInDocument[inputControlName];
-            if(controlIns.inTable != false){
-                let colIndex = this.tableInstance.propToCol(inputControlName);
-                let currentColData = this.tableInstance.getDataAtCol(colIndex);
-                if(this.tableHasRowSum){
-                    currentColData.pop();
-                }
-                dataInput[inputControlName] = currentColData;
+            if(inputControlName == 'document_object_id'){
+                let docObjId = sDocument.state.submit[this.keyInstance]['documentObjectId'];
+                dataInput[inputControlName] = (docObjId) ? docObjId : '';
             }
             else{
-                if (listInputInDocument.hasOwnProperty(inputControlName)){
-                    dataInput[inputControlName] = controlIns.value;
+                let controlIns = listInputInDocument[inputControlName];
+                if(controlIns.inTable != false){
+                    let colIndex = this.tableInstance.propToCol(inputControlName);
+                    let currentColData = this.tableInstance.getDataAtCol(colIndex);
+                    if(this.tableHasRowSum){
+                        currentColData.pop();
+                    }
+                    dataInput[inputControlName] = currentColData;
+                }
+                else{
+                    if (listInputInDocument.hasOwnProperty(inputControlName)){
+                        dataInput[inputControlName] = controlIns.value;
+                    }
+                }
+                if(controlIns.type == 'date'){
+                    dataInput[inputControlName] = controlIns.convertDateToStandard(controlIns.value)
+                }
+                if(controlIns.type == 'time'){
+                    dataInput[inputControlName] = controlIns.convertTimeToStandard(controlIns.value)
                 }
             }
-            if(controlIns.type == 'date'){
-                dataInput[inputControlName] = controlIns.convertDateToStandard(controlIns.value)
-            }
-            if(controlIns.type == 'time'){
-                dataInput[inputControlName] = controlIns.convertTimeToStandard(controlIns.value)
-            }
+            
         }
         return dataInput;
     }
