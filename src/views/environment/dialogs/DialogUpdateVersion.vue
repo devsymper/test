@@ -7,12 +7,12 @@
 		>
 			<v-card>
 			<v-card-title class="fs-15">
-				Deploy version
+				Update version
 			</v-card-title>
 			<v-card-text>
 				<div class="content-deploy-dialog d-flex flex-column ml-2 fs-13">
 					<div class="fs-13 mb-2 mt-2 ">
-						Chọn môi trường bạn muốn deploy
+						Chọn môi trường bạn muốn update version
 					</div>
 					<v-autocomplete
 						v-model="envId"
@@ -23,7 +23,7 @@
 						class="fs-13"
 					></v-autocomplete>
 					<div class="text-wrap">
-						Nhấn Deploy để deploy version này
+						Nhấn Đồng ý  để update version này
 					</div>
 				</div>
 
@@ -40,9 +40,9 @@
 					<v-btn
 					color="green darken-1"
 					text
-					@click="deployVersion"
+					@click="updateVersion"
 				>
-					Deploy
+					Đồng ý 
 				</v-btn>
 			</v-card-actions>
 			</v-card>
@@ -62,8 +62,8 @@ export default {
 	data(){
 		return{
 			selected:"",
-			envId:"",
 			environmentWorker: null,
+			envId:""
 		}
 	},
 	created(){
@@ -75,8 +75,8 @@ export default {
         this.environmentWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
-                case 'deployVersion':
-					self.handlerDeployVersionRes(data.dataAfter)
+                case 'updateVersion':
+					self.handlerUpdateVersion(data.dataAfter)
 					break;
                 
                 default:
@@ -93,11 +93,11 @@ export default {
 		cancel(){
 			this.$emit('cancel')
 		},
-		handlerDeployVersionRes(res){
+		handlerUpdateVersion(res){
 			if(res.status == 200){
 				this.$snotify({
 					type: 'success',
-					title: "Thành công . Đã deploy"
+					title: "Thành công ."
 				})
 			}else{
 				this.$snotify({
@@ -105,8 +105,9 @@ export default {
 					title: "Có lỗi xảy ra"
 				})
 			}
+			this.$emit('cancel')
 		},
-		deployVersion(){
+		updateVersion(){
 			let self = this
 			let serviceId = this.$route.params.serviceId
 			let versionId = this.$store.state.environmentManagement.currentVersionId
@@ -114,20 +115,15 @@ export default {
 				serviceId: serviceId,
 				environmentId: this.envId
 			}
-			self.$emit('cancel')
-			self.$snotify({
-				type: 'success',
-				title: "Đang xử lí. Vui lòng chờ kêt quả.... "
-			})
 			this.environmentWorker.postMessage({
-				action: "deployVersion",
+				action: "updateVersion",
 				data:{
 					versionId : versionId,
 					environmentId: self.envId,
 					dataGetServerId : data
 				}
 			})
-
+			
 		}
 	},
 }
