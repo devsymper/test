@@ -3,7 +3,7 @@ import Handsontable from 'handsontable';
 import sDocument from './../../../store/document'
 import store from './../../../store'
 import ClientSQLManager from './clientSQLManager';
-import { checkControlPropertyProp, getControlInstanceFromStore, getControlType, getSDocumentSubmitStore } from './../common/common'
+import { checkControlPropertyProp, getControlType, getSDocumentSubmitStore,getControlInstanceFromStore } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
 import { util } from '../../../plugins/util';
@@ -69,18 +69,18 @@ Handsontable.cellTypes.registerCellType('percent', {
 
 //renderer user
 Handsontable.renderers.UserRenderer = function(instance, td, row, col, prop, value, cellProperties) {
-        Handsontable.renderers.TextRenderer.apply(this, arguments);
-        if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
-            let listUser = store.state.app.allUsers;
-            let user = listUser.filter(user => {
-                return user.id === value
-            })
-            if (user.length > 0) {
-                td.textContent = user[0].displayName
-            }
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+    if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
+        let listUser = store.state.app.allUsers;
+        let user = listUser.filter(user => {
+            return user.id === value
+        })
+        if (user.length > 0) {
+            td.textContent = user[0].displayName
         }
     }
-    //renderer user
+}
+//renderer user
 Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     if (value == null) value = ""
@@ -126,9 +126,7 @@ Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, val
         $(td).off('click', '.file-add');
         if (sDocument.state.viewType[instance.keyInstance] != 'detail') {
             $(td).on('click', '.file-add', function(e) {
-                let el = $(e.target).closest('.file-add');
-                $("#file-upload-alter-" + instance.keyInstance).attr('data-rowid', row).attr('data-control-name', el.attr('data-ctrlname'));
-                $("#file-upload-alter-" + instance.keyInstance).click();
+                SYMPER_APP.$evtBus.$emit('document-submit-add-file-click', { control: table.listInputInDocument[prop] });
             })
             $(td).off('click', '.remove-file')
             table.listInputInDocument[prop].setDeleteFileEvent($(td), prop)
@@ -234,6 +232,7 @@ export default class Table {
         this.currentControlSelected = null;
         this.cellSelected = null;
         this.listAutoCompleteColumns = {};
+        this.matrixCellRender = []; // biến đánh dấu có thay dổi trong table hay không. để tối ưu cho việc renderer
         this.event = {
             afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
                 store.commit("document/addToDocumentSubmitStore", {
@@ -450,13 +449,14 @@ export default class Table {
                     return
                 }
                 let controlName = changes[0][1];
-                if(source == 'edit'){
-                    let controlIns = getControlInstanceFromStore(thisObj.keyInstance, controlName);
-                    setDataInputBeforeChange(thisObj.keyInstance, controlIns);
-                }
+                
                 // check nếu ko có thay đổi trong cell thì return
                 if (changes[0][2] == changes[0][3] && source == 'edit') {
                     return;
+                }
+                let controlIns = getControlInstanceFromStore(thisObj.keyInstance, controlName);
+                if(source == 'edit' && changes[0][1] != 's_table_id_sql_lite'){
+                    setDataInputBeforeChange(thisObj.keyInstance, controlIns);
                 }
                 if (getSDocumentSubmitStore(thisObj.keyInstance).docStatus == 'init' &&
                     sDocument.state.viewType[thisObj.keyInstance] == 'update') {
@@ -521,6 +521,12 @@ export default class Table {
         listTableInstance[this.tableName] = this;
     }
 
+    checkDateFormated(value, controlIns){
+        if(value){
+            return SYMPER_APP.$moment(value, controlIns.controlProperties.formatDate.value, true).isValid();
+        }
+        return false;
+    }
     handeRunUniqueDBFormula(controlName, changes){
         let dataInput = {}
         dataInput[controlName] = [changes[0][3]]
@@ -544,8 +550,12 @@ export default class Table {
         if (this.tableHasRowSum && cellMeta[0][0] == this.tableInstance.countRows() - 1) {
             return;
         }
+        
         let thisObj = this;
         if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            e.stopPropagation();
             this.tableInstance.alter('insert_row', cellMeta[0][0] + 1, 1, 'auto_set');
             this.dataInsertRows.push([]);
             delayTypingEnter(function() {
@@ -562,6 +572,7 @@ export default class Table {
                 }
                 thisObj.dataInsertRows = []
             });
+            
         } else if (e.key === 'Delete' && e.shiftKey == true) {
             e.stopImmediatePropagation();
             e.preventDefault();
@@ -841,23 +852,33 @@ export default class Table {
         let dataInput = {};
         let listInputInDocument = this.getListInputInDocument();
         for (let inputControlName in inputControl) {
-            let controlIns = listInputInDocument[inputControlName];
-            if(controlIns.inTable != false){
-                let colIndex = this.tableInstance.propToCol(inputControlName);
-                let currentColData = this.tableInstance.getDataAtCol(colIndex);
-                if(this.tableHasRowSum){
-                    currentColData.pop();
-                }
-                dataInput[inputControlName] = currentColData;
+            if(inputControlName == 'document_object_id'){
+                let docObjId = sDocument.state.submit[this.keyInstance]['documentObjectId'];
+                dataInput[inputControlName] = (docObjId) ? docObjId : '';
             }
             else{
-                if (listInputInDocument.hasOwnProperty(inputControlName)){
-                    dataInput[inputControlName] = controlIns.value;
+                let controlIns = listInputInDocument[inputControlName];
+                if(controlIns.inTable != false){
+                    let colIndex = this.tableInstance.propToCol(inputControlName);
+                    let currentColData = this.tableInstance.getDataAtCol(colIndex);
+                    if(this.tableHasRowSum){
+                        currentColData.pop();
+                    }
+                    dataInput[inputControlName] = currentColData;
+                }
+                else{
+                    if (listInputInDocument.hasOwnProperty(inputControlName)){
+                        dataInput[inputControlName] = controlIns.value;
+                    }
+                }
+                if(controlIns.type == 'date'){
+                    dataInput[inputControlName] = controlIns.convertDateToStandard(controlIns.value)
+                }
+                if(controlIns.type == 'time'){
+                    dataInput[inputControlName] = controlIns.convertTimeToStandard(controlIns.value)
                 }
             }
-            if(controlIns.type == 'date'){
-                dataInput[inputControlName] = controlIns.convertDateToStandard(controlIns.value)
-            }
+            
         }
         return dataInput;
     }
@@ -952,9 +973,17 @@ export default class Table {
                     let vls = [];
                     for (let index = 0; index < listIdRow.length; index++) {
                         const element = listIdRow[index];
-                        vls.push([index, controlInstance.name, data[element]]);
+                        let cellValue = data[element];
+                        if(controlInstance.type == 'date'){
+                            if(cellValue){
+                                cellValue = SYMPER_APP.$moment(cellValue, 'YYYY-MM-DD').format(controlInstance.controlProperties.formatDate.value);
+                            }
+                            else{
+                                cellValue = "";
+                            }
+                        }
+                        vls.push([index, controlInstance.name, cellValue]);
                     }
-
                     thisObj.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
                     /**
                      * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
@@ -973,8 +1002,6 @@ export default class Table {
         } catch (error) {
             console.log(error,'errorerror');
         }
-
-
     }
     /**
      * Hàm lấy dữ liệu hiện tại của table và insert vào sql lite table
@@ -990,7 +1017,6 @@ export default class Table {
                 }
             } else {
                 result = rs.data.data;
-
             }
         } else {
             if (!rs.server) {
@@ -1560,9 +1586,10 @@ export default class Table {
         else{
             if(control.type == 'number' && (value === "" || value === undefined || value === null)){
                 td.textContent = 0;
+                td.style.textAlign = 'right'
             }
         }
-        thisObj.getColumnSum(hotInstance, row, column, td, ele, prop)
+        thisObj.getColumnSum(hotInstance, row, column, td, ele, prop,control)
     }
 
     /**
@@ -1574,7 +1601,7 @@ export default class Table {
      * @param {*} ele 
      * @param {*} prop 
      */
-    getColumnSum(hotInstance, row, column, td, ele, prop){
+    getColumnSum(hotInstance, row, column, td, ele, prop, control){
         if(this.tableHasRowSum && row == hotInstance.countRows() - 1){
             ele.find('.validate-icon').remove();
             if(Object.keys(this.columnHasSum).includes(prop)){
@@ -1585,6 +1612,9 @@ export default class Table {
                     b = Number(b);
                     return a+b;
                 },0)
+                sum = control.formatNumberValue(sum);
+                td.style.textAlign = 'right'
+                td.style.fontWeight = "600";
                 td.textContent = sum;
             }
         }

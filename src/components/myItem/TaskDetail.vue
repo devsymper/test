@@ -81,6 +81,7 @@
             <!-- <VuePerfectScrollbar :style="{height: parentHeight +'px'}" > -->
                 <task 
                     @task-submited="handleTaskSubmited" 
+                    @task-submit-error="submitError"
                     :is="`task`"
                     :taskInfo="taskInfo"
                     :appId="appId"
@@ -111,19 +112,17 @@
 import icon from "../../components/common/SymperIcon";
 import attachment from "./Attachment";
 import comment from "./Comment";
-import flow from "./Flow";
 import info from "./Info";
 import people from "./People";
 import relatedItems from "./RelatedItems";
-import subtask from "./Subtask";
 import task from "./Task";
 import BPMNEngine from '../../api/BPMNEngine';
-import { getVarsFromSubmitedDoc, getProcessInstanceVarsMap } from '../../components/process/processAction';
+import { getVarsFromSubmitedDoc } from '../../components/process/processAction';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { documentApi } from '../../api/Document';
-import { appManagementApi } from '@/api/AppManagement';
 import { extractTaskInfoFromObject, addMoreInfoToTask } from '@/components/process/processAction';
 import { util } from '../../plugins/util';
+import { taskApi } from '../../api/task';
 
 export default {
     name: "taskDetail",
@@ -191,11 +190,13 @@ export default {
     },
     components: {
         icon: icon,
-        attachment, comment, flow, info, people, relatedItems, subtask, task,
+        attachment, comment,info, people, relatedItems, task,
         VuePerfectScrollbar
     },
     data: function() {
         return {
+            isSubmited:false,
+            documentObjectId:null,
             loadingAction:false,
             showDialogAlert:false,
             isRole:false, //value =falses khi assignee = userId, =true khi assignee = userId:role
@@ -268,9 +269,12 @@ export default {
         },
     },
     created(){
-        this.checkAndSwitchToTab();
     },
     methods: {
+        submitError(){
+            console.log("Error submit");
+            this.loadingAction = false;
+        },
         getWidthHeaderTask(){
             setTimeout((self) => {
                 let width=$("#taskHeader").width()-$("#action-task").width()-40;
@@ -321,27 +325,6 @@ export default {
         toggleSidebar(){
             this.isShowSidebar = !this.isShowSidebar;
         },
-        checkAndSwitchToTab(){
-            if(this.$route.params.extraData && this.$route.params.extraData.subAction){
-                let tabAction = {
-                    'view_comment': 'comment'
-                };
-                let tab = tabAction[this.$route.params.extraData.subAction];
-                for(let i = 0; i < this.items.length; i++){
-                    if(this.items[i].tab == tab){
-                        this.tab = i;
-                        break;
-                    }
-                }
-            }
-        },
-        onCopySuccess(){
-           this.$snotify({
-                type: 'success',
-                title: "Copy to clipboard",
-                text: "Copy success"
-                });
-        },
         changeTaskDetailInfo(taskId){
             let hostname=window.location.hostname;
             let copyText = this.taskInfo.action.parameter.taskId;
@@ -354,7 +337,7 @@ export default {
             let self = this;
             let filter="notDone";
             if (this.originData) {
-                if (this.originData.endTime) {
+                if (this.originData.endTime || this.isSubmited) {
                     filter = "done";
                 }else{
                     filter = "notDone";
@@ -490,7 +473,6 @@ export default {
                         }else{
                             this.reloadDetailTask();
                         }
-
                         this.loadingAction=false;
                     }else if(this.taskAction == '' ||this.taskAction==undefined ||this.taskAction == 'submitAdhocTask'){
                         let taskData = {
@@ -582,7 +564,11 @@ export default {
                 }else{
                     description=this.descriptionTask;
                 }
-                description.action.parameter.documentObjectId=taskData.variables[0].value;
+                if (this.isSubmited) {
+                    description.action.parameter.documentObjectId=this.documentObjectId;
+                }else{
+                    description.action.parameter.documentObjectId=taskData.variables[0].value;
+                }
                 data.description= JSON.stringify(description);
             }
           
@@ -596,7 +582,7 @@ export default {
                 }
             }else{
                 let elId = this.taskInfo.action.parameter.activityId;
-                let docId = data.document_id;
+                let docId = data.document_id ? data.document_id : "" ;
                 if(!docId){
                     docId = this.taskInfo.action.parameter.documentId;
                 }
@@ -631,6 +617,7 @@ export default {
         // lấy data mới dựa theo data của task
         async changeTaskDetail(){
             let self=this;
+            self.loadingAction = false;
             if(!self.taskInfo.action){
                 return
             }
@@ -655,6 +642,7 @@ export default {
                     }
                 ]
             }
+            await self.checkTaskSubmitedDocument();
             self.changeTaskDetailInfo(self.taskInfo.action.parameter.taskId);
         },
         async reloadDetailTask(){
@@ -677,6 +665,26 @@ export default {
                 infotTask.originData=task;
                 self.$emit("change-info-task",infotTask);
            
+            }
+        },
+        /**
+         * Hàm kiểm tra khi load task:
+         * 
+         * kiểm tra nếu task chưa hoàn thành sẽ call api sang document check xem có documentObject nào đc tạo 
+         * từ taskId chưa.. nếu có (trường hợp chưa đưa task life circle vào sử dụng) thì sẽ cho update documentObjectId vào task
+         * và complete task
+         */
+        async checkTaskSubmitedDocument(){
+            let taskId = this.originData.id;
+            let self = this;
+            this.descriptionTask=this.originData.description;
+            if(!this.originData.endTime){
+                let res = await taskApi.getDocumentObjectIdWithTaskId(taskId);
+                if (res.data != false) { // doc đã đc submit
+                    self.isSubmited = true;
+                    self.documentObjectId = res.data.id;
+                    self.handleTaskSubmited({});
+                }
             }
         }
     }

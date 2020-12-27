@@ -40,9 +40,12 @@ export const taskApi = {
     getDocumentInVariables(filter) {
         return workfloweExtend.get("variables/documents", { page: filter.page, pageSize: filter.pageSize });
     },
-
     getListWork(filter) {
         return workfloweExtend.get("works", filter);
+    },
+    getDocumentObjectIdWithTaskId(taskId){
+        return document.get('documents/object-by-task/' + taskId);
+
     }
 
 

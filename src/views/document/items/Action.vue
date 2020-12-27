@@ -61,11 +61,6 @@ export default {
             let checkControlItem = { text: 'Kiểm tra Control', icon: 'mdi-puzzle-check' ,action:'check-control'};
             this.items.splice(5,0,checkControlItem);
         }
-        this.$evtBus.$on("document-editor-save-doc-callback", locale => {
-            if(this._inactive == true) return;
-            this.isLoadingSaveDoc = false;
-        });
-        
     },
     data(){
         return {
@@ -88,7 +83,6 @@ export default {
     methods:{
         action(type){
             if(type == 'save-document' && this.isLoadingSaveDoc == false){
-                this.isLoadingSaveDoc = true;
                 this.$emit('document-action-'+type);
             }
             else if(type != 'save-document'){
@@ -101,6 +95,9 @@ export default {
         },
         hideLoading(){
             this.isLoadingSaveDoc = false;
+        },
+        showLoading(){
+            this.isLoadingSaveDoc = true;
         }
     },
 }

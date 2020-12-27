@@ -4,6 +4,7 @@
         <v-dialog
         scrollable
         v-model="isShowModelSaveDoc"
+        persistent
         width="800"
         content-class="s-dialog"
         >
@@ -70,6 +71,7 @@ import { documentApi } from "./../../../api/Document.js";
 import { formulasApi } from "./../../../api/Formulas.js";
 import Validate from "./../common/Validate";
 import SystemDataMapping from "./../editor/SystemDataMapping"
+import BPMNEngine from "./../../../api/BPMNEngine";
 export default {
     
     components:{
@@ -115,12 +117,26 @@ export default {
             messageValidate:"",
             showNoteChangeName:false,
             showValidate:true,
+
         }
     },
     created(){
         this.setPropsOfDoc({});
     },
     methods:{
+        getListModels(){
+            let thisCpn = this;
+            if(this.documentProps.updateByWorkflowId.options.length == 0){
+                BPMNEngine.getListModels({pageSize:1000}).then(res=>{
+                    let listWorkFlow = res.data.listObject;   
+                    listWorkFlow = listWorkFlow.reduce((arr,obj)=>{
+                        arr.push({id:obj.id, name:obj.name, title:obj.description});
+                        return arr
+                    },[]);
+                    thisCpn.documentProps.updateByWorkflowId.options = listWorkFlow;
+                })
+            }
+        },
         checkNameDocument(){
             this.$emit('check-name-document');
         },
@@ -153,11 +169,11 @@ export default {
             
         },
         showDialog(){
-            this.isShowModelSaveDoc = true
+            this.isShowModelSaveDoc = true;
+            this.getListModels();
         },
         hideDialog(){
             this.isShowModelSaveDoc = false;
-            this.$evtBus.$emit('document-editor-save-doc-callback');
         },
         // Hàm kiểm tra tên document
         checkValidateNameDocument(value){
@@ -227,7 +243,7 @@ export default {
                 
             }
             this.$emit("save-doc-action");
-            this.hideDialog();
+            this.isShowModelSaveDoc = false;
         },
         /**
          * Hàm kiểm tra tiêu đề của doc đã điền hay chưa, nếu chưa thì báo lỗi
@@ -285,6 +301,16 @@ export default {
                     },
                     validate(){
                         self.checkTitleDocument(this.value)
+                    }
+                },
+                updateByWorkflowId : {
+                    title: this.$t('document.editor.dialog.saveDoc.updateByWorkflow'),
+                    type: "autocomplete",
+                    value: (props.updateByWorkflowId != undefined) ? props.updateByWorkflowId : '',
+                    options:[],
+                    validateStatus:{
+                        isValid:true,
+                        message:""
                     }
                 },
                 fullSize : {

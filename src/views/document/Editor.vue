@@ -548,7 +548,6 @@ export default {
          * nếu copy/ paste các control trong doc hiện tại thì tự động nhân bản các thuộc tính (riêng id phải tạo mới) 
          */
         handlePasteContent(e){
-            e.preventDefault();
             var content = ((e.originalEvent || e).clipboardData || window.clipboardData).getData("text/html");
             content = content.replace(/((<|(<\/))html>)|((<|(<\/))body>)/g,"");
             content = content.replace(/<!--[^>]*-->/g,"");
@@ -556,6 +555,7 @@ export default {
             let contentEl = $(content);
             let listControls = contentEl.find('.s-control:not(.s-control-table .s-control)');
             if(listControls.length > 0){
+                e.preventDefault();
                 for (let index = 0; index < listControls.length; index++) {
                     const controlEl = listControls[index];
                     let controlId = $(controlEl).attr('id');
@@ -898,7 +898,6 @@ export default {
                     let allControl = this.editorStore.allControl;
                     let controlPrimaryKey = this.validateControlBeforeSave(allControl,'0');
                     if(Object.keys(controlPrimaryKey).length > 1){
-                        this.$evtBus.$emit('document-editor-save-doc-callback')
                         let allKey = Object.keys(controlPrimaryKey);
                         this.$snotify({
                                         type: "error",
@@ -934,7 +933,6 @@ export default {
                                 
                                 listName.push(name);
                             })
-                            this.$evtBus.$emit('document-editor-save-doc-callback');
                             this.$snotify({
                                             type: "error",
                                             title: "Tên một số control chưa hợp lệ",
@@ -1091,7 +1089,13 @@ export default {
 
                                     if(formulaType != 'linkConfig'){
                                         if(childControlFormulas[formulaType].value.trim() == ""){
-                                            allControl[controlId].listFields[childControlId].formulas[formulaType].formulasId = 0;
+                                            // Khadm thêm việc check có childControlId trong listFields ko
+                                            // phục vụ trong trường hợp BA xóa một cột trong table
+                                            if(allControl[controlId].listFields[childControlId]){
+                                                allControl[controlId].listFields[childControlId].formulas[formulaType].formulasId = 0;
+                                            }else{
+                                                console.warn("SYMPER DOCUMENT EDITOR ERROR: can not find control with id " + childControlId);
+                                            }
                                         }
                                     }
                                 }
@@ -1167,7 +1171,7 @@ export default {
                         }
                     }
                     else{
-                        this.$evtBus.$emit('document-editor-save-doc-callback')
+                        this.$refs.actionView.hideLoading();
                         this.$snotify({
                                 type: "error",
                                 title: "error from formulas serice, can't not save into formulas service!!!",
@@ -1185,8 +1189,8 @@ export default {
                 }
                 
             } catch (error) {
+                thisCpn.$refs.actionView.hideLoading();
                 console.log('errorerror',error);
-                thisCpn.$evtBus.$emit('document-editor-save-doc-callback')
                 thisCpn.$snotify({
                             type: "error",
                             title: "error from formulas serice, can't not save into formulas service!!!",
@@ -1203,7 +1207,7 @@ export default {
                 dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
             }
             documentApi.saveDocument(dataPost).then(res => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 if (res.status == 200) {
                     thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
@@ -1222,7 +1226,7 @@ export default {
                 }
             })
             .catch(err => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 thisCpn.$snotify({
                         type: "error",
                         title: "can not save document",
@@ -1240,7 +1244,7 @@ export default {
             }
             let thisCpn = this;
             documentApi.editDocument(dataPost).then(res => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 if (res.status == 200) {
                     thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
@@ -1276,7 +1280,7 @@ export default {
                 
             })
             .catch(err => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 thisCpn.$snotify({
                     type: "error",
                     title: "error from edit document api",
@@ -1291,6 +1295,7 @@ export default {
          * hàm validate lại cntrol lần nữa sau khi ấn lưu doc ở modal save doc
          */
         validateControlAfterSave(){
+            this.$refs.actionView.showLoading();
             let thisCpn = this;
             let listControlName = [];
             this.listMessageErr = [];
@@ -1300,7 +1305,7 @@ export default {
                 this.saveDocument();
             }
             else{
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                this.$refs.actionView.hideLoading();
                 this.$snotify({
                                 type: "error",
                                 title: "Thông tin control chưa hợp lệ",
@@ -1322,7 +1327,6 @@ export default {
                     this.dataPivotTable = {};
                 }
                 this.dataPivotTable[currentControl.properties.name.name.value] = tablePivotConfig;
-
             }
             else{
                 if(this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
@@ -1335,6 +1339,12 @@ export default {
                 let row = listRowData[i];
                 let type = row.type;
                 let control = GetControlProps(type);
+                if(row.oldProps){
+                    control.properties = row.oldProps;
+                }
+                if(row.formulas){
+                    control.formulas = row.formulas;
+                }
                 control.properties.name.value = row.name;
                 control.properties.title.value = row.title;
                 let controlEl = $(control.html);
@@ -1514,9 +1524,14 @@ export default {
                         }
                         let idControl = $(tbody[i].outerHTML).find('.s-control').attr('id');
                         let typeControl = $(tbody[i].outerHTML).find('.s-control').attr('s-control-type');
-                        let name = this.editorStore.allControl[tableId]['listFields'][idControl].properties.name.value;
-                        let title = this.editorStore.allControl[tableId]['listFields'][idControl].properties.title.value;
-                        let row = {columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl}
+                        let controlObj = this.editorStore.allControl[tableId]['listFields'][idControl];
+                        let name = controlObj.properties.name.value;
+                        let title = controlObj.properties.title.value;
+                        let row = {
+                                    columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl, 
+                                    oldProps:controlObj.properties, formulas: controlObj.formulas
+
+                                }
                         listData.push(row)
 
                     }
@@ -1906,8 +1921,10 @@ export default {
                 let style = $(value).attr('style');
                 if(type == 'text') type = 'textInput'
                 if(type == 'persent') type = 'percent'
+                if(type == 'datetime') type = 'dateTime'
+                if(type == 'file-upload') type = 'fileUpload'
                 let controlV2 = GetControlProps(type);
-                let controlEl = $(controlV2.html); 
+                let controlEl = $(controlV2.html);
                 var inputid = 's-control-id-' + Date.now();
                 controlEl.attr('id', inputid).attr('style',style);
                 controlEl.replaceAll($(value))
@@ -1945,6 +1962,7 @@ export default {
                         if(type == 'text') type = 'textInput'
                         if(type == 'persent') type = 'percent'
                         if(type == 'file-upload') type = 'fileUpload'
+                        if(type == 'datetime') type = 'dateTime'
                         console.log(type);
                         
                         let childControlV2 = GetControlProps(type);
@@ -2952,12 +2970,13 @@ export default {
         },
         // mở modal lưu , edit doc
         saveFormPrint(docProps){
+            this.$refs.actionView.showLoading();
             if(this.printConfigId != 0 && this.printConfigId != undefined && this.printConfigId != null){
                 let dataPost = {documentId:this.documentId,title:docProps.title.value,
                                 content:this.editorCore.getContent(),printConfigId:this.printConfigId, size:JSON.stringify(this.contentStyle)}
                 let thisCpn = this;
                 documentApi.updatePrintConfig(dataPost).then(res => {
-                    this.$evtBus.$emit('document-editor-save-doc-callback')
+                    thisCpn.$refs.actionView.hideLoading();
                     if (res.status == 200) {
                         thisCpn.editorCore.remove();
                         thisCpn.$router.push('/documents');
@@ -2975,7 +2994,7 @@ export default {
                     }
                 })
                 .catch(err => {
-                    this.$evtBus.$emit('document-editor-save-doc-callback')
+                    thisCpn.$refs.actionView.hideLoading();
                     thisCpn.$snotify({
                             type: "error",
                             title: "can not save form print document",
