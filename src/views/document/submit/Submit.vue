@@ -227,6 +227,10 @@ let impactedFieldsArr = {};
 export default {
     inject: ['theme'],
     props: {
+        showSnackbarSuccess: {
+            type: Boolean,
+            default: true
+        },
         isQickSubmit: {
             type: Boolean,
             default: false
@@ -2109,11 +2113,12 @@ export default {
                     dataResponSubmit['isContinueSubmit'] = thisCpn.isContinueSubmit;
                     thisCpn.$emit('submit-document-success',dataResponSubmit);
                     thisCpn.isSubmitting = false;
-                    thisCpn.$snotify({
-                        type: "success",
-                        title: "Submit document success!"
-                    });        
-                    
+					if(this.showSnackbarSuccess){
+						thisCpn.$snotify({
+							type: "success",
+							title: "Submit document success!"
+						});      
+					}
                     // nếu có công thức nút submit
                     if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
                         let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
@@ -2166,10 +2171,12 @@ export default {
                 thisCpn.$emit('submit-document-success',res.data);
                 thisCpn.isSubmitting = false;
                 if (res.status == 200) {
-                    thisCpn.$snotify({
-                        type: "success",
-                        title: "update document success!"
-                    });        
+					if(this.showSnackbarSuccess){
+						 thisCpn.$snotify({
+							type: "success",
+							title: "update document success!"
+						});    
+					}
                     if(thisCpn.sDocumentSubmit.updateFormulas != undefined){
                         let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.updateFormulas);
                         thisCpn.sDocumentSubmit.updateFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});

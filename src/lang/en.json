@@ -1219,7 +1219,12 @@
         "createTask": {
             "title": "Create task"
         },
-        "claim": "Claim",
+		"claim": "Claim",
+        "unClaim": "Un claim",
+        "reAssign": "Re-assign",
+        "delegate": "Delegate",
+        "resolve": "Resolve",
+        "complete": "Complete",
         "created": "Task created",
         "relatedPeople": {
             "title": "Related people"
