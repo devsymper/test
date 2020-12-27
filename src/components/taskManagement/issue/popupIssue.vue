@@ -59,7 +59,7 @@
             </div>
 
         </v-card-title >
-        <v-card-text class="pa-1 pb-0">
+        <v-card-text class="pa-0 pb-0">
             <v-container class="pa-0">
                 <div v-if="Object.keys(currentProject).length > 0">
                     <submit
@@ -214,4 +214,9 @@ export default {
         border-top: 1px solid #efefef!important;
         border: 1px solid #efefef!important;
     }
+    .doc_issue >>> .sym-form-submit{
+        padding: 4px;
+        padding-right: 10px;
+    }
+
 </style>
