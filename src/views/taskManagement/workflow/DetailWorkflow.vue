@@ -42,8 +42,9 @@ export default {
         }
     },
     created(){
+        let projectId=this.$route.params.id;
         this.$store.dispatch("taskManagement/getAllStatusCategory");
-        this.$store.dispatch("taskManagement/getAllRole");
+        this.$store.dispatch("taskManagement/getAllRole",projectId);
         let self=this;
         let id=this.$route.params.workflowId;
         taskManagementApi

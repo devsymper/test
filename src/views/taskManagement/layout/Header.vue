@@ -25,21 +25,23 @@
                 </div>
             </div>
             <div class="pr-3" style="position:relative;padding: 3px 0;">
-                <!-- <v-tooltip bottom>
-                    <template v-slot:activator="{ on }">
-                        <v-icon  v-on="on">mdi-bell-outline</v-icon>
+                <v-menu offset-y>
+                    <template v-slot:activator="{ on, attrs }">
+                        <v-icon    
+                            v-bind="attrs"
+                            v-on="on">mdi-cog-outline
+                        </v-icon>
                     </template>
-                    <span>Thông báo</span>
-                </v-tooltip>
-                <span class="bandge">3</span> -->
-                
-                <v-tooltip bottom>
-                    
-                    <template v-slot:activator="{ on }">
-                    <v-icon v-on="on">mdi-cog-outline</v-icon>
-                </template>
-                <span>setting</span>
-                </v-tooltip>
+                    <v-list dense>
+                        <v-list-item
+                            v-for="(item, index) in settings"
+                            :key="index"
+                            @click="item.menuAction(item)"
+                        >
+                        <v-list-item-title>{{ item.title }}</v-list-item-title>
+                        </v-list-item>
+                    </v-list>
+                </v-menu>
             </div>
             <!-- <div class="user-info">
                 <v-menu offset-y>
@@ -77,12 +79,21 @@ export default {
         popupIssue
     },
     data(){
+        let self=this;
         return {
             items: [
                 { title: 'Click Me' },
                 { title: 'Click Me' },
                 { title: 'Click Me' },
                 { title: 'Click Me 2' },
+            ],
+            settings: [
+                { 
+                    title: "Priority",
+                    menuAction: action => {
+                        self.$router.push("/task-management/priorities");
+                    },
+                },
             ],
             
         }
@@ -96,7 +107,6 @@ export default {
     },
     created(){
         this.$store.dispatch("taskManagement/getAllStatusCategory");
-        this.$store.dispatch("taskManagement/getAllRole");
         this.$store.dispatch("taskManagement/getAllPriority");
     },
     computed:{

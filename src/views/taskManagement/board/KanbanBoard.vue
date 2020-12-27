@@ -20,7 +20,6 @@
                     <img class="user-in-project" src="https://file.symper.vn/readFile/user_avatar_922" alt="">
                 </div>
                 <div class="ml-3 d-inline-block">
-                   
                     <v-menu offset-y>
                         <template v-slot:activator="{ on, attrs }">
                             <v-icon    
@@ -37,7 +36,7 @@
                             <v-list-item-title>{{ item.title }}</v-list-item-title>
                             </v-list-item>
                         </v-list>
-                        </v-menu>
+                    </v-menu>
                 </div>
             </div>
         </div>

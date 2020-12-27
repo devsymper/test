@@ -38,8 +38,8 @@ export const taskManagementApi = {
     updateProjectFavorite(id){
         return taskManagement.put("projects-favorite/"+id);
     },
-    getListRole(){
-        return taskManagement.get("roles");
+    getListRole(filter){
+        return taskManagement.get("roles",filter);
     },
     addRole(data){
         return taskManagement.post("roles",data);
