@@ -2785,7 +2785,7 @@ export default {
                 }
                 this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
             }
-            else if(this.getRootFromVariable(formulasInstance, listRootControl)){
+            else if(this.getRootFromVariable(formulasInstance)){
                 if(!listRootControl.includes(controlName)){
                     listRootControl.push(controlName);
                 }              
