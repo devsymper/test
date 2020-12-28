@@ -220,12 +220,17 @@ import PopupPivotTable from './items/PopupPivotTable'
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
 import {checkControlPropertyProp,getControlInstanceFromStore,getControlTitleFromName, getListInputInDocument,mapTypeToEffectedControl} from './../common/common'
 import Formulas from './formulas.js';
+import { startWorkflowBySubmitedDoc } from '../../../components/process/processAction.js';
 let impactedFieldsList = {};
 let impactedFieldsArr = {};
 
 export default {
     inject: ['theme'],
     props: {
+        showSnackbarSuccess: {
+            type: Boolean,
+            default: true
+        },
         isQickSubmit: {
             type: Boolean,
             default: false
@@ -347,6 +352,10 @@ export default {
             return this.$store.state.document.submit[this.keyInstance].validateMessage   
         }
     },
+    
+    destroyed(){
+        ClientSQLManager.closeDB(this.keyInstance);
+    },
     data() {
         return {
             controlInfinity:[],
@@ -392,7 +401,7 @@ export default {
             listFormulasTrace:{},
             controlTrace:null,
             listFileControl:[],
-            currentImageControl:null,
+            currentFileControl:null,
             currentControlDataflow:null,
             dataPivotTable:{},
             dataColPivot:[],
@@ -406,15 +415,6 @@ export default {
     mounted() {
         this.editorDoc = $(".sym-form-submit");
         let thisCpn = this;
-        $("#file-upload-alter-" + this.keyInstance).on("change", function(e) {
-            let name = $(this).attr("data-control-name");
-            let rowId = $(this).attr("data-rowid");
-            thisCpn.sDocumentSubmit.listInputInDocument[name].addFile(
-                $(this).prop("files")[0],
-                rowId
-            );
-            $(this).val('')
-        });
         $('#sym-submit-'+this.keyInstance).on('click','.validate-icon',function(e){
             let controlName = $(this).attr('control-name');
             let validate = thisCpn.validateControl[controlName];
@@ -604,7 +604,12 @@ export default {
          */
         this.$evtBus.$on("document-submit-image-click", data => {
             if(thisCpn._inactive == true) return;
-            this.currentImageControl = {el:$(data.e.target).closest('.s-control-image'),controlName:data.e.controlName, controlIns:data.controlIns};
+            this.currentFileControl = {controlIns:data.control};
+            this.$refs.fileUploadView.onButtonClick();
+        });
+        this.$evtBus.$on("document-submit-add-file-click", data => {
+            if(thisCpn._inactive == true) return;
+            this.currentFileControl = {controlIns:data.control};
             this.$refs.fileUploadView.onButtonClick();
         });
         var delayTimer;
@@ -800,13 +805,12 @@ export default {
                     thisCpn.$refs.datePicker.closePicker();
                 }
                 if (
+                    thisCpn.$refs.timeInput &&
                     !$(evt.target).hasClass("s-control-time") &&
                     !$(evt.target).hasClass("card-time-picker") &&
                     $(evt.target).closest(".card-time-picker").length == 0
                 ) { 
-                    setTimeout(() => {
                         thisCpn.$refs.timeInput.hide();
-                    }, 20);
                 }
                 if (
                     !$(evt.target).hasClass("validate-icon") &&
@@ -815,8 +819,6 @@ export default {
                 ) {
                     thisCpn.$refs.validate.hide();
                 }
-               
-                
             } catch (error) {
                 
             }
@@ -938,6 +940,12 @@ export default {
     },
     
     methods: {
+        checkUpdateByWorkflow(){
+            let updateByWorkflowId = this.documentInfo.updateByWorkflowId;
+            if(updateByWorkflowId && this.$getRouteName() == 'updateDocumentObject'){
+                startWorkflowBySubmitedDoc(updateByWorkflowId, {document_id:this.docId})
+            }
+        },
         afterBlurInputPivot(event){
             $(event.target).css({display:'none'});
             this.updateDataAfterChangePivot($(event.target));
@@ -1449,6 +1457,7 @@ export default {
                             let content = res.data.document.content;
                             thisCpn.documentName = res.data.document.name;
                             thisCpn.documentInfo = res.data.document;
+                            thisCpn.checkUpdateByWorkflow();
                             thisCpn.getTitleObjectFormulas(res.data.document.titleObjectFormulasId)
                             thisCpn.docSize = (parseInt(res.data.document.isFullSize) == 1) ? "100%":"21cm";
                             thisCpn.contentDocument = content;
@@ -1509,6 +1518,11 @@ export default {
          */
         loadDocumentObject() {
             let thisCpn = this;
+            thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                            key: 'documentObjectId',
+                            value: this.docObjId,
+                            instance: this.keyInstance
+                        })
             documentApi
                 .detailDocumentObject(this.docObjId)
                 .then(res => {
@@ -1960,7 +1974,7 @@ export default {
          */
         handlerSubmitDocumentClick(isContinueSubmit = false){
             this.isContinueSubmit = isContinueSubmit;
-            if($('#sym-submit-'+this.keyInstance+' .validate-icon').length == 0 && $('#sym-submit-'+this.keyInstance+' .error').length == 0){
+            if(Object.keys(this.validateControl).length == 0){
                 if(this.viewType == 'submit'){
                     this.handleRefreshDataBeforeSubmit();
                 }
@@ -1969,17 +1983,19 @@ export default {
                 }
             }
             else{
-                let controlNotValid = $('#sym-submit-'+this.keyInstance+' .validate-icon');
                 let controlError = $('#sym-submit-'+this.keyInstance+' .error');
                 let listErr = []
-                $.each(controlNotValid,function(k,v){
-                    let message = $(v).attr('title');
-                    listErr.push(message);
-                })
+               
                 $.each(controlError,function(k,v){
                     let message = $(v).attr('valid');
                     listErr.push(message);
                 })
+                for(let key in this.validateControl){
+                    for(let type in this.validateControl[key]){
+                        listErr.push(key+" : "+type + " - "+ this.validateControl[key][type])
+                    }
+                }
+                this.$emit('submit-document-error');
                 this.listMessageErr = listErr;
                 this.$refs.errMessage.showDialog();
             }
@@ -2097,11 +2113,12 @@ export default {
                     dataResponSubmit['isContinueSubmit'] = thisCpn.isContinueSubmit;
                     thisCpn.$emit('submit-document-success',dataResponSubmit);
                     thisCpn.isSubmitting = false;
-                    thisCpn.$snotify({
-                        type: "success",
-                        title: "Submit document success!"
-                    });        
-                    
+					if(this.showSnackbarSuccess){
+						thisCpn.$snotify({
+							type: "success",
+							title: "Submit document success!"
+						});      
+					}
                     // nếu có công thức nút submit
                     if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
                         let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.submitFormulas);
@@ -2110,14 +2127,14 @@ export default {
                     
                     // nếu submit từ form sub submit thì ko rediect trang
                     // mà tìm giá trị của control cần được bind lại giá trị từ emit dataResponSubmit
+                    ClientSQLManager.closeDB(thisCpn.keyInstance);
                     
                     if(thisCpn.$getRouteName() == 'submitDocument' && thisCpn.$route.params.id == thisCpn.documentId){
                         thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                     }
-                    
-                    
                 }
                 else{
+                    thisCpn.$emit('submit-document-error');
                     thisCpn.$snotify({
                         type: "error",
                         title: res.message
@@ -2126,6 +2143,7 @@ export default {
                 }
             })
             .catch(err => {
+                thisCpn.$emit('submit-document-error');
                 thisCpn.$snotify({
                         type: "error",
                         title: "error from submit document api!!!"
@@ -2153,14 +2171,17 @@ export default {
                 thisCpn.$emit('submit-document-success',res.data);
                 thisCpn.isSubmitting = false;
                 if (res.status == 200) {
-                    thisCpn.$snotify({
-                        type: "success",
-                        title: "update document success!"
-                    });        
+					if(this.showSnackbarSuccess){
+						 thisCpn.$snotify({
+							type: "success",
+							title: "update document success!"
+						});    
+					}
                     if(thisCpn.sDocumentSubmit.updateFormulas != undefined){
                         let dataInput = thisCpn.getDataInputFormulas(thisCpn.sDocumentSubmit.updateFormulas);
                         thisCpn.sDocumentSubmit.updateFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
                     }
+                    ClientSQLManager.closeDB(thisCpn.keyInstance);
                     if(thisCpn.$getRouteName() == 'updateDocumentObject')
                      thisCpn.$router.push('/documents/'+thisCpn.documentId+"/objects");
                 }
@@ -2209,6 +2230,9 @@ export default {
                         if(listInput[controlName].type == 'checkbox'){
                             dataControl[controlName] = (value) ? 1 : 0;
                         } 
+                        if(listInput[controlName].type == 'fileUpload'){
+                            dataControl[controlName] = JSON.stringify(value)
+                        }
                        
                     }
                     
@@ -2314,12 +2338,7 @@ export default {
                 instance: this.keyInstance
             });
         },
-        addSQLInstanceDBToStore(SQLDBInstance) {
-            this.$store.commit("document/addInstanceSubmitDB", {
-                instance: this.keyInstance,
-                sqlLite: SQLDBInstance
-            });
-        },
+        
         addToListInputInDocument(name,control){
              this.$store.commit(
                             "document/addToListInputInDocument",
@@ -2462,8 +2481,8 @@ export default {
             let inputControl = formulasInstance.getInputControl();
             let dataInput = {};
             for(let inputControlName in inputControl){
-                  if(inputControlName == 'document_object_id'){
-                    dataInput[inputControlName]=this.docObjId;
+                if(inputControlName == 'document_object_id'){
+                    dataInput[inputControlName] = (this.docObjId) ? this.docObjId : '';
                 }
                 else{
                     if(inputControlName == e.controlName){
@@ -2475,6 +2494,9 @@ export default {
                             let valueInputControl = controlIns.value;
                             if(controlIns.type == 'inputFilter'){
                                 valueInputControl = valueInputControl.split(',')
+                            }
+                            if(controlIns.type == 'time'){
+                                valueInputControl = controlIns.convertTimeToStandard(valueInputControl)
                             }
                             dataInput[inputControlName] = valueInputControl;
                         }
@@ -2904,11 +2926,12 @@ export default {
         },
         afterFileUpload(data){
             let url = data.serverPath;
-            this.currentImageControl.controlIns.setValueControl(url);
+            this.currentFileControl.controlIns.setValue(url);
+            let value = this.currentFileControl.controlIns.value;
             this.updateListInputInDocument(
-                this.currentImageControl.controlName,
+                this.currentFileControl.controlIns.name,
                 "value",
-                url
+                value
             );
         },
         handleInputChangeByUser( controlInstance, valueControl){

@@ -2,7 +2,7 @@
 	<v-dialog
 		v-model="showDialog"
 		persistent
-		max-width="290"
+		max-width="500"
 	>
 		<v-card class="dialog-add-version">
 		<v-card-title class="fs-15 ">
@@ -14,6 +14,7 @@
 				:allInputs="allInputs"
 				:single-line="true"
 			/>
+
 			 <v-menu
 				ref="menu"
 				v-model="menu"
@@ -56,6 +57,13 @@
 				</v-btn>
           </v-date-picker>
         </v-menu>
+		<span class=" mt-2 fs-13 mb-1">Mô tả</span>
+		<div class="text-description-area">
+			<v-textarea
+				solo
+				v-model="description"
+			></v-textarea>
+		</div>
 		</v-card-text>
 		<v-card-actions>
 			<v-spacer></v-spacer>
@@ -83,7 +91,7 @@ import FormTpl from "@/components/common/FormTpl";
 import {environmentManagementApi} from '@/api/EnvironmentManagement'
 export default {
 	components:{
-		FormTpl
+		FormTpl,
 	},
 	props:{
 		showDialog:{
@@ -104,6 +112,7 @@ export default {
 				this.allInputs[i].value = ""
 			}
 			this.dates = ""
+			this.description  = ''
 		}
 	},
 	methods:{
@@ -119,6 +128,7 @@ export default {
 				serviceId = this.routerSerViceId
 			}
 			let formData = {
+				description:this.description
 			}
 			for(let i in this.allInputs){
 				if(i == "status"){
@@ -155,6 +165,7 @@ export default {
 	},
 	data(){
 		return{
+			description: "",
 			menu: false,
 			dates: "",
 			allInputs:{
@@ -170,6 +181,12 @@ export default {
                     value: "",
                     info: ""
 				},
+				// description:{
+                //     title: "Mô tả",
+                //     type: "text",
+                //     value: "",
+                //     info: ""
+				// },
 				status: {
                     title: "Status",
                     type: "checkbox",
@@ -189,5 +206,18 @@ export default {
 }
 .dialog-add-version >>> .v-input__prepend-outer .v-icon{
 	font-size: 13px !important;
+}
+.dialog-add-version >>> .v-text-field__details{
+	display: none !important;
+}
+.dialog-add-version >>> .v-input__slot{
+	box-shadow: unset !important;
+	/* border: 1px solid lightgray; */
+}
+.dialog-add-version >>> .v-input__slot textarea{
+	font-size: 13px !important;
+}
+.dialog-add-version >>> .text-description-area .v-input__slot{
+	border: 1px solid lightgray;
 }
 </style>

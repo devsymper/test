@@ -3,6 +3,7 @@
         <DocumentSubmit 
             v-if="showDoTaskComponent && (action == 'submit' || action=='update')"
             ref="submitComponent"
+			:showSnackbarSuccess="false"
             :docId="Number(docId)"
             :workflowVariable="workflowVariable"
             :showSubmitButton="false"
@@ -13,6 +14,7 @@
             :action="action"
             :documentObjectId="converstNumber(documentObjectId)"
             :overrideControls="overrideControls"
+            @submit-document-error="onSubmitError"
             @submit-document-success="onSubmitDone">
         </DocumentSubmit>
         <Detail 
@@ -62,7 +64,7 @@
         <!-- Phần này cần tách thành component riêng -->
         
         <v-dialog
-            :content-class="'dialog-edit-doc'"
+            :content-class="'dialog-edit-doc h-100'"
             v-model="showUpdateSubmitedDocument"
             width="80%">
             <div class="w-100 py-2 px-4 bg-white justify-space-between d-flex border-bottom-1">
@@ -93,21 +95,25 @@
                     </v-tooltip>
                 </div>
             </div>
-            <DocumentSubmit 
-                v-if="showUpdateSubmitedDocument"
-                class="bg-white"
-                ref="panelUpdateSubmitedDocument"
-                :docId="Number(docId)"
-                :appId="Number(appId)"
-                :workflowVariable="workflowVariable"
-                :showSubmitButton="false"
-                :documentObjectTaskId="workflowInfo.documentObjectTaskId"
-                :documentObjectWorkflowId="workflowInfo.documentObjectWorkflowId"
-                :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
-                :action="'update'"
-                :editableControls="taskInfo.approvalEditableControls"
-                :documentObjectId="converstNumber(documentObjectId)"
-                @submit-document-success="onDocumentUpdateSuccess"/>
+            <div style="height:  calc(100% - 50px)">
+                <DocumentSubmit 
+                    v-if="showUpdateSubmitedDocument"
+                    class="bg-white"
+					:showSnackbarSuccess="false"
+                    ref="panelUpdateSubmitedDocument"
+                    :docId="Number(docId)"
+                    :appId="Number(appId)"
+                    :workflowVariable="workflowVariable"
+                    :showSubmitButton="false"
+                    :documentObjectTaskId="workflowInfo.documentObjectTaskId"
+                    :documentObjectWorkflowId="workflowInfo.documentObjectWorkflowId"
+                    :documentObjectWorkflowObjectId="workflowInfo.documentObjectWorkflowObjectId"
+                    :action="'update'"
+                    :editableControls="taskInfo.approvalEditableControls"
+                    :documentObjectId="converstNumber(documentObjectId)"
+                    @submit-document-error="onSubmitError"
+                    @submit-document-success="onDocumentUpdateSuccess"/>
+            </div>
         </v-dialog>
     </div>
 </template> 
@@ -323,6 +329,9 @@ export default {
             if(action == 'submit'){
                 this.docId = nodeData.formKey;
             }
+        },
+        onSubmitError(){
+            this.$emit('task-submit-error');
         },
         onSubmitDone(data){
             this.$emit('task-submited', data);

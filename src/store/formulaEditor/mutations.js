@@ -14,19 +14,24 @@ var monacoCompletionItemKind = {
     Unit : 12,
     Value : 13,
     Constant : 14,
-    Enum : 15,
-    EnumMember : 16,
-    Keyword : 17,
+    Enum : 15, // custom document
+    EnumMember : 16, //doccontroll
+    Keyword : 17, //
     Text : 18,
     Color : 19,
-    File : 20,
+    File : 20, 
     Reference : 21,
     Customcolor : 22,
     Folder : 23,
     TypeParameter : 24,
     User : 25,
     Issue : 26,
-    Snippet : 27
+	Snippet : 27,
+};
+var mappingDocControlWithKind = {
+	textInput: monacoCompletionItemKind.Text,
+	date: monacoCompletionItemKind.File,
+	number: monacoCompletionItemKind.EnumMember
 };
 
 const addCompletionItemsForDocs = (state, docs) => {
@@ -34,13 +39,13 @@ const addCompletionItemsForDocs = (state, docs) => {
     let word = '';
     let item = {};
     for(let doc of docs){
-        word = `${doc.name} (${doc.id} - ${doc.title})`;
+        word = ` ${doc.name} (${doc.id} - ${doc.title})`;
         if(!state.addedCompletionItems[doc.name]){
             item = {
                 label: word,
                 symperKind: 'doc',
-                kind: monacoCompletionItemKind.Keyword,
-                insertText: doc.name
+				kind: monacoCompletionItemKind.Enum,
+				insertText: doc.name
             };
             items.push(item);
             state.addedCompletionItems[`doc:${doc.name}`] = item;
@@ -55,15 +60,20 @@ const addCompletionItemsForDocControls = (state, data) => {
     let docName = data.docName;
     let items = [];
     let word = '';
-    let item = {};
-
+	let item = {};
     for(let ctrl of controls){
+		let kind
+		if(mappingDocControlWithKind[ctrl.type]){
+			kind = mappingDocControlWithKind[ctrl.type]
+		}else{
+			kind = monacoCompletionItemKind.Keyword
+		}
         word = `${docName}.${ctrl.name} (${ctrl.title})`;
         if(!state.addedCompletionItems[ctrl.name]){
             item = {
                 label: word,
                 symperKind: 'control',
-                kind: monacoCompletionItemKind.Unit,
+                kind: kind,
                 insertText: ctrl.name
             };
             items.push(item);

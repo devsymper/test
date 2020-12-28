@@ -3,7 +3,7 @@ import Handsontable from 'handsontable';
 import sDocument from './../../../store/document'
 import store from './../../../store'
 import ClientSQLManager from './clientSQLManager';
-import { checkControlPropertyProp, getControlInstanceFromStore, getControlType, getSDocumentSubmitStore } from './../common/common'
+import { checkControlPropertyProp, getControlType, getSDocumentSubmitStore,getControlInstanceFromStore } from './../common/common'
 import { SYMPER_APP } from './../../../main.js'
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
 import { util } from '../../../plugins/util';
@@ -69,18 +69,18 @@ Handsontable.cellTypes.registerCellType('percent', {
 
 //renderer user
 Handsontable.renderers.UserRenderer = function(instance, td, row, col, prop, value, cellProperties) {
-        Handsontable.renderers.TextRenderer.apply(this, arguments);
-        if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
-            let listUser = store.state.app.allUsers;
-            let user = listUser.filter(user => {
-                return user.id === value
-            })
-            if (user.length > 0) {
-                td.textContent = user[0].displayName
-            }
+    Handsontable.renderers.TextRenderer.apply(this, arguments);
+    if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
+        let listUser = store.state.app.allUsers;
+        let user = listUser.filter(user => {
+            return user.id === value
+        })
+        if (user.length > 0) {
+            td.textContent = user[0].displayName
         }
     }
-    //renderer user
+}
+//renderer user
 Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, value, cellProperties) {
     Handsontable.renderers.TextRenderer.apply(this, arguments);
     if (value == null) value = ""
@@ -107,14 +107,6 @@ Handsontable.renderers.SelectRenderer = function(instance, td, row, col, prop, v
     }
 }
 
-Handsontable.renderers.ValidateRenderer = function(instance, td, row, col, prop, value, cellProperties) {
-    Handsontable.renderers.TextRenderer.apply(this, arguments);
-    if (!isNaN(value) && instance.hasOwnProperty('keyInstance')) {
-        let listUser = store.state.document.submit[instance.keyInstance];
-
-    }
-}
-
 Handsontable.cellTypes.registerCellType('select', {
     renderer: Handsontable.renderers.SelectRenderer,
     editor: SelectEditor
@@ -134,9 +126,7 @@ Handsontable.renderers.FileRenderer = function(instance, td, row, col, prop, val
         $(td).off('click', '.file-add');
         if (sDocument.state.viewType[instance.keyInstance] != 'detail') {
             $(td).on('click', '.file-add', function(e) {
-                let el = $(e.target).closest('.file-add');
-                $("#file-upload-alter-" + instance.keyInstance).attr('data-rowid', row).attr('data-control-name', el.attr('data-ctrlname'));
-                $("#file-upload-alter-" + instance.keyInstance).click();
+                SYMPER_APP.$evtBus.$emit('document-submit-add-file-click', { control: table.listInputInDocument[prop] });
             })
             $(td).off('click', '.remove-file')
             table.listInputInDocument[prop].setDeleteFileEvent($(td), prop)
@@ -242,6 +232,7 @@ export default class Table {
         this.currentControlSelected = null;
         this.cellSelected = null;
         this.listAutoCompleteColumns = {};
+        this.matrixCellRender = []; // biến đánh dấu có thay dổi trong table hay không. để tối ưu cho việc renderer
         this.event = {
             afterSelection: (row, column, row2, column2, preventScrolling, selectionLayerLevel) => {
                 store.commit("document/addToDocumentSubmitStore", {
@@ -458,22 +449,20 @@ export default class Table {
                     return
                 }
                 let controlName = changes[0][1];
-                if(source == 'edit'){
-                    let controlIns = getControlInstanceFromStore(thisObj.keyInstance, controlName);
-                    setDataInputBeforeChange(thisObj.keyInstance, controlIns);
-                }
+                
                 // check nếu ko có thay đổi trong cell thì return
                 if (changes[0][2] == changes[0][3] && source == 'edit') {
                     return;
+                }
+                let controlIns = getControlInstanceFromStore(thisObj.keyInstance, controlName);
+                if(source == 'edit' && changes[0][1] != 's_table_id_sql_lite'){
+                    setDataInputBeforeChange(thisObj.keyInstance, controlIns);
                 }
                 if (getSDocumentSubmitStore(thisObj.keyInstance).docStatus == 'init' &&
                     sDocument.state.viewType[thisObj.keyInstance] == 'update') {
                     return;
                 }
-                if (/=SUM(.*)/.test(changes[0][2]) || /=SUM(.*)/.test(changes[0][3])) {
-                    return;
-                }
-                
+
                 if (thisObj.isAutoCompleting) {
                     return;
                 }
@@ -555,8 +544,12 @@ export default class Table {
         if (this.tableHasRowSum && cellMeta[0][0] == this.tableInstance.countRows() - 1) {
             return;
         }
+        
         let thisObj = this;
         if (e.key === 'Enter' && e.shiftKey === true && cellMeta != undefined) {
+            e.stopImmediatePropagation();
+            e.preventDefault();
+            e.stopPropagation();
             this.tableInstance.alter('insert_row', cellMeta[0][0] + 1, 1, 'auto_set');
             this.dataInsertRows.push([]);
             delayTypingEnter(function() {
@@ -572,6 +565,7 @@ export default class Table {
                 }
                 thisObj.dataInsertRows = []
             });
+            
         } else if (e.key === 'Delete' && e.shiftKey == true) {
             e.stopImmediatePropagation();
             e.preventDefault();
@@ -851,23 +845,31 @@ export default class Table {
         let dataInput = {};
         let listInputInDocument = this.getListInputInDocument();
         for (let inputControlName in inputControl) {
-            let controlIns = listInputInDocument[inputControlName];
-            if(controlIns.inTable != false){
-                let colIndex = this.tableInstance.propToCol(inputControlName);
-                let currentColData = this.tableInstance.getDataAtCol(colIndex);
-                if(this.tableHasRowSum){
-                    currentColData.pop();
-                }
-                dataInput[inputControlName] = currentColData;
+            if(inputControlName == 'document_object_id'){
+                let docObjId = sDocument.state.submit[this.keyInstance]['documentObjectId'];
+                dataInput[inputControlName] = (docObjId) ? docObjId : '';
             }
             else{
-                if (listInputInDocument.hasOwnProperty(inputControlName)){
-                    dataInput[inputControlName] = controlIns.value;
-                    
+                let controlIns = listInputInDocument[inputControlName];
+                if(controlIns.inTable != false){
+                    let colIndex = this.tableInstance.propToCol(inputControlName);
+                    let currentColData = this.tableInstance.getDataAtCol(colIndex);
+                    if(this.tableHasRowSum){
+                        currentColData.pop();
+                    }
+                    dataInput[inputControlName] = currentColData;
                 }
-            }
-            if(controlIns.type == 'date'){
-                dataInput[inputControlName] = controlIns.convertDateToStandard(controlIns.value)
+                else{
+                    if (listInputInDocument.hasOwnProperty(inputControlName)){
+                        dataInput[inputControlName] = controlIns.value;
+                    }
+                }
+                if(controlIns.type == 'date'){
+                    dataInput[inputControlName] = controlIns.convertDateToStandard(controlIns.value)
+                }
+                if(controlIns.type == 'time'){
+                    dataInput[inputControlName] = controlIns.convertTimeToStandard(controlIns.value)
+                }
             }
             
         }
@@ -964,9 +966,17 @@ export default class Table {
                     let vls = [];
                     for (let index = 0; index < listIdRow.length; index++) {
                         const element = listIdRow[index];
-                        vls.push([index, controlInstance.name, data[element]]);
+                        let cellValue = data[element];
+                        if(controlInstance.type == 'date'){
+                            if(cellValue){
+                                cellValue = SYMPER_APP.$moment(cellValue, 'YYYY-MM-DD').format(controlInstance.controlProperties.formatDate.value);
+                            }
+                            else{
+                                cellValue = "";
+                            }
+                        }
+                        vls.push([index, controlInstance.name, cellValue]);
                     }
-
                     thisObj.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
                     /**
                      * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
@@ -985,46 +995,45 @@ export default class Table {
         } catch (error) {
             console.log(error, 'errorerror');
         }
-
-
     }
     /**
      * Hàm lấy dữ liệu hiện tại của table và insert vào sql lite table
      */
 
+    
     getDataResponseQuery(rs, controlType = "") {
-            let result = "";
-            if (controlType == 'table') {
-                if (!rs.server) {
-                    let data = rs.data;
-                    if (data.length > 0) {
-                        result = data[0]
-                    }
-                } else {
-                    result = rs.data.data;
-
+        let result = "";
+        if (controlType == 'table') {
+            if (!rs.server) {
+                let data = rs.data;
+                if (data.length > 0) {
+                    result = data[0]
                 }
             } else {
-                if (!rs.server) {
-                    let data = rs.data;
-                    if (data.length > 0) {
-                        result = data[0].values[0][0];
-                    }
-                } else {
-                    let data = rs.data.data;
-                    if (data.length > 0) {
-                        result = data[0][Object.keys(data[0])[0]];
-                    }
+                result = rs.data.data;
+            }
+        } else {
+            if (!rs.server) {
+                let data = rs.data;
+                if (data.length > 0) {
+                    result = data[0].values[0][0];
+                }
+            } else {
+                let data = rs.data.data;
+                if (data.length > 0) {
+                    result = data[0][Object.keys(data[0])[0]];
                 }
             }
-
-            return result;
         }
-        /**
-         * Hàm xử lí dữ liệu sau khi chạy xong công thức của 1 cột, -> set data cho cột đó -> chạy công thức cho các control ngoài bảng bị ảnh hưởng
-         * @param {Object} data 
-         * @param {String} controlEffectedName 
-         */
+
+        return result;
+    }
+    
+    /**
+     * Hàm xử lí dữ liệu sau khi chạy xong công thức của 1 cột, -> set data cho cột đó -> chạy công thức cho các control ngoài bảng bị ảnh hưởng
+     * @param {Object} data 
+     * @param {String} controlEffectedName 
+     */
     handlerDataAfterRunFormulas(data, controlInstance, formulasType, dataInput = false) {
         if (formulasType.includes('linkConfig')) {
             controlInstance.handlerDataAfterRunFormulasLink(data, formulasType);
@@ -1054,8 +1063,6 @@ export default class Table {
                 break;
         }
     }
-
-
     /**
      * Hàm lấy formulas của cell select -> chạy -> gán lại data cho autocomplete component
      */
@@ -1089,7 +1096,6 @@ export default class Table {
             return false
         }
         return column.type;
-
     }
 
     render() {
@@ -1098,7 +1104,6 @@ export default class Table {
         thisObj.controlObj.ele.before(tableContainer);
         thisObj.tableContainer = $(tableContainer);
         thisObj.columnsInfo = this.getColumnsInfo();
-
         let colHeaders = thisObj.columnsInfo.headerNames;
         thisObj.colHeaders = colHeaders;
         let defaultData = this.getDefaultData();
@@ -1125,28 +1130,15 @@ export default class Table {
             autoRowSize: false,
             autoColSize: true,
             width: '100%',
+            formulas:true,
             fixedRowsBottom: (thisObj.tableHasRowSum) ? 1 : 0,
-            formulas: true,
             height: 'auto',
             afterRender: function(isForced) {
-
                 let tbHeight = this.container.getElementsByClassName('htCore')[0].getBoundingClientRect().height;
                 if (tbHeight < MAX_TABLE_HEIGHT) {
                     $(this.rootElement).css('height', 'auto');
                 } else {
                     $(this.rootElement).css('height', MAX_TABLE_HEIGHT);
-                }
-                if (!this.reRendered) {
-                    this.reRendered = true;
-                    setTimeout((hotTb) => {
-                        if (thisObj.tableHasRowSum) {
-                            thisObj.setDataForSumRow();
-                            for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
-                                hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
-                            }
-                        }
-                        hotTb.render();
-                    }, 500, this);
                 }
             },
             afterGetRowHeader: function(row, TH) {
@@ -1155,23 +1147,7 @@ export default class Table {
                 }
             },
 
-            /**
-             * Trường hợp có dòng tính tổng trong table thì cần đặt lại công thức cho dòng cuối cùng tính tổng
-             * @param {*} i 
-             * @param {*} amount 
-             */
-            beforeCreateRow: function(i, amount) {
-                let hotTb = this;
-                delay(function(e) {
-                    if (thisObj.tableHasRowSum) {
-                        thisObj.setDataForSumRow()
-                        for (let index = 0; index < hotTb.getDataAtRow(0).length; index++) {
-                            hotTb.setCellMeta(hotTb.countRows() - 1, index, 'readOnly', true);
-                            hotTb.setCellMeta(hotTb.countRows() - 2, index, 'readOnly', false);
-                        }
-                    }
-                });
-            },
+        
             /**
              * Sau khi set data cho 1 cell thì cần insert data này vào bảng sql lite
              * set xong chạy công thức cho control bị ảnh hưởng
@@ -1189,19 +1165,11 @@ export default class Table {
                         columns = columns.map(function(c) {
                             return c.data;
                         });
-
                         ClientSQLManager.insertRow(thisObj.keyInstance, thisObj.tableName, columns, currentRowData, true).then(res => {
                             thisObj.handlerCheckEffectedControlInTable(thisObj.controlNameAfterChange, changes[0][0]);
                         })
                     }, 10);
-                } else if (source == 'timeValidator') {
-
-                } else if (isNaN(changes[0][3]) && changes[0][3].includes("=SUM")) {
-                    setTimeout((self) => {
-                        self.render()
-                    }, 500, this);
-                }
-
+                } 
             },
             /**
              * Sau khi create row thì set id cho dòng đó (cột id này là cột ẩn)
@@ -1227,13 +1195,6 @@ export default class Table {
                 });
             },
             afterRemoveRow: function(index, amount, physicalRows, source) {
-                if (thisObj.tableHasRowSum) {
-                    thisObj.setDataForSumRow()
-                    for (let index = 0; index < this.getDataAtRow(0).length; index++) {
-                        this.setCellMeta(this.countRows() - 1, index, 'readOnly', true);
-                        this.setCellMeta(this.countRows() - 2, index, 'readOnly', false);
-                    }
-                }
                 let pattern = index + '_\\d';
                 let reg = new RegExp(pattern, 'g');
                 for (let key in thisObj.validateValueMap) {
@@ -1242,11 +1203,8 @@ export default class Table {
                     }
                 }
                 this.render();
-
             },
-
         });
-
         this.tableInstance.keyInstance = this.keyInstance;
         this.tableInstance.tableName = this.tableName;
         if (!this.checkDetailView()) {
@@ -1321,13 +1279,8 @@ export default class Table {
     getSourceData() {
         return this.tableInstance.getSourceData();
     }
-
-    setCellReadOnly(row, col, status) {
-            this.tableInstance.setCellMeta(row, 0, 'readOnly', status);
-
-        }
-        // Hàm set data cho table
-        // hàm gọi sau khi chạy công thức 
+    // Hàm set data cho table
+    // hàm gọi sau khi chạy công thức 
     setData(vls, dateFormat = true) {
         try {
             ClientSQLManager.delete(this.keyInstance, this.tableName, false);            
@@ -1390,41 +1343,26 @@ export default class Table {
             if (this.tableHasRowSum) {
                 data.push({})
             }
-
-                this.tableInstance.updateSettings({
-                    data: data
-                })
-                setTimeout((self) => {
-                    self.tableInstance.render()
-                }, 50, this);
-                // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
-                if (!this.checkDetailView())
-                    setTimeout((self) => {
-                        for (let index = 0; index < controlBinding.length; index++) {
-                            self.handlerCheckEffectedControlInTable(controlBinding[index], 'all');
-                        }
-                        self.setDataForSumRow();
-                    }, 50, this);
-
-            } else {
-                let defaultRow = this.getDefaultData(false);
-                this.tableInstance.loadData(defaultRow);
-                this.setDataForSumRow();
-            }
-        }
-        /**
-         * Hàm đặt lại giá trị cho hàm tính tổng khi có thay đổi về giá trị cũng như số row của table
-         */
-    setDataForSumRow() {
-        if (this.tableHasRowSum) {
+            this.tableInstance.updateSettings({
+                data: data
+            })
             setTimeout((self) => {
-                for (let controlName in self.columnHasSum) {
-                    let colIndex = self.getColumnIndexFromControlName(controlName);
-                    let CharAt = String.fromCharCode(65 + self.columnHasSum[controlName]);
-                    let sumValue = '=SUM(' + CharAt + '1:' + CharAt + '' + (self.tableInstance.countRows() - 1) + ')';
-                    self.tableInstance.setDataAtCell(self.tableInstance.countRows() - 1, colIndex, sumValue, 'auto_set');
+                self.tableInstance.render()
+            }, 50, this);
+            // sau khi đổ dữ liệu vào table thì ko chạy các sự kiện của table nên cần chạy công thức cho các control liên quan sau khi đỏ dữ liệu
+            if (!this.checkDetailView()){
+                if(this.checkViewType('update') && getSDocumentSubmitStore(this.keyInstance).docStatus == 'init'){
+                    return;
                 }
-            }, 300, this);
+                setTimeout((self) => {
+                    for (let index = 0; index < controlBinding.length; index++) {
+                        self.handlerCheckEffectedControlInTable(controlBinding[index], 'all');
+                    }
+                }, 50, this);
+            }
+        } else {
+            let defaultRow = this.getDefaultData(false);
+            this.tableInstance.loadData(defaultRow);
         }
     }
     /**
@@ -1432,6 +1370,13 @@ export default class Table {
      */
     checkDetailView() {
         if (sDocument.state.viewType[this.keyInstance] == 'detail') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    checkViewType(type) {
+        if (sDocument.state.viewType[this.keyInstance] == type) {
             return true;
         } else {
             return false;
@@ -1646,14 +1591,44 @@ export default class Table {
         else{
             if(control.type == 'number' && (value === "" || value === undefined || value === null)){
                 td.textContent = 0;
+                td.style.textAlign = 'right'
             }
         }
+        thisObj.getColumnSum(hotInstance, row, column, td, ele, prop)
         if(thisObj.tableHasRowSum && row == hotInstance.countRows() - 1){
             ele.find('.validate-icon').remove();
         }
 
+        // thisObj.getColumnSum(hotInstance, row, column, td, ele, prop,control)
     }
 
+    /**
+     * Hàm tính tổng của 1 cột được tích vào thuộc tính tính tổng
+     * @param {*} hotInstance 
+     * @param {*} row 
+     * @param {*} column 
+     * @param {*} td 
+     * @param {*} ele 
+     * @param {*} prop 
+     */
+    getColumnSum(hotInstance, row, column, td, ele, prop, control){
+        if(this.tableHasRowSum && row == hotInstance.countRows() - 1){
+            ele.find('.validate-icon').remove();
+            if(Object.keys(this.columnHasSum).includes(prop)){
+                let colData = hotInstance.getDataAtCol(column);
+                colData.pop();
+                let sum = colData.reduce((a, b)=>{
+                    a = Number(a);
+                    b = Number(b);
+                    return a+b;
+                },0)
+                sum = control.formatNumberValue(sum);
+                td.style.textAlign = 'right'
+                td.style.fontWeight = "600";
+                td.textContent = sum;
+            }
+        }
+    }
     /**
      * Hàm set các cell được validate
      * @param {*} key 

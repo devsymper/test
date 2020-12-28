@@ -101,7 +101,7 @@ export default {
 						if(res.status == 200){
 							self.$snotify({
 								type: 'success',
-								title: "Thành công . Đang deploy....."
+								title: "Thành công . Đã deploy"
 							})
 						}else{
 							self.$snotify({

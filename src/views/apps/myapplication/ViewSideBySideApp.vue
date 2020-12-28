@@ -516,6 +516,7 @@ x				}
 	text-overflow: ellipsis; 
 	font:13px roboto;
 	padding-left:8px;
+	cursor: pointer;
 }
 
 .view-side-by-side-apps .list-apps h4{

@@ -61,8 +61,8 @@
                             <v-list-item-subtitle style="margin-left: 0.5rem" class="fs-12 sub-title">{{item.description}}
                             </v-list-item-subtitle>
                         </v-list-item-content>
-                        <v-list-item-action v-show="item.enable&&item.actions.length>0" >
-                            <v-menu  max-height="180" max-width="120" offset-y 
+                        <v-list-item-action v-show="item.actions.length > 0" >
+                            <v-menu  max-height="180" max-width="150" offset-y 
                                 style="background-color:white" nudge-left="100">
                                 <template v-slot:activator="{ on }">
                                     <button v-on="on">
@@ -74,10 +74,13 @@
                                     <v-row>
                                         <v-list-item-title 
                                             v-for="(itemsAction, itemActionIdx) in item.actions"
-                                            class="fm fs-13 mt-1 action-button ml-4 mr-6" 
+                                            class="fm fs-13 mt-1 action-button ml-4 mr-4" 
                                             @click="gotoPage(itemsAction,item.type,item.id,item.displayName)"
                                             :key="itemActionIdx">
-                                            <span class="ml-2">{{$t('objects.listAction.'+itemsAction)}}</span>
+                                            <div 
+												style="cursor: pointer; padding:4px" 
+												class="ml-2"
+											>{{$t('objects.listAction.'+itemsAction)}}</div>
                                         </v-list-item-title>
                                     </v-row>
                                 </v-list>
@@ -132,8 +135,6 @@
                             <v-list-item-content>
                                 <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
                                 </v-list-item-title>
-                                <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.displayName">
-                                </v-list-item-subtitle>
                                 <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.email">
                                 </v-list-item-subtitle>
                             </v-list-item-content>
@@ -198,15 +199,15 @@
                             <v-list-item-subtitle style="margin-left: 0.5rem" class="fs-12 sub-title">{{item.description}}
                             </v-list-item-subtitle>
                         </v-list-item-content>
-                        <v-list-item-action v-show="item.enable&&item.actions.length>0" >
+                        <v-list-item-action v-show="item.actions.length > 0" >
                             <v-menu offset-y transition="scale-transition" 
                                 nudge-left="100"
-                                max-height="180" max-width="120"
-                                style="width:50px!important; margin-bottom:40px">
+                                max-height="180" max-width="150"
+							>
                                 <template v-slot:activator="{ on }">
                                     <button v-on="on">
-                                        <i style="height:20px!important;width:20px!important" 
-                                        class="mr-10 dot mdi mdi-dots-horizontal"></i>
+                                        <i 
+										class=" mdi mdi-dots-horizontal"></i>
                                     </button>
                                 </template>
                                 <v-list>
@@ -215,8 +216,10 @@
                                             v-for="(itemsAction, itemsActionIdx) in item.actions" 
                                             :key="itemsActionIdx"
                                             @click="gotoPage(itemsAction,item.type,item.id,item.displayName)"
-                                            class="fm fs-13 ml-6 action-button" style="width:50px!important" >
-                                                 {{$t('objects.listAction.'+itemsAction)}}
+                                            class="fm fs-13 ml-4 mr-4 action-button" style="width:50px!important" >
+                                                 <div style="cursor: pointer; padding:4px">
+													 {{$t('objects.listAction.'+itemsAction)}}
+												 </div>
                                         </v-list-item-title>
                                     </v-row>
                                 </v-list>
@@ -275,8 +278,6 @@
                     <v-list-item-content>
                         <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
                         </v-list-item-title>
-                        <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.displayName">
-                        </v-list-item-subtitle>
                         <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.email">
                         </v-list-item-subtitle>
                     </v-list-item-content>

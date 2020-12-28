@@ -460,6 +460,13 @@ export default {
 
         //     })
         // },
+        formatTime(time){
+            let minutes = 0;
+            let hour = 0;
+            hour = time.includes('h')?time.split('h')[0]:0;
+            minutes = time.includes('h')?time.split('m')[0].split('h')[1]:time.split('m')[0];
+            return hour*60+minutes;
+        },
         changeDuration(duration){
             let minutes = 0;
             let hour = 0;
@@ -641,11 +648,10 @@ export default {
             }
             if (!check){}
             else{
-               
                 timesheetApi.createLogTime({
                     start: start,
                     end: end,
-                    duration: this.duration,
+                    duration: !this.isCaculate?this.duration:this.formatTime(this.duration),
                     task: this.findNameTask(this.task),
                     type: type,
                     date: this.inputs.date,
@@ -706,7 +712,7 @@ export default {
                 timesheetApi.updateLogTime({
                         start: this.$moment(this.newEvent.start).hour(+this.inputs.startTime.split(":")[0]).minute(+this.inputs.startTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
                         end: this.$moment(this.newEvent.start).hour(+this.inputs.endTime.split(":")[0]).minute(+this.inputs.endTime.split(":")[1]).format("YYYY-MM-DD HH:mm"),
-                        duration: this.duration,
+                        duration: !this.isCaculate?this.duration:this.formatTime(this.duration),
                         task: this.findNameTask(taskId),
                         type: type,
                         id: this.newEvent.id,

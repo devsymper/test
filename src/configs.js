@@ -13,7 +13,7 @@ var configs = {
     apiDomain: {
         account: 'https://account.symper.vn/',
         user: 'https://account.symper.vn/',
-        core: 'https://v2hoangnd.dev.symper.vn/',
+		core: 'https://v2hoangnd.dev.symper.vn/',
         bpmne: {
             general: 'https://workflow.symper.vn/',
             models: 'https://workflow-modeler.symper.vn/workflow-modeler/',
@@ -22,6 +22,7 @@ var configs = {
             definitions: "https://workflow.symper.vn/symper-rest/service/repository/process-definitions",
             instances: "https://workflow.symper.vn/symper-rest/service/runtime/process-instances",
             historyInstances: "https://workflow.symper.vn/symper-rest/service/query/historic-process-instances",
+            historyInstancesDel: "https://workflow.symper.vn/symper-rest/service/history/historic-process-instances",
             history: "https://workflow.symper.vn/symper-rest/service/history",
             tasks: "https://workflow.symper.vn/symper-rest/service/runtime/tasks",
             task: "https://workflow.symper.vn/symper-rest/service/query/tasks",

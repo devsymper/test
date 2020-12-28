@@ -12,11 +12,13 @@
         :showExportButton="false"
         :showImportButton="false"
         @after-open-add-panel="addDocument"
+        @close-panel="closePanel"
         :headerPrefixKeypath="'document'"
         :commonActionProps="commonActionProps"
     >
         <div slot="right-panel-content" class="h-100">
             <submit-view 
+                v-if="isShowQuickSubmit"
                 ref="submitView" 
                 :isQickSubmit="true" 
                 :action="'submit'" 
@@ -64,6 +66,7 @@ export default {
             showImportPanel:false,
             actionPanelWidth:830,
             containerHeight: 200,
+            isShowQuickSubmit:false,
             tableContextMenu:{
                 edit: {
                     name: "editdoc",
@@ -108,17 +111,9 @@ export default {
                         return " <i class= 'mdi mdi-text-box-plus-outline' > </i>&nbsp; Nhập liệu nhanh";
                     },
                     callback: (document, callback) => {
-                         const self = this;
-                        // if(document.allowSubmitOutsideWorkflow==1){
-                        //     this.$refs.listDocument.openactionPanel();
-                        //     this.documentId = parseInt(document.id)
-                        // }else{
-                            self.$snotify({
-                                type: "error",
-                                title: "Không cho phép nhập liệu nhanh"
-                            })
-                       // }
-                       
+                        this.isShowQuickSubmit = true
+                        this.$refs.listDocument.openactionPanel();
+                        this.documentId = parseInt(document.id)
                     },
                 },
                 list: {
@@ -294,6 +289,9 @@ export default {
         }
     },
     methods:{
+        closePanel(){
+            this.isShowQuickSubmit = false;
+        },
         getApiDocument(){
             const self = this;
             documentApi.detailDocument(this.documentId)

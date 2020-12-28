@@ -86,10 +86,10 @@ export default {
 					return {
 						columns:[
 							{name: "id", title: "id", type: "text", noFilter: true},
+							{name: "ip", title: "ip	", type: "text", noFilter: true},
 							{name: "versionName", title: "versionName", type: "text", noFilter: true},
 							{name: "environmentIdentifier", title: "environmentIdentifier", type: "text", noFilter: true},
 							{name: "environmentName", title: "environmentName", type: "numeric", noFilter: true},
-							{name: "status", title: "status", type: "numeric", noFilter: true},
 							{name: "userCreateName", title: "userCreate", type: "text", noFilter: true},
 							{name: "userUpdateName", title: "userUpdate", type: "text", noFilter: true},
 							{name: "createAt", title: "createAt", type: "text", noFilter: true},

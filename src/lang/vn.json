@@ -198,8 +198,13 @@
         "environmentName": "Tên môi trường",
         "unfreeze_column": "Bỏ cố định cột này",
         "hide_column": "Ẩn cột này",
-        "show_column": "Hiện cột này",
-        "git": "Link git",
+		"show_column": "Hiện cột này",
+		"processKey": "Process Key",
+		"lastUserUpdate": "Người cập nhât",
+		"lastUpdateTime": "Thời gian cập nhât",
+		"git": "Link git",
+		"os": "Hệ điểu hành",
+		"ip": "Địa chỉ IP",
         "wrap_tex_mode": {
             "wrap": "Xuống dòng",
             "clip": "Cắt bớt"
@@ -250,7 +255,8 @@
 			"suspended": "Trạng thái",
 			"number_instance":"Tổng số instance",
 			"status":"Trạng thái",
-			"endTime":"Thời gian hoàn thành"
+			"endTime":"Thời gian hoàn thành",
+			"nameVersion": "Phiên bản"	
         }
     },
     "validate": {
@@ -717,6 +723,7 @@
                     },
                     "name": "Tên Document",
                     "title": "Tiêu đề Document",
+                    "updateByWorkflow": "Cập nhật bản ghi bằng quy trình",
                     "fullSize": "Hiển thị toàn màn hình Form Submit",
                     "type": "Loại văn bản",
                     "note": "Ghi chú (Phục vụ cho việc tìm kiếm)",
@@ -1345,7 +1352,12 @@
         "createTask": {
             "title": "Tạo task"
         },
-        "claim": "Claim",
+        "claim": "Nhận công việc",
+        "unClaim": "Hủy nhận",
+        "reAssign": "Giao việc",
+        "delegate": "Ủy quyền",
+        "resolve": "Giải quyết",
+        "complete": "Hoàn thành",
         "created": "Đã tạo mới task",
         "relatedPeople": {
             "title": "Những người liên quan"

@@ -196,7 +196,9 @@
         "freeze_column": "Freeze this column",
         "unfreeze_column": "Don't freeze this column",
         "hide_column": "Hide this column",
-        "show_column": "Show this column",
+		"show_column": "Show this column",
+		"os": "Os",
+		"ip": "IP address",
         "wrap_tex_mode": {
             "wrap": "Wrap",
             "clip": "Clip"
@@ -507,6 +509,7 @@
                     },
                     "name": "Document name",
                     "title": "Document title",
+                    "updateByWorkflow": "Update by workflow",
                     "fullSize": "Full size Form Submit",
                     "type": "Document type",
                     "note": "Note (Serve for searching)",
@@ -1216,7 +1219,12 @@
         "createTask": {
             "title": "Create task"
         },
-        "claim": "Claim",
+		"claim": "Claim",
+        "unClaim": "Un claim",
+        "reAssign": "Re-assign",
+        "delegate": "Delegate",
+        "resolve": "Resolve",
+        "complete": "Complete",
         "created": "Task created",
         "relatedPeople": {
             "title": "Related people"

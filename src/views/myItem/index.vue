@@ -1,8 +1,25 @@
 <template>
     <div class="w-100 h-100 myitem">
-       <list-task v-if="objecType==0" @changeObjectType="changeObjectType" :height="height" @change-height="changeHeight"></list-task>
-       <list-work v-if="objecType==1" @changeObjectType="changeObjectType" :height="height" @change-height="changeHeight"></list-work>
-       <list-document v-if="objecType==2" @changeObjectType="changeObjectType" :height="height" @change-height="changeHeight"></list-document>
+       <list-task 
+            v-if="objecType==0" 
+            @changeObjectType="changeObjectType" 
+            :height="height" 
+            @change-height="changeHeight">
+        </list-task>
+
+       <list-work 
+            v-else-if="objecType==1" 
+            @changeObjectType="changeObjectType" 
+            :height="height" 
+            @change-height="changeHeight">
+        </list-work>
+
+       <list-document 
+            v-else-if="objecType==2" 
+            @changeObjectType="changeObjectType" 
+            :height="height" 
+            @change-height="changeHeight">
+        </list-document>
     </div>
 </template>
 
@@ -25,7 +42,6 @@ export default {
     },
     data: function() {
         return {
-            virtualdocUrl: "virtualdocs",
             height: "calc(100vh - 120px)",
             objecType:0,
         };
@@ -35,7 +51,7 @@ export default {
             this.height = newHeight
         },
         changeObjectType(index){
-            this.objecType=index;
+            this.objecType = index;
         }
     },
     created(){

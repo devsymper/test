@@ -57,6 +57,7 @@
 						<ObjectDetail 
 							:tableHeight="tableHeight"
 							@back="tab = 'tab-1'"
+							ref="listObject"
 							@close-popup="handleCloseEvent"
 							:getListUrl="getListUrls"
 							:currentObjectType="currentObjectType"

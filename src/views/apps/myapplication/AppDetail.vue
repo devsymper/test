@@ -1,6 +1,6 @@
 <template>
   <div class="app-details">
-	  	 <VuePerfectScrollbar :style="{height: listItemHeight}">
+	  	 <PerfectScrollbar :style="{height: listItemHeight}">
 			<Preloader
 				v-if="loadingApp"
 			 />
@@ -9,7 +9,7 @@
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
 							<li  v-if="isEndUserCpn == true" 
 								v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)"
-								v-on:click="rightClickHandler($event,childItem,itemT.name)"
+								v-on:click="clickHandler(itemT.name,childItem)"
 								:class="{'child-item-active': childItem.objectIdentifier == activeIndexChild}"
 							>
 								<div style="position:relative">
@@ -66,7 +66,7 @@
 							</li>
 					</ul>
 			</div>	
-		</VuePerfectScrollbar>
+		</PerfectScrollbar>
 		<ContextMenu ref="contextMenu" 
 			:sideBySide="sideBySide"
 			:allAppMode="false"
@@ -78,6 +78,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue';
 import {appManagementApi} from '@/api/AppManagement.js'
 import Preloader from "@/components/common/Preloader"
+import PerfectScrollbar from '@/components/common/PerfectScrollBar'
 export default {
  data: function() {
         return {
@@ -123,7 +124,8 @@ export default {
 	components:{
 		ContextMenu,
 		VuePerfectScrollbar,
-		Preloader
+		Preloader,
+		PerfectScrollbar
 	},
 	mounted(){
    },
@@ -223,6 +225,44 @@ export default {
 					}
 				})
 			}
+		},
+		clickHandler(type,item){
+			this.$store.commit('appConfig/updateActiveChildItem', item.objectIdentifier )
+			let define
+			if(type.includes('document')){
+				this.$store.commit('document/setCurrentTitle',item.title)
+				define ={
+					"module": "document",
+					"resource": "document_definition",
+					"scope": "document",
+					"action": "list_instance"
+				}
+			}
+			if(type == 'orgchart'){
+				define ={
+					"module": "orgchart",
+					"resource": "orgchart",
+					"scope": "orgchart",
+					"action": "detail"
+				}
+			}
+			if(type == 'dashboard'){
+				define ={
+					"module": "dashboard",
+					"resource": "dashboard",
+					"scope": "dashboard",
+					"action": "view"
+				}
+			}
+			if(type == 'workflow_definition'){
+				define ={
+					"module": "workflow",
+					"resource": "workflow_definition",
+					"scope": "workflow",
+					"action": "list_instance"
+				}
+			}
+			this.$store.commit('appConfig/updateActionDef', define)
 		},
 		rightClickHandler(event,item,type){
 			event.stopPropagation();
