@@ -59,14 +59,14 @@
             </div>
 
         </v-card-title >
-        <v-card-text class="pa-1 pb-0">
+        <v-card-text class="pa-0 pb-0">
             <v-container class="pa-0">
                 <div v-if="Object.keys(currentProject).length > 0">
                     <submit
                         ref="submitComponent"
                         class="doc_issue"
                         :action="'submit'"
-                        :docId="returnDocumentId()"
+                        :docId="documentId"
                         :projectId="currentProject.id"
                         :workflowVariable="workflowVariable"
                         :showSubmitButton="false"
@@ -117,6 +117,7 @@ export default {
             isShow:false,
             currentProject: {},
             currentIssueType: null,
+            documentId:null,
             workflowVariable:{
                 // "project_id" : "111111"
             }
@@ -149,21 +150,16 @@ export default {
     methods:{
         // thay đổi document id ở đây
         onChangeIssueType(){
-
+            this.documentId = Number(this.currentIssueType.documentId);
         },
         onChangeProject(){
-            this.getListIssueType()
-        },
-        returnDocumentId(){
-            if (this.currentIssueType && this.currentIssueType.documentId) {
-                return Number(this.currentIssueType.documentId)
-            }else{
-                return 2131;
-            }
+            this.getListIssueType();
+            this.$set(this.workflowVariable,'project_id',this.currentProject.id);
         },
         show(){
             this.isShow=true;
             this.currentProject = this.allProject[0];
+            this.$set(this.workflowVariable,'project_id',this.currentProject.id);
             this.getListIssueType()
            
         },
@@ -172,6 +168,7 @@ export default {
                 await this.$store.dispatch("taskManagement/getListIssueTypeInProjects", this.currentProject.id);
             }
             this.currentIssueType = this.allIssueTypeInProject.find(ele => ele.projectId == this.currentProject.id);
+            this.documentId = Number(this.currentIssueType.documentId);
         },
         submitForm(){
             this.isLoading = true;
@@ -217,4 +214,9 @@ export default {
         border-top: 1px solid #efefef!important;
         border: 1px solid #efefef!important;
     }
+    .doc_issue >>> .sym-form-submit{
+        padding: 4px;
+        padding-right: 10px;
+    }
+
 </style>

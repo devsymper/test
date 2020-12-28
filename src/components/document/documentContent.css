@@ -649,3 +649,9 @@ button:hover {
  .sym-form-submit div:empty, .sym-form-Detail div:empty{
      height: 12px;
  }
+ .sym-form-Detail .s-control-file-upload{
+    border: var(--symper-border);
+}
+ .sym-form-Detail .upload-file-wrapper-outtb{
+     padding-left: 8px;
+}

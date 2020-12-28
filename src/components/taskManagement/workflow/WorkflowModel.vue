@@ -415,20 +415,6 @@ export default {
             this.isLoading = false;
 
         },
-        async getListRole(){
-            let self = this;
-            let allRole = await taskManagementApi.getListRole();
-            if (allRole.status == 200 && allRole.data) {
-                let listRole=allRole.data.listObject;
-                listRole = listRole.reduce((arr, obj)=>{
-                    let newObj = {text:obj.name,value:obj.id};
-                    arr.push(newObj);
-                    return arr
-                },[]);
-
-                this.listRole=listRole;
-            }
-        },
         showPopupAddStatusView(){
             this.$refs.popupAddStatusView.show()
         },

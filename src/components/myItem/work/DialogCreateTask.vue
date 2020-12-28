@@ -66,7 +66,7 @@
 </template>
 
 <script>
-import userSelector from "./UserSelector";
+import userSelector from "../UserSelector";
 import datePicker from "@/components/common/datePicker";
 import SymperDocSelect from "@/components/common/symperInputs/SymperDocumentSelect.vue";
 import { defaultTaskDescription } from "@/components/process/elementDefinitions/customExtToModel";

@@ -1,5 +1,11 @@
 export default [
     {
+        path: "/task-management",
+        name: "taskManagerHome",
+        component: () =>
+            import ('../../views/taskManagement/home/Index.vue')
+    },
+    {
         path: "/task-management/test-workers",
         name: "worker",
         component: () =>

@@ -64,10 +64,28 @@ const getAllStatusCategory = async(context) => {
         }
     }
 }
-const getAllRole = async(context) => {
+const getAllRole = async(context,projectId) => {
     if (context.state.allRole.length==0) {
         try {
-            let res = await taskManagementApi.getListRole();
+            let item={
+                column : "projectId",
+                operation : "and",
+                conditions : [
+                    {
+                        name : "in",
+                        value : [projectId],
+                    }
+                ],
+            }
+            let filter={};
+            filter.filter = [];
+            filter.filter.push(item);
+
+            filter.page = 1;
+            filter.pageSize = 100;
+            filter.distinct = false;
+
+            let res = await taskManagementApi.getListRole(filter);
             if (res.status == 200) {
                 context.commit('setAllRole', res.data.listObject);
             } else {

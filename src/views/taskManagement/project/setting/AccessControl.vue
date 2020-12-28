@@ -44,6 +44,19 @@ export default {
         },
         async getListRole(){
             let self = this;
+            let projectId=this.$route.params.id;
+            let item={
+                column : "projectId",
+                operation : "and",
+                conditions : [
+                    {
+                        name : "in",
+                        value : [projectId],
+                    }
+                ],
+            }
+            this.filter.filter = [];
+            this.filter.filter.push(item);
             let allRole = await taskManagementApi.getListRole(this.filter);
             if (allRole.status == 200 && allRole.data) {
                 self.roles = allRole.data.listObject;

@@ -11,6 +11,7 @@
                         class="save-setting-btn"
                         v-if="listColumn.length > 0"
                         depressed
+                        :loading="isLoading"
                         small
                         @click="updateColumn"
                         >
@@ -19,6 +20,7 @@
                     <v-btn
                         class="save-setting-btn"
                         v-else
+                        :loading="isLoading"
                         depressed
                         small
                         @click="saveColumn"
@@ -136,39 +138,52 @@ export default {
                     this.getStatusForListColumn();
                 }
             }
-          
-        }
+        },
+        listStatusInProject:{
+            deep: true,
+            immediate:true,
+            handler(newVl){
+                this.listStatus = util.cloneDeep(newVl);
+                this.getStatusForListColumn();
+            }
+        },
     },
     components: {
         draggable,
         VuePerfectScrollbar
     },
     computed:{
-        listStatus(){
+        listStatusInProject(){
             let projectId=this.$route.params.id;
-            return util.cloneDeep(this.$store.state.taskManagement.listStatusInProjects[projectId]);
+            if (this.$store.state.taskManagement.listStatusInProjects[projectId] && this.$store.state.taskManagement.listStatusInProjects[projectId].length > 0) {
+                return this.$store.state.taskManagement.listStatusInProjects[projectId];
+            }else{
+                return [];
+            }
         }
     },
     data(){
+        let self = this;
         return{
-            columns:[]
+            isLoading:false,
+            columns:[],
+            listStatus:[]
         }
     },
     mounted(){
       //  this.columns = util.cloneDeep(this.listColumn)
     },
     methods:{
-
         getStatusForListColumn(){
             let self = this;
-            this.columns = util.cloneDeep(this.listColumn);
-            if (this.listStatus.length > 0 ) {
-                for (let i = 0; i < this.listStatusColumn.length; i++) {
-                    let idColumn = this.listStatusColumn[i].columnId;
-                    let statusRoleId = this.listStatusColumn[i].statusRoleId;
-                    let item = this.listStatus.find(ele => ele.statusRoleId == statusRoleId);
+            self.columns = util.cloneDeep(self.listColumn);
+            if (self.listStatus.length > 0 ) {
+                for (let i = 0; i < self.listStatusColumn.length; i++) {
+                    let idColumn = self.listStatusColumn[i].columnId;
+                    let statusRoleId = self.listStatusColumn[i].statusRoleId;
+                    let item = self.listStatus.find(ele => ele.statusRoleId == statusRoleId);
                     if (item) {
-                        let column = this.columns.find(ele => ele.id == idColumn);
+                        let column = self.columns.find(ele => ele.id == idColumn);
                         if (column) {
                             column.statusInColumn.push(item);
                         }
@@ -187,7 +202,6 @@ export default {
                 for (let i = 0; i < this.columns[index].statusInColumn.length; i++) {
                     this.listStatus.push(this.columns[index].statusInColumn[i]);
                 }
-                //this.listStatus.concat(this.columns[index].statusInColumn);
             }
             this.columns.splice(index,1);
         },
@@ -206,6 +220,7 @@ export default {
             
         },
         saveColumn(){
+            this.isLoading = true;
             let idBoard=this.$route.params.idBoard;
             let data={};
                 data.data = JSON.stringify(this.columns);
@@ -215,33 +230,37 @@ export default {
                     .then(res => {
                         if (res.status == 200) {
                             this.$snotifySuccess("Add column completed!");
+                            this.$store.dispatch("taskManagement/getListColumnInBoard",idBoard);
+
                         }else{
                             this.$snotifyError("", "Can not add column!");
                         }
+                        this.isLoading = false;
+
                     })
                     .catch(err => {
+                        this.isLoading = false;
                         this.$snotifyError("", "Can not add column!", err);
                     });
 
         },
-        updateColumn(){
+        async updateColumn(){
+            this.isLoading = true;
             let idBoard=this.$route.params.idBoard;
             let data={};
-                data.data = JSON.stringify(this.columns);
-                data.boardId = idBoard;
-                taskManagementApi
-                    .updateColumnInBoard(data)
-                    .then(res => {
-                        if (res.status == 200) {
-                            this.$snotifySuccess("Update column completed!");
-                        }else{
-                            this.$snotifyError("", "Can not update column!");
-                        }
-                    })
-                    .catch(err => {
-                        this.$snotifyError("", "Can not update column!", err);
-                    });
-
+            data.data = JSON.stringify(this.columns);
+            data.boardId = idBoard;
+            let res =await taskManagementApi.updateColumnInBoard(data);
+            if (res.status == 200) {
+                this.$snotifySuccess("Update column completed!");
+                await this.$store.dispatch("taskManagement/getListColumnInBoard",idBoard);
+                await this.$store.dispatch("taskManagement/getListStatusInColumnBoard",idBoard);
+                this.listStatus =(this.listStatusInProject.length > 0 )? util.cloneDeep(this.listStatusInProject) : [];
+            }else{
+                this.$snotifyError("", "Can not update column!");
+            }
+            this.isLoading = false;
+            this.getStatusForListColumn();
         }
     }
 }

@@ -4,6 +4,7 @@
         v-model="isShowModalErr"
         persistent
         width="800"
+        scrollable
         >
         <v-card
         height="550"

@@ -178,12 +178,6 @@ var configs = {
                         icon: 'mdi-view-week-outline',
                         url:"/task-management/projects/:id/workflow"
                     },
-                    {
-                        name:'priority',
-                        title:"Priority",
-                        icon: 'mdi-view-week-outline',
-                        url:"/task-management/priorities"
-                    }
                 ]
             }
         }
