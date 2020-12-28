@@ -2453,6 +2453,9 @@ export default {
                 if(inputControlName == 'document_object_id'){
                     dataInput[inputControlName] = (this.docObjId) ? this.docObjId : '';
                 }
+                else if(Object.keys(this.workflowVariable).includes(inputControlName)){
+                    dataInput[inputControlName] = this.workflowVariable[inputControlName];
+                }
                 else{
                     if(inputControlName == e.controlName){
                         dataInput[inputControlName] = $(e.e.target).val();

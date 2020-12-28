@@ -8,6 +8,12 @@ export const documentApi = {
     getListDocument() {
         return coreApi.get("documents?pageSize=3000");
     },
+    getListDocumentObject(docId) {
+        return coreApi.get("documents/"+docId+"/objects");
+    },
+    getListObjectByMultipleDocument(ids) {
+        return coreApi.post("documents/objects-by-multiple-document",ids);
+    },
     getBatchDocument(data) {
         return coreApi.post("documents/batch", data);
     },
