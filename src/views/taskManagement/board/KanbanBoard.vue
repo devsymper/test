@@ -87,6 +87,7 @@ import draggable from "vuedraggable";
 import TaskCard from "@/components/taskManagement/board/TaskCard.vue";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import { util } from '../../../plugins/util';
+import { documentApi } from "@/api/Document.js";
 
 export default {
     name: "KanbanBoard",
@@ -222,10 +223,15 @@ export default {
                 }
             ],
             boardCurrent:{},
+
         };
     },
    
     methods:{
+        getListTasks(){
+            // to do : đang làm dở lấy task ở đây
+            // documentApi.getListDocumentObject()
+        },
         async getListBoard(){
             let self=this;
             let id=this.$route.params.id;
