@@ -2743,7 +2743,7 @@ export default {
                                     }
 								}
 							}
-						}
+                        }
                     }
                 }
                 // lưu lại các mối quan hệ cho lần submit sau ko phải thực hiện các bước tìm quan hê này (các root control , các luồng chạy công thức)
@@ -2757,6 +2757,15 @@ export default {
         },
 
 
+        getRootFromVariable(formulasInstance){
+            let dataInputFormula = formulasInstance.getInputControl();
+            for(let control in dataInputFormula){
+                if(!Object.keys(this.workflowVariable).includes(control)){
+                    return false;
+                }
+            }
+            return true;
+        },
         /**
          * Hàm kiểm tra xem control có phải là root hay ko(cả trong table), nếu có đưa vào biến và lưu lại trên db
          */
@@ -2776,6 +2785,12 @@ export default {
                 }
                 this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
             }
+            else if(this.getRootFromVariable(formulasInstance, listRootControl)){
+                if(!listRootControl.includes(controlName)){
+                    listRootControl.push(controlName);
+                }              
+            }
+            
         },
         /**
          * Hàm kiểm tra các input của 1 control có nằm trong cùng table đó hay không
