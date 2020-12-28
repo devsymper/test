@@ -1,16 +1,14 @@
-export const IndexedDB = class {
-    constructor(_dbName, objName = false) {
+const EXPIRE_TIME = 604800; // một tuần
+export default class IndexedDB {
+    constructor(_dbName) {
         this.dbName = _dbName;
         this.dbVersionNumber = 1;
-        if (objName) {
-            this.objName = objName;
-        }
     }
 
     setDBVersionNumber(_dbVersionNumber) {
         this.dbVersionNumber = _dbVersionNumber;
     }
-	
+
     open(objName, keyPath = false, objData = false, onsuccess = false, onerror = false, onupgradeneeded = false) {
         this.objName = objName;
         this.request = indexedDB.open(this.dbName, this.dbVersionNumber);
@@ -40,16 +38,15 @@ export const IndexedDB = class {
         }
     }
 
-    readAll(handleEachItem, loopDone) {
+    readAll(callback) {
         let objectStore = this.db.transaction(this.objName).objectStore(this.objName);
         objectStore.openCursor().onsuccess = function(event) {
             let cursor = event.target.result;
             if (cursor) {
-                handleEachItem(cursor);
+                callback(cursor);
                 cursor.continue();
             } else {
                 console.log("No more entries!");
-                loopDone();
             }
         };
     }
@@ -66,23 +63,46 @@ export const IndexedDB = class {
         });
     }
 
-    add(objData) {
+    
+
+    async save(data, key){
+        let savedData = await this.read(key);
+        debugger
+        if(savedData){
+            this.put(data, key);
+        }else{
+            this.add(data, key);
+        }
+    }
+
+
+    add(value, key = null) {
         let transaction = this.db.transaction([this.objName], 'readwrite');
         let objectStore = transaction.objectStore(this.objName);
 
         return new Promise((resolve, reject) => {
-            let request = objectStore.add(objData);
+            let request = {};
+            if(key){
+                objectStore.add(value, key);
+            }else{
+                objectStore.add(value);
+            }
             request.onsuccess = event => resolve(event);
             request.onerror = event => reject(event);
         });
     }
 
-    put(objData) {
+    put(objData, key = null) {
         let transaction = this.db.transaction([this.objName], 'readwrite');
         let objectStore = transaction.objectStore(this.objName);
 
         return new Promise((resolve, reject) => {
-            let request = objectStore.put(objData);
+            let request = {};
+            if(key){
+                objectStore.put(objData, key);
+            }else{
+                objectStore.put(objData);
+            }
             request.onsuccess = event => resolve(event);
             request.onerror = (event) => reject(event);
         });
