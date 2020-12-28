@@ -1,6 +1,7 @@
 
 import { getDataFromConfig, getDefaultFilterConfig } from "@/components/common/customTable/defaultFilterConfig";
 import {uiConfigApi} from "@/api/uiConfig";
+import { reject } from "lodash";
 
 self.onmessage = async function (event) {
 	var workerDataReceive = event.data;
@@ -10,6 +11,22 @@ self.onmessage = async function (event) {
         case 'getData':
 			let getDataRes = await getData(data);
             postMessage({action:'getData', dataAfter : getDataRes})
+            break;
+        case 'getItemForValueFilter':
+			let getItemForValueFilterRes = await getItemForValueFilter(data.dataConfig);
+            postMessage({action:'getItemForValueFilter', dataAfter : getItemForValueFilterRes})
+            break;
+        case 'setSelectItemForFilter':
+			let setSelectItemForFilterRes = await setSelectItemForFilter(data);
+            postMessage({action:'setSelectItemForFilter', dataAfter : setSelectItemForFilterRes})
+            break;
+        case 'restoreTableDisplayConfig':
+			let restoreTableDisplayConfigRes = await restoreTableDisplayConfig(data);
+            postMessage({action:'restoreTableDisplayConfig', dataAfter : restoreTableDisplayConfigRes})
+            break;
+        case 'saveTableDisplayConfig':
+			let saveTableDisplayConfigRes = await saveTableDisplayConfig(data);
+            postMessage({action:'saveTableDisplayConfig', dataAfter : saveTableDisplayConfigRes})
             break;
         default:
             break;
@@ -22,8 +39,6 @@ export const getData = function(dataConfig){
 		}
 		let handler = function(data){
 			if(dataConfig.customAPIResult){
-				let reduce  = eval("dataConfig.customAPIResult")
-				debugger
 				data = data.data;
 			}else{
 				data = data.data;
@@ -44,6 +59,73 @@ export const getData = function(dataConfig){
 		}
 		prepareFilterAndCallApi(dataConfig.configs.columns , dataConfig.configs.cache , dataConfig.configs.applyFilter, handler , {} , dataConfig);
 	})
+}
+
+export const getItemForValueFilter = function(dataConfig){
+	return new Promise((resolve, reject)=>{
+		let success = (data) => {
+			let obj = {}
+			if(data.status == 200){
+				let items = data.data.listObject.reduce((arr, el) => {
+					arr.push(el[dataConfig.columns[0]]);
+					return arr;
+				}, []);
+				obj.selectItems = createSelectableItems(items , dataConfig.colFilter);
+			}
+			resolve(obj);
+		}
+		prepareFilterAndCallApi(dataConfig.columns , false, true, success, dataConfig.options, dataConfig);
+	})
+	
+}
+export const createSelectableItems = function(items , colFilter){
+	let selectableItems = [];
+	if(colFilter.clickedSelectAll){ // chọn tất cả
+		selectableItems = items.reduce((arr, el) => {
+			arr.push({
+				value: el,
+				checked: true
+			});
+			return arr;
+		}, []);
+	}else if(colFilter.selectAll){ // not in
+		selectableItems = items.reduce((arr, el) => {
+			arr.push({
+				value: el,
+				checked: colFilter.valuesNotIn[el] ? false : true
+			});
+			return arr;
+		}, []);
+	}else{ // in
+		selectableItems = items.reduce((arr, el) => {
+			arr.push({
+				value: el,
+				checked: colFilter.valuesIn[el] ? true : false
+			});
+			return arr;
+		}, []);
+	}  
+	return selectableItems;
+}
+export const setSelectItemForFilter = function(data){
+	let obj = {}
+	obj.selectItems = createSelectableItems(data.textItems, data.colFilter)
+	return obj
+}
+export const restoreTableDisplayConfig = async function(data){
+	let obj = {}
+	let res = await uiConfigApi.getUiConfig(data.widgetIdentifier)
+	if(res.status == 200){
+		obj.savedConfigs = JSON.parse(res.data.detail);
+		if(data.columnDefs.length > 0){
+			obj.columnDefs = getTableColumns(data.columnDefs, true)
+		}
+	}
+	return obj
+}
+export const saveTableDisplayConfig = async function(data){
+	let res = await uiConfigApi.saveUiConfig(data.dataToSave)
+	return res
 }
 
 export const prepareFilterAndCallApi = function(columns = false, cache = false, applyFilter = false, success, configs = {} , dataConfig){
