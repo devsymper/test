@@ -68,6 +68,7 @@
 </template>
 
 <script>
+import EnvironmentWorker from 'worker-loader!@/worker/environment/Environment.Worker.js';
 import {environmentManagementApi} from '@/api/EnvironmentManagement'
 export default {
 	props:{
@@ -90,11 +91,27 @@ export default {
 	data(){
 		return{
 			override:null,
+			environmentWorker: null,
 			envId:""
 		}
 	},
 	created(){
+		this.environmentWorker = new EnvironmentWorker()
 		this.$store.dispatch('environmentManagement/getAllEnvirontment')
+	},
+	mounted(){
+		let self = this
+        this.environmentWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'migrateData':
+					self.handlerSyncData(data.dataAfter)
+					break;
+                
+                default:
+                    break;
+            }
+        });
 	},
 	computed:{
 		allEnv(){
@@ -105,56 +122,51 @@ export default {
 		cancel(){
 			this.$emit('cancel')
 		},
+		handlerSyncData(res){
+			if(res.status == 200){
+				this.$snotify({
+					type: "success",
+					title: "Đang chuyển dữ liệu"
+				})
+			}else if( res.status == 400){
+				this.$snotify({
+					type: "error",
+					title: "Nguồn và target không được trùng nhau"
+				})
+			}
+			this.$emit('cancel')
+		},
 		syncData(){
 			let self = this
 			let sourceInstanceId = this.$store.state.environmentManagement.sourceInstanceId
 			let currentServiceId = this.$store.state.environmentManagement.currentServiceId
 			let currentEnvId = this.envId
-			environmentManagementApi.getServerId({
-				serviceId: currentServiceId,
-				environmentId: currentEnvId
-			}).then(res=>{
-				if(res.data[0]){
-					let targetInstanceId = res.data[0].id
-					let type = self.currentObjectType
-					let arr = []
-					for(let i in self.listItemSelected){
-						arr.push(self.listItemSelected[i].id)
-					}
-					let ids = {
-						"ids":arr
-					}
-					let data = {
-						[type]:ids
-					}
-					environmentManagementApi.migrateData({
+			let type = self.currentObjectType
+			let arr = []
+			for(let i in self.listItemSelected){
+				arr.push(self.listItemSelected[i].id)
+			}
+			let ids = {
+				"ids":arr
+			}
+			let data = {
+				[type]:ids
+			}
+			this.environmentWorker.postMessage({
+				action: 'migrateData',
+				data:{
+					dataGetServerId:{
+						serviceId: currentServiceId,
+						environmentId: currentEnvId
+					},
+					formData:{
 						sourceInstanceId:sourceInstanceId,
-						targetInstanceId:targetInstanceId,
 						data: JSON.stringify(data),
 						override: self.override
-					}).then(res=>{
-						if(res.status == 200){
-							self.$emit('cancel')
-							self.$snotify({
-								type: "success",
-								title: "Đang chuyển dữ liệu"
-							})
-						}else if( res.status == 400){
-							self.$snotify({
-								type: "error",
-								title: "Nguồn và target không được trùng nhau"
-							})
-						}
-					}).catch(err=>{
-						self.$snotify({
-							type: "error",
-							title: "Có lỗi xảy ra"
-						})
-					})	
-
-
+					}
 				}
-			}).catch(err=>{})
+			})
+			
 			
 		}
 	},

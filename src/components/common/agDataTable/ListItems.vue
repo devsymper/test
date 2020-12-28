@@ -302,10 +302,10 @@ import TableFilter from '@/components/common/customTable/TableFilter'
 import {uiConfigApi} from "@/api/uiConfig";
 console.log(PerfectScrollbar,'PerfectScrollbarPerfectScrollbarPerfectScrollbarPerfectScrollbarPerfectScrollbar')
 import PerfectScrollbar from "perfect-scrollbar";
+import ListItemsWorker from 'worker-loader!@/worker/common/listItems/ListItems.Worker.js';
 
 let CustomHeaderVue = Vue.extend(CustomHeader);
 
-var apiObj = new Api("");
 var testSelectData = [ ];
 window.tableDropdownClickHandle = function(el, event) {
     event.preventDefault();
@@ -544,9 +544,13 @@ export default {
             default: ''
         }
 	},
+	beforeCreate(){
+		this.listItemsWorker = new ListItemsWorker()
+		debugger
+	},
 	created(){
 		this.getData();
-        this.restoreTableDisplayConfig();
+		this.restoreTableDisplayConfig();
 	},
 	computed:{
 		alwaysShowActionPanel(){
@@ -654,6 +658,7 @@ export default {
 		let self = this
         return {
 			gridApi: null,
+			listItemsWorker: null,
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
 			showSearchBox: true,
             loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
@@ -668,7 +673,8 @@ export default {
 			fixedCols:[],
             allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
 			defaultColDef:null,
-    	  	rowSelection: null,
+			rowSelection: null,
+			searchKey: "",
 			modules:[
 				MenuModule
 			],
@@ -722,6 +728,17 @@ export default {
 	},
 	mounted(){
 		this.gridApi = this.gridOptions.api;
+		let self = this
+        this.listItemsWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getData':
+					self.handlerGetData( data.dataAfter)
+					break;
+                default:
+                    break;
+            }
+        });
 	},
     beforeMount(){
 		this.defaultColDef = {
@@ -744,6 +761,12 @@ export default {
 		this.rowSelection = 'single';
     },
 	methods:{
+		handlerGetData(res){
+			debugger
+			this.columnDefs = res.columnDefs
+			this.rowData = res.rowData
+			this.totalObject = res.totalObject
+		},
 		reRender(){
 			this.agApi.sizeColumnsToFit()
 		},
@@ -946,22 +969,8 @@ export default {
             }
             return rsl && hasCreatePermission;
         },
-		createImageSpan(imageMultiplier, image) {
-			var resultElement = document.createElement("span");
-			for (var i = 0; i < imageMultiplier; i++) {
-				var imageElement = document.createElement("img");
-				imageElement.src = "https://raw.githubusercontent.com/ag-grid/ag-grid/master/grid-packages/ag-grid-docs/src/images/" + image;
-				resultElement.appendChild(imageElement);
-			}
-			return resultElement;
-		},
 		handlerRowClicked(params){
 			this.$emit('row-selected', params.data);
-			// var selectedRows = this.agApi.getSelectedRows();
-			// if(document.querySelector('#selectedRows')){
-			// 		document.querySelector('#selectedRows').innerHTML =
-			// 	selectedRows.length === 1 ? selectedRows[0].athlete : '';
-			// }
 		},
 		onSelectionChanged() {
 			var selectedRows = this.agApi.getSelectedRows();
@@ -1100,7 +1109,7 @@ export default {
 		},
 		nextPage(lazyLoad = false){
             this.page += 1
-            this.getData(false , false , true ,lazyLoad);
+            this.getData(false , false , true , lazyLoad);
             this.$emit("change-page", this.page);
         },
         prevPage(){
@@ -1111,29 +1120,35 @@ export default {
             this.getData();
             this.$emit("change-page", this.page);
         },
-		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false ) {
-			let thisCpn = this;
-            let handler = (data) => {
-                if(thisCpn.customAPIResult.reformatData){
-                    data = thisCpn.customAPIResult.reformatData(data);
-                }else{
-                    data = data.data;
-                }
-                this.totalObject = data.total ? parseInt(data.total) : 0;
-                thisCpn.columnDefs = thisCpn.getTableColumns(
-                    data.columns
-				);
-                let resData = data.listObject ? data.listObject : []
-                if(lazyLoad){
-                    resData.forEach(function(e){
-                        thisCpn.rowData.push(e)
-                    })
-                }else{
-					thisCpn.rowData = resData;
-                }
-                thisCpn.$emit('data-get', data.listObject);
-            }
-            this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
+		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false ){
+			let self = this;
+			if(!this.listItemsWorker){
+				this.listItemsWorker = new ListItemsWorker()
+			}
+			this.listItemsWorker.postMessage({
+				action: 'getData',
+				data:{
+					configs:{
+						columns: columns,
+						cache: cache, 
+						applyFilter: applyFilter,
+					},
+					lazyLoad: lazyLoad,
+					customAPIResult: self.customAPIResult.reformatData ? self.customAPIResult.reformatData.toString() : null,
+					url: self.getDataUrl,
+					method: self.apiMethod,
+					routeName: self.$getRouteName(),
+					tableFilter: self.tableFilter,
+					columnDefs: self.columnDefs,
+					customDataForApi: self.customDataForApi,
+					useWorkFlowHeader: self.useWorkFlowHeader,
+					searchKey: self.searchKey,
+					page: self.page,
+					pageSize: self.pageSize,
+					conditionByFormula: self.conditionByFormula,
+					savedTableDisplayConfig: self.savedTableDisplayConfig
+				}
+			})
 		},
 		/**
 		 * Lấy ra cấu hình cho việc sort
@@ -1256,7 +1271,14 @@ export default {
             }
 			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'');
             return widgetIdentifier;
-        },
+		},
+		getAllDataToPushIntoWorker(module = false){
+			let obj = {
+
+			}
+
+			return obj
+		},
 		getTableDisplayConfigData(){
             let configs = util.cloneDeep(this.tableDisplayConfig.value);
 			configs.columns = [];

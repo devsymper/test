@@ -62,7 +62,7 @@ export default {
 							{name: "processKey", title: "processKey", type: "text"},
 							{name: "name", title: "name", type: "text", 
 							 	cellRenderer: function(params) {
-									return '<span class="mdi mdi-car-lifted-pickup"></span> <span>'+params.value+'</span>';
+									return '<span class="mdi mdi-car-lifted-pickup"></span> <span>'+ params.value +'</span>';
 								}
 							},
 							{name: "userCreate", title: "userCreate", type: "text"},
@@ -71,8 +71,8 @@ export default {
 							{name: "createAt", title: "createAt", type: "date"},
 							{name: "lastUpdateTime", title: "lastUpdateTime", type: "date"},
 						],
-						listObject:res.data.listObject,
-						total: res.data.total
+						// listObject:res.data.listObject,
+						// total: res.data.total
 					} 
 				}
 			}

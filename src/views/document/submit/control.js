@@ -9,6 +9,7 @@ import {
 } from './../../../main.js'
 import store from './../../../store'
 import {
+    getControlInstanceFromStore,
     getListInputInDocument
 } from './../common/common'
 
@@ -117,7 +118,6 @@ export default class Control {
 
     // set các mối quan hệ của các control trường hợp đã được lưu trên server
     setEffectedData(effected) {
-        console.log(this.name, effected, 'effectedeffectedeffectedeffected');
         if (effected == "" || effected == null) {
             return;
         }
@@ -270,23 +270,35 @@ export default class Control {
             tableControlInstance.tableInstance.tableInstance.render()
         }
     }
-    handlerDataAfterRunFormulasValidate(values) {
+    handlerDataAfterRunFormulasValidate(values, listIdRow = false, sqlRowId = null) {
         if (this.inTable != false) {
-            let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
-            let dataTable = tableControlInstance.tableInstance.tableInstance.getData();
-            let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
-            for (let rowId in values) {
-                let msg = values[rowId];
-                let rowIndex = this.findIndexByRowId(dataTable, rowId);
-                let cellPos = rowIndex + "_" + colIndex;
-                tableControlInstance.tableInstance.addToValueMap(cellPos, {
-                    msg: msg,
+            let tableIns = getControlInstanceFromStore(this.curParentInstance, this.inTable);
+            let colIndex = tableIns.tableInstance.getColumnIndexFromControlName(this.name);
+            if(sqlRowId != null){
+                let msg = values;
+                let newListSqlRowId = tableIns.tableInstance.tableInstance.getDataAtProp('s_table_id_sql_lite');
+                let currentRowIndex = newListSqlRowId.indexOf(sqlRowId);
+                let cellPos = currentRowIndex + "_" + colIndex;
+                tableIns.tableInstance.addToValueMap(cellPos, {
+                    msg: 'Validate: ' + msg,
                     type: "validate",
                     value: (msg != '' && msg != null && msg != undefined && msg != 'f'),
                 });
-
             }
-            tableControlInstance.tableInstance.tableInstance.render()
+            else{ // trường hợp giá trị cho cả cột
+                for (let index = 0; index < listIdRow.length; index++) {
+                    const element = listIdRow[index];
+                    let msg = values[element];
+                    let cellPos = index + "_" + colIndex;
+                    tableIns.tableInstance.addToValueMap(cellPos, {
+                        msg: 'Validate: ' + msg,
+                        type: "validate",
+                        value: (msg != '' && msg != null && msg != undefined && msg != 'f'),
+                    });
+                }
+               
+            }
+            tableIns.tableInstance.tableInstance.render()
         }
     }
     findIndexByRowId(dataTable, rowId) {
@@ -316,17 +328,13 @@ export default class Control {
     }
     handlerDataAfterRunFormulasHidden(values) {
         if (this.inTable != false) {
-            let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
-            let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
-            for (let index = 0; index < values.length; index++) {
-                let row = values[index];
-                let v = row == 1
-                let cellPos = index + "_" + colIndex;
-                tableControlInstance.tableInstance.addToValueMap(cellPos, {
-                    type: "readOnly",
-                    value: v
-                });
+            if(values && Object.values(values).length > 0 && Object.values(values)[0] == 1){
+                let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
+                let colIndex = tableControl.tableInstance.getColumnIndexFromControlName(this.name);
+                var plugin = tableControl.tableInstance.tableInstance.getPlugin('hiddenColumns');
+                plugin.hideColumn(colIndex);
             }
+           
 
         }
     }
@@ -362,18 +370,85 @@ export default class Control {
         }
     }
 
-    handlerDataAfterRunFormulasValue(values) {
-        if (this.inTable != false) {
-            let vls = [];
-            for (let index = 0; index < values.length; index++) {
-                let row = values[index];
-                if (row == null || row == 'null')
-                    row = '';
-                vls.push([index, this.name, row]);
-            }
-            let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
+    /**
+     * Hàm thêm giá trị validate từng cell trong table vào store
+     * @param {*} row 
+     * @param {*} type 
+     * @param {*} message 
+     */
 
-            tableControl.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
+    addToValidateTable(row, type, message){
+        let currentValidate = this.getCurrentValidate();
+        if(!currentValidate){
+            currentValidate = {};
+        }
+        if(!currentValidate[row]){
+            currentValidate[row] = {};
+
+        }
+        currentValidate[row][type] = message;
+        console.log(currentValidate,'currentValidatecurrentValidate');
+        store.commit("document/updateValidateControlSubmit", {
+            controlName: this.name,
+            value: currentValidate,
+            instance: this.curParentInstance
+        });
+    }
+    removeValidateOnCellTable(row, type){
+        store.commit("document/removeValidateControlSubmit", {
+            controlName: this.name,
+            type: type,
+            rowIndex: row,
+            instance: this.curParentInstance
+        });
+    }
+
+    handlerDataAfterRunFormulasValue(values,listIdRow = false, sqlRowId = null) {
+        if (this.inTable != false) {
+            let tableIns = getControlInstanceFromStore(this.curParentInstance, this.inTable);
+            if(sqlRowId != null){
+                if(this.type == 'date'){
+                    values = SYMPER_APP.$moment(values, 'YYYY-MM-DD').format(this.controlProperties.formatDate.value);
+                }
+                /**
+                 * cần lấy lại vị trí cell ứng với id của row sau khi chạy công thức. bởi vì có thể có thao tác khác làm thay đổi vị trí cell trước khi chạy công thức
+                 */
+                let newListSqlRowId = tableIns.tableInstance.tableInstance.getDataAtProp('s_table_id_sql_lite');
+                let newColIndex = tableIns.tableInstance.tableInstance.propToCol(this.name);
+                let currentRowIndex = newListSqlRowId.indexOf(sqlRowId);
+                tableIns.tableInstance.tableInstance.setDataAtCell(currentRowIndex, newColIndex, values, 'auto_set');
+            }
+            else{ // trường hợp giá trị cho cả cột
+                let dataForStore = {};
+                dataForStore = Object.values(values);
+                let vls = [];
+                for (let index = 0; index < listIdRow.length; index++) {
+                    const element = listIdRow[index];
+                    let cellValue = values[element];
+                    if(this.type == 'date'){
+                        if(cellValue){
+                            cellValue = SYMPER_APP.$moment(cellValue, 'YYYY-MM-DD').format(this.controlProperties.formatDate.value);
+                        }
+                        else{
+                            cellValue = "";
+                        }
+                    }
+                    vls.push([index, this.name, cellValue]);
+                }
+                tableIns.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
+                /**
+                 * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
+                 */
+                store.commit("document/updateListInputInDocument", {
+                    controlName: this.name,
+                    key: 'value',
+                    value: dataForStore,
+                    instance: this.curParentInstance
+                });
+            }
+            /**
+             * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
+             */
             markBinedField(this.curParentInstance, this.name);
             setTimeout(() => {
                 let controlEffected = this.getEffectedControl();
@@ -386,28 +461,10 @@ export default class Control {
             if (this.type == 'table') {
                 let vls = [];
                 if (values.columns == undefined) {
-                    // for (let index = 0; index < values.length; index++) {
-                    //     let row = values[index];
-                    //     if (row == null || row == 'null')
-                    //         row = '';
-                    //     vls.push([index, this.name, row]);
-                    // }
-
                     this.setDataTable(values)
                 } else {
                     //sqlite
                 }
-                // let tableControl = getListInputInDocument(this.curParentInstance)[this.name];
-                // tableControl.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, AUTO_SET);
-
-                // markBinedField(this.name);
-                // setTimeout(() => {
-                //     let controlEffected = this.getEffectedControl();
-                //     for (let control in controlEffected) {
-                //         if (getListInputInDocument(this.curParentInstance)[control].inTable == false)
-                //             SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', getListInputInDocument(this.curParentInstance)[control])
-                //     }
-                // }, 100);
             } else {
                 if ($('#' + this.id).length > 0) {
                     $('#' + this.id).val(values);
@@ -440,7 +497,7 @@ export default class Control {
         }
 
     }
-    handlerDataAfterRunFormulasUniqueDB(data, dataInput) {
+    handlerDataAfterRunFormulasUniqueDB(data, rowIndex) {
         if (this.inTable == false) {
             if (data == 't' || data === true) {
                 this.renderValidateIcon('Dữ liệu trường thông tin ' + this.title + ' đã tồn tại', 'UniqueDB');
@@ -451,7 +508,6 @@ export default class Control {
             let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
             let colIndex = tableControl.tableInstance.getColumnIndexFromControlName(this.name);
             let dataAtCol = tableControl.tableInstance.tableInstance.getDataAtCol(colIndex);
-            let rowIndex = dataAtCol.indexOf(dataInput[Object.keys(dataInput)[0]][0]);
             let mess = {
                 msg: "",
                 type: "uniqueDB",
@@ -469,8 +525,8 @@ export default class Control {
             tableControl.tableInstance.tableInstance.render();
         }
     }
-    getCurrentValidate() {
-        return this.getDataStoreSubmit()['validateMessage'][this.nane]
+    getCurrentValidate(){
+        return this.getDataStoreSubmit()['validateMessage'][this.name]
     }
     renderValidateIcon(message, type) {
         let iconEl = Util.makeErrNoti(this.name);
@@ -488,17 +544,15 @@ export default class Control {
     }
     removeValidateIcon(type) {
         let currentValidate = this.getCurrentValidate();
-        if (currentValidate && currentValidate[type]) {
-            delete currentValidate[type];
-            store.commit("document/updateValidateControlSubmit", {
+        if(currentValidate && currentValidate[type]){
+            store.commit("document/removeValidateControlSubmit", {
                 controlName: this.name,
-                value: currentValidate,
+                type: type,
                 instance: this.curParentInstance
             });
-        } else {
-            this.ele.parent().find('.validate-icon').remove();
         }
-
+        this.ele.parent().find('.validate-icon').remove();
+        
     }
     isEmpty() {
             return this.ele.val() == ""

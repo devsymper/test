@@ -1,5 +1,5 @@
 import { util } from "./../../../plugins/util.js";
-import { SYMPER_APP } from "@/main.js";
+// import { SYMPER_APP } from "@/main.js";
 import Api from "@/api/api.js";
 var apiObj = new Api("");
 const defaultConfig = {
@@ -174,11 +174,11 @@ export const getDataFromConfig = function(url, configs, columns, filterData, suc
         success(data);
     })
     .catch(err => {
-        console.warn(err);
-        SYMPER_APP.$snotify({
-            type: "error",
-            title: SYMPER_APP.$t("table.error.cannot_get_data"),
-            text: ""
-        });
+        // console.warn(err);
+        // SYMPER_APP.$snotify({
+        //     type: "error",
+        //     title: SYMPER_APP.$t("table.error.cannot_get_data"),
+        //     text: ""
+        // });
     });
 }

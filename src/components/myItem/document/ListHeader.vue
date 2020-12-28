@@ -207,7 +207,7 @@
 import BPMNEngine from "@/api/BPMNEngine";
 import icon from "@/components/common/SymperIcon";
 import datePicker from "@/components/common/datePicker";
-import userSelector from "./UserSelector";
+import userSelector from "../UserSelector";
 import TaskListFilter from "@/components/tasks/list/TaskListFilter.vue";
 import SymperDocSelect from "@/components/common/symperInputs/SymperDocumentSelect.vue";
 import { defaultTaskDescription } from "@/components/process/elementDefinitions/customExtToModel";
