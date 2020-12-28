@@ -7,6 +7,15 @@ const setAllCategory = (state, allCategory) => {
         Vue.set(state, 'allCategory', allCategory);
 }
 
+const setAllDocumentIdsInIssueType = (state, listDocumentIdsInIssueType) => {
+    Vue.set(state, 'listDocumentIdsInIssueType', listDocumentIdsInIssueType);
+}
+
+const setIssueAssignRecent = (state, listIssueAssignRecent) => {
+    Vue.set(state, 'listIssueAssignRecent', listIssueAssignRecent);
+}
+
+
 const setListProjectRecentAccess = (state, listProjectRecentAccess) => {
     Vue.set(state, 'listProjectRecentAccess', listProjectRecentAccess);
 }
@@ -261,5 +270,7 @@ export {
     setListIssueTypeInProjects,
     setListProjectRecentAccess,
     setLogIssueRecentAccess,
+    setAllDocumentIdsInIssueType,
+    setIssueAssignRecent
 
 };

@@ -10,7 +10,7 @@
             <VuePerfectScrollbar style="width:100%">
                 <div class="d-flex pt-4">
                     <div class="item-recent pr-3" v-for="(item) in listProjectRecent" :key="item.id" >
-                        <div class="header-item-recent" style="height:23px;background:#00C7E6">
+                        <div class="header-item-recent" style="height:23px;" :style="{'background':randomBackground()}">
                             <div class="icon-project">
                                 <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:24px">{{item.icon}}</v-icon>
                                 <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="24" height="24">
@@ -79,28 +79,10 @@
                     />
                 </v-tab-item>
                 <v-tab-item>
-                 
-                        <p>
-                        Morbi nec metus. Suspendisse faucibus, nunc et pellentesque egestas, lacus ante convallis tellus, vitae iaculis lacus elit id tortor. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci. Curabitur ligula sapien, tincidunt non, euismod vitae, posuere imperdiet, leo. Nunc sed turpis.
-                        </p>
-
-                        <p>
-                        Suspendisse feugiat. Suspendisse faucibus, nunc et pellentesque egestas, lacus ante convallis tellus, vitae iaculis lacus elit id tortor. Proin viverra, ligula sit amet ultrices semper, ligula arcu tristique sapien, a accumsan nisi mauris ac eros. In hac habitasse platea dictumst. Fusce ac felis sit amet ligula pharetra condimentum.
-                        </p>
-
-                        <p>
-                        Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Nam commodo suscipit quam. In consectetuer turpis ut velit. Sed cursus turpis vitae tortor. Aliquam eu nunc.
-                        </p>
-
-                        <p>
-                        Etiam ut purus mattis mauris sodales aliquam. Ut varius tincidunt libero. Aenean viverra rhoncus pede. Duis leo. Fusce fermentum odio nec arcu.
-                        </p>
-
-                        <p class="mb-0">
-                        Donec venenatis vulputate lorem. Aenean viverra rhoncus pede. In dui magna, posuere eget, vestibulum et, tempor auctor, justo. Fusce commodo aliquam arcu. Suspendisse enim turpis, dictum sed, iaculis a, condimentum nec, nisi.
-                        </p>
+                    <assigned-recent 
+                        :documentIds="documentIds"
+                    />
                 </v-tab-item>
-               
             </v-tabs>
         </div>
     </div>
@@ -110,11 +92,13 @@
 import { util } from "@/plugins/util";
 import IssueRecent from './IssueRecent.vue';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import AssignedRecent from './AssignedRecent.vue';
 
 export default {
     components: {
         IssueRecent,
-        VuePerfectScrollbar 
+        VuePerfectScrollbar,
+        AssignedRecent 
     },
     computed:{
         listProjectRecent(){
@@ -141,6 +125,9 @@ export default {
             }
 
             return listProject;
+        },
+        documentIds(){
+            return this.$store.state.taskManagement.listDocumentIdsInIssueType;
         }
     },
     props:{
@@ -159,7 +146,16 @@ export default {
     },
     data(){
         return{
-
+            colors:[
+                "#80F878FF",
+                "#D1F658FF",
+                "#63E6CDFF",
+                "#80B8EBFF",
+                "#E596F3FF",
+                "#DA8DA1FF",
+                "#E59973FF",
+                "#EC8376FF"
+            ]
         }
     },
     methods:{
@@ -168,6 +164,10 @@ export default {
         },
         handleAllProjects(){
             this.$router.push("/task-management/projects");
+        },
+        randomBackground(){
+            const random = Math.floor(Math.random() * this.colors.length);
+            return this.colors[random];
         }
     }
 

@@ -45,6 +45,45 @@ const getLogProjectAccess = async(context,userId) => {
 }
 
 
+const getIssueAssignRecent = async(context,data) => { //documentId là all documentId chưa trong all issueType
+    try {
+        let item={
+            column : "tmg_assignee",
+            operation : "and",
+            conditions : [
+                {
+                    name : "in",
+                    value : [data.userId],
+                }
+            ],
+        }
+        let itemSort={
+            column : "document_object_create_time",
+            type :"desc"
+        }
+        
+
+        let filter={};
+        filter.filter = [];
+        filter.sort = [];
+        filter.filter.push(item);
+        filter.sort.push(itemSort);
+        filter.page = 1;
+        filter.pageSize = 200;
+        filter.distinct = false;
+
+        filter.ids =JSON.stringify(data.documentIds);
+        let res = await taskManagementApi.getIssueAssignRecent(filter);
+        if (res.status == 200) {
+            context.commit('setIssueAssignRecent', res.data.listObject);
+        } else {
+            SYMPER_APP.$snotifyError(error, "Can not get all Project!");
+        }
+    } catch (error) {
+        SYMPER_APP.$snotifyError(error, "Can not get all Project!");
+    }
+}
+
 const getLogIssueRecentAccess = async(context,userId) => {
     let data={};
     data =  {
@@ -140,6 +179,18 @@ const getAllProject = async(context) => {
     }
 }
 
+const getAllDocumentIdsInIssueType = async(context) => {
+        try {
+            let res = await taskManagementApi.getAllDocumentIdsInIssueType();
+            if (res.status == 200) {
+                context.commit('setAllDocumentIdsInIssueType', res.data);
+            } else {
+                SYMPER_APP.$snotifyError(error, "Can not get list documentIds in issue type!");
+            }
+        } catch (error) {
+            SYMPER_APP.$snotifyError(error, "Can not get list documentIds in issue type!");
+        }
+}
 const getAllStatusCategory = async(context) => {
     if (context.state.allStatusCategory.length==0) {
         try {
@@ -341,7 +392,9 @@ export {
     getListDocumentConfigFieldIssue,
     getListIssueTypeInProjects,
     getLogProjectAccess,
-    getLogIssueRecentAccess
+    getLogIssueRecentAccess,
+    getIssueAssignRecent,
+    getAllDocumentIdsInIssueType
 
 
 };
