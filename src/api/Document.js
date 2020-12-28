@@ -11,8 +11,8 @@ export const documentApi = {
     getListDocumentObject(docId) {
         return coreApi.get("documents/"+docId+"/objects");
     },
-    getListObjectByMultipleDocument(ids) {
-        return coreApi.post("documents/objects-by-multiple-document",ids);
+    getListObjectByMultipleDocument(data) {
+        return coreApi.post("documents/objects-by-multiple-document",data);
     },
     getBatchDocument(data) {
         return coreApi.post("documents/batch", data);

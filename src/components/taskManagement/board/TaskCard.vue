@@ -1,7 +1,7 @@
 <template>
 	<div class="task-item rounded px-2 pt-2 pb-1">
 		<div class="task-item__header">
-			<p>{{task.title}}</p>
+			<p>{{task.tmg_name}}</p>
 			
 		</div>
 		<div class="mt-4 card-item__body">
@@ -12,7 +12,7 @@
 			</div>
 			<div class="right-content">
 				<v-icon>mdi-clock-time-four-outline</v-icon>
-				<span>{{task.date}}</span>
+				<span>{{task.document_object_create_time}}</span>
 				<img
 					class="user-avatar"
 					src="https://pickaface.net/gallery/avatar/unr_sample_161118_2054_ynlrg.png"

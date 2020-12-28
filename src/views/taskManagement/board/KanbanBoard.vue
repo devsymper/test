@@ -29,7 +29,7 @@
                         </template>
                         <v-list dense>
                             <v-list-item
-                                v-for="(item, index) in items"
+                                v-for="(item, index) in settingBoardMenuitems"
                                 :key="index"
                                 @click="item.menuAction(item)"
                             >
@@ -43,7 +43,7 @@
         <VuePerfectScrollbar class="wrap-scroll">
             <div class="wrap-kanban-board py-4 h-100">
                 <div
-                    v-for="column in columns"
+                    v-for="column in listBoardColumn"
                     :key="column.id"
                     class="px-3 board-column-item rounded mr-4"
                 >
@@ -102,30 +102,7 @@ export default {
         currentBoard(){
             return this.boardCurrent;
         },
-        columns(){
-            let columns = this.listColumn;
-            let self = this;
-            if (this.listStatus.length > 0 ) {
-                for (let i = 0; i < this.listStatusColumn.length; i++) {
-                    let idColumn = this.listStatusColumn[i].columnId;
-                    let statusRoleId = this.listStatusColumn[i].statusRoleId;
-                    let item = this.listStatus.find(ele => ele.statusRoleId == statusRoleId);
-                    if (item) {
-                        item['tasks'] = this.tasks;
-                        let column = columns.find(ele => ele.id == idColumn);
-                        if (column) {
-                            column.statusInColumn.push(item);
-                        }
-                        let index = self.listStatus.indexOf(item);
-                        if (index > -1) {
-                            self.listStatus.splice(index, 1);
-                        }
-                    }
-                    
-                }  
-            }
-            return columns;
-        },
+        
         sTaskManagement() {
             return this.$store.state.taskManagement;
         },
@@ -161,31 +138,37 @@ export default {
             return listStatusColumn;
         },
         listStatus(){
-            let projectId=this.$route.params.id;
             let listStatus = [];
-            if (this.sTaskManagement.listStatusInProjects[projectId] && this.sTaskManagement.listStatusInProjects[projectId].length >= 0 ) {
-                listStatus = util.cloneDeep(this.$store.state.taskManagement.listStatusInProjects[projectId]);
+            if (this.sTaskManagement.listStatusInProjects[this.projectId] && this.sTaskManagement.listStatusInProjects[this.projectId].length >= 0 ) {
+                listStatus = util.cloneDeep(this.$store.state.taskManagement.listStatusInProjects[this.projectId]);
             }
             return listStatus;
-        }
+        },
+        allIssueTypeInProject(){
+            return this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId];
+        },
     },
     
-    data() {
-        let self=this;
-        return {
-            items: [
+    mounted(){
+        this.settingBoardMenuitems = [
                 { 
                     title: this.$t("taskManagement.settingBoard"),
                     menuAction: action => {
-                        if (Object.keys(self.currentBoard).length > 0) {
-                            let id=self.$route.params.id;
-                            self.$router.push("/task-management/projects/"+id+"/kanban-board/settings/" + self.currentBoard.id);
+                        if (Object.keys(this.currentBoard).length > 0) {
+                            this.$router.push("/task-management/projects/"+this.projectId+"/kanban-board/settings/" + this.currentBoard.id);
                         }else{
                             console.log("Chưa có data");
                         }
                     },
                 },
-            ],
+            ]
+    },
+    data() {
+        return {
+            projectId:null,
+            listBoardColumn:null,
+            settingBoardMenuitems: null,
+
             tasks: [
                 {
                     id: 14,
@@ -198,86 +181,67 @@ export default {
                         icon:'mdi-tools'
                     }
                 },
-                {
-                id: 15,
-                    title: "Design shopping cart dropdown",
-                    date: "Sep 9",
-                    issueType:{
-                        icon:'mdi-tools'
-                    },
-                    priority:{
-                        icon:'mdi-tools'
-                    }
-                },
-                {
-                    id: 16,
-                    title: "Add discount code to checkout page",
-                    date: "Sep 14",
-                    issueType:{
-                        icon:'mdi-tools'
-                    },
-                    priority:{
-                        icon:'mdi-tools'
-                    }
-                }
             ],
             boardCurrent:{},
-
         };
     },
    
     methods:{
-        getListTasks(){
-            // to do : đang làm dở lấy task ở đây
-            // documentApi.getListDocumentObject()
+        async getListTasks(){
+            
+            let documentId = this.allIssueTypeInProject.reduce((arr,obj)=>{
+                if(!arr.includes(obj.documentId)){
+                    arr.push(obj.documentId)
+                }
+                return arr
+            },[])
+            let allTask = await documentApi.getListObjectByMultipleDocument({ids:JSON.stringify(documentId)})
+            let columns = this.listColumn;
+            if (this.listStatus.length > 0 ) {
+                for (let i = 0; i < this.listStatusColumn.length; i++) {
+                    let idColumn = this.listStatusColumn[i].columnId;
+                    let statusRoleId = this.listStatusColumn[i].statusRoleId;
+                    let item = this.listStatus.find(ele => ele.statusRoleId == statusRoleId);
+                    if (item) {
+                        item['tasks'] = allTask['data']['listObject'];
+                        let column = columns.find(ele => ele.id == idColumn);
+                        if (column) {
+                            column.statusInColumn.push(item);
+                        }
+                    }
+                }  
+            }
+            this.listBoardColumn = columns;
         },
         async getListBoard(){
-            let self=this;
-            let id=this.$route.params.id;
-            if (id) { // id project
-                let res = await taskManagementApi.getListBoardInProject(id) ;
-                if (res.status == 200) {
-                    self.$store.commit("taskManagement/setListBoardInProject", res.data.listObject);
-                }
+            let res = await taskManagementApi.getListBoardInProject(this.projectId) ;
+            if (res.status == 200) {
+                this.$store.commit("taskManagement/setListBoardInProject", res.data.listObject);
             }
+            this.getDataForBoard();
         },
-        setBoardCurrent(){
-            let projectId=this.$route.params.id;
-            let allBoard= this.listBoard;
+        async getDataForBoard(){
+            let allBoard = this.listBoard;
             if (allBoard.length>0) {
-                this.boardCurrent=allBoard[0];  
+                this.boardCurrent = allBoard[0];  
             }
-            this.getListStatusInProject();
-            this.getListColumn();
-            this.getListColumnStatus();
-        },
-        async getListStatusInProject(){
-            let projectId=this.$route.params.id;
-            if (!this.$store.state.taskManagement.listStatusInProjects[projectId] || this.$store.state.taskManagement.listStatusInProjects[projectId].length == 0) {
-                await this.$store.dispatch("taskManagement/getListStautsInProject", projectId);
+            let idBoard = this.currentBoard.id;
+
+            if (!this.sTaskManagement.listStatusInProjects[this.projectId] || this.sTaskManagement.listStatusInProjects[this.projectId].length == 0) {
+                await this.$store.dispatch("taskManagement/getListStautsInProject", this.projectId);
             }
-        },
-        async getListColumn(){
-            if (this.boardCurrent.id) {
-                let idBoard=this.boardCurrent.id;
-                if (!this.$store.state.taskManagement.listColumnInBoard[idBoard] || this.$store.state.taskManagement.listColumnInBoard[idBoard].length == 0) {
-                   await this.$store.dispatch("taskManagement/getListColumnInBoard",idBoard);
-                }
+            if (!this.sTaskManagement.listColumnInBoard[idBoard] || this.sTaskManagement.listColumnInBoard[idBoard].length == 0) {
+                await this.$store.dispatch("taskManagement/getListColumnInBoard",idBoard);
             }
-      
-        },
-        async getListColumnStatus(){
-            if (this.boardCurrent.id) {
-                let idBoard=this.boardCurrent.id;
-                if (!this.$store.state.taskManagement.listStatusInColumnBoard[idBoard] || this.$store.state.taskManagement.listStatusInColumnBoard[idBoard].length == 0) {
-                   await this.$store.dispatch("taskManagement/getListStatusInColumnBoard",idBoard);
-                }
+            if (!this.sTaskManagement.listStatusInColumnBoard[idBoard] || this.sTaskManagement.listStatusInColumnBoard[idBoard].length == 0) {
+                await this.$store.dispatch("taskManagement/getListStatusInColumnBoard",idBoard);
             }
+            if(!this.allIssueTypeInProject){
+                await this.$store.dispatch("taskManagement/getListIssueTypeInProjects", this.projectId);
+            }
+            this.getListTasks();
         },
-        async loadData(){
-            await this.getListBoard();
-            await this.setBoardCurrent();
-        }
+       
     },
     created(){
         let self = this;
@@ -293,8 +257,8 @@ export default {
         
     },
     activated(){
-       // this.toggleMainContentLoader(false);
-       this.loadData();
+        this.projectId = this.$route.params.id;
+        this.getListBoard();
         let breadcrumbs = [
                 {
                     text: 'Dashboard',
@@ -316,7 +280,7 @@ export default {
         let id=this.$route.params.id;
         let self = this;
         if (id) {
-            let allProject=this.$store.state.taskManagement.allProject;
+            let allProject=this.sTaskManagement.allProject;
             let project=allProject.find(element => element.id==id);
             if (project) {
                 self.$store.commit("taskManagement/setCurrentProject", project);
