@@ -3,8 +3,12 @@ import { appConfigs } from "./../configs.js";
 let taskManagement = new Api(appConfigs.apiDomain.taskManagement);
 let permission = new Api(appConfigs.apiDomain.permission);
 let document = new Api(appConfigs.apiDomain.sdocumentManagement);
+let log = new Api(appConfigs.apiDomain.log);
 
 export const taskManagementApi = {
+    getDataLogService(){
+
+    },
     //danh mục category
     getAllCategory(){
         return taskManagement.get("categories");

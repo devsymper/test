@@ -163,7 +163,7 @@ var configs = {
                     {
                         name:'access',
                         title:"Access",
-                        icon: 'mdi-view-week-outline',
+                        icon: 'mdi-shield-account',
                         url:"/task-management/projects/:id/settings/access"
                     },
                     {

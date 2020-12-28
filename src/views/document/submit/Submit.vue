@@ -838,7 +838,6 @@ export default {
             deep: true,
             immediate:true,
             handler: function (after, before) {
-                // alert('watch')
                 this.setWorkflowVariableToStore(after)
             }
         },

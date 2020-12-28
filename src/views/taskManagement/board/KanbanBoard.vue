@@ -176,12 +176,12 @@ export default {
                 { 
                     title: this.$t("taskManagement.settingBoard"),
                     menuAction: action => {
-                       if (Object.keys(self.currentBoard).length > 0) {
+                        if (Object.keys(self.currentBoard).length > 0) {
                             let id=self.$route.params.id;
                             self.$router.push("/task-management/projects/"+id+"/kanban-board/settings/" + self.currentBoard.id);
-                       }else{
-                           console.log("Chưa có data");
-                       }
+                        }else{
+                            console.log("Chưa có data");
+                        }
                     },
                 },
             ],
