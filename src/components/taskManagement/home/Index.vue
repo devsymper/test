@@ -22,8 +22,8 @@
                     <div class="body-item-recent">
                         <table class="w-100">
                             <tr>
-                                <td class="fs-14 font-weight-medium px-1">
-                                    {{item.name}}
+                                <td class="fs-14  px-1">
+                                    <span @click="handleClickProject(item)" class="task-hover-poiter font-weight-medium">{{item.name}}</span>
                                 </td>
                             </tr>
                             <tr style="height:25px">
@@ -59,7 +59,7 @@
         </div>
 
         <div class="home-tabs w-100" style="height:calc(100% - 241px)">
-            <v-tabs class="pl-4 mt-2 fs-13">
+            <v-tabs class="w-100 h-100 pl-4 mt-2 fs-13">
                 <v-tab>
                     <span>Worked on</span>
                 </v-tab>
@@ -70,14 +70,13 @@
                     <span>Favorite</span>
                 </v-tab> -->
                 <!-- content -->
-                <v-tab-item>
-                    <p>
-                        Morbi nec metus. Suspendisse faucibus, nunc et pellentesque egestas, lacus ante convallis tellus, vitae iaculis lacus elit id tortor. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci. Curabitur ligula sapien, tincidunt non, euismod vitae, posuere imperdiet, leo. Nunc sed turpis.
-                    </p>
+                <v-tab-item >
+                    <issue-recent 
+                        :recentIssue="recentIssue"
+                    />
                 </v-tab-item>
                 <v-tab-item>
-                    <v-card flat>
-                    <v-card-text>
+                 
                         <p>
                         Morbi nec metus. Suspendisse faucibus, nunc et pellentesque egestas, lacus ante convallis tellus, vitae iaculis lacus elit id tortor. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci. Curabitur ligula sapien, tincidunt non, euismod vitae, posuere imperdiet, leo. Nunc sed turpis.
                         </p>
@@ -97,8 +96,6 @@
                         <p class="mb-0">
                         Donec venenatis vulputate lorem. Aenean viverra rhoncus pede. In dui magna, posuere eget, vestibulum et, tempor auctor, justo. Fusce commodo aliquam arcu. Suspendisse enim turpis, dictum sed, iaculis a, condimentum nec, nisi.
                         </p>
-                    </v-card-text>
-                    </v-card>
                 </v-tab-item>
                
             </v-tabs>
@@ -108,28 +105,45 @@
 
 <script>
 import { util } from "@/plugins/util";
+import IssueRecent from './IssueRecent.vue';
 
 export default {
+    components: { IssueRecent },
     computed:{
         listProjectRecent(){
             let allUserById = this.$store.getters['app/mapIdToUser'];
-            let listItem = this.recentPojects;
-            if (listItem.length > 0) {
-                for (let i = 0; i < listItem.length; i++) {
-                    let userId=listItem[i].userLeader;
+            let listItemLog = this.recentPojects;
+            let listProject = [];
+            if (listItemLog.length > 0) {
+                for (let i = 0; i < listItemLog.length; i++) {
+                    let project = JSON.parse(listItemLog[i]['project']);
+                    if (listProject.length > 0) {
+                        let isCheck = listProject.find(ele => ele.id == project.id);
+                        if (isCheck) {
+                            continue; // thoát khỏi vòng lặp
+                        }
+                    }
+                    let userId=project.userLeader;
                     if (userId.indexOf(":")>0) {  //check là userId hay userId:role
                         let arrDataUserIden=userId.split(":");
                         userId=arrDataUserIden[0];
                     }
-                    listItem[i].userLeadName = allUserById[listItem[i].userLeader] ? allUserById[listItem[i].userLeader].displayName : '';
+                    project.userLeadName = allUserById[project.userLeader] ? allUserById[project.userLeader].displayName : '';
+                    listProject.push(project);
                 }
             }
 
-            return listItem;
+            return listProject;
         }
     },
     props:{
         recentPojects:{
+            type: Array,
+            default(){
+                return []
+            }
+        },
+        recentIssue:{
             type: Array,
             default(){
                 return []
@@ -142,6 +156,9 @@ export default {
         }
     },
     methods:{
+        handleClickProject(item){
+            this.$router.push('/task-management/projects/'+item.id+'/kanban-board');
+        },
         handleAllProjects(){
             this.$router.push("/task-management/projects");
         }
@@ -154,6 +171,7 @@ export default {
 .task-hover-poiter:hover{
     cursor: pointer;
     text-decoration: underline;
+    color: blue;
 }
 .item-recent {
     width:230px;
@@ -197,5 +215,15 @@ export default {
 }
 .home-tabs >>> .v-item-group{
  height: 35px;
+}
+.home-tabs >>>.v-tabs-items{
+    width:100%;
+    height: calc(100% - 40px);
+}
+.home-tabs >>>.v-tabs-items .v-window__container,
+.home-tabs >>>.v-tabs-items .v-window-item
+{
+    width:100%;
+    height: 100%
 }
 </style>

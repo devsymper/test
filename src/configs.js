@@ -58,7 +58,7 @@ var configs = {
         uiConfig: "https://ui.symper.vn",
         workflowExtend: "https://workflow-extend.symper.vn/",
         trash: "https://trash.symper.vn/",
-        log: "https://log.symper.vn",
+        log: "https://log.symper.vn/",
         taskManagement: "https://task-management-service.symper.vn/",
 		syqlFunction:'https://syql.symper.vn/'
     },

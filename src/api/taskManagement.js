@@ -6,8 +6,8 @@ let document = new Api(appConfigs.apiDomain.sdocumentManagement);
 let log = new Api(appConfigs.apiDomain.log);
 
 export const taskManagementApi = {
-    getDataLogService(){
-
+    getDataLogService(data){
+        return log.post("query",data);
     },
     //danh mục category
     getAllCategory(){

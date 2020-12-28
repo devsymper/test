@@ -1,6 +1,86 @@
 import { taskManagementApi } from "./../../api/taskManagement.js";
 import { SYMPER_APP } from "./../../main.js";
 
+
+const getLogProjectAccess = async(context,userId) => {
+    let data={};
+    data =  {
+        "query":{ 
+            "bool":{
+                "must": [
+                    {
+                        "term": {
+                            "logObjectType": "task_manager_project"
+                        }
+                    },
+                    {
+                        "term": {
+                            "userId.keyword": userId
+                        }
+                    }
+                ]  
+                    
+            }
+        },
+        "page":1,
+        "size":100
+    }
+
+    try {
+        let res = await taskManagementApi.getDataLogService(data);
+        if (res.status == 200) {
+            context.commit('setListProjectRecentAccess', res.data);
+        } else {
+            SYMPER_APP.$snotifyError(error, "Can not get log project access!");
+        }
+    } catch (error) {
+        SYMPER_APP.$snotifyError(error, "Can not get log project access!");
+    }
+
+}
+
+
+const getLogIssueRecentAccess = async(context,userId) => {
+    let data={};
+    data =  {
+        "query":{ 
+            "bool":{
+                "must": [
+                    {
+                        "term": {
+                            "logObjectType": "document_instance"
+                        }
+                    },
+                    {
+                        "term": {
+                            "documentType": 4
+                        }
+                    },
+                    {
+                        "term": {
+                            "userAccess": userId
+                        }
+                    }
+                ]  
+                    
+            }
+        },
+        "page":1,
+        "size":200
+    }
+
+    try {
+        let res = await taskManagementApi.getDataLogService(data);
+        if (res.status == 200) {
+            context.commit('setLogIssueRecentAccess', res.data);
+        } else {
+            SYMPER_APP.$snotifyError(error, "Can not get log project access!");
+        }
+    } catch (error) {
+        SYMPER_APP.$snotifyError(error, "Can not get log project access!");
+    }
+
+}
 const getAllCategory = async(context) => {
     if (context.state.allCategory.length==0 ) {
         try {
@@ -249,7 +329,9 @@ export {
     getListColumnInBoard,
     getListStatusInColumnBoard,
     getListDocumentConfigFieldIssue,
-    getListIssueTypeInProjects
+    getListIssueTypeInProjects,
+    getLogProjectAccess,
+    getLogIssueRecentAccess
 
 
 };

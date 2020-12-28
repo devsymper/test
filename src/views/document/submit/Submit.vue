@@ -301,6 +301,10 @@ export default {
             default(){
                 return {}
             }
+        },
+        showNotifiSuccess:{
+            type:Boolean,
+            default: true
         }
     },
     name: "submitDocument",
@@ -2089,10 +2093,13 @@ export default {
                     dataResponSubmit['isContinueSubmit'] = thisCpn.isContinueSubmit;
                     thisCpn.$emit('submit-document-success',dataResponSubmit);
                     thisCpn.isSubmitting = false;
-                    thisCpn.$snotify({
-                        type: "success",
-                        title: "Submit document success!"
-                    });        
+                    if (this.showNotifiSuccess) {
+                        thisCpn.$snotify({
+                            type: "success",
+                            title: "Submit document success!"
+                        });     
+                    }
+                     
                     
                     // nếu có công thức nút submit
                     if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
