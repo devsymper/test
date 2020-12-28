@@ -7,55 +7,58 @@
                     View all projects
                 </div>
             </div>
-            <div class="d-flex pt-4">
-                <div class="item-recent pr-3" v-for="(item) in listProjectRecent" :key="item.id" >
-                    <div class="header-item-recent" style="height:23px;background:#00C7E6">
-                        <div class="icon-project">
-                            <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:24px">{{item.icon}}</v-icon>
-                            <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="24" height="24">
-                        </div>
-                        <div class="float-right">
-                            <v-icon style="font-size:13px">mdi-star-outline</v-icon>
-                            <v-icon style="font-size:13px" class="mx-1">mdi-cog-outline</v-icon>
-                        </div>
-                    </div>
-                    <div class="body-item-recent">
-                        <table class="w-100">
-                            <tr>
-                                <td class="fs-14  px-1">
-                                    <span @click="handleClickProject(item)" class="task-hover-poiter font-weight-medium">{{item.name}}</span>
-                                </td>
-                            </tr>
-                            <tr style="height:25px">
-                                <td class="px-1">
-                                    Open issues
-                                </td>
-                                <td class="float-right px-1">
-                                    <span class="open-issue">123</span>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="px-1">
-                                    Done issues
-                                </td>
-                                <td class="float-right px-1">
-                                    <span class="done-issue">13</span>
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                    <div class="footer-item-recent mt-2">
-                        <div class="d-flex justify-space-between px-1">
-                            <div>
-                                3 boards
+            <VuePerfectScrollbar style="width:100%">
+                <div class="d-flex pt-4">
+                    <div class="item-recent pr-3" v-for="(item) in listProjectRecent" :key="item.id" >
+                        <div class="header-item-recent" style="height:23px;background:#00C7E6">
+                            <div class="icon-project">
+                                <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:24px">{{item.icon}}</v-icon>
+                                <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="24" height="24">
                             </div>
-                            <div>
-                                {{item.userLeadName}}
+                            <div class="float-right">
+                                <v-icon style="font-size:13px">mdi-star-outline</v-icon>
+                                <v-icon style="font-size:13px" class="mx-1">mdi-cog-outline</v-icon>
+                            </div>
+                        </div>
+                        <div class="body-item-recent">
+                            <table class="w-100">
+                                <tr>
+                                    <td class="fs-14  px-1">
+                                        <span @click="handleClickProject(item)" class="task-hover-poiter font-weight-medium">{{item.name}}</span>
+                                    </td>
+                                </tr>
+                                <tr style="height:25px">
+                                    <td class="px-1">
+                                        Open issues
+                                    </td>
+                                    <td class="float-right px-1">
+                                        <span class="open-issue">123</span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="px-1">
+                                        Done issues
+                                    </td>
+                                    <td class="float-right px-1">
+                                        <span class="done-issue">13</span>
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                        <div class="footer-item-recent mt-2">
+                            <div class="d-flex justify-space-between px-1">
+                                <div>
+                                    3 boards
+                                </div>
+                                <div>
+                                    {{item.userLeadName}}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            </VuePerfectScrollbar>
+
         </div>
 
         <div class="home-tabs w-100" style="height:calc(100% - 241px)">
@@ -106,9 +109,13 @@
 <script>
 import { util } from "@/plugins/util";
 import IssueRecent from './IssueRecent.vue';
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 
 export default {
-    components: { IssueRecent },
+    components: {
+        IssueRecent,
+        VuePerfectScrollbar 
+    },
     computed:{
         listProjectRecent(){
             let allUserById = this.$store.getters['app/mapIdToUser'];

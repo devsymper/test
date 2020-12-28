@@ -22,6 +22,11 @@ const getLogProjectAccess = async(context,userId) => {
                     
             }
         },
+        "sort":[{
+            "logTime":{
+                "order":"desc"
+            }}
+        ],
         "page":1,
         "size":100
     }
@@ -65,6 +70,11 @@ const getLogIssueRecentAccess = async(context,userId) => {
                     
             }
         },
+        "sort":[{
+            "logTime":{
+                "order":"desc"
+            }}
+        ],
         "page":1,
         "size":200
     }
