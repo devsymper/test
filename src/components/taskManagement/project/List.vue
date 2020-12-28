@@ -299,7 +299,7 @@ export default {
             this.dialogRemove=false;  
         },
         /**
-         * hoangnd:chuyển view mở chi tiết 1 project
+         * chuyển view mở chi tiết 1 project
          */
         onProjectItemClick(obj){
             this.$router.push('/task-management/projects/'+obj.id+'/kanban-board');

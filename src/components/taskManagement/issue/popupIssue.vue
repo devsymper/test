@@ -66,6 +66,7 @@
                         ref="submitComponent"
                         class="doc_issue"
                         :action="'submit'"
+                        :showNotifiSuccess="false"
                         :docId="documentId"
                         :projectId="currentProject.id"
                         :workflowVariable="workflowVariable"
@@ -132,7 +133,7 @@ export default {
             }
             let projects = util.cloneDeep(this.$store.state.taskManagement.allProject);
             projects = projects.reduce((arr,obj)=>{
-                arr.push({id:obj.id, name: obj.name, icon:obj.icon});
+                arr.push({id:obj.id, name: obj.name, icon:obj.icon, key:obj.key});
                 return arr;
             },[])
             return projects;
@@ -155,11 +156,14 @@ export default {
         onChangeProject(){
             this.getListIssueType();
             this.$set(this.workflowVariable,'project_id',this.currentProject.id);
+            this.$set(this.workflowVariable,'project_key',this.currentProject.key);
         },
         show(){
             this.isShow=true;
             this.currentProject = this.allProject[0];
             this.$set(this.workflowVariable,'project_id',this.currentProject.id);
+            this.$set(this.workflowVariable,'project_key',this.currentProject.key);
+
             this.getListIssueType()
            
         },
@@ -176,6 +180,7 @@ export default {
         },
         onSubmitDone(data){
             this.isLoading = false;
+            this.isShow = false;
             this.$snotifySuccess("Add issue success!");
 
         },

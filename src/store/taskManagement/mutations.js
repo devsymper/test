@@ -7,6 +7,13 @@ const setAllCategory = (state, allCategory) => {
         Vue.set(state, 'allCategory', allCategory);
 }
 
+const setListProjectRecentAccess = (state, listProjectRecentAccess) => {
+    Vue.set(state, 'listProjectRecentAccess', listProjectRecentAccess);
+}
+const setLogIssueRecentAccess = (state, listIssueRecentAccess) => {
+    Vue.set(state, 'listIssueRecentAccess', listIssueRecentAccess);
+}
+
 const setAllStatusCategory = (state, allStatusCategory) => {
     Vue.set(state, 'allStatusCategory', allStatusCategory);
 }
@@ -251,6 +258,8 @@ export {
     setListStautsInProject,
     setListStatusInColumnBoard,
     setListDocumentConfigFieldIssue,
-    setListIssueTypeInProjects
+    setListIssueTypeInProjects,
+    setListProjectRecentAccess,
+    setLogIssueRecentAccess,
 
 };
