@@ -1,6 +1,6 @@
 <template>
     <div class="w-100 h-100">
-        <div style="height:40px" class="fs-22 font-weight-medium pl-3 pt-2">Home Page</div>
+        <div style="height:40px; font-size:20px" class="font-weight-medium pl-3 pt-2">Home Page</div>
         <div v-if="listProjectRecent.length > 0" class="task-recent pl-3 pt-3 fs-13" style="height:200px">
             <div class="d-flex justify-space-between">Recent projects
                 <div class="task-hover-poiter mr-2" @click="handleAllProjects" style="color:#0000aa">
@@ -9,7 +9,7 @@
             </div>
             <VuePerfectScrollbar style="width:100%">
                 <div class="d-flex pt-4">
-                    <div class="item-recent pr-3" v-for="(item) in listProjectRecent" :key="item.id" >
+                    <div class="item-recent mr-3" v-for="(item) in listProjectRecent" :key="item.id" >
                         <div class="header-item-recent" style="height:23px;" :style="{'background':randomBackground()}">
                             <div class="icon-project">
                                 <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:24px">{{item.icon}}</v-icon>
@@ -61,7 +61,7 @@
 
         </div>
 
-        <div class="home-tabs w-100" style="height:calc(100% - 241px)">
+        <div class="home-tabs w-100" style="height:calc(100% - 225px)">
             <v-tabs class="w-100 h-100 pl-4 mt-2 fs-13">
                 <v-tab>
                     <span>Worked on</span>
@@ -181,8 +181,11 @@ export default {
     color: blue;
 }
 .item-recent {
-    width:230px;
-    height:150px;
+    width:240px;
+    height:135px;
+    border: 1px solid #eeeeee;
+    border-radius: 5px;
+    border-radius: 5px;
    
 }
 .header-item-recent{

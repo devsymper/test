@@ -30,7 +30,6 @@ const getLogProjectAccess = async(context,userId) => {
         "page":1,
         "size":100
     }
-
     try {
         let res = await taskManagementApi.getDataLogService(data);
         if (res.status == 200) {
