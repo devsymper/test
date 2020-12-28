@@ -155,15 +155,11 @@ export default {
         },
         onChangeProject(){
             this.getListIssueType();
-            this.$set(this.workflowVariable,'project_id',this.currentProject.id);
-            this.$set(this.workflowVariable,'project_key',this.currentProject.key);
         },
         show(){
             this.isShow=true;
             this.currentProject = this.allProject[0];
-            this.$set(this.workflowVariable,'project_id',this.currentProject.id);
-            this.$set(this.workflowVariable,'project_key',this.currentProject.key);
-
+            
             this.getListIssueType()
            
         },
@@ -173,6 +169,12 @@ export default {
             }
             this.currentIssueType = this.allIssueTypeInProject.find(ele => ele.projectId == this.currentProject.id);
             this.documentId = Number(this.currentIssueType.documentId);
+            this.setParamsForField()
+        },
+        setParamsForField(){
+            this.$set(this.workflowVariable,'project_id',this.currentProject.id);
+            this.$set(this.workflowVariable,'project_key',this.currentProject.key);
+            this.$set(this.workflowVariable,'tmg_task_life_circle_id',this.currentIssueType.taskLifeCircleId);
         },
         submitForm(){
             this.isLoading = true;

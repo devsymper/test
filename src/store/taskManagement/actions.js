@@ -238,66 +238,84 @@ const getAllRole = async(context,projectId) => {
     }
 }
 const getListStautsInProject = async(context,projectId) => {
-    try {
-        let res = await taskManagementApi.getListStatusInProject(projectId);
-        if (res.status == 200) {
-            let data={};
-            data.key = projectId;
-            data.data = res.data.listObject;
-            context.commit('setListStautsInProject',data);
-        } else {
-            SYMPER_APP.$snotifyError(error, "Can not get list status in project!");
+    return new Promise((resolve, reject) => {
+        try {
+            taskManagementApi.getListStatusInProject(projectId).then(res=>{
+                if (res.status == 200) {
+                    let data={};
+                    data.key = projectId;
+                    data.data = res.data.listObject;
+                    context.commit('setListStautsInProject',data);
+                    resolve(data);
+                } else {
+                    SYMPER_APP.$snotifyError(error, "Can not get list status in project!");
+                }
+            })
+        } catch (error) {
+            reject(error);
         }
-    } catch (error) {
-        SYMPER_APP.$snotifyError(error, "Can not get list status in project!");
-    }
+    });
 }
 const getListIssueTypeInProjects = async(context,projectId) => {
-    try {
-        let res = await taskManagementApi.getListIssueTypeInProject(projectId);
-        if (res.status == 200) {
-            let data={};
-            data.key = projectId;
-            data.data = res.data.listObject;
-            context.commit('setListIssueTypeInProjects',data);
-        } else {
-            SYMPER_APP.$snotifyError(error, "Can not get list issuetype in project!");
+    return new Promise((resolve, reject) => {
+        try {
+            taskManagementApi.getListIssueTypeInProject(projectId).then(res=>{
+                if (res.status == 200) {
+                    let data={};
+                    data.key = projectId;
+                    data.data = res.data.listObject;
+                    context.commit('setListIssueTypeInProjects',data);
+                    resolve(data);
+                } else {
+                    SYMPER_APP.$snotifyError(error, "Can not get list issuetype in project!");
+                }
+            })
+        } catch (error) {
+            reject(error);
         }
-    } catch (error) {
-        SYMPER_APP.$snotifyError(error, "Can not get list issuetype in project!");
-    }
+    });
 }
 
-const getListColumnInBoard = async(context,boardId) => {
-    try {
-        let res = await taskManagementApi.getListColumn(boardId);
-        if (res.status == 200) {
-            let data={};
-            data.key = boardId;
-            data.data = res.data ? res.data.listObject : [] ;
-            context.commit('setListColumnInBoard',data);
-        } else {
-            SYMPER_APP.$snotifyError(error, "Can not get list column in board!");
+const getListColumnInBoard = (context,boardId) => {
+    return new Promise((resolve, reject) => {
+        try {
+            taskManagementApi.getListColumn(boardId).then(res=>{
+                if (res.status == 200) {
+                    let data={};
+                    data.key = boardId;
+                    data.data = res.data ? res.data.listObject : [] ;
+                    context.commit('setListColumnInBoard',data);
+                    resolve(data);
+                } else {
+                    SYMPER_APP.$snotifyError(error, "Can not get list column in board!");
+                }
+            })
+            
+        } catch (error) {
+            reject(error);
         }
-    } catch (error) {
-        SYMPER_APP.$snotifyError(error, "Can not get list column in board!");
-    }
+    });
 }
 
-const getListStatusInColumnBoard = async(context,boardId) => {
-    try {
-        let res = await taskManagementApi.getListStatusInColumnOfBoard(boardId);
-        if (res.status == 200) {
-            let data={};
-            data.key = boardId;
-            data.data = res.data ? res.data.listObject : [] ;
-            context.commit('setListStatusInColumnBoard',data);
-        } else {
-            SYMPER_APP.$snotifyError(error, "Can not get list column in board!");
+const getListStatusInColumnBoard = (context,boardId) => {
+    return new Promise((resolve, reject) => {
+        try {
+            taskManagementApi.getListStatusInColumnOfBoard(boardId).then(res=>{
+                if (res.status == 200) {
+                    let data={};
+                    data.key = boardId;
+                    data.data = res.data ? res.data.listObject : [] ;
+                    context.commit('setListStatusInColumnBoard',data);
+                    resolve(data)
+                } else {
+                    SYMPER_APP.$snotifyError(error, "Can not get list column in board!");
+                }
+            })
+            
+        } catch (error) {
+            reject(error);
         }
-    } catch (error) {
-        SYMPER_APP.$snotifyError(error, "Can not get list column in board!");
-    }
+    });
 }
 const getListWorkflowInProject = async(context,projectId) => {
     if (context.state.allWorkflow.length==0) {
