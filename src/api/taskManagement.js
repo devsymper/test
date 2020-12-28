@@ -9,6 +9,9 @@ export const taskManagementApi = {
     getDataLogService(data){
         return log.post("query",data);
     },
+    getIssueAssignRecent(data){
+        return document.post("documents/objects-by-multiple-document",data);
+    },
     //danh mục category
     getAllCategory(){
         return taskManagement.get("categories");
@@ -67,6 +70,9 @@ export const taskManagementApi = {
         return taskManagement.put("project-users-role",data);
     },
     /// issue type
+    getAllDocumentIdsInIssueType(){
+        return taskManagement.get("issue-types-documentIds");
+    },
     getListIssueTypeInProject(projectId){
         return taskManagement.get("issue-types/"+projectId);
     },

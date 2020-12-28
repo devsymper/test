@@ -1,6 +1,8 @@
 const defaultState = {
     listProjectRecentAccess: [],
     listIssueRecentAccess: [],
+    listDocumentIdsInIssueType: [],
+    listIssueAssignRecent:[],
     allCategory: [],
     allProject: [],
     allStatusCategory: [],
