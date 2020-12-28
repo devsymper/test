@@ -2707,7 +2707,7 @@ export default {
                                 let formulasInstance = config.instance;
                                 let fType = formulasType+"_"+config.formula.instance;
                                 if(formulasInstance){
-                                    this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,fType,'root')
+                                    this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,fType,'root');
                                 }
                             }
                         }
@@ -2794,7 +2794,8 @@ export default {
             else if(this.getRootFromVariable(formulasInstance)){
                 if(!listRootControl.includes(controlName)){
                     listRootControl.push(controlName);
-                }              
+                }       
+                this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
             }
             
         },
