@@ -37,9 +37,6 @@ export default {
                 self.selfChange = true;
 				self.$emit('input', vl);
 				self.$emit('change', vl);
-				setTimeout(function(){
-					debugger
-				},2000)
                 if(this.completionDiv){
                     this.completionDiv.css('visibility', 'hidden');
                 }

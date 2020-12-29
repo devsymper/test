@@ -3,6 +3,7 @@ import { appConfigs } from "./../configs.js";
 let fileManagement = new Api(appConfigs.apiDomain.fileManagement);
 let document = new Api(appConfigs.apiDomain.sdocumentManagement);
 let workfloweExtend = new Api(appConfigs.apiDomain.workflowExtend);
+let logService = new Api(appConfigs.apiDomain.log);
 
 export const taskApi = {
     getFileByList(data) {
@@ -42,11 +43,28 @@ export const taskApi = {
     },
     getListWork(filter) {
         return workfloweExtend.get("works", filter);
-    },
-    getDocumentObjectIdWithTaskId(taskId){
-        return document.get('documents/object-by-task/' + taskId);
-
-    }
+	},
+	
+	getHistoryTask(id){
+		let data = {
+			"query": {
+				"bool": {
+				"must": [
+						{
+							"term": {
+								"logObjectType": "task"
+							}
+						},{
+							"term": {
+								"logObjectId.keyword": id
+							}
+						}
+					]
+				}
+			}
+		}
+		return logService.post('query',data)
+	}
 
 
 

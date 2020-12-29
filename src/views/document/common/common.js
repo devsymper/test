@@ -66,6 +66,8 @@ const mapTypeToEffectedControl = {
     hidden: "effectedHiddenControl",
     require: "effectedRequireControl",
     validate: "effectedValidateControl",
+    minDate: "effectedMinDateControl",
+    maxDate: "effectedMaxDateControl",
 }
 const currentSelectedControl = function(instance) {
     return getSDocumentEditorStore(instance).currentSelectedControl;

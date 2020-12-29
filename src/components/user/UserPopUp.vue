@@ -44,7 +44,7 @@
                    <i class="mdi-20px mdi mdi-border-color mr-1"></i> Ngày tạo: {{detailUser.createAt}}
                 </v-row>
                 <v-row class="fs-13 mb-1">
-                    <i class="mdi-20px mdi mdi-phone mr-1"></i>Tình trạng: <span v-html="detailUser.status"></span>
+                    <i class="mdi-20px mdi mdi-phone mr-1"></i>Tình trạng: <span class="ml-1" v-html="detailUser.status"></span>
                 </v-row>
             </v-col>
             <v-col class="col-md-5">
@@ -83,7 +83,7 @@ export default {
           if(status==1){
               return "<span class='color-green'> Hoạt động</span> "
           }else if(status==0){
-              return "<span class='color-yellow'> Khóa</span> "
+              return "<span style='color:orange'> Khóa</span> "
           }else{
               return "<span class='color-red'> Tạo mới</span> "
           }

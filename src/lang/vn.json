@@ -2,6 +2,8 @@
     "common": {
         "number_instance": "Tổng số instance",
         "id": "Id",
+        "deleteAll": "Xóa tất cả",
+        "required": "Bắt buộc",
         "select_lang": "Thay đổi ngôn ngữ",
         "KH": "Knowledge Management",
         "taskManagement": "Quản lí công việc",
@@ -19,8 +21,8 @@
         "import_excel_history": "Lịch sử Import",
         "edit": "Sửa",
         "cancel": "Hủy",
-		"update": "Cập nhật",
-		"create":"Thêm mới",
+        "update": "Cập nhật",
+        "create": "Thêm mới",
         "delete": "Xóa",
         "refresh": "Làm mới",
         "userDeletedName": "Email người xóa",
@@ -102,11 +104,11 @@
         "not_always_show_sidebar": "Ẩn sidebar",
         "import_excel": "Nhập bằng excel",
         "isDefault": "SĐTC mặc định",
-		"restore": "Khôi phục",
-		"userCreateName": "Người tạo",
-		"userUpdateName": "Người cập nhật",
-		"createAt": "Thời gian tạo",
-		"updateAt": "Thời gian cập nhật",
+        "restore": "Khôi phục",
+        "userCreateName": "Người tạo",
+        "userUpdateName": "Người cập nhật",
+        "createAt": "Thời gian tạo",
+        "updateAt": "Thời gian cập nhật",
         "sidebar": {
             "Notification Config BA": "Cài đặt thông báo",
             "Setting": "Cài đặt",
@@ -178,27 +180,30 @@
         }
     },
     "table": {
-		"id": "ID",
-		"name": "Tên Service",
-		"description": "Mô tả",
-		"lastVersion": "Version mới nhất",
-		"language": "Ngôn ngữ",
-		"status": "Trạng thái",
-		"userCreate": "Người tạo",
-		"userUpdate": "Người cập nhât",
-		"createAt": "Thời gian tạo",
-		"updateAt": "Thời gian cập nhât",
-		"releaseAt": "Thời gian release",
-		"versionName": "Tên version",
+        "id": "ID",
+        "name": "Tên Service",
+        "description": "Mô tả",
+        "lastVersion": "Version mới nhất",
+        "language": "Ngôn ngữ",
+        "status": "Trạng thái",
+        "userCreate": "Người tạo",
+        "userUpdate": "Người cập nhât",
+        "createAt": "Thời gian tạo",
+        "updateAt": "Thời gian cập nhât",
+        "releaseAt": "Thời gian release",
+        "versionName": "Tên version",
         "wrap_text_mode": "Chế độ xuống dòng",
         "display_density": "Mật độ hiển thị dòng",
         "column_config": "Cấu hình cột",
-		"freeze_column": "Cố định cột này",
-		"environmentIdentifier": "Định danh môi trường",
-		"environmentName": "Tên môi trường",
+        "freeze_column": "Cố định cột này",
+        "environmentIdentifier": "Định danh môi trường",
+        "environmentName": "Tên môi trường",
         "unfreeze_column": "Bỏ cố định cột này",
         "hide_column": "Ẩn cột này",
 		"show_column": "Hiện cột này",
+		"processKey": "Process Key",
+		"lastUserUpdate": "Người cập nhât",
+		"lastUpdateTime": "Thời gian cập nhât",
 		"git": "Link git",
 		"os": "Hệ điểu hành",
 		"ip": "Địa chỉ IP",
@@ -422,7 +427,7 @@
         "grandPermission": "Phân quyền chi tiết",
         "apps": "Apps",
         "contextMenu": {
-			"viewDetails":"Xem chi tiết",
+            "viewDetails": "Xem chi tiết",
             "edit": "Sửa",
             "grantPermission": "Phân quyền",
             "remove": "Xóa"
@@ -687,6 +692,7 @@
             "userCreate": "Người tạo",
             "userUpdate": "Người cập nhật",
             "countRecord": "Số lượng bản ghi",
+            "allowSubmitOutsideWorkflow": "Submit ngoài quy trình",
             "history": {
                 "id": "STT",
                 "name": "Tên văn bản",
@@ -811,6 +817,8 @@
             }
         },
         "validate": {
+            "emptyNote": "Không được bỏ trống ghi chú",
+            "emptyTitleFml": "Không được bỏ trống tiêu đề bản ghi",
             "emptyTitle": "Không được bỏ trống tiêu đề",
             "emptyName": "Không được bỏ trống tên",
             "nameNotValid": "Tên không hợp lệ",
@@ -819,6 +827,9 @@
             "docNameExist": "Tên document đã tồn tại",
             "checkNameRelate": "Tên của văn bản này có thể được sử dụng trong công thức ở các đối tượng trong hệ thống. Chọn kiểm tra để kiểm tra lại các đối tượng"
 
+        },
+        "notification": {
+            "leavePage": "Bạn có muốn rời khỏi trang?"
         }
     },
     "documentObject": {
@@ -1343,7 +1354,12 @@
         "createTask": {
             "title": "Tạo task"
         },
-        "claim": "Claim",
+        "claim": "Nhận công việc",
+        "unClaim": "Hủy nhận",
+        "reAssign": "Giao việc",
+        "delegate": "Ủy quyền",
+        "resolve": "Giải quyết",
+        "complete": "Hoàn thành",
         "created": "Đã tạo mới task",
         "relatedPeople": {
             "title": "Những người liên quan"

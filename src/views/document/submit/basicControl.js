@@ -340,6 +340,10 @@ export default class BasicControl extends Control {
                         this.ele.val("");
                     }
                 }
+                else if (this.type == 'user') {
+                    this.value = value.id;
+                    this.ele.val(value.display);
+                }
                 else if (this.type == 'image') {
                     this.setImageControlValue(value)
                 }        
@@ -402,6 +406,12 @@ export default class BasicControl extends Control {
         if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
             this.defaultValue = value;
         }
+    }
+    getAutocompleteKeyValue(){
+        let x = this.controlProperties;
+        console.log(x);
+        debugger
+        return this.controlProperties
     }
     setImageControlValue(value){
         this.ele.empty();
@@ -574,7 +584,7 @@ export default class BasicControl extends Control {
                 if (response.status == 200) {
                     let file = `<div title="${response.data.path}" class="file-item">
                                 <span data-file-name="${response.data.path}" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
-                                <i  onclick="window.open('`+sDocumentManagementUrl+`file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
+                                <i  onclick="window.open('` + sDocumentManagementUrl + `file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
                             </div>`
                     thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name);
                     thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
@@ -746,7 +756,8 @@ export default class BasicControl extends Control {
     renderDateControl() {
         this.ele.attr('type', 'text');
         this.formatDate = (this.controlProperties.hasOwnProperty('formatDate')) ? this.controlProperties.formatDate.value : "";
-        console.log('this.formatDatethis.formatDate', this.formatDate);
+        this.minDate = "";
+        this.maxDate = "";
         if (this.checkDetailView()) return;
     }
     renderTimeControl() {
@@ -784,38 +795,39 @@ export default class BasicControl extends Control {
         return false;
     }
     renderInfoIconToControl(controlName) {
-        if (this.ele.parent().find('.info-control-btn').length == 0) {
-            let icon = `<span class="mdi mdi-information info-control-btn" data-control="` + controlName + `"></span>`
-            this.ele.parent().append(icon);
+            if (this.ele.parent().find('.info-control-btn').length == 0) {
+
+                // let icon = `<span class="mdi mdi-information info-control-btn" data-control="` + controlName + `"></span>`
+                this.ele.addClass("info-control-btn");
+                this.ele.attr('data-control', controlName)
+                    //  this.ele.parent().append(icon);
+            }
         }
-    }
-     /**
-     * Hàm chuyển định dạng date sang dạng sql hiểu được
-     */
-    convertDateToStandard(data){
+        /**
+         * Hàm chuyển định dạng date sang dạng sql hiểu được
+         */
+    convertDateToStandard(data) {
         let dateFormat = this.controlProperties.formatDate.value;
-        if(!dateFormat){
+        if (!dateFormat) {
             return data;
         }
-        if(!data){
+        if (!data) {
             return "";
         }
-        if(typeof data == 'object'){
+        if (typeof data == 'object') {
             let newData = [];
             for (let index = 0; index < data.length; index++) {
                 let value = data[index];
-                if(value){
-                    newData.push(SYMPER_APP.$moment(value,dateFormat).format('YYYY-MM-DD'))
-                }
-                else{
+                if (value) {
+                    newData.push(SYMPER_APP.$moment(value, dateFormat).format('YYYY-MM-DD'))
+                } else {
                     newData.push("");
                 }
-                
+
             }
             return newData;
-        }
-        else{
-            return SYMPER_APP.$moment(data,dateFormat).format('YYYY-MM-DD')
+        } else {
+            return SYMPER_APP.$moment(data, dateFormat).format('YYYY-MM-DD')
         }
     }
      /**
