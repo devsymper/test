@@ -235,5 +235,12 @@ export default {
                 reject(defData);
             }
         });
-    }
+	},
+	getTaskDetail(id){
+		return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + "/" + id, {}, testHeader)
+	},
+	changeTaskAction(id,data){
+		return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks + "/" + id, JSON.stringify(data), testHeader)
+	}
+	
 };

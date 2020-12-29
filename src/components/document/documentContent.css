@@ -176,7 +176,7 @@ input.s-control {
 
 .handsontable td,
 .handsontable th {
-    color: #212529 !important;
+    color: #212529;
     font-size: 12px;
     border-color: #bbb;
     border-right: 0;
@@ -534,52 +534,58 @@ button:hover {
     position: relative;
 }
 
-.wrap-table .info-control-btn {
-    right: 4px !important;
-    top: 0!important;
-}
-
 .info-control-btn {
-    right: 0;
-    color: blue;
-    position: absolute;
-    top: 4px;
+    color: #e67e23 !important;
+    text-decoration-line: underline;
 }
 
 .s-control.s-control-image {
     background: #f2f2f2;
     border-radius: 4px;
 }
-.ag-theme-alpine .ag-cell-wrapper > *:not(.ag-cell-value):not(.ag-group-value){
-    height: 22px !important;       
+
+.ag-theme-alpine .ag-cell-wrapper>*:not(.ag-cell-value):not(.ag-group-value) {
+    height: 22px !important;
 }
-.ag-theme-alpine .ag-cell-wrapper{
+
+.ag-theme-alpine .ag-cell-wrapper {
     font-size: 12px;
 }
-.ag-theme-alpine .ag-cell-wrapper > .ag-group-value{
+
+.ag-theme-alpine .ag-cell-wrapper>.ag-group-value {
     font-family: "Roboto", sans-serif;
 }
-.ag-theme-alpine .ag-cell-wrapper > *:not(.ag-cell-value):not(.ag-group-value) .ag-icon-tree-closed,
-.ag-theme-alpine .ag-cell-wrapper > *:not(.ag-cell-value):not(.ag-group-value) .ag-icon-tree-open{
+
+.ag-theme-alpine .ag-cell-wrapper>*:not(.ag-cell-value):not(.ag-group-value) .ag-icon-tree-closed,
+.ag-theme-alpine .ag-cell-wrapper>*:not(.ag-cell-value):not(.ag-group-value) .ag-icon-tree-open {
     margin-top: 0px;
     font-size: 13px;
 }
-.ag-theme-alpine .ag-header{
+
+.ag-theme-alpine .ag-header {
     background: white !important;
-    font-size: 12;
+    font-size: 12px;
     font-family: "Roboto", sans-serif;
 }
-.ag-theme-alpine .ag-header  .ag-header-row{
+
+.ag-theme-alpine .ag-cell-wrap-text {
+    font-size: 12px!important;
+}
+
+.ag-theme-alpine .ag-header .ag-header-row {
     color: #212529 !important;
     font-weight: 500;
 }
-.ag-theme-alpine .ag-row{
+
+.ag-theme-alpine .ag-row {
     background: white !important;
 }
-.ag-theme-alpine .ag-cell{
+
+.ag-theme-alpine .ag-cell {
     line-height: 22px !important;
 }
-.ag-pivot-action{
+
+.ag-pivot-action {
     position: absolute;
     top: 0px;
     left: 25px;
@@ -590,66 +596,88 @@ button:hover {
     opacity: 0.6;
     z-index: 1;
 }
-  
-  .dropdown {
+
+.dropdown {
     position: absolute;
-  }
-  
-  .dropdown-content {
+}
+
+.dropdown-content {
     display: none;
     position: absolute;
     background-color: #f1f1f1;
     min-width: 120px;
-    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    box-shadow: 0px 8px 16px 0px rgba(0, 0, 0, 0.2);
     z-index: 1;
     left: 50px;
     z-index: 2;
     top: 4px;
-  }
-  
-  .dropdown-content a {
+}
+
+.dropdown-content a {
     color: black;
     padding: 4px 8px;
     text-decoration: none;
     display: block;
-  }
-  
-  .dropdown-content a:hover {background-color: #ddd;}
-  
-  .dropdown:hover .dropdown-content {display: block;}
-  
-  .dropdown:hover .ag-pivot-action {
+}
+
+.dropdown-content a:hover {
+    background-color: #ddd;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+}
+
+.dropdown:hover .ag-pivot-action {
     background: var(--symper-background-hover);
-  }
-  .input-pivot{
-      position: fixed;
-      height: 24px;
-      display: none;
-      padding: 0 8px;
-      background: var(--symper-background-default);
-  }
-  .input-pivot:focus{
-      outline: none;
-  }
-  .swap-table-btn{
+}
+
+.input-pivot {
+    position: fixed;
+    height: 24px;
+    display: none;
+    padding: 0 8px;
+    background: var(--symper-background-default);
+}
+
+.input-pivot:focus {
+    outline: none;
+}
+
+.swap-table-btn {
     border: 4px;
     opacity: 0.6;
-      position: absolute;
-      top: 1px;
-      left: 1px;
-      height: 24px;
-      width: 24px;
-      z-index: 200;
-      font-size: 18px;
-      background: var(--symper-background-default);
-  }
-  .swap-table-btn:focus{
-      outline: none;
-  }
- .sym-form-submit div:empty, .sym-form-Detail div:empty{
-     height: 12px;
- }
- .sym-form-Detail .s-control-file-upload{
+    position: absolute;
+    top: 1px;
+    left: 1px;
+    height: 24px;
+    width: 24px;
+    z-index: 200;
+    font-size: 18px;
+    background: var(--symper-background-default);
+}
+
+.swap-table-btn:focus {
+    outline: none;
+}
+
+.sym-form-submit div:empty,
+.sym-form-Detail div:empty {
+    height: 12px;
+}
+
+.icon-trace-table {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 200;
+    padding: 2px 16px;
+    display: inline-block;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.sym-form-Detail .s-control-file-upload{
     border: var(--symper-border);
 }
  .sym-form-Detail .upload-file-wrapper-outtb{

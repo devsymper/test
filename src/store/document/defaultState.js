@@ -97,9 +97,7 @@ const defaultState = {
              *      message:'khong được bỏ trống'
              * }}
              */
-            validateMessage:{
-
-            },
+            validateMessage:{},
             dataInputBeforeChange:{}
         }
     },

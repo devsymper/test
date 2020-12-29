@@ -51,6 +51,7 @@
 			:getDataUrl="getListUrl"
 			@close-popup="handleCloseEvent"
 			style="margin-left:10px"
+			:refreshListWhenChangeUrl="false"
 			:useDefaultContext="false"
 			:tableContextMenu="tableContextMenu"
 			:customAPIResult="customAPIResult"
@@ -114,6 +115,7 @@ export default {
 			},
 			customAPIResult:{
 				reformatData(res){
+					self.$refs.listObject.rerenderTable();
 					return{
 						columns:res.data.columns ? res.data.columns : [],
 						listObject:res.data.listObject ? res.data.listObject : [],
@@ -142,11 +144,15 @@ export default {
 		},
 		handleCheckClick(){
 			this.showDialogRelateData = true
-		}
+		},
+	
 	},
 	watch:{
 		getListUrl(val){
-			this.$refs.listObject.refreshList()
+			this.$refs.listObject.emptyShowList()
+			setTimeout((self)=>{
+				self.$refs.listObject.getData()
+			},200,this)
 			this.listItemSelected = {},
 			this.showBtnAddCheckbox = true
 		}

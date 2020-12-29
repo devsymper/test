@@ -12,7 +12,7 @@
             hide-default-footer
             :height="tableHeight"
             dense
-            class="fs-13"
+            class="table"
             no-data-text="Không có dữ liệu"
             calculate-widths
         >
@@ -144,6 +144,9 @@ export default {
 }
 </script>
 <style scoped>
+    .table >>> .text-start{
+        font-size:13px
+    }
     .card-history-control{
         position: absolute;
         top: 0;

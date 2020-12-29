@@ -13,7 +13,7 @@ var configs = {
     apiDomain: {
         account: 'https://account.symper.vn/',
         user: 'https://account.symper.vn/',
-        core: 'https://v2hoangnd.dev.symper.vn/',
+		core: 'https://v2hoangnd.dev.symper.vn/',
         bpmne: {
             general: 'https://workflow.symper.vn/',
             models: 'https://workflow-modeler.symper.vn/workflow-modeler/',

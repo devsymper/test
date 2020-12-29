@@ -17,6 +17,9 @@ export const documentApi = {
     getBatchDocument(data) {
         return coreApi.post("documents/batch", data);
     },
+    deleteAll(data) {
+        return coreApi.delete("documents/objects", data);
+    },
     saveDocument(data) {
         return coreApi.post("documents", data);
     },

@@ -30,6 +30,9 @@ export const environmentManagementApi = {
 	deloy(data){
 		return api.post('instances/deploy',data)
 	},
+	updateVersion(data){
+		return api.post('instances/update-version',data)
+	},
 	getAllObjTypeOfService(obj){
 		let prefix = obj.environmentIdentifier != ""  ?  obj.environmentIdentifier+"." : ""  
 		let str = "https://" + prefix + obj.serviceIdentifier + '.symper.vn'
