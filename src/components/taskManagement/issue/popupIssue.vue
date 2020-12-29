@@ -66,7 +66,7 @@
                 ref="submitComponent"
                 class="doc_issue"
                 :action="'submit'"
-                :showNotifiSuccess="false"
+                :showSnackbarSuccess="false"
                 :docId="documentId"
                 :projectId="currentProject.id"
                 :workflowVariable="workflowVariable"
