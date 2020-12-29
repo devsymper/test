@@ -1,21 +1,8 @@
+import IndexedDB from "@/plugins/utilModules/indexedDB.js";
 
 /**
  * Các hàm phục vụ cho việc xác thực, lưu trữ dữ liệu đăng nhập cho người dùng
  */
-import IndexedDB from "@/plugins/utilModules/indexedDB.js";
-var loginedInfo = {};
-if(!self.document){// Nếu nằm dưới worker
-    function getAndSetLoginInfoForWorker() {
-        let indexedDB = new IndexedDB('SYMPER-LOGIN-INFOR');
-        indexedDB.open('loginInfo', false, false, async()=>{
-            loginedInfo = await indexedDB.read('loginInfo');
-            if(typeof loginedInfo == 'string'){
-                loginedInfo = JSON.parse(loginedInfo);
-            }
-        });
-    }
-    getAndSetLoginInfoForWorker();
-}
 export const authUtil = {
 	saveLoginInfo(data) {
         /**
@@ -37,7 +24,8 @@ export const authUtil = {
 			    return false;
 			}
 		}else{
-            return loginedInfo.token;
+            debugger
+            return self.dataStore.loginedInfo.token;
 		}
     },
 

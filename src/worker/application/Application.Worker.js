@@ -1,3 +1,4 @@
+importScripts('./../workerDataStoreLoader.js');
 import {documentApi} from '@/api/Document';
 import {orgchartApi} from '@/api/orgchart';
 import {dashboardApi} from '@/api/dashboard';
