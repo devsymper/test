@@ -24,9 +24,7 @@ export const authUtil = {
 			    return false;
 			}
 		}else{
-			debugger
-			console.log(Date.now(), 'getToken');
-            return self.dataStore.loginedInfo.token;
+            return self.dataStore.loginInfo.token;
 		}
     },
 

@@ -901,13 +901,13 @@ export default {
 			let self = this
             if(colFilter.selectItems.length == 0){
 				let textItems = testSelectData;
-				this.listItemsWorker.postMessage({
+				this.$postWorkerMessage(this.listItemsWorker, {
 					action: 'setSelectItemForFilter',
 					data:{
 						textItems : textItems,
 						colFilter: self.tableFilter.currentColumn.colFilter,
 					}
-				})
+				});
             }
         },
 		 /**
@@ -926,13 +926,12 @@ export default {
 			dataConfig.options = options
 			dataConfig.columns = columns
 			dataConfig.colFilter = self.tableFilter.currentColumn.colFilter
-			this.listItemsWorker.postMessage({
+			this.$postWorkerMessage(this.listItemsWorker, {
 				action: 'getItemForValueFilter',
 				data:{
 					dataConfig
 				}
-			})
-         
+			});
 		},
 		getConfigApiCall(){
 			let self = this
@@ -1155,10 +1154,11 @@ export default {
 			}
 			dataConfig.lazyLoad = lazyLoad
 			dataConfig.customAPIResult = self.customAPIResult.reformatData ? self.customAPIResult.reformatData.toString() : null
-			this.listItemsWorker.postMessage({
+			
+			this.$postWorkerMessage(this.listItemsWorker, {
 				action: 'getData',
 				data: dataConfig
-			})
+			});
 		},
 		 /**
          * Khôi phục lại cấu hình của hiển thị của table từ dữ liệu được lưu
@@ -1166,13 +1166,13 @@ export default {
         restoreTableDisplayConfig() {
 			let widgetIdentifier = this.getWidgetIdentifier();
 			let self = this
-			this.listItemsWorker.postMessage({
+			this.$postWorkerMessage(this.listItemsWorker, {
 				action: 'restoreTableDisplayConfig',
 				data:{
 					widgetIdentifier: widgetIdentifier,
 					columnDefs: self.columnDefs
 				}
-			})
+			});
 		},
 		getWidgetIdentifier(){
             let widgetIdentifier = '';
@@ -1208,12 +1208,12 @@ export default {
             this.savingConfigs = true;
 			let thisCpn = this;
 			let dataToSave = this.getTableDisplayConfigData();
-			this.listItemsWorker.postMessage({
-				action: "saveTableDisplayConfig",
+			this.$postWorkerMessage(this.listItemsWorker, {
+				action: 'saveTableDisplayConfig',
 				data:{
 					dataToSave: dataToSave
 				}
-			})
+			});
 		},
 		 /**
          * Xử lý việc sau khi kết thúc kéo thả các cột ở thanh cấu hình hiển thị danh sách

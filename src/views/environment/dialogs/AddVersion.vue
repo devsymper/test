@@ -158,24 +158,13 @@ export default {
 
 			}
 			formData.releaseAt = this.dates
-			this.environmentWorker.postMessage({
+			this.$postWorkerMessage(this.environmentWorker, {
 				action: 'addVersion',
 				data:{
 					serviceId: serviceId,
 					formData: formData
 				}
-			})
-			// environmentManagementApi.addVersion({
-			// 	serviceId:serviceId,
-			// 	formData:formData
-			// }).then(res=>{
-			
-			// }).catch(err=>{
-			// 		self.$snotify({
-			// 			type: "error",
-			// 			title: " Có lỗi xảy ra"
-			// 		})
-			// })
+			});
 		},
 		handlerAddversionRes(res){
 			if(res.status == 200){
