@@ -1,5 +1,6 @@
 const defaultState = {
     hideSidebar:true,
+    allIssueType:[],
     listProjectRecentAccess: [],
     listIssueRecentAccess: [],
     listDocumentIdsInIssueType: [],

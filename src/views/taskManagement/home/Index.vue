@@ -27,6 +27,12 @@ export default {
             await this.$store.dispatch("taskManagement/getAllCategory");
             await this.$store.dispatch("taskManagement/getLogProjectAccess",this.$store.state.app.endUserInfo.id);
             await this.$store.dispatch("taskManagement/getLogIssueRecentAccess",this.$store.state.app.endUserInfo.id);
+            if (!this.$store.state.taskManagement.allIssueType || this.$store.state.taskManagement.allIssueType == 0) {
+                await this.$store.dispatch("taskManagement/getAllIssueType");
+            }
+            if (!this.$store.state.taskManagement.allPriority || this.$store.state.taskManagement.allPriority == 0) {
+                await this.$store.dispatch("taskManagement/getAllPriority");
+            }
             this.$store.dispatch("taskManagement/getAllDocumentIdsInIssueType");
             this.$store.dispatch("taskManagement/getAllStatus");
 

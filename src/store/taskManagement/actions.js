@@ -145,6 +145,24 @@ const getAllCategory = async(context) => {
 
 }
 
+const getAllIssueType = async(context) => {
+    try {
+        let filter={};
+        filter.page = 1;
+        filter.pageSize = 500;
+        filter.distinct = true;
+
+        let res = await taskManagementApi.getAllIssueType(filter);
+        if (res.status == 200) {
+            context.commit('setAllIssueType', res.data.listObject);
+        } else {
+            SYMPER_APP.$snotifyError(error, "Can not get all issue type!");
+        }
+    } catch (error) {
+        SYMPER_APP.$snotifyError(error, "Can not get all issue type!");
+    }
+
+}
 
 const getAllProject = async(context) => {
     if (context.state.allProject.length==0) {
@@ -447,6 +465,6 @@ export {
     getAllDocumentIdsInIssueType,
     getListDocumentIdsInProject,
     getAllStatus,
-
+    getAllIssueType,
 
 };

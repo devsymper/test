@@ -11,6 +11,9 @@ const setAllDocumentIdsInIssueType = (state, listDocumentIdsInIssueType) => {
     Vue.set(state, 'listDocumentIdsInIssueType', listDocumentIdsInIssueType);
 }
 
+const setAllIssueType = (state, allIssueType) => {
+    Vue.set(state, 'allIssueType', allIssueType);
+}
 const setIssueAssignRecent = (state, listIssueAssignRecent) => {
     Vue.set(state, 'listIssueAssignRecent', listIssueAssignRecent);
 }
@@ -275,6 +278,7 @@ export {
     setLogIssueRecentAccess,
     setAllDocumentIdsInIssueType,
     setIssueAssignRecent,
-    setListDocumentIdsInProject
+    setListDocumentIdsInProject,
+    setAllIssueType
 
 };
