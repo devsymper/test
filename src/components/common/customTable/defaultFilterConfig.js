@@ -77,12 +77,12 @@ function getFilterConfigs(getDataMode = '', filterData) {
             ];
         }
 
-        if(filter.selectAll && Object.keys(filter.valuesNotIn).keys.length > 0){
+        if(filter.selectAll && Object.keys(filter.valuesNotIn).length > 0){
             option.conditions.push({
                 name: 'not_in',
                 value: Object.keys(filter.valuesNotIn)
             });
-        }else if(!filter.selectAll && Object.keys(filter.valuesIn).keys.length > 0){
+        }else if(!filter.selectAll && Object.keys(filter.valuesIn).length > 0){
             option.conditions.push({
                 name: 'in',
                 value: Object.keys(filter.valuesIn)
