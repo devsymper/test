@@ -932,8 +932,6 @@ export default {
             return firstDay;
         },
         selectDayOfWeek(item){
-            // debugger
-            // debugger
             // let dateSelect = '';
             // dateSelect= dateSelect+item.name;
             // this.crobTabValue[5]=;

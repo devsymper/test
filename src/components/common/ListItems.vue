@@ -1347,7 +1347,6 @@ export default {
                 if(this.customDataForApi){
                     configs.customDataForApi = this.customDataForApi;
 				}
-				debugger
 				getDataFromConfig(url, configs, columns, tableFilter, success, method, header);
             }
         },

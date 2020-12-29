@@ -67,7 +67,6 @@ export default class IndexedDB {
 
     async save(data, key){
         let savedData = await this.read(key);
-        debugger
         if(savedData){
             this.put(data, key);
         }else{
