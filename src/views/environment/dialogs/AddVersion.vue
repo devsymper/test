@@ -128,7 +128,6 @@ export default {
                 case 'addVersion':
 					self.handlerAddversionRes(data.dataAfter)
 					break;
-                
                 default:
                     break;
             }
@@ -170,7 +169,7 @@ export default {
 			if(res.status == 200){
 				this.$snotify({
 					type: "success",
-					title: " Thêm version thành công"
+					title: "Thêm version thành công"
 				})
 				this.$emit('add-success')
 			}else{

@@ -152,7 +152,7 @@ export default {
 			let data = {
 				[type]:ids
 			}
-			this.environmentWorker.postMessage({
+			this.$postWorkerMessage(this.environmentWorker, {
 				action: 'migrateData',
 				data:{
 					dataGetServerId:{
@@ -165,9 +165,7 @@ export default {
 						override: self.override
 					}
 				}
-			})
-			
-			
+			});
 		}
 	},
 }

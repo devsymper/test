@@ -119,15 +119,14 @@ export default {
 				type: 'success',
 				title: "Đang xử lí. Vui lòng chờ kêt quả.... "
 			})
-			this.environmentWorker.postMessage({
-				action: "deployVersion",
+			this.$postWorkerMessage(this.environmentWorker, {
+				action: 'deployVersion',
 				data:{
 					versionId : versionId,
 					environmentId: self.envId,
 					dataGetServerId : data
 				}
-			})
-
+			});
 		}
 	},
 }

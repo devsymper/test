@@ -115,15 +115,14 @@ export default {
 				serviceId: serviceId,
 				environmentId: this.envId
 			}
-			this.environmentWorker.postMessage({
-				action: "updateVersion",
+			this.$postWorkerMessage(this.environmentWorker, {
+				action: 'updateVersion',
 				data:{
 					versionId : versionId,
 					environmentId: self.envId,
 					dataGetServerId : data
 				}
-			})
-			
+			});
 		}
 	},
 }

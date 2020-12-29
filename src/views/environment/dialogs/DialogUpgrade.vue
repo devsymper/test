@@ -23,7 +23,7 @@
 						class="fs-13"
 					></v-autocomplete>
 					<div class="text-wrap">
-						Nhấn Đòng ý để upgrade version này
+						Nhấn Đồng ý để upgrade version này
 					</div>
 				</div>
 
@@ -126,12 +126,12 @@ export default {
 				type: 'success',
 				title: "Đang xử lí. Vui lòng chờ kêt quả.... "
 			})
-			this.environmentWorker.postMessage({
+			this.$postWorkerMessage(this.environmentWorker, {
 				action: 'upgradeVersion',
 				data:{
 					formData: formData
 				}
-			})
+			});
 		}
 	},
 }
