@@ -7,14 +7,19 @@ export const symperAjax = async(options) =>{
 	}else{
 		
 		if(!options.contentType){
-			options.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
-			let data = new URLSearchParams(options.data)
-			options.body = data;
+			if(!options.headers['Content-Type']){
+				options.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
+				let data = new URLSearchParams(options.data)
+				options.body = data;
+			}else{
+				options.body = options.data
+			}
 		}else {
 			options.headers['Content-Type'] = options.contentType;
 			options.body = typeof options.data == 'object' ? JSON.stringify(options.data) : options.data;
 		}
 	}
+	debugger
 	const response = await fetch(options.url,options)
 	return  response.status == 204  ? null : response.json()   
 }

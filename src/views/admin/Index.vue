@@ -122,12 +122,13 @@ export default {
 		},
 		getDetails(obj){
 			let self = this
-			this.adminWorker.postMessage(
-				{
-					action:'getDetailWorkflow',
-					data:{processKey: obj.processKey}
+			this.$postWorkerMessage(this.adminWorker, {
+				action: 'getDetailWorkflow',
+				data:{
+					processKey: obj.processKey
 				}
-			);
+
+			});
 			self.$refs.listWorkFlow.actionPanel = true;
 			self.$store.commit('admin/setProcessKey', obj.processKey)
 			self.$store.commit('admin/setProcessId', obj.id);
