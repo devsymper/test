@@ -57,6 +57,7 @@ export default {
             isHideHeader:false,
             search: '',
             inputType:false,
+            controlValueKey:null,
             isSingleSelectCombobox:true,
             dataSelected:{}
         }
@@ -110,6 +111,9 @@ export default {
         },
         isShow(){
             return this.isShowAutoComplete;
+        },
+        setControlValueKey(controlValueKey){
+            this.controlValueKey = controlValueKey
         },
         setData(data){
             this.showHeader();

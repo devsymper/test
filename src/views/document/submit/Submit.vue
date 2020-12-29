@@ -693,6 +693,8 @@ export default {
                     (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [189,16,8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
                     if(!thisCpn.$refs.autocompleteInput.isShow()){
                         thisCpn.$refs.autocompleteInput.setTypeInput('autocomplete');
+                        let controlIns = getControlInstanceFromStore(thisCpn.keyInstance, e.controlName);
+                        thisCpn.$refs.autocompleteInput.setControlValueKey(controlIns.getAutocompleteKeyValue());
                         thisCpn.$refs.autocompleteInput.show(e.e);
                         let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
                         if(currentTableInteractive != null && currentTableInteractive != undefined)
@@ -1363,7 +1365,7 @@ export default {
         /**
          * Hàm xử lí sau khi chạy công thức được điền dữ liệu vào input bởi hệ thống
          */
-        handleInputChangeBySystem(controlName,valueControl, fromAutocomplete = false, isRunChange = true){
+        handleInputChangeBySystem(controlName,valueControl, fromPopupAutocomplete = false, isRunChange = true){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
             markBinedField(this.keyInstance,controlName);
             controlInstance.setValue(valueControl);
@@ -1371,13 +1373,13 @@ export default {
                 controlInstance.triggerOnChange()
             }
             
-            if(fromAutocomplete){
+            if(fromPopupAutocomplete){
                 $('#'+controlInstance.id).attr('data-autocomplete',valueControl);
             }
-            if(controlInstance.type == 'user'){
-                valueControl = $('#'+controlInstance.id).attr('user-id');
-                if(valueControl == undefined) valueControl = 0;
-            }
+            // if(controlInstance.type == 'user'){
+            //     valueControl = $('#'+controlInstance.id).attr('user-id');
+            //     if(valueControl == undefined) valueControl = 0;
+            // }
             // cần format lại giá trị date về năm tháng ngày để lưu vào store, tránh lỗi khi submit
             if(controlInstance.type == 'date'){
                 valueControl = this.$moment(valueControl).format('YYYY-MM-DD');
@@ -2947,10 +2949,10 @@ export default {
                 $('#'+controlInstance.id).attr('data-autocomplete',"");
                 return;
             }
-            if(controlInstance.type == 'user'){
-                valueControl = $('#'+controlInstance.id).attr('user-id');
-                if(valueControl == undefined) valueControl = 0;
-            }
+            // if(controlInstance.type == 'user'){
+            //     valueControl = $('#'+controlInstance.id).attr('user-id');
+            //     if(valueControl == undefined) valueControl = 0;
+            // }
             if(controlInstance.type == 'date'){
                 valueControl = this.$moment(valueControl,'DD-MM-YYYY').format('YYYY-MM-DD');
             }

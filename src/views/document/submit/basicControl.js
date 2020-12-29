@@ -340,6 +340,10 @@ export default class BasicControl extends Control {
                         this.ele.val("");
                     }
                 }
+                else if (this.type == 'user') {
+                    this.value = value.id;
+                    this.ele.val(value.display);
+                }
                 else if (this.type == 'image') {
                     this.setImageControlValue(value)
                 }        
@@ -402,6 +406,12 @@ export default class BasicControl extends Control {
         if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
             this.defaultValue = value;
         }
+    }
+    getAutocompleteKeyValue(){
+        let x = this.controlProperties;
+        console.log(x);
+        debugger
+        return this.controlProperties
     }
     setImageControlValue(value){
         this.ele.empty();
