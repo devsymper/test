@@ -160,24 +160,19 @@ function  getSortConfigs(filterData) {
  * @param {Object} header header phục vụ cho request 
  */
 export const getDataFromConfig = function(url, configs, columns, filterData, success, method = 'GET',header = {}){
-    let options = {};
+	let options = {};
     if(!configs.emptyOption){
         options = getOptionForGetList(configs, columns, filterData);
     }
 
     if(configs.customDataForApi){
         options = configs.customDataForApi(configs, columns, filterData);
-    }
+	}
     apiObj.callApi(method, url, options, header, {})
     .then(data => {
         success(data);
     })
     .catch(err => {
-        // console.warn(err);
-        // SYMPER_APP.$snotify({
-        //     type: "error",
-        //     title: SYMPER_APP.$t("table.error.cannot_get_data"),
-        //     text: ""
-        // });
+       
     });
 }

@@ -942,7 +942,6 @@ export default {
 				tableFilter: self.tableFilter,
 				customDataForApi: self.customDataForApi,
 				routeName: self.$getRouteName(),
-				columnDefs: self.columnDefs,
 				useWorkFlowHeader: self.useWorkFlowHeader,
 				searchKey: self.searchKey,
 				page: self.page,
@@ -950,6 +949,12 @@ export default {
 				conditionByFormula: self.conditionByFormula,
 				savedTableDisplayConfig: self.savedTableDisplayConfig
 			}
+			self.columnDefs.forEach(function(e){
+				if(e.cellRenderer){
+					e.cellRenderer = e.cellRenderer.toString()
+				}
+			})
+			obj.columnDefs = self.columnDefs
 			return obj
 		},
 		importExcel(){

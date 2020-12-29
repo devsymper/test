@@ -158,6 +158,7 @@ export const prepareFilterAndCallApi = function(columns = false, cache = false, 
 		if(dataConfig.customDataForApi){
 			configs.customDataForApi = dataConfig.customDataForApi;
 		}
+		debugger
 		getDataFromConfig(dataConfig.url, configs, columns, tableFilter, success, dataConfig.method, header);
 	}
 }
