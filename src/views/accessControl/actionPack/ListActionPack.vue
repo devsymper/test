@@ -24,7 +24,6 @@
                     @close-form="closeForm"
                     :action="actionOnItem"
                     :itemData="itemData"
-					
                     ref="actionPackForm"
                 ></ActionPackForm>
             </template>
@@ -200,14 +199,12 @@ export default {
             self.getActionPackOperations(row.id);
             self.actionOnItem = "detail";
             self.applyDataToForm(row);
-            self.$refs.actionPackForm.objectTypeToDocumentDefinition();
         },
         updateActionPack(row){
             let self = this;
             self.getActionPackOperations(row.id);
             self.actionOnItem = "update";
             self.applyDataToForm(row);
-            self.$refs.actionPackForm.objectTypeToDocumentDefinition();
         },
         // onRowSelected(row){
         //     let self = this;

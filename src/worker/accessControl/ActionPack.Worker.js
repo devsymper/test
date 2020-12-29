@@ -1,5 +1,4 @@
-import {adminApi} from '@/api/Admin.js'
-import {documentApi} from '@/api/Document.js'
+import {uiConfigApi} from "@/api/uiConfig";
 
 
 self.onmessage = async function (event) {
@@ -7,9 +6,9 @@ self.onmessage = async function (event) {
     let action = workerDataReceive.action;
     let data = workerDataReceive.data;
 	switch (action) {
-        case 'getDetailWorkflow':
-			let dataDetail = await getWorkflowDetail(data.processKey);
-            postMessage({action:'getDetailWorkflow', dataAfter : dataDetail})
+        case 'getAppInActionPack':
+			let getAppInActionPackRes = await getAppInActionPack(data.str);
+            postMessage({action:'getAppInActionPack', dataAfter : getAppInActionPackRes})
             break;
         
         default:
@@ -18,7 +17,12 @@ self.onmessage = async function (event) {
 };
 
 
-export const getWorkflowDetail = async function(id) {
-	
+export const getAppInActionPack = async function(str) {
+	let res = await uiConfigApi.getUiConfig(str)
+	let arr = []
+	if(res.status == 200){
+		arr = JSON.parse(res.data.detail)
+	}
+	return arr
 }
 

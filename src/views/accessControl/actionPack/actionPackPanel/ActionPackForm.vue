@@ -148,6 +148,7 @@ import ConfigActionPackOrgchart from "./ConfigActionPackOrgchart.vue" ;
 import ObjectInApplication from "./ObjectInApplication";
 import {uiConfigApi} from "@/api/uiConfig";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import ActionPackWorker from 'worker-loader!@/worker/accessControl/ActionPack.Worker.js';
 import ApplicationDefinitionForm from "@/views/accessControl/actionPack/helpers/ApplicationDefinitionForm";
 import _debounce from "lodash/debounce";
 
@@ -176,11 +177,24 @@ let commonTableSetting = {
 }
 export default {
     mounted(){
+		let self = this
 		this.reCaculateTableHeight();
+		this.actionPackWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getAppInActionPack':
+					self.listAppSelected = data.dataAfter
+					break;
+               
+                default:
+                    break;
+            }
+        });
     },
     created(){
 		this.genAllInputForFormTpl();
 		this.getObjectTypeSelections()
+		this.actionPackWorker = new ActionPackWorker()
     },
     methods: { 
         closeActionPackForm(){
@@ -189,16 +203,22 @@ export default {
 		getAppInActionPack(){
 			let self = this
 			let str = 'action-pack:'+ this.itemData.id
-			uiConfigApi.getUiConfig(str).then(res=>{
-				if(res.status == 200){
-					let arr = JSON.parse(res.data.detail)
-					self.listAppSelected = arr
-				}else{
-					self.listAppSelected = []
+			this.actionPackWorker.postMessage({
+				action: 'getAppInActionPack',
+				data:{
+					str: str
 				}
-			}).catch(err=>{
-
 			})
+			// uiConfigApi.getUiConfig(str).then(res=>{
+			// 	if(res.status == 200){
+			// 		let arr = JSON.parse(res.data.detail)
+			// 		self.listAppSelected = arr
+			// 	}else{
+			// 		self.listAppSelected = []
+			// 	}
+			// }).catch(err=>{
+
+			// })
 		},
         handlePermissionSelected(data){
             this.permissionDepartment = data           
@@ -928,6 +948,7 @@ export default {
     data(){
         let self = this;
         return {
+			actionPackWorker: null,
 			listAppSelected:[],
 			listObject:[],
 			objectActive:"document_definition",
