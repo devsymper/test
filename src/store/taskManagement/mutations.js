@@ -32,6 +32,9 @@ const setAllStatus = (state, allStatus) => {
 const setListStautsInProject = (state, data) => {
     Vue.set(state.listStatusInProjects, data.key , data.data);
 }
+const setListDocumentIdsInProject = (state, data) => {
+    Vue.set(state.listDocumentIdsInProject, data.key , data.data);
+}
 
 const setAllProject = (state, allProject) => {
     Vue.set(state, 'allProject', allProject);
@@ -271,6 +274,7 @@ export {
     setListProjectRecentAccess,
     setLogIssueRecentAccess,
     setAllDocumentIdsInIssueType,
-    setIssueAssignRecent
+    setIssueAssignRecent,
+    setListDocumentIdsInProject
 
 };

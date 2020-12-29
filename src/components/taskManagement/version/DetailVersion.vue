@@ -140,6 +140,8 @@
 </template>
 
 <script>
+import { taskManagementApi } from "@/api/taskManagement.js";
+
 export default {
     name:"detailversion",
     props:{
@@ -151,7 +153,10 @@ export default {
         },
     },
     data(){
+        let self = this;
         return{
+            projectId: null,
+            listIssue:[],
             dataProgess:{
                 total:10,
                 item:{
@@ -169,7 +174,56 @@ export default {
                     }
                 }
             },
+            filter:{
+                ids: null,
+                filter:[
+                    {
+                        column : "tmg_version_id",
+                        operation : "and",
+                        conditions : [
+                            {
+                                name : "in",
+                                value : [self.$route.params.idVersion],
+                            }
+                        ],
+                    },
+                ],
+                page : 1,
+                pageSize: 50,
+                distinct: true
+            }
         }
+    },
+    methods:{
+        getData(){
+            let documentIds = this.$store.state.taskManagement.listDocumentIdsInProject[this.projectId];
+            if (documentIds && documentIds.length > 0) {
+                this.filter.ids =JSON.stringify(documentIds);
+                taskManagementApi.getIssueFilter(this.filter)
+                .then(res => {
+                    if (res.status == 200) {
+                        this.listIssue = res.data.listObject;
+                    }else{
+                        this.$snotifyError("", "Can not get list issue in component!");
+                    }
+                });
+            }
+        
+        },
+    },
+    async created(){
+        this.projectId=this.$route.params.id;
+        if (!this.$store.state.taskManagement.listDocumentIdsInProject[this.projectId] || this.$store.state.taskManagement.listDocumentIdsInProject[this.projectId].length == 0) {
+            await this.$store.dispatch("taskManagement/getListDocumentIdsInProject",this.projectId);
+        }
+        if (!this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId] || this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId].length == 0) {
+            await this.$store.dispatch("taskManagement/getListIssueTypeInProjects",this.projectId);
+        }
+        if (!this.$store.state.taskManagement.allStatus || this.$store.state.taskManagement.allStatus.length == 0) {
+            await this.$store.dispatch("taskManagement/getAllStatus");
+        }
+        this.getData();
+      
     }
 
 }

@@ -9,7 +9,7 @@ export const taskManagementApi = {
     getDataLogService(data){
         return log.post("query",data);
     },
-    getIssueAssignRecent(data){
+    getIssueFilter(data){
         return document.post("documents/objects-by-multiple-document",data);
     },
     //danh mục category
@@ -72,6 +72,9 @@ export const taskManagementApi = {
     /// issue type
     getAllDocumentIdsInIssueType(){
         return taskManagement.get("issue-types-documentIds");
+    },
+    getDocumentIdsInProject(projectId){
+        return taskManagement.get("issue-types-documentIds",{projectId:projectId});
     },
     getListIssueTypeInProject(projectId){
         return taskManagement.get("issue-types/"+projectId);

@@ -1312,6 +1312,7 @@
         "listPriority":"List Priority",
         "listActionPack":"List ActionPack",
         "listPermission":"List Permission",
+        "listIssueComponent":"List Issue in component",
         "detailProject":"Detail project",
         "requiredField":"Indicates required field",
         "addPeople":"Add people",

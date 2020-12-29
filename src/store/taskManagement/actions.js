@@ -69,10 +69,10 @@ const getIssueAssignRecent = async(context,data) => { //documentId là all docum
         filter.sort.push(itemSort);
         filter.page = 1;
         filter.pageSize = 200;
-        filter.distinct = false;
+        filter.distinct = true;
 
         filter.ids =JSON.stringify(data.documentIds);
-        let res = await taskManagementApi.getIssueAssignRecent(filter);
+        let res = await taskManagementApi.getIssueFilter(filter);
         if (res.status == 200) {
             context.commit('setIssueAssignRecent', res.data.listObject);
         } else {
@@ -204,6 +204,20 @@ const getAllStatusCategory = async(context) => {
         }
     }
 }
+const getAllStatus = async(context) => {
+    if (context.state.allStatus.length==0) {
+        try {
+            let res = await taskManagementApi.getAllStatus();
+            if (res.status == 200) {
+                context.commit('setAllStatus', res.data.listObject);
+            } else {
+                SYMPER_APP.$snotifyError(error, "Can not get all Status!");
+            }
+        } catch (error) {
+            SYMPER_APP.$snotifyError(error, "Can not get all Status!");
+        }
+    }
+}
 const getAllRole = async(context,projectId) => {
     if (context.state.allRole.length==0) {
         try {
@@ -275,6 +289,25 @@ const getListIssueTypeInProjects = async(context,projectId) => {
     });
 }
 
+const getListDocumentIdsInProject = async(context,projectId) => {
+    return new Promise((resolve, reject) => {
+        try {
+            taskManagementApi.getDocumentIdsInProject(projectId).then(res=>{
+                if (res.status == 200) {
+                    let data={};
+                    data.key = projectId;
+                    data.data = res.data;
+                    context.commit('setListDocumentIdsInProject',data);
+                    resolve(data);
+                } else {
+                    SYMPER_APP.$snotifyError(error, "Can not get list documentIds in project!");
+                }
+            })
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
 const getListColumnInBoard = (context,boardId) => {
     return new Promise((resolve, reject) => {
         try {
@@ -411,7 +444,9 @@ export {
     getLogProjectAccess,
     getLogIssueRecentAccess,
     getIssueAssignRecent,
-    getAllDocumentIdsInIssueType
+    getAllDocumentIdsInIssueType,
+    getListDocumentIdsInProject,
+    getAllStatus,
 
 
 };

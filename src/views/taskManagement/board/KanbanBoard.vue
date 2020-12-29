@@ -267,6 +267,11 @@ export default {
         this.projectId = this.$route.params.id;
         this.getListBoard();
         this.getUserInProject();
+   
+        if (!this.sTaskManagement.listDocumentIdsInProject[this.projectId] || this.sTaskManagement.listDocumentIdsInProject[this.projectId].length == 0) {
+            this.$store.dispatch("taskManagement/getListDocumentIdsInProject",this.projectId);
+        }
+        
         let breadcrumbs = [
                 {
                     text: 'Dashboard',

@@ -51,7 +51,7 @@
                                     3 boards
                                 </div>
                                 <div>
-                                    {{item.userLeadName}}
+                                    <infoUser v-if="item.userLeader" class="userInfo fs-13" :userId="item.userLeader" :roleInfo="{}" />
                                 </div>
                             </div>
                         </div>
@@ -93,12 +93,14 @@ import { util } from "@/plugins/util";
 import IssueRecent from './IssueRecent.vue';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import AssignedRecent from './AssignedRecent.vue';
+import infoUser from "@/components/common/user/InfoUser";
 
 export default {
     components: {
         IssueRecent,
         VuePerfectScrollbar,
-        AssignedRecent 
+        AssignedRecent ,
+        infoUser,
     },
     computed:{
         listProjectRecent(){
@@ -114,12 +116,6 @@ export default {
                             continue; // thoát khỏi vòng lặp
                         }
                     }
-                    let userId=project.userLeader;
-                    if (userId.indexOf(":")>0) {  //check là userId hay userId:role
-                        let arrDataUserIden=userId.split(":");
-                        userId=arrDataUserIden[0];
-                    }
-                    project.userLeadName = allUserById[project.userLeader] ? allUserById[project.userLeader].displayName : '';
                     listProject.push(project);
                 }
             }
@@ -185,7 +181,6 @@ export default {
     height:135px;
     border: 1px solid #eeeeee;
     border-radius: 5px;
-    border-radius: 5px;
    
 }
 .header-item-recent{
@@ -198,17 +193,7 @@ export default {
     left: 10px;
     top: -10px;
 }
-.body-item-recent{
-    border-left: 1px solid #eeeeee;
-    border-right: 1px solid #eeeeee;
 
-}
-.footer-item-recent{
-    border: 1px solid #eeeeee;
-    border-top:unset;
-    border-bottom-left-radius: 5px;
-    border-bottom-right-radius: 5px;
-}
 .open-issue{
     padding: 2px 4px;
     background: #aaa;

@@ -61,7 +61,6 @@ const addCompletionItemsForDocControls = (state, data) => {
     let items = [];
     let word = '';
 	let item = {};
-	debugger
     for(let ctrl of controls){
 		let kind
 		if(mappingDocControlWithKind[ctrl.type]){
