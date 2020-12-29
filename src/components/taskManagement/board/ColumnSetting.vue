@@ -35,8 +35,8 @@
                 <draggable :list="columns" :animation="250" class="py-4 h-100 w-100" ghost-class="ghost-columns" group="people">
                     <transition-group type="transition" name="flip-list" class="wrap-kanban-board">
                         <div
-                            v-for="(column,index) in columns"
-                            :key="index"
+                            v-for="column in columns"
+                            :key="column.id"
                             :style="getColWidth()"
                             class=" board-column-item mr-4"
                         >
