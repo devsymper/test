@@ -59,13 +59,14 @@
                     />
                 </v-tab-item>
                 <v-tab-item>
-                   
+                   <page-issue-done 
+                   />
                 </v-tab-item>
                 <v-tab-item>
-            
+                    <page-issue-in-progress />
                 </v-tab-item>
                 <v-tab-item>
-                
+                    <page-issue-to-do />
                 </v-tab-item>
             </v-tabs>
         </div>
@@ -75,9 +76,12 @@
 <script>
 import { taskManagementApi } from "@/api/taskManagement.js";
 import CommonTableListIssue from './CommonTableListIssue.vue';
+import PageIssueDone from './PageIssueDone.vue';
+import PageIssueInProgress from './PageIssueInProgress';
+import PageIssueToDo from './PageIssueToDo.vue';
 
 export default {
-  components: { CommonTableListIssue },
+  components: { CommonTableListIssue, PageIssueDone, PageIssueInProgress, PageIssueToDo },
     name:"detailversion",
     props:{
         infoVersion: {
@@ -187,7 +191,7 @@ export default {
                     if (res.status == 200) {
                         this.listIssue = res.data.listObject;
                     }else{
-                        this.$snotifyError("", "Can not get list issue in component!");
+                        this.$snotifyError("", "Can not get list issue in version!");
                     }
                 });
             }

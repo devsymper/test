@@ -1,6 +1,6 @@
 <template>
     <common-table-list-issue
-        :listIssueProps="listIssueDoneInVersion"
+        :listIssueProps="listIssueToDoInVersion"
 
     />
 </template>
@@ -14,7 +14,7 @@ export default {
         CommonTableListIssue, 
     },
     computed:{
-        listIssueDoneInVersion(){
+        listIssueToDoInVersion(){
             let issues = this.listIssue;
             let allPriority = this.$store.state.taskManagement.allPriority;
             let listIssueType = this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId];
@@ -84,7 +84,7 @@ export default {
                         conditions : [
                             {
                                 name : "in",
-                                value : ["5fe3155e-23fc-a6da-66e5-56560ea2ab8b"],
+                                value : ["5fe314fb-47f0-99a5-d682-7ae20ea2ab8b"],
                             }
                         ],
                     },
@@ -105,7 +105,7 @@ export default {
                     if (res.status == 200) {
                         this.listIssue = res.data.listObject;
                     }else{
-                        this.$snotifyError("", "Can not get list issue done in version!");
+                        this.$snotifyError("", "Can not get list issue inprogress in version!");
                     }
                 });
             }
@@ -124,9 +124,7 @@ export default {
             await this.$store.dispatch("taskManagement/getAllStatus");
         }
         this.getData();
-      
     }
-
 }
 </script>
 

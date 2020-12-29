@@ -38,7 +38,8 @@ export default {
     },
     methods:{
         afterToggleSideBar(vl){
-            this.isExpand = !vl
+            this.isExpand = !vl;
+            this.$store.commit("taskManagement/addToTaskManagementStore",{key:"hideSidebar",value:vl})
         }
     },
     data(){
