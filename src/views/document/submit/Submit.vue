@@ -728,6 +728,8 @@ export default {
                     (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
                     (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [189,16,8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
                     if(!this.$refs.autocompleteInput.isShow()){
+                        let controlIns = getControlInstanceFromStore(thisCpn.keyInstance, e.controlName);
+                        thisCpn.$refs.autocompleteInput.setControlValueKey(controlIns.getAutocompleteKeyValue());
                         this.$refs.autocompleteInput.show(e.e);
                         let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
                         if(currentTableInteractive != null && currentTableInteractive != undefined)
@@ -760,6 +762,9 @@ export default {
                             value: controlName,
                             instance: this.keyInstance
                         });
+
+                let controlIns = getControlInstanceFromStore(this.keyInstance, controlName);
+                this.$refs.autocompleteInput.setControlValueKey(controlIns.getAutocompleteKeyValue());
                 this.$refs.autocompleteInput.setTypeInput(e.type);
                 if(e.type == 'combobox'){
                     this.$refs.autocompleteInput.setSingleSelectCombobox(e.isSingleSelect);

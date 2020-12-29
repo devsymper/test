@@ -408,10 +408,7 @@ export default class BasicControl extends Control {
         }
     }
     getAutocompleteKeyValue(){
-        let x = this.controlProperties;
-        console.log(x);
-        debugger
-        return this.controlProperties
+        return this.controlProperties.itemValue.value
     }
     setImageControlValue(value){
         this.ele.empty();
