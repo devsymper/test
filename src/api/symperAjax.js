@@ -18,6 +18,12 @@ export const symperAjax = async(options) =>{
 	const response = await fetch(options.url,options)
 	return  response.status == 204  ? null : response.json()   
 }
+
+/**
+ * Dev create : Dungna
+ * Date create: 2020/12/29
+ * Description: Hàm chuyển object thành url params
+ */
 export const serialize = function(obj, prefix) {
 	var str = [],
 	  p;
