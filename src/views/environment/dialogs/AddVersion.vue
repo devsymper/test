@@ -2,7 +2,7 @@
 	<v-dialog
 		v-model="showDialog"
 		persistent
-		max-width="290"
+		max-width="500"
 	>
 		<v-card class="dialog-add-version">
 		<v-card-title class="fs-15 ">
@@ -14,6 +14,7 @@
 				:allInputs="allInputs"
 				:single-line="true"
 			/>
+
 			 <v-menu
 				ref="menu"
 				v-model="menu"
@@ -56,6 +57,13 @@
 				</v-btn>
           </v-date-picker>
         </v-menu>
+		<span class=" mt-2 fs-13 mb-1">Mô tả</span>
+		<div class="text-description-area">
+			<v-textarea
+				solo
+				v-model="description"
+			></v-textarea>
+		</div>
 		</v-card-text>
 		<v-card-actions>
 			<v-spacer></v-spacer>
@@ -81,9 +89,14 @@
 <script>
 import FormTpl from "@/components/common/FormTpl";
 import {environmentManagementApi} from '@/api/EnvironmentManagement'
+import EnvironmentWorker from 'worker-loader!@/worker/environment/Environment.Worker.js';
+
 export default {
 	components:{
-		FormTpl
+		FormTpl,
+	},
+	created(){
+		this.environmentWorker = new EnvironmentWorker()
 	},
 	props:{
 		showDialog:{
@@ -104,7 +117,22 @@ export default {
 				this.allInputs[i].value = ""
 			}
 			this.dates = ""
+			this.description  = ''
 		}
+	},
+	mounted(){
+		let self = this
+        this.environmentWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'addVersion':
+					self.handlerAddversionRes(data.dataAfter)
+					break;
+                
+                default:
+                    break;
+            }
+        });
 	},
 	methods:{
 		cancel(){
@@ -119,6 +147,7 @@ export default {
 				serviceId = this.routerSerViceId
 			}
 			let formData = {
+				description:this.description
 			}
 			for(let i in this.allInputs){
 				if(i == "status"){
@@ -129,32 +158,44 @@ export default {
 
 			}
 			formData.releaseAt = this.dates
-			environmentManagementApi.addVersion({
-				serviceId:serviceId,
-				formData:formData
-			}).then(res=>{
-				if(res.status == 200){
-					self.$snotify({
-						type: "success",
-						title: " Thêm version thành công"
-					})
-					self.$emit('add-success')
-				}else{
-					self.$snotify({
-						type: "error",
-						title: " Có lỗi xảy ra"
-					})
+			this.environmentWorker.postMessage({
+				action: 'addVersion',
+				data:{
+					serviceId: serviceId,
+					formData: formData
 				}
-			}).catch(err=>{
-					self.$snotify({
-						type: "error",
-						title: " Có lỗi xảy ra"
-					})
 			})
+			// environmentManagementApi.addVersion({
+			// 	serviceId:serviceId,
+			// 	formData:formData
+			// }).then(res=>{
+			
+			// }).catch(err=>{
+			// 		self.$snotify({
+			// 			type: "error",
+			// 			title: " Có lỗi xảy ra"
+			// 		})
+			// })
+		},
+		handlerAddversionRes(res){
+			if(res.status == 200){
+				this.$snotify({
+					type: "success",
+					title: " Thêm version thành công"
+				})
+				this.$emit('add-success')
+			}else{
+				this.$snotify({
+					type: "error",
+					title: " Có lỗi xảy ra"
+				})
+			}
 		}
 	},
 	data(){
 		return{
+			environmentWorker: null,
+			description: "",
 			menu: false,
 			dates: "",
 			allInputs:{
@@ -170,6 +211,12 @@ export default {
                     value: "",
                     info: ""
 				},
+				// description:{
+                //     title: "Mô tả",
+                //     type: "text",
+                //     value: "",
+                //     info: ""
+				// },
 				status: {
                     title: "Status",
                     type: "checkbox",
@@ -189,5 +236,18 @@ export default {
 }
 .dialog-add-version >>> .v-input__prepend-outer .v-icon{
 	font-size: 13px !important;
+}
+.dialog-add-version >>> .v-text-field__details{
+	display: none !important;
+}
+.dialog-add-version >>> .v-input__slot{
+	box-shadow: unset !important;
+	/* border: 1px solid lightgray; */
+}
+.dialog-add-version >>> .v-input__slot textarea{
+	font-size: 13px !important;
+}
+.dialog-add-version >>> .text-description-area .v-input__slot{
+	border: 1px solid lightgray;
 }
 </style>

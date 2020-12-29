@@ -47,7 +47,7 @@
                         :likeHandsonTable="true"
                         :rowData="dataTable"
                         :editable="false"
-                         @grid-ready="onGridReady"
+						@grid-ready="onGridReady"
                         :customComponents="customAgComponents"
                         :cellRendererParams="{
                             innerRenderer:'nodeName'
@@ -267,7 +267,7 @@ export default {
                 if(self.$refs.orgStructureView){
                   self.$refs.orgStructureView.reDrawDiagram();
                 }
-            }, 1000, this);
+			}, 1000, this);
             return data;
         },
         allColumns(){

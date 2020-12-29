@@ -40,12 +40,22 @@
 				<v-btn
 					:class="{'mr-2 white--text':true, 'mr-8':showSwitchBtn == false}"
 					depressed
-					color="success"
+					color="primary"
 					small
 					:disabled="disableBtn"
 					@click="activeProcessInstance"
 				>
 				Chạy
+				</v-btn>
+				<v-btn
+					:class="{'mr-2 white--text':true, 'mr-8':showSwitchBtn == false}"
+					depressed
+					color="success"
+					small
+					:disabled="disableBtn"
+					@click="endProcessInstance"
+				>
+				Hoàn thành
 				</v-btn>
 				
 				 <v-tooltip bottom v-if="showSwitchBtn">
@@ -68,6 +78,12 @@
 					<span>Xem toàn màn hình</span>
 				</v-tooltip>	
 		</div>
+			<ConfirmDelete 
+				:showDialog="showDialog"
+				v-if="showDialog"
+				@cancel="cancel"
+				@confirm="deleteProcessInstance"
+			 />
 			<ListItems 
 				ref="listWorkFlow"
 				:pageTitle="'Danh sách các quy trình con'"
@@ -82,16 +98,13 @@
 				:tableContextMenu="tableContextMenu"
 				:showToolbar="false"
 				:isTablereadOnly="false"
+				:customRenderForFilter="customRenderForFilter"
 				@after-selected-row="afterSelectedRow"
 				:showImportHistoryBtn="false"
 				:showPagination="false"
 				:showActionPanelInDisplayConfig="false"
 			/>
-		<ConfirmDelete 
-			:showDialog="showDialog"
-			@cancel="cancel"
-			@confirm="deleteProcessInstance"
-			 />
+	
   </div>
 </template>
 
@@ -102,6 +115,7 @@ import { appConfigs } from "./../../configs.js";
 import {adminApi} from '@/api/Admin.js'
 import {documentApi} from '@/api/Document.js'
 import ListItems from "@/components/common/ListItems.vue"
+import AdminWorker from 'worker-loader!@/worker/admin/Admin.Worker.js';
 import Handsontable from 'handsontable';
 export default {
 	components:{
@@ -122,6 +136,24 @@ export default {
 		return{
 			showDialog:false,
 			disableBtn: true,
+			customRenderForFilter(columnName,items){
+				if(columnName == 'status'){
+					items.forEach(function(e){
+						if(columnName == 'status'){
+							items.forEach(function(e){
+								if(e.value == "1"){
+									e.label = "Đang chạy"
+								}else if(e.value == '2'){
+									e.label = "Tạm dừng"
+								}else if(e.value == '3'){
+									e.label = "Hoàn thành"
+								}
+							})
+						}
+					})
+				}
+				return items
+			},
 			listItemSelected:[],
 			showBtnAddCheckbox: true,
 			customAPIResult:{
@@ -130,6 +162,8 @@ export default {
 						let arr = []
 						res.data.listObject.forEach(function(e){
 							arr.push(e.id)
+							let processDefId = e.processDefinitionId.split(':')
+							e.nameVersion = processDefId[1]
 						})
 						let obj = res.data.listObject
 						adminApi.getStartUserName(arr).then(resA=>{
@@ -146,12 +180,17 @@ export default {
 						}).catch(err=>{
 
 						})
+						res.data.listObject.sort(function(a,b){
+							var c = new Date(a.startTime);
+							var d = new Date(b.startTime);
+							return d-c;
+						})
 					}
 					return{
                          columns: [
                             {name: "id", title: "id", type: "numeric"},
 							{name: "name", title: "name", type: "text"},
-							{name: "startUserName", title: "startUserId", type: "text"},
+							{name: "startUserName", title: "startUserId", type: "text", noFilter: true},
 							{name: "status", title: "status", type: "date",
 								  renderer:  function(instance, td, row, col, prop, value, cellProperties) {
 										Handsontable.dom.empty(td);
@@ -178,7 +217,21 @@ export default {
 										}
 									},
 							},
-							{name: "endTime", title: "endTime", type: "date", noFilter:true,
+							{name: "nameVersion", title: "nameVersion", type: "text", noFilter: true},
+							{name: "startTime", title: "startTime", type: "text",
+								renderer:  function(instance, td, row, col, prop, value, cellProperties) {
+									Handsontable.dom.empty(td);
+									let span;
+									span = document.createElement('span');	
+									if(value != null){
+										let data =  self.$moment(value).format('YYYY-MM-DD HH:mm:ss')
+										$(span).text(data)
+									}	
+									td.appendChild(span);
+									return td;
+								},
+							},
+							{name: "endTime", title: "endTime", type: "text",
 								renderer:  function(instance, td, row, col, prop, value, cellProperties) {
 									Handsontable.dom.empty(td);
 									let span;
@@ -197,6 +250,7 @@ export default {
 				}
 			},
 			containerHeight: null,
+			adminWorker: null,
 			tableContextMenu: {
                viewDetails: {
                     name: "View details",
@@ -221,7 +275,38 @@ export default {
 	},
 	mounted(){
 		this.containerHeight = util.getComponentSize(this).h 
-		this.$refs.listWorkFlow.addCheckBoxColumn()
+		this.adminWorker = new AdminWorker();
+		let self = this
+        this.adminWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'endProcessInstance':
+					self.notifyMessage(data.dataAfter," Tác vụ này đã hoàn thành", "Hoàn thành tác vụ thành công")
+					break;
+                case 'stopProcessInstance':
+					self.notifyMessage(data.dataAfter," Tác vụ này đã hoàn thành", "Dừng tác vụ thành công")
+					break;
+                case 'activeProcessInstance':
+					self.notifyMessage(data.dataAfter," Tác vụ này đã hoàn thành", "Chạy tác vụ thành công")
+					break;
+                case 'deleteProcessInstance':
+					if(data.dataAfter.resDoc == 'notFound'){
+						self.$snotify({
+							type: "error",
+							title: "Không tìm thấy bản ghi liên quan"
+						})
+					}else if(data.dataAfter.resDoc == 'done'){
+						self.$snotify({
+							type: "success",
+							title: "Xóa bản ghi liên quan thành công"
+						})
+					}
+					self.notifyMessage(data.dataAfter.newLists," Tác vụ này đã hoàn thành", "Xóa tác vụ thành công")
+					break;
+                default:
+                    break;
+            }
+        });
 	},
 	watch:{
 		processKey(val){
@@ -232,7 +317,6 @@ export default {
 			deep: true,
             immediate: true,
             handler(obj){
-				this.showBtnAddCheckbox = true
 				if(Object.keys(obj).length == 0){
 					this.disableBtn = true
 				}else{
@@ -250,74 +334,63 @@ export default {
 					this.disableBtn = false
 				}
 		},
+		notifyMessage(data , titleError, titleSuccess){
+			let self = this
+				data.forEach(function(e){
+				if(e == "isDone"){
+					self.$snotify({
+						type: "error",
+						title: titleError
+					})
+				}else if(e == "done"){
+					self.$snotify({
+						type: "success",
+						title: titleSuccess
+					})
+					
+				}else if(e == "isStop"){
+					self.$snotify({
+						type: "error",
+						title: 'Tác vụ này đã được dừng'
+					})
+				}else if(e == "isRunning"){
+					self.$snotify({
+						type: "error",
+						title: 'Tác vụ này đang chạy'
+					})
+					
+				}
+			})
+			self.showBtnAddCheckbox = true
+			self.$refs.listWorkFlow.refreshList()
+		},
 		switchFullScreen(){
 			let processKey = this.$store.state.admin.processKey
 			this.$goToPage('/workflow/process-key/'+processKey+'/list-instances', this.$t('process.instance.listModelInstance')+processKey)
 		},
 		stopProcessInstance(){
-			let self = this
-			for(let i in this.listItemSelected){
-				if(this.listItemSelected[i].status == "3"){
-					self.$snotify(
-						{
-							type: "infor",
-							title:" Tác vụ này đã hoàn thành"
-						}
-					)
-				}else{
-					adminApi.stopProcessInstances(this.listItemSelected[i].id).then(res=>{
-						if(res.suspended == true){
-							self.$snotify(
-								{
-									type: "success",
-									title:" Dừng tác vụ thành công"
-								}
-							)
-						}
-						self.$refs.listWorkFlow.refreshList()
-					}).catch(err=>{
-						self.$snotify(
-								{
-									type: "error",
-									title:"Tác vụ này đã được dừng"
-								}
-							)
-					})
+			this.adminWorker.postMessage(
+				{
+					action:'stopProcessInstance',
+					data:{listItemSelected: this.listItemSelected}
 				}
-				
-			}
- 		},
+			);
+		 },
+		endProcessInstance(){
+			this.adminWorker.postMessage(
+				{
+					action:'endProcessInstance',
+					data:{listItemSelected: this.listItemSelected}
+				}
+			);
+		},
 		activeProcessInstance(){
-			let self = this
-			for(let i in this.listItemSelected){
-				if(this.listItemSelected[i].status == "3"){
-					self.$snotify(
-						{
-							type: "infor",
-							title:" Tác vụ này đã hoàn thành"
-						}
-					)
-				}else{
-					adminApi.activeProcessInstances(this.listItemSelected[i].id).then(res=>{
-						self.$snotify(
-							{
-								type: "success",
-								title:" Chạy tác vụ thành công"
-							}
-						)
-						self.$refs.listWorkFlow.refreshList()
-					}).catch(err=>{
-						self.$snotify(
-								{
-									type: "error",
-									title:"Tác vụ này đang chạy"
-								}
-							)
-					})
+			this.adminWorker.postMessage(
+				{
+					action:'activeProcessInstance',
+					data:{listItemSelected: this.listItemSelected}
 				}
-				
-			}
-			
+			);
 		},
 		confirmDelete(){
 			this.showDialog = true
@@ -328,56 +401,78 @@ export default {
 		},
 		deleteProcessInstance(value){
 			this.showDialog = false
-			let self = this
-			if(value == true){
-				let arr = []
-				for(let i in this.listItemSelected){
-					arr.push(this.listItemSelected[i].id)
-				}
-				documentApi.deleteDocumentObject({workflowObjectIds:JSON.stringify(arr)}).then(res=>{
-					if(res.status == 400){
-						self.$snotify(
-							{
-								type: "error",
-								title:" Không tìm thấy bản ghi liên quan"
-							}
-						)
-					}else if(res.status = 200){
-						self.$snotify(
-							{
-								type: "success",
-								title:" Xóa bản ghi liên quan hành công"
-							}
-						)
+			this.adminWorker.postMessage(
+				{
+					action:'deleteProcessInstance',
+					data:{
+						listItemSelected: this.listItemSelected,
+						isDeleteDoc: value
 					}
-				}).catch(err=>{
-					self.$snotify(
-						{
-							type: "error",
-							title:" Xóa bản ghi liên quan thất bại"
-						}
-					)
-				})
-			}
-			for(let i in this.listItemSelected){
-				adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
-					self.$snotify(
-						{
-							type: "success",
-							title:" Xóa tác vụ thành công"
-						}
-					)
-					self.$refs.listWorkFlow.refreshList()
-				}).catch(err=>{
-					self.$snotify(
-							{
-								type: "error",
-								title:"Đã có lỗi xảy ra"
-							}
-						)
-				})
-			}
+				}
+			);
+			// let self = this
+			// if(value == true){
+			// 	let arr = []
+			// 	for(let i in this.listItemSelected){
+			// 		arr.push(this.listItemSelected[i].id)
+			// 	}
+			// 	documentApi.deleteDocumentObject({workflowObjectIds:JSON.stringify(arr)}).then(res=>{
+			// 		if(res.status == 400){
+			// 			self.$snotify(
+			// 				{
+			// 					type: "error",
+			// 					title:" Không tìm thấy bản ghi liên quan"
+			// 				}
+			// 			)
+			// 		}else if(res.status = 200){
+			// 			self.$snotify(
+			// 				{
+			// 					type: "success",
+			// 					title:" Xóa bản ghi liên quan hành công"
+			// 				}
+			// 			)
+			// 		}
+			// 	}).catch(err=>{
+			// 		self.$snotify(
+			// 			{
+			// 				type: "error",
+			// 				title:" Xóa bản ghi liên quan thất bại"
+			// 			}
+			// 		)
+			// 	})
+			// }
+			// for(let i in this.listItemSelected){
+			// 	if(this.listItemSelected[i].status == '3'){
+			// 		adminApi.deleteTask(this.listItemSelected[i].id).then(res=>{
+			// 			self.notifysuccess()
+			// 		}).catch(err=>{})
+			// 	}else{
+			// 		adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
+			// 			adminApi.deleteTask(this.listItemSelected[i].id).then(res=>{
+			// 			}).catch(err=>{})
+			// 			self.notifysuccess()
+			// 		}).catch(err=>{
+			// 			self.$snotify(
+			// 					{
+			// 						type: "error",
+			// 						title:"Đã có lỗi xảy ra"
+			// 					}
+			// 				)
+			// 		})
+			// 	}
+				
+			// }
 			
+		},
+		notifysuccess(title = " Xóa tác vụ thành công"){
+			this.$snotify(
+				{
+					type: "success",
+					title: title
+				}
+			)
+			this.showBtnAddCheckbox = true
+			this.$refs.listWorkFlow.refreshList()
 		},
 		cancel(){
 			this.showDialog = false

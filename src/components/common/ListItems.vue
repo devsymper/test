@@ -12,6 +12,7 @@
                     <div :class="{'float-right': true, 'overline' : true , 'show-panel-mode': actionPanel } ">
                         <v-text-field
                             @input="bindToSearchkey"
+							v-if="showSearchBox"
                             class="d-inline-block mr-2 sym-small-size"
                             single-line
                             :append-icon="$i('input.search')"
@@ -20,6 +21,15 @@
                             label="Search"
                             :placeholder="$t('common.search')"
                         ></v-text-field>
+						<v-btn
+                            depressed
+                            small
+                            class="mr-2"
+                            v-if="actionPanel "
+                            @click="showSearchBox = !showSearchBox"
+                        >
+                            <v-icon small dark> {{ showSearchBox ? 'mdi-close' : 'mdi-magnify'}} </v-icon>
+                        </v-btn>
                          <v-btn
                             v-show="showButtonAdd && !actionPanel && !dialogMode"
                             depressed
@@ -229,7 +239,7 @@
             :is="actionPanelWrapper"
             :width="actionPanelWidth"
             :max-width="actionPanelWidth"
-            v-model="actionPanel"
+			v-model="actionPanel"
             class="pa-3"
             absolute
             right
@@ -339,7 +349,7 @@ var testSelectData = [ ];
 window.tableDropdownClickHandle = function(el, event) {
     event.preventDefault();
     event.stopPropagation();
-    let thisListItem = util.getClosestVueInstanceFromDom(el, "SymperListItem");
+	let thisListItem = util.getClosestVueInstanceFromDom(el, "SymperListItem");
     thisListItem.showTableDropdownMenu(
         event.pageX,
         event.pageY,
@@ -351,12 +361,18 @@ export default {
     watch: {
         actionPanel(){
             if (this.actionPanel == true) {
-                this.$emit("open-panel");
+				this.$emit("open-panel");
+				this.showSearchBox = false
+            }
+            else{
+                this.$emit("close-panel");
             }
         },
         getDataUrl(){   
 			this.page = 1
-        	this.refreshList();
+			if(this.refreshListWhenChangeUrl){
+        		this.refreshList();
+			}	
         },
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
             if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
@@ -378,10 +394,12 @@ export default {
     data() {
         let self = this;
         return {
+			showSearchBox: true,
             tmpTableContextMenu: null,
             deleteDialogShow: false, // có hiển thị cảnh báo xóa hay không
             deleteItems: [], // danh sách các row cần xóa
-            savingConfigs: false, // có đang lưu cấu hình của showlist hay không
+			savingConfigs: false, // có đang lưu cấu hình của showlist hay không
+			
             // các cấu hình cho việc hiển thị và giá trị của panel cấu hình hiển thị của bảng
             tableDisplayConfig: {
                 show: false, // có hiển thị panel cấu hình ko
@@ -560,6 +578,10 @@ export default {
         });
     },
     props: {
+		refreshListWhenChangeUrl:{
+			type: Boolean, 
+			default: true
+		},
         /**
          * Hàm phục vụ cho việc dev tự định nghĩa data khi gọi API để lấy dữ liệu
          * thay vì sử dụng hàm có sẵn, các tham số truyền vào giống như hàm getOptionForGetList trong defaultFilterConfig
@@ -567,6 +589,14 @@ export default {
         customDataForApi: {
             type: Function,
             // default: (configs, columns, filterData)=>{}
+            default: null
+		},
+		/**
+         * Hàm phục vụ cho việc dev tự định nghĩa custom hiển thị trên component filter
+         */
+        customRenderForFilter: {
+            type: Function,
+            // default: (columnName, items)=>{ return items}
             default: null
         },
 		apiMethod:{
@@ -821,7 +851,7 @@ export default {
                     util.getComponentSize(ref.topBar).h +
                     util.getComponentSize(ref.bottomBar).h + 14;
             }
-            return tbHeight - 15;
+            return tbHeight - 15 ;
         },
         /**
          * Tạo cấu hình cho hiển thị header của table
@@ -840,7 +870,7 @@ export default {
                 return headers;
             }, []);
             return function(col) {
-                let colName = colNames[col];
+				let colName = colNames[col];
                 let markFilter = "";
                 if (thisCpn.filteredColumns[colName]) {
                     markFilter = "applied-filter";
@@ -907,8 +937,6 @@ export default {
         },  
         rerenderTable(){
             this.$refs.dataTable.hotInstance.render();
-        },
-        myFunctionScroll(e){
         },
         importExcel(){
             this.$emit('import-excel');
@@ -1247,7 +1275,11 @@ export default {
                 this.$delete(this.tableFilter.allColumn, colName);
                 icon.removeClass("applied-filter");
             }
-        },
+		},
+		emptyShowList(){
+			this.tableColumns = []
+			this.data = []
+		},
         /**
          * Lấy data từ server
          * @param {Array} columns chứa thông tin của các cột cần trả về.
@@ -1276,8 +1308,6 @@ export default {
                 }else{
                     thisCpn.data = resData;
                 }
-                thisCpn.handleStopDragColumn();
-                thisCpn.$emit('data-get', data.listObject);
             }
             this.prepareFilterAndCallApi(columns , cache , applyFilter, handler);
         },
@@ -1303,7 +1333,6 @@ export default {
                         Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0',
                         "Content-Type": "application/json",
                     };
-                    // options = {};
                     emptyOption = true;
                 }
 
@@ -1318,7 +1347,7 @@ export default {
                 if(this.customDataForApi){
                     configs.customDataForApi = this.customDataForApi;
                 }
-                getDataFromConfig(url, configs, columns, tableFilter, success, method, header);
+				getDataFromConfig(url, configs, columns, tableFilter, success, method, header);
             }
         },
         /**
@@ -1522,7 +1551,10 @@ export default {
                         arr.push(el[columns[0]]);
                         return arr;
                     }, []);
-                    self.tableFilter.currentColumn.colFilter.selectItems = self.createSelectableItems(items);
+					self.tableFilter.currentColumn.colFilter.selectItems = self.createSelectableItems(items);
+					if(self.customRenderForFilter != null){
+                  	  	self.tableFilter.currentColumn.colFilter.selectItems = self.customRenderForFilter(self.tableFilter.currentColumn.name,self.tableFilter.currentColumn.colFilter.selectItems);
+					}
                 }
             }
             this.prepareFilterAndCallApi(columns , false, true, success, options);
@@ -1691,6 +1723,9 @@ export default {
 };
 </script>
 <style scoped>
+	.list-item-common-symper >>> .v-input__control{
+		background-color: #ffffff !important;
+	}
     .group-action-list >>> .v-list-item {
         min-height:unset;
         height:30px;
@@ -1776,8 +1811,8 @@ i.applied-filter {
 .symper-list-item .ht_clone_top_left_corner thead tr th:nth-last-child(2)  {
     border-right-width: 0px !important;
 }
-.handsontable td,
-.handsontable th {
+.symper-list-item .handsontable td,
+.symper-list-item .handsontable th {
     color: #212529 !important;
     border-color: #bbb;
     border-right: 0;

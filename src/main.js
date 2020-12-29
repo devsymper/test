@@ -11,6 +11,7 @@ import {
 import BaView from "./views/layout/BAView";
 import EndUserView from "./views/layout/EndUserView";
 import ContentOnlyView from "./views/layout/ContentOnlyView";
+import Preloader from "@/components/common/Preloader";
 import Notifications from 'vue-notification'
 import VueMoment from "vue-moment";
 import {
@@ -22,12 +23,14 @@ import VueRx from 'vue-rx'
 import iconMap from "./icon";
 //Anhtger import html2canvas
 import VueHtml2Canvas from 'vue-html2canvas';
+util.auth.checkLoginAndSetToIndexedDB();
 Vue.use(VueHtml2Canvas);
 Vue.component('ba-view', BaView);
 Vue.component('end-user-view', EndUserView);
 Vue.component('content-only-view', ContentOnlyView);
 Vue.use(VueRx)
 Vue.use(uploader)
+Vue.component('preloader', Preloader);
 Vue.mixin({
     methods: {
         $bindAction(actionDef, param = {}) {

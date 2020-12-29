@@ -45,7 +45,7 @@
         :instance="keyInstance" 
         ref="saveDocPanel" 
         @check-name-document="checkBeforeDocumentNameChange"
-        @save-doc-action="validateControl"
+        @save-doc-action="validateControlAfterSave"
         @save-form-print-action="saveFormPrint"/>
         
         <FormModal 
@@ -136,6 +136,8 @@ import 'tinymce/plugins/preview';
 import 'tinymce/plugins/fullscreen';
 import 'tinymce/plugins/paste';
 import 'tinymce/plugins/hr';
+import 'tinymce/plugins/charmap';
+
                                 
 // biến lưu chiều rộng editor trước khi resize 
 const ALL_CONTROL = "allControl"
@@ -202,13 +204,14 @@ export default {
             plugins: [
             'advlist autolink lists link image table print preview',
             ' fullscreen',
+            'charmap',
             'table paste hr'
             ],
             contextmenu: 'inserttable table | settingtable | dragTable',
             toolbar:
             'undo redo | fontselect fontsizeselect formatselect pageSize| bold italic forecolor backcolor | \
             alignleft aligncenter alignright alignjustify | \
-            bullist numlist indent hr | removeformat  table |  preview margin rotatePage mdiIcon',
+            bullist numlist indent hr | removeformat  table |  preview margin rotatePage mdiIcon |charmap',
             fontsize_formats: '8px 10px 11px 12px 13px 14px 15px 16px 17px 18px 19px 20px 21px 22px 23px 24px 25px 26px 27px 28px 29px 30px 32px 34px 36px',
             font_formats: 'Roboto=Roboto,sans-serif; Andale Mono=andale mono,times;'+ 'Arial=arial,helvetica,sans-serif;'+ 'Arial Black=arial black,avant garde;'+ 'Book Antiqua=book antiqua,palatino;'+ 'Comic Sans MS=comic sans ms,sans-serif;'+ 'Courier New=courier new,courier;'+ 'Georgia=georgia,palatino;'+ 'Helvetica=helvetica;'+ 'Impact=impact,chicago;'+ 'Symbol=symbol;'+ 'Tahoma=tahoma,arial,helvetica,sans-serif;'+ 'Terminal=terminal,monaco;'+ 'Times New Roman=times new roman,times,serif;'+ 'Trebuchet MS=trebuchet ms,geneva;'+ 'Verdana=verdana,geneva;'+ 'Webdings=webdings;'+ 'Wingdings=wingdings,zapf dingbats',
             valid_elements: '*[*]',
@@ -307,7 +310,10 @@ export default {
                     self.detectBlurEditorEvent(e)
                 });
                 ed.on('keyup', function(e) {
-                    self.keyHandler(e)
+                    self.keyHandler(e, ed)
+                });
+                ed.on('keydown', function(e) {
+                    self.keyDownHandler(e, ed)
                 });
                 ed.on('paste', function(e) {
                     self.handlePasteContent(e);
@@ -330,6 +336,7 @@ export default {
                 self.initEditor()
             },
         });
+        this.handleCloseChrome();
     },
     created() {
         this.currentTabIndex = this.$store.state.app.currentTabIndex;        
@@ -355,9 +362,13 @@ export default {
             let elControl = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body #'+locale.id);
             this.setSelectedControlProp(locale.event,elControl,$('#document-editor-'+this.keyInstance+'_ifr').get(0).contentWindow,true);
         });
+        const self = this;
         this.$evtBus.$on("before-close-app-tab", (data) => {
             if(this._inactive == true) return;
             if(this.routeName == 'editDocument'){
+                const message = self.$t('document.notification.leavePage');
+                let confirm = window.confirm(message);
+                self.$evtBus.$emit("close-edit-document", confirm);
                 documentApi.setEdittingDocument({id:this.documentId,status:0});
                 clearInterval(this.intervalSetEditting);
             }
@@ -456,7 +467,8 @@ export default {
             for(let docName in data){
                 this.listDocument.push({name:docName,id:data[docName].id,title:data[docName].title});
             }
-        }
+        },
+        
     },
     methods:{
         /**
@@ -474,12 +486,18 @@ export default {
                 }
             })
         },
-        
+        /**
+         * Mở 1 dialog: 
+         * input: type - loại dialog (đánh dấu để kiểm tra lúc accept)
+         */
         showDialogEditor(type,title){
             this.dialog = true;
             this.typeDialog = type;
             this.titleDialog = title;
         },
+        /**
+         * Sự kiện khi ấn accept dialog
+         */
         acceptDialog(){
             this.dialog = false;
             if(this.typeDialog == 'deletePage'){
@@ -491,7 +509,8 @@ export default {
         },
 
         /**
-         * Hàm xử lí khi drag control
+         * Hàm xử lí khi drag control trong doc thì cần cập nhật lại state của store khi kéo vào trong table
+         * bao gồm quá trình drag và drop
          */
         handleDragControlInEditor(e){
             this.editorCore.undoManager.add();
@@ -534,9 +553,10 @@ export default {
         },
         /**
          * Hàm xử lí khi paste nội dung vào editor
+         * nếu paste nội dung từ document editor version 1 thì tự động convert các thuộc tính, html...
+         * nếu copy/ paste các control trong doc hiện tại thì tự động nhân bản các thuộc tính (riêng id phải tạo mới) 
          */
         handlePasteContent(e){
-            e.preventDefault();
             var content = ((e.originalEvent || e).clipboardData || window.clipboardData).getData("text/html");
             content = content.replace(/((<|(<\/))html>)|((<|(<\/))body>)/g,"");
             content = content.replace(/<!--[^>]*-->/g,"");
@@ -544,6 +564,7 @@ export default {
             let contentEl = $(content);
             let listControls = contentEl.find('.s-control:not(.s-control-table .s-control)');
             if(listControls.length > 0){
+                e.preventDefault();
                 for (let index = 0; index < listControls.length; index++) {
                     const controlEl = listControls[index];
                     let controlId = $(controlEl).attr('id');
@@ -618,7 +639,7 @@ export default {
             }  
         },
         /**
-         * Hàm xử lí kiểm tra xem tên của control hiện tại đang ở trong những công thức của các control nào doc nao
+         * Hàm xử lí kiểm tra xem tên của control hiện tại đang ở trong những công thức của các control nào document nào
          */
         checkBeforeControlNameChange(){
             let currentControl = this.editorStore.currentSelectedControl;
@@ -648,6 +669,9 @@ export default {
                 self.$refs.controlNameRelated.showDialog();
             }, 100,this);
         },
+        /**
+         * Hàm callback khi đóng panel check tên control, document liên quan đến các công thức
+         */
         afterClosePanel(from){
             if(from == "document")
             setTimeout((self) => {
@@ -673,6 +697,9 @@ export default {
             localStorage.setItem(HTML_CONTENT,content);
             localStorage.setItem(CODUMENT_PROPS,JSON.stringify(documentProperties));
         },
+        /**
+         * Xóa data ra khỏi local storage
+         */
         deleteLocalStorage(){
             localStorage.removeItem(ALL_CONTROL);
             localStorage.removeItem(HTML_CONTENT);
@@ -703,13 +730,24 @@ export default {
                 }
             }  
         },
+        /**
+         * Xóa control trong doc, xóa luôn trong store
+         */
         deleteControl(){
             let control = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.on-selected');
-            this.resetSelectControl()
-            control.remove();
-
+            let currentControl = this.editorStore.currentSelectedControl;
+            if(currentControl.properties.display.isPreventedConfig && currentControl.properties.display.isPreventedConfig.value){
+                this.$snotify({
+                                type: "warn",
+                                title: "Không thể xóa control này"
+                            }); 
+            }
+            else{
+                this.resetSelectControl();
+                control.remove();
+            }
         },
-        // ham tạo dialog của tinymce để cấu hình padding doc
+        // hàm tạo dialog của tinymce để cấu hình padding doc
         showPaddingPageConfig(ed){
             let self = this;
                 var left = $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body').css('padding-left').slice(0, -2);
@@ -806,7 +844,7 @@ export default {
             }
         },
         /**
-         * Hàm xem trước submit form
+         * Hàm xử lí xem trước submit form
          */
         previewSubmitDocument(){
             $("#document-editor-"+this.keyInstance+"_ifr").contents().find('.on-selected').removeClass('on-selected');
@@ -815,6 +853,7 @@ export default {
             this.prepareDataForPreview(fieldForSubmit);
             this.dataPreviewSubmit = {fields:fieldForSubmit,content:this.editorCore.getContent()}
         },
+        // xử lí dữ liệu để đẩy vào form submit
         prepareDataForPreview(fieldForSubmit){
             for(let controlId in fieldForSubmit){
                 for(let prop in fieldForSubmit[controlId].properties){
@@ -868,7 +907,6 @@ export default {
                     let allControl = this.editorStore.allControl;
                     let controlPrimaryKey = this.validateControlBeforeSave(allControl,'0');
                     if(Object.keys(controlPrimaryKey).length > 1){
-                        this.$evtBus.$emit('document-editor-save-doc-callback')
                         let allKey = Object.keys(controlPrimaryKey);
                         this.$snotify({
                                         type: "error",
@@ -904,7 +942,6 @@ export default {
                                 
                                 listName.push(name);
                             })
-                            this.$evtBus.$emit('document-editor-save-doc-callback');
                             this.$snotify({
                                             type: "error",
                                             title: "Tên một số control chưa hợp lệ",
@@ -916,7 +953,10 @@ export default {
             }
             
         },
-        
+        /**
+         * Khi ấn lưu doc -> Hàm kiểm tra các control đã đẩy đủ thông tin về tên và tiêu đề hay chưa
+         * nếu chưa thì ko được phép lưu
+         */
         validateControlBeforeSave(allControl,tableId){
             let controlPrimaryKey = {};
             for(let controlId in allControl){
@@ -952,6 +992,7 @@ export default {
         },
         /**
          * Hàm xử lí lấy dữ liệu các công thức để insert vào formulas service trước khi lưu
+         * output: dataPost cho syql service
          */
         getDataToSaveMultiFormulas(listControl){
             let listControlFormulas = {insert:{},update:{}};
@@ -998,8 +1039,6 @@ export default {
            return listControlFormulas;
             
         },
-
-
         setFormulasDataPost(listFormulasUpdate, listFormulas, formulaId, formulaValue, controlName, formulaType){
              if(formulaId != 0){
                 let item = {};
@@ -1085,7 +1124,11 @@ export default {
             
         },
    
-        // hoangnd: hàm gửi request lưu doc
+        /**
+         * Hàm thực thi api để lưu các công thức và lưu document sau khi check validate hợp lệ
+         * update formulas -> insert formulas -> done -> save document
+         * các công thức thêm mới sẽ được bind ngược lại vào dữ liệu đẩy lên để lưu doc
+         */
         async saveDocument(){
             let minimizeControl = this.minimizeControlEL(this.editorStore.allControl);
             let allControl = minimizeControl.minimizeControl;
@@ -1131,7 +1174,7 @@ export default {
                         }
                     }
                     else{
-                        this.$evtBus.$emit('document-editor-save-doc-callback')
+                        this.$refs.actionView.hideLoading();
                         this.$snotify({
                                 type: "error",
                                 title: "error from formulas serice, can't not save into formulas service!!!",
@@ -1149,8 +1192,8 @@ export default {
                 }
                 
             } catch (error) {
+                thisCpn.$refs.actionView.hideLoading();
                 console.log('errorerror',error);
-                thisCpn.$evtBus.$emit('document-editor-save-doc-callback')
                 thisCpn.$snotify({
                             type: "error",
                             title: "error from formulas serice, can't not save into formulas service!!!",
@@ -1167,7 +1210,7 @@ export default {
                 dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
             }
             documentApi.saveDocument(dataPost).then(res => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 if (res.status == 200) {
                     thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
@@ -1186,7 +1229,7 @@ export default {
                 }
             })
             .catch(err => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 thisCpn.$snotify({
                         type: "error",
                         title: "can not save document",
@@ -1204,7 +1247,7 @@ export default {
             }
             let thisCpn = this;
             documentApi.editDocument(dataPost).then(res => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 if (res.status == 200) {
                     thisCpn.editorCore.remove();
                     thisCpn.$router.push('/documents');
@@ -1240,7 +1283,7 @@ export default {
                 
             })
             .catch(err => {
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                thisCpn.$refs.actionView.hideLoading();
                 thisCpn.$snotify({
                     type: "error",
                     title: "error from edit document api",
@@ -1251,19 +1294,21 @@ export default {
             .always(() => {
             });
         },
-      
-        validateControl(){
+        /**
+         * hàm validate lại cntrol lần nữa sau khi ấn lưu doc ở modal save doc
+         */
+        validateControlAfterSave(){
+            this.$refs.actionView.showLoading();
             let thisCpn = this;
             let listControlName = [];
             this.listMessageErr = [];
             //check trung ten control
             $("#document-editor-"+thisCpn.keyInstance+"_ifr").contents().find('.on-selected').removeClass('on-selected');
             if($('#document-editor-'+thisCpn.keyInstance+'_ifr').contents().find('.s-control-error').length == 0){
-                
                 this.saveDocument();
             }
             else{
-                this.$evtBus.$emit('document-editor-save-doc-callback')
+                this.$refs.actionView.hideLoading();
                 this.$snotify({
                                 type: "error",
                                 title: "Thông tin control chưa hợp lệ",
@@ -1272,28 +1317,7 @@ export default {
             }
         },
         
-       
-        // hàm kiểm tra xem trong công thức có trỏ đến control ko tồn tại hay ko
-        validateFormulasInControl(control,listControlName){
-            // check control Name trong cong thức
-            for(let f in control.formulas){
-                if(control.formulas[f].value != ""){
-                    let formula = control.formulas[f].value;
-                    let controlName = formula.match(/(?<=f.)(\w+)/g);
-                    if(controlName != null)
-                        for(let i = 0; i< controlName.length; i++){
-                            if(listControlName.indexOf(controlName[i]) === -1){
-                                let message = "Không tồn tại control "+controlName[i]+" trong công thức "+f+" của control "+control.properties.name.value;
-                                if(this.listMessageErr.indexOf(message) === -1){
-                                    this.listMessageErr.push(message);
-                                }
-                            }
-                        }
-                }
-                
-            }
-        },
-        // hàm xử lí thêm các cột vào trong control table khi lưu ở tablesetting
+        // hàm xử lí thêm các cột vào trong control table khi lưu ở popup tablesetting
         addColumnTable(data){
             let listRowData = data.listRows;
             let tablePivotConfig = data.tablePivotConfig;
@@ -1306,7 +1330,6 @@ export default {
                     this.dataPivotTable = {};
                 }
                 this.dataPivotTable[currentControl.properties.name.name.value] = tablePivotConfig;
-
             }
             else{
                 if(this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
@@ -1319,6 +1342,12 @@ export default {
                 let row = listRowData[i];
                 let type = row.type;
                 let control = GetControlProps(type);
+                if(row.oldProps){
+                    control.properties = row.oldProps;
+                }
+                if(row.formulas){
+                    control.formulas = row.formulas;
+                }
                 control.properties.name.value = row.name;
                 control.properties.title.value = row.title;
                 let controlEl = $(control.html);
@@ -1332,7 +1361,7 @@ export default {
             elements.find('tbody tr').html(tbody);
         },
 
-        // ham drag table trong editor
+        // Hàm hiển thị khung drag table trong editor
         showDragTable(e){
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.on-selected').closest('.s-control-table');
             if(elements.is('.s-control-table')){
@@ -1498,9 +1527,14 @@ export default {
                         }
                         let idControl = $(tbody[i].outerHTML).find('.s-control').attr('id');
                         let typeControl = $(tbody[i].outerHTML).find('.s-control').attr('s-control-type');
-                        let name = this.editorStore.allControl[tableId]['listFields'][idControl].properties.name.value;
-                        let title = this.editorStore.allControl[tableId]['listFields'][idControl].properties.title.value;
-                        let row = {columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl}
+                        let controlObj = this.editorStore.allControl[tableId]['listFields'][idControl];
+                        let name = controlObj.properties.name.value;
+                        let title = controlObj.properties.title.value;
+                        let row = {
+                                    columnName: $(thead[i]).text(),name: name,title:title, type: typeControl,key:idControl, 
+                                    oldProps:controlObj.properties, formulas: controlObj.formulas
+
+                                }
                         listData.push(row)
 
                     }
@@ -1536,6 +1570,7 @@ export default {
                 properties['dataFlowId'].value = curDataFlow[0];
                 properties['dataFlowId'].options = this.listDataFlow;
             }
+            console.log(properties,'propertiesproperties');
             if(this.$getRouteName() == 'editDocument' && properties.isPreventedConfig){
                 properties.isPreventedConfig.hidden = true;
             }
@@ -1599,9 +1634,10 @@ export default {
             
         },
         // hoangnd: hàm nhận sự kiện keyup của editor 
+        // gõ // để mở autocomplete thêm control
         // 191: / để thêm control
         
-        keyHandler(event)
+        keyHandler(event, ed)
         {
             let thisCpn = this;
             if ( event.keyCode == 191 )
@@ -1635,6 +1671,34 @@ export default {
                 }
                 this.lastKeypressTime = thisKeypressTime;
             }
+           
+            
+        },
+         /**
+             * detect keyup delete
+             * không cho xóa các control đã được đánh dấu ko được chỉnh sửa
+             */
+        keyDownHandler(e,ed){
+            if(event.keyCode == 8){
+                let allData = this.editorCore.undoManager.data;
+                let dataDeleted = allData[allData.length - 1];
+                let curNode = $(ed.selection.getNode());
+                let allControlInNode = curNode.find('.s-control:not(.s-control-table .s-control)');
+                for (let index = 0; index < allControlInNode.length; index++) {
+                    let controlEl = $(allControlInNode[index]);
+                    let controlId = controlEl.attr('id');
+                    let controlStore = this.editorStore.allControl[controlId];
+                    if(controlStore.properties.isPreventedConfig && controlStore.properties.isPreventedConfig.value){
+                         this.$snotify({
+                                type: "warn",
+                                title: "Không thể xóa nội dung chứa control hệ thống"
+                            }); 
+                        e.preventDefault();
+                        e.stopPropagation();
+                    }
+                }
+            }
+            
         },
         /**
          * Hàm xử lí sự kiên click vào tab bên trên header của control tab/page để chuyển tab
@@ -1860,8 +1924,10 @@ export default {
                 let style = $(value).attr('style');
                 if(type == 'text') type = 'textInput'
                 if(type == 'persent') type = 'percent'
+                if(type == 'datetime') type = 'dateTime'
+                if(type == 'file-upload') type = 'fileUpload'
                 let controlV2 = GetControlProps(type);
-                let controlEl = $(controlV2.html); 
+                let controlEl = $(controlV2.html);
                 var inputid = 's-control-id-' + Date.now();
                 controlEl.attr('id', inputid).attr('style',style);
                 controlEl.replaceAll($(value))
@@ -1899,6 +1965,7 @@ export default {
                         if(type == 'text') type = 'textInput'
                         if(type == 'persent') type = 'percent'
                         if(type == 'file-upload') type = 'fileUpload'
+                        if(type == 'datetime') type = 'dateTime'
                         console.log(type);
                         
                         let childControlV2 = GetControlProps(type);
@@ -1958,7 +2025,7 @@ export default {
 
 
         /**
-         * Hàm set style cho form th lưu trên db
+         * Hàm set style cho form
          */
         setDefaultStyle(defaultStyle){
             if(defaultStyle){
@@ -1975,12 +2042,9 @@ export default {
                     });
                     this.setPageSize(this.contentStyle.width, this.contentStyle.height, this.contentStyle.type)
                 } catch (error) {
-                    
+                    console.warn(error);
                 }
-                
             }
-            
-
         },
         async checkAllowEditDocument(document){
             let updateTime = new Date(document.lastEditAt).getTime();
@@ -2018,7 +2082,10 @@ export default {
             }
             return true;
         },
-        // hàm gọi request lấy thông tin của document khi vào edit doc
+        /**
+         * hàm gọi request lấy thông tin của document khi vào edit doc
+         * Thông tin bao gồm cấu trúc html của doc, các thuộc tính và công thức của control
+         */
         async getContentDocument(){
             if(this.documentId != 0){
                 let res = await documentApi.detailDocument(this.documentId);
@@ -2846,10 +2913,6 @@ export default {
                 this.selectControl(control.properties, control.formulas,controlId,'tabPage');
             }
         },
-
-
-
-
         // ************************* Các hàm xử lí liên quan đến cấu hình in *******************************//
         // hàm xử lí thêm các cột vào trong control table khi lưu ở tablesetting
         configColumnTablePrint(listRowData){
@@ -2910,12 +2973,13 @@ export default {
         },
         // mở modal lưu , edit doc
         saveFormPrint(docProps){
+            this.$refs.actionView.showLoading();
             if(this.printConfigId != 0 && this.printConfigId != undefined && this.printConfigId != null){
                 let dataPost = {documentId:this.documentId,title:docProps.title.value,
                                 content:this.editorCore.getContent(),printConfigId:this.printConfigId, size:JSON.stringify(this.contentStyle)}
                 let thisCpn = this;
                 documentApi.updatePrintConfig(dataPost).then(res => {
-                    this.$evtBus.$emit('document-editor-save-doc-callback')
+                    thisCpn.$refs.actionView.hideLoading();
                     if (res.status == 200) {
                         thisCpn.editorCore.remove();
                         thisCpn.$router.push('/documents');
@@ -2933,7 +2997,7 @@ export default {
                     }
                 })
                 .catch(err => {
-                    this.$evtBus.$emit('document-editor-save-doc-callback')
+                    thisCpn.$refs.actionView.hideLoading();
                     thisCpn.$snotify({
                             type: "error",
                             title: "can not save form print document",
@@ -3030,8 +3094,16 @@ export default {
         },
         beforeCloseSubmit(){
             this.isShowPreviewSubmit = false;
+        },
+         // xử lý khi tắt tab chrome
+        handleCloseChrome(){
+            $(window).on("beforeunload", function(e) {
+                let dialogText = 'Are you sure you want to close the Window?';
+                e.returnValue = dialogText;
+                return dialogText;
+            });
         }
-
+       
     },
     
 }

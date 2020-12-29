@@ -14,8 +14,8 @@
           @change-density="isSmallRow = !isSmallRow"
           @changeObjectType="changeObjectType"
           @filter-change-value="handleChangeFilterValue"
-          @create-task="getTasks({})"
-          @refresh-task-list="getTasks()"
+          @create-task="getDocuments({})"
+          @refresh-task-list="getDocuments()"
           @get-list-process-instance="listProrcessInstances = $event"
         ></listHeader>
         <v-divider v-if="!sideBySideMode"></v-divider>
@@ -107,8 +107,6 @@
                     class="pl-3 fs-12 px-1 py-0"
                     v-if="!sideBySideMode"
                 >
-                    <!-- <symperAvatar v-if="obj.userId &&obj.userId >0" :size="20" :userId="obj.userId" />
-                    {{obj.displayName}} -->
 					<infoUser v-if="obj.userId &&obj.userId >0" class="userInfo" :userId="obj.userId" :roleInfo="{}" />
                 </v-col>
                
@@ -154,13 +152,19 @@
             </div>
          
         </VuePerfectScrollbar>
-        <v-skeleton-loader v-else ref="skeleton" :type="'table-tbody'" class="mx-auto"></v-skeleton-loader>
+        <preloader 
+            v-else
+            class="mx-auto" />
+        <preloader 
+            v-if="loadingMoreTask"
+            class="mx-auto" />
+        <!-- <v-skeleton-loader v-else ref="skeleton" :type="'table-tbody'" class="mx-auto"></v-skeleton-loader>
         <v-skeleton-loader
           v-if="loadingMoreTask"
           ref="skeleton"
           :type="'table-tbody'"
           class="mx-auto"
-        ></v-skeleton-loader>
+        ></v-skeleton-loader> -->
       </v-col>
       <v-col
         :cols="!sideBySideMode ? 0 : 8"
@@ -200,15 +204,8 @@
 import BPMNEngine from "@/api/BPMNEngine";
 import icon from "@/components/common/SymperIcon";
 import listHeader from "./ListHeader";
-import userSelector from "./UserSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../../plugins/util";
-import { appConfigs } from "../../../configs";
-import {
-  extractTaskInfoFromObject,
-  addMoreInfoToTask
-} from "@/components/process/processAction";
-import symperAvatar from "@/components/common/SymperAvatar.vue";
 import detailDocument from '@/views/document/detail/Detail';
 import { taskApi } from '@/api/task';
 import infoUser from "./../InfoUser";
@@ -267,9 +264,7 @@ export default {
     components: {
         icon: icon,
         listHeader: listHeader,
-        userSelector: userSelector,
         VuePerfectScrollbar: VuePerfectScrollbar,
-        symperAvatar: symperAvatar,
         detailDocument,
         infoUser
     },
@@ -335,20 +330,19 @@ export default {
                 pageSize:50,
                 page: 1,
             },
-            defaultAvatar: appConfigs.defaultAvatar,
             listDocumentObjectId:[],
 
         };
     },
     created() {
-        this.getTasks();
+        this.getDocuments();
     },
     mounted() {
         let self = this;
         this.$store
         .dispatch("process/getAllDefinitions")
         .then(res => {
-            self.getTasks();
+            self.getDocuments();
         })
         .catch(err => {});
         self.reCalcListTaskHeight();
@@ -390,19 +384,19 @@ export default {
             ) {
                 this.myOwnFilter.page += 1;
                 if ((this.myOwnFilter.page-1)*this.myOwnFilter.pageSize <this.totalDoc) {
-                    this.getTasks();
+                    this.getDocuments();
                 }
             }
         },
         handleTaskSubmited() {
             this.sideBySideMode = false;
-            this.getTasks();
+            this.getDocuments();
         },
         handleChangeFilterValue(data) {
         for (let key in data) {
             this.$set(this.myOwnFilter, key, data[key]);
         }
-        this.getTasks();
+        this.getDocuments();
         },
         reCalcListTaskHeight() {
         this.listTaskHeight =
@@ -425,7 +419,7 @@ export default {
             this.$emit("change-height", "calc(100vh - 120px)");
         },
 
-        async getTasks(filter = {}) {
+        async getDocuments(filter = {}) {
             if (this.loadingTaskList || this.loadingMoreTask) {
                 return;
             }

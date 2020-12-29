@@ -1,8 +1,23 @@
+
 /**
  * Các hàm phục vụ cho việc xác thực, lưu trữ dữ liệu đăng nhập cho người dùng
  */
+import IndexedDB from "@/plugins/utilModules/indexedDB.js";
+var loginedInfo = {};
+if(!self.document){// Nếu nằm dưới worker
+    function getAndSetLoginInfoForWorker() {
+        let indexedDB = new IndexedDB('SYMPER-LOGIN-INFOR');
+        indexedDB.open('loginInfo', false, false, async()=>{
+            loginedInfo = await indexedDB.read('loginInfo');
+            if(typeof loginedInfo == 'string'){
+                loginedInfo = JSON.parse(loginedInfo);
+            }
+        });
+    }
+    getAndSetLoginInfoForWorker();
+}
 export const authUtil = {
-    saveLoginInfo(data) {
+	saveLoginInfo(data) {
         /**
          * data có dạng: {
          *      token: "xxx",
@@ -10,17 +25,20 @@ export const authUtil = {
          *      endUserId: "zzzz"
          * }
          */
-        window.localStorage.setItem('symper-login-info', JSON.stringify(data));
+		localStorage.setItem('symper-login-info', JSON.stringify(data));
     },
 
     getToken() {
-        let loginInfo = window.localStorage.getItem('symper-login-info');
-        if (loginInfo) {
-            return JSON.parse(loginInfo).token;
-        } else {
-            return false;
-        }
-
+		if(self.window){
+			let loginInfo = localStorage.getItem('symper-login-info');
+			if (loginInfo) {
+			    return JSON.parse(loginInfo).token;
+			} else {
+			    return false;
+			}
+		}else{
+            return loginedInfo.token;
+		}
     },
 
     isSupportter() {
@@ -32,14 +50,14 @@ export const authUtil = {
             return true;
         } else {
             return false;
-        }
+		}
     },
     logout() {
-        window.localStorage.removeItem('symper-login-info');
+        localStorage.removeItem('symper-login-info');
     },
 
     getSavedUserInfo() {
-        let loginInfo = window.localStorage.getItem('symper-login-info');
+        let loginInfo = localStorage.getItem('symper-login-info');
         if (loginInfo) {
             return JSON.parse(loginInfo);
         } else {
@@ -48,14 +66,12 @@ export const authUtil = {
     },
 
     setSavedUserInfo(data) {
-
         let loginInfo = this.getSavedUserInfo();
         loginInfo = Object.assign(loginInfo, data);
         this.saveLoginInfo(loginInfo);
     },
 
     getCurrentUserRole() {
-
         let data = this.getSavedUserInfo();
         let role = '';
         if (data.profile.userDelegate &&
@@ -65,6 +81,16 @@ export const authUtil = {
             role = data.profile.role;
         }
         return role;
+    },
+
+    checkLoginAndSetToIndexedDB(){
+        if(this.checkLogin()){
+            let logiInfo = this.getSavedUserInfo();
+            let indexedDB = new IndexedDB('SYMPER-LOGIN-INFOR');
+            indexedDB.open('loginInfo', false, false, ()=>{
+                indexedDB.save(logiInfo, 'loginInfo');
+            });
+        }
     }
 
 }

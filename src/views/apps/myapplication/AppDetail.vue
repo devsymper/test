@@ -1,6 +1,6 @@
 <template>
   <div class="app-details">
-	  	 <VuePerfectScrollbar :style="{height: listItemHeight}">
+	  	 <PerfectScrollbar :style="{height: listItemHeight}">
 			<Preloader
 				v-if="loadingApp"
 			 />
@@ -9,7 +9,7 @@
 					<ul v-for="(childItem,i) in itemT.item" :key="i"  class="app-child-item">
 							<li  v-if="isEndUserCpn == true" 
 								v-on:contextmenu="rightClickHandler($event,childItem,itemT.name)"
-								v-on:click="rightClickHandler($event,childItem,itemT.name)"
+								v-on:click="clickHandler(itemT.name,childItem)"
 								:class="{'child-item-active': childItem.objectIdentifier == activeIndexChild}"
 							>
 								<div style="position:relative">
@@ -66,7 +66,7 @@
 							</li>
 					</ul>
 			</div>	
-		</VuePerfectScrollbar>
+		</PerfectScrollbar>
 		<ContextMenu ref="contextMenu" 
 			:sideBySide="sideBySide"
 			:allAppMode="false"
@@ -78,6 +78,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ContextMenu from './../ContextMenu.vue';
 import {appManagementApi} from '@/api/AppManagement.js'
 import Preloader from "@/components/common/Preloader"
+import PerfectScrollbar from '@/components/common/PerfectScrollBar'
 export default {
  data: function() {
         return {
@@ -123,7 +124,8 @@ export default {
 	components:{
 		ContextMenu,
 		VuePerfectScrollbar,
-		Preloader
+		Preloader,
+		PerfectScrollbar
 	},
 	mounted(){
    },
@@ -182,47 +184,57 @@ export default {
 			let self = this
 			let appS = this.$store.state.appConfig
 			let listItem = appS.listAppsSideBySide[appS.currentAppId];
-			self.objFilter.document_major.item = []
-			self.objFilter.document_category.item = []
-			self.objFilter.orgchart.item = []
-			self.objFilter.dashboard.item = []
-			self.objFilter.workflow_definition.item = []
-			if(listItem.document_major.item.length > 0){
-				listItem.document_major.item.filter(function(item){
-						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
-							self.objFilter.document_major.item.push(item)
+			for(let i in self.objFilter){
+				self.objFilter[i].item = []
+			}
+			for(let i in listItem){
+				if(listItem[i].item.length > 0){
+					listItem[i].item.filter(function(k){
+						let field = k.title ? k.title : k.name
+						if(field.toLowerCase().includes(self.searchKey.toLowerCase())){
+							self.objFilter[i].item.push(k)
 						}
-				})
+					})
+				}
 			}
-			if(listItem.document_category.item.length > 0){
-				listItem.document_category.item.filter(function(item){
-						if(item.title.toLowerCase().includes(self.searchKey.toLowerCase())){
-							self.objFilter.document_category.item.push(item)
-						}
-				})
+		},
+		clickHandler(type,item){
+			this.$store.commit('appConfig/updateActiveChildItem', item.objectIdentifier )
+			let define
+			if(type.includes('document')){
+				this.$store.commit('document/setCurrentTitle',item.title)
+				define ={
+					"module": "document",
+					"resource": "document_definition",
+					"scope": "document",
+					"action": "list_instance"
+				}
 			}
-			if(listItem.orgchart.item.length > 0){
-				listItem.orgchart.item.filter(function(item){
-					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
-						self.objFilter.orgchart.item.push(item)
-					}
-				})
+			if(type == 'orgchart'){
+				define ={
+					"module": "orgchart",
+					"resource": "orgchart",
+					"scope": "orgchart",
+					"action": "detail"
+				}
 			}
-			 
-			if(listItem.dashboard.item.length > 0){
-				listItem.dashboard.item.filter(function(item){
-					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
-						self.objFilter.dashboard.item.push(item)
-					}
-				})
+			if(type == 'dashboard'){
+				define ={
+					"module": "dashboard",
+					"resource": "dashboard",
+					"scope": "dashboard",
+					"action": "view"
+				}
 			}
-			if(listItem.workflow_definition.item.length > 0){
-				listItem.workflow_definition.item.filter(function(item){
-					if(item.name.toLowerCase().includes(self.searchKey.toLowerCase())){
-						self.objFilter.workflow_definition.item.push(item)
-					}
-				})
+			if(type == 'workflow_definition'){
+				define ={
+					"module": "workflow",
+					"resource": "workflow_definition",
+					"scope": "workflow",
+					"action": "list_instance"
+				}
 			}
+			this.$store.commit('appConfig/updateActionDef', define)
 		},
 		rightClickHandler(event,item,type){
 			event.stopPropagation();

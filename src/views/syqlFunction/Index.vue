@@ -14,16 +14,21 @@
 			:actionPanelWidth="1000"
 			@after-open-add-panel="handleAdd"
 			:showActionPanelInDisplayConfig="true"
+			:actionPanelType="'elastic'"
         >
-			<!-- :actionPanelType="'elastic'" -->
-
 			<template slot="right-panel-content">  
 				<SyqlFunctionForm
 					:action="action"
 					@add-success="handleAddSuccess"
+					:syqlId="syqlId"
 				/>
 			</template>
         </list-items>
+		<DialogShowContent 
+			:showDialog="showDialog"
+			:content="content"
+			@cancel="showDialog = false"
+		/>
     </div>
 </template>
 <script>
@@ -33,6 +38,7 @@ import ListItems from "@/components/common/ListItems.vue";
 import SyqlFunctionForm from './SyqlFunctionForm'
 import Handsontable from 'handsontable';
 import {syqlFunctionApi} from '@/api/SyqlFunction'
+import DialogShowContent from './DialogShowContent'
 export default {
 	created(){
 		this.$store.dispatch("app/getAllBA");
@@ -42,6 +48,9 @@ export default {
         return {
 			getListUrl: appConfigs.apiDomain.syqlFunction+'functions',
 			action:'',
+			syqlId: '',
+			content:'',
+			showDialog: false,
 			containerHeight:null,
 			customAPIResult:{
 				reformatData(res){
@@ -72,7 +81,6 @@ export default {
 							{name: "name", title: "name", type: "text"},
 							{name: "parameter", title: "parameter", type: "text"},
 							{name: "description", title: "description", type: "text"},
-							{name: "content", title: "content", type: "text"},
 							{name: "createAt", title: "createAt", type: "date"},
 							{name: "updateAt", title: "updateAt", type: "date"},
 							{name: "userCreateName", title: "userCreateName", type: "text"},
@@ -102,7 +110,16 @@ export default {
                     name: "edit",
                     text: this.$t("common.edit"),
                     callback: (row, callback) => {
-						self.handleEdit()
+						self.handleEdit(row)
+						self.$store.dispatch('SyqlFunction/getFunctionDetail',row.id)
+                    }
+                },
+                viewContent: {
+                    name: "viewContent",
+                    text:'Xem nội dung',
+                    callback: (row, callback) => {
+						self.showDialog = true
+						self.content = row.content
                     }
                 },
                 remove: {
@@ -134,17 +151,20 @@ export default {
                     name: "detail",
                     text: this.$t("common.detail"),
                     callback: (row, callback) => {
-						self.handleView()
+						self.handleView(row)
+						self.$store.dispatch('SyqlFunction/getFunctionDetail',row.id)
                     }
                 },
             }
         };
 	},
 	methods:{
-		handleView(){
+		handleView(row){
+			this.syqlId = row.id
 			this.openPanel('view')
 		},
-		handleEdit(){
+		handleEdit(row){
+			this.syqlId = row.id
 			this.openPanel('edit')
 		},
 		handleAdd(){
@@ -164,7 +184,8 @@ export default {
     },
     components: {
 		ListItems: ListItems,
-		SyqlFunctionForm
+		SyqlFunctionForm,
+		DialogShowContent
     }
 };
 </script>

@@ -142,7 +142,7 @@ export default {
 								self.$emit('cancel')
 								self.$snotify({
 									type: "success",
-									title: "Đang chuyển dữ liệu "+self.listItemSelected[i].title
+									title: "Đang chuyển dữ liệu "+ self.listItemSelected[i].title
 								})
 							}else if( res.status == 400){
 								self.$snotify({
