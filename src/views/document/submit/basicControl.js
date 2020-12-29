@@ -318,7 +318,12 @@ export default class BasicControl extends Control {
             this.setFileControlValue(value);
         }
         else{
-            this.value = value;
+            if(value.inputDislay && value.inputValue){
+                this.value = value.inputValue;
+            }
+            else{
+                this.value = value;
+            }
             if (this.inTable === false) {
                 if (this.type == 'label') {
                     this.ele.text(value);
@@ -341,14 +346,18 @@ export default class BasicControl extends Control {
                     }
                 }
                 else if (this.type == 'user') {
-                    this.value = value.id;
-                    this.ele.val(value.display);
+                    this.ele.val(value.inputDislay);
                 }
                 else if (this.type == 'image') {
                     this.setImageControlValue(value)
                 }        
                 else {
-                    this.ele.val(value);
+                    if(value.inputDislay){
+                        this.ele.val(value.inputDislay);
+                    }
+                    else{
+                        this.ele.val(value);
+                    }
                 }
             }
             if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
