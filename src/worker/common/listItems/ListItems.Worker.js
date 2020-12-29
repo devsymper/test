@@ -1,4 +1,22 @@
 
+// importScripts('./../workerDataStoreLoader.js.js');
+import IndexedDB from "@/plugins/utilModules/indexedDB.js";
+self.dataStore = {};
+if(!self.document){// Nếu nằm dưới worker
+    function getAndSetLoginInfoForWorker() {
+        let indexedDB = new IndexedDB('SYMPER-LOGIN-INFOR');
+        indexedDB.open('loginInfo', false, false, async()=>{
+           let loginedInfo = await indexedDB.read('loginInfo');
+            if(typeof loginedInfo == 'string'){
+                loginedInfo = JSON.parse(loginedInfo);
+			}
+			self.dataStore.loginedInfo = loginedInfo;
+			console.log(Date.now(), 'getAndSetLoginInfoForWorkergetAndSetLoginInfoForWorkergetAndSetLoginInfoForWorker');
+        });
+    }
+    getAndSetLoginInfoForWorker();
+}
+
 import { getDataFromConfig, getDefaultFilterConfig } from "@/components/common/customTable/defaultFilterConfig";
 import {uiConfigApi} from "@/api/uiConfig";
 import { reject } from "lodash";
