@@ -2,6 +2,7 @@ const defaultState = {
     listProjectRecentAccess: [],
     listIssueRecentAccess: [],
     listDocumentIdsInIssueType: [],
+    listDocumentIdsInProject: {}, // list các documentId gán trong các issue type thuộc projectId ,có dạng {key : []} , key là projectId
     listIssueAssignRecent:[],
     allCategory: [],
     allProject: [],

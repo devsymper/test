@@ -28,6 +28,7 @@ export default {
             await this.$store.dispatch("taskManagement/getLogProjectAccess",this.$store.state.app.endUserInfo.id);
             await this.$store.dispatch("taskManagement/getLogIssueRecentAccess",this.$store.state.app.endUserInfo.id);
             this.$store.dispatch("taskManagement/getAllDocumentIdsInIssueType");
+            this.$store.dispatch("taskManagement/getAllStatus");
 
         }
     },  

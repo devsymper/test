@@ -17,7 +17,8 @@
                          class="d-flex w-100 py-1">
                             <v-icon >mdi-square-circle</v-icon>
                             <div class="d-flex justify-space-between ml-2">
-                                <div>{{item.tmg_name}}
+                                <div>
+                                    <span class="task-hover-poiter">{{item.tmg_name}}</span>
                                     <div class="grey--text">
                                         <div>
                                             HT01 - TaskManagement
@@ -61,6 +62,10 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+.task-hover-poiter:hover{
+    cursor: pointer;
+    text-decoration: underline;
+    color: blue;
+}
 </style>

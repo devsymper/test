@@ -709,9 +709,10 @@ export default {
             if (isValid) {
                 let listIdPermissionPack = this.getIdsPermissionPack();
                 let data={};
-                
+                let projectId=this.$route.params.id;
                 data.name = this.nameAndDescriptionProps.name.value;
                 data.description = this.nameAndDescriptionProps.description.value;
+                data.projectId = projectId;
                 data.permissionIds = listIdPermissionPack.length >0 ? JSON.stringify(listIdPermissionPack) : "";
 
                 taskManagementApi

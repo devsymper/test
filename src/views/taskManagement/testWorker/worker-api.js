@@ -7,6 +7,5 @@ worker.addEventListener('message',(e)=>{
 }); 
 
 export function sendMessage(msg){
-    debugger
     worker.postMessage(msg);
 }

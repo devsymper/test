@@ -1,5 +1,5 @@
 <template>
-     <v-dialog
+    <v-dialog
         v-model="isShow"
         max-width="600px"
         scrollable
@@ -60,21 +60,19 @@
 
         </v-card-title >
         <v-card-text class="pa-0 pb-0">
-            <v-container class="pa-0">
-                <div v-if="Object.keys(currentProject).length > 0">
-                    <submit
-                        ref="submitComponent"
-                        class="doc_issue"
-                        :action="'submit'"
-                        :showNotifiSuccess="false"
-                        :docId="documentId"
-                        :projectId="currentProject.id"
-                        :workflowVariable="workflowVariable"
-                        :showSubmitButton="false"
-                        @submit-document-success="onSubmitDone"
-                     />
-                </div>
-            </v-container>
+            <submit
+                v-if="currentIssueType && currentIssueType.id"
+                :key="currentIssueType.id"
+                ref="submitComponent"
+                class="doc_issue"
+                :action="'submit'"
+                :showNotifiSuccess="false"
+                :docId="documentId"
+                :projectId="currentProject.id"
+                :workflowVariable="workflowVariable"
+                :showSubmitButton="false"
+                @submit-document-success="onSubmitDone"
+                />
         </v-card-text>
         <v-card-actions class="px-4">
             <v-spacer></v-spacer>
@@ -152,6 +150,7 @@ export default {
         // thay đổi document id ở đây
         onChangeIssueType(){
             this.documentId = Number(this.currentIssueType.documentId);
+            this.setParamsForField();
         },
         onChangeProject(){
             this.getListIssueType();
@@ -174,6 +173,7 @@ export default {
         setParamsForField(){
             this.$set(this.workflowVariable,'project_id',this.currentProject.id);
             this.$set(this.workflowVariable,'project_key',this.currentProject.key);
+            this.$set(this.workflowVariable,'issue_type_id',this.currentIssueType.id);  
             this.$set(this.workflowVariable,'tmg_task_life_circle_id',this.currentIssueType.taskLifeCircleId);
         },
         submitForm(){
@@ -224,6 +224,9 @@ export default {
     .doc_issue >>> .sym-form-submit{
         padding: 4px;
         padding-right: 10px;
+    }
+    .doc_issue{
+        height: 550px!important;
     }
 
 </style>

@@ -13,11 +13,8 @@
                     :placeholder="$t('common.search')"
                     hide-details
                 ></v-text-field>
-                <div class="list-user d-inline-block">
-                    <img class="user-in-project" src="https://file.symper.vn/readFile/user_avatar_922" alt="">
-                    <img class="user-in-project" src="https://file.symper.vn/readFile/user_avatar_922" alt="">
-                    <img class="user-in-project" src="https://file.symper.vn/readFile/user_avatar_922" alt="">
-                    <img class="user-in-project" src="https://file.symper.vn/readFile/user_avatar_922" alt="">
+                <div class="list-user d-inline-block" v-for="(obj) in listUser" :key="obj.id">
+                    <symperAvatar :size="22"  :userId="obj.userId" />
                 </div>
                 <div class="ml-3 d-inline-block">
                     <v-menu offset-y>
@@ -87,13 +84,15 @@ import TaskCard from "@/components/taskManagement/board/TaskCard.vue";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import { util } from '../../../plugins/util';
 import { documentApi } from "@/api/Document.js";
+import symperAvatar from "@/components/common/SymperAvatar.vue";
 
 export default {
     name: "KanbanBoard",
     components: {
         TaskCard,
         draggable,
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
+        symperAvatar
     },
     computed:{
         listBoard(){
@@ -168,7 +167,7 @@ export default {
             projectId:null,
             listBoardColumn:null,
             settingBoardMenuitems: null,
-
+            listUser:null,
             tasks: [
                 {
                     id: 14,
@@ -241,6 +240,14 @@ export default {
             }
             this.getListTasks();
         },
+        async getUserInProject(){
+            let self=this;
+            let projectId=this.$route.params.id;
+            let list = await taskManagementApi.getUserInProject(projectId);
+            if (list.status == 200 && list.data) {
+                self.listUser = list.data.listObject;
+            }
+        }
        
     },
     created(){
@@ -259,6 +266,12 @@ export default {
     activated(){
         this.projectId = this.$route.params.id;
         this.getListBoard();
+        this.getUserInProject();
+   
+        if (!this.sTaskManagement.listDocumentIdsInProject[this.projectId] || this.sTaskManagement.listDocumentIdsInProject[this.projectId].length == 0) {
+            this.$store.dispatch("taskManagement/getListDocumentIdsInProject",this.projectId);
+        }
+        
         let breadcrumbs = [
                 {
                     text: 'Dashboard',

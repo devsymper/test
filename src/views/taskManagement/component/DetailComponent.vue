@@ -14,6 +14,11 @@ export default {
             return this.$store.state.taskManagement.infoComponentCurrent;
         }
     },
+    created(){
+        if (!this.$store.state.taskManagement.allStatus || this.$store.state.taskManagement.allStatus.length == 0) {
+            this.$store.dispatch("taskManagement/getAllStatus");
+        }
+    }
    
 }
 </script>
