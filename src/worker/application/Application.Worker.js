@@ -1,13 +1,14 @@
-importScripts('./../workerDataStoreLoader.js');
 import {documentApi} from '@/api/Document';
 import {orgchartApi} from '@/api/orgchart';
 import {dashboardApi} from '@/api/dashboard';
 import BpmnEngine from '@/api/BPMNEngine';
 import {appManagementApi} from '@/api/AppManagement.js';
+import { setWorkerDataStore } from '@/worker/common/workerUtil';
 
 
 self.onmessage = async function (event) {
-	var workerDataReceive = event.data;
+	setWorkerDataStore(event);
+	var workerDataReceive = event.data.data;
     let action = workerDataReceive.action;
     let data = workerDataReceive.data;
 	switch (action) {

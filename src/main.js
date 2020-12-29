@@ -274,6 +274,16 @@ Vue.prototype.$snotifySuccess = function(title = 'SUCCESS', detail = '', duratio
     this.$snotify(setting);
 }
 
+Vue.prototype.$postWorkerMessage = function(workerObject, data) {
+    let loginInfo = util.auth.getSavedUserInfo();
+    workerObject.postMessage({
+        commonData: {
+            loginInfo
+        },
+        data: data
+    });
+}
+
 
 Vue.config.productionTip = false;
 global.jQuery = require('jquery');
