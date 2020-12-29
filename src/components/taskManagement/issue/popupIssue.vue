@@ -59,7 +59,7 @@
             </div>
 
         </v-card-title >
-        <v-card-text class="pa-0 pb-0">
+        <v-card-text class="p-2">
             <submit
                 v-if="currentIssueType && currentIssueType.id"
                 :key="currentIssueType.id"

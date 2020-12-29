@@ -255,10 +255,6 @@ export default {
         this.$evtBus.$on('selected-item-board', (data) =>{
 			if (data.id) {
                 self.boardCurrent=data;
-                self.getListStatusInProject();
-                self.getListColumn();
-                self.getListColumnStatus();
-			}else{
 			}
         });
         

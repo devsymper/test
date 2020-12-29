@@ -273,11 +273,13 @@ export default {
             }
         },
         selectIcon(icon) {
-			// console.log(icon);
             this.$emit("selected", icon.trim());
         },
         setContext(ctx){
             this.context = ctx
+        },
+        getContext(){
+            return this.context;
         },
         show(position){
             this.isShow = true;

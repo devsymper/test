@@ -142,7 +142,6 @@
                     <span>{{$t('document.submit.fab.toggleSize')}}</span>
                 </v-tooltip>
             </v-speed-dial>
-         
         <div class="sub-form-action" v-if="parrentInstance != 0">
             <button @click="goToListDocument()" class=subfom-action__item>{{$t('document.submit.goToList')}}</button>
             <button @click="handlerSubmitDocumentClick(true);" class=subfom-action__item><span class="mdi mdi-content-save-move-outline"></span>{{$t('document.submit.continueSubmit')}}</button>
@@ -1380,15 +1379,13 @@ export default {
             if(fromPopupAutocomplete){
                 $('#'+controlInstance.id).attr('data-autocomplete',valueControl);
             }
-            // if(controlInstance.type == 'user'){
-            //     valueControl = $('#'+controlInstance.id).attr('user-id');
-            //     if(valueControl == undefined) valueControl = 0;
-            // }
             // cần format lại giá trị date về năm tháng ngày để lưu vào store, tránh lỗi khi submit
             if(controlInstance.type == 'date'){
                 valueControl = this.$moment(valueControl).format('YYYY-MM-DD');
             }
-          
+            if(valueControl.inputValue){
+                valueControl = valueControl.inputValue;
+            }
             this.updateListInputInDocument(
                 controlName,
                 "value",
