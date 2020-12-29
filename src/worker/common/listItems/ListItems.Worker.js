@@ -39,7 +39,9 @@ export const getData = function(dataConfig){
 		}
 		let handler = function(data){
 			if(dataConfig.customAPIResult){
-				data = data.data;
+				let customData 
+				eval("customData = " + dataConfig.customAPIResult)
+				data = customData(data)
 			}else{
 				data = data.data;
 			}
@@ -55,6 +57,11 @@ export const getData = function(dataConfig){
 			}else{
 				obj.rowData = resData;
 			}
+			obj.columnDefs.forEach(function(e){
+				if(e.cellRenderer){
+					e.cellRenderer = e.cellRenderer.toString()
+				}
+			})
 			resolve(obj);
 		}
 		prepareFilterAndCallApi(dataConfig.configs.columns , dataConfig.configs.cache , dataConfig.configs.applyFilter, handler , {} , dataConfig);

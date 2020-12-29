@@ -730,7 +730,7 @@ export default {
 			let data = event.data;
             switch (data.action) {
                 case 'getData':
-					self.handlerGetData( data.dataAfter)
+					self.handlerGetData(data.dataAfter)
 					break;
                 case 'getItemForValueFilter':
 					self.tableFilter.currentColumn.colFilter.selectItems = data.dataAfter.selectItems
@@ -771,6 +771,11 @@ export default {
     },
 	methods:{
 		handlerGetData(res){
+			res.columnDefs.forEach(function(e){
+				if(e.cellRenderer){
+					eval("e.cellRenderer = " + e.cellRenderer)
+				}
+			})
 			for(let i in res){
 				this[i] = res[i]
 			}

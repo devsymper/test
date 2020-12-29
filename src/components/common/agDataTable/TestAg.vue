@@ -71,8 +71,8 @@ export default {
 							{name: "createAt", title: "createAt", type: "date"},
 							{name: "lastUpdateTime", title: "lastUpdateTime", type: "date"},
 						],
-						// listObject:res.data.listObject,
-						// total: res.data.total
+						listObject:res.data.listObject,
+						total: res.data.total
 					} 
 				}
 			}
@@ -85,14 +85,6 @@ export default {
 	},
 	mounted(){
 		this.containerHeight = util.getComponentSize(this).h
-		// this.MedalCellRenderer.prototype.init = function(params) {
-		// 	this.eGui = document.createElement('span');
-		// 	this.eGui.innerHTML = '#######';
-		// };
-
-		// this.MedalCellRenderer.prototype.getGui = function() {
-		// 	return this.eGui;
-		// };
 	},
 	methods:{
 		handlerRowClicked(params){
