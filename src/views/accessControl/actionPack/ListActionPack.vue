@@ -37,7 +37,7 @@ import { reformatGetListProcess } from "@/components/process/reformatGetListData
 import { appConfigs } from "@/configs.js";
 import { systemRoleApi } from "@/api/systemRole.js";
 import ListItems from "@/components/common/ListItems.vue";
-import ActionPackForm from "./../actionPackPanel/ActionPackForm";
+import ActionPackForm from "./actionPackPanel/ActionPackForm";
 import { permissionApi } from "@/api/permissionPack";
 export default {
     data() {

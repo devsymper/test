@@ -66,7 +66,7 @@ import FormTpl from "@/components/common/FormTpl.vue";
 import UserSelector from "@/views/tasks/userSelector.vue";
 import { systemRoleApi } from "@/api/systemRole.js";
 import PermissionSelector from "@/components/permission/PermissionSelector.vue";
-import ListUserSelector from "@/views/accessControl/helpers/ListUserSelector"
+import ListUserSelector from "@/views/accessControl/actionPack/helpers/ListUserSelector"
 import _debounce from "lodash/debounce";
 
 export default {

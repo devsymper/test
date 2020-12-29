@@ -148,7 +148,7 @@ import ConfigActionPackOrgchart from "./ConfigActionPackOrgchart.vue" ;
 import ObjectInApplication from "./ObjectInApplication";
 import {uiConfigApi} from "@/api/uiConfig";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import ApplicationDefinitionForm from "./../helpers/ApplicationDefinitionForm";
+import ApplicationDefinitionForm from "@/views/accessControl/actionPack/helpers/ApplicationDefinitionForm";
 import _debounce from "lodash/debounce";
 
 let defaultTabConfig = {
@@ -297,10 +297,6 @@ export default {
             }
             this.caculateTableDataForAllInstancesDocDef(initDocObjDataTable);
         },
-        objectTypeToDocumentDefinition(){
-            // this.itemData.objectType = 'document_definition'
-            // this.objectActive = 'document_definition'
-        },
         getTableDataFromOperations(operations){
             let mapActionAndObjectTypes = this.mapObjectTypesAndAction;
             let allResource = this.$store.state.actionPack.allResource;
@@ -316,7 +312,6 @@ export default {
              */
             let mapActionAndObjects = {};
             let mapActionForAllObjects = {};
-
 
             /**
              * Schema cho row mới của từng object type, có dạng:

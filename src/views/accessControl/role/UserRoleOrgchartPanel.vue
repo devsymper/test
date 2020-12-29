@@ -42,7 +42,7 @@
 </template>
 <script>
 import PermissionSelector from "@/components/permission/PermissionSelector"
-import OrgchartElement from './../helpers/OrgchartElement'
+import OrgchartElement from './OrgchartElement'
 import {accessControlApi} from "@/api/accessControl"
 import { permissionApi } from '@/api/permissionPack';
 import _debounce from "lodash/debounce";

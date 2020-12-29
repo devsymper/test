@@ -26,7 +26,7 @@
 </template>
 
 <script>
-import UserRoleOrgchartPanel from "./../panels/UserRoleOrgchartPanel"
+import UserRoleOrgchartPanel from "./UserRoleOrgchartPanel"
 import Handsontable from 'handsontable';
 import { appConfigs } from "@/configs.js";
 import ListItem from "@/components/common/ListItems.vue"
