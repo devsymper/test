@@ -178,6 +178,12 @@ var configs = {
                         icon: 'mdi-view-week-outline',
                         url:"/task-management/projects/:id/workflow"
                     },
+                    {
+                        name:'IssueLink',
+                        title:"Issue Link",
+                        icon: 'mdi-view-week-outline',
+                        url:"/task-management/projects/:id/issue-link"
+                    },
                 ]
             }
         }

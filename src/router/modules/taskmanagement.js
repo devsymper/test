@@ -71,6 +71,14 @@ export default [
                 }
             },
             {
+                path: "projects/:id/issue-link",
+                meta:{group:'projectSetting'},
+                name: "issueLink",
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/issueLink/List.vue')
+                }
+            },
+            {
                 path: "projects/:id/workflow/create",
                 // meta:{group:'projectSetting'},
                 name: "issueTypeWorkflow",
