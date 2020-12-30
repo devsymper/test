@@ -14,7 +14,7 @@
                     hide-details
                 ></v-text-field>
                 <div class="list-user d-inline-block" v-for="(obj) in listUser" :key="obj.id">
-                    <symperAvatar :size="22"  :userId="obj.userId" />
+                    <symperAvatar :size="22" class="user-avatar" :userId="obj.userId" />
                 </div>
                 <div class="ml-3 d-inline-block">
                     <v-menu offset-y>
@@ -42,16 +42,23 @@
                 <div
                     v-for="column in listBoardColumn"
                     :key="column.id"
-                    class="px-3 board-column-item rounded mr-4"
+                    :style="getColWidth()"
+                    class="board-column-item rounded mr-4"
                 >
                     <p class="title-column">{{column.name}}</p>
                     <!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
-                    <VuePerfectScrollbar style="max-height: calc(100vh - 250px);">
-                        <div v-for="(status, idex) in column.statusInColumn"
-                            :key="idex"
+                    <VuePerfectScrollbar style="max-height: calc(100vh - 200px);">
+                        <div v-for="(status, index) in column.statusInColumn"
+                            :key="index"
+                            class="mt-2"
+                            :style="{
+                                'border': (dragging) ? '2px dashed '+ status.color : '2px dashed #f2f2f2'
+                            }"
                         >
                             <p>{{status.name}}-{{status.taskLifeCircleName}}</p>
-                            <draggable :list="status.tasks" :animation="250" ghost-class="ghost-card" group="tasks">
+                            <draggable :list="status.tasks" :animation="250" 
+                            @start="dragging=true" @end="dragging=false"
+                            ghost-class="ghost-card" group="tasks">
                                 <!-- Each element from here will be draggable and animated. Note :key is very important here to be unique both for draggable and animations to be smooth & consistent. -->
                                 <task-card
                                     v-for="(task) in status.tasks"
@@ -182,10 +189,25 @@ export default {
                 },
             ],
             boardCurrent:{},
+            dragging:false
         };
     },
    
     methods:{
+        /**
+         * tính toán chiều rộng cột kanban board
+         */
+        getColWidth(){
+            let colLength = this.listBoardColumn.length;
+            if (colLength >= 4) {
+                return {width:'320px'};
+            }else{
+                return {width:100/colLength + '%'};
+            }
+        },
+        /**
+         * Hàm lấy danh sách task hiên thị lên kanban board
+         */
         async getListTasks(){
             
             let documentId = this.allIssueTypeInProject.reduce((arr,obj)=>{
@@ -195,7 +217,7 @@ export default {
                 return arr
             },[])
             let allTask = await documentApi.getListObjectByMultipleDocument({ids:JSON.stringify(documentId)})
-            console.log(allTask['data']['listObject']);
+            allTask = allTask['data']['listObject'];
             let columns = this.listColumn;
             if (this.listStatus.length > 0 ) {
                 for (let i = 0; i < this.listStatusColumn.length; i++) {
@@ -203,7 +225,11 @@ export default {
                     let statusRoleId = this.listStatusColumn[i].statusRoleId;
                     let item = this.listStatus.find(ele => ele.statusRoleId == statusRoleId);
                     if (item) {
-                        item['tasks'] = allTask['data']['listObject'];
+                        let statusId = item.statusId;
+                        let taskInStatus = allTask.filter(task=>{
+                            return task.tmg_status_id == statusId;
+                        })
+                        item['tasks'] = taskInStatus;
                         let column = columns.find(ele => ele.id == idColumn);
                         if (column) {
                             column.statusInColumn.push(item);
@@ -324,10 +350,9 @@ export default {
 }
 .board-column-item {
     min-width: 320px;
-    width: 320px;
     display: table;
     background: var(--symper-background-default);
-    padding: 8px 0;
+    padding: 8px;
     transition: all ease-in-out 300ms;
 }
 .ghost-card {
@@ -367,5 +392,12 @@ export default {
 .title-column{
     font-weight: 500;
     font-size: 15px;
+}
+.sym-style-input >>> .v-input__slot{
+    box-shadow: none !important;
+}
+.user-avatar{
+    margin-left: -6px;
+    box-shadow: var(--symper-box-shadow);
 }
 </style>

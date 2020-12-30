@@ -4,7 +4,7 @@
 	}"
 	>
 		<div class="task-item__header">
-			<p>{{task.tmg_name}}</p>
+			<p class="task-content">{{task.tmg_name}}</p>
 			
 		</div>
 		<div class="mt-4 card-item__body">
@@ -110,5 +110,12 @@ export default {
 		width: 14px;
 		height: 14px;
 		border-radius: 50%;
+	}
+	.task-content{
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 </style>
