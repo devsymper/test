@@ -101,9 +101,20 @@ export default {
     methods:{
         showPopupCreateIssue(){
             this.$refs.popupIssue.show();
+        },
+        getAllUserOperations(projectId){
+            let thisCpn = this;
+            taskManagementApi.getAllActionOfProject(projectId).then(res=>{
+                if(res.status == 200){
+                    thisCpn.$store.commit('taskManagement/addToTaskManagementStore',{key:'userOperations',value:res.data})
+                }
+            })
         }
-
-        
+    },
+    watch:{
+        sCurrentProject(vl){
+            this.getAllUserOperations(vl.id);
+        }
     },
     created(){
         this.$store.dispatch("taskManagement/getAllStatusCategory");
@@ -112,6 +123,9 @@ export default {
         }
     },
     computed:{
+        sCurrentProject(){
+            return this.$store.state.taskManagement.currentProject
+        },
         currentUserAvatar(){
             let userId = this.$store.state.app.endUserInfo.id;
             return appConfigs.apiDomain.fileManagement+'readFile/user_avatar_' + userId;

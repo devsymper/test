@@ -33,6 +33,7 @@ const defaultState = {
     listIssueTypeInProjects:{}, // có dạng {key : []} , key là boardId,
     listDocumentConfigFieldIssue:[],
     allWorkflow:[],
+    userOperations:{}
 };
 
 export default defaultState;

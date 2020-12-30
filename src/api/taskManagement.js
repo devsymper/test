@@ -238,7 +238,9 @@ export const taskManagementApi = {
     },
     getListActionPackInPermissionPack(permissionId){
         return permission.get("permission_packs/"+permissionId+"/action_packs",{detail:1});
-
+    },
+    getAllActionOfProject(projectId){
+        return taskManagement.get("action-roles/"+projectId);
     },
 
 
