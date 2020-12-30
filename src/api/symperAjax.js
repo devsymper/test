@@ -5,7 +5,6 @@ export const symperAjax = async(options) =>{
 			options.url.includes("?") ? options.url = options.url + "&" + str : options.url = options.url + "?" + fullParams
 		}
 	}else{
-		debugger
 		if(!options.contentType){
 			if(!options.headers['Content-Type']){
 				options.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
