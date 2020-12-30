@@ -2233,6 +2233,9 @@ export default {
                         if(listInput[controlName].type == 'fileUpload'){
                             dataControl[controlName] = JSON.stringify(value)
                         }
+                        if(listInput[controlName].type == 'richText'){
+                            dataControl[controlName] = listInput[controlName].editor.getContent();
+                        }
                        
                     }
                     
