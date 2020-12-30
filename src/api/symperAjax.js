@@ -19,7 +19,6 @@ export const symperAjax = async(options) =>{
 			options.body = typeof options.data == 'object' ? JSON.stringify(options.data) : options.data;
 		}
 	}
-	debugger
 	const response = await fetch(options.url,options)
 	return  response.status == 204  ? null : response.json()   
 }

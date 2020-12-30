@@ -223,11 +223,9 @@ export default {
         },
 		getActiveapps(){
 			let self = this
-			this.myApplicationWorker.postMessage(
-				{
-					action:'getActiveAppSBS',
-				}
-			);
+			this.$postWorkerMessage(this.myApplicationWorker, {
+				action: 'getActiveAppSBS',
+			});
         },
         checkChildrenApp(data,idApp){
             let self = this
@@ -382,12 +380,12 @@ export default {
         },
 
 		async getItemByAccessControl(ids){
-			this.myApplicationWorker.postMessage({
+			this.$postWorkerMessage(this.myApplicationWorker, {
 				action: 'getItemByAccessControl',
 				data:{
 					ids: ids
 				}
-			})
+			});
 		},
         
     },

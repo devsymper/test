@@ -246,17 +246,14 @@ export default {
         },
         createApp() {	
 			let self = this
-			this.applicationWorker.postMessage(
-				{
-					action:'createApp',
-					data:{
-						listItemSelected: self.$store.state.appConfig.listItemSelected,
-						childrenAppData: self.childrenApp,
-						currentAppData: self.currentApp
-					}
+			this.$postWorkerMessage(this.applicationWorker, {
+				action: 'createApp',
+				data:{
+					listItemSelected: self.$store.state.appConfig.listItemSelected,
+					childrenAppData: self.childrenApp,
+					currentAppData: self.currentApp
 				}
-			);
-				
+			});
         },
          updateApp() {
 			if(this.currentApp.hasOwnProperty('childrenApp')){
@@ -266,24 +263,14 @@ export default {
 				this.currentApp.status = 0
 			}
 			let self = this
-			this.applicationWorker.postMessage(
-				{
-					action:'updateApp',
-					data:{
-						listItemSelected: self.$store.state.appConfig.listItemSelected,
-						childrenAppData: self.childrenApp,
-						currentAppData: self.currentApp
-					}
+			this.$postWorkerMessage(this.applicationWorker, {
+				action: 'updateApp',
+				data:{
+					listItemSelected: self.$store.state.appConfig.listItemSelected,
+					childrenAppData: self.childrenApp,
+					currentAppData: self.currentApp
 				}
-			);
-			// this.updateListItem(this.$store.state.appConfig.listItemSelected)
-			// let data = JSON.stringify(this.currentApp);
-			// appManagementApi.updateApp(data).then(res => {
-			// 	  this.$emit("update-app", res)
-			// }).catch(err => {
-			// 	this.showError()
-			// })
-			// .always(() => {});;
+			});
         },
     },
 };
