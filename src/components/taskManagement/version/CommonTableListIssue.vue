@@ -85,12 +85,12 @@ export default {
                 value: "tmg_name"
                 },
                 { text: this.$t("taskManagement.table.description"), value: "tmg_description" },
-                { text: this.$t("common.status"), value: "status" },
-                { text: "Priority", value: "priority" },
-                { text: this.$t("tasks.header.assignee"), value: "assignee" },
-                { text: this.$t("common.created_by"), value: "user" },
-                { text: this.$t("tasks.header.dueDate"), value: "tmg_due_date" },
-                { text: this.$t("taskManagement.table.createAt"), value: "document_object_create_time" },
+                { text: this.$t("common.status"), value: "status" ,width:'120'},
+                { text: "Priority", value: "priority" ,width:'120'},
+                { text: this.$t("tasks.header.assignee"), value: "assignee" ,width:'120'},
+                { text: this.$t("common.created_by"), value: "user" ,width:'150'},
+                { text: this.$t("tasks.header.dueDate"), value: "tmg_due_date" ,width:'100'},
+                { text: this.$t("taskManagement.table.createAt"), value: "document_object_create_time" ,width:'150'},
             ],
         }
     },
@@ -146,5 +146,8 @@ export default {
     cursor: pointer;
     text-decoration: underline;
     color: blue;
+}
+.sym-style-input >>> .v-input__slot{
+    box-shadow: none !important;
 }
 </style>

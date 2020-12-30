@@ -235,4 +235,7 @@ export default {
 .table-list-component >>> td{
     font-size: 13px!important;
 }
+.sym-style-input >>> .v-input__slot{
+    box-shadow: none !important;
+}
 </style>

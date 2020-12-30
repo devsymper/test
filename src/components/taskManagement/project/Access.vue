@@ -896,5 +896,8 @@ export default {
     position: absolute;
     right: 10px;
 }
+.sym-style-input >>> .v-input__slot{
+    box-shadow: none !important;
+}
 
 </style>

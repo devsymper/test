@@ -115,7 +115,7 @@ export default {
     data(){
         return{
             dataProgess:{
-                total:10,
+                total:6,
                 item:{
                     todo:{
                         value:2,
@@ -126,7 +126,7 @@ export default {
                         color:'blue'
                     },
                     done:{
-                        value:5,
+                        value:1,
                         color:'green'
                     }
                 }
@@ -283,5 +283,8 @@ export default {
 }
 .table-list-version >>> td{
     font-size: 13px!important;
+}
+.sym-style-input >>> .v-input__slot{
+    box-shadow: none !important;
 }
 </style>
