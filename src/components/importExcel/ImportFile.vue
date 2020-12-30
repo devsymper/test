@@ -206,7 +206,7 @@ import {
     documentApi
 } from "./../../api/Document";
 import importApi from "./../../api/ImportExcel";
-
+import ImportWorker from 'worker-loader!@/worker/import/Import.Worker.js';
 export default {
     components: {
         UploadFile
@@ -214,6 +214,8 @@ export default {
     props: ['deleteFileName', "tables",'options'],
     data() {
         return {
+            dataImport:{},
+            importWorker:null,
             stepper: 1,
             importInfo:{
                 options: this.options
@@ -236,8 +238,6 @@ export default {
             showCancelBtn: true,
             errorMessage: '',
             key:'',
-            countKey:0,
-           
         };
     },
     computed: {
@@ -246,10 +246,41 @@ export default {
       },
     },
     created(){
+        this.importWorker = new ImportWorker();
         this.stepper= 1;
         this.errorMessage =" "
     },
+    mounted(){ 
+		const self = this
+        this.importWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'import':
+                    self.setDataImport(data.dataAfter)
+					break;
+                default:
+                    break;
+            }
+        });
+
+    },
     methods: {
+        setDataImport(value){
+            let check = this.checkValidate();
+            if(check){
+                importApi.pushDataExcel(value)
+                .then(res => {
+                    if (res.status === 200) {
+                        console.log(dataImport); 
+                    }
+                })
+                .catch(err => {
+                });     
+                this.errorMessage = '';
+                this.$emit('import', {fileName:this.data.fileName});
+                this.showCancelBtn = false;
+            }
+        },
         checkKeyRequired(tables, tableIdx){
             let check = false;
             for(let i=0; i<tables.controls.length;i++){
@@ -292,7 +323,6 @@ export default {
         sumCount(tableIdx,type){
             let totalAllRow = 0;
             let totalFilledRow = this.tables[tableIdx].controls.filter(p => p.dataColumn!=null).length;
-            
             let isFilledKey =  this.tables[tableIdx].keyColumn?(this.tables[tableIdx].keyColumn.enable?1:0):0;
             if(type!='user'){
                 totalAllRow = this.tables[tableIdx].controls.filter(p => p.dataType!='table').length+1;
@@ -304,7 +334,6 @@ export default {
              //Sự kiện xảy ra khi thay đổi Key
         onChangeKey(tableIdx,value){
             if(value){
-                
                 this.tables[tableIdx].keyColumn={
                     enable:true,
                     index:value.index,
@@ -317,18 +346,10 @@ export default {
                     name:''
                  }
             }
-           
         },
         //Chọn key cho bảng
-        selectKeyControl(control, allControls) {
-            for (let ctrl of allControls) {
-                ctrl.isKeyControl = false;
-            }
-            control.isKeyControl = true;
-        },
         setKey(val){
             this.key=val;
-
         },
         cancel() {
             this.$emit('cancel');
@@ -375,36 +396,8 @@ export default {
         },
         // Sự kiện được gọi khi ấn import
         importFile() {
-            let cleanedTables = this.tables.map((t, idx) => ({
-                ...idx !== 0 && {
-                    name: t.name
-                },
-               
-                keyColumn: t.keyColumn ? t.keyColumn : {enable:false, index:-1, name:''},
-                sheetMap: t.sheetMap.name,
-                controls: t.controls.map(c => ({
-                    ...c,
-                    dataColumn: c.dataColumn ? {
-                        name: c.dataColumn.name,
-                        index: c.dataColumn.index
-                    } : null
-                }))
-            }));
-            let general = [];
-            for (let i = 0; i < cleanedTables.length; i++) {
-                if (!cleanedTables[i].sheetMap) {
-                    continue;
-                }
-                let tb = Object.assign({}, cleanedTables[i]);
-                tb.controls = [];
-                for (let j = 0; j < cleanedTables[i].controls.length; j++) {
-                    if (cleanedTables[i].controls[j].dataColumn != null && cleanedTables[i].controls[j].dataType != 'table') {
-                        tb.controls.push(cleanedTables[i].controls[j]);
-                    }
-                }
-                general.push(tb);
-            }
             let dataImport = {
+                tables: this.tables,
                 fileName: this.data.fileName,
                 subObjType:this.options.subObjType,
                 documentName: this.options.nameObj,
@@ -414,26 +407,14 @@ export default {
                 objId: this.options.objId,
                 typeImport: this.selectType,
                 objType: this.options.objType,
-                mode: 'full',
-                mapping: {
-                    general: general[0],
-                    tables: general[1] ? general.slice(1, general.length) : [],
-                },
-
-            };
-            let check = this.checkValidate();
-            if(check){
-                importApi.pushDataExcel(dataImport)
-                .then(res => {
-                    if (res.status === 200) {
-                        console.log(dataImport);                    }
-                })
-                .catch(err => {
-                });     
-                this.errorMessage = '';
-                this.$emit('import', {fileName:this.data.fileName});
-                this.showCancelBtn = false;
             }
+            this.$postWorkerMessage(this.importWorker,{
+                action:'import',
+                data:{
+                    data:dataImport
+                }
+            })
+           
         },
         //
         checkValidate(){
@@ -853,4 +834,9 @@ export default {
     font-size: 14px !important
 }
 
+</style>
+<style >
+    /* .row{
+      //  margin:0px!important
+    } */
 </style>
