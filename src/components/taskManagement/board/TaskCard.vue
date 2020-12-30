@@ -1,46 +1,70 @@
 <template>
-	<div class="task-item rounded px-2 pt-2 pb-1">
+	<div class="task-item rounded px-2 pt-2 pb-1" :style="{
+		'border-left':(status) ? '4px solid '+status.color : ''
+	}"
+	>
 		<div class="task-item__header">
 			<p>{{task.tmg_name}}</p>
 			
 		</div>
 		<div class="mt-4 card-item__body">
 			<div class="left-content">
-				<v-icon v-if="task.issueType" style="color:green;">{{task.issueType.icon}}</v-icon>
-				<v-icon v-if="task.priority" style="color:red;">{{task.priority.icon}}</v-icon>
-				<span>DN-12</span>
+				<v-icon v-if="priority" :style="{color:(priority.color) ? priority.color : ''}">{{priority.icon}}</v-icon>
+				<span>{{task.tmg_project_key+"-"+task.document_object_id}}</span>
 			</div>
 			<div class="right-content">
 				<v-icon>mdi-clock-time-four-outline</v-icon>
 				<span>{{task.document_object_create_time}}</span>
-				<img
-					class="user-avatar"
-					src="https://pickaface.net/gallery/avatar/unr_sample_161118_2054_ynlrg.png"
-					alt="Avatar"
-				>
+				<symper-avatar :size="16" :userId="task.tmg_assignee"/>
 			</div>
 			
 		</div>
   	</div>
 </template>
 <script>
+import SymperAvatar from '../../common/SymperAvatar.vue';
 export default {
+  components: { SymperAvatar },
 	props: {
 		task: {
 		type: Object,
 		default: () => ({})
 		}
 	},
+	data(){
+		return {
+			priority:null,
+			projectId:null,
+			status:null
+		}
+	},
 	computed: {
-		badgeColor() {
-		const mappings = {
-			Design: "purple",
-			"Feature Request": "teal",
-			Backend: "blue",
-			QA: "green",
-			default: "teal"
-		};
-		return mappings[this.task.type] || mappings.default;
+		allPriority(){
+			return this.$store.state.taskManagement.allPriority;
+		},
+		allStatus(){
+			return this.$store.state.taskManagement.listStatusInProjects[this.projectId];
+		}
+	},
+	created(){
+		this.projectId = this.$route.params.id;
+	},
+	mounted(){
+		this.getPriority();
+		this.getStatus();
+	},
+	methods:{
+		getPriority(){
+			let priority = this.allPriority.find(ele => ele.id == this.task.tmg_priority_id);
+			if(priority){
+				this.priority = {icon:priority.icon, color:priority.color}
+			}
+		},
+		getStatus(){
+			let status = this.allStatus.find(ele => ele.statusId == this.task.tmg_status_id);
+			if(status){
+				this.status = {color:status.color}
+			}
 		}
 	}
 };
@@ -80,5 +104,11 @@ export default {
 	}
 	.left-content span{
 		margin-left: 4px;
+	}
+	.status-task{
+		display: inline-block;
+		width: 14px;
+		height: 14px;
+		border-radius: 50%;
 	}
 </style>

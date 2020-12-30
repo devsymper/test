@@ -411,7 +411,21 @@ export default {
                     formulasId: (props.titleObjectFormulasId != undefined) ? props.titleObjectFormulasId : 0,
                     type: "script",
                     groupType: "formulas"
-                }
+                },
+                formStyle : {
+                    title: this.$t('document.editor.dialog.saveDoc.formStyle'),
+                    type: "select",
+                    value: 'document-form-style-default',
+                    options: [{
+                            text: 'Mặc định',
+                            value: 'document-form-style-default'
+                        },
+                        {
+                            text: 'Border Input',
+                            value: 'document-form-style-custom-1'
+                        },
+                    ],
+                },
             }
             if(this.isConfigPrint){
                 docProps = {

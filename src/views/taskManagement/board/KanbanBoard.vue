@@ -195,6 +195,7 @@ export default {
                 return arr
             },[])
             let allTask = await documentApi.getListObjectByMultipleDocument({ids:JSON.stringify(documentId)})
+            console.log(allTask['data']['listObject']);
             let columns = this.listColumn;
             if (this.listStatus.length > 0 ) {
                 for (let i = 0; i < this.listStatusColumn.length; i++) {
