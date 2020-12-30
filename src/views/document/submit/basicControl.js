@@ -5,6 +5,7 @@ import { SYMPER_APP } from './../../../main.js'
 import Util from './util'
 var numbro = require("numbro");
 import { appConfigs } from "@/configs.js";
+import tinymce from 'tinymce/tinymce';
 import { documentApi } from "../../../api/Document";
 let sDocumentManagementUrl = appConfigs.apiDomain.sdocumentManagement;
 const fileTypes = {
@@ -772,14 +773,38 @@ export default class BasicControl extends Control {
 
     }
     renderRichTextControl() {
-        let style = this.ele.attr('style');
-        this.ele.replaceWith('<textarea style="'+style+'" id="'+this.id+'" class="s-control s-control-rich-text" title="Rich-text" s-control-type="richText" type="text"></textarea>');
+        let isReadOnly = 1;
+        this.editor = '';
+        let selector = '';
+        let self = this;
+        let toolbar = true;
         if(this.checkViewType('submit') || this.checkViewType('update')){
-            this.ele = $('#sym-submit-'+this.curParentInstance).find("textarea#"+this.id);
+            this.ele = $('#sym-submit-'+this.curParentInstance).find("#"+this.id);
+            isReadOnly = 0;
+            selector = '#sym-submit-'+this.curParentInstance+" #"+this.id;
         }
         else{
-            this.ele = $('#sym-Detail-'+this.curParentInstance).find("textarea#"+this.id);
+            this.ele = $('#sym-Detail-'+this.curParentInstance).find("#"+this.id);
+            selector = '#sym-Detail-'+this.curParentInstance+" #"+this.id;
+            toolbar = false;
         }
+        if(this.controlProperties.isShowHeaderTinyMce.value){
+            tinymce.init({
+                toolbar: toolbar,
+                menubar: false,
+                branding: false,
+                readonly: isReadOnly,
+                selector:  selector,
+                statusbar: false,
+                init_instance_callback : function(editor) {
+                    self.editor = editor;
+                    self.initEditor();
+                },
+            });    
+        }
+    }
+    initEditor(){
+        return this.editor.setContent(this.value);
     }
     getDefaultValue() {
         if (this.isCheckbox) {

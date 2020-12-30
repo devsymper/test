@@ -1869,7 +1869,7 @@ export default {
         /**
          * Hàm nhận sự kiện ném ra từ compon material icon sau khi chọn icon
          */
-        selectedIcon(data){
+         selectedIcon(data){
             let context = this.$refs.materialIconPicker.getContext()
             if(context == 'toolbar'){
                  this.editorCore.insertContent('&nbsp;<span class="mdi '+data+'"></span>&nbsp;');

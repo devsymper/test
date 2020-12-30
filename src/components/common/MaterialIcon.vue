@@ -230,7 +230,7 @@ export default {
                 mdi-weather-windy,mdi-weather-windy-variant,mdi-web,mdi-webcam,mdi-weight,mdi-weight-kilogram,mdi-whatsapp,mdi-wheelchair-accessibility,mdi-white-balance-auto,
                 mdi-white-balance-incandescent,mdi-white-balance-irradescent,mdi-white-balance-sunny,mdi-wifi,mdi-wii,mdi-wikipedia,mdi-window-close,mdi-window-closed,
                 mdi-window-maximize,mdi-window-open,mdi-window-restore,mdi-windows,mdi-wordpress,mdi-worker,mdi-xbox,mdi-xbox-controller,
-                mdi-xbox-controller-off,mdi-xda,mdi-xml,mdi-yeast,mdi-yelp,mdi-youtube-play,mdi-zip-box`,
+                mdi-xbox-controller-off,mdi-xda,mdi-xml,mdi-yeast,mdi-yelp,mdi-youtube-play,mdi-zip-box,mdi-format-title,mdi-priority-high,mdi-select-group,mdi-script-text-outline`,
             listIconToShow: [],
             tab: null,
             items: [

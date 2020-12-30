@@ -16,6 +16,24 @@ p {
     margin: 0;
 }
 
+.document-form-style-default  input{
+    border-bottom: 0.5px solid #ccc;
+    border-radius: 0;
+    height: 25px;
+    background: transparent;
+    box-shadow: none;
+    padding: 0 5px;
+}
+.document-form-style-custom-1 input{
+    border: 1px solid #e9ecef;
+    padding: 4px 6px;
+    min-height: 30px;
+    border-radius: 3px;
+    background: transparent;
+    color: var(--symper-text-color-default) !important;
+
+}
+
 .sym-form-submit .s-control-tracking-value,
 .sym-form-submit .s-control-approval-history,
 .sym-form-submit .s-control-report,
@@ -42,9 +60,7 @@ p {
 .sym-form-submit .s-control-number {
     width: auto;
     height: 25px;
-    border-radius: 3px;
     font-size: 11px;
-    border: 1px solid #e9ecef;
     font-family: Roboto, sans-serif;
     padding: 0 5px;
     outline: 0!important;
@@ -114,39 +130,26 @@ p {
     border-bottom: 1px solid rgb(230, 230, 230);
 }
 .s-control-rich-text{
-    padding: 2px 5px !important;
-    background: transparent;
-    box-shadow: none !important;
-    border-top: none !important;
-    border-right: none !important;
-    border-left: none !important;
-    border-bottom: 0.5px solid #ccc;
-    border-radius: 0 !important;
+    padding: 2px 5px;
     font-weight: normal; 
     min-height: 25px;
 }
-.s-control:not(.s-control-tab-page):not(.s-control-rich-text):not(.s-control-image):not(button):not(.page-item):not(.s-control-approval-history):not(.s-control-label):not(.s-control-submit):not(.s-control-draft):not(.s-control-reset):not(.s-control-file-upload):not(.s-control-table):not(.s-control-data-flow):not(.s-control-panel) {
-    padding: 0 5px !important;
+.s-control:not(.s-control-tab-page):not(.s-control-rich-text):not(.s-control-image):not(button)
+    :not(.page-item):not(.s-control-approval-history):not(.s-control-label):not(.s-control-submit)
+    :not(.s-control-draft):not(.s-control-reset):not(.s-control-file-upload):not(.s-control-table)
+    :not(.s-control-data-flow):not(.s-control-panel) {
+    padding: 0 5px;
     background: transparent;
-    box-shadow: none !important;
-    border-top: none !important;
-    border-right: none !important;
-    border-left: none !important;
+    box-shadow: none;
     border-bottom: 0.5px solid #ccc;
-    border-radius: 0 !important;
+    border-radius: 0;
     font-weight: normal;
     height: 25px;
 }
 
 .s-control-label {
     background: transparent;
-    box-shadow: none !important;
-    /*border: none !important;*/
-    border-top: none !important;
-    border-right: none !important;
-    border-left: none !important;
-    border-bottom: 0.5px solid #ccc;
-    border-radius: 0 !important;
+    border-radius: 0;
     font-weight: normal;
 }
 

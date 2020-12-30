@@ -1,7 +1,7 @@
 <template>
     <v-dialog
         v-model="isShow"
-        max-width="600px"
+        max-width="21cm"
         scrollable
     >
         <v-card>
