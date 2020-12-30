@@ -55,9 +55,9 @@
 				
 			</div>
 			<div style="width: 600px !important">
-				<div v-if="objectActive == 'application'" class="d-flex flex-column">
+				<div v-if="objectActive == 'application_definition'" class="d-flex flex-column">
 					<ApplicationDefinitionForm 
-						v-if="objectActive == 'application'"
+						v-if="objectActive == 'application_definition'"
 						@list-item-selected="handleListAppSelected"
 						:listApp="listAppSelected"
 						:commonTableSetting="commonTableSetting"
@@ -105,6 +105,12 @@
 						</hot-table>
 					
 					</div>
+					  <DocumentInstanceOperation 
+						@change-data="handleChangeDocumentInstanceOperation"
+						v-if="objectActive == 'document_definition'"
+						:tableDataDefinition="multipleLevelObjects.document_definition"
+						:commonTableSetting="commonTableSetting"
+						:tableHeight="tableHeight - 32"/>
 				</div>
 			</div>
 		</div>	
@@ -184,6 +190,7 @@ export default {
             switch (data.action) {
                 case 'getAppInActionPack':
 					self.listAppSelected = data.dataAfter
+					debugger
 					break;
                
                 default:
@@ -203,22 +210,14 @@ export default {
 		getAppInActionPack(){
 			let self = this
 			let str = 'action-pack:'+ this.itemData.id
-			this.actionPackWorker.postMessage({
-				action: 'getAppInActionPack',
-				data:{
-					str: str
-				}
-			})
-			// uiConfigApi.getUiConfig(str).then(res=>{
-			// 	if(res.status == 200){
-			// 		let arr = JSON.parse(res.data.detail)
-			// 		self.listAppSelected = arr
-			// 	}else{
-			// 		self.listAppSelected = []
-			// 	}
-			// }).catch(err=>{
-
-			// })
+			if(this.actionPackWorker){
+				this.actionPackWorker.postMessage({
+					action: 'getAppInActionPack',
+					data:{
+						str: str
+					}
+				})
+			}
 		},
         handlePermissionSelected(data){
             this.permissionDepartment = data           
@@ -527,6 +526,7 @@ export default {
         },
         handleInputValueChange(name, inputInfo, data){
 			this.objectActive = data
+			debugger
             let self = this
             if(name == 'objectType'){
                 if(data == "department"){

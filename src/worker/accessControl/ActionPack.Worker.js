@@ -1,4 +1,5 @@
 import {uiConfigApi} from "@/api/uiConfig";
+import { permissionApi } from "@/api/permissionPack";
 
 
 self.onmessage = async function (event) {
@@ -9,6 +10,10 @@ self.onmessage = async function (event) {
         case 'getAppInActionPack':
 			let getAppInActionPackRes = await getAppInActionPack(data.str);
             postMessage({action:'getAppInActionPack', dataAfter : getAppInActionPackRes})
+            break;
+        case 'deleteActionPack':
+			let deleteActionPackRes = await deleteActionPack(data.ids);
+            postMessage({action:'deleteActionPack', dataAfter : deleteActionPackRes})
             break;
         
         default:
@@ -23,6 +28,15 @@ export const getAppInActionPack = async function(str) {
 	if(res.status == 200){
 		arr = JSON.parse(res.data.detail)
 	}
+	
 	return arr
+}
+export const deleteActionPack = async function(ids) {
+	let res = await permissionApi.deleteActionPack(ids);
+	if(res.status == 200){
+		return 'success'
+	}else{
+		return 'error'
+	}
 }
 
