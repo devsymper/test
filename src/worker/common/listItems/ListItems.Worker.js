@@ -1,13 +1,11 @@
 
 import { getDataFromConfig, getDefaultFilterConfig } from "@/components/common/customTable/defaultFilterConfig";
 import {uiConfigApi} from "@/api/uiConfig";
-import { setWorkerDataStore } from '@/worker/common/workerUtil';
 
 self.onmessage = async function (event) { 
-	setWorkerDataStore(event);
-	var workerDataReceive = event.data;
-    let action = workerDataReceive.data.action;
-	let data = workerDataReceive.data.data;
+	var workerDataReceive = event.data.data;
+    let action = workerDataReceive.action;
+	let data = workerDataReceive.data;
 	switch (action) {
         case 'getData':
 			let getDataRes = await getData(data);

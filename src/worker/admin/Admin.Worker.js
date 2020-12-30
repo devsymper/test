@@ -1,10 +1,7 @@
 import {adminApi} from '@/api/Admin.js'
 import {documentApi} from '@/api/Document.js'
-import { setWorkerDataStore } from '@/worker/common/workerUtil';
-
 
 self.onmessage = async function (event) {
-	setWorkerDataStore(event)
 	var workerDataReceive = event.data;
     let action = workerDataReceive.data.action;
     let data = workerDataReceive.data.data;
