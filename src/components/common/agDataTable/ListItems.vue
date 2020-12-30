@@ -600,7 +600,9 @@ export default {
             if (this.actionPanel == true) {
 				this.$emit("open-panel");
 				this.showSearchBox = false
-            }
+            }else{
+				this.showSearchBox = true
+			}
 		},
 		columnDefs:{
 			deep: true,
@@ -744,8 +746,15 @@ export default {
 		this.rowSelection = 'single';
     },
 	methods:{
-		reRender(){
-			this.agApi.sizeColumnsToFit()
+		// reRender(){
+		// 	this.agApi.sizeColumnsToFit()
+		// },
+		reRender(skipHeader = false) {
+			// var allColumnIds = [];
+			// this.agApi.getAllColumns().forEach(function (column) {
+			// 	allColumnIds.push(column.colId);
+			// });
+			// this.agApi.autoSizeColumns(allColumnIds, skipHeader);
 		},
 		 /**
          * Tạo ra các item có check box với trạng thái đã check hay chưa 
