@@ -1,9 +1,5 @@
 <template>
-    <div :class="{
-    'wrap-content-submit':true,
-    'sym-sub-form-submit':(parrentInstance == 0) ? false : true
-
-    }">
+    <div :class="globalClass">
     <VuePerfectScrollbar class="scroll-content h-100">
          
         <Preloader ref="preLoaderView"/>
@@ -407,11 +403,16 @@ export default {
             dataPivotTable:{},
             dataColPivot:[],
             dataPivotMode:[],
+            globalClass:null
         };
 
     },
     beforeMount() {
         this.columnsSQLLiteDocument = {};
+        this.globalClass = {
+            'wrap-content-submit':true,
+            'sym-sub-form-submit':(this.parrentInstance == 0) ? false : true,
+        }
     },
     mounted() {
         this.editorDoc = $(".sym-form-submit");
@@ -1467,6 +1468,10 @@ export default {
                             thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
                             if(res.data.document.otherInfo != null && res.data.document.otherInfo != "")
 							thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
+                            let style = JSON.parse(res.data.document.formStyle);
+                            if(style){
+                                this.globalClass[style['globalClass']] = true;
+                            }
                             thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
                             thisCpn.dataPivotTable = res.data.pivotConfig;
                             //if(res.data.document.allowSubmitOutsideWorkflow==1){

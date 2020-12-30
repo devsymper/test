@@ -1,5 +1,10 @@
 <template>
-    <div class="wrap-content-detail" style="overflow:hidden;position: relative;">
+    <div style="overflow:hidden;position: relative;"
+        :class="{
+            'document-form-style-custom-1' :true,
+            'wrap-content-detail':true
+        }"
+    >
         <Preloader ref="preLoaderView"/>
         <div class="panel-header" v-if="!quickView && !isPrint">
             <div class="right-action">
