@@ -314,6 +314,8 @@
         <action-pack 
             ref="actionPack"
             :statusDetail="false"
+            @list-actionpack-change="changeListActionPack"
+
         />
     </div>
 </template>
@@ -790,7 +792,10 @@ export default {
             this.dialogAddRole = false;
             this.getListPermissionPack();
         },
-
+        changeListActionPack(){
+            this.$refs.permission.getListActionPack();
+        }
+        
      
     },
     created(){

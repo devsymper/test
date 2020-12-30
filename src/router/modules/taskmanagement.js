@@ -145,8 +145,6 @@ export default [
             {
                 path: "priorities",
                 name: "priority",
-                meta:{group:'projectSetting'},
-
                 components:{
                     TaskManagement: () => import ('../../views/taskManagement/priority/List.vue')
                 }
