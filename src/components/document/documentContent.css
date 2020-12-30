@@ -676,3 +676,10 @@ button:hover {
     cursor: pointer;
     font-size: 15px;
 }
+
+.sym-form-Detail .s-control-file-upload{
+    border: var(--symper-border);
+}
+ .sym-form-Detail .upload-file-wrapper-outtb{
+     padding-left: 8px;
+}

@@ -37,9 +37,6 @@ export default {
                 self.selfChange = true;
 				self.$emit('input', vl);
 				self.$emit('change', vl);
-				setTimeout(function(){
-					debugger
-				},2000)
                 if(this.completionDiv){
                     this.completionDiv.css('visibility', 'hidden');
                 }
@@ -133,20 +130,20 @@ export default {
 		},
     },
     mounted(){
-        setTimeout((self) => {
-            let editorOption = Object.assign({
-                language: "sql",
-                value: self.value,
-                wordWrap: "on",
-                fontSize: 12
-            }, this.options);
-            self.editor = editor.create(self.$refs.monacoWrapper, editorOption);
-            // Register a completion item provider for the new language
-            self.setStaticCompletionItems();
-            self.$emit('init', self.editor);
-            self.listenEditorEvents();
-			self.model = self.editor.getModel();
-        }, 50, this);
+        let self = this;
+        let editorOption = Object.assign({
+            language: "sql",
+            value: self.value,
+            wordWrap: "on",
+            fontSize: 12,
+            automaticLayout: true
+        }, self.options);
+        self.editor = editor.create(self.$refs.monacoWrapper, editorOption);
+        // Register a completion item provider for the new language
+        self.setStaticCompletionItems();
+        self.$emit('init', self.editor);
+        self.listenEditorEvents();
+        self.model = self.editor.getModel();
     },
     props: {
         value: {
