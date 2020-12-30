@@ -109,10 +109,13 @@ export default class Api {
      * @param {Object} options các option thêm cho request theo Jquery Ajax
      * @returns {Object} Đối tượng có thể sử dụng như của promise
      */
-    callApi(method, url, data, headers, options) {
-
+    async callApi(method, url, data, headers, options) {
+        let token = util.auth.getToken();
+        if(token instanceof Promise){
+            token = await token;
+        }
 		headers = Object.assign({
-            Authorization: `Bearer ${util.auth.getToken()}`
+            Authorization: `Bearer ${token}`
         }, headers);
 
         if ((method == 'GET' || (method == 'POST' && options.cacheResponse)) && !url.includes('workflow.symper.vn')) {
@@ -128,13 +131,15 @@ export default class Api {
             headers: headers
         };
 		options = Object.assign(defaultOptions, options);
-		/**
+        let res = {};
+        /**
 		 * Hàm check nếu gọi api từ worker thì thêm 1 hàm mới gọi từ đó
 		 */
 		if(self.window){
-			return $.ajax(options);
+			res = await $.ajax(options);
 		}else{
-			return symperAjax(options)
-		}
+			res = await symperAjax(options)
+        }
+        return res;
     }
 }
