@@ -728,6 +728,8 @@ export default {
                     (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
                     (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [189,16,8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
                     if(!this.$refs.autocompleteInput.isShow()){
+                        let controlIns = getControlInstanceFromStore(thisCpn.keyInstance, e.controlName);
+                        thisCpn.$refs.autocompleteInput.setControlValueKey(controlIns.getAutocompleteKeyValue());
                         this.$refs.autocompleteInput.show(e.e);
                         let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
                         if(currentTableInteractive != null && currentTableInteractive != undefined)
@@ -760,6 +762,8 @@ export default {
                             value: controlName,
                             instance: this.keyInstance
                         });
+                let controlIns = getControlInstanceFromStore(this.keyInstance, controlName);
+                this.$refs.autocompleteInput.setControlValueKey(controlIns.getAutocompleteKeyValue());
                 this.$refs.autocompleteInput.setTypeInput(e.type);
                 if(e.type == 'combobox'){
                     this.$refs.autocompleteInput.setSingleSelectCombobox(e.isSingleSelect);
@@ -1376,21 +1380,6 @@ export default {
             if(fromPopupAutocomplete){
                 $('#'+controlInstance.id).attr('data-autocomplete',valueControl);
             }
-            // if(controlInstance.type == 'user'){
-            //     valueControl = $('#'+controlInstance.id).attr('user-id');
-            //     if(valueControl == undefined) valueControl = 0;
-            // }
-            // cần format lại giá trị date về năm tháng ngày để lưu vào store, tránh lỗi khi submit
-            if(controlInstance.type == 'date'){
-                valueControl = this.$moment(valueControl).format('YYYY-MM-DD');
-            }
-          
-            this.updateListInputInDocument(
-                controlName,
-                "value",
-                valueControl
-            );
-            
             // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
             if(controlInstance.isRequiredControl()){
                 if(controlInstance.isEmpty()){
@@ -1413,23 +1402,25 @@ export default {
             let headers = [];
             let bodyTable = [];
             if(isFromSQLLite){
-                for(let i = 0; i < data[0].columns.length; i++){
-                    let item = {value:data[0].columns[i], text:data[0].columns[i]};
-                    if(controlAs.hasOwnProperty(data[0].columns[i])){
-                        item.text = controlAs[data[0].columns[i]]
+                if(data[0]){
+                    for(let i = 0; i < data[0].columns.length; i++){
+                        let item = {value:data[0].columns[i], text:data[0].columns[i]};
+                        if(controlAs.hasOwnProperty(data[0].columns[i])){
+                            item.text = controlAs[data[0].columns[i]]
+                        }
+                        if(data[0].columns[i] == 'column1'){
+                            item.text = controlAs[Object.keys(controlAs)[0]]
+                        }
+                        headers.push(item);
                     }
-                    if(data[0].columns[i] == 'column1'){
-                        item.text = controlAs[Object.keys(controlAs)[0]]
+                    let values = data[0].values;
+                    for(let i = 0; i < values.length; i++){
+                        let item = {};
+                        for(let j = 0; j < data[0].columns.length; j++){
+                            item[data[0].columns[j]] = values[i][j];
+                        }
+                        bodyTable.push(item);
                     }
-                    headers.push(item);
-                }
-                let values = data[0].values;
-                for(let i = 0; i < values.length; i++){
-                    let item = {};
-                    for(let j = 0; j < data[0].columns.length; j++){
-                        item[data[0].columns[j]] = values[i][j];
-                    }
-                    bodyTable.push(item);
                 }
             }
             else{
@@ -2937,40 +2928,12 @@ export default {
             );
         },
         handleInputChangeByUser( controlInstance, valueControl){
-            if(controlInstance.type == 'number'){
-                valueControl = valueControl.replace(/=/g,"");
-                valueControl = eval(valueControl);
-                if(!/^[-0-9,.]+$/.test(valueControl)){
-                    return;
-                }
-            }
             setDataInputBeforeChange(this.keyInstance, controlInstance);
             if($('#'+controlInstance.id).attr('data-autocomplete') != "" && $('#'+controlInstance.id).attr('data-autocomplete') != undefined){
                 $('#'+controlInstance.id).attr('data-autocomplete',"");
                 return;
             }
-            // if(controlInstance.type == 'user'){
-            //     valueControl = $('#'+controlInstance.id).attr('user-id');
-            //     if(valueControl == undefined) valueControl = 0;
-            // }
-            if(controlInstance.type == 'date'){
-                valueControl = this.$moment(valueControl,'DD-MM-YYYY').format('YYYY-MM-DD');
-            }
-            this.updateListInputInDocument(
-                controlInstance.name,
-                "value",
-                valueControl
-            );
             
-            // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
-            if(controlInstance.isRequiredControl()){
-                if(controlInstance.isEmpty()){
-                    controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+controlInstance.title, 'Require')
-                }
-                else{
-                    controlInstance.removeValidateIcon('Require');
-                }
-            }
             resetImpactedFieldsList(this.keyInstance);
             this.handleControlInputChange(controlInstance);
         },
