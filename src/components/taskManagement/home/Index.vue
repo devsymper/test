@@ -7,8 +7,8 @@
                     View all projects
                 </div>
             </div>
-            <VuePerfectScrollbar style="width:100%">
-                <div class="d-flex pt-4">
+            <VuePerfectScrollbar style="width:100%;height: calc(100% - 20px);">
+                <div style="width:100%" class="d-flex pt-4">
                     <div class="item-recent mr-3" v-for="(item) in listProjectRecent" :key="item.id" >
                         <div class="header-item-recent" style="height:23px;" :style="{'background':randomBackground()}">
                             <div class="icon-project">
@@ -124,7 +124,7 @@ export default {
         },
         documentIds(){
             return this.$store.state.taskManagement.listDocumentIdsInIssueType;
-        }
+        },
     },
     props:{
         recentPojects:{
@@ -147,10 +147,12 @@ export default {
                 "#D1F658FF",
                 "#63E6CDFF",
                 "#80B8EBFF",
-                "#E596F3FF",
-                "#DA8DA1FF",
-                "#E59973FF",
-                "#EC8376FF"
+                "#F33163FF",
+                "#EA5206FF",
+                "#1CF2DFFF",
+                "#25C308FF",
+                "#F31B35FF",
+                "#30DA25FF"
             ]
         }
     },
@@ -178,6 +180,7 @@ export default {
 }
 .item-recent {
     width:240px;
+    min-width:240px;
     height:135px;
     border: 1px solid #eeeeee;
     border-radius: 5px;

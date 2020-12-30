@@ -145,7 +145,6 @@ export default {
                     this.$snotifyError("", "Chưa có role nào được chọn!");
                     this.isLoadingAdd=false;
                 }
-                this.isLoadingAdd=false;
             }
 
         },

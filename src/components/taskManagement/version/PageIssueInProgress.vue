@@ -1,45 +1,20 @@
 <template>
-    <div class="w-100 h-100" v-if="Object.keys(infoComponent).length >0 " >
-        <div class="d-flex" style="height:40px">
-            <h2 class="ml-4">Component: {{infoComponent.name}}</h2>
-        </div>
-        <div class="fs-13 ml-4" style="height:70px">
-            <div class="grey--text">
-                <v-icon class="fs-13">mdi-calendar</v-icon>
-                <span class="mx-2">{{$t("taskManagement.table.createAt")}}:</span>
-                <span>{{infoComponent.createAt}}</span>
-            </div>
-            <p>{{infoComponent.description}}</p>
-        </div>
-        <div style="height:calc(100% - 110px)">
-            <common-table-list-issue
-                :listIssueProps="listIssueInComponent"
-            />
-        </div>
-    
-    </div>
+    <common-table-list-issue
+        :listIssueProps="listIssueInProgressInVersion"
+
+    />
 </template>
 
 <script>
-import { util } from "@/plugins/util";
+import CommonTableListIssue from './CommonTableListIssue.vue';
 import { taskManagementApi } from "@/api/taskManagement.js";
-import CommonTableListIssue from '../version/CommonTableListIssue.vue';
 
 export default {
-    name:"detailcomponent",
-    components:{
-        CommonTableListIssue,
-    },
-    props:{
-        infoComponent: {
-            type: Object,
-            default() {
-                return {}
-            }
-        },
+    components: { 
+        CommonTableListIssue, 
     },
     computed:{
-        listIssueInComponent(){
+        listIssueInProgressInVersion(){
             let issues = this.listIssue;
             let allPriority = this.$store.state.taskManagement.allPriority;
             let listIssueType = this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId];
@@ -85,26 +60,31 @@ export default {
 
             return issues
         },
-        sTaskManagement() {
-            return this.$store.state.taskManagement;
-        },
     },
     data(){
         let self = this;
         return{
-            projectId: null,
-            search:"",
             listIssue:[],
             filter:{
                 ids: null,
                 filter:[
                     {
-                        column : "tmg_component_id",
+                        column : "tmg_version_id",
                         operation : "and",
                         conditions : [
                             {
                                 name : "in",
-                                value : [self.$route.params.idComponent],
+                                value : [self.$route.params.idVersion],
+                            }
+                        ],
+                    },
+                    {
+                        column : "tmg_status_category_id",
+                        operation : "and",
+                        conditions : [
+                            {
+                                name : "in",
+                                value : ["5fe31524-23fb-9f0f-b005-36450ea2ab8b"],
                             }
                         ],
                     },
@@ -125,11 +105,11 @@ export default {
                     if (res.status == 200) {
                         this.listIssue = res.data.listObject;
                     }else{
-                        this.$snotifyError("", "Can not get list issue in component!");
+                        this.$snotifyError("", "Can not get list issue inprogress in version!");
                     }
                 });
             }
-            
+        
         },
     },
     async created(){
@@ -144,12 +124,10 @@ export default {
             await this.$store.dispatch("taskManagement/getAllStatus");
         }
         this.getData();
-      
     }
-
 }
 </script>
 
-<style scoped>
+<style>
 
 </style>

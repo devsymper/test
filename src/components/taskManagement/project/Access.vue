@@ -314,6 +314,8 @@
         <action-pack 
             ref="actionPack"
             :statusDetail="false"
+            @list-actionpack-change="changeListActionPack"
+
         />
     </div>
 </template>
@@ -790,31 +792,36 @@ export default {
             this.dialogAddRole = false;
             this.getListPermissionPack();
         },
-
+        changeListActionPack(){
+            this.$refs.permission.getListActionPack();
+        }
+        
      
     },
     created(){
         this.getListPermissionPack();
-    },
-    activated(){
+        let projectId=this.$route.params.id;
         let breadcrumbs = [
                 {
                     text: 'Dashboard',
-                    disabled: true,
-                    to: '/report',
-                },
-                {
-                    text: 'Link 1',
                     disabled: false,
-                    to: 'breadcrumbs_link_1',
+                    to: '/task-management/projects/'+projectId+'/kanban-board',
                 },
                 {
-                    text: 'Link 2',
+                    text: 'Project',
                     disabled: true,
-                    to: 'breadcrumbs_link_2',
+                    to: '',
                 },
-            ]
+                {
+                    text: 'Access',
+                    disabled: true,
+                    to: '',
+                },
+            ];
         this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
+    },
+    activated(){
+     
     }
 }
 </script>

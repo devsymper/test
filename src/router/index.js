@@ -19,7 +19,7 @@ const systemRoutes = [{
         path: "/",
         name: "home",
         component: () =>
-            import ('../views/taskManagement/category/List.vue')
+            import ('../views/taskManagement/home/Index.vue')
     },
     {
         path: "/login",

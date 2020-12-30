@@ -1,6 +1,6 @@
 <template>
     <div class="task-manager-app-header">
-        <div class="app-header_left">
+        <div class="app-header_left" :class="{ 'breadcrumb-hide-sidebar': hideSidebar }">
             <v-breadcrumbs :items="headerBreadcrumbs">
                 <template v-slot:divider>
                     <v-icon>mdi-chevron-right</v-icon>
@@ -107,7 +107,9 @@ export default {
     },
     created(){
         this.$store.dispatch("taskManagement/getAllStatusCategory");
-        this.$store.dispatch("taskManagement/getAllPriority");
+        if (!this.$store.state.taskManagement.allPriority || this.$store.state.taskManagement.allPriority == 0) {
+            this.$store.dispatch("taskManagement/getAllPriority");
+        }
     },
     computed:{
         currentUserAvatar(){
@@ -115,7 +117,10 @@ export default {
             return appConfigs.apiDomain.fileManagement+'readFile/user_avatar_' + userId;
         },
         headerBreadcrumbs(){
-            return this.$store.state.app.headerBreadcrumbs;
+            return this.$store.state.taskManagement.headerBreadcrumbs;
+        },
+        hideSidebar(){
+            return this.$store.state.taskManagement.hideSidebar;
         },
         sTaskManagement(){
             return this.$store.state.taskManagement;
@@ -218,5 +223,7 @@ export default {
     .app-header_left--content{
         display: flex;
     }
-
+    .breadcrumb-hide-sidebar{
+        margin-left: 30px;
+    }
 </style>

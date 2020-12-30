@@ -12,7 +12,9 @@ export default {
         listPriority
     },
     created(){
-        this.$store.dispatch("taskManagement/getAllPriority");
+        if (!this.$store.state.taskManagement.allPriority || this.$store.state.taskManagement.allPriority == 0) {
+            this.$store.dispatch("taskManagement/getAllPriority");
+        }
     }
 }
 </script>

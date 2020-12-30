@@ -76,6 +76,9 @@ export const taskManagementApi = {
     getDocumentIdsInProject(projectId){
         return taskManagement.get("issue-types-documentIds",{projectId:projectId});
     },
+    getAllIssueType(filter){
+        return taskManagement.get("issue-types",filter);
+    },
     getListIssueTypeInProject(projectId){
         return taskManagement.get("issue-types/"+projectId);
     },

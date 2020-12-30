@@ -54,85 +54,19 @@
                 </v-tab>
                 <!-- content -->
                 <v-tab-item>
-                    <p>
-                        Morbi nec metus. Suspendisse faucibus, nunc et pellentesque egestas, lacus ante convallis tellus, vitae iaculis lacus elit id tortor. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci. Curabitur ligula sapien, tincidunt non, euismod vitae, posuere imperdiet, leo. Nunc sed turpis.
-                    </p>
-
+                    <common-table-list-issue 
+                        :listIssueProps="allIssueInVersion"
+                    />
                 </v-tab-item>
                 <v-tab-item>
-                    <v-card flat>
-                    <v-card-text>
-                        <p>
-                        Morbi nec metus. Suspendisse faucibus, nunc et pellentesque egestas, lacus ante convallis tellus, vitae iaculis lacus elit id tortor. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci. Curabitur ligula sapien, tincidunt non, euismod vitae, posuere imperdiet, leo. Nunc sed turpis.
-                        </p>
-
-                        <p>
-                        Suspendisse feugiat. Suspendisse faucibus, nunc et pellentesque egestas, lacus ante convallis tellus, vitae iaculis lacus elit id tortor. Proin viverra, ligula sit amet ultrices semper, ligula arcu tristique sapien, a accumsan nisi mauris ac eros. In hac habitasse platea dictumst. Fusce ac felis sit amet ligula pharetra condimentum.
-                        </p>
-
-                        <p>
-                        Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Nam commodo suscipit quam. In consectetuer turpis ut velit. Sed cursus turpis vitae tortor. Aliquam eu nunc.
-                        </p>
-
-                        <p>
-                        Etiam ut purus mattis mauris sodales aliquam. Ut varius tincidunt libero. Aenean viverra rhoncus pede. Duis leo. Fusce fermentum odio nec arcu.
-                        </p>
-
-                        <p class="mb-0">
-                        Donec venenatis vulputate lorem. Aenean viverra rhoncus pede. In dui magna, posuere eget, vestibulum et, tempor auctor, justo. Fusce commodo aliquam arcu. Suspendisse enim turpis, dictum sed, iaculis a, condimentum nec, nisi.
-                        </p>
-                    </v-card-text>
-                    </v-card>
+                   <page-issue-done 
+                   />
                 </v-tab-item>
                 <v-tab-item>
-                    <v-card flat>
-                    <v-card-text>
-                        <p>
-                        Morbi nec metus. Suspendisse faucibus, nunc et pellentesque egestas, lacus ante convallis tellus, vitae iaculis lacus elit id tortor. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci. Curabitur ligula sapien, tincidunt non, euismod vitae, posuere imperdiet, leo. Nunc sed turpis.
-                        </p>
-
-                        <p>
-                        Suspendisse feugiat. Suspendisse faucibus, nunc et pellentesque egestas, lacus ante convallis tellus, vitae iaculis lacus elit id tortor. Proin viverra, ligula sit amet ultrices semper, ligula arcu tristique sapien, a accumsan nisi mauris ac eros. In hac habitasse platea dictumst. Fusce ac felis sit amet ligula pharetra condimentum.
-                        </p>
-
-                        <p>
-                        Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Nam commodo suscipit quam. In consectetuer turpis ut velit. Sed cursus turpis vitae tortor. Aliquam eu nunc.
-                        </p>
-
-                        <p>
-                        Etiam ut purus mattis mauris sodales aliquam. Ut varius tincidunt libero. Aenean viverra rhoncus pede. Duis leo. Fusce fermentum odio nec arcu.
-                        </p>
-
-                        <p class="mb-0">
-                        Donec venenatis vulputate lorem. Aenean viverra rhoncus pede. In dui magna, posuere eget, vestibulum et, tempor auctor, justo. Fusce commodo aliquam arcu. Suspendisse enim turpis, dictum sed, iaculis a, condimentum nec, nisi.
-                        </p>
-                    </v-card-text>
-                    </v-card>
+                    <page-issue-in-progress />
                 </v-tab-item>
                 <v-tab-item>
-                    <v-card flat>
-                    <v-card-text>
-                        <p>
-                        Morbi nec metus. Suspendisse faucibus, nunc et pellentesque egestas, lacus ante convallis tellus, vitae iaculis lacus elit id tortor. Sed mollis, eros et ultrices tempus, mauris ipsum aliquam libero, non adipiscing dolor urna a orci. Curabitur ligula sapien, tincidunt non, euismod vitae, posuere imperdiet, leo. Nunc sed turpis.
-                        </p>
-
-                        <p>
-                        Suspendisse feugiat. Suspendisse faucibus, nunc et pellentesque egestas, lacus ante convallis tellus, vitae iaculis lacus elit id tortor. Proin viverra, ligula sit amet ultrices semper, ligula arcu tristique sapien, a accumsan nisi mauris ac eros. In hac habitasse platea dictumst. Fusce ac felis sit amet ligula pharetra condimentum.
-                        </p>
-
-                        <p>
-                        Sed consequat, leo eget bibendum sodales, augue velit cursus nunc, quis gravida magna mi a libero. Nam commodo suscipit quam. In consectetuer turpis ut velit. Sed cursus turpis vitae tortor. Aliquam eu nunc.
-                        </p>
-
-                        <p>
-                        Etiam ut purus mattis mauris sodales aliquam. Ut varius tincidunt libero. Aenean viverra rhoncus pede. Duis leo. Fusce fermentum odio nec arcu.
-                        </p>
-
-                        <p class="mb-0">
-                        Donec venenatis vulputate lorem. Aenean viverra rhoncus pede. In dui magna, posuere eget, vestibulum et, tempor auctor, justo. Fusce commodo aliquam arcu. Suspendisse enim turpis, dictum sed, iaculis a, condimentum nec, nisi.
-                        </p>
-                    </v-card-text>
-                    </v-card>
+                    <page-issue-to-do />
                 </v-tab-item>
             </v-tabs>
         </div>
@@ -141,8 +75,13 @@
 
 <script>
 import { taskManagementApi } from "@/api/taskManagement.js";
+import CommonTableListIssue from './CommonTableListIssue.vue';
+import PageIssueDone from './PageIssueDone.vue';
+import PageIssueInProgress from './PageIssueInProgress';
+import PageIssueToDo from './PageIssueToDo.vue';
 
 export default {
+  components: { CommonTableListIssue, PageIssueDone, PageIssueInProgress, PageIssueToDo },
     name:"detailversion",
     props:{
         infoVersion: {
@@ -150,6 +89,54 @@ export default {
             default() {
                 return {}
             }
+        },
+    },
+    computed:{
+        allIssueInVersion(){
+            let issues = this.listIssue;
+            let allPriority = this.$store.state.taskManagement.allPriority;
+            let listIssueType = this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId];
+            let allStatus = this.$store.state.taskManagement.allStatus;
+            for (let i = 0; i < issues.length; i++) {
+                    // get info priority
+                if (issues[i].tmg_priority_id) { 
+                    let priority = allPriority.find(ele => ele.id == issues[i].tmg_priority_id);
+                    if (priority) {
+                        let infoPriority = {};
+                        infoPriority.id = priority.id;
+                        infoPriority.name = priority.name;
+                        infoPriority.color = priority.color;
+                        infoPriority.icon = priority.icon;
+
+                        issues[i]["infoPriority"] = infoPriority;
+                    }
+                }    
+                // get info issue type
+                if (issues[i].tmg_issue_type) { 
+                    let issueType = listIssueType.find(ele => ele.id == issues[i].tmg_issue_type);
+                    if (issueType) {
+                        let infoIssueType = {};
+                        infoIssueType.id = issueType.id;
+                        infoIssueType.name = issueType.name;
+                        infoIssueType.icon = issueType.icon;
+
+                        issues[i]["infoIssueType"] = infoIssueType;
+                    }
+                }    
+                // get staus issue
+                if (issues[i].tmg_status_id) { 
+                    let status = allStatus.find(ele => ele.id == issues[i].tmg_status_id);
+                    if (status) {
+                        let infoStatus = {};
+                        infoStatus.id = status.id;
+                        infoStatus.name = status.name;
+                        infoStatus.color = status.color;
+                        issues[i]["infoStatus"] = infoStatus;
+                    }
+                } 
+            }
+
+            return issues
         },
     },
     data(){
@@ -204,7 +191,7 @@ export default {
                     if (res.status == 200) {
                         this.listIssue = res.data.listObject;
                     }else{
-                        this.$snotifyError("", "Can not get list issue in component!");
+                        this.$snotifyError("", "Can not get list issue in version!");
                     }
                 });
             }
