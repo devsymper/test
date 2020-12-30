@@ -1197,7 +1197,8 @@ export default {
 						columnTitle: item.title,
 						cellRenderer: item.cellRenderer ? item.cellRenderer : null,
 						cellRendererParams: item.cellRendererParams ? item.cellRendererParams : null,
-                        noFilter: item.noFilter ? item.noFilter : false
+						noFilter: item.noFilter ? item.noFilter : false,
+						width: item.width ? item.width : false
 					};
 				}	
 				
