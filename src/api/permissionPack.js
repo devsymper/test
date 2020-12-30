@@ -46,10 +46,7 @@ export const permissionApi = {
         return actionModuleApi.get("");
     },
     deleteActionPack(idPacks) {
-        if ($.isArray(idPacks)) {
-            idPacks = idPacks.join(',');
-        }
-        return actionModuleApi.delete('/' + idPacks, idPacks);
+        return actionModuleApi.delete('/' + idPacks);
     },
 
     createMultipleOperation(data) {

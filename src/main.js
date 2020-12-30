@@ -274,7 +274,6 @@ Vue.prototype.$snotifySuccess = function(title = 'SUCCESS', detail = '', duratio
     this.$snotify(setting);
 }
 
-
 Vue.config.productionTip = false;
 global.jQuery = require('jquery');
 var $ = global.jQuery;
