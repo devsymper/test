@@ -215,6 +215,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import FloattingPopup from './../common/FloattingPopup'
 import PopupPivotTable from './items/PopupPivotTable'
 
+import tinymce from 'tinymce/tinymce';
 
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
@@ -442,6 +443,7 @@ export default {
 
     async created() {
         await ClientSQLManager.createDB(this.keyInstance);
+        tinymce.remove()
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});

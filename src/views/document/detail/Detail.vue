@@ -75,7 +75,7 @@ import FloattingPopup from './../common/FloattingPopup'
 import Preloader from './../../../components/common/Preloader';
 import PivotTable from "./../submit/pivot-table";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-
+import tinymce from 'tinymce/tinymce';
 import { util } from '../../../plugins/util.js';
 export default {
     name: "detailDocument",
@@ -180,6 +180,7 @@ export default {
         this.documentSize = "21cm";
     },
     created(){
+        tinymce.remove();
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});

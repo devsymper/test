@@ -772,7 +772,6 @@ export default class BasicControl extends Control {
             selector = '#sym-Detail-'+this.curParentInstance+" #"+this.id;
             toolbar = false;
         }
-        tinymce.remove();
         if(this.controlProperties.isShowHeaderTinyMce.value){
             tinymce.init({
                 toolbar: toolbar,
@@ -785,7 +784,7 @@ export default class BasicControl extends Control {
                     self.editor = editor;
                     self.initEditor();
                 },
-            }); 
+            });    
         }
     }
     initEditor(){
