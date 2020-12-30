@@ -3,12 +3,10 @@ import {orgchartApi} from '@/api/orgchart';
 import {dashboardApi} from '@/api/dashboard';
 import BpmnEngine from '@/api/BPMNEngine';
 import {appManagementApi} from '@/api/AppManagement.js';
-import { setWorkerDataStore } from '@/worker/common/workerUtil';
 
 
 self.onmessage = async function (event) {
-	setWorkerDataStore(event);
-	var workerDataReceive = event.data.data;
+	var workerDataReceive = event.data;
     let action = workerDataReceive.action;
     let data = workerDataReceive.data;
 	switch (action) {

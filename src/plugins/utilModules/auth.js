@@ -1,4 +1,23 @@
 import IndexedDB from "@/plugins/utilModules/indexedDB.js";
+import { reject } from "lodash";
+var loginedInfo = {};	
+
+async function getLoginInfoFromIndexedDB() {	
+    return new Promise((resolve, reject) => {
+        let indexedDB = new IndexedDB('SYMPER-LOGIN-INFOR');
+        if(!loginedInfo){
+            indexedDB.open('loginInfo', false, false, async()=>{	
+                loginedInfo = await indexedDB.read('loginInfo');	
+                if(typeof loginedInfo == 'string'){	
+                    loginedInfo = JSON.parse(loginedInfo);	
+                }
+                resolve(loginedInfo);
+            });	
+        }else{
+            resolve(loginedInfo);
+        }
+    });
+}
 
 /**
  * Các hàm phục vụ cho việc xác thực, lưu trữ dữ liệu đăng nhập cho người dùng
@@ -24,7 +43,10 @@ export const authUtil = {
 			    return false;
 			}
 		}else{
-            return self.dataStore.loginInfo.token;
+            return new Promise(async (resolve, reject) => {
+                let loginInfo = await getLoginInfoFromIndexedDB();
+                resolve(loginInfo.token);
+            });
 		}
     },
 
