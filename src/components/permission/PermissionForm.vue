@@ -41,9 +41,7 @@
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
 import UserSelector from "@/views/tasks/userSelector.vue";
-import { systemRoleApi } from "@/api/systemRole.js";
 import ActionPackSelector from "@/components/permission/ActionPackSelector.vue";
-import { permissionApi } from '@/api/permissionPack';
 import PermissionWorker from 'worker-loader!@/worker/accessControl/Permission.Worker.js';
 import _debounce from "lodash/debounce";
 
