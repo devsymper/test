@@ -16,7 +16,7 @@
                         hide-details
                         class="sym-small-size sym-style-input"
                     ></v-text-field>
-                    <v-btn small class="mx-1" solo depressed  @click="handleCreate">
+                    <v-btn v-if="checkRole('task_manager_issue_type','add')" small class="mx-1" solo depressed  @click="handleCreate">
                         <span>Create Issue Type</span>
                     </v-btn>
                 </v-card-title>
@@ -45,14 +45,14 @@
                     <template  v-slot:[`item.action`]="{ item }">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
-                                <v-icon v-on="on" @click.prevent.stop="handleDeleteIssueType(item)" style="font-size:24px">mdi-delete-outline</v-icon>
+                                <v-icon v-if="checkRole('task_manager_issue_type','delete')" v-on="on" @click.prevent.stop="handleDeleteIssueType(item)" style="font-size:24px">mdi-delete-outline</v-icon>
                             </template>
                             <span>Delete</span>
                         </v-tooltip>
                     </template>
                     <template  v-slot:[`item.taskLifeCircleId`]="{ item }">
                         <div v-if="!item.taskLifeCircleId">
-                            <v-btn x-small class="px-1" solo depressed  @click.prevent.stop="handleShowPopupWorkflow(item)">
+                            <v-btn v-if="checkRole('task_manager_issue_type','edit')" x-small class="px-1" solo depressed  @click.prevent.stop="handleShowPopupWorkflow(item)">
                                 <v-icon color="blue" size="16">mdi-plus</v-icon>
                             </v-btn>
                         </div>
@@ -60,7 +60,7 @@
                             <span class="name-object" style="color:blue" @click.prevent.stop="goToWorkflow(item)" v-if="item.workflowName">{{item.workflowName}}</span>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
-                                    <v-icon v-on="on" @click.prevent.stop="handleChangeWorkflow(item)" class="ml-1" size="16" color="blue">mdi-autorenew</v-icon>
+                                    <v-icon v-if="checkRole('task_manager_issue_type','edit')" v-on="on" @click.prevent.stop="handleChangeWorkflow(item)" class="ml-1" size="16" color="blue">mdi-autorenew</v-icon>
                                 </template>
                                 <span>Change</span>
                             </v-tooltip>
@@ -69,7 +69,7 @@
 
                     <template  v-slot:[`item.documentId`]="{ item }">
                         <div v-if="!item.documentId">
-                            <v-btn x-small class="px-1" solo depressed  @click.prevent.stop="handleShowPopupConfigField(item)">
+                            <v-btn v-if="checkRole('task_manager_issue_type','edit')" x-small class="px-1" solo depressed  @click.prevent.stop="handleShowPopupConfigField(item)">
                                 <v-icon color="blue" size="16">mdi-plus</v-icon>
                             </v-btn>
                         </div>
@@ -77,7 +77,7 @@
                             <span class="name-object" style="color:blue" @click.prevent.stop="goToWorkflow(item)" v-if="item.documentName">{{item.documentName}}</span>
                             <v-tooltip bottom>
                                 <template v-slot:activator="{ on }">
-                                    <v-icon v-on="on" @click.prevent.stop="handleChangeDocConfigField(item)" class="ml-1" size="16" color="blue">mdi-autorenew</v-icon>
+                                    <v-icon v-if="checkRole('task_manager_issue_type','edit')" v-on="on" @click.prevent.stop="handleChangeDocConfigField(item)" class="ml-1" size="16" color="blue">mdi-autorenew</v-icon>
                                 </template>
                                 <span>Change</span>
                             </v-tooltip>
@@ -271,6 +271,7 @@ import { taskManagementApi } from "@/api/taskManagement.js";
 import infoUser from "@/components/common/user/InfoUser";
 import pickIcon from "@/components/common/iconPicker";
 import FormTpl from "@/components/common/FormTpl.vue";
+import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
 
 export default {
     name:"list-issue-type",
@@ -398,6 +399,9 @@ export default {
         }
     },
     methods:{
+        checkRole(objectType,action){
+            return checkPermission(objectType,action);
+        },
         handleChangeWorkflow(item){
             this.selectWorkflowProps.workflow.value = item.taskLifeCircleId;
             this.issueTypeSelected=item;
@@ -449,6 +453,9 @@ export default {
             }
         },
         handelDetailIssueType(item){
+            if (!checkRole('task_manager_issue_type','edit')) {
+                return ;
+            }
             this.dataIssueTypeProps.name.value = item.name;
             this.dataIssueTypeProps.description.value = item.description;
             this.infoIssueType.icon=item.icon;

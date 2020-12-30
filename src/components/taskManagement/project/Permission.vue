@@ -103,7 +103,7 @@
                 <v-btn
                     color="blue darken-1"
                     text
-                    v-if="!statusDetail"
+                    v-if="!statusDetail && checkRole('task_manager_permission','add')"
                     :loading="isLoading"
                     class="btn-add"
                     @click="addPermissionPack"
@@ -113,7 +113,7 @@
                 <v-btn
                     color="blue darken-1"
                     text
-                    v-else
+                    v-else-if="statusDetail && checkRole('task_manager_permission','edit')"
                     :loading="isLoading"
                     :disabled="disabled"
                     class="btn-add"
@@ -152,6 +152,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { find } from 'highcharts';
 import ActionPack from './ActionPack.vue';
 import { util } from '../../../plugins/util';
+import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
 
 export default {
     components:{
@@ -189,35 +190,6 @@ export default {
         }
     },
     computed:{
-        // listActionPack(){
-        //     let allActionPack = [
-        //         {
-        //             id  : 1,
-        //             name : "Nhóm hành động của admin",
-        //             description : "Các hành động về việc config quản lý hệ thống task management",
-        //             isCheck : false
-        //         },
-        //         {
-        //             id  :2,
-        //             name : "Nhóm hành động của admin",
-        //             description : "Các hành động về việc config quản lý hệ thống task management",
-        //             isCheck : false
-        //         },
-        //         {
-        //             id  : 3,
-        //             name : "Nhóm hành động của admin",
-        //             description : "Các hành động về việc config quản lý hệ thống task management",
-        //             isCheck : false
-        //         },
-        //         {
-        //             id  : 4,
-        //             name : "Nhóm hành động của admin",
-        //             description : "Các hành động về việc config quản lý hệ thống task management",
-        //             isCheck : false
-        //         },
-        //     ]
-        //     return allActionPack
-        // },
     },
     data(){
         return{
@@ -273,6 +245,9 @@ export default {
         }
     },
     methods:{
+        checkRole(objectType,action){
+            return checkPermission(objectType,action);
+        },
         getListOperatorInActionPack(item){
             taskManagementApi
                 .getListOperatorInActionPack(item.id)

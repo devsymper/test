@@ -315,7 +315,7 @@ export default {
             let isValid = this.validateData();
             if (isValid) {
                 let data={};
-                let id = this.$route.params.id;
+                let id = this.$route.params.workflowId;
                 data.name=this.dataWorkflowProps.name.value;
                 data.description=this.dataWorkflowProps.description.value;
                 data.nodes = JSON.stringify(this.listNode);

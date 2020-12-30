@@ -9,7 +9,7 @@
                     </v-btn>
                     <v-btn
                         class="save-setting-btn"
-                        v-if="listColumn.length > 0"
+                        v-if="listColumn.length > 0 && checkRole('task_manager_kanban_board','edit')"
                         depressed
                         :loading="isLoading"
                         small
@@ -19,7 +19,7 @@
                     </v-btn>
                     <v-btn
                         class="save-setting-btn"
-                        v-else
+                        v-else-if="listColumn.length == 0 && checkRole('task_manager_kanban_board','edit')"
                         :loading="isLoading"
                         depressed
                         small
@@ -35,8 +35,8 @@
                 <draggable :list="columns" :animation="250" class="py-4 h-100 w-100" ghost-class="ghost-columns" group="people">
                     <transition-group type="transition" name="flip-list" class="wrap-kanban-board">
                         <div
-                            v-for="column in columns"
-                            :key="column.id"
+                            v-for="(column,index) in columns"
+                            :key="index"
                             :style="getColWidth()"
                             class=" board-column-item mr-4"
                         >
@@ -109,6 +109,7 @@
 import draggable from "vuedraggable";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { taskManagementApi } from "@/api/taskManagement.js";
+import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
 
 import {
     util
@@ -174,6 +175,9 @@ export default {
       //  this.columns = util.cloneDeep(this.listColumn)
     },
     methods:{
+        checkRole(objectType,action){
+            return checkPermission(objectType,action);
+        },
         getStatusForListColumn(){
             let self = this;
             self.columns = util.cloneDeep(self.listColumn);
@@ -198,7 +202,7 @@ export default {
 
         },
         removeColumn(index){
-            if (this.columns[index].statusInColumn.length > 0 ) {
+            if (this.columns[index].statusInColumn && this.columns[index].statusInColumn.length > 0 ) {
                 for (let i = 0; i < this.columns[index].statusInColumn.length; i++) {
                     this.listStatus.push(this.columns[index].statusInColumn[i]);
                 }
@@ -214,7 +218,7 @@ export default {
             }
         },
         addColumn(){
-            this.columns.push({name:'new column',isHidden:false,isBacklog:false,statusInColumn:[]})
+            this.columns.push({id:'',name:'new column',isHidden:false,isBacklog:false,statusInColumn:[]})
         },
         onKeyDown(){
             

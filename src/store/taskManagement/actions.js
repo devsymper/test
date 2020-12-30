@@ -237,35 +237,33 @@ const getAllStatus = async(context) => {
     }
 }
 const getAllRole = async(context,projectId) => {
-    if (context.state.allRole.length==0) {
-        try {
-            let item={
-                column : "projectId",
-                operation : "and",
-                conditions : [
-                    {
-                        name : "in",
-                        value : [projectId],
-                    }
-                ],
-            }
-            let filter={};
-            filter.filter = [];
-            filter.filter.push(item);
+    try {
+        let item={
+            column : "projectId",
+            operation : "and",
+            conditions : [
+                {
+                    name : "in",
+                    value : [projectId],
+                }
+            ],
+        }
+        let filter={};
+        filter.filter = [];
+        filter.filter.push(item);
 
-            filter.page = 1;
-            filter.pageSize = 100;
-            filter.distinct = false;
+        filter.page = 1;
+        filter.pageSize = 100;
+        filter.distinct = false;
 
-            let res = await taskManagementApi.getListRole(filter);
-            if (res.status == 200) {
-                context.commit('setAllRole', res.data.listObject);
-            } else {
-                SYMPER_APP.$snotifyError(error, "Can not get all role!");
-            }
-        } catch (error) {
+        let res = await taskManagementApi.getListRole(filter);
+        if (res.status == 200) {
+            context.commit('setAllRole', res.data.listObject);
+        } else {
             SYMPER_APP.$snotifyError(error, "Can not get all role!");
         }
+    } catch (error) {
+        SYMPER_APP.$snotifyError(error, "Can not get all role!");
     }
 }
 const getListStautsInProject = async(context,projectId) => {
@@ -368,17 +366,15 @@ const getListStatusInColumnBoard = (context,boardId) => {
     });
 }
 const getListWorkflowInProject = async(context,projectId) => {
-    if (context.state.allWorkflow.length==0) {
-        try {
-            let res = await taskManagementApi.getListWorkflowInProject(projectId);
-            if (res.status == 200) {
-                context.commit('setAllWorkflow', res.data.listObject);
-            } else {
-                SYMPER_APP.$snotifyError(error, "Can not get all Workflow role!");
-            }
-        } catch (error) {
+    try {
+        let res = await taskManagementApi.getListWorkflowInProject(projectId);
+        if (res.status == 200) {
+            context.commit('setAllWorkflow', res.data.listObject);
+        } else {
             SYMPER_APP.$snotifyError(error, "Can not get all Workflow role!");
         }
+    } catch (error) {
+        SYMPER_APP.$snotifyError(error, "Can not get all Workflow role!");
     }
 }
 

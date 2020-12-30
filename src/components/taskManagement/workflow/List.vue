@@ -16,7 +16,7 @@
                         hide-details
                         class="sym-small-size sym-style-input"
                     ></v-text-field>
-                    <v-btn small class="px-1 ml-1" solo depressed @click="handleCreate" >
+                    <v-btn v-if="checkRole('task_manager_task_life_cycle','add')" small class="px-1 ml-1" solo depressed @click="handleCreate" >
                         <span >Create workflow</span>
                     </v-btn>
                 </v-card-title>
@@ -40,7 +40,7 @@
                     <template  v-slot:[`item.action`]="{ item }">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
-                                <v-icon v-on="on" @click.prevent.stop="handleDeleteWorkflow(item)" style="font-size:20px">mdi-delete-outline</v-icon>
+                                <v-icon v-if="checkRole('task_manager_task_life_cycle','delete')" v-on="on" @click.prevent.stop="handleDeleteWorkflow(item)" style="font-size:20px">mdi-delete-outline</v-icon>
                             </template>
                             <span>Delete</span>
                         </v-tooltip>
@@ -67,6 +67,8 @@
 <script>
 import infoUser from "@/components/common/user/InfoUser";
 import { taskManagementApi } from "@/api/taskManagement.js";
+import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
+
 export default {
     name:"listWorkflow",
     components:{
@@ -100,6 +102,9 @@ export default {
   
     },
     methods:{
+        checkRole(objectType,action){
+            return checkPermission(objectType,action);
+        },
         handleClickRow(item){ 
             if (item.id) {
                 let projectId=this.$route.params.id;

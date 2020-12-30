@@ -27,6 +27,7 @@
                     :isMulti="false"
                     :compactChip="true"
                     :color="'transparent'"
+                    :disabled="disabled"
                     :textColor="''"
                     :flat="true"
                     :valueObj="currentUserLeader"
@@ -34,7 +35,7 @@
                 ></userSelector>
                 <div style="text-align:right">
                     <v-btn
-                        v-if="statusEdit"
+                        v-if="statusEdit && !disabled"
                         class="mt-2 pa-2"
                         :loading="isLoadingAdd"
                         color="blue darken-1"
@@ -59,6 +60,7 @@ import { taskManagementApi } from "@/api/taskManagement.js";
 import { util } from "@/plugins/util";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import FormTpl from "@/components/common/FormTpl.vue";
+import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
 
 export default {
     components:{
@@ -70,6 +72,7 @@ export default {
     },
     data(){
         return{
+            disabled:true,
             isLoadingAdd:false,
             statusEdit:false,
             currentUserLeader:{id:''},
@@ -79,6 +82,7 @@ export default {
                     title: "Name",
                     type: "text",
                     value: '',
+                    disabled:false,
                     validateStatus:{
                         isValid:true,
                         message:"Error"
@@ -97,6 +101,7 @@ export default {
                     title: "Key",
                     type: "text",
                     value: '',
+                    disabled:false,
                     validateStatus:{
                         isValid:true,
                         message:"Error"
@@ -115,6 +120,7 @@ export default {
                     title: "Mô tả",
                     type: "text",
                     value: '',
+                    disabled:false,
                     validateStatus:{
                         isValid:true,
                         message:""
@@ -126,6 +132,7 @@ export default {
                     title: "Category",
                     type: "select",
                     value:"",
+                    disabled:false,
                     options: [
                     ],
                     validateStatus:{
@@ -277,6 +284,16 @@ export default {
                     self.dataProjectProps.categories.options = category;
                     self.dataProjectProps.categories.value = self.infoProject.categoryId;
             }, 500,this);
+        },
+        checkRoleIsAllowEdit(){
+            let isAllow = checkPermission("task_manager_project","edit");
+            this.disabled = !isAllow;
+            if (!isAllow) {
+                this.$set(this.dataProjectProps.name,"disabled",true);
+                this.$set(this.dataProjectProps.key,"disabled",true);
+                this.$set(this.dataProjectProps.description,"disabled",true);
+                this.$set(this.dataProjectProps.categories,"disabled",true);
+            }
         }
     },
     created(){
@@ -284,6 +301,8 @@ export default {
         this.projectNew=util.cloneDeep(this.infoProject);
         this.getDataProps(util.cloneDeep(this.infoProject));
         this.currentUserLeader.id=this.projectNew.userLeader;
+        this.checkRoleIsAllowEdit();
+
     }
 
 

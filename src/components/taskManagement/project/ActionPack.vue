@@ -95,7 +95,7 @@
                 <v-btn
                     color="blue darken-1"
                     text
-                    v-if="!statusDetail"
+                    v-if="!statusDetail && checkRole('task_manager_permission','add')"
                     :loading="isLoading"
                     class="btn-add"
                     @click="addActionPack"
@@ -105,7 +105,7 @@
                 <v-btn
                     color="blue darken-1"
                     text
-                    v-else
+                    v-else-if="statusDetail && checkRole('task_manager_permission','edit')"
                     :loading="isLoading"
                     :disabled="disabled"
                     class="btn-add"
@@ -134,6 +134,7 @@ import FormTpl from "@/components/common/FormTpl.vue";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import infoUser from "@/components/common/user/InfoUser";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
+import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
 
 export default {
     components:{
@@ -225,6 +226,9 @@ export default {
         }
     },
     methods:{
+        checkRole(objectType,action){
+            return checkPermission(objectType,action);
+        },
         /**
          * Function set trạng thái isCheck cho list operator in action pack
          */

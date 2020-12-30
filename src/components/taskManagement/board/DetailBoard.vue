@@ -25,7 +25,7 @@
         <div style="width:500px; text-align:right">
             <v-btn
                 :loading="isLoading"
-                v-if="statusEdit"
+                v-if="statusEdit && checkRole('task_manager_kanban_board','edit')"
                 color="blue darken-1"
                 text
                 @click="updateBoard"
@@ -40,6 +40,7 @@
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
 import { taskManagementApi } from "@/api/taskManagement.js";
+import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
 
 export default {
     name:"detailBoard",
@@ -78,6 +79,7 @@ export default {
                     title: "Name",
                     type: "text",
                     value: '',
+                    disabled:false,
                     validateStatus:{
                         isValid:true,
                         message:"Error"
@@ -96,6 +98,7 @@ export default {
                     title: "Mô tả",
                     type: "text",
                     value: '',
+                    disabled:false,
                     validateStatus:{
                         isValid:true,
                         message:""
@@ -108,6 +111,9 @@ export default {
         }
     },
     methods:{
+        checkRole(objectType,action){
+            return checkPermission(objectType,action);
+        },
         updateBoard(){
             this.isLoading = true;
             let isValid = this.validateData();
@@ -164,9 +170,18 @@ export default {
             }
             return true;
         },
+        checkRoleIsAllowEdit(){
+            let isAllow = checkPermission("task_manager_kanban_board","edit");
+            this.disabled = !isAllow;
+            if (!isAllow) {
+                this.$set(this.infoBoardProps.name,"disabled",true);
+                this.$set(this.infoBoardProps.description,"disabled",true);
+            }
+        }
     },
     created(){
         this.getData()
+        this.checkRoleIsAllowEdit();
     }
 }
 </script>

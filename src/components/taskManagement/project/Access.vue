@@ -7,13 +7,13 @@
                         {{$t("taskManagement.listMember")}} của {{currentProject.name}}
                         <div class="d-flex justify-space-between"><span class="fs-13 grey--text">Tổng số thành viên: {{allUserInProject.length}}</span>
                             <div class="list-button">
-                                <v-btn small depressed @click="handleCreateActionPack">
+                                <v-btn  v-if="checkRole('task_manager_permission','add')"  small depressed @click="handleCreateActionPack">
                                     Create action pack
                                 </v-btn>
-                                <v-btn small  depressed @click="handleCreatePermission">
+                                <v-btn  v-if="checkRole('task_manager_permission','add')"  small  depressed @click="handleCreatePermission">
                                     <span>Create permission</span>
                                 </v-btn>
-                                <v-btn depressed small class="mx-2"  @click="handleClickAddPeople" >
+                                <v-btn  v-if="checkRole('task_manager_access','add')"  depressed small class="mx-2"  @click="handleClickAddPeople" >
                                     {{$t("taskManagement.addPeople")}}
                                 </v-btn>
                                 <v-btn depressed @click="handleRoleManager" small >
@@ -59,6 +59,7 @@
                             item-text="name"
                             item-value="id"
                             return-object
+                            :disabled="!checkRole('task_manager_access','edit')"
                             multiple
                             solo
                             dense
@@ -70,7 +71,7 @@
                     <template  v-slot:[`item.action`]="{ item }">
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
-                                <v-icon v-on="on" @click="handleDeleteMember(item)" style="font-size:24px">mdi-delete-outline</v-icon>
+                                <v-icon  v-if="checkRole('task_manager_access','delete')"  v-on="on" @click="handleDeleteMember(item)" style="font-size:24px">mdi-delete-outline</v-icon>
                             </template>
                             <span>Delete</span>
                         </v-tooltip>
@@ -104,15 +105,9 @@
                                     <span style="color:#777" class="fs-12">{{item.description}}</span>
                                 </v-list-item-content>
                                 <v-list-item-icon>
-                                    <!-- <v-tooltip bottom>
-                                        <template v-slot:activator="{ on }">
-                                            <v-icon v-on="on" @click.prevent.stop="duplicateRole(item)" class="fs-16 mr-1">mdi-sticker-plus</v-icon>
-                                        </template>
-                                        <span>Duplicate role</span>
-                                    </v-tooltip> -->
                                     <v-tooltip bottom>
                                         <template v-slot:activator="{ on }">
-                                            <v-icon v-on="on" @click.prevent.stop="handleDeleteRole(item)" style="font-size:20px">mdi-delete-outline</v-icon>
+                                            <v-icon v-if="checkRole('task_manager_role','delete')" v-on="on" @click.prevent.stop="handleDeleteRole(item)" style="font-size:20px">mdi-delete-outline</v-icon>
                                         </template>
                                         <span>Delete</span>
                                     </v-tooltip>
@@ -125,6 +120,7 @@
             <v-card-actions>
                 <v-spacer></v-spacer>
                 <v-btn
+                    v-if="checkRole('task_manager_role','add')" 
                     color="blue darken-1"
                     text
                     @click="handleOpenAddRole()"
@@ -244,17 +240,18 @@
                 <v-btn
                     color="blue darken-1"
                     text
-                    v-if="!statusDetail"
+                    v-if="!statusDetail && checkRole('task_manager_role','add')"
                     :loading="isLoadingAdd"
                     class="btn-add"
                     @click="handleAddRole"
                 >
+                
                     {{$t("common.add")}}
                 </v-btn>
                 <v-btn
                     color="blue darken-1"
                     text
-                    v-else
+                    v-else-if="statusDetail && checkRole('task_manager_role','edit')"
                     :loading="isLoadingAdd"
                     class="btn-add"
                     @click="handleUpdateRole()"
@@ -330,6 +327,7 @@ import infoUser from "@/components/common/user/InfoUser";
 import { util } from "@/plugins/util";
 import Permission from './Permission.vue';
 import ActionPack from './ActionPack.vue';
+import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
 
 export default {
     name:"add people",
@@ -479,7 +477,9 @@ export default {
         }
     },
     methods:{
-     
+        checkRole(objectType,action){
+            return checkPermission(objectType,action);
+        },
         handleCreatePermission(){
             this.statusDetailPermission = false;
             this.infoPermission = {};
