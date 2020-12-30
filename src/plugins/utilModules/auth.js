@@ -45,7 +45,6 @@ export const authUtil = {
 		}else{
             return new Promise(async (resolve, reject) => {
 				let loginInfo = await getLoginInfoFromIndexedDB();
-				debugger
                 resolve(loginInfo.token);
             });
 		}

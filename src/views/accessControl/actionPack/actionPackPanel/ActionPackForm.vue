@@ -55,9 +55,9 @@
 				
 			</div>
 			<div style="width: 600px !important">
-				<div v-if="objectActive == 'application_definition'" class="d-flex flex-column">
+				<div v-if="objectActive == 'application_definition' || objectActive == 'application'" class="d-flex flex-column">
 					<ApplicationDefinitionForm 
-						v-if="objectActive == 'application_definition'"
+						v-if="objectActive == 'application_definition' || objectActive == 'application'"
 						@list-item-selected="handleListAppSelected"
 						:listApp="listAppSelected"
 						:commonTableSetting="commonTableSetting"
@@ -105,12 +105,12 @@
 						</hot-table>
 					
 					</div>
-					  <DocumentInstanceOperation 
+					  <!-- <DocumentInstanceOperation 
 						@change-data="handleChangeDocumentInstanceOperation"
 						v-if="objectActive == 'document_definition'"
 						:tableDataDefinition="multipleLevelObjects.document_definition"
 						:commonTableSetting="commonTableSetting"
-						:tableHeight="tableHeight - 32"/>
+						:tableHeight="tableHeight - 32"/> -->
 				</div>
 			</div>
 		</div>	
@@ -190,7 +190,22 @@ export default {
             switch (data.action) {
                 case 'getAppInActionPack':
 					self.listAppSelected = data.dataAfter
-					debugger
+					break;
+                case 'updateActionPack':
+					if(data.dataAfter == 'success'){
+						self.$emit('close-form')
+						self.$snotifySuccess("Chỉnh sửa thành công")
+					}else{
+						self.$snotifyError("Có lỗi xảy ra")
+					}
+					break;
+                case 'createActionPack':
+					if(data.dataAfter == 'success'){
+						self.$emit('close-form')
+						self.$snotifySuccess("Thêm mới thành công")
+					}else{
+						self.$snotifyError("Có lỗi xảy ra")
+					}
 					break;
                
                 default:
@@ -413,7 +428,6 @@ export default {
 			let actionPackId = this.itemData.id;
             let initOperations = {}; // các operation mà có action rỗng để đảm bảo luôn hiển thị các object của app ngay cả khi các object này chưa có quyền
             let objectTypeDataTable = {};
-            // let allOperation = await permissionApi.
 
             if(Number(appId) > 0){
                 let objsOfApp = this.multipleLevelObjects.application_definition;
@@ -526,7 +540,6 @@ export default {
         },
         handleInputValueChange(name, inputInfo, data){
 			this.objectActive = data
-			debugger
             let self = this
             if(name == 'objectType'){
                 if(data == "department"){
@@ -805,33 +818,44 @@ export default {
             let res;
             try {
                 if(this.action == 'update'){
-					res = await permissionApi.updateActionPack(this.itemData.id, dataToSave);
-					let dataUi = {
-						widgetIdentifier: 'action-pack:'+this.itemData.id,
-						detail: JSON.stringify(this.listAppSelected)
-					}
-					uiConfigApi.saveUiConfig(dataUi).then(res=>{
-					})
-                    if(res.status == '200'){
-						this.$snotifySuccess("Updated item successfully");
-						this.$emit('close-form')
-                    }else{
-                        this.$snotifyError(res, "Error when update item");
-                    }
-                }else if(this.action == 'create'){
-					res = await permissionApi.createActionPack(dataToSave);
-                    if(res.status == '200'){
-						let dataUi = {
-							widgetIdentifier: 'action-pack:'+res.data.id,
-							detail: JSON.stringify(this.listAppSelected)
+					this.actionPackWorker.postMessage({
+						action: 'updateActionPack',
+						data:{
+							dataUi:{
+								widgetIdentifier: 'action-pack:'+this.itemData.id,
+								detail: JSON.stringify(this.listAppSelected)
+							},
+							dataActionPack:{
+								id: this.itemData.id,
+								dataToSave: dataToSave
+							}
 						}
-						uiConfigApi.saveUiConfig(dataUi).then(res=>{
-						})
-						this.$snotifySuccess("Create item successfully");
-						this.$emit('close-form')
-                    }else{
-                        this.$snotifyError(res, "Error when create item");
-                    }
+					})
+                }else if(this.action == 'create'){
+					this.actionPackWorker.postMessage({
+						action: 'createActionPack',
+						data:{
+							dataUi:{
+								detail: JSON.stringify(this.listAppSelected)
+							},
+							dataActionPack:{
+								dataToSave: dataToSave
+							}
+						}
+					})
+					// res = await permissionApi.createActionPack(dataToSave);
+                    // if(res.status == '200'){
+					// 	let dataUi = {
+					// 		widgetIdentifier: 'action-pack:'+res.data.id,
+					// 		detail: JSON.stringify(this.listAppSelected)
+					// 	}
+					// 	uiConfigApi.saveUiConfig(dataUi).then(res=>{
+					// 	})
+					// 	this.$snotifySuccess("Create item successfully");
+					// 	this.$emit('close-form')
+                    // }else{
+                    //     this.$snotifyError(res, "Error when create item");
+                    // }
                 }
                 this.$emit('saved-item-data',res);
             } catch (error) {

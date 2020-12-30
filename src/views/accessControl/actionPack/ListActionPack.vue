@@ -198,7 +198,8 @@ export default {
     },
     methods: {
         closeForm(){
-            this.$refs.listActionPack.closeactionPanel();
+			this.$refs.listActionPack.closeactionPanel();
+			this.$refs.listActionPack.refreshList()
         },
         detailActionPack(row){
             let self = this;
@@ -257,7 +258,7 @@ export default {
         getTableDataFromOperations(operations){
             let mapActionAndObjectTypes = this.mapObjectTypesAndAction;
             let allResource = this.$store.state.actionPack.allResource;
-
+ 
             /**
              * Map giữa object type và action , có dạng
              * {
@@ -363,10 +364,8 @@ export default {
             this.currentItemData.id = 0;
             this.currentItemData.description = "";
             this.currentItemData.objectType = "document_definition";
-
             this.$set(this.currentItemData, 'mapActionAndObjects', {});
             this.$set(this.currentItemData, 'mapActionForAllObjects', {});
-            this.$refs.actionPackForm.objectTypeToDocumentDefinition();
         },
         calcContainerHeight() {
             this.containerHeight = util.getComponentSize(this).h;

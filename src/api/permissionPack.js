@@ -39,6 +39,9 @@ export const permissionApi = {
         }
         return Promise.all(prms);
     },
+    deletePermissionPackBeta(id) {
+		return permissionPackApi.delete(id);
+    },
     getActionPackOfPermission(permissionId) {
         return permissionPackApi.get(permissionId + '/action_packs');
     },
@@ -46,7 +49,13 @@ export const permissionApi = {
         return actionModuleApi.get("");
     },
     deleteActionPack(idPacks) {
-        return actionModuleApi.delete('/' + idPacks);
+        if ($.isArray(idPacks)) {
+            idPacks = idPacks.join(',');
+        }
+        return actionModuleApi.delete('/' + idPacks, idPacks);
+    },
+    deleteActionPackBeta(id) {
+        return actionModuleApi.delete('/' + id);
     },
 
     createMultipleOperation(data) {
