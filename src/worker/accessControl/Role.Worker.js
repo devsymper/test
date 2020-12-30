@@ -1,5 +1,6 @@
 import { permissionApi } from "@/api/permissionPack";
 import { systemRoleApi } from "@/api/systemRole.js";
+import {accessControlApi} from "@/api/accessControl"
 
 
 self.onmessage = async function (event) {
@@ -22,6 +23,14 @@ self.onmessage = async function (event) {
         case 'createRole':
 			let createRoleRes = await createRole(data.dataToSave);
             postMessage({action:'createRole', dataAfter : createRoleRes})
+            break;
+        case 'getNodePermission':
+			let getNodePermissionRes = await getNodePermission(data.id);
+            postMessage({action:'getNodePermission', dataAfter : getNodePermissionRes})
+            break;
+        case 'savePermission':
+			let savePermissionRes = await savePermission(data.dataToSave);
+            postMessage({action:'savePermission', dataAfter : savePermissionRes})
             break;
         default:
             break;
@@ -54,6 +63,21 @@ export const createRole = async function(data) {
 }
 export const updateRole = async function(data) {
 	let res = await systemRoleApi.update(data.id, data.dataToSave);
+	if(res.status == 200){
+		return 'success'
+	}else{
+		return 'error'
+	}
+}
+export const getNodePermission = async function(id) {
+	let res = await accessControlApi.getNodePermission(id);
+	return {
+		res: res,
+		id: id
+	}
+}
+export const savePermission = async function(data) {
+	let res = await accessControlApi.savePermission(data);
 	if(res.status == 200){
 		return 'success'
 	}else{
