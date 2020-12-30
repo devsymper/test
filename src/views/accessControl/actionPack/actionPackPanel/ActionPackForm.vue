@@ -843,19 +843,6 @@ export default {
 							}
 						}
 					})
-					// res = await permissionApi.createActionPack(dataToSave);
-                    // if(res.status == '200'){
-					// 	let dataUi = {
-					// 		widgetIdentifier: 'action-pack:'+res.data.id,
-					// 		detail: JSON.stringify(this.listAppSelected)
-					// 	}
-					// 	uiConfigApi.saveUiConfig(dataUi).then(res=>{
-					// 	})
-					// 	this.$snotifySuccess("Create item successfully");
-					// 	this.$emit('close-form')
-                    // }else{
-                    //     this.$snotifyError(res, "Error when create item");
-                    // }
                 }
                 this.$emit('saved-item-data',res);
             } catch (error) {
