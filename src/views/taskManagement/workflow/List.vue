@@ -46,6 +46,27 @@ export default {
         this.getListWorkflowInProject();
         this.$store.dispatch("taskManagement/getAllStatusCategory");
         this.$store.dispatch("taskManagement/getAllRole",projectId);
+    },
+    activated(){
+        let projectId=this.$route.params.id;
+        let breadcrumbs = [
+                {
+                    text: 'Dashboard',
+                    disabled: false,
+                    to: '/task-management/projects/'+projectId+'/kanban-board',
+                },
+                {
+                    text: 'Project',
+                    disabled: true,
+                    to: '',
+                },
+                {
+                    text: 'Work flow',
+                    disabled: true,
+                    to: '',
+                },
+            ];
+        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
     }
 
 }

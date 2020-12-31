@@ -37,6 +37,23 @@ export default {
     },
     async created(){
         await this.getListVersion();
+    },
+    activated(){
+        let projectId=this.$route.params.id;
+        let breadcrumbs = [
+                {
+                    text: 'Dashboard',
+                    disabled: false,
+                    to: '/task-management/projects/'+projectId+'/kanban-board',
+                },
+                {
+                    text: 'Versions',
+                    disabled: true,
+                    to: '',
+                }
+               
+            ];
+        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
     }
 
 }

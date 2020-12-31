@@ -4,7 +4,9 @@
          <div :style="{'width':(isExpand) ? 'calc(100% - 210px)' : 'calc(100%)'}" class="h-100">
             <Header />
             <div style="padding:0 8px;height:calc(100% - 45px)">
-                <router-view name="TaskManagement" />
+                <keep-alive>
+                    <router-view :key="routerKey" name="TaskManagement" />
+                </keep-alive>
             </div>
         </div>
     </div>
@@ -42,9 +44,15 @@ export default {
             this.$store.commit("taskManagement/addToTaskManagementStore",{key:"hideSidebar",value:vl})
         }
     },
+    watch:{
+        '$route' (to, from){
+            this.routerKey = to.fullPath;
+        }
+    },
     data(){
         return {
             isExpand:false,
+            routerKey:Date.now()
 
         }
     }

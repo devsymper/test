@@ -35,6 +35,8 @@ export default {
             }
             this.$store.dispatch("taskManagement/getAllDocumentIdsInIssueType");
             this.$store.dispatch("taskManagement/getAllStatus");
+            this.$store.dispatch("taskManagement/getAllProject");
+
 
         }
     },  

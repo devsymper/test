@@ -4,7 +4,7 @@
 	}"
 	>
 		<div class="task-item__header">
-			<p @click.prevent.stop="handleShowDetailIssue" class="task-hover-poiter">{{task.tmg_name}}</p>
+			<p @click.prevent.stop="handleShowDetailIssue" class="task-hover-poiter task-content">{{task.tmg_name}}</p>
 		</div>
 		<div class="mt-4 card-item__body">
 			<div class="left-content">
@@ -20,6 +20,7 @@
 		</div>
 		<detail-issue
             :documentObjectId="documentObjectId"
+			:issue="issue"
             ref="issue"
         />
   	</div>
@@ -44,7 +45,8 @@ export default {
 			priority:null,
 			projectId:null,
 			status:null,
-			documentObjectId:null
+			documentObjectId:null,
+			issue:null
 		}
 	},
 	computed: {
@@ -64,7 +66,8 @@ export default {
 	},
 	methods:{
 		handleShowDetailIssue(){
-            this.documentObjectId = this.task.document_object_id;
+			this.documentObjectId = this.task.document_object_id;
+			this.issue = this.task;
             this.$refs.issue.show();
         },
 		getPriority(){
@@ -128,5 +131,12 @@ export default {
 		cursor: pointer;
 		text-decoration: underline;
 		color: blue;
+	}
+	.task-content{
+		display: -webkit-box;
+		-webkit-line-clamp: 2;
+		-webkit-box-orient: vertical;
+		overflow: hidden;
+		text-overflow: ellipsis;
 	}
 </style>

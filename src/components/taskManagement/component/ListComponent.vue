@@ -16,7 +16,7 @@
                         hide-details
                         class="sym-small-size sym-style-input"
                     ></v-text-field>
-                    <v-btn small class="ml-1 px-1" solo depressed @click="handleCreate">
+                    <v-btn v-if="checkRole('task_manager_component','add')" small class="ml-1 px-1" solo depressed @click="handleCreate">
                         <span>Create component</span>
                     </v-btn>
                 </v-card-title>
@@ -39,10 +39,10 @@
                         <infoUser class="userInfo fs-13" :userId="item.userLeader" :roleInfo="{}" />
                     </template>
                     <template  v-slot:[`item.action`]="{ item }">
-                        <v-icon class="mr-2" @click.prevent.stop="handelDetailComponent(item)" style="font-size:20px">mdi-file-document-edit-outline</v-icon>
+                        <v-icon v-if="checkRole('task_manager_component','edit')" class="mr-2" @click.prevent.stop="handelDetailComponent(item)" style="font-size:20px">mdi-file-document-edit-outline</v-icon>
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
-                                <v-icon v-on="on" @click.prevent.stop="handleDelete(item)" style="font-size:20px">mdi-delete-outline</v-icon>
+                                <v-icon  v-if="checkRole('task_manager_component','delete')" v-on="on" @click.prevent.stop="handleDelete(item)" style="font-size:20px">mdi-delete-outline</v-icon>
                             </template>
                             <span>Delete</span>
                         </v-tooltip>
@@ -78,6 +78,7 @@ import { taskManagementApi } from "@/api/taskManagement.js";
 import modalAddOrDetailComponent from "./ModalAddOrDetailComponent";
 import { util } from "@/plugins/util";
 import infoUser from "@/components/common/user/InfoUser";
+import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
 
 export default {
     name:"listComponent",
@@ -161,12 +162,18 @@ export default {
         }
     },
     methods:{
+        checkRole(objectType,action){
+            return checkPermission(objectType,action);
+        },
         handleClickRow(item){ 
-            if (item.id) {
-                let projectId=this.$route.params.id;
-                this.$store.commit("taskManagement/setInfoComponentCurrent", item);
-                this.$router.push('/task-management/projects/'+projectId+'/components/'+item.id);
+            if (this.checkRole('task_manager_component','detail')) {
+                if (item.id) {
+                    let projectId=this.$route.params.id;
+                    this.$store.commit("taskManagement/setInfoComponentCurrent", item);
+                    this.$router.push('/task-management/projects/'+projectId+'/components/'+item.id);
+                }
             }
+           
         },
         addComponent(){
             this.$emit("add-component");
@@ -234,5 +241,8 @@ export default {
 }
 .table-list-component >>> td{
     font-size: 13px!important;
+}
+.sym-style-input >>> .v-input__slot{
+    box-shadow: none !important;
 }
 </style>

@@ -50,23 +50,24 @@ export default {
         this.$store.commit("taskManagement/addToTaskManagementStore",{key:'currentPage',value:'projectSetting'});
     },
     activated(){
+        let projectId=this.$route.params.id;
         let breadcrumbs = [
                 {
                     text: 'Dashboard',
-                    disabled: true,
-                    to: '/report',
-                },
-                {
-                    text: 'test kanban',
                     disabled: false,
-                    to: 'breadcrumbs_link_1',
+                    to: '/task-management/projects/'+projectId+'/kanban-board',
                 },
                 {
-                    text: 'Link 2',
+                    text: 'Project',
                     disabled: true,
-                    to: 'breadcrumbs_link_2',
+                    to: '',
                 },
-            ]
+                {
+                    text: 'Detail',
+                    disabled: true,
+                    to: '',
+                },
+            ];
         this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
     }
 

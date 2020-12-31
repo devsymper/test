@@ -40,7 +40,25 @@ export default {
         
     },
     activated(){
-        //this.toggleMainContentLoader(false);
+        let projectId=this.$route.params.id;
+        let breadcrumbs = [
+                {
+                    text: 'Dashboard',
+                    disabled: false,
+                    to: '/task-management/projects/'+projectId+'/kanban-board',
+                },
+                {
+                    text: 'Project',
+                    disabled: true,
+                    to: '',
+                },
+                {
+                    text: 'Issue type',
+                    disabled: true,
+                    to: '',
+                },
+            ];
+        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
     }
 
 }

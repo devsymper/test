@@ -297,7 +297,7 @@ export default {
 }
 ::v-deep .popup-select-project{
     position: absolute;
-    top: 90px;
+    top: 40px;
     left: 15px;
 }
 .sidebar-content >>> .ps__rail-x{

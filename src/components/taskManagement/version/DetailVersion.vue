@@ -145,7 +145,7 @@ export default {
             projectId: null,
             listIssue:[],
             dataProgess:{
-                total:10,
+                total:6,
                 item:{
                     todo:{
                         value:2,
@@ -156,7 +156,7 @@ export default {
                         color:'blue'
                     },
                     done:{
-                        value:5,
+                        value:1,
                         color:'green'
                     }
                 }

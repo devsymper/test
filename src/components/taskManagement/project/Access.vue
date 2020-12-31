@@ -800,29 +800,8 @@ export default {
     },
     created(){
         this.getListPermissionPack();
-        let projectId=this.$route.params.id;
-        let breadcrumbs = [
-                {
-                    text: 'Dashboard',
-                    disabled: false,
-                    to: '/task-management/projects/'+projectId+'/kanban-board',
-                },
-                {
-                    text: 'Project',
-                    disabled: true,
-                    to: '',
-                },
-                {
-                    text: 'Access',
-                    disabled: true,
-                    to: '',
-                },
-            ];
-        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
     },
-    activated(){
-     
-    }
+ 
 }
 </script>
 
@@ -895,6 +874,9 @@ export default {
 .list-button {
     position: absolute;
     right: 10px;
+}
+.sym-style-input >>> .v-input__slot{
+    box-shadow: none !important;
 }
 
 </style>

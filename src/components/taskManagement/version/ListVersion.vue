@@ -16,7 +16,7 @@
                         hide-details
                         class="sym-small-size sym-style-input"
                     ></v-text-field>
-                    <v-btn small class="px-1 ml-1" solo depressed @click="handleCreate" >
+                    <v-btn v-if="checkRole('task_manager_version','add')"  small class="px-1 ml-1" solo depressed @click="handleCreate" >
                         <span>Create version</span>
                     </v-btn>
                 </v-card-title>
@@ -51,10 +51,10 @@
                     </template>
                 
                     <template  v-slot:[`item.action`]="{ item }">
-                        <v-icon class="mr-2" @click.prevent.stop="handelDetailVersion(item)" style="font-size:20px">mdi-file-document-edit-outline</v-icon>
+                        <v-icon v-if="checkRole('task_manager_version','edit')"  class="mr-2" @click.prevent.stop="handelDetailVersion(item)" style="font-size:20px">mdi-file-document-edit-outline</v-icon>
                         <v-tooltip bottom>
                             <template v-slot:activator="{ on }">
-                                <v-icon v-on="on" @click.prevent.stop="handleDelete(item)" style="font-size:20px">mdi-delete-outline</v-icon>
+                                <v-icon v-if="checkRole('task_manager_version','delete')"  v-on="on" @click.prevent.stop="handleDelete(item)" style="font-size:20px">mdi-delete-outline</v-icon>
                             </template>
                             <span>Delete</span>
                         </v-tooltip>
@@ -89,6 +89,7 @@ import { taskManagementApi } from "@/api/taskManagement.js";
 import modalAddOrDetailVersion from "./ModalAddOrDetailVersion";
 import { util } from "@/plugins/util";
 import infoUser from "@/components/common/user/InfoUser";
+import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
 
 export default {
     name:"listVersion",
@@ -115,7 +116,7 @@ export default {
     data(){
         return{
             dataProgess:{
-                total:10,
+                total:6,
                 item:{
                     todo:{
                         value:2,
@@ -126,7 +127,7 @@ export default {
                         color:'blue'
                     },
                     done:{
-                        value:5,
+                        value:1,
                         color:'green'
                     }
                 }
@@ -193,11 +194,16 @@ export default {
         }
     },
     methods:{
+        checkRole(objectType,action){
+            return checkPermission(objectType,action);
+        },
         handleClickRow(item){ 
-            if (item.id) {
-                let projectId=this.$route.params.id;
-                this.$store.commit("taskManagement/setInfoVersionCurrent", item);
-                this.$router.push('/task-management/projects/'+projectId+'/versions/'+item.id);
+            if (this.checkRole('task_manager_version','detail')) {
+                if (item.id) {
+                    let projectId=this.$route.params.id;
+                    this.$store.commit("taskManagement/setInfoVersionCurrent", item);
+                    this.$router.push('/task-management/projects/'+projectId+'/versions/'+item.id);
+                }
             }
         },
         addVersion(){
@@ -283,5 +289,8 @@ export default {
 }
 .table-list-version >>> td{
     font-size: 13px!important;
+}
+.sym-style-input >>> .v-input__slot{
+    box-shadow: none !important;
 }
 </style>

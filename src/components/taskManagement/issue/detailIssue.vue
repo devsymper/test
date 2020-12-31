@@ -4,24 +4,40 @@
         max-width="21cm"
         :content-class="'detail-issue h-100'"
     >
-        <div class="pt-2"  style="border-bottom:1px solid #eee">
+        <div class="d-flex justify-space-between py-1"  style="border-bottom:1px solid #eee">
             <span class="fs-16 font-weight-medium ml-4">Info Issues</span>
+            <div class="d-flex">
+                <div style="border:1px solid #eee;" class="d-flex px-2 mx-2" v-if="infoProject">
+                    <v-icon v-if="!!infoProject.icon && infoProject.icon.indexOf('mdi-') > -1" class="mr-1 mt-1" style="font-size:18px">{{infoProject.icon}}</v-icon>
+                    <img  v-else-if="!!infoProject.icon && infoProject.icon.indexOf('mdi-') < 0" :src="infoProject.icon" height="15" width="15" alt="" class="mr-2 mt-1">
+                    <div class="mt-1">{{infoProject.name}}</div>
+                </div>
+                <div style="border:1px solid #eee;" class="d-flex px-2 mr-4" v-if="infoIssueType">
+                    <v-icon v-if="!!infoIssueType.icon && infoIssueType.icon.indexOf('mdi-') > -1" class="mr-1 mt-1" style="font-size:18px">{{infoIssueType.icon}}</v-icon>
+                    <img  v-else-if="!!infoIssueType.icon && infoIssueType.icon.indexOf('mdi-') < 0" :src="infoIssueType.icon" height="15" width="15" alt="" class="mr-2 mt-1">
+                    <div class="mt-1">{{infoIssueType.name}}</div>
+                </div>
+                <v-icon style="font-size:16px; float:right;margin-right:10px" @click="showDetail">mdi-page-next-outline</v-icon>
+            </div>
         </div>
         <div style="height:  calc(100% - 70px)">
             <detail
                 v-if="!statusEdit"
                 :docObjInfo="docObjInfo"
+                :quickView="true"
                 class="issue"
+                ref="detailIssue"
             />
             <submit
                 v-else
-                ref="submitComponent"
+                ref="updateDocument"
                 class="doc_issue"
                 :action="'update'"
                 :showSnackbarSuccess="false"
-                :docId="Number(documentId)"
                 :documentObjectId="Number(docObjInfo.docObjId)"
                 :showSubmitButton="false"
+                @submit-document-success="onDocumentUpdateSuccess"
+                @submit-document-error="onSubmitError"
             />
 
         </div>
@@ -45,9 +61,12 @@
             <v-btn
                 color="green darken-1"
                 text
+                :loading="loadding"
                 v-else
+                @click="updateSubmitedDocument"
+
             >
-                Submit
+                {{$t("common.save")}}
             </v-btn>
            
         </div>
@@ -64,31 +83,88 @@ export default {
             type: String,
             default: ""
         },
-        documentId:{
-            type: Number,
-            default: 0
-        },
+        issue:{
+            type: Object,
+            default(){
+                return {}
+            }
+        }
     },
     watch:{
         documentObjectId(newVl){
             this.statusEdit = false;
+            if (newVl) {
+                this.getInfoProject();
+                this.getInfoIssueType();
+            }
+          
         }
     },
     computed:{
         docObjInfo(){
             return {docObjId:this.documentObjectId};
+        },
+        allProject(){
+            return this.$store.state.taskManagement.allProject;
+        },
+        allIssueType(){
+            return this.$store.state.taskManagement.allIssueType;
         }
     },
     data(){
         return{
+            loadding:false,
             isShow:false,
             statusEdit:false,
+            infoProject:null,
+            infoIssueType:null,
         }
     },
     methods:{
+        getInfoProject(){
+            if (this.issue) {
+                let project = this.allProject.find(ele => ele.id == this.issue.tmg_project_id);
+                if (project) {
+                    this.infoProject = project;
+                }
+            }
+          
+        },
+        getInfoIssueType(){
+            if (this.issue) {
+                let issueType = this.allIssueType.find(ele => ele.id == this.issue.tmg_issue_type);
+                if (issueType) {
+                    this.infoIssueType = issueType;
+                }
+            }
+        },
+        showDetail(){
+            this.$refs.detailIssue.showSideBar()
+        },
         show(){
             this.isShow=true;
         },
+        onSubmitError(){
+            this.$snotifyError("", "Update error!");
+            this.statusEdit = false;
+            this.loadding = false;
+        },
+        onDocumentUpdateSuccess(){
+            this.$snotifySuccess("Update success!");
+            this.statusEdit = false;
+            this.loadding = false;
+        },
+        updateSubmitedDocument(){
+            this.loadding = true;
+            this.$refs.updateDocument.handlerSubmitDocumentClick();
+        },
+    },
+    created(){
+        this.getInfoProject();
+        this.getInfoIssueType();
+        if (!this.$store.state.taskManagement.allIssueType || this.$store.state.taskManagement.allIssueType == 0) {
+            this.$store.dispatch("taskManagement/getAllIssueType");
+        }
     }
 }
 </script>

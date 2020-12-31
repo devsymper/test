@@ -24,7 +24,8 @@
                 <input type="text" placeholder="Search . . ." required>
                 </div>
             </div>
-            <div class="pr-3" style="position:relative;padding: 3px 0;">
+            <v-icon @click="handleHome" style="font-size:24px;color:#5a6061">mdi-home-account</v-icon>
+            <div class="pr-3" style="position:relative;padding: 3px 0;margin-top:3px">
                 <v-menu offset-y>
                     <template v-slot:activator="{ on, attrs }">
                         <v-icon    
@@ -99,6 +100,9 @@ export default {
         }
     },
     methods:{
+        handleHome(){
+            this.$router.push("/task-management");
+        },
         showPopupCreateIssue(){
             this.$refs.popupIssue.show();
         },

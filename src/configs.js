@@ -122,6 +122,11 @@ var configs = {
                         icon: 'mdi-shield-check-outline',
                         url:"/task-management/projects/:id/versions"
                     },
+                    {
+                        title:"TimeSheet",
+                        icon: 'mdi-calendar-month',
+                        url:"/task-management/projects/:id/timesheets"
+                    },
                 ]
             },
             workspace2:{

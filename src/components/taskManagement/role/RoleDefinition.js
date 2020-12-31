@@ -22,6 +22,11 @@ const actionDefault = [
         "title":"Xóa",
         "isCheck":false
     },
+    {
+        "name":"detail",
+        "title":"Chi tiết",
+        "isCheck":false
+    },
 ];
 const actionDefaultIssue = [
     {
@@ -124,7 +129,13 @@ const objectActionControls = { // mức ngoài cùng là group
             "task_manager_project_setting":{
                 "title":"Project setting",
                 "icon":"mdi-cog-outline",
-                "actions":util.cloneDeep(actionDefault)
+                "actions": [
+                    {
+                        "name":"config",
+                        "title":"Config",
+                        "isCheck":false
+                    },
+                ]
             },
             "task_manager_access":{
                 "title":"People",
@@ -134,6 +145,16 @@ const objectActionControls = { // mức ngoài cùng là group
             "task_manager_kanban_board":{
                 "title":"Kanban board",
                 "icon":"mdi-bulletin-board",
+                "actions":util.cloneDeep(actionDefault)
+            },
+            "task_manager_components":{
+                "title":"Component",
+                "icon":"mdi-animation-outline",
+                "actions":util.cloneDeep(actionDefault)
+            },
+            "task_manager_version":{
+                "title":"Version",
+                "icon":"mdi-animation-outline",
                 "actions":util.cloneDeep(actionDefault)
             },
             "task_manager_sprint":{
@@ -234,11 +255,6 @@ const objectActionControls = { // mức ngoài cùng là group
                 "title":"Report config",
                 "icon":"",
                 "actions":[
-                    {
-                        "name":"config",
-                        "title":"Config",
-                        "isCheck":false
-                    },
                     {
                         "name":"view",
                         "title":"View",

@@ -1,54 +1,45 @@
 <template>
     <v-card v-show="isShow" class="popup-select-project">
         <div class="popup-header">
-            RECENT
+            All
         </div>
         <div class="list-recent-project">
-            <div class="project-info" @click="onClick">
-                <img height="25px" src="https://symperv01.atlassian.net/secure/projectavatar?pid=10035&avatarId=10416&size=xxlarge" />
-                <div class="project-name">
-                    <div>ABC tesst</div>
-                    <div>đây là 1 project</div>
+            <VuePerfectScrollbar style="height:200px" >
+                <div class="project-info" v-for="(item,index) in allProject" :key="index" @click="onClick(item)">
+                    <v-icon class="img" v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" style="font-size:24px">{{item.icon}}</v-icon>
+                    <img class="img" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="24" height="24">
+                    <div class="project-name">
+                        <div class="pt-2">{{item.name}}</div>
+                        <div>{{item.description}}</div>
+                    </div>
+                    <v-icon v-if="item.isFavorite==1"  style="font-size:18px;"  color="yellow">mdi-star</v-icon>
+                    <v-icon v-else  style="font-size:18px;" >mdi-star-outline</v-icon>
+                
                 </div>
-                <v-icon style="font-size:18px;">mdi-star-outline</v-icon>
-            </div>
-            <div class="project-info" @click="onClick1">
-                <img height="25px" src="https://symperv01.atlassian.net/secure/projectavatar?size=medium&s=medium&pid=10013&avatarId=10412" />
-                <div class="project-name">
-                    <div>ABC tesst</div>
-                    <div>đây là 1 project</div>
-                </div>
-                <v-icon style="font-size:18px;">mdi-star-outline</v-icon>
-            </div>
-            <div class="project-info">
-                <img height="25px" src="https://symperv01.atlassian.net/secure/projectavatar?size=medium&s=medium&pid=10036&avatarId=10424" />
-                <div class="project-name">
-                    <div>ABC tesst</div>
-                    <div>đây là 1 project</div>
-                </div>
-                <v-icon style="font-size:18px;">mdi-star-outline</v-icon>
-            </div>
-            <div class="project-info">
-                <img height="25px" src="https://symperv01.atlassian.net/secure/projectavatar?pid=10035&avatarId=10416&size=xxlarge" />
-                <div class="project-name">
-                    <div>ABC tesst</div>
-                    <div>đây là 1 project</div>
-                </div>
-                <v-icon style="font-size:18px;">mdi-star-outline</v-icon>
-            </div>
+            </VuePerfectScrollbar>
         </div>
         <div class="popup-actions">
-            <div>
-                view all project
+            <div @click="handleViewAll">
+                View all project
             </div>
-            <div>
-                create new project
+            <div @click="handleViewAllCategory">
+                View all category
             </div>
         </div>
     </v-card>
 </template>
 <script>
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
+
 export default {
+    components:{
+        VuePerfectScrollbar
+    },
+    computed:{
+        allProject(){
+            return this.$store.state.taskManagement.allProject;
+        }
+    },
     data(){
         return {
             isShow:false
@@ -61,11 +52,14 @@ export default {
         hide(){
             this.isShow = false;
         },
-        onClick(){
-            this.toggleMainContentLoader()
+        onClick(item){
+            this.$router.push('/task-management/projects/'+item.id+'/kanban-board');
         },
-        onClick1(){
-            this.toggleMainContentLoader(false)
+        handleViewAll(){
+            this.$router.push('/task-management/projects');
+        },
+        handleViewAllCategory(){
+            this.$router.push('/task-management/categories');
         }
     }
 }
@@ -78,8 +72,8 @@ export default {
         font-size: 13px;
     }
     .project-info{
-        padding: 4px 12px;
-        height: 45px;
+        padding: 0px 12px;
+        height: 35px;
         width: 100%;
         display: flex;
         cursor: pointer;
@@ -88,7 +82,7 @@ export default {
     .project-info:hover{
         background: var(--symper-background-hover);
     }
-    .project-info img{
+    .project-info .img{
         margin: 8px 18px 8px 0;
         height: 19px;
     }

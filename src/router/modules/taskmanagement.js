@@ -71,6 +71,14 @@ export default [
                 }
             },
             {
+                path: "projects/:id/timesheets",
+                meta:{group:'home'},
+                name: "timesheet",
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/timesheet/Index.vue')
+                }
+            },
+            {
                 path: "projects/:id/issue-link",
                 meta:{group:'projectSetting'},
                 name: "issueLink",

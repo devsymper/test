@@ -76,7 +76,25 @@ export default {
         await this.getListRole();
     },
     activated(){
-        //this.toggleMainContentLoader(false);
+        let projectId=this.$route.params.id;
+        let breadcrumbs = [
+                {
+                    text: 'Dashboard',
+                    disabled: false,
+                    to: '/task-management/projects/'+projectId+'/kanban-board',
+                },
+                {
+                    text: 'Project',
+                    disabled: true,
+                    to: '',
+                },
+                {
+                    text: 'Access',
+                    disabled: true,
+                    to: '',
+                },
+            ];
+        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
     }
 
 }

@@ -303,7 +303,8 @@ export default {
         this.currentUserLeader.id=this.projectNew.userLeader;
         this.checkRoleIsAllowEdit();
 
-    }
+    },
+  
 
 
 }
