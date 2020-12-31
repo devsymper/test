@@ -114,8 +114,7 @@
                             <v-icon style=" margin-top:-19px; font-size:13px " class="pr-4" size="18">mdi mdi-key</v-icon>
                             <div class="color-normal" style="float:left; margin-top:-13px">Khoá
                                 <span v-if="tableIdx!=0&&checkKeyRequired(table,tableIdx)" style="color:red">*</span>
-                                <span v-if="tableIdx==0" style="color:red">*</span>
-
+                                <span v-if="tableIdx==0&&tables.length>1" style="color:red">*</span>
                             </div>
                         </v-col>
                         <v-col class="col-md-6 py-0" >
@@ -225,7 +224,6 @@ export default {
             newLastKeyTables:[],
             lastKey:[],
             selectType:'',
-            isSelecting: false,
             nameSheets: [],
             lastTable:[],
             nameColumnDetail: {},
@@ -251,12 +249,18 @@ export default {
         this.errorMessage =" "
     },
     mounted(){ 
-		const self = this
+        const self = this
         this.importWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
                 case 'import':
-                    self.setDataImport(data.dataAfter)
+                    self.handleImportFile(data.dataAfter)
+                    break;
+                 case 'getLastData':
+                    self.handleGetLastData(data.dataAfter)
+                    break;
+                case 'getLastData':
+                    self.handleGetMappingTable(data.dataAfter)
 					break;
                 default:
                     break;
@@ -265,21 +269,43 @@ export default {
 
     },
     methods: {
-        setDataImport(value){
-            let check = this.checkValidate();
-            if(check){
-                importApi.pushDataExcel(value)
-                .then(res => {
-                    if (res.status === 200) {
-                        console.log(dataImport); 
-                    }
-                })
-                .catch(err => {
-                });     
-                this.errorMessage = '';
-                this.$emit('import', {fileName:this.data.fileName});
-                this.showCancelBtn = false;
+        handleGetMappingTable(data){
+            this.tables = data.tables;
+            this.newLastKeyTables = data.newLastKeyTables
+        },
+        getMappingTable(){
+            let data = {
+                nameColumnDetail: this.nameColumnDetail,
+                table : this.tables,
+                lastTable : this.lastTable,
+                nameSheets : this.nameSheets,
+                lastKey: this.lastKey
+
             }
+            this.importWorker.postMessage({
+                action:'getMappingTable',
+                data:{ data: data}
+            })
+        },
+        handleImportFile(dataImport){
+            const self = this;
+           if(dataImport.message==''){
+               importApi.pushDataExcel(dataImport.data).then(res=>{
+                   if(res.status==200){
+                        self.$emit('import', {fileName:self.data.fileName});
+                        self.showCancelBtn = false;
+                   }else{
+                       console.log("error")
+                   }
+               })
+           }else{
+               this.errorMessage = dataImport.message
+           }
+        },
+        handleGetLastData(data){
+            this.lastTable = data.lastTable;
+            this.lastKey = data.lastKey;
+            this.lastNameSheet = data.lastNameSheet
         },
         checkKeyRequired(tables, tableIdx){
             let check = false;
@@ -289,7 +315,6 @@ export default {
                 }
             }
             return check
-
         },
         nextToImport(dataUpload){
             let check = true;
@@ -301,14 +326,12 @@ export default {
                 check = false;
                 this.errorMessage="Bạn chưa chọn tên cho file"
             }
-            
             if(check){
                 this.errorMessage="",
                 this.stepper = 2;
                 this.mapImportInfo();
                 this.selectType = dataUpload.selectType
             }
-        
         },
         showImportInfo(){
             this.stepper = 2;
@@ -319,7 +342,6 @@ export default {
              this.mapImport = true;
             this.showImport= false;
         },
-
         sumCount(tableIdx,type){
             let totalAllRow = 0;
             let totalFilledRow = this.tables[tableIdx].controls.filter(p => p.dataColumn!=null).length;
@@ -366,13 +388,14 @@ export default {
             this.nameColumnDetail={};
             this.$emit('stopSetInterval');
             this.$emit('closeValidate');
-            for (let i = 0; i < this.tables.length; i++){
-                this.tables[i].keyColumn= {enable:false, index:-1, name:''};
-                this.tables[i].sheetMap='';
-                for (let j = 0; j < this.tables[i].controls.length; j++) {
-                        this.tables[i].controls[j].dataColumn=null
+            this.tables.map(table=>{
+                table.keyColumn = {enable:false, index:-1,name:''};
+                table.sheetMap = '';
+                table.controls.map(control=>{
+                    control.dataColumn = null
+                })
                 }
-            }
+            )
             this.getLastData();       
         },
         // Lấy dữ liệu từ API
@@ -394,6 +417,13 @@ export default {
                 }
             }
         },
+        getLastData(){
+            const self = this;
+            this.importWorker.postMessage({
+                action:'getLastData',
+                data:self.options.objId
+            })
+        },
         // Sự kiện được gọi khi ấn import
         importFile() {
             let dataImport = {
@@ -408,47 +438,10 @@ export default {
                 typeImport: this.selectType,
                 objType: this.options.objType,
             }
-            this.$postWorkerMessage(this.importWorker,{
+            this.importWorker.postMessage({
                 action:'import',
-                data:{
-                    data:dataImport
-                }
+                data:{ data:dataImport}
             })
-           
-        },
-        //
-        checkValidate(){
-            this.errorMessage="";
-            let check=true;
-              // kiểm tra key rỗng của table chung
-            if (this.tables[0].keyColumn==undefined||this.tables[0].keyColumn.index==-1) {
-                if(this.options.objType=='document'){
-                    this.errorMessage = '* Bạn chưa chọn khóa cho thông tin chung';
-                    check = false;
-                }
-            };
-            if (this.tables[0].sheetMap == '') {
-                this.errorMessage = '* Điền thiếu trường thông tin chung';
-                check = false;
-                 // nếu có sheetMap thì phải chọn khóa 
-            };
-            // kiểm tra bảng con
-                if(this.options.objType=='document'){
-                    for (let i = 0; i < this.tables.length; i++) {
-                        if(this.tables[i].keyColumn==undefined||this.tables[i].keyColumn.index==-1&&!this.tables[i].keyColumn){
-                            this.errorMessage = '* Bạn chưa chọn khóa cho bảng '+this.tables[i].name;
-                            check = false;
-                        };
-                        for(let j=0; j<this.tables[i].controls.length;j++){
-                             if(!this.tables[i].controls[j].isNull&&this.tables[i].controls[j].dataColumn==null){
-                                check = false;
-                                  this.errorMessage = '* Bạn chưa điền trường bắt buộc cho bảng '+this.tables[i].name;
-                             }
-                        }
-                    }
-            }
-            return check;
-
         },
         //Lấy icon theo kiểu dữ liệu
         getIcon(controlType) {
@@ -523,7 +516,6 @@ export default {
                     }
                     for(let j=0; j<this.nameColumnDetail[name].length;j++){
                         this.nameColumnDetail[name][j].enable = true;
-
                     }
                 }
             }
@@ -570,163 +562,10 @@ export default {
                 this.tables[tableIdx].controls[controlIdx].dataColumn = null;
             }
         },
-        // lưu tất cả dữ liệu mapping lần cuối vào lastTable
-        getLastData(){
-            const self = this;
-            importApi.getMapping(this.options.objId)
-            .then(res => {
-                if (res.status === 200) {
-                    let mapping = JSON.parse(res.data[0].mapping);    
-                    mapping = mapping.mapping;
-                    let row = [];
-                    let lastNameSheet = [];
-                    lastNameSheet.push(mapping.general.sheetMap)
-                    this.lastKey = [];
-                    if(mapping.general.keyColumn){
-                        this.lastKey.push({
-                            enable: mapping.general.keyColumn.enable,
-                            index: mapping.general.keyColumn.index,
-                            name :  mapping.general.keyColumn.name,
-                            nameSheet :  mapping.general.sheetMap,
-                            nameTable: 'Thông tin chung'
-
-                        })
-                    }
-                    for (let i = 0; i < mapping.general.controls.length; i++) {
-                        row.push({
-                            controlName:mapping.general.controls[i].name,
-                            nameSheet: mapping.general.sheetMap,
-                            nameTable:'Thông tin chung',
-                            dataColumn:mapping.general.controls[i].dataColumn.name});
-                    };
-                    if(mapping.tables){
-                        for (let i = 0; i < mapping.tables.length; i++) {
-                            lastNameSheet.push(mapping.tables[i].sheetMap);
-                            if(mapping.tables[i].keyColumn){
-                                let nameLastKeyTables = mapping.tables[i].keyColumn.name
-                                this.lastKey.push({
-                                    name:nameLastKeyTables, 
-                                    index:-1,
-                                    enable:false,
-                                    nameSheet: mapping.tables[i].sheetMap
-                                });
-                            }
-                            for(let j = 0; j< mapping.tables[i].controls.length;j++)
-                                row.push({
-                                    nameSheet: mapping.tables[i].sheetMap,
-                                    controlName:mapping.tables[i].controls[j].name,
-                                    dataColumn:mapping.tables[i].controls[j].dataColumn.name,
-                                    nameTable:mapping.tables[i].name
-                                });
-                            }
-                        }
-                    self.lastTable = row;
-                    self.lastNameSheet = lastNameSheet;
-                }; 
-            })
-            .catch(err => {
-                console.log(err)
-            })
-        },
-        //phần mapping --- hàm tìm index mới cho cột
-         getIndexColumnMapping(value, nameSheet){
-            let index = -1;
-            let arr = this.nameColumnDetail[nameSheet];
-            for(let j = 0; j<arr.length; j++){
-                if(arr[j].name==value){
-                    this.nameColumnDetail[nameSheet][j].enable=false;
-                        return index = arr[j].index;
         
-            }
-            }
-        },
-        //checkSheet có tồn tại
-        checkNameSheetExist(nameSheet){
-            let check = false;
-            for(let j=0;j<this.nameSheets.length;j++){
-                if(this.nameSheets[j].name==nameSheet){
-                    check = true;
-                }
-            }
-            return check
-        },
+        
         //phần mapping--- hàm tìm key cho cột
-        setLastKeyGeneral(){
-            if(this.tables[0].sheetMap.name==this.lastTable[0].nameSheet&&this.checkNameSheetExist(this.lastTable[0].nameSheet)){
-                this.tables[0].keyColumn.name=this.lastKey[0].name;
-                this.tables[0].keyColumn.enable= true;
-                this.tables[0].keyColumn.index= this.getIndexColumnMapping(this.lastKey[0].name,this.tables[0].sheetMap.name);
-            }
-        },
-        // hàm xử lý key từng bảng con, so sánh với dòng trong excel nếu trùng thì set sheetMap
-        setLastKeyTables(){
-            // kiểm tra để lấy key
-            let newLastKeyTables = [];
-            for(let i = 1; i<this.lastKey.length; i++){
-                 for(let j = 0; j<this.nameSheets.length; j++){
-                    let arr = this.nameColumnDetail[this.nameSheets[j].name];
-                    for(let k = 0; k<arr.length; k++){
-                        if(arr[k].name==this.lastKey[i].name){
-                            newLastKeyTables.push({
-                                name:this.lastKey[i].name,
-                                sheet: this.nameSheets[j].name,
-                                index: arr[k].index,
-                                enable: true});
-                            }
-                     }
-                }
-            }
-            this.newLastKeyTables = newLastKeyTables;
-            //đẩy key
-            const self = this;
-            for(let i = 1; i<this.tables.length; i++){
-                   for(let j = 0; j<this.newLastKeyTables.length; j++){
-                        if(this.tables[i].sheetMap&&this.tables[i].sheetMap.name==this.newLastKeyTables[j].sheet){
-                            this.tables[i].keyColumn.name = this.newLastKeyTables[j].name;   
-                            this.tables[i].keyColumn.enable = true;
-                            this.tables[i].keyColumn.index = this.newLastKeyTables[j].index;
-                        }
-                    }
-                }
-        },
-        //phần mapping --- ẩn tên sheet 
-        hideNameSheet(value){
-            for(let i = 0; i<this.nameSheets.length; i++){
-                if(this.nameSheets[i].name==value){
-                    this.nameSheets[i].enable=false;
-                }
-            }
-        },
-        //phần mapping---hàm so sánh tên cột trong danh sách file excel và tên cột trong mapping
-        getMappingTable(){
-            let column = this.nameColumnDetail;
-            column =  JSON.stringify(column);
-            let columnAr = this.nameColumnDetail;
-            columnAr = Object.values(columnAr);
-            if(column.length>2){
-                for(let i = 0; i<this.tables.length;i++){
-                    for(let j=0; j<this.lastTable.length;j++){
-                        if(this.lastTable[j].nameTable==this.tables[i].name&&this.checkNameSheetExist(this.lastTable[j].nameSheet)){
-                            for(let k = 0; k<this.tables[i].controls.length;k++){
-                               if(this.tables[i].controls[k].name==this.lastTable[j].controlName){
-                                    this.hideNameSheet(this.lastTable[j].nameSheet);
-                                    this.tables[i].sheetMap={name:'',enable:false};
-                                    this.tables[i].controls[k].dataColumn = {name: '',index: 0, enable:false};
-                                    this.tables[i].sheetMap.name = this.lastTable[j].nameSheet;
-                                    this.tables[i].controls[k].dataColumn.name= this.lastTable[j].dataColumn;
-                                   
-                                    this.tables[i].controls[k].dataColumn.index = this.getIndexColumnMapping(this.lastTable[j].dataColumn,this.tables[i].sheetMap.name);
-                               }
-                            }
-                        }
-                    }
-                }
-            this.setLastKeyGeneral();
-            this.setLastKeyTables();
-            }else{
-                console.log('Không có file Mapping')
-            }
-        }
+    
     },
     watch: {
         data(){
@@ -735,7 +574,6 @@ export default {
         //lay API lần mapping trước
         selectType(){
            this.getLastData();
-
         },
         newImport(val) {
             this.stepper= 1;
@@ -799,9 +637,6 @@ export default {
     font-size: 13px;
     padding-left: 10px;
 }
-
-
-
 .auto-complete ::v-deep .v-input__slot:after {
     border-color: transparent !important
 }
@@ -836,7 +671,7 @@ export default {
 
 </style>
 <style >
-    /* .row{
-      //  margin:0px!important
-    } */
+    .row{
+    margin:unset!important
+    }
 </style>
