@@ -1339,7 +1339,8 @@
             "alertDescription": "Không có mô tả",
             "relatedTask": "CÁC TASK LIÊN QUAN",
             "attachment": "TỆP ĐÍNH KÈM",
-            "status": "Trạng thái"
+			"status": "Trạng thái",
+			"candidateUser":"Nhóm người dùng candidate"
         },
         "filterOptions": {
             "all": "Toàn bộ task",
