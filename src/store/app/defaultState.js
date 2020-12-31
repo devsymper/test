@@ -146,7 +146,8 @@ const defaultState = {
         token: '', // token của firebase
         topics: {}, // các topic đã đăng ký, {documents: true, workflows: true, }
     },
-    didRegisterSYQLForMonaco: false
+	didRegisterSYQLForMonaco: false,
+	filteredColumns:{}
 };
 
 export default defaultState;
