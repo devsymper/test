@@ -4,8 +4,7 @@
 	}"
 	>
 		<div class="task-item__header">
-			<p>{{task.tmg_name}}</p>
-			
+			<p @click.prevent.stop="handleShowDetailIssue" class="task-hover-poiter">{{task.tmg_name}}</p>
 		</div>
 		<div class="mt-4 card-item__body">
 			<div class="left-content">
@@ -19,12 +18,21 @@
 			</div>
 			
 		</div>
+		<detail-issue
+            :documentObjectId="documentObjectId"
+            ref="issue"
+        />
   	</div>
 </template>
 <script>
 import SymperAvatar from '../../common/SymperAvatar.vue';
+import DetailIssue from '@/components/taskManagement/issue/DetailIssue.vue';
+
 export default {
-  components: { SymperAvatar },
+  	components: { 
+		SymperAvatar,
+		DetailIssue 
+	},
 	props: {
 		task: {
 		type: Object,
@@ -35,7 +43,8 @@ export default {
 		return {
 			priority:null,
 			projectId:null,
-			status:null
+			status:null,
+			documentObjectId:null
 		}
 	},
 	computed: {
@@ -54,6 +63,10 @@ export default {
 		this.getStatus();
 	},
 	methods:{
+		handleShowDetailIssue(){
+            this.documentObjectId = this.task.document_object_id;
+            this.$refs.issue.show();
+        },
 		getPriority(){
 			let priority = this.allPriority.find(ele => ele.id == this.task.tmg_priority_id);
 			if(priority){
@@ -110,5 +123,10 @@ export default {
 		width: 14px;
 		height: 14px;
 		border-radius: 50%;
+	}
+	.task-hover-poiter:hover{
+		cursor: pointer;
+		text-decoration: underline;
+		color: blue;
 	}
 </style>

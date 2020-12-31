@@ -1,71 +1,79 @@
 <template>
-    <v-card style="box-shadow:none">
-        <v-card-title>
-            {{$t("taskManagement.listIssueComponent")}}
-            <v-spacer></v-spacer>
-            <v-text-field
-                v-model="search"
-                append-icon="mdi-magnify"
-                label="Tìm kiếm"
-                dense
-                solo
-                style="max-width:255px;"
-                single-line
-                hide-details
-                class="sym-small-size sym-style-input"
-            ></v-text-field>
-        </v-card-title>
-        <v-data-table
-            v-if="listIssueProps.length>0"
-            :headers="headers"
-            :items="listIssueProps"
-            :search="search"
-            hide-default-footer
-            class="table-list-font-size"
-        >
-            <template v-slot:[`item.tmg_name`]="{ item }">
-                <div class="d-flex">
-                    <div class="item-icon" v-if="item.infoIssueType">
-                        <v-icon v-if="!!item.infoIssueType.icon && item.infoIssueType.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:20px">{{item.infoIssueType.icon}}</v-icon>
-                        <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.infoIssueType.icon && item.infoIssueType.icon.indexOf('mdi-') < 0" :src="item.infoIssueType.icon" width="20" height="20">
-                    </div>
-                    <div class="item-icon" v-else>
-                        <v-icon class="pt-0" style="font-size:20px">mdi-progress-question</v-icon>
-                    </div>
-                    <div>
-                        <span class="task-hover-poiter">{{item.tmg_name}}</span>
-                        <div class="grey--text">
-                                {{item.tmg_project_key}}-{{item.document_object_id}}
+    <div>
+        <v-card style="box-shadow:none">
+            <v-card-title>
+                {{$t("taskManagement.listIssueComponent")}}
+                <v-spacer></v-spacer>
+                <v-text-field
+                    v-model="search"
+                    append-icon="mdi-magnify"
+                    label="Tìm kiếm"
+                    dense
+                    solo
+                    style="max-width:255px;"
+                    single-line
+                    hide-details
+                    class="sym-small-size sym-style-input"
+                ></v-text-field>
+            </v-card-title>
+            <v-data-table
+                v-if="listIssueProps.length>0"
+                :headers="headers"
+                :items="listIssueProps"
+                :search="search"
+                hide-default-footer
+                class="table-list-font-size"
+            >
+                <template v-slot:[`item.tmg_name`]="{ item }">
+                    <div class="d-flex">
+                        <div class="item-icon" v-if="item.infoIssueType">
+                            <v-icon v-if="!!item.infoIssueType.icon && item.infoIssueType.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:20px">{{item.infoIssueType.icon}}</v-icon>
+                            <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.infoIssueType.icon && item.infoIssueType.icon.indexOf('mdi-') < 0" :src="item.infoIssueType.icon" width="20" height="20">
+                        </div>
+                        <div class="item-icon" v-else>
+                            <v-icon class="pt-0" style="font-size:20px">mdi-progress-question</v-icon>
+                        </div>
+                        <div>
+                            <span @click.prevent.stop="handleShowDetailIssue(item)" class="task-hover-poiter">{{item.tmg_name}}</span>
+                            <div class="grey--text">
+                                    {{item.tmg_project_key}}-{{item.document_object_id}}
+                            </div>
                         </div>
                     </div>
-                </div>
-            </template>
-            <template v-slot:[`item.status`]="{ item }">
-                <span style="padding: 2px 4px; border-radius:3px" :style="{'background':item.infoStatus.color,'color':invertColor(item.infoStatus.color)}">{{item.infoStatus.name}}</span>
-            </template>
-            <template v-slot:[`item.user`]="{ item }">
-                <infoUser class="userInfo fs-13" :userId="item.document_object_user_created_id" :roleInfo="{}" />
-            </template>
-            <template v-slot:[`item.priority`]="{ item }">
-                <div v-if="item.infoPriority">
-                    <v-icon :style="{'color':item.infoPriority.color, 'font-size':'18px'}">{{item.infoPriority.icon}}</v-icon>
-                    <span class="pl-1">{{item.infoPriority.name}}</span>
-                </div>
-            </template>
-            <template v-slot:[`item.assignee`]="{ item }">
-                <infoUser v-if="item.tmg_assignee" class="userInfo fs-13" :userId="item.tmg_assignee" :roleInfo="{}" />
-            </template>
-        
-        </v-data-table>
-    </v-card>    
+                </template>
+                <template v-slot:[`item.status`]="{ item }">
+                    <span style="padding: 2px 4px; border-radius:3px" :style="{'background':item.infoStatus.color,'color':invertColor(item.infoStatus.color)}">{{item.infoStatus.name}}</span>
+                </template>
+                <template v-slot:[`item.user`]="{ item }">
+                    <infoUser class="userInfo fs-13" :userId="item.document_object_user_created_id" :roleInfo="{}" />
+                </template>
+                <template v-slot:[`item.priority`]="{ item }">
+                    <div v-if="item.infoPriority">
+                        <v-icon :style="{'color':item.infoPriority.color, 'font-size':'18px'}">{{item.infoPriority.icon}}</v-icon>
+                        <span class="pl-1">{{item.infoPriority.name}}</span>
+                    </div>
+                </template>
+                <template v-slot:[`item.assignee`]="{ item }">
+                    <infoUser v-if="item.tmg_assignee" class="userInfo fs-13" :userId="item.tmg_assignee" :roleInfo="{}" />
+                </template>
+            
+            </v-data-table>
+        </v-card> 
+        <detail-issue
+            :documentObjectId="documentObjectId"
+            ref="issue"
+        />
+    </div>
 </template>
 
 <script>
 import infoUser from "@/components/common/user/InfoUser";
+import DetailIssue from '@/components/taskManagement/issue/DetailIssue.vue';
 
 export default {
     components:{
-        infoUser
+        infoUser,
+        DetailIssue
     },
     props:{
         listIssueProps: {
@@ -78,6 +86,7 @@ export default {
     data(){
         return{
             search:"",
+            documentObjectId:null,
             headers: [
                 {
                 text: this.$t("taskManagement.table.name"),
@@ -95,6 +104,10 @@ export default {
         }
     },
     methods:{
+        handleShowDetailIssue(issue){
+            this.documentObjectId = issue.document_object_id;
+            this.$refs.issue.show();
+        },
           /**
          * function đảo ngược color đầu vào
          */

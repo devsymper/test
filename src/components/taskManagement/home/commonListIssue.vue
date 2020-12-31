@@ -24,7 +24,7 @@
                             </div>
                             <div class="d-flex justify-space-between ml-2">
                                 <div>
-                                    <span class="task-hover-poiter">{{item.tmg_name}}</span>
+                                    <span  @click.prevent.stop="handleShowDetailIssue(item)" class="task-hover-poiter">{{item.tmg_name}}</span>
                                     <div class="grey--text">
                                             {{item.tmg_project_key}}-{{item.document_object_id}}
                                     </div>
@@ -48,17 +48,24 @@
                 </v-list>
             </div>
         </div>
+        <detail-issue
+            :documentObjectId="documentObjectId"
+            :documentId="documentId"
+            ref="issue"
+        />
     </VuePerfectScrollbar>
 </template>
 
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import infoUser from "@/components/common/user/InfoUser";
+import DetailIssue from '@/components/taskManagement/issue/DetailIssue.vue';
 
 export default {
     components: {
         VuePerfectScrollbar,
-        infoUser
+        infoUser,
+        DetailIssue
     },
     props:{
         listItem:{
@@ -68,7 +75,18 @@ export default {
             }
         },
     },
+    data(){
+        return{
+            documentObjectId:null,
+            documentId:null
+        }
+    },
     methods:{
+        handleShowDetailIssue(issue){
+            this.documentObjectId = issue.document_object_id;
+            this.documentId = issue.documentId;
+            this.$refs.issue.show();
+        },
         invertColor(hex) {
             if (hex.indexOf('#') === 0) {
                 hex = hex.slice(1);
