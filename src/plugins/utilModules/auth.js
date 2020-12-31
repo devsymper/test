@@ -1,4 +1,8 @@
-
+importScripts('indexed-db-sw.js');
+var SYM_IDB_NAME = 'SYMPER-IDB-STORE';
+const STORE_REQUEST_NAME = 'requestToken';
+var symRequestStore = new IndexedDB(SYM_IDB_NAME);
+symRequestStore.open(STORE_REQUEST_NAME);
 /**
  * Các hàm phục vụ cho việc xác thực, lưu trữ dữ liệu đăng nhập cho người dùng
  */
@@ -11,6 +15,7 @@ export const authUtil = {
          *      endUserId: "zzzz"
          * }
          */
+		
 		localStorage.setItem('symper-login-info', JSON.stringify(data));
     },
 
