@@ -1,10 +1,10 @@
 <template>
     <div class="w-100 h-100">
-        <div style="height:40px; font-size:20px" class="font-weight-medium pl-3 pt-2">Home Page</div>
+        <div style="height:40px; font-size:20px" class="font-weight-medium pl-3 pt-2">Trang chủ</div>
         <div v-if="listProjectRecent.length > 0" class="task-recent pl-3 pt-3 fs-13" style="height:200px">
-            <div class="d-flex justify-space-between">Recent projects
+            <div class="d-flex justify-space-between">Dự án gần đây
                 <div class="task-hover-poiter mr-2" @click="handleAllProjects" style="color:#0000aa">
-                    View all projects
+                    Xem tất cả dự án
                 </div>
             </div>
             <VuePerfectScrollbar style="width:100%;height: calc(100% - 20px);">
@@ -29,7 +29,7 @@
                                 </tr>
                                 <tr style="height:25px">
                                     <td class="px-1">
-                                        Open issues
+                                        Tác vụ đang làm
                                     </td>
                                     <td class="float-right px-1">
                                         <span class="open-issue">123</span>
@@ -37,7 +37,7 @@
                                 </tr>
                                 <tr>
                                     <td class="px-1">
-                                        Done issues
+                                        Tác vụ hoàn thành
                                     </td>
                                     <td class="float-right px-1">
                                         <span class="done-issue">13</span>
@@ -64,10 +64,10 @@
         <div class="home-tabs w-100" style="height:calc(100% - 225px)">
             <v-tabs class="w-100 h-100 pl-4 mt-2 fs-13">
                 <v-tab>
-                    <span>Worked on</span>
+                    <span>Tác vụ gần đây</span>
                 </v-tab>
                 <v-tab >
-                    <span>Assigned to me</span>
+                    <span>Tác vụ của tôi</span>
                 </v-tab>
                 <!-- <v-tab >
                     <span>Favorite</span>

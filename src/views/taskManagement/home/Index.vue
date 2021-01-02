@@ -1,14 +1,18 @@
 <template>
-    <index 
-    :recentPojects="recentPojects"
-    :recentIssue="recentIssue"
-    />
+    <div class="wraper-loader">
+        <preloader ref="preLoaderView"/>
+        <Index 
+        :recentPojects="recentPojects"
+        :recentIssue="recentIssue"
+        />
+    </div>
 </template>
 
 <script>
-import index from '@/components/taskManagement/home/Index.vue';
+import Index from '@/components/taskManagement/home/Index.vue';
+import Preloader from '../../../components/common/Preloader.vue';
 export default {
-    components: { index },
+    components: { Index,Preloader },
     computed:{
         recentPojects(){
             return this.$store.state.taskManagement.listProjectRecentAccess;
@@ -16,6 +20,12 @@ export default {
         recentIssue(){
             return this.$store.state.taskManagement.listIssueRecentAccess;
         },
+        staskManagement(){
+            return this.$store.state.taskManagement
+        },
+        endUserInfo(){
+            return this.$store.state.app.endUserInfo
+        }
     },
     data(){
         return{
@@ -24,19 +34,13 @@ export default {
     },
     methods:{
         async getData(){
-            await this.$store.dispatch("taskManagement/getAllCategory");
-            await this.$store.dispatch("taskManagement/getLogProjectAccess",this.$store.state.app.endUserInfo.id);
-            await this.$store.dispatch("taskManagement/getLogIssueRecentAccess",this.$store.state.app.endUserInfo.id);
-            if (!this.$store.state.taskManagement.allIssueType || this.$store.state.taskManagement.allIssueType == 0) {
-                await this.$store.dispatch("taskManagement/getAllIssueType");
-            }
-            if (!this.$store.state.taskManagement.allPriority || this.$store.state.taskManagement.allPriority == 0) {
+            await this.$store.dispatch("taskManagement/getLogProjectAccess",this.endUserInfo.id);
+            await this.$store.dispatch("taskManagement/getLogIssueRecentAccess",this.endUserInfo.id);
+            if (!this.staskManagement.allPriority || this.staskManagement.allPriority == 0) {
                 await this.$store.dispatch("taskManagement/getAllPriority");
             }
-            this.$store.dispatch("taskManagement/getAllDocumentIdsInIssueType");
-            this.$store.dispatch("taskManagement/getAllStatus");
-            this.$store.dispatch("taskManagement/getAllProject");
-
+            await this.$store.dispatch("taskManagement/getAllStatus");
+            this.$refs.preLoaderView.hide();
 
         }
     },  
@@ -47,6 +51,10 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+    .wraper-loader{
+        position: relative;
+        width: inherit;
+        height: inherit;
+    }
 </style>
