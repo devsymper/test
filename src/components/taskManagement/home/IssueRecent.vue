@@ -108,6 +108,7 @@ export default {
     },
     methods:{
         getDateFormNow(time){
+            this.$moment().locale("vi")
             var today = this.$moment().format('YYYY-MM-DD');
             if (time===today) {
                 return this.$t('myItem.today');

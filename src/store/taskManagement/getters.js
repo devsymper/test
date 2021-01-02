@@ -1,3 +1,9 @@
-const messages = state => state.messages;
 
-export { messages };
+import mapObjectTypeAndMenu from "./allMenuItems";
+const userMenuItems = function(state) {
+    return mapObjectTypeAndMenu;
+}
+
+export {
+    userMenuItems
+};

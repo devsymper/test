@@ -74,8 +74,9 @@
 </template>
 
 <script>
-import Detail from '../../../views/document/detail/Detail.vue';
-import Submit from '../../../views/document/submit/Submit.vue';
+import Detail from '@/views/document/detail/Detail.vue';
+import Submit from '@/views/document/submit/Submit.vue';
+import { taskManagementApi } from "@/api/taskManagement.js";
 export default {
   components: { Detail, Submit },
     props:{
@@ -91,13 +92,15 @@ export default {
         }
     },
     watch:{
-        documentObjectId(newVl){
-            this.statusEdit = false;
-            if (newVl) {
-                this.getInfoProject();
-                this.getInfoIssueType();
+        documentObjectId:{
+            deep:true,
+            immediate:true,
+            handler:function(newVl){
+                this.statusEdit = false;
+                if (newVl) {
+                    this.getInfoProject();
+                }
             }
-          
         }
     },
     computed:{
@@ -109,7 +112,10 @@ export default {
         },
         allIssueType(){
             return this.$store.state.taskManagement.allIssueType;
-        }
+        },
+        allIssueTypeInProject(){
+            return this.$store.state.taskManagement.listIssueTypeInProjects[this.infoProject.id];
+        },
     },
     data(){
         return{
@@ -122,20 +128,37 @@ export default {
     },
     methods:{
         getInfoProject(){
+            let self = this;
             if (this.issue) {
-                let project = this.allProject.find(ele => ele.id == this.issue.tmg_project_id);
-                if (project) {
-                    this.infoProject = project;
+                if(this.allProject.length > 0){
+                    let project = this.allProject.find(ele => ele.id == this.issue.tmg_project_id);
+                    if (project) {
+                        this.infoProject = project;
+                        this.getInfoIssueType(this.infoProject.id);          
+                    }
+                }
+                else{
+                    taskManagementApi
+                        .getDetailProject(this.issue.tmg_project_id)
+                        .then(res => {
+                            if (res.status == 200) {
+                                self.infoProject = res.data;
+                                self.getInfoIssueType(self.infoProject.id);
+                            }
+                        })
+                        .catch(err => {
+                        })
+                        .always(() => {});
                 }
             }
-          
         },
-        getInfoIssueType(){
-            if (this.issue) {
-                let issueType = this.allIssueType.find(ele => ele.id == this.issue.tmg_issue_type);
-                if (issueType) {
-                    this.infoIssueType = issueType;
-                }
+        async getInfoIssueType(projectId){
+            if(!this.allIssueTypeInProject){
+                await this.$store.dispatch("taskManagement/getListIssueTypeInProjects", projectId);
+            }
+            let issueType = this.allIssueTypeInProject.find(ele => ele.id == this.issue.tmg_issue_type);
+            if (issueType) {
+                this.infoIssueType = issueType;
             }
         },
         showDetail(){
@@ -159,13 +182,6 @@ export default {
             this.$refs.updateDocument.handlerSubmitDocumentClick();
         },
     },
-    created(){
-        this.getInfoProject();
-        this.getInfoIssueType();
-        if (!this.$store.state.taskManagement.allIssueType || this.$store.state.taskManagement.allIssueType == 0) {
-            this.$store.dispatch("taskManagement/getAllIssueType");
-        }
-    }
 }
 </script>
 

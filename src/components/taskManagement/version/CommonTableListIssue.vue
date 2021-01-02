@@ -42,7 +42,7 @@
                     </div>
                 </template>
                 <template v-slot:[`item.status`]="{ item }">
-                    <span style="padding: 2px 4px; border-radius:3px" :style="{'background':item.infoStatus.color,'color':invertColor(item.infoStatus.color)}">{{item.infoStatus.name}}</span>
+                    <span style="padding: 2px 4px; border-radius:3px" :style="{'background':'#f2f2f2','color':item.infoStatus.color}">{{item.infoStatus.name}}</span>
                 </template>
                 <template v-slot:[`item.user`]="{ item }">
                     <infoUser class="userInfo fs-13" :userId="item.document_object_user_created_id" :roleInfo="{}" />

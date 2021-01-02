@@ -83,7 +83,6 @@
 import _ from 'lodash';
 import { util } from "@/plugins/util.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import { appConfigs } from '../../../configs.js';
 import ProjectPopup from '@/components/taskManagement/project/ProjectPopup';
 import SelectBoard from '@/components/taskManagement/board/SelectBoard';
 export default {
@@ -116,6 +115,12 @@ export default {
         },
         sTaskManagement(){
             return this.$store.state.taskManagement
+        },
+        userMenuItems(){
+            return this.$store.getters['taskManagement/userMenuItems'];
+        },
+        listBoardInProject(){
+            return this.$store.state.taskManagement.listBoardInProject;
         }
     },
     watch:{
@@ -129,7 +134,7 @@ export default {
         },
         '$route' (to, old) {
             if(to.meta.group){
-                this.menu = appConfigs.sideBar[to.meta.group];
+                this.menu = this.userMenuItems[to.meta.group];
             }         
         },
         drawer(vl){
@@ -137,10 +142,16 @@ export default {
                 this.$refs.projectPopupView.hide();
                 this.$refs.SelectBoard.hide();
             }
+        },
+        listBoardInProject(vl){
+            if(vl.length > 0){
+                this.menu.workspace1.items[0].title = vl[0].name;
+                this.menu.workspace1.items[0].subTitle = vl[0].description;
+            }
         }
     },
     mounted(){
-        this.menu = appConfigs.sideBar[this.$route.meta.group];
+        this.menu = this.userMenuItems[this.$route.meta.group];
     },
     
     methods: {

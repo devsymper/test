@@ -9,8 +9,8 @@
             </div>
             <VuePerfectScrollbar style="width:100%;height: calc(100% - 20px);">
                 <div style="width:100%" class="d-flex pt-4">
-                    <div class="item-recent mr-3" v-for="(item) in listProjectRecent" :key="item.id" >
-                        <div class="header-item-recent" style="height:23px;" :style="{'background':randomBackground()}">
+                    <div class="item-recent mr-3" v-for="(item,index) in listProjectRecent" :key="item.id" >
+                        <div class="header-item-recent" style="height:23px;" :style="{'background':getColor(index)}">
                             <div class="icon-project">
                                 <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:24px">{{item.icon}}</v-icon>
                                 <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="24" height="24">
@@ -166,6 +166,12 @@ export default {
         randomBackground(){
             const random = Math.floor(Math.random() * this.colors.length);
             return this.colors[random];
+        },
+        getColor(index){
+            if(index >= this.colors.length){
+                return this.randomBackground()
+            }
+            return this.colors[index];
         }
     }
 
@@ -184,7 +190,11 @@ export default {
     height:135px;
     border: 1px solid #eeeeee;
     border-radius: 5px;
+    transition: all ease-in-out 300ms;
    
+}
+.item-recent:hover{
+    box-shadow: var(--symper-box-shadow);
 }
 .header-item-recent{
     position: relative;

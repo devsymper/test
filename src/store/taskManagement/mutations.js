@@ -237,6 +237,7 @@ const removePriorityToStore = (state, id) => {
 const addToTaskManagementStore = (state, data) =>{
     let key = data.key;
     let value = data.value;
+    console.log(value,'value');
     Vue.set(state, key, value)
 }
 export {

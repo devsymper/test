@@ -55,7 +55,7 @@
                                 'border': (dragging) ? '2px dashed '+ status.color : '2px dashed #f2f2f2'
                             }"
                         >
-                            <p>{{status.name}}-{{status.taskLifeCircleName}}</p>
+                            <p>{{status.name}} - {{status.taskLifeCircleName}}</p>
                             <draggable 
                             :list="status.tasks" 
                             :animation="250" 
@@ -259,6 +259,7 @@ export default {
                 }  
             }
             this.listBoardColumn = columns;
+            this.$emit('loaded-content')
         },
         async getListBoard(){
             let res = await taskManagementApi.getListBoardInProject(this.projectId) ;
@@ -308,20 +309,9 @@ export default {
             
             let breadcrumbs = [
                     {
-                        text: 'Dashboard',
-                        disabled: true,
-                        to: '/report',
-                    },
-                    {
                         text: 'Kanban',
-                        disabled: true,
-                        to: 'breadcrumbs_link_1',
+                        disabled: true
                     },
-                    // {
-                    //     text: this.currentBoard.name,
-                    //     disabled: true,
-                    //     to: 'breadcrumbs_link_2',
-                    // },
                 ]
             this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
             let self = this;

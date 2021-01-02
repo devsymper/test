@@ -51,7 +51,18 @@ export default {
             infoBoard:{},
         }
     },
-    methods:{
+    activated(){
+        let breadcrumbs = [
+                {
+                    text: 'Kanban Board',
+                    disabled: true
+                },
+                {
+                    text: 'Setting board',
+                    disabled: true
+                },
+            ]
+        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
     },
     created(){
         let idBoard=this.$route.params.idBoard;

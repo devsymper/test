@@ -79,12 +79,7 @@ export default {
         let projectId=this.$route.params.id;
         let breadcrumbs = [
                 {
-                    text: 'Dashboard',
-                    disabled: false,
-                    to: '/task-management/projects/'+projectId+'/kanban-board',
-                },
-                {
-                    text: 'Project',
+                    text: 'Project Setting',
                     disabled: true,
                     to: '',
                 },

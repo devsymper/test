@@ -24,7 +24,7 @@
                 <input type="text" placeholder="Search . . ." required>
                 </div>
             </div>
-            <v-icon @click="handleHome" style="font-size:24px;color:#5a6061">mdi-home-account</v-icon>
+            <!-- <v-icon @click="handleHome" style="font-size:24px;color:#5a6061">mdi-home-account</v-icon> -->
             <div class="pr-3" style="position:relative;padding: 3px 0;margin-top:3px">
                 <v-menu offset-y>
                     <template v-slot:activator="{ on, attrs }">
@@ -67,6 +67,7 @@
         </div>
         <popup-issue
             ref="popupIssue"
+            v-if="isLoadedPopup"
         />
         
     </div>
@@ -96,6 +97,7 @@ export default {
                     },
                 },
             ],
+            isLoadedPopup:true
             
         }
     },
@@ -135,7 +137,14 @@ export default {
             return appConfigs.apiDomain.fileManagement+'readFile/user_avatar_' + userId;
         },
         headerBreadcrumbs(){
-            return this.$store.state.taskManagement.headerBreadcrumbs;
+            let breadcrumb = this.$store.state.taskManagement.headerBreadcrumbs;
+            breadcrumb.unshift({
+                    text: 'Home',
+                    disabled: false,
+                    to: '/',
+                })
+                return breadcrumb
+            
         },
         hideSidebar(){
             return this.$store.state.taskManagement.hideSidebar;

@@ -19,24 +19,15 @@ import Header from './layout/Header'
 export default {
   components: { Sidebar,Header },
     name:"TaskManagement",
-    // computed:{
-    //     sTaskManagement() {
-    //         return this.$store.state.taskManagement;
-    //     }
-    // }, 
-    created(){
-        this.$store.dispatch("taskManagement/getAllCategory");
-        this.$store.dispatch("taskManagement/getAllProject");
-    },
     activated(){
-        let breadcrumbs = [
-                {
-                text: 'Dashboard',
-                disabled: false,
-                href: 'breadcrumbs_dashboard',
-                }
-            ]
-        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
+        // let breadcrumbs = [
+        //         {
+        //         text: 'Dashboard',
+        //         disabled: false,
+        //         href: 'breadcrumbs_dashboard',
+        //         }
+        //     ]
+        // this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
     },
     methods:{
         afterToggleSideBar(vl){

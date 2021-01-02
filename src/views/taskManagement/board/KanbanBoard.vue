@@ -3,11 +3,9 @@
         <preloader ref="preLoaderView"/>
         <kanban-board 
         ref="boardView"
-        :key="projectId+board"
+        @loaded-content="afterLoadContent"
     />
     </div>
-   
-
 </template>
 
 <script>
@@ -21,20 +19,10 @@ export default {
         Preloader
     },
  
-    data() {
-        return {
-            projectId:null,
-            board:0,
-           
-        };
-    },
-   
     methods:{
-  
-    },
-    created(){
-        let self = this;
-        self.projectId = this.$route.params.id;
+        afterLoadContent(){
+            this.$refs.preLoaderView.hide();
+        }
     },
     
 };

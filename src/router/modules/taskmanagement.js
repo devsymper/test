@@ -41,7 +41,7 @@ export default [
             {
                 path: "projects/:id/kanban-board/settings/:idBoard",
                 name: "kanbanBoardSetting",
-                meta:{group:'home'},
+                meta:{group:'boardSetting'},
                 components:{
                     TaskManagement: () => import ('../../views/taskManagement/board/SettingBoard.vue')
                 }
@@ -159,7 +159,7 @@ export default [
             },
             // priority
             {
-                path: "priorities",
+                path: "projects/:id/priorities",
                 name: "priority",
                 components:{
                     TaskManagement: () => import ('../../views/taskManagement/priority/List.vue')
