@@ -200,6 +200,28 @@ export default class BasicControl extends Control {
                 } else if (thisObj.type == 'checkbox') {
                     valueChange = $(e.target).prop("checked");
                 }
+                if(thisObj.type == 'user'){
+                    return false;
+                }
+                if(thisObj.type == 'number'){
+                    valueChange = valueChange.replace(/=/g,"");
+                    valueChange = eval(valueChange);
+                    if(!/^[-0-9,.]+$/.test(valueChange)){
+                        return false;
+                    }
+                }
+                if(thisObj.type == 'date'){
+                    valueChange = this.$moment(valueChange,'DD-MM-YYYY').format('YYYY-MM-DD');
+                }
+                // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
+                if(thisObj.isRequiredControl()){
+                    if(!valueChange){
+                        thisObj.renderValidateIcon('Không được bỏ trống trường thông tin '+thisObj.title, 'Require')
+                    }
+                    else{
+                        thisObj.removeValidateIcon('Require');
+                    }
+                }
                 thisObj.value = valueChange;
                 SYMPER_APP.$evtBus.$emit('document-submit-input-change', thisObj);
             })
@@ -224,15 +246,6 @@ export default class BasicControl extends Control {
                     }
                     thisObj.traceControl();
                 }
-                if (thisObj.type == 'user') {
-                    e.curTarget = e.target
-                    SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
-                }
-                // if (thisObj.type == 'percent') {
-                //     if (e.target.value > 100) {
-                //         $(e.target).val(100)
-                //     }
-                // }
                 if (thisObj.type == 'department') {
                     e['controlName'] = thisObj.name;
                     SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
@@ -318,7 +331,12 @@ export default class BasicControl extends Control {
             this.setFileControlValue(value);
         }
         else{
-            this.value = value;
+            if(value.inputDislay && value.inputValue){
+                this.value = value.inputValue;
+            }
+            else{
+                this.value = value;
+            }
             if (this.inTable === false) {
                 if (this.type == 'label') {
                     this.ele.text(value);
@@ -326,6 +344,7 @@ export default class BasicControl extends Control {
                     this.ele.val(value);
                 } else if (this.type == 'date') {
                     this.ele.val(SYMPER_APP.$moment(value).format(this.formatDate));
+                    this.value = SYMPER_APP.$moment(value).format('YYYY-MM-DD');
                 } else if (this.type == 'checkbox') {
                     if (value)
                         this.ele.attr('checked', 'checked');
@@ -344,14 +363,19 @@ export default class BasicControl extends Control {
                     this.setImageControlValue(value)
                 }        
                 else {
-                    this.ele.val(value);
+                    if(value.inputDislay){
+                        this.ele.val(value.inputDislay);
+                    }
+                    else{
+                        this.ele.val(value);
+                    }
                 }
             }
             if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
                 this.defaultValue = value;
             }
         }
-        
+        console.log(this.value,'asasas');
     }
     getValue() {
         return this.value;
@@ -402,6 +426,9 @@ export default class BasicControl extends Control {
         if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
             this.defaultValue = value;
         }
+    }
+    getAutocompleteKeyValue(){
+        return this.controlProperties.itemValue.value
     }
     setImageControlValue(value){
         this.ele.empty();

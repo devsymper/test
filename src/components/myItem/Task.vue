@@ -236,8 +236,10 @@ export default {
                             this.workflowInfo.documentObjectTaskId = this.taskInfo.action.parameter.taskId;
                             // cần activityId  của task truyền vào nữa 
                             let workflowVariable = {};
+                            this.taskVarsMap = {};
                             for(let key in varsMap){
                                 workflowVariable['workflow_'+key] = varsMap[key].value;
+                                this.taskVarsMap[key] = varsMap[key].value;
                             }
                             this.workflowVariable = null;
                             this.workflowVariable = workflowVariable;
@@ -272,6 +274,9 @@ export default {
         }
     },
     methods: {
+        getVarsMap(){
+            return this.taskVarsMap;
+        },
         onDocumentUpdateSuccess(){
             this.showDetailDocument = false;
             setTimeout((self) => {
