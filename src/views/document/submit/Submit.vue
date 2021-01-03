@@ -2427,7 +2427,7 @@ export default {
         
         handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType,from=false){
             let dataInput = this.getDataInputFormulas(formulasInstance);
-            if(checkDataInputChange(this.keyInstance, dataInput)){
+            // if(checkDataInputChange(this.keyInstance, dataInput)){
                 let control = getControlInstanceFromStore(this.keyInstance,controlName);
                 if(control.inTable != false){
                     let tableInstance = getControlInstanceFromStore(this.keyInstance,control.inTable);
@@ -2435,10 +2435,13 @@ export default {
                 
                     tableInstance.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataIn,formulasInstance);
                 }
-                formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
-                    this.handleAfterRunFormulas(rs,controlId,controlName,formulasType,from)
-                });
-            }
+                else{
+                    formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
+                        this.handleAfterRunFormulas(rs,controlId,controlName,formulasType,from)
+                    });
+                }
+                
+            // }
         },
         /**
          * Hàm lấy dữ liệu của các control trong store để chuân bị cho việc run formulas
