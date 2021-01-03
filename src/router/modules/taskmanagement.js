@@ -37,7 +37,14 @@ export default [
                     TaskManagement: () => import ('../../views/taskManagement/board/KanbanBoard.vue'),
                 }
             },
-          
+            {
+                path: "projects/:id/backlog",
+                name: "Backlog",
+                meta:{group:'home'},
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/board/Backlog.vue'),
+                }
+            },
             {
                 path: "projects/:id/kanban-board/settings/:idBoard",
                 name: "kanbanBoardSetting",

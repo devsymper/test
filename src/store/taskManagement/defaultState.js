@@ -16,6 +16,7 @@ const defaultState = {
     listActionPack:[],
     headerBreadcrumbs:[],
     currentProject:{},
+    currentBoard:{},
     listBoardInProject:[],
     listComponentInProject:[],
     listVersionInProject:[],

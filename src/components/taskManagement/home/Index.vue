@@ -173,6 +173,11 @@ export default {
             }
             return this.colors[index];
         }
+    },
+    created(){
+        if (!this.$store.state.taskManagement.listDocumentIdsInIssueType || this.$store.state.taskManagement.listDocumentIdsInIssueType.length == 0) {
+            this.$store.dispatch("taskManagement/getAllDocumentIdsInIssueType");
+        }
     }
 
 }

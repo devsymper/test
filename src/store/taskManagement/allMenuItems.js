@@ -19,7 +19,7 @@ export default {
                 {
                     title:"Backlog",
                     icon: 'mdi-view-carousel-outline',
-                    url:"/task-management/projects/:id/kanban-board"
+                    url:"/task-management/projects/:id/backlog"
                 },
                 {
                     title:"Component",

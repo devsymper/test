@@ -58,7 +58,7 @@
                             <p>{{status.name}} - {{status.taskLifeCircleName}}</p>
                             <draggable 
                             :list="status.tasks" 
-                            :animation="250" 
+                            :animation="250"
                             @start="dragging=true" 
                             @end="dragging=false"
                             @change="handleChange($event,status)"
@@ -214,6 +214,7 @@ export default {
         
         setBoard(board){
             this.currentBoard = board;
+            this.$store.commit("taskManagement/setCurrentBoard",board);
         },
         /**
          * tính toán chiều rộng cột kanban board
@@ -246,9 +247,9 @@ export default {
                     let statusRoleId = this.listStatusColumn[i].statusRoleId;
                     let item = this.listStatus.find(ele => ele.statusRoleId == statusRoleId);
                     if (item) {
-                        let statusId = item.statusId;
+                       // let statusId = item.statusId;
                         let taskInStatus = allTask.filter(task=>{
-                            return task.tmg_status_id == statusId;
+                            return task.tmg_status_role_id == statusRoleId;
                         })
                         item['tasks'] = taskInStatus;
                         let column = columns.find(ele => ele.id == idColumn);
@@ -270,8 +271,10 @@ export default {
         },
         async getDataForBoard(){
             let allBoard = this.listBoard;
+            let self = this;
             if (allBoard.length>0) {
                 this.currentBoard = allBoard[0];  
+                self.$store.commit("taskManagement/setCurrentBoard",allBoard[0]);
             }
             let idBoard = this.currentBoard.id;
 
