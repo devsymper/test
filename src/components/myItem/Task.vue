@@ -248,7 +248,14 @@ export default {
                                 if(!this.taskInfo.action.parameter.documentObjectId){
                                     
                                     let approvaledElId = this.taskInfo.targetElement;
-                                    let docObjId = varsMap[approvaledElId+'_document_object_id'];
+                                    let docObjId = 0;
+                                    if(approvaledElId == 'DOC_INSTANCE_FROM_STARTING_WORKFLOW'){
+                                        // docObjId = varsMap['doc_INSTANCE_FROM_STARTING_WORKFLOW'];
+                                        docObjId = varsMap['docInstanceFromStartingWorkflow'];
+                                        docObjId = docObjId ? docObjId : 0;
+                                    }else{
+                                        docObjId = varsMap[approvaledElId+'_document_object_id'];
+                                    }
                                     this.docObjInfo.docObjId = docObjId.value;
                                 }else{
                                     this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
