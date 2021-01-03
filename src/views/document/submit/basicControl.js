@@ -805,7 +805,12 @@ export default class BasicControl extends Control {
             for (let index = 0; index < data.length; index++) {
                 let value = data[index];
                 if(value){
-                    newData.push(SYMPER_APP.$moment(value,dateFormat).format('YYYY-MM-DD'))
+                    if(SYMPER_APP.$moment(data, 'YYYY-MM-DD', true).isValid()){
+                        newData.push(data);
+                    }
+                    else{
+                        newData.push(SYMPER_APP.$moment(value,dateFormat).format('YYYY-MM-DD'))
+                    }
                 }
                 else{
                     newData.push("");
@@ -815,6 +820,9 @@ export default class BasicControl extends Control {
             return newData;
         }
         else{
+            if(SYMPER_APP.$moment(data, 'YYYY-MM-DD', true).isValid()){
+                return data;
+            }
             return SYMPER_APP.$moment(data,dateFormat).format('YYYY-MM-DD')
         }
     }
