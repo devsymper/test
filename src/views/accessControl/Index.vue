@@ -31,11 +31,11 @@
 </template>
 
 <script>
-import ListActionPack from './lists/ListActionPack'
-import ListPermission from './lists/ListPermission'
-import ListUserRole from './lists/ListUserRole'
+import ListActionPack from './actionPack/ListActionPack'
+import ListPermission from './permission/ListPermission'
+import ListUserRole from './role/ListUserRole'
 import { util } from "@/plugins/util.js";
-import ListUserRoleOrgchart from './lists/ListUserRoleOrgchart'
+import ListUserRoleOrgchart from './role/ListUserRoleOrgchart'
 export default {
 	components:{
 		ListActionPack,

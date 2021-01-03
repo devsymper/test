@@ -14,7 +14,6 @@
             :customAPIResult="customAPIResult"
             :commonActionProps="commonActionProps"
 			:showExportButton="false"
-            @row-selected="onRowSelected"
         > 
             <template slot="right-panel-content" slot-scope="{itemData}">
                 <PermissionForm
@@ -34,9 +33,9 @@ import UpdatePermission from "@/views/permissions/Update";
 import Api from "@/api/api.js";
 import accountApi from "@/api/account";
 import { appConfigs } from "@/configs";
-import { permissionApi } from '@/api/permissionPack';
 import PermissionForm from "@/components/permission/PermissionForm.vue";
 import { util } from '@/plugins/util';
+import PermissionWorker from 'worker-loader!@/worker/accessControl/Permission.Worker.js';
 
 let defaultItemData = {
     id: '',
@@ -58,13 +57,14 @@ export default {
         }
     },
     created(){
-        this.$store.dispatch("app/getAllBA");
-        // this.getUserName();
+		this.$store.dispatch("app/getAllBA");
+		this.permissionWorker = new PermissionWorker()
     },
     data: function() {
         let self = this;
         return {
-            listUser:[],
+			listUser:[],
+			permissionWorker: null,
             nameUser:[],
             commonActionProps: {
                 "module": "permission_pack",
@@ -117,7 +117,8 @@ export default {
                                     title: "userUpdate",
                                     type: "text"
                                 }
-                            ]
+							],
+							total: res.data.length
                         };
                     } else {
                         this.$snotifyError(res, "Can not get permissions list");
@@ -149,14 +150,13 @@ export default {
                         let ids = [];
                         for(let item of rows){
                             ids.push(item.id);
-                        }
-                        try {
-                            let res = await permissionApi.deletePermissionPack(ids);
-                                self.$snotifySuccess("Deleted "+ids.length+' items');
-                        } catch (error) {
-                            self.$snotifyError(error, "Can not delete selected items");
-                        }
-                        refreshList();
+						}
+						this.permissionWorker.postMessage({
+							action: "deletePermission",
+							data:{
+								ids: ids
+							}
+						})
                     }
                 }
             },
@@ -165,6 +165,31 @@ export default {
     },
     mounted() {
 		this.tableHeight = util.getComponentSize(this).h;
+		let self = this
+		this.permissionWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'deletePermission':
+					if(data.dataAfter == 'success'){
+						self.$snotifySuccess("Xóa thành công")
+					}else{
+						self.$snotifyError("Có lỗi xảy ra")
+					}
+					self.$refs.listPermission.refreshList();
+					break;
+                case 'getActionPackOfPermission':
+					let listActionPacks = data.dataAfter;
+					let mapActionPack = self.$store.state.permission.allActionPack;
+					self.currentItemData.actionPacks = listActionPacks.reduce((arr, el) => {
+						arr.push(mapActionPack[el.actionPackId]);
+						return arr;
+					}, []);
+					break;
+               
+                default:
+                    break;
+            }
+        });
     },
     methods: {
         closeForm(){
@@ -176,24 +201,12 @@ export default {
                 self.$set(self.currentItemData, key, pack[key]);
             }
 			self.actionOnItem = view == false ? 'update' : 'detail';
-            let res = await permissionApi.getActionPackOfPermission(pack.id);
-            
-            if(res.status == 200){
-                let listActionPacks = res.data;
-                let mapActionPack = self.$store.state.permission.allActionPack;
-                self.currentItemData.actionPacks = listActionPacks.reduce((arr, el) => {
-                    arr.push(mapActionPack[el.actionPackId]);
-                    return arr;
-                }, []);
-            }else{
-                self.$snotifyError(res, "Can not get list action pack of permission "+pack.name);
-            }
-        },
-        onRowSelected(row){
-            if(this.$refs.listPermission.alwaysShowActionPanel){
-                this.$refs.listPermission.openactionPanel();
-                this.updatePermissionData(row);
-            }
+			this.permissionWorker.postMessage({
+				action: 'getActionPackOfPermission',
+				data:{
+					packId: pack.id
+				}
+			})
         },
         setNameForUserId(listData){
             let list = this.$store.state.app.allBA;
@@ -210,30 +223,6 @@ export default {
                 }
             }
         },
-        async getDetailSystemRole(id){
-            let res = await systemRoleApi.detail(id);
-            if(res.status == 200){
-                for(let key in res.data){
-                    this.$set(this.currentItemData, key, res.data[key]);
-                }
-            }else{
-                this.$snotifyError(res, "Can not get item detail");
-            }
-
-            res = await permissionApi.getPermissionOfRole('system:'+id);
-            if(res.status == 200){
-                let mapIdToPermission = this.$store.state.permission.allPermissionPack;
-                let permissions = res.data.reduce((arr, el) => {
-                    if(mapIdToPermission[el.permissionPackId]){
-                        arr.push(mapIdToPermission[el.permissionPackId]);
-                    }
-                    return arr;
-                }, []);
-                this.$set(this.currentItemData, 'permissions', permissions);
-            }else{
-                this.$snotifyError(res, "Can not get permission of role");
-            }
-        },
         handleSavedItem(){
             this.$refs.listPermission.refreshList();
             this.$refs.listPermission.actionPanel = false
@@ -243,14 +232,6 @@ export default {
             this.currentItemData = null;
             this.currentItemData = util.cloneDeep(defaultItemData);
         },
-        calcContainerHeight() {
-            this.containerHeight = util.getComponentSize(this).h;
-        },
-        applyDataToForm(row){
-            for(let key in row){
-                this.$set(this.currentItemData, key, row[key]);
-            }
-        }
     }
 };
 </script>

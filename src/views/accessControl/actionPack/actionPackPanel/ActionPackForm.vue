@@ -55,9 +55,9 @@
 				
 			</div>
 			<div style="width: 600px !important">
-				<div v-if="objectActive == 'application'" class="d-flex flex-column">
+				<div v-if="objectActive == 'application_definition' || objectActive == 'application'" class="d-flex flex-column">
 					<ApplicationDefinitionForm 
-						v-if="objectActive == 'application'"
+						v-if="objectActive == 'application_definition' || objectActive == 'application'"
 						@list-item-selected="handleListAppSelected"
 						:listApp="listAppSelected"
 						:commonTableSetting="commonTableSetting"
@@ -105,6 +105,12 @@
 						</hot-table>
 					
 					</div>
+					  <!-- <DocumentInstanceOperation 
+						@change-data="handleChangeDocumentInstanceOperation"
+						v-if="objectActive == 'document_definition'"
+						:tableDataDefinition="multipleLevelObjects.document_definition"
+						:commonTableSetting="commonTableSetting"
+						:tableHeight="tableHeight - 32"/> -->
 				</div>
 			</div>
 		</div>	
@@ -148,7 +154,8 @@ import ConfigActionPackOrgchart from "./ConfigActionPackOrgchart.vue" ;
 import ObjectInApplication from "./ObjectInApplication";
 import {uiConfigApi} from "@/api/uiConfig";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import ApplicationDefinitionForm from "./../helpers/ApplicationDefinitionForm";
+import ActionPackWorker from 'worker-loader!@/worker/accessControl/ActionPack.Worker.js';
+import ApplicationDefinitionForm from "@/views/accessControl/actionPack/helpers/ApplicationDefinitionForm";
 import _debounce from "lodash/debounce";
 
 let defaultTabConfig = {
@@ -169,17 +176,47 @@ let commonTableSetting = {
     manualColumnMove: true,
     manualColumnResize: true,
     manualRowResize: true,
-    stretchH: "all",
+	stretchH: "all",
+	contextMenu: ['remove_row'],
     rowHeaders: true,
     licenseKey: "non-commercial-and-evaluation",
 }
 export default {
     mounted(){
-        this.reCaculateTableHeight();
+		let self = this
+		this.reCaculateTableHeight();
+		this.actionPackWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getAppInActionPack':
+					self.listAppSelected = data.dataAfter
+					break;
+                case 'updateActionPack':
+					if(data.dataAfter == 'success'){
+						self.$emit('close-form')
+						self.$snotifySuccess("Chỉnh sửa thành công")
+					}else{
+						self.$snotifyError("Có lỗi xảy ra")
+					}
+					break;
+                case 'createActionPack':
+					if(data.dataAfter == 'success'){
+						self.$emit('close-form')
+						self.$snotifySuccess("Thêm mới thành công")
+					}else{
+						self.$snotifyError("Có lỗi xảy ra")
+					}
+					break;
+               
+                default:
+                    break;
+            }
+        });
     },
     created(){
 		this.genAllInputForFormTpl();
 		this.getObjectTypeSelections()
+		this.actionPackWorker = new ActionPackWorker()
     },
     methods: { 
         closeActionPackForm(){
@@ -188,16 +225,14 @@ export default {
 		getAppInActionPack(){
 			let self = this
 			let str = 'action-pack:'+ this.itemData.id
-			uiConfigApi.getUiConfig(str).then(res=>{
-				if(res.status == 200){
-					let arr = JSON.parse(res.data.detail)
-					self.listAppSelected = arr
-				}else{
-					self.listAppSelected = []
-				}
-			}).catch(err=>{
-
-			})
+			if(this.actionPackWorker){
+				this.actionPackWorker.postMessage({
+					action: 'getAppInActionPack',
+					data:{
+						str: str
+					}
+				})
+			}
 		},
         handlePermissionSelected(data){
             this.permissionDepartment = data           
@@ -296,10 +331,6 @@ export default {
             }
             this.caculateTableDataForAllInstancesDocDef(initDocObjDataTable);
         },
-        objectTypeToDocumentDefinition(){
-            // this.itemData.objectType = 'document_definition'
-            // this.objectActive = 'document_definition'
-        },
         getTableDataFromOperations(operations){
             let mapActionAndObjectTypes = this.mapObjectTypesAndAction;
             let allResource = this.$store.state.actionPack.allResource;
@@ -315,7 +346,6 @@ export default {
              */
             let mapActionAndObjects = {};
             let mapActionForAllObjects = {};
-
 
             /**
              * Schema cho row mới của từng object type, có dạng:
@@ -398,7 +428,6 @@ export default {
 			let actionPackId = this.itemData.id;
             let initOperations = {}; // các operation mà có action rỗng để đảm bảo luôn hiển thị các object của app ngay cả khi các object này chưa có quyền
             let objectTypeDataTable = {};
-            // let allOperation = await permissionApi.
 
             if(Number(appId) > 0){
                 let objsOfApp = this.multipleLevelObjects.application_definition;
@@ -789,33 +818,31 @@ export default {
             let res;
             try {
                 if(this.action == 'update'){
-					res = await permissionApi.updateActionPack(this.itemData.id, dataToSave);
-					let dataUi = {
-						widgetIdentifier: 'action-pack:'+this.itemData.id,
-						detail: JSON.stringify(this.listAppSelected)
-					}
-					uiConfigApi.saveUiConfig(dataUi).then(res=>{
-					})
-                    if(res.status == '200'){
-						this.$snotifySuccess("Updated item successfully");
-						this.$emit('close-form')
-                    }else{
-                        this.$snotifyError(res, "Error when update item");
-                    }
-                }else if(this.action == 'create'){
-					res = await permissionApi.createActionPack(dataToSave);
-                    if(res.status == '200'){
-						let dataUi = {
-							widgetIdentifier: 'action-pack:'+res.data.id,
-							detail: JSON.stringify(this.listAppSelected)
+					this.actionPackWorker.postMessage({
+						action: 'updateActionPack',
+						data:{
+							dataUi:{
+								widgetIdentifier: 'action-pack:'+this.itemData.id,
+								detail: JSON.stringify(this.listAppSelected)
+							},
+							dataActionPack:{
+								id: this.itemData.id,
+								dataToSave: dataToSave
+							}
 						}
-						uiConfigApi.saveUiConfig(dataUi).then(res=>{
-						})
-						this.$snotifySuccess("Create item successfully");
-						this.$emit('close-form')
-                    }else{
-                        this.$snotifyError(res, "Error when create item");
-                    }
+					})
+                }else if(this.action == 'create'){
+					this.actionPackWorker.postMessage({
+						action: 'createActionPack',
+						data:{
+							dataUi:{
+								detail: JSON.stringify(this.listAppSelected)
+							},
+							dataActionPack:{
+								dataToSave: dataToSave
+							}
+						}
+					})
                 }
                 this.$emit('saved-item-data',res);
             } catch (error) {
@@ -932,6 +959,7 @@ export default {
     data(){
         let self = this;
         return {
+			actionPackWorker: null,
 			listAppSelected:[],
 			listObject:[],
 			objectActive:"document_definition",
@@ -1039,7 +1067,10 @@ export default {
     computed: {
         mapObjectTypesAndAction() {
             return this.$store.getters["actionPack/listActionByObjectType"];
-        },
+		},
+		htItemWrapper(){
+			return document.getElementsByClassName('htItemWrapper')
+		},
         listAction() {
             return this.$store.getters['actionPack/listActionByObjectType'];
         },
@@ -1065,7 +1096,13 @@ export default {
 				this.objectActive = "document_definition"
             }
 		},
-		
+		htItemWrapper:{
+			deep: true,
+            immediate: true,
+            handler(vl){
+				$(document.getElementsByClassName('htItemWrapper')).text("Xóa Dòng")
+            }
+		},
         listAction: {
             immediate: true,
             deep: true,

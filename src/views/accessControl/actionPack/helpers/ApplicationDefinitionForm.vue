@@ -33,7 +33,6 @@
 import OrgchartSelector from "./OrgchartSelector"
 import ListItemSelector from "./ListItemSelector.vue"
 import {accessControlApi} from '@/api/accessControl'
-import {appManagementApi} from '@/api/AppManagement.js'
 import {uiConfigApi} from "@/api/uiConfig";
 import ObjectInApplication from "./../actionPackPanel/ObjectInApplication"
 export default {
