@@ -104,7 +104,6 @@ export default {
             data.documentIds=this.documentIds;
             data.userId=this.$store.state.app.endUserInfo.id;
             this.$store.dispatch("taskManagement/getIssueAssignRecent",data);
-            this.dispa
         },
         getDateFormNow(time){
             var today = this.$moment().format('YYYY-MM-DD');

@@ -77,6 +77,10 @@ const setListDocumentConfigFieldIssue = (state, listDocumentConfigFieldIssue) =>
 const setCurrentProject = (state, currentProject) => {
     Vue.set(state, 'currentProject', currentProject);
 }
+
+const setCurrentBoard = (state, currentBoard) => {
+    Vue.set(state, 'currentBoard', currentBoard);
+}
 const setInfoVersionCurrent = (state, infoVersionCurrent) => {
     Vue.set(state, 'infoVersionCurrent', infoVersionCurrent);
 }
@@ -280,6 +284,7 @@ export {
     setAllDocumentIdsInIssueType,
     setIssueAssignRecent,
     setListDocumentIdsInProject,
-    setAllIssueType
+    setAllIssueType,
+    setCurrentBoard,
 
 };
