@@ -31,7 +31,7 @@ export default {
 <style scoped>
     .wraper-loader{
         position: relative;
-        width: inherit;
-        height: inherit;
+        width: 100%;
+        height: 100%;
     }
 </style>
