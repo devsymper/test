@@ -378,7 +378,7 @@ export default {
                 this.filterConfigs = null;
                 this.filterConfigs = rsl;
             },
-        }
+		},
     },
     computed: {
         // kiểu dữ liệu của cột hiện tại đang được filter

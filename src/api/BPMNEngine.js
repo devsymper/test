@@ -8,12 +8,6 @@ import {
 
 var bpmneApi = new Api(appConfigs.apiDomain.bpmne.models); // Khởi tạo một đối tượng api với domain của service BPMNE
 
-// Phục vụ cho việc test
-let fullCookieTest = "abc=xyz;FLOWABLE_REMEMBER_ME=YWNLNEUwTHlxbGNoQThEcUV4RTlpQSUzRCUzRDpsZUJRVTlTOSUyQnF5YzBCblNFZzdLQ3clM0QlM0Q";
-fullCookieTest.split(';').forEach((el) => {
-    document.cookie = el.trim();
-});
-
 let testHeader = {
     Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0',
     "Content-Type": "application/json",

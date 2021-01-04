@@ -176,10 +176,7 @@ const checkCanBeBind = function(instance, fieldName) {
  * @param {*} dataInput dữ liệu đầu vào của công thức đang check
  * @param {*} rowIndex index của dòng trong bảng
  */
-const checkDataInputChange = function(instance, dataInput){
-    let sDocumentSubmit = sDocument.state.submit[instance];
-    let rootChangeFieldName = sDocumentSubmit.rootChangeFieldName;
-    let dataInputBeforeChange = sDocumentSubmit.dataInputBeforeChange;
+export const checkDataInputChange = function(rootChangeFieldName, dataInputBeforeChange, dataInput){
     if(Object.keys(dataInput).length == 0){
         return true;
     }
@@ -253,7 +250,6 @@ export {
     markBinedField,
     checkCanBeBind,
     resetImpactedFieldsList,
-    checkDataInputChange,
     setDataInputBeforeChange
 
 }
