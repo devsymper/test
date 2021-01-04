@@ -33,7 +33,7 @@ import ListItems from "@/components/common/ListItems.vue";
 
 import SystemRoleForm from "@/components/systemRole/SystemRoleForm.vue";
 import { permissionPackageApi } from '@/api/PermissionPackage';
-import { permissionApi } from '@/api/permissionPack';
+import RoleWorker from 'worker-loader!@/worker/accessControl/Role.Worker.js';
 export default {
     data() {
         let self = this;
@@ -42,7 +42,8 @@ export default {
                 "module": "role",
                 "resource": "role",
                 "scope": "role",
-            },
+			},
+			roleWorker: null,
             containerHeight: 300,
             actionOnItem: 'create',
             getListUrl: appConfigs.apiDomain.systemRole+'system-role',
@@ -69,18 +70,13 @@ export default {
                         let ids = [];
                         for(let item of rows){
                             ids.push(item.id);
-                        }
-                        try {
-                            let res = await systemRoleApi.delete(ids);
-                            if(res.status == 200){
-                                self.$snotifySuccess("Deleted "+ids.length+' items');
-                            }else{
-                                self.$snotifyError(res, "Can not delete selected items");
-                            }
-                        } catch (error) {
-                            self.$snotifyError(error, "Can not delete selected items");
-                        }
-                        refreshList();
+						}
+						self.roleWorker.postMessage({
+							action: "deleteRole",
+							data:{
+								ids: ids
+							}
+						})
                     }
                 },
                 detail: {
@@ -97,34 +93,60 @@ export default {
         };
     },
     mounted() {
-        this.calcContainerHeight();
+		this.calcContainerHeight();
+		let self = this
+		this.roleWorker = new RoleWorker()
+		this.roleWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getDetailSystemRole':
+					self.handlerGetDetailSystemRole(data.dataAfter)
+					break;
+                case 'deleteRole':
+					if(data.dataAfter == 'success'){
+						self.$snotifySuccess("Xóa thành công")
+					}else{
+						self.$snotifyError("Có lỗi xảy ra")
+					}
+					self.$refs.listSystemRole.refreshList()
+					break;
+                default:
+                    break;
+            }
+        });
     },
-    created() {},
+    created() {
+	},
     watch: {},
     methods: {
-        async getDetailSystemRole(id){
-            let res = await systemRoleApi.detail(id);
-            if(res.status == 200){
-                for(let key in res.data){
-                    this.$set(this.currentItemData, key, res.data[key]);
-                }
-            }else{
-                this.$snotifyError(res, "Can not get item detail");
-            }
-
-            res = await permissionApi.getPermissionOfRole('system:'+id);
-            if(res.status == 200){
+		handlerGetDetailSystemRole(data){
+			let self = this
+			if(data.dataSystemRole.status == 200){
+				for(let key in data.dataSystemRole.data){
+					self.$set(self.currentItemData, key, data.dataSystemRole.data[key]);
+				}
+			}else{
+				self.$snotifyError("Đã xảy ra lỗi")
+			}
+			if(data.dataPermission.status == 200){
                 let mapIdToPermission = this.$store.state.permission.allPermissionPack;
-                let permissions = res.data.reduce((arr, el) => {
+                let permissions = data.dataPermission.data.reduce((arr, el) => {
                     if(mapIdToPermission[el.permissionPackId]){
                         arr.push(mapIdToPermission[el.permissionPackId]);
                     }
                     return arr;
                 }, []);
-                this.$set(this.currentItemData, 'permissions', permissions);
-            }else{
-                this.$snotifyError(res, "Can not get permission of role");
-            }
+				this.$set(this.currentItemData, 'permissions', permissions);
+			}	
+		},
+        async getDetailSystemRole(id){
+			this.roleWorker.postMessage({
+				action: 'getDetailSystemRole',
+				data:{
+					id: id,
+					getPermissionOfRole: 'system:'+id
+				}
+			})
         },
         handleSavedItem(){
             this.$refs.listSystemRole.refreshList();

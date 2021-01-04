@@ -7,41 +7,24 @@
 		>
 			<v-card>
 			<v-card-title class="fs-15">
-				Đồng bộ dữ liệu về domain hiện tại
+				Update version
 			</v-card-title>
 			<v-card-text>
 				<div class="content-deploy-dialog d-flex flex-column ml-2 fs-13">
 					<div class="fs-13 mb-2 mt-2 ">
-						Đồng bộ dữ liện qua domain
+						Chọn môi trường bạn muốn update version
 					</div>
 					<v-autocomplete
 						v-model="envId"
 						:items="allEnv"
-						item-text="frontendDomain"
+						item-text="name"
 						item-value="id"
 						solo-inverted
 						class="fs-13"
 					></v-autocomplete>
-					<div class="mt-1">
-						Các dữ liệu liên quan sẽ được đồng bộ cùng dữ liệu chính 
-					</div>
-
 					<div class="text-wrap">
-						Nhấn OK để  đồng bộ dữ liệu 
+						Nhấn Đồng ý  để update version này
 					</div>
-
-					<v-checkbox
-						v-model="override"
-						label="Ghi đè dữ liệu nếu có trùng lặp"
-						value="1"
-						class="fs-13"
-					></v-checkbox>
-					<v-checkbox
-						v-model="override"
-						class="fs-13"
-						label="CHỉ đồng bộ dữ liệu không bị trùng lặp"
-						value="0"
-					></v-checkbox>
 				</div>
 
 			</v-card-text>
@@ -57,9 +40,9 @@
 					<v-btn
 					color="green darken-1"
 					text
-					@click="syncData"
+					@click="updateVersion"
 				>
-					Đồng bộ
+					Đồng ý 
 				</v-btn>
 			</v-card-actions>
 			</v-card>
@@ -69,43 +52,31 @@
 
 <script>
 import EnvironmentWorker from 'worker-loader!@/worker/environment/Environment.Worker.js';
-import {environmentManagementApi} from '@/api/EnvironmentManagement'
 export default {
 	props:{
 		showDialog:{
 			type: Boolean,
 			default: false,
-		},
-		listItemSelected:{
-			type: Object,
-			default(){
-				return {
-					
-				}
-			}
-		},
-		currentObjectType:{
-			type: String
-		},
+		}
 	},
 	data(){
 		return{
-			override:null,
+			selected:"",
 			environmentWorker: null,
 			envId:""
 		}
 	},
 	created(){
-		this.environmentWorker = new EnvironmentWorker()
 		this.$store.dispatch('environmentManagement/getAllEnvirontment')
 	},
 	mounted(){
+		this.environmentWorker = new EnvironmentWorker()
 		let self = this
         this.environmentWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
-                case 'migrateData':
-					self.handlerSyncData(data.dataAfter)
+                case 'updateVersion':
+					self.handlerUpdateVersion(data.dataAfter)
 					break;
                 
                 default:
@@ -122,48 +93,34 @@ export default {
 		cancel(){
 			this.$emit('cancel')
 		},
-		handlerSyncData(res){
+		handlerUpdateVersion(res){
 			if(res.status == 200){
 				this.$snotify({
-					type: "success",
-					title: "Đang chuyển dữ liệu"
+					type: 'success',
+					title: "Thành công ."
 				})
-			}else if( res.status == 400){
+			}else{
 				this.$snotify({
-					type: "error",
-					title: "Nguồn và target không được trùng nhau"
+					type: 'error',
+					title: "Có lỗi xảy ra"
 				})
 			}
 			this.$emit('cancel')
 		},
-		syncData(){
+		updateVersion(){
 			let self = this
-			let sourceInstanceId = this.$store.state.environmentManagement.sourceInstanceId
-			let currentServiceId = this.$store.state.environmentManagement.currentServiceId
-			let currentEnvId = this.envId
-			let type = self.currentObjectType
-			let arr = []
-			for(let i in self.listItemSelected){
-				arr.push(self.listItemSelected[i].id)
-			}
-			let ids = {
-				"ids":arr
-			}
+			let serviceId = this.$route.params.serviceId
+			let versionId = this.$store.state.environmentManagement.currentVersionId
 			let data = {
-				[type]:ids
+				serviceId: serviceId,
+				environmentId: this.envId
 			}
 			this.environmentWorker.postMessage({
-				action: 'migrateData',
+				action: 'updateVersion',
 				data:{
-					dataGetServerId:{
-						serviceId: currentServiceId,
-						environmentId: currentEnvId
-					},
-					formData:{
-						sourceInstanceId:sourceInstanceId,
-						data: JSON.stringify(data),
-						override: self.override
-					}
+					versionId : versionId,
+					environmentId: self.envId,
+					dataGetServerId : data
 				}
 			});
 		}
@@ -184,14 +141,5 @@ export default {
 }
 .content-deploy-dialog >>> .v-menu{
 	font-size: 13px !important;
-}
-.content-deploy-dialog >>> label{
-	font-size: 13px !important;
-}
-.content-deploy-dialog >>> .v-messages{
-	display:none !important;
-}
-.content-deploy-dialog >>> .v-input__control{
-	margin-bottom:-12px !important;
 }
 </style>

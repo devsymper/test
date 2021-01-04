@@ -1342,14 +1342,11 @@ export default class Table {
             this.tableInstance.updateSettings({
                 data: data
             })
-            setTimeout((self) => {
-                self.tableInstance.render()
-            }, 50, this);
-            
         } else {
             let defaultRow = this.getDefaultData(false);
             this.tableInstance.loadData(defaultRow);
         }
+       
     }
     /**
      * Kiểm tra xem đang ở view detail hay submit

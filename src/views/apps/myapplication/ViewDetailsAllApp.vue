@@ -380,12 +380,12 @@ export default {
         },
 
 		async getItemByAccessControl(ids){
-			this.myApplicationWorker.postMessage({
+			this.applicationWorker.postMessage({
 				action: 'getItemByAccessControl',
 				data:{
 					ids: ids
 				}
-			})
+			});
 		},
         
     },
@@ -499,9 +499,6 @@ export default {
     margin:0px 32px 0px 16px;
     min-height:unset;
     height:50px;
-}
-.view-details-all-app >>> .content-view-details-all-app .v-expansion-panel-header.v-expansion-panel-header--active{
-    /* border-bottom: 1px solid #FF8003; */
 }
 .view-details-all-app >>> .content-view-details-all-app .v-expansion-panel-header__icon{
     margin-right:12px;

@@ -369,28 +369,28 @@ export default {
 			this.$goToPage('/workflow/process-key/'+processKey+'/list-instances', this.$t('process.instance.listModelInstance')+processKey)
 		},
 		stopProcessInstance(){
-			this.adminWorker.postMessage(
-				{
-					action:'stopProcessInstance',
-					data:{listItemSelected: this.listItemSelected}
+			this.adminWorker.postMessage({
+				action: 'stopProcessInstance',
+				data:{
+					listItemSelected: this.listItemSelected
 				}
-			);
+			});
 		 },
 		endProcessInstance(){
-			this.adminWorker.postMessage(
-				{
-					action:'endProcessInstance',
-					data:{listItemSelected: this.listItemSelected}
+			this.adminWorker.postMessage({
+				action: 'endProcessInstance',
+				data:{
+					listItemSelected: this.listItemSelected
 				}
-			);
+			});
 		},
 		activeProcessInstance(){
-			this.adminWorker.postMessage(
-				{
-					action:'activeProcessInstance',
-					data:{listItemSelected: this.listItemSelected}
+			this.adminWorker.postMessage({
+				action: 'activeProcessInstance',
+				data:{
+					listItemSelected: this.listItemSelected
 				}
-			);
+			});
 		},
 		confirmDelete(){
 			this.showDialog = true
@@ -401,78 +401,13 @@ export default {
 		},
 		deleteProcessInstance(value){
 			this.showDialog = false
-			this.adminWorker.postMessage(
-				{
-					action:'deleteProcessInstance',
-					data:{
-						listItemSelected: this.listItemSelected,
-						isDeleteDoc: value
-					}
+			this.adminWorker.postMessage({
+				action: 'deleteProcessInstance',
+				data:{
+					listItemSelected: this.listItemSelected,
+					isDeleteDoc: value
 				}
-			);
-			// let self = this
-			// if(value == true){
-			// 	let arr = []
-			// 	for(let i in this.listItemSelected){
-			// 		arr.push(this.listItemSelected[i].id)
-			// 	}
-			// 	documentApi.deleteDocumentObject({workflowObjectIds:JSON.stringify(arr)}).then(res=>{
-			// 		if(res.status == 400){
-			// 			self.$snotify(
-			// 				{
-			// 					type: "error",
-			// 					title:" Không tìm thấy bản ghi liên quan"
-			// 				}
-			// 			)
-			// 		}else if(res.status = 200){
-			// 			self.$snotify(
-			// 				{
-			// 					type: "success",
-			// 					title:" Xóa bản ghi liên quan hành công"
-			// 				}
-			// 			)
-			// 		}
-			// 	}).catch(err=>{
-			// 		self.$snotify(
-			// 			{
-			// 				type: "error",
-			// 				title:" Xóa bản ghi liên quan thất bại"
-			// 			}
-			// 		)
-			// 	})
-			// }
-			// for(let i in this.listItemSelected){
-			// 	if(this.listItemSelected[i].status == '3'){
-			// 		adminApi.deleteTask(this.listItemSelected[i].id).then(res=>{
-			// 			self.notifysuccess()
-			// 		}).catch(err=>{})
-			// 	}else{
-			// 		adminApi.deleteProcessInstances(this.listItemSelected[i].id).then(res=>{
-			// 			adminApi.deleteTask(this.listItemSelected[i].id).then(res=>{
-			// 			}).catch(err=>{})
-			// 			self.notifysuccess()
-			// 		}).catch(err=>{
-			// 			self.$snotify(
-			// 					{
-			// 						type: "error",
-			// 						title:"Đã có lỗi xảy ra"
-			// 					}
-			// 				)
-			// 		})
-			// 	}
-				
-			// }
-			
-		},
-		notifysuccess(title = " Xóa tác vụ thành công"){
-			this.$snotify(
-				{
-					type: "success",
-					title: title
-				}
-			)
-			this.showBtnAddCheckbox = true
-			this.$refs.listWorkFlow.refreshList()
+			});
 		},
 		cancel(){
 			this.showDialog = false

@@ -74,10 +74,7 @@
 					</v-expansion-panel>
 				</v-expansion-panels>
 		</div>	
-		<!-- <AddEnvironmentDialog 
-			:showDialog="showDialogAddItem"
-			@cancel="cancelAdd"
-			 /> -->
+	
 		<ListObjectInService 
 			:showDialog="showDialog"
 			:tableHeight="tableHeight"
@@ -90,13 +87,11 @@
 
 <script>
 import {util} from '@/plugins/util'
-import AddEnvironmentDialog from "./dialogs/AddEnvironmentDialog"
 import ListObjectInService from "./dialogs/ListObjectInService"
 import {appConfigs} from "@/configs.js"
 import {environmentManagementApi} from '@/api/EnvironmentManagement'
 export default {
 	components:{
-		AddEnvironmentDialog,
 		ListObjectInService
 	},
 	props:{
