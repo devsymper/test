@@ -89,11 +89,9 @@ export default {
 			this.dbName  = ""
 		}
 	},
-	created(){
-		this.environmentWorker = new EnvironmentWorker()
-	},
 	mounted(){
 		let self = this
+		this.environmentWorker = new EnvironmentWorker()
         this.environmentWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {

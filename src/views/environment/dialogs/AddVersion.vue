@@ -95,9 +95,6 @@ export default {
 	components:{
 		FormTpl,
 	},
-	created(){
-		this.environmentWorker = new EnvironmentWorker()
-	},
 	props:{
 		showDialog:{
 			type: Boolean,
@@ -122,6 +119,7 @@ export default {
 	},
 	mounted(){
 		let self = this
+		this.environmentWorker = new EnvironmentWorker()
         this.environmentWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
@@ -165,17 +163,6 @@ export default {
 					formData: formData
 				}
 			})
-			// environmentManagementApi.addVersion({
-			// 	serviceId:serviceId,
-			// 	formData:formData
-			// }).then(res=>{
-			
-			// }).catch(err=>{
-			// 		self.$snotify({
-			// 			type: "error",
-			// 			title: " Có lỗi xảy ra"
-			// 		})
-			// })
 		},
 		handlerAddversionRes(res){
 			if(res.status == 200){

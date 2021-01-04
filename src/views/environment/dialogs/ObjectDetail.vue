@@ -22,16 +22,7 @@
 			>
 				Chọn
 			</v-btn>
-			<!-- <v-btn 
-				class="mr-2 font-normal fs-13"
-				depressed
-				tile
-				small
-				:disabled="showBtnAddCheckbox"
-				@click="handleCheckClick"
-			>
-				Kiểm tra
-			</v-btn> -->
+			
 			<v-btn 
 				class="mr-2 font-normal fs-13"
 				depressed
