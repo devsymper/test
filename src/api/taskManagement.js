@@ -69,6 +69,9 @@ export const taskManagementApi = {
     updateRoleUserInProject(data){
         return taskManagement.put("project-users-role",data);
     },
+    getListRoleUserInProject(projectId){
+        return taskManagement.get("roles-user/"+projectId);
+    },
     /// issue type
     getAllDocumentIdsInIssueType(){
         return taskManagement.get("issue-types-documentIds");
@@ -108,6 +111,11 @@ export const taskManagementApi = {
     updateBoard(id,data){
         return taskManagement.put("boards/"+id,data);
     },
+    countBoardInListProject(projectIds){
+        return taskManagement.get("boards-count",{projectIds:JSON.stringify(projectIds)});
+    },
+    
+    
 
 
 

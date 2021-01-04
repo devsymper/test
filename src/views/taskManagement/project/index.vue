@@ -17,8 +17,13 @@ export default {
         }
     },
     created(){
-        this.$store.dispatch("taskManagement/getAllCategory");
-        this.$store.dispatch("taskManagement/getAllProject");
+        if (!this.$store.state.taskManagement.allCategory || this.$store.state.taskManagement.allCategory.length == 0) {
+            this.$store.dispatch("taskManagement/getAllCategory");
+        }
+        if (!this.$store.state.taskManagement.allProject || this.$store.state.taskManagement.allProject.length == 0) {
+            this.$store.dispatch("taskManagement/getAllProject");
+        }
+
     }
 }
 </script>

@@ -39,6 +39,13 @@ export default {
             if (!this.staskManagement.allPriority || this.staskManagement.allPriority == 0) {
                 await this.$store.dispatch("taskManagement/getAllPriority");
             }
+            if (!this.$store.state.taskManagement.allProject || this.$store.state.taskManagement.allProject.length == 0) {
+                await this.$store.dispatch("taskManagement/getAllProject");
+            }
+            // get all issue type để show icon trong list task in home
+            if (!this.$store.state.taskManagement.allIssueType || this.$store.state.taskManagement.allIssueType == 0) {
+                this.$store.dispatch("taskManagement/getAllIssueType");
+            }
             await this.$store.dispatch("taskManagement/getAllStatus");
             this.$refs.preLoaderView.hide();
 

@@ -35,6 +35,10 @@ const setAllStatus = (state, allStatus) => {
 const setListStautsInProject = (state, data) => {
     Vue.set(state.listStatusInProjects, data.key , data.data);
 }
+const setListRoleUserInProject = (state, data) => {
+    Vue.set(state.listRoleUserInProject, data.key , data.data);
+}
+
 const setListDocumentIdsInProject = (state, data) => {
     Vue.set(state.listDocumentIdsInProject, data.key , data.data);
 }
@@ -286,5 +290,6 @@ export {
     setListDocumentIdsInProject,
     setAllIssueType,
     setCurrentBoard,
+    setListRoleUserInProject,
 
 };

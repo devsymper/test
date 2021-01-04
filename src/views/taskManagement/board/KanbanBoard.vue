@@ -4,6 +4,7 @@
         <kanban-board 
         ref="boardView"
         @loaded-content="afterLoadContent"
+        @loading="beforeLoadContent"
     />
     </div>
 </template>
@@ -22,6 +23,9 @@ export default {
     methods:{
         afterLoadContent(){
             this.$refs.preLoaderView.hide();
+        },
+        beforeLoadContent(){
+            this.$refs.preLoaderView.show();
         }
     },
     

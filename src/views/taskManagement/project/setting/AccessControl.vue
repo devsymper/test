@@ -37,7 +37,9 @@ export default {
             this.getListRole();
         },
         changeRoleUser(){
+            let projectId=this.$route.params.id;
             this.getUserInProject();
+            this.$store.dispatch("taskManagement/getListRoleUserInProject",projectId);
         },
         removeMember(){
             this.getUserInProject();

@@ -27,6 +27,9 @@
                         </v-icon>
                         Thêm link
                     </v-btn>
+                    <v-icon @click="deleteElementOrLink" style="font-size:20px; height:22px;margin-left:4px;margin-top:8px">
+                        mdi-delete-forever
+                    </v-icon>
                     <add-status-view ref="popupAddStatusView" :allStatus="allStatus"  @after-add-status-click="afterAddStatusClick"/>
                     <add-link-view :listNode="listNode" ref="popupAddLinkView" @after-add-link-click="afterAddLinkClick"/>
                 </div>
@@ -161,6 +164,7 @@ export default {
     },
     data(){
         return {
+            selected:null,
             delayTimer:null,
             paper:null,
             isLoading:false,
@@ -269,6 +273,40 @@ export default {
         }
     },
     methods:{
+        deleteElementOrLink(){
+            if (this.selected) {
+                // remove in dataWorkflow , in list node
+                if (this.selected.attributes.type == "standard.Link") {
+                    let obj = this.dataWorkflow.links.find(data => data.id == this.selected.id)
+                    var index = this.dataWorkflow.links.indexOf(obj);
+                    if (index > -1) {
+                        this.dataWorkflow.links.splice(index, 1);
+                    }
+
+                    let obj2 = this.listLink.find(data => data.id.value == this.selected.id)
+                    var index2 = this.listLink.indexOf(obj2);
+                    if (index2 > -1) {
+                        this.listLink.splice(index2, 1);
+                    }
+
+                }else{
+                    let obj = this.dataWorkflow.nodes.find(data => data.id == this.selected.id)
+                    var index = this.dataWorkflow.nodes.indexOf(obj);
+                    if (index > -1) {
+                        this.dataWorkflow.nodes.splice(index, 1);
+                    }
+
+                    let obj2 = this.listNode.find(data => data.id.value == this.selected.id)
+                    var index2 = this.listNode.indexOf(obj2);
+                    if (index2 > -1) {
+                        this.listNode.splice(index2, 1);
+                    }
+
+                }
+                
+                this.selected.remove(); 
+            }
+        },
         handleInputValue(name, inputInfo, data) {
             if(this.delayTimer){
                 clearTimeout(this.delayTimer);
@@ -332,14 +370,16 @@ export default {
                         }else{
                             this.$snotifyError("", "Can not update workflow!");
                         }
+                        this.isLoading=false;
                     })
                     .catch(err => {
                         this.$snotifyError("", "Can not update workflow!", err);
+                        this.isLoading=false;
                     });
             }else{
                 this.$snotifyError("", "Have error!");
+                this.isLoading=false;
             }
-            this.isLoading=false;
         },
         renderNode(nodeInfo){
             var node = new joint.shapes.standard.Rectangle(nodeInfo);   
@@ -386,6 +426,8 @@ export default {
             if (isValid) {
                 if (!self.dataWorkflowProps.name.value  ) {
                     self.$snotifyError("", "Can not add workflow!");
+                    this.isLoading = false;
+
                 }else{
                     let data = {};
                     let projectId=this.$route.params.id;
@@ -406,13 +448,16 @@ export default {
                             }else if(res.status==400){
                                 self.$snotifyError("", "Validate key error",res.message);
                             }
+                            this.isLoading = false;
                         })
                         .catch(err => {
                             self.$snotifyError("", "Can not add workflow!", err);
+                            this.isLoading = false;
                         });
                 }
+            }else{
+                this.isLoading = false;
             }
-            this.isLoading = false;
 
         },
         showPopupAddStatusView(){
@@ -456,8 +501,23 @@ export default {
 
         },
         afterAddLinkClick(linkInfo){
+            let source = {};
+            if (!linkInfo.from.value) {
+                let idNodeTarget = linkInfo.to.value;
+                let node = this.dataWorkflow.nodes.find(ele => ele.id == idNodeTarget);
+                if (node) {
+                    source.x = node.attributes.position.x + node.attributes.size.width/2;
+                    source.y = node.attributes.position.y - 40;
+                }else{
+                    source.x = 200;
+                    source.y = 50;
+                }
+
+            }else{
+                source.id = linkInfo.from.value;
+            }
             let link1 = new joint.shapes.standard.Link({
-                source: { id: linkInfo.from.value },
+                source: source,
                 target: { id: linkInfo.to.value },
                 attrs: {
                     line: {
@@ -541,6 +601,7 @@ export default {
         }
 
         self.paper.on('element:pointerclick', function(elementView) {
+            self.selected = elementView.model;
             let idNode=elementView.model.id;
             if (elementView.model.attributes.attrs.isDefault) {
                 self.$set(self,'nodeConfig',{});
@@ -560,6 +621,7 @@ export default {
         });
 
         self.paper.on('link:pointerclick', function(linkView) {
+            self.selected = linkView.model;
             let idLink=linkView.model.id;
             if (linkView.model.attributes.isDefault) {
                 self.$set(self,'nodeConfig',{});

@@ -22,6 +22,7 @@ const defaultState = {
     listVersionInProject:[],
     infoVersionCurrent:{},
     infoComponentCurrent:{},
+    listRoleUserInProject:{},// có dạng {key : []} , key là projectId
     workFlowData:{
         allNode:[
             

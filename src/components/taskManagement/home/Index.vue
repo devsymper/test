@@ -16,8 +16,10 @@
                                 <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="24" height="24">
                             </div>
                             <div class="float-right">
-                                <v-icon style="font-size:13px">mdi-star-outline</v-icon>
-                                <v-icon style="font-size:13px" class="mx-1">mdi-cog-outline</v-icon>
+                                <v-icon v-if="item.isFavorite==1" style="font-size:13px" color="yellow" @click="updateFavorite(item)">mdi-star</v-icon>
+                                <v-icon v-else style="font-size:13px" @click.prevent.stop="updateFavorite(item)" >mdi-star-outline</v-icon>
+                   
+                                <v-icon style="font-size:13px"  @click.prevent.stop="goConfigProject(item)" class="mx-1">mdi-cog-outline</v-icon>
                             </div>
                         </div>
                         <div class="body-item-recent">
@@ -48,7 +50,7 @@
                         <div class="footer-item-recent mt-2">
                             <div class="d-flex justify-space-between px-1">
                                 <div>
-                                    3 boards
+                                    {{getNumberBoard(item)}} boards
                                 </div>
                                 <div>
                                     <infoUser v-if="item.userLeader" class="userInfo fs-13" :userId="item.userLeader" :roleInfo="{}" />
@@ -94,6 +96,7 @@ import IssueRecent from './IssueRecent.vue';
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import AssignedRecent from './AssignedRecent.vue';
 import infoUser from "@/components/common/user/InfoUser";
+import { taskManagementApi } from "@/api/taskManagement.js";
 
 export default {
     components: {
@@ -105,26 +108,44 @@ export default {
     computed:{
         listProjectRecent(){
             let allUserById = this.$store.getters['app/mapIdToUser'];
+            let allProject = this.$store.state.taskManagement.allProject;
             let listItemLog = this.recentPojects;
             let listProject = [];
             if (listItemLog.length > 0) {
                 for (let i = 0; i < listItemLog.length; i++) {
-                    let project = JSON.parse(listItemLog[i]['project']);
-                    if (listProject.length > 0) {
-                        let isCheck = listProject.find(ele => ele.id == project.id);
-                        if (isCheck) {
-                            continue; // thoát khỏi vòng lặp
+                    let projectLog = JSON.parse(listItemLog[i]['project']);
+                    let project = allProject.find(ele => ele.id == projectLog.id);
+                    if (project) {
+                        if (listProject.length > 0) {
+                            let isCheck = listProject.find(ele => ele.id == project.id);
+                            if (isCheck) {
+                                continue; // thoát khỏi vòng lặp
+                            }
                         }
+                        this.projectIds.push(project.id);
+                        listProject.push(project);
                     }
-                    listProject.push(project);
                 }
             }
-
             return listProject;
         },
         documentIds(){
             return this.$store.state.taskManagement.listDocumentIdsInIssueType;
         },
+        totalBoardInProject(){
+            return this.dataCountBoard;
+        }
+    },
+    watch:{
+        listProjectRecent:{
+            deep: true,
+            immediate: true,
+            handler(after) {
+                if (after.length > 0) {
+                    this.countBoardInProject();
+                }
+            }
+        }
     },
     props:{
         recentPojects:{
@@ -144,7 +165,6 @@ export default {
         return{
             colors:[
                 "#80F878FF",
-                "#D1F658FF",
                 "#63E6CDFF",
                 "#80B8EBFF",
                 "#F33163FF",
@@ -153,10 +173,54 @@ export default {
                 "#25C308FF",
                 "#F31B35FF",
                 "#30DA25FF"
-            ]
+            ],
+            projectIds:[],
+            dataCountBoard:[],
         }
     },
     methods:{
+        getNumberBoard(project){
+            let item = this.totalBoardInProject.find(ele => ele.tmg_project_id == project.id);
+            if (item) {
+                return item.count;
+            }
+            return "";
+        },
+        countBoardInProject(){
+            if (this.projectIds.length > 0) {
+                taskManagementApi
+                .countBoardInListProject(this.projectIds)
+                .then(res => {
+                    if (res.status == 200 && res.data) {
+                        this.dataCountBoard = res.data;
+                    }
+                })
+                .catch(err => {
+                    self.$snotifyError("", "Can not count board!", err);
+                });
+            }
+        },
+        goConfigProject(obj){
+            this.$router.push("/task-management/projects/"+obj.id+"/settings/details");
+        },
+        updateFavorite(obj){
+            let self=this;
+            taskManagementApi
+                .updateProjectFavorite(obj.id)
+                .then(res => {
+                    if (res.status == 200) {
+                        self.$snotifySuccess("Update project completed!");
+                        self.$store.commit("taskManagement/updateStatusFavoriteProject", obj.id);
+
+                    }else{
+                        self.$snotifyError("", "Can not update project!");
+                    }
+                })
+                .catch(err => {
+                    self.$snotifyError("", "Can not update project!", err);
+                })
+                .always(() => {});
+        },
         handleClickProject(item){
             this.$router.push('/task-management/projects/'+item.id+'/kanban-board');
         },

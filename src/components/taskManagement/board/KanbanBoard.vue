@@ -240,10 +240,11 @@ export default {
          * Hàm lấy danh sách task hiên thị lên kanban board
          */
         async getListTasks(){
-            
             let documentId = this.allIssueTypeInProject.reduce((arr,obj)=>{
                 if(!arr.includes(obj.documentId)){
-                    arr.push(obj.documentId)
+                    if (obj.documentId) {
+                        arr.push(obj.documentId)
+                    }
                 }
                 return arr
             },[])
@@ -278,13 +279,18 @@ export default {
             }
             this.getDataForBoard();
         },
-        async getDataForBoard(){
-            let allBoard = this.listBoard;
+        async getDataForBoard(board=null){
             let self = this;
-            if (allBoard.length>0) {
-                this.currentBoard = allBoard[0];  
-                self.$store.commit("taskManagement/setCurrentBoard",allBoard[0]);
+            if (board) {
+                this.currentBoard = board;
+            }else{
+                let allBoard = this.listBoard;
+                if (allBoard.length>0) {
+                    this.currentBoard = allBoard[0];  
+                }
             }
+            self.$store.commit("taskManagement/setCurrentBoard",this.currentBoard);
+          
             let idBoard = this.currentBoard.id;
 
             if (!this.sTaskManagement.listStatusInProjects[this.projectId] || this.sTaskManagement.listStatusInProjects[this.projectId].length == 0) {
@@ -298,6 +304,9 @@ export default {
             }
             if(!this.allIssueTypeInProject){
                 await this.$store.dispatch("taskManagement/getListIssueTypeInProjects", this.projectId);
+            }
+            if (!this.sTaskManagement.listRoleUserInProject[this.projectId] || this.sTaskManagement.listRoleUserInProject[this.projectId].length == 0) {
+                await this.$store.dispatch("taskManagement/getListRoleUserInProject",this.projectId);
             }
             this.getListTasks();
         },
@@ -353,6 +362,13 @@ export default {
             this.$evtBus.$emit('add-issue-btn-click');
         }
        
+    },
+    created(){
+        let self = this;
+        this.$evtBus.$on('selected-item-board', (board) =>{
+            self.$emit('loading');
+            self.getDataForBoard(board);
+        });
     },
     
     activated(){
