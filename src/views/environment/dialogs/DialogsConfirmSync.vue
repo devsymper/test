@@ -134,7 +134,7 @@ export default {
 						override: self.override
 					}).then(res=>{
 						if(res.status == 200){
-							self.$emit('cancel')
+							self.$emit('success')
 							self.$snotify({
 								type: "success",
 								title: "Đang chuyển dữ liệu"
