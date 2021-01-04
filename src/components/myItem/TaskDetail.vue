@@ -44,7 +44,7 @@
                             @click="saveTaskOutcome(action.value)" 
                             class="mr-2"
 							:class="{'mr-16': action.value == 'submit' || action.value == 'complete' || action.value == 'update' }"
-                            :loading="loadingActionTask"
+                            :loading="loadingAction"
                         >
                             {{action.text}}
                         </v-btn>
@@ -205,6 +205,12 @@ import { extractTaskInfoFromObject, addMoreInfoToTask } from '@/components/proce
 import ListActionMenu from './taskLifeCycle/ListActionMenu'
 import SnackBarSubmit from './taskLifeCycle/SnackBarSubmit'
 import { util } from '../../plugins/util';
+import AssignDialog from './taskLifeCycle/Dialogs/AssignDialog'
+import ClaimDialog from './taskLifeCycle/Dialogs/ClaimDialog'
+import CompleteDialog from './taskLifeCycle/Dialogs/CompleteDialog'
+import DelegateDialog from './taskLifeCycle/Dialogs/DelegateDialog'
+import ResolveDialog from './taskLifeCycle/Dialogs/ResolveDialog'
+import UnClaimDialog from './taskLifeCycle/Dialogs/UnClaimDialog'
 import { taskApi } from '../../api/task';
 import { formulasApi } from '../../api/Formulas';
 
@@ -329,7 +335,8 @@ export default {
 				completeShowDialog: false,
 				delegateShowDialog: false,
 				reAssignShowDialog: false,
-			},
+            },
+            loadingAction: false,
 			showSnackbar: false,
 			rightAction: 120,
             showDialogAlert:false,
@@ -465,7 +472,7 @@ export default {
                 }
             }
         },
-        submitError(){
+		submitError(){
             console.log("Error submit");
             this.loadingAction = false;
         },
@@ -667,62 +674,61 @@ export default {
                 this.showDialogAlert=true;
                 this.loadingAction=false;
             }else if(this.checkRoleUser(this.originData)){
-                if(this.taskAction == 'submit' || this.taskAction == 'update' ){
-                    this.$refs.task.submitForm(value);
-                }else if(this.taskAction == 'approval'){
-                    let elId = this.originData.taskDefinitionKey;
-                    let taskData = {
-                        // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
-                        "action": "complete",
-                        "assignee": "1",
-                        // "formDefinitionId": "12345",
-                        "outcome": value,
-                        "variables": [
-                            {
-                                name: elId+'_outcome',
-                                type: 'string',
-                                value: value
-                            },
-                            {
-                                name: elId+'_executor_fullname',
-                                type: 'string',
-                                value: this.$store.state.app.endUserInfo.displayName
-                            },
-                            {
-                                name: elId+'_executor_id',
-                                type: 'string',
-                                value: this.$store.state.app.endUserInfo.id
-                            },
-                        ],
-                        // "transientVariables": []
+                    if(this.taskAction == 'submit' || this.taskAction == 'update' ){
+                        this.$refs.task.submitForm(value);
+                    }else if(this.taskAction == 'approval'){
+                        let elId = this.originData.taskDefinitionKey;
+                        let taskData = {
+                            // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
+                            "action": "complete",
+                            "assignee": "1",
+                            // "formDefinitionId": "12345",
+                            "outcome": value,
+                            "variables": [
+                                {
+                                    name: elId+'_outcome',
+                                    type: 'string',
+                                    value: value
+                                },
+                                {
+                                    name: elId+'_executor_fullname',
+                                    type: 'string',
+                                    value: this.$store.state.app.endUserInfo.displayName
+                                },
+                                {
+                                    name: elId+'_executor_id',
+                                    type: 'string',
+                                    value: this.$store.state.app.endUserInfo.id
+                                },
+                            ],
+                            // "transientVariables": []
+                        }
+                        let res = await this.submitTask(taskData);
+                        this.saveApprovalHistory(value);
+                        if (this.reload) {
+                            this.$emit('task-submited', res);
+                        }else{
+                            this.reloadDetailTask();
+                        }
+                        this.updateProcessInstanceName();
+                        this.loadingAction=false;
+                    }else if(this.taskAction == '' ||this.taskAction == undefined ||this.taskAction == 'submitAdhocTask'){
+                        let taskData = {
+                            "action": "complete",
+                            "outcome": value,
+                        }
+                        let res = await this.submitTask(taskData);
+                        if (this.reload) {
+                            this.$emit('task-submited', res);
+                        }else{
+                            this.reloadDetailTask();
+                        }
+                        this.loadingAction=false;
                     }
-                    let res = await this.submitTask(taskData);
-                    this.saveApprovalHistory(value);
-                    if (this.reload) {
-                        this.$emit('task-submited', res);
-                    }else{
-                        this.reloadDetailTask();
-                    }
-                    this.updateProcessInstanceName();
-                    this.loadingAction=false;
-                }else if(this.taskAction == '' ||this.taskAction==undefined ||this.taskAction == 'submitAdhocTask'){
-                    let taskData = {
-                        "action": "complete",
-                        "outcome": value,
-                    }
-                    let res = await this.submitTask(taskData);
-                    if (this.reload) {
-                        this.$emit('task-submited', res);
-                    }else{
-                        this.reloadDetailTask();
-                    }
-                    this.loadingAction=false;
-                }
             }else{
                 this.showDialogAlert=true;
                 this.loadingAction=false;
             }
-			this.loadingActionTask=false;
         },
         saveApprovalHistory(value){
             let title = this.taskActionBtns.reduce((tt, el) => {
@@ -808,30 +814,27 @@ export default {
             return BPMNEngine.updateTask(taskId,data);
         },
         async handleTaskSubmited(data){
-            if(this.isInitInstance){
-                if (this.reload) {
-                    this.$emit('task-submited', data);            
-                }
-            }else{
-                let elId = this.taskInfo.action.parameter.activityId;
-                let docId = data.document_id ? data.document_id : "" ;
-                if(!docId){
-                    docId = this.taskInfo.action.parameter.documentId;
-                }
-                let varsForBackend = await getVarsFromSubmitedDoc(data, elId, docId);
-                let taskData = { 
-                    // action nhận 1 trong 4 giá trị: complete, claim, resolve, delegate
-                    "action": "complete", 
-                    "assignee": "1",
-                    "outcome": 'submit',
-                    "variables": varsForBackend.vars,
-                }
-                let res =  await this.submitTask(taskData);
-                if (this.reload) {
-                    this.$emit('task-submited', res);
-                }else{
-                    this.reloadDetailTask();
-                }
+			this.$refs.snackbar.clickShowSnackbar()
+			this.showSubmitSuccessBtn = true
+            // if(this.isInitInstance){
+            //     if (this.reload) {
+            //         this.$emit('task-submited', data);            
+            //     }
+            // }else{
+			let elId = this.taskInfo.action.parameter.activityId;
+			let docId = data.document_id;
+			if(!docId){
+				docId = this.taskInfo.action.parameter.documentId;
+			}
+			let varsForBackend = await getVarsFromSubmitedDoc(data, elId, docId);
+			let taskData = { 
+				"outcome": 'submit',
+				"variables": varsForBackend.vars,
+			}
+			let res =  await this.submitTask(taskData);
+			this.reloadDetailTask();
+			if (this.reload) {
+				this.$emit('task-submited', res);
             }
             this.updateProcessInstanceName();
             this.loadingAction=false;
