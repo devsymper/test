@@ -187,7 +187,9 @@
         "userCreate": "Người tạo",
         "userUpdate": "Người cập nhât",
         "createAt": "Thời gian tạo",
+        "createdAt": "Thời gian tạo",
         "updateAt": "Thời gian cập nhât",
+        "updatedAt": "Thời gian cập nhât",
         "releaseAt": "Thời gian release",
         "versionName": "Tên version",
         "wrap_text_mode": "Chế độ xuống dòng",
@@ -204,6 +206,7 @@
 		"lastUpdateTime": "Thời gian cập nhât",
 		"git": "Link git",
 		"os": "Hệ điểu hành",
+		"iconName":"Hình ảnh",
 		"ip": "Địa chỉ IP",
         "wrap_tex_mode": {
             "wrap": "Xuống dòng",
@@ -729,6 +732,7 @@
                     "note": "Ghi chú (Phục vụ cho việc tìm kiếm)",
                     "titleObject": "Tiêu đề bản ghi (Phục vụ cho việc hiển thị trên MyItem, công thức chạy trên server)",
                     "titlePrint": "Tiêu đề bản In",
+                    "formStyle": "Chọn style",
                     "systemMapping": {
                         "title": "Liên kết Doc và đối tượng hệ thống",
                         "itemTitle": "Chọn đối tượng để liên kết (Có thể mở được bản ghi của Doc ngay trong đối tượng hệ thống)",
@@ -1352,7 +1356,12 @@
         "createTask": {
             "title": "Tạo task"
         },
-        "claim": "Claim",
+        "claim": "Nhận công việc",
+        "unClaim": "Hủy nhận",
+        "reAssign": "Giao việc",
+        "delegate": "Ủy quyền",
+        "resolve": "Giải quyết",
+        "complete": "Hoàn thành",
         "created": "Đã tạo mới task",
         "relatedPeople": {
             "title": "Những người liên quan"

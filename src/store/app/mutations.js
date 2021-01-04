@@ -41,6 +41,9 @@ const updateCurrentTabIndex = (state, data) => {
 const removeTab = (state, url) => {
     Vue.delete(state.urlToTabTitleMap, url);
 }
+const setFilteredColumns = (state, data) => {
+    Vue.set(state,'filteredColumns', data);
+}
 
 /**
  * 
@@ -118,5 +121,6 @@ export {
     setUserActionsForObjects,
     setAllSymperRoles,
     changeStatus,
-    setAccountType,
+	setAccountType,
+	setFilteredColumns
 };

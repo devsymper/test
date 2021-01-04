@@ -262,24 +262,6 @@ function search (controlCheck, effectedControl, mapControlEffected) {
     }
 }
 
-
-export const minimizeDataAfterRunFormula = function(rs) {
-    let value = "";
-    if(!rs.server){
-        let data = rs.data; 
-        if(data.length > 0){
-            value=data[0].values[0][0];
-        }
-    }
-    else{
-        let data = rs.data.data;
-        if(data.length > 0){
-            value=data[0][Object.keys(data[0])[0]];
-        }
-    }
-    return value;
-}
-
  /**
  * Hàm kiểm tra xem có sự thay đổi của data input của 1 formula hay không
  * nếu có thì mới thực thi công thức

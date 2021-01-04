@@ -554,6 +554,9 @@ export default class Table {
      */
 
     checkEnterInsertRowEvent(e, cellMeta) {
+        if(!this.controlObj.controlProperties.isInsertRow.value){
+            return;
+        }
         if (!e) {
             return;
         }
@@ -879,32 +882,38 @@ export default class Table {
         let dataInput = {};
         let listInputInDocument = this.getListInputInDocument();
         for (let inputControlName in inputControl) {
-            let controlIns = listInputInDocument[inputControlName];
-            if(controlIns.inTable != false){
-                let colIndex = this.tableInstance.propToCol(inputControlName);
-                let currentColData = '';
-                if(rowIndex != 'all' && rowIndex != null){
-                    currentColData = this.tableInstance.getDataAtCell(rowIndex, colIndex);
-                }
-                else{
-                    currentColData = this.tableInstance.getDataAtCol(colIndex);
-                    if(this.tableHasRowSum){
-                        currentColData.pop();
-                    }
-                }
-                
-                dataInput[inputControlName] = currentColData;
+            if(inputControlName == 'document_object_id'){
+                let docObjId = sDocument.state.submit[this.keyInstance]['documentObjectId'];
+                dataInput[inputControlName] = (docObjId) ? docObjId : '';
             }
             else{
-                if (listInputInDocument.hasOwnProperty(inputControlName)){
-                    dataInput[inputControlName] = controlIns.value;
+                let controlIns = listInputInDocument[inputControlName];
+                if(controlIns.inTable != false){
+                    let colIndex = this.tableInstance.propToCol(inputControlName);
+                    let currentColData = '';
+                    if(rowIndex != 'all' && rowIndex != null){
+                        currentColData = this.tableInstance.getDataAtCell(rowIndex, colIndex);
+                    }
+                    else{
+                        currentColData = this.tableInstance.getDataAtCol(colIndex);
+                        if(this.tableHasRowSum){
+                            currentColData.pop();
+                        }
+                    }
+                    
+                    dataInput[inputControlName] = currentColData;
                 }
-            }
-            if(controlIns.type == 'date'){
-                dataInput[inputControlName] = controlIns.convertDateToStandard(dataInput[inputControlName])
-            }
-            if(controlIns.type == 'time'){
-                dataInput[inputControlName] = controlIns.convertTimeToStandard(dataInput[inputControlName])
+                else{
+                    if (listInputInDocument.hasOwnProperty(inputControlName)){
+                        dataInput[inputControlName] = controlIns.value;
+                    }
+                }
+                if(controlIns.type == 'date'){
+                    dataInput[inputControlName] = controlIns.convertDateToStandard(dataInput[inputControlName])
+                }
+                if(controlIns.type == 'time'){
+                    dataInput[inputControlName] = controlIns.convertTimeToStandard(dataInput[inputControlName])
+                }
             }
         }
         return dataInput;
@@ -1121,7 +1130,7 @@ export default class Table {
             columns: thisObj.columnsInfo.columns,
             allowInsertColumn: false,
             allowRemoveColumn: false,
-            contextMenu: (thisObj.checkDetailView()) ? false : thisObj.getContextMenu(),
+            contextMenu: (thisObj.checkDetailView()) ? false : (thisObj.controlObj.controlProperties.isInsertRow.value?thisObj.getContextMenu('all'):thisObj.getContextMenu('exceptRow')),
             stretchH: 'all',
             autoRowSize: false,
             autoColSize: false,
@@ -1216,7 +1225,7 @@ export default class Table {
     /**
      * Context menu cho handson table trong view nhập liệu
      */
-    getContextMenu() {
+    getContextMenu(value) {
         return {
             callback: function(key, selection, clickEvent) {
                 if (key == 'row_below') {
@@ -1234,10 +1243,16 @@ export default class Table {
             items: {
 
                 "row_above": {
-                    name: "Thêm dòng phía trên"
+                    name: "Thêm dòng phía trên",
+                    hidden: function () {
+                        return  value == "exceptRow";
+                    }
                 },
                 "row_below": {
-                    name: "Thêm dòng phía dưới"
+                    name: "Thêm dòng phía dưới",
+                    hidden: function () {
+                        return  value == "exceptRow";
+                    }
                 },
                 'remove_row': {
                     name: "Xóa dòng",

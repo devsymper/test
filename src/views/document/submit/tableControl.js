@@ -66,8 +66,10 @@ export default class TableControl extends Control {
         }
     }
     renderTable() {
-        this.ele.parent().append('<span onclick="viewTable(this)" table-name="' + this.name + '" instance="' + this.curParentInstance + '" class="mdi mdi-information-outline icon-trace-table"></span>');
         let viewType = sDocument.state.viewType[this.curParentInstance];
+        if ((viewType == 'submit' || viewType == "update") && !this.pivotTable) {
+            this.ele.parent().append('<span onclick="viewTable(this)" table-name="' + this.name + '" instance="' + this.curParentInstance + '" class="mdi mdi-information-outline icon-trace-table"></span>');
+        }
         if (this.isPrintView) {
             if(this.pivotTable){
                 this.pivotTable.render();

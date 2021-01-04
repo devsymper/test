@@ -23,4 +23,16 @@ export default [
     component: () =>
         import ('@/components/common/agDataTable/TestAg'),
 	},
+	{
+    path: "/test-ag/application",
+    name: "procesdsdsdsdadsadsdasdss",
+    component: () =>
+        import ('@/components/common/agDataTable/TestAgApplication'),
+	},
+	{
+    path: "/test-ag/document",
+    name: "procesdssdsdsdsdsds",
+    component: () =>
+        import ('@/components/common/agDataTable/TestAgDocument'),
+	},
  ]

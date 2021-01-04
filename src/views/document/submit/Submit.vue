@@ -1,9 +1,5 @@
 <template>
-    <div :class="{
-    'wrap-content-submit':true,
-    'sym-sub-form-submit':(parrentInstance == 0) ? false : true
-
-    }">
+    <div :class="globalClass">
     <VuePerfectScrollbar class="scroll-content h-100">
          
         <Preloader ref="preLoaderView"/>
@@ -214,6 +210,9 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import FloattingPopup from './../common/FloattingPopup'
 import PopupPivotTable from './items/PopupPivotTable'
 
+import tinymce from 'tinymce/tinymce';
+
+
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
 import {checkControlPropertyProp,getControlInstanceFromStore, 
         getControlTitleFromName, getListInputInDocument, 
@@ -231,6 +230,10 @@ let impactedFieldsArr = {};
 export default {
     inject: ['theme'],
     props: {
+        showSnackbarSuccess: {
+            type: Boolean,
+            default: true
+        },
         isQickSubmit: {
             type: Boolean,
             default: false
@@ -412,6 +415,7 @@ export default {
             dataPivotTable:{},
             dataColPivot:[],
             dataPivotMode:[],
+            globalClass:null,
             controlRelationWorker:null,
             formulasWorker:null
         };
@@ -419,6 +423,10 @@ export default {
     },
     beforeMount() {
         this.columnsSQLLiteDocument = {};
+        this.globalClass = {
+            'wrap-content-submit':true,
+            'sym-sub-form-submit':(this.parrentInstance == 0) ? false : true,
+        }
     },
     mounted() {
         let thisCpn = this;
@@ -497,7 +505,7 @@ export default {
     },
 
     async created() {
-        // await ClientSQLManager.createDB(this.keyInstance);
+        tinymce.remove()
         this.formulasWorker = new FormulasWorker();
         this.formulasWorker.postMessage({action:'createSQLiteDB',data:{keyInstance:this.keyInstance}})
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
@@ -744,6 +752,8 @@ export default {
                     (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [189,16,8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
                     if(!thisCpn.$refs.autocompleteInput.isShow()){
                         thisCpn.$refs.autocompleteInput.setTypeInput('autocomplete');
+                        let controlIns = getControlInstanceFromStore(thisCpn.keyInstance, e.controlName);
+                        thisCpn.$refs.autocompleteInput.setControlValueKey(controlIns.getAutocompleteKeyValue());
                         thisCpn.$refs.autocompleteInput.show(e.e);
                         let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
                         if(currentTableInteractive != null && currentTableInteractive != undefined)
@@ -777,6 +787,8 @@ export default {
                     (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
                     (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [189,16,8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
                     if(!this.$refs.autocompleteInput.isShow()){
+                        let controlIns = getControlInstanceFromStore(thisCpn.keyInstance, e.controlName);
+                        thisCpn.$refs.autocompleteInput.setControlValueKey(controlIns.getAutocompleteKeyValue());
                         this.$refs.autocompleteInput.show(e.e);
                         let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
                         if(currentTableInteractive != null && currentTableInteractive != undefined)
@@ -809,6 +821,8 @@ export default {
                             value: controlName,
                             instance: this.keyInstance
                         });
+                let controlIns = getControlInstanceFromStore(this.keyInstance, controlName);
+                this.$refs.autocompleteInput.setControlValueKey(controlIns.getAutocompleteKeyValue());
                 this.$refs.autocompleteInput.setTypeInput(e.type);
                 if(e.type == 'combobox'){
                     this.$refs.autocompleteInput.setSingleSelectCombobox(e.isSingleSelect);
@@ -1415,7 +1429,7 @@ export default {
         /**
          * Hàm xử lí sau khi chạy công thức được điền dữ liệu vào input bởi hệ thống
          */
-        handleInputChangeBySystem(controlName,valueControl, fromAutocomplete = false, isRunChange = true){
+        handleInputChangeBySystem(controlName,valueControl, fromPopupAutocomplete = false, isRunChange = true){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
             markBinedField(this.keyInstance,controlName);
             controlInstance.setValue(valueControl);
@@ -1423,24 +1437,9 @@ export default {
                 controlInstance.triggerOnChange()
             }
             
-            if(fromAutocomplete){
+            if(fromPopupAutocomplete){
                 $('#'+controlInstance.id).attr('data-autocomplete',valueControl);
             }
-            if(controlInstance.type == 'user'){
-                valueControl = $('#'+controlInstance.id).attr('user-id');
-                if(valueControl == undefined) valueControl = 0;
-            }
-            // cần format lại giá trị date về năm tháng ngày để lưu vào store, tránh lỗi khi submit
-            if(controlInstance.type == 'date'){
-                valueControl = this.$moment(valueControl).format('YYYY-MM-DD');
-            }
-          
-            this.updateListInputInDocument(
-                controlName,
-                "value",
-                valueControl
-            );
-            
             // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
             if(controlInstance.isRequiredControl()){
                 if(controlInstance.isEmpty()){
@@ -1463,23 +1462,25 @@ export default {
             let headers = [];
             let bodyTable = [];
             if(isFromSQLLite){
-                for(let i = 0; i < data[0].columns.length; i++){
-                    let item = {value:data[0].columns[i], text:data[0].columns[i]};
-                    if(controlAs.hasOwnProperty(data[0].columns[i])){
-                        item.text = controlAs[data[0].columns[i]]
+                if(data[0]){
+                    for(let i = 0; i < data[0].columns.length; i++){
+                        let item = {value:data[0].columns[i], text:data[0].columns[i]};
+                        if(controlAs.hasOwnProperty(data[0].columns[i])){
+                            item.text = controlAs[data[0].columns[i]]
+                        }
+                        if(data[0].columns[i] == 'column1'){
+                            item.text = controlAs[Object.keys(controlAs)[0]]
+                        }
+                        headers.push(item);
                     }
-                    if(data[0].columns[i] == 'column1'){
-                        item.text = controlAs[Object.keys(controlAs)[0]]
+                    let values = data[0].values;
+                    for(let i = 0; i < values.length; i++){
+                        let item = {};
+                        for(let j = 0; j < data[0].columns.length; j++){
+                            item[data[0].columns[j]] = values[i][j];
+                        }
+                        bodyTable.push(item);
                     }
-                    headers.push(item);
-                }
-                let values = data[0].values;
-                for(let i = 0; i < values.length; i++){
-                    let item = {};
-                    for(let j = 0; j < data[0].columns.length; j++){
-                        item[data[0].columns[j]] = values[i][j];
-                    }
-                    bodyTable.push(item);
                 }
             }
             else{
@@ -1517,6 +1518,10 @@ export default {
                             thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
                             if(res.data.document.otherInfo != null && res.data.document.otherInfo != "")
 							thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
+                            let style = JSON.parse(res.data.document.formStyle);
+                            if(style){
+                                this.globalClass[style['globalClass']] = true;
+                            }
                             thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
                             thisCpn.dataPivotTable = res.data.pivotConfig;
                             // đẩy phần xử lí data control xuống worker
@@ -1559,6 +1564,11 @@ export default {
          */
         loadDocumentObject() {
             let thisCpn = this;
+            thisCpn.$store.commit("document/addToDocumentSubmitStore", {
+                            key: 'documentObjectId',
+                            value: this.docObjId,
+                            instance: this.keyInstance
+                        })
             documentApi
                 .detailDocumentObject(this.docObjId)
                 .then(res => {
@@ -2167,11 +2177,12 @@ export default {
                     dataResponSubmit['isContinueSubmit'] = thisCpn.isContinueSubmit;
                     thisCpn.$emit('submit-document-success',dataResponSubmit);
                     thisCpn.isSubmitting = false;
-                    thisCpn.$snotify({
-                        type: "success",
-                        title: "Submit document success!"
-                    });        
-                    
+					if(this.showSnackbarSuccess){
+						thisCpn.$snotify({
+							type: "success",
+							title: "Submit document success!"
+						});      
+					}
                     // nếu có công thức nút submit
                     if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
                         // let dataInput = thisCpn.getDataInputFormula(thisCpn.sDocumentSubmit.submitFormulas);
@@ -2223,10 +2234,12 @@ export default {
                 thisCpn.$emit('submit-document-success',res.data);
                 thisCpn.isSubmitting = false;
                 if (res.status == 200) {
-                    thisCpn.$snotify({
-                        type: "success",
-                        title: "update document success!"
-                    });        
+					if(this.showSnackbarSuccess){
+						 thisCpn.$snotify({
+							type: "success",
+							title: "update document success!"
+						});    
+					}
                     if(thisCpn.sDocumentSubmit.updateFormulas != undefined){
                         // let dataInput = thisCpn.getDataInputFormula(thisCpn.sDocumentSubmit.updateFormulas);
                         thisCpn.formulasWorker.postMessage({action:'runFormula',data:{formulaInstance:thisCpn.sDocumentSubmit.updateFormulas, keyInstance:thisCpn.keyInstance}})
@@ -2284,6 +2297,9 @@ export default {
                         } 
                         if(listInput[controlName].type == 'fileUpload'){
                             dataControl[controlName] = JSON.stringify(value)
+                        }
+                        if(listInput[controlName].type == 'richText'){
+                            dataControl[controlName] = listInput[controlName].editor.getContent();
                         }
                        
                     }
@@ -2526,6 +2542,9 @@ export default {
                 else{
                     this.formulasWorker.postMessage({action:'runFormula',data:{formulaInstance:formulaInstance, controlName:controlName, from:from, keyInstance:this.keyInstance}})
                 }
+            } else {
+                markBinedField(this.keyInstance,controlName);
+                this.handleControlInputChange(controlName);
             }
         },
        
@@ -2935,40 +2954,12 @@ export default {
             );
         },
         handleInputChangeByUser( controlInstance, valueControl){
-            if(controlInstance.type == 'number'){
-                valueControl = valueControl.replace(/=/g,"");
-                valueControl = eval(valueControl);
-                if(!/^[-0-9,.]+$/.test(valueControl)){
-                    return;
-                }
-            }
             setDataInputBeforeChange(this.keyInstance, controlInstance);
             if($('#'+controlInstance.id).attr('data-autocomplete') != "" && $('#'+controlInstance.id).attr('data-autocomplete') != undefined){
                 $('#'+controlInstance.id).attr('data-autocomplete',"");
                 return;
             }
-            if(controlInstance.type == 'user'){
-                valueControl = $('#'+controlInstance.id).attr('user-id');
-                if(valueControl == undefined) valueControl = 0;
-            }
-            if(controlInstance.type == 'date'){
-                valueControl = this.$moment(valueControl,'DD-MM-YYYY').format('YYYY-MM-DD');
-            }
-            this.updateListInputInDocument(
-                controlInstance.name,
-                "value",
-                valueControl
-            );
             
-            // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
-            if(controlInstance.isRequiredControl()){
-                if(controlInstance.isEmpty()){
-                    controlInstance.renderValidateIcon('Không được bỏ trống trường thông tin '+controlInstance.title, 'Require')
-                }
-                else{
-                    controlInstance.removeValidateIcon('Require');
-                }
-            }
             resetImpactedFieldsList(this.keyInstance);
             this.handleControlInputChange(controlInstance);
         },

@@ -601,7 +601,9 @@ export default {
             if (this.actionPanel == true) {
 				this.$emit("open-panel");
 				this.showSearchBox = false
-            }
+            }else{
+				this.showSearchBox = true
+			}
 		},
 		columnDefs:{
 			deep: true,
@@ -814,18 +816,21 @@ export default {
 			this.page = 1
 			let colName = this.tableFilter.currentColumn.name;
             this.$set(this.tableFilter.allColumn, colName, filter);
-            let hasFilter = this.checkColumnHasFilter(colName, filter);
+			let hasFilter = this.checkColumnHasFilter(colName, filter);
             this.filteredColumns[colName] = hasFilter;
             let icon = $(this.$el).find(
                 ".symper-table-dropdown-button[col-name=" + colName + "]"
 			);
             this.getData(false,false,true);
             if(hasFilter && source != "clear-filter"){
-                icon.addClass("applied-filter");
+                $(icon).addClass("applied-filter");
             }else{
                 this.$delete(this.tableFilter.allColumn, colName);
                 icon.removeClass("applied-filter");
-            }
+			}
+			this.filteredColumns
+			this.$store.commit('app/setFilteredColumns', this.filteredColumns)
+			debugger
 		},
 		/**
          * Kiểm tra xem một cột trong table có đang áp dụng filter hay ko
@@ -1264,5 +1269,9 @@ export default {
 }
 .ag-row-selected{
 	background-color: #DBE7FE !important;
+}
+.applied-filter {
+    color: #f58634;
+    background-color: #ffdfc8;
 }
 </style>
