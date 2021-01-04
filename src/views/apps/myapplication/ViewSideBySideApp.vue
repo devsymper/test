@@ -303,17 +303,6 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 				self.getItemByAccessControl(dataGet,i)
 			}
         },
-        updateFavoriteItem(mapArray,array){
-			for( let [key,value] of Object.entries(mapArray)){
-				array.forEach(function(item){
-					if(item.objectIdentifier == key){
-						item.favorite = value.isFavorite
-						item.actions = value.actions
-					} 
-				})
-			}
-			return array
-		},
 		getItemByAccessControl(ids,type){
 			let self = this
 			this.myApplicationWorker.postMessage({
