@@ -1,3 +1,4 @@
+import { util } from '../../../plugins/util';
 import store from './../../../store'
 import sDocument from './../../../store/document'
 
@@ -171,6 +172,9 @@ const checkCanBeBind = function(instance, fieldName) {
  /**
  * Hàm kiểm tra xem có sự thay đổi của data input của 1 formula hay không
  * nếu có thì mới thực thi công thức
+ * @param {*} instance state của phiên làm việc hiện tại
+ * @param {*} dataInput dữ liệu đầu vào của công thức đang check
+ * @param {*} rowIndex index của dòng trong bảng
  */
 const checkDataInputChange = function(instance, dataInput){
     let sDocumentSubmit = sDocument.state.submit[instance];
@@ -183,7 +187,7 @@ const checkDataInputChange = function(instance, dataInput){
         if(controlName == rootChangeFieldName){
             return true;
         }
-        if(typeof dataInput[controlName] == 'object'){
+        if(dataInput[controlName] != null &&  typeof dataInput[controlName] == 'object'){
             for (let index = 0; index < dataInput[controlName].length; index++) {
                 let cellValue = dataInput[controlName][index];
                 if(!dataInputBeforeChange[controlName]){
@@ -210,27 +214,33 @@ const checkDataInputChange = function(instance, dataInput){
  * mục đích để kiểm tra nếu có sự thay đổi data input thì mới thực thi công thức
  * với control trong table thì dạng mảng ngoài table dạng giá trị string
  */
-const setDataInputBeforeChange = function(instance, controlInstance){
+const setDataInputBeforeChange = function(instance, controlInstance, rowIndex = null, oldCellData = null){
     let dataInputBeforeChange = {};
-    dataInputBeforeChange[controlInstance.name] = controlInstance.value;
-    if(!dataInputBeforeChange[controlInstance.name] && controlInstance.inTable){
-        dataInputBeforeChange[controlInstance.name] = [null];
-    }
     let sDocumentSubmit = sDocument.state.submit[instance];
     let listInputInDocument = sDocumentSubmit.listInputInDocument;
     let impactedFieldsList = sDocumentSubmit.impactedFieldsList;
     let allControlChange = impactedFieldsList[controlInstance.name];
+    allControlChange[controlInstance.name] = true;
     for(let controlName in allControlChange){
         let controlChangeIns = listInputInDocument[controlName];
         if(controlChangeIns.inTable){
             let tableControl = listInputInDocument[controlChangeIns.inTable];
             let hotTb = tableControl.tableInstance.tableInstance;
             let colIndex = hotTb.propToCol(controlChangeIns.name);
-            let colData = hotTb.getDataAtCol(colIndex);
-            dataInputBeforeChange[controlName] = colData
+            if(rowIndex != null){
+                let cellData = hotTb.getDataAtCell(rowIndex, colIndex);
+                if(controlName == controlInstance.name){
+                    cellData = oldCellData;
+                }
+                dataInputBeforeChange[controlName] = cellData
+            }
+            else{
+                let colData = hotTb.getDataAtCol(colIndex);
+                dataInputBeforeChange[controlName] = colData
+            }
         }
         else{
-            dataInputBeforeChange[controlName] = controlChangeIns.value;
+            dataInputBeforeChange[controlName] = util.cloneDeep(controlChangeIns.value);
         }
     }
     store.commit("document/addToDocumentSubmitStore", {

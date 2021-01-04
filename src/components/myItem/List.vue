@@ -305,6 +305,7 @@
                 style="border-left: 1px solid #e0e0e0;"
             >
                 <taskDetail
+					:delegationState="delegationState"
                     :parentHeight="listTaskHeight"
                     :taskInfo="selectedTask.taskInfo"
                     :originData="selectedTask.originData"
@@ -340,6 +341,7 @@ import infoUser from "./InfoUser";
 import { getDataFromConfig, getDefaultFilterConfig } from "@/components/common/customTable/defaultFilterConfig.js";
 import TableFilter from "@/components/common/customTable/TableFilter.vue";
 import Pagination from "@/components/common/Pagination.vue";
+import workFlowApi  from "./../../api/BPMNEngine.js";
 
 import {
   extractTaskInfoFromObject,
@@ -478,7 +480,8 @@ export default {
     },
     data: function() {
         return {
-            debounceGetData:null,
+			debounceGetData:null,
+			delegationState:null,
             data:[],
             page: 1, // trang hiện tại
             pageSize: 50,
@@ -808,7 +811,7 @@ export default {
             this.listTaskHeight =
                 util.getComponentSize(this.$el.parentElement).h - 130;
         },
-        selectObject(obj, idx,idex) {
+        async selectObject(obj, idx,idex) {
             this.index = idx;
             this.dataIndex = idex;
             this.$set(this.selectedTask, "originData", obj);
@@ -818,7 +821,16 @@ export default {
                 this.selectedTask.idx = idx;
                 if (!this.compackMode) {
                     this.sideBySideMode = true;
-                    let taskInfo = extractTaskInfoFromObject(obj);
+					let taskInfo = extractTaskInfoFromObject(obj);
+					if(this.selectedTask.originData.isDone != '1'){
+						let self = this
+						await workFlowApi.getTaskDetail(obj.id).then(res=>{
+							self.delegationState = res.delegationState
+						}).catch(err=>{
+						})
+					}else{
+						this.delegationState = null
+					}
                     this.$set(this.selectedTask, "taskInfo", taskInfo);
                     this.$emit("change-height", "calc(100vh - 88px)");
                 }
@@ -1052,4 +1064,4 @@ export default {
 .task-to-do {
     background-color: #0760D9!important;
 }
-</style>
+</style>	

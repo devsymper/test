@@ -322,17 +322,13 @@ export default class Control {
     }
     handlerDataAfterRunFormulasHidden(values) {
         if (this.inTable != false) {
-            let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
-            let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
-            for (let index = 0; index < values.length; index++) {
-                let row = values[index];
-                let v = row == 1
-                let cellPos = index + "_" + colIndex;
-                tableControlInstance.tableInstance.addToValueMap(cellPos, {
-                    type: "readOnly",
-                    value: v
-                });
+            if(values && Object.values(values).length > 0 && Object.values(values)[0] == 1){
+                let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
+                let colIndex = tableControl.tableInstance.getColumnIndexFromControlName(this.name);
+                var plugin = tableControl.tableInstance.tableInstance.getPlugin('hiddenColumns');
+                plugin.hideColumn(colIndex);
             }
+           
 
         }
     }

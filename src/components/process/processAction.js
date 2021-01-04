@@ -601,6 +601,11 @@ export const startWorkflowBySubmitedDoc = function(idWorkflow, submitedDocData, 
 
                         // let instanceName = await this.getInstanceName(dataInputForFormula);
                         let instanceName = res.data.name;
+                        vars.push({
+                            name: 'docInstanceFromStartingWorkflow',
+                            type: 'string',
+                            value: submitedDocData.document_object_id
+                        });
                         let newProcessInstance = await runProcessDefinition(SYMPER_APP, defData, vars, instanceName);
                         resolve({
                             message: "Bắt đầu quy trình " + res.data.name + " thành công",

@@ -186,6 +186,17 @@ export default class PivotTable {
             if (!/[a-zA-Z0-9]/i.test(charTyped)) {
                 return;
             }
+            if (row.event.ctrlKey && row.event.code == "KeyC") {
+                let textArea = document.createElement("textarea");
+                textArea.classList = 'hidden-textarea-for-copy';
+                textArea.value = row.value;
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+                document.execCommand('copy');
+                document.body.removeChild(textArea);
+                return
+            }
         }
         let column = row.colDef;
         let columnNameSelected = column.otherName;

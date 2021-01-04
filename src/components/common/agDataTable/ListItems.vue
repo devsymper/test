@@ -600,7 +600,9 @@ export default {
             if (this.actionPanel == true) {
 				this.$emit("open-panel");
 				this.showSearchBox = false
-            }
+            }else{
+				this.showSearchBox = true
+			}
 		},
 		columnDefs:{
 			deep: true,
@@ -653,6 +655,7 @@ export default {
     data(){
 		let self = this
         return {
+			gridApi: null,
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
 			showSearchBox: true,
             loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
@@ -718,7 +721,10 @@ export default {
 		VDialog,
 		TableFilter
 
-    },
+	},
+	mounted(){
+		this.gridApi = this.gridOptions.api;
+	},
     beforeMount(){
 		this.defaultColDef = {
             minWidth: 40,
@@ -740,8 +746,15 @@ export default {
 		this.rowSelection = 'single';
     },
 	methods:{
-		reRender(){
-			this.agApi.sizeColumnsToFit()
+		// reRender(){
+		// 	this.agApi.sizeColumnsToFit()
+		// },
+		reRender(skipHeader = false) {
+			// var allColumnIds = [];
+			// this.agApi.getAllColumns().forEach(function (column) {
+			// 	allColumnIds.push(column.colId);
+			// });
+			// this.agApi.autoSizeColumns(allColumnIds, skipHeader);
 		},
 		 /**
          * Tạo ra các item có check box với trạng thái đã check hay chưa 
@@ -989,42 +1002,54 @@ export default {
             column[type] = !column[type];
             let isValue = column[type];
             if (type == "symperHide") {
-				this.resetHiddenColumns(column.field,idx);
+				this.gridOptions.columnApi.setColumnVisible(column.field, !isValue)
+				this.agApi.sizeColumnsToFit()
+				this.resetHiddenColumns();
             } else {
-                this.reOrderFixedCols(column);
-            }
+				if(isValue){
+					column.pinned = 'left' 
+				}else{
+					delete column.pinned
+				}
+				this.reOrderFixedCols();
+				this.gridOptions.api.setColumnDefs();
+			}
 		},
-		resetHiddenColumns(field ,idx){
-			let value  =  this.tableDisplayConfig.value.hiddenColumns.includes(idx) ? true : false
-            let hiddenColumns = {};
+		resetHiddenColumns(){
+		 	let hiddenColumns = {};
             this.columnDefs.forEach((col, idx) => {
                 if (col.symperHide) {
-                    hiddenColumns[idx] = value;
+                    hiddenColumns[idx] = true;
                 }
             });
             hiddenColumns = Object.keys(hiddenColumns).reduce((newArr, el) => {
                 newArr.push(Number(el));
                 return newArr;
-			}, []);
-			this.$set(this.tableDisplayConfig.value, "hiddenColumns", hiddenColumns);
-			this.gridOptions.columnApi.setColumnVisible(field, value)
-			this.agApi.sizeColumnsToFit()
+            }, []);
+            this.$set(this.tableDisplayConfig.value, "hiddenColumns", hiddenColumns);
+			
         },
-		reOrderFixedCols(column){
-			let pinValue 
-			if(this.fixedCols.includes(column.field)){
-				this.fixedCols.splice(this.fixedCols.indexOf(column.field),1)
-				pinValue = 'unpinned'
-				delete column.pinned
-				column.symperFixed = false
-			}else{
-				this.fixedCols.push(column.field)
-				column.symperFixed = true
-				this.$set(column, 'pinned', 'left')
-				pinValue = 'pinned'
-			}
-			debugger
-			this.gridOptions.columnApi.setColumnPinned(column.field, pinValue)
+		reOrderFixedCols(){
+			let fixedCols = [];
+            let noneFixedCols = [];
+            for (let col of this.columnDefs) {
+                if (col.symperFixed) {
+                    fixedCols.push(col);
+                } else {
+                    noneFixedCols.push(col);
+                }
+            }
+            if (fixedCols.length > 0) {
+                this.columnDefs = fixedCols.concat(noneFixedCols);
+            }
+            setTimeout(
+                thisCpn => {
+                    thisCpn.savedTableDisplayConfig = thisCpn.columnDefs;
+                },
+                1000,
+                this
+			);
+			this.gridOptions.api.setColumnDefs([]);
         },
 		openTableDisplayConfigPanel() {
             this.tableDisplayConfig.show = !this.tableDisplayConfig.show;
@@ -1172,7 +1197,8 @@ export default {
 						columnTitle: item.title,
 						cellRenderer: item.cellRenderer ? item.cellRenderer : null,
 						cellRendererParams: item.cellRendererParams ? item.cellRendererParams : null,
-                        noFilter: item.noFilter ? item.noFilter : false
+						noFilter: item.noFilter ? item.noFilter : false,
+						width: item.width ? item.width : false
 					};
 				}	
 				
@@ -1291,8 +1317,8 @@ export default {
                 this.columnDefs = tbCols;
             }
             this.resetHiddenColumns();
-            // this.reOrderFixedCols();
-            this.$refs.tableDisplayConfig.resetTableColumnsData();
+			this.reOrderFixedCols();		
+			this.gridOptions.api.setColumnDefs([]);
         },
 	},
 

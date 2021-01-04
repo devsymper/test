@@ -235,5 +235,15 @@ export default {
                 reject(defData);
             }
         });
+	},
+	getTaskDetail(id){
+		return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + "/" + id, {}, testHeader)
+	},
+	changeTaskAction(id,data){
+		return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks + "/" + id, JSON.stringify(data), testHeader)
+	},
+	
+    updateProcessInstance(id, data){
+        return bpmneApi.put(appConfigs.apiDomain.bpmne.general +`symper-rest/service/runtime/process-instances/${id}`, JSON.stringify(data), testHeader)
     }
 };

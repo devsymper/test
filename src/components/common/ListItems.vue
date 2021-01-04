@@ -18,7 +18,6 @@
                             :append-icon="$i('input.search')"
                             outlined
                             dense
-                            label="Search"
                             :placeholder="$t('common.search')"
                         ></v-text-field>
 						<v-btn
@@ -1172,7 +1171,7 @@ export default {
                     symperHide: col.symperHide
                 });
             }
-            rsl.detail = JSON.stringify(configs);
+			rsl.detail = JSON.stringify(configs);
             return rsl;
         },
         /**

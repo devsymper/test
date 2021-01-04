@@ -1,5 +1,10 @@
 <template>
-    <div class="wrap-content-detail" style="overflow:hidden;position: relative;">
+    <div style="overflow:hidden;position: relative;"
+        :class="{
+            'document-form-style-custom-1' :true,
+            'wrap-content-detail':true
+        }"
+    >
         <Preloader ref="preLoaderView"/>
         <div class="panel-header" v-if="!quickView && !isPrint">
             <div class="right-action">
@@ -75,7 +80,7 @@ import FloattingPopup from './../common/FloattingPopup'
 import Preloader from './../../../components/common/Preloader';
 import PivotTable from "./../submit/pivot-table";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-
+import tinymce from 'tinymce/tinymce';
 import { util } from '../../../plugins/util.js';
 export default {
     name: "detailDocument",
@@ -180,6 +185,7 @@ export default {
         this.documentSize = "21cm";
     },
     created(){
+        tinymce.remove();
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});

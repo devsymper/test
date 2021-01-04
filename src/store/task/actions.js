@@ -22,6 +22,18 @@ const getArrFileAttachment = async(context, data) => {
 const removeFileAttachToStore = async(context, id) => {
     context.commit('removeFileAttachToStore', id);
 }
+const getTaskHistory = async(context, id) => {
+	context.commit('setCurrentId', id);
+	if(!context.state.taskHistory[id]){
+		let data = []
+		let res = await taskApi.getHistoryTask(id)
+		if(res.status == 200){
+			data = res.data
+		}
+		context.commit('setTaskHistory', {data:data, id: id });
+
+	}
+}
 
 const getArrDocObjId = async(context, data) => {
     try {
@@ -123,6 +135,7 @@ export {
     getListDocumentObjIdWithUserSubmit,
     getAllAppActive,
     getListNodeInProcess,
-    getVariableOfProcess
+	getVariableOfProcess,
+	getTaskHistory
 
 };
