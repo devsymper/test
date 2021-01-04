@@ -1,9 +1,5 @@
 <template>
-    <div :class="{
-    'wrap-content-submit':true,
-    'sym-sub-form-submit':(parrentInstance == 0) ? false : true
-
-    }">
+    <div :class="globalClass">
     <VuePerfectScrollbar class="scroll-content h-100">
          
         <Preloader ref="preLoaderView"/>
@@ -215,6 +211,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import FloattingPopup from './../common/FloattingPopup'
 import PopupPivotTable from './items/PopupPivotTable'
 
+import tinymce from 'tinymce/tinymce';
 
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
@@ -406,11 +403,16 @@ export default {
             dataPivotTable:{},
             dataColPivot:[],
             dataPivotMode:[],
+            globalClass:null
         };
 
     },
     beforeMount() {
         this.columnsSQLLiteDocument = {};
+        this.globalClass = {
+            'wrap-content-submit':true,
+            'sym-sub-form-submit':(this.parrentInstance == 0) ? false : true,
+        }
     },
     mounted() {
         this.editorDoc = $(".sym-form-submit");
@@ -442,6 +444,7 @@ export default {
 
     async created() {
         await ClientSQLManager.createDB(this.keyInstance);
+        tinymce.remove()
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
@@ -1458,6 +1461,10 @@ export default {
                             thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
                             if(res.data.document.otherInfo != null && res.data.document.otherInfo != "")
 							thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
+                            let style = JSON.parse(res.data.document.formStyle);
+                            if(style){
+                                this.globalClass[style['globalClass']] = true;
+                            }
                             thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
                             thisCpn.dataPivotTable = res.data.pivotConfig;
                             //if(res.data.document.allowSubmitOutsideWorkflow==1){
@@ -2225,6 +2232,9 @@ export default {
                         } 
                         if(listInput[controlName].type == 'fileUpload'){
                             dataControl[controlName] = JSON.stringify(value)
+                        }
+                        if(listInput[controlName].type == 'richText'){
+                            dataControl[controlName] = listInput[controlName].editor.getContent();
                         }
                        
                     }

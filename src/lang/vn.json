@@ -732,6 +732,7 @@
                     "note": "Ghi chú (Phục vụ cho việc tìm kiếm)",
                     "titleObject": "Tiêu đề bản ghi (Phục vụ cho việc hiển thị trên MyItem, công thức chạy trên server)",
                     "titlePrint": "Tiêu đề bản In",
+                    "formStyle": "Chọn style",
                     "systemMapping": {
                         "title": "Liên kết Doc và đối tượng hệ thống",
                         "itemTitle": "Chọn đối tượng để liên kết (Có thể mở được bản ghi của Doc ngay trong đối tượng hệ thống)",

@@ -537,6 +537,9 @@ export default class Table {
      */
 
     checkEnterInsertRowEvent(e, cellMeta) {
+        if(!this.controlObj.controlProperties.isInsertRow.value){
+            return;
+        }
         if (!e) {
             return;
         }
@@ -1125,7 +1128,7 @@ export default class Table {
             columns: thisObj.columnsInfo.columns,
             allowInsertColumn: false,
             allowRemoveColumn: false,
-            contextMenu: (thisObj.checkDetailView()) ? false : thisObj.getContextMenu(),
+            contextMenu: (thisObj.checkDetailView()) ? false : (thisObj.controlObj.controlProperties.isInsertRow.value?thisObj.getContextMenu('all'):thisObj.getContextMenu('exceptRow')),
             stretchH: 'all',
             autoRowSize: false,
             autoColSize: true,
@@ -1217,7 +1220,7 @@ export default class Table {
     /**
      * Context menu cho handson table trong view nhập liệu
      */
-    getContextMenu() {
+    getContextMenu(value) {
         return {
             callback: function(key, selection, clickEvent) {
                 if (key == 'row_below') {
@@ -1235,10 +1238,16 @@ export default class Table {
             items: {
 
                 "row_above": {
-                    name: "Thêm dòng phía trên"
+                    name: "Thêm dòng phía trên",
+                    hidden: function () {
+                        return  value == "exceptRow";
+                    }
                 },
                 "row_below": {
-                    name: "Thêm dòng phía dưới"
+                    name: "Thêm dòng phía dưới",
+                    hidden: function () {
+                        return  value == "exceptRow";
+                    }
                 },
                 'remove_row': {
                     name: "Xóa dòng",
