@@ -75,7 +75,7 @@ export default {
 						 listObject: res.data.listObject,
 						 total: res.data.listObject.length,
                          columns: [
-                                {name: "id", title: "id", 	type: "text", },
+                                {name: "id", title: "id", type: "text", width: 50 },
                                 {name: "name", title: "name", type: "text"},
                                 {name: "iconName", title: "icon", type: "text",
                                     cellRenderer: function(params) {
@@ -166,7 +166,6 @@ export default {
         showEditAppPanel(app) {
 			this.isEdit = true;
 			this.$refs.listApp.actionPanel = true
-			debugger
             this.$refs.actionPanel.setAppObject(app);
         },
 

@@ -515,6 +515,7 @@
                     "note": "Note (Serve for searching)",
                     "titleObject": "Title Object (Serve for display on MyItem, formulas execute on server)",
                     "titlePrint": "Title Form Print",
+                    "formStyle": "Select style",
                     "systemMapping": {
                         "title": "Mapping Doc with System object",
                         "itemTitle": "Select the object to be linked (Can open the Doc record within the system object)",

@@ -236,8 +236,10 @@ export default {
                             this.workflowInfo.documentObjectTaskId = this.taskInfo.action.parameter.taskId;
                             // cần activityId  của task truyền vào nữa 
                             let workflowVariable = {};
+                            this.taskVarsMap = {};
                             for(let key in varsMap){
                                 workflowVariable['workflow_'+key] = varsMap[key].value;
+                                this.taskVarsMap[key] = varsMap[key].value;
                             }
                             this.workflowVariable = null;
                             this.workflowVariable = workflowVariable;
@@ -248,7 +250,14 @@ export default {
                                 if(!this.taskInfo.action.parameter.documentObjectId){
                                     
                                     let approvaledElId = this.taskInfo.targetElement;
-                                    let docObjId = varsMap[approvaledElId+'_document_object_id'];
+                                    let docObjId = 0;
+                                    if(approvaledElId == 'DOC_INSTANCE_FROM_STARTING_WORKFLOW'){
+                                        // docObjId = varsMap['doc_INSTANCE_FROM_STARTING_WORKFLOW'];
+                                        docObjId = varsMap['docInstanceFromStartingWorkflow'];
+                                        docObjId = docObjId ? docObjId : 0;
+                                    }else{
+                                        docObjId = varsMap[approvaledElId+'_document_object_id'];
+                                    }
                                     this.docObjInfo.docObjId = docObjId.value;
                                 }else{
                                     this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
@@ -272,6 +281,9 @@ export default {
         }
     },
     methods: {
+        getVarsMap(){
+            return this.taskVarsMap;
+        },
         onDocumentUpdateSuccess(){
             this.showDetailDocument = false;
             setTimeout((self) => {

@@ -5,6 +5,7 @@ import { SYMPER_APP } from './../../../main.js'
 import Util from './util'
 var numbro = require("numbro");
 import { appConfigs } from "@/configs.js";
+import tinymce from 'tinymce/tinymce';
 import { documentApi } from "../../../api/Document";
 let sDocumentManagementUrl = appConfigs.apiDomain.sdocumentManagement;
 const fileTypes = {
@@ -199,6 +200,33 @@ export default class BasicControl extends Control {
                     valueChange = $(e.target).text();
                 } else if (thisObj.type == 'checkbox') {
                     valueChange = $(e.target).prop("checked");
+                } else if(thisObj.type == 'user'){
+                    return false;
+                }else if(thisObj.type == 'number'){
+                    valueChange = valueChange.replace(/=/g,"");
+                    valueChange = eval(valueChange);
+                    if(!/^[-0-9,.]+$/.test(valueChange)){
+                        return false;
+                    }
+                }else if(thisObj.type == 'date'){
+                    valueChange = this.$moment(valueChange,'DD-MM-YYYY').format('YYYY-MM-DD');
+                }else if(thisObj.type == 'time'){
+                    if(!Util.checkTimeValid(valueChange)){
+                        thisObj.renderValidateIcon("Không đúng định dạng thời gian", 'TimeValid')
+                        return false
+                    }
+                    else{
+                        thisObj.removeValidateIcon('TimeValid')
+                    }
+                }
+                // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
+                if(thisObj.isRequiredControl()){
+                    if(!valueChange){
+                        thisObj.renderValidateIcon('Không được bỏ trống trường thông tin '+thisObj.title, 'Require')
+                    }
+                    else{
+                        thisObj.removeValidateIcon('Require');
+                    }
                 }
                 thisObj.value = valueChange;
                 SYMPER_APP.$evtBus.$emit('document-submit-input-change', thisObj);
@@ -224,15 +252,6 @@ export default class BasicControl extends Control {
                     }
                     thisObj.traceControl();
                 }
-                if (thisObj.type == 'user') {
-                    e.curTarget = e.target
-                    SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
-                }
-                // if (thisObj.type == 'percent') {
-                //     if (e.target.value > 100) {
-                //         $(e.target).val(100)
-                //     }
-                // }
                 if (thisObj.type == 'department') {
                     e['controlName'] = thisObj.name;
                     SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
@@ -318,7 +337,12 @@ export default class BasicControl extends Control {
             this.setFileControlValue(value);
         }
         else{
-            this.value = value;
+            if(value.inputDislay && value.inputValue){
+                this.value = value.inputValue;
+            }
+            else{
+                this.value = value;
+            }
             if (this.inTable === false) {
                 if (this.type == 'label') {
                     this.ele.text(value);
@@ -326,6 +350,7 @@ export default class BasicControl extends Control {
                     this.ele.val(value);
                 } else if (this.type == 'date') {
                     this.ele.val(SYMPER_APP.$moment(value).format(this.formatDate));
+                    this.value = SYMPER_APP.$moment(value).format('YYYY-MM-DD');
                 } else if (this.type == 'checkbox') {
                     if (value)
                         this.ele.attr('checked', 'checked');
@@ -344,14 +369,19 @@ export default class BasicControl extends Control {
                     this.setImageControlValue(value)
                 }        
                 else {
-                    this.ele.val(value);
+                    if(value.inputDislay){
+                        this.ele.val(value.inputDislay);
+                    }
+                    else{
+                        this.ele.val(value);
+                    }
                 }
             }
             if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
                 this.defaultValue = value;
             }
         }
-        
+        console.log(this.value,'asasas');
     }
     getValue() {
         return this.value;
@@ -402,6 +432,9 @@ export default class BasicControl extends Control {
         if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
             this.defaultValue = value;
         }
+    }
+    getAutocompleteKeyValue(){
+        return this.controlProperties.itemValue.value
     }
     setImageControlValue(value){
         this.ele.empty();
@@ -756,14 +789,38 @@ export default class BasicControl extends Control {
 
     }
     renderRichTextControl() {
-        let style = this.ele.attr('style');
-        this.ele.replaceWith('<textarea style="'+style+'" id="'+this.id+'" class="s-control s-control-rich-text" title="Rich-text" s-control-type="richText" type="text"></textarea>');
+        let isReadOnly = 1;
+        this.editor = '';
+        let selector = '';
+        let self = this;
+        let toolbar = true;
         if(this.checkViewType('submit') || this.checkViewType('update')){
-            this.ele = $('#sym-submit-'+this.curParentInstance).find("textarea#"+this.id);
+            this.ele = $('#sym-submit-'+this.curParentInstance).find("#"+this.id);
+            isReadOnly = 0;
+            selector = '#sym-submit-'+this.curParentInstance+" #"+this.id;
         }
         else{
-            this.ele = $('#sym-Detail-'+this.curParentInstance).find("textarea#"+this.id);
+            this.ele = $('#sym-Detail-'+this.curParentInstance).find("#"+this.id);
+            selector = '#sym-Detail-'+this.curParentInstance+" #"+this.id;
+            toolbar = false;
         }
+        if(this.controlProperties.isShowHeaderTinyMce.value){
+            tinymce.init({
+                toolbar: toolbar,
+                menubar: false,
+                branding: false,
+                readonly: isReadOnly,
+                selector:  selector,
+                statusbar: false,
+                init_instance_callback : function(editor) {
+                    self.editor = editor;
+                    self.initEditor();
+                },
+            });    
+        }
+    }
+    initEditor(){
+        return this.editor.setContent(this.value);
     }
     getDefaultValue() {
         if (this.isCheckbox) {
@@ -808,16 +865,26 @@ export default class BasicControl extends Control {
             let newData = [];
             for (let index = 0; index < data.length; index++) {
                 let value = data[index];
-                if (value) {
-                    newData.push(SYMPER_APP.$moment(value, dateFormat).format('YYYY-MM-DD'))
-                } else {
+                if(value){
+                    if(SYMPER_APP.$moment(data, 'YYYY-MM-DD', true).isValid()){
+                        newData.push(data);
+                    }
+                    else{
+                        newData.push(SYMPER_APP.$moment(value,dateFormat).format('YYYY-MM-DD'))
+                    }
+                }
+                else{
                     newData.push("");
                 }
 
             }
             return newData;
-        } else {
-            return SYMPER_APP.$moment(data, dateFormat).format('YYYY-MM-DD')
+        }
+        else{
+            if(SYMPER_APP.$moment(data, 'YYYY-MM-DD', true).isValid()){
+                return data;
+            }
+            return SYMPER_APP.$moment(data,dateFormat).format('YYYY-MM-DD')
         }
     }
      /**

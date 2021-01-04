@@ -26,6 +26,22 @@ const getControlInstanceFromStore = function(instance, controlName) {
         return false
     }
 }
+const minimizeDataAfterRunFormula = function(rs) {
+    let value = "";
+    if(!rs.server){
+        let data = rs.data; 
+        if(data.length > 0){
+            value=data[0].values[0][0];
+        }
+    }
+    else{
+        let data = rs.data.data;
+        if(data.length > 0){
+            value=data[0][Object.keys(data[0])[0]];
+        }
+    }
+    return value;
+}
 const getControlTitleFromName = function(instance, controlName) {
     let control = getControlInstanceFromStore(instance, controlName);
     if (control != false) {
@@ -213,5 +229,6 @@ export {
     getListInputInDocument,
     checkNameControl,
     checkTitleControl,
-    mapTypeToEffectedControl
+    mapTypeToEffectedControl,
+    minimizeDataAfterRunFormula
 }

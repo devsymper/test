@@ -551,10 +551,10 @@ export default {
             if(this.isShowDebugMode){
                 this.hideDebugMode();
             }
-            let info = this.largeFormulaEditor;
-            setTimeout((self) => {
-                self.largeFormulaEditor.name = '';
-            }, 500, this);
+            // let info = this.largeFormulaEditor;
+            // setTimeout((self) => {
+            //     self.largeFormulaEditor.name = '';
+            // }, 500, this);
         },
         openLargeValueEditor(inputInfo, name) {
             this.$set(this.largeFormulaEditor, "data", inputInfo);

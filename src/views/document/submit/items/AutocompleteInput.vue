@@ -21,10 +21,10 @@
         >
         <template v-slot:item="{ item }">
             <tr @click="handleClickRow(item)" class="active-row" v-if="item.active" style="background: #f0f0f0">
-                <td v-for="(key,value) in item" :key="key+value" :class="{'row-item':true,'d-none':(value == 'active')}">{{ (value != 'active') ? key : '' }}</td>
+                <td v-for="(key,value) in item" :key="key+value" :class="{'row-item':true,'d-none':(value == 'active' || value == 'document_object_id')}">{{ (value != 'active') ? key : '' }}</td>
             </tr>
             <tr @click="handleClickRow(item)" v-else class="row-item">
-                <td v-for="(key,value) in item" :key="key+value" :class="{'d-none':(value == 'active' || value == 'checked')}">{{ key }}</td>
+                <td v-for="(key,value) in item" :key="key+value" :class="{'d-none':(value == 'active' || value == 'checked' || value == 'document_object_id')}">{{ key }}</td>
                 <span class="mdi mdi-check icon-checked" v-if="item.checked"></span>
             </tr>
         </template>
@@ -57,6 +57,7 @@ export default {
             isHideHeader:false,
             search: '',
             inputType:false,
+            controlValueKey:null,
             isSingleSelectCombobox:true,
             dataSelected:{}
         }
@@ -110,6 +111,9 @@ export default {
         },
         isShow(){
             return this.isShowAutoComplete;
+        },
+        setControlValueKey(controlValueKey){
+            this.controlValueKey = controlValueKey
         },
         setData(data){
             this.showHeader();
@@ -236,6 +240,12 @@ export default {
             else{
                 this.dataTable = [];
                 this.hide();
+            }
+            if(this.controlValueKey){
+                value = {inputDislay:value, inputValue:item[this.controlValueKey]};
+            }
+            else{
+                value = {inputDislay:value, inputValue:value};
             }
             this.$emit('after-select-row',{value:value,fromEnterKey:fromEnterKey});
 
