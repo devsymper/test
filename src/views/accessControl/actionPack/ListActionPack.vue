@@ -167,6 +167,7 @@ export default {
     },
     mounted() {
 		this.calcContainerHeight();
+		this.actionPackWorker = new ActionPackWorker()
 		let self = this
 		this.actionPackWorker.addEventListener("message", function (event) {
 			let data = event.data;
@@ -188,7 +189,6 @@ export default {
     created() {
 		this.$store.dispatch("app/getAllBA");
 		this.$store.dispatch("actionPack/getAllActionByObjectType");
-		this.actionPackWorker = new ActionPackWorker()
     },
     watch: {},
     computed: {

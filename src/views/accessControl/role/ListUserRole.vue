@@ -95,6 +95,7 @@ export default {
     mounted() {
 		this.calcContainerHeight();
 		let self = this
+		this.roleWorker = new RoleWorker()
 		this.roleWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
@@ -115,7 +116,6 @@ export default {
         });
     },
     created() {
-		this.roleWorker = new RoleWorker()
 	},
     watch: {},
     methods: {

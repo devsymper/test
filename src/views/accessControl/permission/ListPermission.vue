@@ -58,7 +58,6 @@ export default {
     },
     created(){
 		this.$store.dispatch("app/getAllBA");
-		this.permissionWorker = new PermissionWorker()
     },
     data: function() {
         let self = this;
@@ -165,6 +164,7 @@ export default {
     },
     mounted() {
 		this.tableHeight = util.getComponentSize(this).h;
+		this.permissionWorker = new PermissionWorker()
 		let self = this
 		this.permissionWorker.addEventListener("message", function (event) {
 			let data = event.data;

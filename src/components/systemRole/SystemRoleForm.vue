@@ -151,11 +151,9 @@ export default {
             default: ''
         }
 	},
-	created(){
-		this.roleWorker = new RoleWorker()
-	},
 	mounted(){
 		let self = this
+		this.roleWorker = new RoleWorker()
 		this.roleWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
