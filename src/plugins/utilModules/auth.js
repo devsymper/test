@@ -1,6 +1,6 @@
 import IndexedDB from "@/plugins/utilModules/indexedDB.js";
 import { reject } from "lodash";
-var loginedInfo = {};	
+var loginedInfo = null;	
 
 async function getLoginInfoFromIndexedDB() {	
     return new Promise((resolve, reject) => {
@@ -44,7 +44,7 @@ export const authUtil = {
 			}
 		}else{
             return new Promise(async (resolve, reject) => {
-                let loginInfo = await getLoginInfoFromIndexedDB();
+				let loginInfo = await getLoginInfoFromIndexedDB();
                 resolve(loginInfo.token);
             });
 		}

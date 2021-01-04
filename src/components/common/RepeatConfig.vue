@@ -932,9 +932,6 @@ export default {
             return firstDay;
         },
         selectDayOfWeek(item){
-            // let dateSelect = '';
-            // dateSelect= dateSelect+item.name;
-            // this.crobTabValue[5]=;
             item.active = !item.active 
         },
         selectDayOfMonth(item){
