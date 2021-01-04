@@ -184,6 +184,7 @@ let commonTableSetting = {
 export default {
     mounted(){
 		let self = this
+		this.actionPackWorker = new ActionPackWorker()
 		this.reCaculateTableHeight();
 		this.actionPackWorker.addEventListener("message", function (event) {
 			let data = event.data;
@@ -216,7 +217,6 @@ export default {
     created(){
 		this.genAllInputForFormTpl();
 		this.getObjectTypeSelections()
-		this.actionPackWorker = new ActionPackWorker()
     },
     methods: { 
         closeActionPackForm(){
