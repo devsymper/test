@@ -165,9 +165,7 @@ export default {
 						override: self.override
 					}
 				}
-			})
-			
-			
+			});
 		}
 	},
 }

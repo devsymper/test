@@ -5,13 +5,12 @@ export const symperAjax = async(options) =>{
 			options.url.includes("?") ? options.url = options.url + "&" + str : options.url = options.url + "?" + fullParams
 		}
 	}else{
+		
 		if(!options.contentType){
 			if(!options.headers['Content-Type']){
 				options.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=UTF-8';
-				if(options.data){
-					let data = new URLSearchParams(options.data)
-					options.body = data;
-				}
+				let data = new URLSearchParams(options.data)
+				options.body = data;
 			}else{
 				options.body = options.data
 			}

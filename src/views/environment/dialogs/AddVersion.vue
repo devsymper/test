@@ -128,7 +128,6 @@ export default {
                 case 'addVersion':
 					self.handlerAddversionRes(data.dataAfter)
 					break;
-                
                 default:
                     break;
             }
@@ -164,24 +163,13 @@ export default {
 					serviceId: serviceId,
 					formData: formData
 				}
-			})
-			// environmentManagementApi.addVersion({
-			// 	serviceId:serviceId,
-			// 	formData:formData
-			// }).then(res=>{
-			
-			// }).catch(err=>{
-			// 		self.$snotify({
-			// 			type: "error",
-			// 			title: " Có lỗi xảy ra"
-			// 		})
-			// })
+			});
 		},
 		handlerAddversionRes(res){
 			if(res.status == 200){
 				this.$snotify({
 					type: "success",
-					title: " Thêm version thành công"
+					title: "Thêm version thành công"
 				})
 				this.$emit('add-success')
 			}else{

@@ -1,5 +1,5 @@
 import { util } from "./../../../plugins/util.js";
-import { SYMPER_APP } from "@/main.js";
+// import { SYMPER_APP } from "@/main.js";
 import Api from "@/api/api.js";
 var apiObj = new Api("");
 const defaultConfig = {
@@ -77,18 +77,17 @@ function getFilterConfigs(getDataMode = '', filterData) {
             ];
         }
 
-        if(filter.selectAll && !$.isEmptyObject(filter.valuesNotIn)){
+        if(filter.selectAll && Object.keys(filter.valuesNotIn).length > 0){
             option.conditions.push({
                 name: 'not_in',
                 value: Object.keys(filter.valuesNotIn)
             });
-        }else if(!filter.selectAll && !$.isEmptyObject(filter.valuesIn)){
+        }else if(!filter.selectAll && Object.keys(filter.valuesIn).length > 0){
             option.conditions.push({
                 name: 'in',
                 value: Object.keys(filter.valuesIn)
             });
         }
-        
         if(option.conditions.length > 0){
             configs.push(option);
         }
@@ -161,24 +160,19 @@ function  getSortConfigs(filterData) {
  * @param {Object} header header phục vụ cho request 
  */
 export const getDataFromConfig = function(url, configs, columns, filterData, success, method = 'GET',header = {}){
-    let options = {};
+	let options = {};
     if(!configs.emptyOption){
         options = getOptionForGetList(configs, columns, filterData);
     }
 
     if(configs.customDataForApi){
         options = configs.customDataForApi(configs, columns, filterData);
-    }
+	}
     apiObj.callApi(method, url, options, header, {})
     .then(data => {
         success(data);
     })
     .catch(err => {
-        console.warn(err);
-        SYMPER_APP.$snotify({
-            type: "error",
-            title: SYMPER_APP.$t("table.error.cannot_get_data"),
-            text: ""
-        });
+       
     });
 }
