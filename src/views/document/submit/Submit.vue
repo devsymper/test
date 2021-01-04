@@ -2427,7 +2427,7 @@ export default {
         
         handlerBeforeRunFormulasValue(formulasInstance,controlId,controlName,formulasType,from=false){
             let dataInput = this.getDataInputFormulas(formulasInstance);
-            // if(checkDataInputChange(this.keyInstance, dataInput)){
+            if(checkDataInputChange(this.keyInstance, dataInput)){
                 let control = getControlInstanceFromStore(this.keyInstance,controlName);
                 if(control.inTable != false){
                     let tableInstance = getControlInstanceFromStore(this.keyInstance,control.inTable);
@@ -2440,8 +2440,11 @@ export default {
                         this.handleAfterRunFormulas(rs,controlId,controlName,formulasType,from)
                     });
                 }
-                
-            // }
+            }
+            else{
+                markBinedField(this.keyInstance,controlName);
+                this.handleControlInputChange(controlName);
+            }
         },
         /**
          * Hàm lấy dữ liệu của các control trong store để chuân bị cho việc run formulas
