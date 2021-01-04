@@ -147,9 +147,9 @@ import MenuConfigTypeView from './MenuConfigTypeView'
     },
     methods:{
 		getActiveApp(){
-			this.myApplicationWorker.postMessage({
-				action: "getActiveApp"
-			})
+			this.applicationWorker.postMessage({
+				action: 'getActiveApp',
+			});
 		},
         rightClickHandler(event,item,type){
 			event.stopPropagation();
@@ -196,12 +196,13 @@ import MenuConfigTypeView from './MenuConfigTypeView'
         getFavorite(){
 			this.listFavorite = []
 			let userId = this.$store.state.app.endUserInfo.id
-			this.myApplicationWorker.postMessage({
-				action: "getFavorite",
+			this.applicationWorker.postMessage({
+				action: 'getFavorite',
 				data:{
 					userId: userId
 				}
-			})
+			});
+
         },
         checkTypeFavorite(data){
 			let self = this
@@ -279,12 +280,12 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 			this.$store.commit('appConfig/emptyItemSelected')
 			let appStore = this.$store.state.appConfig
 			if(!appStore.listAppsSideBySide[appStore.currentAppId]){
-				this.myApplicationWorker.postMessage({
+				this.applicationWorker.postMessage({
 					action: 'getAppDetails',
 					data:{
 						id: item.id
 					}
-				})
+				});
 			}else{
 				this.loadingApp = false
 			}
@@ -318,13 +319,13 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 		},
 		getItemByAccessControl(ids,type){
 			let self = this
-			this.myApplicationWorker.postMessage({
+			this.applicationWorker.postMessage({
 				action: 'getItemByType',
 				data:{
 					ids: ids,
 					type: type
 				}
-			})
+			});
 		},
 		handlerGetAppDetals(res){
 			if (res.status == 200) {

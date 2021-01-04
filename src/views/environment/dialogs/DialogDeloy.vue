@@ -120,14 +120,13 @@ export default {
 				title: "Đang xử lí. Vui lòng chờ kêt quả.... "
 			})
 			this.environmentWorker.postMessage({
-				action: "deployVersion",
+				action: 'deployVersion',
 				data:{
 					versionId : versionId,
 					environmentId: self.envId,
 					dataGetServerId : data
 				}
-			})
-
+			});
 		}
 	},
 }
