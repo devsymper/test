@@ -13,8 +13,9 @@
                     :placeholder="$t('common.search')"
                     hide-details
                 ></v-text-field>
-                <div class="list-user d-inline-block" v-for="(obj) in listUser" :key="obj.id">
-                    <symperAvatar :size="22" class="user-avatar" :userId="obj.userId" />
+                <div class="list-user d-inline-block" v-for="(obj) in getUser()" :key="obj.id">
+                    <span class="count-user" v-if="obj.count">{{obj.count}}+</span>
+                    <symperAvatar v-else :size="22" class="user-avatar" :userId="obj.userId" />
                 </div>
                 <div class="ml-3 d-inline-block">
                     <v-menu offset-y>
@@ -174,13 +175,21 @@ export default {
             projectId:null,
             listBoardColumn:null,
             settingBoardMenuitems: null,
-            listUser:null,
+            listUser:[],
             currentBoard:{},
             dragging:false
         };
     },
    
     methods:{
+        getUser(){
+            if (this.listUser.length > 1) {
+                let arr = this.listUser.slice(0,2);
+                arr.push({count:this.listUser.length - arr.length});
+                return arr;    
+            }
+            return this.listUser;
+        },
         handleChange(event, status){
             if(event.added){
                 let task = event.added.element;
@@ -400,6 +409,7 @@ export default {
 }
 .list-user{
     vertical-align: middle;
+  
 }
 .title-column{
     font-weight: 500;
@@ -411,5 +421,13 @@ export default {
 .user-avatar{
     margin-left: -6px;
     box-shadow: var(--symper-box-shadow);
+}
+.list-user:nth-child(4){
+    border-radius: 50%;
+    background: #f2f2f2;
+    width: 24px;
+    height: 24px;
+    padding: 4px 0px;
+    text-align: center;
 }
 </style>
