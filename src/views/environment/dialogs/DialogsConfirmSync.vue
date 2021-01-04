@@ -152,7 +152,7 @@ export default {
 			let data = {
 				[type]:ids
 			}
-			this.$postWorkerMessage(this.environmentWorker, {
+			this.environmentWorker.postMessage({
 				action: 'migrateData',
 				data:{
 					dataGetServerId:{

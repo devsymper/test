@@ -157,7 +157,7 @@ export default {
 
 			}
 			formData.releaseAt = this.dates
-			this.$postWorkerMessage(this.environmentWorker, {
+			this.environmentWorker.postMessage({
 				action: 'addVersion',
 				data:{
 					serviceId: serviceId,

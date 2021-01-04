@@ -139,7 +139,7 @@ export default {
 			for(let i in this.listItems){
 				this.listItems[i].item = []
 			}
-			this.$postWorkerMessage(this.applicationWorker, {
+			this.applicationWorker.postMessage({
 				action: 'search',
 				data:{
 					value: value,

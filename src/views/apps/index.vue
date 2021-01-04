@@ -267,7 +267,7 @@ export default {
             })
         },
         deleteApp(app){
-			this.$postWorkerMessage(this.applicationWorker, {
+			this.applicationWorker.postMessage({
 				action: 'deleteApp',
 				data:{
 					id: app[0].id
@@ -307,7 +307,7 @@ export default {
 					self.arrType[i].push(e.id)
 				})
 			}
-			this.$postWorkerMessage(this.applicationWorker, {
+			this.applicationWorker.postMessage({
 				action: 'getChildItemInApp',
 				data:{
 					data: self.arrType

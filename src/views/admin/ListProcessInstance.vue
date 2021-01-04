@@ -369,7 +369,7 @@ export default {
 			this.$goToPage('/workflow/process-key/'+processKey+'/list-instances', this.$t('process.instance.listModelInstance')+processKey)
 		},
 		stopProcessInstance(){
-			this.$postWorkerMessage(this.adminWorker, {
+			this.adminWorker.postMessage({
 				action: 'stopProcessInstance',
 				data:{
 					listItemSelected: this.listItemSelected
@@ -377,7 +377,7 @@ export default {
 			});
 		 },
 		endProcessInstance(){
-			this.$postWorkerMessage(this.adminWorker, {
+			this.adminWorker.postMessage({
 				action: 'endProcessInstance',
 				data:{
 					listItemSelected: this.listItemSelected
@@ -385,7 +385,7 @@ export default {
 			});
 		},
 		activeProcessInstance(){
-			this.$postWorkerMessage(this.adminWorker, {
+			this.adminWorker.postMessage({
 				action: 'activeProcessInstance',
 				data:{
 					listItemSelected: this.listItemSelected
@@ -401,7 +401,7 @@ export default {
 		},
 		deleteProcessInstance(value){
 			this.showDialog = false
-			this.$postWorkerMessage(this.adminWorker, {
+			this.adminWorker.postMessage({
 				action: 'deleteProcessInstance',
 				data:{
 					listItemSelected: this.listItemSelected,

@@ -122,7 +122,7 @@ export default {
 		},
 		getDetails(obj){
 			let self = this
-			this.$postWorkerMessage(this.adminWorker, {
+			this.adminWorker.postMessage({
 				action: 'getDetailWorkflow',
 				data:{
 					processKey: obj.processKey

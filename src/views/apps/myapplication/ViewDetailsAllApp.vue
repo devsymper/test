@@ -223,7 +223,7 @@ export default {
         },
 		getActiveapps(){
 			let self = this
-			this.$postWorkerMessage(this.myApplicationWorker, {
+			this.applicationWorker.postMessage({
 				action: 'getActiveAppSBS',
 			});
         },
@@ -380,7 +380,7 @@ export default {
         },
 
 		async getItemByAccessControl(ids){
-			this.$postWorkerMessage(this.myApplicationWorker, {
+			this.applicationWorker.postMessage({
 				action: 'getItemByAccessControl',
 				data:{
 					ids: ids

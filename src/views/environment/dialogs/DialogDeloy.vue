@@ -119,7 +119,7 @@ export default {
 				type: 'success',
 				title: "Đang xử lí. Vui lòng chờ kêt quả.... "
 			})
-			this.$postWorkerMessage(this.environmentWorker, {
+			this.environmentWorker.postMessage({
 				action: 'deployVersion',
 				data:{
 					versionId : versionId,

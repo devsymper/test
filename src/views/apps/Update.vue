@@ -246,7 +246,7 @@ export default {
         },
         createApp() {	
 			let self = this
-			this.$postWorkerMessage(this.applicationWorker, {
+			this.applicationWorker.postMessage({
 				action: 'createApp',
 				data:{
 					listItemSelected: self.$store.state.appConfig.listItemSelected,
@@ -263,7 +263,7 @@ export default {
 				this.currentApp.status = 0
 			}
 			let self = this
-			this.$postWorkerMessage(this.applicationWorker, {
+			this.applicationWorker.postMessage({
 				action: 'updateApp',
 				data:{
 					listItemSelected: self.$store.state.appConfig.listItemSelected,

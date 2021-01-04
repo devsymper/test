@@ -901,7 +901,7 @@ export default {
 			let self = this
             if(colFilter.selectItems.length == 0){
 				let textItems = testSelectData;
-				this.$postWorkerMessage(this.listItemsWorker, {
+				this.listItemsWorker.postMessage({
 					action: 'setSelectItemForFilter',
 					data:{
 						textItems : textItems,
@@ -926,7 +926,7 @@ export default {
 			dataConfig.options = options
 			dataConfig.columns = columns
 			dataConfig.colFilter = self.tableFilter.currentColumn.colFilter
-			this.$postWorkerMessage(this.listItemsWorker, {
+			this.listItemsWorker.postMessage({
 				action: 'getItemForValueFilter',
 				data:{
 					dataConfig
@@ -1155,7 +1155,7 @@ export default {
 			dataConfig.lazyLoad = lazyLoad
 			dataConfig.customAPIResult = self.customAPIResult.reformatData ? self.customAPIResult.reformatData.toString() : null
 			
-			this.$postWorkerMessage(this.listItemsWorker, {
+			this.listItemsWorker.postMessage({
 				action: 'getData',
 				data: dataConfig
 			});
@@ -1166,7 +1166,7 @@ export default {
         restoreTableDisplayConfig() {
 			let widgetIdentifier = this.getWidgetIdentifier();
 			let self = this
-			this.$postWorkerMessage(this.listItemsWorker, {
+			this.listItemsWorker.postMessage({
 				action: 'restoreTableDisplayConfig',
 				data:{
 					widgetIdentifier: widgetIdentifier,
@@ -1208,7 +1208,7 @@ export default {
             this.savingConfigs = true;
 			let thisCpn = this;
 			let dataToSave = this.getTableDisplayConfigData();
-			this.$postWorkerMessage(this.listItemsWorker, {
+			this.listItemsWorker.postMessage({
 				action: 'saveTableDisplayConfig',
 				data:{
 					dataToSave: dataToSave

@@ -131,7 +131,7 @@ export default {
 				dbName: this.dbName
 			}
 			let self = this
-			this.$postWorkerMessage(this.environmentWorker, {
+			this.environmentWorker.postMessage({
 				action: 'changeServer',
 				data: data
 			});
