@@ -1,6 +1,6 @@
 <template>
     <v-card v-show="isShow" class="card-add-board" @click:stop:prevent="onCardClick($event)" :style="position"> 
-        <div class="card-title">Board trong project A</div>
+        <div class="card-title">Chọn Board</div>
         <VuePerfectScrollbar>
             <v-list-item
                 link

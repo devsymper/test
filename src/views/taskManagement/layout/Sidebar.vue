@@ -30,6 +30,9 @@
                                 link
                                 v-if="!item.isWorkSpace"
                                 @click="onClickItem(item, $event)"
+                                :class="{
+                                    'item-active': item.active
+                                }"
                                 >
                                 <v-list-item-icon>
                                     <v-icon>{{ item.icon }}</v-icon>
@@ -53,7 +56,7 @@
                                     v-for="(menuItem,index) in item.items"
                                     :key="index"
                                     @click="onClickItem(menuItem, $event)"
-                                    :class="{'select-item':menuItem.type == 'select','task-sidebar-item':true}"
+                                    :class="{'select-item':menuItem.type == 'select','task-sidebar-item':true,'item-active': menuItem.active}"
                                     >
                                     <v-list-item-icon>
                                         <v-icon>{{ menuItem.icon }}</v-icon>
@@ -214,6 +217,7 @@ export default {
             isShowSidebar:true,
             drawer: false,
             mini: false,
+            oldSelected:null
         };
     }
 };
@@ -334,10 +338,12 @@ export default {
 }
 .collapse-sidebar-icon{
     position: absolute;
+    top:3px;
     transition: all 200ms cubic-bezier(.42,0,.58,1);
 }
 .btn-collapsing{
     right: 0px;
+    top:3px;
     z-index: 1;
     transition: all 250ms ease-in-out;
 }
@@ -386,6 +392,12 @@ export default {
 }
 .task-sidebar-item{
     padding: 0 !important;
+}
+.item-active >>> .v-list-item__icon .mdi{
+    color: var(--symper-color) !important;
+}
+.item-active >>> .v-list-item__title{
+    color: var(--symper-color) !important;
 }
 </style>
 

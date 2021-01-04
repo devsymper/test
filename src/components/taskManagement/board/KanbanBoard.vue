@@ -76,8 +76,8 @@
                         </div>
                     </VuePerfectScrollbar>
                     <div class="text-center mt-2">
-                        <v-btn depressed height="25">
-                        <v-icon>mdi-plus</v-icon>
+                        <v-btn @click="addIssueClick" depressed height="25">
+                            <v-icon>mdi-plus</v-icon>
                         </v-btn>
                     </div>
                     
@@ -339,6 +339,9 @@ export default {
                         .always(() => {});
                 }
             }
+        },
+        addIssueClick(){
+            this.$evtBus.$emit('add-issue-btn-click');
         }
        
     },

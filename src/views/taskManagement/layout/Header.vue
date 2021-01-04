@@ -127,6 +127,9 @@ export default {
         if (!this.$store.state.taskManagement.allPriority || this.$store.state.taskManagement.allPriority == 0) {
             this.$store.dispatch("taskManagement/getAllPriority");
         }
+        this.$evtBus.$on('add-issue-btn-click',() => {
+            this.$refs.popupIssue.show();
+        })
     },
     computed:{
         sCurrentProject(){

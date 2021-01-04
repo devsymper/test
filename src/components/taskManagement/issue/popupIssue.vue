@@ -157,8 +157,13 @@ export default {
         },
         show(){
             this.isShow=true;
-            this.currentProject = this.allProject[0];
-            
+            let projectId = this.$route.params.id;
+            if(projectId){
+                this.currentProject = this.allProject.find(el => el.id == projectId);
+            }
+            else{
+                this.currentProject = this.allProject[0];
+            }
             this.getListIssueType()
            
         },
