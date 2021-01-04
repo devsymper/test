@@ -17,7 +17,6 @@
                             :append-icon="$i('input.search')"
                             outlined
                             dense
-                            label="Search"
                             :placeholder="$t('common.search')"
                         ></v-text-field>
                          <v-btn
