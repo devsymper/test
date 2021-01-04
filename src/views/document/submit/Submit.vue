@@ -2458,9 +2458,15 @@ export default {
                 
                     tableInstance.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataIn,formulasInstance);
                 }
-                formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
-                    this.handleAfterRunFormulas(rs,controlId,controlName,formulasType,from)
-                });
+                else{
+                    formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
+                        this.handleAfterRunFormulas(rs,controlId,controlName,formulasType,from)
+                    });
+                }
+            }
+            else{
+                markBinedField(this.keyInstance,controlName);
+                this.handleControlInputChange(controlName);
             }
         },
        
