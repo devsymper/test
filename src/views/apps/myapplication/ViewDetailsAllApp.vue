@@ -163,22 +163,7 @@ export default {
         }
 	},
 	mounted() {
-		let self = this
-		this.myApplicationWorker.addEventListener("message", function (event) {
-			let data = event.data;
-			switch (data.action) {
-				case 'getActiveAppSBS':
-					self.handlerGetActiveApp(data.dataAfter)
-					break;
-				case 'getItemByAccessControl':
-					self.updateFavoriteItem(data.dataAfter.data)
-                    self.updateChidrenItemToApp(data.dataAfter.data)
-					break;
-			
-				default:
-					break;
-			}
-		});
+		
 	},
     methods:{
         createTask(){
@@ -447,7 +432,23 @@ export default {
         }
     },
     created(){
-       	this.myApplicationWorker = new MyApplicationWorker();
+		this.myApplicationWorker = new MyApplicationWorker();
+		let self = this
+		this.myApplicationWorker.addEventListener("message", function (event) {
+			let data = event.data;
+			switch (data.action) {
+				case 'getActiveAppSBS':
+					self.handlerGetActiveApp(data.dataAfter)
+					break;
+				case 'getItemByAccessControl':
+					self.updateFavoriteItem(data.dataAfter.data)
+                    self.updateChidrenItemToApp(data.dataAfter.data)
+					break;
+			
+				default:
+					break;
+			}
+		});
 		if(!Object.keys(this.listApp[0]).length && !Object.keys(this.listApp[1]).length){
 			this.getActiveapps()
 		}else{

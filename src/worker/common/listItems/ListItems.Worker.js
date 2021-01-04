@@ -3,7 +3,7 @@ import { getDataFromConfig, getDefaultFilterConfig } from "@/components/common/c
 import {uiConfigApi} from "@/api/uiConfig";
 
 self.onmessage = async function (event) { 
-	var workerDataReceive = event.data.data;
+	var workerDataReceive = event.data;
     let action = workerDataReceive.action;
 	let data = workerDataReceive.data;
 	switch (action) {

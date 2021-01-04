@@ -175,6 +175,8 @@ export default {
 	},
 	created(){
 		this.myApplicationWorker = new MyApplicationWorker()
+		this.getActiveapps()
+		this.getFavorite()
 		let self = this
 		this.myApplicationWorker.addEventListener("message", function (event) {
 			let data = event.data;
@@ -191,32 +193,29 @@ export default {
 				case 'getItemByType':
 					self.handlerGetObjectSuccess(data.dataAfter.type,data.dataAfter.res)
 					break;
-			
 				default:
 					break;
 			}
 		});
-		this.getActiveapps()
-		this.getFavorite()
 	},
 	mounted(){
-		 let thisCpn = this;
-	 		$(document).click(function(e){
-				if(!$(e.target).is('.menu') && !$(e.target).is('.menuItem')){
-					$('.menu').hide()		
+		let thisCpn = this;
+		$(document).click(function(e){
+			if(!$(e.target).is('.menu') && !$(e.target).is('.menuItem')){
+				$('.menu').hide()		
+			}
+		});
+		$(document).click(function(e){
+			if(!$(e.target).is('.context-menu')){
+				$(".context-menu").css("display", "none")
+				if(thisCpn.tab == 'tab-1'){
+					thisCpn.$refs.contextMenu.hide()
+				}else{
+					thisCpn.$refs.appDetails.hideContextMenu()		
 				}
-			});
-			$(document).click(function(e){
-				if(!$(e.target).is('.context-menu')){
-					$(".context-menu").css("display", "none")
-					if(thisCpn.tab == 'tab-1'){
-						thisCpn.$refs.contextMenu.hide()
-					}else{
-						thisCpn.$refs.appDetails.hideContextMenu()		
-					}
-				}
-			})
-			
+			}
+		})
+		
 	},
 	components: {
 		VuePerfectScrollbar,
