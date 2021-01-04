@@ -51,7 +51,6 @@
             <time-input 
             :keyInstance="keyInstance"  
             @apply-time-selected="applyTimePicker" 
-            @after-check-input-time-valid="afterCheckTimeNotValid" 
             ref="timeInput" />
             
             <err-message :listErr="listMessageErr" ref="errMessage" @after-close-dialog="afterCloseDialogValidate"/>
@@ -215,7 +214,9 @@ import tinymce from 'tinymce/tinymce';
 
 
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
-import {checkControlPropertyProp,getControlInstanceFromStore,getControlTitleFromName, getListInputInDocument,mapTypeToEffectedControl} from './../common/common'
+import {checkControlPropertyProp,getControlInstanceFromStore, 
+        getControlTitleFromName, getListInputInDocument, 
+        mapTypeToEffectedControl, minimizeDataAfterRunFormula} from './../common/common'
 import Formulas from './formulas.js';
 import { startWorkflowBySubmitedDoc } from '../../../components/process/processAction.js';
 let impactedFieldsList = {};
@@ -1296,10 +1297,11 @@ export default {
          */
         applyTimePicker(data){
             let time = data.value;
-            let input = data.input;
-            if(this.sDocumentSubmit.currentTableInteractive == null){
-                input.val(time);
-                input.trigger('change');
+            let controlName = data.controlName;
+            let controlInstance = getControlInstanceFromStore(this.keyInstance, controlName);
+            if(controlInstance.inTable == false){
+                controlInstance.setValue(time);
+                controlInstance.triggerOnChange();
             }
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
@@ -1307,18 +1309,6 @@ export default {
                 currentTableInteractive.tableInstance.setDataAtCell(cellActive.row,cellActive.col,time,'edit')
             }
         },
-        afterCheckTimeNotValid(data){
-            let isValid = data.isValid;
-            let controlInstance = getControlInstanceFromStore(this.keyInstance,data.controlName);
-            if(isValid){
-                controlInstance.removeValidateIcon('TimeValid');
-            }
-            else{
-                controlInstance.renderValidateIcon('Định dạng thời gian không đúng!', 'TimeValid');
-            }
-            this.checkEscKey(data.event);
-        },
-
         checkEscKey(event){
             if(event != undefined && event.key === "Escape"){
                 this.$refs.timeInput.hide();
@@ -2465,8 +2455,7 @@ export default {
                 if(control.inTable != false){
                     let tableInstance = getControlInstanceFromStore(this.keyInstance,control.inTable);
                     let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulasInstance,tableInstance.name);
-                
-                    tableInstance.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataIn,formulasInstance);
+                    tableInstance.tableInstance.handlerRunFormulasForControlInTable(formulasType,control,dataIn,formulasInstance, 'all');
                 }
                 else{
                     formulasInstance.handleBeforeRunFormulas(dataInput).then(rs=>{
@@ -2516,29 +2505,10 @@ export default {
         },
 
 
-        getValueFromDataResponse(rs){
-            let value = "";
-            if(!rs.server){
-                let data = rs.data; 
-                if(data.length > 0){
-                    value=data[0].values[0][0];
-                }
-            }
-            else{
-                let data = rs.data.data;
-                if(data.length > 0){
-                    value=data[0][Object.keys(data[0])[0]];
-                }
-            }
-            return value;
-        },
-        /**
-         * Hàm xử lí dữ liệu sau khi chạy xong công thức
-         */
         handleAfterRunFormulas(rs,controlId,controlName,formulasType,from){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
+            let value = minimizeDataAfterRunFormula(rs);
             if(formulasType === 'formulasDefaulRow'){
-                let value = this.getValueFromDataResponse(rs);
                 this.$store.commit("document/updateDataToTableControlRoot",{instance:this.keyInstance,value:value,controlName:controlName,tableName:controlInstance.inTable});
                 return;
             }
@@ -2556,7 +2526,6 @@ export default {
                  * con trol ở ngoài
                  */
                 else{
-                    let value = this.getValueFromDataResponse(rs);
                     if(formulasType.includes('linkConfig')){
                         this.handlerDataAfterRunFormulasLink(rs,controlName,formulasType);
                     }

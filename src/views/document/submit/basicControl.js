@@ -200,19 +200,24 @@ export default class BasicControl extends Control {
                     valueChange = $(e.target).text();
                 } else if (thisObj.type == 'checkbox') {
                     valueChange = $(e.target).prop("checked");
-                }
-                if(thisObj.type == 'user'){
+                } else if(thisObj.type == 'user'){
                     return false;
-                }
-                if(thisObj.type == 'number'){
+                }else if(thisObj.type == 'number'){
                     valueChange = valueChange.replace(/=/g,"");
                     valueChange = eval(valueChange);
                     if(!/^[-0-9,.]+$/.test(valueChange)){
                         return false;
                     }
-                }
-                if(thisObj.type == 'date'){
+                }else if(thisObj.type == 'date'){
                     valueChange = this.$moment(valueChange,'DD-MM-YYYY').format('YYYY-MM-DD');
+                }else if(thisObj.type == 'time'){
+                    if(!Util.checkTimeValid(valueChange)){
+                        thisObj.renderValidateIcon("Không đúng định dạng thời gian", 'TimeValid')
+                        return false
+                    }
+                    else{
+                        thisObj.removeValidateIcon('TimeValid')
+                    }
                 }
                 // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
                 if(thisObj.isRequiredControl()){

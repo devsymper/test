@@ -46,6 +46,14 @@ export default class Util {
         return max;
     }
 
+    static checkTimeValid = function(time){
+        let regex = /^([0-1]?[0-9]|[2][0-3]):([0-5][0-9])(:[0-5][0-9])?$|^([0-1]?[0-9]|[2][0-3]):([0-5][0-9])( [AaPp][Mm])?$/g;
+        let isValid = false;
+        if(regex.test(time)){
+            isValid = true;
+        }
+        return isValid; 
+    }
     static debounce = function(func, wait, immediate) {
         var timeout;
         return function() {
