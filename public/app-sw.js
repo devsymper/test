@@ -37,7 +37,6 @@ function handleChangeDataRequest(event) {
             return response;
         }).catch(function(e) {
             event.request.clone().text().then(function(body) {
-                console.log(body, 'bodybodybodybodybodybodybodybody');
                 let now = Date.now();
                 symRequestStore.add({
                     create_time: now,
@@ -132,7 +131,6 @@ async function getRequestPayload(request) {
     if (request.method !== 'GET' && request.method !== 'HEAD') {
         return await request.clone().json().then(function(body) {
             serialized.body = body;
-            console.log(body, 'bodybodybodybodybodybodybodybody');
             return Promise.resolve(serialized);
         });
     }

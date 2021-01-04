@@ -29,6 +29,10 @@ self.onmessage = async function (event) {
 			let migrateDataRes = await migrateData(data);
 			await postMessage({action:'migrateData', dataAfter : migrateDataRes})
             break;
+        case 'syncData':
+			let syncDataRes = await syncData(data);
+			await postMessage({action:'syncData', dataAfter : syncDataRes})
+            break;
         default:
             break;
     }
@@ -70,4 +74,29 @@ export const migrateData = async function(data){
 	data.formData.targetInstanceId = res.data[0].id
 	let migrateDataRes = await environmentManagementApi.migrateData(data.formData)
 	return migrateDataRes
+}
+export const syncData = async function(data){
+	let arrRes = []
+	let res = await environmentManagementApi.getServerId(data.dataGetServerId)
+	data.dataSync.targetInstanceId = res.data[0].id
+	for(let i in data.listItemSelected){
+		let ids = []
+		if(data.listItemSelected[i].title == "document_definition"){
+			ids = {
+				ids: data.listItemSelected[i].arr
+			}
+		}else{
+			let arr = []
+			arr.push(data.listItemSelected[i].arr)
+			ids = {
+				ids: arr
+			}
+		}
+		data.dataSync.data = {
+			[data.listItemSelected[i].title]:ids
+		}
+		let resMigrate = await environmentManagementApi.migrateData(data.dataSync)
+		arrRes.push(resMigrate)
+	}	
+	return arrRes
 }

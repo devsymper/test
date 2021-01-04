@@ -95,9 +95,6 @@ export default {
 	components:{
 		FormTpl,
 	},
-	created(){
-		this.environmentWorker = new EnvironmentWorker()
-	},
 	props:{
 		showDialog:{
 			type: Boolean,
@@ -122,6 +119,7 @@ export default {
 	},
 	mounted(){
 		let self = this
+		this.environmentWorker = new EnvironmentWorker()
         this.environmentWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
@@ -163,7 +161,7 @@ export default {
 					serviceId: serviceId,
 					formData: formData
 				}
-			});
+			})
 		},
 		handlerAddversionRes(res){
 			if(res.status == 200){
