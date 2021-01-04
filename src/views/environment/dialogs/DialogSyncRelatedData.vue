@@ -126,7 +126,7 @@ export default {
 			let sourceInstanceId = this.$store.state.environmentManagement.sourceInstanceId
 			let currentServiceId = this.$store.state.environmentManagement.currentServiceId
 			let currentEnvId = this.envId
-			this.postMessage({
+			this.environmentWorker.postMessage({
 				action: 'syncData',
 				data:{
 					dataGetServerId:{
@@ -140,57 +140,21 @@ export default {
 					}
 				}
 			})
-			// environmentManagementApi.getServerId({
-			// 	serviceId: currentServiceId,
-			// 	environmentId: currentEnvId
-			// }).then(res=>{
-			// 	if(res.data[0]){
-			// 		let targetInstanceId = res.data[0].id
-			// 		// let type = self.currentObjectType
-			// 		for(let i in self.listItemSelected){
-			// 			let ids = []
-			// 			if(self.listItemSelected[i].title == "document_definition"){
-			// 				ids = {
-			// 					ids: self.listItemSelected[i].arr
-			// 				}
-			// 			}else{
-			// 				let arr = []
-			// 				arr.push( self.listItemSelected[i].arr)
-			// 				ids = {
-			// 					ids: arr
-			// 				}
-			// 			}
-			// 			let data = {
-			// 				[self.listItemSelected[i].title]:ids
-			// 			}
-			// 			environmentManagementApi.migrateData({
-			// 				sourceInstanceId:sourceInstanceId,
-			// 				targetInstanceId:targetInstanceId,
-			// 				data: JSON.stringify(data),
-			// 				override: self.override
-			// 			}).then(res=>{
-			// 				if(res.status == 200){
-			// 					self.$emit('cancel')
-			// 					self.$snotify({
-			// 						type: "success",
-			// 						title: "Đang chuyển dữ liệu "+ self.listItemSelected[i].title
-			// 					})
-			// 				}else if( res.status == 400){
-			// 					self.$snotify({
-			// 						type: "error",
-			// 						title: "Nguồn và target không được trùng nhau"
-			// 					})
-			// 				}
-			// 			}).catch(err=>{
-			// 				self.$snotify({
-			// 					type: "error",
-			// 					title: "Có lỗi xảy ra"
-			// 				})
-			// 			})	
-			// 		}
-			// 	}
-			// }).catch(err=>{})
-			
+		},
+		handlerSyncData(res){
+			let self = this
+			if(res.length > 0){
+				res.forEach(function(e){
+					if(e.status == 200){
+						self.$snotifySuccess("Đang chuyển dữ liệu")
+					}else if(e.status == 400){
+						self.$snotifyError("Nguồn và target không được trùng nhau")
+					}else{
+						self.$snotifyError("Có lỗi xảy ra ")
+					}
+				})
+			}
+			self.$emit('cancel')
 		}
 	},
 }

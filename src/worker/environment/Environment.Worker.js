@@ -77,6 +77,8 @@ export const migrateData = async function(data){
 	return migrateDataRes
 }
 export const syncData = async function(data){
+	debugger
+	let arrRes = []
 	let res = await environmentManagementApi.getServerId(data.dataGetServerId)
 	data.dataSync.targetInstanceId = res.data[0].id
 	for(let i in data.listItemSelected){
@@ -96,7 +98,7 @@ export const syncData = async function(data){
 			[data.listItemSelected[i].title]:ids
 		}
 		let resMigrate = await environmentManagementApi.migrateData(data.dataSync)
-		debugger
-		return resMigrate
+		arrRes.push(resMigrate)
 	}	
+	return arrRes
 }

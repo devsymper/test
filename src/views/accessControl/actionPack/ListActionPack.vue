@@ -24,7 +24,6 @@
                     @close-form="closeForm"
                     :action="actionOnItem"
                     :itemData="itemData"
-					
                     ref="actionPackForm"
                 ></ActionPackForm>
             </template>
@@ -37,8 +36,9 @@ import { reformatGetListProcess } from "@/components/process/reformatGetListData
 import { appConfigs } from "@/configs.js";
 import { systemRoleApi } from "@/api/systemRole.js";
 import ListItems from "@/components/common/ListItems.vue";
-import ActionPackForm from "./../actionPackPanel/ActionPackForm";
+import ActionPackForm from "./actionPackPanel/ActionPackForm";
 import { permissionApi } from "@/api/permissionPack";
+import ActionPackWorker from 'worker-loader!@/worker/accessControl/ActionPack.Worker.js';
 export default {
     data() {
         let self = this;
@@ -120,7 +120,8 @@ export default {
             },
             containerHeight: 300,
             actionOnItem: "create",
-            getListUrl: appConfigs.apiDomain.actionPacks,
+			getListUrl: appConfigs.apiDomain.actionPacks,
+			actionPackWorker: null,
             currentItemData: {
                 id: 0,
                 name: "",
@@ -145,26 +146,13 @@ export default {
                         let ids = [];
                         for (let item of rows) {
                             ids.push(item.id);
-                        }
-                        try {
-                            let res = await permissionApi.deleteActionPack(ids);
-                            if (res.status == 200) {
-                                self.$snotifySuccess(
-                                    "Deleted " + ids.length + " items"
-                                );
-                            } else {
-                                self.$snotifyError(
-                                    res,
-                                    "Can not delete selected items"
-                                );
-                            }
-                        } catch (error) {
-                            self.$snotifyError(
-                                error,
-                                "Can not delete selected items"
-                            );
-                        }
-                        refreshList();
+						}
+						this.actionPackWorker.postMessage({
+							action: 'deleteActionPack',
+							data: {
+								ids: ids
+							}
+						})
                     }
                 },
                 detail: {
@@ -178,11 +166,29 @@ export default {
         };
     },
     mounted() {
-        this.calcContainerHeight();
+		this.calcContainerHeight();
+		let self = this
+		this.actionPackWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'deleteActionPack':
+					if(data.dataAfter == 'success'){
+						self.$snotifySuccess("Xóa thành công")
+					}else{
+						self.$snotifyError("Có lỗi xảy ra")
+					}
+					self.$refs.listActionPack.refreshList();
+					break;
+               
+                default:
+                    break;
+            }
+        });
     },
     created() {
 		this.$store.dispatch("app/getAllBA");
-        this.$store.dispatch("actionPack/getAllActionByObjectType");
+		this.$store.dispatch("actionPack/getAllActionByObjectType");
+		this.actionPackWorker = new ActionPackWorker()
     },
     watch: {},
     computed: {
@@ -192,7 +198,8 @@ export default {
     },
     methods: {
         closeForm(){
-            this.$refs.listActionPack.closeactionPanel();
+			this.$refs.listActionPack.closeactionPanel();
+			this.$refs.listActionPack.refreshList()
         },
         detailActionPack(row){
             let self = this;
@@ -200,23 +207,13 @@ export default {
             self.getActionPackOperations(row.id);
             self.actionOnItem = "detail";
             self.applyDataToForm(row);
-            self.$refs.actionPackForm.objectTypeToDocumentDefinition();
         },
         updateActionPack(row){
             let self = this;
             self.getActionPackOperations(row.id);
             self.actionOnItem = "update";
             self.applyDataToForm(row);
-            self.$refs.actionPackForm.objectTypeToDocumentDefinition();
         },
-        // onRowSelected(row){
-        //     let self = this;
-        // 	this.focusingUser = row;
-        //     if(this.$refs.listActionPack.alwaysShowActionPanel){
-        //         self.$refs.listActionPack.actionPanel = true;
-        //         this.updateActionPack(row);
-        //     }
-        // },
         makeOperationMapByObjectType(idActionPack, operations){
             let allActionByObjectType = this.$store.state.actionPack.allActionByObjectType;
             
@@ -261,7 +258,7 @@ export default {
         getTableDataFromOperations(operations){
             let mapActionAndObjectTypes = this.mapObjectTypesAndAction;
             let allResource = this.$store.state.actionPack.allResource;
-
+ 
             /**
              * Map giữa object type và action , có dạng
              * {
@@ -367,10 +364,8 @@ export default {
             this.currentItemData.id = 0;
             this.currentItemData.description = "";
             this.currentItemData.objectType = "document_definition";
-
             this.$set(this.currentItemData, 'mapActionAndObjects', {});
             this.$set(this.currentItemData, 'mapActionForAllObjects', {});
-            this.$refs.actionPackForm.objectTypeToDocumentDefinition();
         },
         calcContainerHeight() {
             this.containerHeight = util.getComponentSize(this).h;

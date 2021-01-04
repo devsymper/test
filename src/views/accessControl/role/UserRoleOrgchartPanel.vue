@@ -42,10 +42,10 @@
 </template>
 <script>
 import PermissionSelector from "@/components/permission/PermissionSelector"
-import OrgchartElement from './../helpers/OrgchartElement'
+import OrgchartElement from './OrgchartElement'
 import {accessControlApi} from "@/api/accessControl"
-import { permissionApi } from '@/api/permissionPack';
 import _debounce from "lodash/debounce";
+import RoleWorker from 'worker-loader!@/worker/accessControl/Role.Worker.js';
 
 export default {
 	props:{
@@ -57,16 +57,62 @@ export default {
 		PermissionSelector,
 		OrgchartElement
 	},
+	created(){
+		this.roleWorker = new RoleWorker()
+	},
+	mounted(){
+		let self = this
+		this.roleWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'savePermission':
+					if(data.dataAfter == 'success'){
+						self.$snotifySuccess("Gắn permission thành công")
+					}else{
+						self.$snotifyError("Có lỗi xảy ra")
+					}
+					self.$emit('close-form')
+					break;
+                case 'getNodePermission':
+					self.handlerGetNodePermission(data.dataAfter)
+					break;
+               
+                default:
+                    break;
+            }
+        });
+	},
 	data(){
 		return{
 			selectingNode:[],
 			currentType:"",
+			roleWorker: null,
 			listNode:{
 
 			}
 		}
 	},
 	methods:{
+		handlerGetNodePermission(dataAfter){
+			let self = this
+			if(dataAfter.res.status == 200){
+				let mapIdToPermission = this.$store.state.permission.allPermissionPack;
+				let permissions = dataAfter.res.data.reduce((arr, el) => {
+					if(mapIdToPermission[el.permissionPackId]){
+						arr.push(mapIdToPermission[el.permissionPackId]);
+					}
+					return arr;
+				}, []);
+				let obj = {
+					role_identifier: dataAfter.id,
+					role_type:'orgchart',
+					permissions: permissions,
+					permission_id: []
+				}
+				self.listNode[dataAfter.id] = obj
+				self.selectingNode = self.listNode[dataAfter.id]
+			}
+		},
 		handleCurrentNodeClick(id , type){
 			let self = this
 			self.currentType = type
@@ -76,26 +122,11 @@ export default {
 				}
 			}else{
 				if(!self.listNode[id]){
-					accessControlApi.getNodePermission(id).then(res=>{
-						if(res.status == 200){
-							let mapIdToPermission = this.$store.state.permission.allPermissionPack;
-							let permissions = res.data.reduce((arr, el) => {
-								if(mapIdToPermission[el.permissionPackId]){
-									arr.push(mapIdToPermission[el.permissionPackId]);
-								}
-								return arr;
-							}, []);
-							let obj = {
-								role_identifier:id,
-								role_type:'orgchart',
-								permissions: permissions,
-								permission_id: []
-							}
-							self.listNode[id] = obj
-							self.selectingNode = self.listNode[id]
+					this.roleWorker.postMessage({
+						action: 'getNodePermission',
+						data:{
+							id:id
 						}
-					}).catch(err=>{
-
 					})
 				}else{
 					self.selectingNode = self.listNode[id]
@@ -116,26 +147,13 @@ export default {
 				delete self.listNode[i].permissions
 				permissions.push(this.listNode[i])
 			}
-			let data = JSON.stringify(permissions)
-			accessControlApi.savePermission(data).then(res=>{
-				if(res.status == 200){
-					self.$emit('close-form')
-					self.$snotify({
-						type: "success",
-						title: "Gắn permissions thành công"
-					})
-				}else{
-					self.$snotify({
-						type: "error",
-						title: "Có lỗi xảy ra"
-					})
+			this.roleWorker.postMessage({
+				action: 'savePermission',
+				data:{
+					dataToSave: JSON.stringify(permissions)
 				}
-			}).catch(err=>{
-					self.$snotify({
-						type: "error",
-						title: err
-					})
 			})
+		
 		}
 	},
 	watch:{
