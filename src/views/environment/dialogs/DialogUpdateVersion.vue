@@ -116,14 +116,13 @@ export default {
 				environmentId: this.envId
 			}
 			this.environmentWorker.postMessage({
-				action: "updateVersion",
+				action: 'updateVersion',
 				data:{
 					versionId : versionId,
 					environmentId: self.envId,
 					dataGetServerId : data
 				}
-			})
-			
+			});
 		}
 	},
 }

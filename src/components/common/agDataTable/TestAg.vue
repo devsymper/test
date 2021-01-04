@@ -62,7 +62,7 @@ export default {
 							{name: "processKey", title: "processKey", type: "text"},
 							{name: "name", title: "name", type: "text", 
 							 	cellRenderer: function(params) {
-									return '<span class="mdi mdi-car-lifted-pickup"></span> <span>'+params.value+'</span>';
+									return '<span class="mdi mdi-car-lifted-pickup"></span> <span>'+ params.value +'</span>';
 								}
 							},
 							{name: "userCreate", title: "userCreate", type: "text"},
@@ -85,14 +85,6 @@ export default {
 	},
 	mounted(){
 		this.containerHeight = util.getComponentSize(this).h
-		// this.MedalCellRenderer.prototype.init = function(params) {
-		// 	this.eGui = document.createElement('span');
-		// 	this.eGui.innerHTML = '#######';
-		// };
-
-		// this.MedalCellRenderer.prototype.getGui = function() {
-		// 	return this.eGui;
-		// };
 	},
 	methods:{
 		handlerRowClicked(params){

@@ -8,7 +8,6 @@ import {
 
 var bpmneApi = new Api(appConfigs.apiDomain.bpmne.models); // Khởi tạo một đối tượng api với domain của service BPMNE
 
-
 let testHeader = {
     Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0',
     "Content-Type": "application/json",

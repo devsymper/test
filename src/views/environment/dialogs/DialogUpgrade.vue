@@ -23,7 +23,7 @@
 						class="fs-13"
 					></v-autocomplete>
 					<div class="text-wrap">
-						Nhấn Đòng ý để upgrade version này
+						Nhấn Đồng ý để upgrade version này
 					</div>
 				</div>
 
@@ -131,7 +131,7 @@ export default {
 				data:{
 					formData: formData
 				}
-			})
+			});
 		}
 	},
 }

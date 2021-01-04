@@ -132,7 +132,7 @@ export default {
 			this.environmentWorker.postMessage({
 				action: 'changeServer',
 				data: data
-			})
+			});
 		}
 	},
 }
