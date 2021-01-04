@@ -121,11 +121,13 @@ import AppDetail from './AppDetail.vue';
 import {appManagementApi} from '@/api/AppManagement.js';
 import ContextMenu from './ContextMenu.vue'
 import emptyApp from "@/assets/image/empty_app.png";
+import MyApplicationWorker from 'worker-loader!@/worker/application/MyApplication.Worker.js';
 export default {
 	data: function() {
         return {
 			listAppHeight: '200px',
 			listFavoriteHeight:'100%',
+			myApplicationWorker: null,
 			tab: 'tab-1',
 			isEndUserCpn:true,
 			searchKey:"",
@@ -172,8 +174,30 @@ export default {
 		 }
 	},
 	created(){
-            this.getActiveapps()
-			this.getFavorite()
+		this.myApplicationWorker = new MyApplicationWorker()
+		let self = this
+		this.myApplicationWorker.addEventListener("message", function (event) {
+			let data = event.data;
+			switch (data.action) {
+				case 'getFavorite':
+					self.handleGetFavorite(data.dataAfter)
+					break;
+				case 'getActiveApp':
+					self.handleGetActiveApp(data.dataAfter)
+					break;
+				case 'getAppDetails':
+					self.handlerGetAppDetals(data.dataAfter)
+					break;
+				case 'getItemByType':
+					self.handlerGetObjectSuccess(data.dataAfter.type,data.dataAfter.res)
+					break;
+			
+				default:
+					break;
+			}
+		});
+		this.getActiveapps()
+		this.getFavorite()
 	},
 	mounted(){
 		 let thisCpn = this;
@@ -192,6 +216,7 @@ export default {
 					}
 				}
 			})
+			
 	},
 	components: {
 		VuePerfectScrollbar,
@@ -208,40 +233,60 @@ export default {
 		listApp(){
             return this.$store.state.appConfig.listApps
 		},
-		
-		
 	},
-	
 	methods:{
-		getActiveapps(){
-			appManagementApi.getActiveApp().then(res => {
-				this.loadingApp = false
-				if (res.status == 200) {
-					this.apps = res.data.listObject
+		handlerGetAppDetals(res){
+			if (res.status == 200) {
+				if(Object.keys(res.data.listObject.childrenApp).length > 0){
+					this.checkChildrenApp(res.data.listObject.childrenApp)
+				}else{
+					this.$store.commit('appConfig/emptyItemSelected')
 				}
-			}).catch((err) => {
-			});
+			}
+		},
+		getActiveapps(){
+			this.myApplicationWorker.postMessage({
+				action: "getActiveApp"
+			})
+		},
+		handleGetActiveApp(res){
+			this.loadingApp = false
+			if(res.status == 200){
+				this.apps = res.data.listObject
+			}else{
+				this.$snotify({
+					type: "error",
+					title: "Không thể lấy danh sách application"
+				})
+			}
+		},
+		handleGetFavorite(res){
+			this.listFavorite= []
+			let self = this
+			if (res.status == 200) {
+				res.data.listObject.forEach(function(e){
+					let arr = ['document_definition', 'orgchart', 'workflow_definition', 'dashboard']
+					arr.forEach(function(k){
+						if(e.objectType == k){
+							self.mapIdFavorite[k][k + ":" + e.objectIdentifier] = e
+						}  
+					})
+				})
+				this.checkTypeFavorite(res.data.listObject)
+				this.$store.commit('appConfig/updateListFavorite',self.listFavorite)
+			}
+			this.loadingFavorite = false
+
 		},
 		getFavorite(){
-			this.listFavorite= []
-			let self = this 
 			let userId = this.$store.state.app.endUserInfo.id
-			appManagementApi.getItemFavorite(userId).then(res =>{
-				if (res.status == 200) {
-					res.data.listObject.forEach(function(e){
-						let arr = ['document_definition', 'orgchart', 'workflow_definition', 'dashboard']
-						arr.forEach(function(k){
-							if(e.objectType == k){
-								self.mapIdFavorite[k][k + ":" + e.objectIdentifier] = e
-							}  
-						})
-					})
-					this.checkTypeFavorite(res.data.listObject)
-					this.$store.commit('appConfig/updateListFavorite', self.listFavorite)
+			this.myApplicationWorker.postMessage({
+				action: "getFavorite",
+				data:{
+					userId: userId
 				}
-			}).catch((err) => {
-			});
-			this.loadingFavorite = false
+			})
+			
 		},
 		clickDetails(item){
 			this.$refs.contextMenu.hide()
@@ -251,16 +296,12 @@ export default {
 			this.title.name = item.name;
 			this.$store.commit("appConfig/updateCurrentAppId",item.id);
 			this.$store.commit("appConfig/updateCurrentAppName",item.name);
-			appManagementApi.getAppDetails(item.id).then(res => {
-				if (res.status == 200) {
-					if(Object.keys(res.data.listObject.childrenApp).length > 0){
-						this.checkChildrenApp(res.data.listObject.childrenApp)
-					}else{
-						this.$store.commit('appConfig/emptyItemSelected')
-					}
+			this.myApplicationWorker.postMessage({
+				action: 'getAppDetails',
+				data:{
+					id: item.id
 				}
-			}).catch((err) => {
-			});
+			})
 			this.tab = 'tab-2'
 		},
 		checkTypeFavorite(data){
@@ -334,18 +375,17 @@ export default {
 					self.mapId[i][i + ":"+e.id] = e;
 				})
 				let dataGet = self.arrType[i];
-				self.getByAccessControl(dataGet,i)
+				self.getItemByAccessControl(dataGet,i)
 			}
 		},
-		getByAccessControl(ids,type){
+		getItemByAccessControl(ids,type){
 			let self = this
-			appManagementApi.getListObjectIdentifier({
-				pageSize:50,
-				ids: ids
-			}).then(res=>{
-				self.handlerGetObjectSuccess(type,res)
-				
-			}).catch(err=>{
+			this.myApplicationWorker.postMessage({
+				action: 'getItemByType',
+				data:{
+					ids: ids,
+					type: type
+				}
 			})
 		},
 		getFavoriteByAccessControl(ids,type){

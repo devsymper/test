@@ -170,7 +170,6 @@ export default {
 				case 'getActiveAppSBS':
 					self.handlerGetActiveApp(data.dataAfter)
 					break;
-			
 				case 'getItemByAccessControl':
 					self.updateFavoriteItem(data.dataAfter.data)
                     self.updateChidrenItemToApp(data.dataAfter.data)
@@ -222,7 +221,6 @@ export default {
             return i
         },
 		getActiveapps(){
-			let self = this
 			this.myApplicationWorker.postMessage(
 				{
 					action:'getActiveAppSBS',
