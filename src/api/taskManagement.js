@@ -72,6 +72,9 @@ export const taskManagementApi = {
     getListRoleUserInProject(projectId){
         return taskManagement.get("roles-user/"+projectId);
     },
+    getListOperatorInProject(projectId){
+        return taskManagement.get("operators/"+projectId);
+    },
     /// issue type
     getAllDocumentIdsInIssueType(){
         return taskManagement.get("issue-types-documentIds");

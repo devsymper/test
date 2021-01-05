@@ -23,6 +23,7 @@ const defaultState = {
     infoVersionCurrent:{},
     infoComponentCurrent:{},
     listRoleUserInProject:{},// có dạng {key : []} , key là projectId
+    listOperatorInProject:{},// có dạng {key : []} , key là projectId
     workFlowData:{
         allNode:[
             

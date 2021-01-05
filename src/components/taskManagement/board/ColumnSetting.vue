@@ -64,7 +64,7 @@
                             </div>
                             <div class="h-100">
                                 <draggable :list="column.statusInColumn" :animation="250" ghost-class="ghost-card" class="h-100 list-group" group="status">
-                                    <div class="status-item" v-for="status in column.statusInColumn" :key="status.statusRoleId">
+                                    <div class="status-item" v-for="status in column.statusInColumn" :key="status.nodeId">
                                         <div class="d-flex justify-space-between">
                                             {{status.name}}
                                             <div :style="{ 'background': status.color ,'width':'15px','height':'7px', 'margin-top': '7px'}" ></div>
@@ -88,7 +88,7 @@
                 </div>
                 <draggable :list="listStatus"  :animation="250" ghost-class="ghost-card" class="h-100 list-group" group="status">
                     <!-- Each element from here will be draggable and animated. Note :key is very important here to be unique both for draggable and animations to be smooth & consistent. -->
-                    <div class="status-item" v-for="status in listStatus" :key="status.statusRoleId">
+                    <div class="status-item" v-for="status in listStatus" :key="status.nodeId">
                         <div class="d-flex justify-space-between">
                             {{status.name}}
                             <div :style="{ 'background': status.color ,'width':'15px','height':'7px', 'margin-top': '7px'}" ></div>
@@ -184,8 +184,9 @@ export default {
             if (self.listStatus.length > 0 ) {
                 for (let i = 0; i < self.listStatusColumn.length; i++) {
                     let idColumn = self.listStatusColumn[i].columnId;
-                    let statusRoleId = self.listStatusColumn[i].statusRoleId;
-                    let item = self.listStatus.find(ele => ele.statusRoleId == statusRoleId);
+                    let statusId = self.listStatusColumn[i].statusId;
+                    let taskLifeCircleId = self.listStatusColumn[i].taskLifeCircleId;
+                    let item = self.listStatus.find(ele => ele.statusId == statusId &&  ele.taskLifeCircleId == taskLifeCircleId );
                     if (item) {
                         let column = self.columns.find(ele => ele.id == idColumn);
                         if (column) {

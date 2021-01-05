@@ -305,6 +305,25 @@ const getListRoleUserInProject = async(context,projectId) => {
     });
 }
 
+const getListOperatorInProject = async(context,projectId) => {
+    return new Promise((resolve, reject) => {
+        try {
+            taskManagementApi.getListOperatorInProject(projectId).then(res=>{
+                if (res.status == 200) {
+                    let data={};
+                    data.key = projectId;
+                    data.data = res.data.listObject;
+                    context.commit('setListOperatorInProject',data);
+                    resolve(data);
+                } else {
+                    SYMPER_APP.$snotifyError(error, "Can not get list operation in project!");
+                }
+            })
+        } catch (error) {
+            reject(error);
+        }
+    });
+}
 const getListIssueTypeInProjects = async(context,projectId) => {
     return new Promise((resolve, reject) => {
         try {
@@ -482,6 +501,7 @@ export {
     getListDocumentIdsInProject,
     getAllStatus,
     getAllIssueType,
-    getListRoleUserInProject
+    getListRoleUserInProject,
+    getListOperatorInProject
 
 };

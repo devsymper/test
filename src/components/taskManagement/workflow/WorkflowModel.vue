@@ -349,6 +349,7 @@ export default {
             }, 500,this);
         },
         updateWorkflow(){
+            let projectId=this.$route.params.id;
             this.isLoading = true;
             let isValid = this.validateData();
             if (isValid) {
@@ -367,6 +368,7 @@ export default {
                             data.id=id;
                             this.$store.commit("taskManagement/updateWorkflowToStore",data);
                             this.dialogSaveOrUpdate=false;
+                            this.$store.dispatch("taskManagement/getListOperatorInProject",projectId);
                         }else{
                             this.$snotifyError("", "Can not update workflow!");
                         }
@@ -444,6 +446,7 @@ export default {
                                 self.$snotifySuccess("Add workflow completed!");
                                 self.$store.commit("taskManagement/addWorkflowToStore",res.data);
                                 self.dialogSaveOrUpdate=false;
+                                self.$store.dispatch("taskManagement/getListOperatorInProject",projectId);
                                 self.$router.push('/task-management/projects/'+projectId+'/workflow/'+res.data.id);
                             }else if(res.status==400){
                                 self.$snotifyError("", "Validate key error",res.message);

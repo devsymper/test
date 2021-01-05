@@ -203,11 +203,12 @@ export default {
             if (this.listStatus.length > 0 ) {
                 for (let i = 0; i < this.listStatusColumn.length; i++) {
                     let idColumn = this.listStatusColumn[i].columnId;
-                    let statusRoleId = this.listStatusColumn[i].statusRoleId;
-                    let item = this.listStatus.find(ele => ele.statusRoleId == statusRoleId);
+                    let statusId = this.listStatusColumn[i].statusId;
+                    let taskLifeCircleId = this.listStatusColumn[i].taskLifeCircleId;
+                    let item = this.listStatus.find(ele => ele.statusId == statusId &&  ele.taskLifeCircleId == taskLifeCircleId );
                     if (item) {
                         let taskInStatus = allTask.filter(task=>{
-                            return task.tmg_status_role_id == statusRoleId;
+                            return task.tmg_status_id == statusId && task.tmg_task_life_circle_id == taskLifeCircleId;
                         });
                         if (taskInStatus.length > 0) {
                             for (let j = 0; j < taskInStatus.length; j++) {

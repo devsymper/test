@@ -7,7 +7,8 @@
             </div>
             <div class="right-content">
                  <v-text-field
-                 class="sym-small-size sym-style-input d-inline-block mr-3"
+                    v-on:input="onSearch($event)"
+                    class="sym-small-size sym-style-input d-inline-block mr-3"
                     append-icon="mdi-magnify"
                     solo
                     :placeholder="$t('common.search')"
@@ -48,20 +49,22 @@
                 >
                     <p class="title-column">{{column.name}}</p>
                     <!-- Draggable component comes from vuedraggable. It provides drag & drop functionality -->
-                    <VuePerfectScrollbar style="max-height: calc(100vh - 200px);">
+                    <VuePerfectScrollbar style="max-height: calc(100vh - 200px);" class="wrap-scroll-column">
                         <div v-for="(status, index) in column.statusInColumn"
                             :key="index"
-                            class="mt-2"
+                            class="mt-2 list-control-autocomplete"
                             :style="{
-                                'border': (dragging) ? '2px dashed '+ status.color : '2px dashed #f2f2f2'
+                                'border': (dragging && !nodeMapPermission[status.nodeId].disable) ? '2px dashed '+ status.color : '2px dashed #f2f2f2',
+                                'min-height': (dragging) ? '50px' :''
                             }"
                         >
                             <p>{{status.name}} - {{status.taskLifeCircleName}}</p>
                             <draggable 
+                            :disabled="nodeMapPermission[status.nodeId] ? nodeMapPermission[status.nodeId].disable : false"
                             :list="status.tasks" 
                             :animation="250"
-                            @start="dragging=true" 
-                            @end="dragging=false"
+                            @start="startMoveTask($event,status)" 
+                            @end="endMoveTask"
                             @change="handleChange($event,status)"
                             ghost-class="ghost-card" group="tasks">
                                 <!-- Each element from here will be draggable and animated. Note :key is very important here to be unique both for draggable and animations to be smooth & consistent. -->
@@ -69,7 +72,7 @@
                                     v-for="(task) in status.tasks"
                                     :key="task.id"
                                     :task="task"
-                                    class="mt-3 cursor-move"
+                                    class="mt-3 cursor-move sym-control"
                                 ></task-card>
                                 <!-- </transition-group> -->
                             </draggable>
@@ -177,11 +180,113 @@ export default {
             settingBoardMenuitems: null,
             listUser:[],
             currentBoard:{},
-            dragging:false
+            dragging:false,
+            nodeMapPermission:{},
         };
     },
    
     methods:{
+        onSearch(vl){
+            let val = vl;
+            $('.list-control-autocomplete .sym-control').removeClass('d-none');
+            $('.list-control-autocomplete .sym-control:not(:Contains("' + val + '"))').addClass('d-none');
+        },
+        getHeightFrameDrag(event, statusLength){
+            let parentFrameEl = $(event.target).closest('.wrap-scroll-column');
+            let h = parentFrameEl.height();
+            return h/statusLength + 'px';
+        },
+        startMoveTask(event,status){
+            this.dragging = true;
+            for (const key in this.nodeMapPermission) {
+
+                if (key == status.nodeId) {
+                    continue ;
+                }
+                $(event.target).find('.sym-control').addClass('item-dragging');
+
+                let arrAllowTo = this.nodeMapPermission[key].allowTo;
+                let isCheck = arrAllowTo.indexOf(status.nodeId);
+                if (isCheck == -1) {
+                    this.nodeMapPermission[key].disable = true;
+                }else{ // check them role
+                    let allRoleUser = this.sTaskManagement.listRoleUserInProject[this.projectId];
+                    let hasRole = false;
+                    if (this.nodeMapPermission[key].permission.length > 0) {
+                        for (let i = 0; i < allRoleUser.length; i++) {
+                            let checkRole = this.nodeMapPermission[key].permission.indexOf(allRoleUser[i].roleId);
+                            if (checkRole > -1) {
+                                hasRole = true;
+                                break;
+                            }                       
+                        }   
+                    }else{
+                        hasRole = true;
+                    }
+                    if (!hasRole) {
+                        this.nodeMapPermission[key].disable = true;
+                    }
+
+                    $('.list-control-autocomplete .sym-control:not(.item-dragging)').addClass('d-none');
+                }
+            }
+        },
+        endMoveTask(){
+            this.dragging = false;
+            for (const key in this.nodeMapPermission) {
+                this.nodeMapPermission[key].disable = false;
+            }
+            $('.list-control-autocomplete .sym-control').removeClass('d-none').removeClass('item-dragging');
+
+        },
+        /**
+         * 
+         */
+        setNodeMap(){
+            let allOperator = this.$store.state.taskManagement.listOperatorInProject[this.projectId];
+            let allNode = this.$store.state.taskManagement.listStatusInProjects[this.projectId];
+            if (allOperator.length > 0 && allNode.length > 0) {
+                for (let i = 0; i < allOperator.length; i++) {
+                    if (allOperator[i].tmg_to_status_id) {
+                        if (!this.nodeMapPermission[allOperator[i].tmg_to_status_id]) {
+                            this.nodeMapPermission[allOperator[i].tmg_to_status_id] = {};
+                            this.nodeMapPermission[allOperator[i].tmg_to_status_id]["allowTo"] = [];
+                            this.nodeMapPermission[allOperator[i].tmg_to_status_id]["permission"] = [];
+                            this.nodeMapPermission[allOperator[i].tmg_to_status_id]["disable"] = false;
+                        }
+                    
+                        let node = allNode.find(ele => ele.nodeId == allOperator[i].tmg_to_status_id);
+                        // get role cho node
+                        if (node) {
+                            if (node.roleIds.length > 10) {
+                                this.nodeMapPermission[allOperator[i].tmg_to_status_id]["permission"] = JSON.parse(node.roleIds);
+                            }
+                        }
+                        // get status được phép chuyển trạng thái đến
+                        if (allOperator[i].tmg_from_status_id) {
+                            if (this.nodeMapPermission[allOperator[i].tmg_to_status_id]["allowTo"].indexOf(allOperator[i].tmg_from_status_id) == -1) {
+                                this.nodeMapPermission[allOperator[i].tmg_to_status_id]["allowTo"].push(allOperator[i].tmg_from_status_id);
+                            }
+                        }else{ // trường hợp cho phép all, add hết status cùng task life circle
+                            let taskLifeCircleId = allOperator[i].tmg_task_life_circle_id;
+                            let listNodeInTaskLifeCircle =  allNode.filter( node =>{
+                                return node.taskLifeCircleId == taskLifeCircleId;
+                            });
+
+                            if (listNodeInTaskLifeCircle.length > 0) {
+                                for (let j = 0; j < listNodeInTaskLifeCircle.length; j++) {
+                                    if (this.nodeMapPermission[allOperator[i].tmg_to_status_id]["allowTo"].indexOf(listNodeInTaskLifeCircle[j].nodeId) == -1) {
+                                        this.nodeMapPermission[allOperator[i].tmg_to_status_id]["allowTo"].push(listNodeInTaskLifeCircle[j].nodeId);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+         
+
+        },
         getUser(){
             if (this.listUser.length > 1) {
                 let arr = this.listUser.slice(0,2);
@@ -202,7 +307,6 @@ export default {
                 }
                 
                 dataControl.tmg_status_id = status.statusId;
-                dataControl.tmg_status_role_id = status.statusRoleId;
                 dataControl.tmg_status = status.name;
                 dataPost['documentObjectWorkflowObjectId'] = "";
                 dataPost['documentObjectWorkflowId'] = "";
@@ -254,12 +358,12 @@ export default {
             if (this.listStatus.length > 0 ) {
                 for (let i = 0; i < this.listStatusColumn.length; i++) {
                     let idColumn = this.listStatusColumn[i].columnId;
-                    let statusRoleId = this.listStatusColumn[i].statusRoleId;
-                    let item = this.listStatus.find(ele => ele.statusRoleId == statusRoleId);
+                    let statusId = this.listStatusColumn[i].statusId;
+                    let taskLifeCircleId = this.listStatusColumn[i].taskLifeCircleId;
+                    let item = this.listStatus.find(ele => ele.statusId == statusId &&  ele.taskLifeCircleId == taskLifeCircleId );
                     if (item) {
-                       // let statusId = item.statusId;
                         let taskInStatus = allTask.filter(task=>{
-                            return task.tmg_status_role_id == statusRoleId;
+                            return task.tmg_status_id == statusId && task.tmg_task_life_circle_id == taskLifeCircleId;
                         })
                         item['tasks'] = taskInStatus;
                         let column = columns.find(ele => ele.id == idColumn);
@@ -270,7 +374,8 @@ export default {
                 }  
             }
             this.listBoardColumn = columns;
-            this.$emit('loaded-content')
+            this.$emit('loaded-content');
+            this.setNodeMap();
         },
         async getListBoard(){
             let res = await taskManagementApi.getListBoardInProject(this.projectId) ;
@@ -307,6 +412,9 @@ export default {
             }
             if (!this.sTaskManagement.listRoleUserInProject[this.projectId] || this.sTaskManagement.listRoleUserInProject[this.projectId].length == 0) {
                 await this.$store.dispatch("taskManagement/getListRoleUserInProject",this.projectId);
+            }
+            if (!this.sTaskManagement.listOperatorInProject[this.projectId] || this.sTaskManagement.listOperatorInProject[this.projectId].length == 0) {
+                await this.$store.dispatch("taskManagement/getListOperatorInProject",this.projectId);
             }
             this.getListTasks();
         },

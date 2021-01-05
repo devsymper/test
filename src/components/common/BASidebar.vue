@@ -3,7 +3,7 @@
         v-resize="reCalcSidebarHeight" 
         mobile-breakpoint="0" 
         :mini-variant="sapp.collapseSideBar"
-        v-if="false"
+        v-if="true"
         :v-model="true" app>
         <v-list dense nav class="py-0 pr-0 list-item">
             <v-list-item 
