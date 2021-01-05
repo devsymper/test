@@ -40,6 +40,7 @@ export const copyLogTime = async function(event) {
       return check
 }
 export const resizeLogtime = async function(events) {
+    debugger
     let taskLength = 60*60*1000;
     let padding = 60*60*300;
     let lastDate, lastEnd;
@@ -56,5 +57,5 @@ export const resizeLogtime = async function(events) {
         }
         return task;
     })
-    return newTasks;
+    return newTasks
 }

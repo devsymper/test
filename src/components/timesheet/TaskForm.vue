@@ -11,7 +11,7 @@
         <v-autocomplete 
             v-bind:style="cateError? 'margin-bottom:4px' :''"
             style="margin-top:2px!important; " 
-            :menu-props="{'nudge-top':-40, 'top': 200}" 
+           
             v-model="categoryTask" 
             class="category-task" 
             :items="category" 
@@ -96,7 +96,7 @@ import SymperAvatar from '../../components/common/SymperAvatar';
 import BPMNEngine from "../../api/BPMNEngine";
 import { defaultTaskDescription } from "../../components/process/elementDefinitions/customExtToModel";
 import { util } from "../../plugins/util" ;
-
+import TaskFormWorker from 'worker-loader!@/worker/timesheet/TaskForm.Worker.js';
 
 export default {
     components:{
@@ -109,6 +109,7 @@ export default {
         desc: '',
         cateError:'',
         search:null,
+        taskFormWorker:null,
         checkbox:false,
         check:false,
         nameError: '',
@@ -117,9 +118,10 @@ export default {
         user:''
     }),
     created(){
+        this.taskFormWorker = new TaskFormWorker();
         this.getCategory();
         this.$store.dispatch("app/getAllUsers");
-        this.getUser();
+        this.listUser = this.$store.state.app.allUsers;
     },
     watch:{
         name(){
@@ -141,23 +143,42 @@ export default {
             }
         }
     },
+    mounted() {
+        const self = this;
+        this.taskFormWorker.addEventListener("message", function (event) {
+            debugger
+			let data = event.data;
+            switch (data.action) {
+                case 'getCategory':
+                    self.setCategory(data.dataAfter)
+                    break;
+                 case 'createTask':
+                    self.checkCreateTask(data.dataAfter)
+                    break;
+                default:
+                    break;
+            }
+        });
+    },
     methods: {
-        getUser(){
-            this.listUser = this.$store.state.app.allUsers;
+        checkCreateTask(check){
+            debugger
+             if (check) {
+                this.$emit('loadTask');
+                this.cancel();
+                alert('thêm thành công');
+             }else{
+                  alert('thêm thất bại');
+             }
+        },
+        setCategory(data){
+            this.category = data;
         },
         getCategory(){
-            let self= this;
-            timesheetApi.getAllCategory({}).then(res => {
-                if (res.status === 200) {
-                    self.category=[];
-                    let category = res.data.category;
-                     for(let i=0; i<category.length; i++){
-                          self.category.push(
-                             category[i].key+"-"+category[i].name
-                        )
-                    }
-                }
-            }).catch(console.log);
+             this.taskFormWorker.postMessage({
+                action:'getCategory',
+                data:{}
+            })
         },
         cancel(){
             this.categoryTask = "";
@@ -189,7 +210,6 @@ export default {
             let res = await BPMNEngine.addTask(JSON.stringify(data));
         },
         save(){
-            // 
             let self = this;
             this.check = true;
             if(this.name==''&&this.categoryTask==''){
@@ -204,23 +224,17 @@ export default {
              }
             else{
              self.saveTaskSymper();
-            timesheetApi.createTask({
-                    task: this.name,
-                    desc: this.desc,
-                    cate: this.categoryTask,
-                    userAssign: this.user,
-                    isPublic: this.checkbox==''?1:0// 1 la co
-                })
-                .then(res => {
-                    if (res.status === 200) {
-                        self.$emit('loadTask');
-                         self.cancel();
-                       
-                        console.log(res);
-                        alert('thêm thành công');
-                    }
-                })
-                .catch(console.log);
+             let data = {
+                task: this.name,
+                desc: this.desc,
+                cate: this.categoryTask,
+                userAssign: this.user,
+                isPublic:this.checkbox==''?1:0
+             }
+              self.taskFormWorker.postMessage({
+                action:'createTask',
+                data:data
+            })
             }
         }
     }
