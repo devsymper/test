@@ -23,8 +23,6 @@ export const showTotalHourInSubmitView = async function(data) {
         }) 
     if (res.status === 200) {
         const ranges = data.data.allColumns.slice(2, data.data.allColumns.length).map(c => c.colId);
-        debugger
-
         const logTimeList = _groupBy(res.data.listLogTime, 'task_id');
         const dateList = _groupBy(res.data.listLogTime, 'date');
         const userName = _groupBy(res.data.listLogTime, 'account_id');

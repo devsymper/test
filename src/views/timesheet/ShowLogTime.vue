@@ -1,5 +1,5 @@
 <template>
-<div class='log-time h-100' style="padding-left: 10px">
+<div class='log-time h-100 pl-4' >
     <v-row style="padding-bottom: 10px; margin-left:2px; margin-bottom:-22px">
         <period-selector  @load-logtime="reloadLog" />
         <div style="width:38%;float:right" 

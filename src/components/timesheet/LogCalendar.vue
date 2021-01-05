@@ -208,6 +208,9 @@ import ViewDetailMonth from "./../../components/timesheet/ViewDetailMonth";
 import LogTimeView from "./../../components/timesheet/LogTimeView";
 import DeleteLogView from "./../../components/timesheet/DeleteLogView";
 import timesheetApi from '../../api/timesheet';
+import LogFormWorker from 'worker-loader!@/worker/timesheet/LogForm.Worker.js';
+
+
 import { mapState} from 'vuex';
 
 import _groupBy from 'lodash/groupBy';
@@ -239,10 +242,12 @@ export default {
             events: [],
             dialog: false,
             hoursRequired: '',
+            logFormWorker:null
         };
     },
 
     created() {
+        this.logFormWorker = new LogFormWorker()
         this.load();
     },
     methods: {
@@ -310,26 +315,16 @@ export default {
                 })
         },
         copyLogTime(event){
-            
-              timesheetApi.createLogTime({
-                start:this.$moment(event.start).add(1, 'h').format("YYYY-MM-DD HH:mm"),
-                end: this.$moment(event.end).add(1, 'h').format("YYYY-MM-DD HH:mm"),
-                duration:event.duration,
-                task: event.task,
-                type: event.type,
-                id: event.id,
-                date: event.date,
-                categoryTask: event.category,
-                desc: event.desc || ""
+            this.logFormWorker.postMessage({
+                action:'copyLogTime',
+                data:event
             })
-            .then(res => {
-                if (res.status === 200) {
-                    //console.log(res);
-                    this.load()
-                }
-            })
-            .catch(console.log);
-                 
+        },
+        setEventCopy(data){
+            if(data){
+                this.load()
+            }
+
         },
         // tính tổng thời gian của cả tháng
         sumMonthDuration(event, start, end) {
@@ -717,7 +712,19 @@ export default {
          this.ready = true
         this.scrollToTime()
         this.updateTime()
+        const self = this
+        this.logFormWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'copyLogTime':
+                    self.setEventCopy(data.dataAfter)
+                    break;
+                default:
+                    break;
+            }
+        });
         },
+
 
 };
 </script>
