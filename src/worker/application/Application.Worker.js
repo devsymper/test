@@ -6,7 +6,7 @@ import {appManagementApi} from '@/api/AppManagement.js';
 
 
 self.onmessage = async function (event) {
-	var workerDataReceive = event.data.data;
+	var workerDataReceive = event.data;
     let action = workerDataReceive.action;
     let data = workerDataReceive.data;
 	switch (action) {

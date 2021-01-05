@@ -755,6 +755,7 @@ export default {
 		this.defaultColDef = {
             minWidth: 40,
 			filter: true,
+			flex: 1,
 			suppressMenu : true,
 			sortable: true,
             resizable: true,
@@ -800,7 +801,7 @@ export default {
 			})
 		},
 		reRender(){
-			this.agApi.sizeColumnsToFit()
+			// this.agApi.sizeColumnsToFit()
 		},
 		searchAutocompleteItems(vl){
             this.tableFilter.currentColumn.colFilter.searchKey = vl;
@@ -1148,6 +1149,7 @@ export default {
 		},
 		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false ){
 			let self = this;
+			debugger
 			if(!this.listItemsWorker){
 				this.listItemsWorker = new ListItemsWorker()
 			}
@@ -1159,7 +1161,7 @@ export default {
 			}
 			dataConfig.lazyLoad = lazyLoad
 			dataConfig.customAPIResult = self.customAPIResult.reformatData ? self.customAPIResult.reformatData.toString() : null
-			
+			dataConfig.filteredColumns = self.filteredColumns
 			this.listItemsWorker.postMessage({
 				action: 'getData',
 				data: dataConfig

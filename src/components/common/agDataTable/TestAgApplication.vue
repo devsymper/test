@@ -79,7 +79,7 @@ export default {
                                 {name: "name", title: "name", type: "text"},
                                 {name: "iconName", title: "icon", type: "text",
                                     cellRenderer: function(params) {
-										return params.value.includes('mdi-') ? '<span class="mdi '+params.value+'"></span>' : '<img src="'+ params.value +'" alt="Girl in a jacket" width="50" height="50">'
+										return params.value.includes('mdi-') ? '<span class="mdi '+params.value+'"></span>' : '<img src="'+ params.value +'" alt="Girl in a jacket" width="20px" height="20px">'
 									}
 								},
 								{name: "status", title: "status", type: "text",

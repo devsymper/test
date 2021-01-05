@@ -3,8 +3,8 @@ import {documentApi} from '@/api/Document.js'
 
 self.onmessage = async function (event) {
 	var workerDataReceive = event.data;
-    let action = workerDataReceive.data.action;
-    let data = workerDataReceive.data.data;
+    let action = workerDataReceive.action;
+    let data = workerDataReceive.data;
 	switch (action) {
         case 'getDetailWorkflow':
 			let dataDetail = await getWorkflowDetail(data.processKey);
