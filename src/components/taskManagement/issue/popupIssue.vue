@@ -179,7 +179,7 @@ export default {
             this.$set(this.workflowVariable,'project_id',this.currentProject.id);
             this.$set(this.workflowVariable,'project_key',this.currentProject.key);
             this.$set(this.workflowVariable,'issue_type_id',this.currentIssueType.id);  
-            this.$set(this.workflowVariable,'tmg_task_life_circle_id',this.currentIssueType.taskLifeCircleId);
+            this.$set(this.workflowVariable,'task_life_circle_id',this.currentIssueType.taskLifeCircleId);
         },
         submitForm(){
             this.isLoading = true;
