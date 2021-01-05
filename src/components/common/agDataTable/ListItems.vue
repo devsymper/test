@@ -691,7 +691,7 @@ export default {
 			gridApi: null,
 			listItemsWorker: null,
 			deleteDialogShow: false,
-			deleteItems: null,
+			deleteItems: [],
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
 			showSearchBox: true,
             loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko

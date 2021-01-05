@@ -84,8 +84,7 @@ export default {
                     name: "remove",
                     text: this.$t("apps.contextMenu.remove"),
                     callback: (app, callback) => {
-						debugger
-						self.deleteApp(app);
+						self.deleteApp(app[0]);
                     },
                 },
             }, 

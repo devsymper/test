@@ -2,6 +2,7 @@ export const symperAjax = async(options) =>{
 	if(options.method == "GET"){
 		if(Object.keys(options.data).length > 0){
 			let fullParams = serialize(options.data)
+			
 			options.url.includes("?") ? options.url = options.url + "&" + str : options.url = options.url + "?" + fullParams
 		}
 	}else{
@@ -40,5 +41,15 @@ export const serialize = function(obj, prefix) {
 		  encodeURIComponent(k) + "=" + encodeURIComponent(v));
 	  }
 	}
-	return str.join("&");
+	str.forEach(function(e){
+		if(e == ""){
+			str.splice(str.indexOf(e), 1)
+		}
+	})
+	let url = str.join("&");
+	if(url.charAt(0) == "&"){
+		url = url.substring(1)		
+	}
+	debugger
+	return url
   }

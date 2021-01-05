@@ -35,9 +35,7 @@ export default {
             tableContextMenu:{
                 restore: {
                     name: "restore",
-                    text: function() {
-                        return " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Khôi phục";
-                    },
+                    text:  "<i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Khôi phục",
                     callback: (document, callback) => {
                         let thisCpn = this;
                         documentApi
@@ -65,18 +63,14 @@ export default {
                 },
                 edit: {
                     name: "editdoc",
-                    text: function() {
-                        return " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Sửa";
-                    },
+                    text:  " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Sửa",
                     callback: (document, callback) => {
                         this.$goToPage('/documents/'+document.id+'/editor/edit',document.title);
                     },
                 },
                 drop: {
                     name:"delete",
-                    text:function() {
-                        return " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa";
-                    },
+                    text: " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa",
                     callback: (document, callback) => {
                         let ids = document.reduce((arr,obj)=>{
                             arr.push(obj.id);

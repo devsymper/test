@@ -84,66 +84,26 @@ export default {
                                 {name: "id", title: "id", 	type: "text", },
                                 {name: "name", title: "name", type: "text"},
                                 {name: "iconName", title: "icon", type: "text",
-                                    renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-										Handsontable.dom.empty(td);
-										if(value === null || value == ""){
-											return td;
-										}
-										if(value.includes("mdi-")){
-											let icon;
-											icon = document.createElement('i');	
-											icon.classList.add('mdi');
-											icon.classList.add(value);
-											$(icon).css('font-size','16px')
-											td.appendChild(icon);
-											return td;
-										}else{
-											let img;
-											img = document.createElement('img');
-											$(img).attr('src',value)
-											$(img).css('width','40px')
-											$(img).css('height','40px')
-											td.appendChild(img)
-											return td;
-										}
-										
-									},
+                                     cellRenderer: function(params) {
+										return params.value.includes('mdi-') ? '<span class="mdi '+params.value+'"></span>' : '<img src="'+ params.value +'" alt="Girl in a jacket" width="20px" height="20px">'
+									}
 								},
 								{name: "status", title: "status", type: "text",
-									renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-										let span;
-										Handsontable.dom.empty(td);
-										span = document.createElement('span')
-										if(value === "1"){
-											$(span).text('Kích hoạt')
-										}else{
-												$(span).text('Không kich hoạt')
-										}
-										td.appendChild(span);
-										return td
-									},
+									cellRenderer: function(params) {
+										return params.value == "1" ? '<span>Kích hoạt</span>' : '<span>Không kích hoạt</span>'
+									}
 								},
 								{name: "createdAt", title: "created_at", type: "text",
-									renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-										let span;
-										Handsontable.dom.empty(td);
-										span = document.createElement('span')
-										let newValue = value.slice(0,value.length-3)
-											$(span).text(newValue)
-										td.appendChild(span);
-										return td
-									},
+									cellRenderer: function(params) {
+										let newValue = params.value.slice(0, params.value.length - 3)
+										return  '<span>'+ newValue +'</span>'
+									}
 								},
 								{name: "updatedAt", title: "updated_at", type: "text",
-									renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-											let span;
-											Handsontable.dom.empty(td);
-											span = document.createElement('span')
-											let newValue = value.slice(0,value.length-3)
-											$(span).text(newValue)
-											td.appendChild(span);
-											return td
-										},
+									cellRenderer: function(params) {
+										let newValue = params.value.slice(0, params.value.length - 3)
+										return  '<span>'+ newValue +'</span>'
+									}
 								},
                          ],
                    }
