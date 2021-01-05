@@ -1202,7 +1202,13 @@ export default {
             let allEls = this.$refs.symperBpmn.getAllNodes();
             let currBizNode = {};
             let submitTasks = [];
-
+            if(attrName == 'updateForElement'){
+                submitTasks.push({
+                    id: 'DOC_INSTANCE_FROM_STARTING_WORKFLOW',
+                    title: 'Doc instance from starting workflow',
+                    nodeData: {}
+                });
+            }
             allEls.filter((el, idx) => {
                 if(el.$type == 'bpmn:SequenceFlow'){
                     return true;

@@ -232,7 +232,7 @@ export default {
                 .catch(err => {
                   console.log("error from rename document api!!!", err);
                 })
-                .always(() => {});
+                .finally(() => {});
             }else{
                 $(this).replaceWith(
                 "<p id=" +
@@ -294,7 +294,7 @@ export default {
                 .catch(err => {
                   console.log("error from update folder api!!!", err);
                 })
-                .always(() => {});
+                .finally(() => {});
             }else{
                 $(this).replaceWith(
                 "<p id="+'tb' +
@@ -325,7 +325,7 @@ export default {
           .catch(err => {
             console.log("error from delete folder user api!!!", err);
           })
-          .always(() => {});
+          .finally(() => {});
       } else {
         knowledgeApi
           .deleteDirectory(path)
@@ -339,7 +339,7 @@ export default {
           .catch(err => {
             console.log("error from delete folder user api!!!", err);
           })
-          .always(() => {});
+          .finally(() => {});
       }
     },
     /**

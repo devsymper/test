@@ -296,7 +296,7 @@ export default {
 			})
 			.catch(err => {
 			})
-			.always(() => {});
+			.finally(() => {});
 	},
 	mounted() {
 		setTimeout((self) => {

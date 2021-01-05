@@ -23,10 +23,7 @@ import VueRx from 'vue-rx'
 import iconMap from "./icon";
 //Anhtger import html2canvas
 import VueHtml2Canvas from 'vue-html2canvas';
-import VueWorker from 'vue-worker';
-
-Vue.use(VueWorker);
-
+util.auth.checkLoginAndSetToIndexedDB();
 Vue.use(VueHtml2Canvas);
 Vue.component('ba-view', BaView);
 Vue.component('end-user-view', EndUserView);
@@ -275,7 +272,6 @@ Vue.prototype.$snotifySuccess = function(title = 'SUCCESS', detail = '', duratio
     }
     this.$snotify(setting);
 }
-
 
 Vue.config.productionTip = false;
 global.jQuery = require('jquery');

@@ -206,7 +206,7 @@ export default {
         .catch(err => {
           console.log("error download file!!!", err);
         })
-        .always(() => {});
+        .finally(() => {});
     },
     removeFileAttach() {
         let data={};
@@ -228,7 +228,7 @@ export default {
         .catch(err => {
           console.log("error from delete attachment file!!!", err);
         })
-        .always(() => {});
+        .finally(() => {});
       this.dialogAlert = false;
     },
     getData(){

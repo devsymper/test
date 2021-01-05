@@ -141,7 +141,7 @@ export default class BasicControl extends Control {
                         }).catch(err => {
 
                         })
-                        .always(() => {});
+                        .finally(() => {});
                 }
             }
 
@@ -200,6 +200,42 @@ export default class BasicControl extends Control {
                     valueChange = $(e.target).text();
                 } else if (thisObj.type == 'checkbox') {
                     valueChange = $(e.target).prop("checked");
+                } else if(thisObj.type == 'user'){
+                    return false;
+                }else if(thisObj.type == 'number'){
+                    valueChange = valueChange.replace(/=/g,"");
+                    valueChange = eval(valueChange);
+                    if(!/^[-0-9,.]+$/.test(valueChange)){
+                        return false;
+                    }
+                }else if(thisObj.type == 'date'){
+                    valueChange = this.$moment(valueChange,'DD-MM-YYYY').format('YYYY-MM-DD');
+                }else if(thisObj.type == 'time'){
+                    if(!Util.checkTimeValid(valueChange)){
+                        thisObj.renderValidateIcon("Không đúng định dạng thời gian", 'TimeValid')
+                        return false
+                    }
+                    else{
+                        thisObj.removeValidateIcon('TimeValid')
+                    }
+                }
+                // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
+                if(thisObj.isRequiredControl()){
+                    if(!valueChange){
+                        thisObj.renderValidateIcon('Không được bỏ trống trường thông tin '+thisObj.title, 'Require')
+                    }
+                    else{
+                        thisObj.removeValidateIcon('Require');
+                    }
+                }
+                else if(thisObj.type == 'time'){
+                    if(!Util.checkTimeValid(valueChange)){
+                        thisObj.renderValidateIcon("Không đúng định dạng thời gian", 'TimeValid')
+                        return false
+                    }
+                    else{
+                        thisObj.removeValidateIcon('TimeValid')
+                    }
                 }
                 thisObj.value = valueChange;
                 SYMPER_APP.$evtBus.$emit('document-submit-input-change', thisObj);
@@ -225,15 +261,6 @@ export default class BasicControl extends Control {
                     }
                     thisObj.traceControl();
                 }
-                if (thisObj.type == 'user') {
-                    e.curTarget = e.target
-                    SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
-                }
-                // if (thisObj.type == 'percent') {
-                //     if (e.target.value > 100) {
-                //         $(e.target).val(100)
-                //     }
-                // }
                 if (thisObj.type == 'department') {
                     e['controlName'] = thisObj.name;
                     SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
@@ -332,6 +359,7 @@ export default class BasicControl extends Control {
                     this.ele.val(value);
                 } else if (this.type == 'date') {
                     this.ele.val(SYMPER_APP.$moment(value).format(this.formatDate));
+                    this.value = SYMPER_APP.$moment(value).format('YYYY-MM-DD');
                 } else if (this.type == 'checkbox') {
                     if (value)
                         this.ele.attr('checked', 'checked');
@@ -345,9 +373,6 @@ export default class BasicControl extends Control {
                     else {
                         this.ele.val("");
                     }
-                }
-                else if (this.type == 'user') {
-                    this.ele.val(value.inputDislay);
                 }
                 else if (this.type == 'image') {
                     this.setImageControlValue(value)
@@ -365,7 +390,7 @@ export default class BasicControl extends Control {
                 this.defaultValue = value;
             }
         }
-        
+        console.log(this.value,'asasas');
     }
     getValue() {
         return this.value;
@@ -849,16 +874,26 @@ export default class BasicControl extends Control {
             let newData = [];
             for (let index = 0; index < data.length; index++) {
                 let value = data[index];
-                if (value) {
-                    newData.push(SYMPER_APP.$moment(value, dateFormat).format('YYYY-MM-DD'))
-                } else {
+                if(value){
+                    if(SYMPER_APP.$moment(data, 'YYYY-MM-DD', true).isValid()){
+                        newData.push(data);
+                    }
+                    else{
+                        newData.push(SYMPER_APP.$moment(value,dateFormat).format('YYYY-MM-DD'))
+                    }
+                }
+                else{
                     newData.push("");
                 }
 
             }
             return newData;
-        } else {
-            return SYMPER_APP.$moment(data, dateFormat).format('YYYY-MM-DD')
+        }
+        else{
+            if(SYMPER_APP.$moment(data, 'YYYY-MM-DD', true).isValid()){
+                return data;
+            }
+            return SYMPER_APP.$moment(data,dateFormat).format('YYYY-MM-DD')
         }
     }
      /**

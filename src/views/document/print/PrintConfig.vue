@@ -418,7 +418,7 @@ export default {
                         title: "can not save document",
                     });
             })
-            .always(() => {
+            .finally(() => {
             });
         },
         checkEmptyControl(allControl,tableId){
@@ -845,7 +845,7 @@ export default {
                 .catch(err => {
                     console.log("error from detail document api!!!", err);
                 })
-                .always(() => {
+                .finally(() => {
                 });
             }
         },

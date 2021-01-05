@@ -60,7 +60,7 @@ export default {
                         .catch(err => {
                             console.log("error from delete document api!!!", err);
                         })
-                        .always(() => {});
+                        .finally(() => {});
                     },
                 },
                 edit: {
@@ -103,7 +103,7 @@ export default {
                         .catch(err => {
                             console.log("error from delete document api!!!", err);
                         })
-                        .always(() => {});
+                        .finally(() => {});
                     },
                 },
                 

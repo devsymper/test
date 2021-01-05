@@ -2,6 +2,8 @@ import {
     util
 } from "./../plugins/util.js";
 
+import {symperAjax} from './symperAjax.js'
+
 function makeCacheHeader(headers, url, data, options) {
     headers['Symper-Request-Name'] = options.requestName ? options.requestName : util.str.hashCode(JSON.stringify(['GET', url, data]));
     headers['Symper-Cache-Strategy'] = options.cacheStrategy ? 'cache-first' : 'network-first';
@@ -56,7 +58,7 @@ export default class Api {
      * @returns {Object} Đối tượng có thể sử dụng như của promise
      */
     get(uri, data = {}, header = {}, options = {}) {
-        let url = this.getFullUrl(uri);
+		let url = this.getFullUrl(uri);
         return this.callApi("GET", url, data, header, options);
     }
 
@@ -107,10 +109,13 @@ export default class Api {
      * @param {Object} options các option thêm cho request theo Jquery Ajax
      * @returns {Object} Đối tượng có thể sử dụng như của promise
      */
-    callApi(method, url, data, headers, options) {
-
-        headers = Object.assign({
-            Authorization: `Bearer ${util.auth.getToken()}`
+    async callApi(method, url, data, headers, options) {
+        let token = util.auth.getToken();
+        if(token instanceof Promise){
+            token = await token;
+        }
+		headers = Object.assign({
+            Authorization: `Bearer ${token}`
         }, headers);
 
         if ((method == 'GET' || (method == 'POST' && options.cacheResponse)) && !url.includes('workflow.symper.vn')) {
@@ -125,7 +130,16 @@ export default class Api {
             crossDomain: true,
             headers: headers
         };
-        options = Object.assign(defaultOptions, options);
-        return $.ajax(options);
+		options = Object.assign(defaultOptions, options);
+        let res = {};
+        /**
+		 * Hàm check nếu gọi api từ worker thì thêm 1 hàm mới gọi từ đó
+		 */
+		if(self.window){
+			res = await $.ajax(options);
+		}else{
+			res = await symperAjax(options)
+        }
+        return res;
     }
 }

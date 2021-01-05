@@ -40,7 +40,7 @@ export default {
                     .catch(err => {
                         console.log("error from delete service api!!!", err);
                     })
-                    .always(() => {
+                    .finally(() => {
                     });
                 }},
                 {

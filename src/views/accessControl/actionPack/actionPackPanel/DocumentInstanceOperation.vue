@@ -20,7 +20,7 @@
 
 <script>
 import { HotTable, HotColumn } from "@handsontable/vue";
-import { util } from '../../../plugins/util';
+import { util } from '@/plugins/util';
 export default {
     components: {
         HotTable

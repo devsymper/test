@@ -60,6 +60,7 @@
 </template>
 
 <script>
+import EnvironmentWorker from 'worker-loader!@/worker/environment/Environment.Worker.js';
 import {environmentManagementApi} from '@/api/EnvironmentManagement'
 export default {
 	props:{
@@ -78,6 +79,7 @@ export default {
 	data(){
 		return{
 			serverId:"",
+			environmentWorker: null,
 			dbName:""
 		}
 	},
@@ -87,9 +89,38 @@ export default {
 			this.dbName  = ""
 		}
 	},
+	mounted(){
+		let self = this
+		this.environmentWorker = new EnvironmentWorker()
+        this.environmentWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'changeServer':
+					self.handlerChangeServer(data.dataAfter)
+					break;
+                
+                default:
+                    break;
+            }
+        });
+	},
 	methods:{
 		cancel(){
 			this.$emit('cancel')
+		},
+		handlerChangeServer(res){
+			if(res.status == 200){
+				this.$emit('success')
+				this.$snotify({
+					type: "success",
+					title: "Đổi server thành công"
+				})
+			}else{
+				this.$snotify({
+					type: "error",
+					title: err
+				})
+			}
 		},
 		changeServer(){
 			let data = {
@@ -98,25 +129,10 @@ export default {
 				dbName: this.dbName
 			}
 			let self = this
-			environmentManagementApi.changeServer(data).then(res=>{
-				if(res.status == 200){
-					self.$emit('success')
-					self.$snotify({
-						type: "success",
-						title: "Đổi server thành công"
-					})
-				}else{
-					self.$snotify({
-					type: "error",
-					title: err
-				})
-				}
-			}).catch(err=>{
-				self.$snotify({
-					type: "error",
-					title: err
-				})
-			})
+			this.environmentWorker.postMessage({
+				action: 'changeServer',
+				data: data
+			});
 		}
 	},
 }

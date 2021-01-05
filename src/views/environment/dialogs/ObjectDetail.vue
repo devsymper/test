@@ -22,16 +22,7 @@
 			>
 				Chọn
 			</v-btn>
-			<!-- <v-btn 
-				class="mr-2 font-normal fs-13"
-				depressed
-				tile
-				small
-				:disabled="showBtnAddCheckbox"
-				@click="handleCheckClick"
-			>
-				Kiểm tra
-			</v-btn> -->
+			
 			<v-btn 
 				class="mr-2 font-normal fs-13"
 				depressed
@@ -63,6 +54,7 @@
 			@cancel="showDialog = false"
 			:listItemSelected="listItemSelected"
 			:currentObjectType="currentObjectType"
+			@success="handlerSuccess"
 		/>
 		<DialogDataRelate 
 			:showDialog="showDialogRelateData"
@@ -135,6 +127,11 @@ export default {
 		addCheckBoxColumn(){
 			this.showBtnAddCheckbox = false
 			this.$refs.listObject.addCheckBoxColumn()
+		},
+		handlerSuccess(){
+			this.showBtnAddCheckbox = true
+			this.showDialog = false 
+			this.$refs.listObject.refreshList()
 		},
 		afterSelectedRow(items){
 			this.$set(this, 'listItemSelected', items)

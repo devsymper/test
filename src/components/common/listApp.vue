@@ -17,11 +17,7 @@
                     :key="index" class="pt-1 pb-1"
                     v-show="object.objects.length"
                 >
-                    <listObject 
-                        :objects="object.objects" 
-                        :type="object.type" 
-                        @toggle-favorite="toggleFavorite"
-                    ></listObject>
+                    
                 </v-col>
             </v-row>
         </v-col>
@@ -34,12 +30,10 @@
 <script>
 import Api from "../../api/api.js";
 import icon from "./SymperIcon";
-import listObject from "../../views/apps/singleObject";
 export default {
     name: "listApp",
     components: {
         icon,
-        listObject
     },
     data: function() {
         return {

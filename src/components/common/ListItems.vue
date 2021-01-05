@@ -18,7 +18,6 @@
                             :append-icon="$i('input.search')"
                             outlined
                             dense
-                            label="Search"
                             :placeholder="$t('common.search')"
                         ></v-text-field>
 						<v-btn
@@ -589,6 +588,14 @@ export default {
         customDataForApi: {
             type: Function,
             // default: (configs, columns, filterData)=>{}
+            default: null
+		},
+		/**
+         * Hàm phục vụ cho việc dev tự định nghĩa custom hiển thị trên component filter
+         */
+        customRenderForFilter: {
+            type: Function,
+            // default: (columnName, items)=>{ return items}
             default: null
         },
 		apiMethod:{
@@ -1338,7 +1345,7 @@ export default {
 
                 if(this.customDataForApi){
                     configs.customDataForApi = this.customDataForApi;
-                }
+				}
 				getDataFromConfig(url, configs, columns, tableFilter, success, method, header);
             }
         },
@@ -1543,7 +1550,10 @@ export default {
                         arr.push(el[columns[0]]);
                         return arr;
                     }, []);
-                    self.tableFilter.currentColumn.colFilter.selectItems = self.createSelectableItems(items);
+					self.tableFilter.currentColumn.colFilter.selectItems = self.createSelectableItems(items);
+					if(self.customRenderForFilter != null){
+                  	  	self.tableFilter.currentColumn.colFilter.selectItems = self.customRenderForFilter(self.tableFilter.currentColumn.name,self.tableFilter.currentColumn.colFilter.selectItems);
+					}
                 }
             }
             this.prepareFilterAndCallApi(columns , false, true, success, options);
