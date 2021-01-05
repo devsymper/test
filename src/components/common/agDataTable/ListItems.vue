@@ -327,6 +327,22 @@ export default {
 			type: Number,
 			default:21
 		},
+		/**
+         * * Các contextmenu cho các item trong list, có dạng:
+         * [
+         *      {
+         *          name: 'action1' // Tên của context menu để phân biệt với các context menu khác.
+         *          text: ' Action 1' // Text hiển thị lên .
+         *      }
+         * ]
+         * Khi một menu item được click,
+         * nó sẽ emit sự kiện tên là: context-selection-tên của menu item
+         */
+        tableContextMenu: {
+            default() {
+                return [];
+            }
+        },
 		 /**
          * Hàm truyền vào context menu 
          */
@@ -749,7 +765,8 @@ export default {
                 default:
                     break;
             }
-        });
+		});
+		this.reduceContextMenuItems()
 	},
     beforeMount(){
 		this.defaultColDef = {
@@ -772,6 +789,10 @@ export default {
 		this.rowSelection = 'single';
     },
 	methods:{
+		reduceContextMenuItems(){
+			let data = this.tableContextMenu
+			debugger
+		},
 		handlerGetData(res){
 			res.columnDefs.forEach(function(e){
 				if(e.cellRenderer){

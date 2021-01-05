@@ -11,6 +11,7 @@
 			:getContextMenuItems="getContextMenuItems"
             @after-open-add-panel="showAddModal"
             :customAPIResult="customAPIResult"
+            :tableContextMenu="tableContextMenu"
 			:rowHeight="50"
             :showActionPanelInDisplayConfig="true"
             :commonActionProps="commonActionProps"
@@ -68,7 +69,25 @@ export default {
             },
             apiUrl: appConfigs.apiDomain.appManagement+"application",
             appUrl: "apps",
-            isEdit: false,
+			isEdit: false,
+			tableContextMenu: {
+               update: {
+                    name: "edit",
+                    text: this.$t("apps.contextMenu.edit"),
+                    callback: (app, callback) => {
+                        this.editCallback = callback;
+                        self.openUpdateApp(app);
+                    },
+                },
+                remove: {
+                    name: "remove",
+                    text: this.$t("apps.contextMenu.remove"),
+                    callback: (app, callback) => {
+                        this.removeCallback = callback;
+                        this.deleteApp(app);
+                    },
+                },
+            }, 
             customAPIResult: {
                 reformatData(res){
                    return{
