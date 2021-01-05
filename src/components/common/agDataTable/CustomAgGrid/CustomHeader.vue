@@ -19,7 +19,6 @@ export default {
 	},
 	computed:{
 		filteredColumns(){
-			debugger
 			return this.$store.state.app.filteredColumns
 		}
 	},

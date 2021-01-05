@@ -3,7 +3,7 @@ import { getDataFromConfig, getDefaultFilterConfig } from "@/components/common/c
 import {uiConfigApi} from "@/api/uiConfig";
 
 self.onmessage = async function (event) { 
-	var workerDataReceive = event.data.data;
+	var workerDataReceive = event.data;
     let action = workerDataReceive.action;
 	let data = workerDataReceive.data;
 	switch (action) {
@@ -46,7 +46,7 @@ export const getData = function(dataConfig){
 			}
 			obj.totalObject = data.total ? parseInt(data.total) : 0;
 			obj.columnDefs = getTableColumns(
-				data.columns, false , dataConfig.savedTableDisplayConfig
+				data.columns, false , dataConfig.savedTableDisplayConfig, dataConfig.filteredColumns
 			);
 			let resData = data.listObject ? data.listObject : []
 			if(dataConfig.lazyLoad){
@@ -161,7 +161,7 @@ export const prepareFilterAndCallApi = function(columns = false, cache = false, 
 	}
 }
 
-export const getTableColumns = function(columns, forcedReOrder = false , savedOrderCols){
+export const getTableColumns = function(columns, forcedReOrder = false , savedOrderCols, filteredColumns ){
 	let colMap = {};
 	if (forcedReOrder) {
 		for (let item of columns) {
@@ -179,7 +179,8 @@ export const getTableColumns = function(columns, forcedReOrder = false , savedOr
 				columnTitle: item.title,
 				cellRenderer: item.cellRenderer ? item.cellRenderer : null,
 				cellRendererParams: item.cellRendererParams ? item.cellRendererParams : null,
-				noFilter: item.noFilter ? item.noFilter : false
+				noFilter: item.noFilter ? item.noFilter : false,
+				filtered: !filteredColumns ? false : filteredColumns[item.name] ? true : false
 			};
 		}	
 		
