@@ -156,7 +156,7 @@ export default {
             }
             this.manageTimesheetWorker.postMessage({
                 action:'showTotalHourManageView',
-                data:{data:data}
+                data:data
             })
         }
     }

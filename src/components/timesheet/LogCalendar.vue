@@ -247,27 +247,19 @@ export default {
     },
 
     created() {
-        this.logFormWorker = new LogFormWorker()
+        this.logFormWorker = new LogFormWorker();
+        //this.calendarViewTimesheetWorker = new CalendarViewWorker()
         this.load();
     },
     methods: {
+        setResizeLogtime(event){
+            this.events = event
+        },
         // lấy log time đầu tiên của mảng
         resizeLogtime(){
-            let taskLength = 60*60*1000;
-            let padding = 60*60*300;
-            let lastDate, lastEnd;
-            let newTasks = this.events.map(task=>{
-                if(task.date!== lastDate){
-                    lastDate = task.date;
-                    task.start = this.$moment(task.start).startOf('day').hour(1).toDate().getTime()
-                    task.end = task.start + taskLength;
-                    lastEnd = task.end
-                }else{
-                    task.start = lastEnd+padding;
-                    task.end = task.start + taskLength;
-                    lastEnd = task.end
-                }
-                return task;
+             this.logFormWorker.postMessage({
+                action:'resizeLogtime',
+                data:this.events
             })
         },
          getCurrentTime () {
@@ -324,7 +316,6 @@ export default {
             if(data){
                 this.load()
             }
-
         },
         // tính tổng thời gian của cả tháng
         sumMonthDuration(event, start, end) {
@@ -587,6 +578,7 @@ export default {
             const self = this;
             this.$refs.calendar.$el.querySelectorAll('.v-calendar-daily__day-interval').forEach(div => {
                 if (self.timeView) {
+                    debugger
                     div.setAttribute('style', div.getAttribute('style').replace('; border-top: none; border-bottom: none', ''));
                 } else {
                     this.$refs.calendar.$el.querySelector('.v-calendar-daily__intervals-head').setAttribute('style', 'display: none');
@@ -605,6 +597,7 @@ export default {
                 this.resizeLogtime();
             }else{
                  this.getLogByUserId(this.userId);
+                 this.load()
             }
             
         },
@@ -709,7 +702,7 @@ export default {
     mounted() {
         // this.$refs.calendar.scrollToTime('07:40');
         this.onChangeCalendar();
-         this.ready = true
+        this.ready = true
         this.scrollToTime()
         this.updateTime()
         const self = this
@@ -719,11 +712,14 @@ export default {
                 case 'copyLogTime':
                     self.setEventCopy(data.dataAfter)
                     break;
+                 case 'resizeLogtime':
+                    self.setResizeLogtime(data.dataAfter)
+                    break;
                 default:
                     break;
             }
         });
-        },
+    },
 
 
 };

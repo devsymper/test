@@ -1,5 +1,6 @@
 import timesheetApi from '@/api/timesheet.js'
 import _groupBy from 'lodash/groupBy';
+import moment from 'moment';
 
 self.onmessage = async function (event) {
 	var workerDataReceive = event.data;
@@ -19,10 +20,10 @@ export const showTotalHourManageView = async function(data) {
     let dataTable = [];
     let sum = 0;
     let res = await timesheetApi.getLogTimeList({
-            startEnd: data.data.startEnd
+            startEnd: data.startEnd
         }) 
     if (res.status === 200) {
-        const ranges = data.data.allColumns.slice(2, data.data.allColumns.length).map(c => c.colId);
+        const ranges = data.allColumns.slice(2, data.allColumns.length).map(c => c.colId);
         const logTimeListByAccount = _groupBy(res.data.listLogTime, 'account_id');
         let userName = res.data.userName;
         dataTable = Object.keys(logTimeListByAccount).map(k => {
@@ -42,7 +43,7 @@ export const showTotalHourManageView = async function(data) {
                         }
                     }
                     let checked = false;
-                    if (this.$moment(log.date).isBetween(start, end, 'day', '[]')) {
+                    if (moment(log.date).isBetween(start, end, 'day', '[]')) {
                         const duration = (log.duration / 60);                        
                         returnObj[r] = (returnObj[r] || 0) + duration;
                         logged += duration;
