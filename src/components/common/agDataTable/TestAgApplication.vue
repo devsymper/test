@@ -75,7 +75,8 @@ export default {
                     name: "edit",
                     text: this.$t("apps.contextMenu.edit"),
                     callback: (app, callback) => {
-                        this.editCallback = callback;
+						self.editCallback = callback;
+						debugger
                         self.openUpdateApp(app);
                     },
                 },
@@ -83,8 +84,8 @@ export default {
                     name: "remove",
                     text: this.$t("apps.contextMenu.remove"),
                     callback: (app, callback) => {
-                        this.removeCallback = callback;
-                        this.deleteApp(app);
+						debugger
+						self.deleteApp(app);
                     },
                 },
             }, 

@@ -121,7 +121,6 @@ export default {
 				assignee: this.userInforId
 			}
 			workFlowApi.updateTask(this.originData.id, data).then(res=>{
-				debugger
 			}).catch(err=>{
 			})
 			this.$snotify({

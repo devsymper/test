@@ -154,6 +154,7 @@ export default {
                     name: "edit",
                     text: this.$t("apps.contextMenu.edit"),
                     callback: (app, callback) => {
+						debugger
                         this.editCallback = callback;
                         self.openUpdateApp(app);
                     },
