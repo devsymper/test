@@ -24,52 +24,50 @@ export const showTotalHourInReportView = async function(data) {
             startEnd: data.data.startEnd
         }) 
     if (res.status === 200) {
-        if (res.status === 200) {
-            const ranges = data.data.allColumns.slice(2, data.data.allColumns.length).map(c => c.colId);
-            const logTimeList = _groupBy(res.data.listLogTime, 'id');
-            const dateList = _groupBy(res.data.listLogTime, 'date');
-            const userName = _groupBy(res.data.listLogTime, 'account_id');
-            const rows = Object.keys(logTimeList).map(k => {
-                const returnObj = {
-                    category: logTimeList[k][0].category_task,
-                    name: [getName(listUser, logTimeList[k][0].account_id),k+'-'+logTimeList[k][0].task_id],
-                };
-                let logged = 0;
-                logTimeList[k].forEach(log => {
-                    const loggedByDay = (log.duration / 60);
-                    returnObj[log.date] = loggedByDay.toFixed(1);
-                    if (ranges.includes(log.date))
-                        logged += loggedByDay;
-                })
-                returnObj['logged'] = logged.toFixed(1);
-                return returnObj;
-            }).filter(logTime => logTime.logged > 0);
+        const ranges = data.data.allColumns.slice(2, data.data.allColumns.length).map(c => c.colId);
+        const logTimeList = _groupBy(res.data.listLogTime, 'id');
+        const dateList = _groupBy(res.data.listLogTime, 'date');
+        const userName = _groupBy(res.data.listLogTime, 'account_id');
+        const rows = Object.keys(logTimeList).map(k => {
+            const returnObj = {
+                category: logTimeList[k][0].category_task,
+                name: [getName(listUser, logTimeList[k][0].account_id),k+'-'+logTimeList[k][0].task_id],
+            };
+            let logged = 0;
+            logTimeList[k].forEach(log => {
+                const loggedByDay = (log.duration / 60);
+                returnObj[log.date] = loggedByDay.toFixed(1);
+                if (ranges.includes(log.date))
+                    logged += loggedByDay;
+            })
+            returnObj['logged'] = logged.toFixed(1);
+            return returnObj;
+        }).filter(logTime => logTime.logged > 0);
 
-            // tính tổng theo từng ngày 
-            Object.keys(userName).forEach(key => {
-                let time =  _groupBy(userName[key], 'date');
-                let totalByDays = {name:[getName(key)]};
-                let totalByUser = 0;
-                Object.keys(time).forEach(day => {
-                    let totalByDay = time[day].reduce((acc, duration) => acc + duration.duration/60, 0);
-                    totalByUser += totalByDay;
-                    totalByDays[day] = totalByDay.toFixed(1);
-                });
-                totalByDays['logged'] = totalByUser.toFixed(1);
-                totalByDays.summary = true;
-                rows.push(totalByDays);
+        // tính tổng theo từng ngày 
+        Object.keys(userName).forEach(key => {
+            let time =  _groupBy(userName[key], 'date');
+            let totalByDays = {name:[getName(key)]};
+            let totalByUser = 0;
+            Object.keys(time).forEach(day => {
+                let totalByDay = time[day].reduce((acc, duration) => acc + duration.duration/60, 0);
+                totalByUser += totalByDay;
+                totalByDays[day] = totalByDay.toFixed(1);
             });
-            
-            Object.keys(dateList).forEach(key => {
-                dateList[key] = dateList[key].reduce((acc, date) => acc + date.duration/60, 0).toFixed(1);
-            });
-            // tính số log theo ngày 
-            dateList.name = ["Tổng"];
-            dateList.logged = (rows.reduce((acc,r) => r.logged && r.summary ? +r.logged + acc : acc, 0)).toFixed(1);
-            sum = dateList.logged;
-            rows.push(dateList);
-            dataTable=rows;
-        }
+            totalByDays['logged'] = totalByUser.toFixed(1);
+            totalByDays.summary = true;
+            rows.push(totalByDays);
+        });
+        
+        Object.keys(dateList).forEach(key => {
+            dateList[key] = dateList[key].reduce((acc, date) => acc + date.duration/60, 0).toFixed(1);
+        });
+        // tính số log theo ngày 
+        dateList.name = ["Tổng"];
+        dateList.logged = (rows.reduce((acc,r) => r.logged && r.summary ? +r.logged + acc : acc, 0)).toFixed(1);
+        sum = dateList.logged;
+        rows.push(dateList);
+        dataTable=rows;
     }
 	return {
         dataTable:dataTable,
