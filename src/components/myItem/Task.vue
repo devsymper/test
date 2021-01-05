@@ -318,7 +318,7 @@ export default {
 			.catch(err => {
 			console.log("error download file!!!", err);
 			})
-			.always(() => {});
+			.finally(() => {});
 		},
         changeUpdateAsignee(){
             this.$emit('changeUpdateAsignee');

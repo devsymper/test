@@ -141,7 +141,7 @@ export default class BasicControl extends Control {
                         }).catch(err => {
 
                         })
-                        .always(() => {});
+                        .finally(() => {});
                 }
             }
 

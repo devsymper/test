@@ -1241,7 +1241,7 @@ export default {
                         title: "can not save document",
                     });
             })
-            .always(() => {
+            .finally(() => {
             });
         },
         /**
@@ -1275,7 +1275,7 @@ export default {
                                     return false;
                                 }
                             }
-                        }).always({}).catch({})
+                        }).finally({}).catch({})
                     }
                     else{
                         thisCpn.$snotify({
@@ -1297,7 +1297,7 @@ export default {
 
                 });
             })
-            .always(() => {
+            .finally(() => {
             });
         },
         /**
@@ -3009,7 +3009,7 @@ export default {
                             title: "can not save form print document",
                         });
                 })
-                .always(() => {
+                .finally(() => {
                 });
             }
             else{
@@ -3038,7 +3038,7 @@ export default {
                             title: "can not save form print document",
                         });
                 })
-                .always(() => {
+                .finally(() => {
                 });
             }
             

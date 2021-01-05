@@ -433,7 +433,7 @@ export default {
 			.catch(err => {
 			console.log("error from delete attachment file!!!", err);
 			})
-			.always(() => {});
+			.finally(() => {});
 		this.dialogAlert = false;
 		},
 		showContentFile(serverPath, name, type, id){
@@ -454,7 +454,7 @@ export default {
 			.catch(err => {
 			console.log("error download file!!!", err);
 			})
-			.always(() => {});
+			.finally(() => {});
 		},
 		actionFileAttachment(e, serverPath, name, type, id){
 			e.preventDefault();

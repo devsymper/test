@@ -128,7 +128,7 @@ export default {
 			.catch(err => {
 				console.log("error from add service api!!!", err);
 			})
-			.always(() => {
+			.finally(() => {
             });
         },
         editService(dataPost){
@@ -142,7 +142,7 @@ export default {
 			.catch(err => {
 				console.log("error from edit service api!!!", err);
 			})
-			.always(() => {
+			.finally(() => {
             });
         },
         setData(service){

@@ -1542,7 +1542,7 @@ export default {
                         //     title: "error from detail document api123!!!"
                         // }); 
                     })
-                    .always(() => {});
+                    .finally(() => {});
             }
         },
 
@@ -1599,7 +1599,7 @@ export default {
                         title: "error from detail document object api!!!"
                     });  
                 })
-                .always(() => {});
+                .finally(() => {});
         },
         /**
          * Hàm chuyển kích thước view sang full size và ngược lại
@@ -2028,7 +2028,7 @@ export default {
                         title: "error from submit document api!!!"
                     });
             })
-            .always(() => {
+            .finally(() => {
             });
         },
         /**
@@ -2214,7 +2214,7 @@ export default {
                 thisCpn.resetCheckRefreshData();
                 thisCpn.isSubmitting = false;
             })
-            .always(() => {
+            .finally(() => {
             });
         },
         updateDocumentObject(){
@@ -2263,7 +2263,7 @@ export default {
                         title: "error from update document api!!!"
                     });
             })
-            .always(() => {
+            .finally(() => {
             });
         },
 
