@@ -116,8 +116,6 @@ import {
 } from "@/plugins/util.js";
 require('@/components/common/rappid/jointjs');
 
-import minimap from "jointjs-minimap";
-
 export default {
     components:{
         FormTpl,

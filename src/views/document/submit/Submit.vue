@@ -2541,9 +2541,6 @@ export default {
                     let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulaInstance,'all');
                     tableInstance.tableInstance.handlerRunFormulasForControlInTable(control,dataIn,formulaInstance, 'all');
                 }
-                else if(Object.keys(this.workflowVariable).includes(inputControlName)){
-                    dataInput[inputControlName] = this.workflowVariable[inputControlName];
-                }
                 else{
                     this.formulasWorker.postMessage({action:'runFormula',data:{formulaInstance:formulaInstance, controlName:controlName, from:from, keyInstance:this.keyInstance}})
                 }
