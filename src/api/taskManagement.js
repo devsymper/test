@@ -12,6 +12,9 @@ export const taskManagementApi = {
     getIssueFilter(data){
         return document.post("documents/objects-by-multiple-document",data);
     },
+    countIssueInListProject(projectIds){
+        return taskManagement.get("count",{projectIds:JSON.stringify(projectIds)});
+    },
     //danh mục category
     getAllCategory(){
         return taskManagement.get("categories");

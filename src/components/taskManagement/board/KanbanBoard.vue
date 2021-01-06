@@ -307,6 +307,7 @@ export default {
                 }
                 
                 dataControl.tmg_status_id = status.statusId;
+                dataControl.tmg_status_category_id = status.statusCategoryId;
                 dataControl.tmg_status = status.name;
                 dataPost['documentObjectWorkflowObjectId'] = "";
                 dataPost['documentObjectWorkflowId'] = "";

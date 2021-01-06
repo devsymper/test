@@ -1,18 +1,18 @@
 <template>
     <div class="w-100 h-100">
         <div style="height:40px; font-size:20px" class="font-weight-medium pl-3 pt-2">Trang chủ</div>
-        <div v-if="listProjectRecent.length > 0" class="task-recent pl-3 pt-3 fs-13" style="height:200px">
+        <div  class="task-recent pl-3 pt-3 fs-13" style="max-height:200px">
             <div class="d-flex justify-space-between">Dự án gần đây
                 <div class="task-hover-poiter mr-2" @click="handleAllProjects" style="color:#0000aa">
                     Xem tất cả dự án
                 </div>
             </div>
-            <VuePerfectScrollbar style="width:100%;height: calc(100% - 20px);">
+            <VuePerfectScrollbar v-if="listProjectRecent.length > 0" style="width:100%;height: calc(100% - 20px);">
                 <div style="width:100%" class="d-flex pt-4">
                     <div class="item-recent mr-3" v-for="(item,index) in listProjectRecent" :key="item.id" >
                         <div class="header-item-recent" style="height:23px;" :style="{'background':getColor(index)}">
                             <div class="icon-project">
-                                <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:24px">{{item.icon}}</v-icon>
+                                <v-icon v-if="!!item.icon && item.icon.indexOf('mdi-') > -1" class="pt-0" style="font-size:24px; color:#000">{{item.icon}}</v-icon>
                                 <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="24" height="24">
                             </div>
                             <div class="float-right">
@@ -34,7 +34,7 @@
                                         Tác vụ đang làm
                                     </td>
                                     <td class="float-right px-1">
-                                        <span class="open-issue">123</span>
+                                        <span class="open-issue">{{getNumberIssue(item,"TO DO")}}</span>
                                     </td>
                                 </tr>
                                 <tr>
@@ -42,7 +42,7 @@
                                         Tác vụ hoàn thành
                                     </td>
                                     <td class="float-right px-1">
-                                        <span class="done-issue">13</span>
+                                        <span class="done-issue">{{getNumberIssue(item,"DONE")}}</span>
                                     </td>
                                 </tr>
                             </table>
@@ -132,9 +132,7 @@ export default {
         documentIds(){
             return this.$store.state.taskManagement.listDocumentIdsInIssueType;
         },
-        totalBoardInProject(){
-            return this.dataCountBoard;
-        }
+       
     },
     watch:{
         listProjectRecent:{
@@ -143,6 +141,7 @@ export default {
             handler(after) {
                 if (after.length > 0) {
                     this.countBoardInProject();
+                    this.countIssueInListProject();
                 }
             }
         }
@@ -176,15 +175,41 @@ export default {
             ],
             projectIds:[],
             dataCountBoard:[],
+            dataCountIssue:[],
         }
     },
     methods:{
+        countIssueInListProject(){
+            if (this.projectIds.length > 0) {
+                taskManagementApi
+                .countIssueInListProject(this.projectIds)
+                .then(res => {
+                    if (res.status == 200 && res.data) {
+                        this.dataCountIssue = res.data;
+                    }
+                })
+                .catch(err => {
+                    self.$snotifyError("", "Can not count board!", err);
+                });
+            }
+        },
         getNumberBoard(project){
-            let item = this.totalBoardInProject.find(ele => ele.tmg_project_id == project.id);
+            let item = this.dataCountBoard.find(ele => ele.tmg_project_id == project.id);
             if (item) {
                 return item.count;
             }
             return "";
+        },
+        getNumberIssue(project,status){
+            if (this.dataCountIssue[project.id]) {
+                let item = this.dataCountIssue[project.id];
+                let obj = item.find(ele => ele.status == status);
+                if (obj) {
+                    return obj.count;
+                }else{
+                    return "";
+                }
+            }
         },
         countBoardInProject(){
             if (this.projectIds.length > 0) {
