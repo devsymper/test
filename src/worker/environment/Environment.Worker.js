@@ -2,8 +2,8 @@ import {environmentManagementApi} from '@/api/EnvironmentManagement'
 
 self.onmessage = async function (event) {
 	var workerDataReceive = event.data;
-    let action = workerDataReceive.data.action;
-	let data = workerDataReceive.data.data;
+    let action = workerDataReceive.action;
+	let data = workerDataReceive.data;
 	switch (action) {
         case 'addVersion':
 			let addVersionRes = await addVersion(data);
