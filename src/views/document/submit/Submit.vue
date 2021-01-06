@@ -1522,6 +1522,10 @@ export default {
                             if(style){
                                 this.globalClass[style['globalClass']] = true;
                             }
+                            else{
+                                this.globalClass['document-form-style-default'] = true;
+                                
+                            }
                             thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
                             thisCpn.dataPivotTable = res.data.pivotConfig;
                             // đẩy phần xử lí data control xuống worker
