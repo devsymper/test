@@ -134,7 +134,7 @@ export default {
 					title: "Nguồn và target không được trùng nhau"
 				})
 			}
-			this.$emit('cancel')
+			this.$emit('success')
 		},
 		syncData(){
 			let self = this
@@ -146,6 +146,7 @@ export default {
 			for(let i in self.listItemSelected){
 				arr.push(self.listItemSelected[i].id)
 			}
+			debugger
 			let ids = {
 				"ids":arr
 			}
