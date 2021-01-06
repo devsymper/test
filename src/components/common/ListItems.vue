@@ -1021,19 +1021,21 @@ export default {
 			this.hideOverlay()
 		},
 		handlerRestoreTableDisplayConfigRes(res){
-			if(res.savedConfigs.wrapTextMode){
-				this.tableDisplayConfig.value.wrapTextMode =  res.savedConfigs.wrapTextMode;
-			}
-			if(res.savedConfigs.densityMode){	
-				this.tableDisplayConfig.value.densityMode =  res.savedConfigs.densityMode;
-			}
-			if(res.savedConfigs.alwaysShowSidebar){
-				this.tableDisplayConfig.value.alwaysShowSidebar =  res.savedConfigs.alwaysShowSidebar;
-			}
-			this.savedTableDisplayConfig = res.savedConfigs.columns;
-			if(res.columnDefs){
-				this.columnDefs = res.columnDefs
-				this.handleStopDragColumn();
+			if(res.savedConfigs){
+				if(res.savedConfigs.wrapTextMode){
+					this.tableDisplayConfig.value.wrapTextMode =  res.savedConfigs.wrapTextMode;
+				}
+				if(res.savedConfigs.densityMode){	
+					this.tableDisplayConfig.value.densityMode =  res.savedConfigs.densityMode;
+				}
+				if(res.savedConfigs.alwaysShowSidebar){
+					this.tableDisplayConfig.value.alwaysShowSidebar =  res.savedConfigs.alwaysShowSidebar;
+				}
+				this.savedTableDisplayConfig = res.savedConfigs.columns;
+				if(res.columnDefs){
+					this.columnDefs = res.columnDefs
+					this.handleStopDragColumn();
+				}
 			}
 		},
 		handlerSaveTableDisplayConfigRes(res){

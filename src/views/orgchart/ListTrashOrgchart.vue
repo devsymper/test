@@ -37,14 +37,13 @@ export default {
             getListUrl: appConfigs.apiDomain.trash+'/items?type=orgchart',
             customAPIResult:{
                  reformatData(res){
-                    //  let mapIdToUser = self.$store.getters['app/mapIdToUser'];
+					 debugger
                      res.data.forEach(function(e){
                          if(e.data != ""){
                             let newData = JSON.parse(e.data)
                             e.orgchartId = newData.orgchart.id
                             e.orgchartCode = newData.orgchart.code
                             e.orgchartName = newData.orgchart.name
-                            // e.userDeletedEmail = newData.orgchart.email
                          }
                      })
                    return{
