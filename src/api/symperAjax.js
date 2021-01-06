@@ -2,8 +2,8 @@ export const symperAjax = async(options) =>{
 	if(options.method == "GET"){
 		if(Object.keys(options.data).length > 0){
 			let fullParams = serialize(options.data)
-			
-			options.url.includes("?") ? options.url = options.url + "&" + str : options.url = options.url + "?" + fullParams
+			debugger
+			options.url.includes("?") ? options.url = options.url + "&"  + fullParams :options.url = options.url + "?" + fullParams 
 		}
 	}else{
 		
@@ -30,25 +30,15 @@ export const symperAjax = async(options) =>{
  * Description: Hàm chuyển object thành url params
  */
 export const serialize = function(obj, prefix) {
-	var str = [],
-	  p;
+	let str = [] , p;
 	for (p in obj) {
-	  if (obj.hasOwnProperty(p)) {
-		var k = prefix ? prefix + "[" + p + "]" : p,
-		  v = obj[p];
-		str.push((v !== null && typeof v === "object") ?
-		  serialize(v, k) :
-		  encodeURIComponent(k) + "=" + encodeURIComponent(v));
-	  }
-	}
-	str.forEach(function(e){
-		if(e == ""){
-			str.splice(str.indexOf(e), 1)
+		if (obj.hasOwnProperty(p)) {
+			var k = prefix ? prefix + "[" + p + "]" : p,
+			v = obj[p];
+			str.push((v !== null && typeof v === "object") ?
+			serialize(v, k) :
+			encodeURIComponent(k) + "=" + encodeURIComponent(v));
 		}
-	})
-	let url = str.join("&");
-	if(url.charAt(0) == "&"){
-		url = url.substring(1)		
 	}
-	return url
+	return str.join("&");
   }

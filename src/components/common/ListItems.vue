@@ -588,6 +588,7 @@ export default {
 			let data = event.data;
             switch (data.action) {
                 case 'getData':
+					debugger
 					self.handlerGetData(data.dataAfter)
 					break;
                 case 'getItemForValueFilter':
@@ -1446,6 +1447,7 @@ export default {
 			dataConfig.lazyLoad = lazyLoad
 			dataConfig.customAPIResult = self.customAPIResult.reformatData ? self.customAPIResult.reformatData.toString() : null
 			dataConfig.filteredColumns = self.filteredColumns
+			debugger
 			this.listItemsWorker.postMessage({
 				action: 'getData',
 				data: dataConfig

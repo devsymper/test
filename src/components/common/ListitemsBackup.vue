@@ -1569,7 +1569,7 @@ export default {
             }
         },
         /**
-         * Tạo ra các item có check box với trạng thái đã check hay chưa 
+         * Tạo ra các item có check box với trạng thái  đã check hay chưa 
          * @param items danh sách các value dạng ['ccc','xxc', ....]
          */
         createSelectableItems(items){

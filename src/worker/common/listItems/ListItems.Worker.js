@@ -39,6 +39,7 @@ self.onmessage = async function (event) {
 export const getData = function(dataConfig){
 	return new Promise((resolve, reject) => {
 		let handler = function(data){
+			debugger
 			resolve(data);
 		}
 		prepareFilterAndCallApi(dataConfig.configs.columns , dataConfig.configs.cache , dataConfig.configs.applyFilter, handler , {} , dataConfig);
@@ -134,6 +135,7 @@ export const prepareFilterAndCallApi = function(columns = false, cache = false, 
 		if(dataConfig.customDataForApi){
 			eval('configs.customDataForApi = ' + dataConfig.customDataForApi)
 		}
+		debugger
 		getDataFromConfig(dataConfig.url, configs, columns, tableFilter, success, dataConfig.method, header);
 	}
 }
