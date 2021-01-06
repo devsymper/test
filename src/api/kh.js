@@ -82,13 +82,6 @@ export const knowledgeApi = {
     moveItemToDirectory(data) {
         return knowledge.put("directory-move", data);
     },
-    // upload file
-    uploadFileDocument(data) {
-        return knowledge.post("upload", data);
-    },
-    getListFileDocument(hash) {
-        return knowledge.get("upload/" + hash);
-    },
     removeFileAttach(data) {
         return fileManagement.put('changeStatusSymperFile', data);
     },

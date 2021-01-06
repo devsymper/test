@@ -137,7 +137,6 @@
                     <span>{{$t('document.submit.fab.toggleSize')}}</span>
                 </v-tooltip>
             </v-speed-dial>
-         
         <div class="sub-form-action" v-if="parrentInstance != 0">
             <button @click="goToListDocument()" class=subfom-action__item>{{$t('document.submit.goToList')}}</button>
             <button @click="handlerSubmitDocumentClick(true);" class=subfom-action__item><span class="mdi mdi-content-save-move-outline"></span>{{$t('document.submit.continueSubmit')}}</button>
@@ -308,7 +307,7 @@ export default {
             default(){
                 return {}
             }
-        }
+        },
     },
     name: "submitDocument",
 
@@ -914,7 +913,6 @@ export default {
             deep: true,
             immediate:true,
             handler: function (after, before) {
-                // alert('watch')
                 this.setWorkflowVariableToStore(after)
             }
         },
@@ -2543,6 +2541,9 @@ export default {
                     let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulaInstance,'all');
                     tableInstance.tableInstance.handlerRunFormulasForControlInTable(control,dataIn,formulaInstance, 'all');
                 }
+                else if(Object.keys(this.workflowVariable).includes(inputControlName)){
+                    dataInput[inputControlName] = this.workflowVariable[inputControlName];
+                }
                 else{
                     this.formulasWorker.postMessage({action:'runFormula',data:{formulaInstance:formulaInstance, controlName:controlName, from:from, keyInstance:this.keyInstance}})
                 }
@@ -2805,7 +2806,7 @@ export default {
                                     }
 								}
 							}
-						}
+                        }
                     }
                 }
                 // lưu lại các mối quan hệ cho lần submit sau ko phải thực hiện các bước tìm quan hê này (các root control , các luồng chạy công thức)
@@ -2817,6 +2818,15 @@ export default {
         },
 
 
+        getRootFromVariable(formulasInstance){
+            let dataInputFormula = formulasInstance.getInputControl();
+            for(let control in dataInputFormula){
+                if(!Object.keys(this.workflowVariable).includes(control)){
+                    return false;
+                }
+            }
+            return true;
+        },
         /**
          * Hàm kiểm tra xem control có phải là root hay ko(cả trong table), nếu có đưa vào biến và lưu lại trên db
          */
@@ -2836,6 +2846,13 @@ export default {
                 }
                 this.handlerBeforeRunFormulasValue(formulaInstance,controlName,formulaType,'root')
             }
+            else if(this.getRootFromVariable(formulasInstance)){
+                if(!listRootControl.includes(controlName)){
+                    listRootControl.push(controlName);
+                }       
+                this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
+            }
+            
         },
         /**
          * Hàm kiểm tra các input của 1 control có nằm trong cùng table đó hay không
