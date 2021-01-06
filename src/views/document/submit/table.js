@@ -158,6 +158,7 @@ var delayAfterInsertRow = makeDelay(1000);;
  */
 const supportCellsType = {
     textInput: 'TextRenderer',
+    richText: 'TextRenderer',
     department: 'TextRenderer',
     currency: 'NumericRenderer',
     number: 'NumericRenderer',

@@ -231,10 +231,10 @@ export default {
 				orgchartApi.getRolesByUser([{idUser: after}]).then(res=>{
 					let listRole = res.data[0].roles;
 					if(listRole.length > 0){
-						let curRole = listRole.filter(role=>{
-							return role.id == self.userRole;
-						})
-						self.userRoleInfo = curRole[0].name;
+						let curRole = listRole.find(role=> role.id == self.userRole);
+						if(curRole){
+							self.userRoleInfo = curRole.name;
+						}
 					}
 				});
 			}
