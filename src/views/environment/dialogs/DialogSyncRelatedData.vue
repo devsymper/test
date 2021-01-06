@@ -153,7 +153,7 @@ export default {
 					}
 				})
 			}
-			self.$emit('cancel')
+			self.$emit('success')
 		}
 	},
 }
