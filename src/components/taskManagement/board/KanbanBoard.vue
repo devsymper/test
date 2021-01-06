@@ -464,7 +464,7 @@ export default {
                         .catch(err => {
                             self.$snotifyError("", "Can not get detail project with id:"+this.projectId);
                         })
-                        .always(() => {});
+                        .finally(() => {});
                 }
             }
         },
