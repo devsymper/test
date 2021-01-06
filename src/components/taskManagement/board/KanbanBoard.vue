@@ -72,6 +72,8 @@
                                     v-for="(task) in status.tasks"
                                     :key="task.id"
                                     :task="task"
+                                    :status="status"
+
                                     class="mt-3 cursor-move sym-control"
                                 ></task-card>
                                 <!-- </transition-group> -->
@@ -298,7 +300,6 @@ export default {
         handleChange(event, status){
             if(event.added){
                 let task = event.added.element;
-            
                 let dataPost ={};
                 let dataControl ={};
                 let issueType = this.allIssueTypeInProject.find(ele => ele.id == task.tmg_issue_type);

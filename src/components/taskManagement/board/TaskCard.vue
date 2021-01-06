@@ -36,15 +36,26 @@ export default {
 	},
 	props: {
 		task: {
-		type: Object,
-		default: () => ({})
+			type: Object,
+			default: () => ({})
+		},
+		status: {
+			type: Object,
+			default: () => ({})
+		}
+	},
+	watch:{
+		task:{
+			deep:true,
+			immediate:true,
+			handler(after){
+			}
 		}
 	},
 	data(){
 		return {
 			priority:null,
 			projectId:null,
-			status:null,
 			documentObjectId:null,
 			issue:null
 		}
@@ -62,7 +73,6 @@ export default {
 	},
 	mounted(){
 		this.getPriority();
-		this.getStatus();
 	},
 	methods:{
 		handleShowDetailIssue(){
@@ -76,12 +86,7 @@ export default {
 				this.priority = {icon:priority.icon, color:priority.color}
 			}
 		},
-		getStatus(){
-			let status = this.allStatus.find(ele => ele.statusId == this.task.tmg_status_id);
-			if(status){
-				this.status = {color:status.color}
-			}
-		}
+	
 	}
 };
 </script>
