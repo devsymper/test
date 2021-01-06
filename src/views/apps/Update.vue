@@ -69,7 +69,6 @@
             </v-row>
         </v-card-text>
         <v-divider></v-divider>
-        <!-- Thêm các object vào trong app -->
        <v-row>
 		   <v-col cols="7">
 			    <v-card-title class="pb-2 pt-2 subtitle-2 font-weight-bold">
@@ -77,25 +76,24 @@
 				</v-card-title>
 		   </v-col>
 		   <v-col cols="5">
-					 <v-menu
-      				  offset-y
-						:close-on-content-click="false"
-       				    :nudge-width="390"
-      				>
-						<template v-slot:activator="{ attrs, on }">
-							<v-btn
-								class="button-add-item"
-								style="backgound-color:#F7F7F7"
-								v-bind="attrs"
-								v-on="on"
-                                @click="clickToAdd"
-								>
-									<span> {{ $t('apps.clickToAdd')}} </span>
-									<v-icon right dark style="border-left:2px solid lightgrey;padding-left:8px">mdi-plus</v-icon>
-							</v-btn>
-						</template>
-						<SearchModal ref="searchModal" @selectedItem="selectedItem"/>
-					</v-menu>
+				<v-menu
+						offset-y
+					:close-on-content-click="false"
+					:nudge-width="390"
+				>
+					<template v-slot:activator="{ attrs, on }">
+						<v-btn
+							class="button-add-item"
+							style="backgound-color:#F7F7F7"
+							v-bind="attrs"
+							v-on="on"
+						>
+								<span> {{ $t('apps.clickToAdd')}} </span>
+								<v-icon right dark style="border-left:2px solid lightgrey;padding-left:8px">mdi-plus</v-icon>
+						</v-btn>
+					</template>
+					<SearchModal ref="searchModal" @selectedItem="selectedItem"/>
+				</v-menu>
 		   </v-col>
 	   </v-row>
 		<AppDetailVue/>
@@ -113,12 +111,13 @@
     </div>    
 </template>
 <script>
-import Api from "./../../api/api.js";
-import iconPicker from "../../components/common/iconPicker";
+import Api from "@/api/api.js";
+import iconPicker from "@/components/common/iconPicker";
 import SearchModal from './SearchModal.vue';
 import AppDetailVue from './AppDetail.vue';
-import {appManagementApi} from './../../api/AppManagement.js';
+import {appManagementApi} from '@/api/AppManagement.js';
 import _debounce from "lodash/debounce";
+import ApplicationWorker from 'worker-loader!@/worker/application/Application.Worker.js';
 
 export default {
     name: "UpdateApp",
@@ -144,14 +143,7 @@ export default {
     },
     data: function() {
         return {
-            // apiUrl: "https://core.symper.vn/application",
-            appUrl: "apps",
-            removeCallback: null,
-            showResult: false,
-            editCallback: null,
-			searchStr: "",
-			isEmpty: null,
-            appObjects: [],
+			applicationWorker: null,
             currentApp: {
                 name: "",
                 description: "",
@@ -169,12 +161,25 @@ export default {
 				workflow_definition:[
 				]
 			},
-            allObjectToImport: [],
-			listObjectToShows: [],
 			listSelectedItem:{},
         };
     },
     mounted(){
+		let self = this
+		this.applicationWorker = new ApplicationWorker();
+        this.applicationWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'updateApp':
+					self.$emit("update-app", data.dataAfter)
+					break;
+                case 'createApp':
+					self.$emit("add-app", data.dataAfter)
+					break;
+                default:
+                    break;
+            }
+        });
     },
     methods: {
         closeForm(){
@@ -183,42 +188,38 @@ export default {
         setAppObject(app) {
             this.currentApp = JSON.parse(JSON.stringify(app));
         },
-        clickToAdd(){
-            this.$refs.searchModal.getListSearch('');
-        },
-		updateListItem(data){
-			let self = this;
-			self.childrenApp.document_definition = []
-			self.childrenApp.orgchart = []
-			self.childrenApp.dashboard = []
-			self.childrenApp.workflow_definition = []
-			if(data.document_category.item.length > 0){
-				data.document_category.item.forEach(function(e){
-					self.childrenApp.document_definition.push(e.id);
-				});
-			}
-			if(data.document_major.item.length > 0){
-				data.document_major.item.forEach(function(e){
-					self.childrenApp.document_definition.push(e.id);
-				});
-			}
-			if(data.orgchart.item.length > 0){
-				data.orgchart.item.forEach(function(e){
-				self.childrenApp.orgchart.push(e.id);
-			});
-			}
-			if(data.dashboard.item.length > 0){
-				data.dashboard.item.forEach(function(e){
-				self.childrenApp.dashboard.push(e.id);
-			});
-			}
-			if(data.workflow_definition.item.length > 0){
-				data.workflow_definition.item.forEach(function(e){
-					self.childrenApp.workflow_definition.push(e.id);
-				});
-			}
-			self.currentApp.childrenApp = self.childrenApp
-		},
+		// updateListItem(data){
+		// 	let self = this;
+		// 	for(let i in self.childrenApp){
+		// 		self.childrenApp[i] = []
+		// 	}
+		// 	if(data.document_category.item.length > 0){
+		// 		data.document_category.item.forEach(function(e){
+		// 			self.childrenApp.document_definition.push(e.id);
+		// 		});
+		// 	}
+		// 	if(data.document_major.item.length > 0){
+		// 		data.document_major.item.forEach(function(e){
+		// 			self.childrenApp.document_definition.push(e.id);
+		// 		});
+		// 	}
+		// 	if(data.orgchart.item.length > 0){
+		// 		data.orgchart.item.forEach(function(e){
+		// 		self.childrenApp.orgchart.push(e.id);
+		// 	});
+		// 	}
+		// 	if(data.dashboard.item.length > 0){
+		// 		data.dashboard.item.forEach(function(e){
+		// 		self.childrenApp.dashboard.push(e.id);
+		// 	});
+		// 	}
+		// 	if(data.workflow_definition.item.length > 0){
+		// 		data.workflow_definition.item.forEach(function(e){
+		// 			self.childrenApp.workflow_definition.push(e.id);
+		// 		});
+		// 	}
+		// 	self.currentApp.childrenApp = self.childrenApp
+		// },
         pickIcon(data) {
             this.$set(this.currentApp, 'iconName', data.icon.trim() )
             this.$set(this.currentApp, 'iconType' , data.type)
@@ -243,16 +244,16 @@ export default {
                 text: this.$t('notification.error')
             })
         },
-        createApp() {
-			this.updateListItem(this.$store.state.appConfig.listItemSelected)
-			let data = JSON.stringify(this.currentApp);
-			appManagementApi.addApp(data).then(res => {
-				 this.$emit("add-app", res)
-			}).catch(err => {
-				this.showError()
-			})
-			.always(() => {});;
-				
+        createApp() {	
+			let self = this
+			this.applicationWorker.postMessage({
+				action: 'createApp',
+				data:{
+					listItemSelected: self.$store.state.appConfig.listItemSelected,
+					childrenAppData: self.childrenApp,
+					currentAppData: self.currentApp
+				}
+			});
         },
          updateApp() {
 			if(this.currentApp.hasOwnProperty('childrenApp')){
@@ -261,14 +262,15 @@ export default {
 			if(this.currentApp.status === null){
 				this.currentApp.status = 0
 			}
-			this.updateListItem(this.$store.state.appConfig.listItemSelected)
-			let data = JSON.stringify(this.currentApp);
-			appManagementApi.updateApp(data).then(res => {
-				  this.$emit("update-app", res)
-			}).catch(err => {
-				this.showError()
-			})
-			.always(() => {});;
+			let self = this
+			this.applicationWorker.postMessage({
+				action: 'updateApp',
+				data:{
+					listItemSelected: self.$store.state.appConfig.listItemSelected,
+					childrenAppData: self.childrenApp,
+					currentAppData: self.currentApp
+				}
+			});
         },
     },
 };
@@ -287,6 +289,9 @@ export default {
 }
 .update-app-symper >>>.button-add-item .v-btn__content{
 	font: 13px Roboto !important;
+}
+.update-app-symper >>>.row{
+	margin: unset !important
 }
 .update-app-symper >>> .v-card__title{
 	font-weight: 410 !important;

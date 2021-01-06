@@ -19,6 +19,9 @@ export const systemRoleApi = {
         }
         return moduleApi.delete('system-role/' + ids);
     },
+    deleteRole(id) {
+        return moduleApi.delete('system-role/' + id);
+    },
     getRolesByUser(idUsers = false) {
         let queryParam = {
             items: idUsers

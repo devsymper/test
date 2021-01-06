@@ -44,7 +44,7 @@
                             @click="saveTaskOutcome(action.value)" 
                             class="mr-2"
 							:class="{'mr-16': action.value == 'submit' || action.value == 'complete' || action.value == 'update' }"
-                            :loading="loadingActionTask"
+                            :loading="loadingAction"
                         >
                             {{action.text}}
                         </v-btn>
@@ -211,6 +211,8 @@ import CompleteDialog from './taskLifeCycle/Dialogs/CompleteDialog'
 import DelegateDialog from './taskLifeCycle/Dialogs/DelegateDialog'
 import ResolveDialog from './taskLifeCycle/Dialogs/ResolveDialog'
 import UnClaimDialog from './taskLifeCycle/Dialogs/UnClaimDialog'
+import { taskApi } from '../../api/task';
+import { formulasApi } from '../../api/Formulas';
 
 export default {
     name: "taskDetail",
@@ -333,7 +335,8 @@ export default {
 				completeShowDialog: false,
 				delegateShowDialog: false,
 				reAssignShowDialog: false,
-			},
+            },
+            loadingAction: false,
 			showSnackbar: false,
 			rightAction: 120,
             showDialogAlert:false,
@@ -451,6 +454,24 @@ export default {
     created(){
     },
     methods: {
+        needComplyFormula(str){
+            return /ref\s*\(|select |\$\{/i.test(str);
+        },
+        async updateProcessInstanceName(){
+            if(this.taskAction != '' && this.taskAction != undefined && this.taskAction != 'submitAdhocTask'){
+                let dataInput = this.$refs.task.getVarsMap();
+                let processName = '';
+                let processKey = this.originData.processDefinitionId.split(':')[0];
+                let processInstanceNameKey = processKey + '_instanceDisplayText';
+                let formulaName = dataInput[processInstanceNameKey];
+                if(this.needComplyFormula(formulaName)){
+                    let newName = await formulasApi.getDataByAllScriptType(formulaName, dataInput);   
+                    BPMNEngine.updateProcessInstance(this.originData.processInstanceId, {
+                        name: newName
+                    });
+                }
+            }
+        },
 		submitError(){
             console.log("Error submit");
             this.loadingAction = false;
@@ -654,7 +675,6 @@ export default {
                 this.loadingAction=false;
             }else if(this.checkRoleUser(this.originData)){
                     if(this.taskAction == 'submit' || this.taskAction == 'update' ){
-			
                         this.$refs.task.submitForm(value);
                     }else if(this.taskAction == 'approval'){
                         let elId = this.originData.taskDefinitionKey;
@@ -690,6 +710,8 @@ export default {
                         }else{
                             this.reloadDetailTask();
                         }
+                        this.updateProcessInstanceName();
+                        this.loadingAction=false;
                     }else if(this.taskAction == '' ||this.taskAction == undefined ||this.taskAction == 'submitAdhocTask'){
                         let taskData = {
                             "action": "complete",
@@ -707,7 +729,6 @@ export default {
                 this.showDialogAlert=true;
                 this.loadingAction=false;
             }
-			this.loadingActionTask=false;
         },
         saveApprovalHistory(value){
             let title = this.taskActionBtns.reduce((tt, el) => {
@@ -814,8 +835,9 @@ export default {
 			this.reloadDetailTask();
 			if (this.reload) {
 				this.$emit('task-submited', res);
-			}
-            // }
+            }
+            this.updateProcessInstanceName();
+            this.loadingAction=false;
         },
         showApprovalOutcomes(approvalActions){
             if(typeof approvalActions == 'string'){

@@ -509,7 +509,7 @@ export default {
 			.catch(err => {
 				console.log("error from add user api!!!", err);
 			})
-			.always(() => {
+			.finally(() => {
 			});
 		},
 
@@ -529,7 +529,7 @@ export default {
 			.catch(err => {
 				//console.log("error from add delete api!!!", err);
 			})
-			.always(() => {
+			.finally(() => {
 
 			});
 		},
@@ -590,7 +590,7 @@ export default {
 			.catch(err => {
 				
 			})
-			.always(() => {
+			.finally(() => {
 
 			});
 		},
@@ -655,7 +655,7 @@ export default {
 				this.$snotify({
 					type: "error",
 					title: this.$t("notification.error")});})
-			.always(() => {
+			.finally(() => {
 
 			});
 		},
@@ -684,7 +684,7 @@ export default {
 				.catch(err => {
 					console.log("error from get pack api!!!", err);
 				})
-				.always(() => {
+				.finally(() => {
 
 				});
 			}
@@ -706,7 +706,7 @@ export default {
 				.catch(err => {
 					console.log("error from get pack api!!!", err);
 				})
-				.always(() => {
+				.finally(() => {
 
 				});
 			}
@@ -728,7 +728,7 @@ export default {
 				.catch(err => {
 					console.log("error from get orgchart api!!!", err);
 				})
-				.always(() => {
+				.finally(() => {
 
 				});
 			}
@@ -754,7 +754,7 @@ export default {
 					.catch(err => {
 						console.log("error from add user api!!!", err);
 					})
-					.always(() => {
+					.finally(() => {
 					});
 				}
 				else{
@@ -868,7 +868,7 @@ export default {
 				.catch(err => {
 					console.log("error from get pack api!!!", err);
 				})
-				.always(() => {
+				.finally(() => {
 
 				});
 			}
@@ -893,7 +893,7 @@ export default {
 			.catch(err => {
 				console.log("error from add delete api!!!", err);
 			})
-			.always(() => {
+			.finally(() => {
 
 			});
 		},
@@ -965,7 +965,7 @@ export default {
 		// 		.catch(err => {
 		// 			console.log("error from upload avatar api!!!", err);
 		// 		})
-		// 		.always(() => {
+		// 		.finally(() => {
 
 		// 		});
 		// 	}

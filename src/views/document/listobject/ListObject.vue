@@ -338,7 +338,7 @@ export default {
                         })
                         .catch(err => {
                         })
-                        .always(() => {});
+                        .finally(() => {});
                     },
                 },
                 detail: {
@@ -410,7 +410,7 @@ export default {
         documentApi.getListPrintConfig(this.docId).then(res=>{
             thisCpn.listTabletItem = res.data.listObject;
             thisCpn.listTabletItem[0].activeSb = true;
-        }).catch(err => {}).always(() => {});
+        }).catch(err => {}).finally(() => {});
     },
     activated(){
         if(this.$refs.listObject && this.$refs.listObject.isShowCheckedRow()){
@@ -483,7 +483,7 @@ export default {
             })
             .catch(err => {
             })
-            .always(() => {});
+            .finally(() => {});
         },
         showDialog(){
             this.dialog = true;

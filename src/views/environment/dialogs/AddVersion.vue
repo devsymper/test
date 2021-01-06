@@ -89,6 +89,8 @@
 <script>
 import FormTpl from "@/components/common/FormTpl";
 import {environmentManagementApi} from '@/api/EnvironmentManagement'
+import EnvironmentWorker from 'worker-loader!@/worker/environment/Environment.Worker.js';
+
 export default {
 	components:{
 		FormTpl,
@@ -115,6 +117,20 @@ export default {
 			this.description  = ''
 		}
 	},
+	mounted(){
+		let self = this
+		this.environmentWorker = new EnvironmentWorker()
+        this.environmentWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'addVersion':
+					self.handlerAddversionRes(data.dataAfter)
+					break;
+                default:
+                    break;
+            }
+        });
+	},
 	methods:{
 		cancel(){
 			this.$emit('cancel')
@@ -139,32 +155,32 @@ export default {
 
 			}
 			formData.releaseAt = this.dates
-			environmentManagementApi.addVersion({
-				serviceId:serviceId,
-				formData:formData
-			}).then(res=>{
-				if(res.status == 200){
-					self.$snotify({
-						type: "success",
-						title: " Thêm version thành công"
-					})
-					self.$emit('add-success')
-				}else{
-					self.$snotify({
-						type: "error",
-						title: " Có lỗi xảy ra"
-					})
+			this.environmentWorker.postMessage({
+				action: 'addVersion',
+				data:{
+					serviceId: serviceId,
+					formData: formData
 				}
-			}).catch(err=>{
-					self.$snotify({
-						type: "error",
-						title: " Có lỗi xảy ra"
-					})
 			})
+		},
+		handlerAddversionRes(res){
+			if(res.status == 200){
+				this.$snotify({
+					type: "success",
+					title: "Thêm version thành công"
+				})
+				this.$emit('add-success')
+			}else{
+				this.$snotify({
+					type: "error",
+					title: " Có lỗi xảy ra"
+				})
+			}
 		}
 	},
 	data(){
 		return{
+			environmentWorker: null,
 			description: "",
 			menu: false,
 			dates: "",

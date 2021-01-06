@@ -481,7 +481,7 @@ export default {
 			.catch(err => {
 			console.log("error download file!!!", err);
 			})
-			.always(() => {});
+			.finally(() => {});
 		},
         showPopupTracking(){
             this.$store.commit("task/setStatusPopupTracking",true)
