@@ -87,6 +87,23 @@ onmessage = function (event) {
             let controlIns = dataOfAction.controlIns;
             workerStore[type][keyInstance]['inputData'][controlIns.name] = controlIns;
             break;
+        case 'addWorkflowVariable':
+            if(!workerStore['submit'][keyInstance]){
+                workerStore['submit'][keyInstance] = {}
+            }
+            if(!workerStore['submit'][keyInstance]['inputData']){
+                workerStore['submit'][keyInstance]['inputData'] = {}
+            }
+            let workflowVariable = dataOfAction.workflowVariable;
+            for(let inputBinding in workflowVariable){
+                workerStore['submit'][keyInstance]['inputData'][inputBinding] = {
+                    name:inputBinding,
+                    type:'textInput',
+                    value:workflowVariable[inputBinding]
+                }
+            }
+            console.log(workerStore,'workerStoreworkerStore');
+            break;
         case 'updateDocumentObjectId':
             workerStore['submit'][keyInstance]['document_object_id'] = dataOfAction.documentObjectId;
             break;
