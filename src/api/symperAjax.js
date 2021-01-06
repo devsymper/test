@@ -2,7 +2,6 @@ export const symperAjax = async(options) =>{
 	if(options.method == "GET"){
 		if(Object.keys(options.data).length > 0){
 			let fullParams = serialize(options.data)
-			debugger
 			options.url.includes("?") ? options.url = options.url + "&"  + fullParams :options.url = options.url + "?" + fullParams 
 		}
 	}else{
