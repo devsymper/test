@@ -507,10 +507,10 @@ export default {
         tinymce.remove()
         this.formulasWorker = new FormulasWorker();
         this.formulasWorker.postMessage({action:'createSQLiteDB',data:{keyInstance:this.keyInstance}})
+        this.formulasWorker.postMessage({action:'addWorkflowVariable',data:{keyInstance:this.keyInstance, workflowVariable:this.workflowVariable}})
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
-        this.setWorkflowVariableToStore(this.workflowVariable)
         let thisCpn = this;
         if (this.docId != 0) {
             this.documentId = this.docId;
@@ -2815,8 +2815,8 @@ export default {
         },
 
 
-        getRootFromVariable(formulasInstance){
-            let dataInputFormula = formulasInstance.getInputControl();
+        getRootFromVariable(formulaInstance){
+            let dataInputFormula = formulaInstance.getInputControl();
             for(let control in dataInputFormula){
                 if(!Object.keys(this.workflowVariable).includes(control)){
                     return false;
@@ -2843,11 +2843,11 @@ export default {
                 }
                 this.handlerBeforeRunFormulasValue(formulaInstance,controlName,formulaType,'root')
             }
-            else if(this.getRootFromVariable(formulasInstance)){
+            else if(this.getRootFromVariable(formulaInstance)){
                 if(!listRootControl.includes(controlName)){
                     listRootControl.push(controlName);
                 }       
-                this.handlerBeforeRunFormulasValue(formulasInstance,controlInstance.id,controlName,formulasType,'root')
+                this.handlerBeforeRunFormulasValue(formulaInstance,controlName,formulaType,'root')
             }
             
         },
