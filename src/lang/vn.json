@@ -208,6 +208,10 @@
 		"os": "Hệ điểu hành",
 		"iconName":"Hình ảnh",
 		"ip": "Địa chỉ IP",
+		"number_instance": "Tổng số instance",
+		"baCreate": "Người tạo",
+		"baUpdate": "Người cập nhât",
+		"totalRecord": "Tổng số bản ghi",
         "wrap_tex_mode": {
             "wrap": "Xuống dòng",
             "clip": "Cắt bớt"

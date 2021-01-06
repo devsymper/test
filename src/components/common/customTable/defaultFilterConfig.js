@@ -173,6 +173,5 @@ export const getDataFromConfig = function(url, configs, columns, filterData, suc
         success(data);
     })
     .catch(err => {
-       
     });
 }

@@ -27,6 +27,10 @@ self.onmessage = async function (event) {
 			let saveTableDisplayConfigRes = await saveTableDisplayConfig(data);
             postMessage({action:'saveTableDisplayConfig', dataAfter : saveTableDisplayConfigRes})
             break;
+        case 'getTableColumns':
+			let getTableColumnsRes = await getTableColumns(data.column , data.forcedReOrder , data.savedOrderCols, data.filteredColumns);
+            postMessage({action:'getTableColumns', dataAfter : getTableColumnsRes})
+            break;
         default:
             break;
     }
@@ -34,41 +38,15 @@ self.onmessage = async function (event) {
 
 export const getData = function(dataConfig){
 	return new Promise((resolve, reject) => {
-		let obj = {
-		}
 		let handler = function(data){
-			if(dataConfig.customAPIResult){
-				let customData 
-				eval("customData = " + dataConfig.customAPIResult)
-				data = customData(data)
-			}else{
-				data = data.data;
-			}
-			obj.totalObject = data.total ? parseInt(data.total) : 0;
-			obj.columnDefs = getTableColumns(
-				data.columns, false , dataConfig.savedTableDisplayConfig, dataConfig.filteredColumns
-			);
-			let resData = data.listObject ? data.listObject : []
-			if(dataConfig.lazyLoad){
-				resData.forEach(function(e){
-					obj.rowData.push(e)
-				})
-			}else{
-				obj.rowData = resData;
-			}
-			obj.columnDefs.forEach(function(e){
-				if(e.cellRenderer){
-					e.cellRenderer = e.cellRenderer.toString()
-				}
-			})
-			resolve(obj);
+			resolve(data);
 		}
 		prepareFilterAndCallApi(dataConfig.configs.columns , dataConfig.configs.cache , dataConfig.configs.applyFilter, handler , {} , dataConfig);
 	})
 }
 
 export const getItemForValueFilter = function(dataConfig){
-	return new Promise((resolve, reject)=>{
+	return new Promise((resolve, reject) => {
 		let success = (data) => {
 			let obj = {}
 			if(data.status == 200){

@@ -76,7 +76,6 @@ export default {
                     text: this.$t("apps.contextMenu.edit"),
                     callback: (app, callback) => {
 						self.editCallback = callback;
-						debugger
                         self.openUpdateApp(app);
                     },
                 },
@@ -102,7 +101,7 @@ export default {
 									}
 								},
 								{name: "status", title: "status", type: "text",
-									 cellRenderer: function(params) {
+									cellRenderer: function(params) {
 										return params.value == "1" ? '<span>Kích hoạt</span>' : '<span>Không kích hoạt</span>'
 									}
 								},

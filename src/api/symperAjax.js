@@ -50,6 +50,5 @@ export const serialize = function(obj, prefix) {
 	if(url.charAt(0) == "&"){
 		url = url.substring(1)		
 	}
-	debugger
 	return url
   }

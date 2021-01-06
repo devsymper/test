@@ -199,6 +199,10 @@
 		"show_column": "Show this column",
 		"os": "Os",
 		"ip": "IP address",
+		"number_instance": "Number instances",
+		"baCreate": "BA Create",
+		"totalRecord": "Total record",
+		"baUpdate": "BA Update",
         "wrap_tex_mode": {
             "wrap": "Wrap",
             "clip": "Clip"

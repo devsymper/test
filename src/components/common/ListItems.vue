@@ -2,10 +2,12 @@
      <div :style="{width:contentWidth}" class="h-100 w-100 d-flex flex-column p-2">
 		 <div v-if="showToolbar" class="d-flex mb-2 " ref="topBar">
 			<div 
-			 	class="fs-17 ml-1 mt-1 font-weight-bold align-items-center flex-grow-1" 
+			 	class="align-items-center flex-grow-1" 
 				:class="{'ml-4': dialogMode == true }"
 			>
-				{{pageTitle}}
+				<span class=" ml-1 mt-1 font-weight-bold " style="font-size: 18px !important">
+					{{pageTitle}}
+				</span>
 			</div>
 			 <div>
 				<v-text-field
@@ -221,6 +223,8 @@
 				:rowData="rowData"
                 :rowSelection="rowSelection"
 				:frameworkComponents="frameworkComponents"
+				:overlayLoadingTemplate="overlayLoadingTemplate"
+				:overlayNoRowsTemplate="overlayNoRowsTemplate"
 				:modules="modules"
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
@@ -575,11 +579,44 @@ export default {
         }
 	},
 	beforeCreate(){
-		this.listItemsWorker = new ListItemsWorker()
+		
 	},
 	created(){
-		this.getData();
+		this.listItemsWorker = new ListItemsWorker()
+		let self = this
+        this.listItemsWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getData':
+					self.handlerGetData(data.dataAfter)
+					break;
+                case 'getItemForValueFilter':
+					self.tableFilter.currentColumn.colFilter.selectItems = data.dataAfter.selectItems
+					break;
+                case 'setSelectItemForFilter':
+					self.tableFilter.currentColumn.colFilter.selectItems = data.dataAfter.selectItems
+					break;
+                case 'restoreTableDisplayConfig':
+					self.handlerRestoreTableDisplayConfigRes(data.dataAfter)
+					break;
+                case 'saveTableDisplayConfig':
+					self.handlerSaveTableDisplayConfigRes(data.dataAfter)
+					break;
+                case 'getTableColumns':
+					data.dataAfter.forEach(function(e){
+						if(e.cellRenderer){
+							eval("e.cellRenderer = " + e.cellRenderer)
+						}
+					})
+					self.columnDefs = data.dataAfter
+					break;
+                default:
+                    break;
+            }
+		});
+		this.getData()
 		this.restoreTableDisplayConfig();
+
 	},
 	computed:{
 		alwaysShowActionPanel(){
@@ -635,6 +672,15 @@ export default {
 				this.showSearchBox = false
             }else{
 				this.showSearchBox = true
+			}
+		},
+		rowData:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				if(arr.length == 0){
+					this.showNoRowsOverlay()
+				}
 			}
 		},
 		columnDefs:{
@@ -697,9 +743,12 @@ export default {
             loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
             loadingExportExcel: false, // có đang chạy export hay ko
 			totalObject:0,
+			flagGetData: false,
 			pageSize: 50,
 			agApi: null,
 			frameworkComponents: null,
+			overlayLoadingTemplate: null,
+			overlayNoRowsTemplate: null,
             actionPanel: false, // có hiển thị action pannel (create, detail, edit) hay không
             page: 1, // trang hiện tại
 			gridOptions:null,
@@ -769,29 +818,7 @@ export default {
 	},
 	mounted(){
 		this.gridApi = this.gridOptions.api;
-		let self = this
-        this.listItemsWorker.addEventListener("message", function (event) {
-			let data = event.data;
-            switch (data.action) {
-                case 'getData':
-					self.handlerGetData(data.dataAfter)
-					break;
-                case 'getItemForValueFilter':
-					self.tableFilter.currentColumn.colFilter.selectItems = data.dataAfter.selectItems
-					break;
-                case 'setSelectItemForFilter':
-					self.tableFilter.currentColumn.colFilter.selectItems = data.dataAfter.selectItems
-					break;
-                case 'restoreTableDisplayConfig':
-					self.handlerRestoreTableDisplayConfigRes(data.dataAfter)
-					break;
-                case 'saveTableDisplayConfig':
-					self.handlerSaveTableDisplayConfigRes(data.dataAfter)
-					break;
-                default:
-                    break;
-            }
-		});
+		
 	},
     beforeMount(){
 		this.defaultColDef = {
@@ -812,9 +839,25 @@ export default {
 		this.frameworkComponents = {
 			agColumnHeader: CustomHeaderVue,
 		};
+		this.overlayLoadingTemplate =
+		  '<span class="ag-overlay-loading-center">Đang tải dữ liệu vui lòng chờ </span>';
+		this.overlayNoRowsTemplate =
+      	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
 		this.rowSelection = 'single';
     },
 	methods:{
+		showLoadingOverlay() {
+			this.agApi.showLoadingOverlay();
+		},
+		showNoRowsOverlay() {
+			if(this.agApi){
+				this.agApi.showNoRowsOverlay();
+			}
+		},
+		hideOverlay() {
+			this.agApi.hideOverlay();
+		},
+		
 		cellMouseOver(params){
 			this.cellAboutSelecting = params.data
 			if(this.debounceRelistContextmenu){
@@ -943,22 +986,51 @@ export default {
                 };
             }
             return contextMenu;
-        },
-		handlerGetData(res){
-			res.columnDefs.forEach(function(e){
+		},
+		
+		handlerGetData(data){
+			let self = this
+			if(self.customAPIResult.reformatData){
+				data = self.customAPIResult.reformatData(data);
+			}else{
+				data = data.data;
+			}
+			this.totalObject = data.total ? parseInt(data.total) : 0;
+			let resData = data.listObject ? data.listObject : []
+			// if(lazyLoad){
+			// 	resData.forEach(function(e){
+			// 		thisCpn.rowData.push(e)
+			// 	})
+			// }else{
+			self.rowData = resData;
+			// }
+			data.columns.forEach(function(e){
 				if(e.cellRenderer){
-					eval("e.cellRenderer = " + e.cellRenderer)
+					e.cellRenderer = e.cellRenderer.toString()
 				}
 			})
-			for(let i in res){
-				this[i] = res[i]
-			}
+			this.listItemsWorker.postMessage({
+				action: 'getTableColumns',
+				data:{
+					column: data.columns,
+					forcedReOrder: false,
+					savedOrderCols: self.savedTableDisplayConfig,
+					filteredColumns: self.filteredColumns
+				}
+			})
+			this.hideOverlay()
 		},
 		handlerRestoreTableDisplayConfigRes(res){
-			// this.tableDisplayConfig.value.wrapTextMode =  res.savedConfigs.wrapTextMode;
-			// this.tableDisplayConfig.value.densityMode =  res.savedConfigs.densityMode;
-			// this.tableDisplayConfig.value.alwaysShowSidebar =  res.savedConfigs.alwaysShowSidebar;
-			// this.savedTableDisplayConfig = res.savedConfigs.columns;
+			if(res.savedConfigs.wrapTextMode){
+				this.tableDisplayConfig.value.wrapTextMode =  res.savedConfigs.wrapTextMode;
+			}
+			if(res.savedConfigs.densityMode){	
+				this.tableDisplayConfig.value.densityMode =  res.savedConfigs.densityMode;
+			}
+			if(res.savedConfigs.alwaysShowSidebar){
+				this.tableDisplayConfig.value.alwaysShowSidebar =  res.savedConfigs.alwaysShowSidebar;
+			}
+			this.savedTableDisplayConfig = res.savedConfigs.columns;
 			if(res.columnDefs){
 				this.columnDefs = res.columnDefs
 				this.handleStopDragColumn();
@@ -1046,7 +1118,7 @@ export default {
 		refreshList(){
 			this.allRowChecked = {}
 			this.$emit('after-selected-row', this.allRowChecked)
-            this.getData();
+			this.getData();
 			this.$emit("refresh-list", {});
 			
         },
@@ -1187,6 +1259,7 @@ export default {
 				params.api.sizeColumnsToFit()
 			},1000)
 			this.agApi = params.api
+			this.agApi.showLoadingOverlay()
 			/**
 			 * Create perfect scrollbar cho ag grid
 			 * Dev-create: dungna
@@ -1327,10 +1400,6 @@ export default {
 		},
 		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false ){
 			let self = this;
-			
-			if(!this.listItemsWorker){
-				this.listItemsWorker = new ListItemsWorker()
-			}
 			let dataConfig = this.getConfigApiCall()
 			dataConfig.configs = {
 				columns: columns,
@@ -1453,5 +1522,9 @@ export default {
 .applied-filter {
     color: #f58634;
     background-color: #ffdfc8;
+}
+.ag-menu-option-text{
+	line-height: + !important;
+	padding-left: unset !important;
 }
 </style>

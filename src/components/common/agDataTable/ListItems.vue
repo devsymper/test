@@ -53,7 +53,6 @@
                             <v-icon left dark>mdi-refresh</v-icon>
                             <span >{{$t('common.refresh')}}</span>
                         </v-btn>
-
                       
                         <v-btn
                             depressed
@@ -222,6 +221,7 @@
                 :rowSelection="rowSelection"
 				:frameworkComponents="frameworkComponents"
 				:modules="modules"
+				:overlayNoRowsTemplate="noRowsTemplate"
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
@@ -637,6 +637,12 @@ export default {
 				this.showSearchBox = true
 			}
 		},
+		rowData:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+			}
+		},
 		columnDefs:{
 			deep: true,
 			immediate: true,
@@ -691,6 +697,7 @@ export default {
 			gridApi: null,
 			listItemsWorker: null,
 			deleteDialogShow: false,
+			flagGetGata: false,
 			deleteItems: [],
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
 			showSearchBox: true,
@@ -700,6 +707,7 @@ export default {
 			pageSize: 50,
 			agApi: null,
 			frameworkComponents: null,
+			noRowsTemplate: null,
             actionPanel: false, // có hiển thị action pannel (create, detail, edit) hay không
             page: 1, // trang hiện tại
 			gridOptions:null,
@@ -804,6 +812,7 @@ export default {
         };
 		this.gridOptions = {};
 		this.gridOptions.rowHeight =  this.rowHeight
+		this.gridOptions.suppressNoRowsOverlay = true;
 		this.gridOptions.getRowStyle = function(params) {
 			if (params.node.rowIndex % 2 != 0) {
 				return { background: '#fbfbfb' };
@@ -813,6 +822,8 @@ export default {
 			agColumnHeader: CustomHeaderVue,
 		};
 		this.rowSelection = 'single';
+		this.noRowsTemplate =
+          '<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">This is a custom \'no rows\' overlay</span>';
     },
 	methods:{
 		cellMouseOver(params){
@@ -1046,7 +1057,11 @@ export default {
 		refreshList(){
 			this.allRowChecked = {}
 			this.$emit('after-selected-row', this.allRowChecked)
-            this.getData();
+			if(this.listItemsWorker){
+           	 	this.getData();
+			}else{
+				this.flagGetGata = true
+			}
             this.$emit("refresh-list", {});
         },
 		showTableDropdownMenu(x, y, colName) {
@@ -1326,7 +1341,6 @@ export default {
 		},
 		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false ){
 			let self = this;
-			
 			if(!this.listItemsWorker){
 				this.listItemsWorker = new ListItemsWorker()
 			}
