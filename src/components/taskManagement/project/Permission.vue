@@ -149,7 +149,6 @@ import FormTpl from "@/components/common/FormTpl.vue";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import infoUser from "@/components/common/user/InfoUser";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import { find } from 'highcharts';
 import ActionPack from './ActionPack.vue';
 import { util } from '../../../plugins/util';
 import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
