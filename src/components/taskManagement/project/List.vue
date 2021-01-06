@@ -344,7 +344,7 @@ export default {
                         .catch(err => {
                             self.$snotifyError("", "Can not add project!", err);
                         })
-                        .always(() => {});
+                        .finally(() => {});
                 }
             }
             this.isLoadingAdd = false;
@@ -365,7 +365,7 @@ export default {
                 .catch(err => {
                     self.$snotifyError("", "Can not update project!", err);
                 })
-                .always(() => {});
+                .finally(() => {});
         },
         selectedIcon(data) {
             this.$set(this.infoProject, 'icon', data.icon.trim() );

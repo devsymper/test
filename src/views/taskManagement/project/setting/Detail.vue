@@ -42,7 +42,7 @@ export default {
                     .catch(err => {
                         self.$snotifyError("", "Can not get detail project with id:"+id);
                     })
-                    .always(() => {});
+                    .finally(() => {});
             }
         }
         this.$store.dispatch("taskManagement/getAllCategory");

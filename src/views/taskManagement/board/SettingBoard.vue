@@ -79,7 +79,7 @@ export default {
                 if(res.status == 200){
                     this.infoBoard = res.data;
                 }
-            }).always({}).catch({})
+            }).finally({}).catch({})
         }
         if (!this.$store.state.taskManagement.listStatusInProjects[projectId] || this.$store.state.taskManagement.listStatusInProjects[projectId].length == 0) {
             this.$store.dispatch("taskManagement/getListStautsInProject", projectId);

@@ -75,7 +75,7 @@ export default {
             .catch(err => {
                 self.$snotifyError("", "Can not get detail workflow with id="+id);
             })
-            .always(() => {});
+            .finally(() => {});
     }
 
 }

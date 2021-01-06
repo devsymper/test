@@ -653,7 +653,7 @@ export default {
                 .catch(err => {
                     this.$snotifyError("", "Can not list permission in role!", err);
                 })
-                .always(() => {});
+                .finally(() => {});
         },
         handleClickAddPeople(){
             this.$refs.addPeopleView.show();
@@ -758,7 +758,7 @@ export default {
                 .catch(err => {
                     this.$snotifyError("", "Can not add role!", err);
                 })
-                .always(() => {});
+                .finally(() => {});
         },
         validateData(){
             let data=this.nameAndDescriptionProps;

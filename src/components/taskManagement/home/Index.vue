@@ -244,7 +244,7 @@ export default {
                 .catch(err => {
                     self.$snotifyError("", "Can not update project!", err);
                 })
-                .always(() => {});
+                .finally(() => {});
         },
         handleClickProject(item){
             this.$router.push('/task-management/projects/'+item.id+'/kanban-board');
