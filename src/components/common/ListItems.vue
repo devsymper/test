@@ -786,6 +786,7 @@ export default {
                 },
                 drag: false,
 			},
+            hasColumnsChecked: false,
 			selectingParams:null,
             filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
 			tableFilter: {
@@ -867,6 +868,40 @@ export default {
 				self.relistContextmenu();
 			}, 100, this);
 		},
+		isShowCheckedRow(){
+            return this.hasColumnsChecked
+		},
+		 // hoangnd: thêm cột checkbox
+        addCheckBoxColumn(){
+            this.hasColumnsChecked = true;
+            this.columnDefs.unshift({name:"checkbox_select_item",data:"checkbox_select_item",title:"Chọn",type:"checkbox"});
+		},
+		// dungna doi hasColumnsChecked = true
+		addColumnsChecked(){
+			this.hasColumnsChecked = true
+		},
+        removeCheckBoxColumn(){
+            this.hasColumnsChecked = false;
+            this.columnDefs.shift();
+        },
+		/**
+         * Đưa dòng được checked vào biến allRowChecked
+         * nêu uncheck thì xóa đi
+         */
+        handleAfterChangeDataTable(change, source) {
+            if(source == 'edit' && this.hasColumnsChecked){
+                for (let index = 0; index < change.length; index++) {
+                    let rowChange = change[index];
+                    if(change[index][3] == true){
+                        this.allRowChecked[change[index][0]] = this.data[change[index][0]]
+                    }else{
+                        delete this.allRowChecked[change[index][0]];
+                    }
+                }
+                
+                this.$emit('after-selected-row',this.allRowChecked)
+            }
+        },
 		relistContextmenu(){
             if(!this.cellAboutSelecting){
                 return;
@@ -1197,7 +1232,7 @@ export default {
 				url: self.getDataUrl,
 				method: self.apiMethod,
 				tableFilter: self.tableFilter,
-				customDataForApi: self.customDataForApi,
+				customDataForApi: self.customDataForApi ? self.customDataForApi.toString() : null,
 				routeName: self.$getRouteName(),
 				useWorkFlowHeader: self.useWorkFlowHeader,
 				searchKey: self.searchKey,

@@ -127,13 +127,15 @@ export const prepareFilterAndCallApi = function(columns = false, cache = false, 
 		configs.searchKey = dataConfig.searchKey;
 		configs.page = configs.page ? configs.page :  dataConfig.page ;
 		configs.pageSize = configs.pageSize ? configs.pageSize : dataConfig.pageSize;
-		configs.formulaCondition = dataConfig.conditionByFormula;
+		configs.formulaCondition = dataConfig.conditionByFormula ? dataConfig.conditionByFormula : null;
 		let tableFilter = dataConfig.tableFilter;
 		tableFilter.allColumnInTable = dataConfig.columnDefs;
 		configs.emptyOption = emptyOption;
+		debugger
 
 		if(dataConfig.customDataForApi){
-			configs.customDataForApi = dataConfig.customDataForApi;
+			debugger
+			eval('configs.customDataForApi = ' + dataConfig.customDataForApi)
 		}
 		getDataFromConfig(dataConfig.url, configs, columns, tableFilter, success, dataConfig.method, header);
 	}
