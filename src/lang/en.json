@@ -1325,6 +1325,7 @@
         "listActionPack":"List ActionPack",
         "listPermission":"List Permission",
         "listIssueComponent":"List Issue in component",
+        "listIssueVersion":"List Issue in version",
         "detailProject":"Detail project",
         "requiredField":"Indicates required field",
         "addPeople":"Add people",

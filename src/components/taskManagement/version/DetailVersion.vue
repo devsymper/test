@@ -56,6 +56,7 @@
                 <v-tab-item>
                     <common-table-list-issue 
                         :listIssueProps="allIssueInVersion"
+                        :listType="listType"
                     />
                 </v-tab-item>
                 <v-tab-item>
@@ -142,6 +143,7 @@ export default {
     data(){
         let self = this;
         return{
+            listType: self.$t('taskManagement.listIssueVersion'),
             projectId: null,
             listIssue:[],
             dataProgess:{

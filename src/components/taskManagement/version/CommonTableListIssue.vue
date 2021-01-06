@@ -2,7 +2,7 @@
     <div>
         <v-card style="box-shadow:none">
             <v-card-title>
-                {{$t("taskManagement.listIssueComponent")}}
+                {{listType}}
                 <v-spacer></v-spacer>
                 <v-text-field
                     v-model="search"
@@ -83,6 +83,12 @@ export default {
                 return []
             }
         },
+        listType:{
+            type: String,
+            default(){
+                return this.$t("taskManagement.listIssueComponent");
+            }
+        }
     },
     data(){
         return{

@@ -1,7 +1,7 @@
 <template>
     <div class="w-100 h-100">
         <div class="d-flex">
-            <div class="symper-title pt-2 pl-2" style="height:40px">Setting for Board XXX</div>
+            <div class="symper-title pt-2 pl-2" style="height:40px">Setting for {{infoBoard.name}}</div>
         
         </div>
         <div  style="height:calc(100% - 40px); width:100%; background:#333">

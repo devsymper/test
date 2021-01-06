@@ -18,7 +18,7 @@
                 
             </v-list-item>
         </VuePerfectScrollbar>
-        <div style="text-align:center">
+        <div class="mt-2" style="text-align:center;margin-top:4px">
             <v-btn :loading="isLoadingAdd"  small  depressed @click="dialogAddBoard=true">
                 <v-icon size="18">mdi-plus</v-icon>
                 <span class="ml-2">{{$t("common.add")}}</span>
