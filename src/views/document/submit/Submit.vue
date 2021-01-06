@@ -1516,8 +1516,8 @@ export default {
                             thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
                             if(res.data.document.otherInfo != null && res.data.document.otherInfo != "")
 							thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
-                            let style = JSON.parse(res.data.document.formStyle);
-                            if(style){
+                            if(res.data.document.formStyle){
+                                let style = JSON.parse(res.data.document.formStyle);
                                 this.globalClass[style['globalClass']] = true;
                             }
                             else{
