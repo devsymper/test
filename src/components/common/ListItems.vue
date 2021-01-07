@@ -1305,9 +1305,7 @@ export default {
 			document.querySelector('.ag-row-selected').innerHTML = selectedRows.length === 1 ? selectedRows[0].athlete : ''
    		 },
 		onGridReady(params){
-			setTimeout((self)=>{
-				params.api.sizeColumnsToFit()
-			},1000)
+			params.api.sizeColumnsToFit()
 			this.agApi = params.api
 			this.agApi.showLoadingOverlay()
 			/**
