@@ -170,8 +170,7 @@ export const getDataFromConfig = function(url, configs, columns, filterData, suc
 		}
 	}
     if(configs.customDataForApi){
-		debugger
-        options = configs.customDataForApi(configs, columns, filterData);
+		options = configs.customDataForApi
 	}
     apiObj.callApi(method, url, options, header, {})
     .then(data => {

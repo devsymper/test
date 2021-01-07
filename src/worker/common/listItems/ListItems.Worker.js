@@ -131,9 +131,7 @@ export const prepareFilterAndCallApi = function(columns = false, cache = false, 
 		let tableFilter = dataConfig.tableFilter;
 		tableFilter.allColumnInTable = dataConfig.columnDefs;
 		configs.emptyOption = emptyOption;
-		if(dataConfig.customDataForApi){
-			eval('configs.customDataForApi = ' + dataConfig.customDataForApi)
-		}
+		configs.customDataForApi = dataConfig.customDataForApi
 		getDataFromConfig(dataConfig.url, configs, columns, tableFilter, success, dataConfig.method, header);
 	}
 }

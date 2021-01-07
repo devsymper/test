@@ -1237,11 +1237,15 @@ export default {
 		},
 		getConfigApiCall(){
 			let self = this
+			let customDataForApi
+			if(self.customDataForApi){
+				customDataForApi = self.customDataForApi(false, false, false)
+			}
 			let obj = {
 				url: self.getDataUrl,
 				method: self.apiMethod,
 				tableFilter: self.tableFilter,
-				customDataForApi: self.customDataForApi ? self.customDataForApi.toString() : null,
+				customDataForApi: customDataForApi,
 				routeName: self.$getRouteName(),
 				useWorkFlowHeader: self.useWorkFlowHeader,
 				searchKey: self.searchKey,
@@ -1570,7 +1574,7 @@ export default {
     background-color: #ffdfc8;
 }
 .ag-menu-option-text{
-	line-height: + !important;
+	line-height: 12px !important;
 	padding-left: unset !important;
 }
 </style>
