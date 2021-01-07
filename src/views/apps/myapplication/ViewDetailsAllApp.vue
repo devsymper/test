@@ -365,7 +365,7 @@ export default {
         },
 
 		async getItemByAccessControl(ids){
-			this.applicationWorker.postMessage({
+			this.myApplicationWorker.postMessage({
 				action: 'getItemByAccessControl',
 				data:{
 					ids: ids

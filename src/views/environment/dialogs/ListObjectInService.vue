@@ -139,8 +139,8 @@ export default {
 
 .dialog-object-in-service >>> .btn-header-popup {
 	position: absolute;
-	top: 15px;
-	right: 235px;
+	top: 9px;
+	right: 218px;
 }
 .dialog-object-in-service >>> .object-type-title{
 	cursor: pointer;

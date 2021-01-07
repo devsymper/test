@@ -2,7 +2,7 @@
     
     <div class="h-100 w-100 list-object-component">
 		<AutocompleteDoc 
-			style="position:absolute; top: 15px ; left: 150px"
+			style="position:absolute; top: 12px ; left: 170px"
 			@change="handleChange"
 		/>
         <list-items
@@ -658,6 +658,7 @@ export default {
          * Sự kiện khi selection vào cell
          */
         afterCellSelection(rowData){
+			this.$refs.listObject.openactionPanel();
             this.actionOnRightSidebar = 'detail';
             this.currentRowData = rowData;
         }
@@ -673,7 +674,7 @@ export default {
         margin-top: -3px;
     }
 	.list-object-component{
-		position: absolute
+		position: relative
 	}
     .panel-header .mdi:hover{
         color: rgba(0,0,0 / 0.6);

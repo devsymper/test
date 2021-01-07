@@ -77,11 +77,9 @@ export default {
 			default: false,
 		},
 		listItemSelected:{
-			type: Object,
+			type: Array,
 			default(){
-				return {
-					
-				}
+				return []
 			}
 		},
 		currentObjectType:{
@@ -134,7 +132,6 @@ export default {
 					title: "Nguồn và target không được trùng nhau"
 				})
 			}
-			this.$emit('success')
 		},
 		syncData(){
 			let self = this
@@ -146,7 +143,6 @@ export default {
 			for(let i in self.listItemSelected){
 				arr.push(self.listItemSelected[i].id)
 			}
-			debugger
 			let ids = {
 				"ids":arr
 			}
@@ -167,6 +163,9 @@ export default {
 					}
 				}
 			});
+			this.$snotifySuccess("Đang xử lý . Vui lòng chờ kết quả")
+			this.$emit('success')
+
 		}
 	},
 }
