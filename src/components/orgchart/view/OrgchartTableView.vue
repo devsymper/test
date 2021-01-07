@@ -59,12 +59,13 @@
                 <div class="h-100 symper-orgchart-table-side-by-side-view">
                     <!-- <TableSideBySildeView /> -->
                            <div style="" class="h-100 ">
-                               <div style="height:31px;display:flex;align-items:center;margin-bottom:8px" class=" tree-orgchart">
-                                   <span style="font:17px roboto;font-weight:500">{{titleToolbar}}</span>
+                               <div style="height:31px;display:flex;align-items:center;margin-bottom:13px" class=" tree-orgchart">
+                                   <span style="font:18px roboto;font-weight:500" class="mt-1">{{titleToolbar}}</span>
                                     <v-menu
                                         :max-width="500"
                                         :max-height="700"
                                         :nudge-width="200"
+										class="mt-1"
                                         offset-y
                                         >
                                         <template v-slot:activator="{ on }">
@@ -99,6 +100,7 @@
                         <VueResizable :width="400" :max-width="500" :min-width="300" :active ="['r']" @resize:end="resizeEnd">
 
                                 <AgDataTable
+									class="mt-1"
                                     :tableHeight="'calc(100% - 50px)'"
                                     :likeHandsonTable="true"
                                     :rowData="dataTable"
@@ -114,7 +116,7 @@
                                     }">
                                 </AgDataTable>
                         </VueResizable>
-                           </div>
+						</div>
                        <ListItems 
                              ref="listUser"
                             :pageTitle="'Danh sách người dùng'"

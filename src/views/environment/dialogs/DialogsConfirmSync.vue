@@ -132,7 +132,6 @@ export default {
 					title: "Nguồn và target không được trùng nhau"
 				})
 			}
-			this.$emit('success')
 		},
 		syncData(){
 			let self = this
@@ -165,7 +164,7 @@ export default {
 				}
 			});
 			this.$snotifySuccess("Đang xử lý . Vui lòng chờ kết quả")
-			this.$emit('cancel')
+			this.$emit('success')
 
 		}
 	},

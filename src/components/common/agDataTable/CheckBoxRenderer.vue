@@ -1,5 +1,5 @@
 <template>
-    <input v-on:change="changeCheckbox" type="checkbox" :checked="value">
+    <input class="mt-1" v-on:change="changeCheckbox" type="checkbox" :checked="value">
 </template>
 <script>
 export default {
@@ -22,7 +22,6 @@ export default {
             let prop = this.params.colDef.field;
             this.$evtBus.$emit('document-editor-ag-grid-on-change-checkbox',{controlName:controlName,value:this.value,prop:prop})
             this.$evtBus.$emit('list-items-ag-grid-on-change-checkbox',{data:this.params.data})
-
         }
     },
     

@@ -889,7 +889,7 @@ export default {
 		 // hoangnd: thêm cột checkbox
         addCheckBoxColumn(){
             this.hasColumnsChecked = true;
-            this.columnDefs.push(
+            this.columnDefs.unshift(
 				{ 
 					headerName: 'checkbox', 
 					field: 'checkbox', 
@@ -897,6 +897,7 @@ export default {
 					cellRendererFramework : 'CheckBoxRenderer'
 				}	
 			)
+			this.gridOptions.api.setColumnDefs([]);
 		},
 		emptyShowList(){
 			this.columnDefs = []
@@ -1336,7 +1337,7 @@ export default {
 					delete column.pinned
 				}
 				this.reOrderFixedCols();
-				this.gridOptions.api.setColumnDefs();
+				this.gridOptions.api.setColumnDefs([]);
 			}
 		},
 		resetHiddenColumns(){
