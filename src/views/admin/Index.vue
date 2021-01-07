@@ -11,12 +11,9 @@
 		:useDefaultContext="false"
 		:headerPrefixKeypath="'admin.table'"
 		:useActionPanel="true"
-		@row-selected="getDetails"
 		:actionPanelWidth="1000"
-		:actionPanelType="'elastic'"
 		:containerHeight="containerHeight"
 		:showImportHistoryBtn="false"
-		:showActionPanelInDisplayConfig="true"
 	> 
 		<template slot="right-panel-content">  
 			<DetailWorkflow 
