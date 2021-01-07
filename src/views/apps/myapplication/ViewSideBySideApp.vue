@@ -90,18 +90,6 @@ import MenuConfigTypeView from './MenuConfigTypeView'
     export default {
     created(){
 		this.myApplicationWorker = new MyApplicationWorker()
-		this.getFavorite()
-		this.getActiveApp()
-    },
-    components:{
-        AppDetail,
-        VuePerfectScrollbar,
-        ContextMenu,
-		SymperActionView,
-		MenuConfigTypeView
-	},
-	mounted(){
-		this.widthActionArea = "calc(100% - 520px)"
 		let self = this
 		this.myApplicationWorker.addEventListener("message", function (event) {
 			let data = event.data;
@@ -123,6 +111,18 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 					break;
 			}
 		});
+		this.getFavorite()
+		this.getActiveApp()
+    },
+    components:{
+        AppDetail,
+        VuePerfectScrollbar,
+        ContextMenu,
+		SymperActionView,
+		MenuConfigTypeView
+	},
+	mounted(){
+		this.widthActionArea = "calc(100% - 520px)"
 	},
     computed:{
         sFavorite(){
@@ -289,8 +289,6 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 			}else{
 				this.loadingApp = false
 			}
-
-			
         },
         checkChildrenApp(data){
 			let self = this 
@@ -306,17 +304,6 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 				self.getItemByAccessControl(dataGet,i)
 			}
         },
-        updateFavoriteItem(mapArray,array){
-			for( let [key,value] of Object.entries(mapArray)){
-				array.forEach(function(item){
-					if(item.objectIdentifier == key){
-						item.favorite = value.isFavorite
-						item.actions = value.actions
-					} 
-				})
-			}
-			return array
-		},
 		getItemByAccessControl(ids,type){
 			let self = this
 			this.applicationWorker.postMessage({

@@ -191,7 +191,7 @@ export default {
                 .catch(err => {
                     
                 })
-                .always(() => {});
+                .finally(() => {});
             }
             
         },

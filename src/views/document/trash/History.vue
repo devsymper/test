@@ -193,7 +193,7 @@ export default {
                         .catch(err => {
                             console.log("error from delete document api!!!", err);
                         })
-                        .always(() => {});
+                        .finally(() => {});
                     },
                 },
                 
@@ -243,7 +243,7 @@ export default {
             .catch(err => {
                 console.log("error from delete document api!!!", err);
             })
-            .always(() => {});
+            .finally(() => {});
         }
     }
 }

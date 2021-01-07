@@ -361,7 +361,7 @@ export default {
                                 .catch(err => {
                                 console.log("error from rename file !!!", err);
                                 })
-                                .always(() => {});
+                                .finally(() => {});
                             } else {
                             $(this).replaceWith(
                                 "<div id="+"file-" +
@@ -432,7 +432,7 @@ export default {
                 .catch(err => {
                 console.log("error download file!!!", err);
                 })
-                .always(() => {});
+                .finally(() => {});
         },
         /**
          * bắt sự kiện upload file
@@ -488,7 +488,7 @@ export default {
                 .catch(err => {
                     console.log("error from restore backup document!!!", err);
                 })
-                .always(() => {});
+                .finally(() => {});
             }
             this.dialogAlert = false;
         },
@@ -594,7 +594,7 @@ export default {
                 .catch(err => {
                 console.log("error from delete attachment file!!!", err);
                 })
-                .always(() => {});
+                .finally(() => {});
             this.dialogAlert = false;
         },
         onClickSidebarRight(e){
