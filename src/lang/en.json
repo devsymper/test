@@ -201,6 +201,17 @@
 		"show_column": "Show this column",
 		"os": "Os",
 		"ip": "IP address",
+		"number_instance": "Number instances",
+		"baCreate": "BA Create",
+		"totalRecord": "Total record",
+		"code": "Code",
+		"userUpdateName": "User update",
+		"parameter": "Parameter",
+		"checkbox": "Checkbox",
+		"userCreateName": "User create",
+		"isDefault":"Default",
+		"lastUpdateAt": "Last update at",
+		"baUpdate": "BA Update",
         "wrap_tex_mode": {
             "wrap": "Wrap",
             "clip": "Clip"
