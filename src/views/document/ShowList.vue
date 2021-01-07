@@ -184,7 +184,7 @@ export default {
                 //         .catch(err => {
                 //             console.log("error from delete document api!!!", err);
                 //         })
-                //         .always(() => {});
+                //         .finally(() => {});
                 //     },
                 // },
                 trash:{
@@ -218,7 +218,7 @@ export default {
                         .catch(err => {
                             console.log("error from delete document api!!!", err);
                         })
-                        .always(() => {});
+                        .finally(() => {});
                     },
                 },
                 templateExcel:{

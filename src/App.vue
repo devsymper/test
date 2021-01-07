@@ -58,7 +58,7 @@ import Content from "./components/common/Content.vue";
 import GeneralNotification from "./components/common/GeneralNotification.vue";
 import { appConfigs } from "./configs.js";
 var firebase = require("@firebase/app").firebase;
-import { IndexedDB } from "./plugins/utilModules/indexedDB.js";
+import IndexedDB from "./plugins/utilModules/indexedDB.js";
 import ResolveBacklogRequest from "./components/app/ResolveBacklogRequest";
 import { util } from './plugins/util.js';
 require("@/assets/css/handsontable.min.css");

@@ -89,7 +89,74 @@ export const str = {
     },
     mapLanguageToMoment() {
         return { 'en': 'en', 'vn': 'vi' } // biến chuyển định dạng ngôn ngữ sang thư viện moment js hiểu được
+    },
+
+    getSubString(str, start, openChar, closeChar, caseInsensitive) {
+        let pattern = new RegExp(start);
+        if(!caseInsensitive){
+            pattern = new RegExp(start, 'i');
+        }
+        let startMatch = str.match(pattern);
+        let firstPos = -1;
+        if(startMatch){
+            firstPos = startMatch.index;
+        }
+        
+        let rsl = {
+            start: -1,
+            end: -1
+        };
+        if (firstPos > -1) {
+            rsl.start = firstPos;
+            let startIndex = firstPos + start.length;
+            let endIndex = firstPos;
+            let countMatches = 0;
+            for (let i = startIndex; i < str.length; i++) {
+                if (str[i] == openChar) {
+                    countMatches += 1;
+                } else if (str[i] == closeChar) {
+                    countMatches -= 1;
+                }
+
+                if (countMatches == 0) {
+                    endIndex = i;
+                    rsl.end = endIndex + 1;
+                    break;
+                }
+            }
+        }
+        return rsl;
+    },
+
+    getTargetInSubstring(rsl, str, startIndex, endIndex, start, openChar, closeChar, caseInsensitive) {
+        let substr = str.substring(startIndex, endIndex);
+        let firstPos = substr.indexOf(start);
+        if (firstPos > -1) {
+            let section = this.getSubString(substr, start, openChar, closeChar, caseInsensitive);
+            if (section.start > -1 && section.end > -1) {
+                rsl.push(section);
+                section.start += startIndex;
+                section.end += startIndex;
+                this.getTargetInSubstring(rsl, substr, section.end - startIndex, str.length, start, openChar, closeChar);
+            }
+        }
+    },
+
+    /**
+     * Hàm lấy ra sub string nằm giữa cặp ký tự đóng mở 
+     * @param {String} str chuỗi cần tìm kiếm
+     * @param {String} start chuỗi bắt đầu , có thể là tên hàm
+     * @param {String} openChar ký tự mở để bắt đầu tìm chuỗi
+     * @param {String} closeChar ký tự đóng để kết thúc việc tìm chuỗi
+     * @param {Boolean} caseInsensitive cờ đánh dấu xem biến "start" có được tìm kiếm theo kiểu phân biệt hoa thường hay ko,
+     */
+    getBoundedSubstr(str, start = '', openChar = '(', closeChar = ')', caseInsensitive = false) {
+        let sections = [];
+        this.getTargetInSubstring(sections, str, 0, str.length, start, openChar, closeChar, caseInsensitive);
+        let rsl = [];
+        for (let item of sections) {
+            rsl.push(str.substring(item.start, item.end));
+        }
+        return rsl;
     }
-
-
 }

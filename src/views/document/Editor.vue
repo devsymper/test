@@ -1098,7 +1098,13 @@ export default {
 
                                     if(formulaType != 'linkConfig'){
                                         if(childControlFormulas[formulaType].value.trim() == ""){
-                                            allControl[controlId].listFields[childControlId].formulas[formulaType].formulasId = 0;
+                                            // Khadm thêm việc check có childControlId trong listFields ko
+                                            // phục vụ trong trường hợp BA xóa một cột trong table
+                                            if(allControl[controlId].listFields[childControlId]){
+                                                allControl[controlId].listFields[childControlId].formulas[formulaType].formulasId = 0;
+                                            }else{
+                                                console.warn("SYMPER DOCUMENT EDITOR ERROR: can not find control with id " + childControlId);
+                                            }
                                         }
                                     }
                                 }
@@ -1235,7 +1241,7 @@ export default {
                         title: "can not save document",
                     });
             })
-            .always(() => {
+            .finally(() => {
             });
         },
         /**
@@ -1269,7 +1275,7 @@ export default {
                                     return false;
                                 }
                             }
-                        }).always({}).catch({})
+                        }).finally({}).catch({})
                     }
                     else{
                         thisCpn.$snotify({
@@ -1291,7 +1297,7 @@ export default {
 
                 });
             })
-            .always(() => {
+            .finally(() => {
             });
         },
         /**
@@ -1863,14 +1869,14 @@ export default {
         /**
          * Hàm nhận sự kiện ném ra từ compon material icon sau khi chọn icon
          */
-        selectedIcon(data){
-            let context = data.context
+         selectedIcon(data){
+            let context = this.$refs.materialIconPicker.getContext()
             if(context == 'toolbar'){
-                 this.editorCore.insertContent('&nbsp;<span class="mdi '+data.icon+'"></span>&nbsp;');
+                 this.editorCore.insertContent('&nbsp;<span class="mdi '+data+'"></span>&nbsp;');
             }
             else{
                 this.currentTabSelectedIcon.removeClass();
-                this.currentTabSelectedIcon.addClass('icon-page mdi '+data.icon);
+                this.currentTabSelectedIcon.addClass('icon-page mdi '+data);
             }
             this.$refs.materialIconPicker.hide()
             
@@ -3003,7 +3009,7 @@ export default {
                             title: "can not save form print document",
                         });
                 })
-                .always(() => {
+                .finally(() => {
                 });
             }
             else{
@@ -3032,7 +3038,7 @@ export default {
                             title: "can not save form print document",
                         });
                 })
-                .always(() => {
+                .finally(() => {
                 });
             }
             

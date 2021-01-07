@@ -60,37 +60,7 @@ export default {
                 }
             }, 10, this);
         },
-        viewType(vl){
-            if(vl == 'detail'){
-                this.tabs = [
-                    {
-                        text: "Liên kết",
-                        name: 'link',
-                        component: LinkControl
-                    },{
-                        text: "Lịch sử chỉnh sửa",
-                        name: 'trackChange',
-                        component: HistoryControl
-                    },{
-                        text: "Bình luận",
-                        name: 'comment',
-                        component: HistoryControl
-                    },
-                ]
-                this.style.width = '600px';
-                this.style.height = '300px';
-            }else{
-                this.tabs = [
-                    {
-                        text: "Liên kết",
-                        name: 'link',
-                        component: LinkControl
-                    }
-                ];
-                this.style.width = '150px';
-                this.style.height = 'auto';
-            }
-        }
+        
     },
     data() {
         return {
@@ -99,21 +69,7 @@ export default {
         style: {},
         currentTab: 1,
         rowIndex:null,
-        tabs: [
-            {
-                text: "Liên kết",
-                name: 'link',
-                component: LinkControl
-            },{
-                text: "Lịch sử chỉnh sửa",
-                name: 'trackChange',
-                component: HistoryControl
-            },{
-                text: "Bình luận",
-                name: 'comment',
-                component: HistoryControl
-            },
-        ]
+        tabs: []
         };
     },
     computed:{
@@ -127,6 +83,35 @@ export default {
     },
     mounted(){
         this.showTrackChangeComp();
+        if(this.viewType == 'detail'){
+            this.tabs = [
+                {
+                    text: "Liên kết",
+                    name: 'link',
+                    component: LinkControl
+                },{
+                    text: "Lịch sử chỉnh sửa",
+                    name: 'trackChange',
+                    component: HistoryControl
+                },{
+                    text: "Bình luận",
+                    name: 'comment',
+                    component: HistoryControl
+                },
+            ]
+            this.style.width = '600px';
+            this.style.height = '300px';
+        }else{
+            this.tabs = [
+                {
+                    text: "Liên kết",
+                    name: 'link',
+                    component: LinkControl
+                }
+            ];
+            this.style.width = '150px';
+            this.style.height = 'auto';
+        }
     },
     methods: {
         showLinkControl(){

@@ -1,5 +1,5 @@
-import sDocument from './../../../store/document'
-import store from './../../../store'
+
+import { workerStore } from '@/worker/document/submit/WorkerStateManagement';
 
 const initSqlJs = require('sql.js');
 
@@ -28,9 +28,10 @@ export default class ClientSQLManager {
      * @param {SQLLite} SQLDBInstance 
      */
     static addSQLInstanceDBToStore(keyInstance, SQLDBInstance) {
-        store.commit(
-            "document/addSqlLiteDb", { instance: keyInstance, db: SQLDBInstance }
-        );
+        if(!workerStore['submit'][keyInstance]){
+            workerStore['submit'][keyInstance] = {};
+        }
+        workerStore['submit'][keyInstance]['SQLiteDB'] = SQLDBInstance;
     }
     /**
      * hoangnd:26/5/2020
@@ -38,7 +39,7 @@ export default class ClientSQLManager {
      * @param {String} keyInstance 
      */
     static getInstanceDB(keyInstance) {
-        return sDocument.state.clientSqlLite[keyInstance]
+        return workerStore['submit'][keyInstance]['SQLiteDB'];
     }
     /**
      * hoangnd:26/5/2020

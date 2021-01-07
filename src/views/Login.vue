@@ -98,7 +98,7 @@ export default {
                     .catch(err => {
                         console.log("error from login api!!!", err);
                     })
-                    .always(() => {
+                    .finally(() => {
                         setTimeout(() => {
                             thisCpn.checkingUser = false;
                         }, 1000);

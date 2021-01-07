@@ -101,7 +101,8 @@ export default {
             this.params.responseVariableName = 'symper_'+nodeAttr.idNode+'_throw_signal_response';
             this.params.requestBody =JSON.stringify({
                 signalName: nodeAttr.signalref.signalName,
-                prefix: nodeAttr.prefixForSignalParameters.value
+                prefix: nodeAttr.prefixForSignalParameters.value,
+                sourceProcessInstanceId: '${execution.getProcessInstanceId()}'
             });
         }
     },

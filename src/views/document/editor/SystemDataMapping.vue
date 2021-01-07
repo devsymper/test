@@ -171,13 +171,13 @@ export default {
             }
             if(this.listMapping[index].id){
                 systemDataMappingApi.delete(this.listMapping[index].id).then(res=>{
-                }).always({}).catch({})
+                }).finally({}).catch({})
             }
             this.listMapping.splice(index, 1);
         },
         deleteMappingInDoc(documentId){
             systemDataMappingApi.deleteInDoc(documentId).then(res=>{
-                }).always({}).catch({})
+                }).finally({}).catch({})
         },
         /**
          * Thay đổi kiểu đối tượng thì gọi lại api lấy dánh sách các column của object hệ thống
@@ -212,7 +212,7 @@ export default {
                 listMap = this.reduceData(listMap);
                 systemDataMappingApi.saveBatch({values:JSON.stringify(listMap),documentId:documentId}).then(res=>{
 
-                }).always({}).catch({})
+                }).finally({}).catch({})
             }
         },
         editMapping(documentId){
@@ -230,7 +230,7 @@ export default {
                     let listMap = this.reduceData(curMapping);
                     systemDataMappingApi.editBatch({values:JSON.stringify(listMap),documentId:documentId}).then(res=>{
 
-                    }).always({}).catch({})
+                    }).finally({}).catch({})
                 }
             }
             else{

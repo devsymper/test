@@ -71,7 +71,7 @@ export default class ActionControl extends Control {
                 .catch(err => {
 
                 })
-                .always(() => {});
+                .finally(() => {});
         } else {
             this.ele.remove();
         }
