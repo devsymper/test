@@ -19,9 +19,9 @@ export default {
         changeCheckbox(){
             this.value = !this.value;
             let controlName = this.params.data.name[this.params.data.name.length - 1];
-            console.log("dákjdsd",this.params);
             let prop = this.params.colDef.field;
             this.$evtBus.$emit('document-editor-ag-grid-on-change-checkbox',{controlName:controlName,value:this.value,prop:prop})
+            this.$evtBus.$emit('list-items-ag-grid-on-change-checkbox',{data:this.params.data})
 
         }
     },

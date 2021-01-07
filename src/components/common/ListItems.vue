@@ -336,6 +336,7 @@ import TableFilter from '@/components/common/customTable/TableFilter'
 import PerfectScrollbar from "perfect-scrollbar";
 import ListItemsWorker from 'worker-loader!@/worker/common/listItems/ListItems.Worker.js';
 import { actionHelper } from "@/action/actionHelper";
+import CheckBoxRenderer from "@/components/common/agDataTable/CheckBoxRenderer"
 
 let CustomHeaderVue = Vue.extend(CustomHeader);
 
@@ -582,8 +583,16 @@ export default {
 		
 	},
 	created(){
-		this.listItemsWorker = new ListItemsWorker()
 		let self = this
+		this.$evtBus.$on('list-items-ag-grid-on-change-checkbox',data=>{
+			if(!self.allRowChecked.includes(data.data)){
+				self.allRowChecked.push(data.data)
+			}else{
+				self.allRowChecked.splice(self.allRowChecked.indexOf(data.data), 1)
+			}
+			self.$emit('after-selected-row',self.allRowChecked)
+        })
+		this.listItemsWorker = new ListItemsWorker()
         this.listItemsWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
@@ -749,12 +758,12 @@ export default {
 			agApi: null,
 			frameworkComponents: null,
 			overlayLoadingTemplate: null,
+			allRowChecked: [],
 			overlayNoRowsTemplate: null,
             actionPanel: false, // có hiển thị action pannel (create, detail, edit) hay không
             page: 1, // trang hiện tại
 			gridOptions:null,
 			fixedCols:[],
-            allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
 			defaultColDef:null,
 			arrContextMenu: [],
 			rowSelection: null,
@@ -815,7 +824,8 @@ export default {
 		"symper-drag-panel": SymperDragPanel,
 		VNavigationDrawer,
 		VDialog,
-		TableFilter
+		TableFilter,
+		CheckBoxRenderer
 
 	},
 	mounted(){
@@ -840,6 +850,7 @@ export default {
 		}
 		this.frameworkComponents = {
 			agColumnHeader: CustomHeaderVue,
+			CheckBoxRenderer: CheckBoxRenderer
 		};
 		this.overlayLoadingTemplate =
 		  '<span class="ag-overlay-loading-center">Đang tải dữ liệu vui lòng chờ </span>';
@@ -848,6 +859,9 @@ export default {
 		this.rowSelection = 'single';
     },
 	methods:{
+		getAllData(){
+			return this.rowData
+		},
 		showLoadingOverlay() {
 			this.agApi.showLoadingOverlay();
 		},
@@ -875,7 +889,18 @@ export default {
 		 // hoangnd: thêm cột checkbox
         addCheckBoxColumn(){
             this.hasColumnsChecked = true;
-            this.columnDefs.unshift({name:"checkbox_select_item",data:"checkbox_select_item",title:"Chọn",type:"checkbox"});
+            this.columnDefs.push(
+				{ 
+					headerName: 'checkbox', 
+					field: 'checkbox', 
+					editable:true,
+					cellRendererFramework : 'CheckBoxRenderer'
+				}	
+			)
+		},
+		emptyShowList(){
+			this.columnDefs = []
+			this.rowData = []
 		},
 		// dungna doi hasColumnsChecked = true
 		addColumnsChecked(){
@@ -884,24 +909,6 @@ export default {
         removeCheckBoxColumn(){
             this.hasColumnsChecked = false;
             this.columnDefs.shift();
-        },
-		/**
-         * Đưa dòng được checked vào biến allRowChecked
-         * nêu uncheck thì xóa đi
-         */
-        handleAfterChangeDataTable(change, source) {
-            if(source == 'edit' && this.hasColumnsChecked){
-                for (let index = 0; index < change.length; index++) {
-                    let rowChange = change[index];
-                    if(change[index][3] == true){
-                        this.allRowChecked[change[index][0]] = this.data[change[index][0]]
-                    }else{
-                        delete this.allRowChecked[change[index][0]];
-                    }
-                }
-                
-                this.$emit('after-selected-row',this.allRowChecked)
-            }
         },
 		relistContextmenu(){
             if(!this.cellAboutSelecting){
@@ -1154,7 +1161,7 @@ export default {
             this.$emit("save-item", {});
 		},
 		refreshList(){
-			this.allRowChecked = {}
+			this.allRowChecked = []
 			this.$emit('after-selected-row', this.allRowChecked)
 			this.getData();
 			this.$emit("refresh-list", {});

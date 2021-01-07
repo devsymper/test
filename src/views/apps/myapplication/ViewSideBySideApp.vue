@@ -147,7 +147,7 @@ import MenuConfigTypeView from './MenuConfigTypeView'
     },
     methods:{
 		getActiveApp(){
-			this.applicationWorker.postMessage({
+			this.myApplicationWorker.postMessage({
 				action: 'getActiveApp',
 			});
 		},
@@ -196,7 +196,7 @@ import MenuConfigTypeView from './MenuConfigTypeView'
         getFavorite(){
 			this.listFavorite = []
 			let userId = this.$store.state.app.endUserInfo.id
-			this.applicationWorker.postMessage({
+			this.myApplicationWorker.postMessage({
 				action: 'getFavorite',
 				data:{
 					userId: userId
@@ -280,7 +280,7 @@ import MenuConfigTypeView from './MenuConfigTypeView'
 			this.$store.commit('appConfig/emptyItemSelected')
 			let appStore = this.$store.state.appConfig
 			if(!appStore.listAppsSideBySide[appStore.currentAppId]){
-				this.applicationWorker.postMessage({
+				this.myApplicationWorker.postMessage({
 					action: 'getAppDetails',
 					data:{
 						id: item.id
@@ -306,7 +306,7 @@ import MenuConfigTypeView from './MenuConfigTypeView'
         },
 		getItemByAccessControl(ids,type){
 			let self = this
-			this.applicationWorker.postMessage({
+			this.myApplicationWorker.postMessage({
 				action: 'getItemByType',
 				data:{
 					ids: ids,
