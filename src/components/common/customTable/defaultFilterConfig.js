@@ -163,7 +163,13 @@ export const getDataFromConfig = function(url, configs, columns, filterData, suc
 	let options = {};
     if(!configs.emptyOption){
         options = getOptionForGetList(configs, columns, filterData);
-    }
+	}
+	for(let i in options){
+		if(!options[i] || options[i].length == 0){
+			delete options[i]
+		}
+	}
+	debugger
     if(configs.customDataForApi){
         options = configs.customDataForApi(configs, columns, filterData);
 	}

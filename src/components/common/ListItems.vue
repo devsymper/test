@@ -836,7 +836,7 @@ export default {
 		this.defaultColDef = {
             minWidth: 40,
 			filter: true,
-			flex: 1,
+			// flex: 1,
 			suppressMenu : true,
 			sortable: true,
             resizable: true,
