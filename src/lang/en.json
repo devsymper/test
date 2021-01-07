@@ -1227,6 +1227,7 @@
         "delegate": "Delegate",
         "resolve": "Resolve",
         "complete": "Complete",
+        "assign": "Assign",
         "created": "Task created",
         "relatedPeople": {
             "title": "Related people"

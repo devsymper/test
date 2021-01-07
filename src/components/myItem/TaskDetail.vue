@@ -16,7 +16,7 @@
 							text-color="white"
 						>
 							<span class="fs-13">
-								{{taskStatus.title}}
+								{{$t('tasks.'+taskStatus.title) }}
 							</span>
 						</v-chip>
                     </div>
@@ -407,20 +407,20 @@ export default {
 		taskStatus(){
 			let obj 
 			if(this.originData.isDone == '1'){
-				obj = this.getTaskStatus('success', 'Hoàn thành','complete')
+				obj = this.getTaskStatus('success', 'complete','complete')
 			}else{
 				if(!this.delegationState){
 					if(this.originData.assignee){
-						obj = this.getTaskStatus('#F59324', 'Đã giao','assign')
+						obj = this.getTaskStatus('#F59324', 'assign','assign')
 					}else{
-						obj = this.getTaskStatus('#ED6A5E', 'Chưa được giao','unAssign')
+						obj = this.getTaskStatus('#ED6A5E', 'unAssign','unAssign')
 					}
 				}else{
 					if(this.delegationState == 'pending'){
-						obj = this.getTaskStatus('#8E2D8C', 'Ủy quyền','delegate')
+						obj = this.getTaskStatus('#8E2D8C', 'delegate','delegate')
 					}
 					if(this.delegationState == 'resolved'){
-						obj = this.getTaskStatus('#F59324', 'Đã giao','assign')
+						obj = this.getTaskStatus('#F59324', 'assign','assign')
 					}
 				}
 			}
@@ -478,8 +478,8 @@ export default {
         },
 		refreshMyItem(type){
 			this.modelDialog[type+'ShowDialog'] = false
-			this.$router.go()
-			// this.reloadDetailTask()
+			this.$emit('task-submited')
+			// this.$emit('reselect-object')
 		},
 		handlerDelegateSuccess(){
 			this.modelDialog.delegateShowDialog = false
@@ -613,7 +613,7 @@ export default {
                 task.name = task.description.content;
             }
 
-            this.descriptionTask=task.description;
+            this.descriptionTask = task.description;
             this.breadcrumb.taskName = task.name;
             if(task.processDefinitionId){
                 let processDefinitionId=task.processDefinitionId;
@@ -793,7 +793,7 @@ export default {
         async updateTask(taskData) {
             let data = {};
             if (this.isRole==false) {
-                data.assignee=this.$store.state.app.endUserInfo.id+":"+this.$store.state.app.endUserInfo.currentRole.id;
+                data.assignee = this.$store.state.app.endUserInfo.id+":"+this.$store.state.app.endUserInfo.currentRole.id;
             }
             if (this.taskAction=='submit') { // khi submit task
                 let description;
@@ -908,7 +908,7 @@ export default {
                 infotTask.taskInfo= taskInfo;
                 infotTask.originData=task;
                 self.$emit("change-info-task",infotTask);
-           
+
             }
         },
         /**
