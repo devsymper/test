@@ -97,6 +97,7 @@ import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import AssignedRecent from './AssignedRecent.vue';
 import infoUser from "@/components/common/user/InfoUser";
 import { taskManagementApi } from "@/api/taskManagement.js";
+import HomeWorker from 'worker-loader!@/worker/taskManagement/home/Index.Worker.js';
 
 export default {
     components: {
@@ -261,12 +262,39 @@ export default {
                 return this.randomBackground()
             }
             return this.colors[index];
+        },
+        getAllDocumentIdsInIssueType(){
+            if (!this.$store.state.taskManagement.listDocumentIdsInIssueType || this.$store.state.taskManagement.listDocumentIdsInIssueType.length == 0) {
+                this.$store.dispatch("taskManagement/getAllDocumentIdsInIssueType");
+                this.homeWorker.postMessage({
+                    action:'getAllDocumentIdsInIssueType',
+                    data:null
+                });
+            }
         }
     },
     created(){
-        if (!this.$store.state.taskManagement.listDocumentIdsInIssueType || this.$store.state.taskManagement.listDocumentIdsInIssueType.length == 0) {
-            this.$store.dispatch("taskManagement/getAllDocumentIdsInIssueType");
-        }
+        // this.homeWorker = new HomeWorker();
+
+        // this.getAllDocumentIdsInIssueType();
+
+        // // if (!this.$store.state.taskManagement.listDocumentIdsInIssueType || this.$store.state.taskManagement.listDocumentIdsInIssueType.length == 0) {
+        // //     this.$store.dispatch("taskManagement/getAllDocumentIdsInIssueType");
+        // // }
+
+        //   this.homeWorker.addEventListener("message", function (event) {
+		// 	let data = event.data;
+        //     switch (data.action) {
+        //         case 'getAllDocumentIdsInIssueType':
+        //             if (data.dataAfter) {
+        //                 let res = data.dataAfter;
+        //                 self.$store.commit('taskManagement/setAllDocumentIdsInIssueType', res.data);
+        //             }
+        //             break;
+        //         default:
+        //             break;
+        //     }
+        // });
     }
 
 }

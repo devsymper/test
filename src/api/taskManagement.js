@@ -7,7 +7,7 @@ let log = new Api(appConfigs.apiDomain.log);
 
 export const taskManagementApi = {
     getDataLogService(data){
-        return log.post("query",data);
+        return log.post("query",data,{},{'contentType': 'application/json'});
     },
     getIssueFilter(data){
         return document.post("documents/objects-by-multiple-document",data);

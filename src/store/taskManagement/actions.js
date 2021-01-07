@@ -31,6 +31,7 @@ const getLogProjectAccess = async(context,userId) => {
         "size":100
     }
     try {
+
         let res = await taskManagementApi.getDataLogService(data);
         if (res.status == 200) {
             context.commit('setListProjectRecentAccess', res.data);
