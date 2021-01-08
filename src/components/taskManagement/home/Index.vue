@@ -349,6 +349,7 @@ export default {
                     self.projectIds =data.dataAfter.projectIds;
                     self.countBoardInProject();
                     self.countIssueInListProject();
+                    break;
                 default:
                     break;
             }
