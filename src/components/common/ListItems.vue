@@ -360,7 +360,7 @@ export default {
          */
         useDefaultContext: {
             type: Boolean,
-            default: true
+            default: false
         },
 		/**
 		 * Truyeenf vao row height
@@ -941,8 +941,9 @@ export default {
                 let objectType = this.commonActionProps.resource;
                 let parentId = this.commonActionProps.parentId ? this.commonActionProps.parentId : id;
                 items = actionHelper.filterAdmittedActions(items, objectType, parentId ,id);
-            }
+			}
 			let tmpTableContextMenu = this.getItemContextMenu(items);
+
 			this.tmpTableContextMenu = this.reduceContextMenuItems(tmpTableContextMenu)
 		},
 		reduceContextMenuItems(tmpTableContextMenu){
@@ -1047,7 +1048,7 @@ export default {
                 contextMenu.items[item.name] = {
                     name: item.text
                 };
-            }
+			}
             return contextMenu;
 		},
 		
@@ -1188,6 +1189,7 @@ export default {
 			
         },
 		showTableDropdownMenu(x, y, colName) {
+			debugger
             var windowWidth = $(window).width()/1.1;
             if(x > windowWidth){
                 x -= 190;
@@ -1236,6 +1238,7 @@ export default {
          */
         getItemForValueFilter(){
 			let columns = [this.tableFilter.currentColumn.name];
+			debugger
             let self = this;
             let options = {
                 pageSize: 300,

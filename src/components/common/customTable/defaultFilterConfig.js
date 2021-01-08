@@ -37,6 +37,7 @@ export const getDefaultFilterConfig = function() {
 function getFilterConfigs(getDataMode = '', filterData) {
     let configs = [];
     for (let colName in filterData.allColumn) {
+		debugger
         let filter = filterData.allColumn[colName];
         let condition = filter.conditionFilter;
         let option = {

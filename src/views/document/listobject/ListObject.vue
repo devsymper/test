@@ -256,7 +256,6 @@ export default {
                 reformatData(res){
                     let thisCpn = util.getClosestVueInstanceFromDom(document.querySelector('.list-object-component'));
                     let listObject = res.data.listObject;
-                  
                     return{
                         columns:res.data.columns,
                         listObject:res.data.listObject,
@@ -658,7 +657,6 @@ export default {
          * Sự kiện khi selection vào cell
          */
         afterCellSelection(rowData){
-			debugger
 			if(!this.$refs.listObject.actionPanel){
 				this.$refs.listObject.openactionPanel();
 			}	
