@@ -21,10 +21,18 @@
         >
         <template v-slot:item="{ item }">
             <tr @click="handleClickRow(item)" class="active-row" v-if="item.active" style="background: #f0f0f0">
-                <td v-for="(key,value) in item" :key="key+value" :class="{'row-item':true,'d-none':(value == 'active' || value == 'document_object_id')}">{{ (value != 'active') ? key : '' }}</td>
+                <td v-for="(key,value) in item" 
+                :key="key+value" 
+                :class="{'row-item':true,'d-none':(value == 'active' || value == 'document_object_id')}">
+                    <v-icon v-if="value == 'tmg_icon'" :color="item.tmg_color"> {{ (value != 'active') ? key : '' }}</v-icon>
+                    <span v-else-if="value != 'tmg_color'"> {{ (value != 'active') ? key : '' }}</span>
+                </td>
             </tr>
             <tr @click="handleClickRow(item)" v-else class="row-item">
-                <td v-for="(key,value) in item" :key="key+value" :class="{'d-none':(value == 'active' || value == 'checked' || value == 'document_object_id')}">{{ key }}</td>
+                <td v-for="(key,value) in item" :key="key+value" :class="{'d-none':(value == 'active' || value == 'checked'|| value == 'document_object_id')}">
+                    <v-icon v-if="value == 'tmg_icon'" :color="item.tmg_color"> {{ key }}</v-icon>
+                    <span v-else-if="value != 'tmg_color'"> {{ key }}</span>
+                </td>
                 <span class="mdi mdi-check icon-checked" v-if="item.checked"></span>
             </tr>
         </template>

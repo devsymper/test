@@ -85,7 +85,7 @@
                         </v-menu>
                     </div>
                 </div>
-                <v-layout style="height:calc(100% - 41px)" class="w-100" justify-center>
+                <v-layout style="height:calc(100% - 41px);overflow:hidden;" class="w-100" justify-center>
                     <slot>
 					</slot>
                 </v-layout>
@@ -129,20 +129,10 @@ export default {
         }
 
     },
-    mounted(){
-        const self = this;
-        this.$evtBus.$on("close-edit-document",(isCloseTab) => {
-            self.isClose = !isCloseTab;
-        });
-    },
     methods: {
         handleCloseTab(idx){
-            const self = this;
-            this.idx = idx;
             this.$evtBus.$emit("before-close-app-tab", idx);
-            if(!self.isClose){
-                self.closeTab(idx);
-            }
+            this.closeTab(idx);
         },
         /**
          * Xử lý các tab
@@ -262,8 +252,6 @@ export default {
     },
     data: function() {
         return {
-            isClose:false,
-            idx:0,
             showConfigNotification:false,
             isExpand:false,
             showSearchInput: false,
