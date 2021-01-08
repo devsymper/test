@@ -1356,7 +1356,6 @@ export default {
             let isValue = column[type];
             if (type == "symperHide") {
 				this.gridOptions.columnApi.setColumnVisible(column.field, !isValue)
-				this.agApi.sizeColumnsToFit()
 				this.resetHiddenColumns();
             } else {
 				if(isValue){
@@ -1365,8 +1364,20 @@ export default {
 					delete column.pinned
 				}
 				this.reOrderFixedCols();
-				this.gridOptions.api.setColumnDefs([]);
+				debugger
+				let flag = false
+				this.columnDefs.forEach(function(e){
+					if(e.symperFixed){
+						flag = true
+						return
+					}
+				})
+				if(!flag){
+					this.refreshList()
+				}
 			}
+			this.agApi.refreshCells()
+
 		},
 		resetHiddenColumns(){
 		 	let hiddenColumns = {};
