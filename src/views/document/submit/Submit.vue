@@ -404,7 +404,7 @@ export default {
             docSubFormId:0,
             drawer: false,
             isContinueSubmit:false,
-            titleObjectFormulas:null,
+            titleObjectFormula:null,
             isShowTraceControlSidebar:false,
             listFormulasTrace:{},
             controlTrace:null,
@@ -473,6 +473,18 @@ export default {
                     break;
                 case 'afterCreateSQLiteDB':
                     thisCpn.handleLoadContentDocument();
+                    break;
+                case 'getDataInputFormula':
+                    let dataInputObjectIdentifier = data.dataAfter.dataInputObjectIdentifier
+                    let dataInputTitleObjectFormulas = data.dataAfter.dataInputTitleObjectFormulas
+                    let dataInputFormula = {}
+                    if(dataInputObjectIdentifier){
+                        dataInputFormula['dataInput'] = dataInputObjectIdentifier
+                    }
+                    if(dataInputTitleObjectFormulas){
+                        dataInputFormula['dataInputTitle'] = dataInputTitleObjectFormulas
+                    }
+                    thisCpn.startSubmitDocument(dataInputFormula);
                     break;
                 default:
                 break;
@@ -1516,8 +1528,8 @@ export default {
                             thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
                             if(res.data.document.otherInfo != null && res.data.document.otherInfo != "")
 							thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
-                            let style = JSON.parse(res.data.document.formStyle);
-                            if(style){
+                            if(res.data.document.formStyle){
+                                let style = JSON.parse(res.data.document.formStyle);
                                 this.globalClass[style['globalClass']] = true;
                             }
                             else{
@@ -1555,7 +1567,7 @@ export default {
             if(formulasId && formulasId != 0){
                 let self = this;
                 formulasApi.detailFormulas(formulasId).then(res=>{
-                    self.titleObjectFormulas = new Formulas(self.keyInstance,res.data.lastContent,'titleObject');
+                    self.titleObjectFormula = new Formulas(self.keyInstance,res.data.lastContent,'titleObject');
                 })
             }
             
@@ -2068,20 +2080,24 @@ export default {
 
         // Hàm chỉ ra control được đánh định danh trong document (sct...)
         getDataRefreshControl(){
-            if(this.objectIdentifier == undefined){
-                return {}
+            let objectIdentiferFormula = null;
+            let titleObjectFormula = null;
+            if(this.objectIdentifier && Object.keys(this.objectIdentifier) > 0){
+                let controlIdentifier = {}
+                let controlNameIdentifier = this.objectIdentifier['name'];
+                let controlInstance = getControlInstanceFromStore(this.keyInstance,controlNameIdentifier);
+                if(controlInstance != false && controlInstance.controlFormulas.hasOwnProperty('formulas')){
+                    let formulaInstance = controlInstance.controlFormulas['formulas']['instance'];
+                    if(formulaInstance){
+                        objectIdentiferFormula = formulaInstance;
+                    }
+                }
             }
-            let controlIdentifier = {}
-            let controlNameIdentifier = this.objectIdentifier['name'];
-            let controlInstance = getControlInstanceFromStore(this.keyInstance,controlNameIdentifier);
-            if(controlInstance != false && controlInstance.controlFormulas.hasOwnProperty('formulas')){
-                let listInput = getListInputInDocument(this.keyInstance);
-                let formulaInstance = controlInstance.controlFormulas['formulas']['instance'];
-                let dataInput = formulaInstance.getDataInputFormula()
-                controlIdentifier['dataInputIdentifier'] = dataInput;
-            }
-            return controlIdentifier;
             
+            if(this.titleObjectFormula != null){
+                titleObjectFormula = this.titleObjectFormula
+            }
+            this.formulasWorker.postMessage({action:'getDataInputFormula',data:{titleObjectFormula:titleObjectFormula,objectIdentiferFormula:objectIdentiferFormula,keyInstance:this.keyInstance}})
         },
 
         handleRefreshDataBeforeSubmit(){
@@ -2132,16 +2148,7 @@ export default {
          */
         async submitDocument(){
             this.isSubmitting = true;
-            let thisCpn = this;
-            let dataPost = this.getDataPostSubmit();
-            dataPost['documentId'] = this.documentId;
-            let dataInputFormulas = this.getDataRefreshControl();
-            
-            if(Object.keys(dataInputFormulas).length>0){
-                dataPost['dataInputFormulas'] = dataInputFormulas;
-            }
-            this.callApiSubmit(dataPost);
-            
+            this.getDataRefreshControl();
         },
         resetCheckRefreshData(){
             this.$store.commit("document/addToDocumentSubmitStore", {
@@ -2150,15 +2157,17 @@ export default {
                 instance: this.keyInstance
             });
         },
+        startSubmitDocument(dataInputFormulas = {}){
+            let dataPost = this.getDataPostSubmit();
+            dataPost['documentId'] = this.documentId;
+            if(Object.keys(dataInputFormulas).length>0){
+                dataPost['dataInputFormulas'] = dataInputFormulas;
+            }
+            this.callApiSubmit(dataPost);
+        },
         async callApiSubmit(dataPost){
             let thisCpn = this;
-            if(this.titleObjectFormulas != null){
-                let dataInputTitle = thisCpn.getDataInputFormula(this.titleObjectFormulas);
-                if(!dataPost['dataInputFormulas']){
-                    dataPost['dataInputFormulas'] = {}
-                }
-                dataPost['dataInputFormulas']['dataInputTitle'] = dataInputTitle;
-            }
+            
             if(this.appId){
                 dataPost['appId'] = this.appId;
             }
@@ -2223,7 +2232,6 @@ export default {
             this.isSubmitting = true;
             let thisCpn = this;
             let dataPost = this.getDataPostSubmit();
-            console.log(dataPost,'dataPostdataPost');
             dataPost['documentId'] = this.documentId;
             if(this.isDraft == 1){
                 dataPost['isDraft'] = true;
@@ -2277,31 +2285,32 @@ export default {
             let newDataPost = {};
             let dataControl = {};
             for (let controlName in listInput) {
-                if(listInput[controlName].inTable != false){
+                let controlIns = listInput[controlName];
+                if(controlIns.inTable != false){
                     continue;
                 }
-                if(!listInput[controlName].checkProps('isSaveToDB')){
+                if(!controlIns.checkProps('isSaveToDB')){
                     continue;
                 }
-                if (listInput[controlName].type == "table") {
-                    let value = this.getDataTableInput(listInput[controlName]);
+                if (controlIns.type == "table") {
+                    let value = this.getDataTableInput(controlIns);
                     Object.assign(dataControl, value);
                 } else {
             
-                    if (!listControlNotNameProp.includes(listInput[controlName].type)) {
-                        let value = (listInput[controlName].type == 'number' && listInput[controlName].value == "" ) ? 0 : listInput[controlName].value;
-                        if(listInput[controlName].type == 'percent'){
-                            value = (listInput[controlName].value === "" ) ? 0 : listInput[controlName].value/100;
+                    if (!listControlNotNameProp.includes(controlIns.type)) {
+                        let value = (controlIns.type == 'number' && controlIns.value == "" ) ? 0 : controlIns.value;
+                        if(controlIns.type == 'percent'){
+                            value = (controlIns.value === "" ) ? 0 : controlIns.value/100;
                         }
                         dataControl[controlName] = value;
-                        if(listInput[controlName].type == 'checkbox'){
+                        if(controlIns.type == 'checkbox'){
                             dataControl[controlName] = (value) ? 1 : 0;
                         } 
-                        if(listInput[controlName].type == 'fileUpload'){
+                        if(controlIns.type == 'fileUpload'){
                             dataControl[controlName] = JSON.stringify(value)
                         }
-                        if(listInput[controlName].type == 'richText'){
-                            dataControl[controlName] = listInput[controlName].editor.getContent();
+                        if(controlIns.type == 'richText' && controlIns.editor){
+                            dataControl[controlName] = controlIns.editor.getContent();
                         }
                        
                     }

@@ -197,6 +197,12 @@ export default {
             let data = event.data;
             switch (data.action) {
                 case 'setDataForPropsControl':
+                    let listControlToStore = data.dataAfter.listControlToStore;
+                    for(let controlId in listControlToStore){
+                        thisCpn.$store.commit(
+                            "document/addControl", { id: controlId, props: listControlToStore[controlId], instance: thisCpn.keyInstance }
+                        );
+                    }
                     thisCpn.processHtml(thisCpn.contentDocument);
                     thisCpn.controlRelationWorker.terminate();
                     break;
@@ -450,13 +456,15 @@ export default {
             }
             let listTableIns = [];
             let thisCpn = this;
+            console.log(this.sDocumentEditor.allControl,'this.sDocumentEditor.allControl');
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
                 
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let idField = this.sDocumentEditor.allControl[id].id;
-                    let valueInput = this.sDocumentEditor.allControl[id].value
+                    let valueInput = this.sDocumentEditor.allControl[id].value;
+                    console.log(valueInput,'valueInputvalueInput');
                     if(controlType == "submit" || controlType == "reset" || controlType == "draft"){
                         $(allInputControl[index]).remove()
                     }

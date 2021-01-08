@@ -1297,13 +1297,16 @@ export default class Table {
     // Hàm set data cho table
     // hàm gọi sau khi chạy công thức 
     setData(vls, dateFormat = true) {
-        this.formulasWorker.postMessage({action:'executeSQliteDB',data:
-            {
-                func:'delete',
-                keyInstance:this.keyInstance, 
-                tableName: this.tableName,
-            }
-        })
+        if(this.formulasWorker){
+            this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+                {
+                    func:'delete',
+                    keyInstance:this.keyInstance, 
+                    tableName: this.tableName,
+                }
+            })
+        }
+        
         if (vls != false) {
             let data = vls;
             let dataToStore = {};
@@ -1334,15 +1337,18 @@ export default class Table {
                 }
                 dataToSqlLite.push('(' + rowData.join() + ')');
             }
-            this.formulasWorker.postMessage({action:'executeSQliteDB',data:
-                {
-                    func:'insertAll',
-                    keyInstance:this.keyInstance, 
-                    tableName: this.tableName,
-                    columns:columnInsert.join(),
-                    allData:dataToSqlLite.join()
-                }
-            })
+            if(this.formulasWorker){
+                this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+                    {
+                        func:'insertAll',
+                        keyInstance:this.keyInstance, 
+                        tableName: this.tableName,
+                        columns:columnInsert.join(),
+                        allData:dataToSqlLite.join()
+                    }
+                })
+            }
+            
             for (let controlName in dataToStore) {
                 store.commit("document/updateListInputInDocument", {
                     controlName: controlName,
