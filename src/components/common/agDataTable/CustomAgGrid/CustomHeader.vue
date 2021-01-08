@@ -3,7 +3,7 @@
 		<div class="customHeaderLabel flex-grow-1">{{prefix ? $t(prefix + params.displayName) : params.displayName}}</div> 
 		<v-icon 
 			class="fs-13 symper-table-dropdown-button " 
-			v-if="!noFilter"
+			v-if="!params.column.colDef.noFilter"
 			:class="{'applied-filter': checkFilterCol(params.displayName)} " 
 			:col-name="params.column.colDef.field" small 
 			onclick="tableDropdownClickHandle(this,event)">mdi-filter-variant</v-icon>
