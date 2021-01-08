@@ -236,7 +236,10 @@
             "cannot_get_data": "Không thể lấy dữ liệu từ máy chủ"
         },
         "success": {
-            "save_config": "Lưu cấu hình hiển thị thành công!"
+            "save_config": "Lưu cấu hình hiển thị thành công!",
+            "save_filter": "Lưu bộ lọc cho table thành công!",
+            "delete_filter": "Xóa bộ lọc cho table thành công!",
+            "edit_filter": "Cập nhật bộ lọc cho table thành công!"
         },
         "filter": {
             "none": "Không chọn",
@@ -256,7 +259,11 @@
             "sort_desc": "Sắp xếp giảm dần",
             "clear_filter": "Xóa bộ lọc",
             "filter_by_value": "Lọc bởi giá trị",
-            "filter_by_condition": "Lọc bởi điều kiện"
+            "filter_by_condition": "Lọc bởi điều kiện",
+            "Delete":"Xóa",
+            "Edit":"Cập nhật",
+            "Default":"Để mặc định",
+            "Delete Default":"Bỏ mặc định"
         }
     },
     "admin": {
