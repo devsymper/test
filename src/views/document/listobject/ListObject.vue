@@ -8,7 +8,7 @@
         <list-items
 			:getDataUrl="sDocumentManagementUrl+'documents/'+docId+'/objects'"
 			:exportLink="sDocumentManagementUrl+'documents/'+docId+'/export-excel'" 
-			:useDefaultContext="false"
+			:useantext="false"
 			:tableContextMenu="tableContextMenu"
 			:pageTitle="$t('documentObject.title')"
 			:containerHeight="containerHeight"
@@ -658,9 +658,12 @@ export default {
          * Sự kiện khi selection vào cell
          */
         afterCellSelection(rowData){
-			this.$refs.listObject.openactionPanel();
+			debugger
+			if(!this.$refs.listObject.actionPanel){
+				this.$refs.listObject.openactionPanel();
+			}	
             this.actionOnRightSidebar = 'detail';
-            this.currentRowData = rowData;
+			this.currentRowData = rowData;
         }
     }
 }

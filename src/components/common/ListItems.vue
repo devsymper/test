@@ -228,7 +228,6 @@
 				:modules="modules"
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
-				@cell-context-menu="cellContextMenu"
 				@grid-ready="onGridReady"
 			>
 			</ag-grid-vue>
@@ -787,7 +786,7 @@ export default {
                 show: false, // có hiển thị panel cấu hình ko
                 width: 300, // Chiều rộng của panel cấu hình
                 value: {
-                    wrapTextMode: 0,
+                    wrapTextMode: 1,
                     densityMode: 2,
                     alwaysShowSidebar: false,
                     hiddenColumns: [],
@@ -843,9 +842,11 @@ export default {
 			suppressMenu : true,
 			sortable: true,
 			resizable: true,
-			cellRendererParams: this.headerPrefixKeypath,
 			wrapText: true,
-			autoHeight: true
+			autoHeight: true,
+			headerComponentParams :{
+				headerPrefixKeypath: this.headerPrefixKeypath
+			}
         };
 		this.gridOptions = {};
 		// this.gridOptions.rowHeight =  this.rowHeight
