@@ -226,6 +226,7 @@
 				:overlayLoadingTemplate="overlayLoadingTemplate"
 				:overlayNoRowsTemplate="overlayNoRowsTemplate"
 				:modules="modules"
+				@cell-context-menu="cellContextMenu"
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
@@ -891,7 +892,9 @@ export default {
 		hideOverlay() {
 			this.agApi.hideOverlay();
 		},
-		
+		cellContextMenu(params){
+			debugger
+		},
 		cellMouseOver(params){
 			this.cellAboutSelecting = params.data
 			if(this.debounceRelistContextmenu){
@@ -909,7 +912,7 @@ export default {
             this.hasColumnsChecked = true;
             this.columnDefs.unshift(
 				{ 
-					headerName: 'checkbox', 
+					headerName: 'Chọn', 
 					field: 'checkbox', 
 					editable:true,
 					cellRendererFramework : 'CheckBoxRenderer',
@@ -1327,7 +1330,7 @@ export default {
 			document.querySelector('.ag-row-selected').innerHTML = selectedRows.length === 1 ? selectedRows[0].athlete : ''
    		 },
 		onGridReady(params){
-			params.api.autoSizeColumns()
+			params.api.sizeColumnsToFit()
 			this.agApi = params.api
 			this.agApi.showLoadingOverlay()
 			setTimeout(self=>{

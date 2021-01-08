@@ -82,24 +82,24 @@ export default {
 						 total: res.data.listObject.length,
                          columns: [
                                 {name: "id", title: "id", 	type: "text", },
-                                {name: "name", title: "name", type: "text"},
-                                {name: "iconName", title: "icon", type: "text",
+                                {name: "name", title: "name", type: "text", flex:1},
+                                {name: "iconName", title: "icon", type: "text",flex:1,
                                      cellRenderer: function(params) {
 										return params.value.includes('mdi-') ? '<span class="mdi '+params.value+'"></span>' : '<img src="'+ params.value +'" alt="Girl in a jacket" width="20px" height="20px">'
 									}
 								},
-								{name: "status", title: "status", type: "text",
+								{name: "status", title: "status", type: "text",flex:1,
 									cellRenderer: function(params) {
 										return params.value == "1" ? '<span>Kích hoạt</span>' : '<span>Không kích hoạt</span>'
 									}
 								},
-								{name: "createdAt", title: "created_at", type: "text",
+								{name: "createdAt", title: "created_at", type: "text",flex:1,
 									cellRenderer: function(params) {
 										let newValue = params.value.slice(0, params.value.length - 3)
 										return  '<span>'+ newValue +'</span>'
 									}
 								},
-								{name: "updatedAt", title: "updated_at", type: "text",
+								{name: "updatedAt", title: "updated_at", type: "text",flex:1,
 									cellRenderer: function(params) {
 										let newValue = params.value.slice(0, params.value.length - 3)
 										return  '<span>'+ newValue +'</span>'
