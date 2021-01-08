@@ -155,7 +155,8 @@ export const getTableColumns = function(columns, forcedReOrder = false , savedOr
 				cellRenderer: item.cellRenderer ? item.cellRenderer : null,
 				cellRendererParams: item.cellRendererParams ? item.cellRendererParams : null,
 				noFilter: item.noFilter ? item.noFilter : false,
-				filtered: !filteredColumns ? false : filteredColumns[item.name] ? true : false
+				filtered: !filteredColumns ? false : filteredColumns[item.name] ? true : false,
+				width: item.name == 'id' ? 50 : item.width ? item.width : false
 			};
 		}	
 		
