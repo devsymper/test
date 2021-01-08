@@ -8,7 +8,6 @@
 
 <script>
 import CommonListIssue from './commonListIssue.vue';
-console.log(fetch, 'fetch2fetch2fetch2fetch2fetch2fetch2');
 export default {
     components: {
         CommonListIssue

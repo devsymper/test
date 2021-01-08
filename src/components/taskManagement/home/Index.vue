@@ -107,45 +107,46 @@ export default {
         infoUser,
     },
     computed:{
-        listProjectRecent(){
-            let allUserById = this.$store.getters['app/mapIdToUser'];
-            let allProject = this.$store.state.taskManagement.allProject;
-            let listItemLog = this.recentPojects;
-            let listProject = [];
-            if (listItemLog.length > 0) {
-                for (let i = 0; i < listItemLog.length; i++) {
-                    let projectLog = JSON.parse(listItemLog[i]['project']);
-                    let project = allProject.find(ele => ele.id == projectLog.id);
-                    if (project) {
-                        if (listProject.length > 0) {
-                            let isCheck = listProject.find(ele => ele.id == project.id);
-                            if (isCheck) {
-                                continue; // thoát khỏi vòng lặp
-                            }
-                        }
-                        this.projectIds.push(project.id);
-                        listProject.push(project);
-                    }
-                }
-            }
-            return listProject;
-        },
+        // listProjectRecent(){
+        //     let allProject = this.$store.state.taskManagement.allProject;
+        //     let listItemLog = this.recentPojects;
+        //     let listProject = [];
+        //     if (listItemLog.length > 0) {
+        //         for (let i = 0; i < listItemLog.length; i++) {
+        //             let projectLog = JSON.parse(listItemLog[i]['project']);
+        //             let project = allProject.find(ele => ele.id == projectLog.id);
+        //             if (project) {
+        //                 if (listProject.length > 0) {
+        //                     let isCheck = listProject.find(ele => ele.id == project.id);
+        //                     if (isCheck) {
+        //                         continue; // thoát khỏi vòng lặp
+        //                     }
+        //                 }
+        //                 this.projectIds.push(project.id);
+        //                 listProject.push(project);
+        //             }
+        //         }
+        //     }
+        //     return listProject;
+        // },
         documentIds(){
             return this.$store.state.taskManagement.listDocumentIdsInIssueType;
         },
+        allProject(){
+            return this.$store.state.taskManagement.allProject;
+        }
        
     },
     watch:{
-        listProjectRecent:{
+        recentPojects:{
             deep: true,
             immediate: true,
             handler(after) {
-                if (after.length > 0) {
-                    this.countBoardInProject();
-                    this.countIssueInListProject();
+                if (after.length > 0 && this.allProject.length > 0) {
+                    this.getDataProjectRecent();
                 }
             }
-        }
+        },
     },
     props:{
         recentPojects:{
@@ -162,6 +163,7 @@ export default {
         }
     },
     data(){
+        let self = this;
         return{
             colors:[
                 "#80F878FF",
@@ -177,21 +179,47 @@ export default {
             projectIds:[],
             dataCountBoard:[],
             dataCountIssue:[],
+            itemSelected: null,
+            listProjectRecent:[],
         }
     },
     methods:{
+        setStatusFavoriteProjectAfterUpate(){
+            let item = this.listProjectRecent.find(ele => ele.id == this.itemSelected.id);
+            if (item) {
+                item.isFavorite = item.isFavorite == 1 ? 0 : 1;
+            }
+        },
+        getDataProjectRecent(){
+            if (this.homeWorker) {
+                let data = {};
+                data.allProject = this.$store.state.taskManagement.allProject;
+                data.listItemLog = this.recentPojects;
+
+                this.homeWorker.postMessage({
+                    action:'getDataProjectRecent',
+                    data:data
+                });
+            }
+        },
         countIssueInListProject(){
             if (this.projectIds.length > 0) {
-                taskManagementApi
-                .countIssueInListProject(this.projectIds)
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.dataCountIssue = res.data;
-                    }
-                })
-                .catch(err => {
-                    self.$snotifyError("", "Can not count board!", err);
-                });
+                if (this.homeWorker) {
+                    this.homeWorker.postMessage({
+                        action:'countIssueInListProject',
+                        data:this.projectIds
+                    });
+                }
+                // taskManagementApi
+                // .countIssueInListProject(this.projectIds)
+                // .then(res => {
+                //     if (res.status == 200 && res.data) {
+                //         this.dataCountIssue = res.data;
+                //     }
+                // })
+                // .catch(err => {
+                //     this.$snotifyError("", "Can not count board!", err);
+                // });
             }
         },
         getNumberBoard(project){
@@ -214,38 +242,51 @@ export default {
         },
         countBoardInProject(){
             if (this.projectIds.length > 0) {
-                taskManagementApi
-                .countBoardInListProject(this.projectIds)
-                .then(res => {
-                    if (res.status == 200 && res.data) {
-                        this.dataCountBoard = res.data;
-                    }
-                })
-                .catch(err => {
-                    self.$snotifyError("", "Can not count board!", err);
-                });
+                if (this.homeWorker) {
+                    this.homeWorker.postMessage({
+                        action:'countBoardInProject',
+                        data:this.projectIds
+                    });
+                }
+
+                // taskManagementApi
+                // .countBoardInListProject(this.projectIds)
+                // .then(res => {
+                //     if (res.status == 200 && res.data) {
+                //         this.dataCountBoard = res.data;
+                //     }
+                // })
+                // .catch(err => {
+                //     self.$snotifyError("", "Can not count board!", err);
+                // });
             }
         },
         goConfigProject(obj){
             this.$router.push("/task-management/projects/"+obj.id+"/settings/details");
         },
         updateFavorite(obj){
-            let self=this;
-            taskManagementApi
-                .updateProjectFavorite(obj.id)
-                .then(res => {
-                    if (res.status == 200) {
-                        self.$snotifySuccess("Update project completed!");
-                        self.$store.commit("taskManagement/updateStatusFavoriteProject", obj.id);
+            this.itemSelected = obj;
+            this.homeWorker.postMessage({
+                action:'updateFavorite',
+                data:obj.id
+            });
 
-                    }else{
-                        self.$snotifyError("", "Can not update project!");
-                    }
-                })
-                .catch(err => {
-                    self.$snotifyError("", "Can not update project!", err);
-                })
-                .finally(() => {});
+            // let self=this;
+            // taskManagementApi
+            //     .updateProjectFavorite(obj.id)
+            //     .then(res => {
+            //         if (res.status == 200) {
+            //             self.$snotifySuccess("Update project completed!");
+            //             self.$store.commit("taskManagement/updateStatusFavoriteProject", obj.id);
+
+            //         }else{
+            //             self.$snotifyError("", "Can not update project!");
+            //         }
+            //     })
+            //     .catch(err => {
+            //         self.$snotifyError("", "Can not update project!", err);
+            //     })
+            //     .finally(() => {});
         },
         handleClickProject(item){
             this.$router.push('/task-management/projects/'+item.id+'/kanban-board');
@@ -265,7 +306,6 @@ export default {
         },
         getAllDocumentIdsInIssueType(){
             if (!this.$store.state.taskManagement.listDocumentIdsInIssueType || this.$store.state.taskManagement.listDocumentIdsInIssueType.length == 0) {
-                this.$store.dispatch("taskManagement/getAllDocumentIdsInIssueType");
                 this.homeWorker.postMessage({
                     action:'getAllDocumentIdsInIssueType',
                     data:null
@@ -274,27 +314,45 @@ export default {
         }
     },
     created(){
-        // this.homeWorker = new HomeWorker();
+        let self = this;
+        this.homeWorker = new HomeWorker();
+        this.getAllDocumentIdsInIssueType();
 
-        // this.getAllDocumentIdsInIssueType();
-
-        // // if (!this.$store.state.taskManagement.listDocumentIdsInIssueType || this.$store.state.taskManagement.listDocumentIdsInIssueType.length == 0) {
-        // //     this.$store.dispatch("taskManagement/getAllDocumentIdsInIssueType");
-        // // }
-
-        //   this.homeWorker.addEventListener("message", function (event) {
-		// 	let data = event.data;
-        //     switch (data.action) {
-        //         case 'getAllDocumentIdsInIssueType':
-        //             if (data.dataAfter) {
-        //                 let res = data.dataAfter;
-        //                 self.$store.commit('taskManagement/setAllDocumentIdsInIssueType', res.data);
-        //             }
-        //             break;
-        //         default:
-        //             break;
-        //     }
-        // });
+        this.homeWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getAllDocumentIdsInIssueType':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit('taskManagement/setAllDocumentIdsInIssueType', res.data);
+                    }
+                    break;
+                case 'countIssueInListProject':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.dataCountIssue = res.data;
+                    }
+                    break;
+                case 'updateFavorite':
+                    self.$snotifySuccess("Update project completed!");
+                    self.$store.commit("taskManagement/updateStatusFavoriteProject", self.itemSelected.id);
+                    self.setStatusFavoriteProjectAfterUpate();
+                    break;
+                case 'countBoardInProject':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.dataCountBoard = res.data;
+                    } 
+                    break;
+                case 'getDataProjectRecent':
+                    self.listProjectRecent = data.dataAfter.listProject;
+                    self.projectIds =data.dataAfter.projectIds;
+                    self.countBoardInProject();
+                    self.countIssueInListProject();
+                default:
+                    break;
+            }
+        });
     }
 
 }

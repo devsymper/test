@@ -36,22 +36,35 @@ export default {
     },
     methods:{
         getData(){
-           // debugger
-            // await this.$store.dispatch("taskManagement/getLogIssueRecentAccess",this.endUserInfo.id);
-            // if (!this.staskManagement.allPriority || this.staskManagement.allPriority == 0) {
-            //     await this.$store.dispatch("taskManagement/getAllPriority");
-            // }
-            // if (!this.$store.state.taskManagement.allProject || this.$store.state.taskManagement.allProject.length == 0) {
-            //     await this.$store.dispatch("taskManagement/getAllProject");
-            // }
-            // //get all issue type để show icon trong list task in home
-            // if (!this.$store.state.taskManagement.allIssueType || this.$store.state.taskManagement.allIssueType == 0) {
-            //     this.$store.dispatch("taskManagement/getAllIssueType");
-            // }
-            // if (!this.$store.state.taskManagement.allStatus || this.$store.state.taskManagement.allStatus == 0) {
-            //     await this.$store.dispatch("taskManagement/getAllStatus");
-            // }
-            //this.$refs.preLoaderView.hide();
+            this.homeWorker.postMessage({
+                action:'getLogProjectAccess',
+                data:this.$store.state.app.endUserInfo.id
+            });
+
+            this.homeWorker.postMessage({
+                action:'getLogIssueRecentAccess',
+                data:this.$store.state.app.endUserInfo.id
+            });
+
+            if (!this.staskManagement.allPriority || this.staskManagement.allPriority == 0) {
+                this.homeWorker.postMessage({
+                    action:'getAllPriority',
+                    data:null
+                });
+            }
+
+            if (!this.$store.state.taskManagement.allIssueType || this.$store.state.taskManagement.allIssueType.length == 0) {
+                this.homeWorker.postMessage({
+                    action:'getAllIssueType',
+                    data:null
+                });
+            }
+            if (!this.$store.state.taskManagement.allStatus || this.$store.state.taskManagement.allStatus.length == 0) {
+                this.homeWorker.postMessage({
+                    action:'getAllStatus',
+                    data:null
+                });
+            }
         },
         getLogProjectAccess(){
             this.homeWorker.postMessage({
@@ -74,6 +87,11 @@ export default {
             }
         },
         getAllProject(){
+            // caches.keys().then(function(names) {
+            //     for (let name of names)
+            //         console.log("deleted cache");
+            //         caches.delete(name);
+            // });
             if (!this.$store.state.taskManagement.allProject || this.$store.state.taskManagement.allProject.length == 0) {
                 this.homeWorker.postMessage({
                     action:'getAllProject',
@@ -101,16 +119,7 @@ export default {
     },  
     created(){
       	this.homeWorker = new HomeWorker();
-        //this.getData();
-        // this.getLogProjectAccess();
-        // this.getLogIssueRecentAccess();
-        this.getAllPriority();
-        // this.getAllProject();
-        setTimeout(() => {
-            this.$refs.preLoaderView.hide();
-        }, 200);
-        // this.getAllIssueType();
-        // this.getAllStatus();
+        this.getAllProject();
         let self = this;
         this.homeWorker.addEventListener("message", function (event) {
 			let data = event.data;
@@ -125,6 +134,8 @@ export default {
                     if (data.dataAfter) {
                         let res = data.dataAfter;
                         self.$store.commit('taskManagement/setLogIssueRecentAccess', res.data);
+                        self.$refs.preLoaderView.hide();
+
                     }
                     break;
                 case 'getAllPriority':
@@ -138,6 +149,7 @@ export default {
                         let res = data.dataAfter;
                         self.$store.commit('taskManagement/setAllProject', res.data.listObject);
                     }
+                    self.getData();
                     break;
                 case 'getAllIssueType':
                     if (data.dataAfter) {
@@ -156,9 +168,7 @@ export default {
             }
         });
     },
-    mounted(){
-      
-    }
+
 
 }
 </script>

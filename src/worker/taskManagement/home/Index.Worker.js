@@ -62,14 +62,14 @@ self.onmessage = async function (event) {
             filter4.distinct = true;
             taskManagementApi.getAllIssueType(filter4).then(res=>{
                 if(res['status'] == 200 && res['data']){
-                    postMessage({action:'getAllProject', dataAfter : res})
+                    postMessage({action:'getAllIssueType', dataAfter : res})
                 }
             })
             break;
         case 'getAllStatus':
             taskManagementApi.getAllStatus().then(res=>{
                 if(res['status'] == 200 && res['data']){
-                    postMessage({action:'getAllProject', dataAfter : res})
+                    postMessage({action:'getAllStatus', dataAfter : res})
                 }
             })
             break;
@@ -80,7 +80,62 @@ self.onmessage = async function (event) {
                 }
             })
             break;
+        case 'countIssueInListProject':
+            taskManagementApi.countIssueInListProject(data).then(res=>{
+                if(res['status'] == 200 && res['data']){
+                    postMessage({action:'countIssueInListProject', dataAfter : res})
+                }
+            })
+            break;
+        case 'updateFavorite':
+            taskManagementApi
+            .updateProjectFavorite(data).then(res=>{
+                if(res['status'] == 200 ){
+                    postMessage({action:'updateFavorite'})
+                }
+            })
+            break;
+        case 'countBoardInProject':
+            taskManagementApi
+            .countBoardInListProject(data).then(res=>{
+                if(res['status'] == 200 ){
+                    postMessage({action:'countBoardInProject',dataAfter : res})
+                }
+            })
+            break;
+        case 'getDataProjectRecent':
+            let res = setDataProjectRecent(data);
+            postMessage({action:'getDataProjectRecent',dataAfter : res})
+
         default:
             break;
     }
 };
+
+function setDataProjectRecent(data){
+    let allProject = data.allProject;
+    let listItemLog = data.listItemLog;
+    let listProject = [];
+    let projectIds = [];
+    if (listItemLog.length > 0) {
+        for (let i = 0; i < listItemLog.length; i++) {
+            let projectLog = JSON.parse(listItemLog[i]['project']);
+            let project = allProject.find(ele => ele.id == projectLog.id);
+            if (project) {
+                if (listProject.length > 0) {
+                    let isCheck = listProject.find(ele => ele.id == project.id);
+                    if (isCheck) {
+                        continue; // thoát khỏi vòng lặp
+                    }
+                }
+                projectIds.push(project.id);
+                listProject.push(project);
+            }
+        }
+    }
+
+    return {
+        listProject:listProject,
+        projectIds: projectIds
+    }
+}
