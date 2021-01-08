@@ -1192,7 +1192,6 @@ export default {
 			
         },
 		showTableDropdownMenu(x, y, colName) {
-			debugger
             var windowWidth = $(window).width()/1.1;
             if(x > windowWidth){
                 x -= 190;
@@ -1241,7 +1240,6 @@ export default {
          */
         getItemForValueFilter(){
 			let columns = [this.tableFilter.currentColumn.name];
-			debugger
             let self = this;
             let options = {
                 pageSize: 300,
