@@ -129,7 +129,6 @@ export default {
 					title: "Hoàn thành công việc thành công"
 				})
 				this.$emit('success')
-				debugger
 			}else{
 				this.$snotifyError("Không thể lấy variable")
 			}

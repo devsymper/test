@@ -42,8 +42,7 @@
                             :key="idx" 
                             :color="action.color" 
                             @click="saveTaskOutcome(action.value)" 
-                            class="mr-2"
-							:class="{'mr-16': action.value == 'submit' || action.value == 'complete' || action.value == 'update' }"
+                            class="mr-2 mr-16"
                             :loading="loadingAction"
                         >
                             {{action.text}}

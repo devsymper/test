@@ -1,6 +1,6 @@
 <template>
 	<div class="menu-action-task-life-cycle">
-		 <v-menu offset-y>
+		 <v-menu offset-y style="z-index: 1000 !important">
 			<template v-slot:activator="{ on, attrs }">
 				<v-btn
 					color="#F5F5F5"
@@ -137,6 +137,9 @@ export default {
 <style scoped>
 .menu-action-task-life-cycle >>> .action-task-life-cycle{
 	box-shadow: unset !important;
+}
+.menu-action-task-life-cycle >>> .v-menu__content{
+	z-index: 1000 !important;
 }
 .v-list-item {
 	min-height: unset !important;
