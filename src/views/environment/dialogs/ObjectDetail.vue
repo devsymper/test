@@ -51,6 +51,7 @@
 			:getDataUrl="getListUrl"
 			@close-popup="handleCloseEvent"
 			style="margin-left:10px"
+			@data-loaded="showBtnAddCheckbox = true"
 			:refreshListWhenChangeUrl="false"
 			:useDefaultContext="false"
 			:tableContextMenu="tableContextMenu"
@@ -94,6 +95,10 @@ export default {
 		currentObjectType:{
 			type: String
 		},
+		tab:{
+			type: String,
+			default: ""
+		}
 	},
 	data(){
 		let self = this
@@ -164,6 +169,10 @@ export default {
 				self.$refs.listObject.getData()
 			},200,this)
 			this.listItemSelected = [],
+			this.showBtnAddCheckbox = true
+		},
+		tab(val){
+			this.$refs.listObject.getData()
 			this.showBtnAddCheckbox = true
 		}
 	}

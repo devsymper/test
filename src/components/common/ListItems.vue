@@ -1086,6 +1086,7 @@ export default {
 				}
 			})
 			this.hideOverlay()
+			this.$emit('data-loaded')
 		},
 		handlerRestoreTableDisplayConfigRes(res){
 			if(res.savedConfigs){
