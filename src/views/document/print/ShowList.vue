@@ -38,18 +38,14 @@ export default {
             tableContextMenu:{
                 edit: {
                     name: "editdoc",
-                    text: function() {
-                        return " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Sửa";
-                    },
+                    text: " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Sửa",
                     callback: (printConfig, callback) => {
                         this.$goToPage('/documents/'+printConfig.documentId+'/editor/print-config/'+printConfig.id,printConfig.title);
                     },
                 },
                 active: {
                     name: "active",
-                    text: function() {
-                        return " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Chọn để in";
-                    },
+                    text: " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Chọn để in",
                     callback: (printConfig, callback) => {
                         
                         let thisCpn = this;
@@ -72,9 +68,7 @@ export default {
                 
                 drop: {
                     name:"delete",
-                    text:function() {
-                        return " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa";
-                    },
+                    text: " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa",
                     callback: (document, callback) => {
                         // let ids = document.reduce((arr,obj)=>{
                         //     arr.push(obj.id);

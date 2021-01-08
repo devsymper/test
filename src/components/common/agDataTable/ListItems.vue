@@ -53,7 +53,6 @@
                             <v-icon left dark>mdi-refresh</v-icon>
                             <span >{{$t('common.refresh')}}</span>
                         </v-btn>
-
                       
                         <v-btn
                             depressed
@@ -215,14 +214,16 @@
 				:class="{'ag-theme-balham': true}"
 				:defaultColDef="defaultColDef"
 				:gridOptions="gridOptions"
+                :getContextMenuItems="getContextMenuItems"
 				:columnDefs="columnDefs"
 				@rowClicked="handlerRowClicked"
 				:rowData="rowData"
                 :rowSelection="rowSelection"
 				:frameworkComponents="frameworkComponents"
 				:modules="modules"
+				:overlayNoRowsTemplate="noRowsTemplate"
 				@selection-changed="onSelectionChanged"
-				:getContextMenuItems="getContextMenuItems"
+				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
 			>
 			</ag-grid-vue>
@@ -280,6 +281,35 @@
             @apply-filter-value="applyFilter"
             @search-autocomplete-items="searchAutocompleteItems"
         ></table-filter>
+		  <v-dialog
+            v-model="deleteDialogShow"
+            max-width="290">
+            <v-card>
+                <v-card-title class="headline">{{$t('common.remove_confirm_title')}}</v-card-title>
+                <v-card-text>
+                {{$t('common.remove_confirm_message', {count: deleteItems.length})}}
+                </v-card-text>
+
+                <v-card-actions>
+                <v-spacer></v-spacer>
+
+                <v-btn
+                    color="green darken-1"
+                    text
+                    @click="deleteDialogShow = false"
+                >
+                    {{$t('common.close')}}
+                </v-btn>
+
+                <v-btn
+                    color="red"
+                    text
+                    @click="confirmDeleteItems()">
+                    {{$t('common.delete')}}
+                </v-btn>
+                </v-card-actions>
+            </v-card>
+        </v-dialog>
 	 </div>
 </template>
 <script>
@@ -289,18 +319,19 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-balham.css';
-import { util } from '../../../plugins/util';
+import { util } from '@/plugins/util';
 import Vue from "vue";
 import Pagination from '@/components/common/Pagination'
 import Api from "@/api/api.js";
 import { getDefaultFilterConfig } from "@/components/common/customTable/defaultFilterConfig.js";
-import CustomHeader from './CustomAgGrid/CustomHeader'
+import CustomHeader from '@/components/common/agDataTable/CustomAgGrid/CustomHeader'
 import DisplayConfig from "@/components/common/listItemComponents/DisplayConfig";
 import SymperDragPanel from "@/components/common/SymperDragPanel.vue";
 import { VDialog, VNavigationDrawer } from "vuetify/lib";
 import TableFilter from '@/components/common/customTable/TableFilter'
 import PerfectScrollbar from "perfect-scrollbar";
 import ListItemsWorker from 'worker-loader!@/worker/common/listItems/ListItems.Worker.js';
+import { actionHelper } from "@/action/actionHelper";
 
 let CustomHeaderVue = Vue.extend(CustomHeader);
 
@@ -320,6 +351,13 @@ export default {
     name: "SymperListItem",
     props:{
 		/**
+         * Mặc định context menu chứa các options: remove, view, edit
+         */
+        useDefaultContext: {
+            type: Boolean,
+            default: true
+        },
+		/**
 		 * Truyeenf vao row height
 		 * 
 		 */
@@ -327,26 +365,20 @@ export default {
 			type: Number,
 			default:21
 		},
-		 /**
-         * Hàm truyền vào context menu 
+		/**
+         * * Các contextmenu cho các item trong list, có dạng:
+         * [
+         *      {
+         *          name: 'action1' // Tên của context menu để phân biệt với các context menu khác.
+         *          text: ' Action 1' // Text hiển thị lên .
+         *      }
+         * ]
          */
-		getContextMenuItems:{
-			type: Function,
-			default: null
-			// (params) {
-			// 	var result = [
-			// 		{
-			// 			name: 'Alert ' + params.value,
-			// 			action: function () {
-
-			// 				window.alert('Alerting about ' + params.value);
-			// 			},
-			// 			cssClasses: ['redFont', 'bold'],
-			// 		},
-			// 	];
-			// 	return result;
-			// },	
-		},
+        tableContextMenu: {
+            default() {
+                return [];
+            }
+        },
 		/**
          * Hàm phục vụ cho việc dev tự định nghĩa data khi gọi API để lấy dữ liệu
          * thay vì sử dụng hàm có sẵn, các tham số truyền vào giống như hàm getOptionForGetList trong defaultFilterConfig
@@ -605,6 +637,12 @@ export default {
 				this.showSearchBox = true
 			}
 		},
+		rowData:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+			}
+		},
 		columnDefs:{
 			deep: true,
 			immediate: true,
@@ -658,6 +696,9 @@ export default {
         return {
 			gridApi: null,
 			listItemsWorker: null,
+			deleteDialogShow: false,
+			flagGetGata: false,
+			deleteItems: [],
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
 			showSearchBox: true,
             loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
@@ -666,19 +707,27 @@ export default {
 			pageSize: 50,
 			agApi: null,
 			frameworkComponents: null,
+			noRowsTemplate: null,
             actionPanel: false, // có hiển thị action pannel (create, detail, edit) hay không
             page: 1, // trang hiện tại
 			gridOptions:null,
 			fixedCols:[],
             allRowChecked:{},   // hoangnd: lưu lại các dòng được checked sau sự kiện after change
 			defaultColDef:null,
+			arrContextMenu: [],
 			rowSelection: null,
+			selectedContextItem: null,
+			getContextMenuItems(param){
+				self.paramOnContextMenu = param;
+				return self.tmpTableContextMenu;
+			},
 			searchKey: "",
 			modules:[
 				MenuModule
 			],
 			MedalCellRenderer(){
 			},	
+            cellAboutSelecting: {}, // cell có nguy cơ được lựa chọn, được set mỗi khi chuột hover qua
 			tableDisplayConfig: {
                 show: false, // có hiển thị panel cấu hình ko
                 width: 300, // Chiều rộng của panel cấu hình
@@ -696,6 +745,7 @@ export default {
                 },
                 drag: false,
 			},
+			selectingParams:null,
             filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
 			tableFilter: {
 				// cấu hình filter của danh sách này
@@ -749,7 +799,7 @@ export default {
                 default:
                     break;
             }
-        });
+		});
 	},
     beforeMount(){
 		this.defaultColDef = {
@@ -762,6 +812,7 @@ export default {
         };
 		this.gridOptions = {};
 		this.gridOptions.rowHeight =  this.rowHeight
+		this.gridOptions.suppressNoRowsOverlay = true;
 		this.gridOptions.getRowStyle = function(params) {
 			if (params.node.rowIndex % 2 != 0) {
 				return { background: '#fbfbfb' };
@@ -771,8 +822,139 @@ export default {
 			agColumnHeader: CustomHeaderVue,
 		};
 		this.rowSelection = 'single';
+		this.noRowsTemplate =
+          '<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">This is a custom \'no rows\' overlay</span>';
     },
 	methods:{
+		cellMouseOver(params){
+			this.cellAboutSelecting = params.data
+			if(this.debounceRelistContextmenu){
+				clearTimeout(this.debounceRelistContextmenu);
+			}
+			this.debounceRelistContextmenu = setTimeout((self) => {
+				self.relistContextmenu();
+			}, 100, this);
+		},
+		relistContextmenu(){
+            if(!this.cellAboutSelecting){
+                return;
+			}
+			let row = this.cellAboutSelecting
+            let id = row.id;
+            let items = this.tableContextMenu;
+            if(!$.isArray(items)){
+                let objectType = this.commonActionProps.resource;
+                let parentId = this.commonActionProps.parentId ? this.commonActionProps.parentId : id;
+                items = actionHelper.filterAdmittedActions(items, objectType, parentId ,id);
+            }
+			let tmpTableContextMenu = this.getItemContextMenu(items);
+			this.tmpTableContextMenu = this.reduceContextMenuItems(tmpTableContextMenu)
+		},
+		reduceContextMenuItems(tmpTableContextMenu){
+			let arr = []
+			let self = this
+			for(let i in tmpTableContextMenu.items){
+				let obj = {}
+				obj.name =  tmpTableContextMenu.items[i].name
+				obj.action = () => {
+					let param = self.paramOnContextMenu;
+					let selection = [{
+						start: {
+							col: param.column.colDef.field,
+							row: param.node.rowIndex,
+						},
+						end: {
+							col: param.column.colDef.field,
+							row: param.node.rowIndex,
+						},
+					}];
+					tmpTableContextMenu.callback(i, selection);
+				}
+				obj.cssClasses = ['redFont', 'bold']
+				arr.push(obj)
+			}
+			return arr;
+		},
+		exeCallbackOnContextMenu(rowData){
+            let thisCpn = this;
+            let menuItem = this.selectedContextItem;
+            menuItem[0].callback(util.cloneDeep(rowData), () => {
+                thisCpn.getData();
+            });
+        },
+        getItemContextMenu(rawItems) {
+            let thisCpn = this;
+            let contextMenu = {
+                callback: function(key, selection) {
+                    let col = selection[0].start.col;
+					let row = selection[0].start.row;
+					
+                    let rowData = thisCpn.rowData[row];
+                    // let colName = Object.keys(rowData)[col];
+                    let callBackOption = thisCpn.tableContextMenu[key];
+                    if(callBackOption && callBackOption.multipleSelection){
+                        rowData = [];
+                        for(let i = selection[0].start.row; i <= selection[0].end.row; i++){
+                            rowData.push(thisCpn.rowData[i]);
+                        }
+                    }
+                    /**
+                     * Phát sự kiện khi có một hành động đối với một row, hoặc cell.
+                     * tham số thứ nhất: row ( index của row đang được chọn)
+                     * tham số thứ hai: colName ( Tên của cột (key trong một row) )
+                     */
+                    // Callback for context menu item
+                    let menuItem = rawItems.filter(menu => {
+                        return menu.name == key;
+                    });
+					thisCpn.selectedContextItem = menuItem;
+                    if (
+                        menuItem.length &&
+                        menuItem[0].hasOwnProperty("callback")
+                    ) {
+                        if(key == 'delete' || key == 'remove'){
+                            thisCpn.deleteItems = [];
+                            let deletedIndexs = {};
+                            for(let item of selection ){
+                                for(let idx = item.start.row ; idx <= item.end.row; idx++){
+                                    if(!deletedIndexs[idx]){
+                                        thisCpn.deleteItems.push(thisCpn.rowData[idx]);
+                                        deletedIndexs[idx] = true;
+                                    }
+                                }
+                            }
+                            thisCpn.deleteDialogShow = true;
+                        }else{
+                            thisCpn.exeCallbackOnContextMenu(rowData);
+                        }
+                    }
+                    
+                    if (key == "edit" || key == "view") {
+                        thisCpn.actionPanel = true;
+                    }
+                },
+                items: {}
+            };
+            if (this.useDefaultContext) {
+                contextMenu.items = {
+                    remove: {
+                        name: "Xóa"
+                    },
+                    edit: {
+                        name: "Sửa"
+                    },
+                    view: {
+                        name: "Chi tiết"
+                    }
+                };
+            }
+            for (let item of rawItems) {
+                contextMenu.items[item.name] = {
+                    name: item.text
+                };
+            }
+            return contextMenu;
+        },
 		handlerGetData(res){
 			res.columnDefs.forEach(function(e){
 				if(e.cellRenderer){
@@ -784,8 +966,8 @@ export default {
 			}
 		},
 		handlerRestoreTableDisplayConfigRes(res){
-			this.tableDisplayConfig.value.wrapTextMode =  res.savedConfigs.wrapTextMode;
-			this.tableDisplayConfig.value.densityMode =  res.savedConfigs.densityMode;
+			// this.tableDisplayConfig.value.wrapTextMode =  res.savedConfigs.wrapTextMode;
+			// this.tableDisplayConfig.value.densityMode =  res.savedConfigs.densityMode;
 			this.tableDisplayConfig.value.alwaysShowSidebar =  res.savedConfigs.alwaysShowSidebar;
 			this.savedTableDisplayConfig = res.savedConfigs.columns;
 			if(res.columnDefs){
@@ -831,8 +1013,14 @@ export default {
 			}
 			this.filteredColumns
 			this.$store.commit('app/setFilteredColumns', this.filteredColumns)
-			debugger
 		},
+		confirmDeleteItems(){
+            this.deleteDialogShow = false;
+            this.exeCallbackOnContextMenu(this.deleteItems);
+            setTimeout((self) => {
+                self.deleteItems = [];
+            }, 200, this);
+        },
 		/**
          * Kiểm tra xem một cột trong table có đang áp dụng filter hay ko
          */
@@ -869,7 +1057,11 @@ export default {
 		refreshList(){
 			this.allRowChecked = {}
 			this.$emit('after-selected-row', this.allRowChecked)
-            this.getData();
+			if(this.listItemsWorker){
+           	 	this.getData();
+			}else{
+				this.flagGetGata = true
+			}
             this.$emit("refresh-list", {});
         },
 		showTableDropdownMenu(x, y, colName) {
@@ -1149,7 +1341,6 @@ export default {
 		},
 		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false ){
 			let self = this;
-			debugger
 			if(!this.listItemsWorker){
 				this.listItemsWorker = new ListItemsWorker()
 			}

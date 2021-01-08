@@ -166,8 +166,8 @@
 								</v-col>
 							</v-col>	
 							<!-- ket thuc anh -->
-						</v-row>
-							<div v-if="actionType == 'edit'">
+						</v-row >
+							<div class="ml-5" v-if="actionType == 'edit'">
 								<v-checkbox dense 
 									class="sym-small-size " 
 									v-model="user.status" 
@@ -374,7 +374,7 @@ export default {
 			}
 		},
 		user(){
-			if(this.user.status=="Đang mở"){
+			if(this.user.status=="Đang hoạt động"){
 				this.user.status = true;
 			}else{
 				this.user.status = false;

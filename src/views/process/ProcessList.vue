@@ -141,34 +141,30 @@ export default {
                 },
             },
              customAPIResult: {
-				getListKey(res){
-                     let listKey = [];
-                     res.map(x=>listKey.push(x.processKey));
-                     return listKey
-				},
-                reformatData(res){
-                    let listKey = this.getListKey(res.data.listObject);
-                     res.data.columns.push(
-                        {
-                            name:'number_instance',
-                            title:'number_instance',
-                            type:"numeric",
-                            noFilter:true
-                        },
-                   )
-                   let listWork = res.data;
+				reformatData(res){
+					let listKey = [];
+					res.data.listObject.map(x=>listKey.push(x.processKey));
+					res.data.columns.push(
+							{
+								name:'number_instance',
+								title:'number_instance',
+								type:"numeric",
+								noFilter:true
+							},
+					)
+					let listWork = res.data;
 					taskApi.countInstant({keys:JSON.stringify(listKey)}).then(res=>{
-                         if (res.status === 200) {
-                              for(let i = 0; i<listWork.listObject.length; i++){
-                                  for(let j =0; j<res.data.length;j++){
-                                      if(listWork.listObject[i].processKey==res.data[j].key){
-                                          listWork.listObject[i].number_instance=res.data[j].number_of_process_instance
-                                      }
-                                  }
-                            }
-							self.$refs.listModels.rerenderTable();
-                         }
-                    })
+						if (res.status === 200) {
+							for(let i = 0; i<listWork.listObject.length; i++){
+								for(let j =0; j<res.data.length;j++){
+									if(listWork.listObject[i].processKey==res.data[j].key){
+										listWork.listObject[i].number_instance=res.data[j].number_of_process_instance
+									}
+								}
+						}
+						self.$refs.listModels.rerenderTable();
+						}
+					})
                     return  listWork;
                 } 
             },
@@ -180,6 +176,11 @@ export default {
     created() {},
     watch: {},
     methods: {
+		getListKey(res){
+				let listKey = [];
+				res.map(x=>listKey.push(x.processKey));
+				return listKey
+		},
         goToCreatePage(){
             this.$goToPage('/workflow/create',this.$t("process.action.create"));
         },

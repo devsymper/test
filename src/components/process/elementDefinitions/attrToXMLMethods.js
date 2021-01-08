@@ -81,12 +81,15 @@ export default {
             if (nodeAllAttrs.toXMLExtend) {
                 toXMLname = nodeAllAttrs.toXMLExtend.name;
             }
-            objToUpdate[toXMLname] = value;
-            if (el.businessObject) {
-                clearEmptyAttr(el.businessObject);
-                // el.businessObject.$attrs[attrName] = value;
-                modeling.updateProperties(el, objToUpdate);
-            }
+
+            if(value !== ''){
+                objToUpdate[toXMLname] = value;
+                if (el.businessObject) {
+                    clearEmptyAttr(el.businessObject);
+                    // el.businessObject.$attrs[attrName] = value;
+                    modeling.updateProperties(el, objToUpdate);
+                }
+            }else{}
         }
     },
 
