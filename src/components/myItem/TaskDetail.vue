@@ -163,6 +163,7 @@
 			:showDialog="modelDialog.completeShowDialog"
 			@cancel="modelDialog.completeShowDialog = false"
 			:taskId="originData.id"
+			:taskInfo="taskInfo"
 			@success="refreshMyItem('complete')"
 		/> 
 		<DelegateDialog 
