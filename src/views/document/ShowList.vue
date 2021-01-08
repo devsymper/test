@@ -251,6 +251,15 @@ export default {
                         self.documentId = Number(document.id);
                     },
                 },
+                documentIndex:{
+                    name: "documentIndex",
+                    text: function() {
+                        return " <i class= 'mdi mdi-file-upload-outline' > </i>&nbsp; Tối ưu nhập liệu";
+                    },
+                    callback: (document, callback) => {
+                        this.documentId = Number(document.id);
+                    },
+                },
             },
             customAPIResult:{
                  reformatData(data){
