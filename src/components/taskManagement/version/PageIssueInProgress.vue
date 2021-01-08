@@ -8,6 +8,7 @@
 <script>
 import CommonTableListIssue from './CommonTableListIssue.vue';
 import { taskManagementApi } from "@/api/taskManagement.js";
+import VersionWorker from 'worker-loader!@/worker/taskManagement/version/Version.Worker.js';
 
 export default {
     components: { 
@@ -64,6 +65,7 @@ export default {
     data(){
         let self = this;
         return{
+            versionWorker:null,
             listIssue:[],
             filter:{
                 ids: null,
@@ -124,6 +126,21 @@ export default {
             await this.$store.dispatch("taskManagement/getAllStatus");
         }
         this.getData();
+        this.versionWorker = new VersionWorker();
+        // this.versionWorker.addEventListener("message", function (event) {
+		// 	let data = event.data;
+        //     switch (data.action) {
+        //         case 'getListVersion':
+        //             if (data.dataAfter) {
+        //                 let res = data.dataAfter;
+        //                 self.$store.commit("taskManagement/setListVersion", res.data.listObject);
+        //                 self.listVersion = res.data.listObject;
+        //             }
+        //             break;
+        //         default:
+        //             break;
+        //     }
+        // });
     }
 }
 </script>

@@ -1,5 +1,5 @@
 import { taskManagementApi } from "@/api/taskManagement.js";
-import { getDataFilterLogProject, getDataFilterIssueRecent} from '@/components/taskManagement/common/apiAction';
+import { getDataFilterLogProject, getDataFilterIssueRecent,getDataFilterIssueAssignee} from '@/components/taskManagement/common/GroupFunctionConvertData';
 self.onmessage = async function (event) {
 	var workerDataReceive = event.data;
     let action = workerDataReceive.action;
@@ -108,10 +108,22 @@ self.onmessage = async function (event) {
             postMessage({action:'getDataProjectRecent',dataAfter : res})
             break;
         case 'getListItemIssueGroupDateTime':
-            let res = setDataListItemIssueGroupDateTime(data);
-            postMessage({action:'getListItemIssueGroupDateTime',dataAfter : res})
+            let res2 = setDataListItemIssueGroupDateTime(data);
+            postMessage({action:'getListItemIssueGroupDateTime',dataAfter : res2})
             break;
-            
+        case 'getDataAssigneeIssue':
+            let filterAssignee = getDataFilterIssueAssignee(data);
+            taskManagementApi
+            .getIssueFilter(filterAssignee).then(res=>{
+                if(res['status'] == 200 ){
+                    postMessage({action:'getDataAssigneeIssue',dataAfter : res})
+                }
+            })
+            break;
+        case 'getListAssigneeIssueGroupDateTime':
+            let res3 = setDataListAssigneeIssueGroupDateTime(data);
+            postMessage({action:'getListAssigneeIssueGroupDateTime',dataAfter : res3})
+            break;
         default:
             break;
     }
@@ -214,6 +226,66 @@ function setDataListItemIssueGroupDateTime(data){
         return groups;
     }, {});
     // Edit: to add it in the array format instead
+    const groupArraysIssue = Object.keys(groups).map(fromNow => {
+        return {
+          fromNow,
+          issues: groups[fromNow]
+        };
+    });
+    return groupArraysIssue;
+}
+
+function setDataListAssigneeIssueGroupDateTime(data){
+    let listIssue = data.listIssue
+    let allPriority = data.allPriority;
+    let listIssueType = data.listIssueType;
+    let allStatus = data.allStatus;
+
+    const groups = listIssue.reduce((groups, issue) => {
+        let date = issue.document_object_create_time.split(" ")[0];
+        let fromNow = date;
+        if (!groups[fromNow]) {
+            groups[fromNow] = [];
+        }
+
+        if (issue.tmg_priority_id) { 
+            let priority = allPriority.find(ele => ele.id == issue.tmg_priority_id);
+            if (priority) {
+                let infoPriority = {};
+                infoPriority.id = priority.id;
+                infoPriority.name = priority.name;
+                infoPriority.color = priority.color;
+                infoPriority.icon = priority.icon;
+
+                issue["infoPriority"] = infoPriority;
+            }
+        }    
+        // get info issue type
+        if (issue.tmg_issue_type) { 
+            let issueType = listIssueType.find(ele => ele.id == issue.tmg_issue_type);
+            if (issueType) {
+                let infoIssueType = {};
+                infoIssueType.id = issueType.id;
+                infoIssueType.name = issueType.name;
+                infoIssueType.icon = issueType.icon;
+
+                issue["infoIssueType"] = infoIssueType;
+            }
+        }    
+        // get staus issue
+        if (issue.tmg_status_id) { 
+            let status = allStatus.find(ele => ele.id == issue.tmg_status_id);
+            if (status) {
+                let infoStatus = {};
+                infoStatus.id = status.id;
+                infoStatus.name = status.name;
+                infoStatus.color = status.color;
+                issue["infoStatus"] = infoStatus;
+            }
+        } 
+        groups[fromNow].push(issue);
+        return groups;
+    }, {});
     const groupArraysIssue = Object.keys(groups).map(fromNow => {
         return {
           fromNow,

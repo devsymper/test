@@ -1348,7 +1348,8 @@
             "removeCategory": "You will remove category from this list.",
             "removeComponent": "You will remove component from this list.",
             "removeWorkflow": "You will remove workflow from this list.",
-            "removePriority": "You will remove priority from this list."
+            "removePriority": "You will remove priority from this list.",
+            "removeVersion": "You will remove version from this list."
 
         },
         "settingBoard":"Board setting"

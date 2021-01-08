@@ -55,7 +55,7 @@
                 <!-- content -->
                 <v-tab-item>
                     <common-table-list-issue 
-                        :listIssueProps="allIssueInVersion"
+                        :listIssueProps="listIssueInVersion"
                         :listType="listType"
                     />
                 </v-tab-item>
@@ -80,6 +80,7 @@ import CommonTableListIssue from './CommonTableListIssue.vue';
 import PageIssueDone from './PageIssueDone.vue';
 import PageIssueInProgress from './PageIssueInProgress';
 import PageIssueToDo from './PageIssueToDo.vue';
+import VersionWorker from 'worker-loader!@/worker/taskManagement/version/Version.Worker.js';
 
 export default {
   components: { CommonTableListIssue, PageIssueDone, PageIssueInProgress, PageIssueToDo },
@@ -93,56 +94,44 @@ export default {
         },
     },
     computed:{
-        allIssueInVersion(){
-            let issues = this.listIssue;
-            let allPriority = this.$store.state.taskManagement.allPriority;
-            let listIssueType = this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId];
-            let allStatus = this.$store.state.taskManagement.allStatus;
-            for (let i = 0; i < issues.length; i++) {
-                    // get info priority
-                if (issues[i].tmg_priority_id) { 
-                    let priority = allPriority.find(ele => ele.id == issues[i].tmg_priority_id);
-                    if (priority) {
-                        let infoPriority = {};
-                        infoPriority.id = priority.id;
-                        infoPriority.name = priority.name;
-                        infoPriority.color = priority.color;
-                        infoPriority.icon = priority.icon;
-
-                        issues[i]["infoPriority"] = infoPriority;
-                    }
-                }    
-                // get info issue type
-                if (issues[i].tmg_issue_type) { 
-                    let issueType = listIssueType.find(ele => ele.id == issues[i].tmg_issue_type);
-                    if (issueType) {
-                        let infoIssueType = {};
-                        infoIssueType.id = issueType.id;
-                        infoIssueType.name = issueType.name;
-                        infoIssueType.icon = issueType.icon;
-
-                        issues[i]["infoIssueType"] = infoIssueType;
-                    }
-                }    
-                // get staus issue
-                if (issues[i].tmg_status_id) { 
-                    let status = allStatus.find(ele => ele.id == issues[i].tmg_status_id);
-                    if (status) {
-                        let infoStatus = {};
-                        infoStatus.id = status.id;
-                        infoStatus.name = status.name;
-                        infoStatus.color = status.color;
-                        issues[i]["infoStatus"] = infoStatus;
-                    }
-                } 
+        listDocumentIdsInProject(){
+            return this.$store.state.taskManagement.listDocumentIdsInProject[this.projectId];
+        }
+    },
+    watch:{
+        listDocumentIdsInProject:{
+            deep:true,
+            immediate:true,
+            handler(newVl){
+                if (newVl){
+                    this.getData();
+                }
             }
-
-            return issues
+        },
+        listIssue:{
+            deep:true,
+            immediate:true,
+            handler(newVl){
+                if (newVl.length > 0){
+                    this.getMoreInfoListIssue();
+                }
+            }
         },
     },
+    listDocumentIdsInProject:{
+            deep:true,
+            immediate:true,
+            handler(newVl){
+                if (newVl){
+                    this.getData();
+                }
+            }
+        },
     data(){
         let self = this;
         return{
+            listIssueInVersion:[],
+            versionWorker:null,
             listType: self.$t('taskManagement.listIssueVersion'),
             projectId: null,
             listIssue:[],
@@ -184,34 +173,94 @@ export default {
         }
     },
     methods:{
+        getMoreInfoListIssue(){
+            let data = {};
+            data.issues = this.listIssue;
+            data.allPriority = this.$store.state.taskManagement.allPriority;
+            data.listIssueType = this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId];
+            data.allStatus = this.$store.state.taskManagement.allStatus;
+      
+            this.versionWorker.postMessage({
+                action:'getMoreInfoListIssue',
+                data:data
+            });
+        },
         getData(){
             let documentIds = this.$store.state.taskManagement.listDocumentIdsInProject[this.projectId];
             if (documentIds && documentIds.length > 0) {
                 this.filter.ids =JSON.stringify(documentIds);
-                taskManagementApi.getIssueFilter(this.filter)
-                .then(res => {
-                    if (res.status == 200) {
-                        this.listIssue = res.data.listObject;
-                    }else{
-                        this.$snotifyError("", "Can not get list issue in version!");
-                    }
+
+                this.versionWorker.postMessage({
+                    action:'getIssueVersion',
+                    data:this.filter
                 });
             }
         
         },
+        getListDocumentIdsInProject(){
+            this.versionWorker.postMessage({
+                action:'getListDocumentIdsInProject',
+                data:this.projectId
+            });
+        },
+        getListIssueTypeInProject(){
+            this.versionWorker.postMessage({
+                action:'getListIssueTypeInProject',
+                data:this.projectId
+            });
+        },
+        getAllStatus(){
+            this.versionWorker.postMessage({
+                action:'getAllStatus',
+                data: null
+            });
+        }
     },
-    async created(){
+    created(){
+        let self = this;
         this.projectId=this.$route.params.id;
+        this.versionWorker = new VersionWorker();
+        this.versionWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getListDocumentIdsInProject':
+                    self.$store.commit('taskManagement/setListDocumentIdsInProject',data.dataAfter);
+                    break;
+                case 'getListIssueTypeInProject':
+                    self.$store.commit('taskManagement/setListIssueTypeInProjects',data.dataAfter);
+                    break;
+                case 'getAllStatus':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit('taskManagement/setAllStatus',res.data.listObject);
+                    } 
+                    break;
+                case 'getIssueVersion':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.listIssue = res.data.listObject;
+                    } 
+                    break;
+                case 'getMoreInfoListIssue':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.listIssueInVersion = res;
+                    } 
+                    break;
+                default:
+                    break;
+            }
+        });
+
         if (!this.$store.state.taskManagement.listDocumentIdsInProject[this.projectId] || this.$store.state.taskManagement.listDocumentIdsInProject[this.projectId].length == 0) {
-            await this.$store.dispatch("taskManagement/getListDocumentIdsInProject",this.projectId);
+            self.getListDocumentIdsInProject();
         }
         if (!this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId] || this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId].length == 0) {
-            await this.$store.dispatch("taskManagement/getListIssueTypeInProjects",this.projectId);
+            self.getListIssueTypeInProject();
         }
         if (!this.$store.state.taskManagement.allStatus || this.$store.state.taskManagement.allStatus.length == 0) {
-            await this.$store.dispatch("taskManagement/getAllStatus");
+            self.getAllStatus();
         }
-        this.getData();
       
     }
 

@@ -10,7 +10,7 @@ export const taskManagementApi = {
         return log.post("query",data,{},{'contentType': 'application/json'});
     },
     getIssueFilter(data){
-        return document.post("documents/objects-by-multiple-document",data);
+        return document.post("documents/objects-by-multiple-document",data,{},{'contentType': 'application/json'});
     },
     countIssueInListProject(projectIds){
         return taskManagement.get("count",{projectIds:JSON.stringify(projectIds)});

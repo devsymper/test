@@ -46,37 +46,6 @@ export default {
                 data:this.$store.state.app.endUserInfo.id
             });
 
-            if (!this.staskManagement.allPriority || this.staskManagement.allPriority == 0) {
-                this.homeWorker.postMessage({
-                    action:'getAllPriority',
-                    data:null
-                });
-            }
-
-            if (!this.$store.state.taskManagement.allIssueType || this.$store.state.taskManagement.allIssueType.length == 0) {
-                this.homeWorker.postMessage({
-                    action:'getAllIssueType',
-                    data:null
-                });
-            }
-            if (!this.$store.state.taskManagement.allStatus || this.$store.state.taskManagement.allStatus.length == 0) {
-                this.homeWorker.postMessage({
-                    action:'getAllStatus',
-                    data:null
-                });
-            }
-        },
-        getLogProjectAccess(){
-            this.homeWorker.postMessage({
-                action:'getLogProjectAccess',
-                data:this.$store.state.app.endUserInfo.id
-            });
-        },
-        getLogIssueRecentAccess(){
-            this.homeWorker.postMessage({
-                action:'getLogIssueRecentAccess',
-                data:this.$store.state.app.endUserInfo.id
-            });
         },
         getAllPriority(){
             if (!this.staskManagement.allPriority || this.staskManagement.allPriority == 0) {
@@ -87,11 +56,6 @@ export default {
             }
         },
         getAllProject(){
-            // caches.keys().then(function(names) {
-            //     for (let name of names)
-            //         console.log("deleted cache");
-            //         caches.delete(name);
-            // });
             if (!this.$store.state.taskManagement.allProject || this.$store.state.taskManagement.allProject.length == 0) {
                 this.homeWorker.postMessage({
                     action:'getAllProject',
@@ -128,6 +92,7 @@ export default {
                     if (data.dataAfter) {
                         let res = data.dataAfter;
                         self.$store.commit('taskManagement/setListProjectRecentAccess', res.data);
+                        self.$refs.preLoaderView.hide();
                     }
                     break;
                 case 'getLogIssueRecentAccess':
@@ -135,7 +100,6 @@ export default {
                         let res = data.dataAfter;
                         self.$store.commit('taskManagement/setLogIssueRecentAccess', res.data);
                         self.$refs.preLoaderView.hide();
-
                     }
                     break;
                 case 'getAllPriority':
@@ -143,25 +107,28 @@ export default {
                         let res = data.dataAfter;
                         self.$store.commit('taskManagement/setAllPriority', res.data.listObject);
                     }
+                    self.getData();
                     break;
                 case 'getAllProject':
                     if (data.dataAfter) {
                         let res = data.dataAfter;
                         self.$store.commit('taskManagement/setAllProject', res.data.listObject);
                     }
-                    self.getData();
+                    self.getAllIssueType();
                     break;
                 case 'getAllIssueType':
                     if (data.dataAfter) {
                         let res = data.dataAfter;
                         self.$store.commit('taskManagement/setAllIssueType', res.data.listObject);
                     }
+                    self.getAllStatus();
                     break;
                 case 'getAllStatus':
                     if (data.dataAfter) {
                         let res = data.dataAfter;
                         self.$store.commit('taskManagement/setAllStatus', res.data.listObject);
                     }
+                    self.getAllPriority();
                     break
                 default:
                     break;

@@ -107,28 +107,6 @@ export default {
         infoUser,
     },
     computed:{
-        // listProjectRecent(){
-        //     let allProject = this.$store.state.taskManagement.allProject;
-        //     let listItemLog = this.recentPojects;
-        //     let listProject = [];
-        //     if (listItemLog.length > 0) {
-        //         for (let i = 0; i < listItemLog.length; i++) {
-        //             let projectLog = JSON.parse(listItemLog[i]['project']);
-        //             let project = allProject.find(ele => ele.id == projectLog.id);
-        //             if (project) {
-        //                 if (listProject.length > 0) {
-        //                     let isCheck = listProject.find(ele => ele.id == project.id);
-        //                     if (isCheck) {
-        //                         continue; // thoát khỏi vòng lặp
-        //                     }
-        //                 }
-        //                 this.projectIds.push(project.id);
-        //                 listProject.push(project);
-        //             }
-        //         }
-        //     }
-        //     return listProject;
-        // },
         documentIds(){
             return this.$store.state.taskManagement.listDocumentIdsInIssueType;
         },
@@ -181,6 +159,7 @@ export default {
             dataCountIssue:[],
             itemSelected: null,
             listProjectRecent:[],
+            homeWorker:null,
         }
     },
     methods:{
@@ -210,16 +189,6 @@ export default {
                         data:this.projectIds
                     });
                 }
-                // taskManagementApi
-                // .countIssueInListProject(this.projectIds)
-                // .then(res => {
-                //     if (res.status == 200 && res.data) {
-                //         this.dataCountIssue = res.data;
-                //     }
-                // })
-                // .catch(err => {
-                //     this.$snotifyError("", "Can not count board!", err);
-                // });
             }
         },
         getNumberBoard(project){
@@ -248,17 +217,6 @@ export default {
                         data:this.projectIds
                     });
                 }
-
-                // taskManagementApi
-                // .countBoardInListProject(this.projectIds)
-                // .then(res => {
-                //     if (res.status == 200 && res.data) {
-                //         this.dataCountBoard = res.data;
-                //     }
-                // })
-                // .catch(err => {
-                //     self.$snotifyError("", "Can not count board!", err);
-                // });
             }
         },
         goConfigProject(obj){
@@ -270,23 +228,6 @@ export default {
                 action:'updateFavorite',
                 data:obj.id
             });
-
-            // let self=this;
-            // taskManagementApi
-            //     .updateProjectFavorite(obj.id)
-            //     .then(res => {
-            //         if (res.status == 200) {
-            //             self.$snotifySuccess("Update project completed!");
-            //             self.$store.commit("taskManagement/updateStatusFavoriteProject", obj.id);
-
-            //         }else{
-            //             self.$snotifyError("", "Can not update project!");
-            //         }
-            //     })
-            //     .catch(err => {
-            //         self.$snotifyError("", "Can not update project!", err);
-            //     })
-            //     .finally(() => {});
         },
         handleClickProject(item){
             this.$router.push('/task-management/projects/'+item.id+'/kanban-board');
