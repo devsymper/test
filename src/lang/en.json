@@ -1219,7 +1219,8 @@
             "alertDescription": "No description",
             "relatedTask": "RELATED TASK",
             "attachment": "ATTACHMENT FILE",
-            "status": "Status"
+			"status": "Status",
+			"candidateUser":"Candidate user"
 
         },
         "filterOptions": {
@@ -1239,6 +1240,7 @@
         "delegate": "Delegate",
         "resolve": "Resolve",
         "complete": "Complete",
+        "assign": "Assign",
         "created": "Task created",
         "relatedPeople": {
             "title": "Related people"
