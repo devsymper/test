@@ -151,5 +151,19 @@ export const documentApi = {
     },
     deleteObjectInTrash(data) {
         return trashApi.post('items/delete-multi', data)
+    },
+
+
+    /**
+     * index column
+     */
+    saveColumnIndex(data){
+        return coreApi.post("documents/index", data);
+    },
+    getColumnIndex(documentId){
+        return coreApi.get("documents/"+documentId+"/index");
+    },
+    getFieldStruct(documentId){
+        return coreApi.get("documents/"+documentId+"/fields/struct");
     }
 };

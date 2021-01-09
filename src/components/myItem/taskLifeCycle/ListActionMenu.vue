@@ -1,6 +1,6 @@
 <template>
 	<div class="menu-action-task-life-cycle">
-		 <v-menu offset-y>
+		 <v-menu offset-y style="z-index: 1000 !important">
 			<template v-slot:activator="{ on, attrs }">
 				<v-btn
 					color="#F5F5F5"
@@ -53,17 +53,32 @@ export default {
 		showResolveAction:{
 			type: Boolean,
 			default: false
+		},
+		taskInfo:{
+			type: Object,
+			default(){
+				return {}
+			}
 		}
 	},
 	computed:{
 		listActions(){
+			
 			let lists = []
 			if(this.userType == 'assignee' && this.taskType == 'assign'){
-				this.items.forEach(function(e){
-					if(e.value == 'reAssign' || e.value == 'delegate' || e.value == 'complete'){
-						lists.push(e)
-					}
-				})
+				if(this.taskInfo.action.action == "approval"){
+					this.items.forEach(function(e){
+						if(e.value == 'reAssign'){
+							lists.push(e)
+						}
+					})
+				}else{
+					this.items.forEach(function(e){
+						if(e.value == 'reAssign' || e.value == 'delegate' || e.value == 'complete'){
+							lists.push(e)
+						}
+					})
+				}
 			}
 			if(this.userType == 'assignee' && this.taskType == 'delegate'){
 				this.items.forEach(function(e){
@@ -137,6 +152,9 @@ export default {
 <style scoped>
 .menu-action-task-life-cycle >>> .action-task-life-cycle{
 	box-shadow: unset !important;
+}
+.menu-action-task-life-cycle >>> .v-menu__content{
+	z-index: 1000 !important;
 }
 .v-list-item {
 	min-height: unset !important;
