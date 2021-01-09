@@ -37,27 +37,42 @@
                                     <v-expansion-panel-header class="v-expand-header">
                                         <div class="d-flex">
                                             <div>
-                                                {{doc.name + '-' + doc.title}}
-                                            </div>
-                                            <div class="ml-auto">
-                                                <span class="fs-13">Tên index</span>
-                                                <input @keyup.stop.prevent @click.stop.prevent type="text" 
-                                                v-model="doc.indexName" 
-                                                :style="{
-                                                    border:(doc.isNotValidName) ? '1px solid red !important' : ''
-                                                }"
-                                                class="sym-small-size sym-style-input index-name">
+                                                {{doc.name + ' - ' + doc.title}}
                                             </div>
                                         </div>
 
                                     </v-expansion-panel-header>
                                     <v-expansion-panel-content class="sym-v-expand-content">
-                                        <div class="control" v-for="control in doc.control" :key="control.name" @click="onClickControl(doc,control)">
-                                            <div>
-                                                {{control.name}} - {{control.title}}                            
-                                            </div>
-                                            <v-icon v-if="control.checked" size="16" color="green">mdi-check-bold</v-icon>
-                                        </div>
+                                        <table class="w-100">
+                                            <tr style="text-align: left;background: #f2f2f2;">
+                                                <th style="padding: 8px;width: 200px;">Index 
+                                                    <v-btn height="20" width="20" min-width="25" depressed @click="onCreateIndexClick(doc)">
+                                                        <v-icon size="16">mdi-plus</v-icon>
+                                                    </v-btn>
+                                                </th>
+                                                <th style="padding: 8px;">Danh sách cột</th>
+                                            </tr>
+                                            <tr>
+                                                <td style="display: flex;flex-flow: column;">
+                                                    <div v-for="(index,i) in doc.indexs" 
+                                                    :key="i" 
+                                                    class="index-item" 
+                                                    :style="{background:(index.active) ? '#f2f2f2' : ''}"
+                                                    @click="onIndexItemClick(doc,index)">
+                                                        <span>{{index.name}}</span>
+                                                        <v-icon size="16" @click="onRemoveIndex(doc.indexs,i,index)">mdi-trash-can-outline</v-icon>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="control" v-for="control in doc.control" :key="control.name" @click="onClickControl(doc,control)">
+                                                        <div>
+                                                            {{control.name}} - {{control.title}}                            
+                                                        </div>
+                                                        <v-icon v-if="control.checked" size="16" color="green">mdi-check-bold</v-icon>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </v-expansion-panel-content>
                                 </v-expansion-panel>
                                 
@@ -286,6 +301,7 @@ export default {
                     callback: (document, callback) => {
                         this.rowActive = document;
                         this.isDocumentIndex = true;
+                        this.allIndexSelected = []
                         this.$refs.listDocument.openactionPanel();
                         this.getListControl(document);
                         
@@ -317,74 +333,70 @@ export default {
         }
     },
     methods:{
+        onRemoveIndex(indexs, i, index){
+            indexs.splice(i,1);
+            if(index.uid){
+                let indexRemove = [];
+                indexRemove.push({parent:index.parent, name:index.name});
+                documentApi.deleteIndex(index.uid, {indexs:JSON.stringify(indexRemove)}).then(res=>{
+                })
+            }
+            
+        },
+        onIndexItemClick(doc,index){
+            this.$set(doc,'indexActive',index);
+            for (let index = 0; index < doc.indexs.length; index++) {
+                if(doc.indexs[index].active){
+                    doc.indexs[index].active = false;
+                }
+            }
+            let columnActive = index.column;
+            for (let index = 0; index < doc.control.length; index++) {
+                if(columnActive.includes(doc.control[index].name)){
+                    this.$set(doc.control[index],'checked',true)
+                }
+                else{
+                    this.$set(doc.control[index],'checked',false)
+                }
+                
+            }
+            this.$set(index,'active',true)
+        },
+        onCreateIndexClick(doc){
+            doc.indexs.push({
+                name:'new_index_'+ eval(doc.indexs.length + 1),
+                parent:doc.key,
+                column:[]
+            });
+        },
         getListControl(document){
             let self = this;
             documentApi.getFieldStruct(document.id).then(res=>{
                 if(res.status == 200){
                     console.log(res);
                     self.listControlInDoc = res.data;
-                    self.getListControlChecked(document.id);
                 }
             });
         },
-        getListControlChecked(docId){
-            let self = this;
-            documentApi.getColumnIndex(docId).then(res=>{
-                if(res.status == 200 && res.data.length > 0){
-                   let indexs = res.data[0].indexs;
-                   if(indexs){
-                       try {
-                            indexs = JSON.parse(indexs);
-                            for (let i = 0; i < indexs.length; i++) {
-                                const element = indexs[i];
-                                self.$set(self.listControlInDoc[element.parent],'indexName',element.name)
-                                let columns = element.column;
-                                for (let j = 0; j < columns.length; j++) {
-                                    const listControl = self.listControlInDoc[element.parent].control;
-                                    for (let l = 0; l < listControl.length; l++) {
-                                        if(listControl[l].name == columns[j]){
-                                            self.$set(self.listControlInDoc[element.parent].control[l],'checked',true)
-                                            break;
-                                        }
-                                    }
-                                }
-                                
-                            }
-
-                       } catch (error) {
-                           console.warn(error);
-                       }
-                   }
-                }
-            });
-        },
+      
         onSaveIndex(){
             for(let key in this.listControlInDoc){
                 let document = this.listControlInDoc[key];
-                if(!document.indexName){
+                if(document.indexs.length == 0){
                     continue;
                 }
-                let controlChecked = [];
-                for (let i = 0; i < document.control.length; i++) {
-                    const control = document.control[i];
-                    if(control.checked){
-                        controlChecked.push(control.name)
+                for (let i = 0; i < document.indexs.length; i++) {
+                    const index = document.indexs[i];
+                    if(index.hasChange && index.column.length > 0){
+                        this.allIndexSelected.push(index);
                     }
-                    
-                }
-                if(controlChecked.length > 0){
-                    let item = {};
-                    item['parent'] = (document.isTable) ? document.name : 'document';
-                    item['name'] = document.indexName;
-                    item['column'] = controlChecked;
-                    this.allIndexSelected.push(item);
                 }
             }
             if(this.allIndexSelected.length == 0){
                 return;
             }
             let self = this;
-            let dataPost = {documentId:this.rowActive.id,indexs:JSON.stringify(this.allIndexSelected)}
+            let dataPost = {documentName:this.rowActive.name,indexs:JSON.stringify(this.allIndexSelected)}
             documentApi.saveColumnIndex(dataPost).then(res=>{
                 if(res.status == 200){
                     self.$refs.listDocument.closeactionPanel();
@@ -402,7 +414,16 @@ export default {
             });
         },
         onClickControl(doc,control){
-            this.$set(control,'checked',!control.checked );
+            if(doc.indexActive){
+                this.$set(control,'checked',!control.checked );
+                if(control.checked){
+                    doc.indexActive.column.push(control.name);
+                }
+                else{
+                    doc.indexActive.column.splice(doc.indexActive.column.indexOf(control.name), 1);
+                }
+                this.$set(doc.indexActive,'hasChange',true );
+            }
         },
         closePanel(){
             this.isShowQuickSubmit = false;
@@ -535,7 +556,7 @@ export default {
         height: 25px;
         padding: 5px 4px;
         cursor: pointer;
-        transition: background ease-in-out 250ms;
+        transition: background ease-in-out 200ms;
     }
     .control:hover{
         background: var(--symper-background-hover);
@@ -569,5 +590,26 @@ export default {
     ::v-deep .v-expand-header{
         padding: 12px 4px;
     }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+   ::v-deep .v-expansion-panel-content__wrap{
+       padding: 0 !important;
+   }
+   .index-item{
+        padding: 8px;
+        margin: 1px 0;
+        display: flex;
+        cursor: pointer;
+        transition: background ease-in-out 200ms;
+   }
+   .index-item:hover{
+        background: var(--symper-background-hover);
+   }
+   .index-item >>> .v-icon{
+       margin-left: auto;
+   }
 </style>
 
