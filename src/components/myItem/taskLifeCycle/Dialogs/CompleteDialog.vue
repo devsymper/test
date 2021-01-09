@@ -70,6 +70,8 @@
 
 <script>
 import workFlowApi  from "@/api/BPMNEngine.js";
+import { getVarsFromSubmitedDoc } from '@/components/process/processAction';
+import {documentApi} from "@/api/Document.js";
 export default {
 	props:{
 		showDialog:{
@@ -79,7 +81,14 @@ export default {
 		taskId:{
 			type: String,
 			default: ""
+		},
+		taskInfo:{
+			type: Object,
+			default(){
+				return {}
+			}
 		}
+		
 	},
 	data(){
 		return{
@@ -93,20 +102,38 @@ export default {
 		cancel(){
 			this.$emit('cancel')
 		},
-		completeTask(){
-			let data = {
-				action: 'complete'
+		async completeTask(){
+			let elId = this.taskInfo.action.parameter.activityId;
+			let docId = this.taskInfo.action.parameter.documentId;
+			let dataDoc
+			let res = await documentApi.detailDocumentObject(docId)
+			if(res.status == 200){
+				dataDoc = res.data
+			}else{
+				dataDoc = []
 			}
-			workFlowApi.changeTaskAction(this.taskId, data).then(res=>{
+			let varsForBackend = await getVarsFromSubmitedDoc(dataDoc, elId, docId);
+			if(varsForBackend){
+				let data = {
+					action: 'complete',
+					outcome: 'submit',
+					variables: varsForBackend.vars
+				}
+				workFlowApi.changeTaskAction(this.taskId, data).then(res=>{
 
-			}).catch(err=>{
+				}).catch(err=>{
 
-			})
-			this.$snotify({
-				type: "success",
-				title: "Hoàn thành công việc thành công"
-			})
-			this.$emit('success')
+				})
+				this.$snotify({
+					type: "success",
+					title: "Hoàn thành công việc thành công"
+				})
+				this.$emit('success')
+			}else{
+				this.$snotifyError("Không thể lấy variable")
+			}
+			
+		
 		}
 	},
 }

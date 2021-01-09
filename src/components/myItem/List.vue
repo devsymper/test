@@ -308,6 +308,7 @@
 					:delegationState="delegationState"
                     :parentHeight="listTaskHeight"
                     :taskInfo="selectedTask.taskInfo"
+					@reselect-object="reselectObject"
                     :originData="selectedTask.originData"
                     :appId="String(selectedTask.originData.symperApplicationId)"
                     :reload="false"
@@ -498,7 +499,8 @@ export default {
                     name: ""
                 }
             },
-            filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
+			filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
+			currentTask: {},
             getDataUrl: appConfigs.apiDomain.workflowExtend+"tasks",
              /**
              * Thêm điều kiện để quy vấn qua api
@@ -810,8 +812,19 @@ export default {
         reCalcListTaskHeight() {
             this.listTaskHeight =
                 util.getComponentSize(this.$el.parentElement).h - 130;
-        },
-        async selectObject(obj, idx,idex) {
+		},
+		reselectObject(){
+			setTimeout(self=>{
+				self.selectObject(this.currentTask.obj , this.currentTask.idx, this.currentTask.idex)
+				debugger
+			},2000,this)
+		},
+        async selectObject(obj, idx, idex) {
+			this.currentTask = {
+				obj: obj,
+				idx: idx,
+				idex: idex
+			}
             this.index = idx;
             this.dataIndex = idex;
             this.$set(this.selectedTask, "originData", obj);

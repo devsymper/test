@@ -1,37 +1,82 @@
 <template>
-<div style="width:100%">
-    <list-items
-        ref="listDocument"
-        :customAPIResult="customAPIResult"
-        :getDataUrl="sDocumentManagementUrl+'documents'"  
-        :useDefaultContext="false"
-        :tableContextMenu="tableContextMenu"
-        :pageTitle="$t('document.title')"
-        :containerHeight="containerHeight"
-        :actionPanelWidth="actionPanelWidth"
-        :showExportButton="false"
-        :showImportButton="false"
-        @after-open-add-panel="addDocument"
-        @close-panel="closePanel"
-        :headerPrefixKeypath="'document'"
-        :commonActionProps="commonActionProps"
-    >
-        <div slot="right-panel-content" class="h-100">
-            <submit-view 
-                v-if="isShowQuickSubmit"
-                ref="submitView" 
-                :isQickSubmit="true" 
-                :action="'submit'" 
-                @submit-document-success="aftersubmitDocument" 
-                :docId="documentId"/>
-        </div> 
-    </list-items>
-         <ImportExcelPanel
-            :options="options"
-            :nameRows="listRowDocument"
-            :open="showImportPanel" />
+    <div style="width:100%">
+        <list-items
+            ref="listDocument"
+            :customAPIResult="customAPIResult"
+            :getDataUrl="sDocumentManagementUrl+'documents'"  
+            :useDefaultContext="false"
+            :tableContextMenu="tableContextMenu"
+            :pageTitle="$t('document.title')"
+            :containerHeight="containerHeight"
+            :actionPanelWidth="actionPanelWidth"
+            :showExportButton="false"
+            :showImportButton="false"
+            @after-open-add-panel="addDocument"
+            @close-panel="closePanel"
+            :headerPrefixKeypath="'document'"
+            :commonActionProps="commonActionProps"
+        >
+            <div slot="right-panel-content" class="h-100">
+                <submit-view 
+                    v-if="isShowQuickSubmit"
+                    ref="submitView" 
+                    :isQickSubmit="true" 
+                    :action="'submit'" 
+                    @submit-document-success="aftersubmitDocument" 
+                    :docId="documentId"/>
+                
+                <div v-if="isDocumentIndex" class="h-100">
+                    <div class="header-panel">
+                        Lựa chọn cột muốn đánh chỉ mục
+                    </div>
+                        <VuePerfectScrollbar class="listControl">
+                            <v-expansion-panels
+                                multiple
+                                >
+                                <v-expansion-panel class="m-0" v-for="(doc,index) in listControlInDoc" :key="index">
+                                    <v-expansion-panel-header class="v-expand-header">
+                                        <div class="d-flex">
+                                            <div>
+                                                {{doc.name + '-' + doc.title}}
+                                            </div>
+                                            <div class="ml-auto">
+                                                <span class="fs-13">Tên index</span>
+                                                <input @keyup.stop.prevent @click.stop.prevent type="text" 
+                                                v-model="doc.indexName" 
+                                                :style="{
+                                                    border:(doc.isNotValidName) ? '1px solid red !important' : ''
+                                                }"
+                                                class="sym-small-size sym-style-input index-name">
+                                            </div>
+                                        </div>
 
-</div>
+                                    </v-expansion-panel-header>
+                                    <v-expansion-panel-content class="sym-v-expand-content">
+                                        <div class="control" v-for="control in doc.control" :key="control.name" @click="onClickControl(doc,control)">
+                                            <div>
+                                                {{control.name}} - {{control.title}}                            
+                                            </div>
+                                            <v-icon v-if="control.checked" size="16" color="green">mdi-check-bold</v-icon>
+                                        </div>
+                                    </v-expansion-panel-content>
+                                </v-expansion-panel>
+                                
+                            </v-expansion-panels>
+                            </VuePerfectScrollbar>
+                    <div class="footer-action">
+                        <v-btn depressed @click="onSaveIndex">
+                            Lưu
+                        </v-btn>
+                    </div>
+                </div>
+            </div> 
+        </list-items>
+            <ImportExcelPanel
+                :options="options"
+                :nameRows="listRowDocument"
+                :open="showImportPanel" />
+    
+    </div>
 </template>
 <script>
 
@@ -43,19 +88,26 @@ import ChangePassPanel from "./../../views/users/ChangePass.vue";
 import Submit from './submit/Submit'
 import { util } from "./../../plugins/util.js";
 import { appConfigs } from '../../configs';
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
+
 export default {
     components: {
         ImportExcelPanel: ImportExcelPanel,
         "list-items": ListItems,
         "action-panel": ActionPanel,
-        'submit-view':Submit
+        'submit-view':Submit,
+        VuePerfectScrollbar
     },
     data(){
         return {
             sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
             documentId:0,
+            rowActive:null,
             options:{
             },
+            isDocumentIndex:false,
+            allIndexSelected:[],
+            listControlInDoc:{},
             propertyDocument:[],
             listRowDocument:[],
             commonActionProps: {
@@ -192,7 +244,7 @@ export default {
                             else{
                                 thisCpn.$snotify({
                                     type: "error",
-                                    title: res.messagr
+                                    title: res.message
                                 });  
                             }
                         })
@@ -228,6 +280,17 @@ export default {
                         self.documentId = Number(document.id);
                     },
                 },
+                documentIndex:{
+                    name: "documentIndex",
+                    text: "<i class= 'mdi mdi-bike-fast' > </i>&nbsp; Tối ưu nhập liệu",
+                    callback: (document, callback) => {
+                        this.rowActive = document;
+                        this.isDocumentIndex = true;
+                        this.$refs.listDocument.openactionPanel();
+                        this.getListControl(document);
+                        
+                    },
+                },
             },
             customAPIResult:{
                  reformatData(data){
@@ -254,8 +317,96 @@ export default {
         }
     },
     methods:{
+        getListControl(document){
+            let self = this;
+            documentApi.getFieldStruct(document.id).then(res=>{
+                if(res.status == 200){
+                    console.log(res);
+                    self.listControlInDoc = res.data;
+                    self.getListControlChecked(document.id);
+                }
+            });
+        },
+        getListControlChecked(docId){
+            let self = this;
+            documentApi.getColumnIndex(docId).then(res=>{
+                if(res.status == 200 && res.data.length > 0){
+                   let indexs = res.data[0].indexs;
+                   if(indexs){
+                       try {
+                            indexs = JSON.parse(indexs);
+                            for (let i = 0; i < indexs.length; i++) {
+                                const element = indexs[i];
+                                self.$set(self.listControlInDoc[element.parent],'indexName',element.name)
+                                let columns = element.column;
+                                for (let j = 0; j < columns.length; j++) {
+                                    const listControl = self.listControlInDoc[element.parent].control;
+                                    for (let l = 0; l < listControl.length; l++) {
+                                        if(listControl[l].name == columns[j]){
+                                            self.$set(self.listControlInDoc[element.parent].control[l],'checked',true)
+                                            break;
+                                        }
+                                    }
+                                }
+                                
+                            }
+
+                       } catch (error) {
+                           console.warn(error);
+                       }
+                   }
+                }
+            });
+        },
+        onSaveIndex(){
+            for(let key in this.listControlInDoc){
+                let document = this.listControlInDoc[key];
+                if(!document.indexName){
+                    continue;
+                }
+                let controlChecked = [];
+                for (let i = 0; i < document.control.length; i++) {
+                    const control = document.control[i];
+                    if(control.checked){
+                        controlChecked.push(control.name)
+                    }
+                    
+                }
+                if(controlChecked.length > 0){
+                    let item = {};
+                    item['parent'] = (document.isTable) ? document.name : 'document';
+                    item['name'] = document.indexName;
+                    item['column'] = controlChecked;
+                    this.allIndexSelected.push(item);
+                }
+            }
+            if(this.allIndexSelected.length == 0){
+                return;
+            }
+            let self = this;
+            let dataPost = {documentId:this.rowActive.id,indexs:JSON.stringify(this.allIndexSelected)}
+            documentApi.saveColumnIndex(dataPost).then(res=>{
+                if(res.status == 200){
+                    self.$refs.listDocument.closeactionPanel();
+                    self.$snotify({
+                                type: "success",
+                                title: "Thêm index thành công"
+                            })
+                }
+                else{
+                    self.$snotify({
+                                type: "error",
+                                title: res.message
+                            })
+                }
+            });
+        },
+        onClickControl(doc,control){
+            this.$set(control,'checked',!control.checked );
+        },
         closePanel(){
             this.isShowQuickSubmit = false;
+            this.isDocumentIndex = false;
         },
         getApiDocument(){
             const self = this;
@@ -377,4 +528,46 @@ export default {
     }
 }
 </script>
+
+<style scoped>
+    .control{
+        display: flex;
+        height: 25px;
+        padding: 5px 4px;
+        cursor: pointer;
+        transition: background ease-in-out 250ms;
+    }
+    .control:hover{
+        background: var(--symper-background-hover);
+    }
+    .control >>> .v-icon{
+        margin-left: auto;
+    }
+    .listControl{
+        height: calc(100% - 80px);
+    }
+    .footer-action{
+        text-align: right;
+    }
+    .header-panel{
+        font-size: 16px;
+        font-weight: 500;
+        margin-bottom: 8px;
+        border-bottom: var(--symper-border);
+    }
+    .index-name{
+        height: 25px;
+        width: 150px;
+        background: var(--symper-background-default);
+        border-radius: 4px;
+        margin-left: 4px;
+        padding: 0 8px;
+    }
+    .index-name:hover{
+        outline: none;
+    }
+    ::v-deep .v-expand-header{
+        padding: 12px 4px;
+    }
+</style>
 
