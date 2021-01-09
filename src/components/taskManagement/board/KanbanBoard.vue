@@ -363,7 +363,7 @@ export default {
             });
         },
         getListRoleUserInProject(){
-            if (this.flagGetListOperatorInProject) {
+            if (this.flagGetListRoleUserInProject) {
                 return;
             }
             this.kanbanWorker.postMessage({
