@@ -102,6 +102,7 @@ import { taskManagementApi } from "@/api/taskManagement.js";
 import { util } from '../../../plugins/util';
 import { documentApi } from "@/api/Document.js";
 import symperAvatar from "@/components/common/SymperAvatar.vue";
+import KanbanWorker from 'worker-loader!@/worker/taskManagement/kanban/Kanban.Worker.js';
 
 export default {
     name: "KanbanBoard",
@@ -177,6 +178,14 @@ export default {
     },
     data() {
         return {
+            flagGetListStatusInProject:false,  // gán cờ trạng thái: đã được gọi hàm hay chưa
+            flagGetListColumnInBoard:false,  // gán cờ trạng thái: đã được gọi hàm hay chưa
+            flagGetListStatusInColumnBoard:false,  // gán cờ trạng thái: đã được gọi hàm hay chưa
+            flagGetListIssueTypeInProjects:false,  // gán cờ trạng thái: đã được gọi hàm hay chưa
+            flagGetListRoleUserInProject:false,  // gán cờ trạng thái: đã được gọi hàm hay chưa
+            flagGetListOperatorInProject:false,  // gán cờ trạng thái: đã được gọi hàm hay chưa
+            isGetListTask:false,
+            kanbanWorker:null,
             projectId:null,
             listBoardColumn:null,
             settingBoardMenuitems: null,
@@ -201,7 +210,6 @@ export default {
         startMoveTask(event,status){
             this.dragging = true;
             for (const key in this.nodeMapPermission) {
-
                 if (key == status.nodeId) {
                     continue ;
                 }
@@ -248,45 +256,14 @@ export default {
             let allOperator = this.$store.state.taskManagement.listOperatorInProject[this.projectId];
             let allNode = this.$store.state.taskManagement.listStatusInProjects[this.projectId];
             if (allOperator.length > 0 && allNode.length > 0) {
-                for (let i = 0; i < allOperator.length; i++) {
-                    if (allOperator[i].tmg_to_status_id) {
-                        if (!this.nodeMapPermission[allOperator[i].tmg_to_status_id]) {
-                            this.nodeMapPermission[allOperator[i].tmg_to_status_id] = {};
-                            this.nodeMapPermission[allOperator[i].tmg_to_status_id]["allowTo"] = [];
-                            this.nodeMapPermission[allOperator[i].tmg_to_status_id]["permission"] = [];
-                            this.nodeMapPermission[allOperator[i].tmg_to_status_id]["disable"] = false;
-                        }
-                    
-                        let node = allNode.find(ele => ele.nodeId == allOperator[i].tmg_to_status_id);
-                        // get role cho node
-                        if (node) {
-                            if (node.roleIds.length > 10) {
-                                this.nodeMapPermission[allOperator[i].tmg_to_status_id]["permission"] = JSON.parse(node.roleIds);
-                            }
-                        }
-                        // get status được phép chuyển trạng thái đến
-                        if (allOperator[i].tmg_from_status_id) {
-                            if (this.nodeMapPermission[allOperator[i].tmg_to_status_id]["allowTo"].indexOf(allOperator[i].tmg_from_status_id) == -1) {
-                                this.nodeMapPermission[allOperator[i].tmg_to_status_id]["allowTo"].push(allOperator[i].tmg_from_status_id);
-                            }
-                        }else{ // trường hợp cho phép all, add hết status cùng task life circle
-                            let taskLifeCircleId = allOperator[i].tmg_task_life_circle_id;
-                            let listNodeInTaskLifeCircle =  allNode.filter( node =>{
-                                return node.taskLifeCircleId == taskLifeCircleId;
-                            });
-
-                            if (listNodeInTaskLifeCircle.length > 0) {
-                                for (let j = 0; j < listNodeInTaskLifeCircle.length; j++) {
-                                    if (this.nodeMapPermission[allOperator[i].tmg_to_status_id]["allowTo"].indexOf(listNodeInTaskLifeCircle[j].nodeId) == -1) {
-                                        this.nodeMapPermission[allOperator[i].tmg_to_status_id]["allowTo"].push(listNodeInTaskLifeCircle[j].nodeId);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
+                let data = {};
+                data.allOperator = allOperator;
+                data.allNode = allNode;
+                this.kanbanWorker.postMessage({
+                    action:'setNodeMap',
+                    data:data
+                });
             }
-         
 
         },
         getUser(){
@@ -300,30 +277,15 @@ export default {
         handleChange(event, status){
             if(event.added){
                 let task = event.added.element;
-                let dataPost ={};
-                let dataControl ={};
-                let issueType = this.allIssueTypeInProject.find(ele => ele.id == task.tmg_issue_type);
-                if (issueType) {
-                    dataPost['documentId'] = issueType.documentId;
-                }
-                
-                dataControl.tmg_status_id = status.statusId;
-                dataControl.tmg_status_category_id = status.statusCategoryId;
-                dataControl.tmg_status = status.name;
-                dataPost['documentObjectWorkflowObjectId'] = "";
-                dataPost['documentObjectWorkflowId'] = "";
-                dataPost['documentObjectTaskId'] = "";
-                dataPost['dataControl'] = JSON.stringify(dataControl);
-               
-                documentApi.updateDocument(task.document_object_id,dataPost).then(res => {
-                    if (res.status == 200) {
-                        console.log("update task success");
-                    }else{
-                        this.$snotifyError("", "Update status error!");
-                    }
-                })
+                let dataSend = {};
+                dataSend.allIssueTypeInProject = this.allIssueTypeInProject;
+                dataSend.task = task;
+                dataSend.status = status;
 
-                
+                this.kanbanWorker.postMessage({
+                    action:'handleChangeStatusIssue',
+                    data:dataSend
+                });
             }
         },
         
@@ -345,48 +307,117 @@ export default {
         /**
          * Hàm lấy danh sách task hiên thị lên kanban board
          */
-        async getListTasks(){
-            let documentId = this.allIssueTypeInProject.reduce((arr,obj)=>{
-                if(!arr.includes(obj.documentId)){
-                    if (obj.documentId) {
-                        arr.push(obj.documentId)
-                    }
-                }
-                return arr
-            },[])
-            let allTask = await documentApi.getListObjectByMultipleDocument({ids:JSON.stringify(documentId)})
-            allTask = allTask['data']['listObject'];
-            let columns = this.listColumn;
-            if (this.listStatus.length > 0 ) {
-                for (let i = 0; i < this.listStatusColumn.length; i++) {
-                    let idColumn = this.listStatusColumn[i].columnId;
-                    let statusId = this.listStatusColumn[i].statusId;
-                    let taskLifeCircleId = this.listStatusColumn[i].taskLifeCircleId;
-                    let item = this.listStatus.find(ele => ele.statusId == statusId &&  ele.taskLifeCircleId == taskLifeCircleId );
-                    if (item) {
-                        let taskInStatus = allTask.filter(task=>{
-                            return task.tmg_status_id == statusId && task.tmg_task_life_circle_id == taskLifeCircleId;
-                        })
-                        item['tasks'] = taskInStatus;
-                        let column = columns.find(ele => ele.id == idColumn);
-                        if (column) {
-                            column.statusInColumn.push(item);
-                        }
-                    }
-                }  
-            }
-            this.listBoardColumn = columns;
-            this.$emit('loaded-content');
-            this.setNodeMap();
+        getListTasks(){
+            this.isGetListTask = true;
+            let data = {};
+            data.listColumn = this.listColumn;
+            data.listStatusColumn = this.listStatusColumn;
+            data.listStatus = this.listStatus;
+            data.allIssueTypeInProject =  this.allIssueTypeInProject
+            // đẩy xuống worker xử lý
+            this.kanbanWorker.postMessage({
+                action:'getListTasks',
+                data:data
+            });
         },
-        async getListBoard(){
-            let res = await taskManagementApi.getListBoardInProject(this.projectId) ;
-            if (res.status == 200) {
-                this.$store.commit("taskManagement/setListBoardInProject", res.data.listObject);
-            }
-            this.getDataForBoard();
+        getListBoard(){
+            this.kanbanWorker.postMessage({
+                action:'getListBoard',
+                data:this.projectId
+            });
         },
-        async getDataForBoard(board=null){
+        getListStatusInProject(){
+            if (this.flagGetListStatusInProject) {
+                return;
+            }
+            this.kanbanWorker.postMessage({
+                action:'getListStatusInProject',
+                data:this.projectId
+            });
+        },
+        getListColumnInBoard(idBoard){
+            if (this.flagGetListColumnInBoard) {
+                return;
+            }
+            this.kanbanWorker.postMessage({
+                action:'getListColumnInBoard',
+                data:idBoard
+            });
+        },
+        getListStatusInColumnBoard(idBoard){
+            if (this.flagGetListStatusInColumnBoard) {
+                return;
+            }
+            this.kanbanWorker.postMessage({
+                action:'getListStatusInColumnBoard',
+                data:idBoard
+            });
+        },
+        getListIssueTypeInProjects(){
+            if (this.flagGetListIssueTypeInProjects) {
+                return;
+            }
+            this.kanbanWorker.postMessage({
+                action:'getListIssueTypeInProjects',
+                data:this.projectId
+            });
+        },
+        getListRoleUserInProject(){
+            if (this.flagGetListOperatorInProject) {
+                return;
+            }
+            this.kanbanWorker.postMessage({
+                action:'getListRoleUserInProject',
+                data:this.projectId
+            });
+        },
+        getListOperatorInProject(){
+            if (this.flagGetListOperatorInProject) {
+                return;
+            }
+            this.kanbanWorker.postMessage({
+                action:'getListOperatorInProject',
+                data:this.projectId
+            });
+        },  
+        getMoreData(){
+            let self = this;
+            let idBoard = this.currentBoard.id;
+            if (!this.sTaskManagement.listStatusInProjects[this.projectId] || this.sTaskManagement.listStatusInProjects[this.projectId].length == 0) {
+                self.getListStatusInProject();
+                this.flagGetListStatusInProject = true;
+            }
+            if (!this.sTaskManagement.listColumnInBoard[idBoard] || this.sTaskManagement.listColumnInBoard[idBoard].length == 0) {
+                self.getListColumnInBoard(idBoard);
+                this.flagGetListColumnInBoard = true;
+            }
+            if (!this.sTaskManagement.listStatusInColumnBoard[idBoard] || this.sTaskManagement.listStatusInColumnBoard[idBoard].length == 0) {
+                self.getListStatusInColumnBoard(idBoard);
+                this.flagGetListStatusInColumnBoard = true;
+            }
+            if(!this.sTaskManagement.listIssueTypeInProjects[this.projectId] ||  this.sTaskManagement.listIssueTypeInProjects[this.projectId].length == 0){
+                self.getListIssueTypeInProjects();
+                this.flagGetListIssueTypeInProjects = true;
+            }
+            if (!this.sTaskManagement.listRoleUserInProject[this.projectId] || this.sTaskManagement.listRoleUserInProject[this.projectId].length == 0) {
+                self.getListRoleUserInProject();
+                this.flagGetListRoleUserInProject = true;
+            }
+            if (!this.sTaskManagement.listOperatorInProject[this.projectId] || this.sTaskManagement.listOperatorInProject[this.projectId].length == 0) {
+                self.getListOperatorInProject();
+                this.flagGetListOperatorInProject = true;
+
+            }
+            if (!self.isGetListTask && self.sTaskManagement.listStatusInProjects[self.projectId] && self.sTaskManagement.listStatusInProjects[self.projectId].length > 0 &&
+                self.sTaskManagement.listColumnInBoard[idBoard] && self.sTaskManagement.listColumnInBoard[idBoard].length > 0 &&
+                self.sTaskManagement.listStatusInColumnBoard[idBoard] && self.sTaskManagement.listStatusInColumnBoard[idBoard].length > 0 &&
+                self.sTaskManagement.listIssueTypeInProjects[self.projectId] &&  self.sTaskManagement.listIssueTypeInProjects[self.projectId].length > 0
+            ) {
+                self.getListTasks();
+            }
+          
+        },
+        getDataForBoard(board=null){
             let self = this;
             if (board) {
                 this.currentBoard = board;
@@ -396,48 +427,45 @@ export default {
                     this.currentBoard = allBoard[0];  
                 }
             }
+            let idBoard = this.currentBoard.id;
             self.$store.commit("taskManagement/setCurrentBoard",this.currentBoard);
           
-            let idBoard = this.currentBoard.id;
-
-            if (!this.sTaskManagement.listStatusInProjects[this.projectId] || this.sTaskManagement.listStatusInProjects[this.projectId].length == 0) {
-                await this.$store.dispatch("taskManagement/getListStautsInProject", this.projectId);
-            }
-            if (!this.sTaskManagement.listColumnInBoard[idBoard] || this.sTaskManagement.listColumnInBoard[idBoard].length == 0) {
-                await this.$store.dispatch("taskManagement/getListColumnInBoard",idBoard);
-            }
-            if (!this.sTaskManagement.listStatusInColumnBoard[idBoard] || this.sTaskManagement.listStatusInColumnBoard[idBoard].length == 0) {
-                await this.$store.dispatch("taskManagement/getListStatusInColumnBoard",idBoard);
-            }
-            if(!this.allIssueTypeInProject){
-                await this.$store.dispatch("taskManagement/getListIssueTypeInProjects", this.projectId);
-            }
-            if (!this.sTaskManagement.listRoleUserInProject[this.projectId] || this.sTaskManagement.listRoleUserInProject[this.projectId].length == 0) {
-                await this.$store.dispatch("taskManagement/getListRoleUserInProject",this.projectId);
-            }
-            if (!this.sTaskManagement.listOperatorInProject[this.projectId] || this.sTaskManagement.listOperatorInProject[this.projectId].length == 0) {
-                await this.$store.dispatch("taskManagement/getListOperatorInProject",this.projectId);
-            }
-            this.getListTasks();
+            this.getMoreData();
         },
-        async getUserInProject(){
-            let self=this;
-            let projectId=this.$route.params.id;
-            let list = await taskManagementApi.getUserInProject(projectId);
-            if (list.status == 200 && list.data) {
-                self.listUser = list.data.listObject;
-            }
+
+        getUserInProject(){
+            this.kanbanWorker.postMessage({
+                action:'getUserInProject',
+                data:this.projectId
+            });
+        },
+        getListWorkflowInProject(){
+            this.kanbanWorker.postMessage({
+                action:'getListWorkflowInProject',
+                data:this.projectId
+            });
+        },
+        getListDocumentIdsInProject(){
+            this.kanbanWorker.postMessage({
+                action:'getListDocumentIdsInProject',
+                data:this.projectId
+            });
+        },
+        getDetailProject(){
+            this.kanbanWorker.postMessage({
+                action:'getDetailProject',
+                data:this.projectId
+            });
         },
         loadData(){
+            let self = this;
             this.projectId = this.$route.params.id;
             this.getListBoard();
             this.getUserInProject();
-            this.$store.dispatch("taskManagement/getListWorkflowInProject",this.projectId);
-
+            this.getListWorkflowInProject();
             if (!this.sTaskManagement.listDocumentIdsInProject[this.projectId] || this.sTaskManagement.listDocumentIdsInProject[this.projectId].length == 0) {
-                this.$store.dispatch("taskManagement/getListDocumentIdsInProject",this.projectId);
+                this.getListDocumentIdsInProject();
             }
-            
             let breadcrumbs = [
                     {
                         text: 'Kanban',
@@ -445,26 +473,13 @@ export default {
                     },
                 ]
             this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
-            let self = this;
             if (this.projectId) {
                 let allProject=this.sTaskManagement.allProject;
                 let project=allProject.find(element => element.id==this.projectId);
                 if (project) {
                     self.$store.commit("taskManagement/setCurrentProject", project);
                 }else{ // call api get detail project
-                    taskManagementApi
-                        .getDetailProject(this.projectId)
-                        .then(res => {
-                            if (res.status == 200) {
-                                self.$store.commit("taskManagement/setCurrentProject", res.data);
-                            }else{
-                                self.$snotifyError("", "Can not get detail project with id:"+this.projectId);
-                            }
-                        })
-                        .catch(err => {
-                            self.$snotifyError("", "Can not get detail project with id:"+this.projectId);
-                        })
-                        .finally(() => {});
+                    self.getDetailProject();
                 }
             }
         },
@@ -476,9 +491,126 @@ export default {
     created(){
         let self = this;
         this.$evtBus.$on('selected-item-board', (board) =>{
+            self.flagGetListOperatorInProject = false;
+            self.flagGetListRoleUserInProject = false;
+            self.flagGetListIssueTypeInProjects = false;
+            self.flagGetListStatusInProject = false;
+            self.flagGetListStatusInColumnBoard = false;
+            self.flagGetListColumnInBoard = false;
+            self.isGetListTask = false;
             self.$emit('loading');
             self.getDataForBoard(board);
+            setTimeout(() => {
+                self.$emit('loaded-content');
+            }, 500);
         });
+
+        this.kanbanWorker = new KanbanWorker();
+        this.kanbanWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'actionError':
+                    self.$snotifyError("", "Update status error!");
+                    break;
+                case 'getListBoard':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/setListBoardInProject", res.data.listObject);
+                        self.getDataForBoard();
+                    } 
+                    break;
+                case 'getUserInProject':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.listUser = res.data.listObject;
+                    } 
+                    break;
+                case 'handleChangeStatusIssue':
+                    console.log("update task success");
+                    break;
+                case 'setNodeMap':
+                    self.nodeMapPermission = data.dataAfter;
+                    break;
+                case 'getListTasks':
+                    self.listBoardColumn = data.dataAfter;
+                    self.$emit('loaded-content');
+                    self.setNodeMap();
+                    break;
+                case 'getListWorkflowInProject':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit('taskManagement/setAllWorkflow', res.data.listObject);
+                    } 
+                    break;
+                case 'getListDocumentIdsInProject':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit('taskManagement/setListDocumentIdsInProject', res);
+                    } 
+                    break;
+                case 'getDetailProject':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/setCurrentProject", res.data);
+                    } 
+                    break;
+                case 'getListStatusInProject':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/setListStautsInProject", res);
+                        self.getMoreData();
+                    } 
+                    break;
+                case 'getListColumnInBoard':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        if (res.data.length == 0) {
+                            self.$emit('loaded-content');
+                        }
+                        self.$store.commit("taskManagement/setListColumnInBoard", res);
+                        self.getMoreData();
+                    } 
+                    break;
+                case 'getListStatusInColumnBoard':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        if (res.data.length == 0) {
+                            self.$emit('loaded-content');
+                        }
+                        self.$store.commit("taskManagement/setListStatusInColumnBoard", res);
+                        self.getMoreData();
+                    } 
+                    break;
+                case 'getListIssueTypeInProjects':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/setListIssueTypeInProjects", res);
+                        self.getMoreData();
+                    } 
+                    break;
+                case 'getListRoleUserInProject':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        if (res.data.length == 0) {
+                            self.$emit('loaded-content');
+                        }
+                        self.$store.commit("taskManagement/setListRoleUserInProject", res);
+                        self.getMoreData();
+                    } 
+                    break;
+                case 'getListOperatorInProject':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/setListOperatorInProject", res);
+                        self.getMoreData();
+                    } 
+                    break;
+                
+                default:
+                    break;
+            }
+        });
+
     },
     
     activated(){

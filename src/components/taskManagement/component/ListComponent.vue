@@ -228,6 +228,7 @@ export default {
                 case 'actionError':
                     self.dialogRemoveComponent=false;
                     self.loading=false;
+                    break;
                 case 'removeComponent':
                     self.$snotifySuccess("Remove component success!");
                     self.$emit("add-component");

@@ -158,7 +158,7 @@ export const taskManagementApi = {
         return taskManagement.get("columns/"+boardId);
     },
     addColumnInBoard(data){
-        return taskManagement.post("columns",data);
+        return taskManagement.post("columns",data,{},{'contentType': 'application/json'});
     },
     updateColumnInBoard(data){
         return taskManagement.put("columns/"+data.boardId,data);

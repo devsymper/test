@@ -41,6 +41,7 @@
 import FormTpl from "@/components/common/FormTpl.vue";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
+import KanbanWorker from 'worker-loader!@/worker/taskManagement/kanban/Kanban.Worker.js';
 
 export default {
     name:"detailBoard",
@@ -71,6 +72,7 @@ export default {
     },
     data(){
         return{
+            kanbanWorker:null,
             isLoading:false,
             statusEdit:false,
             currentProject:{},
@@ -121,25 +123,13 @@ export default {
                 let data={};
                 data.name=this.infoBoardProps.name.value;
                 data.description=this.infoBoardProps.description.value;
+                data.id=this.infoBoard.id;
 
-                taskManagementApi
-                    .updateBoard(this.infoBoard.id,data)
-                    .then(res => {
-                        if (res.status == 200) {
-                            data.id=this.infoBoard.id;
-                            this.$store.commit("taskManagement/updateBoardToStore", data);
-                            this.$snotifySuccess("Update board success!");
-                            this.statusEdit=false;
-                        }else{
-                            this.$snotifyError("", "Can not update board!");
-                        }
-                        this.isLoading=false;
-                    })
-                    .catch(err => {
-                        this.$snotifyError("", "Can not update board!", err);
-                        this.isLoading=false;
-                    });
-                
+                this.kanbanWorker.postMessage({
+                    action:'updateBoard',
+                    data:data
+                });
+
             }else{
                 this.$snotifyError("", "Have error!");
                 this.isLoading=false;   
@@ -180,8 +170,33 @@ export default {
         }
     },
     created(){
+        let self = this;
         this.getData()
         this.checkRoleIsAllowEdit();
+
+        this.kanbanWorker = new KanbanWorker();
+        this.kanbanWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'actionError':
+                    self.$snotifyError("", "Update status error!");
+                    self.isLoading = false;
+                    break;
+                case 'updateBoard':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/updateBoardToStore", res);
+                        self.$snotifySuccess("Update board success!");
+                        self.statusEdit=false;
+                        self.isLoading = false;
+                    }
+                    break;
+             
+                default:
+                    break;
+            }
+        });
+
     }
 }
 </script>

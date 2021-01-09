@@ -118,15 +118,6 @@ export default {
             }
         },
     },
-    listDocumentIdsInProject:{
-            deep:true,
-            immediate:true,
-            handler(newVl){
-                if (newVl){
-                    this.getData();
-                }
-            }
-        },
     data(){
         let self = this;
         return{

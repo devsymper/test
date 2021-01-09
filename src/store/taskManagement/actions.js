@@ -267,7 +267,7 @@ const getAllRole = async(context,projectId) => {
         SYMPER_APP.$snotifyError(error, "Can not get all role!");
     }
 }
-const getListStautsInProject = async(context,projectId) => {
+const getListStatusInProject = async(context,projectId) => {
     return new Promise((resolve, reject) => {
         try {
             taskManagementApi.getListStatusInProject(projectId).then(res=>{
@@ -490,7 +490,7 @@ export {
     getAllRole,
     getListWorkflowInProject,
     getAllPriority,
-    getListStautsInProject,
+    getListStatusInProject,
     getListColumnInBoard,
     getListStatusInColumnBoard,
     getListDocumentConfigFieldIssue,

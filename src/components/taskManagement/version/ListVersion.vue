@@ -260,6 +260,7 @@ export default {
                 case 'actionError':
                     self.dialogRemoveVersion=false;
                     self.loading=false;
+                    break;
                 case 'removeVersion':
                     self.$snotifySuccess("Remove Version success!");
                     self.$emit("add-version");
