@@ -5,6 +5,7 @@
         "select_lang": "Select language",
         "required": "required",
         "KH": "Knowledge Management",
+        "taskManagement": "Task Management",
         "structureManagement": "Structure management",
         "reports": "Reports",
         "workflows": "Workflows",
@@ -132,6 +133,7 @@
             "apps": "My apps",
             "Account management": "Account manager",
             "Access Management": "Access management",
+            "Task Management": "Task management",
             "Applications": "Applications",
             "Lists to do": "Lists to do",
             "My application": "My application",
@@ -1308,5 +1310,52 @@
         "reply": "Reply",
         "edited": "Edited",
         "search": "Search"
+    },
+    "taskManagement":{
+        "table":{
+            "name": "Name",
+            "description": "Description",
+            "lead": "Leader",
+            "category": "Category",
+            "createAt":"Create time",
+            "email":"Email",
+            "role":"Role",
+            "workflow":"Workflow",
+            "startDate":"Start date",
+            "releaseDate":"Release date",
+            "unreleased":"Unreleased",
+            "released":"Released",
+            "configField":"Config field"
+        },
+        "listMember":"List member",
+        "listCategory":"List category",
+        "listProject":"List project",
+        "listComponent":"List component",
+        "listVersion":"List version",
+        "listIssueType":"List Issue type",
+        "listWorkflow":"List Workflow",
+        "listPriority":"List Priority",
+        "listActionPack":"List ActionPack",
+        "listPermission":"List Permission",
+        "listIssueComponent":"List Issue in component",
+        "listIssueVersion":"List Issue in version",
+        "detailProject":"Detail project",
+        "requiredField":"Indicates required field",
+        "addPeople":"Add people",
+        "managerRole":"Manager roles",
+        "createRole":"Create role",
+        "dialog":{
+            "removeUser": "You will remove members from this project?",
+            "removeRole": "You will remove role from this rols.",
+            "removeCategory": "You will remove category from this list.",
+            "removeComponent": "You will remove component from this list.",
+            "removeWorkflow": "You will remove workflow from this list.",
+            "removePriority": "You will remove priority from this list."
+
+        },
+        "settingBoard":"Board setting"
+
+
+
     }
 }

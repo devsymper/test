@@ -6,6 +6,7 @@
         "required": "Bắt buộc",
         "select_lang": "Thay đổi ngôn ngữ",
         "KH": "Knowledge Management",
+        "taskManagement": "Quản lí công việc",
         "structureManagement": "Quản lí cơ cấu ",
         "reports": "Báo cáo",
         "workflows": "Quy trình",
@@ -127,6 +128,7 @@
             "App": "Ứng dụng",
             "Administrator": "Quản trị viên",
             "Account management": "Quản lý tài khoản",
+            "Task Management": "Quản lý công việc",
             "Access Management": "Quản lý truy cập",
             "accessControl": "Quản lý truy cập",
             "accessControlBeta": "Quản lý truy cập beta",
@@ -1448,5 +1450,49 @@
         "reply": "Trả lời",
         "edited": "Đã chỉnh sửa",
         "search": "Tìm kiếm"
+    },
+    "taskManagement":{
+        "table":{
+            "name": "Tên",
+            "description": "Mô tả",
+            "lead": "Leader",
+            "category": "Danh mục",
+            "createAt":"Ngày tạo",
+            "email":"Email",
+            "role":"Quyền",
+            "workflow":"Workflow",
+            "startDate":"Ngày bắt đầu",
+            "releaseDate":"Ngày phát hành",
+            "unreleased":"Chưa phát hành",
+            "released":"Đã phát hành",
+            "configField":"Cấu hình field"
+        },
+        "listMember":"Danh sách thành viên",
+        "listProject":"Danh sách project",
+        "listCategory":"Danh sách danh mục",
+        "listComponent":"Danh sách component",
+        "listVersion":"Danh sách version",
+        "listIssueType":"Danh sách Issue type",
+        "listWorkflow":"Danh sách Workflow",
+        "listPriority":"Danh sách Priority",
+        "listActionPack":"Danh sách ActionPack",
+        "listPermission":"Danh sách Permission",
+        "listIssueComponent":"Danh sách Issue trong component",
+        "listIssueVersion":"Danh sách Issue trong version",
+        "requiredField":"Trường bắt buộc nhập",
+        "detailProject":"Thông tin project",
+        "addPeople":"Thêm thành viên",
+        "managerRole":"Quản lý phân quyền",
+        "createRole":"Tạo role",
+        "dialog":{
+            "removeUser": "Bạn sẽ xóa thành viên khỏi project này",
+            "removeRole": "Bạn sẽ xóa role này khỏi danh sách.",
+            "removeCategory": "Bạn sẽ xóa danh mục này khỏi danh sách.",
+            "removeComponent": "Bạn sẽ xóa component này khỏi danh sách.",
+            "removeWorkflow": "Bạn sẽ xóa workflow này khỏi danh sách.",
+            "removePriority": "Bạn sẽ xóa priority này khỏi danh sách."
+        },
+        "settingBoard":"Cài đặt Board"
+
     }
 }
