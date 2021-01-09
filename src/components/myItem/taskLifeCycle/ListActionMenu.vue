@@ -53,17 +53,32 @@ export default {
 		showResolveAction:{
 			type: Boolean,
 			default: false
+		},
+		taskInfo:{
+			type: Object,
+			default(){
+				return {}
+			}
 		}
 	},
 	computed:{
 		listActions(){
+			
 			let lists = []
 			if(this.userType == 'assignee' && this.taskType == 'assign'){
-				this.items.forEach(function(e){
-					if(e.value == 'reAssign' || e.value == 'delegate' || e.value == 'complete'){
-						lists.push(e)
-					}
-				})
+				if(this.taskInfo.action.action == "approval"){
+					this.items.forEach(function(e){
+						if(e.value == 'reAssign'){
+							lists.push(e)
+						}
+					})
+				}else{
+					this.items.forEach(function(e){
+						if(e.value == 'reAssign' || e.value == 'delegate' || e.value == 'complete'){
+							lists.push(e)
+						}
+					})
+				}
 			}
 			if(this.userType == 'assignee' && this.taskType == 'delegate'){
 				this.items.forEach(function(e){

@@ -33,7 +33,8 @@
 						<v-icon small color="success">mdi-information-outline</v-icon> Submit
 				</v-btn> -->
                 <span v-if="!originData.endTime && !hideActionTask " class="mr-10">
-                    <span v-if="originData.assigneeInfo && checkRole(originData.assigneeInfo.id) == true">
+                            
+                    <span v-if="originData.assigneeInfo && checkRole(originData.assigneeInfo.id) == true" class="mr-16">
                         <v-btn 
                             small 
                             depressed  
@@ -41,8 +42,8 @@
                             dark 
                             :key="idx" 
                             :color="action.color" 
+							class="mr-1"
                             @click="saveTaskOutcome(action.value)" 
-                            class="mr-2 mr-16"
                             :loading="loadingAction"
                         >
                             {{action.text}}
@@ -62,6 +63,7 @@
 					@action-clicked="handlerActionClick"
 					:userType="userType"
 					:taskType="taskStatus.value"
+					:taskInfo="taskInfo"
 					:showResolveAction="!showSubmitBtn"
 					:style="{position: 'absolute', right: rightAction+'px ',top: '4px'}"
 				/>
