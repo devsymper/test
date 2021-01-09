@@ -114,6 +114,7 @@ export default {
 							{name: "description", title: "description", type: "text"},
 							{name: "lastVersion", title: "lastVersion", type: "text"},
 							{name: "language", title: "language", type: "text"},
+							{name: "description", title: "description", type: "text"},
 							{name: "status", title: "status", type: "numeric"},
 							{name: "userCreateName", title: "userCreate", type: "text"},
 							{name: "userUpdateName", title: "userUpdate", type: "text"},

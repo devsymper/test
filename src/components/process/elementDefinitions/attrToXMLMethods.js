@@ -71,9 +71,8 @@ export default {
         if (nodeAllAttrs.hasOwnProperty('getValueForXML')) {
             value = nodeAllAttrs.getValueForXML(attr.value);
         }
-        console.log(attrName, value, value !== '');
 
-        if (value !== '' && attrName != 'overrideid') {
+        if (attrName != 'overrideid') {
             let objToUpdate = {};
             if (typeof value != 'number' && typeof value != 'string') {
                 value = JSON.stringify(value);
@@ -82,12 +81,15 @@ export default {
             if (nodeAllAttrs.toXMLExtend) {
                 toXMLname = nodeAllAttrs.toXMLExtend.name;
             }
-            objToUpdate[toXMLname] = value;
-            if (el.businessObject) {
-                clearEmptyAttr(el.businessObject);
-                // el.businessObject.$attrs[attrName] = value;
-                modeling.updateProperties(el, objToUpdate);
-            }
+
+            if(value !== ''){
+                objToUpdate[toXMLname] = value;
+                if (el.businessObject) {
+                    clearEmptyAttr(el.businessObject);
+                    // el.businessObject.$attrs[attrName] = value;
+                    modeling.updateProperties(el, objToUpdate);
+                }
+            }else{}
         }
     },
 

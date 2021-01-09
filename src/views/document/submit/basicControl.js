@@ -5,6 +5,7 @@ import { SYMPER_APP } from './../../../main.js'
 import Util from './util'
 var numbro = require("numbro");
 import { appConfigs } from "@/configs.js";
+import tinymce from 'tinymce/tinymce';
 import { documentApi } from "../../../api/Document";
 let sDocumentManagementUrl = appConfigs.apiDomain.sdocumentManagement;
 const fileTypes = {
@@ -140,7 +141,7 @@ export default class BasicControl extends Control {
                         }).catch(err => {
 
                         })
-                        .always(() => {});
+                        .finally(() => {});
                 }
             }
 
@@ -199,6 +200,42 @@ export default class BasicControl extends Control {
                     valueChange = $(e.target).text();
                 } else if (thisObj.type == 'checkbox') {
                     valueChange = $(e.target).prop("checked");
+                } else if(thisObj.type == 'user'){
+                    return false;
+                }else if(thisObj.type == 'number'){
+                    valueChange = valueChange.replace(/=/g,"");
+                    valueChange = eval(valueChange);
+                    if(!/^[-0-9,.]+$/.test(valueChange)){
+                        return false;
+                    }
+                }else if(thisObj.type == 'date'){
+                    valueChange = this.$moment(valueChange,'DD-MM-YYYY').format('YYYY-MM-DD');
+                }else if(thisObj.type == 'time'){
+                    if(!Util.checkTimeValid(valueChange)){
+                        thisObj.renderValidateIcon("Không đúng định dạng thời gian", 'TimeValid')
+                        return false
+                    }
+                    else{
+                        thisObj.removeValidateIcon('TimeValid')
+                    }
+                }
+                // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
+                if(thisObj.isRequiredControl()){
+                    if(!valueChange){
+                        thisObj.renderValidateIcon('Không được bỏ trống trường thông tin '+thisObj.title, 'Require')
+                    }
+                    else{
+                        thisObj.removeValidateIcon('Require');
+                    }
+                }
+                else if(thisObj.type == 'time'){
+                    if(!Util.checkTimeValid(valueChange)){
+                        thisObj.renderValidateIcon("Không đúng định dạng thời gian", 'TimeValid')
+                        return false
+                    }
+                    else{
+                        thisObj.removeValidateIcon('TimeValid')
+                    }
                 }
                 thisObj.value = valueChange;
                 SYMPER_APP.$evtBus.$emit('document-submit-input-change', thisObj);
@@ -224,15 +261,6 @@ export default class BasicControl extends Control {
                     }
                     thisObj.traceControl();
                 }
-                if (thisObj.type == 'user') {
-                    e.curTarget = e.target
-                    SYMPER_APP.$evtBus.$emit('document-submit-user-input-change', e)
-                }
-                // if (thisObj.type == 'percent') {
-                //     if (e.target.value > 100) {
-                //         $(e.target).val(100)
-                //     }
-                // }
                 if (thisObj.type == 'department') {
                     e['controlName'] = thisObj.name;
                     SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
@@ -310,41 +338,63 @@ export default class BasicControl extends Control {
     }
 
     setValue(value) {
-        this.value = value;
-        if (this.inTable === false) {
-            if (this.type == 'label') {
-                $('#' + this.id).text(value);
-            } else if (this.type == 'richText') {
-                $('#' + this.id).val(value);
-            } else if (this.type == 'date') {
-                $('#' + this.id).val(SYMPER_APP.$moment(value).format(this.formatDate));
-            } else if (this.type == 'checkbox') {
-                if (value)
-                    $('#' + this.id).attr('checked', 'checked');
-                else {
-                    $('#' + this.id).removeAttr('checked');
+        if (this.type == 'fileUpload') {
+            if(!this.value){
+                this.value = [];
+            }
+            this.value.push(value);
+            this.setFileControlValue(value);
+        }
+        else{
+            if(value.inputDislay && value.inputValue){
+                this.value = value.inputValue;
+            }
+            else{
+                this.value = value;
+            }
+            if (this.inTable === false) {
+                if (this.type == 'label') {
+                    this.ele.text(value);
+                } else if (this.type == 'richText') {
+                    this.ele.val(value);
+                } else if (this.type == 'date') {
+                    this.ele.val(SYMPER_APP.$moment(value).format(this.formatDate));
+                    this.value = SYMPER_APP.$moment(value).format('YYYY-MM-DD');
+                } else if (this.type == 'checkbox') {
+                    if (value)
+                        this.ele.attr('checked', 'checked');
+                    else {
+                        this.ele.removeAttr('checked');
+                    }
+                } else if (this.type == 'number') {
+                    let v = parseInt(value);
+                    if (!isNaN(v))
+                        this.ele.val(numbro(value).format(this.numberFormat));
+                    else {
+                        this.ele.val("");
+                    }
                 }
-            } else if (this.type == 'number') {
-                let v = parseInt(value);
-                if (!isNaN(v))
-                    $('#' + this.id).val(numbro(value).format(this.numberFormat));
+                else if (this.type == 'image') {
+                    this.setImageControlValue(value)
+                }        
                 else {
-                    $('#' + this.id).val("");
+                    if(value.inputDislay){
+                        this.ele.val(value.inputDislay);
+                    }
+                    else{
+                        this.ele.val(value);
+                    }
                 }
-            } else {
-                $('#' + this.id).val(value);
+            }
+            if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
+                this.defaultValue = value;
             }
         }
-        if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
-            this.defaultValue = value;
-        }
-
-
+        console.log(this.value,'asasas');
     }
     getValue() {
         return this.value;
     }
-
 
     setValueControl(vl = undefined) {
         let value = vl;
@@ -363,26 +413,91 @@ export default class BasicControl extends Control {
         if (this.type == 'label') {
             this.ele.text(value)
         } else if (this.type == 'richText') {
-            $('#' + this.id).val(value);
+            this.ele.val(value);
         } else if (this.type == 'image') {
-            this.ele.empty();
-            let w = this.controlProperties.width.value;
-            let h = this.controlProperties.height.value;
-            if (!w) {
-                w = 'auto';
+            this.setImageControlValue(value)
+        }
+        else if (this.type == 'fileUpload') {
+            if (this.checkDetailView()) {
+                this.ele.find('.upload-file-wrapper-outtb').empty()
             }
-            if (!h) {
-                h = '70';
+            this.setFileControlValue(value, true)
+        }
+        else if(this.type == 'user'){
+            let listUser = store.state.app.allUsers;
+            if (this.value != null && this.value != "" && !isNaN(this.value)) {
+                let user = listUser.filter(u => {
+                    return u.id == this.value
+                });
+                if (user[0]) {
+                    this.ele.val(user[0].displayName)
+                }
             }
-            let image = '<img height="' + h + '" width="' + w + '" src="' + value + '">';
-            this.ele.append(image);
-        } else {
+        }
+        else {
             this.ele.val(value)
         }
         this.ele.attr('value', value);
         if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
             this.defaultValue = value;
         }
+    }
+    getAutocompleteKeyValue(){
+        return this.controlProperties.itemValue.value
+    }
+    setImageControlValue(value){
+        this.ele.empty();
+        let w = this.controlProperties.width.value;
+        let h = this.controlProperties.height.value;
+        if (!w) {
+            w = 'auto';
+        }
+        if (!h) {
+            h = '70';
+        }
+        let image = '<img height="' + h + '" width="' + w + '" src="' + value + '">';
+        this.ele.append(image);
+    }
+    setFileControlValue(url, isMultiple = false){
+        let thisObj = this;
+        let fileEl = ""
+        if(isMultiple){
+            try {
+                url = JSON.parse(url);
+                this.value = url
+                store.commit("document/updateListInputInDocument", {
+                    controlName: this.name,
+                    key: 'value',
+                    value: this.value,
+                    instance: this.curParentInstance
+                });
+                for (let index = 0; index < url.length; index++) {
+                    let fileItem = url[index];
+                    fileEl += this.genFileElItem(fileItem);
+                }
+            } catch (error) {
+                console.warn(error,'loi control file');
+            }
+        }
+        else{
+            fileEl = this.genFileElItem(url);
+        }
+        this.ele.find('.upload-file-wrapper-outtb').append(fileEl)
+        this.ele.off('click', '.remove-file')
+        this.ele.on('click', '.remove-file', function(e) {
+            let item = $(this).attr('data-item');
+            let index = thisObj.value.indexOf(item);
+            thisObj.value.splice(index,1);
+            e.preventDefault();
+            e.stopPropagation();
+            $(this).closest('.file-item').remove()
+            store.commit("document/updateListInputInDocument", {
+                controlName: thisObj.name,
+                key: 'value',
+                value: thisObj.value,
+                instance: thisObj.curParentInstance
+            });
+        })
     }
     setPrintValueControl(vl = undefined) {
         let value = vl;
@@ -451,66 +566,35 @@ export default class BasicControl extends Control {
     renderFileControl = function() {
         let fileHtml = this.genFileView();
         this.ele.css('width', 'unset').css('cursor', 'pointer').css('height', '25px').css('vertical-align', 'middle').html(fileHtml);
-
         let thisObj = this;
         $('.file-add').click(function(e) {
-            $("#file-upload-alter-" + thisObj.curParentInstance).click();
-            $("#file-upload-alter-" + thisObj.curParentInstance).attr('data-control-name', $(this).attr('data-control-name'))
+            SYMPER_APP.$evtBus.$emit('document-submit-add-file-click', { control: thisObj });
         })
     }
+    genFileElItem(url){
+        let fileExt = Util.getFileExtension(url);
+        let icon = fileTypes[fileExt];
+        let file = `<div title="${url}" class="file-item">
+                    <span title="xóa" data-item="`+url+`" class="remove-file"><span class="mdi mdi-close"></span></span>
+                <i  onclick="window.open('`+url+`');" class="mdi ` + icon + ` file-view" ></i>
+            </div>`
+        return file;
+    }
 
+    genBtnAddFile(rowId = null){
+        return `
+            <div class="file-add" title="Thêm file" data-rowid="${rowId}">
+                <span class="text-show"><span class="mdi mdi-plus"></span></span>
+            </div>
+        `;
+    }
     genFileView = function(rowId = null) {
-        let ctrlName = this.name;
         let addTpl = '';
-
         if (!this.checkDetailView()) {
-            addTpl = `
-                    <div data-control-name="${ctrlName}" class="file-add" title="Thêm file" data-rowid="${rowId}" data-ctrlname="${ctrlName}">
-                        <span class="text-show"><span class="mdi mdi-plus"></span></span>
-                    </div>
-                `;
+            addTpl = this.genBtnAddFile();
         }
-
         if (!this.inTable) {
-            if (this.value != '' && this.value.length > 0) {
-                let valueArr = this.value.replace(/^,/gi, "");
-                valueArr = valueArr.split(',');
-
-                for (let index = 0; index < valueArr.length; index++) {
-
-                    let element = valueArr[index];
-                    let fileExt = Util.getFileExtension(element);
-                    let icon = fileTypes[fileExt];
-                    api
-                    let file = `<div title="${element}" class="file-item">
-                            <i  onclick="window.open('`+sDocumentManagementUrl+`file/public/` + element + `');" class="mdi ` + icon + ` file-view" ></i>
-                        </div>`
-                    addTpl += file;
-                }
-            }
             return `<div class="upload-file-wrapper-outtb">${addTpl}</div>`;
-        }
-        let deleteFileIcon = '';
-        if (this.checkDetailView()) {
-            let tableInstance = sDocument.state.submit[this.curParentInstance].listInputInDocument[this.inTable]
-            this.value = sDocument.state.editor[this.curParentInstance].allControl[tableInstance.id].value[this.name];
-        }
-        if (this.value != '' && this.value.hasOwnProperty(rowId)) {
-            for (let index = 0; index < this.value[rowId].length; index++) {
-                let fileName = this.value[rowId][index];
-                let fileExt = Util.getFileExtension(fileName);
-                let icon = fileTypes[fileExt];
-                if (!this.checkDetailView()) {
-                    deleteFileIcon = `<span data-rowid="` + rowId + `" data-file-name="` + fileName + `" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>`;
-                }
-                let file = `<div  class="file-item">
-                                ` + deleteFileIcon + `
-                                <i onclick="window.open('`+sDocumentManagementUrl+`file/public` + fileName + `');" class="mdi ` + icon + ` file-view" ></i>
-                            </div>`
-                addTpl += file;
-            }
-
-
         }
         return addTpl.replace(/\n/g, '');
     }
@@ -522,7 +606,7 @@ export default class BasicControl extends Control {
         let icon = fileTypes[type];
         let thisObj = this;
         $.ajax({
-            url: '`+sDocumentManagementUrl+`uploadFile',
+            url: sDocumentManagementUrl+'uploadFile',
             dataType: 'json',
             processData: false,
             contentType: false,
@@ -532,9 +616,9 @@ export default class BasicControl extends Control {
                 if (response.status == 200) {
                     let file = `<div title="${response.data.path}" class="file-item">
                                 <span data-file-name="${response.data.path}" title="xóa" class="remove-file"><span class="mdi mdi-close"></span></span>
-                                <i  onclick="window.open('`+sDocumentManagementUrl+`file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
+                                <i  onclick="window.open('` + sDocumentManagementUrl + `file/` + response.data.path + `');" class="mdi ` + icon + ` file-view" ></i>
                             </div>`
-                    thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name)
+                    thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name);
                     thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
                     let curValue = sDocument.state.submit[thisObj.curParentInstance].listInputInDocument[thisObj.name].value;
                     let tableName = thisObj.inTable;
@@ -644,7 +728,7 @@ export default class BasicControl extends Control {
         })
         this.ele.on('focus', function(e) {
             if (/^[-0-9,.]+$/.test($(this).val())) {
-                $(this).val($(this).val())
+                $(this).val(numbro($(this).val()).format())
             }
         })
     }
@@ -660,23 +744,8 @@ export default class BasicControl extends Control {
 
     }
     renderUserControl() {
-        let listUser = store.state.app.allUsers;
-        if (!this.checkViewType('submit')) {
-            if (this.value != null && this.value != "" && !isNaN(this.value)) {
-                let user = listUser.filter(u => {
-                    return u.id == this.value
-                });
-                if (user[0]) {
-                    this.value = user[0].displayName;
-                    this.ele.val(this.value)
-                } else {
-                    this.ele.val(this.value)
-                }
-            }
-        } else {
-            this.ele.attr('type', 'text');
-            this.ele.parent().css({ display: 'block' })
-        }
+        this.ele.attr('type', 'text');
+        this.ele.parent().css({ display: 'block' })
     }
     renderLabelControl() {
         this.ele.text('').css({ border: 'none' })
@@ -719,7 +788,8 @@ export default class BasicControl extends Control {
     renderDateControl() {
         this.ele.attr('type', 'text');
         this.formatDate = (this.controlProperties.hasOwnProperty('formatDate')) ? this.controlProperties.formatDate.value : "";
-        console.log('this.formatDatethis.formatDate', this.formatDate);
+        this.minDate = "";
+        this.maxDate = "";
         if (this.checkDetailView()) return;
     }
     renderTimeControl() {
@@ -728,14 +798,38 @@ export default class BasicControl extends Control {
 
     }
     renderRichTextControl() {
-        let style = this.ele.attr('style');
-        this.ele.replaceWith('<textarea style="'+style+'" id="'+this.id+'" class="s-control s-control-rich-text" title="Rich-text" s-control-type="richText" type="text"></textarea>');
+        let isReadOnly = 1;
+        this.editor = '';
+        let selector = '';
+        let self = this;
+        let toolbar = true;
         if(this.checkViewType('submit') || this.checkViewType('update')){
-            this.ele = $('#sym-submit-'+this.curParentInstance).find("textarea#"+this.id);
+            this.ele = $('#sym-submit-'+this.curParentInstance).find("#"+this.id);
+            isReadOnly = 0;
+            selector = '#sym-submit-'+this.curParentInstance+" #"+this.id;
         }
         else{
-            this.ele = $('#sym-Detail-'+this.curParentInstance).find("textarea#"+this.id);
+            this.ele = $('#sym-Detail-'+this.curParentInstance).find("#"+this.id);
+            selector = '#sym-Detail-'+this.curParentInstance+" #"+this.id;
+            toolbar = false;
         }
+        if(this.controlProperties.isShowHeaderTinyMce.value){
+            tinymce.init({
+                toolbar: toolbar,
+                menubar: false,
+                branding: false,
+                readonly: isReadOnly,
+                selector:  selector,
+                statusbar: false,
+                init_instance_callback : function(editor) {
+                    self.editor = editor;
+                    self.initEditor();
+                },
+            });    
+        }
+    }
+    initEditor(){
+        return this.editor.setContent(this.value);
     }
     getDefaultValue() {
         if (this.isCheckbox) {
@@ -757,19 +851,55 @@ export default class BasicControl extends Control {
         return false;
     }
     renderInfoIconToControl(controlName) {
-        if (this.ele.parent().find('.info-control-btn').length == 0) {
-            let icon = `<span class="mdi mdi-information info-control-btn" data-control="` + controlName + `"></span>`
-            this.ele.parent().append(icon);
+            if (this.ele.parent().find('.info-control-btn').length == 0) {
+
+                // let icon = `<span class="mdi mdi-information info-control-btn" data-control="` + controlName + `"></span>`
+                this.ele.addClass("info-control-btn");
+                this.ele.attr('data-control', controlName)
+                    //  this.ele.parent().append(icon);
+            }
+        }
+        /**
+         * Hàm chuyển định dạng date sang dạng sql hiểu được
+         */
+    convertDateToStandard(data) {
+        let dateFormat = this.controlProperties.formatDate.value;
+        if (!dateFormat) {
+            return data;
+        }
+        if (!data) {
+            return "";
+        }
+        if (typeof data == 'object') {
+            let newData = [];
+            for (let index = 0; index < data.length; index++) {
+                let value = data[index];
+                if(value){
+                    if(SYMPER_APP.$moment(data, 'YYYY-MM-DD', true).isValid()){
+                        newData.push(data);
+                    }
+                    else{
+                        newData.push(SYMPER_APP.$moment(value,dateFormat).format('YYYY-MM-DD'))
+                    }
+                }
+                else{
+                    newData.push("");
+                }
+
+            }
+            return newData;
+        }
+        else{
+            if(SYMPER_APP.$moment(data, 'YYYY-MM-DD', true).isValid()){
+                return data;
+            }
+            return SYMPER_APP.$moment(data,dateFormat).format('YYYY-MM-DD')
         }
     }
      /**
-     * Hàm chuyển định dạng date sang dạng sql hiểu được
+     * Hàm chuyển định dạng time sang dạng sql hiểu được HH:mm:ss
      */
-    convertDateToStandard(data){
-        let dateFormat = this.controlProperties.formatDate.value;
-        if(!dateFormat){
-            return data;
-        }
+    convertTimeToStandard(data){
         if(!data){
             return "";
         }
@@ -778,7 +908,7 @@ export default class BasicControl extends Control {
             for (let index = 0; index < data.length; index++) {
                 let value = data[index];
                 if(value){
-                    newData.push(SYMPER_APP.$moment(value,dateFormat).format('YYYY-MM-DD'))
+                    newData.push(SYMPER_APP.$moment(value,'hh:mm A').format('HH:mm:ss'))
                 }
                 else{
                     newData.push("");
@@ -788,7 +918,7 @@ export default class BasicControl extends Control {
             return newData;
         }
         else{
-            return SYMPER_APP.$moment(data,dateFormat).format('YYYY-MM-DD')
+            return SYMPER_APP.$moment(data,'hh:mm A').format('HH:mm:ss')
         }
     }
 }

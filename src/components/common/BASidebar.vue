@@ -3,6 +3,7 @@
         v-resize="reCalcSidebarHeight" 
         mobile-breakpoint="0" 
         :mini-variant="sapp.collapseSideBar"
+        v-if="true"
         :v-model="true" app>
         <v-list dense nav class="py-0 pr-0 list-item">
             <v-list-item 
@@ -172,7 +173,7 @@
                         no-action
                         :class="{'menu-group': true , 'menu-group-active': item.active == true }"
                         :symper-action="$bindAction(item.action?item.action:'')"
-                        @click="gotoPage(item)">
+                        @click="handleItemClick(item)">
                        <template v-slot:prependIcon>
                             <v-icon class="ml-1 icon-group">
                                 {{ item.icon }}
@@ -224,7 +225,7 @@
                         link
                         no-action
                         :symper-action="$bindAction(item.action?item.action:'')"
-                        @click="gotoPage(item)">
+                        @click="handleItemClick(item)">
                        <template v-slot:prependIcon>
                            <v-menu 
                                 right offset-y
@@ -394,7 +395,6 @@ export default {
         this.reCalcSidebarHeight();
     },
     methods: {
-		
         isBorderTop(titleGroup){
             if(titleGroup=='Administrator'||titleGroup=='Applications'||titleGroup=='Setting'){
                 return true
@@ -463,7 +463,12 @@ export default {
         },
         goToHome() {
             this.$goToPage("/", "Trang chủ");
-        },
+		},
+		handleItemClick(item){
+			if(!item.children){
+				this.gotoPage(item)
+			}
+		},
         invertSidebarShow() {
             this.showChevIcon =!this.showChevIcon;
             this.$store.commit(

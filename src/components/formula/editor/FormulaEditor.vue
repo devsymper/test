@@ -68,13 +68,13 @@ import AgDataTable from "./../../../components/common/agDataTable/AgDataTable.vu
 import Pagination from './../../../components/common/Pagination'
 import Formulas from '../../../views/document/submit/formulas';
 import {AgGridVue} from "ag-grid-vue";
-import ClientSQLManager from '../../../views/document/submit/clientSQLManager';
+import FormulasWorker from 'worker-loader!@/worker/document/submit/Formulas.Worker.js';
 
 import SymperMonacoEditor from "./SymperMonacoEditor";
 export default {
     created(){
         this.$store.dispatch('document/setListDocuments');
-        ClientSQLManager.createDB(this.instance);
+        this.formulasWorker = new FormulasWorker();
     },
     data(){
         return {
@@ -90,7 +90,10 @@ export default {
             totalRecord:0,
             debugStatus:null,
             timeRequest:0,
-            cacheDataInput:{}
+            cacheDataInput:{},
+            formulasWorker:null,
+            keyInstance:Date.now(),
+            startTimeDebug:0
         }
     },
     beforeMount() {
@@ -102,6 +105,17 @@ export default {
         if(this.disabled){
             this.$refs.edtScript.setReadOnly();
         }
+        this.formulasWorker.addEventListener("message", function (event) {
+            let data = event.data;
+            switch (data.action) {
+                case 'afterRunFormulasSuccess':
+                    let res = data.dataAfter.res;
+                    self.handleAfterRunFormula(res)
+                    break;
+                default:
+                break;
+            }
+        });
     },
     computed: {
         editorOptions(){
@@ -197,6 +211,13 @@ export default {
     methods:{
         toggleDebugView(){
             this.showDebugView = !this.showDebugView;
+            if(this.showDebugView){
+                this.formulasWorker.postMessage({action:'createSQLiteDB',data:{keyInstance:this.keyInstance}});
+                this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: {name:'temp',value:''}, value:'', keyInstance:this.keyInstance, type:'submit'}})
+            }
+            else{
+                this.formulasWorker.postMessage({action:'closeDB',data:{keyInstance:this.keyInstance}});
+            }
             this.debugResultHeight = "calc(100% - "+this.height+" - 30px)"
             this.inputViewHeight = this.height;
             this.columnDefs = [];
@@ -247,49 +268,58 @@ export default {
                 dataInput[input] = this.allInput[input].value;
                 this.cacheDataInput[input] = this.allInput[input].value;
             }
-            let start = Date.now();
-            formulas.handleBeforeRunFormulas(dataInput).then(rs=>{
-                self.debugStatus = {status:true,message:this.$t('formulasEditor.success')};
-                self.rowData = [];
-                self.columnDefs = [];
-                if(rs.server){
-                    let data = rs.data.data;
-                    let err = rs.data.lastErrorMessage;
-                    if(err){
-                        self.debugStatus = {status:false,message:this.$t('formulasEditor.error')};
-                        self.error = err;
-                    }
-                    self.handleDataToTable(data);
+            this.startTimeDebug = Date.now();
+            this.formulasWorker.postMessage({action:'runFormula',data:
+                {
+                    dataInput:dataInput,
+                    formulaInstance:formulas, 
+                    controlName:'temporary', 
+                    keyInstance:this.keyInstance
                 }
-                else{
-                    let columns = rs.data[0].columns;
-                    let values = rs.data[0].values;
-                    self.totalRecord = values.length;
-                    for (let index = 0; index < columns.length; index++) {
-                        let col = columns[index];
-                        self.columnDefs.push( {headerName: col, field: col, resizable: true });
-                    }
-                    for (let k = 0; k < values.length; k++) {
-                        let rowVal = values[k];
-                        let row = {};
-                        for (let i = 0; i < rowVal.length; i++) {
-                            let cellVal = rowVal[i];
-                            row[columns[i]] = cellVal;
-                        }
-                        self.rowData.push(row);
-                    }
-                    self.agApi.sizeColumnsToFit();
+            })
+           
+        },
+        handleAfterRunFormula(rs){
+            this.debugStatus = {status:true,message:this.$t('formulasEditor.success')};
+            this.rowData = [];
+            this.columnDefs = [];
+            if(rs.server){
+                let data = rs.data.data;
+                let err = rs.data.lastErrorMessage;
+                if(err){
+                    this.debugStatus = {status:false,message:this.$t('formulasEditor.error')};
+                    this.error = err;
                 }
-                
-                let end = Date.now();
-                self.timeRequest = end-start;
-                if(self.timeRequest >= 1000){
-                    self.timeRequest = Math.round(((end-start)/1000) * 100) / 100 + 's'
-                }   
-                else{
-                    self.timeRequest = self.timeRequest + 'ms';
+                this.handleDataToTable(data);
+            }
+            else{
+                let columns = rs.data[0].columns;
+                let values = rs.data[0].values;
+                this.totalRecord = values.length;
+                for (let index = 0; index < columns.length; index++) {
+                    let col = columns[index];
+                    this.columnDefs.push( {headerName: col, field: col, resizable: true });
                 }
-            });
+                for (let k = 0; k < values.length; k++) {
+                    let rowVal = values[k];
+                    let row = {};
+                    for (let i = 0; i < rowVal.length; i++) {
+                        let cellVal = rowVal[i];
+                        row[columns[i]] = cellVal;
+                    }
+                    this.rowData.push(row);
+                }
+                this.agApi.sizeColumnsToFit();
+            }
+            
+            let end = Date.now();
+            this.timeRequest = end-this.startTimeDebug;
+            if(this.timeRequest >= 1000){
+                this.timeRequest = Math.round(((end-this.startTimeDebug)/1000) * 100) / 100 + 's'
+            }   
+            else{
+                this.timeRequest = this.timeRequest + 'ms';
+            }
         },
         handleDataToTable(data){
             let firstRow = data[0];

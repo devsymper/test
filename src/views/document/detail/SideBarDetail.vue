@@ -147,7 +147,6 @@ import { documentApi } from "@/api/Document";
 import { orgchartApi } from "@/api/orgchart";
 import bpmnApi from "@/api/BPMNEngine.js";
 import { util } from "@/plugins/util.js";
-import { data } from 'jquery'
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import Comment from './Comment'
 import {logServiceApi} from "@/api/log.js";
@@ -232,10 +231,10 @@ export default {
 				orgchartApi.getRolesByUser([{idUser: after}]).then(res=>{
 					let listRole = res.data[0].roles;
 					if(listRole.length > 0){
-						let curRole = listRole.filter(role=>{
-							return role.id == self.userRole;
-						})
-						self.userRoleInfo = curRole[0].name;
+						let curRole = listRole.find(role=> role.id == self.userRole);
+						if(curRole){
+							self.userRoleInfo = curRole.name;
+						}
 					}
 				});
 			}
@@ -297,7 +296,7 @@ export default {
 			})
 			.catch(err => {
 			})
-			.always(() => {});
+			.finally(() => {});
 	},
 	mounted() {
 		setTimeout((self) => {

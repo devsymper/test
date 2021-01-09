@@ -2,6 +2,7 @@
 <div style="width:100%">
     <list-items
         ref="listDocument"
+        :customAPIResult="customAPIResult"
         :getDataUrl="sDocumentManagementUrl+'documents'"  
         :useDefaultContext="false"
         :tableContextMenu="tableContextMenu"
@@ -11,11 +12,13 @@
         :showExportButton="false"
         :showImportButton="false"
         @after-open-add-panel="addDocument"
+        @close-panel="closePanel"
         :headerPrefixKeypath="'document'"
         :commonActionProps="commonActionProps"
     >
         <div slot="right-panel-content" class="h-100">
             <submit-view 
+                v-if="isShowQuickSubmit"
                 ref="submitView" 
                 :isQickSubmit="true" 
                 :action="'submit'" 
@@ -63,12 +66,11 @@ export default {
             showImportPanel:false,
             actionPanelWidth:830,
             containerHeight: 200,
+            isShowQuickSubmit:false,
             tableContextMenu:{
                 edit: {
                     name: "editdoc",
-                    text: function() {
-                        return " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Sửa";
-                    },
+                    text:  "<i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Sửa",
                     callback: (document, callback) => {
                         this.$goToPage('/documents/'+document.id+'/editor/edit',document.title);
                     },
@@ -76,37 +78,38 @@ export default {
                
                 clone: {
                     name: "cloneDoc",
-                    text: function() {
-                        return " <i class= 'mdi mdi-file-document-multiple-outline' > </i>&nbsp; Nhân bản";
-                    },
+                    text: " <i class= 'mdi mdi-file-document-multiple-outline' > </i>&nbsp; Nhân bản",
                     callback: (document, callback) => {
                         this.$goToPage('/documents/'+document.id+'/editor/clone',"Nhân bản "+document.title);
                     },
                 },
                 submit: {
                     name: "submit",
-                    text: function() {
-                        return " <i class= 'mdi mdi-file-document-outline' > </i>&nbsp; Nhập liệu";
-                    },
+                    text:  " <i class= 'mdi mdi-file-document-outline' > </i>&nbsp; Nhập liệu",
                     callback: (document, callback) => {
-                        this.$goToPage('/documents/'+document.id+'/submit',document.title);
+                        const self = this;
+                             self.$goToPage('/documents/'+document.id+'/submit',document.title);
+                        // }else{
+                        //     self.$snotify({
+                        //         type: "error",
+                        //         title: "Không cho phép nhập liệu"
+                        //     })
+                        // }
+                       
                     },
                 },
                 quick_submit :{
                     name: "quickSubmit",
-                    text: function() {
-                        return " <i class= 'mdi mdi-text-box-plus-outline' > </i>&nbsp; Nhập liệu nhanh";
-                    },
+                    text:  "<i class= 'mdi mdi-text-box-plus-outline' > </i>&nbsp; Nhập liệu nhanh",
                     callback: (document, callback) => {
+                        this.isShowQuickSubmit = true
                         this.$refs.listDocument.openactionPanel();
                         this.documentId = parseInt(document.id)
                     },
                 },
                 list: {
                     name: "listObject",
-                    text: function() {
-                        return " <i class= 'mdi mdi-format-list-checkbox' > </i>&nbsp; Danh sách bản ghi";
-                    },
+                    text:" <i class= 'mdi mdi-format-list-checkbox' > </i>&nbsp; Danh sách bản ghi",
                     callback: (document, callback) => {
 						this.$goToPage('/documents/'+document.id+'/objects',"Danh sách bản ghi");
 						this.$store.commit('document/setCurrentTitle',document.title)
@@ -114,27 +117,21 @@ export default {
                 },
                 list_draft: {
                     name: "listDraftObject",
-                    text: function() {
-                        return " <i class= 'mdi mdi-playlist-edit' > </i>&nbsp; Danh sách bản nháp";
-                    },
+                    text: " <i class= 'mdi mdi-playlist-edit' > </i>&nbsp; Danh sách bản nháp",
                     callback: (document, callback) => {
                         this.$goToPage('/documents/'+document.id+'/draft-objects',"Danh sách bản nháp");
                     },
                 },
                  print_config: {
                     name: "printConfig",
-                    text: function() {
-                        return " <i class= 'mdi mdi-printer-3d-nozzle-outline' > </i>&nbsp; Cấu hình in";
-                    },
+                    text:  " <i class= 'mdi mdi-printer-3d-nozzle-outline' > </i>&nbsp; Cấu hình in",
                     callback: (document, callback) => {
                         this.$goToPage('/documents/'+document.id+'/editor/print-config',document.title);
                     },
                 },
                 list_print_config: {
                     name: "listPrintConfig",
-                    text: function() {
-                        return " <i class= 'mdi mdi-format-list-checkbox' > </i>&nbsp; Danh sách bản in";
-                    },
+                    text:" <i class= 'mdi mdi-format-list-checkbox' > </i>&nbsp; Danh sách bản in",
                     callback: (document, callback) => {
                         this.$goToPage('/documents/'+document.id+'/print-config',"Danh sách bản in");
                     },
@@ -170,14 +167,12 @@ export default {
                 //         .catch(err => {
                 //             console.log("error from delete document api!!!", err);
                 //         })
-                //         .always(() => {});
+                //         .finally(() => {});
                 //     },
                 // },
                 trash:{
-                    name:"remove",text:
-                    function() {
-                        return " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa";
-                    },
+					name:"remove",
+					text:" <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa",
                     callback: (document, callback) => {
                         let ids = document.reduce((arr,obj)=>{
                             arr.push(obj.id);
@@ -204,14 +199,12 @@ export default {
                         .catch(err => {
                             console.log("error from delete document api!!!", err);
                         })
-                        .always(() => {});
+                        .finally(() => {});
                     },
                 },
                 templateExcel:{
                     name: "templateExcel",
-                    text: function() {
-                        return " <i class= 'mdi mdi-file-upload-outline' > </i>&nbsp; Lấy mẫu Import Excel";
-                    },
+                    text:  " <i class= 'mdi mdi-file-upload-outline' > </i>&nbsp; Lấy mẫu Import Excel",
                     callback: (document, callback) => {
                         this.documentId = Number(document.id);
                         let exportUrl = this.sDocumentManagementUrl+'documents/'+this.documentId+'/export-excel?isTemplate="1"'
@@ -228,9 +221,7 @@ export default {
                 },
                 importExcel:{
                     name: "importExcel",
-                    text: function() {
-                        return " <i class= 'mdi mdi-file-upload-outline' > </i>&nbsp; Import Excel";
-                    },
+                    text: " <i class= 'mdi mdi-file-upload-outline' > </i>&nbsp; Import Excel",
                     callback: (document, callback) => {
                         const self = this;
                         self.showImportPanel = !self.showImportPanel; 
@@ -238,6 +229,11 @@ export default {
                     },
                 },
             },
+            customAPIResult:{
+                 reformatData(data){
+                    return data.data
+                 }
+            }
         }
     },
     mounted() {
@@ -258,6 +254,9 @@ export default {
         }
     },
     methods:{
+        closePanel(){
+            this.isShowQuickSubmit = false;
+        },
         getApiDocument(){
             const self = this;
             documentApi.detailDocument(this.documentId)

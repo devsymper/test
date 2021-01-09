@@ -2,7 +2,7 @@
     
     <div class="h-100 w-100 list-object-component">
 		<AutocompleteDoc 
-			style="position:absolute; top: 15px ; left: 150px"
+			style="position:absolute; top: 12px ; left: 170px"
 			@change="handleChange"
 		/>
         <list-items
@@ -51,6 +51,11 @@
                 <v-btn small @click="showDialog" class="delete-record-btn">
                     <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
                 </v-btn>
+                <!-- test -->
+                 <v-btn small @click="deleteAll" class="delete-all-record-btn">
+                    <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.deleteAll')}}
+                </v-btn>
+                <!-- test -->
             </div>
             <div v-else>
                 <div class="panel-header" v-if="actionOnRightSidebar == 'detail'">
@@ -333,7 +338,7 @@ export default {
                         })
                         .catch(err => {
                         })
-                        .always(() => {});
+                        .finally(() => {});
                     },
                 },
                 detail: {
@@ -405,7 +410,7 @@ export default {
         documentApi.getListPrintConfig(this.docId).then(res=>{
             thisCpn.listTabletItem = res.data.listObject;
             thisCpn.listTabletItem[0].activeSb = true;
-        }).catch(err => {}).always(() => {});
+        }).catch(err => {}).finally(() => {});
     },
     activated(){
         if(this.$refs.listObject && this.$refs.listObject.isShowCheckedRow()){
@@ -420,7 +425,28 @@ export default {
         }
     },
     methods:{
-         onDocumentUpdateSuccess(){
+        deleteAll(){
+            let dataDoc = {
+                type:'all',
+                documentId:this.docId
+            };
+            const self = this;
+            documentApi.deleteAll(dataDoc).then(res=>{
+                if (res.status == 200) {
+                    self.$snotify({
+                        type: "success",
+                        title: "Delete all success!"
+                    });  
+                }
+                else{
+                    self.$snotify({
+                        type: "error",
+                        title: res.message
+                    });  
+                }
+            })
+        },
+        onDocumentUpdateSuccess(){
             this.actionOnRightSidebar = 'detail';
 		},
 		handleChange(docId){
@@ -457,7 +483,7 @@ export default {
             })
             .catch(err => {
             })
-            .always(() => {});
+            .finally(() => {});
         },
         showDialog(){
             this.dialog = true;
@@ -632,6 +658,7 @@ export default {
          * Sự kiện khi selection vào cell
          */
         afterCellSelection(rowData){
+			this.$refs.listObject.openactionPanel();
             this.actionOnRightSidebar = 'detail';
             this.currentRowData = rowData;
         }
@@ -647,7 +674,7 @@ export default {
         margin-top: -3px;
     }
 	.list-object-component{
-		position: absolute
+		position: relative
 	}
     .panel-header .mdi:hover{
         color: rgba(0,0,0 / 0.6);
@@ -716,6 +743,11 @@ export default {
         position: absolute;
         bottom: 16px;
         right: 16px;
+    }
+    .delete-all-record-btn{
+        position: absolute;
+        bottom: 16px;
+        right: 106px;
     }
 
 </style>

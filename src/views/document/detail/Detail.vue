@@ -1,6 +1,10 @@
 <template>
-    <div class="wrap-content-detail" style="overflow:hidden;position: relative;">
-        
+    <div style="overflow:hidden;position: relative;"
+        :class="{
+            'document-form-style-custom-1' :true,
+            'wrap-content-detail':true
+        }"
+    >
         <Preloader ref="preLoaderView"/>
         <div class="panel-header" v-if="!quickView && !isPrint">
             <div class="right-action">
@@ -38,10 +42,7 @@
                     :focusingControlName="focusingControlName"
                     :instance="keyInstance"/>
             </div>
-
         </VuePerfectScrollbar>
-        
-      
         <side-bar-detail 
             v-if="!isPrint"
             ref="sidebarView"
@@ -79,8 +80,10 @@ import FloattingPopup from './../common/FloattingPopup'
 import Preloader from './../../../components/common/Preloader';
 import PivotTable from "./../submit/pivot-table";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-
+import tinymce from 'tinymce/tinymce';
 import { util } from '../../../plugins/util.js';
+import ControlRelationWorker from 'worker-loader!@/worker/document/submit/ControlRelation.Worker.js';
+
 export default {
     name: "detailDocument",
     props: {
@@ -136,6 +139,9 @@ export default {
         sDocumentSubmit() {
             return this.$store.state.document.submit[this.keyInstance];
         },
+        sDocumentDetail() {
+            return this.$store.state.document.detail[this.keyInstance];
+        },
         listLinkControl() {
             return this.$store.state.document.linkControl[this.keyInstance];
         },
@@ -150,6 +156,7 @@ export default {
     },
     data() {
         return {
+            controlRelationWorker:null,
             focusingControlName: '',
             contentDocument: null,
             contentPrintDocument:null,
@@ -184,14 +191,28 @@ export default {
         this.documentSize = "21cm";
     },
     mounted(){
-        let self = this;
-        $(document).on('click','#sym-Detail-'+this.keyInstance+' .info-control-btn',function(e){
-            self.$refs.floattingPopup.show(e, $('#sym-Detail-'+self.keyInstance));
-            self.focusingControlName = $(e.target).attr('data-control');
-        })
+        let thisCpn = this;
+        this.controlRelationWorker = new ControlRelationWorker();
+        this.controlRelationWorker.addEventListener("message", function (event) {
+            let data = event.data;
+            switch (data.action) {
+                case 'setDataForPropsControl':
+                    let listControlToStore = data.dataAfter.listControlToStore;
+                    for(let controlId in listControlToStore){
+                        thisCpn.$store.commit(
+                            "document/addControl", { id: controlId, props: listControlToStore[controlId], instance: thisCpn.keyInstance }
+                        );
+                    }
+                    thisCpn.processHtml(thisCpn.contentDocument);
+                    thisCpn.controlRelationWorker.terminate();
+                    break;
+                default:
+                    break;
+            }
+        });
     },
-    
     created(){
+        tinymce.remove();
         this.$store.commit("document/setDefaultSubmitStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultDetailStore",{instance:this.keyInstance});
         this.$store.commit("document/setDefaultEditorStore",{instance:this.keyInstance});
@@ -215,20 +236,21 @@ export default {
             this.docObjId = Number(this.$route.params.id);
             this.loadDocumentObject(this.isPrint); 
         }
-
         this.$evtBus.$on('symper-app-wrapper-clicked',evt=>{
             if(thisCpn._inactive == true) return;
             if(this.$refs.historyView){
-                if($(evt.target).is('.highlight-history')){
+                if($(evt.target).is('.highlight-history') ){
                     this.$refs.historyView.show($(evt.target))    
+                }
+                else if($(evt.target).is('.info-control-btn')){
+                    this.$refs.floattingPopup.show(evt, $('#sym-Detail-'+this.keyInstance));
+                    this.focusingControlName = $(evt.target).attr('data-control');
                 }
                 else{
                     if(!$(evt.target).hasClass("v-data-table") &&
                         $(evt.target).closest(".v-data-table").length == 0){
                         this.$refs.historyView.hide() 
                     }
-
-                    
                     if(!$(evt.target).hasClass("s-floatting-popup") &&
                         $(evt.target).closest(".s-floatting-popup").length == 0){
                             this.focusingControlName = "";
@@ -346,24 +368,19 @@ export default {
                         }
                     }
                     
-                    setDataForPropsControl(docDetailRes.data.fields, this.keyInstance,'detail'); // ddang chay bat dong bo
-                    setTimeout((self) => {
-                        self.processHtml(content,isPrint); 
-                    }, 100,this);
-                        
+                    this.controlRelationWorker.postMessage({action:'setDataForPropsControl',data:
+                        { fields: docDetailRes.data.fields, viewType: 'detail', allDataDetail: this.sDocumentDetail.allData}
+                    });
                 }
                 this.$emit('after-load-document',docDetailRes.data.document);  
 
             } catch (error) {
-                
+                console.log(error,'errorerror');
             }
 
         },
         async loadDocumentObject(isPrint=false) {
             this.contentDocument = ""
-            try {
-                this.$refs.preLoaderView.show();
-            } catch (error) {}
             let thisCpn = this;
             let res = await documentApi
                 .detailDocumentObject(this.docObjId);
@@ -439,13 +456,15 @@ export default {
             }
             let listTableIns = [];
             let thisCpn = this;
+            console.log(this.sDocumentEditor.allControl,'this.sDocumentEditor.allControl');
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
                 
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let idField = this.sDocumentEditor.allControl[id].id;
-                    let valueInput = this.sDocumentEditor.allControl[id].value
+                    let valueInput = this.sDocumentEditor.allControl[id].value;
+                    console.log(valueInput,'valueInputvalueInput');
                     if(controlType == "submit" || controlType == "reset" || controlType == "draft"){
                         $(allInputControl[index]).remove()
                     }

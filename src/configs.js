@@ -13,7 +13,7 @@ var configs = {
     apiDomain: {
         account: 'https://account.symper.vn/',
         user: 'https://account.symper.vn/',
-        core: 'https://v2hoangnd.dev.symper.vn/',
+		core: 'https://v2hoangnd.dev.symper.vn/',
         bpmne: {
             general: 'https://workflow.symper.vn/',
             models: 'https://workflow-modeler.symper.vn/workflow-modeler/',
@@ -58,7 +58,8 @@ var configs = {
         uiConfig: "https://ui.symper.vn",
         workflowExtend: "https://workflow-extend.symper.vn/",
         trash: "https://trash.symper.vn/",
-		log: "https://log.symper.vn",
+        log: "https://log.symper.vn/",
+        taskManagement: "https://task-management-service.symper.vn/",
 		syqlFunction:'https://syql.symper.vn/'
     },
     // nơi chứa domain của các api mà ko bị phụ thuộc vào môi trường 

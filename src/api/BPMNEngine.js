@@ -8,12 +8,6 @@ import {
 
 var bpmneApi = new Api(appConfigs.apiDomain.bpmne.models); // Khởi tạo một đối tượng api với domain của service BPMNE
 
-// Phục vụ cho việc test
-let fullCookieTest = "abc=xyz;FLOWABLE_REMEMBER_ME=YWNLNEUwTHlxbGNoQThEcUV4RTlpQSUzRCUzRDpsZUJRVTlTOSUyQnF5YzBCblNFZzdLQ3clM0QlM0Q";
-fullCookieTest.split(';').forEach((el) => {
-    document.cookie = el.trim();
-});
-
 let testHeader = {
     Authorization: 'Basic cmVzdC1hZG1pbjp0ZXN0',
     "Content-Type": "application/json",
@@ -235,5 +229,15 @@ export default {
                 reject(defData);
             }
         });
+	},
+	getTaskDetail(id){
+		return bpmneApi.get(appConfigs.apiDomain.bpmne.tasks + "/" + id, {}, testHeader)
+	},
+	changeTaskAction(id,data){
+		return bpmneApi.post(appConfigs.apiDomain.bpmne.tasks + "/" + id, JSON.stringify(data), testHeader)
+	},
+	
+    updateProcessInstance(id, data){
+        return bpmneApi.put(appConfigs.apiDomain.bpmne.general +`symper-rest/service/runtime/process-instances/${id}`, JSON.stringify(data), testHeader)
     }
 };

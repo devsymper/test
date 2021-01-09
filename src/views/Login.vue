@@ -1,8 +1,8 @@
  <template>
     <v-flex xs12 sm8 md4>
-        <v-card class="elevation-6" style="top: 50%;
-                                            left: 50%;
-                                            transform: translate(-50%,-50%);">
+        <v-card 
+            class="elevation-6" 
+            style="top: 50%; left: 50%; transform: translate(-50%,-50%);">
             <v-toolbar flat>
                 <v-toolbar-title class="w-100 text-center mt-6">
                     <img height="40px" :src="require('./../assets/image/symper-full-logo.png')" />
@@ -47,6 +47,9 @@
                     dark
                 >Đăng nhập</v-btn>
             </v-card-actions>
+            <div class="d-flex justify-center bg-secondary mb-3">
+                <v-btn text class="fs-13 fw-400 mb-2" style="color:blue" @click="forgotPass">Quên mật khẩu</v-btn>
+            </div>
         </v-card>
     </v-flex>
 </template>
@@ -57,6 +60,9 @@ import { util } from "./../plugins/util.js";
 
 export default {
     methods: {
+        forgotPass(){
+              this.$router.push("login/forgot-pass");
+        },
         checkAndLogin(){
             let canLogin = true;
             if(!this.email.trim()){
@@ -92,7 +98,7 @@ export default {
                     .catch(err => {
                         console.log("error from login api!!!", err);
                     })
-                    .always(() => {
+                    .finally(() => {
                         setTimeout(() => {
                             thisCpn.checkingUser = false;
                         }, 1000);

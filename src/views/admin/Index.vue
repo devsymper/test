@@ -11,12 +11,9 @@
 		:useDefaultContext="false"
 		:headerPrefixKeypath="'admin.table'"
 		:useActionPanel="true"
-		@row-selected="getDetails"
 		:actionPanelWidth="1000"
-		:actionPanelType="'elastic'"
 		:containerHeight="containerHeight"
 		:showImportHistoryBtn="false"
-		:showActionPanelInDisplayConfig="true"
 	> 
 		<template slot="right-panel-content">  
 			<DetailWorkflow 
@@ -36,6 +33,9 @@ import {
     appConfigs
 } from "@/configs";
 import {taskApi} from '@/api/task.js'
+
+import AdminWorker from 'worker-loader!@/worker/admin/Admin.Worker.js';
+
 export default {
 	components:{
 		ListItems,
@@ -48,6 +48,7 @@ export default {
 			showPanel:false,
 			selectedItem: null,
 			apiUrl: appConfigs.apiDomain.bpmne.models,
+			adminWorker: null,
 			customAPIResult: {
                 reformatData(res){
 					let listKey = self.getListKey(res.data.listObject);
@@ -90,7 +91,22 @@ export default {
 		}
 	},
 	mounted(){
-		 this.containerHeight = util.getComponentSize(this).h
+		this.containerHeight = util.getComponentSize(this).h
+		this.adminWorker = new AdminWorker();
+		let self = this
+        this.adminWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getDetailWorkflow':
+					self.$store.commit('admin/setProcessDefination', data.dataAfter.processDefination);
+					self.$store.commit('admin/setProcessId', data.dataAfter.processId);
+					self.$store.commit('admin/setCurrentTrackingProcess', data.dataAfter.currentTrackingProcess);
+					self.$store.commit('admin/setCurrentAggregateWorkflow', data.dataAfter.aggregateWorkflow);
+					break;
+                default:
+                    break;
+            }
+        });
 	},
 	methods:{
 		onRowSelected(item){
@@ -103,29 +119,17 @@ export default {
 		},
 		getDetails(obj){
 			let self = this
-			self.$store.commit('admin/setProcessKey', obj.processKey)
-			self.$refs.listWorkFlow.actionPanel = true;
-			adminApi.getLatestWD(obj.processKey).then(res=>{
-				if(res.data[0]){
-					self.$store.commit('admin/setProcessDefination', res.data[0]);
-					self.$store.commit('admin/setProcessId', obj.id);
-					self.showPanel = true;
-					adminApi.trackingProcess(res.data[0].id).then(res=>{
-						if(res.status == 200){
-							self.$store.commit('admin/setCurrentTrackingProcess', res.data);
-						}
-					}).catch(err=>{
-					})
-					adminApi.aggregateWorkflow(res.data[0].id).then(res=>{
-						if(res.status == 200){
-							self.$store.commit('admin/setCurrentAggregateWorkflow', res.data);
-						}
-					}).catch(err=>{
-					})
+			this.adminWorker.postMessage({
+				action: 'getDetailWorkflow',
+				data:{
+					processKey: obj.processKey
 				}
-				
-			}).catch(err=>{
-			})
+
+			});
+			self.$refs.listWorkFlow.actionPanel = true;
+			self.$store.commit('admin/setProcessKey', obj.processKey)
+			self.$store.commit('admin/setProcessId', obj.id);
+			self.showPanel = true;
 		}
 	}
 }

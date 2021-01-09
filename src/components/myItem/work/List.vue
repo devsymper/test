@@ -99,7 +99,7 @@
             <VuePerfectScrollbar
             v-if="!loadingTaskList"
             @ps-y-reach-end="handleReachEndList"
-            :style="{height: listTaskHeight+'px'}"
+            :style="{height: (listTaskHeight-40)+'px'}"
             >
                 <div
                     v-for="(workGroup, idex) in groupAllProcessInstance"
@@ -230,13 +230,17 @@
                     </v-row>
                 </div>
             </VuePerfectScrollbar>
-            <v-skeleton-loader v-else ref="skeleton" :type="'table-tbody'" class="mx-auto"></v-skeleton-loader>
-            <v-skeleton-loader
-            v-if="loadingMoreTask"
-            ref="skeleton"
-            :type="'table-tbody'"
-            class="mx-auto"
-            ></v-skeleton-loader>
+            <preloader 
+                v-if="loadingTaskList"
+                :style="{height: (listTaskHeight - 50)+'px!important'}"
+                class="mx-auto" />
+            <Pagination
+                @on-change-page="getListByPage"
+                @on-change-page-size="getListByPage"
+                :totalVisible="sideBySideMode ? 3 : 7"
+                :showRange="!sideBySideMode"
+                class="mt-2 px-2" :total="totalObject"/>
+      
         </v-col>
         <v-col
             :cols="!sideBySideMode ? 0 : 8"
@@ -267,23 +271,21 @@
 
 <script>
 import BPMNEngine from "@/api/BPMNEngine";
-import icon from "@/components/common/SymperIcon";
 import workDetail from "./WorkDetail";
 import listHeader from "./ListHeader";
-import userSelector from "./UserSelector";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { util } from "../../../plugins/util";
 import { appConfigs } from "../../../configs";
 import { taskApi } from "@/api/task.js";
 import TableFilter from "@/components/common/customTable/TableFilter.vue";
 import { getDataFromConfig, getDefaultFilterConfig } from "@/components/common/customTable/defaultFilterConfig.js";
+import Pagination from "@/components/common/Pagination.vue";
 
 import {
   extractTaskInfoFromObject,
   addMoreInfoToTask
 } from "@/components/process/processAction";
 import infoUser from "./../InfoUser";
-import ShowListTrashVue from '../../../views/document/trash/ShowListTrash.vue';
 export default {
     computed: {
         fileCountPerTask(){
@@ -355,13 +357,12 @@ export default {
     },
     name: "listWork",
     components: {
-        icon: icon,
         listHeader: listHeader,
-        userSelector: userSelector,
         VuePerfectScrollbar: VuePerfectScrollbar,
         workDetail,
         infoUser,
         TableFilter,
+        Pagination
     },
     watch:{
         sideBySideMode(vl){
@@ -493,6 +494,11 @@ export default {
         self.reCalcListTaskHeight();
     },
     methods: {
+        getListByPage(data){
+            this.page = data.page;
+            this.pageSize = data.pageSize;
+            this.getData();
+        },
         columnFilter(){
             if (this.tableFilter.currentColumn.name=="isDone") {
                 if(this.tableFilter.currentColumn.colFilter.selectItems.length>0){
@@ -686,9 +692,6 @@ export default {
                 return {};
             }
         },  
-        changeUpdateAsignee(){
-            this.handleTaskSubmited();
-        },
         getDateFormNow(time){
             var today = this.$moment().format('YYYY-MM-DD');
             if (time===today) {
@@ -702,17 +705,13 @@ export default {
             this.$emit("changeObjectType", index);
         },
         handleReachEndList() {
-            if (
-                this.data.length < this.totalObject &&
-                this.data.length > 0  && !this.loadingTaskList && !this.loadingMoreTask
-            ) {
-                this.page +=1;
-                this.getData();
-            }
-        },
-        handleTaskSubmited() {
-            this.sideBySideMode = false;
-            this.getData();
+            // if (
+            //     this.data.length < this.totalObject &&
+            //     this.data.length > 0  && !this.loadingTaskList && !this.loadingMoreTask
+            // ) {
+            //     this.page +=1;
+            //     this.getData();
+            // }
         },
         handleChangeFilterValue(data) {
             // for (let key in data) {
@@ -755,17 +754,16 @@ export default {
          * @param {Boolean} cache có ưu tiên dữ liệu từ cache hay ko
          *
          */
-        getData(columns = false, cache = false, applyFilter = true, lazyLoad = true ) {
+        getData(columns = false, cache = false, applyFilter = true, lazyLoad = true ,showLoading = true) {
             if (this.loadingTaskList || this.loadingMoreTask) {
                 return;
             }
             let self = this;
-            if (this.page == 1) {
-                this.data = [];
+
+            if(showLoading){
                 this.loadingTaskList = true;
-            } else {
-                this.loadingMoreTask = true;
             }
+       
             if (Object.keys(this.tableFilter.allColumn).length==0 ) {
                 this.tableFilter.allColumn["startTime"]=getDefaultFilterConfig();
                 this.tableFilter.allColumn.startTime.sort="desc";
@@ -786,14 +784,13 @@ export default {
                     resData.forEach(function(e){
                         thisCpn.data.push(e)
                     })
-                }else{
                     thisCpn.data = resData;
                 }
 
                 for (let work of resData) {
                     processIden.push('work:'+work.id);
                 }
-            
+
                 this.$store.commit('file/setWaitingFileCountPerObj', processIden);
                 this.$store.commit('comment/setWaitingCommentCountPerObj', processIden);
                 this.$store.dispatch('file/getWaitingFileCountPerObj');

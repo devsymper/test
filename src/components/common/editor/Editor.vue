@@ -64,3 +64,8 @@ export default {
     }
 }
 </script>
+<style >
+.tox-statusbar__path-item{
+	display: none !important
+}
+</style>

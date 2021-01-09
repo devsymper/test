@@ -1,9 +1,9 @@
 <template>
-    
     <div>
         <v-dialog
         scrollable
         v-model="isShowModelSaveDoc"
+        persistent
         width="800"
         content-class="s-dialog"
         >
@@ -70,6 +70,7 @@ import { documentApi } from "./../../../api/Document.js";
 import { formulasApi } from "./../../../api/Formulas.js";
 import Validate from "./../common/Validate";
 import SystemDataMapping from "./../editor/SystemDataMapping"
+import BPMNEngine from "./../../../api/BPMNEngine";
 export default {
     
     components:{
@@ -109,20 +110,62 @@ export default {
     data(){
         return {
             listRows:[],
+            isValidNote:true,
+            isValideTitleFml:true,
             isShowModelSaveDoc:false,
             isValidName :true,
             isValidTitle :true,
             messageValidate:"",
             showNoteChangeName:false,
             showValidate:true,
+
         }
     },
     created(){
         this.setPropsOfDoc({});
     },
     methods:{
+        getListModels(){
+            let thisCpn = this;
+            if(this.documentProps.updateByWorkflowId.options.length == 0){
+                BPMNEngine.getListModels({pageSize:1000}).then(res=>{
+                    let listWorkFlow = res.data.listObject;   
+                    listWorkFlow = listWorkFlow.reduce((arr,obj)=>{
+                        arr.push({id:obj.id, name:obj.name, title:obj.description});
+                        return arr
+                    },[]);
+                    thisCpn.documentProps.updateByWorkflowId.options = listWorkFlow;
+                })
+            }
+        },
         checkNameDocument(){
             this.$emit('check-name-document');
+        },
+         checkRequiredTitleObjFml(){
+            let message = ""
+            if(!this.documentProps.titleObjectFormulas.value){
+                this.isValideTitleFml = false;
+                message = this.$t('document.validate.emptyTitle');
+            }
+            else{
+                this.isValideTitleFml = true;
+                message = ""
+            }
+            this.documentProps.titleObjectFormulas.validateStatus.isValid = this.isValideTitleFml;
+            this.documentProps.titleObjectFormulas.validateStatus.message = message;
+        },
+        checkRequiredNote(){
+            let message = ""
+            if(!this.documentProps.note.value){
+                this.isValidNote = false;
+                message = this.$t('document.validate.emptyNote');
+            }
+            else{
+                this.isValidNote = true;
+                message = ""
+            }
+            this.documentProps.note.validateStatus.isValid = this.isValidNote;
+            this.documentProps.note.validateStatus.message = message;
         },
         //Hàm kiểm tra tên document đã tồn tai hay chưa
         handleChangeInput(name, input, data){
@@ -148,16 +191,16 @@ export default {
                 .catch(err => {
                     
                 })
-                .always(() => {});
+                .finally(() => {});
             }
             
         },
         showDialog(){
-            this.isShowModelSaveDoc = true
+            this.isShowModelSaveDoc = true;
+            this.getListModels();
         },
         hideDialog(){
             this.isShowModelSaveDoc = false;
-            this.$evtBus.$emit('document-editor-save-doc-callback');
         },
         // Hàm kiểm tra tên document
         checkValidateNameDocument(value){
@@ -189,19 +232,20 @@ export default {
                     this.$refs.validate.show(false);
                 }
                 else{
-                    if(this.isValidName && this.isValidTitle){
+                    if(this.isValidName && this.isValidTitle && this.isValidNote && this.isValideTitleFml){
                         this.saveFormulasForRecord();
                     }
                     else{
                         this.checkValidateNameDocument(this.documentProps.name.value);
                         this.checkTitleDocument();
+                        this.checkRequiredNote();
+                        this.checkRequiredTitleObjFml()
                     }
                 }
             }
         },
 
         async saveFormulasForRecord(){
-            
             if(this.$getRouteName() == 'editDocument'){
                 this.$refs.systemDataMapping.editMapping(this.$route.params.id);
             }
@@ -227,7 +271,7 @@ export default {
                 
             }
             this.$emit("save-doc-action");
-            this.hideDialog();
+            this.isShowModelSaveDoc = false;
         },
         /**
          * Hàm kiểm tra tiêu đề của doc đã điền hay chưa, nếu chưa thì báo lỗi
@@ -259,6 +303,18 @@ export default {
             else{
                 this.isValidTitle = true
             }
+            if(!props.note){
+                this.isValidNote = false
+            }
+            else{
+                 this.isValidNote = true
+            }
+            if(!props.titleObjectFormulas){
+                this.isValideTitleFml = false
+            }
+            else{
+                 this.isValideTitleFml = true
+            }
             let self = this;
             let docProps = {
                 name : { 
@@ -287,8 +343,23 @@ export default {
                         self.checkTitleDocument(this.value)
                     }
                 },
+                updateByWorkflowId : {
+                    title: this.$t('document.editor.dialog.saveDoc.updateByWorkflow'),
+                    type: "autocomplete",
+                    value: (props.updateByWorkflowId != undefined) ? props.updateByWorkflowId : '',
+                    options:[],
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    }
+                },
                 fullSize : {
                     title: this.$t('document.editor.dialog.saveDoc.fullSize'),
+                    type: "checkbox",
+                    value: (parseInt(props.isFullSize) === 0) ? false : true,
+                },
+                allowSubmitOutsideWorkflow  : {
+                    title: "Cho phép submit ngoài quy trình",
                     type: "checkbox",
                     value: (parseInt(props.isFullSize) === 0) ? false : true,
                 },
@@ -308,6 +379,10 @@ export default {
                             text: this.$t('document.editor.dialog.saveDoc.selectType.business'),
                             value: 1
                         },
+                        {
+                            text: "Document config field issue",
+                            value: 4
+                        },
                     ],
                 },
             
@@ -315,14 +390,42 @@ export default {
                     title: this.$t('document.editor.dialog.saveDoc.note'),
                     type: "textarea",
                     value: (props.note != undefined) ? props.note : '',
+                     validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    validate(){
+                        self.checkRequiredNote(this.value)
+                    }
                 },
                 titleObjectFormulas: {
                     title: this.$t('document.editor.dialog.saveDoc.titleObject'),
                     value: "",
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    validate(){
+                        self.checkRequiredTitleObjFml(this.value)
+                    },
                     formulasId: (props.titleObjectFormulasId != undefined) ? props.titleObjectFormulasId : 0,
                     type: "script",
                     groupType: "formulas"
-                }
+                },
+                formStyle : {
+                    title: this.$t('document.editor.dialog.saveDoc.formStyle'),
+                    type: "select",
+                    value: 'document-form-style-default',
+                    options: [{
+                            text: 'Mặc định',
+                            value: 'document-form-style-default'
+                        },
+                        {
+                            text: 'Border Input',
+                            value: 'document-form-style-custom-1'
+                        },
+                    ],
+                },
             }
             if(this.isConfigPrint){
                 docProps = {

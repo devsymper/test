@@ -135,8 +135,6 @@
                             <v-list-item-content>
                                 <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
                                 </v-list-item-title>
-                                <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.displayName">
-                                </v-list-item-subtitle>
                                 <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.email">
                                 </v-list-item-subtitle>
                             </v-list-item-content>
@@ -280,8 +278,6 @@
                     <v-list-item-content>
                         <v-list-item-title style="margin-left: 0.5" class="item-title fs-13 fm" v-html="item.displayName">
                         </v-list-item-title>
-                        <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.displayName">
-                        </v-list-item-subtitle>
                         <v-list-item-subtitle style="margin-left:0" class="sub-title fs-12" v-html="item.email">
                         </v-list-item-subtitle>
                     </v-list-item-content>

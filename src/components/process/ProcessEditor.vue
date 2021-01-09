@@ -881,10 +881,10 @@ export default {
                 nodeType = "EventSubProcess";
             }
 
-            nodeType = mapLibNameToFlowableName[nodeType]
+            let transltedNodeType = mapLibNameToFlowableName[nodeType]
                 ? mapLibNameToFlowableName[nodeType]
                 : nodeType;
-            return nodeType;
+            return transltedNodeType;
         },
         handleNodeChangeProps(nodeData) {
             let nodeId = nodeData.id;
@@ -1202,7 +1202,13 @@ export default {
             let allEls = this.$refs.symperBpmn.getAllNodes();
             let currBizNode = {};
             let submitTasks = [];
-
+            if(attrName == 'updateForElement'){
+                submitTasks.push({
+                    id: 'DOC_INSTANCE_FROM_STARTING_WORKFLOW',
+                    title: 'Doc instance from starting workflow',
+                    nodeData: {}
+                });
+            }
             allEls.filter((el, idx) => {
                 if(el.$type == 'bpmn:SequenceFlow'){
                     return true;
@@ -1304,6 +1310,10 @@ export default {
                 if(modelData.configValue){
                     this.restoreAttrValueFromJsonConfig(modelData.configValue);
                 }
+                
+                if(this.routeName == "cloneProcess"){
+                    this.createUniqueIdentifyForWorkflow();
+                }
             } catch (error) {
                 this.$snotifyError(
                     error,
@@ -1351,20 +1361,26 @@ export default {
                     }
                     formKeyToNodeIdMap[formKey].push(elName);
                 }
-
+            }
+            this.setColumnsForNodes();
+            this.setInitItemsForFormReferences(formKeyToNodeIdMap);
+        },
+        setColumnsForNodes(){
+            for(let name in this.stateAllElements){
+                let el = this.stateAllElements[name];
                 if(el.type.includes('StartNoneEvent') && el.attrs.formreference.value){
                     this.setControlsForBizKey(el.attrs.formreference.value);
                 }
 
-                if(el.type.includes('UserTask') 
+                if( el.type.includes('UserTask')
                     && el.attrs.taskAction.value == 'approval'){
                     this.setEditableControlsForNode(el, this.stateAllElements[el.attrs.approvalForElement.value]);
                 }
-                 if(el.type.includes('ServiceTask') ){
+                
+                if(el.type.includes('ServiceTask') ){
                     this.setEditableControlsForNode(el, this.stateAllElements[el.attrs.serviceNotificationActionForElement.value]);
                 }
             }
-            this.setInitItemsForFormReferences(formKeyToNodeIdMap);
         },
         async setInitItemsForFormReferences(map){
             let self = this;
@@ -1433,7 +1449,7 @@ export default {
             setTimeout((self) => {
                 let allEls = self.$refs.symperBpmn.getAllNodes();
                 for(let el of allEls){
-                    if(el.$type == "bpmn:Process"){
+                    if(el.$type == "bpmn:Process" || el.$type == "bpmn:Collaboration"){
                         let uniqueId = util.str.randomString(6)+'_'+Date.now();
                         uniqueId = uniqueId.toLowerCase();
                         self.$refs.symperBpmn.updateElementProperties(
@@ -1481,10 +1497,8 @@ export default {
     mounted(){
         this.resetAttrPanelHeight();
         this.calcDiagramHeight();
-        let uniqueId = util.str.randomString(6)+'_'+Date.now();
-        console.log(uniqueId.toLowerCase(), 'uniqueIduniqueIduniqueId');
         
-        if(this.action == 'create' || this.action == 'clone' ){
+        if(this.action == 'create'){
             this.createUniqueIdentifyForWorkflow();
         }
     },

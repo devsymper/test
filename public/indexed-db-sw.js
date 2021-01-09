@@ -38,7 +38,7 @@ class IndexedDB {
         }
     }
 
-    readAll(callback) {
+	readAll(callback) {
         let objectStore = this.db.transaction(this.objName).objectStore(this.objName);
         objectStore.openCursor().onsuccess = function(event) {
             let cursor = event.target.result;

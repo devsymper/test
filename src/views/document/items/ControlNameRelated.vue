@@ -159,7 +159,7 @@ export default {
                         thisCpn.totalRecord = parseInt(data.total)
                     }
                 }
-            }).always(() => {}).catch({});
+            }).finally(() => {}).catch({});
         },
        
         handleData(data){
@@ -181,7 +181,7 @@ export default {
                     thisCpn.setDataTable(data);
                 }
                 
-            }).always({}).catch({});
+            }).finally({}).catch({});
             
         },
         setDataTable(data,dataRes=[]){
@@ -219,7 +219,7 @@ export default {
                                 type: "success",
                                 title: "Update successfull!"
                             }); 
-            }).always({}).catch({})
+            }).finally({}).catch({})
             
         },
 

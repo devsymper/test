@@ -1,5 +1,5 @@
 import { util } from "./../../../plugins/util.js";
-import { SYMPER_APP } from "@/main.js";
+// import { SYMPER_APP } from "@/main.js";
 import Api from "@/api/api.js";
 var apiObj = new Api("");
 const defaultConfig = {
@@ -77,18 +77,17 @@ function getFilterConfigs(getDataMode = '', filterData) {
             ];
         }
 
-        if(filter.selectAll && !$.isEmptyObject(filter.valuesNotIn)){
+        if(filter.selectAll && Object.keys(filter.valuesNotIn).length > 0){
             option.conditions.push({
                 name: 'not_in',
                 value: Object.keys(filter.valuesNotIn)
             });
-        }else if(!filter.selectAll && !$.isEmptyObject(filter.valuesIn)){
+        }else if(!filter.selectAll && Object.keys(filter.valuesIn).length > 0){
             option.conditions.push({
                 name: 'in',
                 value: Object.keys(filter.valuesIn)
             });
         }
-        
         if(option.conditions.length > 0){
             configs.push(option);
         }
@@ -97,7 +96,7 @@ function getFilterConfigs(getDataMode = '', filterData) {
 }
 
 function getOptionForGetList(configs, columns, filterData) {
-    return {
+    let options = {
         filter: getFilterConfigs(configs.getDataMode, filterData),
         sort: getSortConfigs(filterData),
         search: configs.searchKey,
@@ -105,8 +104,13 @@ function getOptionForGetList(configs, columns, filterData) {
         pageSize: configs.pageSize ? configs.pageSize : configs.pageSize,
         columns: columns ? columns : [],
         distinct: configs.distinct ? configs.distinct : false,
-        formulaCondition: configs.conditionByFormula
+        formulaCondition: configs.conditionByFormula ? configs.conditionByFormula : null
     };
+
+    if(configs.moreApiParam){
+        options = Object.assign(options, configs.moreApiParam); 
+    }
+    return options;
 }
 
 
@@ -156,24 +160,23 @@ function  getSortConfigs(filterData) {
  * @param {Object} header header phục vụ cho request 
  */
 export const getDataFromConfig = function(url, configs, columns, filterData, success, method = 'GET',header = {}){
-    let options = {};
+	let options = {};
     if(!configs.emptyOption){
         options = getOptionForGetList(configs, columns, filterData);
-    }
-
+	}
+	for(let i in options){
+		if(!options[i] || options[i].length == 0){
+			delete options[i]
+		}
+	}
     if(configs.customDataForApi){
-        options = configs.customDataForApi(configs, columns, filterData);
-    }
+		options = configs.customDataForApi
+	}
     apiObj.callApi(method, url, options, header, {})
     .then(data => {
         success(data);
     })
     .catch(err => {
-        console.warn(err);
-        SYMPER_APP.$snotify({
-            type: "error",
-            title: SYMPER_APP.$t("table.error.cannot_get_data"),
-            text: ""
-        });
+		debugger
     });
 }

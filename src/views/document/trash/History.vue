@@ -147,18 +147,14 @@ export default {
             tableContextMenu:{
                 list: {
                     name: "listObject",
-                    text: function() {
-                        return " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Danh sách";
-                    },
+                    text: " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Danh sách",
                     callback: (document, callback) => {
                         this.$goToPage('/documents/delete-history/objects',"Danh sách bản ghi",false,true,{allData:document.dataObject,field:document.field});
                     },
                 },
                 restore: {
                     name: "restore",
-                    text: function() {
-                        return " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Khôi phục";
-                    },
+                    text: " <i class= 'mdi mdi-file-document-edit-outline' > </i>&nbsp; Khôi phục",
                     callback: (document, callback) => {
                         this.allIds = document.allIds;
                         this.dialog = true;
@@ -170,9 +166,7 @@ export default {
                 
                 drop: {
                     name:"delete",
-                    text:function() {
-                        return " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa";
-                    },
+                    text: " <i class= 'mdi mdi-delete-outline' > </i>&nbsp; Xóa",
                     callback: (document, callback) => {
                         let ids = document.reduce((arr,obj)=>{
                             arr.push(obj.id);
@@ -199,7 +193,7 @@ export default {
                         .catch(err => {
                             console.log("error from delete document api!!!", err);
                         })
-                        .always(() => {});
+                        .finally(() => {});
                     },
                 },
                 
@@ -249,7 +243,7 @@ export default {
             .catch(err => {
                 console.log("error from delete document api!!!", err);
             })
-            .always(() => {});
+            .finally(() => {});
         }
     }
 }

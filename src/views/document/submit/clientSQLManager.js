@@ -1,5 +1,5 @@
-import sDocument from './../../../store/document'
-import store from './../../../store'
+
+import { workerStore } from '@/worker/document/submit/WorkerStateManagement';
 
 const initSqlJs = require('sql.js');
 
@@ -15,41 +15,39 @@ export default class ClientSQLManager {
      * @param {String} keyInstance 
      */
     static async createDB(keyInstance) {
-            const SQL = await initSqlJs({
-                locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.4.0/dist/sql-wasm.wasm`
-            });
-            let db = new SQL.Database();
-            this.addSQLInstanceDBToStore(keyInstance, db);
-        }
-        /**
-         * hoangnd:26/5/2020
-         * Hàm lưu instance của DB vào store khi create
-         * @param {String} keyInstance 
-         * @param {SQLLite} SQLDBInstance 
-         */
+        const SQL = await initSqlJs({
+            locateFile: file => `https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.4.0/dist/sql-wasm.wasm`
+        });
+        let db = new SQL.Database();
+        this.addSQLInstanceDBToStore(keyInstance, db);
+    }
+    /**
+     * hoangnd:26/5/2020
+     * Hàm lưu instance của DB vào store khi create
+     * @param {String} keyInstance 
+     * @param {SQLLite} SQLDBInstance 
+     */
     static addSQLInstanceDBToStore(keyInstance, SQLDBInstance) {
-            // store.commit(
-            //     "document/addInstanceSubmitDB", { instance: keyInstance, sqlLite: SQLDBInstance }
-            // );
-            store.commit(
-                "document/addSqlLiteDb", { instance: keyInstance, db: SQLDBInstance }
-            );
+        if(!workerStore['submit'][keyInstance]){
+            workerStore['submit'][keyInstance] = {};
         }
-        /**
-         * hoangnd:26/5/2020
-         * Hàm trả về instance của 1 DB dựa vào keyInstance
-         * @param {String} keyInstance 
-         */
+        workerStore['submit'][keyInstance]['SQLiteDB'] = SQLDBInstance;
+    }
+    /**
+     * hoangnd:26/5/2020
+     * Hàm trả về instance của 1 DB dựa vào keyInstance
+     * @param {String} keyInstance 
+     */
     static getInstanceDB(keyInstance) {
-            return sDocument.state.clientSqlLite[keyInstance]
-        }
-        /**
-         * hoangnd:26/5/2020
-         * Hàm chạy công thức
-         * @param {String} keyInstance      : instance của view submit hiện tại (trường hợp có thêm sub submit thì có trên 2 instance)
-         * @param {String} sql              : công thức cần chạy
-         * @param {Boolean} isWithoutReturn : biến kiểm tra có trả về kết quả hay ko
-         */
+        return workerStore['submit'][keyInstance]['SQLiteDB'];
+    }
+    /**
+     * hoangnd:26/5/2020
+     * Hàm chạy công thức
+     * @param {String} keyInstance      : instance của view submit hiện tại (trường hợp có thêm sub submit thì có trên 2 instance)
+     * @param {String} sql              : công thức cần chạy
+     * @param {Boolean} isWithoutReturn : biến kiểm tra có trả về kết quả hay ko
+     */
     static run(keyInstance, sql, isWithoutReturn = false) {
         let db = this.getInstanceDB(keyInstance);
         if (isWithoutReturn) {
@@ -77,8 +75,6 @@ export default class ClientSQLManager {
         } else {
             return this.run(keyInstance, sql, true);
         }
-        // console.log(this.run(keyInstance, 'select * from this_document', false));
-
     }
     static async insertDataToTable(keyInstance, tableName, columns, data, returnPromise = false) {
         let sql = `INSERT INTO ${tableName} (${columns}) VALUES ${data}`;
