@@ -29,7 +29,7 @@
             </div>
         </div>
         <div class="w-100" style="height:calc(100% - 125px)">
-            <v-tabs class="pl-4 mt-2 fs-13">
+            <v-tabs class="h-100 pl-4 mt-2 fs-13 tab-version">
                 <v-tab>
                     <span class="mr-1" style="font-size:40px">{{dataProgess.total}}</span>
                     <span>Issue in <br> version</span>
@@ -53,7 +53,7 @@
                     <span>Issue<br> to do</span>
                 </v-tab>
                 <!-- content -->
-                <v-tab-item>
+                <v-tab-item class="h-100">
                     <common-table-list-issue 
                         :listIssueProps="listIssueInVersion"
                         :listType="listType"
@@ -274,5 +274,8 @@ export default {
 }
 .progress-item{
     margin: 0 1px;
+}
+.tab-version >>> .v-tabs-items{
+    height: 100%;
 }
 </style>

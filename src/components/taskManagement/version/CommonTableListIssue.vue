@@ -1,6 +1,6 @@
 <template>
-    <div>
-        <v-card style="box-shadow:none">
+    <div class="h-100">
+        <v-card class="h-100" style="box-shadow:none">
             <v-card-title>
                 {{listType}}
                 <v-spacer></v-spacer>
@@ -16,7 +16,7 @@
                     class="sym-small-size sym-style-input"
                 ></v-text-field>
             </v-card-title>
-            <VuePerfectScrollbar >
+            <VuePerfectScrollbar style="height:calc(100% - 64px)">
                 <v-data-table
                     v-if="listIssueProps.length>0"
                     :headers="headers"
