@@ -172,7 +172,7 @@ export default {
 			this.showBtnAddCheckbox = true
 		},
 		tab(val){
-			this.$refs.listObject.getData()
+			this.$refs.listObject.removeCheckBoxColumn()
 			this.showBtnAddCheckbox = true
 		}
 	}
