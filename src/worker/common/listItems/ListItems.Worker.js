@@ -35,6 +35,10 @@ self.onmessage = async function (event) {
 			let saveFilterRes = await saveFilter(data);
 			postMessage({action:'saveFilter', dataAfter : saveFilterRes})
 			break;
+		case 'saveWidthColumns':
+			let saveWidthColumnsRes = await saveWidthColumns(data);
+			postMessage({action:'saveWidthColumns', dataAfter : saveWidthColumnsRes})
+			break;
         default:
             break;
     }
@@ -194,6 +198,10 @@ export const getTableColumns = function(columns, forcedReOrder = false , savedOr
 	}
 }
 export const saveFilter = async function(data){
+	let res = await uiConfigApi.saveUiConfig(data)
+	return res
+}
+export const saveWidthColumns = async function(data){
 	let res = await uiConfigApi.saveUiConfig(data)
 	return res
 }

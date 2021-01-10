@@ -36,7 +36,6 @@ export default {
 			deep: true,
 			immediate: true,
 			handler(arr){
-				// debugger
 			}
 		}
 	},

@@ -306,6 +306,7 @@
 				:gridOptions="gridOptions"
                 :getContextMenuItems="getContextMenuItems"
 				:columnDefs="columnDefs"
+                @columnResized="columnResized()"
 				@rowClicked="handlerRowClicked"
 				:rowData="rowData"
                 :rowSelection="rowSelection"
@@ -712,15 +713,29 @@ export default {
 					self.handlerSaveTableDisplayConfigRes(data.dataAfter)
                     break;
                 case 'saveFilter':
-                self.handlerSaveFilter(data.dataAfter)
+                    self.handlerSaveFilter(data.dataAfter)
                 break;
+                case 'saveWidthColumns':
+                    self.handlerSaveWidthColumns(data.dataAfter)
                 case 'getTableColumns':
 					data.dataAfter.forEach(function(e){
 						if(e.cellRenderer){
 							eval("e.cellRenderer = " + e.cellRenderer)
 						}
-					})
-					self.columnDefs = data.dataAfter
+                    })
+                    debugger
+                    self.columnDefs = data.dataAfter
+                    self.columnDefs.map(column=>{
+                    self.widthColumns.map(c=>{
+                        if(c){
+                             if(column.field==c.colId){
+                             column.width=c.width
+                         }
+                        }
+                        
+                    })
+                   
+                })
 					break;
                 default:
                     break;
@@ -794,13 +809,14 @@ export default {
 					this.showNoRowsOverlay()
 				}
 			}
-		},
+        },
+        
 		columnDefs:{
            
 			deep: true,
 			immediate: true,
 			handler(arr){
-                debugger
+               debugger
 				let self = this
 				if(arr.length > 0){
 					arr.forEach(function(e){
@@ -854,6 +870,7 @@ export default {
             closeBtnFilter:false,
             isUpdateFilter:false,
             filter:[],
+            widthColumns:[],
             isClose:true,
             notiFilter:'',
             deleteFilterIdx:0,
@@ -998,6 +1015,31 @@ export default {
             this.getData();
            
 
+        },
+        columnResized(){
+            this.widthColumns=[];
+            this.gridOptions.columnApi.columnController.allDisplayedColumns.map(column=>{
+                this.widthColumns.push({
+                    colId:column.colId,
+                    width: column.actualWidth
+                })
+            })
+            let test = this.widthColumns
+            let tableConfig =  this.getTableDisplayConfigData();
+            tableConfig.detail = JSON.parse(tableConfig.detail);
+            tableConfig.detail.filter = this.filter;
+            debugger
+            this.filter.map(fil=>{
+                if(fil.name==this.selectedFilterName){
+                    fil.widthColumns= this.widthColumns;
+                }
+            })
+            tableConfig.detail= JSON.stringify(tableConfig.detail);
+            this.listItemsWorker.postMessage({
+                action: 'saveWidthColumns',
+                data: tableConfig
+			})
+            
         },
         selectActionFilter(actionIdx,filterIdx){
             switch(actionIdx){
@@ -1325,12 +1367,22 @@ export default {
 				}
 				this.savedTableDisplayConfig = res.savedConfigs.columns;
 				if(res.columnDefs){
+                    debugger
 					this.columnDefs = res.columnDefs
 					this.handleStopDragColumn();
                 }
                 // xử lý phần filter
                 this.filter = res.savedConfigs.filter;
                 this.getDefaultFilter()
+                //xử lý set độ rộng cho cột
+                this.widthColumns = [];
+                res.savedConfigs.filter.map(fil=>{
+                    if(fil.name==this.selectedFilterName){
+                        debugger
+                        this.widthColumns=fil.widthColumns
+                    }
+                });
+              
 			}
 		},
 		handlerSaveTableDisplayConfigRes(res){
@@ -1344,9 +1396,16 @@ export default {
             if(res.status==200){
                 this.addFilter = false;
                 this.filterName = '';
+            }else{
                 this.$snotify({
-				type: "success",
-				title: this.notiFilter	})
+				type: "error",
+				title: "Lỗi"	})
+            }
+        },
+        handlerSaveWidthColumns(res){
+             if(res.status==200){
+                this.addFilter = false;
+                this.filterName = '';
             }else{
                 this.$snotify({
 				type: "error",
@@ -1568,6 +1627,7 @@ export default {
 			document.querySelector('.ag-row-selected').innerHTML = selectedRows.length === 1 ? selectedRows[0].athlete : ''
    		 },
 		onGridReady(params){
+            debugger
 			params.api.autoSizeColumns()
 			this.agApi = params.api
 			this.agApi.showLoadingOverlay()
@@ -1591,6 +1651,7 @@ export default {
 			}
 		},
 		configColumnDisplay(type, idx) {
+            debugger
             let column = this.columnDefs[idx];
             column[type] = !column[type];
             let isValue = column[type];
