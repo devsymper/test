@@ -2,7 +2,7 @@
 import { workerStore } from '@/worker/document/submit/WorkerStateManagement';
 import ClientSQLManager from "@/views/document/submit/clientSQLManager";
 import Formulas from "@/views/document/submit/formulas";
-import { prepareDataGetMultiple } from '@/components/document/dataControl';
+import { prepareDataGetMultiple, genKeyFromDataInput } from '@/components/document/dataControl';
 
 onmessage = function (event) {
     var workerDataReceive = event.data;
@@ -38,11 +38,39 @@ onmessage = function (event) {
             if(from == 'columnTable'){
                 let listIdRow = dataOfAction.listIdRow;
                 let dataPostForGetMultiple = prepareDataGetMultiple(dataInput, listIdRow, workerStore['submit'][keyInstance]['inputData']);
+                let cacheRowData = {};
+                //cache các data input giống nhau -> chỉ chạy 1 lần
+                for(let rowId in dataPostForGetMultiple){
+                    let key = genKeyFromDataInput(dataPostForGetMultiple[rowId]);
+                    if(Object.keys(cacheRowData).includes(key)){
+                        delete dataPostForGetMultiple[rowId];
+                    }
+                    if(!cacheRowData[key]){
+                        cacheRowData[key] = [];
+                    }
+                    if(!cacheRowData[key].includes(rowId)){
+                        cacheRowData[key].push(rowId);
+                    }
+                }
                 formulaIns.getDataMultiple(dataPostForGetMultiple).then(res=>{
                     if(res && res['data']){
+                        if(Object.keys(cacheRowData).length > 0){
+                            let data = res['data'];
+                            for(let rowId in data){
+                                for(let key in cacheRowData){
+                                    let rowIdCache = cacheRowData[key];
+                                    if(rowIdCache.includes(rowId)){
+                                        for (let index = 0; index < rowIdCache.length; index++) {
+                                            res['data'][rowIdCache[index]] = data[rowId];
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         postMessage({action:'afterRunFormulasSuccess', dataAfter : 
                             {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type, dataRowId:listIdRow}
                         })
+                        
                     }
                 })
             }
