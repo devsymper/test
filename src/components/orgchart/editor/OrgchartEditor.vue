@@ -435,6 +435,10 @@ export default {
             try {
                 let res = await orgchartApi.getOrgchartDetail(id);
                 if(res.status == 200){
+					this.$store.commit('orgchart/setDataOrgchartSideBySide',{
+						orgchartId: res.data.orgchart.id,
+						object:res.data
+					})
                     this.$refs.editorWorkspace.createFirstVizNode()
                     let savedData = res.data;
                     let departments = this.correctDiagramDisplay(savedData.orgchart.content);
@@ -1094,11 +1098,18 @@ export default {
 .symper-orgchart-paper .link-tools,
 .symper-orgchart-paper .marker-vertex-group,
 .symper-orgchart-view .symper-orgchart-paper .orgchart-action {
-    display: none!important;
+    display: block !important;
+}
+.symper-orgchart-view  .line-action{
+    display: none !important;
 }
 
 .symper-orgchart-active-editor .symper-orgchart-paper .orgchart-action {
-    display: none;
+    display: block!important;
+}
+.symper-orgchart-active-editor .show-infor-department,
+.symper-orgchart-active-editor .show-infor-user{
+    display: none !important;
 }
 
 .symper-orgchart-active-editor .symper-orgchart-paper .symper-orgchart-node:hover .orgchart-action {

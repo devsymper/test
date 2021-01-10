@@ -15,7 +15,7 @@
             </AgDataTable>
         </VueResizable>
         <ListItems 
-                ref="listUser"
+			ref="listUser"
             :pageTitle="'Danh sách người dùng'"
             :getDataUrl="apiUrl"
             :containerHeight="containerHeight"

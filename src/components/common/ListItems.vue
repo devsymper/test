@@ -229,6 +229,7 @@
 				@cell-context-menu="cellContextMenu"
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
+				@cell-context-menu="cellContextMenu"
 				@grid-ready="onGridReady"
 			>
 			</ag-grid-vue>
@@ -717,6 +718,13 @@ export default {
 				this.agApi.sizeColumnsToFit()
 			}
 		},
+		tableContextMenu:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				this.relistContextmenu();
+			}
+		},
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
             if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
                 this.openactionPanel();
@@ -893,7 +901,7 @@ export default {
 			this.agApi.hideOverlay();
 		},
 		cellContextMenu(params){
-			debugger
+			this.$emit('cell-context-menu', params)
 		},
 		cellMouseOver(params){
 			this.cellAboutSelecting = params.data

@@ -402,7 +402,12 @@ export default {
                 return false
             }
             
-        },
+		},
+		handlerItemClick(item){
+			if(item.children){
+				this.gotoPage(item)
+			}
+		},
         // thêm nhóm cho Menu
         showChangeInfoUser(){
             if(this.sapp.baInfo.id==0){

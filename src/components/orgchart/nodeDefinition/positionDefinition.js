@@ -161,13 +161,7 @@ export const DEFAULT_POSITION_ATTRS = {
 		y: 5,
 		'font-family': 'Roboto'
 	},
-	'.collapse-expand-circle': {
-		r: CEConfig.radius,
-		fill: '#848484',
-		event: 'element:collapse',
-		// x: shapeSize.width / 2,
-		// y: shapeSize.height + CEConfig.stickHeight
-	},
+	
 	'.expand-text': {
 		x: shapeSize.width / 2 - CEConfig.fontSize / 2 + 2,
 		y: shapeSize.height + CEConfig.stickHeight + CEConfig.fontSize / 2 - 1,
