@@ -8,7 +8,7 @@
         <list-items
 			:getDataUrl="sDocumentManagementUrl+'documents/'+docId+'/objects'"
 			:exportLink="sDocumentManagementUrl+'documents/'+docId+'/export-excel'" 
-			:useDefaultContext="false"
+			:useantext="false"
 			:tableContextMenu="tableContextMenu"
 			:pageTitle="$t('documentObject.title')"
 			:containerHeight="containerHeight"
@@ -256,7 +256,6 @@ export default {
                 reformatData(res){
                     let thisCpn = util.getClosestVueInstanceFromDom(document.querySelector('.list-object-component'));
                     let listObject = res.data.listObject;
-                  
                     return{
                         columns:res.data.columns,
                         listObject:res.data.listObject,
@@ -658,9 +657,11 @@ export default {
          * Sự kiện khi selection vào cell
          */
         afterCellSelection(rowData){
-			this.$refs.listObject.openactionPanel();
+			if(!this.$refs.listObject.actionPanel){
+				this.$refs.listObject.openactionPanel();
+			}	
             this.actionOnRightSidebar = 'detail';
-            this.currentRowData = rowData;
+			this.currentRowData = rowData;
         }
     }
 }

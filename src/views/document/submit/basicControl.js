@@ -346,7 +346,7 @@ export default class BasicControl extends Control {
             this.setFileControlValue(value);
         }
         else{
-            if(value.inputDislay && value.inputValue){
+            if(value && value.inputDislay && value.inputValue){
                 this.value = value.inputValue;
             }
             else{
@@ -378,7 +378,7 @@ export default class BasicControl extends Control {
                     this.setImageControlValue(value)
                 }        
                 else {
-                    if(value.inputDislay){
+                    if(value && value.inputDislay){
                         this.ele.val(value.inputDislay);
                     }
                     else{

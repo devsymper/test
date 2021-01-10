@@ -1,32 +1,30 @@
 <template>
 	<div class="header-ag-grid d-flex  w-100" >
-		<div class="customHeaderLabel flex-grow-1">{{$t('table.'+params.displayName)}}</div> 
+		<div class="customHeaderLabel flex-grow-1">{{prefix ? $t(prefix + params.displayName) : params.displayName}}</div> 
 		<v-icon 
 			class="fs-13 symper-table-dropdown-button " 
+			v-if="!params.column.colDef.noFilter"
 			:class="{'applied-filter': checkFilterCol(params.displayName)} " 
-			:col-name="params.displayName" small 
+			:col-name="params.column.colDef.field" small 
 			onclick="tableDropdownClickHandle(this,event)">mdi-filter-variant</v-icon>
 	</div>
 
 </template>
 
 <script>
-import { util } from '@/plugins/util';
-
 export default {
-	data: function () {
-		
-	},
 	computed:{
 		filteredColumns(){
 			return this.$store.state.app.filteredColumns
+		},
+		prefix(){
+			let prefix = this.params.headerPrefixKeypath
+			prefix =
+			prefix[prefix.length - 1] == "." || prefix == ""
+				? prefix
+				: prefix + ".";
+			return  prefix
 		}
-	},
-	watch:{
-		
-	},
-	beforeMount() {},
-	mounted() {
 	},
 	methods: {
 		checkFilterCol(col){

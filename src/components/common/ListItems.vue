@@ -226,6 +226,7 @@
 				:overlayLoadingTemplate="overlayLoadingTemplate"
 				:overlayNoRowsTemplate="overlayNoRowsTemplate"
 				:modules="modules"
+				@cell-context-menu="cellContextMenu"
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
 				@cell-context-menu="cellContextMenu"
@@ -361,7 +362,7 @@ export default {
          */
         useDefaultContext: {
             type: Boolean,
-            default: true
+            default: false
         },
 		/**
 		 * Truyeenf vao row height
@@ -747,6 +748,9 @@ export default {
 					this.agApi.resetRowHeights()
 					break;	
 			}
+		},
+		'tableDisplayConfig.value.wrapTextMode'(value){
+			this.customRowHeights(value)
 		}
 	},
     data(){
@@ -791,7 +795,7 @@ export default {
                 show: false, // có hiển thị panel cấu hình ko
                 width: 300, // Chiều rộng của panel cấu hình
                 value: {
-                    wrapTextMode: 0,
+                    wrapTextMode: 1,
                     densityMode: 2,
                     alwaysShowSidebar: false,
                     hiddenColumns: [],
@@ -844,13 +848,17 @@ export default {
 		this.defaultColDef = {
             minWidth: 40,
 			filter: true,
-			// flex: 1,
 			suppressMenu : true,
 			sortable: true,
-            resizable: true,
+			resizable: true,
+			wrapText: true,
+			autoHeight: true,
+			headerComponentParams :{
+				headerPrefixKeypath: this.headerPrefixKeypath
+			}
         };
 		this.gridOptions = {};
-		this.gridOptions.rowHeight =  this.rowHeight
+		// this.gridOptions.rowHeight =  this.rowHeight
 		this.gridOptions.getRowStyle = function(params) {
 			if (params.node.rowIndex % 2 != 0) {
 				return { background: '#fbfbfb' };
@@ -869,6 +877,17 @@ export default {
 	methods:{
 		getAllData(){
 			return this.rowData
+		},
+		customRowHeights(value){
+			if(value == 1){
+				this.gridOptions.rowHeight  = this.rowHeight
+			}else{
+				this.defaultColDef.autoHeight = true
+				this.defaultColDef.wrapText = true
+			}
+			setTimeout(self=>{
+				self.agApi.resetRowHeights()
+			},10,this)
 		},
 		showLoadingOverlay() {
 			this.agApi.showLoadingOverlay();
@@ -901,10 +920,11 @@ export default {
             this.hasColumnsChecked = true;
             this.columnDefs.unshift(
 				{ 
-					headerName: 'checkbox', 
+					headerName: 'Chọn', 
 					field: 'checkbox', 
 					editable:true,
-					cellRendererFramework : 'CheckBoxRenderer'
+					cellRendererFramework : 'CheckBoxRenderer',
+					width: 50
 				}	
 			)
 			this.gridOptions.api.setColumnDefs([]);
@@ -932,8 +952,9 @@ export default {
                 let objectType = this.commonActionProps.resource;
                 let parentId = this.commonActionProps.parentId ? this.commonActionProps.parentId : id;
                 items = actionHelper.filterAdmittedActions(items, objectType, parentId ,id);
-            }
+			}
 			let tmpTableContextMenu = this.getItemContextMenu(items);
+
 			this.tmpTableContextMenu = this.reduceContextMenuItems(tmpTableContextMenu)
 		},
 		reduceContextMenuItems(tmpTableContextMenu){
@@ -1038,7 +1059,7 @@ export default {
                 contextMenu.items[item.name] = {
                     name: item.text
                 };
-            }
+			}
             return contextMenu;
 		},
 		
@@ -1073,6 +1094,7 @@ export default {
 				}
 			})
 			this.hideOverlay()
+			this.$emit('data-loaded')
 		},
 		handlerRestoreTableDisplayConfigRes(res){
 			if(res.savedConfigs){
@@ -1318,6 +1340,9 @@ export default {
 			params.api.sizeColumnsToFit()
 			this.agApi = params.api
 			this.agApi.showLoadingOverlay()
+			setTimeout(self=>{
+				self.customRowHeights(self.tableDisplayConfig.value.wrapTextMode)
+			},200, this)
 			/**
 			 * Create perfect scrollbar cho ag grid
 			 * Dev-create: dungna
@@ -1340,7 +1365,6 @@ export default {
             let isValue = column[type];
             if (type == "symperHide") {
 				this.gridOptions.columnApi.setColumnVisible(column.field, !isValue)
-				this.agApi.sizeColumnsToFit()
 				this.resetHiddenColumns();
             } else {
 				if(isValue){
@@ -1349,8 +1373,20 @@ export default {
 					delete column.pinned
 				}
 				this.reOrderFixedCols();
-				this.gridOptions.api.setColumnDefs([]);
+				debugger
+				let flag = false
+				this.columnDefs.forEach(function(e){
+					if(e.symperFixed){
+						flag = true
+						return
+					}
+				})
+				if(!flag){
+					this.refreshList()
+				}
 			}
+			this.agApi.refreshCells()
+
 		},
 		resetHiddenColumns(){
 		 	let hiddenColumns = {};
@@ -1576,6 +1612,10 @@ export default {
 }
 .ag-row-selected{
 	background-color: #DBE7FE !important;
+}
+.clip-text .ag-cell{
+	text-overflow: ellipsis !important;
+    white-space: nowrap !important;
 }
 .applied-filter {
     color: #f58634;
