@@ -226,8 +226,10 @@
 				:overlayLoadingTemplate="overlayLoadingTemplate"
 				:overlayNoRowsTemplate="overlayNoRowsTemplate"
 				:modules="modules"
+				@cell-context-menu="cellContextMenu"
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
+				@cell-context-menu="cellContextMenu"
 				@grid-ready="onGridReady"
 			>
 			</ag-grid-vue>
@@ -716,6 +718,13 @@ export default {
 				this.agApi.sizeColumnsToFit()
 			}
 		},
+		tableContextMenu:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				this.relistContextmenu();
+			}
+		},
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
             if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
                 this.openactionPanel();
@@ -891,7 +900,9 @@ export default {
 		hideOverlay() {
 			this.agApi.hideOverlay();
 		},
-		
+		cellContextMenu(params){
+			this.$emit('cell-context-menu', params)
+		},
 		cellMouseOver(params){
 			this.cellAboutSelecting = params.data
 			if(this.debounceRelistContextmenu){
@@ -909,7 +920,7 @@ export default {
             this.hasColumnsChecked = true;
             this.columnDefs.unshift(
 				{ 
-					headerName: 'checkbox', 
+					headerName: 'Chọn', 
 					field: 'checkbox', 
 					editable:true,
 					cellRendererFramework : 'CheckBoxRenderer',
@@ -1083,6 +1094,7 @@ export default {
 				}
 			})
 			this.hideOverlay()
+			this.$emit('data-loaded')
 		},
 		handlerRestoreTableDisplayConfigRes(res){
 			if(res.savedConfigs){
@@ -1189,7 +1201,6 @@ export default {
 			
         },
 		showTableDropdownMenu(x, y, colName) {
-			debugger
             var windowWidth = $(window).width()/1.1;
             if(x > windowWidth){
                 x -= 190;
@@ -1238,7 +1249,6 @@ export default {
          */
         getItemForValueFilter(){
 			let columns = [this.tableFilter.currentColumn.name];
-			debugger
             let self = this;
             let options = {
                 pageSize: 300,
@@ -1327,7 +1337,7 @@ export default {
 			document.querySelector('.ag-row-selected').innerHTML = selectedRows.length === 1 ? selectedRows[0].athlete : ''
    		 },
 		onGridReady(params){
-			params.api.autoSizeColumns()
+			params.api.sizeColumnsToFit()
 			this.agApi = params.api
 			this.agApi.showLoadingOverlay()
 			setTimeout(self=>{
@@ -1355,7 +1365,6 @@ export default {
             let isValue = column[type];
             if (type == "symperHide") {
 				this.gridOptions.columnApi.setColumnVisible(column.field, !isValue)
-				this.agApi.sizeColumnsToFit()
 				this.resetHiddenColumns();
             } else {
 				if(isValue){
@@ -1364,8 +1373,20 @@ export default {
 					delete column.pinned
 				}
 				this.reOrderFixedCols();
-				this.gridOptions.api.setColumnDefs([]);
+				debugger
+				let flag = false
+				this.columnDefs.forEach(function(e){
+					if(e.symperFixed){
+						flag = true
+						return
+					}
+				})
+				if(!flag){
+					this.refreshList()
+				}
 			}
+			this.agApi.refreshCells()
+
 		},
 		resetHiddenColumns(){
 		 	let hiddenColumns = {};

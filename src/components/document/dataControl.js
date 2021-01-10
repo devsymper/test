@@ -81,7 +81,7 @@ export const getAllPropFromData = (fields, viewType, allDataDetail)=>{
             let colValue = {};
             let childObjectId = [];
             for (let childFieldId in listField) {
-                let childControl = GetControlProps(listField[childFieldId].type)
+                let childControl = GetControlProps(listField[childFieldId].type);
                 let childProperties = childControl.properties
                 let childFormulas = childControl.formulas
                 let childType = listField[childFieldId].type
@@ -98,6 +98,7 @@ export const getAllPropFromData = (fields, viewType, allDataDetail)=>{
                         childProperties[childProp].value = valueChildControl;
                     }
                 }
+
                 if (listField[childFieldId]['formulas'] != false && listField[childFieldId]['formulas'] != "[]") {
                     if (viewType != 'detail') {
                         for(let childFormulaType in childFormulas){
@@ -300,7 +301,19 @@ export const checkDataInputChange = function(rootChangeFieldName, dataInputBefor
     return false;
 }
 
-
+export const genKeyFromDataInput = (dataInput)=>{
+    let key = [];
+    for(let control in dataInput){
+        key.push(control+"_"+dataInput[control]);
+    }
+    return key.join('__');
+}
+/**
+ * Ham xử lý data input để đưa ra data post cho hàm chạy công thức nhiều dòng trong table
+ * @param {} dataInput 
+ * @param {*} listIdRow 
+ * @param {*} listInput 
+ */
 export const prepareDataGetMultiple = (dataInput, listIdRow, listInput)=>{
     let dataPost = {};
     /***
@@ -308,38 +321,42 @@ export const prepareDataGetMultiple = (dataInput, listIdRow, listInput)=>{
      */
     if (Object.keys(dataInput).length > 0) {
         let allRowDataInput = [];
+        console.log(listInput,'listInputlistInput');
+        console.log(dataInput,'listInputlistInput');
         for (let control in dataInput) {
-            let controlType = listInput[control].type;
-            let dataRow = dataInput[control];
-            if (!Array.isArray(dataRow)) {
-                for (let index = 0; index < listIdRow.length; index++) {
-                    if (allRowDataInput.length <= index) {
-                        allRowDataInput[index] = {};
-                    }
-                    if(['number','percent'].includes(controlType)){
-                        if (!dataRow) {
-                            dataRow = 0
-                        } else {
-                            dataRow = Number(dataRow);
+            if(listInput[control]){
+                let controlType = listInput[control].type;
+                let dataRow = dataInput[control];
+                if (!Array.isArray(dataRow)) {
+                    for (let index = 0; index < listIdRow.length; index++) {
+                        if (allRowDataInput.length <= index) {
+                            allRowDataInput[index] = {};
                         }
-                    }
-                   
-                    allRowDataInput[index][control] = dataRow;
-                }
-            } else {
-                for (let i = 0; i < dataRow.length; i++) {
-                    if (allRowDataInput.length <= i) {
-                        allRowDataInput[i] = {};
-                    }
-                    let value = dataRow[i];
-                    if(['number','percent'].includes(controlType)){
-                        if (!value) {
-                            value = 0
-                        } else {
-                            value = Number(value);
+                        if(['number','percent'].includes(controlType)){
+                            if (!dataRow) {
+                                dataRow = 0
+                            } else {
+                                dataRow = Number(dataRow);
+                            }
                         }
+                    
+                        allRowDataInput[index][control] = dataRow;
                     }
-                    allRowDataInput[i][control] = value;
+                } else {
+                    for (let i = 0; i < dataRow.length; i++) {
+                        if (allRowDataInput.length <= i) {
+                            allRowDataInput[i] = {};
+                        }
+                        let value = dataRow[i];
+                        if(['number','percent'].includes(controlType)){
+                            if (!value) {
+                                value = 0
+                            } else {
+                                value = Number(value);
+                            }
+                        }
+                        allRowDataInput[i][control] = value;
+                    }
                 }
             }
         }

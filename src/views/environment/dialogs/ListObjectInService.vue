@@ -56,6 +56,7 @@
 					<div class="dialog-object-in-service" style="z-index:1000;background-color: #ffffff ; position: relative">
 						<ObjectDetail 
 							:tableHeight="tableHeight"
+							:tab="tab"
 							@back="tab = 'tab-1'"
 							ref="listObject"
 							@close-popup="handleCloseEvent"

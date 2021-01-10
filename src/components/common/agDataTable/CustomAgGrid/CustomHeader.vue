@@ -12,12 +12,7 @@
 </template>
 
 <script>
-import { util } from '@/plugins/util';
-
 export default {
-	data: function () {
-		
-	},
 	computed:{
 		filteredColumns(){
 			return this.$store.state.app.filteredColumns
@@ -30,18 +25,6 @@ export default {
 				: prefix + ".";
 			return  prefix
 		}
-	},
-	watch:{
-		params:{
-			deep: true,
-			immediate: true,
-			handler(arr){
-				debugger
-			}
-		}
-	},
-	beforeMount() {},
-	mounted() {
 	},
 	methods: {
 		checkFilterCol(col){
