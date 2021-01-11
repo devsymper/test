@@ -240,8 +240,4 @@ export default {
     updateProcessInstance(id, data){
         return bpmneApi.put(appConfigs.apiDomain.bpmne.general +`symper-rest/service/runtime/process-instances/${id}`, JSON.stringify(data), testHeader)
 	},
-	
-	getTaskHistory(id){
-		return bpmneApi.get(appConfigs.apiDomain.bpmne+"/historic-task-instances/" + id)
-	}
 };
