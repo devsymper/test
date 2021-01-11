@@ -87,6 +87,12 @@ export default {
 			default(){
 				return {}
 			}
+		},
+		varsForBackend:{
+			type: Object,
+			default(){
+				return {}
+			}
 		}
 		
 	},
@@ -105,34 +111,54 @@ export default {
 		async completeTask(){
 			let elId = this.taskInfo.action.parameter.activityId;
 			let docId = this.taskInfo.action.parameter.documentId;
+
 			let dataDoc
-			let res = await documentApi.detailDocumentObject(docId)
-			if(res.status == 200){
-				dataDoc = res.data
+			let varsForBackend 
+			let flag = true
+			if(Object.keys(this.varsForBackend).length > 0){
+				varsForBackend = this.varsForBackend
 			}else{
-				dataDoc = []
-			}
-			let varsForBackend = await getVarsFromSubmitedDoc(dataDoc, elId, docId);
-			if(varsForBackend){
-				let data = {
-					action: 'complete',
-					outcome: 'submit',
-					variables: varsForBackend.vars
+				let docObjId = this.taskInfo.action.parameter.documentObjectId;
+
+				let res = await documentApi.detailDocumentObject(docObjId)
+				if(res.status == 200){
+					dataDoc = res.data
+				}else{
+					this.$snotify(
+						{
+							type: 'error',
+							title: "Bạn phải submit doc trước khi hoàn thành"
+						}
+					)
+					flag = false
 				}
-				workFlowApi.changeTaskAction(this.taskId, data).then(res=>{
+				varsForBackend = await getVarsFromSubmitedDoc(dataDoc, elId, docId);
 
-				}).catch(err=>{
-
-				})
-				this.$snotify({
-					type: "success",
-					title: "Hoàn thành công việc thành công"
-				})
-				this.$emit('success')
-			}else{
-				this.$snotifyError("Không thể lấy variable")
 			}
-			
+			if(flag){
+				if(varsForBackend){
+					let data = {
+						action: 'complete',
+						outcome: 'submit',
+						variables: varsForBackend.vars
+					}
+					workFlowApi.changeTaskAction(this.taskId, data).then(res=>{
+
+					}).catch(err=>{
+
+					})
+					this.$snotify({
+						type: "success",
+						title: "Hoàn thành công việc thành công"
+					})
+					this.$emit('success')
+				}else{
+					this.$snotifyError("Không thể lấy variable")
+				}
+			}else{
+				this.$emit('cancel')
+			}
+		
 		
 		}
 	},

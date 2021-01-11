@@ -791,15 +791,11 @@ export default {
             // }
         },
         handleTaskSubmited() {
-            this.sideBySideMode = false;
-            this.getData();
+			this.sideBySideMode = false;
+			debugger
+            this.getData({});
         },
         handleChangeFilterValue(data) {
-            // for (let key in data) {
-            //     this.$set(this.myOwnFilter, key, data[key]);
-            // }
-            // this.getData();
-
             this.searchKey = data.nameLike;
             if(this.debounceGetData){
                 clearTimeout(this.debounceGetData);

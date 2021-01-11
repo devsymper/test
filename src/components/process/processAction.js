@@ -332,6 +332,7 @@ function getVariables(dataObjects) {
  * @param {String} id 
  */
 export const getVarsFromSubmitedDoc = async(docData, elId, docId) => {
+	debugger
     return new Promise((resolve, reject) => {
         let vars = [];
         let dataInputForFormula = {};

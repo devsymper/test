@@ -165,6 +165,7 @@
 			:showDialog="modelDialog.completeShowDialog"
 			@cancel="modelDialog.completeShowDialog = false"
 			:taskId="originData.id"
+			:varsForBackend="varsForBackend"
 			:taskInfo="taskInfo"
 			@success="refreshMyItem('complete')"
 		/> 
@@ -331,6 +332,7 @@ export default {
     data: function() {
         return {
 			showSubmitSuccessBtn:false,
+			varsForBackend:{},
 			modelDialog:{
 				unClaimShowDialog: false,
 				claimShowDialog: false,
@@ -835,17 +837,18 @@ export default {
 			if(!docId){
 				docId = this.taskInfo.action.parameter.documentId;
 			}
-			let varsForBackend = await getVarsFromSubmitedDoc(data, elId, docId);
-			let taskData = { 
-				"outcome": 'submit',
-				"variables": varsForBackend.vars,
-			}
-			let res =  await this.submitTask(taskData);
-			this.reloadDetailTask();
-			if (this.reload) {
-				this.$emit('task-submited', res);
-            }
-            this.updateProcessInstanceName();
+			this.varsForBackend = await getVarsFromSubmitedDoc(data, elId, docId);
+			debugger
+			// let taskData = { 
+			// 	"outcome": 'submit',
+			// 	"variables": varsForBackend.vars,
+			// }
+			// let res =  await this.submitTask(taskData);
+			// this.reloadDetailTask();
+			// if (this.reload) {
+			// 	this.$emit('task-submited', res);
+            // }
+            // this.updateProcessInstanceName();
             this.loadingAction=false;
         },
         showApprovalOutcomes(approvalActions){
