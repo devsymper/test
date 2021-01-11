@@ -297,7 +297,7 @@
                 "firstName": "First name",
                 "lastName": "Last name",
                 "displayName": "Display name",
-                "phone": "Phone number"
+				"phone": "Phone number"
             },
             "passwordSetting": {
                 "title": "Password setting",
@@ -594,7 +594,9 @@
                         "comment": "Comment",
                         "has": "Has",
                         "commentNotResolve": "comment Not Resolve",
-                        "noComment": "No comment"
+						"noComment": "No comment",
+						"listWorks": "Work",
+						"clickToViewListWork": "Click to view work"
                     },
                     "worflowInfo": "Workflow infomation",
                     "userRelated": {

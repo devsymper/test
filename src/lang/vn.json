@@ -816,7 +816,9 @@
                         "has": "Có ",
                         "commentNotResolve": " bình luận chưa được giải quyết",
                         "noComment": "Không có bình luận nào",
-                        "id": "Định danh"
+						"id": "Định danh",
+						"listWorks": "Công việc",
+						"clickToViewListWork": "Bấm vào đây để xem công việc"
                     },
                     "worflowInfo": "THÔNG TIN QUY TRÌNH",
                     "userRelated": {
