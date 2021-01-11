@@ -229,7 +229,6 @@
 				@cell-context-menu="cellContextMenu"
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
-				@cell-context-menu="cellContextMenu"
 				@grid-ready="onGridReady"
 			>
 			</ag-grid-vue>
@@ -1373,7 +1372,6 @@ export default {
 					delete column.pinned
 				}
 				this.reOrderFixedCols();
-				debugger
 				let flag = false
 				this.columnDefs.forEach(function(e){
 					if(e.symperFixed){
