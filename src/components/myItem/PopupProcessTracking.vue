@@ -17,6 +17,7 @@
 							<trackingProcessInstance
 								class="popup-model-diagram"
 								v-if="workInfo.id"
+								@node-clicked="handlerNodeCLicked"
 								:instanceId="workInfo.id"
 								@dataInstanceRuntime="dataInstanceRuntime"
 								>
@@ -37,17 +38,22 @@
 					v-if="taskInfo.action.parameter.processInstanceId"
 					:instanceId="taskInfo.action.parameter.processInstanceId"
 					:elementId="taskInfo.action.parameter.activityId"
+					@node-clicked="handlerNodeCLicked"
 					:definitionName="definitionName"
 					>
 				</trackingProcessInstance>
 			</div>
 		</div>
+		<PopupCallActivityProcess 
+			:showDialog="showDialog"
+		/>
 	</div>
     
 </template>
 
 <script>
 import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue";
+import PopupCallActivityProcess from './PopupCallActivityProcess'
 import bpmneApi from "@/api/BPMNEngine";
 import timeLineAuditTrail from "@/components/common/TimelineTreeview/index.vue";
 import detailItemAuditTrail from "./DetailItemAuditTrail.vue";
@@ -57,7 +63,8 @@ export default {
     components:{
 		trackingProcessInstance,
 		timeLineAuditTrail,
-		detailItemAuditTrail
+		detailItemAuditTrail,
+		PopupCallActivityProcess
 	},
 	watch:{
 		"stask.statusPopupTracking":function (newVl) {
@@ -82,6 +89,7 @@ export default {
 				endEvent:"mdi-record",
 				httpServiceTask:"mdi-email-send-outline"
 			},
+			showDialog: false,
 			filterVariables:{
 				names:"",
 				page:1,
@@ -108,6 +116,11 @@ export default {
 		}
     },
     methods:{
+		handlerNodeCLicked(a,b){
+			if(a.$type == 'bpmn:UserTask'){
+				this.showDialog = true
+			}
+		},
 		async dataInstanceRuntime(data,isCheck=false){
 			let arrIndexRemove=[];
 			for(let index in data){
@@ -255,7 +268,8 @@ export default {
 		height: 100%;
 		background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 	}
-	.popup-model-diagram >>> .djs-hit  {
+
+	.popup-model-diagram >>> .djs-hit-stroke {
 		pointer-events: none;
 	}
 </style>>

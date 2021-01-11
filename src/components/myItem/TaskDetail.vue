@@ -24,14 +24,15 @@
                 <span>{{taskBreadcrumb}}</span>
             </v-tooltip>
             <div id="action-task" class="text-right pt-1 pb-1 pr-0 float-right ">
-				<!-- <v-btn  
-						text small
+				<v-btn  
+						small
 						disabled
-						class="mr-16"
+						class="mr-1"
+						color="success"
 						v-if="showSubmitSuccessBtn"
 					>
-						<v-icon small color="success">mdi-information-outline</v-icon> Submit
-				</v-btn> -->
+						<v-icon small color="success" class="mr-1">mdi-check-outline</v-icon> Submited
+				</v-btn>
                 <span v-if="!originData.endTime && !hideActionTask " class="mr-10">
                             
                     <span v-if="originData.assigneeInfo && checkRole(originData.assigneeInfo.id) == true" class="mr-16">
@@ -818,6 +819,12 @@ export default {
         async handleTaskSubmited(data){
 			this.$refs.snackbar.clickShowSnackbar()
 			this.showSubmitSuccessBtn = true
+			let obj = {
+				text:"Submit",
+				value:"submit",
+				color:"blue"
+			}
+			this.taskActionBtns.splice(this.taskActionBtns.indexOf(obj), 1)
             // if(this.isInitInstance){
             //     if (this.reload) {
             //         this.$emit('task-submited', data);            
