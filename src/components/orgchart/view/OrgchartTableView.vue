@@ -108,6 +108,7 @@
                                     :customComponents="customAgComponents"  
                                     :hideRowBorderCss="true"
                                     @on-cell-dbl-click="onCellDblClick"
+									:getContextMenuItems="getContextMenuItems"
                                     @on-cell-context-menu="onCellContextMenu"
                                     :minWidth="500"
                                     :cellRendererParams="{
@@ -126,7 +127,7 @@
                             :widthContentCustom="widthContentCustom"
                             :useDefaultContext="false"
                             :useActionPanel="true"
-                            :actionPanelWidth="850"
+                            :actionPanelWidth="1000"
                             :headerPrefixKeypath="'user.table'"
                             :customAPIResult="customAPIResult"
                             :showButtonAdd="false"
@@ -138,7 +139,27 @@
                             :lazyLoad="true"
                         >
                             <template slot="right-panel-content" slot-scope="{}">  
-                                <Detail :quickView="true" :docObjInfo="docObjInfo" />
+								<div class="d-flex">
+									<div style="width: 220px" class="d-flex flex-column">
+										<div class="mb-2">
+											<span class="fs-18 font-weight-bold" style="font-size: 18px !important">
+												Danh sách văn bản
+											</span>
+										</div>
+										<div 
+											v-for="(item, i) in listDocuments" 
+											class="ml-2 list-document-description" 
+											:class="{'active-item': item.documentObjectId == activeDocument}"
+											:key="i"
+											@click="handlerDocClick(item)"
+										>
+											<span>
+												{{item.documentDefinition}}
+											</span>
+										</div>
+									</div>
+                              	  	<Detail :quickView="true" :docObjInfo="docObjInfo" />
+								</div>
                             </template>
                        </ListItems>  
                         
@@ -323,7 +344,11 @@ export default {
     methods: {
         onGridReady(params) {
             this.agApi = params.api; 
-        },
+		},
+		handlerDocClick(item){
+			this.activeDocument = item.documentObjectId
+			this.docObjInfo = {docObjId:item.documentObjectId,docSize:'21cm'}
+		},
         resizeEnd(params){
             let value = params.width - this.currentWidthContentCustom
             if(value < 0 ){
@@ -422,21 +447,7 @@ export default {
         },
       
         onCellContextMenu(params){
-             let self = this
-             let objId = "orgchart:"+this.$route.params.id+':'+params.data.vizId
-                orgchartApi.getDescriptionNode({object_identifier:objId}).then(res=>{
-                    if(res.data.length > 0){
-                        let idDoc = res.data[0].documentObjectId
-                        self.docObjInfo = {docObjId:idDoc,docSize:'21cm'}
-                        self.$refs.listUser.actionPanel = true;
-                    }else{
-                        self.$snotify({
-                            type: "error",
-                            title: "Không tìm thấy document mô tả ",
-                        });
-                    }
-                }).catch(err=>{
-                })
+           
         },
         onTabClicked(data){
             this.currentTab = data.action
@@ -451,7 +462,35 @@ export default {
             agApi:null,
             widthContentCustom:0,
             currentWidthContentCustom:400,
-            showToolbar:false,
+			showToolbar:false,
+			getContextMenuItems(params){
+				var result = [
+					{
+					// custom item
+					name: 'Xem chi tiết',
+					action: function () {
+						let objId = "department:"+params.node.data.code
+							orgchartApi.getDescriptionNode({object_identifier:objId}).then(res=>{
+								if(res.data.length > 0){
+									self.listDocuments = res.data
+									self.activeDocument = res.data[0].documentObjectId
+									let idDoc = res.data[0].documentObjectId
+									self.docObjInfo = {docObjId:idDoc,docSize:'21cm'}
+									self.$refs.listUser.actionPanel = true;
+								}else{
+									self.$snotify({
+										type: "error",
+										title: "Không tìm thấy document mô tả ",
+									});
+								}
+							}).catch(err=>{
+							})
+					},
+					cssClasses: ['redFont', 'bold'],
+					},
+				]
+				return result	
+			},
             currentSize: {},
             customAgComponents: {
                 nodeName: NodeNameInTable,
@@ -471,7 +510,8 @@ export default {
             showNavigation:false,
             listUserInNode:[],
             docObjInfo:{},
-            apiUrl: '',
+			apiUrl: '',
+			listDocuments:[],
             mapNameToDynamicAttr: null,
             titleToolbar:"SĐTC dạng cây",
             mapDpmToPos: null,
@@ -510,7 +550,8 @@ export default {
                    }
                 }
             },
-            containerHeight:null,
+			containerHeight:null,
+			activeDocument: "",
             tableContextMenu: {
                viewDetails: {
                     name: "View details",
@@ -522,9 +563,11 @@ export default {
                         let self = this
                         orgchartApi.getDocumentByUserId(data).then(res=>{
                             if(res.data.length > 0){
-                                let idDoc = res.data[0].documentObjectId
-                               self.docObjInfo = {docObjId:idDoc,docSize:'21cm'}
-                               self.$refs.listUser.actionPanel = true;
+								self.listDocuments = res.data
+								self.activeDocument = res.data[0].documentObjectId
+								let idDoc = res.data[0].documentObjectId
+								self.docObjInfo = {docObjId:idDoc,docSize:'21cm'}
+								self.$refs.listUser.actionPanel = true;
                             }else{
                                 self.$snotify({
                                     type: "error",
@@ -600,6 +643,14 @@ export default {
 .orgchart-table-view >>> .v-toolbar .v-toolbar__content{
     height:unset !important;
     padding-top:6px;
+}
+.orgchart-table-view >>> .list-document-description{
+	cursor: pointer;
+	padding: 6px 12px;
+}
+.orgchart-table-view >>> .active-item{
+	background-color: #f7f7f7;
+	border-radius: 5px;
 }
 .orgchart-table-view >>> .v-toolbar .v-toolbar__content button{
 }

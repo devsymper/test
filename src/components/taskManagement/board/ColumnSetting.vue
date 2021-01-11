@@ -36,7 +36,7 @@
                     <transition-group type="transition" name="flip-list" class="wrap-kanban-board">
                         <div
                             v-for="(column,index) in columns"
-                            :key="index"
+                            :key="index+column.id"
                             :style="getColWidth()"
                             class=" board-column-item mr-4"
                         >

@@ -20,8 +20,8 @@
                  :treeData="true"
                  :animateRows="true"
                  :enableRangeSelection="true"
-                 :allowContextMenuWithControlKey="true"
                  :groupDefaultExpanded="groupDefaultExpanded"
+				 :getContextMenuItems="getContextMenuItems"
                  :frameworkComponents="frameworkComponents"
                  :modules="modules"
                  :getDataPath="getDataPath"
@@ -52,7 +52,9 @@ export default {
             type:Array,
             default: function () { return [] }
         },
-        
+        getContextMenuItems:{
+			type: Function
+		},
         // Data để đổ vào table: dựa theo định dạng của ag grid
         rowData:{
             type:Array,

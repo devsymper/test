@@ -11,6 +11,7 @@
             :customAPIResult="customAPIResult"
             :useActionPanel="false"
             :headerPrefixKeypath="'common'"
+			
             @on-add-item-clicked="goToCreatePage()"
         ></list-items>
     </div>
