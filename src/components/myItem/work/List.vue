@@ -129,7 +129,7 @@
                         :style="{
                             minHeight: '50px'
                         }"
-                        @click="selectObject(obj, idx,idex)"
+                        @click="selectObject(obj, idx , idex)"
                         style="border-bottom: 1px solid #eeeeee!important;"
                             
                     >
@@ -297,8 +297,6 @@ export default {
         groupAllProcessInstance() {
             let allUserById = this.$store.getters['app/mapIdToUser'];
             let allPrcess = this.data;
-            console.log("allPrcessallPrcessallPrcess",allPrcess);
-
             const groups = allPrcess.reduce((groups, work) => {
                 let date;
                 work.startUserName = '';
@@ -370,7 +368,27 @@ export default {
                 this.$store.dispatch('file/getWaitingFileCountPerObj');
                 this.$store.dispatch('comment/getWaitingCommentCountPerObj');
             }
-        }
+		},
+		groupAllProcessInstance:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				let self = this
+				if(arr.length > 0){
+					if(this.$route.params.processInstanceId){
+						for(let i in self.groupAllProcessInstance){
+							self.groupAllProcessInstance[i].works.forEach(function(e){
+								if(e.id == self.$route.params.processInstanceId){
+									self.selectObject(e, i , i)
+								}
+							})
+						}
+
+					}
+				}
+				
+			}
+		}
     },
     props: {
         compackMode: {
@@ -481,7 +499,7 @@ export default {
         };
     },
     created() {
-        this.getData();
+		this.getData();
     },
     mounted() {
         let self = this;
@@ -491,7 +509,8 @@ export default {
                 self.getData();
             })
             .catch(err => {});
-        self.reCalcListTaskHeight();
+		self.reCalcListTaskHeight();
+		
     },
     methods: {
         getListByPage(data){

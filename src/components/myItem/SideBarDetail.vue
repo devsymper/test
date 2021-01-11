@@ -80,6 +80,12 @@
 											{{$t('document.detail.sidebar.body.general.commentNotResolve')}}
 										</td>
 									</tr>
+									<tr>
+										<td>{{$t('document.detail.sidebar.body.general.listWorks')}}</td>
+										<td class="pl-2" style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showListWork(originData)">
+											{{$t('document.detail.sidebar.body.general.clickToViewListWork')}}
+										</td>
+									</tr>
 								</table>
 							</div>
 						</v-expansion-panel-content>
@@ -746,6 +752,11 @@ export default {
 		},
 		showComment(){
 			this.$refs.commentTaskView.show();
+		},
+		showListWork(originData){
+			this.$goToPage( "/myItem/work/"+originData.processInstanceId,
+				" Chi tiết " + (originData.name ? originData.name : "")
+			);
 		},
 		handleAction(actionName, role, idx){
             this.statusChange=true;

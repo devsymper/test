@@ -26,10 +26,10 @@ export default {
 	},
 	methods:{
 		getTaskCurrent(){
-			let processInstanceId = this.$route.params.processInstanceId
+			let taskId = this.$route.params.taskId
 			let self = this;
 			debugger
-			BPMNEngine.getProcessInstanceHistory({processInstanceId:processInstanceId, includeProcessVariables: true}).then(res=>{
+			BPMNEngine.getTaskHistory(taskId).then(res=>{
 				debugger
 				if(res.data[0]){
 					this.workInfo = res.data[0]
