@@ -838,7 +838,6 @@ export default {
 				docId = this.taskInfo.action.parameter.documentId;
 			}
 			this.varsForBackend = await getVarsFromSubmitedDoc(data, elId, docId);
-			debugger
 			// let taskData = { 
 			// 	"outcome": 'submit',
 			// 	"variables": varsForBackend.vars,
