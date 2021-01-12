@@ -202,7 +202,8 @@ export default {
                         thisCpn.$store.commit(
                             "document/addControl", { id: controlId, props: listControlToStore[controlId], instance: thisCpn.keyInstance }
                         );
-                    }
+					}
+					debugger
                     thisCpn.processHtml(thisCpn.contentDocument);
                     thisCpn.controlRelationWorker.terminate();
                     break;
@@ -570,7 +571,8 @@ export default {
                         }
                     }
                 }
-            }
+			}
+			debugger
             this.$refs.preLoaderView.hide();
             this.$emit("after-loaded-component-detail",this.formSize);
             $('.wrap-content-detail').removeAttr('style');

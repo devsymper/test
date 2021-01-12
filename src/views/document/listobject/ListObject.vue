@@ -580,12 +580,11 @@ export default {
         },
         afterRowSelected(data){
             if(this.$refs.listObject.isShowSidebar()){
-                let documentObject = data.rowData;
-                let cell = data.cell;
+                let documentObject = data.data;
                 let event = data.event;
-                if(cell.col == 0 && this.$refs.listObject.isShowCheckedRow()){
+                if(this.$refs.listObject.isShowCheckedRow()){
                     return;
-                }
+				}
                 if(['ArrowDown','ArrowUp'].includes(event.key) || event.buttons == 1){
                     if(this.docObjInfo.docObjId == parseInt(documentObject.document_object_id)){
                         return
@@ -657,9 +656,6 @@ export default {
          * Sự kiện khi selection vào cell
          */
         afterCellSelection(rowData){
-			if(!this.$refs.listObject.actionPanel){
-				this.$refs.listObject.openactionPanel();
-			}	
             this.actionOnRightSidebar = 'detail';
 			this.currentRowData = rowData;
         }
