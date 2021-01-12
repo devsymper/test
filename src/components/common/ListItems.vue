@@ -227,6 +227,7 @@
 				:overlayNoRowsTemplate="overlayNoRowsTemplate"
 				:modules="modules"
 				@cell-context-menu="cellContextMenu"
+				@cell-mouse-down="cellMouseDown"
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
@@ -509,7 +510,11 @@ export default {
         isCompactMode: {
             type: Boolean,
             default: false
-        },
+		},
+        flexMode: {
+            type: Boolean,
+            default: false
+		},
         /**
          * Dùng Trong trường hợp mà gọi đến một API mà không thể thay đổi định dạng trả về của API đó  theo đúng với định dạng chung của ListItem 
          * định dạng: 
@@ -785,7 +790,7 @@ export default {
 			},
 			searchKey: "",
 			modules:[
-				MenuModule
+				MenuModule,
 			],
 			MedalCellRenderer(){
 			},	
@@ -847,7 +852,6 @@ export default {
 		this.defaultColDef = {
             minWidth: 40,
 			filter: true,
-			suppressMenu : true,
 			sortable: true,
 			resizable: true,
 			wrapText: true,
@@ -855,9 +859,10 @@ export default {
 			headerComponentParams :{
 				headerPrefixKeypath: this.headerPrefixKeypath
 			}
-        };
+		};
 		this.gridOptions = {};
-		// this.gridOptions.rowHeight =  this.rowHeight
+		this.gridOptions.enableRangeSelection = true;
+		this.gridOptions.enableRangeHandle = true;
 		this.gridOptions.getRowStyle = function(params) {
 			if (params.node.rowIndex % 2 != 0) {
 				return { background: '#fbfbfb' };
@@ -871,7 +876,8 @@ export default {
 		  '<span class="ag-overlay-loading-center">Đang tải dữ liệu vui lòng chờ </span>';
 		this.overlayNoRowsTemplate =
       	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
-		this.rowSelection = 'single';
+		this.rowSelection = 'multiple';
+		
     },
 	methods:{
 		getAllData(){
@@ -901,6 +907,10 @@ export default {
 		},
 		cellContextMenu(params){
 			this.$emit('cell-context-menu', params)
+		},
+		cellMouseDown(params){
+			debugger
+			this.$emit('after-cell-mouse-down', params)
 		},
 		cellMouseOver(params){
 			this.cellAboutSelecting = params.data
