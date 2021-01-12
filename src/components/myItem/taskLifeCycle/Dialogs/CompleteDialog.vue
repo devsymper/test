@@ -149,7 +149,7 @@ export default {
 					})
 					this.$snotify({
 						type: "success",
-						title: self.$t("myItem.taskLifeCycle.notify.complete")
+						title: this.$t("myItem.taskLifeCycle.notify.complete")
 					})
 					this.$emit('success')
 				}else{
