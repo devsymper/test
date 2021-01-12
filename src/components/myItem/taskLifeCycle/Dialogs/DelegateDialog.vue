@@ -149,7 +149,7 @@ export default {
 			})
 			this.$snotify({
 				type: "success",
-				title: "Ủy quyền thành công "
+				title:  self.$t("myItem.taskLifeCycle.notify.delegate")
 			})
 			this.$emit('success')
 		}

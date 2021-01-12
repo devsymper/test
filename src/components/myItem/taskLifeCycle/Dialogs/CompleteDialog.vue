@@ -127,7 +127,7 @@ export default {
 					this.$snotify(
 						{
 							type: 'error',
-							title: "Bạn phải submit doc trước khi hoàn thành"
+							title: self.$t("myItem.taskLifeCycle.notify.notSubmit") 
 						}
 					)
 					flag = false
@@ -149,7 +149,7 @@ export default {
 					})
 					this.$snotify({
 						type: "success",
-						title: "Hoàn thành công việc thành công"
+						title: self.$t("myItem.taskLifeCycle.notify.complete")
 					})
 					this.$emit('success')
 				}else{

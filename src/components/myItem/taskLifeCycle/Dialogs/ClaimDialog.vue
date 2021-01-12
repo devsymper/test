@@ -103,7 +103,7 @@ export default {
 			workFlowApi.updateTask(this.taskId, data).then(res=>{
 				self.$snotify({
 					type: "success",
-					title: "Nhận công việc thành công"
+					title: self.$t("myItem.taskLifeCycle.notify.resolve")
 				})
 				self.$emit('success')
 			}).catch(err=>{

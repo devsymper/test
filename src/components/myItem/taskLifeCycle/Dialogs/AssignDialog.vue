@@ -125,7 +125,7 @@ export default {
 			})
 			this.$snotify({
 				type: "success",
-				title: "Giao việc thành công"
+				title:  self.$t("myItem.taskLifeCycle.notify.assign")
 			})
 			this.$emit('success')
 		}

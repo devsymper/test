@@ -1372,6 +1372,16 @@
 				"title":"Công việc submit thành công",
 				"description":"Bạn có thể hoàn thành công việc bằng cách thực thi ",
 				"action":"Hãy cập nhật bản ghi bằng cách chọn "
+			},
+			"notify":{
+				"unClaim":"Hủy nhận công việc thành công",
+				"resolve":"Thực thi công việc thành công",
+				"claim":"Nhận công việc thành công",
+				"complete":"Hoàn thành công việc thành công",
+				"notSubmit":"Bạn phải submit doc trước khi hoàn thành",
+				"assign": "Giao việc thành công",
+				"delegate": "Ủy quyền thành công "
+
 			}
 		}
     },
