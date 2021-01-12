@@ -857,6 +857,7 @@ export default {
 			}
         };
 		this.gridOptions = {};
+		this.gridOptions.debug = true	
 		// this.gridOptions.rowHeight =  this.rowHeight
 		this.gridOptions.getRowStyle = function(params) {
 			if (params.node.rowIndex % 2 != 0) {

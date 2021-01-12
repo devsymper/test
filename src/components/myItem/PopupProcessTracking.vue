@@ -44,8 +44,10 @@
 				</trackingProcessInstance>
 			</div>
 		</div>
-		<PopupCallActivityProcess 
+		<TrackingProcessDefinition 
+			:processDefinitionId="processDefinitionId"
 			:showDialog="showDialog"
+			@cancel="showDialog = false"
 		/>
 	</div>
     
@@ -53,7 +55,7 @@
 
 <script>
 import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue";
-import PopupCallActivityProcess from './PopupCallActivityProcess'
+import TrackingProcessDefinition from "@/views/process/TrackingProcessDefinition.vue";
 import bpmneApi from "@/api/BPMNEngine";
 import timeLineAuditTrail from "@/components/common/TimelineTreeview/index.vue";
 import detailItemAuditTrail from "./DetailItemAuditTrail.vue";
@@ -64,7 +66,7 @@ export default {
 		trackingProcessInstance,
 		timeLineAuditTrail,
 		detailItemAuditTrail,
-		PopupCallActivityProcess
+		TrackingProcessDefinition
 	},
 	watch:{
 		"stask.statusPopupTracking":function (newVl) {
@@ -79,6 +81,7 @@ export default {
 		return {
 			listInstanceRuntime:{},
 			itemAuditTrail:{},
+			processDefinitionId: "",
 			icon:{
 				processName:"mdi-progress-check	",
 				startEvent:"mdi-play-outline",
@@ -116,8 +119,10 @@ export default {
 		}
     },
     methods:{
-		handlerNodeCLicked(a,b){
-			if(a.$type == 'bpmn:UserTask'){
+		handlerNodeCLicked(a){
+			if(a.$type == 'bpmn:CallActivity'){
+				debugger
+				this.processDefinitionId  = a.calledElement
 				this.showDialog = true
 			}
 		},
