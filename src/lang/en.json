@@ -1230,6 +1230,15 @@
 				"title":"Submit document success",
 				"description":"You can get this task done by executing ",
 				"action":"Update the record by selecting "
+			},
+			"notify":{
+				"unClaim":"Unclaim task success",
+				"resolve":"Resolve task success",
+				"claim":"Claim task success",
+				"complete":"Complete task success",
+				"notSubmit":"You must submit task before complete task",
+				"assign": "Assign task success",
+				"delegate": "Delegate task success"
 			}
 		}
     },
