@@ -9,7 +9,7 @@
 					small
 					:disabled="listActions.length == 0"
 				>
-					Action 
+					{{ $t('tasks.action')}} 
 					<v-icon small right dark style="border-left:2px solid lightgrey;padding-left:8px">mdi-plus</v-icon>
 
 				</v-btn>

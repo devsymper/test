@@ -7,15 +7,15 @@
 		>
 			<v-card>
 			<v-card-title class="fs-15">
-				Nhận công việc
+				{{$t("myItem.taskLifeCycle.dialog.claim.header")}}
 			</v-card-title>
 			<v-card-text>
 				<div class="content-assign-dialog d-flex flex-column ml-2 fs-13">
 					<div class="text-wrap">
-						Khi nhận công việc bạn sẽ có quyền sở hữu trường hợp này 
+							{{$t("myItem.taskLifeCycle.dialog.claim.description")}}
 					</div>
-					<div class="text-wrap   d-flex align-center">
-						Trạng thái hiện tại
+					<div class="text-wrap d-flex align-center">
+						{{$t("myItem.taskLifeCycle.currentStatus")}}
 						<v-chip
 							small
 							label
@@ -24,12 +24,12 @@
 							text-color="white"
 						>
 							<span class="fs-13">
-								Chưa được giao 
+								{{$t("tasks.unAssign")}}
 							</span>
 						</v-chip>
 					</div>
 					<div class="text-wrap   d-flex align-center">
-						Trạng thái mới
+						{{$t("myItem.taskLifeCycle.newStatus")}}
 						<v-chip
 							small
 							label
@@ -38,7 +38,7 @@
 							text-color="white"
 						>
 							<span class="fs-13">
-								Đã giao
+								{{$t("tasks.assign")}}
 							</span>
 						</v-chip>
 					</div>
@@ -52,14 +52,14 @@
 					text
 					@click="cancel"
 				>
-					Hủy
+					{{$t("myItem.taskLifeCycle.cancel")}}
 				</v-btn>
 					<v-btn
 					color="green darken-1"
 					text
 					@click="claimTask"
 				>
-					Áp dụng
+					{{$t("myItem.taskLifeCycle.corfirm")}}
 				</v-btn>
 			</v-card-actions>
 			</v-card>
