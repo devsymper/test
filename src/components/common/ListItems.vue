@@ -227,6 +227,7 @@
 				:overlayNoRowsTemplate="overlayNoRowsTemplate"
 				:modules="modules"
 				@cell-context-menu="cellContextMenu"
+				@cell-mouse-down="cellMouseDown"
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
@@ -782,7 +783,7 @@ export default {
 			},
 			searchKey: "",
 			modules:[
-				MenuModule
+				MenuModule,
 			],
 			MedalCellRenderer(){
 			},	
@@ -853,6 +854,8 @@ export default {
 			}
 		};
 		this.gridOptions = {};
+		this.gridOptions.enableRangeSelection = true;
+		this.gridOptions.enableRangeHandle = true;
 		this.gridOptions.getRowStyle = function(params) {
 			if (params.node.rowIndex % 2 != 0) {
 				return { background: '#fbfbfb' };
@@ -866,7 +869,7 @@ export default {
 		  '<span class="ag-overlay-loading-center">Đang tải dữ liệu vui lòng chờ </span>';
 		this.overlayNoRowsTemplate =
       	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
-		this.rowSelection = 'multiple	';
+		this.rowSelection = 'multiple';
 		
     },
 	methods:{
@@ -897,6 +900,10 @@ export default {
 		},
 		cellContextMenu(params){
 			debugger
+		},
+		cellMouseDown(params){
+			debugger
+			this.$emit('after-cell-mouse-down', params)
 		},
 		cellMouseOver(params){
 			this.cellAboutSelecting = params.data
