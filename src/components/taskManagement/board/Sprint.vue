@@ -11,9 +11,15 @@
                 <v-expansion-panel class="sym-expand-panel" v-for="obj in data" :key="obj.id">
                     <v-expansion-panel-header class="v-expand-header px-4 py-0">
                         <div class="font-weight-medium">
-                            {{obj.name}}
+                            {{obj.name}} 
+                            <span class="grey--text fs-11">
+                                {{'('+obj.tasks.length+' issues)'}}
+                            </span> 
                             <div class="text-ellipsis grey--text fs-11 pt-1">
                                 {{obj.description}}
+                            </div>
+                             <div class="pt-1 grey--text fs-11">
+                                {{$t('table.startTime') + ": " + obj.startTime}}  {{$t('table.endTime') + ": " + obj.endTime}}
                             </div>
                         </div>
                         <v-btn :disabled="isSprintStart()" v-if="obj.status == 'plan'" @click.prevent.stop="handleStartSprint(obj)" small class="btn-action-sprint px-1" solo depressed >
@@ -23,54 +29,56 @@
                         <v-btn :disabled="isSprintStart()" v-else-if="obj.status == 'running'" @click.prevent.stop="handleStartSprint(obj)" small class="btn-action-sprint px-1" solo depressed >
                             <span>Running...</span>
                         </v-btn>
+                        <v-btn  v-else-if="obj.status == 'done'"  small class="btn-action-sprint px-1" color="green" solo depressed >
+                            <span style="color:white">Done</span>
+                        </v-btn>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
-                        <draggable 
+                        <v-list dense>
+                            <draggable 
                             :list="obj.tasks" 
                             :animation="250"
                             @change="handleChange($event,obj)"
                             ghost-class="ghost-card" group="tasks">
-                                <v-list dense>
-                                    <v-list-item
-                                    class="issue-item fs-13"
-                                    v-for="(item, i) in obj.tasks"
-                                    :key="i"
-                                    >
-                                        <div  :class="{'single-row': true }"
-                                        class="d-flex w-100 py-1">
-                                            <div class="item-icon" v-if="item.infoIssueType">
-                                                <v-icon v-if="!!item.infoIssueType.icon && item.infoIssueType.icon.indexOf('mdi-') > -1"  style="font-size:20px">{{item.infoIssueType.icon}}</v-icon>
-                                                <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.infoIssueType.icon && item.infoIssueType.icon.indexOf('mdi-') < 0" :src="item.infoIssueType.icon" width="20" height="20">
-                                            </div>
-                                            <div class="item-icon" v-else>
-                                                <v-icon style="font-size:20px">mdi-progress-question</v-icon>
-                                            </div>
-                                            <div class="d-flex justify-space-between ml-2">
-                                                <div>
-                                                    <div  @click.prevent.stop="handleShowDetailIssue(item)" class="task-hover-poiter">{{item.tmg_name}}</div>
-                                                    <div class="grey--text">
-                                                            {{item.tmg_project_key}}-{{item.document_object_id}}
-                                                    </div>
-                                                </div>    
-                                            </div>
-                                            <div class="mt-2 mr-2" style="margin-left:auto;min-width:120px">
-                                                <div v-if="item.infoPriority">
-                                                    <v-icon :style="{'color':item.infoPriority.color, 'font-size':'18px'}">{{item.infoPriority.icon}}</v-icon>
-                                                    <span class="pl-1">{{item.infoPriority.name}}</span>
-                                                </div>
-                                            </div>  
-                                            <div class="mt-2" style="min-width:120px">
-                                                <span v-if="item.infoStatus" style="padding: 2px 4px; border-radius:3px; background:#f2f2f2;" :style="{'color':item.infoStatus.color}">{{item.infoStatus.name}}</span>
-                                            </div> 
-                                            <div class="mt-2 mx-1" style="min-width:120px" >
-                                                <infoUser v-if="item.tmg_assignee" class="userInfo fs-13" :userId="item.tmg_assignee" :roleInfo="{}" />
-                                            </div>   
+                                <v-list-item
+                                class="issue-item fs-13"
+                                v-for="(item, i) in obj.tasks"
+                                :key="i"
+                                >
+                                    <div  :class="{'single-row': true }"
+                                    class="d-flex w-100 py-1">
+                                        <div class="item-icon" v-if="item.infoIssueType">
+                                            <v-icon v-if="!!item.infoIssueType.icon && item.infoIssueType.icon.indexOf('mdi-') > -1"  style="font-size:20px">{{item.infoIssueType.icon}}</v-icon>
+                                            <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!item.infoIssueType.icon && item.infoIssueType.icon.indexOf('mdi-') < 0" :src="item.infoIssueType.icon" width="20" height="20">
                                         </div>
-                                    
-                                    </v-list-item>
-                                </v-list>
-                                <!-- </transition-group> -->
+                                        <div class="item-icon" v-else>
+                                            <v-icon style="font-size:20px">mdi-progress-question</v-icon>
+                                        </div>
+                                        <div class="d-flex justify-space-between ml-2">
+                                            <div>
+                                                <div  @click.prevent.stop="handleShowDetailIssue(item)" class="task-hover-poiter">{{item.tmg_name}}</div>
+                                                <div class="grey--text">
+                                                        {{item.tmg_project_key}}-{{item.document_object_id}}
+                                                </div>
+                                            </div>    
+                                        </div>
+                                        <div class="mt-2 mr-2" style="margin-left:auto;min-width:120px">
+                                            <div v-if="item.infoPriority">
+                                                <v-icon :style="{'color':item.infoPriority.color, 'font-size':'18px'}">{{item.infoPriority.icon}}</v-icon>
+                                                <span class="pl-1">{{item.infoPriority.name}}</span>
+                                            </div>
+                                        </div>  
+                                        <div class="mt-2" style="min-width:120px">
+                                            <span v-if="item.infoStatus" style="padding: 2px 4px; border-radius:3px; background:#f2f2f2;" :style="{'color':item.infoStatus.color}">{{item.infoStatus.name}}</span>
+                                        </div> 
+                                        <div class="mt-2 mx-1" style="min-width:120px" >
+                                            <infoUser v-if="item.tmg_assignee" class="userInfo fs-13" :userId="item.tmg_assignee" :roleInfo="{}" />
+                                        </div>   
+                                    </div>
+                                </v-list-item>
                             </draggable>
+                        </v-list>
+                                <!-- </transition-group> -->
                     </v-expansion-panel-content>
                 </v-expansion-panel>
             </v-expansion-panels>
@@ -120,6 +128,12 @@ export default {
                 return {}
             }
         }
+    },
+    computed:{
+        allIssueTypeInProject(){
+            let projectId = this.$route.params.id;
+            return this.$store.state.taskManagement.listIssueTypeInProjects[projectId];
+        },
     },
     data(){
         let self = this;
@@ -212,6 +226,18 @@ export default {
             }
         },
         handleChange(event,sprint){
+            if(event.added){
+                let task = event.added.element;
+                let dataSend = {};
+                dataSend.allIssueTypeInProject = this.allIssueTypeInProject;
+                dataSend.task = task;
+                dataSend.sprint = sprint;
+
+                this.kanbanWorker.postMessage({
+                    action:'handleChangeIssueInSprint',
+                    data:dataSend
+                });
+            }
         },
         handleStartSprint(item){
             this.dataSprintProps.name.value=item.name;
@@ -238,6 +264,15 @@ export default {
             this.$store.commit("taskManagement/addSprintToListInStore",sprint);
         },
         startSprintSuccess(){
+            let sprint = this.data.find(ele => ele.id == this.infoSprint.id);
+            if (sprint) {
+                sprint.status = 'running';
+                sprint.name = this.infoSprint.name;
+                sprint.description = this.infoSprint.description;
+                sprint.startTime = this.infoSprint.startTime;
+                sprint.endTime = this.infoSprint.endTime;
+                this.infoSprint['boardId'] = sprint.boardId; 
+            }
             this.$store.commit("taskManagement/updateSprintToListInStore",this.infoSprint);
         },
         getListSprintInBoard(){
@@ -321,6 +356,9 @@ export default {
                 case 'groupIssueInSprint':
                     let res = data.dataAfter;
                     self.data = res;
+                    break;
+                case 'handleChangeIssueInSprint':
+                    console.log("update task success");
                     break;
                 default:
                     break;

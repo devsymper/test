@@ -1,7 +1,7 @@
 <template>
     <div class="w-100 h-100">
         <div style="height:40px; font-size:20px" class="font-weight-medium pl-3 pt-2">Trang chủ</div>
-        <div  class="task-recent pl-3 pt-3 fs-13" style="max-height:200px">
+        <div  class="task-recent pl-3 pt-3 fs-13" style="height:185px">
             <div class="d-flex justify-space-between">Dự án gần đây
                 <div class="task-hover-poiter mr-2" @click="handleAllProjects" style="color:#0000aa">
                     Xem tất cả dự án
@@ -17,9 +17,9 @@
                             </div>
                             <div class="float-right">
                                 <v-icon v-if="item.isFavorite==1" style="font-size:13px" color="yellow" @click="updateFavorite(item)">mdi-star</v-icon>
-                                <v-icon v-else style="font-size:13px;color:#ccc" @click.prevent.stop="updateFavorite(item)" >mdi-star-outline</v-icon>
+                                <v-icon v-else style="font-size:13px;color:white" @click.prevent.stop="updateFavorite(item)" >mdi-star-outline</v-icon>
                    
-                                <v-icon style="font-size:13px;color:#ccc"  @click.prevent.stop="goConfigProject(item)" class="mx-1">mdi-cog-outline</v-icon>
+                                <v-icon style="font-size:13px;color:white"  @click.prevent.stop="goConfigProject(item)" class="mx-1">mdi-cog-outline</v-icon>
                             </div>
                         </div>
                         <div class="body-item-recent">
@@ -49,7 +49,7 @@
                         </div>
                         <div class="footer-item-recent mt-2">
                             <div class="d-flex justify-space-between px-1">
-                                <div>
+                                <div style="color:#ff8003">
                                     {{getNumberBoard(item)}} boards
                                 </div>
                                 <div>
@@ -223,6 +223,7 @@ export default {
         },
         updateFavorite(obj){
             this.itemSelected = obj;
+            this.setStatusFavoriteProjectAfterUpate();
             this.homeWorker.postMessage({
                 action:'updateFavorite',
                 data:obj.id
@@ -261,6 +262,9 @@ export default {
         this.homeWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
+                case 'updateFavoriteError':
+                    self.setStatusFavoriteProjectAfterUpate();
+                    break;
                 case 'getAllDocumentIdsInIssueType':
                     if (data.dataAfter) {
                         let res = data.dataAfter;
@@ -276,7 +280,6 @@ export default {
                 case 'updateFavorite':
                     self.$snotifySuccess("Update project completed!");
                     self.$store.commit("taskManagement/updateStatusFavoriteProject", self.itemSelected.id);
-                    self.setStatusFavoriteProjectAfterUpate();
                     break;
                 case 'countBoardInProject':
                     if (data.dataAfter) {
@@ -309,7 +312,7 @@ export default {
     width:240px;
     min-width:240px;
     height:135px;
-    border: 1px solid #eeeeee;
+    border: var(--symper-border);
     border-radius: 5px;
     transition: all ease-in-out 300ms;
    
@@ -329,14 +332,22 @@ export default {
 }
 
 .open-issue{
-    padding: 2px 4px;
-    background: #aaa;
-    border-radius: 6px;
+    padding: 2px 6px;
+    background: #4a6785;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+    color: white;
 }
 .done-issue{
-    padding: 2px 4px;
-    background: rgb(179, 230, 172);
-    border-radius: 6px;
+    padding: 2px 6px;
+    background: green;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+    text-align: center;
+    color: white;
 }
 .home-tabs >>> .v-tab{
     height: 30px;

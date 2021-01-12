@@ -92,6 +92,8 @@ self.onmessage = async function (event) {
             .updateProjectFavorite(data).then(res=>{
                 if(res['status'] == 200 ){
                     postMessage({action:'updateFavorite'})
+                }else{
+                    postMessage({action:'updateFavoriteError'})
                 }
             })
             break;

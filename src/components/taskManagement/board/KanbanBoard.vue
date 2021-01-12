@@ -5,20 +5,28 @@
                 <v-icon>mdi-view-dashboard-variant-outline</v-icon>
                 <span v-if="currentBoard.type == 'kanban'" class="ml-2">Kanban Board</span>
                 <div v-else>
-                    <div style="height:25px;position:relative" >
+                    <div v-if="Object.keys(sprintStart).length > 0">
+                        <div style="height:25px;position:relative" >
+                            <span class="ml-2" style=" font-size: 18px;font-weight: 500;">
+                                Scrum Board {{sprintStart ? ': '+sprintStart.name :''}}
+                            </span>
+                            <v-btn style="position: absolute;top: -2px;" @click="completeSprint" small class="px-1" solo depressed >
+                                <span class="fs-13">Complete sprint</span>
+                            </v-btn>
+                        </div>
+                        <div class="pl-2 grey--text fs-11 text-ellipsis w-100">
+                            {{sprintStart.description}}
+                        </div>
+                        <div class="pl-2 grey--text fs-11">
+                            {{$t('table.startTime') + ":" + sprintStart.startTime}}  {{$t('table.endTime') + ":" + sprintStart.endTime}}
+                        </div>
+                    </div>
+                    <div v-else>
                         <span class="ml-2" style=" font-size: 18px;font-weight: 500;">
-                            Scrum Board {{sprintStart ? ': '+sprintStart.name :''}}
+                            Scrum Board
                         </span>
-                        <v-btn style="position: absolute;top: -2px;" small class="px-1" solo depressed >
-                            <span class="fs-13">Complete sprint</span>
-                        </v-btn>
                     </div>
-                    <div class="pl-2 grey--text fs-11 text-ellipsis w-100">
-                        {{sprintStart.description}}
-                    </div>
-                    <div class="pl-2 grey--text fs-11">
-                        {{$t('table.startTime') + ":" + sprintStart.startTime}}  {{$t('table.endTime') + ":" + sprintStart.endTime}}
-                    </div>
+                    
                 </div>
             </div>
             <div class="right-content">
@@ -266,6 +274,20 @@ export default {
             let val = vl;
             $('.list-control-autocomplete .sym-control').removeClass('d-none');
             $('.list-control-autocomplete .sym-control:not(:Contains("' + val + '"))').addClass('d-none');
+        },
+        completeSprint(){
+            let data={};
+            data.name=this.sprintStart.name;
+            data.description=this.sprintStart.description;
+            data.status='done';
+            data.startTime=this.sprintStart.startTime;
+            data.endTime=this.sprintStart.endTime;
+
+            // đẩy xuống worker xử lý
+            this.kanbanWorker.postMessage({
+                action:'handleUpdateSprint',
+                data:{id:this.sprintStart.id,data:data}
+            });
         },
         getHeightFrameDrag(event, statusLength){
             let parentFrameEl = $(event.target).closest('.wrap-scroll-column');
@@ -706,6 +728,11 @@ export default {
                         self.$store.commit("taskManagement/setListSprintInBoard", res);
                         self.getSprintRunning();
                     }
+                    break;
+                case 'handleUpdateSprint':
+                    self.$snotifySuccess("Complete sprint!");
+                    self.sprintStart.status = 'done';
+                    self.$store.commit("taskManagement/updateSprintToListInStore",self.sprintStart);
                     break;
                 default:
                     break;

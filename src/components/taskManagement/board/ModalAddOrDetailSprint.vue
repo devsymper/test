@@ -284,6 +284,7 @@ export default {
     },
     data(){
         return{
+            statusSprint:'plan',
             kanbanWorker:null,
             msgErrStartTime:'',
             msgErrEndTime:'',
@@ -359,6 +360,7 @@ export default {
                 data.name=this.dataSprintProps.name.value;
                 data.description=this.dataSprintProps.description.value;
                 if (status) {
+                    this.statusSprint = status;
                     data.status=status;
                 }else{
                     data.status=this.infoSprint.status;
@@ -407,8 +409,12 @@ export default {
                     self.isShow=false;
                     self.isLoadingAdd=false;
                 case 'handleUpdateSprint':
-                    self.$snotifySuccess("Update sprint success!");
-                   // self.$emit("add-sprint"); // emit sự kiện để reload data
+                    if (self.statusSprint == 'running') {
+                        self.$snotifySuccess("Start sprint success!");
+                        self.$emit("start-sprint-success");
+                    }else{
+                        self.$snotifySuccess("Update sprint success!");
+                    }
                     self.isShow=false;
                     self.isLoadingAdd=false;
                     break;
@@ -421,10 +427,7 @@ export default {
                         self.isLoadingAdd=false;
                     }
                     break;
-                case 'handleUpdateSprint':
-                    self.$snotifySuccess("Start sprint success!");
-                    self.$emit("start-sprint-success");
-                    break;
+        
                 default:
                     break;
             }

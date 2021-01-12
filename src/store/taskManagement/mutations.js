@@ -143,7 +143,6 @@ const addSprintToListInStore = (state, item) => {
 }
 
 const updateSprintToListInStore = (state, item) => {
-    console.log('mutationUpdate',item);
     let boardId = item.boardId;
     let currentListSprintInBoard = state.listSprintInBoard;
     if (!currentListSprintInBoard[boardId]) {

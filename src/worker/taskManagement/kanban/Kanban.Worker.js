@@ -50,6 +50,31 @@ self.onmessage = async function (event) {
                 });
             }
             break; 
+        case 'handleChangeIssueInSprint':
+            if (data) {
+                let dataPost ={};
+                let dataControl ={};
+                let issueType = data.allIssueTypeInProject.find(ele => ele.id == data.task.tmg_issue_type);
+                if (issueType) {
+                    dataPost['documentId'] = issueType.documentId;
+                }
+                
+                dataControl.tmg_sprint_id = data.sprint.id;
+                dataControl.tmg_sprint_name = data.sprint.name;
+                dataPost['documentObjectWorkflowObjectId'] = "";
+                dataPost['documentObjectWorkflowId'] = "";
+                dataPost['documentObjectTaskId'] = "";
+                dataPost['dataControl'] = JSON.stringify(dataControl);
+
+                documentApi.updateDocument(data.task.document_object_id,dataPost).then(res => {
+                    if(res['status'] == 200){
+                        postMessage({action:'handleChangeIssueInSprint'})
+                    }else{
+                        postMessage({action:'actionError'})
+                    }
+                });
+            }
+            break; 
         case 'setNodeMap':
             if (data) {
                 let mappPermission = setNodeMap(data);
@@ -264,6 +289,19 @@ self.onmessage = async function (event) {
                 });
 
             }
+            break;
+        case 'handleStartSprint':
+            if (data) {
+                taskManagementApi.updateSprintForBoard(data.id,data.data).then(res => {
+                    if(res['status'] == 200){
+                        postMessage({action:'handleStartSprint'})
+                    }else{
+                        postMessage({action:'actionError'})
+                    }
+                });
+
+            }
+            break;
         default:
             break;
     }
