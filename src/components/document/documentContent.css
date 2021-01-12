@@ -547,45 +547,53 @@ button:hover {
     border-radius: 4px;
 }
 
-.ag-theme-alpine .ag-cell-wrapper>*:not(.ag-cell-value):not(.ag-group-value) {
+.sym-form-submit .ag-theme-alpine .ag-cell-wrapper>*:not(.ag-cell-value):not(.ag-group-value),
+.sym-form-Detail .ag-theme-alpine .ag-cell-wrapper>*:not(.ag-cell-value):not(.ag-group-value) {
     height: 22px !important;
 }
 
-.ag-theme-alpine .ag-cell-wrapper {
+.sym-form-submit .ag-theme-alpine .ag-cell-wrapper,
+.sym-form-Detail .ag-theme-alpine .ag-cell-wrapper {
     font-size: 12px;
 }
-
-.ag-theme-alpine .ag-cell-wrapper>.ag-group-value {
+.sym-form-submit .ag-theme-alpine .ag-cell-wrapper>.ag-group-value,
+.sym-form-Detail .ag-theme-alpine .ag-cell-wrapper>.ag-group-value {
     font-family: "Roboto", sans-serif;
 }
 
-.ag-theme-alpine .ag-cell-wrapper>*:not(.ag-cell-value):not(.ag-group-value) .ag-icon-tree-closed,
-.ag-theme-alpine .ag-cell-wrapper>*:not(.ag-cell-value):not(.ag-group-value) .ag-icon-tree-open {
+.sym-form-submit .ag-theme-alpine .ag-cell-wrapper>*:not(.ag-cell-value):not(.ag-group-value) .ag-icon-tree-closed,
+.sym-form-submit .ag-theme-alpine .ag-cell-wrapper>*:not(.ag-cell-value):not(.ag-group-value) .ag-icon-tree-open,
+.sym-form-Detail .ag-theme-alpine .ag-cell-wrapper>*:not(.ag-cell-value):not(.ag-group-value) .ag-icon-tree-closed,
+.sym-form-Detail .ag-theme-alpine .ag-cell-wrapper>*:not(.ag-cell-value):not(.ag-group-value) .ag-icon-tree-open {
     margin-top: 0px;
     font-size: 13px;
 }
-
-.ag-theme-alpine .ag-header {
+.sym-form-submit .ag-theme-alpine .ag-header,
+.sym-form-Detail .ag-theme-alpine .ag-header {
     background: white !important;
     font-size: 12px;
     font-family: "Roboto", sans-serif;
 }
-
-.ag-theme-alpine .ag-cell-wrap-text {
+.sym-form-submit .ag-theme-alpine .ag-cell-wrap-text,
+.sym-form-Detail .ag-theme-alpine .ag-cell-wrap-text {
     font-size: 12px!important;
 }
-
-.ag-theme-alpine .ag-header .ag-header-row {
+.sym-form-submit .ag-theme-alpine .ag-header .ag-header-row,
+.sym-form-Detail .ag-theme-alpine .ag-header .ag-header-row {
     color: #212529 !important;
     font-weight: 500;
 }
-
-.ag-theme-alpine .ag-row {
+.sym-form-submit .ag-theme-alpine .ag-row,
+.sym-form-Detail .ag-theme-alpine .ag-row {
     background: white !important;
 }
-
-.ag-theme-alpine .ag-cell {
+.sym-form-submit .ag-theme-alpine .ag-cell,
+.sym-form-Detail .ag-theme-alpine .ag-cell {
     line-height: 22px !important;
+}
+.sym-form-submit .ag-theme-alpine .ag-cell-inline-editing,
+.sym-form-Detail .ag-theme-alpine .ag-cell-inline-editing{
+    height: 100% !important;
 }
 
 .ag-pivot-action {
@@ -666,8 +674,8 @@ button:hover {
     outline: none;
 }
 
-.sym-form-submit div:empty,
-.sym-form-Detail div:empty {
+.sym-form-submit div:not(.ag-cell):empty,
+.sym-form-Detail div:not(.ag-cell):empty {
     height: 12px;
 }
 

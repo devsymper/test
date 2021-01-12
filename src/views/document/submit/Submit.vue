@@ -2290,8 +2290,16 @@ export default {
                     continue;
                 }
                 if (controlIns.type == "table") {
-                    let value = this.getDataTableInput(controlIns);
-                    Object.assign(dataControl, value);
+                    let value = null
+                    if(controlIns.tableMode == 'Group'){
+                        value = controlIns.agDataTable.getGroupData();
+                    }
+                    else{
+                        value = this.getDataTableInput(controlIns);
+                    }
+                    if(value){
+                        Object.assign(dataControl, value);
+                    }
                 } else {
             
                     if (!listControlNotNameProp.includes(controlIns.type)) {

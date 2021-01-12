@@ -4,9 +4,8 @@ import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-mod
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-alpine.css';
-import store from './../../../store'
 import {getControlInstanceFromStore} from './../common/common'
-import sDocument from './../../../store/document'
+import sDocument from '@/store/document'
 
 window.addNewDataPivotTable = function(el, event, type){
     let tableName = $(el).attr('table-name');
@@ -24,14 +23,18 @@ export default class GroupTable {
         this.instance = keyInstance;
         this.gridOptions = null;
         this.groupConfig = groupConfig;
+        this.rows = this.groupConfig.rows;
+        this.cols = this.groupConfig.cols;
+        this.values = this.groupConfig.values;
         this.tableContainer = null;
         this.tableHeight = "400px";
         this.columnDefs = this.getColDefs();
+        this.allColumnAppend = [];
+        
     }
     getColDefs(){
         let colDefs = []
-        let rows = this.groupConfig.rows;
-        let cols = this.groupConfig.cols;
+        
         for (let controlName in this.controlObj.listInsideControls){
             let controlInstance = getControlInstanceFromStore(this.instance,controlName);
             let col = {
@@ -39,7 +42,7 @@ export default class GroupTable {
                 field: controlInstance.name,
                 editable:true,
             };
-            let rowGroup = rows.find(ele => ele.name == controlName);
+            let rowGroup = this.rows.find(ele => ele.name == controlName);
             if(rowGroup){
                 col = {...col,...{
                     rowGroup: true,
@@ -47,8 +50,13 @@ export default class GroupTable {
                     hide: true,
                 }}
             }
-            if(cols.length > 0){
-                if(cols[0].name == controlName){
+            if(this.cols.length > 0){
+                if(this.cols[0].name == controlName){
+                    continue
+                }
+            }
+            if(this.values.length > 0){
+                if(this.values[0].name == controlName){
                     continue
                 }
             }
@@ -61,17 +69,16 @@ export default class GroupTable {
      * Hàm đọc thông tin pivot đã lưu để tạo cấu trúc các cột pivot (bao gồm header và các cột group)
      */
     appendTableColumns(data) {
-        let cols = this.groupConfig.cols;
-        if(cols.length > 0){
-            let col = cols[0];
-            let allColumnBinding = data.reduce((arr, obj)=>{
+        if(this.cols.length > 0){
+            let col = this.cols[0];
+            this.allColumnAppend = data.reduce((arr, obj)=>{
                 if(obj[col.name] && !arr.includes(obj[col.name])){
                     arr.push(obj[col.name])
                 }
                 return arr
             },[]);
-            for (let index = 0; index < allColumnBinding.length; index++) {
-                let colItem = allColumnBinding[index];
+            for (let index = 0; index < this.allColumnAppend.length; index++) {
+                let colItem = this.allColumnAppend[index];
                 let colBinding = {
                     headerName:colItem,
                     field: colItem,
@@ -80,22 +87,27 @@ export default class GroupTable {
             }
         }
     }
+    
     /**
-     * Hàm lấy thông tin các cột và đong được pivot
+     * Hàm chuyển data dạng flat sang data dạng đã được cấu hình theo group
+     * @param {*} data 
      */
-    getDataGroup(){
-        let allRowGroup = this.gridOptions.columnApi.getRowGroupColumns();
-        let allPivotCol = this.gridOptions.columnApi.getPivotColumns();
-        let rowGroup = [];
-        let colPivotData = [];
-
-        if(allRowGroup.length > 0){
-            rowGroup.push(allRowGroup[0].colDef.field);
+    convertDataToGroup(data){
+        let controlValue = this.values[0].name;
+        if(this.cols.length > 0){
+            let newData = [];
+            for (let index = 0; index < data.length; index++) {
+                let newRow = data[index];
+                for (let i = 0; i < this.allColumnAppend.length; i++) {
+                    let column = this.allColumnAppend[i];
+                    newRow[column] = (column == newRow[this.cols[0]['name']]) ? newRow[controlValue] : "";
+                }
+                newData.push(newRow);
+                
+            }
+            return newData;
         }
-        if(allRowGroup.length > 0){
-            colPivotData.push(allPivotCol[0].colDef.field);
-        }
-        return {cols:colPivotData,rows:rowGroup}
+        return [];
     }
     /**
      * Hoangnd
@@ -103,26 +115,57 @@ export default class GroupTable {
      * @param {} vl 
      */
     setData(vl) {
-        for (let index = 0; index < vl.length; index++) {
-            let rowData = vl[index];
-            console.log(rowData,'rowDatarowData');
-            
-        }
-        this.autoData(vl);
-        this.appendTableColumns(vl);
+        let data = [
+            {"tb_th":"ten hang 1","tb_mh":"AAA","tb_dvt":"cai","vai_tro":"Hàng Hóa","gia_tri":"1"},
+            {"tb_th":" ten hang 2","tb_mh":"AAA","tb_dvt":"tan","vai_tro":"Hàng Hóa","gia_tri":"2"},
+            {"tb_th":" ten hang 3","tb_mh":"AAA","tb_dvt":"lượng","vai_tro":"Hàng Hóa","gia_tri":"3"}
+        ];
+        this.appendTableColumns(data);
         this.gridOptions.api.setColumnDefs(this.columnDefs);
-        this.gridOptions.api.setRowData(vl);
+        // this.gridOptions.api.setRowData(vl);
+        data = this.convertDataToGroup(data);
+        this.gridOptions.api.setRowData(data);
         let viewType = sDocument.state.viewType[this.instance];
         if(viewType == 'print'){
             this.gridOptions.api.setDomLayout('print');
         }
         this.caculatorHeight();
-        
     }
-    autoData(vl){
-        for (let controlName in this.controlObj.listInsideControls){
 
+    /**
+     * chuyển data dạng pivot sang data dạng flat thì cần xóa các dữ liệu của các cột được thêm vào
+     * @param {*} data 
+     */
+    minimizeData(data){
+        for (let index = 0; index < this.allColumnAppend.length; index++) {
+            delete data[this.allColumnAppend[index]];
         }
+    }
+
+    /**
+     * ham trả về data của table
+     */
+    getGroupData(){
+        let rowData = [];
+        this.gridOptions.api.forEachNode(node => {
+                if(!node.group){
+                    if(this.allColumnAppend.length > 0){
+                        for (let index = 0; index < this.allColumnAppend.length; index++) {
+                            const column = this.allColumnAppend[index];
+                            let newRow = util.cloneDeep(node.data);
+                            newRow[this.cols[0].name] = column;
+                            newRow[this.values[0].name] = newRow[column];
+                            this.minimizeData(newRow);
+                            rowData.push(newRow);
+                        }
+                    }
+                    else{
+                        rowData.push(node.data)
+                    }
+                }
+            }
+        );
+        return rowData;
     }
     /**
      * Hoangnd:
@@ -131,9 +174,10 @@ export default class GroupTable {
     caculatorHeight(){
         let dataHeight = this.gridOptions.api.getDisplayedRowCount()*24;
         let headerHeight = 0;
-        if(this.groupConfig.cols.length > 0){
+        if(this.cols.length > 0){
             headerHeight += 24;
         }
+        headerHeight += 24*2
         let tableHeight = dataHeight + headerHeight + 3;
         if(tableHeight > 500){
             tableHeight = 500;
@@ -147,8 +191,9 @@ export default class GroupTable {
             rowHeight:24,
             groupDefaultExpanded: -1,
             rowData: [],
+            debounceVerticalScrollbar:true,
             autoGroupColumnDef: { 
-                minWidth: 250,
+                minWidth: (this.rows.length > 1) ? 250 : 150,
                 cellRendererParams: {
                     suppressCount: true
                 }
@@ -156,6 +201,7 @@ export default class GroupTable {
             defaultColDef: {
                 filter: true,
                 width: 150,
+                height:24,
                 sortable: true,
                 resizable: true,
                 wrapText:true,
