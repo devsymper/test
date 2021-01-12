@@ -59,14 +59,14 @@
                         :listType="listType"
                     />
                 </v-tab-item>
-                <v-tab-item>
+                <v-tab-item class="h-100">
                    <page-issue-done 
                    />
                 </v-tab-item>
-                <v-tab-item>
+                <v-tab-item class="h-100">
                     <page-issue-in-progress />
                 </v-tab-item>
-                <v-tab-item>
+                <v-tab-item class="h-100">
                     <page-issue-to-do />
                 </v-tab-item>
             </v-tabs>

@@ -152,7 +152,19 @@ export const taskManagementApi = {
     removeVersion(id){
         return taskManagement.delete("versions/"+id);
     }, 
-
+    //// sprint
+    addSprintForBoard(data){
+        return taskManagement.post("sprints",data);
+    },
+    updateSprintForBoard(id,data){
+        return taskManagement.put("sprints/"+id,data);
+    },
+    getListSprint(boardId){
+        return taskManagement.get("sprints/"+boardId);
+    },
+    removeSprint(id){
+        return taskManagement.delete("sprints/"+id);
+    }, 
     //// column in board
     getListColumn(boardId){
         return taskManagement.get("columns/"+boardId);

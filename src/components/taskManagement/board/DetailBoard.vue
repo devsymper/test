@@ -100,7 +100,7 @@ export default {
                     title: "Mô tả",
                     type: "text",
                     value: '',
-                    disabled:false,
+                    disabled: false,
                     validateStatus:{
                         isValid:true,
                         message:""
@@ -108,6 +108,26 @@ export default {
                     validate(){
                     }
                 },
+                type : {
+                    title: "Loại board",
+                    type: "select",
+                    value: '',
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    disabled: true,
+                    options:[{value:'kanban',text:'kanban'},{value:'scrum',text:'scrum'}],
+                    validate(){
+                        if (this.value=="") {
+                            this.validateStatus.isValid=false;
+                            this.validateStatus.message="Không bỏ trống";
+                        }else{
+                            this.validateStatus.isValid=true;
+                            this.validateStatus.message="";
+                        }
+                    }
+                }
 
             },
         }
@@ -123,6 +143,7 @@ export default {
                 let data={};
                 data.name=this.infoBoardProps.name.value;
                 data.description=this.infoBoardProps.description.value;
+                data.type=this.infoBoardProps.type.value;
                 data.id=this.infoBoard.id;
 
                 this.kanbanWorker.postMessage({
@@ -147,6 +168,7 @@ export default {
             if (this.infoBoard.id) {
                 this.infoBoardProps.name.value=this.infoBoard.name;
                 this.infoBoardProps.description.value=this.infoBoard.description;
+                this.infoBoardProps.type.value=this.infoBoard.type;
                 this.currentProject=this.$store.state.taskManagement.currentProject;
             }
         },

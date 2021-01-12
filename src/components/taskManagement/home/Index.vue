@@ -17,9 +17,9 @@
                             </div>
                             <div class="float-right">
                                 <v-icon v-if="item.isFavorite==1" style="font-size:13px" color="yellow" @click="updateFavorite(item)">mdi-star</v-icon>
-                                <v-icon v-else style="font-size:13px" @click.prevent.stop="updateFavorite(item)" >mdi-star-outline</v-icon>
+                                <v-icon v-else style="font-size:13px;color:#ccc" @click.prevent.stop="updateFavorite(item)" >mdi-star-outline</v-icon>
                    
-                                <v-icon style="font-size:13px"  @click.prevent.stop="goConfigProject(item)" class="mx-1">mdi-cog-outline</v-icon>
+                                <v-icon style="font-size:13px;color:#ccc"  @click.prevent.stop="goConfigProject(item)" class="mx-1">mdi-cog-outline</v-icon>
                             </div>
                         </div>
                         <div class="body-item-recent">
@@ -144,15 +144,14 @@ export default {
         let self = this;
         return{
             colors:[
-                "#80F878FF",
-                "#63E6CDFF",
-                "#80B8EBFF",
-                "#F33163FF",
-                "#EA5206FF",
-                "#1CF2DFFF",
-                "#25C308FF",
-                "#F31B35FF",
-                "#30DA25FF"
+                "#F44336",
+                "#536DFE",
+                "#388E3C",
+                "#FF9800",
+                "#E64A19",
+                "#607D8B",
+                "#1976D2",
+                "#FFEB3B",
             ],
             projectIds:[],
             dataCountBoard:[],

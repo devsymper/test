@@ -1360,7 +1360,8 @@
             "alertDescription": "Không có mô tả",
             "relatedTask": "CÁC TASK LIÊN QUAN",
             "attachment": "TỆP ĐÍNH KÈM",
-            "status": "Trạng thái"
+			"status": "Trạng thái",
+			"candidateUser":"Nhóm người dùng candidate"
         },
         "filterOptions": {
             "all": "Toàn bộ task",
@@ -1376,6 +1377,7 @@
         "claim": "Nhận công việc",
         "unClaim": "Hủy nhận",
         "reAssign": "Giao việc",
+        "assign": "Đã giao",
         "delegate": "Ủy quyền",
         "resolve": "Giải quyết",
         "complete": "Hoàn thành",

@@ -19,7 +19,7 @@ self.onmessage = async function (event) {
             if (data) {
                 taskManagementApi.getUserInProject(data).then(res => {
                     if(res['status'] == 200){
-                        postMessage({action:'getUserInProject'})
+                        postMessage({action:'getUserInProject',dataAfter: res})
                     }
                 });
             }
@@ -214,20 +214,91 @@ self.onmessage = async function (event) {
                 });
             }
             break;
-            
+        case 'handleAddSprint':
+            if (data) {
+                taskManagementApi.addSprintForBoard(data).then(res => {
+                    if(res['status'] == 200){
+                        postMessage({action:'handleAddSprint',dataAfter : res})
+                    }else{
+                        postMessage({action:'actionError'})
+                    }
+                });
+            }
+            break;
+        case 'getListSprintInBoard':
+            if (data) {
+                taskManagementApi.getListSprint(data).then(res => {
+                    if(res['status'] == 200 && res['data'] ){
+                        let dataRec8 = {};
+                        dataRec8.key = data;
+                        dataRec8.data = res.data.listObject;
+                        postMessage({action:'getListSprintInBoard',dataAfter : dataRec8})
+                    }
+                });
+            }
+            break;
+        case 'getIssueInSprint':
+            if (data) {
+                taskManagementApi.getIssueFilter(data).then(res => {
+                    if(res['status'] == 200 && res['data'] ){
+                        postMessage({action:'getIssueInSprint',dataAfter : res})
+                    }
+                });
+            }
+            break;
+        case 'groupIssueInSprint':
+            if (data) {
+                let dataSprint = groupIssueInSprint(data);
+                postMessage({action:'groupIssueInSprint',dataAfter : dataSprint})
+
+            }
+            break;
+        case 'handleUpdateSprint':
+            if (data) {
+                taskManagementApi.updateSprintForBoard(data.id,data.data).then(res => {
+                    if(res['status'] == 200){
+                        postMessage({action:'handleUpdateSprint'})
+                    }else{
+                        postMessage({action:'actionError'})
+                    }
+                });
+
+            }
         default:
             break;
     }
 };
 
+function groupIssueInSprint(data){
+    let listSprintInBoard = data.listSprintInBoard;
+    let listAllIssueInSprint = data.listAllIssueInSprint;
+    for (let i = 0; i < listSprintInBoard.length; i++) {
+        let sprintId = listSprintInBoard[i].id;
+        let taskInSprint = listAllIssueInSprint.filter(task=>{
+            return task.tmg_sprint_id == sprintId;
+        });
+        if (taskInSprint.length > 0) {
+            for (let j = 0; j < taskInSprint.length; j++) {
+                getMoreInfoForTask(taskInSprint[j],data);
+            }
+        }
+        listSprintInBoard[i]['tasks'] = taskInSprint;
+    }
+
+    return listSprintInBoard
+}
+
+
 async function setLiskTaskBackLog(data){
-    let documentId = data.allIssueTypeInProject.reduce((arr,obj)=>{
+    let documentIds = data.allIssueTypeInProject.reduce((arr,obj)=>{
         if(!arr.includes(obj.documentId)){
             arr.push(obj.documentId)
         }
         return arr
     },[])
-    let allTask = await documentApi.getListObjectByMultipleDocument({ids:JSON.stringify(documentId)})
+    data.filter.ids = JSON.stringify(documentIds);
+
+    let allTask = await documentApi.getListObjectByMultipleDocument(data.filter)
     allTask = allTask['data']['listObject'];
     let column = data.columnBacklog;
     if (data.listStatus.length > 0 ) {
@@ -305,8 +376,8 @@ async function setLiskTask(data){
         }
         return arr
     },[])
-
-    let allTask = await documentApi.getListObjectByMultipleDocument({ids:JSON.stringify(documentIds)})
+    data.filter.ids = JSON.stringify(documentIds);
+    let allTask = await documentApi.getListObjectByMultipleDocument(data.filter)
     allTask = allTask['data']['listObject'];
     let columns = data.listColumn;
     if (data.listStatus.length > 0 ) {
@@ -317,7 +388,7 @@ async function setLiskTask(data){
             let item = data.listStatus.find(ele => ele.statusId == statusId &&  ele.taskLifeCircleId == taskLifeCircleId );
             if (item) {
                 let taskInStatus = allTask.filter(task=>{
-                    return task.tmg_status_id == statusId && task.tmg_task_life_circle_id == taskLifeCircleId;
+                    return task.tmg_status_id == statusId && task.tmg_task_life_circle_id == taskLifeCircleId ;
                 })
                 item['tasks'] = taskInStatus;
                 let column = columns.find(ele => ele.id == idColumn);

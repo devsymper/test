@@ -128,6 +128,25 @@ export default {
                     validate(){
                     }
                 },
+                type : {
+                    title: "Loại board",
+                    type: "select",
+                    value: 'kanban',
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    options:[{value:'kanban',text:'kanban'},{value:'scrum',text:'scrum'}],
+                    validate(){
+                        if (this.value=="") {
+                            this.validateStatus.isValid=false;
+                            this.validateStatus.message="Không bỏ trống";
+                        }else{
+                            this.validateStatus.isValid=true;
+                            this.validateStatus.message="";
+                        }
+                    }
+                }
             }
         }
     },
@@ -155,6 +174,7 @@ export default {
                 let data={};
                 data.name=this.dataBoardProps.name.value;
                 data.description=this.dataBoardProps.description.value;
+                data.type=this.dataBoardProps.type.value;
                 data.projectId=this.$route.params.id;
 
                 this.kanbanWorker.postMessage({

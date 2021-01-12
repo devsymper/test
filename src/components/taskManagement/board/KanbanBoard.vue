@@ -1,9 +1,25 @@
 <template>
     <div class="kanban-board-view h-100">
         <div class="kanban-board-view__header">
-            <div class="left-content">
+            <div class="left-content d-flex">
                 <v-icon>mdi-view-dashboard-variant-outline</v-icon>
-                <span>Kanban Board</span>
+                <span v-if="currentBoard.type == 'kanban'" class="ml-2">Kanban Board</span>
+                <div v-else>
+                    <div style="height:25px;position:relative" >
+                        <span class="ml-2" style=" font-size: 18px;font-weight: 500;">
+                            Scrum Board {{sprintStart ? ': '+sprintStart.name :''}}
+                        </span>
+                        <v-btn style="position: absolute;top: -2px;" small class="px-1" solo depressed >
+                            <span class="fs-13">Complete sprint</span>
+                        </v-btn>
+                    </div>
+                    <div class="pl-2 grey--text fs-11 text-ellipsis w-100">
+                        {{sprintStart.description}}
+                    </div>
+                    <div class="pl-2 grey--text fs-11">
+                        {{$t('table.startTime') + ":" + sprintStart.startTime}}  {{$t('table.endTime') + ":" + sprintStart.endTime}}
+                    </div>
+                </div>
             </div>
             <div class="right-content">
                  <v-text-field
@@ -14,6 +30,7 @@
                     :placeholder="$t('common.search')"
                     hide-details
                 ></v-text-field>
+               
                 <div class="list-user d-inline-block" v-for="(obj) in getUser()" :key="obj.id">
                     <span class="count-user" v-if="obj.count">{{obj.count}}+</span>
                     <symperAvatar v-else :size="22" class="user-avatar" :userId="obj.userId" />
@@ -40,7 +57,7 @@
             </div>
         </div>
         <VuePerfectScrollbar :key="currentBoard.id" class="wrap-scroll">
-            <div class="wrap-kanban-board py-4 h-100">
+            <div class="wrap-kanban-board py-5 h-100">
                 <div
                     v-for="column in listBoardColumn"
                     :key="column.id"
@@ -177,7 +194,9 @@ export default {
             ]
     },
     data() {
+        let self = this;
         return {
+            sprintStart:{},
             flagGetListStatusInProject:false,  // gán cờ trạng thái: đã được gọi hàm hay chưa
             flagGetListColumnInBoard:false,  // gán cờ trạng thái: đã được gọi hàm hay chưa
             flagGetListStatusInColumnBoard:false,  // gán cờ trạng thái: đã được gọi hàm hay chưa
@@ -193,6 +212,52 @@ export default {
             currentBoard:{},
             dragging:false,
             nodeMapPermission:{},
+            filter:{
+                ids: null,
+                filter:[
+                    {
+                        column : "tmg_project_id",
+                        operation : "and",
+                        conditions : [
+                            {
+                                name : "in",
+                                value : [self.$route.params.id],
+                            }
+                        ],
+                    },
+                    {
+                        column : "tmg_sprint_id",
+                        operation : "and",
+                        conditions : [
+                            {
+                                name : "empty",
+                                value : '',
+                            }
+                        ],
+                    },
+                ],
+                page : 1,
+                pageSize: 500,
+                distinct: true
+            },
+            filterScrum:{
+                ids: null,
+                filter:[
+                    {
+                        column : "tmg_sprint_id",
+                        operation : "and",
+                        conditions : [
+                            {
+                                name : "in",
+                                value : [],
+                            }
+                        ],
+                    },
+                ],
+                page : 1,
+                pageSize: 500,
+                distinct: true
+            },
         };
     },
    
@@ -313,7 +378,13 @@ export default {
             data.listColumn = this.listColumn;
             data.listStatusColumn = this.listStatusColumn;
             data.listStatus = this.listStatus;
-            data.allIssueTypeInProject =  this.allIssueTypeInProject
+            data.allIssueTypeInProject =  this.allIssueTypeInProject;
+            data.boardType = this.currentBoard.type;
+            if (this.currentBoard.type == "kanban") {
+                data.filter = this.filter;
+            }else{
+                data.filter = this.filterScrum;
+            }
             // đẩy xuống worker xử lý
             this.kanbanWorker.postMessage({
                 action:'getListTasks',
@@ -429,10 +500,34 @@ export default {
             }
             let idBoard = this.currentBoard.id;
             self.$store.commit("taskManagement/setCurrentBoard",this.currentBoard);
-          
-            this.getMoreData();
+            if (this.currentBoard.type == "scrum") {
+                this.getListSprintInBoardScrum();
+            }else{
+                this.getMoreData();
+            }
         },
-
+        getListSprintInBoardScrum(){
+            if (!this.$store.state.taskManagement.listSprintInBoard[this.currentBoard.id] || this.$store.state.taskManagement.listSprintInBoard[this.currentBoard.id].length == 0) {
+                this.kanbanWorker.postMessage({
+                    action:'getListSprintInBoard',
+                    data:this.currentBoard.id
+                });
+            }else{
+                this.getSprintRunning();
+            }
+        },
+        getSprintRunning(){
+            let listSprint = this.$store.state.taskManagement.listSprintInBoard[this.currentBoard.id];
+            let sprintStart = listSprint.find(ele => ele.status == "running");
+            if (sprintStart) {
+                this.sprintStart = sprintStart;
+                this.filterScrum.filter[0].conditions[0].value.push(sprintStart.id);
+                this.getMoreData();
+            }else{
+                this.listBoardColumn = null;
+                this.$emit('loaded-content');
+            }
+        },
         getUserInProject(){
             this.kanbanWorker.postMessage({
                 action:'getUserInProject',
@@ -605,7 +700,13 @@ export default {
                         self.getMoreData();
                     } 
                     break;
-                
+                case 'getListSprintInBoard':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/setListSprintInBoard", res);
+                        self.getSprintRunning();
+                    }
+                    break;
                 default:
                     break;
             }
@@ -650,10 +751,6 @@ export default {
 .left-content span{
     font-size: 18px;
     font-weight: 500;
-    margin-left: 8px;
-}
-.left-content .mdi{
-    margin-bottom: 5px;
 }
 .right-content{
     padding: 8px;
@@ -667,7 +764,6 @@ export default {
 }
 .list-user{
     vertical-align: middle;
-  
 }
 .title-column{
     font-weight: 500;

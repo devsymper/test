@@ -644,11 +644,9 @@ export default {
                 let formulaInstance = e.formulaInstance;
                 let controlName = e.controlName;
                 let controlInstance = thisCpn.sDocumentSubmit.listInputInDocument[controlName];
-                let dataInput = formulaInstance.getDataInputFormula();
-
                 this.handlerBeforeRunFormulasValue(formulaInstance, controlName, 'formulas');
             } catch (error) {
-                
+                console.warn(error);
             }
             
         });
@@ -1421,15 +1419,16 @@ export default {
             else{
                 let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive
                 let cellActive = this.sDocumentSubmit.currentControlAutoComplete.split(':');
+                let value = data.value.inputValue;
                 currentTableInteractive.isAutoCompleting = false;
                 if(cellActive.length == 1){
                     cellActive = currentTableInteractive.tableInstance.getActiveEditor();
-                    currentTableInteractive.tableInstance.setDataAtCell(cellActive.row,cellActive.col,data.value,'edit')
+                    currentTableInteractive.tableInstance.setDataAtCell(cellActive.row,cellActive.col,value,'edit')
                 }
                 else if(cellActive.length == 3){
                     let row = cellActive[1];
                     let col = cellActive[2];
-                    currentTableInteractive.tableInstance.setDataAtCell(Number(row),Number(col),data.value,'edit')
+                    currentTableInteractive.tableInstance.setDataAtCell(Number(row),Number(col),value,'edit')
                 }
             }
         },
@@ -1459,7 +1458,8 @@ export default {
                     controlInstance.removeValidateIcon('Require')
                 }
             }
-            // resetImpactedFieldsList(this.keyInstance);
+            let controlToWorker = {name:controlName,type:controlInstance.type,value:controlInstance.value}
+            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, value:controlInstance.value, keyInstance:this.keyInstance, type:'submit'}})
             if(isRunChange){
                 this.handleControlInputChange(controlInstance);
             }
@@ -2548,7 +2548,7 @@ export default {
                 if(control.inTable != false){
                     let tableInstance = getControlInstanceFromStore(this.keyInstance,control.inTable);
                     let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulaInstance,'all');
-                    tableInstance.tableInstance.handlerRunFormulasForControlInTable(control,dataIn,formulaInstance, 'all');
+                    tableInstance.tableInstance.handleRunFormulaForControlInTable(control,dataIn,formulaInstance, 'all');
                 }
                 else{
                     this.formulasWorker.postMessage({action:'runFormula',data:{formulaInstance:formulaInstance, controlName:controlName, from:from, keyInstance:this.keyInstance}})
@@ -2986,7 +2986,8 @@ export default {
                 $('#'+controlInstance.id).attr('data-autocomplete',"");
                 return;
             }
-            
+            let controlToWorker = {name:controlInstance.name,type:controlInstance.type,value:controlInstance.value}
+            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, value:controlInstance.value, keyInstance:this.keyInstance, type:'submit'}})
             resetImpactedFieldsList(this.keyInstance);
             this.handleControlInputChange(controlInstance);
         },

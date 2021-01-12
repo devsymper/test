@@ -2,8 +2,19 @@
   <div class="w-100 h-100">
     <div style="height:40px; font-size:20px" class="font-weight-medium pl-3 pt-2">
         Backlog
+        <span v-if="currentBoard.type == 'scrum'" class="float-right">
+            <v-btn small class="px-1 ml-1" solo depressed @click="showPopupSprint" >
+                <span>Create Sprint</span>
+            </v-btn>
+        </span>
     </div>
-    <div v-if="data" class="fs-13" style="height:calc(100% - 41px)">
+    <div v-if="currentBoard.type == 'scrum'" style="height:calc(100% - 41px)" >
+        <sprint 
+            ref="sprint"
+            :currentBoard="currentBoard"
+        />
+    </div>
+    <div v-else-if="currentBoard.type == 'kanban' && data" class="fs-13" style="height:calc(100% - 41px)">
         <VuePerfectScrollbar
             style="height:100%"
         >
@@ -77,20 +88,22 @@ import CommonListIssue from '../home/commonListIssue.vue';
 import infoUser from "@/components/common/user/InfoUser";
 import DetailIssue from '@/components/taskManagement/issue/DetailIssue.vue';
 import KanbanWorker from 'worker-loader!@/worker/taskManagement/kanban/Kanban.Worker.js';
+import Sprint from './Sprint.vue';
 
 export default {
     components:{
         VuePerfectScrollbar,
         CommonListIssue,
         infoUser,
-        DetailIssue
+        DetailIssue,
+        Sprint
     },
     computed:{
         sTaskManagement(){
             return this.$store.state.taskManagement;
         },
         columnBacklog(){
-            if (!this.currentBoard.id) {
+            if (!this.currentBoard.id || this.currentBoard.type == 'scrum') {
                 return {};
             }
             let idBoard=this.currentBoard.id;
@@ -98,7 +111,7 @@ export default {
             if (this.sTaskManagement.listColumnInBoard[idBoard] && this.sTaskManagement.listColumnInBoard[idBoard].length >= 0 ) {
                 let columns = util.cloneDeep(this.sTaskManagement.listColumnInBoard[idBoard]);
                 backlogColumn = columns.find(ele => ele.isBacklog == 1 && ele.isHidden == 0);
-                backlogColumn.statusInColumn = [];
+                backlogColumn['statusInColumn'] = [];
             }
             return backlogColumn;
         },
@@ -132,6 +145,7 @@ export default {
         },
     },
     data(){
+        let self = this;
         return{
             isGetListTask:false,
             flagGetListColumnInBoard:false,  // gán cờ trạng thái: đã được gọi hàm hay chưa
@@ -143,10 +157,40 @@ export default {
             documentObjectId:null,
             issue:null,
             panel: [0, 1 , 2, 3],
-
+            filter:{
+                ids: null,
+                filter:[
+                    {
+                        column : "tmg_project_id",
+                        operation : "and",
+                        conditions : [
+                            {
+                                name : "in",
+                                value : [self.$route.params.id],
+                            }
+                        ],
+                    },
+                    {
+                        column : "tmg_sprint_id",
+                        operation : "and",
+                        conditions : [
+                            {
+                                name : "empty",
+                                value : '',
+                            }
+                        ],
+                    },
+                ],
+                page : 1,
+                pageSize: 500,
+                distinct: true
+            },
         }
     },  
     methods:{
+        showPopupSprint(){
+            this.$refs.sprint.show();
+        },
         handleShowDetailIssue(issue){
             this.documentObjectId = issue.document_object_id;
             this.issue = issue;
@@ -162,6 +206,7 @@ export default {
             data.allPriority = this.$store.state.taskManagement.allPriority;
             data.listIssueType = this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId];
             data.allStatus = this.$store.state.taskManagement.allStatus;
+            data.filter = this.filter;
             // đẩy xuống worker xử lý
             this.kanbanWorker.postMessage({
                 action:'getListTasksBackLog',
