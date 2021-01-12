@@ -158,10 +158,13 @@ export const documentApi = {
      * index column
      */
     saveColumnIndex(data){
-        return coreApi.post("documents/index", data);
+        return coreApi.post("documents/indexs", data);
+    },
+    deleteIndex(uid, data){
+        return coreApi.delete("documents/indexs/"+uid, data);
     },
     getColumnIndex(documentId){
-        return coreApi.get("documents/"+documentId+"/index");
+        return coreApi.get("documents/"+documentId+"/indexs");
     },
     getFieldStruct(documentId){
         return coreApi.get("documents/"+documentId+"/fields/struct");

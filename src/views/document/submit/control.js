@@ -421,10 +421,11 @@ export default class Control {
             else{ // trường hợp giá trị cho cả cột
                 let dataForStore = {};
                 dataForStore = Object.values(values);
+                let tableSqlRowId = tableIns.tableInstance.tableInstance.getDataAtProp('s_table_id_sql_lite');
                 let vls = [];
                 for (let index = 0; index < listIdRow.length; index++) {
-                    const element = listIdRow[index];
-                    let cellValue = values[element];
+                    const rowId = listIdRow[index];
+                    let cellValue = values[rowId];
                     if(this.type == 'date'){
                         if(cellValue){
                             cellValue = SYMPER_APP.$moment(cellValue, 'YYYY-MM-DD').format(this.controlProperties.formatDate.value);
@@ -433,7 +434,8 @@ export default class Control {
                             cellValue = "";
                         }
                     }
-                    vls.push([index, this.name, cellValue]);
+                    let rowIndex = tableSqlRowId.indexOf(rowId);
+                    vls.push([rowIndex, this.name, cellValue]);
                 }
                 tableIns.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
                 /**

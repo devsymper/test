@@ -722,6 +722,13 @@ export default {
 				this.agApi.sizeColumnsToFit()
 			}
 		},
+		tableContextMenu:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				this.relistContextmenu();
+			}
+		},
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
             if(value && !$.isEmptyObject(this.currentItemDataClone) && this.currentItemDataClone.id){
                 this.openactionPanel();
@@ -899,7 +906,7 @@ export default {
 			this.agApi.hideOverlay();
 		},
 		cellContextMenu(params){
-			debugger
+			this.$emit('cell-context-menu', params)
 		},
 		cellMouseDown(params){
 			debugger
