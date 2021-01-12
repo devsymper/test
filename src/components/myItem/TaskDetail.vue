@@ -289,6 +289,7 @@ export default {
             immediate:true,
             handler(valueAfter){
 				this.isShowSidebar = false
+				this.varsForBackend = {}
 				this.checkActionOfUser(valueAfter)
 				if(this.checkShowEditRecord()){
 					this.rightAction = 120
@@ -827,11 +828,6 @@ export default {
 				color:"blue"
 			}
 			this.taskActionBtns.splice(this.taskActionBtns.indexOf(obj), 1)
-            // if(this.isInitInstance){
-            //     if (this.reload) {
-            //         this.$emit('task-submited', data);            
-            //     }
-            // }else{
 			let elId = this.taskInfo.action.parameter.activityId;
 			let docId = data.document_id;
 			if(!docId){
@@ -843,11 +839,11 @@ export default {
 			// 	"variables": varsForBackend.vars,
 			// }
 			// let res =  await this.submitTask(taskData);
-			// this.reloadDetailTask();
-			// if (this.reload) {
-			// 	this.$emit('task-submited', res);
-            // }
-            // this.updateProcessInstanceName();
+			this.reloadDetailTask();
+			if (this.reload) {
+				this.$emit('task-submited', res);
+            }
+            this.updateProcessInstanceName();
             this.loadingAction=false;
         },
         showApprovalOutcomes(approvalActions){
