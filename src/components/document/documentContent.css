@@ -599,7 +599,9 @@ button:hover {
     opacity: 0.6;
     z-index: 1;
 }
-
+.group-table .ag-pivot-action{
+    left: 1px !important;
+}
 .dropdown {
     position: absolute;
 }

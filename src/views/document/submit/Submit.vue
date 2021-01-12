@@ -189,7 +189,6 @@ import DatePicker from "./../../../components/common/DateTimePicker";
 import TimeInput from "./../../../components/common/TimeInput";
 import UploadFile from "@/components/common/UploadFile.vue";
 import Table from "./table.js";
-import PivotTable from "./pivot-table";
 import SymperDragPanel from "./../../../components/common/SymperDragPanel.vue";
 import { util } from "./../../../plugins/util.js";
 import AutocompleteInput from "./items/AutocompleteInput.vue";
@@ -411,6 +410,7 @@ export default {
             listFileControl:[],
             currentFileControl:null,
             currentControlDataflow:null,
+            dataGroupTable:{},
             dataPivotTable:{},
             dataColPivot:[],
             dataPivotMode:[],
@@ -558,7 +558,7 @@ export default {
             if(thisCpn._inactive == true) return;
             let tableName = locate.tableName;
             let tableInstance = getControlInstanceFromStore(this.keyInstance,tableName);
-            tableInstance.tableMode = (tableInstance.tableMode == 'nomal') ? 'pivot' : 'nomal';
+            tableInstance.tableMode = (tableInstance.tableMode == 'Flat') ? 'Pivot' : 'Flat';
             tableInstance.switchTable();
         })
         /**
@@ -1538,6 +1538,7 @@ export default {
                             }
                             thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
                             thisCpn.dataPivotTable = res.data.pivotConfig;
+                            thisCpn.dataGroupTable = res.data.groupConfig;
                             // đẩy phần xử lí data control xuống worker
                             thisCpn.controlRelationWorker.postMessage({action:'setDataForPropsControl',data:
                                 { fields: res.data.fields, viewType: thisCpn.viewType, allDataDetail: thisCpn.sDocumentDetail.allData}
@@ -1739,6 +1740,7 @@ export default {
                                 field,
                                 thisCpn.keyInstance
                             );
+                            
                             tableControl.initTableControl();
                             tableControl.setEffectedData(prepareData);
                             tableControl.tableInstance = new Table(
@@ -1748,17 +1750,6 @@ export default {
                                 thisCpn.keyInstance
                             );
                             tableControl.tableInstance.setFormulasWorker(thisCpn.formulasWorker)
-                            if(this.dataPivotTable && this.dataPivotTable[controlName]){
-                                tableControl.tableMode = 'pivot';
-                                tableControl.pivotTable = new PivotTable(
-                                    tableControl,
-                                    controlName,
-                                    id,
-                                    this.dataPivotTable[controlName],
-                                    thisCpn.keyInstance
-                                );
-                            }
-                            
                             let tableEle = $(allInputControl[index]);
                             tableEle.find(".s-control").each(function() {
                                 let childControlId = $(this).attr("id");
@@ -1789,6 +1780,12 @@ export default {
                             });
                             tableControl.listInsideControls = listInsideControls;
                             tableControl.controlInTable = controlInTable;
+                            if(this.dataPivotTable && this.dataPivotTable[controlName]){
+                                tableControl.setPivotTableConfig(this.dataPivotTable[controlName]);
+                            }
+                            if(this.dataGroupTable && this.dataGroupTable[controlName]){
+                                tableControl.setGroupTableConfig(this.dataGroupTable[controlName]);
+                            }
                             tableControl.renderTable();
                             if(this.viewType !== 'submit'){
                                 tableControl.setData(valueInput);
@@ -2625,8 +2622,8 @@ export default {
          * Hàm cập nhật dữ liệu cho bảng pivot
          */
         setDataToPivotTable(tableControl, data){
-            if(tableControl.pivotTable){
-                tableControl.pivotTable.setData(data);
+            if(tableControl.agDataTable){
+                tableControl.agDataTable.setData(data);
             }
         },
 
@@ -2642,8 +2639,13 @@ export default {
                 tableControl.tableInstance.setData(false);
                 return;
             }
-            tableControl.tableInstance.setData(data);
-            this.setDataToPivotTable(tableControl,data);
+            if(tableControl.tableMode == 'Group'){
+                this.setDataToPivotTable(tableControl,data);
+            }else{
+                tableControl.tableInstance.setData(data);
+                this.setDataToPivotTable(tableControl,data);   
+            }
+            
         },
 
         /**

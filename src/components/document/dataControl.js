@@ -41,6 +41,9 @@ export const getAllPropFromData = (fields, viewType, allDataDetail)=>{
                 }
                 properties[prop].value = valueControl;
             }
+            if(prop == 'tableView'){
+                properties[prop].value = (properties[prop].value) ? properties[prop].value : 'Flat'
+            }
         }
         if (fields[controlId]['formulas'] != false && fields[controlId]['formulas'] != "[]") {
             if (viewType != 'detail') {
