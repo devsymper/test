@@ -792,7 +792,6 @@ export default {
         },
         handleTaskSubmited() {
 			this.sideBySideMode = false;
-			debugger
             this.getData({});
         },
         handleChangeFilterValue(data) {
@@ -812,7 +811,6 @@ export default {
 		reselectObject(){
 			setTimeout(self=>{
 				self.selectObject(this.currentTask.obj , this.currentTask.idx, this.currentTask.idex)
-				debugger
 			},2000,this)
 		},
         async selectObject(obj, idx, idex) {

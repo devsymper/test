@@ -1373,7 +1373,6 @@ export default {
 					delete column.pinned
 				}
 				this.reOrderFixedCols();
-				debugger
 				let flag = false
 				this.columnDefs.forEach(function(e){
 					if(e.symperFixed){
