@@ -121,7 +121,6 @@ export default {
     methods:{
 		handlerNodeCLicked(a){
 			if(a.$type == 'bpmn:CallActivity'){
-				debugger
 				this.processDefinitionId  = a.calledElement
 				this.showDialog = true
 			}
