@@ -907,10 +907,28 @@ export default {
 			this.agApi.hideOverlay();
 		},
 		cellContextMenu(params){
+			this.changeSelectionRow()
 			this.$emit('cell-context-menu', params)
 		},
 		cellMouseDown(params){
 			this.$emit('after-cell-mouse-down', params)
+		},
+		changeSelectionRow(){
+			let arr = document.getElementsByClassName('ag-row-selected')
+			for(let i = 0; i < arr.length ; i++){
+				$(arr[i]).removeClass('ag-row-selected')
+			}
+			if(arr.length > 0){
+				for(let i = 0; i < arr.length ; i++){
+					$(arr[i]).removeClass('ag-row-selected')
+				}
+			}
+			if(document.getElementsByClassName('ag-row-selected').length > 0){
+			 	$(document.getElementsByClassName('ag-row-selected')[0]).removeClass('ag-row-selected')
+			}	
+			$(document.getElementsByClassName('ag-row-focus')).each(function(e){
+				$(document.getElementsByClassName('ag-row-focus')[e]).addClass('ag-row-selected')
+			}) 
 		},
 		cellMouseOver(params){
 			this.cellAboutSelecting = params.data
@@ -1342,24 +1360,8 @@ export default {
 			this.$emit('row-selected', params.data);
 		},
 		onCellClicked(params){
-			let arr = document.getElementsByClassName('ag-row-selected')
-			for(let i = 0; i < arr.length ; i++){
-				$(arr[i]).removeClass('ag-row-selected')
-			}
-			if(arr.length > 0){
-				for(let i = 0; i < arr.length ; i++){
-					$(arr[i]).removeClass('ag-row-selected')
-				}
-				// $(arr).each(function(e){
-				// 	$(arr[e]).removeClass('ag-row-selected')
-				// })
-			}
-			if(document.getElementsByClassName('ag-row-selected').length > 0){
-			 	$(document.getElementsByClassName('ag-row-selected')[0]).removeClass('ag-row-selected')
-			}	
-			$(document.getElementsByClassName('ag-row-focus')).each(function(e){
-				$(document.getElementsByClassName('ag-row-focus')[e]).addClass('ag-row-selected')
-			}) 
+			this.changeSelectionRow()
+			this.$emit('row-selected', params.data);
 		},
 		onSelectionChanged() {
 			var selectedRows = this.agApi.getSelectedRows();
