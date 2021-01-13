@@ -229,7 +229,6 @@
 				@cell-context-menu="cellContextMenu"
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
-				@cell-context-menu="cellContextMenu"
 				@grid-ready="onGridReady"
 			>
 			</ag-grid-vue>
