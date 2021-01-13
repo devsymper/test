@@ -228,6 +228,7 @@
 				@cell-context-menu="cellContextMenu"
 				@cell-mouse-down="cellMouseDown"
 				@selection-changed="onSelectionChanged"
+				@cell-clicked="onCellClicked"
 				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
 			>
@@ -861,7 +862,7 @@ export default {
 		};
 		this.gridOptions = {
 			enableRangeSelection: true,
-			rowSelection: 'multiple',
+			// rowSelection: 'multiple',
 			onCellKeyDown: this.onCellKeyPress,
 			getRowStyle: function(params) {
 				if (params.node.rowIndex % 2 != 0) {
@@ -1339,6 +1340,26 @@ export default {
         },
 		handlerRowClicked(params){
 			this.$emit('row-selected', params.data);
+		},
+		onCellClicked(params){
+			let arr = document.getElementsByClassName('ag-row-selected')
+			for(let i = 0; i < arr.length ; i++){
+				$(arr[i]).removeClass('ag-row-selected')
+			}
+			if(arr.length > 0){
+				for(let i = 0; i < arr.length ; i++){
+					$(arr[i]).removeClass('ag-row-selected')
+				}
+				// $(arr).each(function(e){
+				// 	$(arr[e]).removeClass('ag-row-selected')
+				// })
+			}
+			if(document.getElementsByClassName('ag-row-selected').length > 0){
+			 	$(document.getElementsByClassName('ag-row-selected')[0]).removeClass('ag-row-selected')
+			}	
+			$(document.getElementsByClassName('ag-row-focus')).each(function(e){
+				$(document.getElementsByClassName('ag-row-focus')[e]).addClass('ag-row-selected')
+			}) 
 		},
 		onSelectionChanged() {
 			var selectedRows = this.agApi.getSelectedRows();
