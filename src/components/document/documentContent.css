@@ -16,7 +16,7 @@ p {
     margin: 0;
 }
 
-.document-form-style-default  input{
+.document-form-style-default  input:not(.ag-input-field-input){
     border-bottom: 0.5px solid #ccc;
     border-radius: 0;
     height: 25px;
@@ -24,7 +24,7 @@ p {
     box-shadow: none;
     padding: 0 5px;
 }
-.document-form-style-custom-1 input{
+.document-form-style-custom-1 input:not(.ag-input-field-input){
     border: 1px solid #e9ecef;
     padding: 4px 6px;
     min-height: 30px;

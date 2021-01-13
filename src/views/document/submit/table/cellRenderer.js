@@ -3,19 +3,6 @@
 import sApp from '@/store/app';
 let mapIdToUsers = sApp.state.mapIdToUsers;
 
-export const NumberRenderer = ()=> {
-}
-
-// init method gets the details of the cell to be renderer
-NumberRenderer.prototype.init = function(params) {
-    this.eGui = document.createElement('span');
-    var text = (params.value) ? params.value : 0;
-    this.eGui.innerHTML = text;
-};
-
-NumberRenderer.prototype.getGui = function() {
-    return this.eGui;
-};
 
 
 // cell renderer class
@@ -59,25 +46,25 @@ PercentRenderer.prototype.getGui = function() {
 export const CheckboxRenderer =()=> {}
 
 CheckboxRenderer.prototype.init = function(params) {
-  this.eGui = document.createElement('input');
-  this.eGui.type = 'checkbox';
-  this.eGui.checked = params.value;
-  this.checkedHandler = this.checkedHandler.bind(this);
-  this.eGui.addEventListener('click', this.checkedHandler);
+    this.eGui = document.createElement('input');
+    this.eGui.type = 'checkbox';
+    this.eGui.checked = params.value;
+    this.checkedHandler = this.checkedHandler.bind(this);
+    this.eGui.addEventListener('click', this.checkedHandler);
 }
 
 CheckboxRenderer.prototype.checkedHandler = function(e) {
-  let checked = e.target.checked;
-  let colId = this.params.column.colId;
-  this.params.node.setDataValue(colId, checked);
+    let checked = e.target.checked;
+    let colId = this.params.column.colId;
+    this.params.node.setDataValue(colId, checked);
 }
 
 CheckboxRenderer.prototype.getGui = function(params) {
-  return this.eGui;
+return this.eGui;
 }
 
 CheckboxRenderer.prototype.destroy = function(params) {
-  this.eGui.removeEventListener('click', this.checkedHandler);
+this.eGui.removeEventListener('click', this.checkedHandler);
 }
 /**
  * Date renderer
@@ -85,10 +72,10 @@ CheckboxRenderer.prototype.destroy = function(params) {
 export const DateRenderer =()=> {}
 
 DateRenderer.prototype.init = function(params) {
-  this.eGui = document.createElement('span');
-  this.eGui.innerHTML = '21/12/2020';
-  this.checkedHandler = this.checkedHandler.bind(this);
-  this.eGui.addEventListener('click', this.checkedHandler);
+this.eGui = document.createElement('span');
+this.eGui.innerHTML = '21/12/2020';
+this.checkedHandler = this.checkedHandler.bind(this);
+this.eGui.addEventListener('click', this.checkedHandler);
 }
 
 DateRenderer.prototype.checkedHandler = function(e) {
@@ -98,11 +85,11 @@ DateRenderer.prototype.checkedHandler = function(e) {
 }
 
 DateRenderer.prototype.getGui = function(params) {
-  return this.eGui;
+return this.eGui;
 }
 
 DateRenderer.prototype.destroy = function(params) {
-  this.eGui.removeEventListener('click', this.checkedHandler);
+this.eGui.removeEventListener('click', this.checkedHandler);
 }
 /**
  * Time renderer
@@ -110,10 +97,10 @@ DateRenderer.prototype.destroy = function(params) {
 export const TimeRenderer =()=> {}
 
 TimeRenderer.prototype.init = function(params) {
-  this.eGui = document.createElement('span');
-  this.eGui.innerHTML = '21/12/2020';
-  this.checkedHandler = this.checkedHandler.bind(this);
-  this.eGui.addEventListener('click', this.checkedHandler);
+this.eGui = document.createElement('span');
+this.eGui.innerHTML = '21/12/2020';
+this.checkedHandler = this.checkedHandler.bind(this);
+this.eGui.addEventListener('click', this.checkedHandler);
 }
 
 TimeRenderer.prototype.checkedHandler = function(e) {
@@ -123,11 +110,11 @@ TimeRenderer.prototype.checkedHandler = function(e) {
 }
 
 TimeRenderer.prototype.getGui = function(params) {
-  return this.eGui;
+return this.eGui;
 }
 
 TimeRenderer.prototype.destroy = function(params) {
-  this.eGui.removeEventListener('click', this.checkedHandler);
+this.eGui.removeEventListener('click', this.checkedHandler);
 }
 
 

@@ -6,7 +6,16 @@ import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-alpine.css';
 import {getControlInstanceFromStore} from './../common/common'
 import sDocument from '@/store/document'
-import {NumberRenderer, CheckboxRenderer, FileRenderer, DateRenderer, TimeRenderer, SelectRenderer,PercentRenderer, UserRenderer} from './table/cellRenderer'
+import NumberCellRenderer from './table/NumberCellRenderer'
+import {
+    CheckboxRenderer, 
+    FileRenderer, 
+    DateRenderer, 
+    TimeRenderer, 
+    SelectRenderer,
+    PercentRenderer, 
+    UserRenderer} from './table/cellRenderer'
+import {AutoCompleteCellEditor} from './table/AutoCompleteCellEditor';
 window.addNewDataPivotTable = function(el, event, type){
     let tableName = $(el).attr('table-name');
     event.preventDefault();
@@ -15,7 +24,6 @@ window.addNewDataPivotTable = function(el, event, type){
     thisListItem.$evtBus.$emit('on-add-data-to-pivot-table',{type:type, tableName:tableName})
     
 }
-
 export default class SymperTable {
     constructor(tableControl, keyInstance, groupConfig = {}, pivotConfig = {}) {
         this.init();
@@ -38,8 +46,8 @@ export default class SymperTable {
          * Các loại cell mà table hỗ trợ hiển thị
          */
         this.supportCellsType = {
-            currency: 'NumberRenderer',
-            number: 'NumberRenderer',
+            currency: 'NumberCellRenderer',
+            number: 'NumberCellRenderer',
             date: 'DateRenderer',
             // dateTime: 'DatetimeRenderer',
             time: 'TimeRenderer',
@@ -50,8 +58,11 @@ export default class SymperTable {
             select: 'SelectRenderer',
             combobox: 'SelectRenderer',
             checkbox: 'CheckboxRenderer',
+            
         };
-        
+        this.supportCellEditor = {
+            autocomplete: 'AutoCompleteCellEditor',
+        }
     }
     getColDefs(){
         let colDefs = []
@@ -64,6 +75,9 @@ export default class SymperTable {
             };
             if(this.supportCellsType[controlInstance.type]){
                 col['cellRenderer'] = this.supportCellsType[controlInstance.type]
+            }
+            if(controlInstance.checkEmptyFormulas('autocomplete')){
+                col['cellEditor'] = 'AutoCompleteCellEditor';
             }
             if(this.rows && this.rows.length > 0){
                 let rowGroup = this.rows.find(ele => ele.name == controlName);
@@ -250,7 +264,7 @@ export default class SymperTable {
             groupDefaultExpanded: -1,
             rowData: [[]],
             components: {
-                NumberRenderer: NumberRenderer,
+                NumberCellRenderer: NumberCellRenderer,
                 FileRenderer: FileRenderer,
                 PercentRenderer: PercentRenderer,
                 UserRenderer: UserRenderer,
@@ -258,6 +272,7 @@ export default class SymperTable {
                 CheckboxRenderer: CheckboxRenderer,
                 DateRenderer: DateRenderer,
                 TimeRenderer: TimeRenderer,
+                AutoCompleteCellEditor:AutoCompleteCellEditor
             },
             // debounceVerticalScrollbar:true,
             autoGroupColumnDef: { 
