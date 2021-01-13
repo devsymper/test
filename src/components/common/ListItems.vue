@@ -1158,7 +1158,8 @@ export default {
                 this.$delete(this.tableFilter.allColumn, colName);
                 icon.removeClass("applied-filter");
 			}
-			this.$store.commit('app/setFilteredColumns', this.filteredColumns)
+			let widgetIdentifier = this.getWidgetIdentifier()
+			this.$store.commit('app/setFilteredColumns', {filteredColumns: this.filteredColumns, widgetIdentifier: widgetIdentifier})
 		},
 		confirmDeleteItems(){
             this.deleteDialogShow = false;

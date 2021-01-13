@@ -15,7 +15,8 @@
 export default {
 	computed:{
 		filteredColumns(){
-			return this.$store.state.app.filteredColumns
+			let widgetIdentifier = this.getWidgetIdentifier()
+			return this.$store.state.app.filteredColumns[widgetIdentifier] ? this.$store.state.app.filteredColumns[widgetIdentifier] : {}
 		},
 		prefix(){
 			let prefix = this.params.headerPrefixKeypath
@@ -37,7 +38,12 @@ export default {
 			}else{
 				return false
 			}
-		}
+		},
+		getWidgetIdentifier(){
+			let widgetIdentifier =  this.$route.path;
+			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'');
+            return widgetIdentifier;
+		},
 	}
 }	
 </script>
