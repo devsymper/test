@@ -21,6 +21,8 @@ export const dashboardApi = {
 	},
 	getDashboardsApp(filter) {
 		return api.get(appConfigs.apiDomain.biService+'dashboards', filter)
+	},
+	getDashboardInfo(id){
+		return api.get(appConfigs.apiDomain.biService+'dashboards/' + id);
 	}
-
 };
