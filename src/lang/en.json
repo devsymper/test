@@ -16,7 +16,8 @@
         "service": "Service",
         "menu": "Menu",
         "users": "Users",
-        "add": "Add",
+		"add": "Add",
+		"view":"View",
         "edit": "Edit",
         "cancel": "Cancel",
 		"update": "Update",
@@ -215,6 +216,7 @@
 		"userCreateName": "User create",
 		"isDefault":"Default",
 		"lastUpdateAt": "Last update at",
+		"userLastUpdate": "Last update at",
 		"baUpdate": "BA Update",
         "wrap_tex_mode": {
             "wrap": "Wrap",
@@ -1129,7 +1131,12 @@
         "successTitle": "Success",
         "older": "Older",
         "today": "Today"
-    },
+	},
+	"bi":{
+		"dashboard":{
+			"titleShowList": "List dashboard"
+		}
+	},
     "virtualdoc": {
         "header": {
             "id": "ID",

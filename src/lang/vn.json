@@ -19,7 +19,8 @@
         "users": "Tài khoản người dùng",
         "add": "Thêm",
         "import_excel_history": "Lịch sử Import",
-        "edit": "Sửa",
+		"edit": "Sửa",
+		"view":"Chi tiết",
         "cancel": "Hủy",
         "update": "Cập nhật",
         "create": "Thêm mới",
@@ -185,7 +186,7 @@
     },
     "table": {
         "id": "ID",
-        "name": "Tên Service",
+        "name": "Tên",
         "description": "Mô tả",
         "lastVersion": "Version mới nhất",
         "language": "Ngôn ngữ",
@@ -229,6 +230,7 @@
 		"code": "Mã",
 		"isDefault":"SĐTC mặc định",
 		"lastUpdateAt": "Thời gian cập nhật",
+		"userLastUpdate": "Thời gian cập nhật",
         "wrap_tex_mode": {
             "wrap": "Xuống dòng",
             "clip": "Cắt bớt"
@@ -1263,7 +1265,15 @@
             "updateAt": "Ngày cập nhật",
             "userFilterAt": "Ngày theo dõi"
         }
-    },
+	},
+	"bi":{
+		"dashboard":{
+			"titleShowList": "Danh sách báo cáo",
+			"header":{
+				"id":"ID"
+			}
+		}
+	},
     "virtualdoc": {
         "header": {
             "id": "ID",
