@@ -7,20 +7,20 @@
 		>
 			<v-card>
 			<v-card-title class="fs-15">
-				Thực thi công việc
+				{{$t("myItem.taskLifeCycle.dialog.resolve.header")}}
 			</v-card-title>
 			<v-card-text>
 				<div class="content-assign-dialog d-flex flex-column ml-2 fs-13">
-					
+					{{$t("myItem.taskLifeCycle.dialog.resolve.description")}}
 					<div class="text-wrap">
-						Công việc sẽ được thực thi và trả về cho chủ sở hữu của công việc 
+						
 					</div>
 					<div class="text-wrap d-flex">
 						<v-icon x-small>
 							mdi-account-check-outline
 						</v-icon> 
 						<span class="mr-1 ml-1">
-							Công việc đã được ủy quyền
+							{{$t("myItem.taskLifeCycle.workDelegated")}}
 						</span>
 						<span style="color: blue"> {{originData.assigneeInfo ? originData.assigneeInfo.displayName : ""}}</span>
 					</div>
@@ -29,12 +29,12 @@
 							mdi-account-tie-outline
 						</v-icon> 
 						<span class="ml-1 mr-1">
-							Chủ sở hữu công việc
+							{{$t("myItem.taskLifeCycle.owner")}}
 						</span>
 						<span style="color: blue">{{ originData.ownerInfo ? originData.ownerInfo.displayName : ""}}</span>
 					</div>
-					<div class="text-wrap   d-flex align-center">
-						Trạng thái hiện tại
+					<div class="text-wrap d-flex align-center">
+						{{$t("myItem.taskLifeCycle.currentStatus")}}
 						<v-chip
 							small
 							label
@@ -43,12 +43,12 @@
 							text-color="white"
 						>
 							<span class="fs-13">
-								Ủy quyền
+								{{$t("tasks.delegate")}}
 							</span>
 						</v-chip>
 					</div>
 					<div class="text-wrap   d-flex align-center">
-						Công việc sẽ được trở về trạng thái
+						{{$t("myItem.taskLifeCycle.newStatus")}}
 						<v-chip
 							small
 							label
@@ -57,7 +57,7 @@
 							text-color="white"
 						>
 							<span class="fs-13">
-								Đã giao
+								{{$t("tasks.assign")}}
 							</span>
 						</v-chip>
 					</div>
@@ -71,14 +71,14 @@
 					text
 					@click="cancel"
 				>
-					Hủy
+					{{$t("myItem.taskLifeCycle.cancel")}}
 				</v-btn>
 					<v-btn
 					color="green darken-1"
 					text
 					@click="resolveTask"
 				>
-					Áp dụng
+					{{$t("myItem.taskLifeCycle.corfirm")}}
 				</v-btn>
 			</v-card-actions>
 			</v-card>
@@ -132,7 +132,7 @@ export default {
 			})
 			this.$snotify({
 				type: "success",
-				title: "Thực thi công việc thành công"
+				title: this.$t("myItem.taskLifeCycle.notify.resolve")
 			})
 			this.$emit('success')
 		}
