@@ -180,7 +180,7 @@ import { userApi } from "./../../../api/user.js";
 import "./../../../components/document/documentContent.css";
 import {allControlNotSetData,getMapControlEffected,checkInfinityControl } from "./../../../components/document/dataControl";
 import BasicControl from "./basicControl";
-import TableControl from "./tableControl";
+import TableControl1 from "./tableControl1";
 import ActionControl from "./actionControl";
 import LayoutControl from "./layoutControl";
 import PageControl from "./pageControl";
@@ -1732,24 +1732,17 @@ export default {
                         }
                         //truong hop la control table
                         else {
-                            let listInsideControls = {};
                             let controlInTable = {};
-                            let tableControl = new TableControl(
+                            let tableControl = new TableControl1(
                                 idField,
                                 $(allInputControl[index]),
                                 field,
-                                thisCpn.keyInstance
+                                thisCpn.keyInstance,
+                                (this.dataPivotTable) ? this.dataPivotTable[controlName] : {},
+                                (this.dataGroupTable) ? this.dataGroupTable[controlName] : {},
                             );
-                            
-                            tableControl.initTableControl();
                             tableControl.setEffectedData(prepareData);
-                            tableControl.tableInstance = new Table(
-                                tableControl,
-                                controlName,
-                                id,
-                                thisCpn.keyInstance
-                            );
-                            tableControl.tableInstance.setFormulasWorker(thisCpn.formulasWorker)
+                            // tableControl.tableInstance.setFormulasWorker(thisCpn.formulasWorker)
                             let tableEle = $(allInputControl[index]);
                             tableEle.find(".s-control").each(function() {
                                 let childControlId = $(this).attr("id");
@@ -1775,23 +1768,15 @@ export default {
                                 childControl.init();
                                 childControl.setEffectedData(childPrepareData);
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
-                                listInsideControls[childControlName] = true;
-                                 controlInTable[childControlName] = childControl;
+                                controlInTable[childControlName] = childControl;
                             });
-                            tableControl.listInsideControls = listInsideControls;
                             tableControl.controlInTable = controlInTable;
-                            if(this.dataPivotTable && this.dataPivotTable[controlName]){
-                                tableControl.setPivotTableConfig(this.dataPivotTable[controlName]);
-                            }
-                            if(this.dataGroupTable && this.dataGroupTable[controlName]){
-                                tableControl.setGroupTableConfig(this.dataGroupTable[controlName]);
-                            }
                             tableControl.renderTable();
                             if(this.viewType !== 'submit'){
                                 tableControl.setData(valueInput);
                             }
                             this.addToListInputInDocument(controlName,tableControl);
-                            tableControl.renderInfoButtonInRow(this.linkControl);
+                            // tableControl.renderInfoButtonInRow(this.linkControl);
                         }
                     }
                 }
@@ -2292,7 +2277,8 @@ export default {
                 if (controlIns.type == "table") {
                     let value = null
                     if(controlIns.tableMode == 'Group'){
-                        value = controlIns.agDataTable.getGroupData();
+                        value = {};
+                        value[controlIns.name] = controlIns.agDataTable.getGroupData();
                     }
                     else{
                         value = this.getDataTableInput(controlIns);

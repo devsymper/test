@@ -909,7 +909,6 @@ export default {
 			this.$emit('cell-context-menu', params)
 		},
 		cellMouseDown(params){
-			debugger
 			this.$emit('after-cell-mouse-down', params)
 		},
 		cellMouseOver(params){

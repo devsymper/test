@@ -91,14 +91,14 @@ export const getAllPropFromData = (fields, viewType, allDataDetail)=>{
                 let childId = listField[childFieldId]['properties'].id
                 let childPrepareData = listField[childFieldId].dataPrepareSubmit;
                 for(let childProp in childProperties){
-                    let valueChildControl = listField[childFieldId]['properties'][childProp]
+                    let valueChildProp = listField[childFieldId]['properties'][childProp]
                     if (childType == 'checkbox') {
-                        childProperties[childProp].value = (valueChildControl == 0 || valueChildControl == '0' || valueChildControl == '') ? false : true
+                        childProperties[childProp].value = valueChildProp;
                     } else {
-                        if (childType == "number" && childProp == 'defaultValue' && valueChildControl == "") {
-                            valueChildControl = 0;
+                        if (childType == "number" && childProp == 'defaultValue' && valueChildProp == "") {
+                            valueChildProp = 0;
                         }
-                        childProperties[childProp].value = valueChildControl;
+                        childProperties[childProp].value = valueChildProp;
                     }
                 }
 
