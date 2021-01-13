@@ -28,7 +28,7 @@
 					<v-icon small class="mr-1">
 						mdi-history
 					</v-icon>
-					Lịch sử
+					{{$t('myItem.sidebar.history')}}
 				</v-btn>
 				<span class="mdi mdi-close" @click="hide"></span>
 			</div>
@@ -78,6 +78,12 @@
 											{{$t('document.detail.sidebar.body.general.has')}} 
 											{{countCommentNotResolve}} 
 											{{$t('document.detail.sidebar.body.general.commentNotResolve')}}
+										</td>
+									</tr>
+									<tr>
+										<td>{{$t('document.detail.sidebar.body.general.listWorks')}}</td>
+										<td class="pl-2" style="text-decoration: underline;cursor:pointer;color:#F1853B;" @click="showListWork(originData)">
+											{{$t('document.detail.sidebar.body.general.clickToViewListWork')}}
 										</td>
 									</tr>
 								</table>
@@ -270,7 +276,7 @@
 						<v-icon small class="mr-1">
 							mdi-history
 						</v-icon>
-						Lịch sử
+						{{$t('myItem.sidebar.history')}}
 					</v-btn>	
 					<v-icon @click="showHistoryTask = false"> mdi-close</v-icon>
 				</div>
@@ -746,6 +752,11 @@ export default {
 		},
 		showComment(){
 			this.$refs.commentTaskView.show();
+		},
+		showListWork(originData){
+			this.$goToPage( "/myItem/work/"+originData.processInstanceId,
+				" Chi tiết " + (originData.name ? originData.name : "")
+			);
 		},
 		handleAction(actionName, role, idx){
             this.statusChange=true;

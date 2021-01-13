@@ -791,15 +791,10 @@ export default {
             // }
         },
         handleTaskSubmited() {
-            this.sideBySideMode = false;
-            this.getData();
+			this.sideBySideMode = false;
+            this.getData({});
         },
         handleChangeFilterValue(data) {
-            // for (let key in data) {
-            //     this.$set(this.myOwnFilter, key, data[key]);
-            // }
-            // this.getData();
-
             this.searchKey = data.nameLike;
             if(this.debounceGetData){
                 clearTimeout(this.debounceGetData);
@@ -816,7 +811,6 @@ export default {
 		reselectObject(){
 			setTimeout(self=>{
 				self.selectObject(this.currentTask.obj , this.currentTask.idx, this.currentTask.idex)
-				debugger
 			},2000,this)
 		},
         async selectObject(obj, idx, idex) {

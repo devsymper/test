@@ -189,7 +189,7 @@ export default {
                     }
                 })
                 .catch(err => {
-                    self.$snotifyError("", "Can not count board!", err);
+                    this.$snotifyError("", "Can not count board!", err);
                 });
             }
         },

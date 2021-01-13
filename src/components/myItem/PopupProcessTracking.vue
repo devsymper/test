@@ -17,6 +17,7 @@
 							<trackingProcessInstance
 								class="popup-model-diagram"
 								v-if="workInfo.id"
+								@node-clicked="handlerNodeCLicked"
 								:instanceId="workInfo.id"
 								@dataInstanceRuntime="dataInstanceRuntime"
 								>
@@ -37,17 +38,24 @@
 					v-if="taskInfo.action.parameter.processInstanceId"
 					:instanceId="taskInfo.action.parameter.processInstanceId"
 					:elementId="taskInfo.action.parameter.activityId"
+					@node-clicked="handlerNodeCLicked"
 					:definitionName="definitionName"
 					>
 				</trackingProcessInstance>
 			</div>
 		</div>
+		<TrackingProcessDefinition 
+			:processDefinitionId="processDefinitionId"
+			:showDialog="showDialog"
+			@cancel="showDialog = false"
+		/>
 	</div>
     
 </template>
 
 <script>
 import trackingProcessInstance from "@/views/process/TrackingProcessInstance.vue";
+import TrackingProcessDefinition from "@/views/process/TrackingProcessDefinition.vue";
 import bpmneApi from "@/api/BPMNEngine";
 import timeLineAuditTrail from "@/components/common/TimelineTreeview/index.vue";
 import detailItemAuditTrail from "./DetailItemAuditTrail.vue";
@@ -57,7 +65,8 @@ export default {
     components:{
 		trackingProcessInstance,
 		timeLineAuditTrail,
-		detailItemAuditTrail
+		detailItemAuditTrail,
+		TrackingProcessDefinition
 	},
 	watch:{
 		"stask.statusPopupTracking":function (newVl) {
@@ -72,6 +81,7 @@ export default {
 		return {
 			listInstanceRuntime:{},
 			itemAuditTrail:{},
+			processDefinitionId: "",
 			icon:{
 				processName:"mdi-progress-check	",
 				startEvent:"mdi-play-outline",
@@ -82,6 +92,7 @@ export default {
 				endEvent:"mdi-record",
 				httpServiceTask:"mdi-email-send-outline"
 			},
+			showDialog: false,
 			filterVariables:{
 				names:"",
 				page:1,
@@ -108,6 +119,12 @@ export default {
 		}
     },
     methods:{
+		handlerNodeCLicked(a){
+			if(a.$type == 'bpmn:CallActivity'){
+				this.processDefinitionId  = a.calledElement
+				this.showDialog = true
+			}
+		},
 		async dataInstanceRuntime(data,isCheck=false){
 			let arrIndexRemove=[];
 			for(let index in data){
@@ -255,7 +272,8 @@ export default {
 		height: 100%;
 		background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
 	}
-	.popup-model-diagram >>> .djs-hit  {
+
+	.popup-model-diagram >>> .djs-hit-stroke {
 		pointer-events: none;
 	}
 </style>>
