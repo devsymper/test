@@ -1,5 +1,11 @@
 export default [
     {
+        path: '/dashboards',
+        name: "listDashboards",
+        component: () =>
+            import ('../../views/dashboard/Index.vue'),
+    },
+    {
         path: '/dashboard/:id/view',
         name: "viewDashboard",
         component: () =>

@@ -160,7 +160,11 @@
             "list_workflow": "Danh sách quy trình",
             "list_work": "Danh sách công việc",
             "syqlFunction": "SYQL Function",
-            "environment": "Quản lí môi trường"
+			"environment": "Quản lí môi trường",
+			"listDashboards":"Danh sách báo cáo",
+			"listDataflows":"Danh sách dataflow",
+			"listRelations":"Danh sách relation",
+			"listDatasets":"Danh sách dataset"
         },
         "system": "Vai trò người dùng",
         "copy": "Sao chép"
