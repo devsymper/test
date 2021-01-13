@@ -1158,7 +1158,6 @@ export default {
                 this.$delete(this.tableFilter.allColumn, colName);
                 icon.removeClass("applied-filter");
 			}
-			debugger
 			this.$store.commit('app/setFilteredColumns', this.filteredColumns)
 		},
 		confirmDeleteItems(){
