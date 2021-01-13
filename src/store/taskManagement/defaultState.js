@@ -34,11 +34,11 @@ const defaultState = {
     listColumnInBoard:{}, // có dạng {key : []} , key là boardId
     listStatusInColumnBoard:{}, // có dạng {key : []} , key là boardId,
     listIssueTypeInProjects:{}, // có dạng {key : []} , key là boardId,
-    listSprintInBoard:{}, // có dạng {key : []} , key là boardId,
     listIssueInSprintProject:{}, // có dạng {key : []} , key là projectId,
     listDocumentConfigFieldIssue:[],
     allWorkflow:[],
-    userOperations:{}
+    userOperations:{},
+    dataSprintAfterMapIssue:{},// có dạng {key : []} , key là boardId,
 };
 
 export default defaultState;

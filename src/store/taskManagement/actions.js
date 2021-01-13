@@ -15,7 +15,7 @@ const getLogProjectAccess = async(context,userId) => {
                     },
                     {
                         "term": {
-                            "userId.keyword": userId
+                            "logUser": userId
                         }
                     }
                 ]  
@@ -102,7 +102,7 @@ const getLogIssueRecentAccess = async(context,userId) => {
                     },
                     {
                         "term": {
-                            "userAccess": userId
+                            "logUser": userId
                         }
                     }
                 ]  

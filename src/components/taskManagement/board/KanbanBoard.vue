@@ -185,8 +185,21 @@ export default {
         allIssueTypeInProject(){
             return this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId];
         },
+        dataSprintAfterMapIssue(){
+            return this.$store.state.taskManagement.dataSprintAfterMapIssue[this.currentBoard.id];
+        }
     },
-    
+    watch:{
+        dataSprintAfterMapIssue:{
+            deep:true,
+            immediate:true,
+            handler(val){
+                if (val) {
+                    this.getListTasks(true);
+                }
+            }
+        }
+    },
     mounted(){
         this.settingBoardMenuitems = [
                 { 
@@ -394,8 +407,10 @@ export default {
         /**
          * Hàm lấy danh sách task hiên thị lên kanban board
          */
-        getListTasks(){
-            this.isGetListTask = true;
+        getListTasks(isCheck = false){
+            if (!isCheck) {
+                this.isGetListTask = true;
+            }
             let data = {};
             data.listColumn = this.listColumn;
             data.listStatusColumn = this.listStatusColumn;
@@ -512,13 +527,19 @@ export default {
         },
         getDataForBoard(board=null){
             let self = this;
+            
             if (board) {
                 this.currentBoard = board;
             }else{
-                let allBoard = this.listBoard;
-                if (allBoard.length>0) {
-                    this.currentBoard = allBoard[0];  
+                if (Object.keys(this.$store.state.taskManagement.currentBoard).length > 0) {
+                    this.currentBoard = this.$store.state.taskManagement.currentBoard;
+                }else{
+                    let allBoard = this.listBoard;
+                    if (allBoard.length>0) {
+                        this.currentBoard = allBoard[0];  
+                    }
                 }
+             
             }
             let idBoard = this.currentBoard.id;
             self.$store.commit("taskManagement/setCurrentBoard",this.currentBoard);
@@ -529,7 +550,7 @@ export default {
             }
         },
         getListSprintInBoardScrum(){
-            if (!this.$store.state.taskManagement.listSprintInBoard[this.currentBoard.id] || this.$store.state.taskManagement.listSprintInBoard[this.currentBoard.id].length == 0) {
+            if (!this.$store.state.taskManagement.dataSprintAfterMapIssue[this.currentBoard.id] || this.$store.state.taskManagement.dataSprintAfterMapIssue[this.currentBoard.id].length == 0) {
                 this.kanbanWorker.postMessage({
                     action:'getListSprintInBoard',
                     data:this.currentBoard.id
@@ -539,7 +560,7 @@ export default {
             }
         },
         getSprintRunning(){
-            let listSprint = this.$store.state.taskManagement.listSprintInBoard[this.currentBoard.id];
+            let listSprint = this.$store.state.taskManagement.dataSprintAfterMapIssue[this.currentBoard.id];
             let sprintStart = listSprint.find(ele => ele.status == "running");
             if (sprintStart) {
                 this.sprintStart = sprintStart;
@@ -725,7 +746,7 @@ export default {
                 case 'getListSprintInBoard':
                     if (data.dataAfter) {
                         let res = data.dataAfter;
-                        self.$store.commit("taskManagement/setListSprintInBoard", res);
+                        self.$store.commit("taskManagement/setListDataSprintAfterAfterMapIssue", res);
                         self.getSprintRunning();
                     }
                     break;

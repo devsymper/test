@@ -8,11 +8,11 @@
                 multiple
                 style="overflow: hidden;"
             >
-                <v-expansion-panel class="sym-expand-panel" v-for="obj in data" :key="obj.id">
+                <v-expansion-panel class="sym-expand-panel" v-for="obj in dataSprintAfterMapIssue" :key="obj.id">
                     <v-expansion-panel-header class="v-expand-header px-4 py-0">
                         <div class="font-weight-medium">
                             {{obj.name}} 
-                            <span class="grey--text fs-11">
+                            <span v-if="obj.tasks" class="grey--text fs-11">
                                 {{'('+obj.tasks.length+' issues)'}}
                             </span> 
                             <div class="text-ellipsis grey--text fs-11 pt-1">
@@ -134,6 +134,9 @@ export default {
             let projectId = this.$route.params.id;
             return this.$store.state.taskManagement.listIssueTypeInProjects[projectId];
         },
+        dataSprintAfterMapIssue(){
+            return this.$store.state.taskManagement.dataSprintAfterMapIssue[this.currentBoard.id];
+        }
     },
     data(){
         let self = this;
@@ -217,7 +220,7 @@ export default {
     },
     methods:{
         isSprintStart(){
-            let allSprint = this.data;
+            let allSprint = this.dataSprintAfterMapIssue;
             let item = allSprint.find(ele => ele.status == "running");
             if (item) {
                 return true;
@@ -261,22 +264,15 @@ export default {
             this.$refs.modalAddOrDetailSprint.show();
         },
         addSprintSuccess(sprint){
+            sprint.tasks = [];
             this.$store.commit("taskManagement/addSprintToListInStore",sprint);
         },
         startSprintSuccess(){
-            let sprint = this.data.find(ele => ele.id == this.infoSprint.id);
-            if (sprint) {
-                sprint.status = 'running';
-                sprint.name = this.infoSprint.name;
-                sprint.description = this.infoSprint.description;
-                sprint.startTime = this.infoSprint.startTime;
-                sprint.endTime = this.infoSprint.endTime;
-                this.infoSprint['boardId'] = sprint.boardId; 
-            }
+            this.infoSprint['boardId'] = this.currentBoard.id; 
             this.$store.commit("taskManagement/updateSprintToListInStore",this.infoSprint);
         },
         getListSprintInBoard(){
-            if (!this.$store.state.taskManagement.listSprintInBoard[this.currentBoard.id] || this.$store.state.taskManagement.listSprintInBoard[this.currentBoard.id].length == 0) {
+            if (!this.$store.state.taskManagement.dataSprintAfterMapIssue[this.currentBoard.id] || this.$store.state.taskManagement.dataSprintAfterMapIssue[this.currentBoard.id].length == 0) {
                 this.kanbanWorker.postMessage({
                     action:'getListSprintInBoard',
                     data:this.currentBoard.id
@@ -304,7 +300,7 @@ export default {
         groupIssueInSprint(){
             let projectId = this.$route.params.id;
             let data = {};
-            data.listSprintInBoard = this.$store.state.taskManagement.listSprintInBoard[this.currentBoard.id];
+            data.listSprintInBoard = this.$store.state.taskManagement.dataSprintAfterMapIssue[this.currentBoard.id];
             data.listAllIssueInSprint = this.$store.state.taskManagement.listIssueInSprintProject[projectId];
             data.allPriority = this.$store.state.taskManagement.allPriority;
             data.listIssueType = this.$store.state.taskManagement.listIssueTypeInProjects[projectId];
@@ -332,13 +328,7 @@ export default {
                 case 'getListSprintInBoard':
                     if (data.dataAfter) {
                         let res = data.dataAfter;
-                        self.$store.commit("taskManagement/setListSprintInBoard", res);
-                        self.getIssueInSprint();
-                    }
-                    break;
-                case 'getIssueVersion':
-                    if (data.dataAfter) {
-                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/setListDataSprintAfterAfterMapIssue", res);
                         self.getIssueInSprint();
                     }
                     break;
@@ -355,7 +345,10 @@ export default {
                     
                 case 'groupIssueInSprint':
                     let res = data.dataAfter;
-                    self.data = res;
+                    let dataSetStore2 = {};
+                    dataSetStore2.key = self.currentBoard.id;
+                    dataSetStore2.data = res;
+                    self.$store.commit("taskManagement/setListDataSprintAfterAfterMapIssue",dataSetStore2);
                     break;
                 case 'handleChangeIssueInSprint':
                     console.log("update task success");

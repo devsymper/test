@@ -414,6 +414,8 @@ export default {
                         self.$emit("start-sprint-success");
                     }else{
                         self.$snotifySuccess("Update sprint success!");
+                        self.$emit("update-sprint-success");
+
                     }
                     self.isShow=false;
                     self.isLoadingAdd=false;

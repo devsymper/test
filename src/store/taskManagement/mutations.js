@@ -65,8 +65,9 @@ const setListColumnInBoard = (state, data) => {
     Vue.set(state.listColumnInBoard, data.key , data.data);
 }
 
-const setListSprintInBoard = (state, data) => {
-    Vue.set(state.listSprintInBoard, data.key , data.data);
+
+const setListDataSprintAfterAfterMapIssue = (state, data) => {
+    Vue.set(state.dataSprintAfterMapIssue, data.key , data.data);
 }
 const setListIssueInSprintProject = (state, data) => {
     Vue.set(state.listIssueInSprintProject, data.key , data.data);
@@ -134,17 +135,17 @@ const addPriorityToStore = (state, item) => {
 
 const addSprintToListInStore = (state, item) => {
     let boardId = item.boardId;
-    let currentListSprintInBoard = state.listSprintInBoard;
+    let currentListSprintInBoard = state.dataSprintAfterMapIssue;
     if (!currentListSprintInBoard[boardId]) {
         currentListSprintInBoard[boardId] = [];
     }
     currentListSprintInBoard[boardId].push(item); // đẩy vào vị trí cuối
-    Vue.set(state, 'listSprintInBoard', currentListSprintInBoard);
+    Vue.set(state, 'dataSprintAfterMapIssue', currentListSprintInBoard);
 }
 
 const updateSprintToListInStore = (state, item) => {
     let boardId = item.boardId;
-    let currentListSprintInBoard = state.listSprintInBoard;
+    let currentListSprintInBoard = state.dataSprintAfterMapIssue;
     if (!currentListSprintInBoard[boardId]) {
         currentListSprintInBoard[boardId].push(item);
     }else{
@@ -159,7 +160,7 @@ const updateSprintToListInStore = (state, item) => {
             currentListSprintInBoard[boardId][index].endTime= item.endTime;
         }
     }
-    Vue.set(state, 'listSprintInBoard', currentListSprintInBoard);
+    Vue.set(state, 'dataSprintAfterMapIssue', currentListSprintInBoard);
 }
 const updateStatusFavoriteProject = (state, id) => {
     let currentListProject = state.allProject;
@@ -333,9 +334,9 @@ export {
     setCurrentBoard,
     setListRoleUserInProject,
     setListOperatorInProject,
-    setListSprintInBoard,
     addSprintToListInStore,
     setListIssueInSprintProject,
     updateSprintToListInStore,
+    setListDataSprintAfterAfterMapIssue,
 
 };
