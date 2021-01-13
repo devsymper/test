@@ -46,9 +46,9 @@ export default {
 .header-ag-grid{
 	position: relative;
 }
-/* .icon-filter-ag-grid{
-	position: absolute;
-	top: 5px;
-	right: 6px;
-} */
+.customHeaderLabel{
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
 </style>
