@@ -185,6 +185,7 @@ export default {
             wrapFormCss:{},
             defaultData:{},
             dataPivotTable:{},
+            dataGroupTable:{},
         };
     },
     beforeMount() {
@@ -203,7 +204,6 @@ export default {
                             "document/addControl", { id: controlId, props: listControlToStore[controlId], instance: thisCpn.keyInstance }
                         );
 					}
-					debugger
                     thisCpn.processHtml(thisCpn.contentDocument);
                     thisCpn.controlRelationWorker.terminate();
                     break;
@@ -338,6 +338,7 @@ export default {
                 let docDetailRes = await documentApi.detailDocument(documentId,dataPost);
                 if (docDetailRes.status == 200) {
                     this.dataPivotTable = docDetailRes.data.pivotConfig;
+                    this.dataGroupTable = docDetailRes.data.groupConfig;
                     let content = docDetailRes.data.document.content;
                     if(!isPrint){
                         $('.content-print-document').addClass('d-none');
@@ -524,16 +525,6 @@ export default {
                                 id,
                                 thisCpn.keyInstance
                             );
-                            if(this.dataPivotTable && this.dataPivotTable[controlName]){
-                                tableControl.tableMode = 'pivot';
-                                tableControl.pivotTable = new PivotTable(
-                                    tableControl,
-                                    controlName,
-                                    id,
-                                    this.dataPivotTable[controlName],
-                                    this.keyInstance
-                                );
-                            }
                             tableControl.tablePrint = new TablePrint(
                                 tableControl,
                                 controlName,
@@ -564,6 +555,12 @@ export default {
                             tableControl.controlInTable = controlInTable;
                             tableControl.mapControlToIndex = mapControlToIndex;
                             this.addToListInputInDocument(controlName,tableControl)
+                            if(this.dataPivotTable && this.dataPivotTable[controlName]){
+                                tableControl.setPivotTableConfig(this.dataPivotTable[controlName]);
+                            }
+                            if(this.dataGroupTable && this.dataGroupTable[controlName]){
+                                tableControl.setGroupTableConfig(this.dataGroupTable[controlName]);
+                            }
                             tableControl.renderTable();
                             tableControl.setData(valueInput);
                             tableControl.renderInfoButtonInRow(this.listLinkControl);
@@ -572,7 +569,6 @@ export default {
                     }
                 }
 			}
-			debugger
             this.$refs.preLoaderView.hide();
             this.$emit("after-loaded-component-detail",this.formSize);
             $('.wrap-content-detail').removeAttr('style');

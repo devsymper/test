@@ -62,6 +62,12 @@ export default class GroupTable {
             }
             colDefs.push(col);
         }
+        let colObjectId = {
+            headerName:'child_object_id',
+            field: 'child_object_id',
+            hide:true
+        };
+        colDefs.push(colObjectId);
         return colDefs;
     }
     /**
@@ -85,7 +91,16 @@ export default class GroupTable {
                 };
                 this.columnDefs.push(colBinding);
             }
+        }       
+    }
+    getHashRow(row){
+        let columnDataNotChange = [];
+        for(let column in row){
+            if(this.cols[0].name != column && this.values[0].name != column && column != 'childObjectId'){
+                columnDataNotChange.push(row[column]);
+            }
         }
+        return columnDataNotChange.join('__');
     }
     
     /**
@@ -93,17 +108,24 @@ export default class GroupTable {
      * @param {*} data 
      */
     convertDataToGroup(data){
+        let mapRowWithData = [];
         let controlValue = this.values[0].name;
         if(this.cols.length > 0){
             let newData = [];
             for (let index = 0; index < data.length; index++) {
                 let newRow = data[index];
-                for (let i = 0; i < this.allColumnAppend.length; i++) {
-                    let column = this.allColumnAppend[i];
-                    newRow[column] = (column == newRow[this.cols[0]['name']]) ? newRow[controlValue] : "";
+                let rowKey = this.getHashRow(newRow);
+                if(!mapRowWithData.includes(rowKey)){
+                    mapRowWithData.push(rowKey);
+                    for (let i = 0; i < this.allColumnAppend.length; i++) {
+                        let column = this.allColumnAppend[i];
+                        newRow[column] = (column == newRow[this.cols[0]['name']]) ? newRow[controlValue] : "";
+                    }
+                    newData.push(newRow);
                 }
-                newData.push(newRow);
-                
+                else{
+                    newData[mapRowWithData.indexOf(rowKey)][newRow[this.cols[0]['name']]] = newRow[controlValue]
+                }
             }
             return newData;
         }
@@ -114,15 +136,9 @@ export default class GroupTable {
      * Hàm xử lí data cho bảng
      * @param {} vl 
      */
-    setData(vl) {
-        let data = [
-            {"tb_th":"ten hang 1","tb_mh":"AAA","tb_dvt":"cai","vai_tro":"Hàng Hóa","gia_tri":"1"},
-            {"tb_th":" ten hang 2","tb_mh":"AAA","tb_dvt":"tan","vai_tro":"Hàng Hóa","gia_tri":"2"},
-            {"tb_th":" ten hang 3","tb_mh":"AAA","tb_dvt":"lượng","vai_tro":"Hàng Hóa","gia_tri":"3"}
-        ];
+    setData(data) {
         this.appendTableColumns(data);
         this.gridOptions.api.setColumnDefs(this.columnDefs);
-        // this.gridOptions.api.setRowData(vl);
         data = this.convertDataToGroup(data);
         this.gridOptions.api.setRowData(data);
         let viewType = sDocument.state.viewType[this.instance];
@@ -165,7 +181,19 @@ export default class GroupTable {
                 }
             }
         );
-        return rowData;
+        let dataForSubmit = {};
+        if(rowData.length > 0){
+            for (let index = 0; index < rowData.length; index++) {
+                let row = rowData[index];
+                for (let control in row){
+                    if(!dataForSubmit[control]){
+                        dataForSubmit[control] = []
+                    }
+                    dataForSubmit[control].push(row[control]);
+                }
+            }
+        }
+        return dataForSubmit;
     }
     /**
      * Hoangnd:
