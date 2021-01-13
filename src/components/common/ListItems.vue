@@ -337,7 +337,7 @@ import TableFilter from '@/components/common/customTable/TableFilter'
 import PerfectScrollbar from "perfect-scrollbar";
 import ListItemsWorker from 'worker-loader!@/worker/common/listItems/ListItems.Worker.js';
 import { actionHelper } from "@/action/actionHelper";
-import CheckBoxRenderer from "@/components/common/agDataTable/CheckBoxRenderer"
+import CheckBoxRendererListItems from "@/components/common/agDataTable/CheckBoxRendererListItems"
 
 let CustomHeaderVue = Vue.extend(CustomHeader);
 
@@ -596,6 +596,7 @@ export default {
 				self.allRowChecked.splice(self.allRowChecked.indexOf(data.data), 1)
 			}
 			self.$emit('after-selected-row',self.allRowChecked)
+			// self.$emit('row-selected',self.allRowChecked)
         })
 		this.listItemsWorker = new ListItemsWorker()
         this.listItemsWorker.addEventListener("message", function (event) {
@@ -839,7 +840,7 @@ export default {
 		VNavigationDrawer,
 		VDialog,
 		TableFilter,
-		CheckBoxRenderer
+		CheckBoxRendererListItems
 
 	},
 	mounted(){
@@ -870,7 +871,7 @@ export default {
 		}
 		this.frameworkComponents = {
 			agColumnHeader: CustomHeaderVue,
-			CheckBoxRenderer: CheckBoxRenderer
+			CheckBoxRendererListitems: CheckBoxRendererListItems
 		};
 		this.overlayLoadingTemplate =
 		  '<span class="ag-overlay-loading-center">Đang tải dữ liệu vui lòng chờ </span>';
@@ -930,7 +931,7 @@ export default {
 					headerName: 'Chọn', 
 					field: 'checkbox', 
 					editable:true,
-					cellRendererFramework : 'CheckBoxRenderer',
+					cellRendererFramework : 'CheckBoxRendererListItems',
 					width: 50
 				}	
 			)
