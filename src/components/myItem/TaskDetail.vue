@@ -24,14 +24,15 @@
                 <span>{{taskBreadcrumb}}</span>
             </v-tooltip>
             <div id="action-task" class="text-right pt-1 pb-1 pr-0 float-right ">
-				<!-- <v-btn  
-						text small
+				<v-btn  
+						small
 						disabled
-						class="mr-16"
+						class="mr-1"
+						color="success"
 						v-if="showSubmitSuccessBtn"
 					>
-						<v-icon small color="success">mdi-information-outline</v-icon> Submit
-				</v-btn> -->
+						<v-icon small color="success" class="mr-1">mdi-check-outline</v-icon> Submited
+				</v-btn>
                 <span v-if="!originData.endTime && !hideActionTask " class="mr-10">
                             
                     <span v-if="originData.assigneeInfo && checkRole(originData.assigneeInfo.id) == true" class="mr-16">
@@ -164,6 +165,7 @@
 			:showDialog="modelDialog.completeShowDialog"
 			@cancel="modelDialog.completeShowDialog = false"
 			:taskId="originData.id"
+			:varsForBackend="varsForBackend"
 			:taskInfo="taskInfo"
 			@success="refreshMyItem('complete')"
 		/> 
@@ -287,6 +289,7 @@ export default {
             immediate:true,
             handler(valueAfter){
 				this.isShowSidebar = false
+				this.varsForBackend = {}
 				this.checkActionOfUser(valueAfter)
 				if(this.checkShowEditRecord()){
 					this.rightAction = 120
@@ -330,6 +333,7 @@ export default {
     data: function() {
         return {
 			showSubmitSuccessBtn:false,
+			varsForBackend:{},
 			modelDialog:{
 				unClaimShowDialog: false,
 				claimShowDialog: false,
@@ -818,22 +822,23 @@ export default {
         async handleTaskSubmited(data){
 			this.$refs.snackbar.clickShowSnackbar()
 			this.showSubmitSuccessBtn = true
-            // if(this.isInitInstance){
-            //     if (this.reload) {
-            //         this.$emit('task-submited', data);            
-            //     }
-            // }else{
+			let obj = {
+				text:"Submit",
+				value:"submit",
+				color:"blue"
+			}
+			this.taskActionBtns.splice(this.taskActionBtns.indexOf(obj), 1)
 			let elId = this.taskInfo.action.parameter.activityId;
 			let docId = data.document_id;
 			if(!docId){
 				docId = this.taskInfo.action.parameter.documentId;
 			}
-			let varsForBackend = await getVarsFromSubmitedDoc(data, elId, docId);
-			let taskData = { 
-				"outcome": 'submit',
-				"variables": varsForBackend.vars,
-			}
-			let res =  await this.submitTask(taskData);
+			this.varsForBackend = await getVarsFromSubmitedDoc(data, elId, docId);
+			// let taskData = { 
+			// 	"outcome": 'submit',
+			// 	"variables": varsForBackend.vars,
+			// }
+			// let res =  await this.submitTask(taskData);
 			this.reloadDetailTask();
 			if (this.reload) {
 				this.$emit('task-submited', res);

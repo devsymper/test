@@ -9,7 +9,7 @@
 					small
 					:disabled="listActions.length == 0"
 				>
-					Action 
+					{{ $t('tasks.action')}} 
 					<v-icon small right dark style="border-left:2px solid lightgrey;padding-left:8px">mdi-plus</v-icon>
 
 				</v-btn>
@@ -66,15 +66,21 @@ export default {
 			
 			let lists = []
 			if(this.userType == 'assignee' && this.taskType == 'assign'){
-				if(this.taskInfo.action.action == "approval"){
+				let flag = true
+				if(this.taskInfo.action){
+					if(this.taskInfo.action.action == "approval"){
+						flag = false
+					}
+				}
+				if(flag){
 					this.items.forEach(function(e){
-						if(e.value == 'reAssign'){
+						if(e.value == 'reAssign' || e.value == 'delegate' || e.value == 'complete'){
 							lists.push(e)
 						}
 					})
 				}else{
 					this.items.forEach(function(e){
-						if(e.value == 'reAssign' || e.value == 'delegate' || e.value == 'complete'){
+						if(e.value == 'reAssign'){
 							lists.push(e)
 						}
 					})
