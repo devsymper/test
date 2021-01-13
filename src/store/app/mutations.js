@@ -42,7 +42,8 @@ const removeTab = (state, url) => {
     Vue.delete(state.urlToTabTitleMap, url);
 }
 const setFilteredColumns = (state, data) => {
-    Vue.set(state,'filteredColumns', data);
+	Vue.set(state,'filteredColumns', data);
+	debugger
 }
 
 /**
