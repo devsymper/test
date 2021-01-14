@@ -104,6 +104,11 @@ export default {
                 this.$refs.SelectBoard.hide()
             }
         });
+
+        this.$evtBus.$on('selected-item-board', (board) =>{
+            this.menu.workspace1.items[0].title = board.name;
+            this.menu.workspace1.items[0].subTitle = "";
+        });
         
         
     },
@@ -149,7 +154,7 @@ export default {
         listBoardInProject(vl){
             if(vl.length > 0){
                 this.menu.workspace1.items[0].title = vl[0].name;
-                this.menu.workspace1.items[0].subTitle = vl[0].description;
+                this.menu.workspace1.items[0].subTitle = "";
             }
         }
     },

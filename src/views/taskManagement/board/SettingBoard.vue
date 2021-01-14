@@ -82,7 +82,7 @@ export default {
             }).finally({}).catch({})
         }
         if (!this.$store.state.taskManagement.listStatusInProjects[projectId] || this.$store.state.taskManagement.listStatusInProjects[projectId].length == 0) {
-            this.$store.dispatch("taskManagement/getListStautsInProject", projectId);
+            this.$store.dispatch("taskManagement/getListStatusInProject", projectId);
         }
         if (!this.$store.state.taskManagement.listColumnInBoard[idBoard] || this.$store.state.taskManagement.listColumnInBoard[idBoard].length == 0) {
             this.$store.dispatch("taskManagement/getListColumnInBoard",idBoard);

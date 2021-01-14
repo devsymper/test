@@ -1458,7 +1458,8 @@ export default {
                     controlInstance.removeValidateIcon('Require')
                 }
             }
-            // resetImpactedFieldsList(this.keyInstance);
+            let controlToWorker = {name:controlName,type:controlInstance.type,value:controlInstance.value}
+            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, value:controlInstance.value, keyInstance:this.keyInstance, type:'submit'}})
             if(isRunChange){
                 this.handleControlInputChange(controlInstance);
             }
@@ -2985,7 +2986,8 @@ export default {
                 $('#'+controlInstance.id).attr('data-autocomplete',"");
                 return;
             }
-            
+            let controlToWorker = {name:controlInstance.name,type:controlInstance.type,value:controlInstance.value}
+            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, value:controlInstance.value, keyInstance:this.keyInstance, type:'submit'}})
             resetImpactedFieldsList(this.keyInstance);
             this.handleControlInputChange(controlInstance);
         },
