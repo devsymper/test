@@ -30,7 +30,11 @@ self.onmessage = async function (event) {
         case 'getTableColumns':
 			let getTableColumnsRes = await getTableColumns(data.column , data.forcedReOrder , data.savedOrderCols, data.filteredColumns);
             postMessage({action:'getTableColumns', dataAfter : getTableColumnsRes})
-            break;
+			break;
+		case 'saveFilter':
+			let saveFilterRes = await saveFilter(data);
+			postMessage({action:'saveFilter', dataAfter : saveFilterRes})
+			break;
         default:
             break;
     }
@@ -189,4 +193,8 @@ export const getTableColumns = function(columns, forcedReOrder = false , savedOr
 	} else {
 		return Object.values(colMap);
 	}
+}
+export const saveFilter = async function(data){
+	let res = await uiConfigApi.saveUiConfig(data)
+	return res
 }
