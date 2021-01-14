@@ -1,6 +1,6 @@
 <template>
-    <div class="symper-dashboard-editor">
-        <div class="d-flex">
+    <div class="symper-dashboard-editor h-100">
+        <div class="d-flex h-100">
             <div class="d-flex flex-column">
                 <DashboardToolBar 
                     :style="{
@@ -17,7 +17,12 @@
                     :instanceKey="instanceKey"/>
             </div>
             <DashboardDasetDetail 
+                ref="datasetDetail"
                 :instanceKey="instanceKey"/>
+            <v-btn @click="recheckSelectedColumn">
+                Click
+            </v-btn>
+            <v-btn @click="testClearSelectedItem">Clear</v-btn>
         </div>
     </div>
 </template>
@@ -45,7 +50,68 @@ export default {
     },
     data(){
         return {
-            instanceKey: Date.now() 
+            instanceKey: Date.now(),
+            currentCellConfigs:{
+                "sharedConfigs": {
+                    "type": "pivot",
+                    "yAxisCount": 1,
+                    "cellId": "cell-1609348095437"
+                },
+                "rawConfigs": {
+                    "setting": {
+                    "value": {
+                        "name": "Value",
+                        "slot": "n",
+                        "hasAgg": true,
+                        "selectedColums": [
+                        {
+                            "as": "Số người làm",
+                            "agg": "sum",
+                            "cond": {
+                            "val": "",
+                            "type": "isall"
+                            },
+                            "edit": false,
+                            "name": "sl_ns",
+                            "type": "number",
+                            "dataset": "2833",
+                            "origin_type": "number"
+                        }
+                        ]
+                    },
+                    "rows": {
+                        "name": "Rows",
+                        "slot": "1",
+                        "selectedColums": [
+                        {
+                            "as": "Ca làm",
+                            "agg": "first",
+                            "cond": {
+                            "val": "",
+                            "type": "isall"
+                            },
+                            "edit": false,
+                            "name": "ca_lam",
+                            "type": "text",
+                            "dataset": "2833",
+                            "origin_type": "text"
+                        }  
+                        ]
+                    }
+                    },
+                    "extra": {
+                    }
+                },
+                "viewConfigs": {
+                    "isSelecting": true,
+                    "selectedDataset": {"3665":{"assignee":true,"ngay_end_tt":true,"ngay_end":true}},
+                    "showIcon": false,
+                    "commentCount": 0,
+                    "needSaveExtraOptions": {},
+                    "filter": {},
+                    "loadingData": false
+                }
+            }
         }
     },
     methods: {
@@ -75,6 +141,13 @@ export default {
                     console.error(` action ${action} not found `);
                 }
             });
+        },
+        recheckSelectedColumn(){
+            this.$refs.datasetDetail.clearSelectedItemDisplay();
+            this.$refs.datasetDetail.setSelectedDataset(this.currentCellConfigs.viewConfigs.selectedDataset, true);
+        },
+        testClearSelectedItem(){
+            this.$refs.datasetDetail.clearSelectedItemDisplay();
         }
     },
     props: {
