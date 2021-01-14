@@ -23,11 +23,11 @@
                 </template>
                 <span>{{taskBreadcrumb}}</span>
             </v-tooltip>
-            <div id="action-task" class="text-right pt-1 pb-1 pr-0 float-right ">
+            <div id="action-task" class="text-right pt-1 pb-1 pr-0 float-right">
 				<v-btn  
 						small
 						disabled
-						class="mr-1"
+						class="mr-3"
 						color="success"
 						v-if="showSubmitSuccessBtn"
 					>
@@ -35,7 +35,7 @@
 				</v-btn>
                 <span v-if="!originData.endTime && !hideActionTask " class="mr-10">
                             
-                    <span v-if="originData.assigneeInfo && checkRole(originData.assigneeInfo.id) == true" class="mr-16">
+                    <span v-if="originData.assigneeInfo && checkRole(originData.assigneeInfo.id) == true" style="margin-right: 80px !important">
                         <v-btn 
                             small 
                             depressed  
@@ -43,7 +43,7 @@
                             dark 
                             :key="idx" 
                             :color="action.color" 
-							class="mr-1"
+							class="mr-2"
                             @click="saveTaskOutcome(action.value)" 
                             :loading="loadingAction"
                         >
@@ -839,10 +839,7 @@ export default {
 			// 	"variables": varsForBackend.vars,
 			// }
 			// let res =  await this.submitTask(taskData);
-			this.reloadDetailTask();
-			if (this.reload) {
-				this.$emit('task-submited', res);
-            }
+			// this.reloadDetailTask();
             this.updateProcessInstanceName();
             this.loadingAction=false;
         },
