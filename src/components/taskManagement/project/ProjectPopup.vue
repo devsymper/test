@@ -10,7 +10,7 @@
                     <img class="img" style="object-fit: fill;border-radius:3px" v-else-if="!!item.icon && item.icon.indexOf('mdi-') < 0" :src="item.icon" width="24" height="24">
                     <div class="project-name">
                         <div class="pt-2">{{item.name}}</div>
-                        <div>{{item.description}}</div>
+                        <!-- <div>{{item.description}}</div> -->
                     </div>
                     <v-icon v-if="item.isFavorite==1"  style="font-size:18px;"  color="yellow">mdi-star</v-icon>
                     <v-icon v-else  style="font-size:18px;" >mdi-star-outline</v-icon>
