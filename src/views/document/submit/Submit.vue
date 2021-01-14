@@ -214,7 +214,7 @@ import tinymce from 'tinymce/tinymce';
 import { checkCanBeBind, resetImpactedFieldsList, markBinedField, checkDataInputChange, setDataInputBeforeChange } from './handlerCheckRunFormulas';
 import {checkControlPropertyProp,getControlInstanceFromStore, 
         getControlTitleFromName, getListInputInDocument, 
-        mapTypeToEffectedControl, minimizeDataAfterRunFormula} from './../common/common'
+        mapTypeToEffectedControl, minimizeDataAfterRunFormula,SQLITE_COLUMN_IDENTIFIER} from './../common/common'
 import Formulas from './formulas.js';
 import { startWorkflowBySubmitedDoc } from '../../../components/process/processAction.js';
 
@@ -955,7 +955,7 @@ export default {
                                 let listDataControlRoot = listControlRootInTable[tableName];
                                 let rowData = [];
                                 for(let controlName in listDataControlRoot){
-                                    let cellValue = tableControl.tableInstance.tableInstance.getDataAtRowProp(0,controlName);
+                                    let cellValue = tableControl.tableInstance.getCellData(controlName, 0);
                                     rowData.push([0,controlName,cellValue]);
                                 }
                                 self.$store.commit("document/updateDataToTableControlRoot",
@@ -1053,7 +1053,7 @@ export default {
                 for (let index = 0; index < value.length; index++) {
                     value[index][keyChange] = input.val();
                 }
-                if(value[0].s_table_id_sql_lite){  // edit dòng đã có
+                if(value[0][SQLITE_COLUMN_IDENTIFIER]){  // edit dòng đã có
                     this.updateToTableNomalData(tableName, value, []);
                 }
                 else{   // thêm dòng mới cho table thường
@@ -1063,7 +1063,7 @@ export default {
             }
             else{
                 value[keyChange] = input.val();
-                if(value.s_table_id_sql_lite){  // edit dòng đã có
+                if(value[SQLITE_COLUMN_IDENTIFIER]){  // edit dòng đã có
                     this.updateToTableNomalData(tableName, [value], []);
                 }
                 else{   // thêm dòng mới cho table thường
@@ -1141,11 +1141,11 @@ export default {
                 for (let index = 0; index < allData.length; index++) {
                     for (let i = 0; i < oldData.length; i++) {
                         let rowChange = oldData[i];
-                        if(allData[index].s_table_id_sql_lite == rowChange.s_table_id_sql_lite){
+                        if(allData[index][SQLITE_COLUMN_IDENTIFIER] == rowChange[SQLITE_COLUMN_IDENTIFIER]){
                             allData[index] = rowChange;
                         }
                     }
-                    delete allData[index].s_table_id_sql_lite;
+                    delete allData[index][SQLITE_COLUMN_IDENTIFIER];
                     for(let control in allColumnTable){
                         if(!allData[index][control]){
                             allData[index][control] = null;
@@ -1163,7 +1163,7 @@ export default {
                                     allData[index][control] = null;
                                 }
                             }
-                            delete allData[index].s_table_id_sql_lite;
+                            delete allData[index][SQLITE_COLUMN_IDENTIFIER];
                         }
                         for (let control in allData[0]) {
                             if(!rowData[control]){
@@ -1531,9 +1531,12 @@ export default {
 							if(res.data.document.dataPrepareSubmit != null && res.data.document.dataPrepareSubmit != "")
                             thisCpn.preDataSubmit = JSON.parse(res.data.document.dataPrepareSubmit);
                             if(res.data.document.otherInfo != null && res.data.document.otherInfo != "")
-							thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
+                            thisCpn.otherInfo = JSON.parse(res.data.document.otherInfo);
                             if(res.data.document.formStyle){
                                 let style = JSON.parse(res.data.document.formStyle);
+                                if(!style['globalClass']){
+                                    style['globalClass'] = 'document-form-style-default'
+                                }
                                 this.globalClass[style['globalClass']] = true;
                             }
                             else{
@@ -2541,9 +2544,8 @@ export default {
             if(checkDataInputChange(this.sDocumentSubmit.rootChangeFieldName, this.sDocumentSubmit.dataInputBeforeChange, dataInput)){
                 let control = getControlInstanceFromStore(this.keyInstance,controlName);
                 if(control.inTable != false){
-                    let tableInstance = getControlInstanceFromStore(this.keyInstance,control.inTable);
-                    let dataIn = tableInstance.tableInstance.getDataInputForFormulas(formulaInstance,'all');
-                    tableInstance.tableInstance.handleRunFormulaForControlInTable(control,dataIn,formulaInstance, 'all');
+                    let tableControl = getControlInstanceFromStore(this.keyInstance,control.inTable);
+                    tableControl.tableInstance.handleRunFormulaForControlInTable(control,formulaInstance, 'all');
                 }
                 else{
                     this.formulasWorker.postMessage({action:'runFormula',data:{formulaInstance:formulaInstance, controlName:controlName, from:from, keyInstance:this.keyInstance}})

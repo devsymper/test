@@ -402,7 +402,7 @@ export default {
 					let mapDocControl = this.$store.state.document.submit[this.keyInstance].listInputInDocument;
 					let table = mapDocControl[tbName];
 					let mapControlToIndex = table.mapControlToIndex;
-					let allColumnId = table.tableInstance.tableInstance.getDataAtProp('childObjectId');
+					let allColumnId = table.tableInstance.getColData('childObjectId');
 					
 					for(let rowId in tbChange){
 						let dataChange = tbChange[rowId];

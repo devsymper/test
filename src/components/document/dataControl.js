@@ -5,7 +5,6 @@ import {
     util
 } from "./../../plugins/util.js";
 
-
 /**
  * Hàm xử lí việc bóc tách dữ liệu của các field từ server để đưa vào store
  * dữ liệu là các thuộc tính và các công thức của các control trong doc

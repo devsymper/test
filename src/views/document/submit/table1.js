@@ -6,7 +6,7 @@ import  {ClipboardModule} from '@ag-grid-enterprise/clipboard';
 import 'ag-grid-enterprise';
 import '@ag-grid-community/core/dist/styles/ag-grid.css';
 import '@ag-grid-community/core/dist/styles/ag-theme-alpine.css';
-import {getControlInstanceFromStore, getListInputInDocument, minimizeDataAfterRunFormula} from './../common/common'
+import {getControlInstanceFromStore, getListInputInDocument, minimizeDataAfterRunFormula, SQLITE_COLUMN_IDENTIFIER} from './../common/common'
 import sDocument from '@/store/document'
 import store from './../../../store'
 
@@ -45,6 +45,7 @@ export default class SymperTable {
         this.allColumnAppend = [];
         this.agInstance = null;
         this.tableMode = this.tableControl.tableMode;
+        this.cellRendererValueMap = {}
     }
     init(){
         /**
@@ -119,12 +120,9 @@ export default class SymperTable {
             hide:true
         };
         let colSqlId = {
-            headerName:'s_table_id_sql_lite',
-            field: 's_table_id_sql_lite',
+            headerName:SQLITE_COLUMN_IDENTIFIER,
+            field: SQLITE_COLUMN_IDENTIFIER,
             hide:true,
-            valueGetter: function (params){
-                return Date.now();
-            }
         };
         colDefs.push(colObjectId);
         colDefs.push(colSqlId);
@@ -261,13 +259,15 @@ export default class SymperTable {
      * Hàm tính toán chiều cao cho table
      */
     caculatorHeight(){
-        let dataHeight = this.gridOptions.api.getDisplayedRowCount()*24;
+        let dataHeight = (this.gridOptions.api.getDisplayedRowCount() + 1)*25;
         let headerHeight = 0;
         if(this.cols && this.cols.length > 0){
-            headerHeight += 24;
+            headerHeight += 25;
         }
-        headerHeight += 24*this.rows.length;
-        let tableHeight = dataHeight + headerHeight + 3;
+        if(this.rows && this.rows.length > 0){
+            headerHeight += 25*this.rows.length;
+        }
+        let tableHeight = dataHeight + headerHeight + 20;
         if(tableHeight > 500){
             tableHeight = 500;
         }
@@ -278,10 +278,11 @@ export default class SymperTable {
         this.gridOptions = {
             columnDefs: this.columnDefs,
             animateRows: true,
-            rowHeight:24,
+            rowHeight:25,
+            headerHeight:25,
             rowBuffer: 0,       // số view trong 1 viewport
             groupDefaultExpanded: -1,
-            rowData: [[]],
+            rowData: this.getRowDefaultData(),
             components: {
                 NumberCellRenderer: NumberCellRenderer,
                 FileRenderer: FileRenderer,
@@ -337,13 +338,44 @@ export default class SymperTable {
         }
         this.agInstance = new Grid(this.tableContainer, this.gridOptions, { modules: [ClientSideRowModelModule, RowGroupingModule, ClipboardModule] });
         if(this.tableControl.name == 'tb_demo'){
-            this.demoLargeData()
+            this.demoLargeData();
         }
+        this.caculatorHeight();
         
     }
+    getRowDefaultData(){
+        let rowItem = {};
+        for (let controlName in this.tableControl.controlInTable){
+            let controlInstance = this.tableControl.controlInTable[controlName];
+            let defaultControlValue = controlInstance.getValueProp('defaultValue');
+            if(['number','percent'].includes(controlInstance.type)){
+                rowItem[controlName] = 0;
+            }
+            rowItem[controlName] = (defaultControlValue) ? defaultControlValue : "";
+            if(controlInstance.type == 'date' && controlInstance.formatDate){
+                rowItem[controlName] = SYMPER_APP.$moment(rowItem[controlName]).format(controlInstance.formatDate)
+            }
+        }
+        rowItem[SQLITE_COLUMN_IDENTIFIER] = Date.now();
+        return [rowItem]
+    }
+    /**
+     * Set dữ liệu cho 1 cell theo key (column name)
+     */
+    setDataAtCell(key, value, currentRowIndex){
+        let rowNode = this.getRowNode(currentRowIndex);
+        rowNode.setDataValue(key,value);
+    }
+    /**
+     * Hàm lấy model của 1 row
+     * @param {*} rowIndex 
+     */
     getRowNode(rowIndex){
         return this.gridOptions.api.getRowNode(rowIndex);
     }
+    /**
+     * Hàm trả về dữ liệu của 1 dòng theo index
+     */
     getDataByRowIndex(rowIndexs){
         let rowData = [];
         for (let index = 0; index < rowIndexs.length; index++) {
@@ -352,19 +384,54 @@ export default class SymperTable {
         }
         return rowData;
     }
-    getRowData() {
+    /**
+     * Hàm trả về tất cả dữ liệu của bảng
+     */
+    getAllData() {
         let rowData = [];
-        this.gridOptions.api.forEachNode(node => rowData.push(node.data));
-        console.log(rowData)
+        this.gridOptions.api.forEachNode(node => 
+            rowData.push(Object.assign({},node.data))
+        );
+        return rowData;
     }
+    /**
+     * Hàm trả về dữ liệu của 1 cột
+     * @param {*} colName 
+     */
     getColData(colName){
-        let allData = this.getRowData()
+        let allData = this.getAllData();
         let colData = allData.reduce((arr,obj)=>{
             arr.push(obj[colName]);
             return arr;
         },[])
         return colData
     }
+    /**
+     * Hàm trả về giá trị của 1 cell
+     * @param {*} columnName 
+     * @param {*} rowIndex 
+     */
+    getCellData(columnName, rowIndex){
+        let rowNode = this.gridOptions.api.getRowNode(rowIndex);
+        return rowNode.data[columnName];
+    }
+    updateItems(mapIndexChange, columnChange, isAll = false) {
+        var itemsToUpdate = [];
+        this.gridOptions.api.forEachNode(function (rowNode, index) {
+            if(isAll){
+                var data = rowNode.data;
+                itemsToUpdate.push(data);
+            }
+            else {
+                if(mapIndexChange[index]){
+                    var data = rowNode.data;
+                    data[columnChange] = mapIndexChange[index]
+                    itemsToUpdate.push(data);
+                }
+            }
+        });
+        this.gridOptions.api.applyTransaction({ update: itemsToUpdate });
+      }
     /**
      * Nhận sự kiên khi giá trị của cell thay đổi => chạy công thức cho các control bị ảnh hưởng
      */
@@ -373,7 +440,6 @@ export default class SymperTable {
             let columnChange = event.colDef.field;
             let controlInstance = getControlInstanceFromStore(this.tableInstance.keyInstance, columnChange);
             let colData = this.tableInstance.getColData(columnChange);
-            console.log(colData,'colDatacolData');
             let controlToWorker = {name:columnChange,type:controlInstance.type,value:colData}
             this.tableInstance.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, keyInstance:this.tableInstance.keyInstance, type:'submit'}})
             this.tableInstance.handlerAfterChangeCellByUser(columnChange,event.newValue,event.data, event.rowIndex);
@@ -385,7 +451,7 @@ export default class SymperTable {
                 func:'editRow',
                 columns:columnName, 
                 value:valueChange,
-                condition:'WHERE s_table_id_sql_lite = ' + currentRowData['text_render'],
+                condition:'WHERE '+SQLITE_COLUMN_IDENTIFIER+' = ' + currentRowData['text_render'],
                 keyInstance:this.keyInstance, 
                 tableName: this.tableName
             }
@@ -510,7 +576,7 @@ export default class SymperTable {
             this.handleRunFormulaOnRow(controlInstance, formulaInstance, rowIndex);
         }
         else if(rowIndex == "all"){
-            // this.handleRunFormulaOnColumn(controlInstance, dataInput, formulaInstance)
+            this.handleRunFormulaOnColumn(controlInstance, formulaInstance)
         }
         else{
             // this.handleRunFormulaOnRowChange(controlInstance, dataInput, formulaInstance, rowIndex);
@@ -529,7 +595,7 @@ export default class SymperTable {
         let rowData = this.getDataByRowIndex(rowIndex);
         if(rowData.length > 0){
             rowData = rowData[0];
-            let sqlRowId = rowData.data['s_table_id_sql_lite'];
+            let sqlRowId = rowData.data[SQLITE_COLUMN_IDENTIFIER];
             this.formulasWorker.postMessage({action:'runFormula',data:
                 {
                     formulaInstance:formulaInstance, 
@@ -542,11 +608,8 @@ export default class SymperTable {
             });
         }
     }
-    handleRunFormulaOnColumn( controlInstance, dataInput, formulaInstance){
-        let listIdRow = this.tableInstance.getDataAtCol(this.tableInstance.getDataAtRow(0).length - 1);
-        if (this.tableHasRowSum) {
-            listIdRow.pop();
-        }
+    handleRunFormulaOnColumn( controlInstance, formulaInstance){
+        let listIdRow = this.getColData(SQLITE_COLUMN_IDENTIFIER);
         this.formulasWorker.postMessage({action:'runFormula',data:
             {
                 formulaInstance:formulaInstance, 
@@ -555,7 +618,6 @@ export default class SymperTable {
                 keyInstance:this.keyInstance,
                 listIdRow:listIdRow, 
                 controlType:controlInstance.type,
-                dataInput:dataInput
             }
         });
         
@@ -754,6 +816,25 @@ export default class SymperTable {
             }
         }
         return dataInput;
+    }
+     /**
+     * Hàm set các cell được validate
+     * @param {*} key 
+     * @param {*} value 
+     */
+    addToValueMap(key, value) {
+        if (!this.cellRendererValueMap[key]) {
+            this.cellRendererValueMap[key] = [];
+        }
+        for (let index = 0; index < this.cellRendererValueMap[key].length; index++) {
+            const cellVld = this.cellRendererValueMap[key][index];
+            if (cellVld.type == value.type) {
+                this.cellRendererValueMap[key][index] = value;
+                return;
+            }
+
+        }
+        this.cellRendererValueMap[key].push(value);
     }
     show() {
         this.tableContainer.style.maxHeight = 'unset';

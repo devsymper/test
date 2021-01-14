@@ -85,6 +85,19 @@ export default class Control {
 
 
     }
+    /**
+     * Hàm trả về giá trị của 1 prop
+     * @param {*} prop 
+     */
+    getValueProp(prop){
+        if (this.controlProperties[prop] != undefined) {
+            if (typeof this.controlProperties[prop].value == 'object') {
+                return "";
+            }
+            return this.controlProperties[prop].value;
+        }
+        return false
+    }
     getDataStoreSubmit() {
         return sDocument.state.submit[this.curParentInstance];
     }
@@ -279,12 +292,11 @@ export default class Control {
     handlerDataAfterRunFormulasValidate(values, listIdRow = false, sqlRowId = null) {
         if (this.inTable != false) {
             let tableIns = getControlInstanceFromStore(this.curParentInstance, this.inTable);
-            let colIndex = tableIns.tableInstance.getColumnIndexFromControlName(this.name);
             if(sqlRowId != null){
                 let msg = values;
-                let newListSqlRowId = tableIns.tableInstance.tableInstance.getDataAtProp('s_table_id_sql_lite');
+                let newListSqlRowId = tableIns.tableInstance.getColData('s_table_id_sql_lite');
                 let currentRowIndex = newListSqlRowId.indexOf(sqlRowId);
-                let cellPos = currentRowIndex + "_" + colIndex;
+                let cellPos = currentRowIndex + "____" + this.name;
                 tableIns.tableInstance.addToValueMap(cellPos, {
                     msg: 'Validate: ' + msg,
                     type: "validate",
@@ -295,7 +307,7 @@ export default class Control {
                 for (let index = 0; index < listIdRow.length; index++) {
                     const element = listIdRow[index];
                     let msg = values[element];
-                    let cellPos = index + "_" + colIndex;
+                    let cellPos = index + "____" + this.name;
                     tableIns.tableInstance.addToValueMap(cellPos, {
                         msg: 'Validate: ' + msg,
                         type: "validate",
@@ -304,7 +316,6 @@ export default class Control {
                 }
                
             }
-            tableIns.tableInstance.tableInstance.render()
         }
     }
     findIndexByRowId(dataTable, rowId) {
@@ -419,17 +430,13 @@ export default class Control {
                 /**
                  * cần lấy lại vị trí cell ứng với id của row sau khi chạy công thức. bởi vì có thể có thao tác khác làm thay đổi vị trí cell trước khi chạy công thức
                  */
-                let newListSqlRowId = tableIns.tableInstance.tableInstance.getDataAtProp('s_table_id_sql_lite');
-                let newColIndex = tableIns.tableInstance.tableInstance.propToCol(this.name);
+                let newListSqlRowId = tableIns.tableInstance.getColData('s_table_id_sql_lite');
                 let currentRowIndex = newListSqlRowId.indexOf(sqlRowId);
-                tableIns.tableInstance.tableInstance.setDataAtCell(currentRowIndex, newColIndex, values, 'auto_set');
+                tableIns.tableInstance.setDataAtCell(this.name, values,currentRowIndex);
             }
             else{ // trường hợp giá trị cho cả cột
-                let dataForStore = {};
-                dataForStore = Object.values(values);
-                debugger
-                let tableSqlRowId = tableIns.tableInstance.tableInstance.getDataAtProp('s_table_id_sql_lite');
-                let vls = [];
+                let tableSqlRowId = tableIns.tableInstance.getColData('s_table_id_sql_lite');
+                let mapIndexToValue = {}
                 for (let index = 0; index < listIdRow.length; index++) {
                     const rowId = listIdRow[index];
                     let cellValue = values[rowId];
@@ -442,19 +449,19 @@ export default class Control {
                         }
                     }
                     let rowIndex = tableSqlRowId.indexOf(rowId);
-                    vls.push([rowIndex, this.name, cellValue]);
+                    mapIndexToValue[rowIndex] = cellValue
                 }
-                tableIns.tableInstance.tableInstance.setDataAtRowProp(vls, null, null, 'auto_set');
-                /**
-                 * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
-                 */
-                store.commit("document/updateListInputInDocument", {
-                    controlName: this.name,
-                    key: 'value',
-                    value: dataForStore,
-                    instance: this.curParentInstance
-                });
+                tableIns.tableInstance.updateItems(mapIndexToValue, this.name);
             }
+            /**
+             * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
+             */
+            store.commit("document/updateListInputInDocument", {
+                controlName: this.name,
+                key: 'value',
+                value: tableIns.tableInstance.getColData(this.name),
+                instance: this.curParentInstance
+            });
             /**
              * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
              */

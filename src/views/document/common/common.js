@@ -2,6 +2,7 @@ import store from './../../../store';
 import sDocument from './../../../store/document';
 import { util } from '../../../plugins/util';
 
+export const SQLITE_COLUMN_IDENTIFIER = 's_table_id_sql_lite';
 let listNameValueControl = {};
 const checkControlPropertyProp = function(instance, controlName, type) {
     let control = getControlInstanceFromStore(instance, controlName);
