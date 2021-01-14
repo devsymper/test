@@ -124,7 +124,7 @@ export default {
 					return{
 						columns:res.data.columns ? res.data.columns : [],
 						listObject:res.data.listObject ? res.data.listObject : [],
-						total: res.data.listObject ? res.data.listObject.length : 0,
+						total: res.data.total,
 					}
 				}
 			}

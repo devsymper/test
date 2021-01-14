@@ -27,4 +27,26 @@ export const getDefaultReportConfig = function(){
     }
 }
 
-export const 
+var loadedClasses = {}; // map các class đã được map với key là 
+var mapReportTypeAndClasses
+/**
+ * Hàm load tự động các class của các loại report
+ * @returns {Object} object chứa các hàm khởi tạo của 
+ */
+export const autoLoadChartClasses = function () {
+    if(Object.keys(loadedClasses) == 0){
+        let context = require.context('@/components/dashboard/reports', true, /\.(chart\.js)$/);
+        let rsl = {};
+        let obj;
+        let reportClass = null;
+        context.keys().forEach((filePath) => {
+            reportClass = context(filePath).default;
+            obj = new reportClass();
+            rsl[obj.getType()] = reportClass;
+        });
+        loadedClasses = rsl;
+        return rsl;
+    }else{
+        return loadedClasses;
+    }
+}

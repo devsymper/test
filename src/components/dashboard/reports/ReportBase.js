@@ -1,9 +1,15 @@
-import { extend } from "lodash"
-
 /**
- * Class chứa các thuộc tính chung của toàn bộ các report 
+ * Class chứa các thuộc tính và các phương thức chung của toàn bộ các report 
  */
-class ReportBase {
+export default class ReportBase {
+    // Các thuộc tính bắt buộc phải có ở các class kế thừa class này
+    mustOverrideMembers = {
+        columnSettingKeys: Object,
+        styleKeys : Object,
+        setSampleColumnSetting: Function,
+        setSampleStyleConfig: Function
+    }
+
     rawConfigs = { // config thô do BA setting
         condition: [], // cấu hình điều kiện cho report này
         setting: {}, // cấu hình cho các cột
@@ -27,10 +33,64 @@ class ReportBase {
         showIcon: true // có hiển thị icon ko
     };
 
-    constructor(symperId = ''){
+    constructor(type, symperId = ''){
         if(!symperId){
             symperId = 'cell-' + Date.now();
         }
         this.sharedConfigs.cellId = symperId;
+        this.sharedConfigs.type = type;
+        this.setSampleColumnSetting();
+        this.setSampleStyleConfig();
+    }
+
+    getType(){
+        return this.sharedConfigs.type;
+    }
+
+    /**
+     * Hàm chuyển đổi từ cấu hình của Symper sang cấu hình của thư viện được sử dụng 
+     */
+    async translate(){
+
+    }
+    
+
+    /**
+     * Hàm lấy config để lưu xuống DB
+     */
+    getConfigToSave(){
+        
+    }
+
+    restoreSetting(cell){
+        let setting = typeof cell.settings == 'string' ? JSON.parse(cell.settings) : cell.settings;
+        for (let name in setting) {
+            if (this.rawConfigs.setting.hasOwnProperty(name)) {
+                this.rawConfigs.setting[name].selectedColums = setting[name];
+            }
+        }
+    }
+
+    restoreStyle(cell){
+        let style = typeof cell.style == 'string' ? JSON.parse(cell.style) : cell.style;
+        for (let item of this.rawConfigs.style) {
+            if (style.hasOwnProperty(item.name)) {
+                for (let propName in style[item.name]) {
+                    if (item.children.hasOwnProperty(propName)) {
+                        item.children[propName].value = style[item.name][propName].value;
+                    }
+                }
+            }
+        }
+    }
+
+    /**
+     * Hàm khôi phục config từ dữ liệu đã lưu thành cấu hình có thể hiển thị
+     */
+    restoreConfigFromSavedData(cell){
+        this.rawConfigs.condition = typeof cell.condition == 'string' ? JSON.parse(cell.condition) : cell.condition;
+        this.restoreSetting(cell);
+        this.restoreStyle(cell);
+        newCell.rawConfigs.extra = cell.extra ? JSON.parse(cell.extra) : {};
     }
 }

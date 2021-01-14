@@ -125,7 +125,6 @@ export default {
 		},
 		showReportConfig(val){
 			let value = val == true ? 0 : 1090
-			debugger
 			$('.symper-report-type-selector').css({transform:'translateX('+value+'px)','transition-duration': '1s'})
 		}
 	},
@@ -154,7 +153,6 @@ export default {
 </style>
 <style>
 .symper-report-type-selector{
-	width: 190px;
 	border-right: 1px solid lightgray;
 	border-left: 1px solid lightgray;
 }

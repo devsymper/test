@@ -1,4 +1,6 @@
 import { dashboardApi } from "@/api/dashboard.js";
+import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig";
+var mapTypeToClass = autoLoadChartClasses();
 
 onmessage = function (event) {
     let data = event.data;
@@ -18,21 +20,32 @@ var handler = {
      */
     restoreAllCellConfigs(allCell) {
         let cellConfigs = {};
-        let newCell = {};
+        let newCell = null;
+        let cellType = '';
         for (let cell of allCell) {
-            newCell = this.getDefaultCellConfigs(cell.type, cell.id_symper);
-            cell.setting = JSON.parse(cell.settings);
-            cell.style = JSON.parse(cell.style);
-            newCell.rawConfigs.condition = JSON.parse(cell.condition);
+            // newCell = this.getDefaultCellConfigs(cell.type, cell.id_symper);
+            // cell.setting = JSON.parse(cell.settings);
+            // cell.style = JSON.parse(cell.style);
+            // newCell.rawConfigs.condition = JSON.parse(cell.condition);
 
-            // chuyển nội dung của editor từ setting sang displayoption
-            if (cell.type == 'editor') {
-                newCell.viewConfigs.displayOptions.content = cell.setting.content;
-                cell.setting = {};
+            // // chuyển nội dung của editor từ setting sang displayoption
+            // if (cell.type == 'editor') {
+            //     newCell.viewConfigs.displayOptions.content = cell.setting.content;
+            //     cell.setting = {};
+            // }
+            // newCell = this.restoreCellSetting(newCell, cell);
+            // newCell = this.restoreCellStyle(newCell, cell);
+            // newCell.rawConfigs.extra = cell.extra ? JSON.parse(cell.extra) : {};
+            // cellConfigs[cell.id_symper] = newCell;
+
+            //=====================================
+            cellType = cell.type;
+            if(mapTypeToClass[cellType]){
+                newCell = new mapTypeToClass[cellType](cell.id_symper);
+                newCell.restoreConfigFromSavedData(cell);
+            }else{
+                console.error(`class for report type  ${cellType} not found`, cell);
             }
-            newCell = this.restoreCellSetting(newCell, cell);
-            newCell = this.restoreCellStyle(newCell, cell);
-            newCell.rawConfigs.extra = cell.extra ? JSON.parse(cell.extra) : {};
             cellConfigs[cell.id_symper] = newCell;
         }
 

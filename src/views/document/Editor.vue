@@ -37,7 +37,10 @@
         <div class="sym-document__side-bar-right">
             <sidebar-right ref="sidebarRight" :isConfigPrint="isConfigPrint" :styles="contentStyle" :instance="keyInstance"/>
         </div>
-        <s-table-setting v-if="!isConfigPrint" ref="tableSetting" :instance="keyInstance" @add-columns-table="addColumnTable" :defaultTablePivotConfig="defaultTablePivotConfig"/>
+        <s-table-setting v-if="!isConfigPrint" ref="tableSetting" :instance="keyInstance"
+        @add-columns-table="addColumnTable" 
+        :defaultTablePivotConfig="defaultTablePivotConfig"
+        :defaultTableGroupConfig="defaultTableGroupConfig"/>
         <PrintTableConfig v-if="isConfigPrint" ref="printTableConfig" @config-column-table-print="configColumnTablePrint"/>
         <auto-complete-control v-if="!isConfigPrint" ref="autocompleteControl" @add-control="insertControl"/>
         <save-doc-panel 
@@ -404,7 +407,9 @@ export default {
             intervalSetEditting:null,
             currentTabIndex:null,
             dataPivotTable:{},
-            defaultTablePivotConfig:{}
+            dataGroupTable:{},
+            defaultTablePivotConfig:{},
+            defaultTableGroupConfig:{},
         }
     },
     
@@ -1215,6 +1220,9 @@ export default {
             if(this.dataPivotTable && Object.keys(this.dataPivotTable).length > 0){
                 dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
             }
+            if(this.dataGroupTable && Object.keys(this.dataGroupTable).length > 0){
+                dataPost['groupConfig'] = JSON.stringify(this.dataGroupTable);
+            }
             documentApi.saveDocument(dataPost).then(res => {
                 thisCpn.$refs.actionView.hideLoading();
                 if (res.status == 200) {
@@ -1250,6 +1258,9 @@ export default {
         editDocument(dataPost){
             if(this.dataPivotTable && Object.keys(this.dataPivotTable).length > 0){
                 dataPost['pivotConfig'] = JSON.stringify(this.dataPivotTable);
+            }
+            if(this.dataGroupTable && Object.keys(this.dataGroupTable).length > 0){
+                dataPost['groupConfig'] = JSON.stringify(this.dataGroupTable);
             }
             let thisCpn = this;
             documentApi.editDocument(dataPost).then(res => {
@@ -1327,6 +1338,7 @@ export default {
         addColumnTable(data){
             let listRowData = data.listRows;
             let tablePivotConfig = data.tablePivotConfig;
+            let tableGroupConfig = data.tableGroupConfig;
             let elements = $('#document-editor-'+this.keyInstance+'_ifr').contents().find('.s-control-table.on-selected');
             let table = elements.find('thead').closest('.s-control-table');
             let tableId = table.attr('id');
@@ -1340,6 +1352,17 @@ export default {
             else{
                 if(this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
                     delete this.dataPivotTable[currentControl.properties.name.name.value];
+                }
+            }
+            if(currentControl.properties.name.name.value && tableGroupConfig){
+                if(!this.dataGroupTable){
+                    this.dataGroupTable = {};
+                }
+                this.dataGroupTable[currentControl.properties.name.name.value] = tableGroupConfig;
+            }
+            else{
+                if(this.dataGroupTable && this.dataGroupTable[currentControl.properties.name.name.value]){
+                    delete this.dataGroupTable[currentControl.properties.name.name.value];
                 }
             }
             let thead = '';
@@ -1549,6 +1572,9 @@ export default {
                 let currentControl = this.editorStore.currentSelectedControl;
                 if(currentControl.properties.name.name.value && this.dataPivotTable && this.dataPivotTable[currentControl.properties.name.name.value]){
                     this.defaultTablePivotConfig = this.dataPivotTable[currentControl.properties.name.name.value];
+                }
+                if(currentControl.properties.name.name.value && this.dataGroupTable && this.dataGroupTable[currentControl.properties.name.name.value]){
+                    this.defaultTableGroupConfig = this.dataGroupTable[currentControl.properties.name.name.value];
                 }
                 this.$refs.tableSetting.setListRow(listData);
             }
@@ -2109,6 +2135,7 @@ export default {
                     }
                     this.editorCore.setContent(content);
                     this.dataPivotTable = res.data.pivotConfig;
+                    this.dataGroupTable = res.data.groupConfig;
                     $("#document-editor-"+this.keyInstance+"_ifr").contents().find('body select').each(function(e){
                         let id = $(this).attr('id')
                         $(this).replaceWith('<input class="s-control s-control-select" s-control-type="select" type="text" title="Select" readonly="readonly" id="' + id + '">');

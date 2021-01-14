@@ -1,24 +1,21 @@
 <template>
-	<div>
-		<v-dialog
-			v-model="showDialog"
-			persistent
-			content-class="bi-dataset-selector d-flex flex-column"
-			class="h-100 w-100"
-		>
-			<ListItem 
-				:showButtonAdd="false"
-				:showExportButton="false"
-				:showDisplayConfig="false"
-				:containerHeight="tableHeight"
-				:getDataUrl="getDataUrl"
-				:customAPIResult="customAPIResult"
-				:customHeaderBtn="customHeaderBtn"
-				@custom-btn-cliced="handlerCustomBtnClick"
-			/>
-		</v-dialog>
-
-	</div>
+	<v-dialog
+		v-model="showDialog"
+		persistent
+		content-class="bi-dataset-selector"
+		class="h-100 w-100"
+	>
+		<ListItem 
+			:showButtonAdd="false"
+			:showExportButton="false"
+			:showDisplayConfig="false"
+			:containerHeight="tableHeight"
+			:getDataUrl="getDataUrl"
+			:customAPIResult="customAPIResult"
+			:customHeaderBtn="customHeaderBtn"
+			@custom-btn-cliced="handlerCustomBtnClick"
+		/>
+	</v-dialog>
 </template>
 
 <script>
@@ -30,10 +27,7 @@ export default {
 		ListItem
 	},
 	props:{
-		showDialog:{
-			type: Boolean,
-			default: false,
-		},
+	
 		tableHeight:{
 			type: Number,
 			default: 0
@@ -41,6 +35,7 @@ export default {
 	},
 	data(){
 		return{
+			showDialog: false,
 			listDatasetSelected:[],
 			getDataUrl: appConfigs.apiDomain.biService +"datasets/get-list",
 			customAPIResult:{
@@ -53,10 +48,11 @@ export default {
 							headerName: 'Chọn', 
 							field: 'checkbox', 
 							editable:true,
-							cellRendererFramework : 'CheckBoxRenderer',
+							cellRendererFramework : 'CheckBoxRendererListItems',
 							width: 50
 						}	
 					)
+					debugger
 					return{
 						columns:res.data.columns,
 						listObject: res.data.listObject,
@@ -79,20 +75,22 @@ export default {
 		}
 	},
 	methods:{
-		cancel(){
-			this.$emit('cancel')
-		},
-		selectDataset(){
-			this.$emit('list-dataset-selected' , this.listDatasetSelected)
+		show(){
+			this.showDialog = true
 		},
 		handlerCustomBtnClick(i){
+			this.$set(this, 'showDialog', false)
 			if(this[i]){
 				this[i]()
 			}
 		},
 		select(){
+			this.$emit('list-dataset-selected' , this.listDatasetSelected)
 		},
 	},
+	watch:{
+		
+	}
 }
 </script>
 

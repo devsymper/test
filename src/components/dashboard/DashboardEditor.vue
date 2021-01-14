@@ -1,13 +1,19 @@
 <template>
-    <div class="symper-dashboard-editor h-100">
-        <div class="d-flex h-100">
-            <div class="d-flex flex-column">
+    <div class="symper-dashboard-editor h-100 w-100">
+        <div class="d-flex h-100 w-100">
+            <div class="d-flex flex-column"
+                :style="{
+                    width: 'calc(100% - 450px)'
+                }">
                 <DashboardToolBar 
                     :style="{
                         height: '35px'
                     }"
                     :instanceKey="instanceKey"/>
                 <DashboardWorkspace 
+                    :style="{
+                        height: 'calc(100 % - 35px)'
+                    }"
                     :instanceKey="instanceKey"/>
             </div>
 			<div>
@@ -18,7 +24,10 @@
 					mdi-file
 				</v-icon>
 			</div>	
-            <div class="d-flex flex-column h-100" >
+            <div class="d-flex flex-column h-100"
+                :style="{
+                    width: '200px'
+                }">
                 <ReportTypeSelector 
                     :instanceKey="instanceKey"
 					:showReportConfig="showReportConfig"
@@ -28,13 +37,16 @@
                 <ReportConfig 
                     :instanceKey="instanceKey"/>
             </div>
-            <DashboardDasetDetail 
+            <DashboardDasetDetail
+                class="h-100"
+                :style="{
+                    width: '250px'
+                }" 
                 :instanceKey="instanceKey"/>
         </div>
 		<DatasetSelector
-			:showDialog="showDatasetSelectorDialog"
+			ref="datasetSelector"
 			:tableHeight="tableHeight"
-			@cancel="toggleDatasetDialog"
 		/> 	
     </div>
 </template>
@@ -48,6 +60,9 @@ import ReportTypeSelector from "@/components/dashboard/components/ReportTypeSele
 import DashboardEditorWorker from 'worker-loader!@/worker/dashboard/DasboardEditor.Worker.js';
 import DatasetSelector from '@/components/dataset/DatasetSelector'
 import {util} from '@/plugins/util'
+import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
+
+var reportClasses = autoLoadChartClasses();
 
 export default {
     components: {
@@ -86,8 +101,7 @@ export default {
             }
 		},
 		toggleDatasetDialog(){
-			this.showDatasetSelectorDialog = !this.showDatasetSelectorDialog
-			debugger
+			this.$refs.datasetSelector.show()
 		},
 		handlerSelectedChartType(type){
 
