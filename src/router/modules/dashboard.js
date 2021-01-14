@@ -6,7 +6,7 @@ export default [
             import ('../../views/dashboard/Index.vue'),
     },
     {
-        path: '/dashboard/:id/view',
+        path: '/dashboards/:id/view',
         name: "viewDashboard",
         component: () =>
             import ('../../views/dashboard/DashboardView.vue'),
