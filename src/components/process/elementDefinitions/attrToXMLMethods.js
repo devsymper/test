@@ -89,7 +89,11 @@ export default {
                     // el.businessObject.$attrs[attrName] = value;
                     modeling.updateProperties(el, objToUpdate);
                 }
-            }else{}
+            }else{
+                if(toXMLname.includes('skipExpression')){
+                    delete el.businessObject.skipExpression;
+                }
+            }
         }
     },
 
