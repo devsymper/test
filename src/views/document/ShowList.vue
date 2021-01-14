@@ -537,7 +537,7 @@ export default {
             return controls;
         },
         addDocument(){
-            this.$router.push('/document/editor');
+            this.$goToPage('/document/editor/'+Date.now(),"Danh sách bản in");
         },
      
         calcContainerHeight() {

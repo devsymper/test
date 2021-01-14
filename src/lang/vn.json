@@ -822,7 +822,9 @@
                         "has": "Có ",
                         "commentNotResolve": " bình luận chưa được giải quyết",
                         "noComment": "Không có bình luận nào",
-                        "id": "Định danh"
+						"id": "Định danh",
+						"listWorks": "Công việc",
+						"clickToViewListWork": "Bấm vào đây để xem công việc"
                     },
                     "worflowInfo": "THÔNG TIN QUY TRÌNH",
                     "userRelated": {
@@ -1329,7 +1331,8 @@
             "showLess": "Thu gọn",
             "showMoreFile": "Xem thêm các tệp",
             "quickView": "Xem nhanh",
-            "openTask": "Mở công việc"
+			"openTask": "Mở công việc",
+			"history":"Lịch sử"
         },
         "alert": {
             "title_aproval": "Thực thi công việc",
@@ -1338,8 +1341,61 @@
         },
         "unfinished": "Chưa hoàn thành",
         "totalTask": "Tổng số tác vụ",
-        "totalWork": "Tổng số công việc"
+        "totalWork": "Tổng số công việc",
+		"taskLifeCycle":{
+			"dialog":{
+				"complete":{
+					"header": "Hoàn thành công việc",
+					"description":"Nhấn áp dụng để hoàn thành công việc này"
+				},
+				"assign":{
+					"header": "Giao lại việc",
+					"description":"Công việc sẽ được giao cho người khác thực hiện, người thực hiện có toàn quyền với công việc",
+					"workStatus":"Công việc đã được giao cho"
+				},
+				"claim":{
+					"header": "Nhận công việc",
+					"description":"Khi nhận công việc bạn sẽ có quyền sở hữu công việc này "
+				},
+				"delegate":{
+					"header": "Ủy quyền công việc",
+					"description":"Công việc sẽ được giao cho người khác thực hiện nhưng không có quyền hoàn thành"
+				},
+				"unClaim":{
+					"header": "Hủy bỏ nhận công việc",
+					"description":"Công việc bạn đã nhận sẽ được hủy bỏ khỏi xanh sách công việc của bạn"
+				},
+				"resolve":{
+					"header": "Thực thi công việc",
+					"description":"Công việc sẽ được thực thi và trả về cho chủ sở hữu của công việc "
+				}
+				
+			},
+			"assignee":"Người được giao việc",
+			"delegateUser":"Người được ủy quyền",
+			"assigneePermission":"Người được giao việc sẽ có quyền xem và thực thi công việc",
+			"currentStatus":"Trạng thái hiện tại",
+			"workDelegated":"Công việc đã được ủy quyền ",
+			"owner":"Chủ sở hữu công việc",
+			"newStatus": "Trạng thái mới",
+			"cancel":"Hủy",
+			"corfirm":"Áp dụng",
+			"snackbar":{
+				"title":"Công việc submit thành công",
+				"description":"Bạn có thể hoàn thành công việc bằng cách thực thi ",
+				"action":"Hãy cập nhật bản ghi bằng cách chọn "
+			},
+			"notify":{
+				"unClaim":"Hủy nhận công việc thành công",
+				"resolve":"Thực thi công việc thành công",
+				"claim":"Nhận công việc thành công",
+				"complete":"Hoàn thành công việc thành công",
+				"notSubmit":"Bạn phải submit doc trước khi hoàn thành",
+				"assign": "Giao việc thành công",
+				"delegate": "Ủy quyền thành công "
 
+			}
+		}
     },
     "tasks": {
         "error": {
@@ -1393,7 +1449,8 @@
         "delegate": "Ủy quyền",
         "resolve": "Giải quyết",
         "complete": "Hoàn thành",
-        "created": "Đã tạo mới task",
+		"created": "Đã tạo mới task",
+		"action": "Hành động",
         "relatedPeople": {
             "title": "Những người liên quan"
         },
@@ -1502,7 +1559,8 @@
             "removeCategory": "Bạn sẽ xóa danh mục này khỏi danh sách.",
             "removeComponent": "Bạn sẽ xóa component này khỏi danh sách.",
             "removeWorkflow": "Bạn sẽ xóa workflow này khỏi danh sách.",
-            "removePriority": "Bạn sẽ xóa priority này khỏi danh sách."
+            "removePriority": "Bạn sẽ xóa priority này khỏi danh sách.",
+            "removeVersion": "Bạn sẽ xóa version này khỏi danh sách"
         },
         "settingBoard":"Cài đặt Board"
 

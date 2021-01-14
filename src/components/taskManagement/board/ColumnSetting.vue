@@ -36,7 +36,7 @@
                     <transition-group type="transition" name="flip-list" class="wrap-kanban-board">
                         <div
                             v-for="(column,index) in columns"
-                            :key="index+column.id"
+                            :key="column.id"
                             :style="getColWidth()"
                             class=" board-column-item mr-4"
                         >
@@ -110,6 +110,7 @@ import draggable from "vuedraggable";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
+import KanbanWorker from 'worker-loader!@/worker/taskManagement/kanban/Kanban.Worker.js';
 
 import {
     util
@@ -168,7 +169,9 @@ export default {
         return{
             isLoading:false,
             columns:[],
-            listStatus:[]
+            listStatus:[],
+            kanbanWorker:null,
+
         }
     },
     mounted(){
@@ -228,46 +231,85 @@ export default {
             this.isLoading = true;
             let idBoard=this.$route.params.idBoard;
             let data={};
-                data.data = JSON.stringify(this.columns);
-                data.boardId = idBoard;
-                taskManagementApi
-                    .addColumnInBoard(data)
-                    .then(res => {
-                        if (res.status == 200) {
-                            this.$snotifySuccess("Add column completed!");
-                            this.$store.dispatch("taskManagement/getListColumnInBoard",idBoard);
-
-                        }else{
-                            this.$snotifyError("", "Can not add column!");
-                        }
-                        this.isLoading = false;
-
-                    })
-                    .catch(err => {
-                        this.isLoading = false;
-                        this.$snotifyError("", "Can not add column!", err);
-                    });
+            data.data = JSON.stringify(this.columns);
+            data.boardId = idBoard;
+            
+            this.kanbanWorker.postMessage({
+                action:'saveColumn',
+                data:data
+            });
 
         },
-        async updateColumn(){
+        updateColumn(){
             this.isLoading = true;
             let idBoard=this.$route.params.idBoard;
             let data={};
             data.data = JSON.stringify(this.columns);
             data.boardId = idBoard;
-            let res =await taskManagementApi.updateColumnInBoard(data);
-            if (res.status == 200) {
-                this.$snotifySuccess("Update column completed!");
-                await this.$store.dispatch("taskManagement/getListColumnInBoard",idBoard);
-                await this.$store.dispatch("taskManagement/getListStatusInColumnBoard",idBoard);
-                this.listStatus =(this.listStatusInProject.length > 0 )? util.cloneDeep(this.listStatusInProject) : [];
-            }else{
-                this.$snotifyError("", "Can not update column!");
+            
+            this.kanbanWorker.postMessage({
+                action:'updateColumn',
+                data:data
+            });
+        },
+        getListColumnInBoard(){
+            let idBoard=this.$route.params.idBoard;
+            this.kanbanWorker.postMessage({
+                action:'getListColumnInBoard',
+                data:idBoard
+            });
+        },
+        getListStatusInColumnBoard(){
+            let idBoard=this.$route.params.idBoard;
+            this.kanbanWorker.postMessage({
+                action:'getListStatusInColumnBoard',
+                data:idBoard
+            });
+        },
+    },
+    created(){
+        let self = this;
+
+        this.kanbanWorker = new KanbanWorker();
+        this.kanbanWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'actionError':
+                    self.$snotifyError("", "Update status error!");
+                    self.isLoading = false;
+                    break;
+                case 'saveColumn':
+                    let idBoard=self.$route.params.idBoard;
+                    self.$snotifySuccess("Add column completed!");
+                    self.getListColumnInBoard();
+                    self.isLoading = false;
+                    break;
+                case 'updateColumn':
+                    let idBoard2=self.$route.params.idBoard;
+                    self.$snotifySuccess("Update column completed!");
+                    self.getListColumnInBoard();
+                    self.isLoading = false;
+                    break;
+                case 'getListColumnInBoard':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/setListColumnInBoard", res);
+                        self.getListStatusInColumnBoard();
+                    } 
+                    break;
+                case 'getListStatusInColumnBoard':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/setListStatusInColumnBoard", res);
+                        self.listStatus =(self.listStatusInProject.length > 0 )? util.cloneDeep(self.listStatusInProject) : [];
+                    } 
+                    break;
+                default:
+                    break;
             }
-            this.isLoading = false;
-            this.getStatusForListColumn();
-        }
-    }
+        });
+
+    },
 }
 </script>
 

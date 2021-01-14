@@ -24,6 +24,7 @@
 import { util } from "@/plugins/util";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import CommonTableListIssue from '../version/CommonTableListIssue.vue';
+import ComponentWorker from 'worker-loader!@/worker/taskManagement/component/Component.Worker.js';
 
 export default {
     name:"detailcomponent",
@@ -39,59 +40,38 @@ export default {
         },
     },
     computed:{
-        listIssueInComponent(){
-            let issues = this.listIssue;
-            let allPriority = this.$store.state.taskManagement.allPriority;
-            let listIssueType = this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId];
-            let allStatus = this.$store.state.taskManagement.allStatus;
-            for (let i = 0; i < issues.length; i++) {
-                    // get info priority
-                if (issues[i].tmg_priority_id) { 
-                    let priority = allPriority.find(ele => ele.id == issues[i].tmg_priority_id);
-                    if (priority) {
-                        let infoPriority = {};
-                        infoPriority.id = priority.id;
-                        infoPriority.name = priority.name;
-                        infoPriority.color = priority.color;
-                        infoPriority.icon = priority.icon;
-
-                        issues[i]["infoPriority"] = infoPriority;
-                    }
-                }    
-                // get info issue type
-                if (issues[i].tmg_issue_type) { 
-                    let issueType = listIssueType.find(ele => ele.id == issues[i].tmg_issue_type);
-                    if (issueType) {
-                        let infoIssueType = {};
-                        infoIssueType.id = issueType.id;
-                        infoIssueType.name = issueType.name;
-                        infoIssueType.icon = issueType.icon;
-
-                        issues[i]["infoIssueType"] = infoIssueType;
-                    }
-                }    
-                // get staus issue
-                if (issues[i].tmg_status_id) { 
-                    let status = allStatus.find(ele => ele.id == issues[i].tmg_status_id);
-                    if (status) {
-                        let infoStatus = {};
-                        infoStatus.id = status.id;
-                        infoStatus.name = status.name;
-                        infoStatus.color = status.color;
-                        issues[i]["infoStatus"] = infoStatus;
-                    }
-                } 
-            }
-
-            return issues
-        },
         sTaskManagement() {
             return this.$store.state.taskManagement;
+        },
+        listDocumentIdsInProject(){
+            return this.$store.state.taskManagement.listDocumentIdsInProject[this.projectId];
+        }
+    },
+    watch:{
+        listDocumentIdsInProject:{
+            deep:true,
+            immediate:true,
+            handler(newVl){
+                if (newVl){
+                    this.getData();
+                }
+            }
+        },
+        listIssue:{
+            deep:true,
+            immediate:true,
+            handler(newVl){
+                if (newVl.length > 0){
+                    this.getMoreInfoListIssue();
+                }
+            }
         },
     },
     data(){
         let self = this;
         return{
+            listIssueInComponent:[],
+            componentWorker:null,
             projectId: null,
             search:"",
             listIssue:[],
@@ -116,34 +96,95 @@ export default {
         }
     },
     methods:{
+        getMoreInfoListIssue(){
+            let data = {};
+            data.issues = this.listIssue;
+            data.allPriority = this.$store.state.taskManagement.allPriority;
+            data.listIssueType = this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId];
+            data.allStatus = this.$store.state.taskManagement.allStatus;
+
+            this.componentWorker.postMessage({
+                action:'getMoreInfoListIssue',
+                data:data
+            });
+        },
         getData(){
             let documentIds = this.$store.state.taskManagement.listDocumentIdsInProject[this.projectId];
             if (documentIds && documentIds.length > 0) {
                 this.filter.ids =JSON.stringify(documentIds);
-                taskManagementApi.getIssueFilter(this.filter)
-                .then(res => {
-                    if (res.status == 200) {
-                        this.listIssue = res.data.listObject;
-                    }else{
-                        this.$snotifyError("", "Can not get list issue in component!");
-                    }
+                
+                this.componentWorker.postMessage({
+                    action:'getIssueComponent',
+                    data:this.filter
                 });
             }
             
         },
+        getListDocumentIdsInProject(){
+            this.componentWorker.postMessage({
+                action:'getListDocumentIdsInProject',
+                data:this.projectId
+            });
+        },
+        getListIssueTypeInProject(){
+            this.componentWorker.postMessage({
+                action:'getListIssueTypeInProject',
+                data:this.projectId
+            });
+        },
+        getAllStatus(){
+            this.componentWorker.postMessage({
+                action:'getAllStatus',
+                data: null
+            });
+        }
     },
-    async created(){
+    created(){
+        let self = this;
         this.projectId=this.$route.params.id;
+        this.componentWorker = new ComponentWorker();
+        this.componentWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getListDocumentIdsInProject':
+                    self.$store.commit('taskManagement/setListDocumentIdsInProject',data.dataAfter);
+                    break;
+                case 'getListIssueTypeInProject':
+                    self.$store.commit('taskManagement/setListIssueTypeInProjects',data.dataAfter);
+                    break;
+                case 'getAllStatus':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit('taskManagement/setAllStatus',res.data.listObject);
+                    } 
+                    break;
+                case 'getIssueComponent':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.listIssue = res.data.listObject;
+                    } 
+                    break;
+                case 'getMoreInfoListIssue':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.listIssueInComponent = res;
+                    } 
+                    break;
+                    
+                default:
+                    break;
+            }
+        });
+
         if (!this.$store.state.taskManagement.listDocumentIdsInProject[this.projectId] || this.$store.state.taskManagement.listDocumentIdsInProject[this.projectId].length == 0) {
-            await this.$store.dispatch("taskManagement/getListDocumentIdsInProject",this.projectId);
+            self.getListDocumentIdsInProject();
         }
         if (!this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId] || this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId].length == 0) {
-            await this.$store.dispatch("taskManagement/getListIssueTypeInProjects",this.projectId);
+            self.getListIssueTypeInProject();
         }
         if (!this.$store.state.taskManagement.allStatus || this.$store.state.taskManagement.allStatus.length == 0) {
-            await this.$store.dispatch("taskManagement/getAllStatus");
+            self.getAllStatus();
         }
-        this.getData();
       
     }
 

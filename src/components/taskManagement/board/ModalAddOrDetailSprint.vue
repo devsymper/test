@@ -8,13 +8,12 @@
     >
         <v-card>
         <v-card-title>
-            <span class="fs-16">Version</span>
+            <span class="fs-16">Sprint</span>
         </v-card-title>
         <v-card-text>
-            <v-container>
                 <div>
                     <form-tpl
-                    :allInputs="dataVersionProps"/>
+                    :allInputs="dataSprintProps"/>
                 </div>
                 <div class="d-flex justify-space-between">
                     <div style="width:47%">
@@ -93,7 +92,6 @@
                     </div>
                 </div>
                 
-            </v-container>
         </v-card-text>
         <v-card-actions>
             <v-spacer></v-spacer>
@@ -103,9 +101,19 @@
                 v-if="!statusDetail"
                 :loading="isLoadingAdd"
                 class="btn-add"
-                @click="handleAddVersion"
+                @click="handleAddSprint"
             >
                 {{$t("common.add")}}
+            </v-btn>
+            <v-btn
+                color="blue darken-1"
+                text
+                v-else-if="statusDetail && actionSprint =='start'"
+                :loading="isLoadingAdd"
+                class="btn-add"
+                @click="handleUpdateSprint('running')"
+            >
+                {{$t("common.start")}}
             </v-btn>
             <v-btn
                 color="blue darken-1"
@@ -114,11 +122,11 @@
                 :loading="isLoadingAdd"
                 :disabled="disabled"
                 class="btn-add"
-                @click="handleUpdateVersion()"
+                @click="handleUpdateSprint()"
             >
                 {{$t("common.update")}}
             </v-btn>
-
+    
             <v-btn
             color="red darken-1"
             text
@@ -135,14 +143,24 @@
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
 import { taskManagementApi } from "@/api/taskManagement.js";
-import VersionWorker from 'worker-loader!@/worker/taskManagement/version/Version.Worker.js';
+import KanbanWorker from 'worker-loader!@/worker/taskManagement/kanban/Kanban.Worker.js';
 
 export default {
     components:{
         FormTpl,
     },
     props:{
-        dataVersionProps: {
+        currentBoard:{
+            type:Object,
+            default(){
+                return {}
+            }
+        },
+        actionSprint:{
+            type:String,
+            default:null
+        },
+        dataSprintProps: {
             type: Object,
             default() {
                 return {
@@ -179,7 +197,7 @@ export default {
                 }
             }
         },
-        infoVersion: {
+        infoSprint: {
             type: Object,
             default() {
                 return {
@@ -199,7 +217,7 @@ export default {
      
     },
     watch: {
-        infoVersion:{
+        infoSprint:{
             deep:true,
             immediate:true,
             handler(newVl){
@@ -207,12 +225,12 @@ export default {
                 this.dateEnd=newVl.endTime;
             }
         },
-        dataVersionProps: {
+        dataSprintProps: {
             deep: true,
             immediate:true,
             handler(newVl){
-                if (newVl.name.value == this.infoVersion.name &&
-                    newVl.description.value == this.infoVersion.description )
+                if (newVl.name.value == this.infoSprint.name &&
+                    newVl.description.value == this.infoSprint.description )
                 {
                     this.disabled=true;
                 }else{
@@ -234,7 +252,7 @@ export default {
                     this.msgErrEndTime='';
                 }
             }
-            if (val == this.infoVersion.startTime) {
+            if (val == this.infoSprint.startTime) {
                 this.disabled=true;
             }else{
                 this.disabled=false;
@@ -256,7 +274,7 @@ export default {
                 }
             }
             
-            if (val == this.infoVersion.endTime) {
+            if (val == this.infoSprint.endTime) {
                 this.disabled=true;
             }else{
                 this.disabled=false;
@@ -266,7 +284,8 @@ export default {
     },
     data(){
         return{
-            versionWorker:null,
+            statusSprint:'plan',
+            kanbanWorker:null,
             msgErrStartTime:'',
             msgErrEndTime:'',
             dateStart: "",
@@ -310,48 +329,53 @@ export default {
             this.dateEnd = this.datePickerValueEnd;
         },
 
-        handleAddVersion(){
+        handleAddSprint(){
             this.isLoadingAdd = true;
             let isValid = this.validateData();
             if (isValid) {
                 let data={};
-                let projectId=this.$route.params.id;
-                data.name=this.dataVersionProps.name.value;
-                data.description=this.dataVersionProps.description.value;
+                data.name=this.dataSprintProps.name.value;
+                data.description=this.dataSprintProps.description.value;
                 if (this.dateStart) {
                     data.startTime=this.dateStart;
                 }
                 if (this.dateEnd) {
                     data.endTime=this.dateEnd;
                 }
-                data.projectId=projectId;
+                data.boardId=this.currentBoard.id;
                 // đẩy xuống worker xử lý
-                this.versionWorker.postMessage({
-                    action:'handleAddVersion',
+                this.kanbanWorker.postMessage({
+                    action:'handleAddSprint',
                     data:data
                 });
             }else{
                 this.isLoadingAdd=false;
             }
         },
-        handleUpdateVersion(){
+        handleUpdateSprint(status = null){
             this.isLoadingAdd = true;
             let isValid = this.validateData();
             if (isValid) {
                 let data={};
-                data.name=this.dataVersionProps.name.value;
-                data.description=this.dataVersionProps.description.value;
-                data.status=this.infoVersion.status;
+                data.name=this.dataSprintProps.name.value;
+                data.description=this.dataSprintProps.description.value;
+                if (status) {
+                    this.statusSprint = status;
+                    data.status=status;
+                }else{
+                    data.status=this.infoSprint.status;
+                }
                 if (this.dateStart) {
                     data.startTime=this.dateStart;
                 }
                 if (this.dateEnd) {
                     data.endTime=this.dateEnd;
                 }
+
                 // đẩy xuống worker xử lý
-                this.versionWorker.postMessage({
-                    action:'handleUpdateVersion',
-                    data:{id:this.infoVersion.id,data:data}
+                this.kanbanWorker.postMessage({
+                    action:'handleUpdateSprint',
+                    data:{id:this.infoSprint.id,data:data}
                 });
             }else{
                 this.$snotifyError("", "Have error!");
@@ -362,7 +386,7 @@ export default {
             this.isShow=true;
         },
         validateData(){
-            let data=this.dataVersionProps;
+            let data=this.dataSprintProps;
             for (var key in data) {
                 data[key].validate();
                 if (data[key].validateStatus.isValid==false) {
@@ -377,25 +401,35 @@ export default {
     },
     created(){
         let self = this;
-        this.versionWorker = new VersionWorker();
-        this.versionWorker.addEventListener("message", function (event) {
+        this.kanbanWorker = new KanbanWorker();
+        this.kanbanWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
                 case 'actionError':
                     self.isShow=false;
                     self.isLoadingAdd=false;
-                case 'handleUpdateVersion':
-                    self.$snotifySuccess("Update version success!");
-                    self.$emit("add-version"); // emit sự kiện để reload data
+                case 'handleUpdateSprint':
+                    if (self.statusSprint == 'running') {
+                        self.$snotifySuccess("Start sprint success!");
+                        self.$emit("start-sprint-success");
+                    }else{
+                        self.$snotifySuccess("Update sprint success!");
+                        self.$emit("update-sprint-success");
+
+                    }
                     self.isShow=false;
                     self.isLoadingAdd=false;
                     break;
-                case 'handleAddVersion':
-                    self.$emit("add-version");
-                    self.$snotifySuccess("Add version completed!");
-                    self.isShow=false;
-                    self.isLoadingAdd=false;
+                case 'handleAddSprint':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$emit("add-sprint",res.data);
+                        self.$snotifySuccess("Add sprint completed!");
+                        self.isShow=false;
+                        self.isLoadingAdd=false;
+                    }
                     break;
+        
                 default:
                     break;
             }
