@@ -10,9 +10,15 @@
                 <DashboardWorkspace 
                     :instanceKey="instanceKey"/>
             </div>
-            <div class="d-flex flex-column h-100">
+				<v-icon @click="showReportConfig = true">
+					mdi-folder
+				</v-icon>
+            <div class="d-flex flex-column h-100" >
                 <ReportTypeSelector 
-                    :instanceKey="instanceKey"/>
+                    :instanceKey="instanceKey"
+					:showReportConfig="showReportConfig"
+					@collapse-report-config="showReportConfig = false"
+					/>
                 <ReportConfig 
                     :instanceKey="instanceKey"/>
             </div>
@@ -45,7 +51,8 @@ export default {
     },
     data(){
         return {
-            instanceKey: Date.now() 
+			instanceKey: Date.now() ,
+			showReportConfig: true
         }
     },
     methods: {

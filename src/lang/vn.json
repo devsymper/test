@@ -1269,7 +1269,10 @@
 	"bi":{
 		"dashboard":{
 			"titleShowList": "Danh sách báo cáo",
-			"title-visualization":"Các loại chart"
+			"title-visualization":"Các loại chart",
+			"column-config":"Cấu hình cột",
+			"style-config":"Cấu hình style",
+			"condition-config":"Cấu hình condition"
 		}
 	},
     "virtualdoc": {
