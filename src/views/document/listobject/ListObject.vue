@@ -620,18 +620,18 @@ export default {
             }
         },
         afterSelectedRow(dataSelected){
-            this.countRecordSelected = Object.keys(dataSelected).length;
+            this.countRecordSelected = dataSelected.length;
             this.recordSelected = dataSelected; 
         },
         /**
          * Ấn để in các bản ghi đã chọn
          */
         printSelected(){
-            if(Object.keys(this.recordSelected).length == 0){
+            if(this.recordSelected.length == 0){
                 this.$snotify({
-                            type: "info",
-                            title: "Vui lòng chọn bản ghi để in"
-                        }); 
+					type: "info",
+					title: "Vui lòng chọn bản ghi để in"
+				}); 
                 return;
             }
             this.hideBottomSheet();
