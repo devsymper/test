@@ -493,6 +493,12 @@ export default {
 				return {}
 			}
 		},
+		checkedRows:{
+			type: Array,
+			default(){
+				return []
+			}
+		},
         getDataFromFilterUrl: {
             type: String,
             default: ""
@@ -620,9 +626,11 @@ export default {
 	created(){
 		let self = this
 		this.$evtBus.$on('list-items-ag-grid-on-change-checkbox',data=>{
+			self.$set(data.data, 'checked', true)
 			if(!self.allRowChecked.includes(data.data)){
 				self.allRowChecked.push(data.data)
 			}else{
+				data.checked = false
 				self.allRowChecked.splice(self.allRowChecked.indexOf(data.data), 1)
 			}
 			self.$emit('after-selected-row',self.allRowChecked)
@@ -718,6 +726,15 @@ export default {
 				this.showSearchBox = false
             }else{
 				this.showSearchBox = true
+			}
+		},
+		checkedRows:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				if(arr.length > 0){
+					this.allRowChecked = arr
+				}
 			}
 		},
 		rowData:{
@@ -1135,7 +1152,6 @@ export default {
 			// }else{
 			self.rowData = resData;
 			// }z
-			
 			data.columns.forEach(function(e){
 				if(e.cellRenderer){
 					e.cellRenderer = e.cellRenderer.toString()

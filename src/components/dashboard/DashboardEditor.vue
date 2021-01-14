@@ -46,6 +46,7 @@
         </div>
 		<DatasetSelector
 			ref="datasetSelector"
+			v-model="listDatasetSelected"
 			:tableHeight="tableHeight"
 		/> 	
     </div>
@@ -83,11 +84,20 @@ export default {
 			instanceKey: Date.now() ,
 			showReportConfig: true,
 			showDatasetSelectorDialog: false,
-			tableHeight: 0
+			tableHeight: 0,
+			listDatasetSelected:["2879" , "3020"],
         }
 	},
 	mounted(){
 		this.tableHeight = util.getComponentSize(this).h - 100
+	},
+	watch:{
+		listDatasetSelected:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+			}
+		}
 	},
     methods: {
         getDashboardInfo(){
@@ -100,6 +110,7 @@ export default {
                 });
             }
 		},
+		
 		toggleDatasetDialog(){
 			this.$refs.datasetSelector.show()
 		},

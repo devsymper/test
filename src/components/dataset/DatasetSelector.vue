@@ -6,12 +6,16 @@
 		class="h-100 w-100"
 	>
 		<ListItem 
+			ref="listObject"
 			:showButtonAdd="false"
 			:showExportButton="false"
 			:showDisplayConfig="false"
 			:containerHeight="tableHeight"
 			:getDataUrl="getDataUrl"
 			:customAPIResult="customAPIResult"
+			@data-loaded="addCheckboxColumn"
+			@after-selected-row="changeDatasetSelected"
+			:checkedRows="checkedRows"
 			:customHeaderBtn="customHeaderBtn"
 			@custom-btn-cliced="handlerCustomBtnClick"
 		/>
@@ -27,32 +31,34 @@ export default {
 		ListItem
 	},
 	props:{
-	
+        value: {
+            type: Array,
+            default(){
+                return []
+            }
+        },
 		tableHeight:{
 			type: Number,
 			default: 0
 		}
 	},
 	data(){
+		let self = this
 		return{
 			showDialog: false,
-			listDatasetSelected:[],
+			checkedRows: [],
 			getDataUrl: appConfigs.apiDomain.biService +"datasets/get-list",
 			customAPIResult:{
 				reformatData(res){
 					res.data.columns.forEach(function(e){
 						e.flex = 1
 					})
-					res.data.columns.unshift(
-						{ 
-							headerName: 'Chọn', 
-							field: 'checkbox', 
-							editable:true,
-							cellRendererFramework : 'CheckBoxRendererListItems',
-							width: 50
-						}	
-					)
-					debugger
+					res.data.listObject.forEach(function(e){
+						if(self.value.includes(e.id)){
+							e.checked = true
+							self.checkedRows.push(e)
+						}
+					})
 					return{
 						columns:res.data.columns,
 						listObject: res.data.listObject,
@@ -71,7 +77,8 @@ export default {
 					icon: 'mdi-check'
 				},
 				
-			}
+			},
+			
 		}
 	},
 	methods:{
@@ -83,6 +90,18 @@ export default {
 			if(this[i]){
 				this[i]()
 			}
+		},
+		changeDatasetSelected(data){
+			let arr = []
+			data.forEach(function(e){
+				arr.push(e.id)
+			})
+			this.$emit('input', arr)
+		},
+		addCheckboxColumn(){
+			setTimeout(self=>{
+				self.$refs.listObject.addCheckBoxColumn()
+			},200, this)
 		},
 		select(){
 			this.$emit('list-dataset-selected' , this.listDatasetSelected)
