@@ -1,7 +1,10 @@
 <template>
     <div class="symper-dashboard-editor h-100 w-100">
-        <div class="d-flex">
-            <div class="d-flex flex-column">
+        <div class="d-flex h-100 w-100">
+            <div class="d-flex flex-column"
+                :style="{
+                    width: 'calc(100% - 450px)'
+                }">
                 <DashboardToolBar 
                     :style="{
                         height: '35px'
@@ -15,9 +18,9 @@
             </div>
             <div class="d-flex flex-column h-100"
                 :style="{
-                    width: '250px'
+                    width: '200px'
                 }">
-                <ReportTytpeSelector 
+                <ReportTypeSelector 
                     :instanceKey="instanceKey"/>
                 <ReportConfig 
                     :instanceKey="instanceKey"/>
@@ -25,7 +28,7 @@
             <DashboardDasetDetail
                 class="h-100"
                 :style="{
-                    width: '300px'
+                    width: '250px'
                 }" 
                 :instanceKey="instanceKey"/>
         </div>
@@ -40,8 +43,9 @@ import ReportConfig from "@/components/dashboard/components/ReportConfig.vue";
 import ReportTypeSelector from "@/components/dashboard/components/ReportTypeSelector.vue";
 import DashboardEditorWorker from 'worker-loader!@/worker/dashboard/DasboardEditor.Worker.js';
 import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
+
 var reportClasses = autoLoadChartClasses();
-console.log(reportClasses, 'reportClassesreportClassesreportClasses');
+
 export default {
     components: {
         DashboardDasetDetail,

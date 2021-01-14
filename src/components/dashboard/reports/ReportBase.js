@@ -2,12 +2,13 @@
  * Class chứa các thuộc tính và các phương thức chung của toàn bộ các report 
  */
 export default class ReportBase {
-    /* Các thuộc tính và các method ở dưới đây bắt buộc phải được override trong các lớp con */
-    columnSettingKeys = {};
-    styleKeys = {};
-    setSampleColumnSetting(){}
-    setSampleStyleConfig(){}
-    /******************************************************************************************/
+    // Các thuộc tính bắt buộc phải có ở các class kế thừa class này
+    mustOverrideMembers = {
+        columnSettingKeys: Object,
+        styleKeys : Object,
+        setSampleColumnSetting: Function,
+        setSampleStyleConfig: Function
+    }
 
     rawConfigs = { // config thô do BA setting
         condition: [], // cấu hình điều kiện cho report này
