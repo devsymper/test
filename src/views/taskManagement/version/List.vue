@@ -8,6 +8,8 @@
 <script>
 import listVersion from '../../../components/taskManagement/version/ListVersion.vue';
 import { taskManagementApi } from "@/api/taskManagement.js";
+import VersionWorker from 'worker-loader!@/worker/taskManagement/version/Version.Worker.js';
+
 export default {
     name:"versions",
     components: { 
@@ -16,27 +18,42 @@ export default {
      data(){
         return{
             listVersion:[],
+            versionWorker:null
+
         }
     },
     methods:{
         addVersion(){
             this.getListVersion();
         },
-        async getListVersion(){
-            let self=this;
+        getListVersion(){
             let id=this.$route.params.id;
-            if (id) {
-                let listVersion =await taskManagementApi.getListVersion(id);
-                if (listVersion.status==200 && listVersion.data) {
-                    self.listVersion=listVersion.data.listObject;
-                    self.$store.commit("taskManagement/setListVersion", listVersion.data.listObject);
-                }
-              
-            }
+            this.versionWorker.postMessage({
+                action:'getListVersion',
+                data:id
+            });
+
         },
     },
-    async created(){
-        await this.getListVersion();
+    created(){
+        let self = this;
+        this.versionWorker = new VersionWorker();
+        this.getListVersion();
+
+        this.versionWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getListVersion':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/setListVersion", res.data.listObject);
+                        self.listVersion = res.data.listObject;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
     },
     activated(){
         let projectId=this.$route.params.id;

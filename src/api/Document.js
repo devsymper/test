@@ -12,7 +12,7 @@ export const documentApi = {
         return coreApi.get("documents/"+docId+"/objects");
     },
     getListObjectByMultipleDocument(data) {
-        return coreApi.post("documents/objects-by-multiple-document",data);
+        return coreApi.post("documents/objects-by-multiple-document",data,{},{'contentType': 'application/json'});
     },
     getBatchDocument(data) {
         return coreApi.post("documents/batch", data);
