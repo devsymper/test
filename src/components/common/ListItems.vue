@@ -974,7 +974,7 @@ export default {
 			headerComponentParams :{
 				headerPrefixKeypath: this.headerPrefixKeypath
             },
-            cellStyle: {color: 'red', 'background-color': 'green'}
+            
         };
 		this.gridOptions = {};
 		// this.gridOptions.rowHeight =  this.rowHeight
@@ -1334,7 +1334,7 @@ export default {
 				}
 				this.savedTableDisplayConfig = res.savedConfigs.columns;
 				if(res.columnDefs){
-					this.columnDefs = res.columnDefs
+                    this.columnDefs = res.columnDefs,
 					this.handleStopDragColumn();
                 }
                 // xử lý phần filter
