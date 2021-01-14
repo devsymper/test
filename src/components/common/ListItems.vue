@@ -1,5 +1,5 @@
 <template>
-     <div :style="{width:contentWidth}" class="h-100 w-100 d-flex flex-column p-2">
+     <div :style="{width:contentWidth}" class="symper-list-items h-100 w-100 d-flex flex-column p-2">
 		 <div v-if="showToolbar" class="d-flex mb-2 " ref="topBar">
 			<div 
 			 	class="align-items-center flex-grow-1" 
@@ -221,7 +221,6 @@
 				:columnDefs="columnDefs"
 				@rowClicked="handlerRowClicked"
 				:rowData="rowData"
-                :rowSelection="rowSelection"
 				:frameworkComponents="frameworkComponents"
 				:overlayLoadingTemplate="overlayLoadingTemplate"
 				:overlayNoRowsTemplate="overlayNoRowsTemplate"
@@ -229,6 +228,7 @@
 				@cell-context-menu="cellContextMenu"
 				@cell-mouse-down="cellMouseDown"
 				@selection-changed="onSelectionChanged"
+				@cell-clicked="onCellClicked"
 				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
 			>
@@ -338,7 +338,7 @@ import TableFilter from '@/components/common/customTable/TableFilter'
 import PerfectScrollbar from "perfect-scrollbar";
 import ListItemsWorker from 'worker-loader!@/worker/common/listItems/ListItems.Worker.js';
 import { actionHelper } from "@/action/actionHelper";
-import CheckBoxRenderer from "@/components/common/agDataTable/CheckBoxRenderer"
+import CheckBoxRendererListItems from "@/components/common/agDataTable/CheckBoxRendererListItems"
 
 let CustomHeaderVue = Vue.extend(CustomHeader);
 
@@ -597,6 +597,7 @@ export default {
 				self.allRowChecked.splice(self.allRowChecked.indexOf(data.data), 1)
 			}
 			self.$emit('after-selected-row',self.allRowChecked)
+			// self.$emit('row-selected',self.allRowChecked)
         })
 		this.listItemsWorker = new ListItemsWorker()
         this.listItemsWorker.addEventListener("message", function (event) {
@@ -782,7 +783,6 @@ export default {
 			fixedCols:[],
 			defaultColDef:null,
 			arrContextMenu: [],
-			rowSelection: null,
 			selectedContextItem: null,
 			getContextMenuItems(param){
 				self.paramOnContextMenu = param;
@@ -841,7 +841,7 @@ export default {
 		VNavigationDrawer,
 		VDialog,
 		TableFilter,
-		CheckBoxRenderer
+		CheckBoxRendererListItems
 
 	},
 	mounted(){
@@ -860,29 +860,30 @@ export default {
 				headerPrefixKeypath: this.headerPrefixKeypath
 			}
 		};
-		this.gridOptions = {};
-		this.gridOptions.enableRangeSelection = true;
-		this.gridOptions.enableRangeHandle = true;
-		this.gridOptions.getRowStyle = function(params) {
-			if (params.node.rowIndex % 2 != 0) {
-				return { background: '#fbfbfb' };
+		this.gridOptions = {
+			enableRangeSelection: true,
+			// rowSelection: 'multiple',
+			onCellKeyDown: this.onCellKeyPress,
+			getRowStyle: function(params) {
+				if (params.node.rowIndex % 2 != 0) {
+					return { background: '#fbfbfb' };
+				}
 			}
 		}
 		this.frameworkComponents = {
 			agColumnHeader: CustomHeaderVue,
-			CheckBoxRenderer: CheckBoxRenderer
+			CheckBoxRendererListitems: CheckBoxRendererListItems
 		};
 		this.overlayLoadingTemplate =
 		  '<span class="ag-overlay-loading-center">Đang tải dữ liệu vui lòng chờ </span>';
 		this.overlayNoRowsTemplate =
       	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
-		this.rowSelection = 'multiple';
-		
     },
 	methods:{
 		getAllData(){
 			return this.rowData
 		},
+		
 		customRowHeights(value){
 			if(value == 1){
 				this.gridOptions.rowHeight  = this.rowHeight
@@ -906,11 +907,28 @@ export default {
 			this.agApi.hideOverlay();
 		},
 		cellContextMenu(params){
+			this.changeSelectionRow()
 			this.$emit('cell-context-menu', params)
 		},
 		cellMouseDown(params){
-			debugger
 			this.$emit('after-cell-mouse-down', params)
+		},
+		changeSelectionRow(){
+			let arr = document.getElementsByClassName('ag-row-selected')
+			for(let i = 0; i < arr.length ; i++){
+				$(arr[i]).removeClass('ag-row-selected')
+			}
+			if(arr.length > 0){
+				for(let i = 0; i < arr.length ; i++){
+					$(arr[i]).removeClass('ag-row-selected')
+				}
+			}
+			if(document.getElementsByClassName('ag-row-selected').length > 0){
+			 	$(document.getElementsByClassName('ag-row-selected')[0]).removeClass('ag-row-selected')
+			}	
+			$(document.getElementsByClassName('ag-row-focus')).each(function(e){
+				$(document.getElementsByClassName('ag-row-focus')[e]).addClass('ag-row-selected')
+			}) 
 		},
 		cellMouseOver(params){
 			this.cellAboutSelecting = params.data
@@ -932,7 +950,7 @@ export default {
 					headerName: 'Chọn', 
 					field: 'checkbox', 
 					editable:true,
-					cellRendererFramework : 'CheckBoxRenderer',
+					cellRendererFramework : 'CheckBoxRendererListItems',
 					width: 50
 				}	
 			)
@@ -1159,8 +1177,8 @@ export default {
                 this.$delete(this.tableFilter.allColumn, colName);
                 icon.removeClass("applied-filter");
 			}
-			this.filteredColumns
-			this.$store.commit('app/setFilteredColumns', this.filteredColumns)
+			let widgetIdentifier = this.getWidgetIdentifier()
+			this.$store.commit('app/setFilteredColumns', {filteredColumns: this.filteredColumns, widgetIdentifier: widgetIdentifier})
 		},
 		confirmDeleteItems(){
             this.deleteDialogShow = false;
@@ -1341,10 +1359,19 @@ export default {
 		handlerRowClicked(params){
 			this.$emit('row-selected', params.data);
 		},
+		onCellClicked(params){
+			this.changeSelectionRow()
+			this.$emit('row-selected', params.data);
+		},
 		onSelectionChanged() {
 			var selectedRows = this.agApi.getSelectedRows();
 			document.querySelector('.ag-row-selected').innerHTML = selectedRows.length === 1 ? selectedRows[0].athlete : ''
-   		 },
+		},
+		onCellKeyPress(params){
+			if(params.event.keyCode == 67){
+				this.agApi.copySelectedRowsToClipboard();
+			}
+		},	
 		onGridReady(params){
 			params.api.sizeColumnsToFit()
 			this.agApi = params.api
@@ -1467,13 +1494,15 @@ export default {
             this.allRowChecked = []
         },
 		changePageSize(vl){
-            this.pageSize = vl.pageSize
+			this.pageSize = vl.pageSize
+			this.showLoadingOverlay()
             this.getData();
             this.$emit("change-page-size", vl.pageSize);
 		},
 		changePage(vl){
-            this.page = vl.page
-            this.getData();
+			this.page = vl.page
+			this.showLoadingOverlay()
+			this.getData();
             this.$emit("change-page", vl.page);
 		},
 		addItem() {
@@ -1589,47 +1618,47 @@ export default {
     
     
 </script>
-<style>
-.ag-row{
+<style scoped>
+.symper-list-items >>> .ag-row{
 	border-top-style:unset !important;
 }
-.ag-theme-balham .ag-root-wrapper{
+.symper-list-items >>> .ag-theme-balham .ag-root-wrapper{
 	border: unset !important;
 }
-.ag-header{
+.symper-list-items >>> .ag-header{
 	border: unset !important;
 }
-.ag-row{
+.symper-list-items >>> .ag-row{
 	border-radius: 4px;
 }
-.ag-row:hover{
+.symper-list-items >>> .ag-row:hover{
 	border-radius: 4px;
 }
-.ag-theme-balham .ag-cell{
+.symper-list-items >>> .ag-theme-balham .ag-cell{
 	line-height: unset !important
 }
-.ag-header {
+.symper-list-items >>> .ag-header {
 	height: 28px !important;
 	min-height: unset !important;
 	background-color: #ffffff !important;
 	border-top: 1px solid lightgray !important;
 	border-bottom: 1px solid lightgray !important;
 }
-.ag-theme-balham .ag-header-row {
+.symper-list-items >>> .ag-theme-balham .ag-header-row {
     height: 24px !important;
 }
-.ag-row-selected{
+.symper-list-items >>> .ag-row-selected{
 	background-color: #DBE7FE !important;
 }
-.clip-text .ag-cell{
+.symper-list-items >>> .clip-text .ag-cell{
 	text-overflow: ellipsis !important;
     white-space: nowrap !important;
 }
-.applied-filter {
+.symper-list-items >>> .applied-filter {
     color: #f58634;
     background-color: #ffdfc8;
 }
-.ag-menu-option-text{
+.symper-list-items >>> .ag-menu-option-text{
 	line-height: 12px !important;
 	padding-left: unset !important;
 }
