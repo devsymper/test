@@ -15,8 +15,8 @@
 					:src="'img/dashboard/report-builder/'+i+'.png'" 
 					@click="selectCellType(i)"
 					class="report-type-img" 
-					height="20px" 
-					width="20px" 
+					height="32px" 
+					width="32px" 
 					alt=""
 				>
 			</span>
@@ -61,6 +61,10 @@ export default {
 	/* background-color: lightgray; */
 }
 .report-type-img{
-	margin: 8px;
+	margin: 2px;
+	padding: 6px;
+}
+.report-type-img:hover{
+	background-color: lightgray;
 }
 </style>
