@@ -1,6 +1,6 @@
 <template>
-    <div class="symper-dashboard-editor h-100">
-        <div class="d-flex h-100">
+    <div class="symper-dashboard-editor h-100 w-100">
+        <div class="d-flex">
             <div class="d-flex flex-column">
                 <DashboardToolBar 
                     :style="{
@@ -8,15 +8,25 @@
                     }"
                     :instanceKey="instanceKey"/>
                 <DashboardWorkspace 
+                    :style="{
+                        height: 'calc(100 % - 35px)'
+                    }"
                     :instanceKey="instanceKey"/>
             </div>
-            <div class="d-flex flex-column h-100">
-                <ReportTypeSelector 
+            <div class="d-flex flex-column h-100"
+                :style="{
+                    width: '250px'
+                }">
+                <ReportTytpeSelector 
                     :instanceKey="instanceKey"/>
                 <ReportConfig 
                     :instanceKey="instanceKey"/>
             </div>
-            <DashboardDasetDetail 
+            <DashboardDasetDetail
+                class="h-100"
+                :style="{
+                    width: '300px'
+                }" 
                 :instanceKey="instanceKey"/>
         </div>
     </div>
@@ -29,7 +39,9 @@ import DashboardWorkspace from "@/components/dashboard/components/DashboardWorks
 import ReportConfig from "@/components/dashboard/components/ReportConfig.vue";
 import ReportTypeSelector from "@/components/dashboard/components/ReportTypeSelector.vue";
 import DashboardEditorWorker from 'worker-loader!@/worker/dashboard/DasboardEditor.Worker.js';
-
+import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
+var reportClasses = autoLoadChartClasses();
+console.log(reportClasses, 'reportClassesreportClassesreportClasses');
 export default {
     components: {
         DashboardDasetDetail,
