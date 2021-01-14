@@ -17,6 +17,7 @@
                 <ReportTypeSelector 
                     :instanceKey="instanceKey"
 					:showReportConfig="showReportConfig"
+					@selected-type="handlerSelectedChartType"
 					@collapse-report-config="showReportConfig = false"
 					/>
                 <ReportConfig 
@@ -65,7 +66,10 @@ export default {
                     }
                 });
             }
-        },
+		},
+		handlerSelectedChartType(type){
+
+		},
         setDashboardData(info){
 
         },

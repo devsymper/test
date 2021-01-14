@@ -130,8 +130,8 @@ export default {
 		}
 	},
 	methods:{
-		selectCellType(item){
-			debugger
+		selectCellType(type){
+			this.$emit('selected-type' , type)
 		},
 		collapse(){
 			this.$emit('collapse-report-config')
