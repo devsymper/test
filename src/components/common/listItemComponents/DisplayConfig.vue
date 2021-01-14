@@ -7,19 +7,29 @@
         right
         :style="{width: tableDisplayConfig.width+'px','z-index':'7'}"
     >
-        <div class="title">
-            <div>
-                {{$t('common.list_config')}}
-                <v-icon
-                    class="close-btn float-right"
-                    @click="handlerCloseClick"
-                >mdi-close</v-icon>
-            </div>
-            
-            <!-- <div class="pb-2 justify-space-between d-flex mt-2" v-if="showActionPanelInDisplayConfig">
+    <div>
+        <v-icon
+            class="close-btn float-right"
+            @click="handlerCloseClick">
+            mdi-close
+        </v-icon>
+    </div>
+     <v-tabs v-model="tab" color="orange" grow style="flex-grow: 0">
+        <v-tab href="#tab-1" class="tab">
+            <span class="fs-12"> {{$t('common.list_config')}}</span>
+          
+        </v-tab>
+         <v-tab href="#tab-2" class="tab">
+             <span class="fs-12"> {{$t('common.format_table')}}</span>
+        </v-tab>
+    </v-tabs>
+      <v-tabs-items v-model="tab" style="flex-grow: 1">
+        <v-tab-item :key="1" :value="'tab-' + 1" class="tab-item" style="flex-grow: 1">
+            <div class="title">
+            <div class="pb-2 justify-space-between d-flex mt-2" v-if="showActionPanelInDisplayConfig">
                 <div class="subtitle-2">{{$t('common.always_show_sidebar')}}</div>
                 <v-switch style="height: 25px" v-model="tableDisplayConfig.value.alwaysShowSidebar" class="float-right pt-0 mt-0" ></v-switch>
-            </div> -->
+            </div>
             <div class="pb-2">
                 <div class="subtitle-2">{{$t('table.wrap_text_mode')}}</div>
                 <div>
@@ -131,16 +141,23 @@
                 </v-btn>
             </div>
         </template>
+        </v-tab-item>
+         <v-tab-item :key="2" :value="'tab-' + 2" class="tab-item" style="flex-grow: 1">
+            <ConditionalFormatting :tableColumns="tableColumns" :headerPrefixKeypath='headerPrefixKeypath'/>
+        </v-tab-item>
+        </v-tabs-items>
     </v-navigation-drawer>
 </template>
 
 <script>
 import { appConfigs } from "./../../../configs.js";
 import draggable from "vuedraggable";
+import ConditionalFormatting from "./ConditionalFormatting";
 import { util } from '../../../plugins/util';
 export default {
     components: {
         draggable,
+        ConditionalFormatting
     },
     watch: {
         tableColumns: {
@@ -153,12 +170,15 @@ export default {
     },
     data(){
         return {
+            tab:null,
+            lists:['Min value','None value','Max value'],
             savingConfigs: false,
             tableColumnsClone: []
         }
     },
     computed: {},
     props: {
+       
         tableDisplayConfig: {
             type: Object,
             default(){
@@ -226,5 +246,9 @@ export default {
 .column-drag-pos{
 	border: 1px solid lightgray;
 	padding-left: 2px;
+}
+.v-label {
+    font-size:13px!important;
+    color:black!important
 }
 </style>

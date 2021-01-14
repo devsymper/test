@@ -627,7 +627,7 @@ export default {
 		});
 		this.getData()
 		this.restoreTableDisplayConfig();
-
+        
 	},
 	computed:{
 		alwaysShowActionPanel(){
@@ -854,12 +854,18 @@ export default {
 			autoHeight: true,
 			headerComponentParams :{
 				headerPrefixKeypath: this.headerPrefixKeypath
-			}
+            },
+            cellStyle: {color: 'red', 'background-color': 'green'}
         };
 		this.gridOptions = {};
 		// this.gridOptions.rowHeight =  this.rowHeight
 		this.gridOptions.getRowStyle = function(params) {
+            debugger
+            // if(params.data['status']=='Đang hoạt động'){
+            //     	return { background: '#fbfbfb' }
+            // }
 			if (params.node.rowIndex % 2 != 0) {
+                debugger
 				return { background: '#fbfbfb' };
 			}
 		}
@@ -1109,7 +1115,8 @@ export default {
 				this.savedTableDisplayConfig = res.savedConfigs.columns;
 				if(res.columnDefs){
 					this.columnDefs = res.columnDefs
-					this.handleStopDragColumn();
+                    this.handleStopDragColumn();
+                    //  this.tableDisplayConfig.show = true
 				}
 			}
 		},
@@ -1424,6 +1431,8 @@ export default {
         },
 		openTableDisplayConfigPanel() {
             this.tableDisplayConfig.show = !this.tableDisplayConfig.show;
+            // this.tableDisplayConfig.show = true;
+
 		},
 		bindToSearchkey(vl) {
             this.searchKey = vl;
