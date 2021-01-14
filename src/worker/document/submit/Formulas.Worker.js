@@ -21,14 +21,14 @@ onmessage = function (event) {
             }
             let extraData = dataOfAction.extraData;
             let sqlRowId = dataOfAction.sqlRowId;
-            let dataInput = {}
+            let dataInput = {};
             if(dataOfAction.dataInput){
                 dataInput = dataOfAction.dataInput;
             }
             else{
                 dataInput = formulaIns.getDataInputFormula(rowIndex,extraData);
             }
-            if(['rowTable','columnTable'].includes(from)){
+            if(['columnTable'].includes(from)){
                 dataInput = dataOfAction.dataInput
             }
             

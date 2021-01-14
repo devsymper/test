@@ -70,7 +70,11 @@ export default {
             dataSelected:{}
         }
     },
-   
+    created(){
+        this.$evtBus.$on("document-submit-hide-autocomplete",e=>{
+            this.hide();
+        })
+    },
     methods:{
        
         show(e){
@@ -152,22 +156,22 @@ export default {
         },
         calculatorPositionBox(e){
             // nếu autocomplete từ cell của handsontable  
-            if(e.hasOwnProperty('curTarget')){
-                this.curInput = $(e.curTarget);
+            if($(e.target).is('.ag-cell') || $(e.target).is('.ag-cell-autocomplete')){
+                this.curInput = $(e.target);
                 let autoEL = $(this.$el).detach();
-                $(e.curTarget).closest('.wrap-table').append(autoEL);
-                let edtos = $(e.curTarget).offset();
-                if(!$(e.curTarget).is('.handsontableInput')){
-                    edtos = $(e.curTarget).closest('td.htAutocomplete.current.highlight').offset();
-                }
-                if($(e.curTarget).is('div.select-cell')){
-                    edtos = $(e.curTarget).parent().offset();
-                }
-                if($(e.curTarget).is('div.select-cell .select-chervon-bottom')){
-                    edtos = $(e.curTarget).parent().parent().offset();
-                }
-                let tbcos = $(e.curTarget).closest('.wrap-table').find('[s-control-type="table"]').offset();
-                this.positionBox = {'top':edtos.top - tbcos.top + $(e.curTarget).height() +'px','left':edtos.left - tbcos.left+'px'};
+                $(e.target).closest('.wrap-table').append(autoEL);
+                let edtos = $(e.target).offset();
+                // if(!$(e.target).is('.handsontableInput')){
+                //     edtos = $(e.target).closest('td.htAutocomplete.current.highlight').offset();
+                // }
+                // if($(e.target).is('div.select-cell')){
+                //     edtos = $(e.target).parent().offset();
+                // }
+                // if($(e.target).is('div.select-cell .select-chervon-bottom')){
+                //     edtos = $(e.target).parent().parent().offset();
+                // }
+                let tbcos = $(e.target).closest('.wrap-table').offset();
+                this.positionBox = {'top':edtos.top - tbcos.top + this.curInput.height() + 3 +'px','left':edtos.left - tbcos.left+'px'};
             }
             //nêu là ngoài bảng
             else{
@@ -255,7 +259,9 @@ export default {
             else{
                 value = {inputDislay:value, inputValue:value};
             }
-            this.$emit('after-select-row',{value:value,fromEnterKey:fromEnterKey});
+            this.curInput.val(value.inputValue);
+            
+            // this.$emit('after-select-row',{value:value,fromEnterKey:fromEnterKey});
 
         },
         openSubForm(){

@@ -13,11 +13,10 @@ AutoCompleteCellEditor.prototype.init = function(params) {
     if (params.value) {
         this.eInput.value = params.value;
     }
-    console.log(params,'this.params');
+    
     this.params = params;
     this.controlName = params.controlName
     this.eInput.classList.add('ag-input-field-input');
-    this.eInput.classList.add('ag-cell-autocomplete');
     this.eInput.classList.add('ag-text-field-input');
     this.eInput.style.height = 'inherit'
     var startValue;
@@ -43,8 +42,7 @@ AutoCompleteCellEditor.prototype.init = function(params) {
     this.eInput.addEventListener('keyup', function(e){
         SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
             e: e,
-            controlName: self.controlName,
-            rowIndex:self.params.rowIndex
+            controlName: self.controlName
         })
     } );
 };

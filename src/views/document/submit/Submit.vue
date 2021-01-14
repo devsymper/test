@@ -469,7 +469,9 @@ export default {
                         let tableControl = getControlInstanceFromStore(thisCpn.keyInstance, controlIns.inTable);
                         tableControl.tableInstance.afterRunFormula(res, formulaType , controlIns, dataRowId, from);
                     }
-                    thisCpn.handleAfterRunFormulas(res,controlName,formulaType,from);
+                    else{
+                        thisCpn.handleAfterRunFormulas(res,controlName,formulaType,from);
+                    }
                     break;
                 case 'afterCreateSQLiteDB':
                     thisCpn.handleLoadContentDocument();
@@ -759,22 +761,22 @@ export default {
                 if((e.e.keyCode >= 96 && e.e.keyCode <= 105) ||
                     (e.e.keyCode >= 48 && e.e.keyCode <= 57) ||
                     (e.e.keyCode >= 65 && e.e.keyCode <= 90) || [189,16,8,32,231].includes(e.e.keyCode)) { // nếu key code là các kí tự chữ và số hợp lệ
+                    let controlIns = getControlInstanceFromStore(thisCpn.keyInstance, e.controlName);
                     if(!thisCpn.$refs.autocompleteInput.isShow()){
                         thisCpn.$refs.autocompleteInput.setTypeInput('autocomplete');
-                        let controlIns = getControlInstanceFromStore(thisCpn.keyInstance, e.controlName);
                         thisCpn.$refs.autocompleteInput.setControlValueKey(controlIns.getAutocompleteKeyValue());
                         thisCpn.$refs.autocompleteInput.show(e.e);
-                        let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
-                        if(currentTableInteractive != null && currentTableInteractive != undefined)
-                        currentTableInteractive.isAutoCompleting = true;
+                        // let currentTableInteractive = this.sDocumentSubmit.currentTableInteractive;
+                        // if(currentTableInteractive != null && currentTableInteractive != undefined)
+                        // currentTableInteractive.isAutoCompleting = true;
                         thisCpn.$store.commit("document/addToDocumentSubmitStore", {
                             key: 'currentControlAutoComplete',
                             value: e.controlName,
                             instance: thisCpn.keyInstance
                         });
                     }
-                    if(e.isSelect == false){
-                        thisCpn.getDataForAutocomplete(e,'autocomplete');
+                    if(!e.isSelect){
+                        thisCpn.getDataForAutocomplete(e,'autocomplete',"",controlIns);
                     }
                 }
                 else if((e.e.keyCode < 37 || e.e.keyCode > 40)){
@@ -1264,23 +1266,25 @@ export default {
         /**
          * Hàm chạy công thức autocomplete để đổ dữ liệu vào box autucomplete, control select cũng dùng trường hợp này
          */
-        getDataForAutocomplete(e,type,aliasControl=""){ 
+        getDataForAutocomplete(e,type,aliasControl="", controlIns){ 
             let thisCpn = this
             let listInput = getListInputInDocument(this.keyInstance);
             if(['select','combobox'].includes(type)){
-                this.formulasWorker.postMessage({action:'runFormula',data:{formulaInstance:e.selectFormulasInstance, controlName:aliasControl, keyInstance:this.keyInstance}})
+                let formulaIns = controlIns.getFormulaInstance('list');
+                this.formulasWorker.postMessage({action:'runFormula',data:{formulaInstance:formulaIns, controlName:aliasControl, keyInstance:this.keyInstance}})
             }
             else{
-                
-                let aliasControl = e.autocompleteFormulasInstance.autocompleteDetectAliasControl();
+                let formulaIns = controlIns.getFormulaInstance('autocomplete');
+                let aliasControl = formulaIns.autocompleteDetectAliasControl();
                 let extraItem = {};
                 extraItem[aliasControl] = $(e.e.target).val();
-                let dataInput = e.autocompleteFormulasInstance.getDataInputFormula(e.e.rowIndex,extraItem,listInput);
-                let dataFromCache = this.getDataAutocompleteFromCache(aliasControl, dataInput);
+                // let dataInput = formulaIns.getDataInputFormula(e.e.rowIndex,extraItem,listInput);
+                // let dataFromCache = this.getDataAutocompleteFromCache(aliasControl, dataInput);
+                let dataFromCache = false;
                 if(dataFromCache == false){
                     this.formulasWorker.postMessage({action:'runFormula',data:
                         {
-                            formulaInstance:e.autocompleteFormulasInstance, 
+                            formulaInstance:formulaIns, 
                             controlName:aliasControl, 
                             rowIndex:e.e.rowIndex,
                             extraData:extraItem,
@@ -1459,7 +1463,7 @@ export default {
                 }
             }
             let controlToWorker = {name:controlName,type:controlInstance.type,value:controlInstance.value}
-            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, value:controlInstance.value, keyInstance:this.keyInstance, type:'submit'}})
+            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker,keyInstance:this.keyInstance, type:'submit'}})
             if(isRunChange){
                 this.handleControlInputChange(controlInstance);
             }
@@ -1742,7 +1746,6 @@ export default {
                                 (this.dataGroupTable) ? this.dataGroupTable[controlName] : {},
                             );
                             tableControl.setEffectedData(prepareData);
-                            // tableControl.tableInstance.setFormulasWorker(thisCpn.formulasWorker)
                             let tableEle = $(allInputControl[index]);
                             tableEle.find(".s-control").each(function() {
                                 let childControlId = $(this).attr("id");
@@ -1772,6 +1775,7 @@ export default {
                             });
                             tableControl.controlInTable = controlInTable;
                             tableControl.renderTable();
+                            tableControl.tableInstance.setFormulasWorker(thisCpn.formulasWorker);
                             if(this.viewType !== 'submit'){
                                 tableControl.setData(valueInput);
                             }
@@ -2403,7 +2407,7 @@ export default {
         updateListInputInDocument(controlName, key, value) {
             let controlIns = getControlInstanceFromStore(this.keyInstance,controlName);
             let controlToWorker = {name:controlName,type:controlIns.type,value:controlIns.value}
-            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, value:value, keyInstance:this.keyInstance, type:'submit'}})
+            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, keyInstance:this.keyInstance, type:'submit'}})
             this.$store.commit("document/updateListInputInDocument", {
                 controlName: controlName,
                 key: key,
@@ -2414,7 +2418,7 @@ export default {
         
         addToListInputInDocument(name,control){
             let controlToWorker = {name:control.name,type:control.type,value:control.value}
-            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, value:control.value, keyInstance:this.keyInstance, type:'submit'}})
+            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, keyInstance:this.keyInstance, type:'submit'}})
              this.$store.commit(
                             "document/addToListInputInDocument",
                             { name: name, control: control ,instance: this.keyInstance}
@@ -2983,7 +2987,7 @@ export default {
                 return;
             }
             let controlToWorker = {name:controlInstance.name,type:controlInstance.type,value:controlInstance.value}
-            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, value:controlInstance.value, keyInstance:this.keyInstance, type:'submit'}})
+            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, keyInstance:this.keyInstance, type:'submit'}})
             resetImpactedFieldsList(this.keyInstance);
             this.handleControlInputChange(controlInstance);
         },

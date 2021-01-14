@@ -15,6 +15,12 @@ p {
 @page {
     margin: 0;
 }
+div.ag-root {
+    -webkit-user-select:text;
+    -moz-user-select:text;
+    -ms-user-select:text;
+    user-select:text;
+    }
 
 .document-form-style-default  input:not(.ag-input-field-input){
     border-bottom: 0.5px solid #ccc;
