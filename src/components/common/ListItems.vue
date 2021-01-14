@@ -196,6 +196,21 @@
                             </template>
                             <span>{{alwaysShowActionPanel ? $t('common.not_always_show_sidebar') : $t('common.always_show_sidebar')}}</span>
                         </v-tooltip>
+
+						
+						<span v-if="Object.keys(customHeaderBtn).length > 0">
+							 <v-btn
+								depressed
+								small
+								v-for="(item, i) in customHeaderBtn"
+								:key="i"
+								@click="customBtnclick(i)"
+								class="mr-2"
+							>
+								<v-icon left dark>{{item.icon}}</v-icon>
+								<span> {{item.title}} </span>
+							</v-btn>
+						</span>
 			 </div>
 		 </div>
 		 <div
@@ -363,7 +378,22 @@ export default {
         useDefaultContext: {
             type: Boolean,
             default: false
-        },
+		},
+		/**
+		 * Custom thêm các action trong header show list 
+		 */
+		customHeaderBtn:{
+			type: Object,
+			default(){
+				return {}
+			}
+		},
+		checkedRows:{
+			type: Array,
+			default(){
+				return []
+			}
+		},
 		/**
 		 * Truyeenf vao row height
 		 * 
@@ -591,9 +621,11 @@ export default {
 	created(){
 		let self = this
 		this.$evtBus.$on('list-items-ag-grid-on-change-checkbox',data=>{
+			self.$set(data.data, 'checked', true)
 			if(!self.allRowChecked.includes(data.data)){
 				self.allRowChecked.push(data.data)
 			}else{
+				data.checked = false
 				self.allRowChecked.splice(self.allRowChecked.indexOf(data.data), 1)
 			}
 			self.$emit('after-selected-row',self.allRowChecked)
@@ -689,6 +721,15 @@ export default {
 				this.showSearchBox = false
             }else{
 				this.showSearchBox = true
+			}
+		},
+		checkedRows:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				if(arr.length > 0){
+					this.allRowChecked = arr
+				}
 			}
 		},
 		rowData:{
