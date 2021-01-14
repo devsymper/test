@@ -14,7 +14,7 @@ export default {
     },
     methods: {
         getValue() {
-            return this.params.value;
+            return this.params.data.checked ? true : false ;
         },
         changeCheckbox(){
             this.$evtBus.$emit('list-items-ag-grid-on-change-checkbox',{data:this.params.data})
