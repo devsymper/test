@@ -16,7 +16,8 @@
         "service": "Service",
         "menu": "Menu",
         "users": "Users",
-        "add": "Add",
+		"add": "Add",
+		"view":"View",
         "edit": "Edit",
         "cancel": "Cancel",
 		"update": "Update",
@@ -153,7 +154,11 @@
             "viewOrgchart": "View orgchart default",
             "list_workflow": "List Workflow",
             "list_work": "List Jobs",
-            "environment": "Environment management"
+			"environment": "Environment management",
+			"listDashboards":"List dashboard",
+			"listDataflows":"List dataflow",
+			"listRelations":"List relation",
+			"listDatasets":"List dataset"
         },
         "system": "System",
         "copy": "Copy"
@@ -211,6 +216,7 @@
 		"userCreateName": "User create",
 		"isDefault":"Default",
 		"lastUpdateAt": "Last update at",
+		"userLastUpdate": "Last update at",
 		"baUpdate": "BA Update",
         "wrap_tex_mode": {
             "wrap": "Wrap",
@@ -1125,7 +1131,13 @@
         "successTitle": "Success",
         "older": "Older",
         "today": "Today"
-    },
+	},
+	"bi":{
+		"dashboard":{
+			"titleShowList": "List dashboard",
+			"title-visualization":"Visualization"
+		}
+	},
     "virtualdoc": {
         "header": {
             "id": "ID",

@@ -19,7 +19,8 @@
         "users": "Tài khoản người dùng",
         "add": "Thêm",
         "import_excel_history": "Lịch sử Import",
-        "edit": "Sửa",
+		"edit": "Sửa",
+		"view":"Chi tiết",
         "cancel": "Hủy",
         "update": "Cập nhật",
         "create": "Thêm mới",
@@ -160,7 +161,11 @@
             "list_workflow": "Danh sách quy trình",
             "list_work": "Danh sách công việc",
             "syqlFunction": "SYQL Function",
-            "environment": "Quản lí môi trường"
+			"environment": "Quản lí môi trường",
+			"listDashboards":"Danh sách báo cáo",
+			"listDataflows":"Danh sách dataflow",
+			"listRelations":"Danh sách relation",
+			"listDatasets":"Danh sách dataset"
         },
         "system": "Vai trò người dùng",
         "copy": "Sao chép"
@@ -181,7 +186,7 @@
     },
     "table": {
         "id": "ID",
-        "name": "Tên Service",
+        "name": "Tên",
         "description": "Mô tả",
         "lastVersion": "Version mới nhất",
         "language": "Ngôn ngữ",
@@ -225,6 +230,7 @@
 		"code": "Mã",
 		"isDefault":"SĐTC mặc định",
 		"lastUpdateAt": "Thời gian cập nhật",
+		"userLastUpdate": "Thời gian cập nhật",
         "wrap_tex_mode": {
             "wrap": "Xuống dòng",
             "clip": "Cắt bớt"
@@ -1259,7 +1265,13 @@
             "updateAt": "Ngày cập nhật",
             "userFilterAt": "Ngày theo dõi"
         }
-    },
+	},
+	"bi":{
+		"dashboard":{
+			"titleShowList": "Danh sách báo cáo",
+			"title-visualization":"Các loại chart"
+		}
+	},
     "virtualdoc": {
         "header": {
             "id": "ID",

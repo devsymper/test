@@ -1077,7 +1077,8 @@ export default {
 			// 	})
 			// }else{
 			self.rowData = resData;
-			// }
+			// }z
+			debugger
 			data.columns.forEach(function(e){
 				if(e.cellRenderer){
 					e.cellRenderer = e.cellRenderer.toString()
