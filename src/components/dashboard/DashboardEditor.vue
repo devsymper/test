@@ -1,6 +1,6 @@
 <template>
-    <div class="symper-dashboard-editor">
-        <div class="d-flex">
+    <div class="symper-dashboard-editor h-100">
+        <div class="d-flex h-100">
             <div class="d-flex flex-column">
                 <DashboardToolBar 
                     :style="{
@@ -10,8 +10,8 @@
                 <DashboardWorkspace 
                     :instanceKey="instanceKey"/>
             </div>
-            <div class="d-flex flex-column">
-                <ReportTytpeSelector 
+            <div class="d-flex flex-column h-100">
+                <ReportTypeSelector 
                     :instanceKey="instanceKey"/>
                 <ReportConfig 
                     :instanceKey="instanceKey"/>
@@ -27,7 +27,7 @@ import DashboardDasetDetail from "@/components/dashboard/components/DashboardDas
 import DashboardToolBar from "@/components/dashboard/components/DashboardToolBar.vue";
 import DashboardWorkspace from "@/components/dashboard/components/DashboardWorkspace.vue";
 import ReportConfig from "@/components/dashboard/components/ReportConfig.vue";
-import ReportTytpeSelector from "@/components/dashboard/components/ReportTytpeSelector.vue";
+import ReportTypeSelector from "@/components/dashboard/components/ReportTypeSelector.vue";
 import DashboardEditorWorker from 'worker-loader!@/worker/dashboard/DasboardEditor.Worker.js';
 
 export default {
@@ -36,7 +36,7 @@ export default {
         DashboardToolBar,
         DashboardWorkspace,
         ReportConfig,
-        ReportTytpeSelector
+        ReportTypeSelector
     },
     created(){
         this.dashboardEditorWorker = new DashboardEditorWorker();

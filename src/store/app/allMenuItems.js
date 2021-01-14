@@ -56,12 +56,24 @@ export default {
         title: "Report",
         icon: "mdi-view-dashboard-outline",
         group: "My work",
-        action: {
-            "module": "dashboard",
-            "resource": "dashboard",
-            "scope": "dashboard",
-            "action": "list"
-        },
+        children: {
+            listDashboards: {
+                title: "listDashboards",
+                link: "/dashboards"
+            },
+            listDataflows: {
+                title: "listDataflows",
+                link: "/dataflows"
+            },
+            listRelations: {
+                title: "listRelations",
+                link: "/relations"
+            },
+            listDatasets: {
+                title: "listDatasets",
+                link: "/datasets"
+            },
+        }
     },
     orgchart: {
         title: "orgchart",
