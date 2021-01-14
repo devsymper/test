@@ -37,7 +37,7 @@ export default {
                     text: this.$t("common.edit"),
                     callback: (obj, callback) => {
 						self.$goToPage("/dashboards/" + obj.id + "/edit",
-                            " Chi tiết " + (obj.name ? obj.name : "")
+                            self.$t('common.edit') + " " + (obj.name ? obj.name : "")
 						)
                     },
                 },
@@ -46,7 +46,7 @@ export default {
                     text: this.$t("common.view"),
                     callback: (obj, callback) => {
 						self.$goToPage("/dashboards/" + obj.id + "/view",
-                            " Chi tiết " + (obj.name ? obj.name : "")
+                           self.$t('common.detail')+ " " + (obj.name ? obj.name : "")
 						)
                     },
                 },
@@ -55,7 +55,7 @@ export default {
                     text: this.$t("common.clone"),
                     callback: (obj, callback) => {
 						self.$goToPage("/dashboards/" + obj.id + "/clone",
-                            " Chi tiết " + (obj.name ? obj.name : "")
+                            self.$t('common.clone')+ " " + (obj.name ? obj.name : "")
 						)
                     },
                 },

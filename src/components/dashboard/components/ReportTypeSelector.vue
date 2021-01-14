@@ -11,7 +11,7 @@
 					mdi-chevron-right
 				</v-icon>
 			</v-btn>
-			<span>
+			<span class="mt-1" style="font-size: 18px !important">
 				{{$t('bi.dashboard.title-visualization')}}
 			</span>
 		</div>
@@ -44,6 +44,7 @@
 							<v-icon
 								v-bind="attrs"
 								v-on="on"
+								small 
 								>
 								{{item.icon}}
 							</v-icon>
@@ -87,11 +88,11 @@ export default {
 				},
 				styleConfig:{
 					title: this.$t('bi.dashboard.style-config'),
-					icon: 'mdi-phone'
+					icon: 'mdi-box-cutter'
 				},
 				conditionConfig:{
 					title: this.$t('bi.dashboard.condition-config'),
-					icon: 'mdi-home'
+					icon: 'mdi-checkbox-multiple-marked-outline'
 				},
 
 			},
@@ -153,6 +154,7 @@ export default {
 </style>
 <style>
 .symper-report-type-selector{
+	width: 190px;
 	border-right: 1px solid lightgray;
 	border-left: 1px solid lightgray;
 }

@@ -1135,7 +1135,13 @@
 	"bi":{
 		"dashboard":{
 			"titleShowList": "List dashboard",
-			"title-visualization":"Visualization"
+			"title-visualization":"Visualization",
+			"column-config":"Column config",
+			"style-config":"Style config",
+			"condition-config":"Condition config",
+			"config":{
+				"add-field":"Add field here"
+			}
 		}
 	},
     "virtualdoc": {

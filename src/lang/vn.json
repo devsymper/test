@@ -21,7 +21,7 @@
         "import_excel_history": "Lịch sử Import",
 		"edit": "Sửa",
 		"view":"Chi tiết",
-        "cancel": "Hủy",
+		"cancel": "Hủy",
         "update": "Cập nhật",
         "create": "Thêm mới",
         "delete": "Xóa",
@@ -1272,7 +1272,10 @@
 			"title-visualization":"Các loại chart",
 			"column-config":"Cấu hình cột",
 			"style-config":"Cấu hình style",
-			"condition-config":"Cấu hình condition"
+			"condition-config":"Cấu hình condition",
+			"config":{
+				"add-field":"Thêm trường mới"
+			}
 		}
 	},
     "virtualdoc": {
