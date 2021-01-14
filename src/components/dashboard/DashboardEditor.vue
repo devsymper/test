@@ -10,9 +10,14 @@
                 <DashboardWorkspace 
                     :instanceKey="instanceKey"/>
             </div>
+			<div>
 				<v-icon @click="showReportConfig = true">
 					mdi-folder
 				</v-icon>
+				<v-icon @click="toggleDatasetDialog">
+					mdi-file
+				</v-icon>
+			</div>	
             <div class="d-flex flex-column h-100" >
                 <ReportTypeSelector 
                     :instanceKey="instanceKey"
@@ -26,6 +31,11 @@
             <DashboardDasetDetail 
                 :instanceKey="instanceKey"/>
         </div>
+		<DatasetSelector
+			:showDialog="showDatasetSelectorDialog"
+			:tableHeight="tableHeight"
+			@cancel="toggleDatasetDialog"
+		/> 	
     </div>
 </template>
 
@@ -36,6 +46,8 @@ import DashboardWorkspace from "@/components/dashboard/components/DashboardWorks
 import ReportConfig from "@/components/dashboard/components/ReportConfig.vue";
 import ReportTypeSelector from "@/components/dashboard/components/ReportTypeSelector.vue";
 import DashboardEditorWorker from 'worker-loader!@/worker/dashboard/DasboardEditor.Worker.js';
+import DatasetSelector from '@/components/dataset/DatasetSelector'
+import {util} from '@/plugins/util'
 
 export default {
     components: {
@@ -43,7 +55,8 @@ export default {
         DashboardToolBar,
         DashboardWorkspace,
         ReportConfig,
-        ReportTypeSelector
+		ReportTypeSelector,
+		DatasetSelector
     },
     created(){
         this.dashboardEditorWorker = new DashboardEditorWorker();
@@ -53,9 +66,14 @@ export default {
     data(){
         return {
 			instanceKey: Date.now() ,
-			showReportConfig: true
+			showReportConfig: true,
+			showDatasetSelectorDialog: false,
+			tableHeight: 0
         }
-    },
+	},
+	mounted(){
+		this.tableHeight = util.getComponentSize(this).h - 100
+	},
     methods: {
         getDashboardInfo(){
             if(this.idObject){
@@ -66,6 +84,10 @@ export default {
                     }
                 });
             }
+		},
+		toggleDatasetDialog(){
+			this.showDatasetSelectorDialog = !this.showDatasetSelectorDialog
+			debugger
 		},
 		handlerSelectedChartType(type){
 

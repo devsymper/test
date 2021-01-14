@@ -1,5 +1,6 @@
 {
     "common": {
+		"ok": "OK",
         "number_instance": "Tổng số instance",
         "id": "Id",
         "deleteAll": "Xóa tất cả",

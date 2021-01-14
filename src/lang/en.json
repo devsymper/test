@@ -1,5 +1,6 @@
 {
     "common": {
+		"ok": "OK",
         "id": "Id",
         "number_instance": "Number of process instance",
         "select_lang": "Select language",

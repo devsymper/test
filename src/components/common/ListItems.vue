@@ -173,7 +173,7 @@
                                     @click="openTableDisplayConfigPanel"
                                     depressed
                                     small
-									v-if="!dialogMode"
+									v-if="!dialogMode && showDisplayConfig"
                                     v-on="on"
                                 >
                                     <v-icon left dark class="ml-1 mr-0 ">mdi-table-cog</v-icon>
@@ -196,6 +196,22 @@
                             </template>
                             <span>{{alwaysShowActionPanel ? $t('common.not_always_show_sidebar') : $t('common.always_show_sidebar')}}</span>
                         </v-tooltip>
+
+
+						<span v-if="Object.keys(customHeaderBtn).length > 0">
+							 <v-btn
+								depressed
+								small
+								v-for="(item, i) in customHeaderBtn"
+								:key="i"
+								@click="customBtnclick(i)"
+								class="mr-2"
+							>
+								<v-icon left dark>{{item.icon}}</v-icon>
+								<span> {{item.title}} </span>
+							</v-btn>
+						</span>
+					
 			 </div>
 		 </div>
 		 <div
@@ -393,7 +409,11 @@ export default {
             type: Function,
             // default: (configs, columns, filterData)=>{}
             default: null
-        },
+		},
+		showDisplayConfig:{
+			type: Boolean,
+			default: true
+		},
 		apiMethod:{
 			type: String,
 			default : "GET"
@@ -462,7 +482,16 @@ export default {
         getDataUrl: {
             type: String,
             default: ""
-        },
+		},
+		/**
+		 * Custom thêm các action trong header show list 
+		 */
+		customHeaderBtn:{
+			type: Object,
+			default(){
+				return {}
+			}
+		},
         getDataFromFilterUrl: {
             type: String,
             default: ""
@@ -1317,7 +1346,10 @@ export default {
         },
 		changeAlwayShowSBSState(){
             this.tableDisplayConfig.value.alwaysShowSidebar = !this.tableDisplayConfig.value.alwaysShowSidebar;
-        },
+		},
+		customBtnclick(i){
+			this.$emit('custom-btn-cliced', i)
+		},
 		checkShowCreateButton(){
             let rsl = !this.isCompactMode;
             let objectType = this.commonActionProps.resource;
