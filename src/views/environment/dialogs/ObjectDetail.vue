@@ -34,7 +34,7 @@
 				Đồng bộ
 			</v-btn>
 			<v-btn 
-				class="font-normal fs-13"
+				class="font-normal fs-13 mr-2"
 				depressed
 				tile
 				small
