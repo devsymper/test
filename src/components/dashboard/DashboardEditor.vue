@@ -75,18 +75,17 @@ export default {
                 });
             }
         },
-        setDashboardData(info){
-
+        setRestoredDashboardConfigs(info){
+            console.log(info, 'infoinfoinfo');
+            debugger
         },
         listenFromWorker(){
-            let mapActionAndMethod = {
-                setDashboardData: this.setDashboardData
-            };
+            let self = this;
             this.dashboardEditorWorker.addEventListener("message", function (event) {
                 let data = event.data;
                 let action = data.action;
-                if(this[action]){
-                    this[action](data.data);
+                if(self[action]){
+                    self[action](data.data);
                 } else {
                     console.error(` action ${action} not found `);
                 }

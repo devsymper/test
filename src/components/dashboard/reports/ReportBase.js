@@ -1,13 +1,67 @@
+import { getStyleItems } from "@/components/dashboard/configPool/reportStyleItems.js";
+import { getColumnConfigItems } from "@/components/dashboard/configPool/reportColumnSettingItems.js";
+
+/**
+ * các loại chart
+ *  area:Object
+    card:Object
+    clusteredBar:Object
+    clusteredColumn:Object
+    donut:Object
+    editor:Object
+    filter:Object
+    global:Object
+    line:Object
+    lineAndClusteredColumn:Object
+    lineAndStackedColumn:Object
+    pie:Object
+    pivot:Object
+    stackedArea:Object
+    stackedBar:Object
+    stackedBar100:Object
+    stackedColumn:Object
+    stackedColumn100:Object
+    table:Object
+    treeMap:Object
+ */
+var commonStyleAttrItems = {
+    general: {
+        title: 'General',
+        items: ['fontFamily', 'bgColor', 'borderWidth', 'borderColor', 'colorPalette']
+    },
+    title: {
+        title: 'Title',
+        items: ['show', 'titleText', 'fontColor', 'textSize', 'alignment', 'bgColor']
+    }
+}
+
 /**
  * Class chứa các thuộc tính và các phương thức chung của toàn bộ các report 
  */
 export default class ReportBase {
     // Các thuộc tính bắt buộc phải có ở các class kế thừa class này
     mustOverrideMembers = {
-        columnSettingKeys: Object,
-        styleKeys : Object,
-        setSampleColumnSetting: Function,
-        setSampleStyleConfig: Function
+        /**
+         * columnSettingKeys chứa cấu hình về các trường cần config cho column của từng report, theo định dạng:
+         * {
+         *      headerFormat: {
+         *          title: 'Header Style',
+         *          items: ['show','titleText', ...]
+         *      },...
+         * }
+         */
+        columnSettingKeys: {},
+
+        /**
+         * Chứa cấu hình về các trường cần config cho style của report, có dạng:
+         * {
+         *      headerFormat: {
+         *          title: 'Header Style',
+         *          items: ['show','titleText', ...]
+         *      },...
+         * }
+         */
+        styleKeys : {},
     }
 
     rawConfigs = { // config thô do BA setting
@@ -33,14 +87,54 @@ export default class ReportBase {
         showIcon: true // có hiển thị icon ko
     };
 
-    constructor(type, symperId = ''){
+    constructor(type, symperId = '', columnSettingKeys, styleKeys){
         if(!symperId){
             symperId = 'cell-' + Date.now();
         }
         this.sharedConfigs.cellId = symperId;
         this.sharedConfigs.type = type;
-        this.setSampleColumnSetting();
-        this.setSampleStyleConfig();
+        this.checkRequiredVariables(columnSettingKeys, styleKeys);
+        this.setColumnSettingTemplate(columnSettingKeys);
+        this.setStyleConfigTemplate(styleKeys);
+    }
+
+    setColumnSettingTemplate(columnSettingKeys){
+        if(columnSettingKeys){
+            this.rawConfigs.setting = getColumnConfigItems(columnSettingKeys);
+        }
+    }
+
+    setStyleConfigTemplate(styleKeys){
+        if(styleKeys){
+            let allStyleItems = Object.assign({}, commonStyleAttrItems);
+            allStyleItems = Object.assign(allStyleItems, styleKeys);
+
+            let style = {};
+            let item = {};
+            for(let key in allStyleItems){
+                item = allStyleItems[key];
+                let group = {
+                    children: {},
+                    label: item.title,
+                    name: key,
+                    show: true
+                };
+                group.children = getStyleItems(item.items);
+                style[key] = group;
+            }
+            this.rawConfigs.style = style;
+        }
+    }
+
+    checkRequiredVariables(columnSettingKeys, styleKeys){
+        let className = this.__proto__.constructor.name;
+        if(!columnSettingKeys){
+            console.error(`Missing parameter "columnSettingKeys" when construct object in class "${className}"`);
+        }
+
+        if(!styleKeys){
+            console.error(`Missing parameter "styleKeys" when construct object in class "${className}"`);
+        }
     }
 
     getType(){
@@ -73,7 +167,9 @@ export default class ReportBase {
 
     restoreStyle(cell){
         let style = typeof cell.style == 'string' ? JSON.parse(cell.style) : cell.style;
-        for (let item of this.rawConfigs.style) {
+        let item = null;
+        for (let key in this.rawConfigs.style) {
+            item = this.rawConfigs.style[key];
             if (style.hasOwnProperty(item.name)) {
                 for (let propName in style[item.name]) {
                     if (item.children.hasOwnProperty(propName)) {
@@ -84,13 +180,17 @@ export default class ReportBase {
         }
     }
 
+    restoreByDefault(cell){
+        this.rawConfigs.condition = typeof cell.condition == 'string' ? JSON.parse(cell.condition) : cell.condition;
+        this.restoreSetting(cell);
+        this.restoreStyle(cell);
+        this.rawConfigs.extra = cell.extra ? JSON.parse(cell.extra) : {};
+    }
+
     /**
      * Hàm khôi phục config từ dữ liệu đã lưu thành cấu hình có thể hiển thị
      */
     restoreConfigFromSavedData(cell){
-        this.rawConfigs.condition = typeof cell.condition == 'string' ? JSON.parse(cell.condition) : cell.condition;
-        this.restoreSetting(cell);
-        this.restoreStyle(cell);
-        newCell.rawConfigs.extra = cell.extra ? JSON.parse(cell.extra) : {};
+        this.restoreByDefault(cell);
     }
 }
