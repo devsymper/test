@@ -14,5 +14,14 @@ export default {
     methods:{
         
     },
+    activated(){
+        let breadcrumbs = [
+                {
+                    text: 'Report',
+                    disabled: true
+                },
+            ]
+        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
+    }
 };
 </script>
