@@ -17,6 +17,12 @@ let reportColumnSettingItems = {
         hasAgg:true,
         lastYaxis: 1
     },
+    yAxis2:{
+        name:'Y Axis 2',
+        slot:'1',
+        hasAgg:true,
+        lastYaxis: 1
+    },
     tooltips:{
         name:'Tooltips',
         slot:'n',
