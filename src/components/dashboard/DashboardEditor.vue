@@ -114,7 +114,6 @@ export default {
         },
         setRestoredDashboardConfigs(info){
             console.log(info, 'infoinfoinfo');
-            debugger
 		},
 		
 		toggleDatasetDialog(){

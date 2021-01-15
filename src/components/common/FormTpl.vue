@@ -200,6 +200,15 @@ const inputTypeConfigs = {
             };
         }
     },
+    number: {
+        tag: "v-text-field",
+        props(config) {
+            return {
+                placeholder: config.title,
+                type: "number"
+            };
+        }
+    },
     text: {
         tag: "v-text-field",
         props(config) {

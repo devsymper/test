@@ -5,12 +5,12 @@
 import _cloneDeep from "lodash/cloneDeep";
 var attrItems = {
     titleText: {
-        label: 'Title text',
+        title: 'Title text',
         type: 'text',
         default: ''
     },
     zeroValueDisplay: {
-        label: 'Zero value display', // Tiêu đề hiển thị của cấu hình
+        title: 'Zero value display', // Tiêu đề hiển thị của cấu hình
         type: 'select', // loại input để hiển thị
         default: '-', // giá trị mặc định cho thuộc tính này
         options: [{   // Thuộc tính đặc thù của từng loại
@@ -28,7 +28,7 @@ var attrItems = {
         ]
     },
     pieLableStyle: {
-        label: 'Label style',
+        title: 'Label style',
         type: 'select',
         default: 'category',
         options: [{
@@ -58,43 +58,43 @@ var attrItems = {
         ]
     },
     show: {
-        label: 'Show',
+        title: 'Show',
         type: 'switch',
         default: true
     },
     showLegendTitle: {
-        label: 'Show Legend Title',
+        title: 'Show Legend Title',
         type: 'switch',
         default: true
     },
 
     name: {
-        label: 'Name',
+        title: 'Name',
         type: 'text',
         default: ''
     },
     axistitle: {
-        label: 'Axis title',
+        title: 'Axis title',
         type: 'switch',
         default: true
     },
     gridLine: {
-        label: 'Show Gridline',
+        title: 'Show Gridline',
         type: 'switch',
         default: true
     },
     gridLineWidth: {
-        label: 'Gridline Width',
+        title: 'Gridline Width',
         type: 'number',
         default: 1
     },
     gridLineColor: {
-        label: 'Gridline Color',
+        title: 'Gridline Color',
         type: 'color',
         default: '#e6e6e6'
     },
     gridLineType: {
-        label: 'Gridline Type',
+        title: 'Gridline Type',
         type: 'select',
         default: 'LongDash',
         options: [{
@@ -112,22 +112,22 @@ var attrItems = {
         ]
     },
     dateFormat: {
-        label: 'Format date',
+        title: 'Format date',
         type: 'text',
         default: 'YYYY-mm-dd',
     },
     wrapText: {
-        label: 'Wrap text',
+        title: 'Wrap text',
         type: 'switch',
         default: false
     },
     fontColor: {
-        label: 'Font Corlor',
+        title: 'Font Corlor',
         type: 'color',
         default: '#344750'
     },
     legendPosition: {
-        label: 'Position',
+        title: 'Position',
         type: 'btnSelect',
         default: 'vertical-bottom',
         options: [{
@@ -157,7 +157,7 @@ var attrItems = {
         ],
     },
     unit: {
-        label: 'Display Unit',
+        title: 'Display Unit',
         type: 'select',
         default: 'auto',
         options: [{
@@ -190,42 +190,42 @@ var attrItems = {
         columnDepend: true // được clone dựa vào từng column, không biết trước số lượng cụ thể
     },
     borderColor: {
-        label: 'Border Corlor',
+        title: 'Border Corlor',
         type: 'color',
         default: '#000000'
     },
     borderBottomColor: {
-        label: 'Border Corlor',
+        title: 'Border Corlor',
         type: 'color',
         default: '#ededed'
     },
     bgColor: {
-        label: 'Background Corlor',
+        title: 'Background Corlor',
         type: 'color',
         default: '#ffffff'
     },
     textSize: {
-        label: 'Text Size',
+        title: 'Text Size',
         type: 'number',
         default: '13'
     },
     borderWidth: {
-        label: 'Border Width',
+        title: 'Border Width',
         type: 'number',
         default: 0
     },
     borderBottomWidth: {
-        label: 'Border Width',
+        title: 'Border Width',
         type: 'number',
         default: 1
     },
     tooltipDecimalNumber: {
-        label: 'Decimal number',
+        title: 'Decimal number',
         type: 'number',
         default: 2
     },
     fontFamily: {
-        label: 'Font family',
+        title: 'Font family',
         type: 'select',
         default: 'roboto',
         options: [{
@@ -234,7 +234,7 @@ var attrItems = {
         }]
     },
     position: {
-        label: 'Position',
+        title: 'Position',
         type: 'select',
         default: 'bottom',
         options: [{
@@ -272,7 +272,7 @@ var attrItems = {
         ]
     },
     alignment: {
-        label: 'Alignment',
+        title: 'Alignment',
         type: 'btnSelect',
         default: 'left',
         options: [{
@@ -296,7 +296,7 @@ var attrItems = {
         ]
     },
     verticalAlign: {
-        label: 'vertical alignment',
+        title: 'vertical alignment',
         type: 'btnSelect',
         default: 'top',
         options: [{
@@ -320,7 +320,7 @@ var attrItems = {
         ]
     },
     selectionType: {
-        label: 'Selection Type',
+        title: 'Selection Type',
         type: 'btnSelect',
         default: 'multiple',
         options: [{
@@ -338,7 +338,7 @@ var attrItems = {
         ]
     },
     selectionMode: {
-        label: 'Selection Mode',
+        title: 'Selection Mode',
         type: 'select',
         default: 'default',
         options: [{
@@ -352,37 +352,37 @@ var attrItems = {
         ]
     },
     valueDecimal: {
-        label: 'Value decimal places',
+        title: 'Value decimal places',
         type: 'number',
         default: 2
     },
     markerSize: {
-        label: 'Marker size',
+        title: 'Marker size',
         type: 'number',
         default: 3
     },
     markerEnable: {
-        label: 'Marker enable',
+        title: 'Marker enable',
         type: 'switch',
         default: false
     },
     revertColor: {
-        label: 'Revert color',
+        title: 'Revert color',
         type: 'switch',
         default: false
     },
     verticalLine: {
-        label: 'Vertical line',
+        title: 'Vertical line',
         type: 'switch',
         default: false
     },
     lineWidth: {
-        label: 'Line width',
+        title: 'Line width',
         type: 'number',
         default: 1.3
     },
     cardMode: {
-        label: 'Mode',
+        title: 'Mode',
         type: 'radio',
         default: 'number',
         options: [{
@@ -406,7 +406,7 @@ var attrItems = {
         ]
     },
     dashboardSizeType: {
-        label: 'Size type',
+        title: 'Size type',
         type: 'select',
         default: '16:9',
         disabled: false,
@@ -433,7 +433,7 @@ var attrItems = {
         ]
     },
     dashboardSizeMode: {
-        label: 'Size mode',
+        title: 'Size mode',
         type: 'select',
         disabled: false,
         default: 'realSize',
@@ -452,31 +452,31 @@ var attrItems = {
         ]
     },
     width: {
-        label: 'Width',
+        title: 'Width',
         type: 'number',
         default: 0,
         disabled: false,
 
     },
     height: {
-        label: 'Height',
+        title: 'Height',
         type: 'number',
         default: 0,
         disabled: false,
 
     },
     cellMargin: {
-        label: 'Margin between cells',
+        title: 'Margin between cells',
         type: 'number',
         default: 10
     },
     colorPalette: {
-        label: 'Color palette',
+        title: 'Color palette',
         type: 'colorArray',
         default: [],
     },
     tableColumnWidthMode: {
-        label: 'Column width mode',
+        title: 'Column width mode',
         type: 'select',
         default: 'auto',
         options: [{
@@ -498,7 +498,7 @@ var attrItems = {
         ]
     },
     conditionalFormatCondition: {
-        label: 'Conditional format columns',
+        title: 'Conditional format columns',
         type: 'conditionalFormatItems',
         default: []
     },
