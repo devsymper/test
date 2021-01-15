@@ -19,8 +19,8 @@
                         <v-checkbox
                             @click="handleCheckAll"
                             ref="checkBoxAll"
-                            :input-value="countRecordSelected == nodeSelected.number_of_task"
-                            :indeterminate="countRecordSelected > 0 && countRecordSelected < nodeSelected.number_of_task"
+                            :input-value="countRecordSelected == totalRecord"
+                            :indeterminate="countRecordSelected > 0 && countRecordSelected < totalRecord"
                             class="pa-0 ma-0 checkBox"
                         ></v-checkbox>
                     </v-col>
@@ -56,10 +56,6 @@
                         class="fs-13 pt-1 pb-0 font-weight-medium"
                     >{{$t("common.add")}}</v-col>
                     
-                    <!-- <v-btn style="position: absolute;right: 20px;top: 1px;" 
-                        v-if="sideBySideMode" small tile icon text  @click="closeDetail">
-                        <v-icon small>mdi-close</v-icon>
-                    </v-btn> -->
                 </v-row>
             </v-col>
         </v-row>
@@ -137,6 +133,8 @@
                     @changeValueCheckBox="changeValueCheckBox"
                     @changeSideBySide="changeSideBySide"
                     @closeDetail="closeDetail"
+                    @size-query-task="setTotalCurrentTask"
+
                 />
             </v-col>
         </v-row>
@@ -156,7 +154,7 @@
         <BottomSheet :persistent="true" :isShadow="false" ref="bottomSheetView" class="h-100">
             <div slot="content" class="sheet-content d-flex">
                 <div class="count-selection" style="padding-top: 15px;">
-                    <span style="margin-left: 50px;">{{$t('document.instance.showlist.select')}} {{countRecordSelected}}/{{nodeSelected.number_of_task}} {{$t('document.instance.showlist.record')}}</span>
+                    <span style="margin-left: 50px;">{{$t('document.instance.showlist.select')}} {{countRecordSelected}}/{{totalRecord}} {{$t('document.instance.showlist.record')}}</span>
                 </div>
                 <div class="sheet-action">
                     <v-btn small depressed v-for="(action, idx) in taskActionBtns" dark :key="idx" :color="action.color" @click="saveTaskOutcome(action.value)" class="mr-2">
@@ -249,11 +247,14 @@ export default {
         }
     },
     methods:{
+        setTotalCurrentTask(size){
+            this.totalRecord=size;
+        },
         handleCheckAll(){
-            if (this.countRecordSelected==this.nodeSelected.number_of_task) {
+            if (this.countRecordSelected==this.totalRecord) {
                 this.countRecordSelected=0;
             }else{
-                this.countRecordSelected=this.nodeSelected.number_of_task;
+                this.countRecordSelected=this.totalRecord;
 
             }
 
@@ -276,7 +277,6 @@ export default {
             this.totalRecord=obj.number_of_task;
             this.nodeSelected=null;
             this.nodeSelected=obj;
-            //this.nodeSelected=obj;
             this.taskActionBtns=[];
         },
         handleReachEndList(){},
@@ -406,14 +406,15 @@ export default {
             if (originData.assignee.indexOf(":")>0) {
                 let arrDataAssignee=originData.assignee.split(":");
                 let assigneeId=arrDataAssignee[0];
-                let roleIdentify=originData.assignee.slice(assigneeId.length);
+                let roleIdentify=originData.assignee.slice(assigneeId.length + 1);
                 // ktra enduser có tồn tại role trong assignee không
                 let rolesUser=self.$store.state.app.endUserInfo.roles;
-                let role=rolesUser[arrDataAssignee[1]].find(element => element.id==originData.assignee);
+                let role=rolesUser[arrDataAssignee[1]].find(element => element.id==roleIdentify);
                 if (role) {
                     self.isRole=true;
                     return true;
                 }else{
+                    self.isRole=true;
                     return false;
                 }
             }else{

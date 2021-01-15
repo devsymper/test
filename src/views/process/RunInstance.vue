@@ -121,7 +121,7 @@ export default {
             }
             for(let task of arrTask){
                 let assignee=task.assignee;
-                if (assignee.indexOf(":")>0) {
+                if (assignee && assignee.indexOf(":")>0) {
                     assignee=assignee.split(":")[0];
                 }
                 if (assignee == this.$store.state.app.endUserInfo.id) {
