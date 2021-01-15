@@ -173,7 +173,7 @@
                                     @click="openTableDisplayConfigPanel"
                                     depressed
                                     small
-									v-if="!dialogMode"
+									v-if="!dialogMode && showDisplayConfig"
                                     v-on="on"
                                 >
                                     <v-icon left dark class="ml-1 mr-0 ">mdi-table-cog</v-icon>
@@ -489,7 +489,8 @@ export default {
         headerPrefixKeypath: {
             type: String,
             default: ""
-        },
+		},
+		
         getDataUrl: {
             type: String,
             default: ""
@@ -511,6 +512,10 @@ export default {
         lazyLoad:{
             type:Boolean,
             default:false
+        },
+        showDisplayConfig:{
+            type:Boolean,
+            default: true
         },
         // Chiều rộng của pannel bên phải
         actionPanelWidth: {
