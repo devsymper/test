@@ -424,7 +424,11 @@ export default {
             type: Function,
             // default: (configs, columns, filterData)=>{}
             default: null
-        },
+		},
+		showDisplayConfig:{
+			type: Boolean,
+			default: true
+		},
 		apiMethod:{
 			type: String,
 			default : "GET"
@@ -494,7 +498,22 @@ export default {
         getDataUrl: {
             type: String,
             default: ""
-        },
+		},
+		/**
+		 * Custom thêm các action trong header show list 
+		 */
+		customHeaderBtn:{
+			type: Object,
+			default(){
+				return {}
+			}
+		},
+		checkedRows:{
+			type: Array,
+			default(){
+				return []
+			}
+		},
         getDataFromFilterUrl: {
             type: String,
             default: ""
@@ -1152,7 +1171,6 @@ export default {
 			// }else{
 			self.rowData = resData;
 			// }z
-			debugger
 			data.columns.forEach(function(e){
 				if(e.cellRenderer){
 					e.cellRenderer = e.cellRenderer.toString()
@@ -1391,7 +1409,10 @@ export default {
         },
 		changeAlwayShowSBSState(){
             this.tableDisplayConfig.value.alwaysShowSidebar = !this.tableDisplayConfig.value.alwaysShowSidebar;
-        },
+		},
+		customBtnclick(i){
+			this.$emit('custom-btn-cliced', i)
+		},
 		checkShowCreateButton(){
             let rsl = !this.isCompactMode;
             let objectType = this.commonActionProps.resource;
