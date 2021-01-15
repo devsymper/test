@@ -38,11 +38,12 @@
                     :instanceKey="instanceKey"/>
             </div>
             <DashboardDasetDetail
+                ref="datasetDetail"
                 class="h-100"
                 :style="{
                     width: '250px'
                 }" 
-                :instanceKey="instanceKey"/>
+            />
         </div>
 		<DatasetSelector
 			ref="datasetSelector"
@@ -81,6 +82,7 @@ export default {
     },
     data(){
         return {
+            currentCellConfigs:{},
 			instanceKey: Date.now() ,
 			showReportConfig: true,
 			showDatasetSelectorDialog: false,
@@ -132,7 +134,11 @@ export default {
                     console.error(` action ${action} not found `);
                 }
             });
-        }
+        },
+        // recheckSelectedColumn(){
+        //     this.$refs.datasetDetail.clearSelectedItemDisplay();
+        //     this.$refs.datasetDetail.postSelectedDatasetBefor(this.currentCellConfigs.viewConfigs.selectedDataset, true);
+        // },
     },
     props: {
         action: {
