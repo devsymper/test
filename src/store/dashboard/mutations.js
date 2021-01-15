@@ -5,12 +5,9 @@ const setAllWorkflowModel = (state, data) => {
 
 
 const addDatasetAndColumnInDashboard = (state, data) => {
-    let currentDatasetAndColumn = state.datasetAndColumn;
-    if (!currentDatasetAndColumn[data.key]) {
-        currentDatasetAndColumn[boardId] = {};
-    }
-    currentDatasetAndColumn[boardId] = data.data; // đẩy vào vị trí cuối
-    Vue.set(state, 'datasetAndColumn', currentDatasetAndColumn);
+    let currentAllDashboard = state.allDashboard;
+    currentAllDashboard[data.key].allDatasetColumns = data.data; // đẩy vào vị trí cuối
+    Vue.set(state, 'allDashboard', currentAllDashboard);
 }
 
 export {

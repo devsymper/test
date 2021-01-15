@@ -1,28 +1,37 @@
 <template>
-    <div class="symper-dashboard-editor h-100">
-        <div class="d-flex h-100">
-            <div class="d-flex flex-column">
+    <div class="symper-dashboard-editor h-100 w-100">
+        <div class="d-flex h-100 w-100">
+            <div class="d-flex flex-column"
+                :style="{
+                    width: 'calc(100% - 450px)'
+                }">
                 <DashboardToolBar 
                     :style="{
                         height: '35px'
                     }"
                     :instanceKey="instanceKey"/>
                 <DashboardWorkspace 
+                    :style="{
+                        height: 'calc(100 % - 35px)'
+                    }"
                     :instanceKey="instanceKey"/>
             </div>
-            <div class="d-flex flex-column h-100">
+            <div class="d-flex flex-column h-100"
+                :style="{
+                    width: '200px'
+                }">
                 <ReportTypeSelector 
                     :instanceKey="instanceKey"/>
                 <ReportConfig 
                     :instanceKey="instanceKey"/>
             </div>
-            <DashboardDasetDetail 
+            <DashboardDasetDetail
                 ref="datasetDetail"
-                :instanceKey="instanceKey"/>
-            <v-btn @click="recheckSelectedColumn">
-                Click
-            </v-btn>
-            <v-btn @click="testClearSelectedItem">Clear</v-btn>
+                class="h-100"
+                :style="{
+                    width: '250px'
+                }" 
+            />
         </div>
     </div>
 </template>
@@ -34,6 +43,9 @@ import DashboardWorkspace from "@/components/dashboard/components/DashboardWorks
 import ReportConfig from "@/components/dashboard/components/ReportConfig.vue";
 import ReportTypeSelector from "@/components/dashboard/components/ReportTypeSelector.vue";
 import DashboardEditorWorker from 'worker-loader!@/worker/dashboard/DasboardEditor.Worker.js';
+import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
+
+var reportClasses = autoLoadChartClasses();
 
 export default {
     components: {
@@ -51,67 +63,7 @@ export default {
     data(){
         return {
             instanceKey: Date.now(),
-            currentCellConfigs:{
-                "sharedConfigs": {
-                    "type": "pivot",
-                    "yAxisCount": 1,
-                    "cellId": "cell-1609348095437"
-                },
-                "rawConfigs": {
-                    "setting": {
-                    "value": {
-                        "name": "Value",
-                        "slot": "n",
-                        "hasAgg": true,
-                        "selectedColums": [
-                        {
-                            "as": "Số người làm",
-                            "agg": "sum",
-                            "cond": {
-                            "val": "",
-                            "type": "isall"
-                            },
-                            "edit": false,
-                            "name": "sl_ns",
-                            "type": "number",
-                            "dataset": "2833",
-                            "origin_type": "number"
-                        }
-                        ]
-                    },
-                    "rows": {
-                        "name": "Rows",
-                        "slot": "1",
-                        "selectedColums": [
-                        {
-                            "as": "Ca làm",
-                            "agg": "first",
-                            "cond": {
-                            "val": "",
-                            "type": "isall"
-                            },
-                            "edit": false,
-                            "name": "ca_lam",
-                            "type": "text",
-                            "dataset": "2833",
-                            "origin_type": "text"
-                        }  
-                        ]
-                    }
-                    },
-                    "extra": {
-                    }
-                },
-                "viewConfigs": {
-                    "isSelecting": true,
-                    "selectedDataset": {"3665":{"assignee":true,"ngay_end_tt":true,"ngay_end":true}},
-                    "showIcon": false,
-                    "commentCount": 0,
-                    "needSaveExtraOptions": {},
-                    "filter": {},
-                    "loadingData": false
-                }
-            }
+            currentCellConfigs:{}
         }
     },
     methods: {
@@ -129,9 +81,6 @@ export default {
 
         },
         listenFromWorker(){
-            let mapActionAndMethod = {
-                setDashboardData: this.setDashboardData
-            };
             this.dashboardEditorWorker.addEventListener("message", function (event) {
                 let data = event.data;
                 let action = data.action;
@@ -142,13 +91,10 @@ export default {
                 }
             });
         },
-        recheckSelectedColumn(){
-            this.$refs.datasetDetail.clearSelectedItemDisplay();
-            this.$refs.datasetDetail.setSelectedDataset(this.currentCellConfigs.viewConfigs.selectedDataset, true);
-        },
-        testClearSelectedItem(){
-            this.$refs.datasetDetail.clearSelectedItemDisplay();
-        }
+        // recheckSelectedColumn(){
+        //     this.$refs.datasetDetail.clearSelectedItemDisplay();
+        //     this.$refs.datasetDetail.postSelectedDatasetBefor(this.currentCellConfigs.viewConfigs.selectedDataset, true);
+        // },
     },
     props: {
         action: {

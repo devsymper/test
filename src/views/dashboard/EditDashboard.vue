@@ -1,5 +1,5 @@
 <template>
-<div class="symper-edit-dashboard">
+<div class="symper-edit-dashboard w-100">
     <DashboardEditor
         action="edit"
         :idObject="$route.params.id"

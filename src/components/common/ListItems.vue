@@ -1078,7 +1078,6 @@ export default {
 			// }else{
 			self.rowData = resData;
 			// }z
-			debugger
 			data.columns.forEach(function(e){
 				if(e.cellRenderer){
 					e.cellRenderer = e.cellRenderer.toString()
@@ -1373,7 +1372,6 @@ export default {
 					delete column.pinned
 				}
 				this.reOrderFixedCols();
-				debugger
 				let flag = false
 				this.columnDefs.forEach(function(e){
 					if(e.symperFixed){

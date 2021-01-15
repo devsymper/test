@@ -1,8 +1,13 @@
 <template>
-    <div class="h-100 fs-13" style="width:260px;">
-        <div>
+    <div class="w-100 h-100 fs-13" >
+        <div class="pt-2 d-flex">
             <v-icon>mdi-chevron-right</v-icon>
-            Fields
+            <div style="width:95%;padding-top:3px">
+                <span class="font-weight-medium">Fields</span> 
+                <v-icon class="float-right fs-16 mx-3">mdi-database</v-icon>
+                <v-icon class="float-right fs-16">mdi-relation-zero-or-one-to-one-or-many</v-icon>
+            </div>
+           
         </div>
         <v-text-field
             v-on:input="onSearch($event)"
@@ -13,12 +18,16 @@
             hide-details
             dense
             flat
-            v-model="search"
             label="Search"
             :placeholder="$t('common.search')"
             style="width: inherit"
         ></v-text-field>
+        <preloader 
+            v-if="loadding"
+            style="height:100px!important;width:250px"
+            class="mx-auto" />
         <VuePerfectScrollbar 
+            v-else
             style="height:calc(100% - 100px)">
             <v-expansion-panels
                 multiple
@@ -28,9 +37,10 @@
             >
                 <v-expansion-panel class="sym-expand-panel " v-for="(dataset,idx) in datasetAndColumn" :key="idx" v-show="dataset.show && !dataset.isSubDataset">
                     <v-expansion-panel-header class="v-expand-header px-4 py-0">
-                        <v-icon class="fs-15 icon-table">mdi-table-large</v-icon>
+                        <v-icon v-if="dataset.type == 'doc'" class="fs-15 icon-table">mdi-table-large</v-icon>
+                        <v-icon v-else class="fs-15 icon-table">mdi-view-module-outline</v-icon>
                         <v-icon class="selected-dataset-mark" v-if="dataset.isSelected">mdi-check-circle</v-icon>
-                        <span class="dataset-item-title fs-13 pl-2">{{dataset.title}}</span>
+                        <span :title="dataset.title" class="dataset-item-title fs-13 pl-2">{{dataset.title}}</span>
                     </v-expansion-panel-header>
                     <v-expansion-panel-content class="sym-v-expand-content">
                         <v-expansion-panels
@@ -40,7 +50,7 @@
                             v-model="openedPanelChild"
                         >
                             <!-- Danh sách các table trong doc -->
-                            <v-expansion-panel class="sym-expand-panel" v-for="(subId,idx) in dataset.subDatasetIds" :key="idx"  v-show="datasetAndColumn[subId].show" >
+                            <v-expansion-panel class="sym-expand-panel dataset-child" v-for="(subId,idx) in dataset.subDatasetIds" :key="idx"  v-show="datasetAndColumn[subId].show" >
                                 <v-expansion-panel-header class="v-expand-header px-4 py-0">
                                     <v-icon class="fs-15 icon-table">mdi-table-large</v-icon>
                                     <v-icon class="selected-dataset-mark" v-if="dataset.isSelected">mdi-check-circle</v-icon>
@@ -91,6 +101,8 @@
 import VuePerfectScrollbar from 'vue-perfect-scrollbar';
 import draggable from "vuedraggable";
 import columnInfo from "@/components/common/bi/ColumnInfo";
+import DashboardDatasetWorker from 'worker-loader!@/worker/dashboard/dashboard/DashboardDataset.Worker.js';
+
 export default {
     components:{
         VuePerfectScrollbar,
@@ -98,7 +110,9 @@ export default {
         columnInfo
     },
     computed:{
-
+        datasetAndColumn(){
+            return this.$store.state.dashboard.allDashboard[this.instanceKey].allDatasetColumns;
+        },
     },
     props:{
         selectedCell:{
@@ -106,433 +120,53 @@ export default {
             default(){
                 return {}
             }
+        },
+        instanceKey:{
+            type: Number,
+            default: 123423,
         }
     },
     data(){
         return{
+            loadding:false,
+            dashboardDatasetWorker:null,
             openedPanelParent:[],
             openedPanelChild:[],
             search:"",
-               datasetAndColumn:{
-                "3665": {
-                "id": "3665",
-                "name": "symper_wbs",
-                "type": "doc",
-                "uid": null,
-                "status": null,
-                "id_database": null,
-                "alias_name": "SYMPER Wbs",
-                "generated_sql": null,
-                "created_at": null,
-                "updated_at": null,
-                "symper_id": "2186",
-                "table_name": null,
-                "id_parent": null,
-                "list_foreign_key": [],
-                "title": "SYMPER Wbs",
-                "show": true,
-                "subDatasetIds": [
-                "3666"
-                ],
-                "isSelected": false,
-                "columns": [
-                {
-                    "id": "469194",
-                    "name": "id_bug",
-                    "title": "BUG ID",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469195",
-                    "name": "priority",
-                    "title": "MỨC ĐỘ ƯU TIÊN",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469196",
-                    "name": "so_id",
-                    "title": "SỐ ID",
-                    "type": "number",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "number",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469197",
-                    "name": "ma_module",
-                    "title": "MODULE",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469198",
-                    "name": "tong_tg",
-                    "title": "Tổng thời gian",
-                    "type": "number",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "number",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469199",
-                    "name": "ngay_end_tt",
-                    "title": "NGÀY END TT",
-                    "type": "date",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "date",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469200",
-                    "name": "task_des",
-                    "title": "TASK DESCRIPTION",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469201",
-                    "name": "chi_tiet",
-                    "title": "CHI TIẾT CÔNG VIỆC",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469202",
-                    "name": "mo_ta_bug",
-                    "title": "Mô tả bug",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469203",
-                    "name": "ngay_start",
-                    "title": "NGÀY KHỞI TẠO",
-                    "type": "date",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "date",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469204",
-                    "name": "assignee",
-                    "title": "ASSIGNEE",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469205",
-                    "name": "ngay_end",
-                    "title": "NGÀY END",
-                    "type": "date",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "date",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469206",
-                    "name": "ten_module",
-                    "title": "TÊN MODULE",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469207",
-                    "name": "ma_wbs",
-                    "title": "WBS",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469208",
-                    "name": "tong_tg_tt",
-                    "title": "Tổng thời gian TT",
-                    "type": "number",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "number",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469209",
-                    "name": "reporter",
-                    "title": "REPORTER",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469210",
-                    "name": "loai",
-                    "title": "LOẠI TASK",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469211",
-                    "name": "ttsd",
-                    "title": "TRẠNG THÁI",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469212",
-                    "name": "giai_phap",
-                    "title": "GIẢI PHÁP",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469213",
-                    "name": "wbs_id",
-                    "title": "WBS ID",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3665",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                }
-                ]
-            },
-            "3666": 
-            {
-                "id": "3666",
-                "name": "tb1",
-                "type": "doc",
-                "uid": null,
-                "status": "1",
-                "id_database": "1",
-                "alias_name": "TB1",
-                "generated_sql": "",
-                "created_at": "2021-01-12 22:40:02",
-                "updated_at": "2021-01-12 22:40:02",
-                "symper_id": "2187",
-                "table_name": "document_child_symper_wbs_tb1",
-                "id_parent": "3665",
-                "list_foreign_key": [],
-                "show": true,
-                "isSubDataset": true,
-                "title": "TB1",
-                "isSelected": false,
-                "columns": [
-                {
-                    "id": "469214",
-                    "name": "tb1_ngay_kt",
-                    "title": "Ngày kết thúc",
-                    "type": "date",
-                    "uid": "",
-                    "id_dataset": "3666",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "date",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469215",
-                    "name": "tb1_task_id",
-                    "title": "Task ID",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3666",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469216",
-                    "name": "tb1_priority",
-                    "title": "TB1 PRIORITY",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3666",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469217",
-                    "name": "tb1_duration",
-                    "title": "TB1 DURATION",
-                    "type": "number",
-                    "uid": "",
-                    "id_dataset": "3666",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "number",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469218",
-                    "name": "tb1_cv",
-                    "title": "TB1 CV",
-                    "type": "text",
-                    "uid": "",
-                    "id_dataset": "3666",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "text",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                },
-                {
-                    "id": "469219",
-                    "name": "tb1_ngay_bd",
-                    "title": "Ngày bắt đầu",
-                    "type": "date",
-                    "uid": "",
-                    "id_dataset": "3666",
-                    "created_at": "2021-01-12 22:40:02",
-                    "origin_type": "date",
-                    "updated_at": "2021-01-12 22:40:02",
-                    "list_foreign_key": [],
-                    "show": true,
-                    "isSelected": false
-                }
-                ]
-            }
-            },
-         
         }
     },
     methods:{
         onSearch(vl){
-            $('.sym-expand-panel .column-dataset').removeClass('d-none');
-            $('.sym-expand-panel .column-dataset:not(:contains("' + vl + '"))').addClass('d-none');
+            // call function setOpenPanle để count max panle set all open khi search
+            if(this.delayTimer){
+                clearTimeout(this.delayTimer);
+            }
+            this.delayTimer = setTimeout((self) => {
+                this.loadding = true;
+                if (!vl) {
+                    self.openedPanelParent = [];
+                    self.openedPanelChild = [];
+                }else{
+                    self.dashboardDatasetWorker.postMessage({
+                        action: 'setOpenPanel',
+                        data:{
+                            datasetAndColumn: self.datasetAndColumn
+                        }
+                    });
+                }
+                self.dashboardDatasetWorker.postMessage({
+                    action: 'searchDatasetColumn',
+                    data:{
+                        datasetAndColumn: self.datasetAndColumn,
+                        vl:vl
+                    }
+                });
+            }, 300,this);
+          
+        },
+        setOpenPanelAfter(data){
+            this.openedPanelParent = data.openedPanelParent;
+            this.openedPanelChild = data.openedPanelChild;
         },
         cloneColumn(item){
             let agg = item.type == 'number'?'sum':'first';
@@ -552,39 +186,59 @@ export default {
             }
         },
         clearSelectedItemDisplay(){
-            for(let key in this.datasetAndColumn){
-                this.datasetAndColumn[key].isSelected = false;
-                if (this.datasetAndColumn[key].columns.length > 0) {
-                    let columns = this.datasetAndColumn[key].columns;
-                    for (let i = 0; i < columns.length; i++) {
-                        columns[i].isSelected = false;
-                    }
-                }
-            }
+            this.dashboardDatasetWorker.postMessage({
+				action: 'clearSelectedItemDisplay',
+				data:{
+                    datasetAndColumn: this.datasetAndColumn
+				}
+            });
         },
-        setSelectedDataset(selectedDataset,setSelect = true){
-            for(let dtsId in selectedDataset){
-                let dtsInfo = this.datasetAndColumn[dtsId];
-                if(!dtsInfo){
-                    continue;
-                }
-                dtsInfo.isSelected = setSelect;
-                this.datasetAndColumn[dtsId].isSelected = setSelect;
-                for(let name in selectedDataset[dtsId]){
-                    let column = this.datasetAndColumn[dtsId].columns.find(ele => ele.name == name);
-                    if (column) {
-                        column.isSelected = setSelect;
-                    }
-                }
-                if(dtsInfo.id_parent && this.datasetAndColumn[dtsInfo.id_parent]){
-                    this.datasetAndColumn[dtsInfo.id_parent].isSelected = setSelect;
-                }
-            }
+        clearSelectedItemDisplayAfter(data){
+            let dataPos = {};
+            dataPos.key = this.instanceKey;
+            dataPos.data = data.datasetAndColumn;
+            this.$store.commit("dashboard/addDatasetAndColumnInDashboard",dataPos);
         },
-
+        searchDatasetColumnAfter(data){
+            let dataPos = {};
+            dataPos.key = this.instanceKey;
+            dataPos.data = data.datasetAndColumn;
+            this.$store.commit("dashboard/addDatasetAndColumnInDashboard",dataPos);
+            setTimeout((self) => {
+                self.loadding = false;
+            }, 100,this);
+        },
+        postSelectedDatasetBefor(selectedDataset,setSelect = true){
+            this.dashboardDatasetWorker.postMessage({
+				action: 'postSelectedDatasetBefor',
+				data:{
+                    selectedDataset: selectedDataset,
+                    datasetAndColumn: this.datasetAndColumn
+				}
+            });
+        },
+        postSelectedDatasetAfter(data){
+            let dataPos = {};
+            dataPos.key = this.instanceKey;
+            dataPos.data = data.datasetAndColumn;
+            this.$store.commit("dashboard/addDatasetAndColumnInDashboard",dataPos);
+        },
+        listenFromWorker(){
+            let self = this;
+            this.dashboardDatasetWorker.addEventListener("message", function (event) {
+                let data = event.data;
+                let action = data.action;
+                if(self[action]){
+                    self[action](data.data);
+                } else {
+                    console.error(` action ${action} not found `);
+                }
+            });
+        },
     },
     created(){
-
+        this.dashboardDatasetWorker = new DashboardDatasetWorker();
+        this.listenFromWorker();
     }
 
 }
@@ -612,5 +266,13 @@ export default {
     font-size: 12px;
     left: 12px;
     color: #f58634;
+}
+.dataset-item-title{
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.sym-expand-panel{
+    margin-top: 0px ;
 }
 </style>

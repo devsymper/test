@@ -2,19 +2,9 @@
     <div class="single-row px-4 item-column-dataset justify-space-between">
         <span class="text-ellipsis">
             <v-icon color="#000" class="fs-14 pr-2">{{icon[infoColumn.type]}}</v-icon>
-            <v-tooltip bottom>
-                <template v-slot:activator="{ on }">
-                    <span v-on="on" class="mr-2" :class="{ 'highlight' : infoColumn.isSelected}">{{infoColumn.title}}</span>
-                </template>
-                <span>{{ infoColumn.title }}</span>
-            </v-tooltip>
+            <span :title="infoColumn.title" class="mr-2" :class="{ 'highlight' : infoColumn.isSelected}">{{infoColumn.title}}</span>
         </span>
-         <v-tooltip bottom>
-            <template v-slot:activator="{ on }">
-                <span v-on="on" class="float-right pr-1" style="color: #909399">{{infoColumn.name}}</span>
-            </template>
-            <span>{{ infoColumn.name }}</span>
-        </v-tooltip>
+        <span :title="infoColumn.name" class="float-right pr-1" style="color: #909399">{{infoColumn.name}}</span>
     </div>
 </template>
 
@@ -49,6 +39,8 @@ export default {
 }
 .item-column-dataset{
     display: flex;
+    margin-top: 6px;
+    font-size: 12px;
 }
 .highlight{
     color: #f58634;
