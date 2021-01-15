@@ -12,7 +12,7 @@ export default {
     mounted() {
         this.value = this.getValue();
     },
-    methods: {
+    methods:{
         getValue() {
             return this.params.data.checked ? true : false ;
         },
