@@ -703,6 +703,7 @@ export default {
                 let tableFilter = this.tableFilter;
                 tableFilter.allColumnInTable = [];
                 configs.emptyOption = emptyOption;
+                configs.distinct = true;
                 configs.moreApiParam = {
                     variables : 'symper_last_executor_id,symper_user_id_start_workflow,symper_last_executor_name',
                 }

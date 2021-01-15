@@ -1551,7 +1551,7 @@
         "requiredField":"Trường bắt buộc nhập",
         "detailProject":"Thông tin project",
         "addPeople":"Thêm thành viên",
-        "managerRole":"Quản lý phân quyền",
+        "managerRole":"Quản lý vai trò",
         "createRole":"Tạo role",
         "dialog":{
             "removeUser": "Bạn sẽ xóa thành viên khỏi project này",

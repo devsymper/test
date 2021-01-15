@@ -118,11 +118,9 @@ export default [
                 }
                     
             },
-        
-        
             //report
             {
-                path: "report",
+                path: "projects/:id/report",
                 name: "Report",
                 meta:{group:'home'},
                 components:{
