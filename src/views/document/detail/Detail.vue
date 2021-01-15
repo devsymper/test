@@ -204,7 +204,7 @@ export default {
                         );
 					}
                     thisCpn.processHtml(thisCpn.contentDocument);
-                    thisCpn.controlRelationWorker.terminate();
+                    // thisCpn.controlRelationWorker.terminate();
                     break;
                 default:
                     break;
@@ -302,7 +302,7 @@ export default {
                 if(after.docObjId){
                     this.docObjId = Number(after.docObjId);
                     this.documentSize = after.docSize;
-                    this.loadDocumentObject(this.isPrint);
+                    this.loadDocumentObject(this.isPrint);z
                 }
             }
         },
