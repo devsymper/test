@@ -28,7 +28,7 @@
 					<v-icon small class="mr-1">
 						mdi-history
 					</v-icon>
-					Lịch sử
+					{{$t('myItem.sidebar.history')}}
 				</v-btn>
 				<span class="mdi mdi-close" @click="hide"></span>
 			</div>
@@ -276,7 +276,7 @@
 						<v-icon small class="mr-1">
 							mdi-history
 						</v-icon>
-						Lịch sử
+						{{$t('myItem.sidebar.history')}}
 					</v-btn>	
 					<v-icon @click="showHistoryTask = false"> mdi-close</v-icon>
 				</div>

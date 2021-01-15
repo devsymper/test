@@ -172,7 +172,6 @@ export default {
 			obj.userCreateActionType  = userCreateActionType
 			obj.userCreateAction  = mapIdToUser[userCreateActionId].displayName
 			obj.userCreateActionId = userCreateActionId
-
 			return obj
 		}
 	}

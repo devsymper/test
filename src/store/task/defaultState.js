@@ -1,6 +1,5 @@
 const defaultState = {
     arrFileAttach: [],
-    filter:'notDone',
     arrDocObjId:[],
     listDocumentObjId:[],
     listDocumentObjIdWithUserSubmit:[],

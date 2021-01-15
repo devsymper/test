@@ -6,10 +6,6 @@ const addToListAttachStore = (state, item) => {
     currentarrFileAttach.unshift(item)
     Vue.set(state, 'arrFileAttach', currentarrFileAttach);
 }
-const setFilter = (state, item) => {
-    Vue.set(state, 'filter', item);
-}
-
 const setStatusPopupTracking= (state, item) => {
     Vue.set(state, 'statusPopupTracking', item);
 }
@@ -73,7 +69,6 @@ const setCurrentId = (state, id) => {
 export {
     setArrFileAttach,
     addToListAttachStore,
-    setFilter,
     removeFileAttachToStore,
     setArrDocObjId,
     setStatusPopupTracking,
