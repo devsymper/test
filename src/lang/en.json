@@ -1,5 +1,6 @@
 {
     "common": {
+		"ok": "OK",
         "id": "Id",
         "number_instance": "Number of process instance",
         "select_lang": "Select language",
@@ -303,7 +304,7 @@
                 "firstName": "First name",
                 "lastName": "Last name",
                 "displayName": "Display name",
-                "phone": "Phone number"
+				"phone": "Phone number"
             },
             "passwordSetting": {
                 "title": "Password setting",
@@ -600,7 +601,9 @@
                         "comment": "Comment",
                         "has": "Has",
                         "commentNotResolve": "comment Not Resolve",
-                        "noComment": "No comment"
+						"noComment": "No comment",
+						"listWorks": "Work",
+						"clickToViewListWork": "Click to view work"
                     },
                     "worflowInfo": "Workflow infomation",
                     "userRelated": {
@@ -1135,7 +1138,13 @@
 	"bi":{
 		"dashboard":{
 			"titleShowList": "List dashboard",
-			"title-visualization":"Visualization"
+			"title-visualization":"Visualization",
+			"column-config":"Column config",
+			"style-config":"Style config",
+			"condition-config":"Condition config",
+			"config":{
+				"add-field":"Add field here"
+			}
 		}
 	},
     "virtualdoc": {
@@ -1188,7 +1197,8 @@
             "showLess": "Show less task related",
             "showMoreFile": "Show more file",
             "quickView": "Quick view",
-            "openTask": "Open task"
+			"openTask": "Open task",
+			"history":"History"
         },
         "alert": {
             "title_aproval": "Action work",
@@ -1197,8 +1207,59 @@
         },
         "unfinished": "Unfinished",
         "totalTask": "Total task",
-        "totalWork": "Total work"
-
+		"totalWork": "Total work",
+		"taskLifeCycle":{
+			"dialog":{
+				"complete":{
+					"header": "Complete task",
+					"description":"Press apply to complete task"
+				},
+				"assign":{
+					"header": "Reassign task",
+					"description":"This work will be assigned to another person to perform, assignee has full control over the work",
+					"workStatus":"Work will assign to"
+				},
+				"claim":{
+					"header": "Claim work",
+					"description":"You will be task owner"
+				},
+				"delegate":{
+					"header": "Delegate task",
+					"description":"This work will be assigned to someone else to perform but will not have the right to complete it"
+				},
+				"unClaim":{
+					"header": "Unclaim task",
+					"description":"This work you received will be removed from your to-do list"
+				},
+				"resolve":{
+					"header": "Resolve task",
+					"description":"This work will be executed and returned to the owner of the job "
+				}
+			},
+			"assignee":"Assignee",
+			"delegateUser":"Delegate user",
+			"assigneePermission":"Assign can view and resolve task",
+			"workDelegated":"This work is delegate to",
+			"owner":"Owner task",
+			"currentStatus":"Current task status",
+			"newStatus": "New task status",
+			"cancel":"Cancel",
+			"corfirm":"Apply",
+			"snackbar":{
+				"title":"Submit document success",
+				"description":"You can get this task done by executing ",
+				"action":"Update the record by selecting "
+			},
+			"notify":{
+				"unClaim":"Unclaim task success",
+				"resolve":"Resolve task success",
+				"claim":"Claim task success",
+				"complete":"Complete task success",
+				"notSubmit":"You must submit task before complete task",
+				"assign": "Assign task success",
+				"delegate": "Delegate task success"
+			}
+		}
     },
     "tasks": {
         "error": {
@@ -1253,7 +1314,8 @@
         "resolve": "Resolve",
         "complete": "Complete",
         "assign": "Assign",
-        "created": "Task created",
+		"created": "Task created",
+		"action": "Action",
         "relatedPeople": {
             "title": "Related people"
         },
@@ -1362,7 +1424,8 @@
             "removeCategory": "You will remove category from this list.",
             "removeComponent": "You will remove component from this list.",
             "removeWorkflow": "You will remove workflow from this list.",
-            "removePriority": "You will remove priority from this list."
+            "removePriority": "You will remove priority from this list.",
+            "removeVersion": "You will remove version from this list."
 
         },
         "settingBoard":"Board setting"

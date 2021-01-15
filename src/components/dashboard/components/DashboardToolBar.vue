@@ -5,7 +5,7 @@
 </template>
 
 <script>
-import { getDefaultDashboardConfig } from "@/components/dashboard/configPool/defaultDashboardConfigs.js";
+import { getDefaultDashboardConfig } from "@/components/dashboard/configPool/dashboardConfigs.js";
 export default {
     computed: {
         dashboardInfo(){

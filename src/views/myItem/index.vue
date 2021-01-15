@@ -9,7 +9,7 @@
 
        <list-work 
             v-else-if="objecType==1" 
-            @changeObjectType="changeObjectType" 
+            @changeObjectType="changeObjectType"
             :height="height" 
             @change-height="changeHeight">
         </list-work>
@@ -36,7 +36,9 @@ export default {
         "list-document": listDocument,
     },
     computed: {
-        
+		type(){
+			return this.$route.params.type
+		}
     },
     mounted() {
     },

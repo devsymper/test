@@ -9,6 +9,7 @@
 <script>
 import ListComponent from '../../../components/taskManagement/component/ListComponent.vue';
 import { taskManagementApi } from "@/api/taskManagement.js";
+import ComponentWorker from 'worker-loader!@/worker/taskManagement/component/Component.Worker.js';
 
 export default {
     components: { 
@@ -18,32 +19,44 @@ export default {
     data(){
         return{
             listComponent:[],
+            componentWorker:null
         }
     },
     methods:{
         addComponent(){
             this.getListComponent();
         },
-        async getListComponent(){
-            let self=this;
+        getListComponent(){
             let id=this.$route.params.id;
-            if (id) {
-                let listComponent =await taskManagementApi.getListComponent(id);
-                if (listComponent.status==200 && listComponent.data) {
-                    self.listComponent=listComponent.data.listObject;
-                    self.$store.commit("taskManagement/setListComponent", listComponent.data.listObject);
-                }
-              
-            }
+            this.componentWorker.postMessage({
+                action:'getListComponent',
+                data:id
+            });
+
         },
     },
-    async created(){
-        await this.getListComponent();
+    created(){
+        let self = this;
+        this.componentWorker = new ComponentWorker();
+        this.getListComponent();
+        this.componentWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getListComponent':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/setListComponent", res.data.listObject);
+                        self.listComponent = res.data.listObject;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        });
     },
     activated(){
         let projectId=this.$route.params.id;
         let breadcrumbs = [
-                
                 {
                     text: 'Components',
                     disabled: true,

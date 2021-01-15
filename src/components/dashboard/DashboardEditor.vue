@@ -16,12 +16,24 @@
                     }"
                     :instanceKey="instanceKey"/>
             </div>
+			<div>
+				<v-icon @click="showReportConfig = true">
+					mdi-folder
+				</v-icon>
+				<v-icon @click="toggleDatasetDialog">
+					mdi-file
+				</v-icon>
+			</div>	
             <div class="d-flex flex-column h-100"
                 :style="{
                     width: '200px'
                 }">
                 <ReportTypeSelector 
-                    :instanceKey="instanceKey"/>
+                    :instanceKey="instanceKey"
+					:showReportConfig="showReportConfig"
+					@selected-type="handlerSelectedChartType"
+					@collapse-report-config="showReportConfig = false"
+					/>
                 <ReportConfig 
                     :instanceKey="instanceKey"/>
             </div>
@@ -33,6 +45,11 @@
                 }" 
             />
         </div>
+		<DatasetSelector
+			ref="datasetSelector"
+			v-model="listDatasetSelected"
+			:tableHeight="tableHeight"
+		/> 	
     </div>
 </template>
 
@@ -43,6 +60,8 @@ import DashboardWorkspace from "@/components/dashboard/components/DashboardWorks
 import ReportConfig from "@/components/dashboard/components/ReportConfig.vue";
 import ReportTypeSelector from "@/components/dashboard/components/ReportTypeSelector.vue";
 import DashboardEditorWorker from 'worker-loader!@/worker/dashboard/DasboardEditor.Worker.js';
+import DatasetSelector from '@/components/dataset/DatasetSelector'
+import {util} from '@/plugins/util'
 import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
 
 var reportClasses = autoLoadChartClasses();
@@ -53,7 +72,8 @@ export default {
         DashboardToolBar,
         DashboardWorkspace,
         ReportConfig,
-        ReportTypeSelector
+		ReportTypeSelector,
+		DatasetSelector
     },
     created(){
         this.dashboardEditorWorker = new DashboardEditorWorker();
@@ -62,10 +82,25 @@ export default {
     },
     data(){
         return {
-            instanceKey: Date.now(),
-            currentCellConfigs:{}
+            currentCellConfigs:{},
+			instanceKey: Date.now() ,
+			showReportConfig: true,
+			showDatasetSelectorDialog: false,
+			tableHeight: 0,
+			listDatasetSelected:["2879" , "3020"],
         }
-    },
+	},
+	mounted(){
+		this.tableHeight = util.getComponentSize(this).h - 100
+	},
+	watch:{
+		listDatasetSelected:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+			}
+		}
+	},
     methods: {
         getDashboardInfo(){
             if(this.idObject){
@@ -77,15 +112,24 @@ export default {
                 });
             }
         },
-        setDashboardData(info){
+        setRestoredDashboardConfigs(info){
+            console.log(info, 'infoinfoinfo');
+            debugger
+		},
+		
+		toggleDatasetDialog(){
+			this.$refs.datasetSelector.show()
+		},
+		handlerSelectedChartType(type){
 
-        },
+		},
         listenFromWorker(){
+            let self = this;
             this.dashboardEditorWorker.addEventListener("message", function (event) {
                 let data = event.data;
                 let action = data.action;
-                if(this[action]){
-                    this[action](data.data);
+                if(self[action]){
+                    self[action](data.data);
                 } else {
                     console.error(` action ${action} not found `);
                 }

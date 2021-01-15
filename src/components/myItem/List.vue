@@ -703,6 +703,7 @@ export default {
                 let tableFilter = this.tableFilter;
                 tableFilter.allColumnInTable = [];
                 configs.emptyOption = emptyOption;
+                configs.distinct = true;
                 configs.moreApiParam = {
                     variables : 'symper_last_executor_id,symper_user_id_start_workflow,symper_last_executor_name',
                 }
@@ -791,15 +792,10 @@ export default {
             // }
         },
         handleTaskSubmited() {
-            this.sideBySideMode = false;
-            this.getData();
+			this.sideBySideMode = false;
+            this.getData({});
         },
         handleChangeFilterValue(data) {
-            // for (let key in data) {
-            //     this.$set(this.myOwnFilter, key, data[key]);
-            // }
-            // this.getData();
-
             this.searchKey = data.nameLike;
             if(this.debounceGetData){
                 clearTimeout(this.debounceGetData);

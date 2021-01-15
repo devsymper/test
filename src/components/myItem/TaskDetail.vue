@@ -23,34 +23,43 @@
                 </template>
                 <span>{{taskBreadcrumb}}</span>
             </v-tooltip>
-            <div id="action-task" class="text-right pt-1 pb-1 pr-0 float-right ">
-				<!-- <v-btn  
-						text small
+            <div id="action-task" class="text-right pt-1 pb-1 pr-0 float-right">
+				<v-btn  
+						small
 						disabled
-						class="mr-16"
+						class="mr-3"
+						color="success"
 						v-if="showSubmitSuccessBtn"
 					>
-						<v-icon small color="success">mdi-information-outline</v-icon> Submit
-				</v-btn> -->
+						<v-icon small color="success" class="mr-1">mdi-check-outline</v-icon> Submited
+				</v-btn>
                 <span v-if="!originData.endTime && !hideActionTask " class="mr-10">
                             
-                    <span v-if="originData.assigneeInfo && checkRole(originData.assigneeInfo.id) == true" class="mr-16">
+                    <span v-if="originData.assigneeInfo && checkRole(originData.assigneeInfo.id) == true" style="margin-right: 80px !important">
                         <v-btn 
                             small 
                             depressed  
                             v-for="(action, idx) in taskActionBtns" 
-                            dark 
+                            :dark="!loadingAction || idx == indexAction"
                             :key="idx" 
                             :color="action.color" 
 							class="mr-1"
-                            @click="saveTaskOutcome(action.value)" 
-                            :loading="loadingAction"
+                            @click="saveTaskOutcome(action.value,idx)" 
+                            :loading="loadingAction && idx == indexAction"
+                            :disabled="loadingAction && idx != indexAction"
                         >
                             {{action.text}}
                         </v-btn>
                     </span>
                     <span v-else class="mr-14">
-                        <v-btn small depressed disabled v-for="(action, idx) in taskActionBtns"  :key="idx" :color="action.color"  class="mr-2">
+                        <v-btn 
+                        small 
+                        depressed 
+                        disabled
+                        v-for="(action, idx) in taskActionBtns"  
+                        :key="idx" 
+                        :color="action.color"  
+                        class="mr-2">
                             {{action.text}}
                         </v-btn>
 
@@ -164,6 +173,7 @@
 			:showDialog="modelDialog.completeShowDialog"
 			@cancel="modelDialog.completeShowDialog = false"
 			:taskId="originData.id"
+			:varsForBackend="varsForBackend"
 			:taskInfo="taskInfo"
 			@success="refreshMyItem('complete')"
 		/> 
@@ -287,6 +297,7 @@ export default {
             immediate:true,
             handler(valueAfter){
 				this.isShowSidebar = false
+				this.varsForBackend = {}
 				this.checkActionOfUser(valueAfter)
 				if(this.checkShowEditRecord()){
 					this.rightAction = 120
@@ -329,7 +340,9 @@ export default {
     },
     data: function() {
         return {
+            indexAction:-1,
 			showSubmitSuccessBtn:false,
+			varsForBackend:{},
 			modelDialog:{
 				unClaimShowDialog: false,
 				claimShowDialog: false,
@@ -574,16 +587,6 @@ export default {
                 return;
             }
             let self = this;
-            let filter="notDone";
-            if (this.originData) {
-                if (this.originData.endTime || this.isSubmited) {
-                    filter = "done";
-                }else{
-                    filter = "notDone";
-                }
-            }
-            this.$store.commit("task/setFilter", filter);
-           
             for(let role in self.tabsData.people){
                 self.tabsData.people[role]=[];
                 if(this.originData[role]){
@@ -668,7 +671,8 @@ export default {
         closeDetail() {
             this.$emit("close-detail", {});
         },
-		async saveTaskOutcome(value){ // hành động khi người dùng submit task của họ
+        async saveTaskOutcome(value,idx){ // hành động khi người dùng submit task của họ
+            this.indexAction = idx;
             //check xem user có phải assignee
             this.loadingAction=true;
             // kiểm tra xem user hiện tại có role được phân quyền trong task không? 
@@ -757,9 +761,9 @@ export default {
             return new Promise(async (resolve, reject) => {
                 try {
                     let taskId = self.taskInfo.action.parameter.taskId;
-                    // let result = await BPMNEngine.actionOnTask(taskId, taskData);   
-                    // self.$snotifySuccess("Task completed!");
-                    // resolve(result);
+                    let result = await BPMNEngine.actionOnTask(taskId, taskData);   
+                    self.$snotifySuccess("Task completed!");
+                    resolve(result);
                 } catch (error) {
                     let detail = '';
                     if(error.responseText){
@@ -771,15 +775,15 @@ export default {
                 }
             });
         },
-        async checkRoleUser(originData){
+        checkRoleUser(originData){
             let self=this;
             if (originData.assignee.indexOf(":")>0) {
                 let arrDataAssignee=originData.assignee.split(":");
                 let assigneeId=arrDataAssignee[0];
-                let roleIdentify=originData.assignee.slice(assigneeId.length);
+                let roleIdentify=originData.assignee.slice(assigneeId.length + 1);
                 // ktra enduser có tồn tại role trong assignee không
                 let rolesUser=self.$store.state.app.endUserInfo.roles;
-                let role=rolesUser[arrDataAssignee[1]].find(element => element.id==originData.assignee);
+                let role=rolesUser[arrDataAssignee[1]].find(element => element.id == roleIdentify);
                 if (role) {
                     self.isRole=true;
                     return true;
@@ -818,26 +822,28 @@ export default {
         async handleTaskSubmited(data){
 			this.$refs.snackbar.clickShowSnackbar()
 			this.showSubmitSuccessBtn = true
-            // if(this.isInitInstance){
-            //     if (this.reload) {
-            //         this.$emit('task-submited', data);            
-            //     }
-            // }else{
+			let obj = {
+				text:"Submit",
+				value:"submit",
+				color:"blue"
+			}
+			this.taskActionBtns.splice(this.taskActionBtns.indexOf(obj), 1)
 			let elId = this.taskInfo.action.parameter.activityId;
 			let docId = data.document_id;
 			if(!docId){
 				docId = this.taskInfo.action.parameter.documentId;
 			}
-			let varsForBackend = await getVarsFromSubmitedDoc(data, elId, docId);
+			this.varsForBackend = await getVarsFromSubmitedDoc(data, elId, docId);
 			let taskData = { 
 				"outcome": 'submit',
-				"variables": varsForBackend.vars,
-			}
-			let res =  await this.submitTask(taskData);
-			this.reloadDetailTask();
-			if (this.reload) {
-				this.$emit('task-submited', res);
+				"variables": this.varsForBackend.vars,
             }
+            this.updateTask(taskData);
+			// let res =  await this.submitTask(taskData);
+			this.reloadDetailTask();
+			// if (this.reload) {
+			// 	this.$emit('task-submited', res);
+            // }
             this.updateProcessInstanceName();
             this.loadingAction=false;
         },
@@ -898,11 +904,6 @@ export default {
             let res =await BPMNEngine.postTaskHistory(filter);
             if (res.total>0) {
                 let task=res.data[0];
-                if (task.endTime && task.endTime!=null) {
-                    self.$store.commit("task/setFilter", 'done');
-                }else{
-                    self.$store.commit("task/setFilter", 'notDone');
-                }
                 let taskInfo = extractTaskInfoFromObject(task);
                 task = addMoreInfoToTask(task);
                 task.symperApplicationId=this.appId;

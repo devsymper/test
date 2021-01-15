@@ -71,6 +71,7 @@
 import FormTpl from "@/components/common/FormTpl.vue";
 import { taskManagementApi } from "@/api/taskManagement.js";
 import userSelector from "@/components/user/UserSelector.vue";
+import ComponentWorker from 'worker-loader!@/worker/taskManagement/component/Component.Worker.js';
 
 export default {
     components:{
@@ -167,6 +168,7 @@ export default {
     },
     data(){
         return{
+            componentWorker:null,
             isLoadingAdd:false,
             disabled:true,
             isShow:false,
@@ -189,22 +191,12 @@ export default {
                 if (this.currentUserLeader.id) {
                     data.userLeader=this.currentUserLeader.id;
                 }
-                taskManagementApi
-                    .addComponentForProject(data)
-                    .then(res => {
-                        if (res.status == 200) {
-                            this.$emit("add-component");
-                            this.$snotifySuccess("Add component completed!");
-                            this.isShow=false;
-                        }else{
-                            this.$snotifyError("", "Can not add component!");
-                        }
-                        this.isLoadingAdd=false;
-                    })
-                    .catch(err => {
-                        this.$snotifyError("", "Can not add component!", err);
-                        this.isLoadingAdd=false;
-                    });
+                // đẩy data xuống worker để add
+                this.componentWorker.postMessage({
+                    action:'handleAddComponent',
+                    data:data
+                });
+
             }else{
                 this.isLoadingAdd=false;
             }
@@ -218,23 +210,11 @@ export default {
                 data.name=this.dataComponentProps.name.value;
                 data.description=this.dataComponentProps.description.value;
                 data.userLeader=this.currentUserLeader.id;
-                taskManagementApi
-                    .updateComponentForProject(this.infoComponent.id,data)
-                    .then(res => {
-                        if (res.status == 200) {
-                            this.$snotifySuccess("Update Component success!");
-                            data.id=this.infoComponent.id;
-                            this.$emit("add-component"); // emit sự kiện để reload data
-                            this.isShow=false;
-                        }else{
-                            this.$snotifyError("", "Can not update Component!");
-                        }
-                        this.isLoadingAdd=false;
-                    })
-                    .catch(err => {
-                        this.$snotifyError("", "Can not update Component!", err);
-                        this.isLoadingAdd=false;
-                    });
+                // đẩy data xuống worker để update
+                this.componentWorker.postMessage({
+                    action:'handleUpdateComponent',
+                    data:{id:this.infoComponent.id,data:data}
+                });
             }else{
                 this.$snotifyError("", "Have error!");
                 this.isLoadingAdd=false;
@@ -254,7 +234,34 @@ export default {
             return true;
         },
     },
-    
+    created(){
+        let self = this;
+        this.componentWorker = new ComponentWorker();
+
+        this.componentWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'actionError':
+                    self.isShow=false;
+                    self.isLoadingAdd=false;
+                case 'handleUpdateComponent':
+                    self.$snotifySuccess("Update Component success!");
+                    self.$emit("add-component"); // emit sự kiện để reload data
+                    self.isShow=false;
+                    self.isLoadingAdd=false;
+                    break;
+                case 'handleAddComponent':
+                    self.$emit("add-component");
+                    self.$snotifySuccess("Add component completed!");
+                    self.isShow=false;
+                    self.isLoadingAdd=false;
+                    break;
+                
+                default:
+                    break;
+            }
+        });
+    }
 }
 </script>
 

@@ -202,9 +202,9 @@ export default {
                         thisCpn.$store.commit(
                             "document/addControl", { id: controlId, props: listControlToStore[controlId], instance: thisCpn.keyInstance }
                         );
-                    }
+					}
                     thisCpn.processHtml(thisCpn.contentDocument);
-                    thisCpn.controlRelationWorker.terminate();
+                    // thisCpn.controlRelationWorker.terminate();
                     break;
                 default:
                     break;
@@ -302,7 +302,7 @@ export default {
                 if(after.docObjId){
                     this.docObjId = Number(after.docObjId);
                     this.documentSize = after.docSize;
-                    this.loadDocumentObject(this.isPrint);
+                    this.loadDocumentObject(this.isPrint);z
                 }
             }
         },
@@ -570,7 +570,7 @@ export default {
                         }
                     }
                 }
-            }
+			}
             this.$refs.preLoaderView.hide();
             this.$emit("after-loaded-component-detail",this.formSize);
             $('.wrap-content-detail').removeAttr('style');
