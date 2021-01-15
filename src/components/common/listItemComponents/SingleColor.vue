@@ -1,8 +1,6 @@
 <template>
     <div class="w-100 mb-1"  >
         <div class="w-100">
-       <!-- test -->
-       <!-- test -->
        <v-menu v-for="(item, type) in items" :key="type"
             :nudge-top="150"
             :close-on-content-click="false" 
@@ -41,6 +39,8 @@
 import PickColor from "./PickColor"
 import TreeSqlConfig from "./../../../views/document/sideright/items/TreeSqlConfig"
 export default {
+  watch: {
+  },
     components:{
         PickColor,
         TreeSqlConfig
@@ -54,26 +54,70 @@ export default {
           })
       },
       getJsScript(){
-          this.treeItemToJS(this.treeData);
+          this.value.conditionFormat = this.treeItemToJS(this.$refs.treeConfig.treeData[0]);
+          this.value.originCondition = this.$refs.treeConfig.treeData[0];
+          this.$emit('change',this.value )
       },
+      getHeaderName(nameTable){
+          let headerName = '';
+          this.tableColumns.map(t=>{
+              if(t.name==nameTable){
+                  headerName = t.headerName
+              }
+          })
+          return headerName;
+
+      },
+      getFieldTb(nameTb){
+        let field = '';
+        this.tableColumns.map(t=>{
+              if(t.name==nameTb){
+                  field = t.field
+              }
+        })
+        return field
+      },
+      // kiểm tra toán tử có tồn tại trong list cần format không
+      checkIsInListOpr(opr){
+          let check = false;
+          this.listOperators.map(operator=>{
+              if(operator.name==opr){
+                  check=true
+              }
+          })
+          return check;
+      },
+      // chuyển toán tử về dạng đúng format trong js
+      formatOperator(name){
+        let value = '';
+        this.listOperators.map(opr=>{
+            if(this.checkIsInListOpr(opr.name)){
+                 if(opr.name==name){
+                    value = opr.value}
+            }else{
+                    value = name
+                }
+        })
+        return value
+        },
+
+      // chuyển cây điều kiện sang câu lệnh js
       treeItemToJS(node){
            if(!node.condition){
-            // let varName = node.column;
-            let varName = `row['${node.columnTitle}']`;
-            let columnDataType = node.columnDataType;
+            let field = this.getFieldTb(node.column);
+            let headerName = this.getHeaderName(node.column);
+            let conditionName = `e.data.${field}`;
+            let column = node.column;
             let value = node.value;
-            if(columnDataType != 'number'){
-                value = `'${value}'`;
-            }
-            let functionName = node.operand;
-            return ` mo.${functionName}(${varName}, ${value}) `;
+            let functionName = this.formatOperator(node.operator);
+            return ` (${conditionName}${functionName} ${value}) `;
         }else if(node.condition){
             let arrCond = [];
             for(let childNode of node.children){
-                let itemCond = this.treeItemToJSCondition(childNode);
+                let itemCond = this.treeItemToJS(childNode);
                 arrCond.push(itemCond);
             }
-            let opr = logicalOperand[node.label];
+            let opr = node.name=="OR"?'||':'&&';
             let cond = arrCond.join(opr);
             return ` (${cond}) `;
         }
@@ -82,13 +126,12 @@ export default {
       getColor(type){
           let color = "black";
           if(type=='BackgroundColor'){
-              debugger
               color = this.value.backgroundColor
-
           }
           if(type=='FontColor'){
               color = this.value.fontColor 
           }
+
           return color
       },
   },
@@ -97,9 +140,9 @@ export default {
             if(index!=0){
                 this.formatTableColumn.push(column);
                 this.tableColumnsForTree.push(column);
-                this.tableColumnsForTree[index-1].title=column.field;
+                this.tableColumnsForTree[index-1].title=column.name;
             }
-      })
+      });
   },
   props: {
       tableColumns:{
@@ -107,15 +150,32 @@ export default {
             default(){
                 return []
             }
+      },
+      value:{
+          type:Object,
+          default(){
+                return {}
+        }
       }
   },
      data(){
         return {
             treeData:[],
+            listOperators:[
+                {
+                    name:'=',
+                    value:'=='
+                },
+                {
+                    name:'<>',
+                    value:'!='
+                },
+                {
+                    name:'!>',
+                    value:'<='
+                },
+            ],
             tableColumnsForTree:[],
-            scriptCondition:'',
-            treeConfigData:null,
-            listColumn:[],
             formatTableColumn:[],
             items: [
                  {
@@ -150,15 +210,17 @@ export default {
                     type:'FontColor'
 
                 }],
-            value:{
-                    backgroundColor: '#FFFFFF',
-                    fontColor: '#000000',
-                    italic: false,
-                    bold: false,
-                    fontSize: 13,
-                    underline: false,
-                    strike: false
-            }
+            // value:{
+            //         backgroundColor: '#FFFFFF',
+            //         fontColor: '#000000',
+            //         italic: false,
+            //         bold: false,
+            //         fontSize: 13,
+            //         underline: false,
+            //         strike: false,
+            //         conditionFormat:'',
+            //         originCondition:[]
+            // }
         }
     }
 }

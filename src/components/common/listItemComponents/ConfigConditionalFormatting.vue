@@ -11,7 +11,7 @@
                 single-line
                 outlined
                 dense
-                v-model="nameGroup"
+                v-model="value.nameGroup"
                 label="Nhập tên nhóm không quá 26 kí tự "
                 :placeholder="$t('common.search')"
             ></v-text-field>
@@ -44,17 +44,18 @@
             >
                 <v-radio 
                     label="Single Color"
-                    value="Single"
+                    value="singleColor"
                 ></v-radio>
                 <v-radio
                     label="Color Scale"
-                    value="Scale"
+                    value="colorScale"
                 ></v-radio>
              </v-radio-group>
         </v-row>
-        <div v-if="colorType=='Single'">
+        <div v-if="colorType=='singleColor'">
             <SingleColor style="margin-top:-20px" 
-                @valueSingle="valueSingle"
+                ref="singleColor"
+                v-model="value.displayMode.singleColor"
                 :tableColumns="formatTableColumns"/>
         </div>
         <div style="margin-top:-20px" v-else>
@@ -85,8 +86,24 @@ export default {
     SingleColor,
   },
   methods: {
+    save(){
+        this.$refs.singleColor.getJsScript();
+        this.$emit("change", this.value);
+        this.$emit("save");
+    },
     changeToAdd(){
         this.$emit("changeToAdd")
+    },
+    //chuyển cột được chọn thành script js dạng (column.headerName=='table.id'||column.headerName=='table.note')
+    formatSelectedColumnToJS(){
+        let selectedCols=[];
+        this.formatTableColumns.map(t=>{
+            if(t.isSelected){
+                selectedCols.push("column.headerName=='"+t.headerName+"'")
+            }
+        })
+        let result =  selectedCols.join('||')
+        return result
     },
     check(index){
         this.formatTableColumns.map((column,i)=>{
@@ -97,6 +114,7 @@ export default {
                 }
             }
         })
+        this.value.tableColumnsJS= this.formatSelectedColumnToJS();
     },
     checkAll(value = true){
         this.formatTableColumns.map(column=>{
@@ -128,10 +146,12 @@ export default {
                 type:column.type,
                 field:column.field,
                 isSelected:false,
+                headerName:column.headerName
             })
             
         })
         this.formatTableColumns = tableColumns;
+        this.value.tableColumns=this.formatTableColumns;
 
     },
     getDataTypeIcon(type) {
@@ -158,32 +178,13 @@ export default {
             type: String,
             default: ''
         }
-  },
-        data(){
-            return {
-                conditionFormat:{
-                    nameGroup:'test',
-                    tableColumns:this.tableColumns,
-                    color:{
-                        type:'SingleColor',
-                        style:{
-                              background: '#FFFFFF',
-                                fontColor: '#000000',
-                                italic: false,
-                                bold: false,
-                                fontSize: 13,
-                                underline: false,
-                                strike: false
-                        }
-                    },
-                    condition:'id = 2341'
-
-                },
-                valueSingle:[],
-                colorType:'Single',
-                formatTableColumns:[],
-                lists:['Min value','None value','Max value'],
-            }
+    },
+    data(){
+        return {
+            colorType:'singleColor',
+            formatTableColumns:[],
+            lists:['Min value','None value','Max value'],
+        }
     },
 }
 </script>

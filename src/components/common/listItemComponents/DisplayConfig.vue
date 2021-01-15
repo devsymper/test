@@ -143,7 +143,12 @@
         </template>
         </v-tab-item>
          <v-tab-item :key="2" :value="'tab-' + 2" class="tab-item" style="flex-grow: 1">
-            <ConditionalFormatting :tableColumns="tableColumns" :headerPrefixKeypath='headerPrefixKeypath'/>
+            <ConditionalFormatting
+                @apply-config="applyConfig"
+                :conditionalFormat="conditionalFormat"
+                :tableColumns="tableColumns" 
+                @save="saveConditionalFormatting"
+                :headerPrefixKeypath='headerPrefixKeypath'/>
         </v-tab-item>
         </v-tabs-items>
     </v-navigation-drawer>
@@ -178,7 +183,12 @@ export default {
     },
     computed: {},
     props: {
-       
+        conditionalFormat:{
+             type: Array,
+                default(){
+                    return []
+                }
+        },
         tableDisplayConfig: {
             type: Object,
             default(){
@@ -201,6 +211,12 @@ export default {
         }
     },
     methods: {
+        applyConfig(index){
+             this.$emit('apply-config',index)
+        },
+        saveConditionalFormatting(data){
+            this.$emit('save-conditional-formatting',data);
+        },
         saveTableDisplayConfig(){
             this.$emit('save-list-display-config');
         },

@@ -320,10 +320,13 @@
 			</ag-grid-vue>
 			 <display-config
 				ref="tableDisplayConfig"
+                @apply-config="applyConfig"
+                @save-conditional-formatting="saveConditionalFormatting"
 				@drag-columns-stopped="handleStopDragColumn"
 				@change-colmn-display-config="configColumnDisplay"
 				@save-list-display-config="saveTableDisplayConfig"
 				@re-render="reRender"
+                :conditionalFormat="conditionalFormat"
 				:tableDisplayConfig="tableDisplayConfig"
 				:tableColumns="columnDefs"
 				:headerPrefixKeypath="headerPrefixKeypath"
@@ -720,7 +723,24 @@ export default {
 							eval("e.cellRenderer = " + e.cellRenderer)
 						}
 					})
-					self.columnDefs = data.dataAfter
+                    self.columnDefs = data.dataAfter;
+                    self.columnDefs.map(column=>{
+                        debugger
+                        // let tableCols= "column.headerName=='id'||column.headerName=='userName'||column.headerName=='email'||column.headerName=='avatar'"
+                        let tableCols = self.conditionalFormat[0].tableColumnsJS;
+                        if(eval(tableCols)){
+                            column.cellStyle= function(e){
+                                // let conditionalFormat1 =" ( (e.data.id==920) )"
+                                let conditionalFormat1 = self.conditionalFormat[0].displayMode.singleColor.conditionFormat
+                                if(eval(conditionalFormat1)){
+                                    return {color: self.conditionalFormat[0].displayMode.singleColor.fontColor, backgroundColor:self.conditionalFormat[0].displayMode.singleColor.backgroundColor}
+                                }
+                                // return {color: self.conditionalFormat.displayMode.singleColor.fontColor, backgroundColor:self.conditionalFormat.displayMode.singleColor.backgroundColor}
+
+                            }
+                        }
+                    })
+                    debugger
 					break;
                 default:
                     break;
@@ -856,6 +876,7 @@ export default {
     data(){
 		let self = this;
         return {
+            conditionalFormat:[],
             closeBtnFilter:false,
             isUpdateFilter:false,
             filter:[],
@@ -979,12 +1000,7 @@ export default {
 		this.gridOptions = {};
 		// this.gridOptions.rowHeight =  this.rowHeight
 		this.gridOptions.getRowStyle = function(params) {
-            debugger
-            // if(params.data['status']=='Đang hoạt động'){
-            //     	return { background: '#fbfbfb' }
-            // }
 			if (params.node.rowIndex % 2 != 0) {
-                debugger
 				return { background: '#fbfbfb' };
 			}
 		}
@@ -999,6 +1015,24 @@ export default {
 		this.rowSelection = 'single';
     },
 	methods:{
+        applyConfig(index){
+            this.columnDefs.map(column=>{
+                        debugger
+                        // let tableCols= "column.headerName=='id'||column.headerName=='userName'||column.headerName=='email'||column.headerName=='avatar'"
+                        let tableCols = this.conditionalFormat[index].tableColumnsJS;
+                        if(eval(tableCols)){
+                            column.cellStyle= function(e){
+                                // let conditionalFormat1 =" ( (e.data.id==92index) )"
+                                let conditionalFormat1 = this.conditionalFormat[index].displayMode.singleColor.conditionFormat
+                                if(eval(conditionalFormat1)){
+                                    return {color: this.conditionalFormat[index].displayMode.singleColor.fontColor, backgroundColor:this.conditionalFormat[index].displayMode.singleColor.backgroundColor}
+                                }
+                                // return {color: this.conditionalFormat.displayMode.singleColor.fontColor, backgroundColor:this.conditionalFormat.displayMode.singleColor.backgroundColor}
+
+                            }
+                        }
+            })
+        },
         hideCloseBtnFilter(){
             this.selectedFilterName = '';
             this.closeBtnFilter = false;
@@ -1097,7 +1131,7 @@ export default {
             this.listItemsWorker.postMessage({
                 action: 'saveFilter',
                 data: tableConfig
-			})
+            })
         },
 		getAllData(){
 			return this.rowData
@@ -1340,6 +1374,10 @@ export default {
                 // xử lý phần filter
                 this.filter = res.savedConfigs.filter;
                 this.getDefaultFilter()
+                // xử lý phần format conditional
+                debugger
+                this.conditionalFormat = res.savedConfigs.conditionalFormat;
+                // this.getDefaultFilter()
 			}
 		},
 		handlerSaveTableDisplayConfigRes(res){
@@ -1807,7 +1845,21 @@ export default {
 					dataToSave: dataToSave
 				}
 			});
-		},
+        },
+        // lưu cấu hình formatting Table
+        saveConditionalFormatting(data){
+            debugger
+            let tableConfig =  this.getTableDisplayConfigData();
+            tableConfig.detail = JSON.parse(tableConfig.detail);
+            tableConfig.detail.filter = this.filter;
+            tableConfig.detail.conditionalFormat = data;
+            tableConfig.detail= JSON.stringify(tableConfig.detail);
+              this.listItemsWorker.postMessage({
+                action: 'saveFilter',
+                data: tableConfig
+			})
+           
+        },
 		 /**
          * Xử lý việc sau khi kết thúc kéo thả các cột ở thanh cấu hình hiển thị danh sách
          */
