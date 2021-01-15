@@ -53,7 +53,7 @@ export default {
                delete: {
                     name: "delete",
                     text: this.$t("common.delete"),
-                    callback: (obj, callback) => {
+                    callback: (obj, callback) => {	
 						
                     },
                 },
@@ -79,7 +79,7 @@ export default {
     },
     methods: {
 		addDataset(){
-
+			
 		}
 	}
 };
