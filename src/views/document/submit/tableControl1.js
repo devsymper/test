@@ -38,11 +38,12 @@ export default class TableControl1 extends Control {
         this.controlInTable = {};
         this.mapControlToIndex = {};
         this.tableMode = this.controlProperties.tableView.value;
+        this.formulasWorker = null
         this.init();
         this.ele.wrap('<span style="position:relative;display: block;" class="wrap-table">');
     }
     renderTable() {
-        this.tableInstance = new SymperTable(this, this.curParentInstance, this.groupConfig, this.pivotConfig);
+        this.tableInstance = new SymperTable(this, this.curParentInstance, this.groupConfig, this.pivotConfig, this.formulasWorker);
         let viewType = sDocument.state.viewType[this.curParentInstance];
         if ((viewType == 'submit' || viewType == "update") && !this.agDataTable) {
             this.ele.parent().append('<span onclick="traceTable(this)" table-name="' + this.name + '" instance="' + this.curParentInstance + '" class="mdi mdi-information-outline icon-trace-table"></span>');
@@ -65,6 +66,9 @@ export default class TableControl1 extends Control {
             }
             this.ele.detach().hide();
         }
+    }
+    setFormulasWorker(worker){
+        this.formulasWorker = worker;
     }
     /**
      * Hàm set data cho handson table, cho trường hợp viewdetail đã có data

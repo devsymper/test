@@ -67,7 +67,8 @@ export default {
             inputType:false,
             controlValueKey:null,
             isSingleSelectCombobox:true,
-            dataSelected:{}
+            dataSelected:{},
+            controlForcusing:null
         }
     },
     created(){
@@ -77,11 +78,12 @@ export default {
     },
     methods:{
        
-        show(e){
+        show(e, controlName){
             this.isShowAutoComplete = true;
             this.calculatorPositionBox(e);
             this.setEvent();
             // this.search = $(e.target).val();
+            this.controlForcusing = controlName
         },
         setEvent(){
             let thisCpn = this;
@@ -108,6 +110,8 @@ export default {
                     }
                     else if(e.keyCode == 13){
                         let rowActive = thisCpn.dataTable[thisCpn.indexActive];
+                        e.preventDefault();
+                        e.stopPropagation();
                         thisCpn.handleClickRow(rowActive,true);
                     }
                 }
@@ -261,7 +265,7 @@ export default {
             }
             this.curInput.val(value.inputValue);
             
-            // this.$emit('after-select-row',{value:value,fromEnterKey:fromEnterKey});
+            this.$emit('after-select-row',{value:value,fromEnterKey:fromEnterKey,controlName:this.controlForcusing});
 
         },
         openSubForm(){

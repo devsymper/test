@@ -687,7 +687,7 @@ button:hover {
 
 .icon-trace-table {
     position: absolute;
-    left: 0;
+    right: -8px;
     top: 0;
     z-index: 200;
     padding: 2px 16px;

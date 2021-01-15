@@ -190,6 +190,9 @@ export default class BasicControl extends Control {
     triggerOnChange() {
         this.ele.trigger('change');
     }
+    unFocusInput(){
+        this.ele.blur();
+    }
     setEvent() {
             // biến check xem control có đang autocomplete hay ko
             // nếu đang autocomplete thì ko nhận sự kiện thay đổi khi giá trị đang được gõ
@@ -220,15 +223,8 @@ export default class BasicControl extends Control {
                     }
                 }
                 // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
-                if(thisObj.isRequiredControl()){
-                    if(!valueChange){
-                        thisObj.renderValidateIcon('Không được bỏ trống trường thông tin '+thisObj.title, 'Require')
-                    }
-                    else{
-                        thisObj.removeValidateIcon('Require');
-                    }
-                }
-                else if(thisObj.type == 'time'){
+                thisObj.checkRequire();
+                if(thisObj.type == 'time'){
                     if(!Util.checkTimeValid(valueChange)){
                         thisObj.renderValidateIcon("Không đúng định dạng thời gian", 'TimeValid')
                         return false
@@ -280,7 +276,7 @@ export default class BasicControl extends Control {
                         autocompleteFormulasInstance: formulasInstance,
                         isSelect: false,
                         controlTitle: thisObj.title,
-                        controlName: thisObj.controlProperties.name.value,
+                        controlName: thisObj.name,
                         val: $(e.target).val()
                     })
                 }
@@ -303,12 +299,6 @@ export default class BasicControl extends Control {
                 store.commit("document/addToDocumentSubmitStore", {
                     key: 'docStatus',
                     value: 'input',
-                    instance: thisObj.curParentInstance
-                });
-
-                store.commit("document/addToDocumentSubmitStore", {
-                    key: 'currentTableInteractive',
-                    value: null,
                     instance: thisObj.curParentInstance
                 });
                 e.controlName = thisObj.name;
@@ -337,6 +327,16 @@ export default class BasicControl extends Control {
         SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { control: this })
     }
 
+    checkRequire(){
+        if(this.isRequiredControl()){
+            if(this.isEmpty()){
+                this.renderValidateIcon('Không được bỏ trống trường thông tin '+this.name, 'Require')
+            }
+            else{
+                this.removeValidateIcon('Require')
+            }
+        }
+    }
     setValue(value) {
         if (this.type == 'fileUpload') {
             if(!this.value){
@@ -757,11 +757,6 @@ export default class BasicControl extends Control {
         let thisObj = this;
         this.ele.attr('readonly', isReadOnly)
         this.ele.on('click', function(e) {
-            store.commit("document/addToDocumentSubmitStore", {
-                key: 'currentTableInteractive',
-                value: null,
-                instance: thisObj.curParentInstance
-            });
             if (!thisObj.controlFormulas.list) {
                 return;
             }

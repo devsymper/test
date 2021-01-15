@@ -21,6 +21,7 @@ import {
     UserRenderer} from './table/cellRenderer'
 import {AutoCompleteCellEditor} from './table/AutoCompleteCellEditor';
 import { checkCanBeBind } from "./handlerCheckRunFormulas";
+import PerfectScrollbar from "perfect-scrollbar";
 window.addNewDataPivotTable = function(el, event, type){
     let tableName = $(el).attr('table-name');
     event.preventDefault();
@@ -30,7 +31,7 @@ window.addNewDataPivotTable = function(el, event, type){
     
 }
 export default class SymperTable {
-    constructor(tableControl, keyInstance, groupConfig = {}, pivotConfig = {}) {
+    constructor(tableControl, keyInstance, groupConfig = {}, pivotConfig = {}, formulasWorker) {
         this.init();
         this.tableControl = tableControl;
         this.tableName = tableControl.name;
@@ -41,11 +42,15 @@ export default class SymperTable {
         this.values = groupConfig.values;
         this.tableContainer = null;
         this.tableHeightDefault = "400px";
+        this.tableHasRowSum = false;
+        this.sumColumns = {};
         this.columnDefs = this.getColDefs();
         this.allColumnAppend = [];
         this.agInstance = null;
         this.tableMode = this.tableControl.tableMode;
-        this.cellRendererValueMap = {}
+        this.cellRendererValueMap = {},
+        this.formulasWorker = formulasWorker
+        
     }
     init(){
         /**
@@ -70,17 +75,19 @@ export default class SymperTable {
             autocomplete: 'AutoCompleteCellEditor',
         }
     }
-    setFormulasWorker(formulasWorker){
-        this.formulasWorker = formulasWorker
-    }
     getColDefs(){
         let colDefs = []
         for (let controlName in this.tableControl.controlInTable){
             let controlInstance = this.tableControl.controlInTable[controlName];
+            if (controlInstance.checkProps('isSumTable')) {
+                this.sumColumns[controlName] = controlInstance;
+                this.tableHasRowSum = true;
+            }
             let col = {
                 headerName:controlInstance.title,
                 field: controlInstance.name,
                 editable:true,
+                hide:controlInstance.checkProps('isHidden')
             };
             if(this.supportCellsType[controlInstance.type]){
                 col['cellRenderer'] = this.supportCellsType[controlInstance.type]
@@ -112,6 +119,7 @@ export default class SymperTable {
                     continue
                 }
             }
+            console.log(col,'colcolcol');
             colDefs.push(col);
         }
         let colObjectId = {
@@ -195,6 +203,67 @@ export default class SymperTable {
      * @param {} vl 
      */
     setData(data) {
+        if(this.formulasWorker){
+            this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+                {
+                    func:'delete',
+                    keyInstance:this.keyInstance, 
+                    tableName: this.tableName,
+                }
+            })
+        }
+        if(!data){
+            data = this.getRowDefaultData();
+        }
+        else{
+            let dataToStore = {};
+            let dataToSqlLite = [];
+            let columnInsert = [];
+            for (let index = 0; index < data.length; index++) {
+                let rowId = Date.now() + index;
+                data[index]['s_table_id_sql_lite'] = rowId;
+
+                let listKey = Object.keys(data[index]);
+                columnInsert = listKey;
+                let rowData = [];
+                for (let j = 0; j < listKey.length; j++) {
+                    let controlName = listKey[j];
+                    rowData.push('"' + data[index][controlName] + '"');
+                    if (controlName == 's_table_id_sql_lite') {
+                        continue;
+                    }
+                    if (!dataToStore.hasOwnProperty(controlName)) {
+                        dataToStore[controlName] = [];
+                    }
+                    let controlIns = getControlInstanceFromStore(this.keyInstance, controlName);
+                    if (controlIns && dateFormat && controlIns.type == 'date') {
+                        data[index][controlName] = SYMPER_APP.$moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
+                    }
+                    if (data[index] != undefined)
+                        dataToStore[controlName].push(data[index][controlName]);
+                }
+                dataToSqlLite.push('(' + rowData.join() + ')');
+            }
+            if(this.formulasWorker){
+                this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+                    {
+                        func:'insertAll',
+                        keyInstance:this.keyInstance, 
+                        tableName: this.tableName,
+                        columns:columnInsert.join(),
+                        allData:dataToSqlLite.join()
+                    }
+                })
+            }
+            for (let controlName in dataToStore) {
+                store.commit("document/updateListInputInDocument", {
+                    controlName: controlName,
+                    key: 'value',
+                    value: dataToStore[controlName],
+                    instance: this.keyInstance
+                });
+            }
+        }
         if(this.tableMode != 'Flat'){
             this.appendTableColumns(data);
             this.gridOptions.api.setColumnDefs(this.columnDefs);
@@ -315,6 +384,7 @@ export default class SymperTable {
             enableRangeSelection: true,
             enableCellTextSelection:false,
             onCellValueChanged:this.onCellValueChanged,
+            onGridReady:this.onGridReady,
             tableInstance:this
         };
         let viewType = sDocument.state.viewType[this.instance];
@@ -343,11 +413,76 @@ export default class SymperTable {
         this.caculatorHeight();
         
     }
-    getRowDefaultData(){
+    onGridReady(params){
+        // setTimeout((self)=>{
+        //     params.api.sizeColumnsToFit()
+        // },1000)
+        const agBodyViewport = $(this.tableInstance.tableContainer).find('.ag-body-viewport')[0];
+        const agBodyHorizontalViewport = $(this.tableInstance.tableContainer).find('.ag-body-horizontal-scroll-viewport')[0];
+        if (agBodyViewport) {
+        const ps = new PerfectScrollbar(agBodyViewport);
+            ps.update();
+        }
+        if (agBodyHorizontalViewport) {
+        const ps = new PerfectScrollbar(agBodyHorizontalViewport);
+            ps.update();
+        }
+    }
+
+    /**
+     * Kiểm tra xem đang ở view detail hay submit
+     */
+    checkDetailView() {
+        if (sDocument.state.viewType[this.keyInstance] == 'detail') {
+            return true;
+        } else {
+            return false;
+        }
+    }
+   
+    /**
+     * Hàm khởi tạo bảng sql lite
+     */
+    createSqliteTable() {
+        let columns = [];
+        for (let controlName in this.tableControl.controlInTable){
+            let controlInstance = this.tableControl.controlInTable[controlName];
+            let type = controlInstance.type;
+            if(['number','percent'].includes(type)){
+                type = 'numeric';
+            }
+            else{
+                type = 'text';
+            }
+            columns.push(controlName + " " + type);
+        }
+        columns.push('s_table_id_sql_lite integer');
+        this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+            {
+                func:'createTable',
+                columns:columns.join(','), 
+                keyInstance:this.keyInstance, 
+                tableName: this.tableName,
+            }
+        })
+
+    }
+    /**
+     * Ham trả về dòng có giá trị mặc định
+     */
+    getRowDefaultData(isCreateSqlTable = true){
+        if (isCreateSqlTable && !this.checkDetailView())
+            this.createSqliteTable();
         let rowItem = {};
+        let columnInsert = [];
+        let dataInsert = [];
         for (let controlName in this.tableControl.controlInTable){
             let controlInstance = this.tableControl.controlInTable[controlName];
             let defaultControlValue = controlInstance.getValueProp('defaultValue');
+            if(defaultControlValue){
+                columnInsert.push(controlName);
+                dataInsert.push(defaultControlValue);
+            }
             if(['number','percent'].includes(controlInstance.type)){
                 rowItem[controlName] = 0;
             }
@@ -357,6 +492,20 @@ export default class SymperTable {
             }
         }
         rowItem[SQLITE_COLUMN_IDENTIFIER] = Date.now();
+        if (!this.checkDetailView()) {
+            columnInsert.push('s_table_id_sql_lite');
+            dataInsert.push(rowItem[SQLITE_COLUMN_IDENTIFIER]);
+            this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+                {
+                    func:'insertRow',
+                    columns:columnInsert, 
+                    rowData:dataInsert,
+                    keyInstance:this.keyInstance, 
+                    tableName: this.tableName,
+                    isPromise:false
+                }
+            })
+        }
         return [rowItem]
     }
     /**
@@ -436,6 +585,7 @@ export default class SymperTable {
      * Nhận sự kiên khi giá trị của cell thay đổi => chạy công thức cho các control bị ảnh hưởng
      */
     onCellValueChanged(event){
+        console.log(event,'eventevent');
         if(event.newValue != event.oldValue){
             let columnChange = event.colDef.field;
             let controlInstance = getControlInstanceFromStore(this.tableInstance.keyInstance, columnChange);
@@ -747,76 +897,7 @@ export default class SymperTable {
             self.gridOptions.api.setRowData(data);
         });
     }
-    /**
-     * Hàm lấy các data input cho 1 công thức
-     * @param {Object} formulaInstance đối tượng của công thức 
-     */
-    getDataInputInTableForFormula(formulaInstance, rowIndex = null) {
-        let inputControl = formulaInstance.getInputControl();
-        let dataInput = {};
-        let listInputInDocument = getListInputInDocument(this.keyInstance);
-        let sSubmit = sDocument.state.submit[this.keyInstance];
-        for (let inputControlName in inputControl) {
-            if(inputControlName == 'document_object_id'){
-                let docObjId = sSubmit['documentObjectId'];
-                dataInput[inputControlName] = (docObjId) ? docObjId : '';
-            }
-            else if (inputControlName == 'context'){
-                let context = sSubmit['context'];
-                dataInput[inputControlName] = (context) ? context : '';
-            }
-            else if (inputControlName == 'action'){
-                let action = sSubmit['action'];
-                dataInput[inputControlName] = (action) ? action : '';
-            }
-            else{
-                let controlIns = listInputInDocument[inputControlName];
-                if(!controlIns){
-                    dataInput[inputControlName] = "";
-                }
-                else{
-                    if(controlIns.inTable != false){
-                        let colIndex = this.tableInstance.propToCol(inputControlName);
-                        let currentColData = '';
-                        if(rowIndex != 'all' && rowIndex.length == 1){
-                            currentColData = this.tableInstance.getDataAtCell(rowIndex, colIndex);
-                        }
-                        else if(rowIndex == 'all'){
-                            currentColData = this.tableInstance.getDataAtCol(colIndex);
-                            if(this.tableHasRowSum){
-                                currentColData.pop();
-                            }
-                        }
-                        else if(rowIndex.length > 1){
-                            let listRowData = [];
-                            currentColData = this.tableInstance.getDataAtCol(colIndex);
-                            for (let index = 0; index < rowIndex.length; index++) {
-                                let rowInd = rowIndex[index];
-                                let rowData = currentColData[rowInd];
-                                listRowData.push(rowData);
-                                
-                            }
-                            currentColData = listRowData;
-                        }
-                        dataInput[inputControlName] = currentColData;
-                    }
-                    else{
-                        if (listInputInDocument.hasOwnProperty(inputControlName)){
-                            dataInput[inputControlName] = controlIns.value;
-                        }
-                    }
-                    if(controlIns.type == 'date'){
-                        dataInput[inputControlName] = controlIns.convertDateToStandard(dataInput[inputControlName])
-                    }
-                    if(controlIns.type == 'time'){
-                        dataInput[inputControlName] = controlIns.convertTimeToStandard(dataInput[inputControlName])
-                    }
-                }
-                
-            }
-        }
-        return dataInput;
-    }
+    
      /**
      * Hàm set các cell được validate
      * @param {*} key 

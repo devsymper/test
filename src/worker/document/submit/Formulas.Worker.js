@@ -15,19 +15,19 @@ onmessage = function (event) {
             let formulaInstance = dataOfAction.formulaInstance
             let from = dataOfAction.from
             let formulaIns = new Formulas(formulaInstance.keyInstance,formulaInstance.formulas,formulaInstance.type);
-            let rowIndex = dataOfAction.rowIndex;
-            if(rowIndex == undefined){
-                rowIndex = null
-            }
-            let extraData = dataOfAction.extraData;
+            // let rowIndex = dataOfAction.rowIndex;
+            // if(rowIndex == undefined){
+            //     rowIndex = null
+            // }
+            // let extraData = dataOfAction.extraData;
             let sqlRowId = dataOfAction.sqlRowId;
             let dataInput = {};
             if(dataOfAction.dataInput){
                 dataInput = dataOfAction.dataInput;
             }
-            else{
-                dataInput = formulaIns.getDataInputFormula(rowIndex,extraData);
-            }
+            // else{
+            //     dataInput = formulaIns.getDataInputFormula(rowIndex,extraData);
+            // }
             /**
              * Trương hợp chạy công thức cho cả cột trong table
              */
