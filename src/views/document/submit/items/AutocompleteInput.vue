@@ -91,7 +91,6 @@ export default {
             this.curInput.on('keydown',function(e){
                 if(thisCpn.dataTable != undefined && thisCpn.dataTable.length > 0){
                     if(e.keyCode == 38){    //len
-                    
                         if(thisCpn.indexActive == 0){
                             return false;
                         }
@@ -160,11 +159,14 @@ export default {
         },
         calculatorPositionBox(e){
             // nếu autocomplete từ cell của handsontable  
-            if($(e.target).is('.ag-cell') || $(e.target).is('.ag-cell-autocomplete')){
+            if($(e.target).is('.ag-cell') || $(e.target).is('.ag-cell-autocomplete') || $(e.target).closest('.ag-cell')){
                 this.curInput = $(e.target);
                 let autoEL = $(this.$el).detach();
                 $(e.target).closest('.wrap-table').append(autoEL);
                 let edtos = $(e.target).offset();
+                if($(e.target).closest('.ag-cell')){
+                    edtos = $(e.target).closest('.ag-cell').offset();
+                }
                 // if(!$(e.target).is('.handsontableInput')){
                 //     edtos = $(e.target).closest('td.htAutocomplete.current.highlight').offset();
                 // }
@@ -264,7 +266,6 @@ export default {
                 value = {inputDislay:value, inputValue:value};
             }
             this.curInput.val(value.inputValue);
-            
             this.$emit('after-select-row',{value:value,fromEnterKey:fromEnterKey,controlName:this.controlForcusing});
 
         },

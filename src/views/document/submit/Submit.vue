@@ -772,9 +772,7 @@ export default {
                         thisCpn.$refs.autocompleteInput.setControlValueKey(controlIns.getAutocompleteKeyValue());
                         thisCpn.$refs.autocompleteInput.show(e.e, e.controlName);
                     }
-                    if(!e.isSelect){
-                        thisCpn.getDataForAutocomplete(e,'autocomplete',"",controlIns);
-                    }
+                    thisCpn.getDataForAutocomplete(e,'autocomplete',"",controlIns);
                 }
                 else if((e.e.keyCode < 37 || e.e.keyCode > 40)){
                     thisCpn.$refs.autocompleteInput.hide();
@@ -806,6 +804,7 @@ export default {
                 }
                 
             } catch (error) { 
+                console.log('errorerrorerror',error);
                 
             }
             
@@ -814,7 +813,7 @@ export default {
         this.$evtBus.$on("document-submit-select-input", e => {
             if(this._inactive == true) return;
             try { 
-                let controlName = (e.cellActive) ? e.alias + ":"+e.cellActive[0][0]+":"+e.cellActive[0][1] : e.alias;
+                let controlName = e.controlName;
                 this.$refs.autocompleteInput.show(e.e, controlName);
                 let controlIns = getControlInstanceFromStore(this.keyInstance, controlName);
                 this.$refs.autocompleteInput.setControlValueKey(controlIns.getAutocompleteKeyValue());
@@ -822,7 +821,7 @@ export default {
                 if(e.type == 'combobox'){
                     this.$refs.autocompleteInput.setSingleSelectCombobox(e.isSingleSelect);
                 }
-                this.getDataForAutocomplete(e,e.type,e.alias);
+                this.getDataForAutocomplete(e,controlIns.type,controlName,controlIns);
             } catch (error) {
                 console.log('errorerrorerror',error);
             }
@@ -850,7 +849,8 @@ export default {
                 if (
                     !$(evt.target).hasClass("s-control-date") &&
                     !$(evt.target).hasClass("card-datetime-picker") &&
-                    $(evt.target).closest(".card-datetime-picker").length == 0
+                    $(evt.target).closest(".card-datetime-picker").length == 0 && 
+                    $(evt.target).closest('.ag-cell').length == 0
                 ) {
                     thisCpn.$refs.datePicker.closePicker();
                 }
@@ -858,7 +858,8 @@ export default {
                     thisCpn.$refs.timeInput &&
                     !$(evt.target).hasClass("s-control-time") &&
                     !$(evt.target).hasClass("card-time-picker") &&
-                    $(evt.target).closest(".card-time-picker").length == 0
+                    $(evt.target).closest(".card-time-picker").length == 0 && 
+                    $(evt.target).closest('.ag-cell').length == 0
                 ) { 
                         thisCpn.$refs.timeInput.hide();
                 }
@@ -1245,12 +1246,23 @@ export default {
             let listInput = getListInputInDocument(this.keyInstance);
             if(['select','combobox'].includes(type)){
                 let formulaIns = controlIns.getFormulaInstance('list');
-                let dataInput = getDataInputFormula(formulaIns,listInput,this.optionalDataBinding, e.rowIndex);
-                this.formulasWorker.postMessage({action:'runFormula',data:{
-                    formulaInstance:formulaIns, 
-                    dataInput:dataInput,
-                    controlName:aliasControl,
-                    keyInstance:this.keyInstance}})
+                if(formulaIns){
+                    let dataInput = getDataInputFormula(formulaIns,listInput,this.optionalDataBinding, e.rowIndex);
+                    let dataFromCache = this.getDataAutocompleteFromCache(aliasControl, dataInput);
+                    if(dataFromCache == false){
+                        this.formulasWorker.postMessage({action:'runFormula',data:{
+                            formulaInstance:formulaIns, 
+                            dataInput:dataInput,
+                            controlName:aliasControl,
+                            keyInstance:this.keyInstance}})
+                    }
+                    else{
+                        this.$refs.autocompleteInput.setAliasControl(aliasControl);
+                        this.$refs.autocompleteInput.setData(dataFromCache);
+                    }
+                    
+                }
+                
             }
             else{
                 let formulaIns = controlIns.getFormulaInstance('autocomplete');
@@ -1361,7 +1373,9 @@ export default {
                 controlInstance.triggerOnChange();
             }
             else{
-                
+                let tableControl = getControlInstanceFromStore(this.keyInstance, controlInstance.inTable);
+                let currentCell = tableControl.tableInstance.getForcusCell();
+                tableControl.tableInstance.setDataAtCell(controlName, time, currentCell.rowIndex);
             }
         },
         checkEscKey(event){
@@ -1390,11 +1404,16 @@ export default {
             if(controlIns.inTable == false){
                 if(data.fromEnterKey){
                     this.handleInputChangeBySystem(data.controlName,data.value,true, false);
-                    controlIns.unFocusInput();
+                    controlIns.unFocusInput()
                 }
                 else{
                     this.handleInputChangeBySystem(data.controlName,data.value,false,false);
                 }
+            }
+            else{
+                let tableControl = getControlInstanceFromStore(this.keyInstance, controlIns.inTable);
+                let currentCell = tableControl.tableInstance.getForcusCell();
+                tableControl.tableInstance.setDataAtCell(data.controlName, data.value.inputValue, currentCell.rowIndex);
             }
         },
 
@@ -1404,6 +1423,7 @@ export default {
          * Hàm xử lí sau khi chạy công thức được điền dữ liệu vào input bởi hệ thống
          */
         handleInputChangeBySystem(controlName,valueControl, fromPopupAutocomplete = false, isRunChange = true){
+            console.trace(controlName,'controlNamecontrolName');
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
             markBinedField(this.keyInstance,controlName);
             controlInstance.setValue(valueControl);
@@ -1829,8 +1849,17 @@ export default {
          */
         selectedDate(data){
             this.$refs.datePicker.closePicker();
-            let currentControl = this.sDocumentSubmit.currentControlEditByUser;
-            this.handleInputChangeBySystem(currentControl,data)
+            let controlName = this.sDocumentSubmit.currentControlEditByUser;
+            let controlInstance = getControlInstanceFromStore(this.keyInstance, controlName);
+            if(controlInstance.inTable == false){
+                controlInstance.setValue(time);
+                this.handleInputChangeBySystem(controlName,data)
+            }
+            else{
+                let tableControl = getControlInstanceFromStore(this.keyInstance, controlInstance.inTable);
+                let currentCell = tableControl.tableInstance.getForcusCell();
+                tableControl.tableInstance.setDataAtCell(controlName, data, currentCell.rowIndex);
+            }
         },
 
         /**
@@ -2513,8 +2542,10 @@ export default {
                         keyInstance:this.keyInstance}})
                 }
             } else {
-                markBinedField(this.keyInstance,controlName);
-                this.handleControlInputChange(getControlInstanceFromStore(controlName));
+                if(formulaType == 'formulas'){
+                    markBinedField(this.keyInstance,controlName);
+                    this.handleControlInputChange(getControlInstanceFromStore(this.keyInstance, controlName));
+                }
             }
         },
        

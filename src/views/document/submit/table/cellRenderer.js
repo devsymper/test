@@ -118,25 +118,6 @@ this.eGui.removeEventListener('click', this.checkedHandler);
 }
 
 
-/**
- * Select renderer
- */
-export const SelectRenderer = ()=> {
-}
-
-// init method gets the details of the cell to be renderer
-SelectRenderer.prototype.init = function(params) {
-    this.eGui = document.createElement('span');
-    let value = (params.value) ? params.value : "";
-    let div = `<div class="select-cell" style="position:relative;height:22px;width:100%;">` + value + `
-                    <span class="select-chervon-bottom" style="position: absolute;right:8px;top:2px;font-size: 10px;color: #eee;">▼</span>
-                </div>`
-    this.eGui.innerHTML = div;
-};
-
-SelectRenderer.prototype.getGui = function() {
-    return this.eGui;
-};
 
 // FileRenderer
 export const FileRenderer = ()=> {

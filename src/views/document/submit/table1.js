@@ -11,17 +11,19 @@ import sDocument from '@/store/document'
 import store from './../../../store'
 
 import {NumberCellRenderer} from './table/NumberCellRenderer'
+import {BottomPinnedRowRenderer} from './table/BottomPinnedRowRenderer'
+import {SelectCellRenderer} from './table/SelectCellRenderer'
+import {DateCellRenderer} from './table/DateCellRenderer'
+import {TimeCellRenderer} from './table/TimeCellRenderer'
 import {
     CheckboxRenderer, 
     FileRenderer, 
-    DateRenderer, 
-    TimeRenderer, 
-    SelectRenderer,
     PercentRenderer, 
     UserRenderer} from './table/cellRenderer'
 import {AutoCompleteCellEditor} from './table/AutoCompleteCellEditor';
 import { checkCanBeBind } from "./handlerCheckRunFormulas";
 import PerfectScrollbar from "perfect-scrollbar";
+import {getDataInputFormula } from "./../../../components/document/dataControl";
 window.addNewDataPivotTable = function(el, event, type){
     let tableName = $(el).attr('table-name');
     event.preventDefault();
@@ -59,15 +61,15 @@ export default class SymperTable {
         this.supportCellsType = {
             currency: 'NumberCellRenderer',
             number: 'NumberCellRenderer',
-            date: 'DateRenderer',
+            date: 'DateCellRenderer',
             // dateTime: 'DatetimeRenderer',
-            time: 'TimeRenderer',
+            time: 'TimeCellRenderer',
             image: 'FileRenderer',
             fileUpload: 'FileRenderer',
             percent: 'PercentRenderer',
             user: 'UserRenderer',
-            select: 'SelectRenderer',
-            combobox: 'SelectRenderer',
+            select: 'SelectCellRenderer',
+            combobox: 'SelectCellRenderer',
             checkbox: 'CheckboxRenderer',
             
         };
@@ -79,19 +81,28 @@ export default class SymperTable {
         let colDefs = []
         for (let controlName in this.tableControl.controlInTable){
             let controlInstance = this.tableControl.controlInTable[controlName];
-            if (controlInstance.checkProps('isSumTable')) {
-                this.sumColumns[controlName] = controlInstance;
-                this.tableHasRowSum = true;
-            }
+            
             let col = {
                 headerName:controlInstance.title,
                 field: controlInstance.name,
                 editable:true,
                 hide:controlInstance.checkProps('isHidden')
             };
+            if (controlInstance.checkProps('isSumTable')) {
+                this.sumColumns[controlName] = controlInstance;
+                this.tableHasRowSum = true;
+                col['pinnedRowCellRenderer'] = 'BottomPinnedRowRenderer',
+                col['pinnedRowCellRendererParams'] = {
+                    style: { 'font-style': 'italic' },
+                }
+            }
             if(this.supportCellsType[controlInstance.type]){
                 col['cellRenderer'] = this.supportCellsType[controlInstance.type]
             }
+            if(['label','select'].includes(controlInstance.type)){
+                // col['editable'] = false
+            }
+          
             if(controlInstance.checkEmptyFormulas('autocomplete')){
                 col['cellEditor'] = 'AutoCompleteCellEditor';
                 col['cellEditorParams'] = {
@@ -119,7 +130,9 @@ export default class SymperTable {
                     continue
                 }
             }
-            console.log(col,'colcolcol');
+            col['cellRendererParams'] = {
+                controlName:controlName
+            };
             colDefs.push(col);
         }
         let colObjectId = {
@@ -212,6 +225,7 @@ export default class SymperTable {
                 }
             })
         }
+
         if(!data){
             data = this.getRowDefaultData();
         }
@@ -236,8 +250,8 @@ export default class SymperTable {
                         dataToStore[controlName] = [];
                     }
                     let controlIns = getControlInstanceFromStore(this.keyInstance, controlName);
-                    if (controlIns && dateFormat && controlIns.type == 'date') {
-                        data[index][controlName] = SYMPER_APP.$moment(data[index][controlName], 'YYYY-MM-DD').format(controlIns.controlProperties.formatDate.value);
+                    if (controlIns.type == 'date') {
+                        data[index][controlName] = controlIns.convertDateToStandard(data[index][controlName])
                     }
                     if (data[index] != undefined)
                         dataToStore[controlName].push(data[index][controlName]);
@@ -270,6 +284,9 @@ export default class SymperTable {
             data = this.convertDataToGroup(data);
         }
         this.gridOptions.api.setRowData(data);
+        if(this.tableHasRowSum){
+            this.gridOptions.api.setPinnedBottomRowData(this.createBottomTotalRow(data))
+        }
         let viewType = sDocument.state.viewType[this.keyInstance];
         if(viewType == 'print'){
             this.gridOptions.api.setDomLayout('print');
@@ -336,7 +353,10 @@ export default class SymperTable {
         if(this.rows && this.rows.length > 0){
             headerHeight += 25*this.rows.length;
         }
-        let tableHeight = dataHeight + headerHeight + 20;
+        let tableHeight = dataHeight + headerHeight + 4
+        if(this.tableHasRowSum){
+            tableHeight += 25
+        }
         if(tableHeight > 500){
             tableHeight = 500;
         }
@@ -357,11 +377,18 @@ export default class SymperTable {
                 FileRenderer: FileRenderer,
                 PercentRenderer: PercentRenderer,
                 UserRenderer: UserRenderer,
-                SelectRenderer: SelectRenderer,
+                SelectCellRenderer: SelectCellRenderer,
                 CheckboxRenderer: CheckboxRenderer,
-                DateRenderer: DateRenderer,
-                TimeRenderer: TimeRenderer,
-                AutoCompleteCellEditor:AutoCompleteCellEditor
+                DateCellRenderer: DateCellRenderer,
+                TimeCellRenderer: TimeCellRenderer,
+                AutoCompleteCellEditor:AutoCompleteCellEditor,
+                BottomPinnedRowRenderer: BottomPinnedRowRenderer,
+            },
+            pinnedBottomRowData: (this.tableHasRowSum) ? this.createBottomTotalRow() : false,
+            getRowStyle: function (params) {
+                if (params.node.rowPinned) {
+                  return { 'font-weight': '500' };
+                }
             },
             // debounceVerticalScrollbar:true,
             autoGroupColumnDef: { 
@@ -379,6 +406,7 @@ export default class SymperTable {
                 autoHeight:true,
                 editable:true,
             },
+            suppressRowTransform:true,
             undoRedoCellEditing: true,
             enableFillHandle:true,
             enableRangeSelection: true,
@@ -413,6 +441,15 @@ export default class SymperTable {
         this.caculatorHeight();
         
     }
+
+   
+    createBottomTotalRow(data = []) {
+        var result = {};
+        for (let controlName in this.sumColumns) {
+            result[controlName] = 0;
+        }
+        return [result];
+      }
     onGridReady(params){
         // setTimeout((self)=>{
         //     params.api.sizeColumnsToFit()
@@ -508,6 +545,9 @@ export default class SymperTable {
         }
         return [rowItem]
     }
+    getForcusCell(){
+        return this.gridOptions.api.getFocusedCell();
+    }
     /**
      * Set dữ liệu cho 1 cell theo key (column name)
      */
@@ -588,10 +628,6 @@ export default class SymperTable {
         console.log(event,'eventevent');
         if(event.newValue != event.oldValue){
             let columnChange = event.colDef.field;
-            let controlInstance = getControlInstanceFromStore(this.tableInstance.keyInstance, columnChange);
-            let colData = this.tableInstance.getColData(columnChange);
-            let controlToWorker = {name:columnChange,type:controlInstance.type,value:colData}
-            this.tableInstance.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, keyInstance:this.tableInstance.keyInstance, type:'submit'}})
             this.tableInstance.handlerAfterChangeCellByUser(columnChange,event.newValue,event.data, event.rowIndex);
         }
     }
@@ -746,6 +782,8 @@ export default class SymperTable {
         if(rowData.length > 0){
             rowData = rowData[0];
             let sqlRowId = rowData.data[SQLITE_COLUMN_IDENTIFIER];
+            let listInput = getListInputInDocument(this.keyInstance);
+            let dataInput = getDataInputFormula(formulaInstance,listInput,{}, rowIndex);
             this.formulasWorker.postMessage({action:'runFormula',data:
                 {
                     formulaInstance:formulaInstance, 
@@ -754,12 +792,15 @@ export default class SymperTable {
                     from:'rowTable', 
                     sqlRowId:sqlRowId, 
                     rowIndex:rowIndex,
+                    dataInput:dataInput
                 }
             });
         }
     }
     handleRunFormulaOnColumn( controlInstance, formulaInstance){
         let listIdRow = this.getColData(SQLITE_COLUMN_IDENTIFIER);
+        let listInput = getListInputInDocument(this.keyInstance);
+        let dataInput = getDataInputFormula(formulaInstance,listInput,{}, 'all');
         this.formulasWorker.postMessage({action:'runFormula',data:
             {
                 formulaInstance:formulaInstance, 
@@ -768,6 +809,7 @@ export default class SymperTable {
                 keyInstance:this.keyInstance,
                 listIdRow:listIdRow, 
                 controlType:controlInstance.type,
+                dataInput:dataInput
             }
         });
         

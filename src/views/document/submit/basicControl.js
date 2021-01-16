@@ -198,6 +198,7 @@ export default class BasicControl extends Control {
             // nếu đang autocomplete thì ko nhận sự kiện thay đổi khi giá trị đang được gõ
             let thisObj = this;
             this.ele.on('change', function(e) {
+                console.log(thisObj.name,'thisObjthisObj');
                 let valueChange = $(e.target).val();
                 if (thisObj.type == 'label') {
                     valueChange = $(e.target).text();
@@ -390,7 +391,6 @@ export default class BasicControl extends Control {
                 this.defaultValue = value;
             }
         }
-        console.log(this.value,'asasas');
     }
     getValue() {
         return this.value;

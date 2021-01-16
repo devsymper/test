@@ -13,7 +13,6 @@ AutoCompleteCellEditor.prototype.init = function(params) {
     if (params.value) {
         this.eInput.value = params.value;
     }
-    console.log(params,'this.params');
     this.params = params;
     this.controlName = params.controlName
     this.eInput.classList.add('ag-input-field-input');
