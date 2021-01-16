@@ -6,6 +6,7 @@
 		"deleteAll": "Xóa tất cả",
 		"inputPlaceholder": "Nhập giá trị",
 		"inputAddPlaceholder": "Thêm giá trị",
+		"placeholder-search": "Tìm kiếm",
 		"dblclick": "Click đúp để đổi tên",
         "required": "Bắt buộc",
         "select_lang": "Thay đổi ngôn ngữ",
@@ -1282,7 +1283,8 @@
 			"condition-value":"Giá trị điều kiện",
 			"config":{
 				"add-field":"Thêm trường mới"
-			}
+			},
+			"relation-selector": "Lựa chọn relation"
 		}
 	},
     "virtualdoc": {

@@ -51,7 +51,6 @@
 		/> 	
 		<RelationSelector
 			ref="relationSelector"
-			v-model="listDatasetSelected"
 			:tableHeight="tableHeight"
 		/> 	
     </div>
