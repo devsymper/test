@@ -41,10 +41,11 @@ AutoCompleteCellEditor.prototype.init = function(params) {
     }
     let self = this;
     this.eInput.addEventListener('keyup', function(e){
+        params.value = e.target.value
         SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
             e: e,
             controlName: self.controlName,
-            rowIndex:self.params.rowIndex
+            rowIndex:[self.params.rowIndex]
         })
     } );
 };

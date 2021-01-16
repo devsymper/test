@@ -1245,7 +1245,7 @@ export default {
             let listInput = getListInputInDocument(this.keyInstance);
             if(['select','combobox'].includes(type)){
                 let formulaIns = controlIns.getFormulaInstance('list');
-                let dataInput = getDataInputFormula(formulaIns,listInput,this.optionalDataBinding, e.e.rowIndex);
+                let dataInput = getDataInputFormula(formulaIns,listInput,this.optionalDataBinding, e.rowIndex);
                 this.formulasWorker.postMessage({action:'runFormula',data:{
                     formulaInstance:formulaIns, 
                     dataInput:dataInput,
@@ -1254,8 +1254,9 @@ export default {
             }
             else{
                 let formulaIns = controlIns.getFormulaInstance('autocomplete');
-                controlIns.value = e.e.target.value;
-                let dataInput = getDataInputFormula(formulaIns,listInput,this.optionalDataBinding, e.e.rowIndex);
+                let dataControlAutocompleting = {};
+                dataControlAutocompleting[controlIns.name] = e.e.target.value;
+                let dataInput = getDataInputFormula(formulaIns,listInput,this.optionalDataBinding, e.rowIndex, dataControlAutocompleting);
                 let aliasControl = formulaIns.autocompleteDetectAliasControl();
                 let dataFromCache = this.getDataAutocompleteFromCache(aliasControl, dataInput);
                 if(dataFromCache == false){
@@ -1406,7 +1407,6 @@ export default {
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
             markBinedField(this.keyInstance,controlName);
             controlInstance.setValue(valueControl);
-            console.log(controlInstance,'controlInstancecontrolInstance');
             this.updateListInputInDocument(controlName, 'value',controlInstance.value);
             
             if(fromPopupAutocomplete){
@@ -2412,7 +2412,6 @@ export default {
          * nếu có insideTableInDoc thì công thức từ nội bộ của bảng
          */
         handleControlInputChange(controlInstance){
-            console.trace(controlInstance,'controlInstance');
             let controlName = controlInstance.name;
             if(controlInstance.checkValidValueLength()){
                 let controlUnique = checkControlPropertyProp(this.keyInstance,controlName,'isDBOnly');
