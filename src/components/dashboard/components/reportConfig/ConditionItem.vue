@@ -36,13 +36,14 @@
 					@click="removeCondition"
 					color="red"
 					class="icon-remove-condition"
-				>mdi-close</v-icon>
-				<!-- <i class="el-icon-close remove-cond" @click="removeCondition()"></i> -->
+				>
+					mdi-close
+				</v-icon>
 			</v-expansion-panel-header>
 			<v-expansion-panel-content class="sym-v-expand-content">
 				<div class="conds-column-editor pl-3 pr-3 pt-2">
 					<span>
-						Value with condition
+						{{$t('bi.dashboard.condition-value')}}
 					</span>
 					<v-select 
 						@change="handleChangeValue" 
@@ -53,24 +54,29 @@
 						filterable 
 					>
 					</v-select>
-					<v-input 
+					<v-text-field 
 						@change="handleChangeValue" 
 						v-if="condColumn.type == 'number'" 
 						class="mt-2"
 						small 
-						placeholder="text here" 
-						v-model="condColumn.cond.val">
-					</v-input>
-					<v-input 
+						:placeholder="$t('common.inputPlaceholder')" 
+						v-model="condColumn.cond.val"
+					>
+					</v-text-field>
+					<v-text-field 
 						@change="handleChangeValue" 
 						v-else 
+						solo
 						:class="'mt-2 '+checkValueValidate(condColumn)" 
-						placeholder="text here" 
-						v-model="condColumn.cond.val">
-					</v-input>
+						:placeholder="$t('common.inputPlaceholder')" 
+						v-model="condColumn.cond.val"
+					>
+					</v-text-field>
 					<span 
 						v-if="condColumn.validValue === false" 
-						class="danger-text">{{condColumn.errMsg}} expected
+						class="danger-text"
+					>
+						{{condColumn.errMsg}} expected
 					</span>
 				</div>
 			</v-expansion-panel-content>
@@ -113,7 +119,7 @@ export default {
         idx: {
             default: 0
         }
-    },
+	},
     methods: {
         handleChangeValue(){
             this.$emit('change-value', this.condColumn);
@@ -128,6 +134,8 @@ export default {
 			return (condType.sign?condType.sign:condType.label)+' '+condColumn.cond.val;
         },
         removeCondition(){
+			event.preventDefault()
+			event.stopPropagation()
             this.$emit('remove', this.idx);
         },
         
@@ -165,37 +173,51 @@ export default {
 
 .condition-item >>> .title-condition{
 	white-space: nowrap; 
-	width: 70px; 
+	width: 80px; 
 	overflow: hidden;
 	text-overflow: ellipsis; 
 }
 .condition-item >>> .icon-remove-condition{
 	opacity: 0;
-	margin-left: -16px;
-	margin-right: -12px;
 }
 .condition-item >>> .v-expansion-panel-header:hover .icon-remove-condition{
 	opacity: 1;
 }
+.condition-item >>> .v-expansion-panel-header:hover .value-condition{
+	white-space: nowrap; 
+	width: 40px; 
+	overflow: hidden;
+	text-overflow: ellipsis; 
+}
 .condition-item >>> .value-condition{
 	white-space: nowrap; 
-	width: 50px; 
+	width: 60px; 
 	overflow: hidden;
 	text-overflow: ellipsis; 
 }
 .condition-item >>> .v-expansion-panel-content__wrap{
 	padding: unset;
 }
+.condition-item >>> .v-input__control{
+	min-height: unset !important;
+}
 .condition-item >>> .v-text-field__details{
 	display: none;
 }
 .condition-item >>> .v-input__slot{
-	box-shadow: unset;
+	box-shadow: unset !important;
 	border: 1px solid lightgray;
 	border-radius: 4px;
 	min-height: unset;
 }
+.condition-item >>> .v-select__slot,
+.condition-item >>> .v-input__slot{
+	font-size: 13px !important
+}
+
 </style>
 <style >
-
+.condition-item  .v-list-item__title{
+	font-size: 13px !important
+}
 </style>

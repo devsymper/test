@@ -3,7 +3,8 @@
 		"ok": "OK",
         "number_instance": "Tổng số instance",
         "id": "Id",
-        "deleteAll": "Xóa tất cả",
+		"deleteAll": "Xóa tất cả",
+		"inputPlaceholder": "Nhập giá trị",
         "required": "Bắt buộc",
         "select_lang": "Thay đổi ngôn ngữ",
         "KH": "Knowledge Management",
@@ -1275,7 +1276,8 @@
 			"title-visualization":"Các loại chart",
 			"column-config":"Cấu hình cột",
 			"style-config":"Cấu hình style",
-			"condition-config":"Cấu hình condition",
+			"condition-config":"Cấu hình điều kiện",
+			"condition-value":"Giá trị điều kiện",
 			"config":{
 				"add-field":"Thêm trường mới"
 			}

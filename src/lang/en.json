@@ -4,6 +4,7 @@
         "id": "Id",
         "number_instance": "Number of process instance",
         "select_lang": "Select language",
+		"inputPlaceholder": "Text here",
         "required": "required",
         "KH": "Knowledge Management",
         "taskManagement": "Task Management",
@@ -1142,6 +1143,7 @@
 			"column-config":"Column config",
 			"style-config":"Style config",
 			"condition-config":"Condition config",
+			"condition-value":"Condition value",
 			"config":{
 				"add-field":"Add field here"
 			}

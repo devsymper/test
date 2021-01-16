@@ -24,7 +24,6 @@
 					class="report-type-img" 
 					height="32px" 
 					width="32px" 
-					alt=""
 				>
 			</span>
 		</div>
@@ -55,9 +54,15 @@
 			</v-tabs>
 		</div>
 		<div>
-			<ColumnConfig v-if="tabs == 0"/>
-			<StyleConfig v-if="tabs == 1"/>
-			<ConditionConfig v-if="tabs == 2"/>
+			<ColumnConfig 
+				v-if="tabs == 0"
+			/>
+			<StyleConfig 
+				v-if="tabs == 1"
+			/>
+			<ConditionConfig 
+				v-if="tabs == 2"
+			/>
 		</div>
 	</div>
 </template>
