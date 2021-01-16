@@ -20,9 +20,6 @@
 				<v-icon @click="showReportConfig = true">
 					mdi-folder
 				</v-icon>
-				<v-icon @click="toggleDatasetDialog">
-					mdi-file
-				</v-icon>
 			</div>	
             <div class="d-flex flex-column h-100"
                 :style="{
@@ -40,6 +37,7 @@
             <DashboardDasetDetail
                 ref="datasetDetail"
                 class="h-100"
+				@show-dataset-selector="toggleDatasetDialog"
                 :style="{
                     width: '250px'
                 }" 

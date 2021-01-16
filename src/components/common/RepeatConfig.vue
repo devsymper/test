@@ -9,23 +9,24 @@
                 <span>Cấu hình lặp lại</span>
             </div>
             <v-select
-            class="symper-custom-select"
-            :items="listType"
-            v-model="selectedType"
-            return-object
-            hide-details
-            item-value="type"
-            item-text="name"
-            dense
-            :style="{'width':'150px',
-                    'display': 'inline-block',
-                    'font-weight':'500',
-                    'font-size':'13px',
-                    'padding':'4px 8px',
-                    'border-radius':'3px',
-                    'background-color':'#F7F7F7',
-                    'vertical-align': 'top',
-            }"
+				class="symper-custom-select"
+				:items="listType"
+				v-model="selectedType"
+				return-object
+				hide-details
+				item-value="type"
+				item-text="name"
+				dense
+				:style="{
+					'width':'150px',
+					'display': 'inline-block',
+					'font-weight':'500',
+					'font-size':'13px',
+					'padding':'4px 8px',
+					'border-radius':'3px',
+					'background-color':'#F7F7F7',
+					'vertical-align': 'top',
+				}"
             ></v-select>
             <div class="form__no-loop">
                 <v-checkbox
@@ -43,7 +44,6 @@
             <div class="btn-review-repeat">
                 <button v-on:click="previewRepeatTime">
                     <v-icon>mdi-calendar-check</v-icon>
-
                 </button>
                 <div class="calendar-review-repeat" 
                 :style="{
@@ -65,25 +65,25 @@
             <!-- minutes -->
             <div  v-if="selectedType.type=='secondly'" class="mt-4">
                <div class="w-100 ml-4">
-                    <v-checkbox 
-                    dense
-                    v-model="allMinutes"
-                   
-                    label="Mỗi phút"
-                    color="success darken-3">
-                </v-checkbox>
+					<v-checkbox 
+						dense
+						v-model="allMinutes"
+					
+						label="Mỗi phút"
+						color="success darken-3">
+					</v-checkbox>
                </div>
-                <v-checkbox 
-                    dense
-                    v-for="second in minutes" 
-                    :key="second.name"  class="ml-4"
-                    v-model="second.value"
-                    style="float:left; margin-top:-15px; margin-left:-10px" 
-                    :label="`${second.name}`"
-                    color="success darken-3">
-                 <template >
-                 </template>
-                </v-checkbox>
+					<v-checkbox 
+						dense
+						v-for="second in minutes" 
+						:key="second.name"  class="ml-4"
+						v-model="second.value"
+						style="float:left; margin-top:-15px; margin-left:-10px" 
+						:label="`${second.name}`"
+						color="success darken-3">
+						<template >
+						</template>
+					</v-checkbox>
             </div>
             <!-- minutes -->
               <div  v-if="selectedType.type=='hourly'" class="mt-4">
