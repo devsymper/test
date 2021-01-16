@@ -6,14 +6,16 @@
         <v-list dense three-line>
         <template v-for="(item, index) in listData">
           <v-list-item
-            style="border-bottom:1px solid lightgrey"
+            style="border-bottom:1px solid lightgrey;"
             dense
             :key="item.title"
           >
-            <v-list-item-avatar style="border:1px solid grey">
-              <div :style="{background:item.displayMode.singleColor.backgroundColor,color:item.displayMode.singleColor.fontColor}">{{setNumber(index)}}
+            <v-avatar  class="mr-2 my-1" 
+              :style="{background:item.displayMode.singleColor.backgroundColor,'background-image':getBackgroundColor(index)}"
+              tile style="border:1px solid grey;margin-left:-12px">
+              <div :style="{color:item.displayMode.singleColor.fontColor}">{{setNumber(index)}}
               </div>
-            </v-list-item-avatar>
+            </v-avatar>
             <v-list-item-content dense>
               <v-list-item-title >
                   <span class="fs-13 fw-400">
@@ -58,6 +60,23 @@ export default {
         },
   },
   methods: {
+    getBackgroundColor(index){
+      let result = '';
+      if(this.listData[index].displayMode.type=='singleColor'){
+      }else{
+        let colorMin = this.listData[index].displayMode.colorScale.config[0].color;
+        let colorMid = this.listData[index].displayMode.colorScale.config[1].color;
+        let colorMax = this.listData[index].displayMode.colorScale.config[2].color;
+        if(colorMid==colorMid){
+         result = 'linear-gradient('+colorMin+','+colorMax+')'
+          
+        }else{
+         result = 'linear-gradient('+colorMin+','+colorMid+', '+colorMax+')'
+
+        }
+      }
+     return result;
+    },
     setNumber(index){
       return String(index+1).padStart(3, '0')
     },

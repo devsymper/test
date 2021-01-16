@@ -3,6 +3,7 @@
     <AddConditionalFormatting 
         v-if="typeFormart!='config'"
         :listData="listData"
+        @delete-config="deleteConfig"
         @edit-config="editConfig"
         @apply-config="applyConfig"
         @changeToConfig="changeToConfig()"
@@ -112,15 +113,16 @@ export default {
   methods: {
       changeToConfig(){
           this.typeFormart='config';
-          this.data.displayMode = this.typeFormart;
       },
        changeToAdd(){
           this.typeFormart='add';
-          this.data.displayMode = this.typeFormart;
+
+      },
+      deleteConfig(index){
+          this.$emit('delete-config',index)
 
       },
       save(){
-          debugger
           this.listData.push(this.data)
           this.$emit('save',this.listData)
       },
@@ -130,6 +132,8 @@ export default {
        editConfig(index){
         this.typeFormart='config';
         this.data=this.listData[index];
+        this.$emit('edit-config',index)
+
       }
   }
 }

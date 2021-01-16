@@ -321,6 +321,8 @@
 			 <display-config
 				ref="tableDisplayConfig"
                 @apply-config="applyConfig"
+                @editConfig="editConfig"
+                @delete-config="deleteConfig"
                 @save-conditional-formatting="saveConditionalFormatting"
 				@drag-columns-stopped="handleStopDragColumn"
 				@change-colmn-display-config="configColumnDisplay"
@@ -724,19 +726,19 @@ export default {
 						}
 					})
                     data.dataAfter.map(column=>{
-                        debugger
                         // let tableCols= "column.headerName=='id'||column.headerName=='userName'||column.headerName=='email'||column.headerName=='avatar'"
-                        let tableCols = self.conditionalFormat[0].tableColumnsJS;
-                        if(eval(tableCols)){
+                        //let tableCols = ;
                             column.cellStyle= function(e){
+                                if(eval(self.conditionalFormat[self.conditionIndex].tableColumnsJS)==true){
                                 // let conditionalFormat1 =" ( (e.data.id==920) )"
-                                
-                                let conditionalFormat1 = self.conditionalFormat[self.conditionIndex].displayMode.singleColor.conditionFormat
-                                if(eval(conditionalFormat1)){
-                                    return {color: self.conditionalFormat[self.conditionIndex].displayMode.singleColor.fontColor, backgroundColor:self.conditionalFormat[self.conditionIndex].displayMode.singleColor.backgroundColor}
-                                }
+                                    debugger
+                                        let conditionalFormat1 = self.conditionalFormat[self.conditionIndex].displayMode.singleColor.conditionFormat
+                                        if(eval(conditionalFormat1)){
+                                            return {color: self.conditionalFormat[self.conditionIndex].displayMode.singleColor.fontColor, backgroundColor:self.conditionalFormat[self.conditionIndex].displayMode.singleColor.backgroundColor}
+                                        }
                                 // return {color: self.conditionalFormat.displayMode.singleColor.fontColor, backgroundColor:self.conditionalFormat.displayMode.singleColor.backgroundColor}
-
+                            }else{
+                                return {}
                             }
                         }
                     })
@@ -1020,6 +1022,27 @@ export default {
             let self = this
             this.conditionIndex = index;
             this.reRender();
+        },
+        editConfig(index){
+
+        },
+          // lưu cấu hình formatting Table
+        saveConditionalFormatting(data){
+            let tableConfig =  this.getTableDisplayConfigData();
+            tableConfig.detail = JSON.parse(tableConfig.detail);
+            tableConfig.detail.filter = this.filter;
+            tableConfig.detail.conditionalFormat = data;
+            tableConfig.detail= JSON.stringify(tableConfig.detail);
+              this.listItemsWorker.postMessage({
+                action: 'saveFilter',
+                data: tableConfig
+			})
+           
+        },
+        deleteConfig(index){
+            this.conditionalFormat = this.conditionalFormat.filter((c,i)=>i!=index)
+            debugger
+            this.saveConditionalFormatting(this.conditionalFormat);
         },
         hideCloseBtnFilter(){
             this.selectedFilterName = '';
@@ -1380,7 +1403,7 @@ export default {
                 this.filterName = '';
                 this.$snotify({
 				type: "success",
-				title: 'Lưu thành công'	})
+				title: 'Thành công'	})
             }else{
                 this.$snotify({
 				type: "error",
@@ -1833,19 +1856,7 @@ export default {
 				}
 			});
         },
-        // lưu cấu hình formatting Table
-        saveConditionalFormatting(data){
-            let tableConfig =  this.getTableDisplayConfigData();
-            tableConfig.detail = JSON.parse(tableConfig.detail);
-            tableConfig.detail.filter = this.filter;
-            tableConfig.detail.conditionalFormat = data;
-            tableConfig.detail= JSON.stringify(tableConfig.detail);
-              this.listItemsWorker.postMessage({
-                action: 'saveFilter',
-                data: tableConfig
-			})
-           
-        },
+      
 		 /**
          * Xử lý việc sau khi kết thúc kéo thả các cột ở thanh cấu hình hiển thị danh sách
          */

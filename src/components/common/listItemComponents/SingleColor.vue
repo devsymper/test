@@ -89,7 +89,7 @@ export default {
       },
       // chuyển toán tử về dạng đúng format trong js
       formatOperator(name){
-        let value = '';
+        let value = name;
         this.listOperators.map(opr=>{
             if(this.checkIsInListOpr(opr.name)){
                  if(opr.name==name){
@@ -108,7 +108,7 @@ export default {
             let headerName = this.getHeaderName(node.column);
             let conditionName = `e.data.${field}`;
             let column = node.column;
-            let value = node.value;
+            let value = "'"+node.value+"'";
             let functionName = this.formatOperator(node.operator);
             return ` (${conditionName}${functionName} ${value}) `;
         }else if(node.condition){
@@ -136,9 +136,6 @@ export default {
       },
   },
   created () {
-      debugger
-     
-      
         this.tableColumns.map((column,index)=>{
             if(index!=0){
                 this.formatTableColumn.push(column);

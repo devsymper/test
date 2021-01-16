@@ -1,8 +1,6 @@
 <template>
     <div style="background:white!important">
         <div class="mt-2 ml-2 d-flex fs-13 justify-center" style="margin-bottom:-10px">
-            <!-- <v-icon size="16" class="mr-2">mdi-delete-sweep</v-icon>
-            Đặt lại {{color}} -->
         </div>
         <v-color-picker 
             class="ma-2"
@@ -15,11 +13,7 @@
             show-swatches
             :swatches="swatches"
             swatches-max-height="200"
-            
         ></v-color-picker>
-        <!-- <div class="ml-2 d-flex fs-13 justify-center">
-           Gần đây
-        </div> -->
          <div class="ml-2 d-flex fs-13 justify-center mb-2" >
             <v-icon size="16" class=" mr-2">mdi-delete-sweep</v-icon>Đặt lại
         </div>

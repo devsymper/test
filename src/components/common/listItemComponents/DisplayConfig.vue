@@ -145,6 +145,7 @@
          <v-tab-item :key="2" :value="'tab-' + 2" class="tab-item" style="flex-grow: 1">
             <ConditionalFormatting
                 @apply-config="applyConfig"
+                @delete-config="deleteConfig"
                 :conditionalFormat="conditionalFormat"
                 :tableColumns="tableColumns" 
                 @save="saveConditionalFormatting"
@@ -213,6 +214,9 @@ export default {
     methods: {
         applyConfig(index){
              this.$emit('apply-config',index)
+        },
+        deleteConfig(index){
+             this.$emit('delete-config',index)
         },
         saveConditionalFormatting(data){
             this.$emit('save-conditional-formatting',data);

@@ -91,8 +91,11 @@ export default {
   methods: {
     save(){
         if(this.colorType=='singleColor'){
+          this.value.displayMode.type = 'singleColor';
+            
             this.$refs.singleColor.getJsScript();
         }else{
+            this.value.displayMode.type = 'colorScale';
             // this.$refs.ColorScale.save();
         }
         this.$emit("change", this.value);
