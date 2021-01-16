@@ -19,6 +19,7 @@
 					>
                         <span class="column d-flex flex-grow-1" style="width: calc(100% - 35px)">
 							<v-menu
+								open-on-hover
 								v-if="checkColumnExist(subItem) && settingItem.hasAgg"  
 								top
 								offset-y
@@ -253,9 +254,6 @@
                 SDashboardEditor.recheckSelectedColumn();
             },
             getClassForSelectedColumn(settingItem){
-                // if(this.showSelectAxisType(settingItem)){
-                //     return 'column-item-setting column-item-axis-type d-flex';
-                // }
                 return 'column-item-setting d-flex align-center';
             },
             showSelectAxisType(settingItem){
@@ -269,9 +267,6 @@
     }
 </script>
 <style scoped>
-    .setting-item {
-        /* margin-top: 10px; */
-    }
 	.setting-item >>> .v-input__control{
 		min-height: unset !important;
     }

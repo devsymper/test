@@ -169,6 +169,7 @@ export default {
 	background-color: #EBEEF5 !important;
 	min-height: unset !important;
 	padding: 8px 12px;
+	position: relative;
 }
 
 .condition-item >>> .title-condition{
@@ -178,20 +179,21 @@ export default {
 	text-overflow: ellipsis; 
 }
 .condition-item >>> .icon-remove-condition{
+	position: absolute;
+	right: 14px;
 	opacity: 0;
+	z-index: 10000;
 }
-.condition-item >>> .v-expansion-panel-header:hover .icon-remove-condition{
+.condition-item >>> .v-expansion-panel-header:hover .icon-remove-condition {
 	opacity: 1;
 }
-.condition-item >>> .v-expansion-panel-header:hover .value-condition{
-	white-space: nowrap; 
-	width: 40px; 
-	overflow: hidden;
-	text-overflow: ellipsis; 
+.condition-item >>> .v-expansion-panel-header:hover .v-expansion-panel-header__icon{
+	opacity: 0;
 }
+
 .condition-item >>> .value-condition{
 	white-space: nowrap; 
-	width: 60px; 
+	width: 65px; 
 	overflow: hidden;
 	text-overflow: ellipsis; 
 }
