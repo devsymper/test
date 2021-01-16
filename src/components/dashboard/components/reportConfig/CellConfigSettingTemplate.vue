@@ -7,11 +7,66 @@
                 :list="settingItem.selectedColums"
                 @change="handleChangeColumn"
                 class="dragArea list-group">
-                <div class="draggable-setting-item"  v-for="(subItem,idx) in settingItem.selectedColums" :key="idx">
-                    <div :class="getClassForSelectedColumn(settingItem)" :ref="'wrap'+subItem.name">
-                        <span class="column d-flex" style="width: calc(100% - 35px)">
-                            <span :title="settingTplAgg[subItem.type][subItem.agg].name" :ref="'agg'+subItem.name" v-if="settingItem.hasAgg" class="agg-func-name">{{subItem.agg}}</span>
-                            <span :title="subItem.name + ' - ' + subItem.as" class="column-item-label" :ref="'cln-label'+subItem.name" v-show="!subItem.edit">{{subItem.as}}</span>
+                <div 
+					class="draggable-setting-item d-flex"  
+					v-for="(subItem,idx) in settingItem.selectedColums" 
+					:key="idx"
+				>
+                    <div 
+						:class="getClassForSelectedColumn(settingItem)" 
+						:style="{width: showSelectAxisType(settingItem) ? '85% ': '100%'}"
+						:ref="'wrap'+subItem.name"
+					>
+                        <span class="column d-flex flex-grow-1" style="width: calc(100% - 35px)">
+							<v-menu
+								v-if="checkColumnExist(subItem) && settingItem.hasAgg"  
+								top
+								offset-y
+							>
+								<template v-slot:activator="{ on, attrs }">
+									 <span 
+										:title="settingTplAgg[subItem.type][subItem.agg].name" 
+										:ref="'agg'+subItem.name" 
+										v-if="settingItem.hasAgg" 
+										class="agg-func-name"
+										v-bind="attrs"
+										v-on="on"
+									>
+										{{subItem.agg}}
+									</span>
+								</template>
+								<v-list 
+								>
+									<v-list-item
+										v-for="(action,actName) in settingTplAgg[subItem.type]" 
+										:key="actName"
+										class="list-item-on-menu"
+										@click="handleAction({subItem:subItem,agg:actName})"
+									>	
+										<v-list-item-title>
+											{{action.name}}
+										</v-list-item-title>
+									</v-list-item>
+								</v-list>
+							</v-menu>
+                           <v-tooltip 
+						   		bottom
+							>
+								<template v-slot:activator="{ on, attrs }">
+									 <span 
+										:title="subItem.name + ' - ' + subItem.as" 
+										class="column-item-label" 
+										:ref="'cln-label'+subItem.name" 
+										v-show="!subItem.edit"
+										v-bind="attrs"
+										@dblclick="handleAction({subItem:subItem,agg:'rename'})"
+										v-on="on"
+									>
+										{{subItem.as}}
+									</span>
+								</template>
+								<span> {{$t('common.dblclick')}}</span>
+							</v-tooltip>
                             <input  
                                 class="rename-column-editor w-100" 
                                 :ref="'edt'+subItem.name" 
@@ -20,87 +75,87 @@
                                 @blur="renameColumn(subItem)" 
                                 v-model="subItem.as" 
                                 type="text" 
-                                v-show="subItem.edit">
+                                v-show="subItem.edit"
+							>
                         </span>
-                        <i :ref="'rm'+subItem.name" @click="removeColumn(idx)" class="el-icon-close float-right remove-column"></i>
-
-                        <el-dropdown v-if="checkColumnExist(subItem)"  size="small" class="float-right" @command="handleAction">
-                            <span class="el-dropdown-link">
-                                <i :ref="'act'+subItem.name" class="el-icon-setting" style="cursor:pointer"></i>
-                            </span>
-                            <el-dropdown-menu slot="dropdown">
-                                <template v-if="settingItem.hasAgg">
-                                    <el-dropdown-item :command="{subItem:subItem,agg:actName}" v-for="(action,actName) in settingTplAgg[subItem.type]" :key="actName" :icon="action.icon">{{action.name}}</el-dropdown-item>
-                                </template>
-                                
-                                <el-dropdown-item :command="{subItem:subItem,agg:'rename'}" divided icon="el-icon-edit">Rename</el-dropdown-item>
-                                
-                                <el-dropdown-item v-if="selectedCell.sharedConfigs.type == 'table' ||selectedCell.sharedConfigs.type == 'pivot'"> 
-                                    <el-dropdown class="w-100 " @command="changeLastLineColumnAgg" size="mini" placement="bottom-end">
-                                        <div class="w-100">
-                                            <span class="w-100 fs-13 mr-2">
-                                                <i class="ms-Icon ms-Icon--Calculator mr-1"></i> 
-                                                Last line agg 
-                                            </span>
-                                            <span class="float-right agg-func-name">
-                                                {{subItem.lastLineAgg ? subItem.lastLineAgg : 'sum'}}
-                                            </span>
-                                        </div>
-                                        <el-dropdown-menu slot="dropdown">
-                                            <el-dropdown-item 
-                                                v-for="(item, idx) in aggForLastLine" 
-                                                :key="idx"
-                                                :command="{
-                                                    agg: item,
-                                                    column: subItem
-                                                }">
-
-                                                {{item.label}}
-                                            </el-dropdown-item>
-                                        </el-dropdown-menu>
-                                    </el-dropdown>
-                                </el-dropdown-item>
-                                
-                            </el-dropdown-menu>
-                        </el-dropdown>
-                        <span v-else >
-                            <el-tooltip placement="top">
-                                <div slot="content"><span>Column not found in selected datasets<br>
-                                Please remove this column</span></div>
-                                <i class="el-icon-warning float-right"  style="cursor:pointer; color: red"></i>
-                            </el-tooltip>
-                        </span>
-
+						<v-icon
+							@click="removeColumn(idx)"
+							style="margin-right: 4px"
+							class="icon-remove"
+							small
+						>
+							mdi-close
+						</v-icon>
                     </div>
-
-                    <div class="y-axis-type" v-if="showSelectAxisType(settingItem)">
-                        <el-dropdown size="small" @command="handleChangeSeryType">
-                            <i  :class="getClassForSeryType(subItem)"></i>
-                            <el-dropdown-menu slot="dropdown">
-                                <el-dropdown-item :command="{subItem:subItem,type:'line'}" icon="ms-Icon ms-Icon--LineChart">Line</el-dropdown-item>
-                                <el-dropdown-item :command="{subItem:subItem,type:'area'}" icon="ms-Icon ms-Icon--AreaChart">Area</el-dropdown-item>
-                                <el-dropdown-item :command="{subItem:subItem,type:'column'}" icon="ms-Icon ms-Icon--StackedColumnChart2Fill">Column</el-dropdown-item>
-                                <el-dropdown-item :command="{subItem:subItem,type:'bar'}" icon="ms-Icon ms-Icon--BarChartHorizontal">Bar</el-dropdown-item>
-                            </el-dropdown-menu>
-                        </el-dropdown>
-                    </div>
-                </div>
+						<v-menu
+							open-on-hover
+							v-if="showSelectAxisType(settingItem)"
+							bottom
+							offset-y
+						>
+							<template v-slot:activator="{ on, attrs }">
+								<v-icon  
+									v-bind="attrs"
+									class="icon-show-sery-type ml-2"
+									small
+									v-on="on"
+								>{{getClassForSeryType(subItem)}}</v-icon>
+							</template>
+							<v-list 
+								
+							>
+								<v-list-item
+									v-for="(item, i ) in seryTypes"
+									:key="i"
+									class="list-item-on-menu"
+									@click="handleChangeSeryType({subItem:subItem , type: i})"
+								>	
+									<v-list-item-title>
+										<v-icon small>
+											{{item.icon}}
+										</v-icon>
+										{{item.title}}
+									</v-list-item-title>
+								</v-list-item>
+							</v-list>
+						</v-menu>
+					</div>
             </draggable>
-            <input placeholder="Add field here" type="text" class="el-input__inner search-item add-field-config-setting">
+			<div style="opacity: 0.5" class="fs-13 ml-2">
+				{{$t('common.inputAddPlaceholder')}}
+			</div>
         </div>
     </div>
 </template>
 <script>
     let seryTypeIcons = {
-        line:'ms-Icon--LineChart',
-        area:'ms-Icon--AreaChart',
-        column:'ms-Icon--StackedColumnChart2Fill',
-        bar:'ms-Icon--BarChartHorizontal',
+        line:'mdi-chart-line',
+        area:'mdi-chart-scatter-plot',
+        column:'mdi-chart-box-outline',
+        bar:'mdi-chart-timeline',
     };
     export default {
         props:['settingItem','settingTplAgg','selectedCell'],
         data(){
             return {
+				seryTypes:{
+					line:{
+						title: "Line",
+						icon: 'mdi-chart-line'
+					},
+					area:{
+						title: "Area",
+						icon: 'mdi-chart-scatter-plot'
+					},
+					column:{
+						title: "Column",
+						icon: 'mdi-chart-box-outline'
+					},
+					bar:{
+						title: "Bar",
+						icon: 'mdi-chart-timeline'
+					},
+				},
                 aggForLastLine: [
                     {
                         value: 'sum',
@@ -144,7 +199,8 @@
                 this.$emit('change-column-setting');
             },
             checkColumnExist(column){
-                return SDashboardEditor.checkColumnInSelectedDataset(column);
+				return true
+                // return SDashboardEditor.checkColumnInSelectedDataset(column);
             },
             showAddYAxis(){
                 let last = this.settingItem.lastYaxis;
@@ -155,17 +211,16 @@
                 return rsl;
             },
             addYAxis(){
-                window.SDashboardEditor.addYAxis();
+                // window.SDashboardEditor.addYAxis();
             },
             getClassForSeryType(column){
                 let iconType = seryTypeIcons['line'];
                 if(column.seryType){
                     iconType = seryTypeIcons[column.seryType];
                 }
-                return 'ms-Icon y-axis-type-select-icon '+iconType;
+                return iconType;
             },
             handleChangeSeryType(command){
-                // command.subItem.seryType = command.type;
                 this.$set(command.subItem,'seryType',command.type);
                 this.$emit('change-column-setting');
             },
@@ -198,12 +253,13 @@
                 SDashboardEditor.recheckSelectedColumn();
             },
             getClassForSelectedColumn(settingItem){
-                if(this.showSelectAxisType(settingItem)){
-                    return 'column-item-setting column-item-axis-type d-flex';
-                }
-                return 'column-item-setting d-flex';
+                // if(this.showSelectAxisType(settingItem)){
+                //     return 'column-item-setting column-item-axis-type d-flex';
+                // }
+                return 'column-item-setting d-flex align-center';
             },
             showSelectAxisType(settingItem){
+				return true
                 if(this.selectedCell.sharedConfigs.type.includes('lineAnd') && settingItem.name.includes('Y Axis')){
                     return true;
                 }
@@ -214,14 +270,30 @@
 </script>
 <style scoped>
     .setting-item {
-        margin-top: 10px;
+        /* margin-top: 10px; */
     }
-
-    .config-settings .setting-item .title {
-        padding: 0px 10px;
-        font-size: 13px;
+	.setting-item >>> .v-input__control{
+		min-height: unset !important;
     }
-
+    .setting-item >>> .v-input__slot{
+		box-shadow: unset !important;
+		border: 1px solid lightgray !important;
+		font-size: 13px !important;
+		min-height: unset !important;
+    }
+    .setting-item >>> .rename-column-editor .v-input__slot{
+		margin-bottom: unset;
+    }
+    .setting-item >>> .v-text-field__details{
+		display: none !important;
+    }
+    .config-settings  .setting-item .title {
+        padding: 0px 8px;
+        font-size: 13px !important;
+    }
+	.icon-show-sery-type{
+		/* margin-top: -36px !important; */
+	}
     .setting-sub-items {
         margin: 2px 5px 5px 5px;
         padding: 5px 5px;
@@ -282,7 +354,7 @@
         position: relative;
     }
     .column-item-axis-type{
-        display: inline-block!important;
+        /* display: inline-block!important; */
         width: calc(100% - 30px)!important;
         padding-bottom: 0px!important;
     }
@@ -314,4 +386,15 @@
         position: relative;
         top: 2px;
     }
+</style>
+<style>
+.list-item-on-menu{
+	min-height: unset !important;
+	padding: 8px 12px !important;
+	margin: -6px 2px;
+}
+.list-item-on-menu .v-list-item__title{
+	font-size: 13px !important;
+}
+
 </style>

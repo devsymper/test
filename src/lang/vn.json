@@ -5,6 +5,8 @@
         "id": "Id",
 		"deleteAll": "Xóa tất cả",
 		"inputPlaceholder": "Nhập giá trị",
+		"inputAddPlaceholder": "Thêm giá trị",
+		"dblclick": "Click đúp để đổi tên",
         "required": "Bắt buộc",
         "select_lang": "Thay đổi ngôn ngữ",
         "KH": "Knowledge Management",

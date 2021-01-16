@@ -44,11 +44,11 @@ let numberAgg = {
             icon:'',
         },
         max:{
-            name:'Maximun',
+            name:'Maximum',
             icon:'',
         },
         min:{
-            name:'Minimun',
+            name:'Minimum',
             icon:'',
         }
     };

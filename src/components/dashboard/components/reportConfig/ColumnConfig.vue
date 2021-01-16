@@ -15,12 +15,9 @@
 import CellConfigSettingTemplate from '@/components/dashboard/components/reportConfig/CellConfigSettingTemplate';
 import settingTplAgg from '@/components/dashboard/configPool/settingTplAgg';
 
-// import repositoryFactory from './../../../api/repositoryFactory';
-// const reportDataGet = repositoryFactory.get('reportDataGet');
-
 export default {
     components:{
-        'CellConfigSettingTemplate':CellConfigSettingTemplate
+        'CellConfigSettingTemplate': CellConfigSettingTemplate
     },
 	props:{
 		selectedCell:{
