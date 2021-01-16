@@ -136,6 +136,9 @@ export default {
       },
   },
   created () {
+      debugger
+     
+      
         this.tableColumns.map((column,index)=>{
             if(index!=0){
                 this.formatTableColumn.push(column);
@@ -143,6 +146,8 @@ export default {
                 this.tableColumnsForTree[index-1].title=column.name;
             }
       });
+    //    if(this.value.originCondition){
+    //       this.$refs.treeConfig.treeData[0] = this.value.originCondition};
   },
   props: {
       tableColumns:{

@@ -11,13 +11,13 @@
             :key="item.title"
           >
             <v-list-item-avatar style="border:1px solid grey">
-              <div :style="{background:item.displayMode.singleColor.backgroundColor,color:item.displayMode.singleColor.fontColor}">00{{index+1}}
+              <div :style="{background:item.displayMode.singleColor.backgroundColor,color:item.displayMode.singleColor.fontColor}">{{setNumber(index)}}
               </div>
             </v-list-item-avatar>
             <v-list-item-content dense>
               <v-list-item-title >
                   <span class="fs-13 fw-400">
-                      Định dạng 00{{index+1}}: {{item.nameGroup}}
+                      Định dạng {{setNumber(index)}}: {{item.nameGroup}}
                   </span>
                   </v-list-item-title>
               <v-list-item-subtitle >
@@ -58,18 +58,20 @@ export default {
         },
   },
   methods: {
+    setNumber(index){
+      return String(index+1).padStart(3, '0')
+    },
       changeToConfig(){
           this.$emit('changeToConfig')
       },
-      deleteConfig(){
-
+      deleteConfig(index){
+          this.$emit('delete-config',index)
       },
       applyConfig(index){
         this.$emit('apply-config',index)
       },
-      editConfig(){
-        alert('edit')
-
+      editConfig(index){
+          this.$emit('edit-config',index)
       }
   },
   data () {

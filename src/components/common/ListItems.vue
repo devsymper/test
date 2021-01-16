@@ -715,7 +715,7 @@ export default {
 					self.handlerSaveTableDisplayConfigRes(data.dataAfter)
                     break;
                 case 'saveFilter':
-                self.handlerSaveFilter(data.dataAfter)
+                    self.handlerSaveFilter(data.dataAfter)
                 break;
                 case 'getTableColumns':
 					data.dataAfter.forEach(function(e){
@@ -723,24 +723,24 @@ export default {
 							eval("e.cellRenderer = " + e.cellRenderer)
 						}
 					})
-                    self.columnDefs = data.dataAfter;
-                    self.columnDefs.map(column=>{
+                    data.dataAfter.map(column=>{
                         debugger
                         // let tableCols= "column.headerName=='id'||column.headerName=='userName'||column.headerName=='email'||column.headerName=='avatar'"
                         let tableCols = self.conditionalFormat[0].tableColumnsJS;
                         if(eval(tableCols)){
                             column.cellStyle= function(e){
                                 // let conditionalFormat1 =" ( (e.data.id==920) )"
-                                let conditionalFormat1 = self.conditionalFormat[0].displayMode.singleColor.conditionFormat
+                                
+                                let conditionalFormat1 = self.conditionalFormat[self.conditionIndex].displayMode.singleColor.conditionFormat
                                 if(eval(conditionalFormat1)){
-                                    return {color: self.conditionalFormat[0].displayMode.singleColor.fontColor, backgroundColor:self.conditionalFormat[0].displayMode.singleColor.backgroundColor}
+                                    return {color: self.conditionalFormat[self.conditionIndex].displayMode.singleColor.fontColor, backgroundColor:self.conditionalFormat[self.conditionIndex].displayMode.singleColor.backgroundColor}
                                 }
                                 // return {color: self.conditionalFormat.displayMode.singleColor.fontColor, backgroundColor:self.conditionalFormat.displayMode.singleColor.backgroundColor}
 
                             }
                         }
                     })
-                    debugger
+                    self.columnDefs = data.dataAfter;
 					break;
                 default:
                     break;
@@ -881,6 +881,7 @@ export default {
             isUpdateFilter:false,
             filter:[],
             notiFilter:'',
+            conditionIndex : 0,
             deleteFilterIdx:0,
             filterContent:"",
             showDelFilterPopUp:false,
@@ -1016,22 +1017,9 @@ export default {
     },
 	methods:{
         applyConfig(index){
-            this.columnDefs.map(column=>{
-                        debugger
-                        // let tableCols= "column.headerName=='id'||column.headerName=='userName'||column.headerName=='email'||column.headerName=='avatar'"
-                        let tableCols = this.conditionalFormat[index].tableColumnsJS;
-                        if(eval(tableCols)){
-                            column.cellStyle= function(e){
-                                // let conditionalFormat1 =" ( (e.data.id==92index) )"
-                                let conditionalFormat1 = this.conditionalFormat[index].displayMode.singleColor.conditionFormat
-                                if(eval(conditionalFormat1)){
-                                    return {color: this.conditionalFormat[index].displayMode.singleColor.fontColor, backgroundColor:this.conditionalFormat[index].displayMode.singleColor.backgroundColor}
-                                }
-                                // return {color: this.conditionalFormat.displayMode.singleColor.fontColor, backgroundColor:this.conditionalFormat.displayMode.singleColor.backgroundColor}
-
-                            }
-                        }
-            })
+            let self = this
+            this.conditionIndex = index;
+            this.reRender();
         },
         hideCloseBtnFilter(){
             this.selectedFilterName = '';
@@ -1375,7 +1363,6 @@ export default {
                 this.filter = res.savedConfigs.filter;
                 this.getDefaultFilter()
                 // xử lý phần format conditional
-                debugger
                 this.conditionalFormat = res.savedConfigs.conditionalFormat;
                 // this.getDefaultFilter()
 			}
@@ -1393,7 +1380,7 @@ export default {
                 this.filterName = '';
                 this.$snotify({
 				type: "success",
-				title: this.notiFilter	})
+				title: 'Lưu thành công'	})
             }else{
                 this.$snotify({
 				type: "error",
@@ -1401,7 +1388,7 @@ export default {
             }
         },
 		reRender(){
-			// this.agApi.sizeColumnsToFit()
+             this.agApi.redrawRows();
 		},
 		searchAutocompleteItems(vl){
             this.tableFilter.currentColumn.colFilter.searchKey = vl;
@@ -1651,7 +1638,7 @@ export default {
 					delete column.pinned
 				}
 				this.reOrderFixedCols();
-				debugger
+				
 				let flag = false
 				this.columnDefs.forEach(function(e){
 					if(e.symperFixed){
@@ -1848,7 +1835,6 @@ export default {
         },
         // lưu cấu hình formatting Table
         saveConditionalFormatting(data){
-            debugger
             let tableConfig =  this.getTableDisplayConfigData();
             tableConfig.detail = JSON.parse(tableConfig.detail);
             tableConfig.detail.filter = this.filter;

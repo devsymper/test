@@ -59,7 +59,10 @@
                 :tableColumns="formatTableColumns"/>
         </div>
         <div style="margin-top:-20px" v-else>
-            <ColorScale />
+            <ColorScale 
+                ref="colorScale"
+                v-model="value.displayMode.colorScale"
+                :tableColumns="formatTableColumns"/>
         </div>
         <div class="d-flex justify-end">
             <v-btn text  @click="changeToAdd()" >
@@ -87,7 +90,11 @@ export default {
   },
   methods: {
     save(){
-        this.$refs.singleColor.getJsScript();
+        if(this.colorType=='singleColor'){
+            this.$refs.singleColor.getJsScript();
+        }else{
+            // this.$refs.ColorScale.save();
+        }
         this.$emit("change", this.value);
         this.$emit("save");
     },
@@ -160,6 +167,7 @@ export default {
   },
   created(){
       this.setTableColumns();
+      this.formatTableColumns = this.value.tableColumns;
   },
   props: {
       value:{
@@ -183,7 +191,7 @@ export default {
         return {
             colorType:'singleColor',
             formatTableColumns:[],
-            lists:['Min value','None value','Max value'],
+         
         }
     },
 }

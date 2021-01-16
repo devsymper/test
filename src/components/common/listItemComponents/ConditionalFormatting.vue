@@ -3,6 +3,7 @@
     <AddConditionalFormatting 
         v-if="typeFormart!='config'"
         :listData="listData"
+        @edit-config="editConfig"
         @apply-config="applyConfig"
         @changeToConfig="changeToConfig()"
         @click="typeFormart='config'"/>
@@ -69,7 +70,35 @@ export default {
                     conditionFormat:'',
                     originCondition:[]
                     },
-                colorScale:{}
+                colorScale:{
+                    applyColumn:'',
+                    config:[
+                         {
+                            name:'Min point',
+                            value:'',
+                            disable:false,
+                            type:'Min value',
+                            color:'red',
+                            lists: ['Min value','Number','Percent'],
+                        },
+                        {
+                            name:'Mid point',
+                            value:'',
+                            disable:false,
+                            type:'None',
+                            color:'red',
+                            lists: ['None','Number','Percent'],
+                        },
+                        {
+                            name:'Max point',
+                            value:'',
+                            disable:false,
+                            type:'Max value',
+                            color:'yellow',
+                            lists:['Max value','Number','Percent'],
+                        }
+                    ]
+                }
             }
 
         },
@@ -82,10 +111,13 @@ export default {
   },
   methods: {
       changeToConfig(){
-          this.typeFormart='config'
+          this.typeFormart='config';
+          this.data.displayMode = this.typeFormart;
       },
        changeToAdd(){
-          this.typeFormart='add'
+          this.typeFormart='add';
+          this.data.displayMode = this.typeFormart;
+
       },
       save(){
           debugger
@@ -94,6 +126,10 @@ export default {
       },
       applyConfig(index){
           this.$emit('apply-config',index)
+      },
+       editConfig(index){
+        this.typeFormart='config';
+        this.data=this.listData[index];
       }
   }
 }
