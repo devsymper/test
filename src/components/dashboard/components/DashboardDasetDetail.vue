@@ -5,7 +5,7 @@
             <div style="width:95%;padding-top:3px">
                 <span class="font-weight-medium">Fields</span> 
                 <v-icon @click="showDatasetSelector" class="float-right fs-16 mx-3">mdi-database</v-icon>
-                <v-icon class="float-right fs-16" >mdi-relation-zero-or-one-to-one-or-many</v-icon>
+                <v-icon @click="showRelationSelector" class="float-right fs-16" >mdi-relation-zero-or-one-to-one-or-many</v-icon>
             </div>
            
         </div>
@@ -166,6 +166,9 @@ export default {
 		},
 		showDatasetSelector(){
 			this.$emit('show-dataset-selector')
+		},
+		showRelationSelector(){
+			this.$emit('show-relation-selector')
 		},
         setOpenPanelAfter(data){
             this.openedPanelParent = data.openedPanelParent;
