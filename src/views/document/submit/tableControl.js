@@ -1,6 +1,8 @@
 import Control from "./control";
 import { util } from "@/plugins/util.js";
 import sDocument from './../../../store/document'
+import PivotTable from "./pivot-table";
+import GroupTable from "./GroupTable";
 import {
     SYMPER_APP
 } from './../../../main.js'
@@ -32,7 +34,7 @@ export default class TableControl extends Control {
          */
         this.tableInstance = null;
         this.tablePrint = null;
-        this.pivotTable = null;
+        this.agDataTable = null;
         this.isPrintView = isPrintView;
         /**
          * tên các control nằm trong control này, mặc định là null, nếu control là table thì mới có giá trị là {'tên control':true}
@@ -40,10 +42,32 @@ export default class TableControl extends Control {
         this.listInsideControls = null;
         this.controlInTable = {};
         this.mapControlToIndex = {};
-        this.tableMode = 'nomal';
+        this.tableMode = this.controlProperties.tableView.value;
         this.ele.wrap('<span style="position:relative;display: block;" class="wrap-table">');
-
-
+    }
+    setPivotTableConfig(config){
+        if(this.tableMode == 'Pivot'){
+            this.pivotTableConfig = config;
+            this.agDataTable = new PivotTable(
+                this,
+                this.name,
+                this.id,
+                this.pivotTableConfig,
+                this.curParentInstance
+            );
+        }
+    }
+    setGroupTableConfig(config){
+        if(this.tableMode == 'Group'){
+            this.groupTableConfig = config;
+            this.agDataTable = new GroupTable(
+                this,
+                this.name,
+                this.id,
+                this.groupTableConfig,
+                this.curParentInstance
+            );
+        }
     }
     renderInfoButtonInRow(linkControl) {
         if (linkControl) {
@@ -67,12 +91,12 @@ export default class TableControl extends Control {
     }
     renderTable() {
         let viewType = sDocument.state.viewType[this.curParentInstance];
-        if ((viewType == 'submit' || viewType == "update") && !this.pivotTable) {
+        if ((viewType == 'submit' || viewType == "update") && !this.agDataTable) {
             this.ele.parent().append('<span onclick="viewTable(this)" table-name="' + this.name + '" instance="' + this.curParentInstance + '" class="mdi mdi-information-outline icon-trace-table"></span>');
         }
         if (this.isPrintView) {
-            if(this.pivotTable){
-                this.pivotTable.render();
+            if(this.agDataTable){
+                this.agDataTable.render();
             }
             else{
                 this.ele.attr('table-id', this.ele.attr('id'));
@@ -83,12 +107,14 @@ export default class TableControl extends Control {
             }
         } else {
             this.tableInstance.render();
-            if(this.pivotTable){
-                this.pivotTable.render();
-                let switchTableButton = $(`<button onclick="switchTableMode(this)" view-type="`+viewType+`" table-name="`+this.name+`" class="swap-table-btn"><span class="mdi mdi-swap-horizontal"></button>`)[0];
-                this.ele.before(switchTableButton);
+            if(this.agDataTable){
+                this.agDataTable.render();
+                if(this.tableMode == 'Pivot'){
+                    let switchTableButton = $(`<button onclick="switchTableMode(this)" view-type="`+viewType+`" table-name="`+this.name+`" class="swap-table-btn"><span class="mdi mdi-swap-horizontal"></button>`)[0];
+                    this.ele.before(switchTableButton);    
+                }
+                this.switchTable();
             }
-            this.switchTable();
             if (this.controlProperties['isHidden'] != undefined && this.checkProps('isHidden')) {
                 this.ele.closest('.wrap-table').css({ 'display': 'none' })
             }
@@ -144,7 +170,7 @@ export default class TableControl extends Control {
                 tr += '</tr>';
                 bodyHtml += tr;
             }
-            if (!this.pivotTable) {
+            if (!this.agDataTable) {
                 this.ele.find('table tbody').append(bodyHtml);
                 this.ele.find('table').attr('contenteditable', 'false');
             }
@@ -162,8 +188,8 @@ export default class TableControl extends Control {
                 }
                 dataTable.push(rowData)
             }
-            if (this.pivotTable) {
-                this.pivotTable.setData(dataTable)
+            if (this.agDataTable) {
+                this.agDataTable.setData(dataTable)
             }
         } else {
             if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1) {
@@ -184,31 +210,38 @@ export default class TableControl extends Control {
                 dataTable.push(rowData)
 
             }
-            this.tableInstance.setData(dataTable, false);
-            setTimeout((self) => {
-                self.tableInstance.tableInstance.render();
-                SYMPER_APP.$evtBus.$emit('document-on-table-change', {
-                    data: self.tableInstance.tableInstance.getSourceData(),
-                    tableName: self.name
-                });
-            }, 100, this);
+            if(this.agDataTable){
+                this.agDataTable.setData(dataTable);
+            }
+            else{
+                this.tableInstance.setData(dataTable, false);
+                setTimeout((self) => {
+                    self.tableInstance.tableInstance.render();
+                    SYMPER_APP.$evtBus.$emit('document-on-table-change', {
+                        data: self.tableInstance.tableInstance.getSourceData(),
+                        tableName: self.name
+                    });
+                }, 100, this);
+            }
+            
             if (this.currentDataStore.docStatus == 'init') {
                 this.defaultValue = data;
             }
+            
 
         }
     }
     switchTable() {
-        if (this.tableMode == 'nomal') {
+        if (this.tableMode == 'Flat') {
             this.tableInstance.show();
             this.tableInstance.tableInstance.render();
-            if (this.pivotTable) {
-                this.pivotTable.hide();
+            if (this.agDataTable) {
+                this.agDataTable.hide();
             }
         } else {
             this.tableInstance.hide();
-            if (this.pivotTable) {
-                this.pivotTable.show();
+            if (this.agDataTable) {
+                this.agDataTable.show();
             }
 
         }
