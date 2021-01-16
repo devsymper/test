@@ -178,6 +178,8 @@ import FormAutoComplete from "./../../views/document/sideright/items/FormAutoCom
 import FormulaEditor from "./../formula/editor/FormulaEditor";
 import DateFormat from "./../common/DateFormat";
 import Editor from "./../common/editor/Editor";
+import ButtonSelect from "./../common/bi/ButtonSelect";
+import ColorPalette from "./../common/bi/ColorPalette";
 import NumberFormat from "./../common/NumberFormat";
 import DataTable from "./../common/customTable/DataTable";
 import SymperDragPanel from "./SymperDragPanel";
@@ -422,7 +424,23 @@ const inputTypeConfigs = {
                 label: config.title,
             };
         }
-    }
+    },
+    btnSelect:{
+        tag:"button-select",
+        props(config){
+            return{
+                value:config.value
+            }
+        }
+    },
+    colorArray:{
+        tag:"color-palette",
+        props(config){
+            return{
+                value:config.value
+            }
+        }
+    },
 
 };
 export default {
@@ -750,7 +768,9 @@ export default {
         SymperColorPicker: SymperColorPicker,
         "default-control-document":SymperDefaultControlDocument,
         'symper-editor':Editor,
-        SymperListCombobox
+        SymperListCombobox,
+        'button-select':ButtonSelect,
+        'color-palette':ColorPalette,
 
 
     }

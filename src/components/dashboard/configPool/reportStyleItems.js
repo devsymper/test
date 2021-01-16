@@ -277,19 +277,19 @@ var attrItems = {
         default: 'left',
         options: [{
                 name: 'left',
-                icon: 'ms-Icon ms-Icon--AlignHorizontalLeft',
+                icon: 'mdi-align-horizontal-left',
                 value: 'left',
                 text: ''
             },
             {
                 name: 'center',
-                icon: 'ms-Icon ms-Icon--AlignHorizontalCenter',
+                icon: 'mdi-align-horizontal-center',
                 value: 'center',
                 text: ''
             },
             {
                 name: 'right',
-                icon: 'ms-Icon ms-Icon--AlignHorizontalRight',
+                icon: 'mdi-align-horizontal-right',
                 value: 'right',
                 text: ''
             },
@@ -301,19 +301,19 @@ var attrItems = {
         default: 'top',
         options: [{
                 name: 'Top',
-                icon: 'ms-Icon ms-Icon--AlignVerticalTop',
+                icon: 'mdi-align-vertical-top',
                 value: 'top',
                 text: ''
             },
             {
                 name: 'Midle',
-                icon: 'ms-Icon ms-Icon--AlignVerticalCenter',
+                icon: 'mdi-align-vertical-center',
                 value: 'midle',
                 text: ''
             },
             {
                 name: 'bottom',
-                icon: 'ms-Icon ms-Icon--AlignVerticalBottom',
+                icon: 'mdi-align-vertical-bottom',
                 value: 'Bottom',
                 text: ''
             },
@@ -325,13 +325,13 @@ var attrItems = {
         default: 'multiple',
         options: [{
                 name: 'Single',
-                icon: 'ms-Icon ms-Icon--ReceiptCheck',
+                icon: 'mdi-check-circle-outline',
                 value: 'single',
                 text: ''
             },
             {
                 name: 'multiple',
-                icon: 'ms-Icon ms-Icon--CheckList',
+                icon: 'mdi-checkbox-multiple-marked-circle-outline',
                 value: 'multiple',
                 text: ''
             }

@@ -16,14 +16,14 @@
                     }"
                     :instanceKey="instanceKey"/>
             </div>
-			<div>
+			<!-- <div>
 				<v-icon @click="showReportConfig = true">
 					mdi-folder
 				</v-icon>
 				<v-icon @click="toggleDatasetDialog">
 					mdi-file
 				</v-icon>
-			</div>	
+			</div>	 -->
             <div class="d-flex flex-column h-100"
                 :style="{
                     width: '200px'
