@@ -599,6 +599,12 @@ export default {
                 data:this.projectId
             });
         },
+        getAllProject(){
+            this.kanbanWorker.postMessage({
+                action:'getAllProject',
+                data:null
+            });
+        },
         getDetailProject(){
             this.kanbanWorker.postMessage({
                 action:'getDetailProject',
@@ -621,18 +627,33 @@ export default {
                     },
                 ]
             this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
-            if (this.projectId) {
-                let allProject=this.sTaskManagement.allProject;
-                let project=allProject.find(element => element.id==this.projectId);
-                if (project) {
-                    self.$store.commit("taskManagement/setCurrentProject", project);
-                }else{ // call api get detail project
-                    self.getDetailProject();
+            if (!this.$store.state.taskManagement.allProject || this.$store.state.taskManagement.allProject.length == 0) {
+                this.$store.dispatch("taskManagement/getAllProject");
+                this.getAllProject();
+            }else{
+                if (this.projectId) {
+                    let allProject=this.sTaskManagement.allProject;
+                    let project=allProject.find(element => element.id==this.projectId);
+                    if (project) {
+                        self.$store.commit("taskManagement/setCurrentProject", project);
+                    }else{ // call api get detail project
+                        self.getDetailProject();
+                    }
                 }
             }
+        
         },
         addIssueClick(){
             this.$evtBus.$emit('add-issue-btn-click');
+        },
+        getCurrentProject(){
+            let allProject=this.sTaskManagement.allProject;
+            let project=allProject.find(element => element.id==this.projectId);
+            if (project) {
+                this.$store.commit("taskManagement/setCurrentProject", project);
+            }else{ // call api get detail project
+                this.getDetailProject();
+            }
         }
        
     },
@@ -673,6 +694,13 @@ export default {
             switch (data.action) {
                 case 'actionError':
                     self.$snotifyError("", "Update status error!");
+                    break;
+                case 'getAllProject':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit('taskManagement/setAllProject', res.data.listObject);
+                        self.getCurrentProject();
+                    }
                     break;
                 case 'getListBoard':
                     if (data.dataAfter) {

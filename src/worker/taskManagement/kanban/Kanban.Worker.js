@@ -6,6 +6,29 @@ self.onmessage = async function (event) {
     let action = workerDataReceive.action;
     let data = workerDataReceive.data;
 	switch (action) {
+        case 'getAllProject':
+            let itemPro={
+                column : "isDelete",
+                operation : "and",
+                conditions : [
+                    {
+                        name : "in",
+                        value : [0],
+                    }
+                ],
+            }
+            let filterPro={};
+            filterPro.filter = [];
+            filterPro.filter.push(itemPro);
+            filterPro.page = 1;
+            filterPro.pageSize = 200;
+            filterPro.distinct = false;
+            taskManagementApi.getAllProject(filterPro).then(res => {
+                if(res['status'] == 200 && res['data']){
+                    postMessage({action:'getAllProject', dataAfter : res})
+                }
+            });
+            break;
         case 'getListBoard':
             if (data) {
                 taskManagementApi.getListBoardInProject(data).then(res => {
