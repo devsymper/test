@@ -54,7 +54,7 @@
 				</v-tab>
 			</v-tabs>
 		</div>
-		<div>
+		<div class="w-100" style="height:calc(100% - 285px)">
 			<ColumnConfig v-if="tabs == 0"/>
 			<StyleConfig v-if="tabs == 1"/>
 			<ConditionConfig v-if="tabs == 2"/>
