@@ -320,9 +320,7 @@
 			</ag-grid-vue>
 			 <display-config
 				ref="tableDisplayConfig"
-                @apply-config="applyConfig"
-                @editConfig="editConfig"
-                @delete-config="deleteConfig"
+                @change-format="changeFormat"
                 @save-conditional-formatting="saveConditionalFormatting"
 				@drag-columns-stopped="handleStopDragColumn"
 				@change-colmn-display-config="configColumnDisplay"
@@ -1004,8 +1002,31 @@ export default {
 		this.rowSelection = 'single';
     },
 	methods:{
-        handelConditionalFormat(data){
+        changeFormat(data){
             debugger
+            switch(data.type){
+                case 'view':
+                    break;
+                case 'apply':
+                    this.applyConfigFormat(data.index);
+                    break;
+                case 'edit':
+                    this.editConfigFormat(data.index);
+                    break
+                case 'delete':
+                    this.deleteConfigFormat(data.index);
+                    break
+                case 'disApply':
+                    this.disApplyConfigFormat(data.index);
+                    break;
+            };
+             this.reRender();
+
+        },
+         disApplyConfigFormat(index){
+             this.conditionIndex = -1;
+         },
+        handelConditionalFormat(data){
             const self = this;
              if(this.conditionalFormat&&this.conditionalFormat.length>0){
                 data.map(column=>{
@@ -1040,12 +1061,10 @@ export default {
             }
             return data;
         },
-        applyConfig(index){
-            let self = this
+        applyConfigFormat(index){
             this.conditionIndex = index;
-            this.reRender();
         },
-        editConfig(index){
+        editConfigFormat(index){
 
         },
           // lưu cấu hình formatting Table
@@ -1061,7 +1080,7 @@ export default {
 			})
            
         },
-        deleteConfig(index){
+        deleteConfigFormat(index){
             this.conditionalFormat = this.conditionalFormat.filter((c,i)=>i!=index)
             this.saveConditionalFormatting(this.conditionalFormat);
         },

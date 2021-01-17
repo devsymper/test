@@ -144,8 +144,7 @@
         </v-tab-item>
          <v-tab-item :key="2" :value="'tab-' + 2" class="tab-item" style="flex-grow: 1">
             <ConditionalFormatting
-                @apply-config="applyConfig"
-                @delete-config="deleteConfig"
+                @change-format="changeFormat"
                 :rowData="rowData"
                 :conditionalFormat="conditionalFormat"
                 :tableColumns="tableColumns" 
@@ -218,8 +217,8 @@ export default {
         }
     },
     methods: {
-        applyConfig(index){
-             this.$emit('apply-config',index)
+        changeFormat(index){
+             this.$emit('change-format',index)
         },
         deleteConfig(index){
              this.$emit('delete-config',index)
