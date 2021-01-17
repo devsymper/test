@@ -407,10 +407,10 @@
         </v-dialog>
         <SymperDialogConfirm 
             @confirm="confirmDeleteFilter()"
-            @cancel="showDelFilterPopUp=false"
-            :title="'Xóa bộ lọc'" 
-            :content="filterContent" 
-            :showDialog="showDelFilterPopUp"
+            @cancel="showDelPopUp=false"
+            :title="'Xóa'" 
+            :content="contentDelete" 
+            :showDialog="showDelPopUp"
         />
 	 </div>
 </template>
@@ -862,6 +862,7 @@ export default {
     data(){
 		let self = this;
         return {
+            typeDelete:'',
             conditionalFormat:[],
             closeBtnFilter:false,
             isUpdateFilter:false,
@@ -869,8 +870,8 @@ export default {
             notiFilter:'',
             conditionIndex : -1,
             deleteFilterIdx:0,
-            filterContent:"",
-            showDelFilterPopUp:false,
+            contentDelete:"",
+            showDelPopUp:false,
             actionFilter:[
                 // {icon:'mdi-check-box-multiple-outline',content:"Delete Default"},
                 // {icon:'mdi-check-box-multiple-outline',content:"Default"},
@@ -1003,7 +1004,6 @@ export default {
     },
 	methods:{
         changeFormat(data){
-            debugger
             switch(data.type){
                 case 'view':
                     break;
@@ -1065,7 +1065,7 @@ export default {
             this.conditionIndex = index;
         },
         editConfigFormat(index){
-
+            this.conditionIndex = index;
         },
           // lưu cấu hình formatting Table
         saveConditionalFormatting(data){
@@ -1081,8 +1081,10 @@ export default {
            
         },
         deleteConfigFormat(index){
-            this.conditionalFormat = this.conditionalFormat.filter((c,i)=>i!=index)
-            this.saveConditionalFormatting(this.conditionalFormat);
+            this.typeDelete = 'formatTable';
+            this.showDelPopUp = true;
+            this.contentDelete =" Xóa định dạng "+this.conditionalFormat[index].nameGroup+" khỏi danh sách các định dạng";
+            
         },
         hideCloseBtnFilter(){
             this.selectedFilterName = '';
@@ -1141,16 +1143,23 @@ export default {
         },
         
         deleteFilter(filterIdx){
-            this.showDelFilterPopUp = true;
-            this.filterContent =" Xóa bộ lọc "+this.filter[filterIdx].name+" khỏi danh sách các bộ lọc";
+            this.showDelPopUp = true;
+            this.typeDelete = 'filter';
+            this.contentDelete =" Xóa bộ lọc "+this.filter[filterIdx].name+" khỏi danh sách các bộ lọc";
             this.deleteFilterIdx = filterIdx;
         },
         confirmDeleteFilter(){
-            let filter = this.filter.filter((item,idx)=>idx!=this.deleteFilterIdx);
-            this.filter = filter;
-            this.sendFilterWorker();
-            this.notiFilter = this.$t("table.success.delete_filter");
-            this.showDelFilterPopUp=false;
+            if(this.typeDelete=='filter'){
+                let filter = this.filter.filter((item,idx)=>idx!=this.deleteFilterIdx);
+                this.filter = filter;
+                this.sendFilterWorker();
+                this.notiFilter = this.$t("table.success.delete_filter");
+            }else{
+                this.conditionalFormat = this.conditionalFormat.filter((c,i)=>i!=this.conditionIndex)
+                 this.saveConditionalFormatting(this.conditionalFormat);
+                 this.reRender()
+            }
+            this.showDelPopUp=false;
         },
         setTable(filterIdx){
             this.closeBtnFilter = true;

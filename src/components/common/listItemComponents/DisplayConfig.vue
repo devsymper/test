@@ -217,11 +217,8 @@ export default {
         }
     },
     methods: {
-        changeFormat(index){
-             this.$emit('change-format',index)
-        },
-        deleteConfig(index){
-             this.$emit('delete-config',index)
+        changeFormat(data){
+             this.$emit('change-format',data)
         },
         saveConditionalFormatting(data){
             this.$emit('save-conditional-formatting',data);
@@ -245,7 +242,6 @@ export default {
         getDataTypeIcon(type) {
             return appConfigs.dataTypeIcon[type];
         },
-        
         columnTitle(title) {
             let prefix = this.headerPrefixKeypath;
             prefix =

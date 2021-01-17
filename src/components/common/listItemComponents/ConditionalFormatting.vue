@@ -23,6 +23,16 @@ import AddConditionalFormatting from "./AddConditionalFormatting";
 import ConfigConditionalFormatting from "./ConfigConditionalFormatting";
 
 export default {
+  watch: {
+      conditionalFormat:{
+           deep: true,
+            immediate: true,
+            handler(value){
+                debugger
+                this.listData=this.conditionalFormat
+            }
+      }
+  },
   created () {
      this.listData=this.conditionalFormat
   },
