@@ -20,9 +20,6 @@
 				<v-icon @click="showReportConfig = true">
 					mdi-folder
 				</v-icon>
-				<v-icon @click="toggleDatasetDialog">
-					mdi-file
-				</v-icon>
 			</div>	
             <div class="d-flex flex-column h-100"
                 :style="{
@@ -40,6 +37,8 @@
             <DashboardDasetDetail
                 ref="datasetDetail"
                 class="h-100"
+				@show-dataset-selector="toggleDatasetDialog"
+				@show-relation-selector="toggleRelationDialog"
                 :style="{
                     width: '250px'
                 }" 
@@ -49,7 +48,11 @@
 			ref="datasetSelector"
 			v-model="listDatasetSelected"
 			:tableHeight="tableHeight"
-		/>
+		/> 	
+		<RelationSelector
+			ref="relationSelector"
+			:tableHeight="tableHeight"
+		/> 	
     </div>
 </template>
 
@@ -61,6 +64,7 @@ import ReportConfig from "@/components/dashboard/components/ReportConfig.vue";
 import ReportTypeSelector from "@/components/dashboard/components/ReportTypeSelector.vue";
 import DashboardEditorWorker from 'worker-loader!@/worker/dashboard/DasboardEditor.Worker.js';
 import DatasetSelector from '@/components/dataset/DatasetSelector'
+import RelationSelector from '@/components/relation/RelationSelector'
 import {util} from '@/plugins/util'
 import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
 import { getDefaultDashboardConfig } from "@/components/dashboard/configPool/dashboardConfigs.js";
@@ -75,7 +79,8 @@ export default {
         DashboardWorkspace,
         ReportConfig,
 		ReportTypeSelector,
-		DatasetSelector
+		DatasetSelector,
+		RelationSelector
     },
     created(){
         this.dashboardEditorWorker = new DashboardEditorWorker();
@@ -124,6 +129,9 @@ export default {
 		
 		toggleDatasetDialog(){
 			this.$refs.datasetSelector.show()
+		},
+		toggleRelationDialog(){
+			this.$refs.relationSelector.show()
 		},
 		handlerSelectedChartType(type){
 
