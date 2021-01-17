@@ -130,14 +130,19 @@ var handler = {
                 needRemoteDataCellCount += 1;
             }
         }
-
+        let relateDatasetIds = [];
+        response.data.dashboard.relateDatasets.reduce((arr, el) =>{
+            arr.push(el.id);
+            return arr;
+        }, []);
         self.postMessage({
             action: 'setRestoredDashboardConfigs',
             data: {
                 allCellConfigs,
                 dashboardInfo,
                 needRemoteDataCellCount,
-                relateDatasets: response.data.dashboard.relateDatasets
+                relateDatasets: response.data.dashboard.relateDatasets,
+                relateDatasetIds: relateDatasetIds
             }
         });
     }

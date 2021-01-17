@@ -3,7 +3,7 @@
  */
 export const getDefaultDashboardConfig = function(){
     return {
-        cellConfigsHeight:"px",
+        cellConfigsHeight:"200px",
         cellContextMenu: {}, // chứa các context menu có thể có của cell đang được foucus
         colapsedPane: { // lưu lại trạng thái đóng mở của các tab cấu hình bên phải 
             comment: true, // tab comment
