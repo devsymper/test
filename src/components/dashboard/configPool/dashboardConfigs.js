@@ -19,16 +19,34 @@ export const getDefaultDashboardConfig = function(){
             info: {
                 activePageIndex: 0, // index của page đang được mở lên
                 activeTabIndex:"0", // index của page đang được mở lên
-                currentTabPageKey:"", // key của tab và page đang được mở lên
+                currentTabPageKey:"tab 1", // key của tab và page đang được mở lên
                 dashboardName:"", // tên dashboard
                 datasets: {}, // map các dataset được lựa chọn cho dashboard này, dạng: {id dataset : true}
-                drillThrough: {}, // cấu hình về drill through
+                drillThrough: {
+                    drillThrough: {
+                        'tab 1': []
+                    },
+                }, // cấu hình về drill through
                 focusingDataPoint: {}, // điểm đang được foucus của các report khi click chuột phải hoặc click bằng chuột trái
                 hasCopiedCell:false, // dashboard này đang có cell được copy ko
-                layout: {}, // chứa config về layout của các tab trong dashboard: có những cell với vị trí, kích thước ntn
+                layout: {
+                    'tab 1': [],
+                    '': []
+                }, // chứa config về layout của các tab trong dashboard: có những cell với vị trí, kích thước ntn
                 lockWorkspace: false, // có đang khóa việc kéo thả các cell ko
                 relations: [], // mảng chứa các id của relation được áp dụng trong dashboard  
-                tabsAndPages: {}, // object chứa config của các tab trong dashboard
+                tabsAndPages: {
+                    tabs: [{
+                            name: 'tab 1',
+                            active: true
+                        },
+                        {
+                            name: '',
+                            active: true
+                        }
+                    ],
+                    // pages: ['page 1']
+                }, // object chứa config của các tab trong dashboard
                 theme: "symper_default_dashboard_theme" // id theme được áp dụng cho dashboard
             }
         }, // cấu hình của toàn bộ dashboard này
