@@ -85,7 +85,7 @@
                         </v-menu>
                     </div>
                 </div>
-                <v-layout style="height:calc(100%);overflow:hidden;" class="w-100" justify-center>
+                <v-layout style="height:calc(100% - 41px);overflow:hidden;" class="w-100" justify-center>
                     <slot>
 					</slot>
                 </v-layout>
