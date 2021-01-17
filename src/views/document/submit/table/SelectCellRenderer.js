@@ -13,15 +13,19 @@ SelectCellRenderer.prototype.init = function(params) {
     let div = `<div class="select-cell" style="position:relative;height:22px;width:100%;">` + value + `
                     <span class="select-chervon-bottom" style="position: absolute;right:8px;top:2px;font-size: 10px;color: #ababab;">▼</span>
                 </div>`
-    this.eGui.innerHTML = div;
-    let control = params.control;
-    this.eGui.querySelector('.select-chervon-bottom').addEventListener('click', function(e){
-        SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
-            e: e,
-            controlName: control.name,
-            rowIndex:[params.rowIndex]
-        })
-    } );
+    
+    if(!params.node.rowPinned){
+        this.eGui.innerHTML = div;
+        let control = params.control;
+        this.eGui.querySelector('.select-chervon-bottom').addEventListener('click', function(e){
+            SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
+                e: e,
+                controlName: control.name,
+                rowIndex:[params.rowIndex]
+            })
+        } );
+    }
+    
 };
 
 SelectCellRenderer.prototype.getGui = function() {

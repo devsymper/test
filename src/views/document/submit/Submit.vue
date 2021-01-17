@@ -2967,13 +2967,16 @@ export default {
         },
         afterFileUpload(data){
             let url = data.serverPath;
-            this.currentFileControl.controlIns.setValue(url);
-            let value = this.currentFileControl.controlIns.value;
-            this.updateListInputInDocument(
-                this.currentFileControl.controlIns.name,
-                "value",
-                value
-            );
+            let controlIns = this.currentFileControl.controlIns;
+            if(controlIns.inTable != false){
+                let tableControl = getControlInstanceFromStore(this.keyInstance, controlIns.inTable);
+                let currentCell = tableControl.tableInstance.getForcusCell();
+                tableControl.tableInstance.setDataAtCell(controlIns.name, url, currentCell.rowIndex);
+            }
+            else{
+                this.currentFileControl.controlIns.setValue(url);
+            }
+            
         },
         handleInputChangeByUser( controlInstance, valueControl){
             setDataInputBeforeChange(this.keyInstance, controlInstance);

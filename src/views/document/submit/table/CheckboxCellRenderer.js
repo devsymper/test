@@ -5,12 +5,15 @@
 export const CheckboxCellRenderer =()=> {}
 
 CheckboxCellRenderer.prototype.init = function(params) {
-    this.eGui = document.createElement('input');
-    this.params = params;
-    this.eGui.type = 'checkbox';
-    this.eGui.checked = params.value;
-    this.checkedHandler = this.checkedHandler.bind(this);
-    this.eGui.addEventListener('click', this.checkedHandler);
+    if(!params.node.rowPinned){
+        this.eGui = document.createElement('input');
+        this.params = params;
+        this.eGui.type = 'checkbox';
+        this.eGui.checked = params.value;
+        this.checkedHandler = this.checkedHandler.bind(this);
+        this.eGui.addEventListener('click', this.checkedHandler);
+    }
+    
 }
 
 CheckboxCellRenderer.prototype.checkedHandler = function(e) {

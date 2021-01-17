@@ -8,7 +8,7 @@ import { appConfigs } from "@/configs.js";
 import tinymce from 'tinymce/tinymce';
 import { documentApi } from "../../../api/Document";
 let sDocumentManagementUrl = appConfigs.apiDomain.sdocumentManagement;
-const fileTypes = {
+let fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
     'txt': 'mdi-file-document-outline',
     'csv': 'mdi-file-document-outline',
