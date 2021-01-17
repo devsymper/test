@@ -49,7 +49,7 @@
 			ref="datasetSelector"
 			v-model="listDatasetSelected"
 			:tableHeight="tableHeight"
-		/> 	
+		/>
     </div>
 </template>
 
@@ -63,6 +63,8 @@ import DashboardEditorWorker from 'worker-loader!@/worker/dashboard/DasboardEdit
 import DatasetSelector from '@/components/dataset/DatasetSelector'
 import {util} from '@/plugins/util'
 import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
+import { getDefaultDashboardConfig } from "@/components/dashboard/configPool/dashboardConfigs.js";
+
 
 var reportClasses = autoLoadChartClasses();
 
@@ -81,25 +83,19 @@ export default {
         this.getDashboardInfo();
     },
     data(){
+        let defaultData = getDefaultDashboardConfig();
         return {
-            currentCellConfigs:{},
+            ...defaultData,
 			instanceKey: Date.now() ,
 			showReportConfig: true,
-			showDatasetSelectorDialog: false,
 			tableHeight: 0,
-			listDatasetSelected:["2879" , "3020"],
+			listDatasetSelected:[],
         }
 	},
 	mounted(){
 		this.tableHeight = util.getComponentSize(this).h - 100
 	},
 	watch:{
-		listDatasetSelected:{
-			deep: true,
-			immediate: true,
-			handler(arr){
-			}
-		}
 	},
     methods: {
         getDashboardInfo(){
@@ -112,8 +108,18 @@ export default {
                 });
             }
         },
-        setRestoredDashboardConfigs(info){
-            console.log(info, 'infoinfoinfo');
+        setRestoredDashboardConfigs(data){
+            this.listDatasetSelected = data.relateDatasetIds;
+            this.$set(
+                this.dashboardConfigs,
+                'allCellConfigs',
+                data.allCellConfigs
+            );
+            this.$set(
+                this.dashboardConfigs,
+                'info',
+                data.dashboardInfo
+            );
 		},
 		
 		toggleDatasetDialog(){
@@ -134,10 +140,6 @@ export default {
                 }
             });
         },
-        // recheckSelectedColumn(){
-        //     this.$refs.datasetDetail.clearSelectedItemDisplay();
-        //     this.$refs.datasetDetail.postSelectedDatasetBefor(this.currentCellConfigs.viewConfigs.selectedDataset, true);
-        // },
     },
     props: {
         action: {
