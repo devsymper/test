@@ -109,8 +109,6 @@ export default {
                     }
                     else if(e.keyCode == 13){
                         let rowActive = thisCpn.dataTable[thisCpn.indexActive];
-                        e.preventDefault();
-                        e.stopPropagation();
                         thisCpn.handleClickRow(rowActive,true);
                     }
                 }
@@ -159,7 +157,7 @@ export default {
         },
         calculatorPositionBox(e){
             // nếu autocomplete từ cell của handsontable  
-            if($(e.target).is('.ag-cell') || $(e.target).is('.ag-cell-autocomplete') || $(e.target).closest('.ag-cell')){
+            if($(e.target).closest('.ag-cell').length > 0){
                 this.curInput = $(e.target);
                 let autoEL = $(this.$el).detach();
                 $(e.target).closest('.wrap-table').append(autoEL);
@@ -167,15 +165,6 @@ export default {
                 if($(e.target).closest('.ag-cell')){
                     edtos = $(e.target).closest('.ag-cell').offset();
                 }
-                // if(!$(e.target).is('.handsontableInput')){
-                //     edtos = $(e.target).closest('td.htAutocomplete.current.highlight').offset();
-                // }
-                // if($(e.target).is('div.select-cell')){
-                //     edtos = $(e.target).parent().offset();
-                // }
-                // if($(e.target).is('div.select-cell .select-chervon-bottom')){
-                //     edtos = $(e.target).parent().parent().offset();
-                // }
                 let tbcos = $(e.target).closest('.wrap-table').offset();
                 this.positionBox = {'top':edtos.top - tbcos.top + this.curInput.height() + 3 +'px','left':edtos.left - tbcos.left+'px'};
             }

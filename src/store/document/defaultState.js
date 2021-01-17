@@ -95,7 +95,8 @@ const defaultState = {
              * }}
              */
             validateMessage:{},
-            dataInputBeforeChange:{}
+            dataInputBeforeChange:{},
+            mapValueToTextAutocompleteInput:{}
         }
     },
     detail: {

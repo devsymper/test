@@ -11,13 +11,14 @@ SelectCellRenderer.prototype.init = function(params) {
     this.eGui = document.createElement('span');
     let value = (params.value) ? params.value : "";
     let div = `<div class="select-cell" style="position:relative;height:22px;width:100%;">` + value + `
-                    <span class="select-chervon-bottom" style="position: absolute;right:8px;top:2px;font-size: 10px;color: #eee;">▼</span>
+                    <span class="select-chervon-bottom" style="position: absolute;right:8px;top:2px;font-size: 10px;color: #ababab;">▼</span>
                 </div>`
     this.eGui.innerHTML = div;
+    let control = params.control;
     this.eGui.querySelector('.select-chervon-bottom').addEventListener('click', function(e){
         SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
             e: e,
-            controlName: params.controlName,
+            controlName: control.name,
             rowIndex:[params.rowIndex]
         })
     } );

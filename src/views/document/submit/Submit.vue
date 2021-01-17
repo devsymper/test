@@ -1399,12 +1399,17 @@ export default {
          * Hàm xử lí nhận dữ liệu component autocomplete khi chọn 1 dòng
          */
         afterSelectRowAutoComplete(data){
+            this.$store.commit("document/setAutocompleteValueToText", {
+                            key: data.value.inputValue,
+                            value: data.value.inputDislay,
+                            controlName: data.controlName,
+                            instance: this.keyInstance
+                        })
             // th này không phải trong table      
             let controlIns = getControlInstanceFromStore(this.keyInstance, data.controlName);
             if(controlIns.inTable == false){
                 if(data.fromEnterKey){
-                    this.handleInputChangeBySystem(data.controlName,data.value,true, false);
-                    controlIns.unFocusInput()
+                    this.handleInputChangeBySystem(data.controlName,data.value,false, false);
                 }
                 else{
                     this.handleInputChangeBySystem(data.controlName,data.value,false,false);
@@ -1852,7 +1857,7 @@ export default {
             let controlName = this.sDocumentSubmit.currentControlEditByUser;
             let controlInstance = getControlInstanceFromStore(this.keyInstance, controlName);
             if(controlInstance.inTable == false){
-                controlInstance.setValue(time);
+                controlInstance.setValue(data);
                 this.handleInputChangeBySystem(controlName,data)
             }
             else{

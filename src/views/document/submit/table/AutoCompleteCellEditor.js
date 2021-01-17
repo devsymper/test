@@ -14,7 +14,7 @@ AutoCompleteCellEditor.prototype.init = function(params) {
         this.eInput.value = params.value;
     }
     this.params = params;
-    this.controlName = params.controlName
+    this.controlName = params.control.name
     this.eInput.classList.add('ag-input-field-input');
     this.eInput.classList.add('ag-cell-autocomplete');
     this.eInput.classList.add('ag-text-field-input');

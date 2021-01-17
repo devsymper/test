@@ -1,4 +1,5 @@
 import { util } from "@/plugins/util.js";
+import { SYMPER_APP } from '@/main.js'
 import { Grid, simpleHttpRequest } from 'ag-grid-community';
 import { ClientSideRowModelModule } from '@ag-grid-community/client-side-row-model';
 import { RowGroupingModule } from '@ag-grid-enterprise/row-grouping';
@@ -15,11 +16,11 @@ import {BottomPinnedRowRenderer} from './table/BottomPinnedRowRenderer'
 import {SelectCellRenderer} from './table/SelectCellRenderer'
 import {DateCellRenderer} from './table/DateCellRenderer'
 import {TimeCellRenderer} from './table/TimeCellRenderer'
-import {
-    CheckboxRenderer, 
-    FileRenderer, 
-    PercentRenderer, 
-    UserRenderer} from './table/cellRenderer'
+import {UserCellRenderer} from './table/UserCellRenderer'
+import {CheckboxCellRenderer} from './table/CheckboxCellRenderer'
+import {PercentCellRenderer} from './table/PercentCellRenderer'
+import {FileCellRenderer} from './table/FileCellRenderer'
+import {AutoCompleteCellRenderer} from './table/AutoCompleteCellRenderer';
 import {AutoCompleteCellEditor} from './table/AutoCompleteCellEditor';
 import { checkCanBeBind } from "./handlerCheckRunFormulas";
 import PerfectScrollbar from "perfect-scrollbar";
@@ -64,13 +65,13 @@ export default class SymperTable {
             date: 'DateCellRenderer',
             // dateTime: 'DatetimeRenderer',
             time: 'TimeCellRenderer',
-            image: 'FileRenderer',
-            fileUpload: 'FileRenderer',
-            percent: 'PercentRenderer',
-            user: 'UserRenderer',
+            image: 'FileCellRenderer',
+            fileUpload: 'FileCellRenderer',
+            percent: 'PercentCellRenderer',
+            user: 'UserCellRenderer',
             select: 'SelectCellRenderer',
             combobox: 'SelectCellRenderer',
-            checkbox: 'CheckboxRenderer',
+            checkbox: 'CheckboxCellRenderer',
             
         };
         this.supportCellEditor = {
@@ -83,9 +84,10 @@ export default class SymperTable {
             let controlInstance = this.tableControl.controlInTable[controlName];
             
             let col = {
+                flex: 1,
                 headerName:controlInstance.title,
                 field: controlInstance.name,
-                editable:true,
+                editable:!controlInstance.checkProps('isReadOnly'),
                 hide:controlInstance.checkProps('isHidden')
             };
             if (controlInstance.checkProps('isSumTable')) {
@@ -100,14 +102,15 @@ export default class SymperTable {
                 col['cellRenderer'] = this.supportCellsType[controlInstance.type]
             }
             if(['label','select'].includes(controlInstance.type)){
-                // col['editable'] = false
+                col['editable'] = false
             }
           
             if(controlInstance.checkEmptyFormulas('autocomplete')){
                 col['cellEditor'] = 'AutoCompleteCellEditor';
                 col['cellEditorParams'] = {
-                    controlName:controlName
+                    control:controlInstance
                 };
+                col['cellRenderer'] = 'AutoCompleteCellRenderer'
             }
             if(this.rows && this.rows.length > 0){
                 let rowGroup = this.rows.find(ele => ele.name == controlName);
@@ -131,7 +134,7 @@ export default class SymperTable {
                 }
             }
             col['cellRendererParams'] = {
-                controlName:controlName
+                control:controlInstance
             };
             colDefs.push(col);
         }
@@ -143,7 +146,7 @@ export default class SymperTable {
         let colSqlId = {
             headerName:SQLITE_COLUMN_IDENTIFIER,
             field: SQLITE_COLUMN_IDENTIFIER,
-            hide:true,
+            hide:true
         };
         colDefs.push(colObjectId);
         colDefs.push(colSqlId);
@@ -367,21 +370,22 @@ export default class SymperTable {
         this.gridOptions = {
             columnDefs: this.columnDefs,
             animateRows: true,
-            rowHeight:25,
+            // rowHeight:25,
             headerHeight:25,
             rowBuffer: 0,       // số view trong 1 viewport
             groupDefaultExpanded: -1,
             rowData: this.getRowDefaultData(),
             components: {
                 NumberCellRenderer: NumberCellRenderer,
-                FileRenderer: FileRenderer,
-                PercentRenderer: PercentRenderer,
-                UserRenderer: UserRenderer,
+                FileCellRenderer: FileCellRenderer,
+                PercentCellRenderer: PercentCellRenderer,
+                UserCellRenderer: UserCellRenderer,
                 SelectCellRenderer: SelectCellRenderer,
-                CheckboxRenderer: CheckboxRenderer,
+                CheckboxCellRenderer: CheckboxCellRenderer,
                 DateCellRenderer: DateCellRenderer,
                 TimeCellRenderer: TimeCellRenderer,
                 AutoCompleteCellEditor:AutoCompleteCellEditor,
+                AutoCompleteCellRenderer: AutoCompleteCellRenderer,
                 BottomPinnedRowRenderer: BottomPinnedRowRenderer,
             },
             pinnedBottomRowData: (this.tableHasRowSum) ? this.createBottomTotalRow() : false,
@@ -406,6 +410,9 @@ export default class SymperTable {
                 autoHeight:true,
                 editable:true,
             },
+            getRowHeight:function (params) {
+                return 25;
+            },
             suppressRowTransform:true,
             undoRedoCellEditing: true,
             enableFillHandle:true,
@@ -413,6 +420,7 @@ export default class SymperTable {
             enableCellTextSelection:false,
             onCellValueChanged:this.onCellValueChanged,
             onGridReady:this.onGridReady,
+            onCellKeyDown:this.onCellKeyDown,
             tableInstance:this
         };
         let viewType = sDocument.state.viewType[this.instance];
@@ -436,7 +444,7 @@ export default class SymperTable {
         }
         this.agInstance = new Grid(this.tableContainer, this.gridOptions, { modules: [ClientSideRowModelModule, RowGroupingModule, ClipboardModule] });
         if(this.tableControl.name == 'tb_demo'){
-            this.demoLargeData();
+            // this.demoLargeData();
         }
         this.caculatorHeight();
         
@@ -466,6 +474,61 @@ export default class SymperTable {
         }
     }
 
+    
+    addNewRow(newRow, rowIndex) {
+        this.gridOptions.api.applyTransaction({ add: newRow, addIndex:rowIndex });
+        console.log(rowIndex,'rowIndexrowIndex');
+        this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+                                {
+                                    func:'insertRow',
+                                    columns:Object.keys(newRow), 
+                                    rowData:Object.values(newRow),
+                                    keyInstance:this.keyInstance, 
+                                    tableName: this.tableName
+                                }
+                            })
+        this.caculatorHeight()
+    }
+    deleteRow(rowData, sqlRowId){
+        this.gridOptions.api.applyTransaction({ remove: rowData});
+        this.formulasWorker.postMessage({action:'executeSQliteDB',data:
+                {
+                    func:'deleteRow',condition:'where s_table_id_sql_lite = ' + sqlRowId,keyInstance:this.keyInstance, tableName: this.tableName
+                }
+            })
+        this.caculatorHeight()
+    }
+    /**
+     * Xử lý sự kiện shift + enter xuống dòng
+     * shift + enter để xóa dòng
+     * @param {*} params 
+     */
+    onCellKeyDown(params){
+        let event = params.event;
+        let rowData = params.data;
+        let sqlRowId = rowData.s_table_id_sql_lite;
+        if(params.rowPinned){
+            return;
+        }
+        if(event.key == 'Enter' && event.shiftKey){
+            let rowData = this.tableInstance.getRowDefaultData(false);
+            let listRootTable = sDocument.state.submit[this.tableInstance.keyInstance]['listTableRootControl'];
+            if (listRootTable.hasOwnProperty(this.tableInstance.tableName)){
+                let rowDataFromRoot = util.cloneDeep(listRootTable[this.tableInstance.tableName]['defaultRow']);
+                for (let index = 0; index < rowDataFromRoot.length; index++) {
+                    let cellValue = rowDataFromRoot[index];
+                    rowData[0][cellValue[1]] = cellValue[2];
+                    
+                }
+                rowData[0].s_table_id_sql_lite = Date.now();
+            }
+            console.log(rowData,'rowDatarowData');
+            this.tableInstance.addNewRow(rowData, params.rowIndex + 1);
+        }
+        else if(event.key == 'Backspace' && event.shiftKey){
+            this.tableInstance.deleteRow(rowData, sqlRowId)
+        }
+    }
     /**
      * Kiểm tra xem đang ở view detail hay submit
      */
@@ -553,6 +616,7 @@ export default class SymperTable {
      */
     setDataAtCell(key, value, currentRowIndex){
         let rowNode = this.getRowNode(currentRowIndex);
+        console.log('rowIndexrowIndex',currentRowIndex,rowNode);
         rowNode.setDataValue(key,value);
     }
     /**
@@ -560,7 +624,8 @@ export default class SymperTable {
      * @param {*} rowIndex 
      */
     getRowNode(rowIndex){
-        return this.gridOptions.api.getRowNode(rowIndex);
+        let rowModel = this.gridOptions.api.getModel();
+        return rowModel.rowsToDisplay[rowIndex];
     }
     /**
      * Hàm trả về dữ liệu của 1 dòng theo index
@@ -637,7 +702,7 @@ export default class SymperTable {
                 func:'editRow',
                 columns:columnName, 
                 value:valueChange,
-                condition:'WHERE '+SQLITE_COLUMN_IDENTIFIER+' = ' + currentRowData['text_render'],
+                condition:'WHERE '+SQLITE_COLUMN_IDENTIFIER+' = ' + currentRowData[SQLITE_COLUMN_IDENTIFIER],
                 keyInstance:this.keyInstance, 
                 tableName: this.tableName
             }

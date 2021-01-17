@@ -417,7 +417,8 @@ const setDefaultSubmitStore = (state, params) => {
             data:{}
         },
         validateMessage:{},
-        dataInputBeforeChange:{}
+        dataInputBeforeChange:{},
+        mapValueToTextAutocompleteInput:{}
     }
     let instance = params.instance;
     Vue.set(state.submit, instance, value);
@@ -618,6 +619,25 @@ const removeValidateControlSubmit = (state, params) => {
         
 }
 
+/**
+ * 
+ * Lưu các giá trị cho control autocomplete, 
+ * tại các control autocomplete được cấu hình hiển thị 1 kiểu, giá trị lưu 1 kiểu
+ * @param {*} state 
+ * @param {*} params 
+ */
+
+const setAutocompleteValueToText = (state, params) => {
+    let key = params.key;
+    let value = params.value;
+    let controlName = params.controlName;
+    let instance = params.instance;
+    if(!state.submit[instance].mapValueToTextAutocompleteInput[controlName]){
+        Vue.set(state.submit[instance].mapValueToTextAutocompleteInput, controlName, {});
+    }
+    Vue.set(state.submit[instance].mapValueToTextAutocompleteInput[controlName], key, value);
+}
+
 export {
     addControl,
     moveControl,
@@ -656,6 +676,7 @@ export {
     updateDocumentState,
     updateValidateControlSubmit,
     removeValidateControlSubmit,
-	setCurrentTitle
+    setCurrentTitle,
+    setAutocompleteValueToText
 
 };

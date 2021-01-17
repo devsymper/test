@@ -583,6 +583,14 @@ button:hover {
 .sym-form-Detail .ag-floating-bottom {
     overflow: hidden !important;
 }
+.sym-form-submit .ag-input-field-input {
+    border: none !important;
+    padding: 0 !important;
+}
+.sym-form-submit .ag-input-field-input:focus {
+    outline: none !important;
+    box-shadow:none !important;
+}
 .sym-form-submit .ag-theme-alpine .ag-cell-wrapper>.ag-group-value,
 .sym-form-Detail .ag-theme-alpine .ag-cell-wrapper>.ag-group-value {
     font-family: "Roboto", sans-serif;
