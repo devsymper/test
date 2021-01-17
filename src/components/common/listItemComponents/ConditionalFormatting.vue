@@ -13,6 +13,7 @@
         @changeToAdd="changeToAdd()"
         v-model="data"
         @save='save()'
+        :rowData="rowData"
         :conditionalFormat="conditionalFormat"
         :tableColumns="tableColumns"
         :headerPrefixKeypath="headerPrefixKeypath"
@@ -29,6 +30,12 @@ export default {
   },
     props: {
          conditionalFormat:{
+             type: Array,
+                default(){
+                    return []
+                }
+        },
+        rowData:{
              type: Array,
                 default(){
                     return []
@@ -98,7 +105,8 @@ export default {
                             color:'yellow',
                             lists:['Max value','Number','Percent'],
                         }
-                    ]
+                    ],
+                    listColors:[]
                 }
             }
 

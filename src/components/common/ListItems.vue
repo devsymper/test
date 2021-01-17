@@ -328,6 +328,7 @@
 				@change-colmn-display-config="configColumnDisplay"
 				@save-list-display-config="saveTableDisplayConfig"
 				@re-render="reRender"
+                :rowData="rowData"
                 :conditionalFormat="conditionalFormat"
 				:tableDisplayConfig="tableDisplayConfig"
 				:tableColumns="columnDefs"
@@ -437,6 +438,7 @@ import ListItemsWorker from 'worker-loader!@/worker/common/listItems/ListItems.W
 import { actionHelper } from "@/action/actionHelper";
 import CheckBoxRenderer from "@/components/common/agDataTable/CheckBoxRenderer"
 import SymperDialogConfirm from "@/components/common/SymperDialogConfirm"
+import {Gradient} from "javascript-color-gradient";
 
 let CustomHeaderVue = Vue.extend(CustomHeader);
 
@@ -687,7 +689,8 @@ export default {
 		
 	},
 	created(){
-		let self = this
+        let self = this;
+     
 		this.$evtBus.$on('list-items-ag-grid-on-change-checkbox',data=>{
 			if(!self.allRowChecked.includes(data.data)){
 				self.allRowChecked.push(data.data)
@@ -724,24 +727,69 @@ export default {
 						if(e.cellRenderer){
 							eval("e.cellRenderer = " + e.cellRenderer)
 						}
-					})
-                    data.dataAfter.map(column=>{
-                        // let tableCols= "column.headerName=='id'||column.headerName=='userName'||column.headerName=='email'||column.headerName=='avatar'"
-                        //let tableCols = ;
+                    })
+                    //no
+                    // data.dataAfter.map(column=>{
+                    //         column.cellStyle= function(e){
+                    //             //singleCOler
+                    //             if(self.conditionalFormat&&self.conditionalFormat[self.conditionIndex].displayMode.type=="singleColor"){
+                    //                 if(eval(self.conditionalFormat[self.conditionIndex].tableColumnsJS)){
+                    //                 let conditionalFormat1 = self.conditionalFormat[self.conditionIndex].displayMode.singleColor.conditionFormat
+                    //                     if(eval(conditionalFormat1)){
+                    //                         return {color: self.conditionalFormat[self.conditionIndex].displayMode.singleColor.fontColor, backgroundColor:self.conditionalFormat[self.conditionIndex].displayMode.singleColor.backgroundColor}
+                    //                     }
+                    //                 }else{
+                    //                     return {}
+                    //                 }
+                    //             //singleColor
+                    //             }else{
+                    //                   if(eval(self.conditionalFormat[self.conditionIndex].tableColumnsJS)){
+                    //                     // const colorGradient = new Gradient();
+                    //                     // if(e.data.id==self.conditionalFormat[self.conditionIndex].displayMode.colorScale.listId.name){
+                    //                     //     return{background: self.conditionalFormat[self.conditionIndex].displayMode.colorScale.listId.color}
+
+                    //                     // }
+                    //                    // colorGradient.setGradient(minValue, midValue,maxValue).setMidpoint(3).getArray();
+                    //                     return{background:'blue'}
+                    //                   }
+                    //             }
+                                
+                               
+                    //     }
+                    // })
+                    //no
+                     if(self.conditionalFormat&&self.conditionalFormat.length>0){
+                        data.dataAfter.map(column=>{
                             column.cellStyle= function(e){
-                                if(eval(self.conditionalFormat[self.conditionIndex].tableColumnsJS)==true){
-                                // let conditionalFormat1 =" ( (e.data.id==920) )"
-                                    debugger
-                                        let conditionalFormat1 = self.conditionalFormat[self.conditionIndex].displayMode.singleColor.conditionFormat
-                                        if(eval(conditionalFormat1)){
-                                            return {color: self.conditionalFormat[self.conditionIndex].displayMode.singleColor.fontColor, backgroundColor:self.conditionalFormat[self.conditionIndex].displayMode.singleColor.backgroundColor}
+                                let dataFormat = self.conditionalFormat[self.conditionIndex];
+                                if(eval(dataFormat.tableColumnsJS)){
+                                    // nếu là kiểu màu đơn
+                                    if(dataFormat.displayMode.type=="singleColor"){
+                                        let conditionalFormat = dataFormat.displayMode.singleColor.conditionFormat
+                                        if(eval(conditionalFormat)){
+                                            return {color: dataFormat.displayMode.singleColor.fontColor, backgroundColor:dataFormat.displayMode.singleColor.backgroundColor}
                                         }
-                                // return {color: self.conditionalFormat.displayMode.singleColor.fontColor, backgroundColor:self.conditionalFormat.displayMode.singleColor.backgroundColor}
-                            }else{
-                                return {}
+                                    }
+                                    else{
+                                        debugger
+                                        // nếu thang màu
+                                        let field = dataFormat.displayMode.colorScale.applyColumn.field;
+                                        let valueTable = e.data[field];
+                                        let listColors = dataFormat.displayMode.colorScale.listColors;
+                                        let color = '';
+                                        listColors.map(v=>{
+                                            if(v.name==valueTable){
+                                                debugger
+                                                color = v.backgroundColor
+                                            }
+                                        })
+                                       debugger
+                                         return {backgroundColor:color}
+                                    }
                             }
                         }
                     })
+                    }
                     self.columnDefs = data.dataAfter;
 					break;
                 default:
@@ -1041,7 +1089,6 @@ export default {
         },
         deleteConfig(index){
             this.conditionalFormat = this.conditionalFormat.filter((c,i)=>i!=index)
-            debugger
             this.saveConditionalFormatting(this.conditionalFormat);
         },
         hideCloseBtnFilter(){
@@ -1579,7 +1626,7 @@ export default {
 					e.cellRenderer = e.cellRenderer.toString()
 				}
 			})
-			obj.columnDefs = self.columnDefs
+            obj.columnDefs = self.columnDefs
 			return obj
 		},
 		importExcel(){
