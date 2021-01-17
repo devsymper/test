@@ -33,7 +33,6 @@ onmessage = function (event) {
              */
             if(from == 'columnTable'){
                 let listIdRow = dataOfAction.listIdRow;
-                console.log(dataInput,'dataInputdataInput');
                 let dataPostForGetMultiple = prepareDataGetMultiple(dataInput, listIdRow, workerStore['submit'][keyInstance]['inputData']);
                 let cacheRowData = {};
                 //cache các data input giống nhau -> chỉ chạy 1 lần

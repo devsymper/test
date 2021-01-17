@@ -10,7 +10,7 @@ AutoCompleteCellRenderer.prototype.init = function(params) {
         this.eGui = document.createElement('span');
         let control = params.control;
         let mapValueToText = sDocument.state.submit[control.curParentInstance].mapValueToTextAutocompleteInput[control.name];
-        var text = (params.value) ? mapValueToText[params.value] : '';
+        var text = (params.value && mapValueToText) ? mapValueToText[params.value] : params.value;
         this.eGui.innerHTML = text;
     }
 };

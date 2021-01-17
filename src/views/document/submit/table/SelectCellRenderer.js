@@ -10,6 +10,7 @@ export const SelectCellRenderer = ()=> {
 SelectCellRenderer.prototype.init = function(params) {
     this.eGui = document.createElement('span');
     let value = (params.value) ? params.value : "";
+    this.params = params;
     let div = `<div class="select-cell" style="position:relative;height:22px;width:100%;">` + value + `
                     <span class="select-chervon-bottom" style="position: absolute;right:8px;top:2px;font-size: 10px;color: #ababab;">▼</span>
                 </div>`
@@ -33,7 +34,7 @@ SelectCellRenderer.prototype.getGui = function() {
 };
 
 SelectCellRenderer.prototype.destroy = function() {
-    if(this.eGui){
+    if(this.eGui && !this.params.node.rowPinned){
         this.eGui.querySelector('.select-chervon-bottom').removeEventListener('click',(event));
     }
 };

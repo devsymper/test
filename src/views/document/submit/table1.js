@@ -19,6 +19,7 @@ import {TimeCellRenderer} from './table/TimeCellRenderer'
 import {UserCellRenderer} from './table/UserCellRenderer'
 import {CheckboxCellRenderer} from './table/CheckboxCellRenderer'
 import {PercentCellRenderer} from './table/PercentCellRenderer'
+import {ValidateCellRenderer} from './table/ValidateCellRenderer'
 import {FileCellRenderer} from './table/FileCellRenderer'
 import {AutoCompleteCellRenderer} from './table/AutoCompleteCellRenderer';
 import {AutoCompleteCellEditor} from './table/AutoCompleteCellEditor';
@@ -52,7 +53,9 @@ export default class SymperTable {
         this.agInstance = null;
         this.tableMode = this.tableControl.tableMode;
         this.cellRendererValueMap = {},
-        this.formulasWorker = formulasWorker
+        this.formulasWorker = formulasWorker,
+        this.tableWorker = null
+        this.pinnedRowNode = null;
         
     }
     init(){
@@ -78,8 +81,12 @@ export default class SymperTable {
             autocomplete: 'AutoCompleteCellEditor',
         }
     }
+
+    /**
+     * Hàm lấy các định nghĩa của cột
+     */
     getColDefs(){
-        let colDefs = []
+        let colDefs = [];
         for (let controlName in this.tableControl.controlInTable){
             let controlInstance = this.tableControl.controlInTable[controlName];
             
@@ -90,6 +97,7 @@ export default class SymperTable {
                 editable:!controlInstance.checkProps('isReadOnly'),
                 hide:controlInstance.checkProps('isHidden')
             };
+
             if (controlInstance.checkProps('isSumTable')) {
                 this.sumColumns[controlName] = controlInstance;
                 this.tableHasRowSum = true;
@@ -100,6 +108,9 @@ export default class SymperTable {
             }
             if(this.supportCellsType[controlInstance.type]){
                 col['cellRenderer'] = this.supportCellsType[controlInstance.type]
+            }
+            else{
+                col['cellRenderer'] = 'ValidateCellRenderer';
             }
             if(['label','select'].includes(controlInstance.type)){
                 col['editable'] = false
@@ -280,6 +291,7 @@ export default class SymperTable {
                     instance: this.keyInstance
                 });
             }
+            
         }
         if(this.tableMode != 'Flat'){
             this.appendTableColumns(data);
@@ -287,6 +299,12 @@ export default class SymperTable {
             data = this.convertDataToGroup(data);
         }
         this.gridOptions.api.setRowData(data);
+        let controlBinding = Object.keys(data[0]);
+        for (let index = 0; index < controlBinding.length; index++) {
+            if(controlBinding[index] != 's_table_id_sql_lite'){
+                this.handlerCheckEffectedControlInTable(controlBinding[index], 'all');
+            }
+        }
         if(this.tableHasRowSum){
             this.gridOptions.api.setPinnedBottomRowData(this.createBottomTotalRow(data))
         }
@@ -387,6 +405,7 @@ export default class SymperTable {
                 AutoCompleteCellEditor:AutoCompleteCellEditor,
                 AutoCompleteCellRenderer: AutoCompleteCellRenderer,
                 BottomPinnedRowRenderer: BottomPinnedRowRenderer,
+                ValidateCellRenderer: ValidateCellRenderer,
             },
             pinnedBottomRowData: (this.tableHasRowSum) ? this.createBottomTotalRow() : false,
             getRowStyle: function (params) {
@@ -421,6 +440,8 @@ export default class SymperTable {
             onCellValueChanged:this.onCellValueChanged,
             onGridReady:this.onGridReady,
             onCellKeyDown:this.onCellKeyDown,
+            onRowDataChanged:this.onRowDataChanged,
+            onRowDataUpdated:this.onRowDataUpdated,
             tableInstance:this
         };
         let viewType = sDocument.state.viewType[this.instance];
@@ -498,6 +519,7 @@ export default class SymperTable {
             })
         this.caculatorHeight()
     }
+    
     /**
      * Xử lý sự kiện shift + enter xuống dòng
      * shift + enter để xóa dòng
@@ -510,7 +532,7 @@ export default class SymperTable {
         if(params.rowPinned){
             return;
         }
-        if(event.key == 'Enter' && event.shiftKey){
+        if(event.key == 'Enter' && event.shiftKey && this.tableInstance.tableControl.isInsertRow()){
             let rowData = this.tableInstance.getRowDefaultData(false);
             let listRootTable = sDocument.state.submit[this.tableInstance.keyInstance]['listTableRootControl'];
             if (listRootTable.hasOwnProperty(this.tableInstance.tableName)){
@@ -661,6 +683,20 @@ export default class SymperTable {
         return colData
     }
     /**
+     * Hàm tính tổng 1 cột
+     * @param {*} colName 
+     */
+    getSumColumn(colName){
+        let allData = this.getAllData();
+        let sum = allData.reduce((arr,obj)=>{
+            if(obj[colName]){
+                arr += Number(obj[colName])
+            }
+            return arr;
+        },0)
+        return sum
+    }
+    /**
      * Hàm trả về giá trị của 1 cell
      * @param {*} columnName 
      * @param {*} rowIndex 
@@ -685,14 +721,27 @@ export default class SymperTable {
             }
         });
         this.gridOptions.api.applyTransaction({ update: itemsToUpdate });
+        setTimeout((self) => {
+            self.handlerCheckEffectedControlInTable(columnChange, 'all');
+        }, 50,this);
       }
     /**
      * Nhận sự kiên khi giá trị của cell thay đổi => chạy công thức cho các control bị ảnh hưởng
      */
     onCellValueChanged(event){
-        console.log(event,'eventevent');
+        if(event.rowPinned){
+            return;
+        }
         if(event.newValue != event.oldValue){
+        console.log(event,'eventevent');
+
             let columnChange = event.colDef.field;
+            if(this.tableInstance.tableHasRowSum){
+                this.tableInstance.pinnedRowNode = event.api.getPinnedBottomRow(0);
+                let sum = this.tableInstance.getSumColumn(columnChange);
+                this.tableInstance.pinnedRowNode.setDataValue(columnChange,sum);
+
+            }
             this.tableInstance.handlerAfterChangeCellByUser(columnChange,event.newValue,event.data, event.rowIndex);
         }
     }
@@ -720,7 +769,7 @@ export default class SymperTable {
             return
         }
         let controlInstance = getControlInstanceFromStore(this.keyInstance, controlName);
-        if (controlInstance.checkValidValueLength(rowIndex)) {
+        if (controlInstance && controlInstance.checkValidValueLength(rowIndex)) {
             if (controlInstance == null || controlInstance == undefined) {
                 return;
             }
@@ -762,28 +811,27 @@ export default class SymperTable {
             for (let i in controlEffected) {
                 let controlEffectedInstance = getControlInstanceFromStore(this.keyInstance,i);
                 let allFormulas = controlEffectedInstance.controlFormulas;
-                // if (allFormulas.hasOwnProperty(formulasType)) {
-                //     if (formulasType == 'linkConfig') { // nếu có cấu hình công thức link thì cũng chạy các công thức của nó
-                //         let configData = allFormulas[formulasType].configData;
-                //         for (let ind = 0; ind < configData.length; ind++) {
-                //             let config = configData[ind];
-                //             let formulasInstance = config.instance;
-                //             let dataInput = this.getDataInputForFormulas(formulasInstance, rowIndex);
-                //             let fType = formulasType + "_" + config.formula.instance;
-                //             this.handleRunFormulaForControlInTable(controlEffectedInstance, dataInput, formulasInstance, rowIndex)
-                //         }
-                //     } else {
-                //         if (allFormulas[formulasType].hasOwnProperty('instance')) {
-                //             let formulasInstance = allFormulas[formulasType].instance;
-                //             let dataInput = this.getDataInputForFormulas(formulasInstance, rowIndex);
-                //             if (controlEffectedInstance.hasOwnProperty('inTable')) {
-                //                 if (controlEffectedInstance.inTable == this.tableName) {
-                //                     this.handleRunFormulaForControlInTable(controlEffectedInstance, dataInput, formulasInstance, rowIndex);
-                //                 }
-                //             }
-                //         }
-                //     }
-                // }
+                if (allFormulas.hasOwnProperty(formulasType)) {
+                    if (formulasType == 'linkConfig') { // nếu có cấu hình công thức link thì cũng chạy các công thức của nó
+                        // let configData = allFormulas[formulasType].configData;
+                        // for (let ind = 0; ind < configData.length; ind++) {
+                        //     let config = configData[ind];
+                        //     let formulasInstance = config.instance;
+                        //     let dataInput = this.getDataInputForFormulas(formulasInstance, rowIndex);
+                        //     let fType = formulasType + "_" + config.formula.instance;
+                        //     this.handleRunFormulaForControlInTable(controlEffectedInstance, dataInput, formulasInstance, rowIndex)
+                        // }
+                    } else {
+                        if (allFormulas[formulasType].hasOwnProperty('instance')) {
+                            let formulaInstance = allFormulas[formulasType].instance;
+                            if (controlEffectedInstance.hasOwnProperty('inTable')) {
+                                if (controlEffectedInstance.inTable == this.tableName) {
+                                    this.handleRunFormulaForControlInTable(controlEffectedInstance, formulaInstance, rowIndex);
+                                }
+                            }
+                        }
+                    }
+                }
             }
         }
     }
@@ -819,18 +867,20 @@ export default class SymperTable {
      * 
      */
     handleRunFormulaForControlInTable(controlInstance, formulaInstance, rowIndex = null) {
+        let listInput = getListInputInDocument(this.keyInstance);
+        let dataInput = getDataInputFormula(formulaInstance,listInput,{}, rowIndex);
         // let sDocumentSubmit = getSDocumentSubmitStore(this.keyInstance);
         // if(!checkDataInputChange(sDocumentSubmit.rootChangeFieldName, sDocumentSubmit.dataInputBeforeChange, dataInput)){
         //     return;
         // }
         if(rowIndex.length == 1 && rowIndex != "all"){
-            this.handleRunFormulaOnRow(controlInstance, formulaInstance, rowIndex);
+            this.handleRunFormulaOnRow(controlInstance,dataInput, formulaInstance, rowIndex);
         }
         else if(rowIndex == "all"){
-            this.handleRunFormulaOnColumn(controlInstance, formulaInstance)
+            this.handleRunFormulaOnColumn(controlInstance,dataInput, formulaInstance)
         }
         else{
-            // this.handleRunFormulaOnRowChange(controlInstance, dataInput, formulaInstance, rowIndex);
+            this.handleRunFormulaOnRowChange(controlInstance, dataInput, formulaInstance, rowIndex);
         }
         
     }
@@ -842,13 +892,12 @@ export default class SymperTable {
      * @param {*} controlInstance  control đang chạy công thức
      * 
      */
-    handleRunFormulaOnRow(controlInstance, formulaInstance, rowIndex){
+    handleRunFormulaOnRow(controlInstance, dataInput, formulaInstance, rowIndex){
         let rowData = this.getDataByRowIndex(rowIndex);
         if(rowData.length > 0){
             rowData = rowData[0];
             let sqlRowId = rowData.data[SQLITE_COLUMN_IDENTIFIER];
-            let listInput = getListInputInDocument(this.keyInstance);
-            let dataInput = getDataInputFormula(formulaInstance,listInput,{}, rowIndex);
+            
             this.formulasWorker.postMessage({action:'runFormula',data:
                 {
                     formulaInstance:formulaInstance, 
@@ -862,10 +911,9 @@ export default class SymperTable {
             });
         }
     }
-    handleRunFormulaOnColumn( controlInstance, formulaInstance){
+    handleRunFormulaOnColumn( controlInstance, dataInput, formulaInstance){
         let listIdRow = this.getColData(SQLITE_COLUMN_IDENTIFIER);
-        let listInput = getListInputInDocument(this.keyInstance);
-        let dataInput = getDataInputFormula(formulaInstance,listInput,{}, 'all');
+        
         this.formulasWorker.postMessage({action:'runFormula',data:
             {
                 formulaInstance:formulaInstance, 
@@ -885,12 +933,14 @@ export default class SymperTable {
      */
     handleRunFormulaOnRowChange(controlInstance, dataInput, formulaInstance, rowIndex){
         let listIdRow = [];
-        for (let index = 0; index < rowIndex.length; index++) {
-            let rowInd = rowIndex[index];
-            let rowData = this.tableInstance.getDataAtRow(rowInd);
-            listIdRow.push(rowData[rowData.length - 1]);
+        // for (let index = 0; index < rowIndex.length; index++) {
+        //     let rowInd = rowIndex[index];
+        //     let rowData = this.tableInstance.getDataAtRow(rowInd);
+        //     listIdRow.push(rowData[rowData.length - 1]);
             
-        }
+        // }
+        let rowDatas =  this.getDataByRowIndex(rowIndex);
+        debugger
         this.formulasWorker.postMessage({action:'runFormula',data:
             {
                 formulaInstance:formulaInstance, 

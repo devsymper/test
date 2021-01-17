@@ -711,7 +711,7 @@ export default {
         this.$evtBus.$on("document-submit-open-validate-message", e => {
             if(this._inactive == true) return;
             this.messageValidate = e.msg;
-            this.$refs.validate.show(e);
+            this.$refs.validate.show(e.e);
         });
        
         this.$evtBus.$on("document-submit-show-time-picker", e => {
@@ -1428,7 +1428,6 @@ export default {
          * Hàm xử lí sau khi chạy công thức được điền dữ liệu vào input bởi hệ thống
          */
         handleInputChangeBySystem(controlName,valueControl, fromPopupAutocomplete = false, isRunChange = true){
-            console.trace(controlName,'controlNamecontrolName');
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
             markBinedField(this.keyInstance,controlName);
             controlInstance.setValue(valueControl);

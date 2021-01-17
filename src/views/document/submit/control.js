@@ -191,8 +191,8 @@ export default class Control {
                 if (this.controlFormulas[key].value && Object.values(this.controlFormulas[key].value).length > 0) {
                     let formulas = Object.values(this.controlFormulas[key].value)[0];
                     formulas = formulas.replace(/\r?\n|\r/g, ' ');
+                    formulas = formulas.trim();
                     if (formulas) {
-                        formulas = formulas.trim();
                         this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, formulas, key);
                         let table = this.controlFormulas[key]['instance'].detectTableRelateLocalFormulas();
                         if (table.length > 0) {

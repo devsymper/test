@@ -80,11 +80,10 @@ export default {
                 this.positionBox = {'top':'50%','left':'50%',transform: 'translate(-50%, -50%)',position: 'fixed',width:'400px'};
             }
             else{
-                if($(e.target).closest('.handsontable').length > 0){
+                if($(e.target).closest('.ag-cell').length > 0){
                     let autoEL = $(this.$el).detach();
                     $(e.target).closest('.wrap-table').append(autoEL);
-                    let edtos = $(e.delegateTarget).offset();
-                    
+                    let edtos = $(e.target).closest('.ag-cell').offset();
                     let tbcos = $(e.target).closest('.wrap-table').find('[s-control-type="table"]').offset();
                     this.positionBox = {'top':edtos.top - tbcos.top + $(e.target).height() +'px','left':edtos.left - tbcos.left+'px'};
                 }

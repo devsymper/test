@@ -246,5 +246,8 @@ export default class TableControl extends Control {
 
         }
     }
+    isInsertRow(){
+        return this.controlProperties.isInsertRow.value
+    }
 
 }
