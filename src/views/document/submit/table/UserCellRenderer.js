@@ -6,11 +6,14 @@ export const UserCellRenderer = ()=> {
 
 // init method gets the details of the cell to be renderer
 UserCellRenderer.prototype.init = function(params) {
-    this.eGui = document.createElement('span');
+    this.eGui = document.createElement('div');
     let control = params.control;
     let mapIdToUsers = sDocument.state.submit[control.curParentInstance].mapValueToTextAutocompleteInput[control.name];
     var text = (params.value) ? mapIdToUsers[params.value] : '';
-    this.eGui.innerHTML = text;
+    let div = `<div style="position:relative;height:100%;width:100%;">` + text + `
+                    <span style="position: absolute;right:8px;top:2px;font-size: 14px;color: #ababab;" class="mdi mdi-account-search-outline"></span>
+                </div>`
+    this.eGui.innerHTML = div;
 };
 
 UserCellRenderer.prototype.getGui = function() {

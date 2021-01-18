@@ -11,7 +11,15 @@ AutoCompleteCellRenderer.prototype.init = function(params) {
         let control = params.control;
         let mapValueToText = sDocument.state.submit[control.curParentInstance].mapValueToTextAutocompleteInput[control.name];
         var text = (params.value && mapValueToText) ? mapValueToText[params.value] : params.value;
-        this.eGui.innerHTML = text;
+        if(!text){
+            let validateEle = (control.isRequiredControl()) ? control.makeErrNoti(params.rowIndex) : '';
+            let userEle = (control.type == 'user') ? '<span style="position: absolute;right:8px;top:2px;font-size: 14px;color: #ababab;" class="mdi mdi-account-search-outline"></span>' : ''
+            let div = `<div style="position:relative;height:100%;width:100%;">` + text +validateEle+ userEle+`</div>`
+            this.eGui.innerHTML = div;
+        }
+        else{
+            this.eGui.innerHTML = text;
+        }
     }
 };
 

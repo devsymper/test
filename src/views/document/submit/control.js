@@ -1,6 +1,5 @@
 import Formulas from "./formulas";
 import sDocument from './../../../store/document';
-import Util from './util';
 import {
     markBinedField
 } from './handlerCheckRunFormulas';
@@ -544,8 +543,11 @@ export default class Control {
     getCurrentValidate(){
         return this.getDataStoreSubmit()['validateMessage'][this.name]
     }
+    makeErrNoti(rowIndex = null) {
+        return '<span class="mdi mdi-checkbox-blank-circle validate-icon" control-name="'+this.name+'" row-index="'+rowIndex+'"></span>'
+    }
     renderValidateIcon(message, type) {
-        let iconEl = Util.makeErrNoti(this.name);
+        let iconEl = this.makeErrNoti();
         this.ele.parent().append(iconEl);
         let currentValidate = this.getCurrentValidate();
         if (!currentValidate) {

@@ -1,7 +1,5 @@
-import { SYMPER_APP } from '@/main.js'
-
 /**
- * Select renderer
+ * validate renderer
  */
 export const ValidateCellRenderer = ()=> {
 }
@@ -15,14 +13,8 @@ ValidateCellRenderer.prototype.init = function(params) {
         
         let control = params.control;
         if(control.isRequiredControl() && value == ""){
-            let div = `<div style="position:relative;height:100%;width:100%;">` + value + `
-                        <span class="validate-icon mdi mdi-alert-circle" style="position: absolute;right:8px;top:2px;font-size: 8px;color: red;"></span>
-                    </div>`
+            let div = `<div style="position:relative;height:100%;width:100%;">` + value + control.makeErrNoti(params.rowIndex) + `</div>`
             this.eGui.innerHTML = div;
-            this.eGui.querySelector('.validate-icon').addEventListener('click', function(e){
-                let msg = 'Không được bỏ trống'
-                SYMPER_APP.$evtBus.$emit('document-submit-open-validate-message', {e:e,msg:msg});
-            } );
         }
         else{
             this.eGui.innerHTML = value;
@@ -34,10 +26,4 @@ ValidateCellRenderer.prototype.init = function(params) {
 
 ValidateCellRenderer.prototype.getGui = function() {
     return this.eGui;
-};
-
-ValidateCellRenderer.prototype.destroy = function() {
-    if(this.eGui && !this.params.node.rowPinned && this.eGui.querySelector('.validate-icon')){
-        this.eGui.querySelector('.validate-icon').removeEventListener('click',(event));
-    }
 };

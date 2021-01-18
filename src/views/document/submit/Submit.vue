@@ -850,7 +850,7 @@ export default {
                     !$(evt.target).hasClass("s-control-date") &&
                     !$(evt.target).hasClass("card-datetime-picker") &&
                     $(evt.target).closest(".card-datetime-picker").length == 0 && 
-                    $(evt.target).closest('.ag-cell').length == 0
+                    $(evt.target).closest('.ag-input-date').length == 0
                 ) {
                     thisCpn.$refs.datePicker.closePicker();
                 }
@@ -859,11 +859,12 @@ export default {
                     !$(evt.target).hasClass("s-control-time") &&
                     !$(evt.target).hasClass("card-time-picker") &&
                     $(evt.target).closest(".card-time-picker").length == 0 && 
-                    $(evt.target).closest('.ag-cell').length == 0
+                    $(evt.target).closest('.ag-input-time').length == 0
                 ) { 
                         thisCpn.$refs.timeInput.hide();
                 }
                 if (
+                    !$(evt.target).hasClass("validate-icon-cell") &&
                     !$(evt.target).hasClass("validate-icon") &&
                     !$(evt.target).hasClass("card-validate") &&
                     $(evt.target).closest(".card-validate").length == 0
@@ -2272,17 +2273,8 @@ export default {
                     continue;
                 }
                 if (controlIns.type == "table") {
-                    let value = null
-                    if(controlIns.tableMode == 'Group'){
-                        value = {};
-                        value[controlIns.name] = controlIns.agDataTable.getGroupData();
-                    }
-                    else{
-                        value = this.getDataTableInput(controlIns);
-                    }
-                    if(value){
-                        Object.assign(dataControl, value);
-                    }
+                    let value = controlIns.tableInstance.getDataSubmit();
+                    Object.assign(dataControl, value);
                 } else {
             
                     if (!listControlNotNameProp.includes(controlIns.type)) {

@@ -471,7 +471,84 @@ export default class SymperTable {
         
     }
 
-   
+    /**
+     * Hàm lấy dữ liệu cho việc submit
+     */
+    getDataSubmit(){
+        let data = {};
+        if(this.tableMode == 'Flat'){
+            data[this.tableName] = this.getDataTableForSubmit();
+        }
+        else if(this.tableMode == 'Group'){
+            data[this.tableName] = this.getGroupData()
+        }
+        else{
+            data[this.tableName] = {}
+        }
+        return data;
+    }
+
+    /**
+     * chuyển data dạng pivot sang data dạng flat thì cần xóa các dữ liệu của các cột được thêm vào
+     * @param {*} data 
+     */
+    minimizeData(data){
+        for (let index = 0; index < this.allColumnAppend.length; index++) {
+            delete data[this.allColumnAppend[index]];
+        }
+    }
+
+    /**
+     * ham trả về data của table
+     */
+    getGroupData(){
+        let rowData = [];
+        this.gridOptions.api.forEachNode(node => {
+                if(!node.group){
+                    if(this.allColumnAppend.length > 0){
+                        for (let index = 0; index < this.allColumnAppend.length; index++) {
+                            const column = this.allColumnAppend[index];
+                            let newRow = util.cloneDeep(node.data);
+                            newRow[this.cols[0].name] = column;
+                            newRow[this.values[0].name] = newRow[column];
+                            this.minimizeData(newRow);
+                            rowData.push(newRow);
+                        }
+                    }
+                    else{
+                        rowData.push(node.data)
+                    }
+                }
+            }
+        );
+        let dataForSubmit = {};
+        if(rowData.length > 0){
+            for (let index = 0; index < rowData.length; index++) {
+                let row = rowData[index];
+                for (let control in row){
+                    if(!dataForSubmit[control]){
+                        dataForSubmit[control] = []
+                    }
+                    dataForSubmit[control].push(row[control]);
+                }
+            }
+        }
+        return dataForSubmit;
+    }
+
+    getDataTableForSubmit(){
+        let dataSubmit = {}
+        for(let controlName in this.tableControl.controlInTable){
+            dataSubmit[controlName] = this.getColData(controlName);
+        }
+        
+        dataSubmit['child_object_id'] = this.getColData('child_object_id');
+        return dataSubmit
+    }
+    /**
+     * Tạo dòng tính tổng
+     * @param {*} data 
+     */
     createBottomTotalRow(data = []) {
         var result = {};
         for (let controlName in this.sumColumns) {
@@ -479,6 +556,11 @@ export default class SymperTable {
         }
         return [result];
       }
+
+    /**
+     * Đổi thanh cuộn trong table
+     * @param {*} params 
+     */
     onGridReady(params){
         // setTimeout((self)=>{
         //     params.api.sizeColumnsToFit()
@@ -495,7 +577,11 @@ export default class SymperTable {
         }
     }
 
-    
+    /**
+     * Thêm mới dòng
+     * @param {*} newRow 
+     * @param {*} rowIndex 
+     */
     addNewRow(newRow, rowIndex) {
         this.gridOptions.api.applyTransaction({ add: newRow, addIndex:rowIndex });
         console.log(rowIndex,'rowIndexrowIndex');
@@ -510,6 +596,11 @@ export default class SymperTable {
                             })
         this.caculatorHeight()
     }
+    /**
+     * Xóa dòng
+     * @param {*} rowData 
+     * @param {*} sqlRowId 
+     */
     deleteRow(rowData, sqlRowId){
         this.gridOptions.api.applyTransaction({ remove: rowData});
         this.formulasWorker.postMessage({action:'executeSQliteDB',data:
@@ -733,10 +824,9 @@ export default class SymperTable {
             return;
         }
         if(event.newValue != event.oldValue){
-        console.log(event,'eventevent');
-
             let columnChange = event.colDef.field;
-            if(this.tableInstance.tableHasRowSum){
+            let controlIns = getControlInstanceFromStore(this.tableInstance.keyInstance, columnChange);
+            if(this.tableInstance.tableHasRowSum && controlIns.checkProps('isSumTable')){
                 this.tableInstance.pinnedRowNode = event.api.getPinnedBottomRow(0);
                 let sum = this.tableInstance.getSumColumn(columnChange);
                 this.tableInstance.pinnedRowNode.setDataValue(columnChange,sum);

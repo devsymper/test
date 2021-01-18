@@ -7,7 +7,17 @@ TimeCellRenderer.prototype.init = function(params) {
     this.eGui.placeholder = "HH:mm:ss";
     let value = (params.value) ? params.value : "";
     this.eGui.classList.add('ag-input-time');
-    this.eGui.innerHTML = value;
+
+    if(!value){
+        let div = `<div style="position:relative;height:100%;width:100%;">` + value + `
+                <span style="position: absolute;right:8px;top:2px;font-size: 14px;color: #ababab;" class="mdi mdi-clock-time-two-outline"></span>
+            </div>`
+        this.eGui.innerHTML = div;
+    }
+    else{
+        this.eGui.innerHTML = value;
+    }
+
     let control = params.control;
     this.eGui.addEventListener('click', function(e){
         let event = e;
