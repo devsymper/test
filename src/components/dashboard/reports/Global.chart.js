@@ -29,5 +29,18 @@ export default class Global extends ReportBase {
             }
         };
         super('global', symperId, columnSettingKeys, styleKeys);
+        this.viewConfigs.displayOptions = {
+            dashboardStyle: {
+                size: {
+                    h: 720,
+                    w: 1080
+                },
+                style: {
+                    background: {
+                        color: 'white'
+                    }
+                }
+            }
+        };
     }
 }

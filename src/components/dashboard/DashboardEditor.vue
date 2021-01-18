@@ -14,32 +14,25 @@
                     :style="{
                         height: 'calc(100 % - 35px)'
                     }"
+                    :action="action"
                     :instanceKey="instanceKey"/>
             </div>
-			<!-- <div>
-				<v-icon @click="showReportConfig = true">
-					mdi-folder
-				</v-icon>
-				<v-icon @click="toggleDatasetDialog">
-					mdi-file
-				</v-icon>
-			</div>	 -->
             <div class="d-flex flex-column h-100"
                 :style="{
                     width: '200px'
                 }">
                 <ReportTypeSelector 
                     :instanceKey="instanceKey"
-					:showReportConfig="showReportConfig"
 					@selected-type="handlerSelectedChartType"
-					@collapse-report-config="showReportConfig = false"
-					/>
+                />
                 <ReportConfig 
                     :instanceKey="instanceKey"/>
             </div>
             <DashboardDasetDetail
                 ref="datasetDetail"
                 class="h-100"
+				@show-dataset-selector="toggleDatasetDialog"
+				@show-relation-selector="toggleRelationDialog"
                 :style="{
                     width: '250px'
                 }" 
@@ -48,6 +41,10 @@
 		<DatasetSelector
 			ref="datasetSelector"
 			v-model="listDatasetSelected"
+			:tableHeight="tableHeight"
+		/> 	
+		<RelationSelector
+			ref="relationSelector"
 			:tableHeight="tableHeight"
 		/> 	
     </div>
@@ -61,8 +58,11 @@ import ReportConfig from "@/components/dashboard/components/ReportConfig.vue";
 import ReportTypeSelector from "@/components/dashboard/components/ReportTypeSelector.vue";
 import DashboardEditorWorker from 'worker-loader!@/worker/dashboard/DasboardEditor.Worker.js';
 import DatasetSelector from '@/components/dataset/DatasetSelector'
+import RelationSelector from '@/components/relation/RelationSelector'
 import {util} from '@/plugins/util'
 import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
+import { getDefaultDashboardConfig } from "@/components/dashboard/configPool/dashboardConfigs.js";
+import Global from "@/components/dashboard/reports/Global.chart.js";
 
 var reportClasses = autoLoadChartClasses();
 
@@ -73,35 +73,46 @@ export default {
         DashboardWorkspace,
         ReportConfig,
 		ReportTypeSelector,
-		DatasetSelector
+		DatasetSelector,
+		RelationSelector
     },
     created(){
         this.dashboardEditorWorker = new DashboardEditorWorker();
         this.listenFromWorker();
         this.getDashboardInfo();
+        this.initDashboardData();
     },
     data(){
         return {
-            currentCellConfigs:{},
-			instanceKey: Date.now() ,
-			showReportConfig: true,
-			showDatasetSelectorDialog: false,
-			tableHeight: 0,
-			listDatasetSelected:["2879" , "3020"],
-        }
+            instanceKey: Date.now(),
+            tableHeight: 0,
+            listDatasetSelected:[],
+        };
 	},
 	mounted(){
 		this.tableHeight = util.getComponentSize(this).h - 100
 	},
 	watch:{
-		listDatasetSelected:{
-			deep: true,
-			immediate: true,
-			handler(arr){
-			}
-		}
-	},
+    },
+    computed: {
+        myData(){
+           return this.$store.state.dashboard.allDashboard[this.instanceKey];
+        }
+    },
     methods: {
+        initDashboardData(){
+            let defaultData = getDefaultDashboardConfig();
+            let data = {
+                ...defaultData,
+                instanceKey: this.instanceKey,
+                showReportConfig: true,
+            }
+            data.dashboardConfigs.allCellConfigs.global = new Global();
+            this.$store.commit('dashboard/setDashboardConfig', {
+                instanceKey: this.instanceKey,
+                data
+            });
+        },
         getDashboardInfo(){
             if(this.idObject){
                 this.dashboardEditorWorker.postMessage({
@@ -112,12 +123,26 @@ export default {
                 });
             }
         },
-        setRestoredDashboardConfigs(info){
-            console.log(info, 'infoinfoinfo');
+        setRestoredDashboardConfigs(data){
+            this.listDatasetSelected = data.relateDatasetIds;
+            this.$set(
+                this.myData.dashboardConfigs,
+                'allCellConfigs',
+                data.allCellConfigs
+            );
+
+            this.$set(
+                this.myData.dashboardConfigs,
+                'info',
+                data.dashboardInfo
+            );
 		},
 		
 		toggleDatasetDialog(){
 			this.$refs.datasetSelector.show()
+		},
+		toggleRelationDialog(){
+			this.$refs.relationSelector.show()
 		},
 		handlerSelectedChartType(type){
 
@@ -134,10 +159,6 @@ export default {
                 }
             });
         },
-        // recheckSelectedColumn(){
-        //     this.$refs.datasetDetail.clearSelectedItemDisplay();
-        //     this.$refs.datasetDetail.postSelectedDatasetBefor(this.currentCellConfigs.viewConfigs.selectedDataset, true);
-        // },
     },
     props: {
         action: {
