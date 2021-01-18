@@ -3,7 +3,7 @@
         <div class="mt-2 ml-2 d-flex fs-13 justify-center" style="margin-bottom:-10px">
         </div>
         <v-color-picker 
-            class="ma-2"
+            class="pa-2"
             :hide-canvas="false"
             hide-inputs
             hide-mode-switch
@@ -14,7 +14,7 @@
             :swatches="swatches"
             swatches-max-height="200"
         ></v-color-picker>
-         <div class="ml-2 d-flex fs-13 justify-center mb-2" >
+         <div class="px-2 d-flex fs-13 justify-center pb-2" >
             <v-btn  v-show="showButton" small class="px-1 ml-1" solo depressed @click="handleSelected">
                 Ok
             </v-btn>
