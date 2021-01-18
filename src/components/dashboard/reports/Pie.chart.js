@@ -6,12 +6,9 @@ export default class Pie extends ReportBase {
         let columnSettingKeys = ReportGroupConfig.Group3.columnSettingKeys
         let styleKeys = ReportGroupConfig.Group3.styleKeys
         super('pie', symperId, columnSettingKeys, styleKeys);
-	}
+    }
 
-	translate(rawConfig, data, changes = {} , oldOutput = {}){
-		rawConfig
-		data
-		debugger
-		return 'pl'
-	}
+    translate(rawConfig,  data, changes = {}, oldOutput = {}){
+        
+    }
 }

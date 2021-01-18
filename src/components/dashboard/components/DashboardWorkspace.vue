@@ -43,6 +43,7 @@
                     <DashboardCell 
                         v-if="true || item.active"
                         :layoutItem="item"
+                        :instanceKey="instanceKey"
                         :cellConfigs="dashboardConfig.allCellConfigs[item.cellId]">
                     </DashboardCell>
                 </grid-item>
@@ -78,8 +79,7 @@
                     <v-menu
                         top
                         offset-y
-                        open-on-hover
-                        class="dashboard-tab-options" 
+                        open-on-hover 
                         v-if="!isView && !tab.editTabName"
                         :close-on-content-click="true"
                     >
@@ -87,7 +87,9 @@
                             <v-btn
                                 v-bind="attrs"
                                 v-on="on"
+                                x-small
                                 icon
+                                class="dashboard-tab-options"
                             >
                                 <i class="fs-16 mdi mdi-dots-horizontal"></i>
                             </v-btn>
@@ -158,20 +160,37 @@ export default {
         }
     },
     methods: {
+        addTab(){
+            // let tabs = this.dashboardConfig.info.tabsAndPages.tabs;
+            // let newTabName = 'tab '+ tabs.length;
+            // tabs[tabs.length - 1].name = newTabName;
+
+            // this.dashboardConfig.info.currentTabPageKey = newTabName;
+            // this.$set(this.dashboardConfig.info.layout, newTabName, []);
+            // this.$set(this.dashboardConfig.info.drillThrough, newTabName, []);
+            // this.dashboardConfig.info.activeTabIndex = (tabs.length - 1)+'';
+            // this.switchTab(tabs.length - 1);
+
+            // tabs.push({
+            //     name: '',
+            //     active: false,
+            //     editTabName:false
+            // });
+        },
         switchTab(newTabIndex, oldIndex = -1){
-            window.SDashboardEditor.selectCell('global'); 
-            this.dashboardConfig.info.currentTabPageKey = this.dashboardConfig.info.tabsAndPages.tabs[newTabIndex].name;
-            for(let tab of this.dashboardConfig.info.tabsAndPages.tabs){
-                tab.active = false;
-            }
-            setTimeout((self) => {
-                let info = self.dashboardConfig.info;
-                info.tabsAndPages.tabs[newTabIndex].active = true;
-                info.activeTabIndex = newTabIndex+'';
-                info.currentTabPageKey = info.tabsAndPages.tabs[newTabIndex].name;
-                self.renderCellsInViewport();
-                self.deactiveCellsInTab(oldIndex);
-            }, 200, this);
+            // this.$store.commit('dashboard/setSelectedCell', {id: 'global', instanceKey: this.instanceKey});
+            // this.dashboardConfig.info.currentTabPageKey = this.dashboardConfig.info.tabsAndPages.tabs[newTabIndex].name;
+            // for(let tab of this.dashboardConfig.info.tabsAndPages.tabs){
+            //     tab.active = false;
+            // }
+            // setTimeout((self) => {
+            //     let info = self.dashboardConfig.info;
+            //     info.tabsAndPages.tabs[newTabIndex].active = true;
+            //     info.activeTabIndex = newTabIndex+'';
+            //     info.currentTabPageKey = info.tabsAndPages.tabs[newTabIndex].name;
+            //     self.renderCellsInViewport();
+            //     self.deactiveCellsInTab(oldIndex);
+            // }, 200, this);
         },
         handleCommandOnTabs(info){
             let tabId = info.tabIdx;
@@ -284,6 +303,26 @@ export default {
         action: {
             defaul: 'view'
         },
+    },
+    watch: {
+        'dashboardConfig.info.activeTabIndex': {
+            handler(newVl, oldValue){
+                if(newVl == this.dashboardConfig.info.tabsAndPages.tabs.length - 1){
+                    this.addTab();
+                }else{
+                    this.switchTab(newVl, oldValue)
+                }
+            }
+        },
+        activeAutoScroll(vl){
+            if(vl){
+                this.autoScrollAction = setInterval((self) => {
+                    self.autoScrollBottom(5);
+                }, 10, this);
+            }else{
+                clearInterval(this.autoScrollAction);
+            }
+        }
     }
 
 }
@@ -293,5 +332,23 @@ export default {
 .symper-dashboard-workspace .tab-name-input {
     height: 28px;
     border: 1px solid rgb(206, 206, 206);
+}
+
+.dashboard-tab-options{
+    position: relative;
+    right: -20px;
+    visibility: hidden;
+}
+
+.symper-dashboard-workspace .v-tab:hover .dashboard-tab-options{
+    visibility: visible;
+}
+
+.symper-dashboard-cell-wrapper.selected-report{
+    border-color: #f58634!important;
+}
+
+.symper-dashboard-cell-wrapper{
+    border: 2px solid #ffffff00;
 }
 </style>

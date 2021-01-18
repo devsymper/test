@@ -16,12 +16,13 @@
 			</span>
 		</div>
 		<div class="all-chart-types">
-			<span v-for="(item , i ) in chartConfigs" :key="i">
+			<span v-for="(item , i ) in chartConfigs" :key="i" >
 				<img 
 					:title="i" 
 					:src="'img/dashboard/report-builder/'+i+'.png'" 
 					@click="selectCellType(i)"
 					class="report-type-img" 
+					:class="{'selected-report-type':i == currentCellConfigsType }"
 					height="32px" 
 					width="32px" 
 				>
@@ -80,6 +81,20 @@ export default {
 	props:{
 		showReportConfig:{
 			type: Boolean,
+		},
+		instanceKey:{
+			type: Number,
+			default: 0
+		}
+
+	},
+	computed:{
+		currentCellConfigsType(){
+			if( this.$store.state.dashboard.allDashboard[this.instanceKey]){
+				return this.$store.state.dashboard.allDashboard[this.instanceKey].currentCellConfigs.sharedConfigs.type
+			}else{
+				return ''
+			}
 		}
 	},
 	components:{
@@ -149,6 +164,8 @@ export default {
 		let titleHeight = $(document.getElementsByClassName('title-all-chart-types')).height()
 		let allChartSelectorHeight = $(document.getElementsByClassName('all-chart-types')).height()
 		this.height = util.getComponentSize(this).h - titleHeight - allChartSelectorHeight - 100;
+		this.currentCellConfigs
+		debugger
 	}
 }
 </script>
@@ -173,9 +190,13 @@ export default {
 .report-type-img{
 	margin: 2px;
 	padding: 6px;
+	cursor: pointer;
 }
 .report-type-img:hover{
 	border-radius: 2px;
 	background-color: lightgray;
+}
+.selected-report-type{
+	background-color: #FEEDE1;
 }
 </style>
