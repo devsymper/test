@@ -14,23 +14,17 @@
                     :style="{
                         height: 'calc(100 % - 35px)'
                     }"
+                    :action="action"
                     :instanceKey="instanceKey"/>
             </div>
-			<div>
-				<v-icon @click="showReportConfig = true">
-					mdi-folder
-				</v-icon>
-			</div>	
             <div class="d-flex flex-column h-100"
                 :style="{
                     width: '200px'
                 }">
                 <ReportTypeSelector 
                     :instanceKey="instanceKey"
-					:showReportConfig="showReportConfig"
 					@selected-type="handlerSelectedChartType"
-					@collapse-report-config="showReportConfig = false"
-					/>
+                />
                 <ReportConfig 
                     :instanceKey="instanceKey"/>
             </div>
@@ -67,6 +61,8 @@ import DatasetSelector from '@/components/dataset/DatasetSelector'
 import RelationSelector from '@/components/relation/RelationSelector'
 import {util} from '@/plugins/util'
 import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
+import { getDefaultDashboardConfig } from "@/components/dashboard/configPool/dashboardConfigs.js";
+import Global from "@/components/dashboard/reports/Global.chart.js";
 
 var reportClasses = autoLoadChartClasses();
 
@@ -84,29 +80,39 @@ export default {
         this.dashboardEditorWorker = new DashboardEditorWorker();
         this.listenFromWorker();
         this.getDashboardInfo();
+        this.initDashboardData();
     },
     data(){
         return {
-            currentCellConfigs:{},
-			instanceKey: Date.now() ,
-			showReportConfig: true,
-			showDatasetSelectorDialog: false,
-			tableHeight: 0,
-			listDatasetSelected:["2879" , "3020"],
-        }
+            instanceKey: Date.now(),
+            tableHeight: 0,
+            listDatasetSelected:[],
+        };
 	},
 	mounted(){
 		this.tableHeight = util.getComponentSize(this).h - 100
 	},
 	watch:{
-		listDatasetSelected:{
-			deep: true,
-			immediate: true,
-			handler(arr){
-			}
-		}
-	},
+    },
+    computed: {
+        myData(){
+           return this.$store.state.dashboard.allDashboard[this.instanceKey];
+        }
+    },
     methods: {
+        initDashboardData(){
+            let defaultData = getDefaultDashboardConfig();
+            let data = {
+                ...defaultData,
+                instanceKey: this.instanceKey,
+                showReportConfig: true,
+            }
+            data.dashboardConfigs.allCellConfigs.global = new Global();
+            this.$store.commit('dashboard/setDashboardConfig', {
+                instanceKey: this.instanceKey,
+                data
+            });
+        },
         getDashboardInfo(){
             if(this.idObject){
                 this.dashboardEditorWorker.postMessage({
@@ -117,9 +123,19 @@ export default {
                 });
             }
         },
-        setRestoredDashboardConfigs(info){
-            console.log(info, 'infoinfoinfo');
-            debugger
+        setRestoredDashboardConfigs(data){
+            this.listDatasetSelected = data.relateDatasetIds;
+            this.$set(
+                this.myData.dashboardConfigs,
+                'allCellConfigs',
+                data.allCellConfigs
+            );
+
+            this.$set(
+                this.myData.dashboardConfigs,
+                'info',
+                data.dashboardInfo
+            );
 		},
 		
 		toggleDatasetDialog(){
@@ -143,10 +159,6 @@ export default {
                 }
             });
         },
-        // recheckSelectedColumn(){
-        //     this.$refs.datasetDetail.clearSelectedItemDisplay();
-        //     this.$refs.datasetDetail.postSelectedDatasetBefor(this.currentCellConfigs.viewConfigs.selectedDataset, true);
-        // },
     },
     props: {
         action: {
