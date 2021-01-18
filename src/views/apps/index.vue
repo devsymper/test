@@ -99,7 +99,7 @@ export default {
 										return  '<span>'+ newValue +'</span>'
 									}
 								},
-								{name: "updatedAt", title: "updated_at", type: "text",flex:1,
+								{name: "updatedAt", title: "updated_at", type: "text",flex:1, 
 									cellRenderer: function(params) {
 										let newValue = params.value.slice(0, params.value.length - 3)
 										return  '<span>'+ newValue +'</span>'

@@ -216,10 +216,10 @@ export default class GroupTable {
         this.gridOptions = {
             columnDefs: this.columnDefs,
             animateRows: true,
-            rowHeight:24,
+            // rowHeight:24,
             groupDefaultExpanded: -1,
             rowData: [],
-            debounceVerticalScrollbar:true,
+            // debounceVerticalScrollbar:true,
             autoGroupColumnDef: { 
                 minWidth: (this.rows.length > 1) ? 250 : 150,
                 cellRendererParams: {

@@ -173,7 +173,7 @@
                                     @click="openTableDisplayConfigPanel"
                                     depressed
                                     small
-									v-if="!dialogMode"
+									v-if="!dialogMode && showDisplayConfig"
                                     v-on="on"
                                 >
                                     <v-icon left dark class="ml-1 mr-0 ">mdi-table-cog</v-icon>
@@ -196,6 +196,21 @@
                             </template>
                             <span>{{alwaysShowActionPanel ? $t('common.not_always_show_sidebar') : $t('common.always_show_sidebar')}}</span>
                         </v-tooltip>
+
+						
+						<span v-if="Object.keys(customHeaderBtn).length > 0">
+							 <v-btn
+								depressed
+								small
+								v-for="(item, i) in customHeaderBtn"
+								:key="i"
+								@click="customBtnclick(i)"
+								class="mr-2"
+							>
+								<v-icon left dark>{{item.icon}}</v-icon>
+								<span> {{item.title}} </span>
+							</v-btn>
+						</span>
 			 </div>
 		 </div>
 		 <div
@@ -228,6 +243,7 @@
 				@cell-context-menu="cellContextMenu"
 				@cell-mouse-down="cellMouseDown"
 				@selection-changed="onSelectionChanged"
+				@cell-clicked="onCellClicked"
 				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
 			>
@@ -337,7 +353,7 @@ import TableFilter from '@/components/common/customTable/TableFilter'
 import PerfectScrollbar from "perfect-scrollbar";
 import ListItemsWorker from 'worker-loader!@/worker/common/listItems/ListItems.Worker.js';
 import { actionHelper } from "@/action/actionHelper";
-import CheckBoxRenderer from "@/components/common/agDataTable/CheckBoxRenderer"
+import CheckBoxRendererListItems from "@/components/common/agDataTable/CheckBoxRendererListItems"
 
 let CustomHeaderVue = Vue.extend(CustomHeader);
 
@@ -362,7 +378,22 @@ export default {
         useDefaultContext: {
             type: Boolean,
             default: false
-        },
+		},
+		/**
+		 * Custom thêm các action trong header show list 
+		 */
+		customHeaderBtn:{
+			type: Object,
+			default(){
+				return {}
+			}
+		},
+		checkedRows:{
+			type: Array,
+			default(){
+				return []
+			}
+		},
 		/**
 		 * Truyeenf vao row height
 		 * 
@@ -458,7 +489,8 @@ export default {
         headerPrefixKeypath: {
             type: String,
             default: ""
-        },
+		},
+		
         getDataUrl: {
             type: String,
             default: ""
@@ -480,6 +512,10 @@ export default {
         lazyLoad:{
             type:Boolean,
             default:false
+        },
+        showDisplayConfig:{
+            type:Boolean,
+            default: true
         },
         // Chiều rộng của pannel bên phải
         actionPanelWidth: {
@@ -590,12 +626,15 @@ export default {
 	created(){
 		let self = this
 		this.$evtBus.$on('list-items-ag-grid-on-change-checkbox',data=>{
+			self.$set(data.data, 'checked', true)
 			if(!self.allRowChecked.includes(data.data)){
 				self.allRowChecked.push(data.data)
 			}else{
+				data.checked = false
 				self.allRowChecked.splice(self.allRowChecked.indexOf(data.data), 1)
 			}
 			self.$emit('after-selected-row',self.allRowChecked)
+			// self.$emit('row-selected',self.allRowChecked)
         })
 		this.listItemsWorker = new ListItemsWorker()
         this.listItemsWorker.addEventListener("message", function (event) {
@@ -687,6 +726,15 @@ export default {
 				this.showSearchBox = false
             }else{
 				this.showSearchBox = true
+			}
+		},
+		checkedRows:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				if(arr.length > 0){
+					this.allRowChecked = arr
+				}
 			}
 		},
 		rowData:{
@@ -839,7 +887,7 @@ export default {
 		VNavigationDrawer,
 		VDialog,
 		TableFilter,
-		CheckBoxRenderer
+		CheckBoxRendererListItems
 
 	},
 	mounted(){
@@ -860,7 +908,7 @@ export default {
 		};
 		this.gridOptions = {
 			enableRangeSelection: true,
-			rowSelection: 'multiple',
+			// rowSelection: 'multiple',
 			onCellKeyDown: this.onCellKeyPress,
 			getRowStyle: function(params) {
 				if (params.node.rowIndex % 2 != 0) {
@@ -870,7 +918,7 @@ export default {
 		}
 		this.frameworkComponents = {
 			agColumnHeader: CustomHeaderVue,
-			CheckBoxRenderer: CheckBoxRenderer
+			CheckBoxRendererListitems: CheckBoxRendererListItems
 		};
 		this.overlayLoadingTemplate =
 		  '<span class="ag-overlay-loading-center">Đang tải dữ liệu vui lòng chờ </span>';
@@ -905,10 +953,28 @@ export default {
 			this.agApi.hideOverlay();
 		},
 		cellContextMenu(params){
+			this.changeSelectionRow()
 			this.$emit('cell-context-menu', params)
 		},
 		cellMouseDown(params){
 			this.$emit('after-cell-mouse-down', params)
+		},
+		changeSelectionRow(){
+			let arr = document.getElementsByClassName('ag-row-selected')
+			for(let i = 0; i < arr.length ; i++){
+				$(arr[i]).removeClass('ag-row-selected')
+			}
+			if(arr.length > 0){
+				for(let i = 0; i < arr.length ; i++){
+					$(arr[i]).removeClass('ag-row-selected')
+				}
+			}
+			if(document.getElementsByClassName('ag-row-selected').length > 0){
+			 	$(document.getElementsByClassName('ag-row-selected')[0]).removeClass('ag-row-selected')
+			}	
+			$(document.getElementsByClassName('ag-row-focus')).each(function(e){
+				$(document.getElementsByClassName('ag-row-focus')[e]).addClass('ag-row-selected')
+			}) 
 		},
 		cellMouseOver(params){
 			this.cellAboutSelecting = params.data
@@ -930,7 +996,7 @@ export default {
 					headerName: 'Chọn', 
 					field: 'checkbox', 
 					editable:true,
-					cellRendererFramework : 'CheckBoxRenderer',
+					cellRendererFramework : 'CheckBoxRendererListItems',
 					width: 50
 				}	
 			)
@@ -1101,7 +1167,7 @@ export default {
 				}
 			})
 			this.hideOverlay()
-			this.$emit('data-loaded')
+			this.$emit('data-loaded', resData)
 		},
 		handlerRestoreTableDisplayConfigRes(res){
 			if(res.savedConfigs){
@@ -1157,8 +1223,8 @@ export default {
                 this.$delete(this.tableFilter.allColumn, colName);
                 icon.removeClass("applied-filter");
 			}
-			this.filteredColumns
-			this.$store.commit('app/setFilteredColumns', this.filteredColumns)
+			let widgetIdentifier = this.getWidgetIdentifier()
+			this.$store.commit('app/setFilteredColumns', {filteredColumns: this.filteredColumns, widgetIdentifier: widgetIdentifier})
 		},
 		confirmDeleteItems(){
             this.deleteDialogShow = false;
@@ -1337,6 +1403,10 @@ export default {
             return rsl && hasCreatePermission;
         },
 		handlerRowClicked(params){
+			this.$emit('row-selected', params.data);
+		},
+		onCellClicked(params){
+			this.changeSelectionRow()
 			this.$emit('row-selected', params.data);
 		},
 		onSelectionChanged() {

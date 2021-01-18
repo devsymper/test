@@ -243,7 +243,7 @@ export default {
 			let self = this
 			if(after != "" && after != "0"){
 				bpmnApi.getProcessInstanceData(this.workflowId).then(res=>{
-					self.workflowName = res.data[0].processDefinitionName
+					self.workflowName = res.data.length > 0 ? res.data[0].processDefinitionName : ""
 				});
 			}
 		},

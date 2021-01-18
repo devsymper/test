@@ -1539,7 +1539,7 @@
         "requiredField":"Trường bắt buộc nhập",
         "detailProject":"Thông tin project",
         "addPeople":"Thêm thành viên",
-        "managerRole":"Quản lý phân quyền",
+        "managerRole":"Quản lý vai trò",
         "createRole":"Tạo role",
         "dialog":{
             "removeUser": "Bạn sẽ xóa thành viên khỏi project này",
@@ -1547,7 +1547,8 @@
             "removeCategory": "Bạn sẽ xóa danh mục này khỏi danh sách.",
             "removeComponent": "Bạn sẽ xóa component này khỏi danh sách.",
             "removeWorkflow": "Bạn sẽ xóa workflow này khỏi danh sách.",
-            "removePriority": "Bạn sẽ xóa priority này khỏi danh sách."
+            "removePriority": "Bạn sẽ xóa priority này khỏi danh sách.",
+            "removeVersion": "Bạn sẽ xóa version này khỏi danh sách"
         },
         "settingBoard":"Cài đặt Board"
 

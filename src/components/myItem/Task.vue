@@ -1,7 +1,7 @@
 <template>
     <div class="h-100 w-100 d-flex justify-center task-style"> 
         <DocumentSubmit 
-            v-if="showDoTaskComponent && (action == 'submit' || action=='update')"
+            v-if="showDoTaskComponent && (action == 'submit' || action=='update') && statusTask == 'notSubmit'"
             ref="submitComponent"
 			:showSnackbarSuccess="false"
             :docId="Number(docId)"
@@ -20,10 +20,10 @@
         <Detail 
             class="doc-detail"
             :showCommentInDoc="false"
-            v-else-if="(showDetailDocument && showDoTaskComponent && (action == 'approval')) || filter=='done'"
+            v-else-if="(showDetailDocument && showDoTaskComponent && (action == 'approval')) || statusTask=='done' || statusTask=='submited' "
             :docObjInfo="docObjInfo">
         </Detail>
-        <div style="width:100%" v-else-if="filter=='done-noneObj' || action=='submitAdhocTask'">
+        <div style="width:100%" v-else-if="statusTask=='done-noneObj' || action=='submitAdhocTask'">
             <h3 class="pl-2" style="text-align:left; margin-top:20px; color:#4e4e4e">Mô tả: {{taskInfo.extraLabel}} </h3>
         </div>
         <div v-else-if="action == 'undefined'">
@@ -136,11 +136,10 @@ export default {
         PopupProcessTracking
     },
     created(){
-        console.log(this,'thissthissthissthissthissthissthissthiss');
-        
     },
     data(){
         return {
+            statusTask:"notSubmit", // statusTask có 3 trạng thái chính.. notSubmit, submited,done
             fileId: "",
 			serverPath: "",
 			name: "",
@@ -159,7 +158,6 @@ export default {
             },
             showDoTaskComponent: false,
             documentObjectId: 0,
-            filter:'notDone',
             showUpdateSubmitedDocument: false,
             showDetailDocument: true,
         }
@@ -221,12 +219,20 @@ export default {
             handler: async function (after, before) {
                 console.log(after, before, "after taskInfo change");
                 this.showDoTaskComponent = false;
-                let filter = this.stask.filter;
-                this.filter=filter;
-                if (filter!='done') {
+                if (this.originData.endTime) {
+                    this.statusTask = 'done'
+                }else{
+                    if (this.taskInfo.action && this.taskInfo.action.parameter.documentObjectId) {
+                        this.statusTask = 'submited'
+                    }else{
+                        this.statusTask = 'notSubmit'
+                    }
+                }
+
+                if (this.statusTask!='done') {
                     if(this.taskInfo.action){
                         if(!this.taskInfo.action.parameter.documentObjectId && this.taskInfo.action.parameter.documentObjectId==0 ){
-                            this.filter='done-noneObj';
+                            this.statusTask='done-noneObj';
                         }else{
                             let action = this.taskInfo.action.action;
                             this.action = action;
@@ -245,8 +251,12 @@ export default {
                             this.workflowVariable = workflowVariable;
                             if(action == 'submit'){
                                 this.docId = Number(this.taskInfo.action.parameter.documentId);
-                                this.documentObjectId = 0;
-                            }else if(action == 'approval' || action == 'update' || filter =='done'){
+                                if (this.statusTask == 'submited') {
+                                    this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
+                                }else{
+                                    this.documentObjectId = 0;
+                                }
+                            }else if(action == 'approval' || action == 'update' ||  this.statusTask ==' done'){
                                 if(!this.taskInfo.action.parameter.documentObjectId){
                                     
                                     let approvaledElId = this.taskInfo.targetElement;
@@ -274,7 +284,7 @@ export default {
                     if(this.taskInfo.action.parameter.documentObjectId){
                         this.docObjInfo.docObjId = this.taskInfo.action.parameter.documentObjectId;
                     }else{
-                        this.filter='done-noneObj';
+                        this.statusTask='done-noneObj';
                     }
                 }
             }
