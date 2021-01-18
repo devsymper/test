@@ -9,7 +9,7 @@
 				@change="handleChangeCondition"
 				class="dragArea list-group mt-1"
 			>
-				<VuePerfectScrollbar :style="{height: height + 'px'}">	
+				<VuePerfectScrollbar :style="{height: height - 50 + 'px'}">	
 					<v-expansion-panels accordion>
 						<div
 							class="columns-condition"

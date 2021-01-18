@@ -11,7 +11,7 @@
 					mdi-chevron-right
 				</v-icon>
 			</v-btn>
-			<span class="mt-1" style="font-size: 13px !important">
+			<span class="mt-1 font-weight-bold" style="font-size: 13px !important">
 				{{$t('bi.dashboard.title-visualization')}}
 			</span>
 		</div>
@@ -108,7 +108,6 @@ export default {
 			chartConfigs:{
 				area:{},
 				card:{},
-				donut:{},
 				editor:{},
 				clusteredBar:{},
 				clusteredColumn:{},
@@ -118,6 +117,7 @@ export default {
 				lineAndClusteredColumn:{},
 				lineAndStackedColumn:{},
 				pie:{},
+				donut:{},
 				pivot:{},
 				stackedArea:{},
 				stackedBar:{},
