@@ -11,7 +11,7 @@
 					mdi-chevron-right
 				</v-icon>
 			</v-btn>
-			<span class="mt-1" style="font-size: 18px !important">
+			<span class="mt-1" style="font-size: 13px !important">
 				{{$t('bi.dashboard.title-visualization')}}
 			</span>
 		</div>
