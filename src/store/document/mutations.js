@@ -391,8 +391,6 @@ const setDefaultSubmitStore = (state, params) => {
         impactedFieldsList: {},
         impactedFieldsListWhenStart: {},
         rootChangeFieldName: null,
-        currentTableInteractive: null,
-        currentControlAutoComplete: null,
         submitFormulas: null,
         listUser: null,
         localRelated: {},
@@ -418,8 +416,8 @@ const setDefaultSubmitStore = (state, params) => {
             key:"",
             data:{}
         },
-        validateMessage:{},
-        dataInputBeforeChange:{}
+        dataInputBeforeChange:{},
+        mapValueToTextAutocompleteInput:{}
     }
     let instance = params.instance;
     Vue.set(state.submit, instance, value);
@@ -581,43 +579,22 @@ const setCurrentTitle = (state, data) => {
 }
 
 /**
- * Hàm thêm xóa các control vi phạm dữ liệu validate
- * mục đích validate khi submit
+ * 
+ * Lưu các giá trị cho control autocomplete, 
+ * tại các control autocomplete được cấu hình hiển thị 1 kiểu, giá trị lưu 1 kiểu
  * @param {*} state 
  * @param {*} params 
  */
-const updateValidateControlSubmit = (state, params) => {
-    let controlName = params.controlName;
+
+const setAutocompleteValueToText = (state, params) => {
+    let key = params.key;
     let value = params.value;
-    let instance = params.instance;
-    Vue.set(state.submit[instance].validateMessage, controlName, value);
-        
-}
-
-const removeValidateControlSubmit = (state, params) => {
     let controlName = params.controlName;
-    let type = params.type;
-    let rowIndex = params.rowIndex;
     let instance = params.instance;
-    let controlValidate = state.submit[instance].validateMessage[controlName];
-    if(rowIndex != undefined && controlValidate){
-        if(controlValidate[rowIndex]){
-            Vue.delete(state.submit[instance].validateMessage[controlName][rowIndex], type);
-            if(Object.keys(state.submit[instance].validateMessage[controlName][rowIndex])){
-                Vue.delete(state.submit[instance].validateMessage[controlName],rowIndex);
-            }
-        }
+    if(!state.submit[instance].mapValueToTextAutocompleteInput[controlName]){
+        Vue.set(state.submit[instance].mapValueToTextAutocompleteInput, controlName, {});
     }
-    else{
-        if(controlValidate){
-            Vue.delete(state.submit[instance].validateMessage[controlName], type);
-            if(Object.keys(state.submit[instance].validateMessage[controlName].length == 0)){
-                Vue.delete(state.submit[instance].validateMessage,controlName);
-            }
-        }
-
-    }
-        
+    Vue.set(state.submit[instance].mapValueToTextAutocompleteInput[controlName], key, value);
 }
 
 export {
@@ -656,8 +633,7 @@ export {
     setDetailTrackChange,
     updateDataForLinkControl,
     updateDocumentState,
-    updateValidateControlSubmit,
-    removeValidateControlSubmit,
-	setCurrentTitle
+    setCurrentTitle,
+    setAutocompleteValueToText
 
 };
