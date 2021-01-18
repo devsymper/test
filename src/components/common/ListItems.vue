@@ -167,7 +167,7 @@
                             <slot name="extra-button"></slot>
                         </component>
                         <!-- filter button -->
-                        <v-menu offset-y nudge-bottom='8' :close-on-click="false" >
+                        <v-menu offset-y nudge-bottom='8' :max-width="200" :min-width="200" :close-on-click="false" >
                             <template v-slot:activator="{ on:menu }">
                                 <v-tooltip top>
                                     <template v-slot:activator="{ on:tooltip }">
@@ -181,56 +181,16 @@
                                             <span style="color:#FF8C00!important;" >{{selectedFilterName}}</span>
                                             <div v-if="closeBtnFilter"  class="ml-2" style="border-right:1px solid #E0E0E0; height:27px"></div>
                                             <v-icon v-if="closeBtnFilter" class="ml-2" style="font-size:14px" @click="hideCloseBtnFilter()">mdi-close</v-icon>
-                                          
                                         </v-btn>
                                     </template>
                                     <span>{{ $t('common.filter')}}</span>
                                 </v-tooltip>
                             </template>
-                            <v-list dense class="px-2">
-                                <v-list-item dense class=" filter-menu fs-13" v-for="(item,key) in filter" :key="key">
-                                    <!--  -->
-                                    <v-list-item-content dense style="margin-left:-29px!important">
-                                        <v-list-item-title @click="setTable(key)" class="col-md-10 fw-400" style="margin-top:-5px">
-                                            <span class="ml-2" >{{item.name}}</span>
-                                        </v-list-item-title>
-                                        <v-list-item-subtitle  class="fw-400 ml-5" style="font-size:9px!important;margin-top:-19px">
-                                            <span :style="{opacity:item.isDefault?1:0}">Mặc định</span>
-                                        </v-list-item-subtitle>
-                                    </v-list-item-content>
-                                     <v-list-item-icon class="show-icon col-md-2" style="margin-right:-20px">
-                                            <v-menu offset-y nudge-left='343' nudge-top="28" >
-                                                    <template v-slot:activator="{ on:config }">
-                                                        <i class="mdi mdi-cog-outline config-filter-icon mr-1" v-on="{ ...config}"></i>
-                                                    </template>
-                                                    <v-list dense >
-                                                        <v-list-item  v-if="!item.isDefault" class="action-filter" @click="selectActionFilter(2,key)">
-                                                            <v-icon  class=" mr-1 " style="font-size:14px!important">mdi-check-box-multiple-outline</v-icon>
-                                                            <span class="fs-13"> 
-                                                                {{$t('table.filter.Default')}}
-                                                            </span>
-                                                        </v-list-item>
-                                                        <v-list-item v-else class="action-filter" @click="selectActionFilter(3,key)">
-                                                            <v-icon  class=" mr-1 " style="font-size:14px!important">mdi-check-box-multiple-outline</v-icon>
-                                                            <span class="fs-13"> 
-                                                                {{$t('table.filter.Delete Default')}}
-                                                            </span>
-                                                        </v-list-item>
-                                                        <v-list-item class="action-filter" v-for="(action,keyAction) in actionFilter" :key="keyAction" @click="selectActionFilter(keyAction,key)">
-                                                            <v-icon  class=" mr-1 " style="font-size:14px!important">{{action.icon}}</v-icon>
-                                                            <span class="fs-13"> 
-                                                                {{$t('table.filter.'+action.content)}}
-                                                            </span>
-                                                        </v-list-item>
-                                                    </v-list>
-                                            </v-menu>
-                                        </v-list-item-icon>
-                                </v-list-item>
-                                <v-list-item  class="w-100 fs-13 add-filter" @click="addFilter= true"> 
-                                    <i style="margin-left:-12px" class="mdi mdi-plus mr-1 color-green"></i>
-                                    <span class="color-green"> Thêm bộ lọc</span>
-                                </v-list-item>
-                            </v-list>
+                         <config-filter 
+                            @set-table="setTable"
+                            @config-filter-action="configFilterAction"
+                            @add-filter-config="addFilterConfig"
+                            :filter="filter"/>
                         </v-menu>
                         <!-- filter button -->
                         <v-tooltip top>
@@ -247,7 +207,6 @@
                             </template>
                             <span>{{ $t('common.list_config') }}</span>
                         </v-tooltip>
-                        
                         <v-tooltip top v-if="showActionPanelInDisplayConfig ">
                             <template v-slot:activator="{ on }">
                                 <v-btn
@@ -265,24 +224,7 @@
 			 </div>
 		 </div>
          <!-- add filter -->
-         <v-row v-if="addFilter" class="w-100" style="background:rgb(230, 229, 229)">
-             <v-col class="col-md-11" style="margin-top:-5px;margin-bottom:-8px">
-                  <span class="ml-1 fs-13">Tên bộ lọc</span>
-                    <v-text-field
-                        class="d-inline-block ml-2 sym-small-size"
-                        single-line
-                        v-model="filterName"
-                        style="background:white"
-                        v-if="showSearchBox"
-                        outlined
-                        dense
-                    ></v-text-field>
-             </v-col>
-            <v-col class="col-md-1" style="margin-top:-5px; margin-bottom:-8px">
-                <span class="mdi mdi-check color-green mx-6" @click="saveFilter()"></span>
-                <span class="mdi mdi-close" @click="addFilter=false"></span>
-            </v-col>
-        </v-row>
+        <add-filter v-if="addFilter" :filterName="filterName" @add-filter="handleAddFilter"/>
          <!-- add filter -->
 		 <div
 		 	:class="{
@@ -431,6 +373,10 @@ import ListItemsWorker from 'worker-loader!@/worker/common/listItems/ListItems.W
 import { actionHelper } from "@/action/actionHelper";
 import CheckBoxRenderer from "@/components/common/agDataTable/CheckBoxRenderer"
 import SymperDialogConfirm from "@/components/common/SymperDialogConfirm"
+import ConfigFilter from "./ListItemConfigFilter"
+import AddFilter from "./ListItemAddFilter"
+
+
 
 let CustomHeaderVue = Vue.extend(CustomHeader);
 
@@ -711,7 +657,7 @@ export default {
 					self.handlerSaveTableDisplayConfigRes(data.dataAfter)
                     break;
                 case 'saveFilter':
-                self.handlerSaveFilter(data.dataAfter)
+                    self.handlerSaveFilter(data.dataAfter)
                 break;
                 case 'getTableColumns':
 					data.dataAfter.forEach(function(e){
@@ -852,12 +798,6 @@ export default {
             deleteFilterIdx:0,
             filterContent:"",
             showDelFilterPopUp:false,
-            actionFilter:[
-                // {icon:'mdi-check-box-multiple-outline',content:"Delete Default"},
-                // {icon:'mdi-check-box-multiple-outline',content:"Default"},
-                {icon:'mdi-lead-pencil',content:"Edit"},
-                {icon:'mdi mdi-close',content:"Delete"},
-            ],
             gridApi: null,
             selectedFilterName:'',
 			listItemsWorker: null,
@@ -938,6 +878,8 @@ export default {
     components: {
 		AgGridVue,
         Pagination,
+        "add-filter":AddFilter,
+        "config-filter" : ConfigFilter,
         SymperDialogConfirm,
 		DisplayConfig,
 		"symper-drag-panel": SymperDragPanel,
@@ -978,6 +920,42 @@ export default {
 		this.rowSelection = 'single';
     },
 	methods:{
+        handleAddFilter(data){
+            if(data.type=='save'){
+                this.filterName = data.filterName
+                this.saveFilter()
+            }else{
+                this.addFilter = false;
+            }
+        },
+        configFilterAction(data){
+            let type = data.type;
+              switch(type){
+                case 'setDefaultFilter':
+                    this.setDefaultFilter(data.filterIdx);
+                    break;
+                case 'unsetDefaultFilter':
+                    this.unsetDefaultFilter(data.filterIdx);
+                    break;
+                case 'editFilter':
+                    this.editFilter(data.filterIdx)
+                    break;
+                case 'deleteFilter':
+                    data.type="deleteFilter";
+                    this.deleteFilter(data.filterIdx)
+                    break;
+              }
+        },
+        setTable(filterIdx){
+            this.closeBtnFilter = true;
+            this.selectedFilterName = this.filter[filterIdx].name;
+            let filter = this.filter;
+            this.tableFilter.allColumn = this.filter[filterIdx].columns;
+            this.getData()
+        },
+        addFilterConfig(){
+            this.addFilter = true;
+        },
         hideCloseBtnFilter(){
             this.selectedFilterName = '';
             this.closeBtnFilter = false;
@@ -985,24 +963,8 @@ export default {
             this.tableFilter.allColumn={}
             this.getData();
         },
-        selectActionFilter(actionIdx,filterIdx){
-            switch(actionIdx){
-                case 2:
-                    this.setDefaultFilter(filterIdx);
-                    break;
-                case 3:
-                    this.unsetDefaultFilter(filterIdx);
-                    break;
-                case 0:
-                    this.editFilter(filterIdx)
-                    break;
-                case 1:
-                    this.deleteFilter(filterIdx)
-                break;
-            }
-        },
         getDefaultFilter(){
-            if(this.filter.length>0){
+            if(this.filter&&this.filter.length>0){
                 this.filter.map((fil,i)=>{
                     if(fil.isDefault){
                         this.selectedFilterName = fil.name
@@ -1033,7 +995,6 @@ export default {
             this.isUpdateFilter= true;
             this.filterIdx = filterIdx;
         },
-        
         deleteFilter(filterIdx){
             this.showDelFilterPopUp = true;
             this.filterContent =" Xóa bộ lọc "+this.filter[filterIdx].name+" khỏi danh sách các bộ lọc";
@@ -1045,13 +1006,6 @@ export default {
             this.sendFilterWorker();
             this.notiFilter = this.$t("table.success.delete_filter");
             this.showDelFilterPopUp=false;
-        },
-        setTable(filterIdx){
-            this.closeBtnFilter = true;
-            this.selectedFilterName = this.filter[filterIdx].name;
-            let filter = this.filter;
-            this.tableFilter.allColumn = this.filter[filterIdx].columns;
-            this.getData()
         },
         saveFilter(){
             if(!this.isUpdateFilter){
@@ -1092,7 +1046,6 @@ export default {
 		hideOverlay() {
 			this.agApi.hideOverlay();
 		},
-		
 		cellMouseOver(params){
 			this.cellAboutSelecting = params.data
 			if(this.debounceRelistContextmenu){
@@ -1813,18 +1766,8 @@ export default {
 	line-height: 12px !important;
 	padding-left: unset !important;
 }
-.filter-menu{
-    height:35px!important
-    /* //height:18px!important; */
-}
-.filter-menu:hover,.add-filter:hover,.action-filter:hover{
-    background: #f5f5f5;
-}
-.config-filter-icon{
-    margin-top:-15px;
-    /* //display:none!important */
-}
-/* .show-icon:hover{
-    display:block!important
-} */
+
+
+
+
 </style>
