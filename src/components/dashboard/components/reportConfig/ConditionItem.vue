@@ -119,7 +119,7 @@ export default {
         },
         idx: {
             default: 0
-        }
+        },
 	},
     methods: {
         handleChangeValue(){

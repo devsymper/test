@@ -1,23 +1,27 @@
 <template>
-    <div class="config-settings" >
-        <cell-config-setting-template 
-            @add-y-axis="addYAxis" 
-            @change-column-setting="changeColumnSetting" 
-            v-for="(item,settingName) in settings" 
-            :key="settingName" 
-            :settingItem="item" 
-            :selectedCell="selectedCell"
-            :settingTplAgg="settingTplAgg"> 
-        </cell-config-setting-template>
-    </div>
+	<div class="config-settings" >
+		<VuePerfectScrollbar :style="{height: height + 'px'}">
+				<cell-config-setting-template 
+					@add-y-axis="addYAxis" 
+					@change-column-setting="changeColumnSetting" 
+					v-for="(item,settingName) in settings" 
+					:key="settingName" 
+					:settingItem="item" 
+					:selectedCell="selectedCell"
+					:settingTplAgg="settingTplAgg"> 
+				</cell-config-setting-template>
+		</VuePerfectScrollbar>
+	</div>
 </template>
 <script> 
 import CellConfigSettingTemplate from '@/components/dashboard/components/reportConfig/CellConfigSettingTemplate';
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import settingTplAgg from '@/components/dashboard/configPool/settingTplAgg';
 
 export default {
     components:{
-        'CellConfigSettingTemplate': CellConfigSettingTemplate
+		'CellConfigSettingTemplate': CellConfigSettingTemplate,
+		VuePerfectScrollbar
     },
 	props:{
 		selectedCell:{
@@ -1135,6 +1139,10 @@ export default {
 				}
 			}
 		},
+		height:{
+			type: Number,
+			default: 0
+		},
 		settings:{
 			type: Object,
 			default(){
@@ -1178,9 +1186,9 @@ export default {
     },
     data() {
         return {
-            cpnType:'config_setting',
+            cpnType: 'config_setting',
             settingItems:{},
-            settingTplAgg:settingTplAgg
+            settingTplAgg: settingTplAgg
         }    
     }
 }

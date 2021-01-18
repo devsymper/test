@@ -1,6 +1,6 @@
 <template>
 	<div class="symper-report-type-selector h-100 d-flex flex-column">
-		<div class="mt-2 mb-2 ml-1">
+		<div class="mt-2 mb-2 ml-1 title-all-chart-types">
 			<v-btn 
 				icon
 				tile
@@ -15,7 +15,7 @@
 				{{$t('bi.dashboard.title-visualization')}}
 			</span>
 		</div>
-		<div>
+		<div class="all-chart-types">
 			<span v-for="(item , i ) in chartConfigs" :key="i">
 				<img 
 					:title="i" 
@@ -56,12 +56,15 @@
 		<div>
 			<ColumnConfig 
 				v-if="tabs == 0"
+				:height="height"
 			/>
 			<StyleConfig 
 				v-if="tabs == 1"
+				:height="height"
 			/>
 			<ConditionConfig 
 				v-if="tabs == 2"
+				:height="height"
 			/>
 		</div>
 	</div>
@@ -71,6 +74,7 @@
 import ColumnConfig from "@/components/dashboard/components/reportConfig/ColumnConfig"
 import ConditionConfig from "@/components/dashboard/components/reportConfig/ConditionConfig"
 import StyleConfig from "@/components/dashboard/components/reportConfig/StyleConfig"
+import { util } from '@/plugins/util.js';
 
 export default {
 	props:{
@@ -140,6 +144,11 @@ export default {
 		collapse(){
 			this.$emit('collapse-report-config')
 		}
+	},
+	mounted(){
+		let titleHeight = $(document.getElementsByClassName('title-all-chart-types')).height()
+		let allChartSelectorHeight = $(document.getElementsByClassName('all-chart-types')).height()
+		this.height = util.getComponentSize(this).h - titleHeight - allChartSelectorHeight - 100;
 	}
 }
 </script>
