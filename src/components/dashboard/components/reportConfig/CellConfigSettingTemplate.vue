@@ -290,7 +290,7 @@
 		/* margin-top: -36px !important; */
 	}
     .setting-sub-items {
-        margin: 2px 5px 5px 5px;
+        margin: -4px 5px 5px 5px;
         padding: 5px 5px;
         border: 1px dashed #eaeaea;
         border-radius: 5px;
