@@ -42,7 +42,7 @@
 			ref="datasetSelector"
 			v-model="listDatasetSelected"
 			:tableHeight="tableHeight"
-		/> 	
+		/>
 		<RelationSelector
 			ref="relationSelector"
 			:tableHeight="tableHeight"
@@ -136,6 +136,7 @@ export default {
                 'info',
                 data.dashboardInfo
             );
+            this.$store.commit('dashboard/setSelectedCell', {id: 'global', instanceKey: this.instanceKey});
 		},
 		
 		toggleDatasetDialog(){
