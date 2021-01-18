@@ -26,7 +26,9 @@
         <div style="border:1px solid lightgrey; over-flow:auto; border-radius:4px" >
             <div class="apply-for" v-for="(item,key) in formatTableColumns" :key="key"  @click="check(key)">
                 <div  :style="{'color':item.isSelected?'green':'rgba(0, 0, 0,0.87)'}" class="mx-2 check" >
-                    <v-icon :style="{'color':item.isSelected?'green':'grey'}" size="18" class="mr-2">{{getDataTypeIcon(item.type)}}</v-icon>
+                    <v-icon :style="{'color':item.isSelected?'green':'grey'}" size="18" class="mr-2">
+                        {{getDataTypeIcon(item.type)}}
+                    </v-icon>
                     <span> 
                         {{item.name}}
                     </span>
@@ -55,6 +57,7 @@
         <div v-if="colorType=='singleColor'">
             <SingleColor style="margin-top:-20px" 
                 ref="singleColor"
+                :rowData="rowData"
                 v-model="value.displayMode.singleColor"
                 :tableColumns="formatTableColumns"/>
         </div>
@@ -83,21 +86,23 @@ import SingleColor from "./SingleColor";
 import TreeSqlConfig from "./../../../views/document/sideright/items/TreeSqlConfig"
 
 export default {
- 
   components:{
     TreeSqlConfig,
     ColorScale,
     SingleColor,
   },
   methods: {
+    refreshAll(){
+        // this.value.nameGroup = "";
+        // this.value.displayMode.singleColor.backgroundColor = '#FFFFFF';
+        // this.value.displayMode.singleColor.fontColor = '#000000';
+    },
     save(){
         if(this.colorType=='singleColor'){
-          this.value.displayMode.type = 'singleColor';
-            
+            this.value.displayMode.type = 'singleColor';
             this.$refs.singleColor.getJsScript();
         }else{
             this.value.displayMode.type = 'colorScale';
-            // this.$refs.ColorScale.save();
         }
         this.$emit("change", this.value);
         this.$emit("save");
@@ -110,7 +115,9 @@ export default {
         let selectedCols=[];
         this.formatTableColumns.map(t=>{
             if(t.isSelected){
-                selectedCols.push("column.headerName=='"+t.headerName+"'")
+                if(t.name!='All'){
+                    selectedCols.push("column.headerName=='"+t.headerName+"'")
+                }
             }
         })
         let result =  selectedCols.join('||')
@@ -126,11 +133,13 @@ export default {
             }
         })
         this.value.tableColumnsJS= this.formatSelectedColumnToJS();
+        this.value.tableColumns = this.formatTableColumns
     },
     checkAll(value = true){
         this.formatTableColumns.map(column=>{
             column.isSelected=value
-        })
+        });
+
     },
     columnTitle(title) {
         let prefix = this.headerPrefixKeypath;
@@ -170,6 +179,9 @@ export default {
     },
   },
   created(){
+      if(!this.isUpdate){
+          this.refreshAll()
+      }
       this.setTableColumns();
       this.formatTableColumns = this.value.tableColumns;
   },
@@ -179,6 +191,9 @@ export default {
             default(){
                 return {}
             }
+      },
+      isUpdate:{
+          type: Boolean,
       },
        rowData:{
              type: Array,

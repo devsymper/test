@@ -58,14 +58,22 @@ export default {
           this.value.originCondition = this.$refs.treeConfig.treeData[0];
           this.$emit('change',this.value )
       },
-      getHeaderName(nameTable){
-          let headerName = '';
+      checkTypeCol(field){
+          let type = 'string';
+          if(typeof this.rowData[field]=='number'){
+              type = 'number'
+          }
+          return type;
+
+      },
+      getTypeCol(nameTable){
+          let type = '';
           this.tableColumns.map(t=>{
               if(t.name==nameTable){
-                  headerName = t.headerName
+                  type = t.type
               }
           })
-          return headerName;
+          return type;
 
       },
       getFieldTb(nameTb){
@@ -105,10 +113,15 @@ export default {
       treeItemToJS(node){
            if(!node.condition){
             let field = this.getFieldTb(node.column);
-            let headerName = this.getHeaderName(node.column);
+            let typeCol = this.getTypeCol(node.column);
             let conditionName = `e.data.${field}`;
             let column = node.column;
-            let value = "'"+node.value+"'";
+            let value = '';
+            if(typeCol=='numeric'&&this.checkTypeCol(field)=='number'){
+                 value = node.value;
+            }else{
+                value = "'"+node.value+"'";
+            }
             let functionName = this.formatOperator(node.operator);
             return ` (${conditionName}${functionName} ${value}) `;
         }else if(node.condition){
@@ -147,6 +160,12 @@ export default {
     //       this.$refs.treeConfig.treeData[0] = this.value.originCondition};
   },
   props: {
+        rowData:{
+             type: Array,
+                default(){
+                    return []
+                }
+        },
       tableColumns:{
         type: Array,
             default(){
