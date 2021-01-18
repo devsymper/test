@@ -46,7 +46,7 @@
             </sym-drag-panel>
             <input type="file" :id="'file-upload-alter-'+keyInstance" class="hidden d-none" />
             <user-select :keyInstance="keyInstance" @after-select-user="afterSelectUser" ref="userInput" />
-            <validate :keyInstance="keyInstance" :message="messageValidate" ref="validate" />
+            <validate :keyInstance="keyInstance" ref="validate" />
            
             <time-input 
             :keyInstance="keyInstance"  
@@ -356,9 +356,7 @@ export default {
         currentRowChangePivotMode(){
             return this.$store.state.document.submit[this.keyInstance].currentRowChangePivotMode
         },
-        validateControl(){
-            return this.$store.state.document.submit[this.keyInstance].validateMessage   
-        }
+       
     },
     
     destroyed(){
@@ -394,7 +392,6 @@ export default {
             leftPositionDragPanel:300,
             listMessageErr:[],
             titleValidate:"",
-            messageValidate:"",
 			isDraft:0,
             preDataSubmit:{},
             objectIdentifier:{},
@@ -498,14 +495,23 @@ export default {
             }
         });
         $('#sym-submit-'+this.keyInstance).on('click','.validate-icon',function(e){
+            e.preventDefault();
+            e.stopPropagation();
             let controlName = $(this).attr('control-name');
-            let validate = thisCpn.validateControl[controlName];
-            let msg = "";
-            for(let vldType in validate){
-                msg += vldType +" : "+validate[vldType];
+            let control = getControlInstanceFromStore(thisCpn.keyInstance, controlName);
+            let rowIndex = $(this).attr('row-index');
+            rowIndex = Number(rowIndex)
+            if(!rowIndex){
+                rowIndex = 0   
             }
-            thisCpn.messageValidate = msg;
-            thisCpn.$refs.validate.show(e);
+            let validateData = {}
+            for (let index = 0; index < control.validateMessageType.length; index++) {
+                const type = control.validateMessageType[index];
+                if(control.optionValues[type] && control.optionValues[type][rowIndex].isValid){
+                    validateData[type] = control.optionValues[type]
+                }
+            }
+            thisCpn.$refs.validate.show(e, validateData);
         });
         $(document).find('#sym-submit-'+this.keyInstance).off('click','.run-dataflow')
         $(document).find('#sym-submit-'+this.keyInstance).on('click','.run-dataflow',function(e){
@@ -708,11 +714,7 @@ export default {
             if(this._inactive == true) return;
             this.handlerBeforeRunFormulasValue(control.controlFormulas.formulas.instance,control.name,'formulas');
         });
-        this.$evtBus.$on("document-submit-open-validate-message", e => {
-            if(this._inactive == true) return;
-            this.messageValidate = e.msg;
-            this.$refs.validate.show(e.e);
-        });
+       
        
         this.$evtBus.$on("document-submit-show-time-picker", e => {
             if(this._inactive == true) return;
@@ -2024,7 +2026,22 @@ export default {
          */
         handlerSubmitDocumentClick(isContinueSubmit = false){
             this.isContinueSubmit = isContinueSubmit;
-            if(Object.keys(this.validateControl).length == 0){
+            let validateBeforeSubmit = {}
+            let listInput = getListInputInDocument(this.keyInstance);
+            for(let controlName in listInput){
+                let controlIns = listInput[controlName];
+                for (let i = 0; i < controlIns.validateMessageType.length; i++) {
+                    const type = controlIns.validateMessageType[i];
+                    for(let validateItem in controlIns.optionValues[type]){
+                        let validate = controlIns.optionValues[type][validateItem]
+                        if(validate.isValid){
+                            validateBeforeSubmit[controlName] = type + " - " + validate.msg;
+                        }
+                    }
+                    
+                }
+            }
+            if(Object.keys(validateBeforeSubmit).length == 0){
                 if(this.viewType == 'submit'){
                     this.handleRefreshDataBeforeSubmit();
                 }
@@ -2040,10 +2057,8 @@ export default {
                     let message = $(v).attr('valid');
                     listErr.push(message);
                 })
-                for(let key in this.validateControl){
-                    for(let type in this.validateControl[key]){
-                        listErr.push(key+" : "+type + " - "+ this.validateControl[key][type])
-                    }
+                for(let control in validateBeforeSubmit){
+                    listErr.push(control + " : "+ validateBeforeSubmit[control])
                 }
                 this.$emit('submit-document-error');
                 this.listMessageErr = listErr;
@@ -2582,7 +2597,7 @@ export default {
                             break;
                         
                         case "validate":
-                            this.handlerDataAfterRunFormulasValidate(value,controlName);
+                            controlInstance.handlerDataAfterRunFormulasValidate(value);
                             break;
                         case "require":
                             this.handlerDataAfterRunFormulasRequire(value,controlName);
@@ -2695,18 +2710,7 @@ export default {
                 controlInstance.removeValidateIcon('Require');
             }
         },
-        handlerDataAfterRunFormulasValidate(message,controlName){
-            if(Array.isArray(message)){
-                message=message[0]
-            }
-            let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
-            if(message != "" && message != null){
-                controlInstance.renderValidateIcon(message, 'Validate');
-            }
-            else{
-                controlInstance.removeValidateIcon('Validate');
-            }
-        },
+      
         handlerDataAfterRunFormulasHidden(controlInstance,isHidden,controlId){
             if(Array.isArray(isHidden)){
                 isHidden=isHidden[0];

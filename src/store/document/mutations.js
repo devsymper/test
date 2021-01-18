@@ -416,7 +416,6 @@ const setDefaultSubmitStore = (state, params) => {
             key:"",
             data:{}
         },
-        validateMessage:{},
         dataInputBeforeChange:{},
         mapValueToTextAutocompleteInput:{}
     }
@@ -580,46 +579,6 @@ const setCurrentTitle = (state, data) => {
 }
 
 /**
- * Hàm thêm xóa các control vi phạm dữ liệu validate
- * mục đích validate khi submit
- * @param {*} state 
- * @param {*} params 
- */
-const updateValidateControlSubmit = (state, params) => {
-    let controlName = params.controlName;
-    let value = params.value;
-    let instance = params.instance;
-    Vue.set(state.submit[instance].validateMessage, controlName, value);
-        
-}
-
-const removeValidateControlSubmit = (state, params) => {
-    let controlName = params.controlName;
-    let type = params.type;
-    let rowIndex = params.rowIndex;
-    let instance = params.instance;
-    let controlValidate = state.submit[instance].validateMessage[controlName];
-    if(rowIndex != undefined && controlValidate){
-        if(controlValidate[rowIndex]){
-            Vue.delete(state.submit[instance].validateMessage[controlName][rowIndex], type);
-            if(Object.keys(state.submit[instance].validateMessage[controlName][rowIndex])){
-                Vue.delete(state.submit[instance].validateMessage[controlName],rowIndex);
-            }
-        }
-    }
-    else{
-        if(controlValidate){
-            Vue.delete(state.submit[instance].validateMessage[controlName], type);
-            if(Object.keys(state.submit[instance].validateMessage[controlName].length == 0)){
-                Vue.delete(state.submit[instance].validateMessage,controlName);
-            }
-        }
-
-    }
-        
-}
-
-/**
  * 
  * Lưu các giá trị cho control autocomplete, 
  * tại các control autocomplete được cấu hình hiển thị 1 kiểu, giá trị lưu 1 kiểu
@@ -674,8 +633,6 @@ export {
     setDetailTrackChange,
     updateDataForLinkControl,
     updateDocumentState,
-    updateValidateControlSubmit,
-    removeValidateControlSubmit,
     setCurrentTitle,
     setAutocompleteValueToText
 
