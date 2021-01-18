@@ -11,7 +11,6 @@
         @changeToAdd="changeToAdd()"
         v-model="data"
         @save='save()'
-        :isUpdate="update"
         :rowData="rowData"
         :conditionalFormat="conditionalFormat"
         :tableColumns="tableColumns"
@@ -29,6 +28,7 @@ export default {
            deep: true,
             immediate: true,
             handler(value){
+                debugger
                 this.listData=this.conditionalFormat
             }
       }
@@ -68,7 +68,6 @@ export default {
   },
   data () {
     return {
-        update:true,
         typeFormart:'add',
         data:{
             nameGroup:'',
@@ -95,7 +94,7 @@ export default {
                             value:'',
                             disable:false,
                             type:'Min value',
-                            color:'#FF0000',
+                            color:'red',
                             lists: ['Min value','Number','Percent'],
                         },
                         {
@@ -103,7 +102,7 @@ export default {
                             value:'',
                             disable:false,
                             type:'None',
-                            color:'#FF0000',
+                            color:'red',
                             lists: ['None','Number','Percent'],
                         },
                         {
@@ -111,13 +110,14 @@ export default {
                             value:'',
                             disable:false,
                             type:'Max value',
-                            color:'#FFFF00',
+                            color:'yellow',
                             lists:['Max value','Number','Percent'],
                         }
                     ],
                     listColors:[]
                 }
             }
+
         },
         listData:[]
     }
@@ -129,19 +129,18 @@ export default {
   methods: {
       changeToConfig(){
           this.typeFormart='config';
-          this.update = false;
       },
        changeToAdd(){
-           this.update = true;
           this.typeFormart='add';
-           this.listData = this.conditionalFormat
+
       },
       changeFormat(data){
           this.$emit('change-format',data);
-          if(data.type == 'edit'){
-               this.typeFormart = 'config';
-                this.data = this.listData[data.index];
+          if(data.type=='edit'){
+               this.typeFormart='config';
+                this.data=this.listData[data.index];
           }
+
       },
       save(){
           this.listData.push(this.data)
