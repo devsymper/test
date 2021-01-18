@@ -13,8 +13,14 @@ const addDatasetAndColumnInDashboard = (state, data) => {
 const setDashboardConfig = (state, data) => {
     Vue.set(state.allDashboard, data.instanceKey, data.data);
 }
+
+const setListColumnInDataset = (state, data) => {
+    Vue.set(state.listColumnInDataset, data);
+
+}
 export {
     setAllWorkflowModel,
     addDatasetAndColumnInDashboard,
-    setDashboardConfig
+    setDashboardConfig,
+    setListColumnInDataset
 };
