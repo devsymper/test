@@ -8,7 +8,7 @@ export const SelectCellRenderer = ()=> {
 
 // init method gets the details of the cell to be renderer
 SelectCellRenderer.prototype.init = function(params) {
-    if(!params.node.rowPinned){
+    if(!params.node.rowPinned && !params.node.group){
         this.eGui = document.createElement('span');
         let value = (params.value) ? params.value : "";
         let control = params.control;
@@ -37,7 +37,9 @@ SelectCellRenderer.prototype.init = function(params) {
             SYMPER_APP.$evtBus.$emit('document-submit-select-input', {
                 e: e,
                 controlName: control.name,
-                rowIndex:[params.rowIndex]
+                rowIndex:[params.rowIndex],
+                type:control.type,
+                isSingleSelect:(control.type == 'select') ? true : false
             })
         } );
     }
