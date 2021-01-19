@@ -243,7 +243,7 @@ export default {
                                 returnObjSearch.type = data.type;
                                 returnObjSearch.id = data.id;
                                 returnObjSearch.actions = data.actions;
-                                returnObjSearch.enable = false;debugger
+                                returnObjSearch.enable = false;
                                 if(data.type!='document_definition'&&data.type!='workflow_definition'&&data.type!='knowledge'){
                                       returnObjSearch.description = data.description?data.description:(data.description==null||data.description==''?"Mô tả đang để trống":"Symper");
                                 }
