@@ -41,6 +41,8 @@
 		<DatasetSelector
 			ref="datasetSelector"
 			v-model="listDatasetSelected"
+			@list-dataset-selected="handlerListDatasetSelected"
+			@cancel="handlerCancelSelectDataset"
 			:tableHeight="tableHeight"
 		/>
 		<RelationSelector
@@ -100,6 +102,12 @@ export default {
         }
     },
     methods: {
+		handlerListDatasetSelected(listDatasetIds){
+			debugger
+		},
+		handlerCancelSelectDataset(listDatasetIds){
+			debugger
+		},
         initDashboardData(){
             let defaultData = getDefaultDashboardConfig();
             let data = {

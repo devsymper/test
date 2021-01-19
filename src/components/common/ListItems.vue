@@ -1411,7 +1411,7 @@ export default {
             this.tableDisplayConfig.value.alwaysShowSidebar = !this.tableDisplayConfig.value.alwaysShowSidebar;
 		},
 		customBtnclick(i){
-			this.$emit('custom-btn-cliced', i)
+			this.customHeaderBtn[i].callBack()
 		},
 		checkShowCreateButton(){
             let rsl = !this.isCompactMode;
