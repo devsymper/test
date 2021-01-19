@@ -222,8 +222,8 @@ export default {
                                      returnObjSearch.description = data.values?description.description:'Chưa điền mô tả';
                                 
                                  }else if(data.type=='workflow_definition'||data.type=="knowledge"){
-                                     returnObjSearch.displayName = data.new?data.new.name:"Không có tên";
-                                     returnObjSearch.description = data.new?data.new.description:'Chưa điền mô tả';
+                                     returnObjSearch.displayName = data.name?data.name:"Không có tên";
+                                     returnObjSearch.description = data.description?data.description:'Chưa điền mô tả';
                                  }
                                 else{
                                      returnObjSearch.displayName = data.name? data.name:"Không có tên";
@@ -243,7 +243,7 @@ export default {
                                 returnObjSearch.type = data.type;
                                 returnObjSearch.id = data.id;
                                 returnObjSearch.actions = data.actions;
-                                returnObjSearch.enable = false;
+                                returnObjSearch.enable = false;debugger
                                 if(data.type!='document_definition'&&data.type!='workflow_definition'&&data.type!='knowledge'){
                                       returnObjSearch.description = data.description?data.description:(data.description==null||data.description==''?"Mô tả đang để trống":"Symper");
                                 }
