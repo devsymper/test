@@ -60,3 +60,14 @@ export const getDefaultDashboardConfig = function(){
         allDatasetColumns: {} // danh sách tất cả các dataset được sử dụng trong dashboard
     }
 }
+export const getDefaultDisplayOption = function() {
+    return {
+        symperTitle: {},
+        general: {},
+        data: [],
+        contentSize: {
+            h: 0,
+            w: 0
+        }
+    };
+}

@@ -1,6 +1,6 @@
 import ReportBase from './ReportBase'
 import ReportGroupConfig from '@/components/dashboard/configPool/reportGroupConfig'
-import {getDefaultDisplayOption} from '@/components/dashboard/configPool/defaultConfig'
+import {getDefaultDisplayOption} from '@/components/dashboard/configPool/dashboardConfigs'
 import {legendConvert, titleConvert , pieDetailLabelConvert, generalConvert } from '@/components/dashboard/configPool/styleConvert'
 
 export default class Pie extends ReportBase {
