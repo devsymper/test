@@ -1164,7 +1164,6 @@ export default {
     created(){
 		let pie = new PieChart()
 		let output = pie.translate(this.testData.rawConfigs, this.testData.sharedConfigs.data)
-		debugger
     },
     methods:{
         addYAxis(newLast){

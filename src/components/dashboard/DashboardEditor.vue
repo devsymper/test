@@ -40,8 +40,9 @@
         </div>
 		<DatasetSelector
 			ref="datasetSelector"
-			v-model="listDatasetSelected"
+			:value="listDatasetSelected"
 			:tableHeight="tableHeight"
+            @change="changeSelectedDatasets"
 		/>
 		<RelationSelector
 			ref="relationSelector"
@@ -100,6 +101,15 @@ export default {
         }
     },
     methods: {
+        async changeSelectedDatasets(datasetIds){
+            this.dashboardEditorWorker.postMessage({
+                action: 'getDatasetInfo',
+                data: datasetIds
+            });
+        },
+        applySelectedDatasets(datasets){
+            this.$refs.datasetDetail.getColumnDataset(datasets);
+        },
         initDashboardData(){
             let defaultData = getDefaultDashboardConfig();
             let data = {

@@ -77,7 +77,6 @@ export default {
 					title: this.$t('common.ok'),
 					icon: 'mdi-check'
 				},
-				
 			},
 			
 		}
