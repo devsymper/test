@@ -84,6 +84,10 @@
                         </v-btn>
                     </div>
                 </div>
+                <div v-if="isShowProcessInstance">
+                    asdjasdji
+                    <DoTask />
+                </div>
             </div> 
         </list-items>
             <ImportExcelPanel
@@ -97,29 +101,35 @@
 
 import ImportExcelPanel from "./../../components/document/ImportExelPanel";
 import { documentApi } from "./../../api/Document.js";
+import bpmnApi from "./../../api/BPMNEngine.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import ActionPanel from "./../../views/users/ActionPanel.vue";
 import ChangePassPanel from "./../../views/users/ChangePass.vue";
 import Submit from './submit/Submit'
 import { util } from "./../../plugins/util.js";
 import { appConfigs } from '../../configs';
+import DoTask from "./../../components/myItem/DoTask";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-
+import { deployProcess, deployProcessFromXML, getLastestDefinition } from "./../../components/process/processAction.js";
 export default {
     components: {
         ImportExcelPanel: ImportExcelPanel,
         "list-items": ListItems,
         "action-panel": ActionPanel,
         'submit-view':Submit,
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
+        DoTask
     },
     data(){
         return {
             sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
             documentId:0,
+            listWorkFollow:[],
             rowActive:null,
+            isShowProcessInstance:false,
             options:{
             },
+            proccessRow:{},
             isDocumentIndex:false,
             allIndexSelected:[],
             listControlInDoc:{},
@@ -307,6 +317,16 @@ export default {
                         
                     },
                 },
+                  startProcess:{
+                    name: "startProcess",
+                    text: "<i class= 'mdi mdi-bike-fast' > </i>&nbsp; Bắt đầu nhanh quy trình",
+                    subMenu: [],
+                    callback: (document, callback) => {
+                        const self = this;
+                        debugger
+                        self.getListWorkFollowName(Number(document.id));
+                    },
+                },
             },
             customAPIResult:{
                  reformatData(data){
@@ -333,6 +353,33 @@ export default {
         }
     },
     methods:{
+        
+        getListWorkFollowName(docId){
+            this.tableContextMenu.startProcess.subMenu=[];
+             const self = this;
+            bpmnApi.getProcessByDocId(docId).then(res=>{
+                if(res.status==200){
+                    res.data.map(data=>{
+                         let row = data;
+                         self.proccessRow = data;
+                        self.tableContextMenu.startProcess.subMenu.push({
+                            name:data.name,
+                            action: async function (row, action){
+                            let defData = await getLastestDefinition(self.proccessRow, true);
+                            if(defData.data[0]){
+                                //  self.$refs.listDocument.openactionPanel();
+                                 self.isShowProcessInstance = true;
+                                self.$goToPage(`/workflow/process-definition/${defData.data[0].id}/run`,'Start process instance');
+                            }else {
+                                self.$snotifyError({},"Can not find process definition having deployment id "+deploymentId);
+                            }
+                        }
+                        })
+                        }
+                    )
+                }
+            })
+        },
         onRemoveIndex(indexs, i, index){
             indexs.splice(i,1);
             if(index.uid){

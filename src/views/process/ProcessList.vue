@@ -102,6 +102,7 @@ export default {
                     name: "start",
                     text: this.$t("process.list.start"),
                     callback: async function (row, callback){
+                        debugger
                         let defData = await getLastestDefinition(row, true);
                         if(defData.data[0]){
                             self.$goToPage(`/workflow/process-definition/${defData.data[0].id}/run`,'Start process instance');

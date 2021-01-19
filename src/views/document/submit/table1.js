@@ -1091,7 +1091,6 @@ export default class SymperTable {
             
         // }
         let rowDatas =  this.getDataByRowIndex(rowIndex);
-        debugger
         this.formulasWorker.postMessage({action:'runFormula',data:
             {
                 formulaInstance:formulaInstance, 

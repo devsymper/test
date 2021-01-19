@@ -551,6 +551,7 @@ export const addMoreInfoToTask = function(task) {
 
 export const getLastestDefinition = function(row, needDeploy = false) {
     return new Promise(async(resolve, reject) => {
+        debugger
         let processKey = row.processKey;
         if (!processKey) {
             let res = await bpmnApi.getModelData(row.id);
