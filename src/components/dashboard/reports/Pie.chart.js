@@ -1,8 +1,8 @@
 import ReportBase from './ReportBase'
 import ReportGroupConfig from '@/components/dashboard/configPool/reportGroupConfig'
 import {getDefaultDisplayOption} from '@/components/dashboard/configPool/dashboardConfigs'
-import {legendConvert, titleConvert , pieDetailLabelConvert, generalConvert } from '@/components/dashboard/configPool/styleConvert'
-
+// import {legendConvert, titleConvert , pieDetailLabelConvert, generalConvert } as converter from '@/components/dashboard/configPool/styleConvert'
+import {StyleConvert} from '@/components/dashboard/configPool/styleConvert'
 export default class Pie extends ReportBase {
     constructor(symperId){
         let columnSettingKeys = ReportGroupConfig.Group3.columnSettingKeys
@@ -59,17 +59,16 @@ export default class Pie extends ReportBase {
 		if(options.style.length > 0){
 			options.style.forEach(function(e){
 				// let converter = e.name+'Convert'
-				// obj[e.name] = eval(converter+'(e.children)')
-				if(e.name == 'legend'){
-					obj[e.name] = legendConvert(e.children)
-				}else if(e.name == 'title'){
-					obj[e.name] = titleConvert(e.children)
-				}else if(e.name == 'pieDetailLabel'){
-					obj[e.name] = pieDetailLabelConvert(e.children)
-				}else if(e.name == 'general'){
-					obj[e.name] = generalConvert(e.children)
-				}
 				debugger
+				obj[e.name] = StyleConvert[e.name+'Convert'](e.children)
+
+				// if(e.name == 'legend'){
+				// 	obj[e.name] = legendConvert(e.children)
+				// }else if(e.name == 'title'){
+				// 	obj[e.name] = titleConvert(e.children)
+				// }else if(e.name == 'pieDetailLabel'){
+				// 	obj[e.name] = pieDetailLabelConvert(e.children)
+				// }
 			})
 		}
 		return obj
