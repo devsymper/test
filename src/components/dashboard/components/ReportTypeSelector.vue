@@ -57,6 +57,7 @@
 		<div>
 			<ColumnConfig 
 				v-if="tabs == 0"
+				:instanceKey="instanceKey"
 				:height="height"
 			/>
 			<StyleConfig 
@@ -90,8 +91,10 @@ export default {
 	},
 	computed:{
 		currentCellConfigsType(){
-			if( this.$store.state.dashboard.allDashboard[this.instanceKey]){
-				return this.$store.state.dashboard.allDashboard[this.instanceKey].currentCellConfigs.sharedConfigs.type
+			let obj = this.$store.state.dashboard.allDashboard[this.instanceKey].currentCellConfigs
+			debugger
+			if(Object.keys(obj).length){
+				return obj.sharedConfigs.type
 			}else{
 				return ''
 			}
