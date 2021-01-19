@@ -1,6 +1,6 @@
 <template>
   <div class="config-settings">
-    <VuePerfectScrollbar :style="{ height: height + 'px' }">
+    <VuePerfectScrollbar :style="{ height: height + 'px' }" v-if="currentCellConfigs.rawConfigs">
       <cell-config-setting-template
         @add-y-axis="addYAxis"
         @change-column-setting="changeColumnSetting"
