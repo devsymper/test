@@ -7,4 +7,8 @@ export default class StackedBar extends ReportBase {
         let styleKeys = ReportGroupConfig.Group1.styleKeys
         super('stackedBar', symperId, columnSettingKeys, styleKeys);
     }
+    
+    translate(rawConfig,  data, changes = {}, oldOutput = {}){
+        
+    }
 }
