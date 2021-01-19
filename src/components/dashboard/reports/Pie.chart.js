@@ -10,7 +10,7 @@ export default class Pie extends ReportBase {
         super('pie', symperId, columnSettingKeys, styleKeys);
     }
 
-    translate(rawConfig,  data, changes = {}, oldOutput = {}){
+    translate(rawConfig,  data, extraData ,changes = {}, oldOutput = {}){
 		let defConfig = getDefaultDisplayOption()
 		defConfig.series = this.convertSeries(rawConfig, data)
 		let styleConvert = this.convertStyle(rawConfig)
@@ -66,6 +66,8 @@ export default class Pie extends ReportBase {
 					obj[e.name] = titleConvert(e.children)
 				}else if(e.name == 'pieDetailLabel'){
 					obj[e.name] = pieDetailLabelConvert(e.children)
+				}else if(e.name == 'general'){
+					obj[e.name] = generalConvert(e.children)
 				}
 				debugger
 			})

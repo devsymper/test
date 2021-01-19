@@ -63,3 +63,4 @@ export const pieDetailLabelConvert = function(obj){
 	 let general = {}
 	 return general
  }
+ 
