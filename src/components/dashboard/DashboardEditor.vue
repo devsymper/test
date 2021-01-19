@@ -40,7 +40,9 @@
         </div>
 		<DatasetSelector
 			ref="datasetSelector"
-			:value="listDatasetSelected"
+			v-model="listDatasetSelected"
+			@list-dataset-selected="handlerListDatasetSelected"
+			@cancel="handlerCancelSelectDataset"
 			:tableHeight="tableHeight"
             @change="changeSelectedDatasets"
 		/>
@@ -101,7 +103,7 @@ export default {
         }
     },
     methods: {
-        async changeSelectedDatasets(datasetIds){
+        changeSelectedDatasets(datasetIds){
             this.dashboardEditorWorker.postMessage({
                 action: 'getDatasetInfo',
                 data: datasetIds
@@ -110,6 +112,12 @@ export default {
         applySelectedDatasets(datasets){
             this.$refs.datasetDetail.getColumnDataset(datasets);
         },
+		handlerListDatasetSelected(listDatasetIds){
+			debugger
+		},
+		handlerCancelSelectDataset(listDatasetIds){
+			debugger
+		},
         initDashboardData(){
             let defaultData = getDefaultDashboardConfig();
             let data = {

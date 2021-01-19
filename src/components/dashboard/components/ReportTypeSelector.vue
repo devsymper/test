@@ -166,7 +166,6 @@ export default {
 		let titleHeight = $(document.getElementsByClassName('title-all-chart-types')).height()
 		let allChartSelectorHeight = $(document.getElementsByClassName('all-chart-types')).height()
 		this.height = util.getComponentSize(this).h - titleHeight - allChartSelectorHeight - 100;
-		this.currentCellConfigs
 	}
 }
 </script>
