@@ -8,9 +8,9 @@ export default class Pie extends ReportBase {
         super('pie', symperId, columnSettingKeys, styleKeys);
     }
 
-    translate(rawConfig,  data, changes = {}, oldOutput = {}){
-		debugger
+    translate(rawConfig,  data, extraData, changes = {}, oldOutput = {}){
+      debugger
 
-		return {}
+      return {}
     }
 }

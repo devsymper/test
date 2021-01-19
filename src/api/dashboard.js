@@ -24,5 +24,8 @@ export const dashboardApi = {
 	},
 	getDashboardInfo(id){
 		return api.get(appConfigs.apiDomain.biService+'dashboards/' + id);
+	},
+	getData(options){
+		return api.post(`${appConfigs.apiDomain.biService}report-get-data`, options, {}, {contentType: 'application/json'});
 	}
 };

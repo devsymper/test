@@ -144,9 +144,9 @@ export default class ReportBase {
     /**
      * Hàm chuyển đổi từ cấu hình của Symper sang cấu hình của thư viện được sử dụng 
      */
-    async translate(){
+    // async translate(){
 
-    }
+    // }
     
 
     /**
@@ -192,5 +192,63 @@ export default class ReportBase {
      */
     restoreConfigFromSavedData(cell){
         this.restoreByDefault(cell);
+    }
+
+    assignComputedAttrsValue(attr){
+        for(let key in attr){
+            this[key] = attr[key];
+        }
+    }
+
+    
+    getStyleItemsInConfig(st, sizeUnit = '', ratio) {
+        let rsl = {
+            textOutline: '0px',
+            display: st.show === undefined ? '' : (st.show.value ? '' : 'none'),
+            backgroundColor: st.bgColor ? st.bgColor.value : '',
+            color: st.fontColor ? st.fontColor.value : '',
+            fontFamily: st.fontFamily ? st.fontFamily.value : 'roboto',
+            fontSize: ((st.textSize ? st.textSize.value : 13) * ratio) + sizeUnit,
+            textAlign: st.alignment ? st.alignment.value : '',
+            borderBottomWidth: st.borderBottomWidth ? (st.borderBottomWidth.value + sizeUnit) : '',
+            borderWidth: st.borderWidth ? (st.borderWidth.value + sizeUnit) : '',
+        }
+
+        if (st.borderBottomColor && st.borderBottomColor.value) {
+            rsl.borderBottomColor = st.borderBottomColor.value;
+        }
+
+        if (st.borderColor && st.borderColor.value) {
+            rsl.borderColor = st.borderColor.value;
+        }
+
+        return rsl;
+    }
+
+    
+    /**
+     * Dịch các thông tin chung của tất cả các cell thành dạng css
+     * @param {Object} commonAttr Object chứa thông tin về các thuộc tính chung của cell, 
+     * trùng với các thông tin ở hàm  getCommonAttr() trong file getAtyleAttesFuncs
+     */
+    getCommonCellStyleAttr(commonAttr, ratio) {
+        return {
+            general: this.getStyleItemsInConfig(commonAttr.general.children, 'px', ratio),
+            symperTitle: {
+                text: commonAttr.title.children.titleText.value,
+                style: this.getStyleItemsInConfig(commonAttr.title.children, 'px', ratio)
+            }
+        };
+    }
+
+    
+    getZeroValueDisplay(style) {
+        let zeroValueDisplay = style.cellFormat.children.zeroValueDisplay.value;
+        if (zeroValueDisplay == 'blank') {
+            zeroValueDisplay = '';
+        } else if (zeroValueDisplay == 'original') {
+            zeroValueDisplay = 0;
+        }
+        return zeroValueDisplay;
     }
 }
