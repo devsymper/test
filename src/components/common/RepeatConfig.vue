@@ -28,7 +28,7 @@
 					'vertical-align': 'top',
 				}"
             ></v-select>
-            <div class="form__no-loop">
+            <!-- <div class="form__no-loop">
                 <v-checkbox
                 hide-details
                 v-model="checkNoLoop"
@@ -40,7 +40,7 @@
                 }"
                 ></v-checkbox>
                 <span class="title-form" style="color:#717171;font-weight:unset">* Service chỉ chạy 1 lần nếu không cấu hình lặp lại</span>
-            </div>
+            </div> -->
             <div class="btn-review-repeat">
                 <button v-on:click="previewRepeatTime">
                     <v-icon>mdi-calendar-check</v-icon>
@@ -65,25 +65,24 @@
             <!-- minutes -->
             <div  v-if="selectedType.type=='secondly'" class="mt-4">
                <div class="w-100 ml-4">
-					<v-checkbox 
-						dense
-						v-model="allMinutes"
-					
-						label="Mỗi phút"
-						color="success darken-3">
-					</v-checkbox>
+                    <v-checkbox 
+                        dense
+                        v-model="allMinutes"
+                        label="Mỗi phút"
+                        color="success darken-3">
+                </v-checkbox>
                </div>
-					<v-checkbox 
-						dense
-						v-for="second in minutes" 
-						:key="second.name"  class="ml-4"
-						v-model="second.value"
-						style="float:left; margin-top:-15px; margin-left:-10px" 
-						:label="`${second.name}`"
-						color="success darken-3">
-						<template >
-						</template>
-					</v-checkbox>
+                <v-checkbox v-if="!allMinutes"
+                    dense
+                    v-for="second in minutes" 
+                    :key="second.name"  class="ml-4"
+                    v-model="second.value"
+                    style="float:left; margin-top:-15px; margin-left:-10px" 
+                    :label="`${second.name}`"
+                    color="success darken-3">
+                 <template >
+                 </template>
+                </v-checkbox>
             </div>
             <!-- minutes -->
               <div  v-if="selectedType.type=='hourly'" class="mt-4">
@@ -95,7 +94,7 @@
                     color="success darken-3">
                 </v-checkbox>
                </div>
-                <v-checkbox class="ml-4" 
+                <v-checkbox class="ml-4" v-if="!allHour"
                     style="float:left; margin-top:-15px; margin-left:-10px" 
                     :key="hour.name" 
                     v-for="hour in hour"
@@ -621,14 +620,16 @@ export default {
             }
         },
         allHour(){
-            let crontab = '0 * 0 ? * * *';
+            let crontab = '0 0 * ? * * *';
             this.crobTabValue = crontab.split(' ');
             this.$emit('value',this.crobTabValue)
         },
         allMinutes(){
-            let crontab= '0 0 * ? * * *'
-            this.crobTabValue = crontab.split(' ');
-            this.$emit('value',this.crobTabValue)
+            if(this.allMinutes){
+                 let crontab= '0 * * ? * *'
+                this.crobTabValue = crontab.split(' ');
+                this.$emit('value',this.crobTabValue)
+            }
         },
         cronTab(){
             this.cronTabValue= this.cronTab.split(' ')
@@ -648,12 +649,15 @@ export default {
             deep: true,
             immediate: true,
             handler(newValue){
+                
                 let value = '';
                 for(let i = 0; i<newValue.length;i++){
                     if(newValue[i].value){
                         value+=Number(newValue[i].name)+",";
+                        
                     }
                 }
+                this.crobTabValue[1]= 0;
                 this.crobTabValue[2]=value!=''?(value.substring(0, value.length - 1)):'*';
                 this.$emit('value',this.crobTabValue)
             }
