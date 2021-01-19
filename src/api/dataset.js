@@ -5,8 +5,6 @@ let api = new Api(appConfigs.apiDomain.biService);
 
 export const datasetApi = {
     getListByFilter(filter){
-        filter = new URLSearchParams(filter);
-        let url = `${biUrl}datasets/get-list?${filter}`;
-        return api.get(url);
+        return api.get(`${appConfigs.apiDomain.biService}datasets/get-list`, filter);
     }
 }

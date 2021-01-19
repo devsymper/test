@@ -31,6 +31,7 @@
             <DashboardDasetDetail
                 ref="datasetDetail"
                 class="h-100"
+                :instanceKey="instanceKey"
 				@show-dataset-selector="toggleDatasetDialog"
 				@show-relation-selector="toggleRelationDialog"
                 :style="{
@@ -41,10 +42,9 @@
 		<DatasetSelector
 			ref="datasetSelector"
 			v-model="listDatasetSelected"
-			@list-dataset-selected="handlerListDatasetSelected"
+			@list-dataset-selected="changeSelectedDatasets"
 			@cancel="handlerCancelSelectDataset"
 			:tableHeight="tableHeight"
-            @change="changeSelectedDatasets"
 		/>
 		<RelationSelector
 			ref="relationSelector"
@@ -104,6 +104,8 @@ export default {
     },
     methods: {
         changeSelectedDatasets(datasetIds){
+            
+            this.listDatasetSelected = datasetIds;
             this.dashboardEditorWorker.postMessage({
                 action: 'getDatasetInfo',
                 data: datasetIds
@@ -112,9 +114,8 @@ export default {
         applySelectedDatasets(datasets){
             this.$refs.datasetDetail.getColumnDataset(datasets);
         },
-		handlerListDatasetSelected(listDatasetIds){
-		},
 		handlerCancelSelectDataset(listDatasetIds){
+			this.listDatasetSelected = listDatasetIds;
 		},
         initDashboardData(){
             let defaultData = getDefaultDashboardConfig();
@@ -140,13 +141,13 @@ export default {
             }
         },
         setRestoredDashboardConfigs(data){
-            this.listDatasetSelected = data.relateDatasetIds;
+            
+            this.changeSelectedDatasets(data.relateDatasetIds);
             this.$set(
                 this.myData.dashboardConfigs,
                 'allCellConfigs',
                 data.allCellConfigs
             );
-
             this.$set(
                 this.myData.dashboardConfigs,
                 'info',
