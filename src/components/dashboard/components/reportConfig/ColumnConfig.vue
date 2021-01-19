@@ -1,23 +1,31 @@
 <template>
-    <div class="config-settings" >
-        <cell-config-setting-template 
-            @add-y-axis="addYAxis" 
-            @change-column-setting="changeColumnSetting" 
-            v-for="(item,settingName) in settings" 
-            :key="settingName" 
-            :settingItem="item" 
-            :selectedCell="selectedCell"
-            :settingTplAgg="settingTplAgg"> 
-        </cell-config-setting-template>
-    </div>
+	<div class="config-settings" >
+		<VuePerfectScrollbar 
+			:style="{height: height + 'px'}" 
+			v-if="currentCellConfigs.rawConfigs"
+		>
+			<cell-config-setting-template 
+				@add-y-axis="addYAxis" 
+				@change-column-setting="changeColumnSetting" 
+				v-for="(item,settingName) in currentCellConfigs.rawConfigs.setting" 
+				:key="settingName" 
+				:settingItem="item" 
+				:selectedCell="currentCellConfigs"
+				:settingTplAgg="settingTplAgg"> 
+			</cell-config-setting-template>
+		</VuePerfectScrollbar>
+	</div>
 </template>
 <script> 
 import CellConfigSettingTemplate from '@/components/dashboard/components/reportConfig/CellConfigSettingTemplate';
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import settingTplAgg from '@/components/dashboard/configPool/settingTplAgg';
+import PieChart from '@/components/dashboard/reports/Pie.chart.js'
 
 export default {
     components:{
-        'CellConfigSettingTemplate': CellConfigSettingTemplate
+		'CellConfigSettingTemplate': CellConfigSettingTemplate,
+		VuePerfectScrollbar
     },
 	props:{
 		selectedCell:{
@@ -1135,20 +1143,20 @@ export default {
 				}
 			}
 		},
-		settings:{
-			type: Object,
-			default(){
-				return 	{
-					"xAxis":{"name":"X Axis","slot":"n","selectedColums":[{"as":"ASSIGNEE","agg":"first","cond":{"val":"","type":"isall"},"edit":false,"name":"assignee","type":"text","dataset":"3665","origin_type":"text"}]},
-					"legend":{"name":"Legend","slot":"1","selectedColums":[]},
-					"tooltips":{"name":"Tooltips","slot":"n","hasAgg":true,"selectedColums":[]},
-					"yAxis1":{"name":"Y Axis 1","slot":"1","hasAgg":true,"lastYaxis":1,"selectedColums":[{"as":"Tổng thời gian KH","agg":"sum","cond":{"val":"","type":"isall"},"edit":false,"name":"tong_tg","type":"number","dataset":"3665","yAxisNum":0,"origin_type":"number"},{"as":"Tổng thời gian TT","agg":"sum","cond":{"val":"","type":"isall"},"edit":false,"name":"tong_tg_tt","type":"number","dataset":"3665","yAxisNum":0,"origin_type":"number"}]},
-					"yAxis2":{"name":"Y Axis 2","slot":"1","hasAgg":true,"lastYaxis":1,"selectedColums":[]}
-				}
-			}
-		}
+		instanceKey:{
+			type: Number,
+			default: 0
+		},
+		height:{
+			type: Number,
+			default: 0
+		},
 	},
     created(){
+		let pie = new PieChart()
+		if(this.currentCellConfigs.sharedConfigs){
+			let output = pie.translate(this.currentCellConfigs.rawConfigs, this.currentCellConfigs.sharedConfigs.data)
+		}
     },
     methods:{
         addYAxis(newLast){
@@ -1161,11 +1169,7 @@ export default {
             delete this.settingItems.tooltips;
             this.$set(this.settingItems,'yAxis'+newLast,newYAxis);
             this.$set(this.settingItems,'tooltips',tooltips);
-
-            
             for(let name in this.settingItems){
-                
-                
                 if(name.includes('yAxis')){
                     this.settingItems[name].lastYaxis = newLast;
                 }
@@ -1178,11 +1182,16 @@ export default {
     },
     data() {
         return {
-            cpnType:'config_setting',
+            cpnType: 'config_setting',
             settingItems:{},
-            settingTplAgg:settingTplAgg
+			settingTplAgg: settingTplAgg,
         }    
-    }
+	},
+	computed:{
+		currentCellConfigs(){
+			return this.$store.state.dashboard.allDashboard[this.instanceKey].currentCellConfigs
+		}
+	}
 }
 </script>
 <style scoped>

@@ -188,7 +188,12 @@
             }
         },
         watch:{
-            
+            selectedCell:{
+				deep: true,
+				immediate: true,
+				handler(arr){
+				}
+			}
         },
         computed:{
         },
@@ -257,7 +262,6 @@
                 return 'column-item-setting d-flex align-center';
             },
             showSelectAxisType(settingItem){
-				return true
                 if(this.selectedCell.sharedConfigs.type.includes('lineAnd') && settingItem.name.includes('Y Axis')){
                     return true;
                 }
@@ -290,7 +294,7 @@
 		/* margin-top: -36px !important; */
 	}
     .setting-sub-items {
-        margin: 2px 5px 5px 5px;
+        margin: -4px 5px 5px 5px;
         padding: 5px 5px;
         border: 1px dashed #eaeaea;
         border-radius: 5px;

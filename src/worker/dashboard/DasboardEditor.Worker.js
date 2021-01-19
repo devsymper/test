@@ -3,6 +3,9 @@ import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportCo
 import { getDefaultDashboardConfig } from "@/components/dashboard/configPool/dashboardConfigs.js";
 import _cloneDeep from 'lodash/cloneDeep';
 import { getNewCellConfigLayout } from "@/components/dashboard/configPool/cellLayout";
+import { appConfigs } from "@/configs.js";
+import { datasetApi } from "../../api/dataset";
+
 var mapTypeToClass = autoLoadChartClasses();
 
 onmessage = function (event) {
@@ -118,6 +121,27 @@ var handler = {
         return result;
     },
     
+    async getDatasetInfo(datasetIds){
+        let filter = {
+            filter: [
+                {
+                    column: 'id',
+                    operation: 'and',
+                    conditions: [{
+                        name: 'in',
+                        value: datasetIds
+                    }]
+                }
+            ],
+            page: 1,
+            pageSize: 500
+        }
+        let res = await datasetApi.getListByFilter(filter);
+        self.postMessage({
+            action: 'applySelectedDatasets',
+            data: res.data.listObject
+        });
+    },
     async getDashboardInfo(data){
         let idDashboard = data.idDashboard;
         let response = await dashboardApi.getDashboardInfo(idDashboard);
@@ -130,8 +154,7 @@ var handler = {
                 needRemoteDataCellCount += 1;
             }
         }
-        let relateDatasetIds = [];
-        response.data.dashboard.relateDatasets.reduce((arr, el) =>{
+        let relateDatasetIds = response.data.dashboard.relateDatasets.reduce((arr, el) =>{
             arr.push(el.id);
             return arr;
         }, []);

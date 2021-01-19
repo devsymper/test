@@ -17,7 +17,6 @@
 			@after-selected-row="changeDatasetSelected"
 			:checkedRows="checkedRows"
 			:customHeaderBtn="customHeaderBtn"
-			@custom-btn-cliced="handlerCustomBtnClick"
 		/>
 	</v-dialog>
 </template>
@@ -25,6 +24,7 @@
 <script>
 import ListItem from "@/components/common/ListItems"
 import { appConfigs } from "@/configs.js";
+import { util } from '@/plugins/util';
 
 export default {
 	components:{
@@ -42,10 +42,16 @@ export default {
 			default: 0
 		}
 	},
+	created(){
+		this.setOriginValue(this.value);
+	},
+	
 	data(){
 		let self = this
 		return{
+			internalChange: false,
 			showDialog: false,
+			originDatasetIds:[],
 			checkedRows: [],
 			getDataUrl: appConfigs.apiDomain.biService +"datasets/get-list",
 			customAPIResult:{
@@ -53,6 +59,7 @@ export default {
 					res.data.columns.forEach(function(e){
 						e.flex = 1
 					})
+
 					res.data.listObject.forEach(function(e){
 						if(self.value.includes(e.id)){
 							e.checked = true
@@ -70,13 +77,20 @@ export default {
 			customHeaderBtn:{
 				cancel:{
 					title: this.$t('common.cancel'),
-					icon: 'mdi-close'
+					icon: 'mdi-close',
+					callBack(){
+						self.showDialog = false
+						self.$emit("cancel", self.originDatasetIds)
+					}
 				},
 				select:{
 					title: this.$t('common.ok'),
-					icon: 'mdi-check'
+					icon: 'mdi-check',
+					callBack(){
+						self.showDialog = false
+						self.$emit('list-dataset-selected', self.value)
+					}
 				},
-				
 			},
 			
 		}
@@ -85,18 +99,16 @@ export default {
 		show(){
 			this.showDialog = true
 		},
-		handlerCustomBtnClick(i){
-			this.$set(this, 'showDialog', false)
-			if(this[i]){
-				this[i]()
-			}
-		},
 		changeDatasetSelected(data){
 			let arr = []
 			data.forEach(function(e){
 				arr.push(e.id)
 			})
+			this.internalChange = true;
 			this.$emit('input', arr)
+			setTimeout((self) => {
+				self.internalChange = false;
+			}, 0, this);
 		},
 		addCheckboxColumn(){
 			setTimeout(self=>{
@@ -106,9 +118,19 @@ export default {
 		select(){
 			this.$emit('list-dataset-selected' , this.listDatasetSelected)
 		},
+		setOriginValue(value){
+			this.originDatasetIds = util.cloneDeep(value)
+		}
 	},
 	watch:{
-		
+		value: {
+			deep: true,
+			handler(newValue){
+				if(!this.internalChange){
+					this.setOriginValue(newValue);
+				}
+			}
+		}
 	}
 }
 </script>

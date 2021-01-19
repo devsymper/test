@@ -14,9 +14,10 @@
             style="width: inherit"
         ></v-text-field>
 		<preloader 
-		v-if="loadding"
-		style="height:100px!important;width:185px"
-		class="mx-auto" />
+			v-if="loadding"
+			style="height:100px!important;width:185px"
+			class="mx-auto"
+		/>
 		<VuePerfectScrollbar v-else style="height:calc(100% - 44px)">
 			<template>
 				<v-expansion-panels
@@ -52,15 +53,12 @@
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import FormTpl from "@/components/common/FormTpl.vue";
 import DashboardStyleConfig from 'worker-loader!@/worker/dashboard/dashboard/DashboardStyleConfig.Worker.js';
-// import ColorPalette from '../../../common/bi/ColorPalette.vue';
 export default {
 	components:{
 		VuePerfectScrollbar,
 		FormTpl,
-		// ColorPalette,
 	},
 	computed:{
-	// return this.$store.state.dashboard.allDashboard[this.instanceKey].currentCellConfigs.rawConfigs.style;
 	},
 	data(){
 		return{

@@ -222,17 +222,16 @@ const setDataInputBeforeChange = function(instance, controlInstance, rowIndex = 
         let controlChangeIns = listInputInDocument[controlName];
         if(controlChangeIns.inTable){
             let tableControl = listInputInDocument[controlChangeIns.inTable];
-            let hotTb = tableControl.tableInstance.tableInstance;
-            let colIndex = hotTb.propToCol(controlChangeIns.name);
+            let tableIns = tableControl.tableInstance;
             if(rowIndex != null){
-                let cellData = hotTb.getDataAtCell(rowIndex, colIndex);
+                let cellData = tableIns.getCellData(controlName, rowIndex);
                 if(controlName == controlInstance.name){
                     cellData = oldCellData;
                 }
                 dataInputBeforeChange[controlName] = cellData
             }
             else{
-                let colData = hotTb.getDataAtCol(colIndex);
+                let colData = tableIns.getColData(controlName);
                 dataInputBeforeChange[controlName] = colData
             }
         }

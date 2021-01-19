@@ -1,6 +1,6 @@
 <template>
 	<div class="symper-report-type-selector h-100 d-flex flex-column">
-		<div class="mt-2 mb-2 ml-1">
+		<div class="mt-2 mb-2 ml-1 title-all-chart-types">
 			<v-btn 
 				icon
 				tile
@@ -11,17 +11,18 @@
 					mdi-chevron-right
 				</v-icon>
 			</v-btn>
-			<span class="mt-1" style="font-size: 18px !important">
+			<span class="mt-1 font-weight-bold" style="font-size: 13px !important">
 				{{$t('bi.dashboard.title-visualization')}}
 			</span>
 		</div>
-		<div>
-			<span v-for="(item , i ) in chartConfigs" :key="i">
+		<div class="all-chart-types">
+			<span v-for="(item , i ) in chartConfigs" :key="i" >
 				<img 
 					:title="i" 
 					:src="'img/dashboard/report-builder/'+i+'.png'" 
 					@click="selectCellType(i)"
 					class="report-type-img" 
+					:class="{'selected-report-type':i == currentCellConfigsType }"
 					height="32px" 
 					width="32px" 
 				>
@@ -56,12 +57,16 @@
 		<div>
 			<ColumnConfig 
 				v-if="tabs == 0"
+				:instanceKey="instanceKey"
+				:height="height"
 			/>
 			<StyleConfig 
 				v-if="tabs == 1"
+				:height="height"
 			/>
 			<ConditionConfig 
 				v-if="tabs == 2"
+				:height="height"
 			/>
 		</div>
 	</div>
@@ -71,11 +76,27 @@
 import ColumnConfig from "@/components/dashboard/components/reportConfig/ColumnConfig"
 import ConditionConfig from "@/components/dashboard/components/reportConfig/ConditionConfig"
 import StyleConfig from "@/components/dashboard/components/reportConfig/StyleConfig"
+import { util } from '@/plugins/util.js';
 
 export default {
 	props:{
 		showReportConfig:{
 			type: Boolean,
+		},
+		instanceKey:{
+			type: Number,
+			default: 0
+		}
+
+	},
+	computed:{
+		currentCellConfigsType(){
+			let obj = this.$store.state.dashboard.allDashboard[this.instanceKey].currentCellConfigs
+			if(Object.keys(obj).length){
+				return obj.sharedConfigs.type
+			}else{
+				return ''
+			}
 		}
 	},
 	components:{
@@ -104,7 +125,6 @@ export default {
 			chartConfigs:{
 				area:{},
 				card:{},
-				donut:{},
 				editor:{},
 				clusteredBar:{},
 				clusteredColumn:{},
@@ -114,6 +134,7 @@ export default {
 				lineAndClusteredColumn:{},
 				lineAndStackedColumn:{},
 				pie:{},
+				donut:{},
 				pivot:{},
 				stackedArea:{},
 				stackedBar:{},
@@ -140,6 +161,11 @@ export default {
 		collapse(){
 			this.$emit('collapse-report-config')
 		}
+	},
+	mounted(){
+		let titleHeight = $(document.getElementsByClassName('title-all-chart-types')).height()
+		let allChartSelectorHeight = $(document.getElementsByClassName('all-chart-types')).height()
+		this.height = util.getComponentSize(this).h - titleHeight - allChartSelectorHeight - 100;
 	}
 }
 </script>
@@ -164,9 +190,13 @@ export default {
 .report-type-img{
 	margin: 2px;
 	padding: 6px;
+	cursor: pointer;
 }
 .report-type-img:hover{
 	border-radius: 2px;
 	background-color: lightgray;
+}
+.selected-report-type{
+	background-color: #FEEDE1;
 }
 </style>

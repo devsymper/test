@@ -9,6 +9,8 @@ export default class Pie extends ReportBase {
     }
 
     translate(rawConfig,  data, changes = {}, oldOutput = {}){
-        
+		debugger
+
+		return {}
     }
 }
