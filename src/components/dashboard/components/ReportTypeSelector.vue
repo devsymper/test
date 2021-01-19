@@ -65,6 +65,7 @@
 				:height="height"
 			/>
 			<ConditionConfig 
+				:instanceKey="instanceKey"
 				v-if="tabs == 2"
 				:height="height"
 			/>
