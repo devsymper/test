@@ -7,7 +7,6 @@
                 <v-icon @click="showDatasetSelector" class="float-right fs-16 mx-3">mdi-database</v-icon>
                 <v-icon @click="showRelationSelector" class="float-right fs-16" >mdi-relation-zero-or-one-to-one-or-many</v-icon>
             </div>
-           
         </div>
         <v-text-field
             v-on:input="onSearch($event)"
@@ -133,6 +132,7 @@ export default {
             openedPanelParent:[],
             openedPanelChild:[],
             search:"",
+            dataSetTest :[{"id":"2833","name":"x_sgcnl","type":"doc","uid":null,"status":null,"id_database":null,"alias_name":"[BM.10.02] SỔ G.CA BP GCNL","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"1747","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"[BM.10.02] SỔ G.CA BP GCNL"},{"id":"2865","name":"x_bcsx_ngay","type":"doc","uid":null,"status":null,"id_database":null,"alias_name":"VID-BCSX NGÀY","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"1787","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"VID-BCSX NGÀY"},{"id":"2891","name":"lk_bcsxnl_th","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxnl_th","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxnl_th"},{"id":"2892","name":"lk_bcsxnl_na","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxnl_na","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxnl_na"},{"id":"2893","name":"lk_bcsxth_na","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxth_na","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxth_na"},{"id":"2894","name":"lk_bcsxth_th","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxth_th","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxth_th"},{"id":"2895","name":"lk_bcsxln_na","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxln_na","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxln_na"},{"id":"2896","name":"lk_bcsxln_th","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxln_th","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxln_th"},{"id":"2897","name":"lk_bcsxm_th","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxm_th","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxm_th"},{"id":"2898","name":"lk_bcsxm_na","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxm_na","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxm_na"},{"id":"2899","name":"lk_bcsxsp_th","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"lk_bcsxsp_th","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"lk_bcsxsp_th"},{"id":"3347","name":"sgcth1","type":"dataset_by_dataflow","uid":null,"status":null,"id_database":null,"alias_name":"sgcth1","generated_sql":null,"created_at":null,"updated_at":null,"symper_id":"0","table_name":null,"id_parent":null,"list_foreign_key":[],"title":"sgcth1"}]
         }
     },
     methods:{
@@ -241,6 +241,25 @@ export default {
                 }
             });
         },
+        getColumnDataset(listDataset){
+            this.dashboardDatasetWorker.postMessage({
+				action: 'getColumnDataset',
+				data:{
+                    listDataset: listDataset,
+                    listColumnInDataset: this.$store.state.dashboard.listColumnInDataset
+				}
+            });
+        },
+        postGetColumnDatasetAfter(data){
+            let dataPos = {};
+            dataPos.key = this.instanceKey;
+            dataPos.data = data.datasetAndColumn;
+            this.$store.commit("dashboard/addDatasetAndColumnInDashboard",dataPos);
+
+            let listColumnInDataset = data.listColumnInDataset;
+            this.$store.commit("dashboard/setListColumnInDataset",listColumnInDataset);
+
+        }
     },
     created(){
         this.dashboardDatasetWorker = new DashboardDatasetWorker();
