@@ -59,6 +59,7 @@
 						v-if="condColumn.type == 'number'" 
 						class="mt-2"
 						small 
+						solo
 						:placeholder="$t('common.inputPlaceholder')" 
 						v-model="condColumn.cond.val"
 					>
@@ -118,7 +119,7 @@ export default {
         },
         idx: {
             default: 0
-        }
+        },
 	},
     methods: {
         handleChangeValue(){

@@ -14,6 +14,10 @@ const setDashboardConfig = (state, data) => {
     Vue.set(state.allDashboard, data.instanceKey, data.data);
 }
 
+const setListColumnInDataset = (state, data) => {
+    Vue.set(state.listColumnInDataset, data);
+
+}
 const disSelectCurrentCell = (state, instanceKey) => {
     let viewConfigs = state.allDashboard[instanceKey].currentCellConfigs.viewConfigs;
     if(viewConfigs){
@@ -34,5 +38,6 @@ export {
     setSelectedCell,
     setAllWorkflowModel,
     addDatasetAndColumnInDashboard,
-    setDashboardConfig
+    setDashboardConfig,
+    setListColumnInDataset
 };

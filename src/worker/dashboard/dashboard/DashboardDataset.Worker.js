@@ -1,5 +1,4 @@
-import { dashboardApi } from "@/api/dashboard.js";
-
+import { biApi } from "@/api/bi.js";
 onmessage = function (event) {
     let data = event.data;
     let action = data.action;
@@ -11,6 +10,75 @@ onmessage = function (event) {
 };
 
 var handler = {
+    async getColumnDataset(data){
+        let listDataset = data.listDataset;
+        let listColumnInDataset = data.listColumnInDataset;
+        let arrIds = [];
+        let str = "";
+        if (listDataset.length > 0) {
+            for (let i = 0; i < listDataset.length; i++) {
+                let datasetId = listDataset[i].id;
+                if (!listColumnInDataset.columns[datasetId]) {
+                    arrIds.push(datasetId);
+                    str += datasetId+",";
+                }  
+            }
+        }
+
+        if (str.length > 0) { // call api get list column in dataset
+            str = str.substring(0, str.length-1);
+            let res = await biApi.getColumnWithDatasetIds(str)
+            if(res['status'] == 200 && res['data']){
+                if (res['data'].columns) {
+                    listColumnInDataset.columns = Object.assign(listColumnInDataset.columns, res['data'].columns);
+                    listColumnInDataset.subDatasets = Object.assign(listColumnInDataset.subDatasets, res['data'].subDatasets);
+                }
+            }
+        }
+        let datasetAndColumn = this.mapDataToDatasetAndColumn(listDataset,listColumnInDataset);
+        self.postMessage({action:'postGetColumnDatasetAfter', data :{datasetAndColumn: datasetAndColumn,listColumnInDataset: listColumnInDataset}});
+   
+    },
+    mapDataToDatasetAndColumn(datasets,listColumnInDataset){
+        let datasetAndColumn = {};
+
+        for(let dts of datasets){
+            dts.title = dts.alias_name?dts.alias_name:dts.name;
+            dts.show = true;
+            dts.subDatasetIds = [];
+            dts.isSelected = false;
+            dts.columns = listColumnInDataset.columns[dts.id];
+            for(let cl of dts.columns){
+                cl.show = true;
+                cl.isSelected = false;
+            }
+            if (listColumnInDataset.subDatasets.length > 0) {
+                let subDatasets = listColumnInDataset.subDatasets.filter(item=>{
+                    return item.id_parent == dts.id;
+                });
+                if (subDatasets.length > 0) {
+                    for (let i = 0; i < subDatasets.length; i++) {
+                        subDatasets[i].show = true;
+                        subDatasets[i].isSubDataset = true;
+                        subDatasets[i].title = subDatasets[i].alias_name?subDatasets[i].alias_name:subDatasets[i].name;
+                        subDatasets[i].isSelected = false;
+
+                        dts.subDatasetIds.push(subDatasets[i].id);
+                        datasetAndColumn[subDatasets[i].id] = subDatasets[i];
+                        datasetAndColumn[subDatasets[i].id].columns = listColumnInDataset.columns[subDatasets[i].id];
+                        for(let clSub of datasetAndColumn[subDatasets[i].id].columns){
+                            clSub.show = true;
+                            clSub.isSelected = false;
+                        }
+                    }
+                }
+            }
+            datasetAndColumn[dts.id] = dts;
+             
+        }
+     
+        return datasetAndColumn;
+    },
     postSelectedDatasetBefor(data){
         let selectedDataset = data.selectedDataset;
         let datasetAndColumn = data.datasetAndColumn;

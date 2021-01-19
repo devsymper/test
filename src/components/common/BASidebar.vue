@@ -162,7 +162,7 @@
                     </v-list-item-subtitle>
                 </v-list-item-content>
             </v-list-item>
-            <VuePerfectScrollbar :style="{height: menuItemsHeight} " v-show="!sapp.collapseSideBar">
+            <VuePerfectScrollbar :style="{height: menuItemsHeight}" v-show="!sapp.collapseSideBar">
                 <div class="pr-2">
                     <v-list :expand="true">
                     <v-list-group
