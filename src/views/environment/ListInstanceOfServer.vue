@@ -82,7 +82,8 @@ export default {
 				reformatData(res){
 					let listBA = self.$store.state.app.allBA;
 					res.data.forEach(function(e){
-						e.domainName = e.environmentIdentifier + '.' + e.serviceIdentifier+'.symper.vn' 
+						let prefix = e.environmentIdentifier ? e.environmentIdentifier + '.' : ""
+						e.domainName =  prefix + e.serviceIdentifier+'.symper.vn' 
 						if(!e.userCreate){
 							e.userCreateName = ""  
 						}else{
