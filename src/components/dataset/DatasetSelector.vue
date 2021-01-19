@@ -42,6 +42,7 @@ export default {
 			default: 0
 		}
 	},
+	
 	data(){
 		let self = this
 		return{
