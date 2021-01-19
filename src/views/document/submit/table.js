@@ -1420,7 +1420,7 @@ export default class Table {
                 let rowData = [];
                 for (let j = 0; j < listKey.length; j++) {
                     let controlName = listKey[j];
-                    rowData.push("'" + data[index][controlName] + "'");
+                    rowData.push('"' + data[index][controlName] + '"');
                     if (controlName == 's_table_id_sql_lite') {
                         continue;
                     }

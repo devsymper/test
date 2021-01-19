@@ -90,7 +90,6 @@ export default {
 						self.$emit('list-dataset-selected', self.value)
 					}
 				},
-				
 			},
 			
 		}

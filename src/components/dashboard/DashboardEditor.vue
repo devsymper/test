@@ -44,6 +44,7 @@
 			@list-dataset-selected="handlerListDatasetSelected"
 			@cancel="handlerCancelSelectDataset"
 			:tableHeight="tableHeight"
+            @change="changeSelectedDatasets"
 		/>
 		<RelationSelector
 			ref="relationSelector"
@@ -102,6 +103,15 @@ export default {
         }
     },
     methods: {
+        changeSelectedDatasets(datasetIds){
+            this.dashboardEditorWorker.postMessage({
+                action: 'getDatasetInfo',
+                data: datasetIds
+            });
+        },
+        applySelectedDatasets(datasets){
+            this.$refs.datasetDetail.getColumnDataset(datasets);
+        },
 		handlerListDatasetSelected(listDatasetIds){
 		},
 		handlerCancelSelectDataset(listDatasetIds){

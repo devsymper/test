@@ -137,6 +137,7 @@ const defaultState = {
     orgchartNodes: {},
     // Danh sách tất cả các user trong hệ thống
     allUsers: [],
+    mapIdToUsers: {},
     allBA: [],
     generalNotificationPosition: 'top right',
     userLoadedRoleType: [],
