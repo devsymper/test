@@ -136,7 +136,7 @@ var handler = {
             page: 1,
             pageSize: 500
         }
-        let res = datasetApi.getListByFilter(filter);
+        let res = await datasetApi.getListByFilter(filter);
         self.postMessage({
             action: 'applySelectedDatasets',
             data: res.data.listObject
@@ -154,8 +154,7 @@ var handler = {
                 needRemoteDataCellCount += 1;
             }
         }
-        let relateDatasetIds = [];
-        response.data.dashboard.relateDatasets.reduce((arr, el) =>{
+        let relateDatasetIds = response.data.dashboard.relateDatasets.reduce((arr, el) =>{
             arr.push(el.id);
             return arr;
         }, []);

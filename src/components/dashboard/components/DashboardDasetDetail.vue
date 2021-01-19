@@ -121,8 +121,7 @@ export default {
             }
         },
         instanceKey:{
-            type: Number,
-            default: 123423,
+            default: '',
         }
     },
     data(){

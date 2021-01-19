@@ -43,13 +43,13 @@ export default {
 		}
 	},
 	created(){
-		this.originDatasetIds = util.cloneDeep(this.value)
-		debugger
+		this.setOriginValue(this.value);
 	},
 	
 	data(){
 		let self = this
 		return{
+			internalChange: false,
 			showDialog: false,
 			originDatasetIds:[],
 			checkedRows: [],
@@ -59,7 +59,6 @@ export default {
 					res.data.columns.forEach(function(e){
 						e.flex = 1
 					})
-					debugger
 
 					res.data.listObject.forEach(function(e){
 						if(self.value.includes(e.id)){
@@ -105,7 +104,11 @@ export default {
 			data.forEach(function(e){
 				arr.push(e.id)
 			})
+			this.internalChange = true;
 			this.$emit('input', arr)
+			setTimeout((self) => {
+				self.internalChange = false;
+			}, 0, this);
 		},
 		addCheckboxColumn(){
 			setTimeout(self=>{
@@ -115,9 +118,19 @@ export default {
 		select(){
 			this.$emit('list-dataset-selected' , this.listDatasetSelected)
 		},
+		setOriginValue(value){
+			this.originDatasetIds = util.cloneDeep(value)
+		}
 	},
 	watch:{
-		
+		value: {
+			deep: true,
+			handler(newValue){
+				if(!this.internalChange){
+					this.setOriginValue(newValue);
+				}
+			}
+		}
 	}
 }
 </script>

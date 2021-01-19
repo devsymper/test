@@ -8,6 +8,7 @@
         @ps-scroll-y="handleDashboardScrolled" 
         @click="selectDashboard()">
         <grid-layout
+            @layout-updated="handleLayoutRendered"
             ref="gridLayout"
             class="symper-dashboard-layout"
             :layout.sync="currentLayout"
@@ -160,6 +161,11 @@ export default {
         }
     },
     methods: {
+        handleLayoutRendered(){
+            setTimeout(() => {
+                
+            }, 0);
+        },
         addTab(){
             // let tabs = this.dashboardConfig.info.tabsAndPages.tabs;
             // let newTabName = 'tab '+ tabs.length;
