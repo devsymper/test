@@ -164,13 +164,6 @@ export default class TableControl1 extends Control {
             }
             else{
                 this.tableInstance.setData(dataTable, false);
-                setTimeout((self) => {
-                    self.tableInstance.tableInstance.render();
-                    SYMPER_APP.$evtBus.$emit('document-on-table-change', {
-                        data: self.tableInstance.tableInstance.getSourceData(),
-                        tableName: self.name
-                    });
-                }, 100, this);
             }
             
             if (this.currentDataStore.docStatus == 'init') {

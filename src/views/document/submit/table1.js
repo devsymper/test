@@ -48,10 +48,10 @@ export default class SymperTable {
         this.tableHeightDefault = "400px";
         this.tableHasRowSum = false;
         this.sumColumns = {};
+        this.tableMode = this.tableControl.tableMode;
         this.columnDefs = this.getColDefs();
         this.allColumnAppend = [];
         this.agInstance = null;
-        this.tableMode = this.tableControl.tableMode;
         this.cellRendererValueMap = {},
         this.formulasWorker = formulasWorker,
         this.tableWorker = null
@@ -87,6 +87,15 @@ export default class SymperTable {
      */
     getColDefs(){
         let colDefs = [];
+        if(this.tableMode =='Flat'){
+            colDefs.push( {
+                headerName: "",
+                minWidth:50,
+                valueGetter: "node.rowIndex + 1",
+                pinnedRowCellRenderer:'BottomPinnedRowRenderer'
+              })
+        }
+        
         for (let controlName in this.tableControl.controlInTable){
             let controlInstance = this.tableControl.controlInTable[controlName];
             
@@ -95,7 +104,9 @@ export default class SymperTable {
                 headerName:controlInstance.title,
                 field: controlInstance.name,
                 editable:!controlInstance.checkProps('isReadOnly'),
-                hide:controlInstance.checkProps('isHidden')
+                hide:controlInstance.checkProps('isHidden'),
+                minWidth: 150,
+
             };
 
             if (controlInstance.checkProps('isSumTable')) {
@@ -170,6 +181,7 @@ export default class SymperTable {
     appendTableColumns(data) {
         if(this.cols && this.cols.length > 0){
             let col = this.cols[0];
+            let value = this.values[0];
             this.allColumnAppend = data.reduce((arr, obj)=>{
                 if(obj[col.name] && !arr.includes(obj[col.name])){
                     arr.push(obj[col.name])
@@ -178,9 +190,30 @@ export default class SymperTable {
             },[]);
             for (let index = 0; index < this.allColumnAppend.length; index++) {
                 let colItem = this.allColumnAppend[index];
+                let colField = colItem.replace('\.','____')
                 let colBinding = {
                     headerName:colItem,
-                    field: colItem,
+                    field: colField,
+                    cellRenderer: this.supportCellsType[value.type],
+                    cellRendererParams:{
+                        control:getControlInstanceFromStore(this.keyInstance, value.name),
+                        controlColumn:colField
+                    },
+                    cellStyle: function(params) {
+                        if (params.value=='R') {
+                            return {color: 'white', backgroundColor: 'green'};
+                        }
+                        if (params.value=='A') {
+                            return {color: 'white', backgroundColor: 'red'};
+                        }
+                        if (params.value=='C') {
+                            return {color: 'white', backgroundColor: 'orange'};
+                        }
+                        if (params.value=='I') {
+                            return {color: 'white', backgroundColor: 'gray'};
+                        }
+                        return null;
+                    }
                 };
                 this.columnDefs.push(colBinding);
             }
@@ -189,7 +222,7 @@ export default class SymperTable {
     getHashRow(row){
         let columnDataNotChange = [];
         for(let column in row){
-            if(this.cols[0].name != column && this.values[0].name != column && column != 'childObjectId'){
+            if(this.cols[0].name != column && this.values[0].name != column && column != 'childObjectId' && column != 's_table_id_sql_lite'){
                 columnDataNotChange.push(row[column]);
             }
         }
@@ -211,13 +244,17 @@ export default class SymperTable {
                 if(!mapRowWithData.includes(rowKey)){
                     mapRowWithData.push(rowKey);
                     for (let i = 0; i < this.allColumnAppend.length; i++) {
-                        let column = this.allColumnAppend[i];
-                        newRow[column] = (column == newRow[this.cols[0]['name']]) ? newRow[controlValue] : "";
+                        let column = util.cloneDeep(this.allColumnAppend[i]);
+                        let newColumn = util.cloneDeep(this.allColumnAppend[i]);
+                        newColumn = newColumn.replace('\.','____');
+                        newRow[newColumn] = (column == newRow[this.cols[0]['name']]) ? newRow[controlValue] : "";
                     }
                     newData.push(newRow);
                 }
                 else{
-                    newData[mapRowWithData.indexOf(rowKey)][newRow[this.cols[0]['name']]] = newRow[controlValue]
+                    let columnCache = newRow[this.cols[0]['name']];
+                    columnCache = columnCache.replace('\.','____')
+                    newData[mapRowWithData.indexOf(rowKey)][columnCache] = newRow[controlValue]
                 }
             }
             return newData;
@@ -422,7 +459,7 @@ export default class SymperTable {
             },
             defaultColDef: {
                 filter: true,
-                width: 150,
+                minWidth: 150,
                 sortable: true,
                 resizable: true,
                 wrapText:true,
@@ -494,7 +531,9 @@ export default class SymperTable {
      */
     minimizeData(data){
         for (let index = 0; index < this.allColumnAppend.length; index++) {
-            delete data[this.allColumnAppend[index]];
+            let column = this.allColumnAppend[index];
+            column = column.replace('\.','____')
+            delete data[column];
         }
     }
 
@@ -507,10 +546,12 @@ export default class SymperTable {
                 if(!node.group){
                     if(this.allColumnAppend.length > 0){
                         for (let index = 0; index < this.allColumnAppend.length; index++) {
-                            const column = this.allColumnAppend[index];
+                            let column = util.cloneDeep(this.allColumnAppend[index]);
+                            let columnOld = util.cloneDeep(this.allColumnAppend[index]);
+                            column = column.replace('\.','____')
                             let newRow = util.cloneDeep(node.data);
-                            newRow[this.cols[0].name] = column;
-                            newRow[this.values[0].name] = newRow[column];
+                            newRow[this.cols[0].name] = columnOld;
+                            newRow[this.values[0].name] = (newRow[column]) ? newRow[column] : "";
                             this.minimizeData(newRow);
                             rowData.push(newRow);
                         }
@@ -525,6 +566,7 @@ export default class SymperTable {
         if(rowData.length > 0){
             for (let index = 0; index < rowData.length; index++) {
                 let row = rowData[index];
+                delete row['s_table_id_sql_lite'];
                 for (let control in row){
                     if(!dataForSubmit[control]){
                         dataForSubmit[control] = []
@@ -619,6 +661,9 @@ export default class SymperTable {
     onCellKeyDown(params){
         let event = params.event;
         let rowData = params.data;
+        if(!rowData){
+            return;
+        }
         let sqlRowId = rowData.s_table_id_sql_lite;
         if(params.rowPinned){
             return;
@@ -744,7 +789,6 @@ export default class SymperTable {
      */
     setDataAtCell(key, value, currentRowIndex){
         let rowNode = this.getRowNode(currentRowIndex);
-        console.log('rowIndexrowIndex',currentRowIndex,rowNode);
         rowNode.setDataValue(key,value);
     }
     /**
@@ -877,6 +921,7 @@ export default class SymperTable {
      * Nhận sự kiên khi giá trị của cell thay đổi => chạy công thức cho các control bị ảnh hưởng
      */
     onCellValueChanged(event){
+        console.log(event,'eventeventevent');
         if(event.rowPinned){
             return;
         }

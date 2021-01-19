@@ -618,9 +618,13 @@ button:hover {
     color: #212529 !important;
     font-weight: 500;
 }
-.sym-form-submit .ag-theme-alpine .ag-row,
-.sym-form-Detail .ag-theme-alpine .ag-row {
+.sym-form-submit .ag-theme-alpine .ag-row:not(.ag-row-group-expanded),
+.sym-form-Detail .ag-theme-alpine .ag-row:not(.ag-row-group-expanded) {
     background: white !important;
+}
+.sym-form-submit .ag-row.ag-row-group.ag-row-group-expanded,
+.sym-form-Detail .ag-row.ag-row-group.ag-row-group-expanded{
+    background: rgba(0,0,0,0.05);
 }
 .sym-form-submit .ag-theme-alpine .ag-cell,
 .sym-form-Detail .ag-theme-alpine .ag-cell {

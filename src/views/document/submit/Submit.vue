@@ -816,10 +816,10 @@ export default {
             if(this._inactive == true) return;
             try { 
                 let controlName = e.controlName;
+                this.$refs.autocompleteInput.setTypeInput(e.type);
                 this.$refs.autocompleteInput.show(e.e, controlName);
                 let controlIns = getControlInstanceFromStore(this.keyInstance, controlName);
                 this.$refs.autocompleteInput.setControlValueKey(controlIns.getAutocompleteKeyValue());
-                this.$refs.autocompleteInput.setTypeInput(e.type);
                 if(e.type == 'combobox'){
                     this.$refs.autocompleteInput.setSingleSelectCombobox(e.isSingleSelect);
                 }
@@ -837,12 +837,14 @@ export default {
             if(thisCpn._inactive == true) return;
             try {
                 if (
-                    !$(evt.target).hasClass("s-control-user") &&
-                    !$(evt.target).hasClass("card-list-user") &&
-                    $(evt.target).closest(".card-list-user").length == 0
+                    !$(evt.target).is(".s-control-select") &&
+                    !$(evt.target).is(".s-control-combobox") &&
+                    !$(evt.target).is(".select-chervon-bottom") &&
+                    $(evt.target).closest(".card-autocomplete").length == 0
                 ) {
-                    thisCpn.$refs.userInput.hide();
+                    thisCpn.$refs.autocompleteInput.hide();
                 }
+                
                 if( !$(evt.target).hasClass("info-control-btn") &&
                     !$(evt.target).hasClass("s-floatting-popup") &&
                     $(evt.target).closest(".s-floatting-popup").length == 0){
@@ -1004,7 +1006,8 @@ export default {
         },
         checkUpdateByWorkflow(){
             let updateByWorkflowId = this.documentInfo.updateByWorkflowId;
-            if(updateByWorkflowId && this.$getRouteName() == 'updateDocumentObject'){
+            
+            if(updateByWorkflowId && updateByWorkflowId != "0" && this.$getRouteName() == 'updateDocumentObject'){
                 startWorkflowBySubmitedDoc(updateByWorkflowId, {document_id:this.docId})
             }
         },
@@ -1421,7 +1424,7 @@ export default {
             else{
                 let tableControl = getControlInstanceFromStore(this.keyInstance, controlIns.inTable);
                 let currentCell = tableControl.tableInstance.getForcusCell();
-                tableControl.tableInstance.setDataAtCell(data.controlName, data.value.inputValue, currentCell.rowIndex);
+                tableControl.tableInstance.setDataAtCell(currentCell.column.colDef.field, data.value.inputValue, currentCell.rowIndex);
             }
         },
 
