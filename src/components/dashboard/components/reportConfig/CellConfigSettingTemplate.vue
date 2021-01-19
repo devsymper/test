@@ -188,7 +188,13 @@
             }
         },
         watch:{
-            
+            selectedCell:{
+				deep: true,
+				immediate: true,
+				handler(arr){
+					debugger
+				}
+			}
         },
         computed:{
         },
@@ -257,7 +263,6 @@
                 return 'column-item-setting d-flex align-center';
             },
             showSelectAxisType(settingItem){
-				return true
                 if(this.selectedCell.sharedConfigs.type.includes('lineAnd') && settingItem.name.includes('Y Axis')){
                     return true;
                 }

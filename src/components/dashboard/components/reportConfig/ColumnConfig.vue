@@ -4,10 +4,10 @@
 				<cell-config-setting-template 
 					@add-y-axis="addYAxis" 
 					@change-column-setting="changeColumnSetting" 
-					v-for="(item,settingName) in settings" 
+					v-for="(item,settingName) in currentCellConfigs.rawConfigs.setting" 
 					:key="settingName" 
 					:settingItem="item" 
-					:selectedCell="selectedCell"
+					:selectedCell="currentCellConfigs"
 					:settingTplAgg="settingTplAgg"> 
 				</cell-config-setting-template>
 		</VuePerfectScrollbar>
@@ -1140,6 +1140,10 @@ export default {
 				}
 			}
 		},
+		instanceKey:{
+			type: Number,
+			default: 0
+		},
 		height:{
 			type: Number,
 			default: 0
@@ -1905,7 +1909,12 @@ export default {
 				}
 			}
         }    
-    }
+	},
+	computed:{
+		currentCellConfigs(){
+			return this.$store.state.dashboard.allDashboard[this.instanceKey].currentCellConfigs
+		}
+	}
 }
 </script>
 <style scoped>
