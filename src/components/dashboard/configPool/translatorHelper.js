@@ -41,12 +41,12 @@ export const TranslatorHelper = {
 				legend: TranslatorHelper.translateLegend(style.legend.children, ratio),
 				series: TranslatorHelper.getPieSeries(data, columns, style),
 				tooltip: {
-					// formatter: function() {
-					// 	let decimal = style.pieDetailLabel.children.tooltipDecimalNumber.value;
-					// 	let vl = Highcharts.numberFormat(TranslatorHelper.y, decimal);
-					// 	return `<b>${TranslatorHelper.x !== undefined ? TranslatorHelper.x : ''}</b><br>
-					// 			<b>${TranslatorHelper.series.name} : </b> ${vl}`;
-					// }
+					formatter: function() {
+						let decimal = style.pieDetailLabel.children.tooltipDecimalNumber.value;
+						let vl = Highcharts.numberFormat(TranslatorHelper.y, decimal);
+						return `<b>${TranslatorHelper.x !== undefined ? TranslatorHelper.x : ''}</b><br>
+								<b>${TranslatorHelper.series.name} : </b> ${vl}`;
+					}
 				}
 			};
 
@@ -67,8 +67,54 @@ export const TranslatorHelper = {
 		 * @param {Object} columns Cấu hình các cột
 		 * @param {Object} style Cấu hình hiển thị
 		 */
-		treeMap(){
-
+		treeMap(data, columns, style, ratio) {
+			style = TranslatorHelper.makeStyleMap(style);
+			let colors = TranslatorHelper.getColorsFromStyle(style);
+			let groupCol = columns.group.selectedColums[0] ? columns.group.selectedColums[0] : false;
+			let detailCol = columns.detail.selectedColums[0] ? columns.detail.selectedColums[0] : false;
+			let valueCol = columns.value.selectedColums[0];
+			let chartData = TranslatorHelper.getTreeMapData(groupCol, detailCol, valueCol, data, colors);
+			let rsl = {
+				chart: {
+					type: 'treemap'
+				},
+				tooltip: {
+					formatter: function() {
+						let decimal = style.lvl1DataLabel.children.tooltipDecimalNumber.value;
+						let vl = Highcharts.numberFormat(this.point.value, decimal);
+						return `<b>${this.key} : </b> ${vl}`;
+					}
+				}
+			};
+			rsl.series = [{
+				type: "treemap",
+				layoutAlgorithm: 'squarified',
+				alternateStartingDirection: true,
+				levels: [{
+					level: 1,
+					layoutAlgorithm: 'squarified',
+					dataLabels: {
+						enabled: style.lvl1DataLabel.children.show.value,
+						align: style.lvl1DataLabel.children.alignment.value,
+						verticalAlign: style.lvl1DataLabel.children.verticalAlign.value,
+						style: TranslatorHelper.getStyleItemsInConfig(style.lvl1DataLabel.children, '', ratio)
+					}
+				}, {
+					level: 2,
+					dataLabels: {
+						enabled: style.lvl2DataLabel.children.show.value,
+						align: style.lvl2DataLabel.children.alignment.value,
+						verticalAlign: style.lvl2DataLabel.children.verticalAlign.value,
+						style: TranslatorHelper.getStyleItemsInConfig(style.lvl2DataLabel.children, '', ratio)
+					}
+				}],
+				data: chartData
+			}];
+			rsl.series[0].levels[0].dataLabels.style.fontWeight = 100;
+			rsl.series[0].levels[1].dataLabels.style.fontWeight = 100;
+			let commonAttr = TranslatorHelper.getCommonCellStyleAttr(style, ratio);
+			rsl = Object.assign(rsl, commonAttr);
+			return rsl;
 		}
 	},
 	/**
@@ -229,5 +275,58 @@ export const TranslatorHelper = {
 	},
 	getColorsFromStyle(style) {
 		return style.general.children.colorPalette.value;
+	},
+	getTreeMapData(groupCol, detailCol, valueCol, data, colors) {
+		let chartData = [];
+		let i = 0;
+		if (groupCol) {
+			if (detailCol) {
+				let level1Items = {};
+				for (let item of data) {
+					level1Items[groupCol.as] = true;
+					chartData.push({
+						name: item[detailCol.as],
+						parent: item[groupCol.as],
+						value: Number(item[valueCol.as]),
+					});
+					i += 1;
+				}
+				for (let name in level1Items) {
+					chartData.unshift({
+						name: name,
+						color: colors[i],
+						id: name,
+					});
+					i += 1;
+				}
+			} else {
+				for (let item of data) {
+					chartData.push({
+						color: colors[i],
+						name: item[groupCol.as],
+						value: Number(item[valueCol.as]),
+					});
+					i += 1;
+				}
+			}
+		} else {
+			if (detailCol) {
+				for (let item of data) {
+					chartData.push({
+						color: colors[i],
+						name: item[detailCol.as],
+						value: Number(item[valueCol.as])
+					});
+					i += 1;
+				}
+			} else {
+				chartData.push({
+					color: colors[i],
+					name: valueCol.as,
+					value: Number(data[0][valueCol.as])
+				});
+			}
+		}
+		return chartData;
 	}
 }

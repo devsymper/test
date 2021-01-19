@@ -1,4 +1,5 @@
 import ReportBase from './ReportBase'
+import {TranslatorHelper} from '@/components/dashboard/configPool/translatorHelper'
 
 export default class TreeMap extends ReportBase {
     constructor(symperId){
@@ -26,5 +27,10 @@ export default class TreeMap extends ReportBase {
 			},
 		}
         super('treeMap', symperId, columnSettingKeys, styleKeys);
-    }
+	}
+	translate(rawConfig,  data, extraData ,changes = {}, oldOutput = {}){
+		let output =  TranslatorHelper.Charts.treeMap(data, rawConfig.setting, rawConfig.style , false, 1)
+		return output
+	}
+
 }
