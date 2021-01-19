@@ -9,7 +9,7 @@
                     <span :style="{opacity:item.isDefault?1:0}">Mặc định</span>
                 </v-list-item-subtitle>
             </v-list-item-content>
-                <v-list-item-icon class="show-icon col-md-2" style="margin-right:-20px">
+                <v-list-item-icon class="show-icon col-md-2" style="margin-right:-10px">
                     <v-menu offset-y nudge-left='310' nudge-top="28" >
                             <template v-slot:activator="{ on:config }">
                                 <i class="mdi mdi-cog-outline config-filter-icon mr-1" v-on="{ ...config}"></i>
@@ -85,7 +85,9 @@ export default {
   props: {
       filter:{
 			type: Array,
-			default: [],
+			default(){
+				return []
+			}
 		},
   },
     

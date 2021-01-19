@@ -12,8 +12,8 @@
             ></v-text-field>
         </v-col>
         <v-col class="col-md-1" style="margin-top:-5px; margin-bottom:-8px">
-            <span class="mdi mdi-check color-green mx-6" @click="handleAddFilter('save')"></span>
-            <span class="mdi mdi-close" @click="handleAddFilter('add')"></span>
+            <span class="mdi mdi-check color-green mx-6" @click="handleAddFilter('save')" style="font-size:15px"></span>
+            <span class="mdi mdi-close" @click="handleAddFilter('add')" style="font-size:15px"></span>
         </v-col>
     </v-row>
 </template>
