@@ -1077,6 +1077,7 @@ export default {
         saveFilter(){
             if(!this.isUpdateFilter){
                 debugger
+            
                 this.listFilters.push({
                     name:this.filterName,
                     isDefault: false,

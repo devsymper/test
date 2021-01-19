@@ -395,9 +395,7 @@ export default {
             filter = Object.assign(filter, this.myOwnFilter);
             let res = {};
             let listTasks = [];
-            if (filter.status) {
-                this.$store.commit("task/setFilter", filter.status);
-            }
+          
             if(this.filterTaskAction == 'subtasks'){
                 res = await BPMNEngine.getSubtasks(this.filterFromParent.parentTaskId, filter);
                 if (filter.status=='done') {

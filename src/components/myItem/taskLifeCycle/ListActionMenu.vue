@@ -1,6 +1,6 @@
 <template>
 	<div class="menu-action-task-life-cycle">
-		 <v-menu offset-y>
+		 <v-menu offset-y style="z-index: 1000 !important">
 			<template v-slot:activator="{ on, attrs }">
 				<v-btn
 					color="#F5F5F5"
@@ -9,7 +9,7 @@
 					small
 					:disabled="listActions.length == 0"
 				>
-					Action 
+					{{ $t('tasks.action')}} 
 					<v-icon small right dark style="border-left:2px solid lightgrey;padding-left:8px">mdi-plus</v-icon>
 
 				</v-btn>
@@ -53,17 +53,38 @@ export default {
 		showResolveAction:{
 			type: Boolean,
 			default: false
+		},
+		taskInfo:{
+			type: Object,
+			default(){
+				return {}
+			}
 		}
 	},
 	computed:{
 		listActions(){
+			
 			let lists = []
 			if(this.userType == 'assignee' && this.taskType == 'assign'){
-				this.items.forEach(function(e){
-					if(e.value == 'reAssign' || e.value == 'delegate' || e.value == 'complete'){
-						lists.push(e)
+				let flag = true
+				if(this.taskInfo.action){
+					if(this.taskInfo.action.action == "approval"){
+						flag = false
 					}
-				})
+				}
+				if(flag){
+					this.items.forEach(function(e){
+						if(e.value == 'reAssign' || e.value == 'delegate' || e.value == 'complete'){
+							lists.push(e)
+						}
+					})
+				}else{
+					this.items.forEach(function(e){
+						if(e.value == 'reAssign'){
+							lists.push(e)
+						}
+					})
+				}
 			}
 			if(this.userType == 'assignee' && this.taskType == 'delegate'){
 				this.items.forEach(function(e){
@@ -137,6 +158,9 @@ export default {
 <style scoped>
 .menu-action-task-life-cycle >>> .action-task-life-cycle{
 	box-shadow: unset !important;
+}
+.menu-action-task-life-cycle >>> .v-menu__content{
+	z-index: 1000 !important;
 }
 .v-list-item {
 	min-height: unset !important;

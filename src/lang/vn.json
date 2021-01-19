@@ -6,6 +6,7 @@
         "required": "Bắt buộc",
         "select_lang": "Thay đổi ngôn ngữ",
         "KH": "Knowledge Management",
+        "taskManagement": "Quản lí công việc",
         "structureManagement": "Quản lí cơ cấu ",
         "reports": "Báo cáo",
         "workflows": "Quy trình",
@@ -127,6 +128,7 @@
             "App": "Ứng dụng",
             "Administrator": "Quản trị viên",
             "Account management": "Quản lý tài khoản",
+            "Task Management": "Quản lý công việc",
             "Access Management": "Quản lý truy cập",
             "accessControl": "Quản lý truy cập",
             "accessControlBeta": "Quản lý truy cập beta",
@@ -821,7 +823,9 @@
                         "has": "Có ",
                         "commentNotResolve": " bình luận chưa được giải quyết",
                         "noComment": "Không có bình luận nào",
-                        "id": "Định danh"
+						"id": "Định danh",
+						"listWorks": "Công việc",
+						"clickToViewListWork": "Bấm vào đây để xem công việc"
                     },
                     "worflowInfo": "THÔNG TIN QUY TRÌNH",
                     "userRelated": {
@@ -1322,7 +1326,8 @@
             "showLess": "Thu gọn",
             "showMoreFile": "Xem thêm các tệp",
             "quickView": "Xem nhanh",
-            "openTask": "Mở công việc"
+			"openTask": "Mở công việc",
+			"history":"Lịch sử"
         },
         "alert": {
             "title_aproval": "Thực thi công việc",
@@ -1331,8 +1336,61 @@
         },
         "unfinished": "Chưa hoàn thành",
         "totalTask": "Tổng số tác vụ",
-        "totalWork": "Tổng số công việc"
+        "totalWork": "Tổng số công việc",
+		"taskLifeCycle":{
+			"dialog":{
+				"complete":{
+					"header": "Hoàn thành công việc",
+					"description":"Nhấn áp dụng để hoàn thành công việc này"
+				},
+				"assign":{
+					"header": "Giao lại việc",
+					"description":"Công việc sẽ được giao cho người khác thực hiện, người thực hiện có toàn quyền với công việc",
+					"workStatus":"Công việc đã được giao cho"
+				},
+				"claim":{
+					"header": "Nhận công việc",
+					"description":"Khi nhận công việc bạn sẽ có quyền sở hữu công việc này "
+				},
+				"delegate":{
+					"header": "Ủy quyền công việc",
+					"description":"Công việc sẽ được giao cho người khác thực hiện nhưng không có quyền hoàn thành"
+				},
+				"unClaim":{
+					"header": "Hủy bỏ nhận công việc",
+					"description":"Công việc bạn đã nhận sẽ được hủy bỏ khỏi xanh sách công việc của bạn"
+				},
+				"resolve":{
+					"header": "Thực thi công việc",
+					"description":"Công việc sẽ được thực thi và trả về cho chủ sở hữu của công việc "
+				}
+				
+			},
+			"assignee":"Người được giao việc",
+			"delegateUser":"Người được ủy quyền",
+			"assigneePermission":"Người được giao việc sẽ có quyền xem và thực thi công việc",
+			"currentStatus":"Trạng thái hiện tại",
+			"workDelegated":"Công việc đã được ủy quyền ",
+			"owner":"Chủ sở hữu công việc",
+			"newStatus": "Trạng thái mới",
+			"cancel":"Hủy",
+			"corfirm":"Áp dụng",
+			"snackbar":{
+				"title":"Công việc submit thành công",
+				"description":"Bạn có thể hoàn thành công việc bằng cách thực thi ",
+				"action":"Hãy cập nhật bản ghi bằng cách chọn "
+			},
+			"notify":{
+				"unClaim":"Hủy nhận công việc thành công",
+				"resolve":"Thực thi công việc thành công",
+				"claim":"Nhận công việc thành công",
+				"complete":"Hoàn thành công việc thành công",
+				"notSubmit":"Bạn phải submit doc trước khi hoàn thành",
+				"assign": "Giao việc thành công",
+				"delegate": "Ủy quyền thành công "
 
+			}
+		}
     },
     "tasks": {
         "error": {
@@ -1365,7 +1423,8 @@
             "alertDescription": "Không có mô tả",
             "relatedTask": "CÁC TASK LIÊN QUAN",
             "attachment": "TỆP ĐÍNH KÈM",
-            "status": "Trạng thái"
+			"status": "Trạng thái",
+			"candidateUser":"Nhóm người dùng candidate"
         },
         "filterOptions": {
             "all": "Toàn bộ task",
@@ -1381,10 +1440,12 @@
         "claim": "Nhận công việc",
         "unClaim": "Hủy nhận",
         "reAssign": "Giao việc",
+        "assign": "Đã giao",
         "delegate": "Ủy quyền",
         "resolve": "Giải quyết",
         "complete": "Hoàn thành",
-        "created": "Đã tạo mới task",
+		"created": "Đã tạo mới task",
+		"action": "Hành động",
         "relatedPeople": {
             "title": "Những người liên quan"
         },
@@ -1453,5 +1514,50 @@
         "reply": "Trả lời",
         "edited": "Đã chỉnh sửa",
         "search": "Tìm kiếm"
+    },
+    "taskManagement":{
+        "table":{
+            "name": "Tên",
+            "description": "Mô tả",
+            "lead": "Leader",
+            "category": "Danh mục",
+            "createAt":"Ngày tạo",
+            "email":"Email",
+            "role":"Quyền",
+            "workflow":"Workflow",
+            "startDate":"Ngày bắt đầu",
+            "releaseDate":"Ngày phát hành",
+            "unreleased":"Chưa phát hành",
+            "released":"Đã phát hành",
+            "configField":"Cấu hình field"
+        },
+        "listMember":"Danh sách thành viên",
+        "listProject":"Danh sách project",
+        "listCategory":"Danh sách danh mục",
+        "listComponent":"Danh sách component",
+        "listVersion":"Danh sách version",
+        "listIssueType":"Danh sách Issue type",
+        "listWorkflow":"Danh sách Workflow",
+        "listPriority":"Danh sách Priority",
+        "listActionPack":"Danh sách ActionPack",
+        "listPermission":"Danh sách Permission",
+        "listIssueComponent":"Danh sách Issue trong component",
+        "listIssueVersion":"Danh sách Issue trong version",
+        "requiredField":"Trường bắt buộc nhập",
+        "detailProject":"Thông tin project",
+        "addPeople":"Thêm thành viên",
+        "managerRole":"Quản lý vai trò",
+        "createRole":"Tạo role",
+        "dialog":{
+            "removeUser": "Bạn sẽ xóa thành viên khỏi project này",
+            "removeRole": "Bạn sẽ xóa role này khỏi danh sách.",
+            "removeCategory": "Bạn sẽ xóa danh mục này khỏi danh sách.",
+            "removeComponent": "Bạn sẽ xóa component này khỏi danh sách.",
+            "removeWorkflow": "Bạn sẽ xóa workflow này khỏi danh sách.",
+            "removePriority": "Bạn sẽ xóa priority này khỏi danh sách.",
+            "removeVersion": "Bạn sẽ xóa version này khỏi danh sách"
+        },
+        "settingBoard":"Cài đặt Board"
+
     }
 }

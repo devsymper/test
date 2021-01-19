@@ -8,7 +8,7 @@
         <list-items
 			:getDataUrl="sDocumentManagementUrl+'documents/'+docId+'/objects'"
 			:exportLink="sDocumentManagementUrl+'documents/'+docId+'/export-excel'" 
-			:useDefaultContext="false"
+			:useantext="false"
 			:tableContextMenu="tableContextMenu"
 			:pageTitle="$t('documentObject.title')"
 			:containerHeight="containerHeight"
@@ -20,7 +20,7 @@
 			:isTablereadOnly="false"
 			:conditionByFormula="formulasInput.formula.value"
 			@after-open-add-panel="submitDocument"
-			@data-get="afterGetData"
+			@data-loaded="afterGetData"
 			@before-keydown="afterRowSelected"
 			@after-cell-mouse-down="afterRowSelected"
 			@after-selected-row="afterSelectedRow"
@@ -256,7 +256,6 @@ export default {
                 reformatData(res){
                     let thisCpn = util.getClosestVueInstanceFromDom(document.querySelector('.list-object-component'));
                     let listObject = res.data.listObject;
-                  
                     return{
                         columns:res.data.columns,
                         listObject:res.data.listObject,
@@ -581,20 +580,19 @@ export default {
         },
         afterRowSelected(data){
             if(this.$refs.listObject.isShowSidebar()){
-                let documentObject = data.rowData;
-                let cell = data.cell;
+                let documentObject = data.data;
                 let event = data.event;
-                if(cell.col == 0 && this.$refs.listObject.isShowCheckedRow()){
+                if(this.$refs.listObject.isShowCheckedRow()){
                     return;
-                }
+				}
                 if(['ArrowDown','ArrowUp'].includes(event.key) || event.buttons == 1){
                     if(this.docObjInfo.docObjId == parseInt(documentObject.document_object_id)){
                         return
-                    }
+					}
                     this.currentDocObjectActiveIndex = this.dataTable.findIndex(obj => obj.document_object_id == documentObject.document_object_id);
                     this.$refs.listObject.openactionPanel();
                     this.dataClipboard = window.location.origin+ '/#/documents/objects/'+documentObject.document_object_id;
-                    this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
+					this.docObjInfo = {docObjId:parseInt(documentObject.document_object_id),docSize:'21cm'}
                 }
             }
             
@@ -622,18 +620,18 @@ export default {
             }
         },
         afterSelectedRow(dataSelected){
-            this.countRecordSelected = Object.keys(dataSelected).length;
+            this.countRecordSelected = dataSelected.length;
             this.recordSelected = dataSelected; 
         },
         /**
          * Ấn để in các bản ghi đã chọn
          */
         printSelected(){
-            if(Object.keys(this.recordSelected).length == 0){
+            if(this.recordSelected.length == 0){
                 this.$snotify({
-                            type: "info",
-                            title: "Vui lòng chọn bản ghi để in"
-                        }); 
+					type: "info",
+					title: "Vui lòng chọn bản ghi để in"
+				}); 
                 return;
             }
             this.hideBottomSheet();
@@ -658,9 +656,8 @@ export default {
          * Sự kiện khi selection vào cell
          */
         afterCellSelection(rowData){
-			this.$refs.listObject.openactionPanel();
             this.actionOnRightSidebar = 'detail';
-            this.currentRowData = rowData;
+			this.currentRowData = rowData;
         }
     }
 }

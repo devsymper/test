@@ -135,9 +135,7 @@ export const prepareFilterAndCallApi = function(columns = false, cache = false, 
 		let tableFilter = dataConfig.tableFilter;
 		tableFilter.allColumnInTable = dataConfig.columnDefs;
 		configs.emptyOption = emptyOption;
-		if(dataConfig.customDataForApi){
-			eval('configs.customDataForApi = ' + dataConfig.customDataForApi)
-		}
+		configs.customDataForApi = dataConfig.customDataForApi
 		getDataFromConfig(dataConfig.url, configs, columns, tableFilter, success, dataConfig.method, header);
 	}
 }
@@ -151,7 +149,7 @@ export const getTableColumns = function(columns, forcedReOrder = false , savedOr
 	} else {
 		for (let item of columns) {
 			colMap[item.name] = {
-				headerName: item.name,
+				headerName: item.title,
 				field: item.name,
 				type: item.type, // lưu ý khi loại dữ liệu của cột là number (cần format) và dạng html
 				editor: false,
@@ -161,7 +159,10 @@ export const getTableColumns = function(columns, forcedReOrder = false , savedOr
 				cellRenderer: item.cellRenderer ? item.cellRenderer : null,
 				cellRendererParams: item.cellRendererParams ? item.cellRendererParams : null,
 				noFilter: item.noFilter ? item.noFilter : false,
-				filtered: !filteredColumns ? false : filteredColumns[item.name] ? true : false
+				filtered: !filteredColumns ? false : filteredColumns[item.name] ? true : false,
+				width: item.name == 'id' ? 50 : item.width ? item.width : false,
+				flex: item.flex ? item.flex : false,
+				noFilter: item.noFilter ? true : false
 			};
 		}	
 		

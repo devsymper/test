@@ -62,6 +62,7 @@ export default class ClientSQLManager {
         if (dataInsert != false && columnInsert != false) {
             sql += `INSERT INTO ${tableName} (${columnInsert}) VALUES ${dataInsert};`
         }
+        console.log(sql, 'xxxxxxxxxxx');
         // this.run(keyInstance, sql, true);
         if (returnPromise) {
             return new Promise((resolve, reject) => {

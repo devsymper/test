@@ -3,6 +3,7 @@
         v-resize="reCalcSidebarHeight" 
         mobile-breakpoint="0" 
         :mini-variant="sapp.collapseSideBar"
+        v-if="true"
         :v-model="true" app>
         <v-list dense nav class="py-0 pr-0 list-item">
             <v-list-item 
@@ -401,7 +402,12 @@ export default {
                 return false
             }
             
-        },
+		},
+		handlerItemClick(item){
+			if(item.children){
+				this.gotoPage(item)
+			}
+		},
         // thêm nhóm cho Menu
         showChangeInfoUser(){
             if(this.sapp.baInfo.id==0){

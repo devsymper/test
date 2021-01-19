@@ -34,7 +34,7 @@
 				Đồng bộ
 			</v-btn>
 			<v-btn 
-				class="font-normal fs-13"
+				class="font-normal fs-13 mr-2"
 				depressed
 				tile
 				small
@@ -51,6 +51,7 @@
 			:getDataUrl="getListUrl"
 			@close-popup="handleCloseEvent"
 			style="margin-left:10px"
+			@data-loaded="showBtnAddCheckbox = true"
 			:refreshListWhenChangeUrl="false"
 			:useDefaultContext="false"
 			:tableContextMenu="tableContextMenu"
@@ -94,6 +95,10 @@ export default {
 		currentObjectType:{
 			type: String
 		},
+		tab:{
+			type: String,
+			default: ""
+		}
 	},
 	data(){
 		let self = this
@@ -119,7 +124,7 @@ export default {
 					return{
 						columns:res.data.columns ? res.data.columns : [],
 						listObject:res.data.listObject ? res.data.listObject : [],
-						total: res.data.listObject ? res.data.listObject.length : 0,
+						total: res.data.total,
 					}
 				}
 			}
@@ -164,6 +169,10 @@ export default {
 				self.$refs.listObject.getData()
 			},200,this)
 			this.listItemSelected = [],
+			this.showBtnAddCheckbox = true
+		},
+		tab(val){
+			this.$refs.listObject.removeCheckBoxColumn()
 			this.showBtnAddCheckbox = true
 		}
 	}

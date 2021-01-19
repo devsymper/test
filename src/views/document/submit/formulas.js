@@ -131,7 +131,7 @@ export default class Formulas extends FormulasEvent{
                 let item = {};
                 for (let i = 0; i < listOrgChartFormulas.length; i++) {
                     let reverseData = undefined
-                    if (workerStore['submit'][this.keyInstance]) {
+                    if (workerStore['submit'][this.keyInstance]['orgchartTableSqlName']) {
                         reverseData = workerStore['submit'][this.keyInstance].orgchartTableSqlName[listOrgChartFormulas[i].trim()];
                     }
                     if (reverseData == undefined) {
