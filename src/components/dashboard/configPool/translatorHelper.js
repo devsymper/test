@@ -1,16 +1,13 @@
 export const TranslatorHelper = {
-	Pie:{
-		/******  ĐỊA PHẬN CỦA PIE ******/
+	Charts:{
 		/**
 		 * Chuyển đổi cấu hình cho loại pie chart
 		 * @param {Array} data Mảng dữ liệu của chart
 		 * @param {Object} columns Cấu hình các cột
 		 * @param {Object} style Cấu hình hiển thị
+		 * @param {Object} isDonut Loại chart donut false of true 
 		 */
 		pie(data, columns, style, isDonut = false, ratio) {
-			console.log(data, 'dataaaaaaaaaaaaaaaaaaaaaaaaaa')
-			debugger
-			console.log(columns, 'columnsssssssssssssssssssssssss')
 			let pieDetailLabelFormat = {
 				category: '{point.name}',
 				value: '{point.y}',
@@ -64,7 +61,15 @@ export const TranslatorHelper = {
 			return Object.assign(commonAttr, rsl);
 
 		},
+		/**
+		 * Chuyển đổi cấu hình cho loại treemap chart
+		 * @param {Array} data Mảng dữ liệu của chart
+		 * @param {Object} columns Cấu hình các cột
+		 * @param {Object} style Cấu hình hiển thị
+		 */
+		treeMap(){
 
+		}
 	},
 	/**
      * Chuyển giá trị của các row có chứa key bắt buộc là number thành number
