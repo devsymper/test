@@ -82,6 +82,7 @@ export default {
 				reformatData(res){
 					let listBA = self.$store.state.app.allBA;
 					res.data.forEach(function(e){
+						e.domainName = e.environmentIdentifier + '.' + e.serviceIdentifier+'.symper.vn' 
 						if(!e.userCreate){
 							e.userCreateName = ""  
 						}else{
@@ -101,11 +102,15 @@ export default {
 							})
 						}
 					})
+					debugger
 					return {
 						columns:[
 							{name: "id", title: "id", type: "text", noFilter: true},
 							{name: "ip", title: "ip	", type: "text", noFilter: true},
+							{name: "domainName", title: "domainName", type: "text", noFilter: true},
 							{name: "versionName", title: "versionName", type: "text", noFilter: true},
+							{name: "serviceIdentifier", title: "serviceIdentifier", type: "text", noFilter: true},
+							{name: "serviceName", title: "serviceName", type: "numeric", noFilter: true},
 							{name: "environmentIdentifier", title: "environmentIdentifier", type: "text", noFilter: true},
 							{name: "environmentName", title: "environmentName", type: "numeric", noFilter: true},
 							{name: "userCreateName", title: "userCreate", type: "text", noFilter: true},
