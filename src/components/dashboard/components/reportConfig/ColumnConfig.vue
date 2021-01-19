@@ -18,6 +18,7 @@ import CellConfigSettingTemplate from '@/components/dashboard/components/reportC
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import settingTplAgg from '@/components/dashboard/configPool/settingTplAgg';
 import PieChart from '@/components/dashboard/reports/Pie.chart.js'
+import DonutChart from '@/components/dashboard/reports/Donut.chart.js'
 
 export default {
     components:{
@@ -1152,6 +1153,9 @@ export default {
     created(){
 		let pie = new PieChart()
 		let output = pie.translate(this.testData.rawConfigs, this.testData.sharedConfigs.data)
+		debugger
+		let donut = new DonutChart()
+		let outputDonut = donut.translate(this.testData.rawConfigs, this.testData.sharedConfigs.data)
 		debugger
     },
     methods:{
