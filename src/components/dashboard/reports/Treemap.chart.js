@@ -1,6 +1,6 @@
 import ReportBase from './ReportBase'
 import {TranslatorHelper} from '@/components/dashboard/configPool/translatorHelper'
-
+	
 export default class TreeMap extends ReportBase {
     constructor(symperId){
         let columnSettingKeys = ['detail','group','tooltips','value' ]
