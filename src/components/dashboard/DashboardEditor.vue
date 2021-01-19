@@ -103,10 +103,8 @@ export default {
     },
     methods: {
 		handlerListDatasetSelected(listDatasetIds){
-			debugger
 		},
 		handlerCancelSelectDataset(listDatasetIds){
-			debugger
 		},
         initDashboardData(){
             let defaultData = getDefaultDashboardConfig();

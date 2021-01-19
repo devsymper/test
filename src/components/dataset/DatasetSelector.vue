@@ -44,7 +44,6 @@ export default {
 	},
 	created(){
 		this.originDatasetIds = util.cloneDeep(this.value)
-		debugger
 	},
 	
 	data(){
@@ -59,7 +58,6 @@ export default {
 					res.data.columns.forEach(function(e){
 						e.flex = 1
 					})
-					debugger
 
 					res.data.listObject.forEach(function(e){
 						if(self.value.includes(e.id)){
