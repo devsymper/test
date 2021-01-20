@@ -44,12 +44,12 @@ export default {
     // let donut = new DonutChart()
     // let outputDonut = donut.translate(this.testData.rawConfigs, this.testData.sharedConfigs.data)
     // debugger
-    let treeMap = new TreemapChart();
-    let outputDonut = treeMap.translate(
-      this.testDataTreemap.rawConfigs,
-      this.testDataTreemap.sharedConfigs.data
-	);
-	debugger
+    // let treeMap = new TreemapChart();
+    //   let outputDonut = treeMap.translate(
+    //   this.testDataTreemap.rawConfigs,
+    //   this.testDataTreemap.sharedConfigs.data
+    // );
+    // debugger
   },
   methods: {
     addYAxis(newLast) {

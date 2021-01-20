@@ -29,7 +29,7 @@ export default class TreeMap extends ReportBase {
         super('treeMap', symperId, columnSettingKeys, styleKeys);
 	}
 	translate(rawConfig,  data, extraData ,changes = {}, oldOutput = {}){
-		let output =  TranslatorHelper.Charts.treeMap(data, rawConfig.setting, rawConfig.style , false, 1)
+		let output =  TranslatorHelper.Charts.treeMap(data.data, rawConfig.setting, rawConfig.style , false, 1)
 		return output
 	}
 

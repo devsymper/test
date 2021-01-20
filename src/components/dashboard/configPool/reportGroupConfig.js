@@ -78,7 +78,7 @@ let ReportGroupConfig = {
 			},
 			"pieDetailLabel":{
 				"title":"Data label",
-				"items":["bgColor","borderColor","borderWidth","fontColor","show","textSize","tooltipDecimalNumber"]
+				"items":["bgColor", "pieLableStyle","borderColor","borderWidth","fontColor","show","textSize","tooltipDecimalNumber"]
 			},
 			"general":{
 				"title":"General",
