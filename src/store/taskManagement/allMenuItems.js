@@ -83,7 +83,7 @@ export default {
                 {
                     name:'workflow',
                     title:"workflow",
-                    icon: 'mdi-graph',
+                    icon: 'mdi-lan',
                     url:"/task-management/projects/:id/workflow"
                 },
                 {
