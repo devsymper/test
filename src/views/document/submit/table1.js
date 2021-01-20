@@ -52,10 +52,11 @@ export default class SymperTable {
         this.columnDefs = this.getColDefs();
         this.allColumnAppend = [];
         this.agInstance = null;
-        this.cellRendererValueMap = {},
-        this.formulasWorker = formulasWorker,
-        this.tableWorker = null
+        this.cellRendererValueMap = {};
+        this.formulasWorker = formulasWorker;
+        this.tableWorker = null;
         this.pinnedRowNode = null;
+        this.dataChange = {}
         
     }
     init(){
@@ -103,7 +104,7 @@ export default class SymperTable {
                 flex: 1,
                 headerName:controlInstance.title,
                 field: controlInstance.name,
-                editable:!controlInstance.checkProps('isReadOnly'),
+                editable:this.checkEditableCell(controlInstance),
                 hide:controlInstance.checkProps('isHidden'),
                 minWidth: 150,
 
@@ -123,9 +124,7 @@ export default class SymperTable {
             else{
                 col['cellRenderer'] = 'ValidateCellRenderer';
             }
-            if(['label','select'].includes(controlInstance.type)){
-                col['editable'] = false
-            }
+            
           
             if(controlInstance.checkEmptyFormulas('autocomplete')){
                 col['cellEditor'] = 'AutoCompleteCellEditor';
@@ -174,6 +173,20 @@ export default class SymperTable {
         colDefs.push(colSqlId);
         return colDefs;
     }
+    checkEditableCell(control){
+        let viewType = sDocument.state.viewType[this.keyInstance];
+        if(viewType == 'detail'){
+            return false;
+        }
+        if(['label','select'].includes(control.type)){
+            return false;
+        }
+        if(control.checkProps('isReadOnly')){
+            return false;
+        }
+
+        return true;
+    }
     /**
      * hoangnd
      * Hàm đọc thông tin pivot đã lưu để tạo cấu trúc các cột pivot (bao gồm header và các cột group)
@@ -184,21 +197,25 @@ export default class SymperTable {
             let value = this.values[0];
             this.allColumnAppend = data.reduce((arr, obj)=>{
                 if(obj[col.name] && !arr.includes(obj[col.name])){
-                    arr.push(obj[col.name])
+                    arr.push(obj[col.name]);
+                    arr.push(obj[col.name]+"_____s_table_id_sql_lite");
                 }
                 return arr
             },[]);
+            let controlValue = getControlInstanceFromStore(this.keyInstance, value.name);
             for (let index = 0; index < this.allColumnAppend.length; index++) {
                 let colItem = this.allColumnAppend[index];
-                let colField = colItem.replace('\.','____')
+                let colField = colItem.replace('\.','____');
                 let colBinding = {
                     headerName:colItem,
                     field: colField,
                     cellRenderer: this.supportCellsType[value.type],
                     cellRendererParams:{
-                        control:getControlInstanceFromStore(this.keyInstance, value.name),
+                        control:controlValue,
                         controlColumn:colField
                     },
+                    hide:colField.includes('_____s_table_id_sql_lite'),
+                    editable:this.checkEditableCell(controlValue),
                     cellStyle: function(params) {
                         if (params.value=='R') {
                             return {color: 'white', backgroundColor: 'green'};
@@ -241,12 +258,19 @@ export default class SymperTable {
             for (let index = 0; index < data.length; index++) {
                 let newRow = data[index];
                 let rowKey = this.getHashRow(newRow);
+                /**
+                 * đánh dấu giá trị theo dòng những trường ko đưa vào cột
+                 * tạo ra 1 key tương ứng để các dòng tiếp theo nếu trùng dữ liệu thì chỉ cần đẩy dữ liệu vào cell ứng với cột
+                 */
                 if(!mapRowWithData.includes(rowKey)){
                     mapRowWithData.push(rowKey);
                     for (let i = 0; i < this.allColumnAppend.length; i++) {
                         let column = util.cloneDeep(this.allColumnAppend[i]);
                         let newColumn = util.cloneDeep(this.allColumnAppend[i]);
                         newColumn = newColumn.replace('\.','____');
+                        if(column == newRow[this.cols[0]['name']]){
+                            newRow[newColumn+'_____s_table_id_sql_lite'] = newRow['s_table_id_sql_lite'];
+                        }
                         newRow[newColumn] = (column == newRow[this.cols[0]['name']]) ? newRow[controlValue] : "";
                     }
                     newData.push(newRow);
@@ -254,6 +278,7 @@ export default class SymperTable {
                 else{
                     let columnCache = newRow[this.cols[0]['name']];
                     columnCache = columnCache.replace('\.','____')
+                    newData[mapRowWithData.indexOf(rowKey)][columnCache+'_____s_table_id_sql_lite'] = newRow['s_table_id_sql_lite']
                     newData[mapRowWithData.indexOf(rowKey)][columnCache] = newRow[controlValue]
                 }
             }
@@ -429,7 +454,6 @@ export default class SymperTable {
             headerHeight:25,
             rowBuffer: 0,       // số view trong 1 viewport
             groupDefaultExpanded: -1,
-            rowData: this.getRowDefaultData(),
             components: {
                 NumberCellRenderer: NumberCellRenderer,
                 FileCellRenderer: FileCellRenderer,
@@ -469,19 +493,29 @@ export default class SymperTable {
             getRowHeight:function (params) {
                 return 25;
             },
-            suppressRowTransform:true,
-            undoRedoCellEditing: true,
-            enableFillHandle:true,
             enableRangeSelection: true,
-            enableCellTextSelection:false,
-            onCellValueChanged:this.onCellValueChanged,
             onGridReady:this.onGridReady,
-            onCellKeyDown:this.onCellKeyDown,
-            onRowDataChanged:this.onRowDataChanged,
-            onRowDataUpdated:this.onRowDataUpdated,
-            tableInstance:this
+            tableInstance:this,
+
+            
         };
-        let viewType = sDocument.state.viewType[this.instance];
+        
+        let viewType = sDocument.state.viewType[this.keyInstance];
+        if(['submit','update'].includes(viewType)){
+            let moreOptions = {
+                rowData: this.getRowDefaultData(),
+                suppressRowTransform:true,
+                undoRedoCellEditing: true,
+                enableFillHandle:true,
+                enableCellTextSelection:false,
+                onCellValueChanged:this.onCellValueChanged,
+                onCellKeyDown:this.onCellKeyDown,
+                onRowDataChanged:this.onRowDataChanged,
+                onRowDataUpdated:this.onRowDataUpdated,
+                onPasteEnd:this.onPasteEnd,
+            }
+            this.gridOptions = Object.assign(this.gridOptions,moreOptions);
+        }
         let actionBtn = ""
         // let actionBtn = ` <div class="dropdown">
         //                     <button class="ag-pivot-action"><span class="mdi mdi-plus"></span></button>
@@ -508,6 +542,12 @@ export default class SymperTable {
         
     }
 
+    /**
+     * tinh lại chiều cao table sau khi paste
+     */
+    onPasteEnd(){
+        this.tableInstance.caculatorHeight()
+    }
     /**
      * Hàm lấy dữ liệu cho việc submit
      */
@@ -927,6 +967,8 @@ export default class SymperTable {
         }
         if(event.newValue != event.oldValue){
             let columnChange = event.colDef.field;
+            this.tableInstance.dataChange['columnName'] = columnChange;
+            this.tableInstance.dataChange['currentRowData'] = event.data;
             let controlIns = getControlInstanceFromStore(this.tableInstance.keyInstance, columnChange);
             if(this.tableInstance.tableHasRowSum && controlIns.checkProps('isSumTable')){
                 this.tableInstance.pinnedRowNode = event.api.getPinnedBottomRow(0);
@@ -938,6 +980,9 @@ export default class SymperTable {
         }
     }
     handlerAfterChangeCellByUser(columnName, valueChange, currentRowData, rowIndex) {
+        if(this.values && this.values.length > 0 && this.tableMode == 'Group'){
+            columnName = this.values[0].name;
+        }
         this.formulasWorker.postMessage({action:'executeSQliteDB',data:
             {
                 func:'editRow',
@@ -1053,6 +1098,38 @@ export default class SymperTable {
         }
     }
 
+    /**
+     * trường hợp bảng đưa giá trị lên group mà công thức cần giá trị cho cột nào đó thì cần lấy giá trị tương ứng
+     * @param {*} formulaInstance 
+     * @param {*} columnGroupName 
+     * @param {*} rowIndex 
+     */
+    getDataInputFromGroupTable(listInput, formulaInstance){
+        let columnGroupName = this.dataChange['columnName']
+        let currentRowData = this.dataChange['currentRowData']
+
+        let extraData = {}
+        let inputControl = formulaInstance.getInputControl();
+        for (let inputControlName in inputControl) {
+            if(listInput.hasOwnProperty(inputControlName)){
+                let controlIns = listInput[inputControlName];
+                if(controlIns.inTable == this.tableName){
+                    if(currentRowData[inputControlName]){
+                        extraData[inputControlName] = currentRowData[inputControlName];
+                    }
+                    else if(this.values[0].name == inputControlName){
+                        extraData[inputControlName] = currentRowData[columnGroupName];
+                    }
+                    else if(this.cols[0].name == inputControlName){
+                        let colData = columnGroupName.replace('____','\.')
+                        extraData[inputControlName] = colData
+                    }
+                }
+            }
+        }
+        return extraData;
+        
+    }
      /**
      * Hàm xử lí chạy công thức theo cột trong bảng
      * @param {*} controlEffectedInstance   Object của 1 control bị ảnh hưởng
@@ -1063,7 +1140,9 @@ export default class SymperTable {
      */
     handleRunFormulaForControlInTable(controlInstance, formulaInstance, rowIndex = null) {
         let listInput = getListInputInDocument(this.keyInstance);
-        let dataInput = getDataInputFormula(formulaInstance,listInput,{}, rowIndex);
+        // trường hợp bảng group thì cần lấy data input của control đầu vào tương ứng
+        let extraData = this.getDataInputFromGroupTable(listInput,formulaInstance);
+        let dataInput = getDataInputFormula(formulaInstance,listInput,{}, rowIndex, extraData);
         // let sDocumentSubmit = getSDocumentSubmitStore(this.keyInstance);
         // if(!checkDataInputChange(sDocumentSubmit.rootChangeFieldName, sDocumentSubmit.dataInputBeforeChange, dataInput)){
         //     return;
@@ -1206,6 +1285,7 @@ export default class SymperTable {
      */
     handleDataAfterRunFormula(data, controlInstance, formulasType, listIdRow = null) {
         let rowIndexs = this.getRowIndexFromSqlIds(listIdRow);
+        console.log(rowIndexs,'rowIndexrowIndex');
         if (formulasType.includes('linkConfig')) {
             controlInstance.handlerDataAfterRunFormulasLink(data, formulasType);
         }
