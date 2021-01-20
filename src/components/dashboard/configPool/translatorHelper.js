@@ -402,7 +402,7 @@ export const TranslatorHelper = {
                 i += 1;
             }
         }
-        return rsl;
+        return [rsl];
     },
 	 /**
      * Dịch các thông tin chung của tất cả các cell thành dạng css
