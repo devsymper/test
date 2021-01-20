@@ -70,6 +70,8 @@ export default {
             let list = await taskManagementApi.getUserInProject(projectId);
             if (list.status == 200 && list.data) {
                 self.listUser = list.data.listObject;
+            }else{
+                self.listUser = [];
             }
         }
     },
