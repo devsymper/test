@@ -63,6 +63,7 @@
 			<StyleConfig 
 				v-if="tabs == 1"
 				:height="height"
+				:instanceKey="instanceKey"
 			/>
 			<ConditionConfig 
 				:instanceKey="instanceKey"

@@ -9,7 +9,7 @@ export default class Pie extends ReportBase {
     }
 
     translate(rawConfig,  data, extraData ,changes = {}, oldOutput = {}){
-		let output =  TranslatorHelper.Charts.pie(data, rawConfig.setting, rawConfig.style , false, 1)
+		let output =  TranslatorHelper.Charts.pie(data.data, rawConfig.setting, rawConfig.style , false, 1)
 		return output
 	}
 

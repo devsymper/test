@@ -37,25 +37,26 @@ export default {
             default: 0,
         },
     },
-    created() {
-        // let pie = new PieChart()
-        // let output = pie.translate(this.testData.rawConfigs, this.testData.sharedConfigs.data)
-        // debugger
-        // let donut = new DonutChart()
-        // let outputDonut = donut.translate(this.testData.rawConfigs, this.testData.sharedConfigs.data)
-        // debugger
-        let treeMap = new TreemapChart();
-        let outputDonut = treeMap.translate(
-            this.testDataTreemap.rawConfigs,
-            this.testDataTreemap.sharedConfigs.data
-        );
-    },
-    methods: {
-        addYAxis(newLast) {
-        let newYAxis = JSON.parse(JSON.stringify(this.settingItems.yAxis1));
-        newYAxis.selectedColums = [];
-        newYAxis.num = newLast;
-        newYAxis.name = "Y Axis " + newLast;
+  created() {
+    // let pie = new PieChart()
+    // let output = pie.translate(this.testData.rawConfigs, this.testData.sharedConfigs.data)
+    // debugger
+    // let donut = new DonutChart()
+    // let outputDonut = donut.translate(this.testData.rawConfigs, this.testData.sharedConfigs.data)
+    // debugger
+    // let treeMap = new TreemapChart();
+    //   let outputDonut = treeMap.translate(
+    //   this.testDataTreemap.rawConfigs,
+    //   this.testDataTreemap.sharedConfigs.data
+    // );
+    // debugger
+  },
+  methods: {
+    addYAxis(newLast) {
+      let newYAxis = JSON.parse(JSON.stringify(this.settingItems.yAxis1));
+      newYAxis.selectedColums = [];
+      newYAxis.num = newLast;
+      newYAxis.name = "Y Axis " + newLast;
 
         let tooltips = this.settingItems.tooltips;
         delete this.settingItems.tooltips;
