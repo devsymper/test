@@ -56,6 +56,9 @@ export const TranslatorHelper = {
 			rsl.chart = {
 				backgroundColor: commonAttr.general.backgroundColor,
 				type: 'pie',
+				style:{
+					fontFamily: 'roboto'
+				},
 				height:313.70141220092773, //extraData
 				width:335.9930725097656 //extraData
 			};
