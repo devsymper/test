@@ -1151,6 +1151,10 @@
 				"add-field":"Add field here"
 			},
 			"relation-selector": "Select relation"
+		},
+		"dataflow":{
+			"titleShowlist": "List dataflow",
+			"titleShowlistTrash": "List trash dataflow"
 		}
 	},
     "virtualdoc": {

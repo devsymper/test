@@ -1,4 +1,5 @@
 import ReportBase from './ReportBase'
+import {TranslatorHelper} from '@/components/dashboard/configPool/translatorHelper'
 
 export default class Card extends ReportBase {
     constructor(symperId){
@@ -26,5 +27,9 @@ export default class Card extends ReportBase {
 			},
 		}
         super('card', symperId, columnSettingKeys, styleKeys);
-    }
+	}
+	translate(rawConfig,  data, extraData ,changes = {}, oldOutput = {}){
+		let output = TranslatorHelper.Charts.card(data , rawConfig.setting , rawConfig.style , 1)
+		return output
+	}
 }

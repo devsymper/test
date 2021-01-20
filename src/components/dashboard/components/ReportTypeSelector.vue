@@ -200,5 +200,6 @@ export default {
 }
 .selected-report-type{
 	background-color: #FEEDE1;
+	border: 1px solid orange;
 }
 </style>

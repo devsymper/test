@@ -193,6 +193,11 @@ export default {
 }
 </script>
 
-<style>
-
+<style scoped>
+.v-list-item{
+	min-height: unset !important;
+}
+.v-list-item__title{
+	font-size: 13px !important;
+}
 </style>
