@@ -115,7 +115,7 @@ export const TranslatorHelper = {
 			let commonAttr = TranslatorHelper.getCommonCellStyleAttr(style, ratio);
 			rsl = Object.assign(rsl, commonAttr);
 			return rsl;
-		}
+		},
 	},
 	/**
      * Chuyển giá trị của các row có chứa key bắt buộc là number thành number
