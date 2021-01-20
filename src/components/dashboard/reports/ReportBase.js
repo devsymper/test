@@ -255,7 +255,7 @@ export default class ReportBase {
     
     makeDisplayColOptions(cellStyle, list, keyAs = 'name', keyName = 'name', prevDisplayOptions) {
         let rsl = [];
-        let extraDisplay = prevDisplayOptions ? (prevDisplayOptions.symperExtraDisplay ? prevDisplayOptions.symperExtraDisplay : {}) : {};
+        let extraDisplay = cellStyle.extraData ? cellStyle.extraData : {};
         let colsWidth = extraDisplay.columnsWidth ? extraDisplay.columnsWidth : [];
         let pinnedColIdx = extraDisplay.pinnedColIdx ? extraDisplay.pinnedColIdx : {};
         let run = 0;

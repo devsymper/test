@@ -55,6 +55,7 @@ export default class Table extends ReportBase {
         };
 
         cellStyle.originStyle = style;
+        cellStyle.extraData = rawConfig.extra;
         // if (type == 'table') {
         rsl.columns = this.makeDisplayColOptions(cellStyle, columns.value.selectedColums, 'as', 'as', prevDisplayOptions, style)
         // if(rsl.columns[0].symperColumnName == "Format entire row"){ // check xem có condition format cho toàn bộ row trong table hay ko
