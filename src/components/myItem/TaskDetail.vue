@@ -782,14 +782,19 @@ export default {
                 let assigneeId=arrDataAssignee[0];
                 let roleIdentify=originData.assignee.slice(assigneeId.length + 1);
                 // ktra enduser có tồn tại role trong assignee không
-                let rolesUser=self.$store.state.app.endUserInfo.roles;
-                let role=rolesUser[arrDataAssignee[1]].find(element => element.id == roleIdentify);
-                if (role) {
-                    self.isRole=true;
-                    return true;
+                if(roleIdentify!= "0"){
+                	let rolesUser=self.$store.state.app.endUserInfo.roles;
+					let role=rolesUser[arrDataAssignee[1]].find(element => element.id == roleIdentify);
+					if (role) {
+						self.isRole=true;
+						return true;
+					}else{
+						self.isRole=false;
+						return false;
+					}
                 }else{
-                    self.isRole=false;
-                    return false;
+                	self.isRole=false;
+					return true;
                 }
             }else{
                 self.isRole=false;
