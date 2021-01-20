@@ -13,10 +13,10 @@ onmessage = function (event) {
         case 'runFormula':
             let controlName = dataOfAction.controlName;
             let formulaInstance = dataOfAction.formulaInstance
-            let from = dataOfAction.from
             let formulaIns = new Formulas(formulaInstance.keyInstance,formulaInstance.formulas,formulaInstance.type);
-            // let rowIndex = dataOfAction.rowIndex;
+            let rowNodeId = dataOfAction.rowNodeId; // th trong table thì mỗi dòng có 1 id
             let sqlRowId = dataOfAction.sqlRowId;
+            let columnName = dataOfAction.columnName;
             let dataInput = {};
             if(dataOfAction.dataInput){
                 dataInput = dataOfAction.dataInput;
@@ -25,7 +25,7 @@ onmessage = function (event) {
             /**
              * Trương hợp chạy công thức cho cả cột trong table
              */
-            if(from == 'columnTable'){
+            if(rowNodeId && rowNodeId.length > 1){
                 let listIdRow = dataOfAction.listIdRow;
                 let dataPostForGetMultiple = prepareDataGetMultiple(dataInput, listIdRow, workerStore['submit'][keyInstance]['inputData']);
                 let cacheRowData = {};
@@ -58,7 +58,7 @@ onmessage = function (event) {
                             }
                         }
                         postMessage({action:'afterRunFormulasSuccess', dataAfter : 
-                            {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type, dataRowId:listIdRow}
+                            {controlName:controlName, res:res, formulaType:formulaInstance.type, rowNodeId:listIdRow}
                         })
                         
                     }
@@ -72,7 +72,7 @@ onmessage = function (event) {
                     formulaIns.handleRunAutoCompleteFormulas(dataInput).then(res=>{
                         if(res && res['data']){
                             postMessage({action:'afterRunFormulasSuccess', dataAfter : 
-                                {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type}
+                                {controlName:controlName, res:res, formulaType:formulaInstance.type}
                             })
                         }
                     })
@@ -84,7 +84,7 @@ onmessage = function (event) {
                     formulaIns.handleBeforeRunFormulas(dataInput).then(res=>{
                         if(res && res['data']){
                             postMessage({action:'afterRunFormulasSuccess', dataAfter : 
-                                {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type,dataRowId:sqlRowId}
+                                {controlName:controlName, res:res, formulaType:formulaInstance.type,rowNodeId:rowNodeId, columnName:columnName}
                             })
                         }
                     })

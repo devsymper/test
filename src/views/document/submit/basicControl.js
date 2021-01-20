@@ -366,7 +366,7 @@ export default class BasicControl extends Control {
                     this.setImageControlValue(value)
                 }        
                 else {
-                    if(value && value.inputDislay){
+                    if(value && value.inputValue){
                         this.ele.val(value.inputDislay);
                     }
                     else{
