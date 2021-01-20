@@ -116,6 +116,48 @@ export const TranslatorHelper = {
 			rsl = Object.assign(rsl, commonAttr);
 			return rsl;
 		},
+		/**
+		 * Chuyển đổi cấu hình cho loại treemap chart
+		 * @param {Array} data Mảng dữ liệu của chart
+		 * @param {Object} columns Cấu hình các cột
+		 * @param {Object} style Cấu hình hiển thịs
+		 */
+		filter(data, columns, style, ratio) {
+			style = TranslatorHelper.makeStyleMap(style);
+			let selectedColum = columns.value.selectedColums[0];
+			selectedColum = selectedColum ? selectedColum : {};
+
+			let rsl = {
+				selectionMode: style.selectionControl.children.selectionMode.value,
+				data: data,
+				selectionType: style.selectionControl.children.selectionType.value,
+				itemStyle: TranslatorHelper.getStyleItemsInConfig(style.filterItem.children, 'px', ratio)
+			};
+			
+			
+			if (data.length > 0) {
+				let type = selectedColum.type;
+				if (rsl.selectionMode == 'default' && (type == 'number' || type == 'date')) {
+					let min = type == 'number' ? Number(data[0].min) : data[0].min;
+					let max = type == 'number' ? Number(data[0].max) : data[0].max;
+					rsl.data = {
+						min: min,
+						max: max,
+						value: [min, max]
+					};
+				} else {
+					for (let i in data) {
+						rsl.data[i].symper__selected = false;
+					}
+				}
+			}
+			rsl = JSON.parse(JSON.stringify(rsl));
+			let commonAttr = TranslatorHelper.getCommonCellStyleAttr(style, ratio);
+			commonAttr.symperTitle.text = commonAttr.symperTitle.text ? commonAttr.symperTitle.text : selectedColum.as;
+			return Object.assign(commonAttr, rsl);
+
+		},
+		
 	},
 	/**
      * Chuyển giá trị của các row có chứa key bắt buộc là number thành number
