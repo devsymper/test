@@ -199,6 +199,9 @@
         "unfreeze_column": "Don't freeze this column",
         "hide_column": "Hide this column",
 		"show_column": "Show this column",
+		"domainName": "Domain name",
+        "serviceIdentifier": "Service identifier",
+        "serviceName": "Service name",
 		"os": "Os",
 		"ip": "IP address",
 		"number_instance": "Number instances",
@@ -225,7 +228,10 @@
             "cannot_get_data": "Can not get data from server"
         },
         "success": {
-            "save_config": "Save config successfully!"
+            "save_config": "Save config successfully!",
+            "save_filter": "Save filter table successfully!",
+            "delete_filter": "Save filter table successfully!",
+            "edit_filter": "Save filter table successfully!"
         },
         "filter": {
             "none": "None",
@@ -245,7 +251,12 @@
             "sort_desc": "Sort DESC",
             "clear_filter": "Clear filter",
             "filter_by_value": "Filter by value",
-            "filter_by_condition": "Filter by condition"
+            "filter_by_condition": "Filter by condition",
+            "Delete":"Delete",
+            "Edit":"Edit",
+            "Default":"Default",
+            "Delete Default":"Bỏ mặc định"
+
         }
     },
     "import": {
