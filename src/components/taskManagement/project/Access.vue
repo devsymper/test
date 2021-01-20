@@ -13,13 +13,12 @@
                                 <v-btn  v-if="checkRole('task_manager_permission','add')"  small  depressed @click="handleCreatePermission">
                                     <span>Tạo permission</span>
                                 </v-btn>
-                                <v-btn  v-if="checkRole('task_manager_access','add')"  depressed small class="mx-2"  @click="handleClickAddPeople" >
-                                    {{$t("taskManagement.addPeople")}}
-                                </v-btn>
                                 <v-btn depressed @click="handleRoleManager" small >
                                     {{$t("taskManagement.managerRole")}}
                                 </v-btn>
-                         
+                                <v-btn  v-if="checkRole('task_manager_access','add')"  depressed small class="mx-2"  @click="handleClickAddPeople" >
+                                    {{$t("taskManagement.addPeople")}}
+                                </v-btn>
                             </div>
                         </div>
                     </div>
