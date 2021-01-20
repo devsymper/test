@@ -21,6 +21,23 @@ export const staticChartOptions = {
         }
     }
 };
+const yAxisValueFormatter = {
+    none: () => {
+        return eval("this.value;");
+    },
+    thousands: () => {
+        return eval("(this.value/1000)+'K'");
+    },
+    milions: () => {
+        return eval("(this.value/1000000)+'M'");
+    },
+    bilions: () => {
+        return eval("(this.value/1000000000)+'B'");
+    },
+    trilions: () => {
+        return eval("(this.value/1000000000000)+'T'");
+    }
+};
 export const TranslatorHelper = {
 	Charts:{
 		/**
@@ -473,7 +490,7 @@ export const TranslatorHelper = {
             xAxisCol = columns.xAxis.selectedColums[0].as;
             // có legend => chỉ xét một cột của một yaxis
             if (legendCols.length > 0) {
-                let pivotData = getPivotArray(data, yAxisCol.as, legendCols[0].as, xAxisCol);
+                let pivotData = this.getPivotArray(data, yAxisCol.as, legendCols[0].as, xAxisCol);
                 rsl.xAxisCategory = pivotData[0].slice(1);
 
                 for (let i = 1; i < pivotData.length; i++) {
@@ -670,5 +687,42 @@ export const TranslatorHelper = {
 			rsl = rsl + unit;
 		}
 		return rsl;
-	}
+    },
+         /**
+     * Chuyển đổi dạng 
+     * @param {Array} dataArray Data cần pivot dạng [{key1:value1}, {key2:value2}]
+     * @param {*} rowKey key trong row để lấy dữ liệu cho row
+     * @param {*} colKey key của row để lấy dữ liệu cho column
+     * @param {*} dataIndex key của row để lấy dữ liệu đê tính giá trị
+     */
+    getPivotArray(dataArray, dataIndex, rowKey, colKey) {
+        var result = {},ret = [];
+        var newCols = [];
+        for (var i = 0; i < dataArray.length; i++) {
+            if (!result[dataArray[i][rowKey]]) {
+                result[dataArray[i][rowKey]] = {};
+            }
+            result[dataArray[i][rowKey]][dataArray[i][colKey]] = dataArray[i][dataIndex];
+            //To get column names
+            if (newCols.indexOf(dataArray[i][colKey]) == -1) {
+                newCols.push(dataArray[i][colKey]);
+            }
+        }
+        newCols.sort();
+        var item = [];
+        //Add Header Row
+        item.push('Item');
+        item.push.apply(item, newCols);
+        ret.push(item);
+        //Add content 
+        for (var key in result) {
+            item = [];
+            item.push(key);
+            for (var i = 0; i < newCols.length; i++) {
+                item.push(result[key][newCols[i]] || "-");
+            }
+            ret.push(item);
+        }
+        return ret;
+    },
 }
