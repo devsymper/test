@@ -30,7 +30,6 @@ agCellRender.numberRenderer.prototype.init = function(params) {
     }
 
     if((value + '').toLowerCase() == 'nan'){
-        debugger
     }
     this.eGui.innerHTML = value;
 };
