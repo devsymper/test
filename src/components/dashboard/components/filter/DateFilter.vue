@@ -140,6 +140,9 @@ export default {
 .report-date-filter >>> .v-text-field__details {
 	display: none !important;
 }
+.report-date-filter >>> input{
+	font-size: 13px !important;
+}
 .report-date-filter >>> .v-input__icon {
 	font-size: 14px !important;
 	margin-top: -6px !important;
