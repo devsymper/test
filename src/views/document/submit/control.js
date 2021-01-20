@@ -300,7 +300,7 @@ export default class Control {
             if(!this.optionValues['Validate']){
                 this.optionValues['Validate'] = {}
             }
-            if(Object.keys(rowNodeId).length == 1){
+            if(rowNodeId && Object.keys(rowNodeId).length == 1){
                 values = (values) ? values : '';
                 values = (typeof values == 'object') ? Object.values(values)[0] : values;
                 this.optionValues['Validate'][rowNodeId[0]] = {
@@ -411,7 +411,6 @@ export default class Control {
                 tableIns.tableInstance.setDataAtCell(this.name, values,rowNodeId[0]);
             }
             else{ // trường hợp giá trị cho cả cột
-                let mapIndexToValue = {}
                 tableIns.tableInstance.updateItems(values, this.name);
             }
             /**
@@ -436,23 +435,7 @@ export default class Control {
                     }
                 }
             }, 100,this);
-        } else {
-            if (this.type == 'table') {
-                let vls = [];
-                if (values.columns == undefined) {
-                    this.setDataTable(values)
-                } else {
-                    //sqlite
-                }
-            } else {
-                if ($('#' + this.id).length > 0) {
-                    $('#' + this.id).val(values);
-                    $('#' + this.id).trigger('change')
-                    markBinedField(this.curParentInstance, this.name);
-                }
-            }
-
-        }
+        } 
     }
     setDataTable(data) {
         if (data.length > 0 && data[0].length > 0) {
