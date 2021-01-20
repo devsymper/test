@@ -39,14 +39,14 @@ export const TranslatorHelper = {
 				},
 				legend: TranslatorHelper.translateLegend(style.legend.children, ratio),
 				series: TranslatorHelper.getPieSeries(data, columns, style),
-				// tooltip: {
+				tooltip: {
 				// 	formatter: function() { // ko thể truyền hàm qua worker, đưa hàm này lên mainprocess
 				// 		let decimal = style.pieDetailLabel.children.tooltipDecimalNumber.value;
 				// 		let vl = Highcharts.numberFormat(TranslatorHelper.y, decimal);
 				// 		return `<b>${TranslatorHelper.x !== undefined ? TranslatorHelper.x : ''}</b><br>
 				// 				<b>${TranslatorHelper.series.name} : </b> ${vl}`;
 				// 	}
-				// }
+				}
 			};
 
 			if (isDonut) {
@@ -55,8 +55,16 @@ export const TranslatorHelper = {
 			let commonAttr = TranslatorHelper.getCommonCellStyleAttr(style, ratio);
 			rsl.chart = {
 				backgroundColor: commonAttr.general.backgroundColor,
-				type: 'pie'
+				type: 'pie',
+				height:313.70141220092773,
+				width:335.9930725097656
 			};
+			rsl.contentSize = {
+				h:313.70141220092773,
+				w:335.9930725097656
+			};
+			rsl.lang = {"numericSymbols":["K","M","B","T","P","E"],"thousandsSep":","}
+			rsl.xAxis = {"labels":{"autoRotation":[-45,-90]}}
 			return Object.assign(commonAttr, rsl);
 
 		},
@@ -76,13 +84,13 @@ export const TranslatorHelper = {
 				chart: {
 					type: 'treemap'
 				},
-				tooltip: {
-					formatter: function() {
-						let decimal = style.lvl1DataLabel.children.tooltipDecimalNumber.value;
-						let vl = Highcharts.numberFormat(this.point.value, decimal);
-						return `<b>${this.key} : </b> ${vl}`;
-					}
-				}
+				// tooltip: {
+				// 	formatter: function() {
+				// 		let decimal = style.lvl1DataLabel.children.tooltipDecimalNumber.value;
+				// 		let vl = Highcharts.numberFormat(this.point.value, decimal);
+				// 		return `<b>${this.key} : </b> ${vl}`;
+				// 	}
+				// }
 			};
 			rsl.series = [{
 				type: "treemap",
@@ -121,7 +129,6 @@ export const TranslatorHelper = {
 		 * @param {Object} style Cấu hình hiển thịs
 		 */
 		filter(data, columns, style, ratio) {
-			style = TranslatorHelper.makeStyleMap(style);
 			let selectedColum = columns.value.selectedColums[0];
 			selectedColum = selectedColum ? selectedColum : {};
 
