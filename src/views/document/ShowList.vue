@@ -130,6 +130,7 @@ export default {
     },
     data(){
         return {
+            listWorkflows:[],
             startProcess:{
                 name: "startProcess",
                 subMenu:[],
@@ -494,36 +495,75 @@ export default {
             }
             
         },
+        checkExistWorkflow(docId){
+            let data = {
+                check: false,
+                startProcess:{},
+                data:[]
+            }
+            this.listWorkflows.map(lw=>{
+                if(lw.id==docId){
+                    data.check =  true;
+                    data.startProcess = lw.startProcess;
+                    data.data = lw.data
+                }
+            })
+            return data
+
+        },
         getListWorkFollowName(docId){
             this.tableContextMenu.startProcess.subMenu=[];
             const self = this;
-            bpmnApi.getProcessByDocId(docId).then(res=>{
+            let check = this.checkExistWorkflow(docId);
+            if(!check.check){
+                 bpmnApi.getProcessByDocId(docId).then(res=>{
                 if(res.status==200){
                     if(res.data.length==0){
                         self.tableContextMenu.startProcess={};
-                    }else{
-                        self.tableContextMenu.startProcess=self.startProcess
                     }
+                    self.listWorkflows.push({
+                        id: docId,
+                        startProcess: self.startProcess,
+                        data:res.data
+                    })
+                    self.tableContextMenu.startProcess=self.startProcess
                     res.data.map(data=>{
                         let row = data;
                         self.proccessRow = data;
                         self.tableContextMenu.startProcess.subMenu.push({
                             name:data.name,
                             action: async function (row, action){
+                                let defData = await getLastestDefinition(self.proccessRow, true);
+                                if(defData.data[0]){
+                                    self.$refs.listDocument.openactionPanel();
+                                    self.paramId = defData.data[0].id;
+                                    self.getFirstNodeData(defData.data[0].id)
+                                }else {
+                                    self.$snotifyError({},"Can not find process definition having deployment id "+deploymentId);
+                                }
+                            }
+                        })
+                    })
+                }})
+            }else{
+                check.data.map(data=>{
+                    let row = data;
+                    self.proccessRow = data;
+                    self.tableContextMenu.startProcess.subMenu.push({
+                        name:data.name,
+                        action: async function (row, action){
                             let defData = await getLastestDefinition(self.proccessRow, true);
                             if(defData.data[0]){
-                                 self.$refs.listDocument.openactionPanel();
-                                 self.paramId = defData.data[0].id;
+                                    self.$refs.listDocument.openactionPanel();
+                                    self.paramId = defData.data[0].id;
                                 self.getFirstNodeData(defData.data[0].id)
                             }else {
                                 self.$snotifyError({},"Can not find process definition having deployment id "+deploymentId);
                             }
                         }
-                        })
-                        }
-                    )
-                }
-            })
+                    })
+                })
+            }
         },
         onRemoveIndex(indexs, i, index){
             indexs.splice(i,1);
