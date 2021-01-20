@@ -1285,6 +1285,10 @@
 				"add-field":"Thêm trường mới"
 			},
 			"relation-selector": "Lựa chọn relation"
+		},
+		"dataflow":{
+			"titleShowlist": "Danh sách dataflow",
+			"titleShowlistTrash": "Danh sách dataflow đã xóa"
 		}
 	},
     "virtualdoc": {
