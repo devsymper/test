@@ -611,6 +611,15 @@ export default {
                 }
             }
         },
+        /**
+         * flexColumns : true of false, nếu đúng thì colmn sẽ có thêm thược tính flex đê full màn hinh
+         * dev created : dungna
+         * 
+         */
+        flexColumns:{
+            type: Boolean,
+            default: false
+        },
         showPagination:{
             type: Boolean,
             default:true
@@ -658,6 +667,9 @@ export default {
 					break;
                 case 'getTableColumns':
 					data.dataAfter.forEach(function(e){
+                        if(self.flexColumns){
+                            e.flex = 1
+                        }
 						if(e.cellRenderer){
 							eval("e.cellRenderer = " + e.cellRenderer)
 						}
@@ -983,7 +995,8 @@ export default {
 			}
 			this.debounceRelistContextmenu = setTimeout((self) => {
 				self.relistContextmenu();
-			}, 100, this);
+            }, 100, this);
+            this.$emit('cell-mouse-over',params)
 		},
 		isShowCheckedRow(){
             return this.hasColumnsChecked
