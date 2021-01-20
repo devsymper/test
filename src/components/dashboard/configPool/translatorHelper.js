@@ -17,7 +17,6 @@ export const TranslatorHelper = {
 				all: '<b>{point.name}</b>:<br>{point.y} ({point.percentage:.1f} %)',
 			};
 			data = TranslatorHelper.makeValuesToNumber(data, columns);
-			style = TranslatorHelper.makeStyleMap(style);
 			let dataLabels = style.pieDetailLabel.children;
 			let labelsStyle = TranslatorHelper.getStyleItemsInConfig(dataLabels, '', ratio);
 			labelsStyle.fontWeight = 300;
@@ -40,14 +39,14 @@ export const TranslatorHelper = {
 				},
 				legend: TranslatorHelper.translateLegend(style.legend.children, ratio),
 				series: TranslatorHelper.getPieSeries(data, columns, style),
-				tooltip: {
-					formatter: function() {
-						let decimal = style.pieDetailLabel.children.tooltipDecimalNumber.value;
-						let vl = Highcharts.numberFormat(TranslatorHelper.y, decimal);
-						return `<b>${TranslatorHelper.x !== undefined ? TranslatorHelper.x : ''}</b><br>
-								<b>${TranslatorHelper.series.name} : </b> ${vl}`;
-					}
-				}
+				// tooltip: {
+				// 	formatter: function() { // ko thể truyền hàm qua worker, đưa hàm này lên mainprocess
+				// 		let decimal = style.pieDetailLabel.children.tooltipDecimalNumber.value;
+				// 		let vl = Highcharts.numberFormat(TranslatorHelper.y, decimal);
+				// 		return `<b>${TranslatorHelper.x !== undefined ? TranslatorHelper.x : ''}</b><br>
+				// 				<b>${TranslatorHelper.series.name} : </b> ${vl}`;
+				// 	}
+				// }
 			};
 
 			if (isDonut) {
@@ -68,7 +67,6 @@ export const TranslatorHelper = {
 		 * @param {Object} style Cấu hình hiển thị
 		 */
 		treeMap(data, columns, style, ratio) {
-			style = TranslatorHelper.makeStyleMap(style);
 			let colors = TranslatorHelper.getColorsFromStyle(style);
 			let groupCol = columns.group.selectedColums[0] ? columns.group.selectedColums[0] : false;
 			let detailCol = columns.detail.selectedColums[0] ? columns.detail.selectedColums[0] : false;
@@ -139,17 +137,7 @@ export const TranslatorHelper = {
         }
         return data;
 	},
-	 /**
-     * Chuyển từ dạng mảng các style thành dạng key value để dễ truy cập
-     * @param {Array} style mảng các style
-     */
-    makeStyleMap(style) {
-        let styleMap = {};
-        for (let item of style) {
-            styleMap[item.name] = item;
-        }
-        return styleMap;
-	},
+
 	getStyleItemsInConfig(st, sizeUnit = '', ratio) {
         let rsl = {
             textOutline: '0px',
