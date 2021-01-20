@@ -3,6 +3,8 @@ import ReportGroupConfig from '@/components/dashboard/configPool/reportGroupConf
 import { staticChartOptions} from './Common.js'
 import { util } from '@/plugins/util';
 import common from './Common.js'
+import {TranslatorHelper} from '@/components/dashboard/configPool/translatorHelper'
+
 export default class StackedBar extends ReportBase {
     constructor(symperId){
         let columnSettingKeys = ReportGroupConfig.Group1.columnSettingKeys
@@ -11,7 +13,7 @@ export default class StackedBar extends ReportBase {
     }
     
     translate(rawConfig,  data, extraData = {} ,changes = {}, oldOutput = {}){
-        let displayOptions = configsToDisplayOptions(rawConfig,data,displayOptions,1);
+        let displayOptions = TranslatorHelper.stackedBarChart(rawConfig,data,displayOptions,1);
 
     }
 }

@@ -77,7 +77,6 @@ export default {
 	},
 	methods:{
 		testRenderChart(){
-			debugger
 			let stackedbar = new Stackedbar();
 			stackedbar.translate(this.testRowconfig,this.testData);
 		},

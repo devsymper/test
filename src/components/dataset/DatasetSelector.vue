@@ -44,7 +44,6 @@ export default {
 	},
 	created(){
 		this.setOriginValue(this.value);
-		this.originDatasetIds = util.cloneDeep(this.value)
 	},
 	
 	data(){

@@ -13,7 +13,7 @@
 					<v-expansion-panels accordion>
 						<div
 							class="columns-condition"
-							v-for="(condColumn, idx) in conditions"
+							v-for="(condColumn, idx) in currentCellConfigs.rawConfigs.condition"
 							:key="idx"
 						>
 							<ConditionItem
@@ -81,11 +81,20 @@ export default {
 		height:{
 			type: Number,
 			default: 0
-		}
+		},
+		instanceKey: {
+			type: Number,
+			default: 0,
+		},
 	},
 	components: {
 		ConditionItem,
 		VuePerfectScrollbar
+	},
+	computed:{
+		currentCellConfigs(){
+			return this.$store.state.dashboard.allDashboard[this.instanceKey].currentCellConfigs;
+		}
 	},
 	data() {
 		return {

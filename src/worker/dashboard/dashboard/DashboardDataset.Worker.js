@@ -69,11 +69,10 @@ var handler = {
                         dts.subDatasetIds.push(subDatasets[i].id);
                         datasetAndColumn[subDatasets[i].id] = subDatasets[i];
                         datasetAndColumn[subDatasets[i].id].columns = listColumnInDataset.columns[subDatasets[i].id];
-                        let subColumns = datasetAndColumn[subDatasets[i].id].columns;
-                        if (subColumns) {
-                            for (let j = 0; j < subColumns.length; j++) {
-                                subColumns[j].show = true;
-                                subColumns[j].isSelected = false;                            
+                        if(datasetAndColumn[subDatasets[i].id].columns){
+                            for(let clSub of datasetAndColumn[subDatasets[i].id].columns){
+                                clSub.show = true;
+                                clSub.isSelected = false;
                             }
                         }
                     }

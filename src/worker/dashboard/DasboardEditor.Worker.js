@@ -3,7 +3,6 @@ import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportCo
 import { getDefaultDashboardConfig } from "@/components/dashboard/configPool/dashboardConfigs.js";
 import _cloneDeep from 'lodash/cloneDeep';
 import { getNewCellConfigLayout } from "@/components/dashboard/configPool/cellLayout";
-import { appConfigs } from "@/configs.js";
 import { datasetApi } from "../../api/dataset";
 
 var mapTypeToClass = autoLoadChartClasses();

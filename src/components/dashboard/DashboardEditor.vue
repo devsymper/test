@@ -118,6 +118,7 @@ export default {
             this.listDatasetSelected = listDatasetIds;
         },
 		handlerListDatasetSelected(listDatasetIds){
+			this.listDatasetSelected = listDatasetIds;
 		},
         initDashboardData(){
             let defaultData = getDefaultDashboardConfig();
