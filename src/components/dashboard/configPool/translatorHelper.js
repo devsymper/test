@@ -56,15 +56,15 @@ export const TranslatorHelper = {
 			rsl.chart = {
 				backgroundColor: commonAttr.general.backgroundColor,
 				type: 'pie',
-				height:313.70141220092773,
-				width:335.9930725097656
+				height:313.70141220092773, //extraData
+				width:335.9930725097656 //extraData
 			};
 			rsl.contentSize = {
-				h:313.70141220092773,
-				w:335.9930725097656
+				h:313.70141220092773, //extraData
+				w:335.9930725097656 //extraData
 			};
-			rsl.lang = {"numericSymbols":["K","M","B","T","P","E"],"thousandsSep":","}
-			rsl.xAxis = {"labels":{"autoRotation":[-45,-90]}}
+			rsl.lang = {"numericSymbols":["K","M","B","T","P","E"],"thousandsSep":","} //extraData
+			rsl.xAxis = {"labels":{"autoRotation":[-45,-90]}} //extraData
 			return Object.assign(commonAttr, rsl);
 
 		},
@@ -160,7 +160,68 @@ export const TranslatorHelper = {
 			let commonAttr = TranslatorHelper.getCommonCellStyleAttr(style, ratio);
 			commonAttr.symperTitle.text = commonAttr.symperTitle.text ? commonAttr.symperTitle.text : selectedColum.as;
 			return Object.assign(commonAttr, rsl);
-
+		},
+		card(data, columns, style, ratio) {
+			let valueCol = columns.value.selectedColums[0];
+			valueCol = valueCol ? valueCol : {};
+			let rsl = {
+				delta: false,
+				value: data[0] ? data[0][valueCol.as] : 0,
+				compareValue: false,
+				mode: 'number',
+				revert: style.card.children.revertColor.value,
+				sign: 'equal',
+				deltaStyle: TranslatorHelper.getStyleItemsInConfig(style.deltaInfo.children, 'px', ratio),
+				valueStyle: TranslatorHelper.getStyleItemsInConfig(style.dataLabel.children, 'px', ratio),
+			};
+	
+			let upStyle = {
+				color: 'green'
+			};
+			let downStyle = {
+				color: 'red'
+			};
+			if (columns.compareValue.selectedColums.length > 0) {
+				rsl.compareValue = data[0][columns.compareValue.selectedColums[0].as];
+				let mode = style.card.children.cardMode.value;
+				rsl.mode = mode;
+				let delta = 0;
+				if (mode == 'percent') {
+					delta = Number(((rsl.compareValue - rsl.value) / rsl.compareValue * 100).toFixed(3));
+					rsl.sign = delta >= 0 ? (delta == 0 ? 'equal' : 'greater') : 'less';
+					delta += ' %';
+				} else if (mode == 'progress') {
+					delta = Number((rsl.value / rsl.compareValue * 100).toFixed(3));
+				} else if (mode == 'number') {
+					delta = rsl.compareValue - rsl.value;
+					rsl.sign = delta >= 0 ? (delta == 0 ? 'equal' : 'greater') : 'less';
+					let deltaTmp = Math.abs(delta);
+					deltaTmp = TranslatorHelper.getValueDecimal(deltaTmp, 2, 'auto', true);
+					delta = delta > 0 ? deltaTmp : ('-' + deltaTmp);
+				}
+	
+				if (style.card.children.revertColor.value) {
+					let tmp = upStyle;
+					upStyle = downStyle;
+					downStyle = tmp;
+				}
+	
+				if (rsl.sign == 'less') {
+					rsl.deltaStyle = Object.assign(rsl.deltaStyle, downStyle);
+				} else if (rsl.sign == 'greater') {
+					rsl.deltaStyle = Object.assign(rsl.deltaStyle, upStyle);
+				}
+				rsl.delta = delta;
+			}
+			rsl.value = 0;
+			if (data[0]) {
+				rsl.value = TranslatorHelper.getValueDecimal(data[0][valueCol.as], style.dataLabel.children.valueDecimal.value, style.dataLabel.children.unit.value, true);
+			}
+			let commonStyle = TranslatorHelper.getCommonCellStyleAttr(style, ratio);
+			let titleText = commonStyle.symperTitle.text;
+			titleText = titleText ? titleText : '';
+			commonStyle.symperTitle.text = titleText.trim() != '' ? titleText : valueCol.as;
+			return Object.assign(commonStyle, rsl);
 		},
 		
 	},
@@ -187,6 +248,50 @@ export const TranslatorHelper = {
         return data;
 	},
 
+	getValueDecimal(num, decimalNum, mode, needUnit = false) {
+		num = Number(num);
+		decimalNum = Number(decimalNum);
+		let rsl = num;
+		let modeMapNum = {
+			thousands: {
+				v: 1000,
+				s: 'K'
+			},
+			milions: {
+				v: 1000000,
+				s: 'M'
+			},
+			bilions: {
+				v: 1000000000,
+				s: 'B'
+			},
+			trilions: {
+				v: 1000000000000,
+				s: 'T'
+			},
+		};
+		if (mode == 'none') {
+			rsl = num;
+		} else if (mode == 'auto') {
+			for (let runMode in modeMapNum) {
+				if (num > modeMapNum[runMode].v) {
+					mode = runMode;
+					rsl = num / modeMapNum[runMode].v;
+				}
+			}
+		} else {
+			rsl = num / modeMapNum[mode].v;
+		}
+		rsl = Number(Number(rsl).toFixed(decimalNum));
+		rsl = (rsl + '').split('.');
+		rsl[0] = rsl[0].replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+		rsl = rsl.length > 1 ? (rsl[0] + '.' + rsl[1]) : rsl[0];
+		if (needUnit && mode != 'none') {
+			let unit = mode == 'auto' ? '' : modeMapNum[mode].s;
+			rsl = rsl + unit;
+		}
+		return rsl;
+	},
 	getStyleItemsInConfig(st, sizeUnit = '', ratio) {
         let rsl = {
             textOutline: '0px',
