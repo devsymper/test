@@ -1,15 +1,15 @@
 <template>
   <div class="config-settings">
     <VuePerfectScrollbar :style="{ height: height + 'px' }" v-if="currentCellConfigs.rawConfigs">
-      <cell-config-setting-template
-        @add-y-axis="addYAxis"
-        @change-column-setting="changeColumnSetting"
-        v-for="(item, settingName) in currentCellConfigs.rawConfigs.setting"
-        :key="settingName"
-        :settingItem="item"
-        :selectedCell="currentCellConfigs"
-        :settingTplAgg="settingTplAgg"
-      >
+        <cell-config-setting-template
+            @add-y-axis="addYAxis"
+            @change-column-setting="changeColumnSetting"
+            v-for="(item, settingName) in currentCellConfigs.rawConfigs.setting"
+            :key="settingName"
+            :settingItem="item"
+            :selectedCell="currentCellConfigs"
+            :settingTplAgg="settingTplAgg"
+        >
       </cell-config-setting-template>
     </VuePerfectScrollbar>
   </div>
@@ -23,20 +23,20 @@ import DonutChart from "@/components/dashboard/reports/Donut.chart.js";
 import TreemapChart from "@/components/dashboard/reports/Treemap.chart.js";
 
 export default {
-  components: {
-    CellConfigSettingTemplate: CellConfigSettingTemplate,
-    VuePerfectScrollbar,
-  },
-  props: {
-    instanceKey: {
-      type: Number,
-      default: 0,
+    components: {
+        CellConfigSettingTemplate: CellConfigSettingTemplate,
+        VuePerfectScrollbar,
     },
-    height: {
-      type: Number,
-      default: 0,
+    props: {
+        instanceKey: {
+            type: Number,
+            default: 0,
+        },
+        height: {
+            type: Number,
+            default: 0,
+        },
     },
-  },
   created() {
     // let pie = new PieChart()
     // let output = pie.translate(this.testData.rawConfigs, this.testData.sharedConfigs.data)
@@ -58,16 +58,16 @@ export default {
       newYAxis.num = newLast;
       newYAxis.name = "Y Axis " + newLast;
 
-      let tooltips = this.settingItems.tooltips;
-      delete this.settingItems.tooltips;
-      this.$set(this.settingItems, "yAxis" + newLast, newYAxis);
-      this.$set(this.settingItems, "tooltips", tooltips);
-      for (let name in this.settingItems) {
-        if (name.includes("yAxis")) {
-          this.settingItems[name].lastYaxis = newLast;
+        let tooltips = this.settingItems.tooltips;
+        delete this.settingItems.tooltips;
+        this.$set(this.settingItems, "yAxis" + newLast, newYAxis);
+        this.$set(this.settingItems, "tooltips", tooltips);
+        for (let name in this.settingItems) {
+            if (name.includes("yAxis")) {
+            this.settingItems[name].lastYaxis = newLast;
+            }
         }
-      }
-    },
+        },
     changeColumnSetting() {
       window.SDashboardEditor.onChangeCellConfigs("column");
     },
