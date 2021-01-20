@@ -1,5 +1,6 @@
 import ReportBase from './ReportBase'
 import ReportGroupConfig from '@/components/dashboard/configPool/reportGroupConfig'
+import {TranslatorHelper} from '@/components/dashboard/configPool/translatorHelper'
 
 export default class StackedBar extends ReportBase {
     constructor(symperId){
@@ -8,7 +9,11 @@ export default class StackedBar extends ReportBase {
         super('stackedBar', symperId, columnSettingKeys, styleKeys);
     }
     
-    translate(rawConfig,  data, changes = {}, oldOutput = {}){
-        
+    translate(rawConfig,  data, extraData = {} ,changes = {}, oldOutput = {}){
+        let displayOptions = {};
+        displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,"bar",'normal',1);
+        return displayOptions;
+
     }
 }
+

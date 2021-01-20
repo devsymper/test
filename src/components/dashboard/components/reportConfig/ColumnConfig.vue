@@ -1,18 +1,18 @@
 <template>
-	<div class="config-settings">
-		<VuePerfectScrollbar :style="{ height: height + 'px' }" v-if="currentCellConfigs.rawConfigs">
-			<cell-config-setting-template
-				@add-y-axis="addYAxis"
-				@change-column-setting="changeColumnSetting"
-				v-for="(item, settingName) in currentCellConfigs.rawConfigs.setting"
-				:key="settingName"
-				:settingItem="item"
-				:selectedCell="currentCellConfigs"
-				:settingTplAgg="settingTplAgg"
-			>
-			</cell-config-setting-template>
-		</VuePerfectScrollbar>
-	</div>
+  <div class="config-settings">
+    <VuePerfectScrollbar :style="{ height: height + 'px' }" v-if="currentCellConfigs.rawConfigs">
+        <cell-config-setting-template
+            @add-y-axis="addYAxis"
+            @change-column-setting="changeColumnSetting"
+            v-for="(item, settingName) in currentCellConfigs.rawConfigs.setting"
+            :key="settingName"
+            :settingItem="item"
+            :selectedCell="currentCellConfigs"
+            :settingTplAgg="settingTplAgg"
+        >
+      </cell-config-setting-template>
+    </VuePerfectScrollbar>
+  </div>
 </template>
 <script>
 import CellConfigSettingTemplate from '@/components/dashboard/components/reportConfig/CellConfigSettingTemplate';

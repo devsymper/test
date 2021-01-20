@@ -41,13 +41,13 @@ var handler = {
     },
     mapDataToDatasetAndColumn(datasets,listColumnInDataset){
         let datasetAndColumn = {};
-
         for(let dts of datasets){
             dts.title = dts.alias_name?dts.alias_name:dts.name;
             dts.show = true;
             dts.subDatasetIds = [];
             dts.isSelected = false;
             dts.columns = listColumnInDataset.columns[dts.id];
+
             for(let cl of dts.columns){
                 cl.show = true;
                 cl.isSelected = false;
@@ -58,6 +58,9 @@ var handler = {
                 });
                 if (subDatasets.length > 0) {
                     for (let i = 0; i < subDatasets.length; i++) {
+                        if (i == 4) {
+
+                        }
                         subDatasets[i].show = true;
                         subDatasets[i].isSubDataset = true;
                         subDatasets[i].title = subDatasets[i].alias_name?subDatasets[i].alias_name:subDatasets[i].name;

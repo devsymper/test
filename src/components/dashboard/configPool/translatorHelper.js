@@ -1,3 +1,43 @@
+import { util } from '@/plugins/util';
+export const staticChartOptions = {
+    lang: {
+        numericSymbols: ["K", "M", "B", "T", "P", "E"],
+        thousandsSep: ','
+    },
+    // colors: ['#01B8AA','#374649','#FD625E','#F2C80F','#5F6B6D','#8AD4EB','#FE9666','#A66999 #73B761','#4A588A','#ECC846','#CD4C46','#71AFE2','#8D6FD1','#EE9E64','#95DABB #074650','#009292','#FE6DB6','#FEB5DA','#480091','#B66DFF','#B5DAFE','#6DB6FF'],
+    chart:{
+        height : null,
+        width : null,
+        style:{
+            fontFamily :'roboto',
+        }
+    },
+    title : {
+        text : ''
+    },
+    xAxis:{
+        labels:{
+            autoRotation:[-45,-90]
+        }
+    }
+};
+const yAxisValueFormatter = {
+    none: () => {
+        return eval("this.value;");
+    },
+    thousands: () => {
+        return eval("(this.value/1000)+'K'");
+    },
+    milions: () => {
+        return eval("(this.value/1000000)+'M'");
+    },
+    bilions: () => {
+        return eval("(this.value/1000000000)+'B'");
+    },
+    trilions: () => {
+        return eval("(this.value/1000000000000)+'T'");
+    }
+};
 export const TranslatorHelper = {
 	Charts:{
 		/**
@@ -227,7 +267,80 @@ export const TranslatorHelper = {
 			return Object.assign(commonStyle, rsl);
 		},
 		
+		barChart(rawConfigs,data,displayOptions,typeChart,stacking, ratio) {
+			ratio = 1;
+			let columns = rawConfigs.setting;
+			let style = util.cloneDeep(rawConfigs.style);
+		  //  let cellSize = SDashboardEditor.getSizeOfCellContent(cell.sharedConfigs.cellId);
+		
+			displayOptions.symperExtraDisplay = rawConfigs.extra;
+			// style.cellId = data.cellId;
+			// let viewOptions = translateV2(data.data, columns, style, ratio);
+			let viewOptions = TranslatorHelper.linesAndColumns(data.data,columns,style,typeChart,stacking, ratio);
+			let rsl = viewOptions; // Kết quả trả về
+			// rsl.contentSize = {
+			//     w: cellSize.w,
+			//     h: cellSize.h - 10,
+			// };
+		
+			// translate cho chart
+			let options = JSON.parse(JSON.stringify(staticChartOptions));
+			options.chart.type = typeChart;
+			
+			rsl = options;
+			for (let name in options) {
+				if (viewOptions[name]) {
+					options[name] = Object.assign(options[name], viewOptions[name]);
+					delete viewOptions[name];
+				}
+			}
+			rsl = Object.assign(options, viewOptions);
+			// rsl.chart.height = rsl.contentSize.h;
+			// rsl.chart.width = rsl.contentSize.w - 5;
+			return rsl;
+		}
 	},
+
+	    /**
+     * Chuyển các cấu hình thành options tương ứng với các loại chart: line, column, bar, combo
+     * @param {Array} data mảng dữ liệu của chart
+     * @param {Object} columns Cấu hình cột của chart
+     * @param {Object} style style của chart
+     * @param {number} ratio tỷ lệ thu phóng của dashboard
+     */
+    linesAndColumns(data, columns, originStyle, chartType, stacking = undefined, ratio) {
+        data = this.makeValuesToNumber(data, columns);
+        columns = this.filterUnuseColumnsForGroup1(columns);
+        let style = originStyle;
+		let series = this.getSeriesOptions(data, columns, chartType, stacking);
+        series.series = this.applySeriesStyle(series.series, style, ratio);
+        let rsl = {
+            yAxis: this.getYAxisOptions(style, ratio),
+            xAxis: this.translateAxis(style.xAxis.children, ratio),
+            plotOptions: {
+                series: {
+                    dataLabels: this.translateDataLabels(style.dataLabel.children, style.yAxis1.children, ratio),
+                }
+            },
+            legend: this.translateLegend(style.legend.children, ratio),
+            series: series.series
+            // tooltip: {
+            //     formatter: function() {
+            //         let decimal = style.dataLabel.children.tooltipDecimalNumber.value;
+            //         let vl = Highcharts.numberFormat(this.y, decimal);
+            //         setFocusingPoint(originStyle.cellId, this.point.index);
+            //         return `<b>${this.x}</b><br>
+            //                 <b>${this.series.name} : </b> ${vl}`;
+            //     }
+            // }
+        };
+        rsl.xAxis.categories = series.xAxisCategory;
+        let commonAttr = this.getCommonCellStyleAttr(style, ratio);
+        rsl.chart = {
+            backgroundColor: commonAttr.general.backgroundColor,
+        };
+        return Object.assign(commonAttr, rsl);
+    },
 	/**
      * Chuyển giá trị của các row có chứa key bắt buộc là number thành number
      * @param {Array} data mảng dữ liệu của chart
@@ -473,5 +586,300 @@ export const TranslatorHelper = {
 			}
 		}
 		return chartData;
-	}
+	},
+	  /**
+     * Loại bỏ các cột không phù hợp với ràng buộc để tạo thành biểu đổ cho Group 1: là nhóm các chart line, column, bar, combo
+     * @param {Object} columns cấu hình các cột cho việc lấy dữ liệu
+     */
+	filterUnuseColumnsForGroup1(columns) {
+		let correctColumnConfigs = {
+			legend: {
+				selectedColums: []
+			},
+			xAxis: {},
+			yAxis1: {},
+		};
+		// Nếu có legend
+		if (columns.legend.selectedColums.length > 0) {
+			correctColumnConfigs.legend.selectedColums = [columns.legend.selectedColums[0]]; // chỉ lấy cột đầu tiên của legend
+			// Chỉ lấy cột đầu tiên của yAxis
+			correctColumnConfigs.yAxis1.selectedColums = columns.yAxis1.selectedColums.length > 0 ? [columns.yAxis1.selectedColums[0]] : [];
+		} else {
+			for (let name in columns) {
+				if (name.includes('yAxis')) {
+					correctColumnConfigs[name] = columns[name];
+				}
+			}
+		}
+		// chỉ lấy cột đầu tiên của xAxis
+		correctColumnConfigs.xAxis.selectedColums = columns.xAxis.selectedColums.length > 0 ? [columns.xAxis.selectedColums[0]] : [];
+		return correctColumnConfigs;
+	},
+	 /**
+     *  Lấy ra cấu hình của các series trong chart
+     * @param {Array} data mảng dữ liệu của chart
+     * @param {Object} columns cấu hình các cột của chart
+     * @param {Number} ratio tỷ lệ thu phóng của dashboard
+     */
+    getSeriesOptions(data, columns, chartType, stacking) {
+
+        let rsl = {
+            xAxisCategory: [''],
+            series: []
+        };
+        let xAxisCol = false;
+        let yAxisCol = columns.yAxis1.selectedColums[0];
+        let legendCols = columns.legend.selectedColums;
+
+        // danh sách tất cả các column trong yAxis1, yAxis2, ... 
+        let allColsInYAxis = [];
+        for (let name in columns) {
+            if (name.includes('yAxis')) {
+                let yAxisNum = Number(name.replace('yAxis', '')) - 1;
+                for (let columnInYAxis of columns[name].selectedColums) {
+                    columnInYAxis.yAxisNum = yAxisNum;
+                }
+                allColsInYAxis = allColsInYAxis.concat(columns[name].selectedColums);
+            }
+        }
+        // có xAxis
+        if (columns.xAxis.selectedColums.length > 0) {
+            xAxisCol = columns.xAxis.selectedColums[0].as;
+            // có legend => chỉ xét một cột của một yaxis
+            if (legendCols.length > 0) {
+                let pivotData = this.getPivotArray(data, yAxisCol.as, legendCols[0].as, xAxisCol);
+                rsl.xAxisCategory = pivotData[0].slice(1);
+
+                for (let i = 1; i < pivotData.length; i++) {
+                    let type = yAxisCol.seryType ? yAxisCol.seryType : chartType;
+                    rsl.series.push({
+                        yAxis: 0,
+                        zIndex: /line/i.test(type) ? 2 : 1,
+                        stacking: stacking,
+                        name: pivotData[i][0],
+                        type: type,
+                        data: pivotData[i].slice(1),
+                    });
+                }
+            } else {
+                rsl.xAxisCategory = [];
+                // Không có legend, xét nhiều yAxis và nhiều cột trong yAxis
+                for (let yAxisCol of allColsInYAxis) {
+                    let type = yAxisCol.seryType ? yAxisCol.seryType : chartType;
+                    rsl.series.push({
+                        yAxis: yAxisCol.yAxisNum,
+                        stacking: stacking,
+                        name: yAxisCol.as,
+                        zIndex: /line/i.test(type) ? 2 : 1,
+                        type: type,
+                        data: [],
+                    });
+                    for (let item of data) {
+                        if (yAxisCol.yAxisNum == 0) {
+                            rsl.xAxisCategory.push(item[xAxisCol] === null ? '' : item[xAxisCol]);
+                        }
+                        rsl.series[rsl.series.length - 1].data.push(item[yAxisCol.as]);
+                    }
+                }
+            }
+        } else {
+            // có legend
+            if (legendCols.length > 0) {
+                for (let item of data) {
+                    let type = yAxisCol.seryType ? yAxisCol.seryType : chartType;
+                    rsl.series.push({
+                        yAxis: 0,
+                        stacking: stacking,
+                        name: legendCols[0].as,
+                        zIndex: /line/i.test(type) ? 2 : 1,
+                        type: type,
+                        data: [item[yAxisCol.as]],
+                    });
+                }
+            } else {
+                for (let yAxisCol of allColsInYAxis) {
+                    let type = yAxisCol.seryType ? yAxisCol.seryType : chartType;
+                    rsl.series = [{
+                        yAxis: yAxisCol.yAxisNum,
+                        stacking: stacking,
+                        zIndex: /line/i.test(type) ? 2 : 1,
+                        name: yAxisCol.as,
+                        type: type,
+                        data: [data[0][yAxisCol.as]],
+                    }];
+                }
+
+            }
+        }
+        return rsl;
+    },
+	applySeriesStyle(series, styles, ratio) {
+        let colors = this.getColorsFromStyle(styles);
+        for (let i in series) {
+            series[i].color = colors[i];
+            if (/line/i.test(series[i].type) && styles.hasOwnProperty('line')) {
+                let lineProp = styles.line.children;
+                series[i].lineWidth = lineProp.lineWidth.value;
+                series[i].states = {
+                        hover: {
+                            enabled: true,
+                            lineWidth: lineProp.lineWidth.value
+                        }
+                    },
+                    series[i].marker = {
+                        enabled: lineProp.markerEnable.value,
+                        radius: lineProp.markerSize.value * ratio,
+                        states: {
+                            hover: {
+                                enabled: true,
+                                radius: lineProp.markerSize.value * ratio
+                            }
+                        }
+                    };
+            }
+
+        }
+
+        return series;
+	},
+	getYAxisOptions(styles, ratio) {
+        let yAxis = [];
+        for (let name in styles) {
+            if (name.includes('yAxis')) {
+                let props = styles[name].children;
+                let newYAxis = this.translateAxis(props, ratio);
+                let alignValue = props.alignment.value;
+                newYAxis.opposite = alignValue == 'left' ? false : true;
+                if (props.unit.value != 'auto') {
+                    newYAxis.labels.formatter = yAxisValueFormatter[props.unit.value];
+                }
+                yAxis.push(newYAxis);
+            }
+        }
+        return yAxis;
+    },
+    translateAxis(st, ratio) {
+        let mapAlignment = {
+            left: 'low',
+            right: 'high',
+            center: 'middle',
+        };
+        return {
+            gridLineColor: st.gridLineColor.value,
+            gridLineDashStyle: st.gridLineType.value,
+            gridLineWidth: st.gridLine.value ? st.gridLineWidth.value : 0,
+
+            visible: st.show.value,
+            labels: {
+                style: {
+                    fontSize: st.textSize.value * ratio
+                }
+            },
+
+            title: {
+                align: mapAlignment[st.alignment.value],
+                enabled: st.axistitle.value,
+                text: st.titleText.value
+            }
+        }
+	},
+	translateDataLabels(st, yAxis, ratio) {
+        let options = {
+            align: 'center',
+            borderRadius: 2,
+
+            padding: 4 * ratio,
+            enabled: st.show.value,
+            borderColor: st.borderColor.value,
+            borderWidth: st.borderWidth.value,
+            backgroundColor: st.bgColor.value,
+            style: this.getStyleItemsInConfig(st, '', ratio),
+            // formatter: function(options) {
+            //     return getValueDecimal(this.y, 2, yAxis.unit.value, true);
+            // }
+        };
+        options.style.fontWeight = 300;
+        return options;
+	},
+	getValueDecimal(num, decimalNum, mode, needUnit = false) {
+		num = Number(num);
+		decimalNum = Number(decimalNum);
+		let rsl = num;
+		let modeMapNum = {
+			thousands: {
+				v: 1000,
+				s: 'K'
+			},
+			milions: {
+				v: 1000000,
+				s: 'M'
+			},
+			bilions: {
+				v: 1000000000,
+				s: 'B'
+			},
+			trilions: {
+				v: 1000000000000,
+				s: 'T'
+			},
+		};
+		if (mode == 'none') {
+			rsl = num;
+		} else if (mode == 'auto') {
+			for (let runMode in modeMapNum) {
+				if (num > modeMapNum[runMode].v) {
+					mode = runMode;
+					rsl = num / modeMapNum[runMode].v;
+				}
+			}
+		} else {
+			rsl = num / modeMapNum[mode].v;
+		}
+		rsl = Number(Number(rsl).toFixed(decimalNum));
+		rsl = (rsl + '').split('.');
+		rsl[0] = rsl[0].replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,");
+		rsl = rsl.length > 1 ? (rsl[0] + '.' + rsl[1]) : rsl[0];
+		if (needUnit && mode != 'none') {
+			let unit = mode == 'auto' ? '' : modeMapNum[mode].s;
+			rsl = rsl + unit;
+		}
+		return rsl;
+    },
+         /**
+     * Chuyển đổi dạng 
+     * @param {Array} dataArray Data cần pivot dạng [{key1:value1}, {key2:value2}]
+     * @param {*} rowKey key trong row để lấy dữ liệu cho row
+     * @param {*} colKey key của row để lấy dữ liệu cho column
+     * @param {*} dataIndex key của row để lấy dữ liệu đê tính giá trị
+     */
+    getPivotArray(dataArray, dataIndex, rowKey, colKey) {
+        var result = {},ret = [];
+        var newCols = [];
+        for (var i = 0; i < dataArray.length; i++) {
+            if (!result[dataArray[i][rowKey]]) {
+                result[dataArray[i][rowKey]] = {};
+            }
+            result[dataArray[i][rowKey]][dataArray[i][colKey]] = dataArray[i][dataIndex];
+            //To get column names
+            if (newCols.indexOf(dataArray[i][colKey]) == -1) {
+                newCols.push(dataArray[i][colKey]);
+            }
+        }
+        newCols.sort();
+        var item = [];
+        //Add Header Row
+        item.push('Item');
+        item.push.apply(item, newCols);
+        ret.push(item);
+        //Add content 
+        for (var key in result) {
+            item = [];
+            item.push(key);
+            for (var i = 0; i < newCols.length; i++) {
+                item.push(result[key][newCols[i]] || "-");
+            }
+            ret.push(item);
+        }
+        return ret;
+    },
 }

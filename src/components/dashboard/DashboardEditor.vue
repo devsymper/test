@@ -115,6 +115,9 @@ export default {
             this.$refs.datasetDetail.getColumnDataset(datasets);
         },
 		handlerCancelSelectDataset(listDatasetIds){
+            this.listDatasetSelected = listDatasetIds;
+        },
+		handlerListDatasetSelected(listDatasetIds){
 			this.listDatasetSelected = listDatasetIds;
 		},
         initDashboardData(){
