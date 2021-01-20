@@ -18,7 +18,7 @@ export const getDefaultDashboardConfig = function(){
             },
             info: {
                 activePageIndex: 0, // index của page đang được mở lên
-                activeTabIndex:"0", // index của page đang được mở lên
+                activeTabIndex: 0, // index của page đang được mở lên
                 currentTabPageKey:"tab 1", // key của tab và page đang được mở lên
                 dashboardName:"", // tên dashboard
                 datasets: {}, // map các dataset được lựa chọn cho dashboard này, dạng: {id dataset : true}

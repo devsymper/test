@@ -76,13 +76,13 @@ export const TranslatorHelper = {
 				chart: {
 					type: 'treemap'
 				},
-				tooltip: {
-					formatter: function() {
-						let decimal = style.lvl1DataLabel.children.tooltipDecimalNumber.value;
-						let vl = Highcharts.numberFormat(this.point.value, decimal);
-						return `<b>${this.key} : </b> ${vl}`;
-					}
-				}
+				// tooltip: {
+				// 	formatter: function() {
+				// 		let decimal = style.lvl1DataLabel.children.tooltipDecimalNumber.value;
+				// 		let vl = Highcharts.numberFormat(this.point.value, decimal);
+				// 		return `<b>${this.key} : </b> ${vl}`;
+				// 	}
+				// }
 			};
 			rsl.series = [{
 				type: "treemap",

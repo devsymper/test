@@ -53,7 +53,7 @@
     </VuePerfectScrollbar>
 
     <v-tabs ref="dashboardTabs" v-model="dashboardConfig.info.activeTabIndex" >
-        <v-tab  v-for="(tab, idx) in dashboardConfig.info.tabsAndPages.tabs" :key="tab.name">
+        <v-tab  v-for="(tab, idx) in dashboardConfig.info.tabsAndPages.tabs" :key="tab.id" :symper-id="tab.id">
             <div>
                 <span v-if="!tab.editTabName && !tab.name && !isView">
                     <i  class="mdi mdi-plus fs-16"></i>
@@ -74,18 +74,18 @@
                         @input="handleInputTabname"
                         @blur="changeTabName(idx)"
                         v-model="tab.name"/>
-                    <span class="dashboard-tab-item-name" v-else>
+                    <span class="dashboard-tab-item-name" v-else :symper-id="tab.id">
                         {{tab.name}}
                     </span>
                     <v-menu
                         top
                         offset-y
-                        open-on-hover 
                         v-if="!isView && !tab.editTabName"
                         :close-on-content-click="true"
                     >
                         <template v-slot:activator="{ on, attrs }">
                             <v-btn
+                                @click="switchTab(idx)"
                                 v-bind="attrs"
                                 v-on="on"
                                 x-small
@@ -131,6 +131,7 @@ import _cloneDeep from "lodash/cloneDeep";
 import ReportRenderManagement from "@/components/dashboard/reports/ReportRenderManagement.js";
 import ReportTranslatorWorker from 'worker-loader!@/worker/dashboard/ReportTranslator.Worker.js';
 import _isEmpty from "lodash/isEmpty";
+import Sortable from "sortablejs";
 
 export default {
     created(){
@@ -168,6 +169,59 @@ export default {
         }
     },
     methods: {
+        onDragTabEnd(evt) {
+            let self = this;
+            let tabEl = $(self.$refs.dashboardTabs.$el).find('.dashboard-tab-item-name');
+            let names = [];
+            let ids = [];
+            let count = 0;
+
+            let mapNameToTab = self.dashboardConfig.info.tabsAndPages.tabs.reduce((map, el) => {
+                map[el.name] = el;
+                return map;
+            }, {});
+        
+            for(let item of tabEl){
+                let name = $(item).text().trim();
+                let id = $(item).attr('symper-id');
+                names.push(name);
+                ids.push(id);
+            }
+
+            let newArr = [];
+            let tab = null;
+            for(let i = 0; i < names.length; i++){
+                tab = mapNameToTab[names[i]];
+                tab.id = util.str.randomString(6);
+                newArr.push(tab);
+            }
+            newArr.push({
+                id: util.str.randomString(6),
+                active: false,
+                editTabName:false,
+                name:""
+            });
+            self.dashboardConfig.info.tabsAndPages.tabs = newArr;
+            setTimeout((self) => {
+                for(let i = 0 ; i < newArr.length; i++){
+                    if(newArr[i].name.trim() == self.dashboardConfig.info.currentTabPageKey.trim()){
+                        self.dashboardConfig.info.activeTabIndex = i;
+                        break;
+                    }
+                }
+            }, 0, this);
+        },
+        dragAndDropTabs(){
+            let el = $(this.$refs.dashboardTabs.$el).find('.v-slide-group__content.v-tabs-bar__content')[0];
+            let sortTabs = Sortable.create(el, {
+                animation: 200,
+                filter: ".el-icon-close",
+                onEnd: this.onDragTabEnd,
+                ghostClass: 'ghost-class-dragging',
+                dragClass: 'ghost-class-dragging',
+                chosenClass: 'ghost-class-dragging',
+            });
+        },
         listenFromWorker(workerObj){
             let self = this;
             workerObj.addEventListener("message", function (event) {
@@ -219,36 +273,45 @@ export default {
             }, 0, this);
         },
         addTab(){
-            // let tabs = this.dashboardConfig.info.tabsAndPages.tabs;
-            // let newTabName = 'tab '+ tabs.length;
-            // tabs[tabs.length - 1].name = newTabName;
+            let tabs = this.dashboardConfig.info.tabsAndPages.tabs;
+            let newTabName = 'tab '+ tabs.length;
+            tabs[tabs.length - 1].name = newTabName;
 
-            // this.dashboardConfig.info.currentTabPageKey = newTabName;
-            // this.$set(this.dashboardConfig.info.layout, newTabName, []);
-            // this.$set(this.dashboardConfig.info.drillThrough, newTabName, []);
-            // this.dashboardConfig.info.activeTabIndex = (tabs.length - 1)+'';
-            // this.switchTab(tabs.length - 1);
+            this.dashboardConfig.info.currentTabPageKey = newTabName;
+            this.$set(this.dashboardConfig.info.layout, newTabName, []);
+            this.$set(this.dashboardConfig.info.drillThrough, newTabName, []);
+            
+            this.dashboardConfig.info.activeTabIndex = (tabs.length - 1);
+            this.switchTab(tabs.length - 1);
 
-            // tabs.push({
-            //     name: '',
-            //     active: false,
-            //     editTabName:false
-            // });
+            tabs.push({
+                name: '',
+                active: false,
+                id: Date.now() + util.str.randomString(6),
+                editTabName:false
+            });
         },
         switchTab(newTabIndex, oldIndex = -1){
-            // this.$store.commit('dashboard/setSelectedCell', {id: 'global', instanceKey: this.instanceKey});
-            // this.dashboardConfig.info.currentTabPageKey = this.dashboardConfig.info.tabsAndPages.tabs[newTabIndex].name;
-            // for(let tab of this.dashboardConfig.info.tabsAndPages.tabs){
-            //     tab.active = false;
-            // }
-            // setTimeout((self) => {
-            //     let info = self.dashboardConfig.info;
-            //     info.tabsAndPages.tabs[newTabIndex].active = true;
-            //     info.activeTabIndex = newTabIndex+'';
-            //     info.currentTabPageKey = info.tabsAndPages.tabs[newTabIndex].name;
-            //     self.renderCellsInViewport();
-            //     self.deactiveCellsInTab(oldIndex);
-            // }, 200, this);
+            this.$store.commit('dashboard/setSelectedCell', {id: 'global', instanceKey: this.instanceKey});
+            this.dashboardConfig.info.currentTabPageKey = this.dashboardConfig.info.tabsAndPages.tabs[newTabIndex].name;
+            for(let tab of this.dashboardConfig.info.tabsAndPages.tabs){
+                tab.active = false;
+            }
+            setTimeout((self) => {
+                let info = self.dashboardConfig.info;
+                info.tabsAndPages.tabs[newTabIndex].active = true;
+                
+                info.activeTabIndex = newTabIndex;
+                info.currentTabPageKey = info.tabsAndPages.tabs[newTabIndex].name;
+                self.renderCellsInViewport();
+                self.deactiveCellsInTab(oldIndex);
+            }, 200, this);
+        },
+        deactiveCellsInTab(tabIndex){
+            if(tabIndex != -1){
+                let tabName = this.dashboardConfig.info.tabsAndPages.tabs[tabIndex].name;
+                this.reportRenderManagement.deactiveCells(this.dashboardConfig.info.layout[tabName]);   
+            }
         },
         handleCommandOnTabs(info){
             let tabId = info.tabIdx;
@@ -270,7 +333,7 @@ export default {
                 }
                 setTimeout((self) => {
                     tabs.splice(tabId, 1);  
-                    window.SDashboardEditor.selectCell('global'); 
+                    this.$store.commit('dashboard/setSelectedCell', {id: 'global', instanceKey: this.instanceKey});
                     let layout = self.dashboardConfig.info.layout[tab.name];
                     for(let cell of layout){
                         self.$delete(self.dashboardConfig.allCellConfigs, cell.cellId) ;    
@@ -292,7 +355,11 @@ export default {
         },
         selectCell(cellId){
         },
-        changeTabName(tabId, newName = null){
+        changeTabName(tabId, evt = null){
+            let newName = null;
+            if(evt){
+                newName = evt.target.value;
+            }
             if(typeof newName == 'string' && !newName.trim()){
                 this.invalidTabName = true;
                 this.$snotifyError({}, "Tên của tab không được để trống");
@@ -349,6 +416,7 @@ export default {
     },
     mounted(){
         this.setWorkspaceHeight();
+        this.dragAndDropTabs();
     },
     props: {
         instanceKey: {
@@ -361,9 +429,11 @@ export default {
     watch: {
         'dashboardConfig.info.activeTabIndex': {
             handler(newVl, oldValue){
-                if(newVl == this.dashboardConfig.info.tabsAndPages.tabs.length - 1){
+                debugger
+                let tabs = this.dashboardConfig.info.tabsAndPages.tabs;
+                if(newVl == tabs.length - 1){
                     this.addTab();
-                }else{
+                }else if(newVl > -1 && newVl < tabs.length && oldValue > -1 && oldValue < tabs.length){
                     this.switchTab(newVl, oldValue)
                 }
             }
@@ -413,5 +483,14 @@ export default {
 
 .vue-grid-item:hover .vue-resizable-handle{
     display: block;
+}
+
+
+.invalid-tab-name input{
+    background-color: rgba(255, 0, 0, 0.37);
+}
+
+.ghost-class-dragging {
+    background-color: rgb(255, 227, 176)!important;
 }
 </style>
