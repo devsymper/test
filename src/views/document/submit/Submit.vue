@@ -466,15 +466,16 @@ export default {
                     let controlName = data.dataAfter.controlName;
                     let res = data.dataAfter.res;
                     let formulaType = data.dataAfter.formulaType;
-                    let from = data.dataAfter.from;
-                    let dataRowId = data.dataAfter.dataRowId;
+
+                    let rowNodeId = data.dataAfter.rowNodeId;
+                    let columnName = data.dataAfter.columnName;
                     let controlIns = getControlInstanceFromStore(thisCpn.keyInstance, controlName)
-                    if(['rowTable','columnTable'].includes(from)){
+                    if(rowNodeId){
                         let tableControl = getControlInstanceFromStore(thisCpn.keyInstance, controlIns.inTable);
-                        tableControl.tableInstance.afterRunFormula(res, formulaType , controlIns, dataRowId, from);
+                        tableControl.tableInstance.afterRunFormula(res, formulaType , controlIns, rowNodeId, columnName);
                     }
                     else{
-                        thisCpn.handleAfterRunFormulas(res,controlName,formulaType,from);
+                        thisCpn.handleAfterRunFormulas(res,controlName,formulaType);
                     }
                     break;
                 case 'afterCreateSQLiteDB':
@@ -501,7 +502,7 @@ export default {
             e.stopPropagation();
             let controlName = $(this).attr('control-name');
             let control = getControlInstanceFromStore(thisCpn.keyInstance, controlName);
-            let rowIndex = $(this).attr('row-index');
+            let rowIndex = $(this).attr('row-node-id');
             rowIndex = Number(rowIndex)
             if(!rowIndex){
                 rowIndex = 0   
@@ -509,8 +510,10 @@ export default {
             let validateData = {}
             for (let index = 0; index < control.validateMessageType.length; index++) {
                 const type = control.validateMessageType[index];
-                if(control.optionValues[type] && control.optionValues[type][rowIndex].isValid){
-                    validateData[type] = control.optionValues[type]
+                if(control.optionValues[type] && control.optionValues[type][rowIndex] && control.optionValues[type][rowIndex].isValid){
+                    let item = {};
+                    item[rowIndex] = control.optionValues[type][rowIndex]
+                    validateData[type] = item;
                 }
             }
             thisCpn.$refs.validate.show(e, validateData);
@@ -1353,7 +1356,7 @@ export default {
                             formulaInstance:formulaIns,
                             dataInput:dataInput, 
                             controlName:aliasControl, 
-                            rowIndex:e.e.rowIndex,
+                            rowNodeId:e.e.rowNodeId,
                             keyInstance:this.keyInstance
                         }
                     })
@@ -1450,8 +1453,9 @@ export default {
             }
             else{
                 let tableControl = getControlInstanceFromStore(this.keyInstance, controlInstance.inTable);
-                let currentCell = tableControl.tableInstance.getForcusCell();
-                tableControl.tableInstance.setDataAtCell(controlName, time, currentCell.rowIndex);
+                let currentCell = tableControl.tableInstance.getFocusedCell();
+                let currentRow = tableControl.tableInstance.getDisplayedRowAtIndex(currentCell.rowIndex);
+                tableControl.tableInstance.setDataAtCell(controlName, time, currentRow.id);
             }
         },
         checkEscKey(event){
@@ -1493,8 +1497,9 @@ export default {
             }
             else{
                 let tableControl = getControlInstanceFromStore(this.keyInstance, controlIns.inTable);
-                let currentCell = tableControl.tableInstance.getForcusCell();
-                tableControl.tableInstance.setDataAtCell(currentCell.column.colDef.field, data.value.inputValue, currentCell.rowIndex);
+                let currentCell = tableControl.tableInstance.getFocusedCell();
+                let currentRow = tableControl.tableInstance.getDisplayedRowAtIndex(currentCell.rowIndex);
+                tableControl.tableInstance.setDataAtCell(currentCell.column.colDef.field, data.value.inputValue, currentRow.id);
             }
         },
 
@@ -1937,8 +1942,9 @@ export default {
             }
             else{
                 let tableControl = getControlInstanceFromStore(this.keyInstance, controlInstance.inTable);
-                let currentCell = tableControl.tableInstance.getForcusCell();
-                tableControl.tableInstance.setDataAtCell(controlName, data, currentCell.rowIndex);
+                let currentCell = tableControl.tableInstance.getFocusedCell();
+                let currentRow = tableControl.tableInstance.getDisplayedRowAtIndex(currentCell.rowIndex);
+                tableControl.tableInstance.setDataAtCell(controlName, data, currentRow.id);
             }
         },
 
@@ -2622,7 +2628,6 @@ export default {
                         formulaInstance:formulaInstance, 
                         dataInput:dataInput,
                         controlName:controlName, 
-                        from:from, 
                         keyInstance:this.keyInstance}})
                 }
             } else {
@@ -2637,7 +2642,7 @@ export default {
         /**
          *  Hàm xử lí dứ liệu sau khi chạy công thức
          */
-        handleAfterRunFormulas(res,controlName,formulaType,from){
+        handleAfterRunFormulas(res,controlName,formulaType){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
             if(formulaType == 'autocomplete' || formulaType == 'list'){
                 let titleControl = (controlInstance) ? controlInstance.title : "";
@@ -3038,8 +3043,9 @@ export default {
             let controlIns = this.currentFileControl.controlIns;
             if(controlIns.inTable != false){
                 let tableControl = getControlInstanceFromStore(this.keyInstance, controlIns.inTable);
-                let currentCell = tableControl.tableInstance.getForcusCell();
-                tableControl.tableInstance.setDataAtCell(controlIns.name, url, currentCell.rowIndex);
+                let currentCell = tableControl.tableInstance.getFocusedCell();
+                let currentRow = tableControl.tableInstance.getDisplayedRowAtIndex(currentCell.rowIndex);
+                tableControl.tableInstance.setDataAtCell(controlIns.name, url, currentRow.id);
             }
             else{
                 this.currentFileControl.controlIns.setValue(url);
