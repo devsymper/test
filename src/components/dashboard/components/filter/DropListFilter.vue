@@ -1,27 +1,17 @@
 <template>
-    <div class="w-100 h-100 mt-2" style="position:relative">
+    <div class="w-100 h-100 mt-2 report-select-filter" style="position:relative">
         <v-select
             style="width: calc(100% - 20px);margin-left: 10px;"
             v-model="selectedValues"
             :multiple="cellView.displayOptions.selectionType == 'multiple'"
-            filterable
-            remote
-            collapse-tags
-            reserve-keyword
 			:items="Object.keys(data)"
+			solo
+			class="report-filter"
+			small-chips
             @change="handleChangeFilterValue"
-            placeholder="Enter key word"
-            size="mini"
-            :remote-method="remoteMethod"
-            :loading="loading">
-            <!-- <el-option
-                v-for="item in data"
-                :key="item[selectedCol.as]"
-                :label="item[selectedCol.as]"
-                :value="item[selectedCol.as]">
-            </el-option> -->
+            :loading="loading"
+		>
         </v-select>
-        <i class="el-icon-arrow-down" style="position:absolute;    right: 15px;top: 8px;"></i>
     </div>
 </template>
 <script>
@@ -69,5 +59,29 @@ export default {
 }
 </script>
 <style scoped>
+.report-select-filter >>> .v-text-field__details{
+	display: none !important;
+}
+.report-select-filter >>> .v-input__control{
+	min-height: unset !important;
+}
+.report-select-filter >>> .v-input__slot{
+	box-shadow: unset !important;
+	border: 1px solid lightgray;
+}
+.v-list-item >>> .v-list-item__title{
+	margin-left: 8px !important;
+}
 
+</style>
+<style >
+.v-list-item{
+	min-height: unset !important;
+}
+.v-list-item__title{
+	font-size: 13px !important;
+}
+.v-list-item__action{
+	margin: unset !important
+} 
 </style>
