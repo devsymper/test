@@ -178,15 +178,15 @@ export default {
         listStatus(){
             let listStatus = [];
             if (this.sTaskManagement.listStatusInProjects[this.projectId] && this.sTaskManagement.listStatusInProjects[this.projectId].length >= 0 ) {
-                listStatus = util.cloneDeep(this.$store.state.taskManagement.listStatusInProjects[this.projectId]);
+                listStatus = util.cloneDeep(this.sTaskManagement.listStatusInProjects[this.projectId]);
             }
             return listStatus;
         },
         allIssueTypeInProject(){
-            return this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId];
+            return this.sTaskManagement.listIssueTypeInProjects[this.projectId];
         },
         dataSprintAfterMapIssue(){
-            return this.$store.state.taskManagement.dataSprintAfterMapIssue[this.currentBoard.id];
+            return this.sTaskManagement.dataSprintAfterMapIssue[this.currentBoard.id];
         }
     },
     watch:{
@@ -363,8 +363,8 @@ export default {
          * 
          */
         setNodeMap(){
-            let allOperator = this.$store.state.taskManagement.listOperatorInProject[this.projectId];
-            let allNode = this.$store.state.taskManagement.listStatusInProjects[this.projectId];
+            let allOperator = this.sTaskManagement.listOperatorInProject[this.projectId];
+            let allNode = this.sTaskManagement.listStatusInProjects[this.projectId];
             if (allOperator.length > 0 && allNode.length > 0) {
                 let data = {};
                 data.allOperator = allOperator;
@@ -541,8 +541,8 @@ export default {
             if (board) {
                 this.currentBoard = board;
             }else{
-                if (Object.keys(this.$store.state.taskManagement.currentBoard).length > 0 && this.$store.state.taskManagement.currentBoard.projectId == this.projectId) {
-                        this.currentBoard = this.$store.state.taskManagement.currentBoard;
+                if (Object.keys(this.sTaskManagement.currentBoard).length > 0 && this.sTaskManagement.currentBoard.projectId == this.projectId) {
+                        this.currentBoard = this.sTaskManagement.currentBoard;
                 }else{
                     let allBoard = this.listBoard;
                     if (allBoard.length>0) {
@@ -560,7 +560,7 @@ export default {
             }
         },
         getListSprintInBoardScrum(){
-            if (!this.$store.state.taskManagement.dataSprintAfterMapIssue[this.currentBoard.id] || this.$store.state.taskManagement.dataSprintAfterMapIssue[this.currentBoard.id].length == 0) {
+            if (!this.sTaskManagement.dataSprintAfterMapIssue[this.currentBoard.id] || this.sTaskManagement.dataSprintAfterMapIssue[this.currentBoard.id].length == 0) {
                 this.kanbanWorker.postMessage({
                     action:'getListSprintInBoard',
                     data:this.currentBoard.id
@@ -570,7 +570,7 @@ export default {
             }
         },
         getSprintRunning(){
-            let listSprint = this.$store.state.taskManagement.dataSprintAfterMapIssue[this.currentBoard.id];
+            let listSprint = this.sTaskManagement.dataSprintAfterMapIssue[this.currentBoard.id];
             let sprintStart = listSprint.find(ele => ele.status == "running");
             if (sprintStart) {
                 this.sprintStart = sprintStart;
@@ -620,25 +620,13 @@ export default {
             if (!this.sTaskManagement.listDocumentIdsInProject[this.projectId] || this.sTaskManagement.listDocumentIdsInProject[this.projectId].length == 0) {
                 this.getListDocumentIdsInProject();
             }
-            let breadcrumbs = [
-                    {
-                        text: 'Kanban',
-                        disabled: true
-                    },
-                ]
-            this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
-            if (!this.$store.state.taskManagement.allProject || this.$store.state.taskManagement.allProject.length == 0) {
+            
+            if (!this.sTaskManagement.allProject || this.sTaskManagement.allProject.length == 0) {
                 this.$store.dispatch("taskManagement/getAllProject");
                 this.getAllProject();
             }else{
                 if (this.projectId) {
-                    let allProject=this.sTaskManagement.allProject;
-                    let project=allProject.find(element => element.id==this.projectId);
-                    if (project) {
-                        self.$store.commit("taskManagement/setCurrentProject", project);
-                    }else{ // call api get detail project
-                        self.getDetailProject();
-                    }
+                    this.getCurrentProject()
                 }
             }
         
@@ -818,6 +806,13 @@ export default {
     },
     
     activated(){
+        let breadcrumbs = [
+                {
+                    text: 'Kanban',
+                    disabled: true
+                },
+            ]
+       
         this.loadData()
     }
 };
@@ -884,7 +879,7 @@ export default {
     background: #f2f2f2;
     width: 24px;
     height: 24px;
-    padding: 4px 0px;
+    /* padding: 4px 0px; */
     text-align: center;
 }
 </style>
