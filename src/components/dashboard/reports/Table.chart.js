@@ -23,55 +23,6 @@ export default class Table extends ReportBase {
         super('table', symperId, columnSettingKeys, styleKeys);
     }
     
-    makeDisplayColOptions(cellStyle, list, keyAs = 'name', keyName = 'name', prevDisplayOptions) {
-        let rsl = [];
-        let extraDisplay = prevDisplayOptions ? (prevDisplayOptions.symperExtraDisplay ? prevDisplayOptions.symperExtraDisplay : {}) : {};
-        let colsWidth = extraDisplay.columnsWidth ? extraDisplay.columnsWidth : [];
-        let pinnedColIdx = extraDisplay.pinnedColIdx ? extraDisplay.pinnedColIdx : {};
-        let run = 0;
-        let mapNameToColumn = {};
-        list.forEach(element => {
-            mapNameToColumn[element.columnName] = element;
-            let newCol = {
-                headerName: element[keyAs],
-                field: element[keyName],
-                headerTooltip: element[keyAs],
-                symperType: element.type,
-                symperColumnName: element.columnName,
-                editable: false,
-                symperCellConfig: {
-                    decimal: cellStyle.symperCellConfig.decimalTootip
-                },
-                lastLineAgg: element.lastLineAgg ? element.lastLineAgg : 'sum',
-                headerClass: 'symper-table-dashboard-header',
-                cellClass: element.type == 'number' ? 'text-align-right' : '',
-            };
-
-            if (element.type == 'number') {
-                newCol.cellRenderer = 'numberRenderer';
-                newCol.symperCellConfig.zeroValueDisplay = cellStyle.symperCellConfig.zeroValueDisplay;
-            }
-
-            if (cellStyle.symperCellConfig.headerWrapText) {
-                newCol.headerClass += ' symper-table-dashboard-header-wraptext';
-            }
-
-            if (colsWidth[run]) {
-                newCol.width = colsWidth[run];
-            }
-
-            if (pinnedColIdx[run]) {
-                newCol.pinned = pinnedColIdx[run];
-            }
-            run += 1;
-            newCol.symperCellConfig.decimalNumber = cellStyle.symperCellConfig.decimalTootip;
-            rsl.push(newCol);
-        });
-        // comment do chưa dùng tới chức năng conditional format
-        // rsl = treeConditionConverter.addConditionFormatToColDef(rsl, cellStyle.originStyle, mapNameToColumn);
-        return rsl;
-    }
-
     translate(rawConfig,  resData, extraData, changes = {}, oldOutput = {}){
         let ratio = 1;
         let data = resData.data;

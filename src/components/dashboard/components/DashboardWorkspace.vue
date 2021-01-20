@@ -429,7 +429,6 @@ export default {
     watch: {
         'dashboardConfig.info.activeTabIndex': {
             handler(newVl, oldValue){
-                debugger
                 let tabs = this.dashboardConfig.info.tabsAndPages.tabs;
                 if(newVl == tabs.length - 1){
                     this.addTab();
