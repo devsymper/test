@@ -23,7 +23,6 @@
                 <span @click="changeSelectItem()" class="el-checkbox__label">Select All
                 </span>
             </label>
-            <!-- giống y hệt của el-element nhưng chắc do bug nên ko chạy ==> phải thay bằng HTML tương đương -->
             <div v-for="(item,idx) in data" :key="idx">
                 <label 
                     :class="'el-checkbox' + (item.symper__selected ? ' is-checked':'')">

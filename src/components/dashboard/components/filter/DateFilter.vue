@@ -7,7 +7,7 @@
 			<div class="d-flex" style="background-color: #ffffff">
 				<div style="border-right: 1px solid lightgray ">
 					<div v-for="(item, i) in pickerOptions.shortcuts" :key="i">
-						<span class="fs-13 ml-2 mt-2 mr-4 picker-option-title">
+						<span class="fs-13 ml-2 mt-2 mr-4 picker-option-title" @click="item.onClick(dates)">
 							{{ item.text }}
 						</span>
 					</div>
@@ -44,8 +44,8 @@ export default {
 	},
 	props: ['data', 'selectionType', 'selectedCol', 'cellId', 'cellView'],
 	computed: {
-		dateRangeText () {
-			return this.dates.join(' ~ ')
+		dateRangeText() {
+			return this.dates.join(' ~ ');
 		},
 	},
 	data() {
@@ -66,6 +66,7 @@ export default {
 					{
 						text: 'Yesterday',
 						onClick(picker) {
+							debugger;
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24);
@@ -136,17 +137,17 @@ export default {
 }
 </style>
 <style scoped>
-.report-date-filter >>> .v-text-field__details{
+.report-date-filter >>> .v-text-field__details {
 	display: none !important;
 }
-.report-date-filter >>> .v-input__icon{
+.report-date-filter >>> .v-input__icon {
 	font-size: 14px !important;
 	margin-top: -6px !important;
 }
-.report-date-filter >>> .v-input__control{
+.report-date-filter >>> .v-input__control {
 	min-height: unset !important;
 }
-.report-date-filter >>> .v-input__slot{
+.report-date-filter >>> .v-input__slot {
 	box-shadow: unset !important;
 	border: 1px solid lightgray;
 }

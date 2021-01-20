@@ -69,10 +69,6 @@ export default {
 	box-shadow: unset !important;
 	border: 1px solid lightgray;
 }
-.v-list-item >>> .v-list-item__title{
-	margin-left: 8px !important;
-}
-
 </style>
 <style >
 .v-list-item{

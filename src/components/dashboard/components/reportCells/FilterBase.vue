@@ -19,11 +19,12 @@
             v-else-if="selectedCol.type != 'number'">
         </select-filter>
         <div class="pl-3 pr-3" v-else>
-            <div style="margin-bottom: -10px">
+            <div style="margin-bottom: -10px" class="filter-base">
                 <v-text-field
                     size="nano"
                     :controls="false"
                     class=" mr-2 w-45"
+					solo
                     style="min-width:50px;max-width:100px"
                     @change="handleChangeFilterValue(cellConfigs.sharedConfigs.cellId)"
                     placeholder="Please Input"
@@ -31,6 +32,7 @@
                 </v-text-field>
                 <v-text-field
                     style="min-width:50px;max-width:100px"
+					solo
                     size="nano"
                     :controls="false"
                     @change="handleChangeFilterValue(cellConfigs.sharedConfigs.cellId)"
@@ -39,7 +41,6 @@
                     v-model="sliderDataValue.value[1]">
                 </v-text-field>
             </div>
-			ahihihi
             <!-- <el-slider
                 v-model="sliderDataValue.value"
                 range
@@ -116,3 +117,15 @@ export default {
     }
 }
 </script>
+<style scoped>
+.filter-base >>> .v-text-field__details{
+	display: none !important;
+}
+.filter-base >>> .v-input__control{
+	min-height: unset !important;
+}
+.filter-base >>> .v-input__slot{
+	box-shadow: unset !important;
+	border: 1px solid lightgray;
+}
+</style>
