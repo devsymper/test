@@ -1,6 +1,8 @@
 import ReportBase from './ReportBase'
 import ReportGroupConfig from '@/components/dashboard/configPool/reportGroupConfig'
-
+import { staticChartOptions} from './Common.js'
+import { util } from '@/plugins/util';
+import common from './Common.js'
 export default class StackedBar extends ReportBase {
     constructor(symperId){
         let columnSettingKeys = ReportGroupConfig.Group1.columnSettingKeys
@@ -8,97 +10,47 @@ export default class StackedBar extends ReportBase {
         super('stackedBar', symperId, columnSettingKeys, styleKeys);
     }
     
-    translate(rawConfig,  data, changes = {}, oldOutput = {}){
-        let displayOptions = getDefaultDisplayOption();
-
-        let xAxis = []; // các cột được chọn làm x axis (thường chỉ có một cột)
-        let yAxis = [[]]; // các cột chọn làm y axis, bắt đầu bằng 1
-        let mergedYAxis = []; // các cột chọn làm y axis, nhưng dưới dạng liệt kê, không phân trái phải
-
-        if(rawConfig.settings.xAxis && rawConfig.settings.xAxis.selectedColums !== undefined){
-            for(let cln of rawConfig.settings.xAxis.selectedColums){
-                xAxis.push(cln.as);
-            }
-        }
-        
-        if(rawConfig.settings.yAxis1){
-            let maxYAxis = rawConfig.settings.yAxis1.lastYaxis;
-            for(let i = 1 ;i<=maxYAxis;i++){
-                yAxis.push([]);
-                if(rawConfig.settings['yAxis'+i].selectedColums !== undefined){
-                    for(let cln of rawConfig.settings['yAxis'+i].selectedColums){
-                        yAxis[i].push(cln);
-                        mergedYAxis.push(cln);
-                    }
-                }
-                
-            }
-        };
-
-        return getStructuredOptions(xAxis,mergedYAxis,yAxis,data,"stackedBar");
+    translate(rawConfig,  data, extraData = {} ,changes = {}, oldOutput = {}){
+        let displayOptions = configsToDisplayOptions(rawConfig,data,displayOptions,1);
 
     }
 }
 
-export const getDefaultDisplayOption = function() {
-    return {
-        symperTitle: {},
-        general: {},
-        data: [],
-        contentSize: {
-            h: 0,
-            w: 0
-        }
-    };
-}
+function configsToDisplayOptions(rawConfigs,data,displayOptions, ratio) {
+    ratio = 1;
+    let columns = rawConfigs.setting;
+    let style = util.cloneDeep(rawConfigs.style);
+  //  let cellSize = SDashboardEditor.getSizeOfCellContent(cell.sharedConfigs.cellId);
 
-function getStructuredOptions(xAxis,mergedYAxis,yAxis,data,chartType){
-    let xAxisCategory = [];
-    let convertedYAxis = [];
-    let series = [];
+    displayOptions.symperExtraDisplay = rawConfigs.extra;
+    // style.cellId = cell.sharedConfigs.cellId;
+    let viewOptions = translateV2(data, columns, style, ratio);
+    let rsl = viewOptions; // Kết quả trả về
+    // rsl.contentSize = {
+    //     w: cellSize.w,
+    //     h: cellSize.h - 10,
+    // };
 
-    let activeYAxisCount = 0;
-    if(yAxis.length > 0){
-        for(let i = 0; i < yAxis.length;i++ ){
-            let yAxisColumns = yAxis[i];
-            if(yAxisColumns.length > 0){
-                // Đặt tiêu đề cho các yaxis
-                let yConfig = {
-                    title: {
-                        text: '',
-                    },
-                };
-                yConfig.title.text =  yAxisColumns[0].as;
-                convertedYAxis.push(yConfig);
-
-                // tạo luôn series ứng với yaxis nào
-                 for(let column of yAxisColumns){
-                    let newSery = {
-                        yAxis: activeYAxisCount,
-                        name:column.as,
-                        data:[]
-                    };
-                    series.push(newSery);
-                }
-                activeYAxisCount += 1;
-            }
-        }
-    }
+    // translate cho chart
+    let options = JSON.parse(JSON.stringify(staticChartOptions));
+    options.chart.type = 'bar';
     
-
-    xAxis = xAxis[0]; // Thường chỉ có 1 xaxis nên chỉ lấy thằng đầu tiên
-    for(let dt of data){
-        xAxisCategory.push(dt[xAxis]);
-        for(let sr of series){
-            sr.data.push(Number(dt[sr.name]));
+    rsl = options;
+    for (let name in options) {
+        if (viewOptions[name]) {
+            options[name] = Object.assign(options[name], viewOptions[name]);
+            delete viewOptions[name];
         }
     }
-
-    return {
-        series:series,
-        xAxis: {
-            categories: xAxisCategory
-        },
-        yAxis:convertedYAxis
-    }
+    rsl = Object.assign(options, viewOptions);
+    // rsl.chart.height = rsl.contentSize.h;
+    // rsl.chart.width = rsl.contentSize.w - 5;
+    console.log("result", rsl);
+    return rsl;
 }
+
+function translateV2(data,columns,stlye, ratio = 1){
+    let result = common.linesAndColumns(data,columns,stlye,'bar','normal', ratio);
+    return result;
+}
+

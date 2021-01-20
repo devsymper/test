@@ -41,13 +41,13 @@ var handler = {
     },
     mapDataToDatasetAndColumn(datasets,listColumnInDataset){
         let datasetAndColumn = {};
-
         for(let dts of datasets){
             dts.title = dts.alias_name?dts.alias_name:dts.name;
             dts.show = true;
             dts.subDatasetIds = [];
             dts.isSelected = false;
             dts.columns = listColumnInDataset.columns[dts.id];
+
             for(let cl of dts.columns){
                 cl.show = true;
                 cl.isSelected = false;
@@ -58,6 +58,9 @@ var handler = {
                 });
                 if (subDatasets.length > 0) {
                     for (let i = 0; i < subDatasets.length; i++) {
+                        if (i == 4) {
+
+                        }
                         subDatasets[i].show = true;
                         subDatasets[i].isSubDataset = true;
                         subDatasets[i].title = subDatasets[i].alias_name?subDatasets[i].alias_name:subDatasets[i].name;
@@ -66,9 +69,12 @@ var handler = {
                         dts.subDatasetIds.push(subDatasets[i].id);
                         datasetAndColumn[subDatasets[i].id] = subDatasets[i];
                         datasetAndColumn[subDatasets[i].id].columns = listColumnInDataset.columns[subDatasets[i].id];
-                        for(let clSub of datasetAndColumn[subDatasets[i].id].columns){
-                            clSub.show = true;
-                            clSub.isSelected = false;
+                        let subColumns = datasetAndColumn[subDatasets[i].id].columns;
+                        if (subColumns) {
+                            for (let j = 0; j < subColumns.length; j++) {
+                                subColumns[j].show = true;
+                                subColumns[j].isSelected = false;                            
+                            }
                         }
                     }
                 }
