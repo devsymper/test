@@ -752,7 +752,14 @@ export default class BasicControl extends Control {
             if (thisObj.type == 'combobox') {
                 isSingleSelect = thisObj.checkProps('isSingleSelect');
             }
-            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title, type: thisObj.type, isSingleSelect: isSingleSelect })
+            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { 
+                e: e, 
+                selectFormulasInstance: formulasInstance, 
+                alias: thisObj.name, 
+                controlTitle: thisObj.title, 
+                controlName:thisObj.name,
+                type: thisObj.type, 
+                isSingleSelect: isSingleSelect })
         });
     }
 

@@ -414,7 +414,8 @@ export default {
             globalClass:null,
             controlRelationWorker:null,
             formulasWorker:null,
-            optionalDataBinding:null
+            optionalDataBinding:null,
+            tableFocusing:null
         };
 
     },
@@ -426,10 +427,11 @@ export default {
         }
     },
     mounted() {
+        window.addEventListener('paste', this.insertNewRowsBeforePaste);
         this.optionalDataBinding = {},
-        this.optionalDataBinding['context'] = this.docObjId
-        this.optionalDataBinding['document_object_id'] = ""
-        this.optionalDataBinding['action'] = ""
+        this.optionalDataBinding['context'] = (this.documentObjectWorkflowId) ? 'inWorkflow' : 'outWorkflow'
+        this.optionalDataBinding['document_object_id'] = this.docObjId
+        this.optionalDataBinding['action'] = this.action
         let thisCpn = this;
         this.controlRelationWorker = new ControlRelationWorker();
         this.controlRelationWorker.addEventListener("message", function (event) {
@@ -814,7 +816,7 @@ export default {
         // hàm nhận sự thay đổi của input select gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-select-input", e => {
             if(this._inactive == true) return;
-            try { 
+            try {
                 let controlName = e.controlName;
                 this.$refs.autocompleteInput.setTypeInput(e.type);
                 this.$refs.autocompleteInput.show(e.e, controlName);
@@ -992,6 +994,74 @@ export default {
     },
     
     methods: {
+        insertNewRowsBeforePaste(event){
+            var self = this;
+
+            // gets data from clipboard and converts it to an array (1 array element for each line)
+            var clipboardData = event.clipboardData || window.clipboardData;
+            var pastedData = clipboardData.getData('Text');
+            var dataArray = self.dataToArray(pastedData);
+            let table = getControlInstanceFromStore(this.keyInstance, 'tb_render');
+            let gridOptions = table.tableInstance.gridOptions
+
+            // First row is already in the grid and dataToArray returns an empty row at the end of array (maybe you want to validate that it is actually empty)
+            for (var i = 1; i < dataArray.length-1; i++) {
+                gridOptions.api.applyTransaction({ add: [{}], addIndex:i });
+            }
+        },
+        dataToArray(strData) {
+            let table = getControlInstanceFromStore(this.keyInstance, 'tb_render');
+            let gridOptions = table.tableInstance.gridOptions
+            var delimiter = gridOptions.api.gridOptionsWrapper.getClipboardDeliminator();;
+            // Create a regular expression to parse the CSV values.
+            var objPattern = new RegExp((
+            // Delimiters.
+            "(\\" + delimiter + "|\\r?\\n|\\r|^)" +
+                // Quoted fields.
+                "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+                // Standard fields.
+                "([^\"\\" + delimiter + "\\r\\n]*))"), "gi");
+            // Create an array to hold our data. Give the array
+            // a default empty first row.
+            var arrData = [[]];
+            // Create an array to hold our individual pattern
+            // matching groups.
+            var arrMatches = null;
+            // Keep looping over the regular expression matches
+            // until we can no longer find a match.
+            while (arrMatches = objPattern.exec(strData)) {
+                // Get the delimiter that was found.
+                var strMatchedDelimiter = arrMatches[1];
+                // Check to see if the given delimiter has a length
+                // (is not the start of string) and if it matches
+                // field delimiter. If id does not, then we know
+                // that this delimiter is a row delimiter.
+                if (strMatchedDelimiter.length &&
+                    strMatchedDelimiter !== delimiter) {
+                    // Since we have reached a new row of data,
+                    // add an empty row to our data array.
+                    arrData.push([]);
+                }
+                var strMatchedValue = void 0;
+                // Now that we have our delimiter out of the way,
+                // let's check to see which kind of value we
+                // captured (quoted or unquoted).
+                if (arrMatches[2]) {
+                    // We found a quoted value. When we capture
+                    // this value, unescape any double quotes.
+                    strMatchedValue = arrMatches[2].replace(new RegExp("\"\"", "g"), "\"");
+                }
+                else {
+                    // We found a non-quoted value.
+                    strMatchedValue = arrMatches[3];
+                }
+                // Now that we have our value string, let's add
+                // it to the data array.
+                arrData[arrData.length - 1].push(strMatchedValue);
+            }
+            // Return the parsed data.
+            return arrData;
+        },
         closeFormulasWorker(){
             this.formulasWorker.postMessage({action:'closeDB',data:{keyInstance:this.keyInstance}});
             this.formulasWorker.terminate();
