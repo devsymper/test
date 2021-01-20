@@ -1,4 +1,5 @@
 import ReportBase from './ReportBase'
+import {TranslatorHelper} from '@/components/dashboard/configPool/translatorHelper'
 
 export default class Filter extends ReportBase {
     constructor(symperId){
@@ -22,5 +23,10 @@ export default class Filter extends ReportBase {
 			},
 		}
         super('filter', symperId, columnSettingKeys, styleKeys);
-    }
+	}
+	translate(rawConfig,  data, extraData ,changes = {}, oldOutput = {}){
+		let output = TranslatorHelper.Charts.pie(data, rawConfig.setting, rawConfig.style , false, 1)
+		return output
+	}
+
 }
