@@ -188,6 +188,21 @@ export default {
         }
     },  
     methods:{
+        checkUpdateTaskInBacklog(issue){
+            if (!issue.tmg_sprint_id) {
+                let data = {};
+                data.dataSend = this.data;
+                data.projectId = this.projectId;
+                data.issue = issue;
+                data.allPriority = this.$store.state.taskManagement.allPriority;
+                data.listIssueType = this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId];
+                data.allStatus = this.$store.state.taskManagement.allStatus;
+                this.kanbanWorker.postMessage({
+                    action:'checkUpdateTaskInBacklog',
+                    data: data
+                });
+            }
+        },
         showPopupSprint(){
             this.$refs.sprint.show();
         },
@@ -277,6 +292,9 @@ export default {
     },
     created(){
         let self = this;
+        this.$evtBus.$on('task-manager-submit-issue-success', (issue) =>{
+            self.checkUpdateTaskInBacklog(issue);
+        })
         this.$evtBus.$on('selected-item-board', (board) =>{
             self.flagGetListStatusInColumnBoard = false;
             self.flagGetListColumnInBoard = false;
@@ -309,6 +327,10 @@ export default {
                         self.getMoreData();
                     } 
                     break;
+                case 'updateTaskInBacklog':
+                    if (data.dataAfter) {
+                        self.data = data.dataAfter;
+                    }
                 default:
                     break;
             }

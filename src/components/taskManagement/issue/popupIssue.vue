@@ -183,12 +183,13 @@ export default {
         },
         submitForm(){
             this.isLoading = true;
-            this.$refs.submitComponent.handlerSubmitDocumentClick();
+            this.$refs.submitComponent.handlerSubmitDocumentClick(true);
         },
         onSubmitDone(data){
             this.isLoading = false;
             this.isShow = false;
             this.$snotifySuccess("Add issue success!");
+            this.$evtBus.$emit("task-manager-submit-issue-success",data);
 
         },
     },

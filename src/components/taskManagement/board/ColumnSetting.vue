@@ -137,6 +137,7 @@ export default {
             immediate:true,
             handler(newVl){
                 if (newVl.length > 0 && this.listColumn.length > 0) {
+                    this.arrStatusColumn = newVl;
                     this.getStatusForListColumn();
                 }
             }
@@ -149,6 +150,15 @@ export default {
                 this.getStatusForListColumn();
             }
         },
+        listColumn:{
+            deep: true,
+            immediate:true,
+            handler(newVl){
+                if (newVl.length > 0) {
+                    this.getListStatusInColumnBoard();
+                }
+            }
+        }
     },
     components: {
         draggable,
@@ -171,6 +181,7 @@ export default {
             columns:[],
             listStatus:[],
             kanbanWorker:null,
+            arrStatusColumn:[],
 
         }
     },
@@ -185,10 +196,10 @@ export default {
             let self = this;
             self.columns = util.cloneDeep(self.listColumn);
             if (self.listStatus.length > 0 ) {
-                for (let i = 0; i < self.listStatusColumn.length; i++) {
-                    let idColumn = self.listStatusColumn[i].columnId;
-                    let statusId = self.listStatusColumn[i].statusId;
-                    let taskLifeCircleId = self.listStatusColumn[i].taskLifeCircleId;
+                for (let i = 0; i < self.arrStatusColumn.length; i++) {
+                    let idColumn = self.arrStatusColumn[i].columnId;
+                    let statusId = self.arrStatusColumn[i].statusId;
+                    let taskLifeCircleId = self.arrStatusColumn[i].taskLifeCircleId;
                     let item = self.listStatus.find(ele => ele.statusId == statusId &&  ele.taskLifeCircleId == taskLifeCircleId );
                     if (item) {
                         let column = self.columns.find(ele => ele.id == idColumn);
@@ -260,11 +271,14 @@ export default {
             });
         },
         getListStatusInColumnBoard(){
-            let idBoard=this.$route.params.idBoard;
-            this.kanbanWorker.postMessage({
-                action:'getListStatusInColumnBoard',
-                data:idBoard
-            });
+            if (this.kanbanWorker) {
+                let idBoard=this.$route.params.idBoard;
+                this.kanbanWorker.postMessage({
+                    action:'getListStatusInColumnBoard',
+                    data:idBoard
+                });
+            }
+          
         },
     },
     created(){
@@ -301,7 +315,8 @@ export default {
                     if (data.dataAfter) {
                         let res = data.dataAfter;
                         self.$store.commit("taskManagement/setListStatusInColumnBoard", res);
-                        self.listStatus =(self.listStatusInProject.length > 0 )? util.cloneDeep(self.listStatusInProject) : [];
+                        self.arrStatusColumn = res.data;
+                        self.listStatus = (self.listStatusInProject.length > 0 )? util.cloneDeep(self.listStatusInProject) : [];
                     } 
                     break;
                 default:

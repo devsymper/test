@@ -6,6 +6,29 @@ self.onmessage = async function (event) {
     let action = workerDataReceive.action;
     let data = workerDataReceive.data;
 	switch (action) {
+        case 'getAllProject':
+            let itemPro={
+                column : "isDelete",
+                operation : "and",
+                conditions : [
+                    {
+                        name : "in",
+                        value : [0],
+                    }
+                ],
+            }
+            let filterPro={};
+            filterPro.filter = [];
+            filterPro.filter.push(itemPro);
+            filterPro.page = 1;
+            filterPro.pageSize = 200;
+            filterPro.distinct = false;
+            taskManagementApi.getAllProject(filterPro).then(res => {
+                if(res['status'] == 200 && res['data']){
+                    postMessage({action:'getAllProject', dataAfter : res})
+                }
+            });
+            break;
         case 'getListBoard':
             if (data) {
                 taskManagementApi.getListBoardInProject(data).then(res => {
@@ -302,11 +325,95 @@ self.onmessage = async function (event) {
 
             }
             break;
+        case 'checkUpdateTaskToKanban':
+            if (data) {
+                let checkUpdateIssue = checkUpdateIssueToKanban(data);
+                if (checkUpdateIssue) {
+                    postMessage({action:'updateTaskToKanban', dataAfter:checkUpdateIssue.data})
+                }
+            }
+            break;
+        case 'checkUpdateTaskInSprint':
+            if (data) {
+                let checkUpdateIssueSprint = funcCheckUpdateIssueSprint(data);
+                if (checkUpdateIssueSprint) {
+                    postMessage({action:'pushTaskInSprint', dataAfter:checkUpdateIssueSprint.data})
+                }
+            }
+            break;
+        case 'checkUpdateTaskInBacklog':
+            if (data) {
+                let checkUpdateIssueBacklog = checkUpdateIssueToBacklog(data);
+                if (checkUpdateIssueBacklog) {
+                    postMessage({action:'updateTaskInBacklog', dataAfter:checkUpdateIssueBacklog.data})
+                }
+            }
+            break;
+            
         default:
             break;
     }
 };
 
+function funcCheckUpdateIssueSprint(data){
+    let dataSprintAfterMapIssue = data.dataSprintAfterMapIssue;
+    let issue = data.issue;
+    let dataRes ={};
+    let sprint = dataSprintAfterMapIssue.find(ele => ele.id == issue.tmg_sprint_id);
+    if (sprint) {
+        issue = getMoreInfoForTask(issue,data)
+        sprint.tasks.unshift(issue);
+        dataRes.data = dataSprintAfterMapIssue;
+        return dataRes;
+    }else{
+        return null;
+    }
+ 
+
+}
+function checkUpdateIssueToBacklog(data){
+    let projectId = data.projectId;
+    let dataSend = data.dataSend;
+    let issue = data.issue;
+    let dataRes ={};
+    if (issue.tmg_project_id == projectId) {
+        if (dataSend.statusInColumn && dataSend.statusInColumn.length > 0 ) {
+            let status = dataSend.statusInColumn.find(ele => ele.statusId == issue.tmg_status_id);
+            if (status) {
+                issue = getMoreInfoForTask(issue,data);
+                status.tasks.unshift(issue);
+                dataRes.data = dataSend;
+                return dataRes;
+
+            }else{
+                return null;
+            }
+        }
+    }
+    return null;
+}
+function checkUpdateIssueToKanban(data){
+    let projectId = data.projectId;
+    let listBoardColumn = data.listBoardColumn;
+    let issue = data.issue;
+    let dataRes ={};
+    if (issue.tmg_project_id == projectId) {
+        for (let i = 0; i < listBoardColumn.length; i++) {
+            if (listBoardColumn[i].statusInColumn && listBoardColumn[i].statusInColumn.length > 0) {
+                let listStatusInColumn = listBoardColumn[i].statusInColumn;
+                for (let j = 0; j < listStatusInColumn.length; j++) {
+                    let status = listStatusInColumn[j];
+                    if (status.statusId == issue.tmg_status_id) {
+                        status.tasks.unshift(issue);
+                        dataRes.data = listBoardColumn;
+                        return dataRes;
+                    }            
+                }
+            }            
+        }
+    }
+    return null;
+}
 function groupIssueInSprint(data){
     let listSprintInBoard = data.listSprintInBoard;
     let listAllIssueInSprint = data.listAllIssueInSprint;
