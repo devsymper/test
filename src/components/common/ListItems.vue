@@ -105,7 +105,6 @@
                             <v-icon dark>mdi-close</v-icon>
                         </v-btn>
                          <v-menu
-                            
                             bottom
                             left
                             >
@@ -167,6 +166,33 @@
                         >
                             <slot name="extra-button"></slot>
                         </component>
+                        <!-- filter button -->
+                        <v-menu offset-y nudge-bottom='8' :max-width="210" :min-width="210" :close-on-click="false" >
+                            <template v-slot:activator="{ on:menu }">
+                                <v-tooltip top>
+                                    <template v-slot:activator="{ on:tooltip }">
+                                        <v-btn
+                                            depressed
+                                            small
+                                            v-if="showFilter"
+                                            class="mr-2"
+                                            v-on="{ ...tooltip, ...menu }">
+                                            <v-icon  left dark class="mr-0" :style="{color:selectedFilterName?'#FF8C00!important':'black'}">mdi-filter</v-icon>
+                                            <span style="color:#FF8C00!important;" >{{selectedFilterName}}</span>
+                                            <div v-if="closeBtnFilter"  class="ml-2" style="border-right:1px solid #E0E0E0; height:27px"></div>
+                                            <v-icon v-if="closeBtnFilter" class="ml-2" style="font-size:14px" @click="hideCloseBtnFilter()">mdi-close</v-icon>
+                                        </v-btn>
+                                    </template>
+                                    <span>{{ $t('common.filter')}}</span>
+                                </v-tooltip>
+                            </template>
+                         <config-filter 
+                            @set-table="setTable"
+                            @config-filter-action="configFilterAction"
+                            @add-filter-config="addFilterConfig"
+                            :filter="listFilters"/>
+                        </v-menu>
+                        <!-- filter button -->
                         <v-tooltip top>
                             <template v-slot:activator="{ on }">
                                 <v-btn
@@ -181,7 +207,6 @@
                             </template>
                             <span>{{ $t('common.list_config') }}</span>
                         </v-tooltip>
-                        
                         <v-tooltip top v-if="showActionPanelInDisplayConfig ">
                             <template v-slot:activator="{ on }">
                                 <v-btn
@@ -213,6 +238,9 @@
 						</span>
 			 </div>
 		 </div>
+         <!-- add filter -->
+        <add-filter v-if="addFilter" :filterName="filterName" @add-filter="handleAddFilter"/>
+         <!-- add filter -->
 		 <div
 		 	:class="{
 				'fs-13 symper-custom-table symper-list-item  w-100': true,
@@ -331,6 +359,13 @@
                 </v-card-actions>
             </v-card>
         </v-dialog>
+        <SymperDialogConfirm 
+            @confirm="confirmDeleteFilter()"
+            @cancel="showDelFilterPopUp=false"
+            :title="'Xóa bộ lọc'" 
+            :content="filterContent" 
+            :showDialog="showDelFilterPopUp"
+        />
 	 </div>
 </template>
 <script>
@@ -353,6 +388,10 @@ import TableFilter from '@/components/common/customTable/TableFilter'
 import PerfectScrollbar from "perfect-scrollbar";
 import ListItemsWorker from 'worker-loader!@/worker/common/listItems/ListItems.Worker.js';
 import { actionHelper } from "@/action/actionHelper";
+import CheckBoxRenderer from "@/components/common/agDataTable/CheckBoxRenderer"
+import SymperDialogConfirm from "@/components/common/SymperDialogConfirm"
+import ConfigFilter from "./ListItemConfigFilter"
+import AddFilter from "./ListItemAddFilter"
 import CheckBoxRendererListItems from "@/components/common/agDataTable/CheckBoxRendererListItems"
 
 let CustomHeaderVue = Vue.extend(CustomHeader);
@@ -448,6 +487,10 @@ export default {
         showImportButton: {
             type: Boolean,
             default: false
+        },
+        showFilter:{
+            type: Boolean,
+            default: true
         },
         showImportHistoryBtn:{
             type: Boolean,
@@ -611,6 +654,15 @@ export default {
                 }
             }
         },
+        /**
+         * flexColumns : true of false, nếu đúng thì colmn sẽ có thêm thược tính flex đê full màn hinh
+         * dev created : dungna
+         * 
+         */
+        flexColumns:{
+            type: Boolean,
+            default: false
+        },
         showPagination:{
             type: Boolean,
             default:true
@@ -655,9 +707,15 @@ export default {
 					break;
                 case 'saveTableDisplayConfig':
 					self.handlerSaveTableDisplayConfigRes(data.dataAfter)
-					break;
+                    break;
+                case 'saveFilter':
+                    self.handlerSaveFilter(data.dataAfter)
+                break;
                 case 'getTableColumns':
 					data.dataAfter.forEach(function(e){
+                        if(self.flexColumns){
+                            e.flex = 1
+                        }
 						if(e.cellRenderer){
 							eval("e.cellRenderer = " + e.cellRenderer)
 						}
@@ -670,7 +728,7 @@ export default {
 		});
 		this.getData()
 		this.restoreTableDisplayConfig();
-
+        // this.getDefaultFilter();
 	},
 	computed:{
 		alwaysShowActionPanel(){
@@ -805,12 +863,23 @@ export default {
 		}
 	},
     data(){
-		let self = this
+		let self = this;
         return {
-			gridApi: null,
+            closeBtnFilter:false,
+            isUpdateFilter:false,
+            listFilters:[],
+            notiFilter:'',
+            deleteFilterIdx:0,
+            filterContent:"",
+            showDelFilterPopUp:false,
+            gridApi: null,
+            selectedFilterName:'',
 			listItemsWorker: null,
 			deleteDialogShow: false,
-			deleteItems: [],
+            deleteItems: [],
+            filterMenu:false,
+            addFilter:false,
+            filterName:'',
             savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
 			showSearchBox: true,
             loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
@@ -881,7 +950,10 @@ export default {
     },
     components: {
 		AgGridVue,
-		Pagination,
+        Pagination,
+        "add-filter":AddFilter,
+        "config-filter" : ConfigFilter,
+        SymperDialogConfirm,
 		DisplayConfig,
 		"symper-drag-panel": SymperDragPanel,
 		VNavigationDrawer,
@@ -926,6 +998,121 @@ export default {
       	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
     },
 	methods:{
+        handleAddFilter(data){
+            if(data.type=='save'){
+                this.filterName = data.filterName
+                this.saveFilter()
+            }else{
+                this.addFilter = false;
+            }
+        },
+        configFilterAction(data){
+            let type = data.type;
+              switch(type){
+                case 'setDefaultFilter':
+                    this.setDefaultFilter(data.filterIdx);
+                    break;
+                case 'unsetDefaultFilter':
+                    this.unsetDefaultFilter(data.filterIdx);
+                    break;
+                case 'editFilter':
+                    this.editFilter(data.filterIdx)
+                    break;
+                case 'deleteFilter':
+                    data.type="deleteFilter";
+                    this.deleteFilter(data.filterIdx)
+                    break;
+              }
+        },
+        setTable(filterIdx){
+            this.closeBtnFilter = true;
+            this.selectedFilterName = this.listFilters[filterIdx].name;
+            let filter = this.listFilters;
+            this.tableFilter.allColumn = this.listFilters[filterIdx].columns;
+            this.getData()
+        },
+        addFilterConfig(){
+            this.addFilter = true;
+        },
+        hideCloseBtnFilter(){
+            this.selectedFilterName = '';
+            this.closeBtnFilter = false;
+            //set lại trạng thái không filter
+            this.tableFilter.allColumn={}
+            this.getData();
+        },
+        getDefaultFilter(){
+            if(this.listFilters&&this.listFilters.length>0){
+                this.listFilters.map((fil,i)=>{
+                    if(fil.isDefault){
+                        this.selectedFilterName = fil.name;
+                        this.closeBtnFilter = true;
+                        this.tableFilter.allColumn = fil.columns;
+                        this.getData()
+                    }
+                })
+            }
+        },
+        setDefaultFilter(filterIdx){
+            this.listFilters[filterIdx].isDefault= true;
+            this.listFilters.map((fil,i)=>{
+                if(i!==filterIdx){
+                    fil.isDefault=false;
+                }
+            })
+            this.sendFilterWorker();
+            this.notiFilter = this.$t("table.success.save_filter");
+        },
+        unsetDefaultFilter(filterIdx){
+            this.listFilters[filterIdx].isDefault= false;
+            this.sendFilterWorker();
+            this.notiFilter = this.$t("table.success.save_filter");
+        },
+        editFilter(filterIdx){
+            this.addFilter = true;
+            this.filterName = this.listFilters[filterIdx].name;
+            this.isUpdateFilter= true;
+            this.filterIdx = filterIdx;
+        },
+        deleteFilter(filterIdx){
+            this.showDelFilterPopUp = true;
+            this.filterContent =" Xóa bộ lọc "+this.listFilters[filterIdx].name+" khỏi danh sách các bộ lọc";
+            this.deleteFilterIdx = filterIdx;
+        },
+        confirmDeleteFilter(){
+            let filter = this.listFilters.filter((item,idx)=>idx!=this.deleteFilterIdx);
+            this.listFilters = filter;
+            this.sendFilterWorker();
+            this.notiFilter = this.$t("table.success.delete_filter");
+            this.showDelFilterPopUp=false;
+        },
+        saveFilter(){
+            if(!this.isUpdateFilter){
+                debugger
+            
+                this.listFilters.push({
+                    name:this.filterName,
+                    isDefault: false,
+                    columns:this.tableFilter.allColumn
+                })
+                this.notiFilter = this.$t("table.success.save_filter");
+            }else{
+                this.listFilters[this.filterIdx].name = this.filterName;
+                this.listFilters[this.filterIdx].columns = this.tableFilter.allColumn;
+                this.notiFilter = this.$t("table.success.edit_filter");
+            }
+            this.sendFilterWorker()
+        },
+        sendFilterWorker(){
+            let tableConfig =  this.getTableDisplayConfigData();
+            tableConfig.detail = JSON.parse(tableConfig.detail);
+            tableConfig.detail.filter = this.listFilters;
+            tableConfig.detail= JSON.stringify(tableConfig.detail);
+            this.listItemsWorker.postMessage({
+                action: 'saveFilter',
+                data: tableConfig
+			})
+        },
 		getAllData(){
 			return this.rowData
 		},
@@ -983,7 +1170,8 @@ export default {
 			}
 			this.debounceRelistContextmenu = setTimeout((self) => {
 				self.relistContextmenu();
-			}, 100, this);
+            }, 100, this);
+            this.$emit('cell-mouse-over',params)
 		},
 		isShowCheckedRow(){
             return this.hasColumnsChecked
@@ -1035,7 +1223,10 @@ export default {
 			let self = this
 			for(let i in tmpTableContextMenu.items){
 				let obj = {}
-				obj.name =  tmpTableContextMenu.items[i].name
+                obj.name =  tmpTableContextMenu.items[i].name;
+                if(tmpTableContextMenu.items[i].subMenu){
+                    obj.subMenu = tmpTableContextMenu.items[i].subMenu
+                };
 				obj.action = () => {
 					let param = self.paramOnContextMenu;
 					let selection = [{
@@ -1052,7 +1243,7 @@ export default {
 				}
 				obj.cssClasses = ['redFont', 'bold']
 				arr.push(obj)
-			}
+            }
 			return arr;
 		},
 		exeCallbackOnContextMenu(rowData){
@@ -1068,7 +1259,6 @@ export default {
                 callback: function(key, selection) {
                     let col = selection[0].start.col;
 					let row = selection[0].start.row;
-					
                     let rowData = thisCpn.rowData[row];
                     // let colName = Object.keys(rowData)[col];
                     let callBackOption = thisCpn.tableContextMenu[key];
@@ -1113,7 +1303,7 @@ export default {
                         thisCpn.actionPanel = true;
                     }
                 },
-                items: {}
+                items: {},
             };
             if (this.useDefaultContext) {
                 contextMenu.items = {
@@ -1132,7 +1322,10 @@ export default {
                 contextMenu.items[item.name] = {
                     name: item.text
                 };
-			}
+                if(item.subMenu&&item.subMenu.length>0){
+                    contextMenu.items[item.name].subMenu = item.subMenu
+                }
+            }
             return contextMenu;
 		},
 		
@@ -1170,6 +1363,7 @@ export default {
 			this.$emit('data-loaded', resData)
 		},
 		handlerRestoreTableDisplayConfigRes(res){
+            this.listFilters = [];
 			if(res.savedConfigs){
 				if(res.savedConfigs.wrapTextMode){
 					this.tableDisplayConfig.value.wrapTextMode =  res.savedConfigs.wrapTextMode;
@@ -1184,7 +1378,10 @@ export default {
 				if(res.columnDefs){
 					this.columnDefs = res.columnDefs
 					this.handleStopDragColumn();
-				}
+                }
+                // xử lý phần filter
+                this.listFilters = res.savedConfigs.filter;
+                this.getDefaultFilter()
 			}
 		},
 		handlerSaveTableDisplayConfigRes(res){
@@ -1193,7 +1390,20 @@ export default {
 				type: "success",
 				title: this.$t("table.success.save_config")
 			})
-		},
+        },
+        handlerSaveFilter(res){
+            if(res.status==200){
+                this.addFilter = false;
+                this.filterName = '';
+                this.$snotify({
+				type: "success",
+				title: this.notiFilter	})
+            }else{
+                this.$snotify({
+				type: "error",
+				title: "Lỗi"	})
+            }
+        },
 		reRender(){
 			// this.agApi.sizeColumnsToFit()
 		},
@@ -1271,7 +1481,6 @@ export default {
 			this.$emit('after-selected-row', this.allRowChecked)
 			this.getData();
 			this.$emit("refresh-list", {});
-			
         },
 		showTableDropdownMenu(x, y, colName) {
             var windowWidth = $(window).width()/1.1;
@@ -1506,7 +1715,7 @@ export default {
         },
 		openTableDisplayConfigPanel() {
             this.tableDisplayConfig.show = !this.tableDisplayConfig.show;
-		},
+        },
 		bindToSearchkey(vl) {
             this.searchKey = vl;
             if(this.debounceGetData){
@@ -1621,6 +1830,7 @@ export default {
             let rsl = {
                 widgetIdentifier: this.getWidgetIdentifier(),
                 detail: '{}',
+
             };
             for (let col of this.columnDefs) {
                 configs.columns.push({
@@ -1637,8 +1847,12 @@ export default {
          */
         saveTableDisplayConfig() {
             this.savingConfigs = true;
-			let thisCpn = this;
-			let dataToSave = this.getTableDisplayConfigData();
+            let thisCpn = this;
+            let dataToSave =  this.getTableDisplayConfigData();
+            dataToSave.detail = JSON.parse(dataToSave.detail);
+            dataToSave.detail.filter = this.listFilters;
+            dataToSave.detail= JSON.stringify(dataToSave.detail);
+            //dataToSave.filter = this.filter;
 			this.listItemsWorker.postMessage({
 				action: 'saveTableDisplayConfig',
 				data:{
@@ -1708,4 +1922,8 @@ export default {
 	line-height: 12px !important;
 	padding-left: unset !important;
 }
+
+
+
+
 </style>
