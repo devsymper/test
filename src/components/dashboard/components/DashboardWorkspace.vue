@@ -33,7 +33,6 @@
                         :w="item.w"
                         :h="item.h"
                         :i="item.i"
-                        :ref="item.i"
                         :symper-cell-id="item.cellId"
                         :class="{   
                                 'symper-grid-item symper-dashboard-cell-wrapper' : true,
@@ -42,7 +41,8 @@
                         @resized="handleResizeItem"
                         @resize="handleResizingItem">
                     <DashboardCell 
-                        v-if="true || item.active"
+                        v-if="item.active"
+                        :ref="item.cellId"
                         :layoutItem="item"
                         :instanceKey="instanceKey"
                         :cellConfigs="dashboardConfig.allCellConfigs[item.cellId]">
@@ -128,9 +128,16 @@ import VueGridLayout from 'vue-grid-layout';
 import DashboardCell from "@/components/dashboard/components/DashboardCell.vue";
 import { util } from '../../../plugins/util';
 import _cloneDeep from "lodash/cloneDeep";
-
+import ReportRenderManagement from "@/components/dashboard/reports/ReportRenderManagement.js";
+import ReportTranslatorWorker from 'worker-loader!@/worker/dashboard/ReportTranslator.Worker.js';
+import _isEmpty from "lodash/isEmpty";
 
 export default {
+    created(){
+        this.reportRenderManagement = new ReportRenderManagement(this);
+        this.reportTranslatorWorker = new ReportTranslatorWorker();
+        this.listenFromWorker(this.reportTranslatorWorker);
+    },
     components: {
         DashboardCell,
         VuePerfectScrollbar,
@@ -161,10 +168,55 @@ export default {
         }
     },
     methods: {
+        listenFromWorker(workerObj){
+            let self = this;
+            workerObj.addEventListener("message", function (event) {
+                let data = event.data;
+                let action = data.action;
+                if(self[action]){
+                    self[action](data.data);
+                } else {
+                    console.error(` action ${action} not found `);
+                }
+            });
+        },
+        onChangeCellConfigs(changeType, cellId){
+            this.translateReportConfig(cellId)
+        }, 
+        translateReportConfig(cellId){
+            let reportSize = util.getComponentSize(this.$refs[cellId][0]);
+            this.reportTranslatorWorker.postMessage({
+                action: 'translateReportConfig',
+                data: {
+                    extra: {
+                        size: reportSize,
+                        relations: this.dashboardConfig.info.relations 
+                    },
+                    cell: {
+                        rawConfigs: this.dashboardConfig.allCellConfigs[cellId].rawConfigs,
+                        sharedConfigs: this.dashboardConfig.allCellConfigs[cellId].sharedConfigs
+                    },
+                    oldDisplayOption: this.dashboardConfig.allCellConfigs[cellId].viewConfigs.displayOptions,
+                }
+            });
+        },
+        applyTranslatedConfig(data){
+            if(!_isEmpty(data)){
+                this.dashboardConfig.allCellConfigs[data.cellId].sharedConfigs.data = data.originData;
+                this.$set(this.dashboardConfig.allCellConfigs[data.cellId].viewConfigs, 'displayOptions', data.translatedData);
+            }
+        },
+        renderCellsInViewport(){
+            let scrollY = this.$refs.cellContainer.$el.scrollTop;;
+            let layout = this.dashboardConfig.info.layout;
+            let tabKey = this.dashboardConfig.info.currentTabPageKey;
+            let viewportHeight = this.workspaceHeight;
+            this.reportRenderManagement.renderCellsInViewport(scrollY, layout, tabKey, viewportHeight);
+        },
         handleLayoutRendered(){
-            setTimeout(() => {
-                
-            }, 0);
+            setTimeout((self) => {
+                self.renderCellsInViewport();
+            }, 0, this);
         },
         addTab(){
             // let tabs = this.dashboardConfig.info.tabsAndPages.tabs;
@@ -272,16 +324,12 @@ export default {
             this.$delete(drillThrough, oldName) ;
         },
         handleDashboardScrolled(){
-            // if(this.debounceActivateReport){
-            //     clearTimeout(this.debounceActivateReport);
-            // }
-
-            // // this.viewportScrollY = this.$refs.cellContainer[0].$el.scrollTop;
-            // this.$refs.dashboardCellRender.setScrollY(this.$refs.cellContainer.$el.scrollTop);
-            
-            // this.debounceActivateReport = setTimeout((self) => {
-            //     self.$refs.dashboardCellRender.renderCellsInViewport();
-            // }, 100, this);
+            if(this.debounceActivateReport){
+                clearTimeout(this.debounceActivateReport);
+            }
+            this.debounceActivateReport = setTimeout((self) => {
+                self.renderCellsInViewport();
+            }, 100, this);
         },
         selectDashboard(){
         },
@@ -356,5 +404,14 @@ export default {
 
 .symper-dashboard-cell-wrapper{
     border: 2px solid #ffffff00;
+}
+
+
+.vue-grid-item .vue-resizable-handle{
+    display: none;
+}
+
+.vue-grid-item:hover .vue-resizable-handle{
+    display: block;
 }
 </style>
