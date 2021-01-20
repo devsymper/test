@@ -654,6 +654,15 @@ export default {
                 }
             }
         },
+        /**
+         * flexColumns : true of false, nếu đúng thì colmn sẽ có thêm thược tính flex đê full màn hinh
+         * dev created : dungna
+         * 
+         */
+        flexColumns:{
+            type: Boolean,
+            default: false
+        },
         showPagination:{
             type: Boolean,
             default:true
@@ -704,6 +713,9 @@ export default {
                 break;
                 case 'getTableColumns':
 					data.dataAfter.forEach(function(e){
+                        if(self.flexColumns){
+                            e.flex = 1
+                        }
 						if(e.cellRenderer){
 							eval("e.cellRenderer = " + e.cellRenderer)
 						}
@@ -1158,7 +1170,8 @@ export default {
 			}
 			this.debounceRelistContextmenu = setTimeout((self) => {
 				self.relistContextmenu();
-			}, 100, this);
+            }, 100, this);
+            this.$emit('cell-mouse-over',params)
 		},
 		isShowCheckedRow(){
             return this.hasColumnsChecked
@@ -1210,7 +1223,10 @@ export default {
 			let self = this
 			for(let i in tmpTableContextMenu.items){
 				let obj = {}
-				obj.name =  tmpTableContextMenu.items[i].name
+                obj.name =  tmpTableContextMenu.items[i].name;
+                if(tmpTableContextMenu.items[i].subMenu){
+                    obj.subMenu = tmpTableContextMenu.items[i].subMenu
+                };
 				obj.action = () => {
 					let param = self.paramOnContextMenu;
 					let selection = [{
@@ -1227,7 +1243,7 @@ export default {
 				}
 				obj.cssClasses = ['redFont', 'bold']
 				arr.push(obj)
-			}
+            }
 			return arr;
 		},
 		exeCallbackOnContextMenu(rowData){
@@ -1243,7 +1259,6 @@ export default {
                 callback: function(key, selection) {
                     let col = selection[0].start.col;
 					let row = selection[0].start.row;
-					
                     let rowData = thisCpn.rowData[row];
                     // let colName = Object.keys(rowData)[col];
                     let callBackOption = thisCpn.tableContextMenu[key];
@@ -1288,7 +1303,7 @@ export default {
                         thisCpn.actionPanel = true;
                     }
                 },
-                items: {}
+                items: {},
             };
             if (this.useDefaultContext) {
                 contextMenu.items = {
@@ -1307,7 +1322,10 @@ export default {
                 contextMenu.items[item.name] = {
                     name: item.text
                 };
-			}
+                if(item.subMenu&&item.subMenu.length>0){
+                    contextMenu.items[item.name].subMenu = item.subMenu
+                }
+            }
             return contextMenu;
 		},
 		
