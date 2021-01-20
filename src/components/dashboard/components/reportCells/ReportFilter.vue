@@ -1,14 +1,14 @@
 <template>
-    <CardBase
+    <FilterBase
     	:cellConfigs="cellConfigs"
 	/>
 </template>
 
 <script>
-import CardBase from "./CardBase";
+import FilterBase from "./FilterBase";
 export default {
     components: {
-        CardBase
+        FilterBase
     },
     props: {
         cellConfigs: {

@@ -1,7 +1,7 @@
 import ReportBase from './ReportBase'
 import {TranslatorHelper} from '@/components/dashboard/configPool/translatorHelper'
 
-export default class Filter extends ReportBase {
+export default class ReportFilter extends ReportBase {
     constructor(symperId){
         let columnSettingKeys = ['value']
         let styleKeys ={
