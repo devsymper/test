@@ -1380,7 +1380,7 @@ export default {
 					this.handleStopDragColumn();
                 }
                 // xử lý phần filter
-                this.listFilters = res.savedConfigs.filter;
+                this.listFilters = res.savedConfigs.filter?res.savedConfigs.filter:[];
                 this.getDefaultFilter()
 			}
 		},
