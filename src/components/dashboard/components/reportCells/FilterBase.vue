@@ -27,7 +27,7 @@
 					solo
                     style="min-width:50px;max-width:100px"
                     @change="handleChangeFilterValue(cellConfigs.sharedConfigs.cellId)"
-                    placeholder="Please Input"
+                    :placeholder="$t('common.inputPlaceholder')"
                     v-model="sliderDataValue.value[0]">
                 </v-text-field>
                 <v-text-field
@@ -37,7 +37,7 @@
                     :controls="false"
                     @change="handleChangeFilterValue(cellConfigs.sharedConfigs.cellId)"
                     class="w-45"
-                    placeholder="Please Input"
+                    :placeholder="$t('common.inputPlaceholder')"
                     v-model="sliderDataValue.value[1]">
                 </v-text-field>
             </div>
