@@ -160,10 +160,14 @@
             "list_workflow": "List Workflow",
             "list_work": "List Jobs",
 			"environment": "Environment management",
-			"listDashboards":"List dashboard",
-			"listDataflows":"List dataflow",
-			"listRelations":"List relation",
-			"listDatasets":"List dataset"
+			"list-dashboard":"List dashboard",
+			"list-trash-dashboard":"List trash dashboard",
+			"list-dataflow":"List dataflow",
+			"list-trash-dataflow":"List trash dataflow ",
+			"list-relation":"List relation",
+			"list-trash-relation":"List trash relation",
+			"list-dataset":"List dataset",
+			"list-trash-dataset":"List trash dataset"
         },
         "system": "System",
         "copy": "Copy"
@@ -1141,7 +1145,8 @@
 	},
 	"bi":{
 		"dashboard":{
-			"titleShowList": "List dashboard",
+			"title-show-list": "List dashboard",
+			"title-show-list-trash": "List trash dashboard",
 			"title-visualization":"Visualization",
 			"column-config":"Column config",
 			"style-config":"Style config",
@@ -1153,8 +1158,16 @@
 			"relation-selector": "Select relation"
 		},
 		"dataflow":{
-			"titleShowlist": "List dataflow",
-			"titleShowlistTrash": "List trash dataflow"
+			"title-show-list": "List dataflow",
+			"title-show-list-trash": "List trash dataflow"
+		},
+		"dataset":{
+			"title-show-list": "Danh sách dataset",
+			"title-show-list-trash": "Danh sách dataset đã xóa"
+		},
+		"relation":{
+			"title-show-list": "Danh sách relation",
+			"title-show-list-trash": "Danh sách relation đã xóa"
 		}
 	},
     "virtualdoc": {

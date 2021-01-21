@@ -1,5 +1,11 @@
 export default [
     {
+        path: '/report',
+        name: "reportHome",
+        component: () =>
+            import ('../../views/report/Index.vue'),
+    },
+    {
         path: '/dashboards',
         name: "listDashboards",
         component: () =>

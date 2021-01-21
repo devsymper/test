@@ -2,7 +2,7 @@
 	<div>
 		<ListItems
 			ref="listServer"
-			:pageTitle="$t('bi.dataflow.title-show-list')"
+			:pageTitle="$t('bi.dataset.title-show-list-trash')"
 			:containerHeight="containerHeight"
 			:getDataUrl="getListUrl"
 			:headerPrefixKeypath="'table'"
@@ -11,6 +11,7 @@
 			:tableContextMenu="tableContextMenu"
 			:actionPanelWidth="550"
 			:customAPIResult="customAPIResult"
+			:showButtonAdd="false"
 		>
 			<template slot="right-panel-content" slot-scope="{}"> </template>
 		</ListItems>
@@ -41,15 +42,10 @@ export default {
 		return {
 			showDialog: false,
 			tableContextMenu: {
-				update: {
-					name: 'edit',
-					text: this.$t('apps.contextMenu.edit'),
-					callback: (app, callback) => {},
-				},
-				remove: {
-					name: 'remove',
-					text: this.$t('apps.contextMenu.remove'),
-					callback: (app, callback) => {},
+				restore: {
+					name: 'restore',
+					text: self.$t('common.restore'),
+					callback: (row, callback) => {},
 				},
 			},
 			customAPIResult: {

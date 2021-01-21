@@ -2,7 +2,7 @@
 	<div>
 		<ListItems
 			ref="listServer"
-			:pageTitle="$t('bi.dataflow.titleShowlistTrash')"
+			:pageTitle="$t('bi.dataflow.title-show-list-trash')"
 			:containerHeight="containerHeight"
 			:getDataUrl="getListUrl"
 			:headerPrefixKeypath="'table'"

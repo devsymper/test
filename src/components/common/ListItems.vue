@@ -5,7 +5,7 @@
 			 	class="align-items-center flex-grow-1" 
 				:class="{'ml-4': dialogMode == true }"
 			>
-				<span class=" ml-1 mt-1 font-weight-bold " style="font-size: 18px !important">
+				<span class=" ml-1 mt-1 font-weight-bold title-show-list" style="font-size: 18px !important">
 					{{pageTitle}}
 				</span>
 			</div>
