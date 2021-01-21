@@ -725,7 +725,7 @@ export default {
 							eval("e.cellRenderer = " + e.cellRenderer)
 						}
                     })
-                    self.columnDefs = self.handelConditionalFormat(data.dataAfter);
+                    self.columnDefs = self.handleConditionalFormat(data.dataAfter);
 					break;
                 default:
                     break;
@@ -1029,8 +1029,7 @@ export default {
          disApplyConfigFormat(index){
              this.conditionIndex = -1;
          },
-        handelConditionalFormat(data){
-            debugger
+        handleConditionalFormat(data){
             const self = this;
              if(this.conditionalFormat&&this.conditionalFormat.length>0){
                 data.map(column=>{
@@ -1124,6 +1123,12 @@ export default {
         },
         addFilterConfig(){
             this.addFilter = true;
+            debugger
+            this.conditionIndex = index;
+            this.typeDelete = 'formatTable';
+            this.showDelPopUp = true;
+            this.contentDelete =" Xóa định dạng "+this.conditionalFormat[index].nameGroup+" khỏi danh sách các định dạng";
+            
         },
         hideCloseBtnFilter(){
             this.selectedFilterName = '';
