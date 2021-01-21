@@ -15,8 +15,8 @@ onmessage = function (event) {
             let formulaInstance = dataOfAction.formulaInstance
             let formulaIns = new Formulas(formulaInstance.keyInstance,formulaInstance.formulas,formulaInstance.type);
             let rowNodeId = dataOfAction.rowNodeId; // th trong table thì mỗi dòng có 1 id
-            let sqlRowId = dataOfAction.sqlRowId;
             let columnName = dataOfAction.columnName;
+            let runOnColumn = dataOfAction.runOnColumn;
             let dataInput = {};
             if(dataOfAction.dataInput){
                 dataInput = dataOfAction.dataInput;
@@ -25,9 +25,8 @@ onmessage = function (event) {
             /**
              * Trương hợp chạy công thức cho cả cột trong table
              */
-            if(rowNodeId && rowNodeId.length > 1){
-                let listIdRow = dataOfAction.listIdRow;
-                let dataPostForGetMultiple = prepareDataGetMultiple(dataInput, listIdRow, workerStore['submit'][keyInstance]['inputData']);
+            if(runOnColumn){
+                let dataPostForGetMultiple = dataInput;
                 let cacheRowData = {};
                 //cache các data input giống nhau -> chỉ chạy 1 lần
                 for(let rowId in dataPostForGetMultiple){
@@ -58,7 +57,7 @@ onmessage = function (event) {
                             }
                         }
                         postMessage({action:'afterRunFormulasSuccess', dataAfter : 
-                            {controlName:controlName, res:res, formulaType:formulaInstance.type, rowNodeId:listIdRow}
+                            {controlName:controlName, res:res, formulaType:formulaInstance.type, rowNodeId:rowNodeId}
                         })
                         
                     }
@@ -81,6 +80,7 @@ onmessage = function (event) {
                  * trường hợp chạy công thức cho các trường hợp còn lại
                  */
                 else{
+                    console.log(dataInput,'dataInputdataInput');
                     formulaIns.handleBeforeRunFormulas(dataInput).then(res=>{
                         if(res && res['data']){
                             postMessage({action:'afterRunFormulasSuccess', dataAfter : 

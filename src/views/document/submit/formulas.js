@@ -381,6 +381,8 @@ export default class Formulas extends FormulasEvent{
             return formulas;
         }
         let listControlInDoc = this.getListControl();
+        console.trace(formulas,dataInput,'xxxxxxxxxxc')
+
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
             let value = dataInput[controlName];

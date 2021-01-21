@@ -336,8 +336,7 @@ export const getDataInputFormula = (formulaInstance, listInput, extraData = null
                             let currentColData = '';
                             let tableControl = listInput[controlIns.inTable];
                             if(rowIndex != 'all' && rowIndex.length == 1){
-                                currentColData = tableControl.tableInstance.getCellData(inputControlName, rowIndex[0]);
-                            console.log(rowIndex,currentColData,'rowIndexrowIndex');
+                                currentColData = tableControl.tableInstance.getCellDataByNodeId(inputControlName, rowIndex[0]);
                             }
                             else if(rowIndex == 'all'){
                                 currentColData = tableControl.tableInstance.getColData(inputControlName);

@@ -562,12 +562,6 @@ export default {
         if(this.documentObjectId){
             this.docObjId = this.documentObjectId;
         }
-
-        // đặt trang thái của view là submit => isDetailView = false
-        this.$store.commit("document/changeViewType", {
-            key: this.keyInstance,
-            value: this.action,
-        });
         
         /**
          * Nhận xử lí sự kiện click chuyển đổi dạng table <=> pivot mode
@@ -1596,7 +1590,6 @@ export default {
                             }
                             else{
                                 this.globalClass['document-form-style-default'] = true;
-                                
                             }
                             thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
                             thisCpn.dataPivotTable = res.data.pivotConfig;
@@ -1903,6 +1896,11 @@ export default {
                         }
                     }
                 }
+                this.$store.commit("document/addToDocumentSubmitStore", {
+                    key: 'readyLoaded',
+                    value: true,
+                    instance: this.keyInstance
+                });
             }
         },
 
