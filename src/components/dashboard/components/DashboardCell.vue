@@ -6,8 +6,8 @@
             <img :src="'img/dashboard/report-builder/'+cellConfigs.sharedConfigs.type+'.png'" height="40px" width="40px">
         </div>
         <div class="h-100 w-100 symper-dashboard-cell" v-else>
-            <div ref="cellTitle" class="symper-cell-title  pb-1 pt-2" :symper-cell-id="cellConfigs.sharedConfigs.cellId" :style="viewAttrs.symperTitle.style">
-                <div class="cell-title-text d-inline-block pl-2 pr-2" style="calc(100% - 30px)">
+            <div ref="cellTitle" class="symper-cell-title  pb-1 pt-1" :symper-cell-id="cellConfigs.sharedConfigs.cellId" :style="viewAttrs.symperTitle.style">
+                <div class="cell-title-text text-ellipsis  d-inline-block pl-2 pr-2" style="width: calc(100% - 10px)">
                     <span style="cursor: text" v-if="isView">{{viewAttrs.symperTitle.text}}</span>
                     <span 
                         v-if="!edditingTitle && !isView"

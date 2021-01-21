@@ -141,9 +141,13 @@ var mapTypeToClasses = autoLoadChartClasses();
 
 export default {
     created(){
+        let self = this;
         this.reportRenderManagement = new ReportRenderManagement(this);
         this.reportTranslatorWorker = new ReportTranslatorWorker();
         this.listenFromWorker(this.reportTranslatorWorker);
+        this.$evtBus.$on('bi-report-change-display', (data) => {
+            self.translateReportConfig(data.id);
+        });
     },
     components: {
         DashboardCell,
