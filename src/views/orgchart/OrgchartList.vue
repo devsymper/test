@@ -11,6 +11,7 @@
             :customAPIResult="customAPIResult"
             :useActionPanel="false"
             :headerPrefixKeypath="'common'"
+			
             @on-add-item-clicked="goToCreatePage()"
         ></list-items>
     </div>
@@ -41,18 +42,10 @@ export default {
                             {name: "code", title: "code", type: "text"},
                             {name: "name", title: "name", type: "text"},
                             {name: "isDefault", title: "isDefault", type: "text",
-                                renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-                                    let span;
-                                    Handsontable.dom.empty(td);
-                                    span = document.createElement('span')
-                                    if(value == "1"){
-                                        $(span).text('Mặc định')
-                                    }else{
-                                        $(span).text('')
-                                    }
-                                    td.appendChild(span);
-                                    return td
-                                },
+								cellRenderer: function(params) {
+									let newValue = params.value == '1' ? "Mặc định" : ""
+									return  '<span style="color: blue">'+ newValue +'</span>'
+								}
                             },
                             {name: "description", title: "description", type: "text"},
                             {name: "createAt", title: "create_at", type: "date"},

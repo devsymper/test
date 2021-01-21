@@ -86,18 +86,10 @@ export default {
 							{name: "userCreateName", title: "userCreateName", type: "text"},
 							{name: "userUpdateName", title: "userUpdateName", type: "text"},
 							{name: "status", title: "status", type: "numeric",
-								renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-									let span;
-									Handsontable.dom.empty(td);
-									span = document.createElement('span')
-									if(value === "1"){
-										$(span).text('Kích hoạt')
-									}else{
-										$(span).text('Không kich hoạt')
-									}
-									td.appendChild(span);
-									return td
-								},
+								cellRenderer: function(params) {
+									let newValue = params.value == '1' ? "Kích hoạt" : "Không kích hoạt"
+									return  '<span style="color: blue">'+ newValue +'</span>'
+								}
 							}
 						],
 						listObject: res.data.listObject,

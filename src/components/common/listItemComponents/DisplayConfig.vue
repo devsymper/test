@@ -68,7 +68,7 @@
                         :name="!tableDisplayConfig.drag ? 'flip-list' : null"
                     >
                         <div
-                            class="fs-13 column-drag-pos"
+                            class="fs-13 column-drag-pos pl-2"
                             v-for="(column,idx) in tableColumnsClone"
                             :key="column.data ? column.data : column.field"
                         >

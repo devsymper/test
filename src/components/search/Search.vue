@@ -222,8 +222,8 @@ export default {
                                      returnObjSearch.description = data.values?description.description:'Chưa điền mô tả';
                                 
                                  }else if(data.type=='workflow_definition'||data.type=="knowledge"){
-                                     returnObjSearch.displayName = data.new?data.new.name:"Không có tên";
-                                     returnObjSearch.description = data.new?data.new.description:'Chưa điền mô tả';
+                                     returnObjSearch.displayName = data.name?data.name:"Không có tên";
+                                     returnObjSearch.description = data.description?data.description:'Chưa điền mô tả';
                                  }
                                 else{
                                      returnObjSearch.displayName = data.name? data.name:"Không có tên";

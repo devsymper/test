@@ -308,6 +308,7 @@
 					:delegationState="delegationState"
                     :parentHeight="listTaskHeight"
                     :taskInfo="selectedTask.taskInfo"
+					@reselect-object="reselectObject"
                     :originData="selectedTask.originData"
                     :appId="String(selectedTask.originData.symperApplicationId)"
                     :reload="false"
@@ -498,7 +499,8 @@ export default {
                     name: ""
                 }
             },
-            filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
+			filteredColumns: {}, // tên các cột đã có filter, dạng {tên cột : true},
+			currentTask: {},
             getDataUrl: appConfigs.apiDomain.workflowExtend+"tasks",
              /**
              * Thêm điều kiện để quy vấn qua api
@@ -701,6 +703,7 @@ export default {
                 let tableFilter = this.tableFilter;
                 tableFilter.allColumnInTable = [];
                 configs.emptyOption = emptyOption;
+                configs.distinct = true;
                 configs.moreApiParam = {
                     variables : 'symper_last_executor_id,symper_user_id_start_workflow,symper_last_executor_name',
                 }
@@ -789,15 +792,10 @@ export default {
             // }
         },
         handleTaskSubmited() {
-            this.sideBySideMode = false;
-            this.getData();
+			this.sideBySideMode = false;
+            this.getData({});
         },
         handleChangeFilterValue(data) {
-            // for (let key in data) {
-            //     this.$set(this.myOwnFilter, key, data[key]);
-            // }
-            // this.getData();
-
             this.searchKey = data.nameLike;
             if(this.debounceGetData){
                 clearTimeout(this.debounceGetData);
@@ -810,8 +808,18 @@ export default {
         reCalcListTaskHeight() {
             this.listTaskHeight =
                 util.getComponentSize(this.$el.parentElement).h - 130;
-        },
-        async selectObject(obj, idx,idex) {
+		},
+		reselectObject(){
+			setTimeout(self=>{
+				self.selectObject(this.currentTask.obj , this.currentTask.idx, this.currentTask.idex)
+			},2000,this)
+		},
+        async selectObject(obj, idx, idex) {
+			this.currentTask = {
+				obj: obj,
+				idx: idx,
+				idex: idex
+			}
             this.index = idx;
             this.dataIndex = idex;
             this.$set(this.selectedTask, "originData", obj);

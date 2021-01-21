@@ -82,6 +82,9 @@ import PivotTable from "./../submit/pivot-table";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import tinymce from 'tinymce/tinymce';
 import { util } from '../../../plugins/util.js';
+import ControlRelationWorker from 'worker-loader!@/worker/document/submit/ControlRelation.Worker.js';
+import TableControl1 from '../submit/tableControl1.js';
+
 export default {
     name: "detailDocument",
     props: {
@@ -137,6 +140,9 @@ export default {
         sDocumentSubmit() {
             return this.$store.state.document.submit[this.keyInstance];
         },
+        sDocumentDetail() {
+            return this.$store.state.document.detail[this.keyInstance];
+        },
         listLinkControl() {
             return this.$store.state.document.linkControl[this.keyInstance];
         },
@@ -151,6 +157,7 @@ export default {
     },
     data() {
         return {
+            controlRelationWorker:null,
             focusingControlName: '',
             contentDocument: null,
             contentPrintDocument:null,
@@ -179,10 +186,32 @@ export default {
             wrapFormCss:{},
             defaultData:{},
             dataPivotTable:{},
+            dataGroupTable:{},
         };
     },
     beforeMount() {
         this.documentSize = "21cm";
+    },
+    mounted(){
+        let thisCpn = this;
+        this.controlRelationWorker = new ControlRelationWorker();
+        this.controlRelationWorker.addEventListener("message", function (event) {
+            let data = event.data;
+            switch (data.action) {
+                case 'setDataForPropsControl':
+                    let listControlToStore = data.dataAfter.listControlToStore;
+                    for(let controlId in listControlToStore){
+                        thisCpn.$store.commit(
+                            "document/addControl", { id: controlId, props: listControlToStore[controlId], instance: thisCpn.keyInstance }
+                        );
+					}
+                    thisCpn.processHtml(thisCpn.contentDocument);
+                    // thisCpn.controlRelationWorker.terminate();
+                    break;
+                default:
+                    break;
+            }
+        });
     },
     created(){
         tinymce.remove();
@@ -275,7 +304,7 @@ export default {
                 if(after.docObjId){
                     this.docObjId = Number(after.docObjId);
                     this.documentSize = after.docSize;
-                    this.loadDocumentObject(this.isPrint);
+                    this.loadDocumentObject(this.isPrint);z
                 }
             }
         },
@@ -310,6 +339,7 @@ export default {
                 let docDetailRes = await documentApi.detailDocument(documentId,dataPost);
                 if (docDetailRes.status == 200) {
                     this.dataPivotTable = docDetailRes.data.pivotConfig;
+                    this.dataGroupTable = docDetailRes.data.groupConfig;
                     let content = docDetailRes.data.document.content;
                     if(!isPrint){
                         $('.content-print-document').addClass('d-none');
@@ -341,24 +371,19 @@ export default {
                         }
                     }
                     
-                    setDataForPropsControl(docDetailRes.data.fields, this.keyInstance,'detail'); // ddang chay bat dong bo
-                    setTimeout((self) => {
-                        self.processHtml(content,isPrint); 
-                    }, 100,this);
-                        
+                    this.controlRelationWorker.postMessage({action:'setDataForPropsControl',data:
+                        { fields: docDetailRes.data.fields, viewType: 'detail', allDataDetail: this.sDocumentDetail.allData}
+                    });
                 }
                 this.$emit('after-load-document',docDetailRes.data.document);  
 
             } catch (error) {
-                
+                console.log(error,'errorerror');
             }
 
         },
         async loadDocumentObject(isPrint=false) {
             this.contentDocument = ""
-            try {
-                this.$refs.preLoaderView.show();
-            } catch (error) {}
             let thisCpn = this;
             let res = await documentApi
                 .detailDocumentObject(this.docObjId);
@@ -432,15 +457,17 @@ export default {
                     ".s-control:not(.bkerp-input-table .s-control)"
                 );
             }
-            let listTableIns = [];
+            // let listTableIns = [];
             let thisCpn = this;
+            console.log(this.sDocumentEditor.allControl,'this.sDocumentEditor.allControl');
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
                 
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let idField = this.sDocumentEditor.allControl[id].id;
-                    let valueInput = this.sDocumentEditor.allControl[id].value
+                    let valueInput = this.sDocumentEditor.allControl[id].value;
+                    console.log(valueInput,'valueInputvalueInput');
                     if(controlType == "submit" || controlType == "reset" || controlType == "draft"){
                         $(allInputControl[index]).remove()
                     }
@@ -483,38 +510,15 @@ export default {
                         }
                         //truong hop la control table
                         else {
-                            let listInsideControls = {};
                             let controlInTable = {};
-                            let mapControlToIndex = {};
-                            let tableControl = new TableControl(
+                            let tableControl = new TableControl1(
                                 idField,
                                 $(allInputControl[index]),
                                 this.sDocumentEditor.allControl[id],
-                                thisCpn.keyInstance
+                                thisCpn.keyInstance,
+                                (this.dataPivotTable) ? this.dataPivotTable[controlName] : {},
+                                (this.dataGroupTable) ? this.dataGroupTable[controlName] : {},
                             );
-                            tableControl.initTableControl(isPrint);
-                            tableControl.tableInstance = new Table(
-                                tableControl,
-                                controlName,
-                                id,
-                                thisCpn.keyInstance
-                            );
-                            if(this.dataPivotTable && this.dataPivotTable[controlName]){
-                                tableControl.tableMode = 'pivot';
-                                tableControl.pivotTable = new PivotTable(
-                                    tableControl,
-                                    controlName,
-                                    id,
-                                    this.dataPivotTable[controlName],
-                                    this.keyInstance
-                                );
-                            }
-                            tableControl.tablePrint = new TablePrint(
-                                tableControl,
-                                controlName,
-                                thisCpn.keyInstance
-                            );
-                            let columnsTableSqlLite = {};
                             let tableEle = $(allInputControl[index]);
                             tableEle.find(".s-control").each(function() {
                                 let childControlId = $(this).attr("id");
@@ -529,24 +533,25 @@ export default {
                                 childControl.init();
                                 childControl.inTable = controlName;
                                 let childControlName = childControlProp.properties.name.value;
-                                let colIndex = thisCpn.getColIndexControl($(this));
-                                mapControlToIndex[childControlName] = colIndex
                                 thisCpn.addToListInputInDocument(childControlName,childControl)
-                                listInsideControls[childControlName] = true;
                                 controlInTable[childControlName] = childControl;
                             });
-                            tableControl.listInsideControls = listInsideControls;
                             tableControl.controlInTable = controlInTable;
-                            tableControl.mapControlToIndex = mapControlToIndex;
-                            this.addToListInputInDocument(controlName,tableControl)
+                            // if(this.dataPivotTable && this.dataPivotTable[controlName]){
+                            //     tableControl.setPivotTableConfig(this.dataPivotTable[controlName]);
+                            // }
+                            // if(this.dataGroupTable && this.dataGroupTable[controlName]){
+                            //     tableControl.setGroupTableConfig(this.dataGroupTable[controlName]);
+                            // }
                             tableControl.renderTable();
                             tableControl.setData(valueInput);
-                            tableControl.renderInfoButtonInRow(this.listLinkControl);
-                            listTableIns[controlName] = tableControl;
+                            this.addToListInputInDocument(controlName,tableControl)
+                            // tableControl.renderInfoButtonInRow(this.listLinkControl);
+                            // listTableIns[controlName] = tableControl;
                         }
                     }
                 }
-            }
+			}
             this.$refs.preLoaderView.hide();
             this.$emit("after-loaded-component-detail",this.formSize);
             $('.wrap-content-detail').removeAttr('style');

@@ -1,7 +1,7 @@
 <template>
     <div
         :class="{'symper-table-filter-container elevation-8':true, 'd-none':!showTableFilter}"
-        style="height:450px"
+        style="height:450px ; z-index: 9999"
     >
         <div
             ref="it1"

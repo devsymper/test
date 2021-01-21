@@ -474,7 +474,8 @@ export default {
             this.nodeDetailPanel.position.top = evt.originalEvent.clientY + 10;
             this.nodeDetailPanel.title = bizNode.name;
             this.nodeDetailPanel.titleIcon = 'mdi-account';
-            this.nodeDetailPanel.show = true;
+			this.nodeDetailPanel.show = true;
+			this.$emit('node-clicked', bizNode , evt)
         },
     },
    

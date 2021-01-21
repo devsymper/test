@@ -17,22 +17,4 @@ export default [
     component: () =>
         import ('../../views/admin/ListWorkInProcessInstance.vue'),
 	},
-	{
-    path: "/test/testAg",
-    name: "procesdsdsds",
-    component: () =>
-        import ('@/components/common/agDataTable/TestAg'),
-	},
-	{
-    path: "/test-ag/application",
-    name: "procesdsdsdsdadsadsdasdss",
-    component: () =>
-        import ('@/components/common/agDataTable/TestAgApplication'),
-	},
-	{
-    path: "/test-ag/document",
-    name: "procesdssdsdsdsdsds",
-    component: () =>
-        import ('@/components/common/agDataTable/TestAgDocument'),
-	},
  ]

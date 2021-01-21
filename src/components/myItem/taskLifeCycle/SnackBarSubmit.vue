@@ -9,10 +9,10 @@
 		multi-line
 	>
 		<div class="snackbar-submit d-flex flex-column fs-13">
-			<span style="color: green" class="fs-15 mb-2 ">Công việc submit thành công</span>
+			<span style="color: green" class="fs-15 mb-2 ">{{$t("myItem.taskLifeCycle.snackbar.title")}}</span>
 			<div class="d-flex " style="height:40px">
 				<div  style="width:200px">
-					Bạn có thể hoàn thành công việc bằng cách thực thi 
+					{{$t("myItem.taskLifeCycle.snackbar.description")}}
 				</div>
 				<ListActionMenu  
 					:snackbarMode="true"
@@ -24,7 +24,7 @@
 			</div>
 			<div class="d-flex">
 				<div style="width:200px">
-					Hãy cập nhật bản ghi bằng cách chọn 
+					{{$t("myItem.taskLifeCycle.snackbar.action")}}
 				</div>
 				<div>
 					<v-btn

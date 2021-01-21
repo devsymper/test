@@ -273,7 +273,6 @@ export default {
             }
         },
         selectIcon(icon) {
-			// console.log(icon);
             this.$emit("selected", icon.trim());
         },
         setContext(ctx){

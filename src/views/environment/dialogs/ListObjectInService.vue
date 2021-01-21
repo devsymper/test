@@ -56,6 +56,7 @@
 					<div class="dialog-object-in-service" style="z-index:1000;background-color: #ffffff ; position: relative">
 						<ObjectDetail 
 							:tableHeight="tableHeight"
+							:tab="tab"
 							@back="tab = 'tab-1'"
 							ref="listObject"
 							@close-popup="handleCloseEvent"
@@ -139,8 +140,8 @@ export default {
 
 .dialog-object-in-service >>> .btn-header-popup {
 	position: absolute;
-	top: 15px;
-	right: 235px;
+	top: 9px;
+	right: 218px;
 }
 .dialog-object-in-service >>> .object-type-title{
 	cursor: pointer;

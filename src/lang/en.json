@@ -5,6 +5,7 @@
         "select_lang": "Select language",
         "required": "required",
         "KH": "Knowledge Management",
+        "taskManagement": "Task Management",
         "structureManagement": "Structure management",
         "reports": "Reports",
         "workflows": "Workflows",
@@ -132,6 +133,7 @@
             "apps": "My apps",
             "Account management": "Account manager",
             "Access Management": "Access management",
+            "Task Management": "Task management",
             "Applications": "Applications",
             "Lists to do": "Lists to do",
             "My application": "My application",
@@ -197,8 +199,22 @@
         "unfreeze_column": "Don't freeze this column",
         "hide_column": "Hide this column",
 		"show_column": "Show this column",
+		"domainName": "Domain name",
+        "serviceIdentifier": "Service identifier",
+        "serviceName": "Service name",
 		"os": "Os",
 		"ip": "IP address",
+		"number_instance": "Number instances",
+		"baCreate": "BA Create",
+		"totalRecord": "Total record",
+		"code": "Code",
+		"userUpdateName": "User update",
+		"parameter": "Parameter",
+		"checkbox": "Checkbox",
+		"userCreateName": "User create",
+		"isDefault":"Default",
+		"lastUpdateAt": "Last update at",
+		"baUpdate": "BA Update",
         "wrap_tex_mode": {
             "wrap": "Wrap",
             "clip": "Clip"
@@ -212,7 +228,10 @@
             "cannot_get_data": "Can not get data from server"
         },
         "success": {
-            "save_config": "Save config successfully!"
+            "save_config": "Save config successfully!",
+            "save_filter": "Save filter table successfully!",
+            "delete_filter": "Save filter table successfully!",
+            "edit_filter": "Save filter table successfully!"
         },
         "filter": {
             "none": "None",
@@ -232,7 +251,12 @@
             "sort_desc": "Sort DESC",
             "clear_filter": "Clear filter",
             "filter_by_value": "Filter by value",
-            "filter_by_condition": "Filter by condition"
+            "filter_by_condition": "Filter by condition",
+            "Delete":"Delete",
+            "Edit":"Edit",
+            "Default":"Default",
+            "Delete Default":"Bỏ mặc định"
+
         }
     },
     "import": {
@@ -284,7 +308,7 @@
                 "firstName": "First name",
                 "lastName": "Last name",
                 "displayName": "Display name",
-                "phone": "Phone number"
+				"phone": "Phone number"
             },
             "passwordSetting": {
                 "title": "Password setting",
@@ -581,7 +605,9 @@
                         "comment": "Comment",
                         "has": "Has",
                         "commentNotResolve": "comment Not Resolve",
-                        "noComment": "No comment"
+						"noComment": "No comment",
+						"listWorks": "Work",
+						"clickToViewListWork": "Click to view work"
                     },
                     "worflowInfo": "Workflow infomation",
                     "userRelated": {
@@ -1163,7 +1189,8 @@
             "showLess": "Show less task related",
             "showMoreFile": "Show more file",
             "quickView": "Quick view",
-            "openTask": "Open task"
+			"openTask": "Open task",
+			"history":"History"
         },
         "alert": {
             "title_aproval": "Action work",
@@ -1172,8 +1199,59 @@
         },
         "unfinished": "Unfinished",
         "totalTask": "Total task",
-        "totalWork": "Total work"
-
+		"totalWork": "Total work",
+		"taskLifeCycle":{
+			"dialog":{
+				"complete":{
+					"header": "Complete task",
+					"description":"Press apply to complete task"
+				},
+				"assign":{
+					"header": "Reassign task",
+					"description":"This work will be assigned to another person to perform, assignee has full control over the work",
+					"workStatus":"Work will assign to"
+				},
+				"claim":{
+					"header": "Claim work",
+					"description":"You will be task owner"
+				},
+				"delegate":{
+					"header": "Delegate task",
+					"description":"This work will be assigned to someone else to perform but will not have the right to complete it"
+				},
+				"unClaim":{
+					"header": "Unclaim task",
+					"description":"This work you received will be removed from your to-do list"
+				},
+				"resolve":{
+					"header": "Resolve task",
+					"description":"This work will be executed and returned to the owner of the job "
+				}
+			},
+			"assignee":"Assignee",
+			"delegateUser":"Delegate user",
+			"assigneePermission":"Assign can view and resolve task",
+			"workDelegated":"This work is delegate to",
+			"owner":"Owner task",
+			"currentStatus":"Current task status",
+			"newStatus": "New task status",
+			"cancel":"Cancel",
+			"corfirm":"Apply",
+			"snackbar":{
+				"title":"Submit document success",
+				"description":"You can get this task done by executing ",
+				"action":"Update the record by selecting "
+			},
+			"notify":{
+				"unClaim":"Unclaim task success",
+				"resolve":"Resolve task success",
+				"claim":"Claim task success",
+				"complete":"Complete task success",
+				"notSubmit":"You must submit task before complete task",
+				"assign": "Assign task success",
+				"delegate": "Delegate task success"
+			}
+		}
     },
     "tasks": {
         "error": {
@@ -1206,7 +1284,8 @@
             "alertDescription": "No description",
             "relatedTask": "RELATED TASK",
             "attachment": "ATTACHMENT FILE",
-            "status": "Status"
+			"status": "Status",
+			"candidateUser":"Candidate user"
 
         },
         "filterOptions": {
@@ -1226,7 +1305,9 @@
         "delegate": "Delegate",
         "resolve": "Resolve",
         "complete": "Complete",
-        "created": "Task created",
+        "assign": "Assign",
+		"created": "Task created",
+		"action": "Action",
         "relatedPeople": {
             "title": "Related people"
         },
@@ -1295,5 +1376,53 @@
         "reply": "Reply",
         "edited": "Edited",
         "search": "Search"
+    },
+    "taskManagement":{
+        "table":{
+            "name": "Name",
+            "description": "Description",
+            "lead": "Leader",
+            "category": "Category",
+            "createAt":"Create time",
+            "email":"Email",
+            "role":"Role",
+            "workflow":"Workflow",
+            "startDate":"Start date",
+            "releaseDate":"Release date",
+            "unreleased":"Unreleased",
+            "released":"Released",
+            "configField":"Config field"
+        },
+        "listMember":"List member",
+        "listCategory":"List category",
+        "listProject":"List project",
+        "listComponent":"List component",
+        "listVersion":"List version",
+        "listIssueType":"List Issue type",
+        "listWorkflow":"List Workflow",
+        "listPriority":"List Priority",
+        "listActionPack":"List ActionPack",
+        "listPermission":"List Permission",
+        "listIssueComponent":"List Issue in component",
+        "listIssueVersion":"List Issue in version",
+        "detailProject":"Detail project",
+        "requiredField":"Indicates required field",
+        "addPeople":"Add people",
+        "managerRole":"Manager roles",
+        "createRole":"Create role",
+        "dialog":{
+            "removeUser": "You will remove members from this project?",
+            "removeRole": "You will remove role from this rols.",
+            "removeCategory": "You will remove category from this list.",
+            "removeComponent": "You will remove component from this list.",
+            "removeWorkflow": "You will remove workflow from this list.",
+            "removePriority": "You will remove priority from this list.",
+            "removeVersion": "You will remove version from this list."
+
+        },
+        "settingBoard":"Board setting"
+
+
+
     }
 }

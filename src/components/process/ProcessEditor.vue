@@ -1448,7 +1448,6 @@ export default {
         createUniqueIdentifyForWorkflow(){
             setTimeout((self) => {
                 let allEls = self.$refs.symperBpmn.getAllNodes();
-                debugger
                 for(let el of allEls){
                     if(el.$type == "bpmn:Process" || el.$type == "bpmn:Collaboration"){
                         let uniqueId = util.str.randomString(6)+'_'+Date.now();

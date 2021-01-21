@@ -5,13 +5,13 @@
 			small
 			icon
 			tile
-			style="position:absolute; left:0; top:11px"
+			style="position:absolute; left:0; top:6px"
 			@click="back"
 			class="mr-2 ml-1"
 		>
 			<v-icon dark small>mdi-keyboard-backspace</v-icon>
 		</v-btn>
-		<span class="btn-header-popup">
+		<div class="btn-header-popup">
 			<v-btn 
 				class="mr-2 font-normal fs-13"
 				depressed
@@ -33,7 +33,16 @@
 			>
 				Đồng bộ
 			</v-btn>
-		</span>
+			<v-btn 
+				class="font-normal fs-13 mr-2"
+				depressed
+				tile
+				small
+				@click="handleSyncAll"
+			>
+				Đồng bộ tất cả
+			</v-btn>
+		</div>
 		<ListItem 
 			ref="listObject"
 			:showExportButton="false"
@@ -42,6 +51,7 @@
 			:getDataUrl="getListUrl"
 			@close-popup="handleCloseEvent"
 			style="margin-left:10px"
+			@data-loaded="showBtnAddCheckbox = true"
 			:refreshListWhenChangeUrl="false"
 			:useDefaultContext="false"
 			:tableContextMenu="tableContextMenu"
@@ -85,11 +95,15 @@ export default {
 		currentObjectType:{
 			type: String
 		},
+		tab:{
+			type: String,
+			default: ""
+		}
 	},
 	data(){
 		let self = this
 		return{
-			listItemSelected: {},
+			listItemSelected: [],
 			showBtnAddCheckbox: true,
 			showDialogRelateData: false,
 			showList: false,
@@ -107,11 +121,10 @@ export default {
 			},
 			customAPIResult:{
 				reformatData(res){
-					self.$refs.listObject.rerenderTable();
 					return{
 						columns:res.data.columns ? res.data.columns : [],
 						listObject:res.data.listObject ? res.data.listObject : [],
-						total: res.data.listObject ? res.data.listObject.length : 0,
+						total: res.data.total,
 					}
 				}
 			}
@@ -139,6 +152,11 @@ export default {
 		handleSyncClick(){
 			this.showDialog = true
 		},
+		handleSyncAll(){
+			let items = this.$refs.listObject.getAllData()
+			this.$set(this, 'listItemSelected', items)
+			this.showDialog = true
+		},
 		handleCheckClick(){
 			this.showDialogRelateData = true
 		},
@@ -150,7 +168,11 @@ export default {
 			setTimeout((self)=>{
 				self.$refs.listObject.getData()
 			},200,this)
-			this.listItemSelected = {},
+			this.listItemSelected = [],
+			this.showBtnAddCheckbox = true
+		},
+		tab(val){
+			this.$refs.listObject.removeCheckBoxColumn()
 			this.showBtnAddCheckbox = true
 		}
 	}
@@ -163,7 +185,7 @@ export default {
 }
 .btn-header-popup{
 	position: absolute;
-	top: 15px;
+	top: 6px; 
 	right: 235px;
 }
 </style>
