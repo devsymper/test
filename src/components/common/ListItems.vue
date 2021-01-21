@@ -725,7 +725,7 @@ export default {
 							eval("e.cellRenderer = " + e.cellRenderer)
 						}
                     })
-                    self.columnDefs = self.handleConditionalFormat(data.dataAfter);
+                    self.columnDefs = self.handelConditionalFormat(data.dataAfter);
 					break;
                 default:
                     break;
@@ -1029,7 +1029,7 @@ export default {
          disApplyConfigFormat(index){
              this.conditionIndex = -1;
          },
-        handleConditionalFormat(data){
+        handelConditionalFormat(data){
             const self = this;
              if(this.conditionalFormat&&this.conditionalFormat.length>0){
                 data.map(column=>{
@@ -1085,46 +1085,6 @@ export default {
            
         },
         deleteConfigFormat(index){
-            this.conditionalFormat = this.conditionalFormat.filter((c,i)=>i!=index)
-            this.saveConditionalFormatting(this.conditionalFormat);
-        },
-        handleAddFilter(data){
-            if(data.type=='save'){
-                this.filterName = data.filterName
-                this.saveFilter()
-            }else{
-                this.addFilter = false;
-            }
-        },
-        configFilterAction(data){
-            let type = data.type;
-              switch(type){
-                case 'setDefaultFilter':
-                    this.setDefaultFilter(data.filterIdx);
-                    break;
-                case 'unsetDefaultFilter':
-                    this.unsetDefaultFilter(data.filterIdx);
-                    break;
-                case 'editFilter':
-                    this.editFilter(data.filterIdx)
-                    break;
-                case 'deleteFilter':
-                    data.type="deleteFilter";
-                    this.deleteFilter(data.filterIdx)
-                    break;
-              }
-        },
-        setTable(filterIdx){
-            this.closeBtnFilter = true;
-            this.selectedFilterName = this.listFilters[filterIdx].name;
-            let filter = this.listFilters;
-            this.tableFilter.allColumn = this.listFilters[filterIdx].columns;
-            this.getData()
-        },
-        addFilterConfig(){
-            this.addFilter = true;
-            debugger
-            this.conditionIndex = index;
             this.typeDelete = 'formatTable';
             this.showDelPopUp = true;
             this.contentDelete =" Xóa định dạng "+this.conditionalFormat[index].nameGroup+" khỏi danh sách các định dạng";
