@@ -32,7 +32,12 @@ const minimizeDataAfterRunFormula = function(rs) {
     if(!rs.server){
         let data = rs.data; 
         if(data.length > 0){
-            value=data[0].values[0][0];
+            if(!data[0]){
+                value = ""
+            }
+            else{
+                value=data[0].values[0][0];
+            }
         }
     }
     else{

@@ -78,6 +78,9 @@ export default class ClientSQLManager {
         }
     }
     static async insertDataToTable(keyInstance, tableName, columns, data, returnPromise = false) {
+        if(!data){
+            return
+        }
         let sql = `INSERT INTO ${tableName} (${columns}) VALUES ${data}`;
         if (returnPromise) {
             return new Promise((resolve, reject) => {

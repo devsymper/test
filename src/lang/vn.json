@@ -2,6 +2,7 @@
     "common": {
         "number_instance": "Tổng số instance",
         "id": "Id",
+        "format_table":"Định dạng",
         "deleteAll": "Xóa tất cả",
         "required": "Bắt buộc",
         "select_lang": "Thay đổi ngôn ngữ",
@@ -36,7 +37,7 @@
         "search": "Tìm kiếm",
         "note": "Ghi chú",
         "quickSearch": "Tìm nhanh",
-        "list_config": "Cấu hình danh sách",
+        "list_config": "Cấu hình",
         "save": "Lưu",
         "confirm": "Xác nhận",
         "check": "Kiểm tra",

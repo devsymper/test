@@ -25,7 +25,7 @@ import {AutoCompleteCellRenderer} from './table/AutoCompleteCellRenderer';
 import {AutoCompleteCellEditor} from './table/AutoCompleteCellEditor';
 import { checkCanBeBind } from "./handlerCheckRunFormulas";
 import PerfectScrollbar from "perfect-scrollbar";
-import {getDataInputFormula } from "./../../../components/document/dataControl";
+import {getDataInputFormula, prepareDataGetMultiple } from "./../../../components/document/dataControl";
 window.addNewDataPivotTable = function(el, event, type){
     let tableName = $(el).attr('table-name');
     event.preventDefault();
@@ -756,6 +756,7 @@ export default class SymperTable {
             columns.push(controlName + " " + type);
         }
         columns.push('s_table_id_sql_lite integer');
+        columns.push('childObjectId integer');
         this.formulasWorker.postMessage({action:'executeSQliteDB',data:
             {
                 func:'createTable',
@@ -808,6 +809,7 @@ export default class SymperTable {
         return [rowItem]
     }
     refreshCells(controlName, rowNodeId = null){
+        console.trace('oks')
         let allRowRefresh = [];
         for (let index = 0; index < rowNodeId.length; index++) {
             let rowNode = this.getRowNodeById(rowNodeId[index])
@@ -887,6 +889,16 @@ export default class SymperTable {
         return rowData;
     }
     /**
+     * Hàm trả về tất cả row node id cho trường  hợp chạy công thức cả cột
+     */
+    getAllRowNodeId() {
+        let rowData = [];
+        this.gridOptions.api.forEachNode(node => 
+            rowData.push(node.id)
+        );
+        return rowData;
+    }
+    /**
      * Hàm trả về dữ liệu của 1 cột
      * @param {*} colName 
      */
@@ -918,6 +930,15 @@ export default class SymperTable {
      * @param {*} rowIndex 
      */
     getCellData(columnName, rowIndex){
+        let rowNode = this.gridOptions.api.getRowNode(rowIndex);
+        return rowNode.data[columnName];
+    }
+    /**
+     * Hàm trả về giá trị của 1 cell theo nodeId
+     * @param {*} columnName 
+     * @param {*} rowIndex 
+     */
+    getCellDataByNodeId(columnName, rowIndex){
         let rowNode = this.gridOptions.api.getRowNode(rowIndex);
         return rowNode.data[columnName];
     }
@@ -1187,7 +1208,9 @@ export default class SymperTable {
             this.handleRunFormulaOnRow(controlInstance,dataInput, formulaInstance, rowId, columnName);
         }
         else if(rowId == "all"){
-            this.handleRunFormulaOnColumn(controlInstance,dataInput, formulaInstance)
+            let rowNodeId = this.getAllRowNodeId();
+            let dataInputAll = prepareDataGetMultiple(dataInput,rowNodeId,listInput)
+            this.handleRunFormulaOnColumn(controlInstance, formulaInstance, dataInputAll, rowNodeId)
         }
         else{
             this.handleRunFormulaOnRowChange(controlInstance, dataInput, formulaInstance, rowId);
@@ -1220,16 +1243,16 @@ export default class SymperTable {
             });
         }
     }
-    handleRunFormulaOnColumn( controlInstance, dataInput, formulaInstance){
-        let listIdRow = this.getColData(SQLITE_COLUMN_IDENTIFIER);
+    handleRunFormulaOnColumn( controlInstance,formulaInstance, dataInput,rowNodeId){
         
         this.formulasWorker.postMessage({action:'runFormula',data:
             {
                 formulaInstance:formulaInstance, 
                 controlName:controlInstance.name, 
                 keyInstance:this.keyInstance,
-                listIdRow:listIdRow, 
+                rowNodeId:rowNodeId, 
                 controlType:controlInstance.type,
+                runOnColumn:true,
                 dataInput:dataInput
             }
         });
