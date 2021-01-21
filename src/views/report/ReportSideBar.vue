@@ -105,9 +105,6 @@ export default {
 			if (!item.children) {
 				this.setActive(item, subItem, parent);
 			}
-			let path = 'common.sidebar.' + item.title;
-			let title = this.$t(path);
-			this.$goToPage(item.link, title, false, false);
 		},
 		setActive(item, subItem, parent) {
 			this.$emit('selecting-show-list', item.title)
@@ -136,7 +133,7 @@ export default {
 					group: 'My work',
 					children: {
 						listDashboard: {
-							title: 'listDashboards',
+							title: 'list-dashboard',
 							link: '/report',
 						},
 						listTrashDashboard: {
@@ -152,7 +149,7 @@ export default {
 					group: 'My work',
 					children: {
 						listDataflow: {
-							title: 'listDataflows',
+							title: 'list-dataflow',
 							link: '/report',
 						},
 						listTrashDataflow: {
@@ -167,7 +164,7 @@ export default {
 					group: 'My work',
 					children: {
 						listRelation: {
-							title: 'listRelations',
+							title: 'list-relation',
 							link: '/report',
 						},
 						listTrashRelation: {
@@ -182,7 +179,7 @@ export default {
 					group: 'My work',
 					children: {
 						listDataset: {
-							title: 'listDatasets',
+							title: 'list-dataset',
 							link: '/report',
 						},
 						listTrashDataset: {

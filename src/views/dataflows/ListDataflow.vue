@@ -2,7 +2,7 @@
 	<div>
 		<ListItems
 			ref="listServer"
-			:pageTitle="$t('bi.dataflow.titleShowlist')"
+			:pageTitle="$t('bi.dataflow.title-show-list')"
 			:containerHeight="containerHeight"
 			:getDataUrl="getListUrl"
 			:headerPrefixKeypath="'table'"

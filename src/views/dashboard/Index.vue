@@ -4,8 +4,8 @@
             ref="listApp"
             :getDataUrl="apiUrl"
             :headerPrefixKeypath="'table'"
-            :pageTitle="$t('bi.dashboard.titleShowList')"
-            :containerHeight="tableHeight"
+            :pageTitle="$t('bi.dashboard.title-show-list')"
+            :containerHeight="containerHeight"
             :tableContextMenu="tableContextMenu"
 			:customAPIResult="customAPIResult"
             :useDefaultContext="false"
@@ -16,7 +16,6 @@
 </template>
 <script>
 import ListItems from "@/components/common/ListItems";
-import { util } from '@/plugins/util.js';
 import {
     appConfigs
 } from "@/configs";
@@ -24,9 +23,14 @@ export default {
     name: "listApps",
     components: {
         ListItems,
-    },
-    created(){
-    },
+	},
+	props:{
+		containerHeight:{
+			type: Number,
+			default: 0
+		}
+	},
+
     data: function() {
 		let self = this;
         return {
@@ -85,11 +89,9 @@ export default {
 					}
 				}
 			},
-			tableHeight: 0,
         };
     },
     mounted() {
-		this.tableHeight = util.getComponentSize(this).h;
     },
     methods: {
 		addDashboard(){

@@ -167,13 +167,13 @@
             "list_work": "Danh sách công việc",
             "syqlFunction": "SYQL Function",
 			"environment": "Quản lí môi trường",
-			"listDashboards":"Danh sách báo cáo",
+			"list-dashboard":"Danh sách báo cáo",
 			"list-trash-dashboard":"Danh sách báo cáo đã xóa",
-			"listDataflows":"Danh sách dataflow",
+			"list-dataflow":"Danh sách dataflow",
 			"list-trash-dataflow":"Danh sách dataflow đã xóa",
-			"listRelations":"Danh sách relation",
+			"list-relation":"Danh sách relation",
 			"list-trash-relation":"Danh sách relation đã xóa",
-			"listDatasets":"Danh sách dataset",
+			"list-dataset":"Danh sách dataset",
 			"list-trash-dataset":"Danh sách dataset đã xóa",
 			"dashboard": "Dashboard",
 			"dataflow":"Data flow",
@@ -1283,7 +1283,7 @@
 	},
 	"bi":{
 		"dashboard":{
-			"titleShowList": "Danh sách báo cáo",
+			"title-show-list": "Danh sách báo cáo",
 			"title-visualization":"Các loại chart",
 			"column-config":"Cấu hình cột",
 			"style-config":"Cấu hình style",
@@ -1295,16 +1295,16 @@
 			"relation-selector": "Lựa chọn relation"
 		},
 		"dataflow":{
-			"titleShowlist": "Danh sách dataflow",
-			"titleShowlistTrash": "Danh sách dataflow đã xóa"
+			"title-show-list": "Danh sách dataflow",
+			"title-show-list-trash": "Danh sách dataflow đã xóa"
 		},
 		"dataset":{
-			"titleShowlist": "Danh sách dataset",
-			"titleShowlistTrash": "Danh sách dataset đã xóa"
+			"title-show-list": "Danh sách dataset",
+			"title-show-list-trash": "Danh sách dataset đã xóa"
 		},
 		"relation":{
-			"titleShowlist": "Danh sách relation",
-			"titleShowlistTrash": "Danh sách relation đã xóa"
+			"title-show-list": "Danh sách relation",
+			"title-show-list-trash": "Danh sách relation đã xóa"
 		}
 
 	},

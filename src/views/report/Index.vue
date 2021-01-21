@@ -6,10 +6,11 @@
 			/>
 		<div class="flex-grow-1">
 			<ListDashboard 
-				v-if="selectingShowList == 'listDashboards'"
+				v-if="selectingShowList == 'list-dashboard'"
+				:containerHeight="containerHeight"
 			/>
 			<ListDataflow 
-				v-else-if="selectingShowList == 'listDataflows'"
+				v-else-if="selectingShowList == 'list-dataflow'"
 				:containerHeight="containerHeight"
 			/>
 			<ListTrashDataflow 
@@ -17,10 +18,12 @@
 				:containerHeight="containerHeight"
 			/>
 			<ListDataset 
-				v-else-if="selectingShowList == 'listDatasets'"
+				v-else-if="selectingShowList == 'list-dataset'"
+				:containerHeight="containerHeight"
 			/>
 			<ListRelation 
-				v-else-if="selectingShowList == 'listRelations'"
+				v-else-if="selectingShowList == 'list-relation'"
+				:containerHeight="containerHeight"
 			/>
 			<span v-else class="ml-12">
 				{{selectingShowList}}
@@ -53,7 +56,7 @@ export default {
         return {
 			showSideBar : false,
 			containerHeight: 0,
-			selectingShowList: 'listDashboards'
+			selectingShowList: 'list-dashboard'
         };
 	},
 	mounted(){
