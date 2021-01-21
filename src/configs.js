@@ -8,6 +8,7 @@ var configs = {
         date: 'mdi-calendar-month-outline',
         datetime: 'mdi-calendar-clock',
         time: 'mdi-timer-outline',
+        all:'mdi-table-row'
     },
     maxOpenTab: 15,
     apiDomain: {

@@ -63,7 +63,7 @@
                     <span   v-if="isSuccess">
                        Bạn đã đổi mật khẩu thành công!</span>
                     <span  v-if="!isSuccess">
-                        Rất tiếc gửi yêu cầu đổi mật khẩu của bạn đã thất bại!
+                        {{errorMessage}}
                     </span>
                 </v-card-text>
                 <v-card-actions>
@@ -87,6 +87,7 @@ export default {
     data() {
         return {
             showNotification:false,
+            errorMessage:'Rất tiếc gửi yêu cầu đổi mật khẩu của bạn đã thất bại!',
             isSuccess:false,
             reNewPassword:'',
             showPassRenew:false,
@@ -97,6 +98,10 @@ export default {
                 min: v => (typeof v != 'undefined' && v != undefined && v.length >= 8) || 'Yêu cầu mật khẩu lớn hơn 8 kí tự',
                 max: v => (typeof v != 'undefined' && v != undefined && v.length < 25) || 'Yêu cầu mật khẩu ít hơn 24 kí tự',
                 match: v => (v==this.newPassword) || 'Mật khẩu mới và xác nhận không trùng nhau',
+                newPassword:value => {
+					const pattern = /^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?).{8,}$/
+					return pattern.test(value) || 'Mật khẩu phải có chữ thường, chữ hoa và số';
+				},
             },
         }
     },
@@ -113,7 +118,9 @@ export default {
                     if(res.status==200){
                         self.showNotification=true;
                         self.isSuccess=true;
+                        self.$router.push("/");
                     }else{
+                        this.errorMessage=res.message;
                         self.showNotification=true;
                         self.isSuccess=false;
                     }
