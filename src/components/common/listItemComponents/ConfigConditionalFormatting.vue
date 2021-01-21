@@ -60,7 +60,6 @@
         </div>
         <div style="margin-top:-20px" v-else>
             <ColorScale 
-                :rowData="rowData"
                 ref="colorScale"
                 v-model="value.displayMode.colorScale"
                 :tableColumns="formatTableColumns"/>
@@ -180,12 +179,6 @@ export default {
                 return {}
             }
       },
-       rowData:{
-             type: Array,
-                default(){
-                    return []
-                }
-        },
       tableColumns: {
             type: Array,
                 default(){

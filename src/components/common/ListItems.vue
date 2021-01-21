@@ -278,9 +278,7 @@
 			</ag-grid-vue>
 			 <display-config
 				ref="tableDisplayConfig"
-                @apply-config="applyConfig"
-                @editConfig="editConfig"
-                @delete-config="deleteConfig"
+                @change-format="changeFormat"
                 @save-conditional-formatting="saveConditionalFormatting"
 				@drag-columns-stopped="handleStopDragColumn"
 				@change-colmn-display-config="configColumnDisplay"
@@ -727,69 +725,7 @@ export default {
 							eval("e.cellRenderer = " + e.cellRenderer)
 						}
                     })
-                    //no
-                    // data.dataAfter.map(column=>{
-                    //         column.cellStyle= function(e){
-                    //             //singleCOler
-                    //             if(self.conditionalFormat&&self.conditionalFormat[self.conditionIndex].displayMode.type=="singleColor"){
-                    //                 if(eval(self.conditionalFormat[self.conditionIndex].tableColumnsJS)){
-                    //                 let conditionalFormat1 = self.conditionalFormat[self.conditionIndex].displayMode.singleColor.conditionFormat
-                    //                     if(eval(conditionalFormat1)){
-                    //                         return {color: self.conditionalFormat[self.conditionIndex].displayMode.singleColor.fontColor, backgroundColor:self.conditionalFormat[self.conditionIndex].displayMode.singleColor.backgroundColor}
-                    //                     }
-                    //                 }else{
-                    //                     return {}
-                    //                 }
-                    //             //singleColor
-                    //             }else{
-                    //                   if(eval(self.conditionalFormat[self.conditionIndex].tableColumnsJS)){
-                    //                     // const colorGradient = new Gradient();
-                    //                     // if(e.data.id==self.conditionalFormat[self.conditionIndex].displayMode.colorScale.listId.name){
-                    //                     //     return{background: self.conditionalFormat[self.conditionIndex].displayMode.colorScale.listId.color}
-
-                    //                     // }
-                    //                    // colorGradient.setGradient(minValue, midValue,maxValue).setMidpoint(3).getArray();
-                    //                     return{background:'blue'}
-                    //                   }
-                    //             }
-                                
-                               
-                    //     }
-                    // })
-                    //no
-                     if(self.conditionalFormat&&self.conditionalFormat.length>0){
-                        data.dataAfter.map(column=>{
-                            column.cellStyle= function(e){
-                                let dataFormat = self.conditionalFormat[self.conditionIndex];
-                                if(eval(dataFormat.tableColumnsJS)){
-                                    // nếu là kiểu màu đơn
-                                    if(dataFormat.displayMode.type=="singleColor"){
-                                        let conditionalFormat = dataFormat.displayMode.singleColor.conditionFormat
-                                        if(eval(conditionalFormat)){
-                                            return {color: dataFormat.displayMode.singleColor.fontColor, backgroundColor:dataFormat.displayMode.singleColor.backgroundColor}
-                                        }
-                                    }
-                                    else{
-                                        debugger
-                                        // nếu thang màu
-                                        let field = dataFormat.displayMode.colorScale.applyColumn.field;
-                                        let valueTable = e.data[field];
-                                        let listColors = dataFormat.displayMode.colorScale.listColors;
-                                        let color = '';
-                                        listColors.map(v=>{
-                                            if(v.name==valueTable){
-                                                debugger
-                                                color = v.backgroundColor
-                                            }
-                                        })
-                                       debugger
-                                         return {backgroundColor:color}
-                                    }
-                            }
-                        }
-                    })
-                    }
-                    self.columnDefs = data.dataAfter;
+                    self.columnDefs = self.handelConditionalFormat(data.dataAfter);
 					break;
                 default:
                     break;
@@ -939,7 +875,7 @@ export default {
             isUpdateFilter:false,
             listFilters:[],
             notiFilter:'',
-            conditionIndex : 0,
+            conditionIndex : -1,
             deleteFilterIdx:0,
             filterContent:"",
             showDelFilterPopUp:false,
@@ -1069,12 +1005,71 @@ export default {
       	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
     },
 	methods:{
-        applyConfig(index){
-            let self = this
-            this.conditionIndex = index;
-            this.reRender();
+        changeFormat(data){
+            debugger
+            switch(data.type){
+                case 'view':
+                    break;
+                case 'apply':
+                    this.applyConfigFormat(data.index);
+                    break;
+                case 'edit':
+                    this.editConfigFormat(data.index);
+                    break
+                case 'delete':
+                    this.deleteConfigFormat(data.index);
+                    break
+                case 'disApply':
+                    this.disApplyConfigFormat(data.index);
+                    break;
+            };
+            //  this.reRender();
+
         },
-        editConfig(index){
+         disApplyConfigFormat(index){
+             this.conditionIndex = -1;
+         },
+        handelConditionalFormat(data){
+            debugger
+            const self = this;
+             if(this.conditionalFormat&&this.conditionalFormat.length>0){
+                data.map(column=>{
+                    column.cellStyle= function(e){
+                        if(self.conditionIndex>-1){//table có format màu
+                            let dataFormat = self.conditionalFormat[self.conditionIndex];
+                            if(eval(dataFormat.tableColumnsJS)){// những cột được set màu
+                                if(dataFormat.displayMode.type=="singleColor"){// nếu là kiểu màu đơn
+                                    let conditionalFormat = dataFormat.displayMode.singleColor.conditionFormat
+                                    if(eval(conditionalFormat)){
+                                        return {color: dataFormat.displayMode.singleColor.fontColor, backgroundColor:dataFormat.displayMode.singleColor.backgroundColor}
+                                    }
+                                }
+                                else{// nếu thang màu
+                                    let field = dataFormat.displayMode.colorScale.applyColumn.field;
+                                    let valueTable = e.data[field];
+                                    let listColors = dataFormat.displayMode.colorScale.listColors;
+                                    let color = '';
+                                    listColors.map(v=>{
+                                        if(v.name==valueTable){
+                                            color = v.backgroundColor
+                                        }
+                                    })
+                                        return {backgroundColor:color}
+                                }
+                            }
+                        }else{// chế độ table mặc định
+                            return {}
+                        }
+                    }
+                })
+            }
+            return data;
+        },
+        applyConfigFormat(index){
+            debugger
+            this.conditionIndex = index;
+        },
+        editConfigFormat(index){
 
         },
           // lưu cấu hình formatting Table
@@ -1090,7 +1085,7 @@ export default {
 			})
            
         },
-        deleteConfig(index){
+        deleteConfigFormat(index){
             this.conditionalFormat = this.conditionalFormat.filter((c,i)=>i!=index)
             this.saveConditionalFormatting(this.conditionalFormat);
         },
@@ -1138,10 +1133,11 @@ export default {
             this.getData();
         },
         getDefaultFilter(){
-            if(this.filter.length>0){
-                this.filter.map((fil,i)=>{
-                    if(fil.isDefault){
-                        this.selectedFilterName = fil.name
+            if(this.listFilters&&this.listFilters.length>0){
+                this.listFilters.map((fil,i)=>{
+                      if(fil.isDefault){               
+                        this.selectedFilterName = fil.name;
+                        this.closeBtnFilter = true;
                         this.tableFilter.allColumn = fil.columns;
                         this.getData()
                     }

@@ -146,7 +146,6 @@
             <ConditionalFormatting
                 @apply-config="applyConfig"
                 @delete-config="deleteConfig"
-                :rowData="rowData"
                 :conditionalFormat="conditionalFormat"
                 :tableColumns="tableColumns" 
                 @save="saveConditionalFormatting"
@@ -178,6 +177,7 @@ export default {
     data(){
         return {
             tab:null,
+            lists:['Min value','None value','Max value'],
             savingConfigs: false,
             tableColumnsClone: []
         }
@@ -185,12 +185,6 @@ export default {
     computed: {},
     props: {
         conditionalFormat:{
-             type: Array,
-                default(){
-                    return []
-                }
-        },
-        rowData:{
              type: Array,
                 default(){
                     return []
