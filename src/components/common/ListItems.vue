@@ -1450,9 +1450,11 @@ export default {
 		},
 		getListId(listObject){
             this.listId = [];
-            listObject.map(obj=>{
+            if(listObject){
+                listObject.map(obj=>{
                 this.listId.push(obj.id)
             })
+            }
             this.$emit('get-list-id',this.listId)
         },
 		handlerGetData(data){
