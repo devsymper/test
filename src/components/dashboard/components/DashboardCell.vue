@@ -6,6 +6,18 @@
             <img :src="'img/dashboard/report-builder/'+cellConfigs.sharedConfigs.type+'.png'" height="40px" width="40px">
         </div>
         <div class="h-100 w-100" v-else>
+            <div ref="cellTitle" class="symper-cell-title  pb-1 pt-2" :symper-cell-id="cellConfigs.sharedConfigs.cellId" :style="viewAttrs.symperTitle.style">
+                <div class="cell-title-text d-inline-block pl-2 pr-2" style="calc(100% - 30px)">
+                    <span style="cursor: text" v-if="isView">{{viewAttrs.symperTitle.text}}</span>
+                    <span 
+                        v-if="!edditingTitle && !isView"
+                        style="cursor: text" 
+                        @dblclick="editTitleCell" >
+                        {{viewAttrs.symperTitle.text}}
+                    </span>
+                    <input class="w-100 border-none" v-else-if="!isView" ref="renameTitleInput" @blur="applyTitleChange" @change="applyTitleChange" type="text" v-model="viewAttrs.symperTitle.text">
+                </div>
+            </div>
             <component 
                 :is="reportTag"
                 :cellConfigs="cellConfigs">
@@ -32,6 +44,13 @@ var reportComps = autoImportReportCells();
 var chartClasses = autoLoadChartClasses();
 
 export default { 
+    data(){
+        return {
+            edditingTitle: false,
+            sortMode: '',
+            sortColumn: {}
+        }
+    },
     components: {
         ...reportComps
     },
@@ -39,6 +58,17 @@ export default {
         selectThisCell(){
             this.$store.commit('dashboard/setSelectedCell', {id: this.cellConfigs.sharedConfigs.cellId, instanceKey: this.instanceKey});
         },
+        applyTitleChange(){
+            this.edditingTitle = false;
+            let titleConfig = null;
+            this.cellConfigs.rawConfigs.style.title.children.titleText.value = this.viewAttrs.symperTitle.text;
+        },
+        editTitleCell(){
+            this.edditingTitle = true;
+            setTimeout((self) => {
+                $(self.$refs.renameTitleInput).focus();            
+            }, 0, this);
+        }
     },
     computed: {
         reportTag(){
@@ -48,6 +78,9 @@ export default {
             }else{
                 return null;
             }
+        },
+        viewAttrs(){
+            return this.cellConfigs.viewConfigs.displayOptions;
         }
     },
     props: {
@@ -64,6 +97,9 @@ export default {
         instanceKey: {
             defaul: ''
         },
+        isView: {
+            default: true
+        }
     }
 }
 </script>

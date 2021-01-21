@@ -4,6 +4,7 @@ import { getDefaultDashboardConfig } from "@/components/dashboard/configPool/das
 import _cloneDeep from 'lodash/cloneDeep';
 import { getNewCellConfigLayout } from "@/components/dashboard/configPool/cellLayout";
 import { datasetApi } from "../../api/dataset";
+import { util } from "../../plugins/util";
 
 var mapTypeToClass = autoLoadChartClasses();
 
@@ -111,7 +112,12 @@ var handler = {
         if (info.configs.hasOwnProperty('tabsAndPages')) {
             for(let tab of info.configs.tabsAndPages.tabs){
                 tab.editTabName = false;
+                tab.active = false;
+                if(!tab.id){
+                    tab.id = util.str.randomString(6);
+                }
             }
+            info.configs.tabsAndPages.tabs[0].active = true;
             result.tabsAndPages = info.configs.tabsAndPages;
             result.currentTabPageKey = result.tabsAndPages.tabs[0].name;
         }
