@@ -48,7 +48,6 @@ export const TranslatorHelper = {
 		 * @param {Object} isDonut Loại chart donut false of true 
 		 */
 		pie(data, columns, style, isDonut = false, ratio, extraData) {
-			debugger
 			let pieDetailLabelFormat = {
 				category: '{point.name}',
 				value: '{point.y}',
@@ -173,6 +172,8 @@ export const TranslatorHelper = {
 		 * @param {Object} style Cấu hình hiển thịs
 		 */
 		filter(data, columns, style, ratio) {
+			debugger
+
 			let selectedColum = columns.value.selectedColums[0];
 			selectedColum = selectedColum ? selectedColum : {};
 

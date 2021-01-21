@@ -1,6 +1,6 @@
 <template>
 	<div class="fs-13 pt-1 report-date-filter">
-		<v-menu ref="menu" v-model="menu" content-class="report-date-filter-menu" :close-on-content-click="false" :return-value.sync="dates" transition="scale-transition" offset-y min-width="290px">
+		<v-menu ref="menu" v-model="menu" content-class="report-date-filter-menu" :close-on-content-click="false" :return-value.sync="dataValue.value" transition="scale-transition" offset-y min-width="290px">
 			<template v-slot:activator="{ on, attrs }">
 				<v-combobox v-model="dateRangeText" solo prepend-icon="mdi-calendar" readonly v-bind="attrs" v-on="on"> </v-combobox>
 			</template>
@@ -12,20 +12,16 @@
 						</span>
 					</div>
 				</div>
-				<v-date-picker v-model="dates" range scrollable> </v-date-picker>
+				<v-date-picker v-model="dataValue.value" range scrollable> </v-date-picker>
 			</div>
 		</v-menu>
 	</div>
 </template>
 <script>
-import DateTimePicker from '@/components/common/DateTimePicker';
 export default {
-	components: {
-		DateTimePicker,
-	},
 	computed: {
 		dataValue() {
-			if (this.data.value) {
+			if (this.data.value){
 				return this.data;
 			} else {
 				let today = new Date().toISOString().slice(0, 10);
@@ -36,6 +32,9 @@ export default {
 				};
 			}
 		},
+		dateRangeText() {
+			return this.dates.join(' ~ ');
+		},
 	},
 	methods: {
 		handleChangeValue() {
@@ -43,11 +42,6 @@ export default {
 		},
 	},
 	props: ['data', 'selectionType', 'selectedCol', 'cellId', 'cellView'],
-	computed: {
-		dateRangeText() {
-			return this.dates.join(' ~ ');
-		},
-	},
 	data() {
 		return {
 			selectAll: false,
