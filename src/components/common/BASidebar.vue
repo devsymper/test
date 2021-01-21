@@ -137,7 +137,7 @@
                                                 text
                                                 depressed
                                                 v-on="{ ...tooltip, ...menu }">
-                                                <span class="fs-11 fm">
+                                                <span class="fs-11 ">
                                                     {{sapp.endUserInfo.currentRole.name}}
                                                 </span>
                                             </v-btn>
@@ -187,7 +187,6 @@
                                  style="margin-left:-25px;"
                                  :symper-action="$bindAction(item.action)">
                                 <v-list-item-title 
-                                    class="fm" 
                                     style="color:rgb(0,0,0,0.8)" 
                                     :symper-action="$bindAction(item.action)">
                                     {{ $t('common.sidebar.'+item.title) }}
@@ -195,7 +194,7 @@
                             </v-list-item-title>
                         </template>
                         <template v-slot:activator v-else>  
-                            <v-list-item-title class="fm title-group">
+                            <v-list-item-title class=" title-group">
                                   <span class="fs-11"> {{ $t('common.sidebar.'+item.titleGroup) }}</span>
                             </v-list-item-title>    
                         </template>
@@ -205,7 +204,7 @@
                             :key="objectType"
                             :class="{'menu-group-active': subMenu.active == true }"
                             @click="gotoPage(subMenu,true,item)">
-                            <v-list-item-title class="fm" style=" color:rgb(0,0,0,0.8)" >
+                            <v-list-item-title  style=" color:rgb(0,0,0,0.8)" >
                                 {{$t('common.sidebar.'+subMenu.title)}}
                             </v-list-item-title>
                         </v-list-item>
@@ -389,7 +388,15 @@ export default {
                 this.$set(this.selectingChildItem, "active", true)
                 
             }
-        }
+		},
+		menu:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				console.log(arr, 'menu sibe bả')
+				debugger
+			}
+		}
     },
     mounted(){
         this.reCalcSidebarHeight();
@@ -560,7 +567,6 @@ export default {
 }
 .fm{
     font-weight:400!important;
-    
 }
 .icon-group{
     font-size:17px; 

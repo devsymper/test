@@ -168,9 +168,17 @@
             "syqlFunction": "SYQL Function",
 			"environment": "Quản lí môi trường",
 			"listDashboards":"Danh sách báo cáo",
+			"list-trash-dashboard":"Danh sách báo cáo đã xóa",
 			"listDataflows":"Danh sách dataflow",
+			"list-trash-dataflow":"Danh sách dataflow đã xóa",
 			"listRelations":"Danh sách relation",
-			"listDatasets":"Danh sách dataset"
+			"list-trash-relation":"Danh sách relation đã xóa",
+			"listDatasets":"Danh sách dataset",
+			"list-trash-dataset":"Danh sách dataset đã xóa",
+			"dashboard": "Dashboard",
+			"dataflow":"Data flow",
+			"relation":"Relation",
+			"dataset":"Data set"
         },
         "system": "Vai trò người dùng",
         "copy": "Sao chép"
