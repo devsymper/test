@@ -1434,7 +1434,7 @@ export default {
 					this.handleStopDragColumn();
                 }
                 // xử lý phần filter
-                this.filter = res.savedConfigs.filter;
+                this.filter = res.savedConfigs.filter?res.savedConfigs.filter:[];
                 this.getDefaultFilter()
                 // xử lý phần format conditional
                 debugger

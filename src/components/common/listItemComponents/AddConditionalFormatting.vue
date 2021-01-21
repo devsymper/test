@@ -27,11 +27,11 @@
                     @click="handleAction(actionIdx,dataIdx)">
                       {{action.title}}
                   </v-btn>
-                  <v-btn text x-small  v-if="dataIdx==dataIdxSelected" @click="handleAction(4,dataIdx)">
-                      {{listActions[4].title}}
-                  </v-btn>
-                   <v-btn text x-small  v-else @click="handleAction(3,dataIdx)">
+                  <v-btn text x-small  v-if="dataIdx==dataIdxSelected" @click="handleAction(3,dataIdx)">
                       {{listActions[3].title}}
+                  </v-btn>
+                   <v-btn text x-small  v-else @click="handleAction(2,dataIdx)">
+                      {{listActions[2].title}}
                   </v-btn>
               </v-list-item-subtitle>
             </v-list-item-content>
@@ -74,10 +74,10 @@ export default {
       return String(index+1).padStart(3, '0')
     },
     handleAction(actionIdx,dataIdx){
-      if(actionIdx==3){
+      if(actionIdx==2){
         this.dataIdxSelected = dataIdx;
       }
-      if(actionIdx==4){
+      if(actionIdx==3){
         this.dataIdxSelected = -1;
       }
       let data={
@@ -94,7 +94,7 @@ export default {
     return {
       dataIdxSelected:-1,
       listActions:[
-        {id:0,title:'Xem',name:'view',isShow:true},
+        // {id:0,title:'Xem',name:'view',isShow:true},
         {id:1,title:'Sửa',name:'edit',isShow:true},
         {id:2,title:'Xóa',name:'delete',isShow:true},
         {id:3,title:'Chọn',name:'apply',isShow:false},

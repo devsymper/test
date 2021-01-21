@@ -67,15 +67,20 @@ export default {
   methods: {
       // trường hợp min value và max value với số 
       handleMinMaxValue(){
-     debugger
-
-          let maxValue = Math.max(...this.listsValue);
-          let minValue = Math.min(...this.listsValue);
-          let midPoint = maxValue-minValue+1;
-           const minColor = this.settingPoint[0].color;
-            const midColor = this.settingPoint[1].color;
-            const maxColor = this.settingPoint[2].color;
-          const colorGradient = new Gradient();
+        let maxValue = Math.max(...this.listsValue);
+        let minValue = Math.min(...this.listsValue);
+        if(this.value.config[0].value&&typeof Number(this.value.config[0].value)=='number'){
+            debugger
+             minValue = Number(this.value.config[0].value);
+        };
+        if(this.value.config[2].value&&typeof Number(this.value.config[2].value)=='number'){
+             maxValue = Number(this.value.config[2].value) ;
+        }
+        let midPoint = maxValue-minValue+1;
+        const minColor = this.settingPoint[0].color;
+        const midColor = this.settingPoint[1].color;
+        const maxColor = this.settingPoint[2].color;
+        const colorGradient = new Gradient();
         let listColor = colorGradient.setGradient(minColor, midColor,maxColor).setMidpoint(midPoint).getArray()
         listColor.map((color,i)=>{
             this.dataColumnsAndColor.map((data,j)=>{
@@ -83,24 +88,14 @@ export default {
                 data.backgroundColor = listColor[distance]
             })
      });
-     debugger
      this.value.listColors= this.dataColumnsAndColor
-        
           
-      },
-      countMidPoint(){
-          let listId = [];
-          for(let i = 900;i<1100;i++){
-            this.listId.push({name:i,color:''})
-          }
-          return this.listId.length;
       },
       setValue(){
         this.formatTableColumn=this.tableColumns.filter((t,i)=>i!=0&&t.type=='numeric');
         this.value.applyColumn= this.formatTableColumn[0];
         this.settingPoint = this.value.config;
         this.applyColumn = this.value.applyColumn;
-        
       }
      
   },

@@ -96,7 +96,7 @@ export default {
                             disable:false,
                             type:'Min value',
                             color:'#FF0000',
-                            lists: ['Min value','Number','Percent'],
+                            lists: ['Min value','Number'],
                         },
                         {
                             name:'Mid point',
@@ -104,7 +104,7 @@ export default {
                             disable:false,
                             type:'None',
                             color:'#FF0000',
-                            lists: ['None','Number','Percent'],
+                            lists: ['None','Number'],
                         },
                         {
                             name:'Max point',
@@ -112,7 +112,7 @@ export default {
                             disable:false,
                             type:'Max value',
                             color:'#FFFF00',
-                            lists:['Max value','Number','Percent'],
+                            lists:['Max value','Number'],
                         }
                     ],
                     listColors:[]
