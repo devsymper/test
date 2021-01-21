@@ -43,9 +43,11 @@ export default {
 	},
 	props: ['data', 'selectionType', 'selectedCol', 'cellId', 'cellView'],
 	data() {
+		let self = this
 		return {
 			selectAll: false,
 			selectingRadioBox: -1,
+			menu: false,
 			dates: ['2019-09-10', '2019-09-20'],
 			pickerOptions: {
 				shortcuts: [
@@ -55,16 +57,17 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							this.$emit('pick', [start, end]);
+							self.menu = false
 						},
 					},
 					{
 						text: 'Yesterday',
 						onClick(picker) {
-							debugger;
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24);
 							this.$emit('pick', [start, end]);
+							self.menu = false
 						},
 					},
 					{
@@ -74,6 +77,7 @@ export default {
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
 							this.$emit('pick', [start, end]);
+							self.menu = false
 						},
 					},
 					{
@@ -83,6 +87,7 @@ export default {
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 14);
 							this.$emit('pick', [start, end]);
+							self.menu = false
 						},
 					},
 					{
@@ -92,6 +97,7 @@ export default {
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 28);
 							this.$emit('pick', [start, end]);
+							self.menu = false
 						},
 					},
 					{
@@ -101,6 +107,7 @@ export default {
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
 							this.$emit('pick', [start, end]);
+							self.menu = false
 						},
 					},
 				],

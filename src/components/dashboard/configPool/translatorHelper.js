@@ -48,7 +48,6 @@ export const TranslatorHelper = {
 		 * @param {Object} isDonut Loại chart donut false of true 
 		 */
 		pie(data, columns, style, isDonut = false, ratio, extraData) {
-			debugger
 			let pieDetailLabelFormat = {
 				category: '{point.name}',
 				value: '{point.y}',
@@ -173,8 +172,6 @@ export const TranslatorHelper = {
 		 * @param {Object} style Cấu hình hiển thịs
 		 */
 		filter(data, columns, style, ratio) {
-			debugger
-
 			let selectedColum = columns.value.selectedColums[0];
 			selectedColum = selectedColum ? selectedColum : {};
 
@@ -205,7 +202,6 @@ export const TranslatorHelper = {
 			rsl = JSON.parse(JSON.stringify(rsl));
 			let commonAttr = TranslatorHelper.getCommonCellStyleAttr(style, ratio);
 			commonAttr.symperTitle.text = commonAttr.symperTitle.text ? commonAttr.symperTitle.text : selectedColum.as;
-			commonAttr.title = commonAttr.symperTitle
 			return Object.assign(commonAttr, rsl);
 		},
 		card(data, columns, style, ratio, extraData) {
@@ -532,7 +528,10 @@ export const TranslatorHelper = {
             symperTitle: {
                 text: commonAttr.title.children.titleText.value,
                 style: TranslatorHelper.getStyleItemsInConfig(commonAttr.title.children, 'px', ratio)
-            }
+			},
+			title: {
+				text: ""
+			}
         };
 	},
 	getColorsFromStyle(style) {
