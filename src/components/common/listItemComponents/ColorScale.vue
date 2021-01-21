@@ -67,13 +67,15 @@ export default {
   methods: {
       // trường hợp min value và max value với số 
       handleMinMaxValue(){
-        let maxValue = Math.max(...this.listsValue);
-        let minValue = Math.min(...this.listsValue);
-        let midPoint = maxValue-minValue+1;
-        const minColor = this.settingPoint?this.settingPoint[0].color:'';
-        const midColor = this.settingPoint?this.settingPoint[0].color:'';
-        const maxColor = this.settingPoint?this.settingPoint[0].color:''
-        const colorGradient = new Gradient();
+     debugger
+
+          let maxValue = Math.max(...this.listsValue);
+          let minValue = Math.min(...this.listsValue);
+          let midPoint = maxValue-minValue+1;
+           const minColor = this.settingPoint[0].color;
+            const midColor = this.settingPoint[1].color;
+            const maxColor = this.settingPoint[2].color;
+          const colorGradient = new Gradient();
         let listColor = colorGradient.setGradient(minColor, midColor,maxColor).setMidpoint(midPoint).getArray()
         listColor.map((color,i)=>{
             this.dataColumnsAndColor.map((data,j)=>{
