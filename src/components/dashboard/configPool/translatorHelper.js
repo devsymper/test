@@ -205,6 +205,7 @@ export const TranslatorHelper = {
 			rsl = JSON.parse(JSON.stringify(rsl));
 			let commonAttr = TranslatorHelper.getCommonCellStyleAttr(style, ratio);
 			commonAttr.symperTitle.text = commonAttr.symperTitle.text ? commonAttr.symperTitle.text : selectedColum.as;
+			commonAttr.title = commonAttr.symperTitle
 			return Object.assign(commonAttr, rsl);
 		},
 		card(data, columns, style, ratio, extraData) {
