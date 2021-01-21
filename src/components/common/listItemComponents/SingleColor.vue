@@ -228,7 +228,8 @@ export default {
 }
 </script>
 <style >
-.v-input__slot{
+/* Khadm: comment lại các phần viết css quá ẩu: làm ảnh hưởng tới những phần hiển thị khác */
+/* .v-input__slot{
     min-height: 26px!important;
     max-height:26px!important
 }
@@ -237,7 +238,7 @@ export default {
 }
 .v-select__selections{
     font-size:13px!important
-}
+} */
 .hight-light{
     background-color:#f5863417;
     color:#f58634!important
@@ -245,7 +246,8 @@ export default {
 .background-orange{
     background:#f5863417
 }
-.v-btn:not(.v-btn--round).v-size--x-small{
+/* Khadm: comment lại các phần viết css quá ẩu: làm ảnh hưởng tới những phần hiển thị khác */
+/* .v-btn:not(.v-btn--round).v-size--x-small{
     padding: 0 2px!important;
     margin-right:2px!important;
     min-width:26px!important
@@ -253,5 +255,5 @@ export default {
 .v-menu__content {
     background:white!important;
     left:1237!important
-}
+} */
 </style>
