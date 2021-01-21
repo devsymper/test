@@ -175,7 +175,7 @@ export default {
 				},
 				{
 					title: 'dataset',
-					icon: 'mdi-briefcase-edit-outline',
+					icon: 'mdi-view-module-outline',
 					group: 'My work',
 					children: {
 						listDataset: {
