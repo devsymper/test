@@ -6,7 +6,7 @@ export default class LineAndStackedColumn extends ReportBase {
     constructor(symperId){
         let columnSettingKeys = ReportGroupConfig.Group2.columnSettingKeys
         let styleKeys = ReportGroupConfig.Group2.styleKeys
-        super('', symperId, columnSettingKeys, styleKeys);
+        super('lineAndStackedColumn', symperId, columnSettingKeys, styleKeys);
     }
     translate(rawConfig,  data, extraData = {} ,changes = {}, oldOutput = {}){
         let displayOptions = {};

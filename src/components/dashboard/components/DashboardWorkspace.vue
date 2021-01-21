@@ -44,6 +44,7 @@
                         v-if="item.active"
                         :ref="item.cellId"
                         :layoutItem="item"
+                        :isView="isView"
                         :instanceKey="instanceKey"
                         :cellConfigs="dashboardConfig.allCellConfigs[item.cellId]">
                     </DashboardCell>
@@ -237,8 +238,16 @@ export default {
         onChangeCellConfigs(changeType, cellId){
             this.translateReportConfig(cellId)
         }, 
+        getReportWraperSize(cellId){
+            let size = util.getComponentSize(this.$refs[cellId][0]);
+            let titleAttr = this.dashboardConfig.allCellConfigs[cellId].rawConfigs.style.title.children;
+            if(titleAttr.show.value && titleAttr.titleText.value){
+                size.h -= 35;
+            }
+            return size;
+        },
         translateReportConfig(cellId){
-            let reportSize = util.getComponentSize(this.$refs[cellId][0]);
+            let reportSize = this.getReportWraperSize(cellId);
             this.reportTranslatorWorker.postMessage({
                 action: 'translateReportConfig',
                 data: {
