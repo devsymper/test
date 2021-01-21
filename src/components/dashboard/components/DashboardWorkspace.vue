@@ -265,7 +265,9 @@ export default {
         },
         applyTranslatedConfig(data){
             if(!_isEmpty(data)){
-                this.dashboardConfig.allCellConfigs[data.cellId].sharedConfigs.data = data.originData;
+                if (this.dashboardConfig.allCellConfigs[data.cellId].sharedConfigs) {
+                    this.dashboardConfig.allCellConfigs[data.cellId].sharedConfigs.data = data.originData;
+                }
                 this.$set(this.dashboardConfig.allCellConfigs[data.cellId].viewConfigs, 'displayOptions', data.translatedData);
             }
         },

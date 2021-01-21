@@ -9,7 +9,7 @@ export default class StackedColumn100 extends ReportBase {
     }
        translate(rawConfig,  data, extraData = {} ,changes = {}, oldOutput = {}){
         let displayOptions = {};
-        displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,"column",'percent',1);
+        displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,extraData,"column",'percent',1);
         return displayOptions;
 
     }
