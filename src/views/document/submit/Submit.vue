@@ -481,18 +481,6 @@ export default {
                 case 'afterCreateSQLiteDB':
                     thisCpn.handleLoadContentDocument();
                     break;
-                case 'getDataInputFormula':
-                    let dataInputObjectIdentifier = data.dataAfter.dataInputObjectIdentifier
-                    let dataInputTitleObjectFormulas = data.dataAfter.dataInputTitleObjectFormulas
-                    let dataInputFormula = {}
-                    if(dataInputObjectIdentifier){
-                        dataInputFormula['dataInput'] = dataInputObjectIdentifier
-                    }
-                    if(dataInputTitleObjectFormulas){
-                        dataInputFormula['dataInputTitle'] = dataInputTitleObjectFormulas
-                    }
-                    thisCpn.startSubmitDocument(dataInputFormula);
-                    break;
                 default:
                 break;
             }
@@ -697,17 +685,18 @@ export default {
         this.$evtBus.$on("document-submit-input-change", controlInstance => {
            if(this._inactive == true) return;
                 let valueControl = controlInstance.value;
-                if(controlInstance.checkAutoCompleteControl()){
-                    clearTimeout(delayTimer);
-                    // delay trong trường hợp chọn dòng trong box autocomplete thì đã kích hoạt sự kiện onchange
-                    // lúc này input chưa có dữ liệu đên phải delay
-                    delayTimer = setTimeout(function() {
-                        thisCpn.handleInputChangeByUser( controlInstance, valueControl);
-                    }, 300);
-                }
-                else{
-                    this.handleInputChangeByUser( controlInstance, valueControl);
-                }
+                // if(controlInstance.checkAutoCompleteControl()){
+                //     clearTimeout(delayTimer);
+                //     // delay trong trường hợp chọn dòng trong box autocomplete thì đã kích hoạt sự kiện onchange
+                //     // lúc này input chưa có dữ liệu đên phải delay
+                //     delayTimer = setTimeout(function() {
+                //         thisCpn.handleInputChangeByUser( controlInstance, valueControl);
+                //     }, 300);
+                // }
+                // else{
+                   
+                // }
+                 this.handleInputChangeByUser( controlInstance, valueControl);
         });
         this.$evtBus.$on("run-effected-control-when-table-change", control => {
             if(this._inactive == true) return;
@@ -1483,10 +1472,10 @@ export default {
             let controlIns = getControlInstanceFromStore(this.keyInstance, data.controlName);
             if(controlIns.inTable == false){
                 if(data.fromEnterKey){
-                    this.handleInputChangeBySystem(data.controlName,data.value,false, false);
+                    this.handleInputChangeBySystem(data.controlName,data.value,false, true);
                 }
                 else{
-                    this.handleInputChangeBySystem(data.controlName,data.value,false,false);
+                    this.handleInputChangeBySystem(data.controlName,data.value,false,true);
                 }
             }
             else{
@@ -2145,25 +2134,30 @@ export default {
 
 
         // Hàm chỉ ra control được đánh định danh trong document (sct...)
-        getDataRefreshControl(){
-            let objectIdentiferFormula = null;
-            let titleObjectFormula = null;
+        /**
+         * lấy data để chạy công thức trên server
+         */
+        getDataForRunFormulaOnServer(){
+            let dataInputFormula = {};
+            let listInput = getListInputInDocument(this.keyInstance)
             if(this.objectIdentifier && Object.keys(this.objectIdentifier) > 0){
-                let controlIdentifier = {}
                 let controlNameIdentifier = this.objectIdentifier['name'];
                 let controlInstance = getControlInstanceFromStore(this.keyInstance,controlNameIdentifier);
                 if(controlInstance != false && controlInstance.controlFormulas.hasOwnProperty('formulas')){
                     let formulaInstance = controlInstance.controlFormulas['formulas']['instance'];
                     if(formulaInstance){
-                        objectIdentiferFormula = formulaInstance;
+                        let dataInput = getDataInputFormula(formulaInstance,listInput);
+                        dataInputFormula['dataInput'] = dataInput
                     }
                 }
             }
             
             if(this.titleObjectFormula != null){
-                titleObjectFormula = this.titleObjectFormula
+                let dataInput = getDataInputFormula(this.titleObjectFormula,listInput);
+                dataInputFormula['dataInputTitle'] = dataInput
             }
-            this.formulasWorker.postMessage({action:'getDataInputFormula',data:{titleObjectFormula:titleObjectFormula,objectIdentiferFormula:objectIdentiferFormula,keyInstance:this.keyInstance}})
+            this.startSubmitDocument(dataInputFormula);
+            // this.formulasWorker.postMessage({action:'getDataInputFormula',data:{titleObjectFormula:titleObjectFormula,objectIdentiferFormula:objectIdentiferFormula,keyInstance:this.keyInstance}})
         },
 
         handleRefreshDataBeforeSubmit(){
@@ -2214,7 +2208,7 @@ export default {
          */
         async submitDocument(){
             this.isSubmitting = true;
-            this.getDataRefreshControl();
+            this.getDataForRunFormulaOnServer();
         },
         resetCheckRefreshData(){
             this.$store.commit("document/addToDocumentSubmitStore", {

@@ -83,6 +83,16 @@ export default class SymperTable {
         }
     }
 
+    addCheckBoxForFirstColumn(){
+        var columnDefs = getColumnDefs();
+        columnDefs.forEach(function (colDef) {
+            if (colDef.field === 'index_increment') {
+                colDef.headerCheckboxSelection = true;
+                colDef.checkboxSelection = true
+            }
+        });
+        gridOptions.api.setColumnDefs(columnDefs);
+    }
     /**
      * Hàm lấy các định nghĩa của cột
      */
@@ -90,10 +100,13 @@ export default class SymperTable {
         let colDefs = [];
         if(this.tableMode =='Flat'){
             colDefs.push( {
+                field:'index_increment',
                 minWidth:50,
                 width:50,
                 valueGetter: "node.rowIndex + 1",
-                pinnedRowCellRenderer:'BottomPinnedRowRenderer'
+                pinnedRowCellRenderer:'BottomPinnedRowRenderer',
+                headerCheckboxSelection: true,
+                checkboxSelection: true,
               })
         }
         
@@ -365,7 +378,7 @@ export default class SymperTable {
         let controlBinding = Object.keys(data[0]);
         for (let index = 0; index < controlBinding.length; index++) {
             if(controlBinding[index] != 's_table_id_sql_lite'){
-                this.handlerCheckEffectedControlInTable(controlBinding[index], 'all');
+                this.handlerCheckEffectedControlInTable(controlBinding[index], 'all',null,controlBinding);
             }
         }
         if(this.tableHasRowSum){
@@ -455,6 +468,7 @@ export default class SymperTable {
             headerHeight:25,
             rowBuffer: 0,       // số view trong 1 viewport
             groupDefaultExpanded: -1,
+            // rowSelection:'multiple',
             components: {
                 NumberCellRenderer: NumberCellRenderer,
                 FileCellRenderer: FileCellRenderer,
@@ -721,11 +735,17 @@ export default class SymperTable {
                 }
                 rowData[0].s_table_id_sql_lite = Date.now();
             }
-            console.log(rowData,'rowDatarowData');
             this.tableInstance.addNewRow(rowData, params.rowIndex + 1);
         }
         else if(event.key == 'Backspace' && event.shiftKey){
-            this.tableInstance.deleteRow(rowData, sqlRowId)
+            let rowCount = this.api.getDisplayedRowCount();
+            let rowSelection = this.tableInstance.getSelectedRows();
+            this.tableInstance.deleteRow(rowSelection, sqlRowId);
+            let newCellIndex = params.rowIndex;
+            if(newCellIndex > rowCount - 1){
+                newCellIndex = rowCount - 1;
+            }
+            this.api.setFocusedCell(newCellIndex, params.colDef.field)
         }
     }
     /**
@@ -808,6 +828,9 @@ export default class SymperTable {
         }
         return [rowItem]
     }
+    /**
+     * Refresh lại cell renderer của 1 cell
+     */
     refreshCells(controlName, rowNodeId = null){
         console.trace('oks')
         let allRowRefresh = [];
@@ -824,14 +847,31 @@ export default class SymperTable {
         }
         this.gridOptions.api.refreshCells(params);
     }
+    /**
+     * Hàm lấy cell đang forcus
+     */
     getFocusedCell(){
         return this.gridOptions.api.getFocusedCell();
     }
+
     getSelectedNodes(){
         return this.gridOptions.api.getSelectedNodes();
     }
+    /**
+     * Hàm trả về rowNode theo index
+     * @param {*} index 
+     */
     getDisplayedRowAtIndex(index){
         return this.gridOptions.api.getDisplayedRowAtIndex(index);
+    }
+    /**
+     * Hàm trả về các dòng đang được chọn của table
+     */
+    getSelectedRows(){
+        return this.gridOptions.api.getSelectedRows();
+    }
+    getCellRanges(){
+        return this.gridOptions.api.getCellRanges();
     }
     /**
      * Set dữ liệu cho 1 cell theo key (column name)
@@ -1057,7 +1097,7 @@ export default class SymperTable {
      * @param {*} controlName 
      * @param {*} rowId 
      */
-    handlerCheckEffectedControlInTable(controlName, rowId = null, columnName = null) {
+    handlerCheckEffectedControlInTable(controlName, rowId = null, columnName = null, allControlBinding = null) {
         if (controlName == "") {
             return
         }
@@ -1078,7 +1118,7 @@ export default class SymperTable {
             this.handlerRunOtherFormulaControl(controlRequireEffected, 'require', rowId, columnName);
             this.handlerRunOtherFormulaControl(controlLinkEffected, 'linkConfig', rowId, columnName);
             this.handlerRunOtherFormulaControl(controlValidateEffected, 'validate', rowId, columnName);
-            this.handlerRunValueFormulaControl(controlEffected, rowId, columnName);
+            this.handlerRunValueFormulaControl(controlEffected, rowId, columnName, allControlBinding);
             
         }
     }
@@ -1087,9 +1127,12 @@ export default class SymperTable {
      * @param {*} controlEffected 
      * @param {*} rowId 
      */
-    handlerRunValueFormulaControl(controlEffected, rowId, columnName){
+    handlerRunValueFormulaControl(controlEffected, rowId, columnName, allControlBinding){
         if (Object.keys(controlEffected).length > 0) {
             for (let i in controlEffected) {
+                if(allControlBinding.includes(i)){
+                    continue;
+                }
                 this.handlerCheckCanBeRunFormula(i,rowId, columnName);
             }
         }

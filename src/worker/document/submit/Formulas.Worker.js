@@ -56,6 +56,8 @@ onmessage = function (event) {
                                 }
                             }
                         }
+        console.log(res,'resresres');
+
                         postMessage({action:'afterRunFormulasSuccess', dataAfter : 
                             {controlName:controlName, res:res, formulaType:formulaInstance.type, rowNodeId:rowNodeId}
                         })
@@ -94,22 +96,6 @@ onmessage = function (event) {
             /**
              * Có cập nhật input trên main thì worker cũng phải lưu lại giá trị
              */
-        case 'getDataInputFormula':
-            let formulaInstanceTmp = dataOfAction.objectIdentiferFormula;
-            let titleObjectFormula = dataOfAction.titleObjectFormula;
-            let dataRes = {}
-            if(formulaInstanceTmp){
-                let formulaInsTmp = new Formulas(formulaInstanceTmp.keyInstance,formulaInstanceTmp.formulas,formulaInstanceTmp.type);
-                let dataInputObjectIdentifier = formulaInsTmp.getDataInputFormula();
-                dataRes['dataInputObjectIdentifier'] = dataInputObjectIdentifier
-            }
-            if(titleObjectFormula){
-                let titleObjectFormulaTmp = new Formulas(titleObjectFormula.keyInstance,titleObjectFormula.formulas,titleObjectFormula.type);
-                let dataInputTitleObjectFormulas = titleObjectFormulaTmp.getDataInputFormula();
-                dataRes['dataInputTitleObjectFormulas'] = dataInputTitleObjectFormulas
-            }
-            postMessage({action:'getDataInputFormula', dataAfter : dataRes})
-            break;
         case 'updateWorkerStore':
             let type = dataOfAction.type;
             if(!workerStore[type][keyInstance]){
