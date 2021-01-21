@@ -1164,7 +1164,7 @@ export default {
 			}) 
 		},
 		cellMouseOver(params){
-			this.cellAboutSelecting = params.data
+            this.cellAboutSelecting = params.data
 			if(this.debounceRelistContextmenu){
 				clearTimeout(this.debounceRelistContextmenu);
 			}
