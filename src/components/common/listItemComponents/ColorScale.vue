@@ -94,7 +94,7 @@ export default {
           return this.listId.length;
       },
       setValue(){
-        this.formatTableColumn=this.tableColumns.filter((t,i)=>i!=0&&t.type=='numeric');
+        this.formatTableColumn=this.tableColumns.filter((t,i)=>i!=0);
         this.value.applyColumn= this.formatTableColumn[0];
         this.settingPoint = this.value.config;
         this.applyColumn = this.value.applyColumn;
@@ -122,6 +122,15 @@ export default {
             immediate: true,
             handler(value){
                 this.handleMinMaxValue()
+                // const colorGradient = new Gradient();
+                // const minValue = value.config[0].color;
+                // const midValue = value.config[1].color;
+                // const maxValue = value.config[2].color;
+                // let midPoint = this.countMidPoint();
+                // colorGradient.setGradient(minValue, midValue,midValue).setMidpoint(midPoint).getArray().map((c,i)=>{
+                //     this.listId[i].color=c
+                // });
+                
             }
       }
   },
