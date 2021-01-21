@@ -4,7 +4,7 @@
             ref="listApp"
             :getDataUrl="apiUrl"
             :headerPrefixKeypath="'table'"
-            :pageTitle="$t('bi.dataset.title-show-list')"
+            :pageTitle="$t('bi.relation.title-show-list-trash')"
             :containerHeight="tableHeight"
             :tableContextMenu="tableContextMenu"
 			:customAPIResult="customAPIResult"
