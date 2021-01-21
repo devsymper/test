@@ -1,45 +1,41 @@
 <template>
     <div>
-        <!-- <div v-for="(item, idx) in listData" :key="idx">
-
-        </div> -->
         <v-list dense three-line>
-        <template v-for="(item, index) in listData">
+        <template v-for="(data, dataIdx) in listData">
           <v-list-item
             style="border-bottom:1px solid lightgrey;"
             dense
-            :key="item.title"
+            :key="data.title"
           >
             <v-avatar  class="mr-2 my-1" 
-              :style="{background:item.displayMode.singleColor.backgroundColor,'background-image':getBackgroundColor(index)}"
+              :style="{background:data.displayMode.singleColor.backgroundColor,'background-image':getBackgroundColor(dataIdx)}"
               tile style="border:1px solid grey;margin-left:-12px">
-              <div :style="{color:item.displayMode.singleColor.fontColor}">{{setNumber(index)}}
+              <div :style="{color:data.displayMode.singleColor.fontColor}">
+                {{setNumber(dataIdx)}}
               </div>
             </v-avatar>
             <v-list-item-content dense>
               <v-list-item-title >
                   <span class="fs-13 fw-400">
-                      Định dạng {{setNumber(index)}}: {{item.nameGroup}}
+                      Định dạng {{setNumber(dataIdx)}}: {{data.nameGroup}}
                   </span>
                   </v-list-item-title>
-              <v-list-item-subtitle >
-                  <v-btn text x-small  @click="editConfig(index)">
-                      Sửa
+              <v-list-item-subtitle>
+                  <v-btn text x-small  
+                    v-for="(action,actionIdx) in listActions.filter(act=>act.isShow)" 
+                    :key="actionIdx" 
+                    @click="handleAction(actionIdx,dataIdx)">
+                      {{action.title}}
                   </v-btn>
-                   <v-btn text x-small>
-                      Chi tiết
+                  <v-btn text x-small  v-if="dataIdx==dataIdxSelected" @click="handleAction(4,dataIdx)">
+                      {{listActions[4].title}}
                   </v-btn>
-                   <v-btn  text x-small @click="deleteConfig(index)">
-                      Xóa
-                  </v-btn>
-                  <v-btn  text x-small @click="applyConfig(index)">
-                      Chọn
+                   <v-btn text x-small  v-else @click="handleAction(3,dataIdx)">
+                      {{listActions[3].title}}
                   </v-btn>
               </v-list-item-subtitle>
             </v-list-item-content>
-              
           </v-list-item>
-         
         </template>
       </v-list>
         <div @click="changeToConfig()">
@@ -53,26 +49,23 @@
 export default {
   props: {
      listData:{
-             type: Array,
-                default(){
-                    return []
-                }
+        type: Array,
+          default(){
+              return []
+          }
         },
   },
   methods: {
     getBackgroundColor(index){
       let result = '';
-      if(this.listData[index].displayMode.type=='singleColor'){
-      }else{
+      if(this.listData[index].displayMode.type!='singleColor'){
         let colorMin = this.listData[index].displayMode.colorScale.config[0].color;
         let colorMid = this.listData[index].displayMode.colorScale.config[1].color;
         let colorMax = this.listData[index].displayMode.colorScale.config[2].color;
         if(colorMid==colorMid){
-         result = 'linear-gradient('+colorMin+','+colorMax+')'
-          
+          result = 'linear-gradient('+colorMin+','+colorMax+')'
         }else{
-         result = 'linear-gradient('+colorMin+','+colorMid+', '+colorMax+')'
-
+          result = 'linear-gradient('+colorMin+','+colorMid+', '+colorMax+')'
         }
       }
      return result;
@@ -80,21 +73,33 @@ export default {
     setNumber(index){
       return String(index+1).padStart(3, '0')
     },
+    handleAction(actionIdx,dataIdx){
+      if(actionIdx==3){
+        this.dataIdxSelected = dataIdx;
+      }
+      if(actionIdx==4){
+        this.dataIdxSelected = -1;
+      }
+      let data={
+        type: this.listActions[actionIdx].name,
+        index: dataIdx
+      }
+      this.$emit('change-format',data )
+    },
       changeToConfig(){
           this.$emit('changeToConfig')
       },
-      deleteConfig(index){
-          this.$emit('delete-config',index)
-      },
-      applyConfig(index){
-        this.$emit('apply-config',index)
-      },
-      editConfig(index){
-          this.$emit('edit-config',index)
-      }
   },
   data () {
     return {
+      dataIdxSelected:-1,
+      listActions:[
+        {id:0,title:'Xem',name:'view',isShow:true},
+        {id:1,title:'Sửa',name:'edit',isShow:true},
+        {id:2,title:'Xóa',name:'delete',isShow:true},
+        {id:3,title:'Chọn',name:'apply',isShow:false},
+        {id:4,title:'Bỏ chọn',name:'disApply',isShow:false},
+      ]
     }
   },
     

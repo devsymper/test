@@ -144,8 +144,8 @@
         </v-tab-item>
          <v-tab-item :key="2" :value="'tab-' + 2" class="tab-item" style="flex-grow: 1">
             <ConditionalFormatting
-                @apply-config="applyConfig"
-                @delete-config="deleteConfig"
+                @change-format="changeFormat"
+                :rowData="rowData"
                 :conditionalFormat="conditionalFormat"
                 :tableColumns="tableColumns" 
                 @save="saveConditionalFormatting"
@@ -177,7 +177,6 @@ export default {
     data(){
         return {
             tab:null,
-            lists:['Min value','None value','Max value'],
             savingConfigs: false,
             tableColumnsClone: []
         }
@@ -185,6 +184,12 @@ export default {
     computed: {},
     props: {
         conditionalFormat:{
+             type: Array,
+                default(){
+                    return []
+                }
+        },
+        rowData:{
              type: Array,
                 default(){
                     return []
@@ -212,11 +217,8 @@ export default {
         }
     },
     methods: {
-        applyConfig(index){
-             this.$emit('apply-config',index)
-        },
-        deleteConfig(index){
-             this.$emit('delete-config',index)
+        changeFormat(data){
+             this.$emit('change-format',data)
         },
         saveConditionalFormatting(data){
             this.$emit('save-conditional-formatting',data);
@@ -240,7 +242,6 @@ export default {
         getDataTypeIcon(type) {
             return appConfigs.dataTypeIcon[type];
         },
-        
         columnTitle(title) {
             let prefix = this.headerPrefixKeypath;
             prefix =

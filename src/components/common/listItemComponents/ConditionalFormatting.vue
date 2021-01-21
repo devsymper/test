@@ -3,9 +3,7 @@
     <AddConditionalFormatting 
         v-if="typeFormart!='config'"
         :listData="listData"
-        @delete-config="deleteConfig"
-        @edit-config="editConfig"
-        @apply-config="applyConfig"
+        @change-format="changeFormat"
         @changeToConfig="changeToConfig()"
         @click="typeFormart='config'"/>
     <ConfigConditionalFormatting 
@@ -13,6 +11,7 @@
         @changeToAdd="changeToAdd()"
         v-model="data"
         @save='save()'
+        :isUpdate="update"
         :rowData="rowData"
         :conditionalFormat="conditionalFormat"
         :tableColumns="tableColumns"
@@ -30,7 +29,6 @@ export default {
            deep: true,
             immediate: true,
             handler(value){
-                debugger
                 this.listData=this.conditionalFormat
             }
       }
@@ -40,6 +38,12 @@ export default {
   },
     props: {
          conditionalFormat:{
+             type: Array,
+                default(){
+                    return []
+                }
+        },
+        rowData:{
              type: Array,
                 default(){
                     return []
@@ -64,6 +68,7 @@ export default {
   },
   data () {
     return {
+        update:true,
         typeFormart:'add',
         data:{
             nameGroup:'',
@@ -90,7 +95,7 @@ export default {
                             value:'',
                             disable:false,
                             type:'Min value',
-                            color:'red',
+                            color:'#FF0000',
                             lists: ['Min value','Number','Percent'],
                         },
                         {
@@ -98,7 +103,7 @@ export default {
                             value:'',
                             disable:false,
                             type:'None',
-                            color:'red',
+                            color:'#FF0000',
                             lists: ['None','Number','Percent'],
                         },
                         {
@@ -106,13 +111,13 @@ export default {
                             value:'',
                             disable:false,
                             type:'Max value',
-                            color:'yellow',
+                            color:'#FFFF00',
                             lists:['Max value','Number','Percent'],
                         }
-                    ]
+                    ],
+                    listColors:[]
                 }
             }
-
         },
         listData:[]
     }
@@ -124,36 +129,25 @@ export default {
   methods: {
       changeToConfig(){
           this.typeFormart='config';
+          this.update = false;
       },
        changeToAdd(){
+           this.update = true;
           this.typeFormart='add';
-
+           this.listData = this.conditionalFormat
       },
-      deleteConfig(index){
-          this.$emit('delete-config',index)
-      },
-
       changeFormat(data){
           this.$emit('change-format',data);
-          if(data.type=='edit'){
-               this.typeFormart='config';
-                this.data=this.listData[data.index];
+          if(data.type == 'edit'){
+               this.typeFormart = 'config';
+                this.data = this.listData[data.index];
           }
-
       },
       save(){
           this.listData.push(this.data)
           this.$emit('save',this.listData)
       },
-      applyConfig(index){
-          this.$emit('apply-config',index)
-      },
-       editConfig(index){
-        this.typeFormart='config';
-        this.data=this.listData[index];
-        this.$emit('edit-config',index)
-
-      }
+      
   }
 }
 </script>
