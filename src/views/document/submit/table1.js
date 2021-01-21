@@ -756,6 +756,7 @@ export default class SymperTable {
             columns.push(controlName + " " + type);
         }
         columns.push('s_table_id_sql_lite integer');
+        columns.push('childObjectId integer');
         this.formulasWorker.postMessage({action:'executeSQliteDB',data:
             {
                 func:'createTable',

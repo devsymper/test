@@ -42,8 +42,8 @@ let fileTypes = {
 };
 
 export default class BasicControl extends Control {
-    constructor(idField, ele, controlProps, curParentInstance, value) {
-        super(idField, ele, controlProps, curParentInstance, value);
+    constructor(idField, ele, controlProps, keyInstance, value) {
+        super(idField, ele, controlProps, keyInstance, value);
         this.minValue = (this.controlProperties.hasOwnProperty('minValue')) ? this.controlProperties.minValue.value : false;
         this.maxValue = (this.controlProperties.hasOwnProperty('maxValue')) ? this.controlProperties.maxValue.value : false;
         this.colIndex = -1;
@@ -52,7 +52,7 @@ export default class BasicControl extends Control {
 
     render() {
             this.ele.wrap('<span style="position:relative;display:inline-block">');
-            this.ele.attr('key-instance', this.curParentInstance);
+            this.ele.attr('key-instance', this.keyInstance);
             if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
                 this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title, 'Require');
             }
@@ -123,6 +123,7 @@ export default class BasicControl extends Control {
                 this.setPrintValueControl();
             }
             else{
+
                 this.setValueControl();
             }
             this.setEvent();
@@ -241,7 +242,7 @@ export default class BasicControl extends Control {
                 store.commit("document/addToDocumentSubmitStore", {
                     key: 'rootChangeFieldName',
                     value: thisObj.name,
-                    instance: thisObj.curParentInstance
+                    instance: thisObj.keyInstance
                 });
             })
             // cần xóa dữ liệu của auto complete trong thuộc tính của input nếu un focus
@@ -287,7 +288,7 @@ export default class BasicControl extends Control {
                 store.commit("document/addToDocumentSubmitStore", {
                     key: 'docStatus',
                     value: 'input',
-                    instance: thisObj.curParentInstance
+                    instance: thisObj.keyInstance
                 });
                 e.controlName = thisObj.name;
                 if (thisObj.type == 'date') {
@@ -374,7 +375,7 @@ export default class BasicControl extends Control {
                     }
                 }
             }
-            if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
+            if (sDocument.state.submit[this.keyInstance].docStatus == 'init') {
                 this.defaultValue = value;
             }
         }
@@ -383,11 +384,8 @@ export default class BasicControl extends Control {
         return this.value;
     }
 
-    setValueControl(vl = undefined) {
-        let value = vl;
-        if (vl == undefined) {
-            value = this.value;
-        }
+    setValueControl() {
+        let value = this.value;
         if (!value) {
             value = "";
         } else if (this.type == 'number') {
@@ -425,7 +423,7 @@ export default class BasicControl extends Control {
             this.ele.val(value)
         }
         this.ele.attr('value', value);
-        if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
+        if (sDocument.state.submit[this.keyInstance].docStatus == 'init') {
             this.defaultValue = value;
         }
     }
@@ -456,7 +454,7 @@ export default class BasicControl extends Control {
                     controlName: this.name,
                     key: 'value',
                     value: this.value,
-                    instance: this.curParentInstance
+                    instance: this.keyInstance
                 });
                 for (let index = 0; index < url.length; index++) {
                     let fileItem = url[index];
@@ -482,7 +480,7 @@ export default class BasicControl extends Control {
                 controlName: thisObj.name,
                 key: 'value',
                 value: thisObj.value,
-                instance: thisObj.curParentInstance
+                instance: thisObj.keyInstance
             });
         })
     }
@@ -541,9 +539,9 @@ export default class BasicControl extends Control {
                 store.commit("document/addToDocumentSubmitStore", {
                     key: 'controlOpenSubform',
                     value: thisObj,
-                    instance: thisObj.curParentInstance
+                    instance: thisObj.keyInstance
                 });
-                SYMPER_APP.$evtBus.$emit('document-submit-open-subform', { docId: subFormId, instance: thisObj.curParentInstance })
+                SYMPER_APP.$evtBus.$emit('document-submit-open-subform', { docId: subFormId, instance: thisObj.keyInstance })
             })
         } else {
 
@@ -607,7 +605,7 @@ export default class BasicControl extends Control {
                             </div>`
                     thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name);
                     thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
-                    let curValue = sDocument.state.submit[thisObj.curParentInstance].listInputInDocument[thisObj.name].value;
+                    let curValue = sDocument.state.submit[thisObj.keyInstance].listInputInDocument[thisObj.name].value;
                     let tableName = thisObj.inTable;
                     if (tableName != false) {
                         if (!Array.isArray(curValue)) {
@@ -625,10 +623,10 @@ export default class BasicControl extends Control {
                         controlName: thisObj.name,
                         key: 'value',
                         value: curValue,
-                        instance: thisObj.curParentInstance
+                        instance: thisObj.keyInstance
                     });
                     if (tableName != false) {
-                        sDocument.state.submit[thisObj.curParentInstance].listInputInDocument[tableName].tableInstance.tableInstance.render();
+                        sDocument.state.submit[thisObj.keyInstance].listInputInDocument[tableName].tableInstance.tableInstance.render();
                     }
 
                 }
@@ -636,7 +634,7 @@ export default class BasicControl extends Control {
         });
     }
     setDeleteFileEvent(ele, controlName) {
-        let listInputInDocument = sDocument.state.submit[this.curParentInstance].listInputInDocument
+        let listInputInDocument = sDocument.state.submit[this.keyInstance].listInputInDocument
         let value = listInputInDocument[controlName].value;
         let thisObj = this;
         ele.off('click', '.remove-file')
@@ -660,7 +658,7 @@ export default class BasicControl extends Control {
                 controlName: controlName,
                 key: 'value',
                 value: newValue,
-                instance: thisObj.curParentInstance
+                instance: thisObj.keyInstance
             });
         })
     }
@@ -793,13 +791,13 @@ export default class BasicControl extends Control {
         let self = this;
         let toolbar = true;
         if(this.checkViewType('submit') || this.checkViewType('update')){
-            this.ele = $('#sym-submit-'+this.curParentInstance).find("#"+this.id);
+            this.ele = $('#sym-submit-'+this.keyInstance).find("#"+this.id);
             isReadOnly = 0;
-            selector = '#sym-submit-'+this.curParentInstance+" #"+this.id;
+            selector = '#sym-submit-'+this.keyInstance+" #"+this.id;
         }
         else{
-            this.ele = $('#sym-Detail-'+this.curParentInstance).find("#"+this.id);
-            selector = '#sym-Detail-'+this.curParentInstance+" #"+this.id;
+            this.ele = $('#sym-Detail-'+this.keyInstance).find("#"+this.id);
+            selector = '#sym-Detail-'+this.keyInstance+" #"+this.id;
             toolbar = false;
         }
         if(this.controlProperties.isShowHeaderTinyMce.value){

@@ -15,7 +15,7 @@ import {
 const AUTO_SET = 'auto_set';
 
 export default class Control {
-    constructor(idField, ele, controlProps, curParentInstance, value = "") {
+    constructor(idField, ele, controlProps, keyInstance, value = "") {
         /**
          * object các thuộc tính về hiển thị của control
          */
@@ -31,7 +31,7 @@ export default class Control {
         /**
          * instance của submit hiện tại
          */
-        this.curParentInstance = curParentInstance;
+        this.keyInstance = keyInstance;
         /**
          * id của dòng dữ liệu trong bảng field, phục vụ cho việc lấy datapost submit
          */
@@ -100,7 +100,7 @@ export default class Control {
         return false
     }
     getDataStoreSubmit() {
-        return sDocument.state.submit[this.curParentInstance];
+        return sDocument.state.submit[this.keyInstance];
     }
 
     /**
@@ -184,7 +184,7 @@ export default class Control {
                         if (formulas) {
                             formulas = formulas.trim();
                             formulas = formulas.replace(/\r?\n|\r/g, ' ');
-                            this.controlFormulas[key].configData[index]['instance'] = new Formulas(this.curParentInstance, formulas, key);
+                            this.controlFormulas[key].configData[index]['instance'] = new Formulas(this.keyInstance, formulas, key);
                         }
 
                     }
@@ -194,13 +194,13 @@ export default class Control {
                     formulas = formulas.replace(/\r?\n|\r/g, ' ');
                     formulas = formulas.trim();
                     if (formulas) {
-                        this.controlFormulas[key]['instance'] = new Formulas(this.curParentInstance, formulas, key);
+                        this.controlFormulas[key]['instance'] = new Formulas(this.keyInstance, formulas, key);
                         let table = this.controlFormulas[key]['instance'].detectTableRelateLocalFormulas();
                         if (table.length > 0) {
                             store.commit("document/addToRelatedLocalFormulas", {
                                 key: this.name,
                                 value: table,
-                                instance: this.curParentInstance
+                                instance: this.keyInstance
                             });
                         }
                     }
@@ -215,11 +215,11 @@ export default class Control {
         if (!this.checkDetailView() && this.checkProps('isDBOnly')) {
             let fromTable = (this.inTable == false) ? "document_" + this.docName : "document_child_" + this.docName + "_" + this.inTable;
             let formulas = "ref(SELECT count(" + this.name + ") > 0 AS " + this.name + " from " + fromTable + " where " + this.name + " = '{" + this.name + "}')"
-                // this.controlFormulas.uniqueDB = new Formulas(this.curParentInstance, formulas, 'uniqueDB');
+                // this.controlFormulas.uniqueDB = new Formulas(this.keyInstance, formulas, 'uniqueDB');
             this.controlFormulas.uniqueDB = {
                 title: "Duy nhất trong DataBase",
                 value: formulas,
-                instance: new Formulas(this.curParentInstance, formulas, 'uniqueDB'),
+                instance: new Formulas(this.keyInstance, formulas, 'uniqueDB'),
                 formulasId: 0,
                 type: "script",
                 groupType: "formulas"
@@ -255,7 +255,7 @@ export default class Control {
     handlerDataAfterRunFormulasLink(values, formulasType) {
         if (this.inTable != false) {
             let configInstance = formulasType.split('_')[1]
-            let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
+            let tableControlInstance = getListInputInDocument(this.keyInstance)[this.inTable];
             let dataTable = tableControlInstance.tableInstance.tableInstance.getData();
             let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
             let linkFormulas = this.controlFormulas.linkConfig.configData;
@@ -284,7 +284,7 @@ export default class Control {
                     source: source,
                 });
                 store.commit(
-                    "document/updateDataForLinkControl", { formulasType: formulasType + "_" + rowIndex, link: value, title: title, source: source, instance: this.curParentInstance, controlName: this.name }
+                    "document/updateDataForLinkControl", { formulasType: formulasType + "_" + rowIndex, link: value, title: title, source: source, instance: this.keyInstance, controlName: this.name }
                 );
             }
             tableControlInstance.tableInstance.tableInstance.render()
@@ -296,7 +296,7 @@ export default class Control {
      */
     handlerDataAfterRunFormulasValidate(values, rowNodeId = null, columnName = null) {
         if (this.inTable != false) {
-            let tableIns = getControlInstanceFromStore(this.curParentInstance, this.inTable);
+            let tableIns = getControlInstanceFromStore(this.keyInstance, this.inTable);
             if(!this.optionValues['Validate']){
                 this.optionValues['Validate'] = {}
             }
@@ -344,7 +344,7 @@ export default class Control {
     }
     handlerDataAfterRunFormulasRequire(values) {
         if (this.inTable != false) {
-            let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
+            let tableControlInstance = getListInputInDocument(this.keyInstance)[this.inTable];
             let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
             for (let index = 0; index < values.length; index++) {
                 let row = values[index];
@@ -361,7 +361,7 @@ export default class Control {
     handlerDataAfterRunFormulasHidden(values) {
         if (this.inTable != false) {
             if(values && Object.values(values).length > 0 && Object.values(values)[0] == 1){
-                let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
+                let tableControl = getListInputInDocument(this.keyInstance)[this.inTable];
                 let colIndex = tableControl.tableInstance.getColumnIndexFromControlName(this.name);
                 var plugin = tableControl.tableInstance.tableInstance.getPlugin('hiddenColumns');
                 plugin.hideColumn(colIndex);
@@ -372,7 +372,7 @@ export default class Control {
     }
     handlerDataAfterRunFormulasReadonly(values) {
         if (this.inTable != false) {
-            // let tableControlInstance = getListInputInDocument(this.curParentInstance)[this.inTable];
+            // let tableControlInstance = getListInputInDocument(this.keyInstance)[this.inTable];
             // let colIndex = tableControlInstance.tableInstance.getColumnIndexFromControlName(this.name);
             // let tableData = tableControlInstance.tableInstance.getSourceData();
             // for (let index = 0; index < tableData.length; index++) {
@@ -404,7 +404,7 @@ export default class Control {
 
     handlerDataAfterRunFormulasValue(values,rowNodeId = {}) {
         if (this.inTable != false) {
-            let tableIns = getControlInstanceFromStore(this.curParentInstance, this.inTable);
+            let tableIns = getControlInstanceFromStore(this.keyInstance, this.inTable);
             if(Object.keys(rowNodeId).length == 1){
                 values = (values) ? values : '';
                 values = (typeof values == 'object') ? Object.values(values)[0] : values;
@@ -420,16 +420,16 @@ export default class Control {
                 controlName: this.name,
                 key: 'value',
                 value: tableIns.tableInstance.getColData(this.name),
-                instance: this.curParentInstance
+                instance: this.keyInstance
             });
             /**
              * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
              */
-            markBinedField(this.curParentInstance, this.name);
+            markBinedField(this.keyInstance, this.name);
             setTimeout((self) => {
                 let controlEffected = this.getEffectedControl();
                 for (let control in controlEffected) {
-                    let controlIns = getControlInstanceFromStore(self.curParentInstance, control)
+                    let controlIns = getControlInstanceFromStore(self.keyInstance, control)
                     if (controlIns.inTable == false){
                         SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', controlIns)
                     }
@@ -467,7 +467,7 @@ export default class Control {
                 this.removeValidateIcon('UniqueDB');
             }
         } else {
-            let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
+            let tableControl = getListInputInDocument(this.keyInstance)[this.inTable];
             let colIndex = tableControl.tableInstance.getColumnIndexFromControlName(this.name);
             let dataAtCol = tableControl.tableInstance.tableInstance.getDataAtCol(colIndex);
             let mess = {
@@ -510,14 +510,14 @@ export default class Control {
         }
         // hàm kiểm tra là view detail hay submit
     checkDetailView() {
-        if (sDocument.state.viewType[this.curParentInstance] == 'detail') {
+        if (sDocument.state.viewType[this.keyInstance] == 'detail') {
             return true;
         } else {
             return false;
         }
     }
     checkViewType(type) {
-        if (sDocument.state.viewType[this.curParentInstance] == type) {
+        if (sDocument.state.viewType[this.keyInstance] == type) {
             return true;
         } else {
             return false;
@@ -534,7 +534,7 @@ export default class Control {
             }
             let rs = true;
             if (this.inTable != false) {
-                // let table = getListInputInDocument(this.curParentInstance)[this.inTable];
+                // let table = getListInputInDocument(this.keyInstance)[this.inTable];
                 // let colIndex = table.tableInstance.getColumnIndexFromControlName(this.name);
                 // let dataAtCol = table.tableInstance.tableInstance.getDataAtCol(colIndex);
                 // if (rowIndex == "all") {
@@ -656,7 +656,7 @@ export default class Control {
 
     }
     traceInputTable(className, isRemove = false) {
-        let tableControl = getListInputInDocument(this.curParentInstance)[this.inTable];
+        let tableControl = getListInputInDocument(this.keyInstance)[this.inTable];
         tableControl.tableInstance.traceInputTable(this.name, className, isRemove)
     }
     handlerDataAfterRunFormulasMinDate(value) {

@@ -8,7 +8,7 @@ export const UserCellRenderer = ()=> {
 UserCellRenderer.prototype.init = function(params) {
     this.eGui = document.createElement('div');
     let control = params.control;
-    let mapIdToUsers = sDocument.state.submit[control.curParentInstance].mapValueToTextAutocompleteInput[control.name];
+    let mapIdToUsers = sDocument.state.submit[control.keyInstance].mapValueToTextAutocompleteInput[control.name];
     var text = (params.value) ? mapIdToUsers[params.value] : '';
     let div = `<div style="position:relative;height:100%;width:100%;">` + text + `
                     <span style="position: absolute;right:8px;top:2px;font-size: 14px;color: #ababab;" class="mdi mdi-account-search-outline"></span>
