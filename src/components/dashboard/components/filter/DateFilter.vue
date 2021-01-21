@@ -7,7 +7,7 @@
 			<div class="d-flex" style="background-color: #ffffff">
 				<div style="border-right: 1px solid lightgray ">
 					<div v-for="(item, i) in pickerOptions.shortcuts" :key="i">
-						<span class="fs-13 ml-2 mt-2 mr-4 picker-option-title" @click="item.onClick(dates)">
+						<span class="fs-13 ml-2 mt-2 mr-4 picker-option-title" @click="item.onClick()">
 							{{ item.text }}
 						</span>
 					</div>
@@ -54,7 +54,7 @@ export default {
 						onClick(picker) {
 							const end = new Date();
 							const start = new Date();
-							picker.$emit('pick', [start, end]);
+							this.$emit('pick', [start, end]);
 						},
 					},
 					{
@@ -64,7 +64,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24);
-							picker.$emit('pick', [start, end]);
+							this.$emit('pick', [start, end]);
 						},
 					},
 					{
@@ -73,7 +73,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 7);
-							picker.$emit('pick', [start, end]);
+							this.$emit('pick', [start, end]);
 						},
 					},
 					{
@@ -82,7 +82,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 14);
-							picker.$emit('pick', [start, end]);
+							this.$emit('pick', [start, end]);
 						},
 					},
 					{
@@ -91,7 +91,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 28);
-							picker.$emit('pick', [start, end]);
+							this.$emit('pick', [start, end]);
 						},
 					},
 					{
@@ -100,7 +100,7 @@ export default {
 							const end = new Date();
 							const start = new Date();
 							start.setTime(start.getTime() - 3600 * 1000 * 24 * 30);
-							picker.$emit('pick', [start, end]);
+							this.$emit('pick', [start, end]);
 						},
 					},
 				],
