@@ -323,12 +323,6 @@ export default {
             }
         },
 
-        checkHasVerticalScroll(){
-            let viewportHeight = $(this.$el).find('.ag-body-viewport ').height();
-            let bodyHeight = $(this.$el).find('.ag-center-cols-clipper').height();
-            return bodyHeight > viewportHeight;
-        },
-
         /**
          * Tự động resize chiều rộng các cột theo chiều dài dữ liệu của cột đó
          * @param {Boolean} skipHeader xét việc co chiều rộng có xét tới chiều rộng của header hay không
@@ -363,10 +357,12 @@ export default {
             return this.cellConfigs.viewConfigs.displayOptions;
         },
         tableStyle(){
+            let titleAttr = this.cellConfigs.rawConfigs.style.title.children;
+            let showTitle = titleAttr.show.value && titleAttr.titleText.value;
             return Object.assign({
                 width: '100%', 
-                height: 'calc(100% - 35px)'
-            },this.options.cellStyle);
+                height: showTitle ? 'calc(100% - 60px)' : 'calc(100% - 35px)'
+            }, this.options.cellStyle);
         }
     },
     components:{

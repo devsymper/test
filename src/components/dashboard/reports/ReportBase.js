@@ -301,4 +301,16 @@ export default class ReportBase {
         // rsl = treeConditionConverter.addConditionFormatToColDef(rsl, cellStyle.originStyle, mapNameToColumn);
         return rsl;
     }
+
+    canGetDataFromServer(){
+        let columnSetting = this.rawConfigs.setting;
+        let canRun = false;
+        for(let key in columnSetting){
+            if(columnSetting[key].selectedColums && columnSetting[key].selectedColums.length > 0){
+                canRun = true;
+                break;
+            }
+        }
+        return canRun;
+    }
 }
