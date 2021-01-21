@@ -865,6 +865,8 @@ export default {
     data(){
 		let self = this;
         return {
+            listId:[],// chứa list Id của table
+			gridApi: null,
             closeBtnFilter:false,
             isUpdateFilter:false,
             listFilters:[],
@@ -872,7 +874,6 @@ export default {
             deleteFilterIdx:0,
             filterContent:"",
             showDelFilterPopUp:false,
-            gridApi: null,
             selectedFilterName:'',
 			listItemsWorker: null,
 			deleteDialogShow: false,
@@ -1328,8 +1329,15 @@ export default {
             }
             return contextMenu;
 		},
-		
+		getListId(listObject){
+            this.listId = [];
+            listObject.map(obj=>{
+                this.listId.push(obj.id)
+            })
+            this.$emit('get-list-id',this.listId)
+        },
 		handlerGetData(data){
+            this.getListId(data.data.listObject);
 			let self = this
 			if(self.customAPIResult.reformatData){
 				data = self.customAPIResult.reformatData(data);
@@ -1359,7 +1367,7 @@ export default {
 					filteredColumns: self.filteredColumns
 				}
 			})
-			this.hideOverlay()
+            this.hideOverlay()
 			this.$emit('data-loaded', resData)
 		},
 		handlerRestoreTableDisplayConfigRes(res){
@@ -1813,7 +1821,7 @@ export default {
 					columnDefs: self.columnDefs
 				}
 			});
-		},
+        },
 		getWidgetIdentifier(){
             let widgetIdentifier = '';
             if(this.widgetIdentifier){
