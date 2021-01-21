@@ -394,7 +394,6 @@ export default {
 			immediate: true,
 			handler(arr){
 				console.log(arr, 'menu sibe bả')
-				debugger
 			}
 		}
     },
