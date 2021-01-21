@@ -256,6 +256,16 @@ export default {
                             }
                         ],
                     },
+                    {
+                        column : "tmg_assignee",
+                        operation : "and",
+                        conditions : [
+                            {
+                                name : "in",
+                                value : [self.$store.state.app.endUserInfo.id],
+                            }
+                        ],
+                    },
                 ],
                 page : 1,
                 pageSize: 500,
@@ -284,14 +294,17 @@ export default {
    
     methods:{
         checkUpdateTask(issue){
-            let data = {};
-            data.projectId = this.projectId;
-            data.listBoardColumn = this.listBoardColumn;
-            data.issue = issue;
-            this.kanbanWorker.postMessage({
-                action:'checkUpdateTaskToKanban',
-                data: data
-            });
+            if(issue.tmg_assignee == self.$store.state.app.endUserInfo.id){
+                let data = {};
+                data.projectId = this.projectId;
+                data.listBoardColumn = this.listBoardColumn;
+                data.issue = issue;
+                this.kanbanWorker.postMessage({
+                    action:'checkUpdateTaskToKanban',
+                    data: data
+                });
+            }
+            
         },
         onSearch(vl){
             let val = vl;

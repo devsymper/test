@@ -88,6 +88,7 @@ import { util } from "@/plugins/util.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ProjectPopup from '@/components/taskManagement/project/ProjectPopup';
 import SelectBoard from '@/components/taskManagement/board/SelectBoard';
+import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
 export default {
     created(){
         this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
@@ -142,8 +143,7 @@ export default {
         },
         '$route' (to, old) {
             if(to.meta.group){
-                this.originMenu = util.cloneDeep(this.userMenuItems[to.meta.group]);
-                this.menu = this.userMenuItems[to.meta.group];
+                this.checkShowListMenu();
             }         
         },
         drawer(vl){
@@ -152,29 +152,126 @@ export default {
                 this.$refs.SelectBoard.hide();
             }
         },
-        listBoardInProject(vl){
-            if(vl.length > 0){
-                this.menu.workspace1.items[0].title = vl[0].name;
-                this.menu.workspace1.items[0].subTitle = "";
-            }
-        },
-        menu(newVl){
-            if (Object.keys(newVl).length > 0) {
-                this.checkRoleSetMenuShow();
-            }
-        },
+        // listBoardInProject(vl){
+        //     if(vl.length > 0){
+        //         this.menu.workspace1.items[0].title = vl[0].name;
+        //         this.menu.workspace1.items[0].subTitle = "";
+        //     }
+        // },
         sCurrentProject(newVl){
             if (Object.keys(newVl).length > 0) {
-                this.checkRoleSetMenuShow();
+                this.checkShowListMenu();
             }
         }
     },
     mounted(){
-        this.menu = this.userMenuItems[this.$route.meta.group];
-        this.originMenu =util.cloneDeep(this.userMenuItems[this.$route.meta.group]);
+        this.checkShowListMenu()
     },
     
     methods: {
+        checkShowListMenu(){
+            this.menu = [];
+            let currentMenu = this.userMenuItems[this.$route.meta.group];
+            let currentProject = this.$store.state.taskManagement.currentProject;
+            if (currentProject.userLeader == this.$store.state.app.endUserInfo.id) {
+                this.menu = currentMenu;
+            }
+            else{
+                if (currentMenu.workspace1) {
+                    let listItemInWorkspace1 = currentMenu.workspace1.items;
+                    // check role show list component
+                    if (!checkPermission('task_manager_components','list')) {
+                        let item = listItemInWorkspace1.find(data => data.name === 'component')
+                        var index = listItemInWorkspace1.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspace1.splice(index, 1);
+                        }
+                    }
+                    // check role show list version
+                    if (!checkPermission('task_manager_version','list')) {
+                        let item = listItemInWorkspace1.find(data => data.name === 'version')
+                        var index = listItemInWorkspace1.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspace1.splice(index, 1);
+                        }
+                    }
+                }
+                //check trong workspace 2
+                if (currentMenu.workspace2) {
+                    let listItemInWorkspace2 = currentMenu.workspace2.items;
+                        // check role show báo cáo
+                    if (!checkPermission('task_manager_report_config','view')) {
+                        let item = listItemInWorkspace2.find(data => data.name === 'report')
+                        var index = listItemInWorkspace2.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspace2.splice(index, 1);
+                        }
+                    }
+                }
+                //check trong item 3
+                if (currentMenu.item3) {
+                    let listItemInItem3 = currentMenu.item3.items;
+                        // check role project setting
+                    if (!checkPermission('task_manager_project_setting','config')) {
+                        let item = listItemInItem3.find(data => data.name === 'projectSetting')
+                        var index = listItemInItem3.indexOf(item);
+                        if (index > -1) {
+                            listItemInItem3.splice(index, 1);
+                        }
+                    }
+                }
+                //check trong setting project
+                if (currentMenu.workspaceProject) {
+                    let listItemInWorkspaceProject = currentMenu.workspaceProject.items;
+                        // check role show list access controls
+                    if (!checkPermission('task_manager_access','list')) {
+                        let item = listItemInWorkspaceProject.find(data => data.name === "access")
+                        var index = listItemInWorkspaceProject.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspaceProject.splice(index, 1);
+                        }
+                    }
+
+                    // check role show list issue type
+                    if (!checkPermission('task_manager_issue_type','list')) {
+                        let item = listItemInWorkspaceProject.find(data => data.name === "issueType")
+                        var index = listItemInWorkspaceProject.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspaceProject.splice(index, 1);
+                        }
+                    }
+
+                    // check role show list workflow
+                    if (!checkPermission('task_manager_task_life_cycle','list')) {
+                        let item = listItemInWorkspaceProject.find(data => data.name === "workflow")
+                        var index = listItemInWorkspaceProject.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspaceProject.splice(index, 1);
+                        }
+                    }
+
+                    // check role show list issue link
+                    if (!checkPermission('task_manager_issue_link','list')) {
+                        let item = listItemInWorkspaceProject.find(data => data.name === "issueLink")
+                        var index = listItemInWorkspaceProject.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspaceProject.splice(index, 1);
+                        }
+                    }
+                    // check role show list priority
+                    if (!checkPermission('task_manager_priority','list')) {
+                        let item = listItemInWorkspaceProject.find(data => data.name === "priority")
+                        var index = listItemInWorkspaceProject.indexOf(item);
+                        if (index > -1) {
+                            listItemInWorkspaceProject.splice(index, 1);
+                        }
+                    }
+                }
+                this.menu = currentMenu;
+                console.log(this.menu,'this.menu');
+            }
+            
+        },
         afterSelectBoard(board){
             this.menu.workspace1.items[0].title = board.name
         },
@@ -221,108 +318,6 @@ export default {
                 this.$router.push(link);
             }
         },
-        checkRoleSetMenuShow(){
-            let userOperator = this.$store.state.taskManagement.userOperations;
-            let infoCurrentProject = this.$store.state.taskManagement.currentProject;
-            if (infoCurrentProject.userLeader == this.$store.state.app.endUserInfo.id) {
-                this.menu = this.originMenu;
-                return;
-            }else{
-                //check trong workspace 1
-                if (this.menu.workspace1) {
-                    let listItemInWorkspace1 = this.menu.workspace1.items;
-                    // check role show list component
-                    if (!userOperator.task_manager_components || (userOperator.task_manager_components && !userOperator.task_manager_components.includes("list"))) {
-                        let item = listItemInWorkspace1.find(data => data.name === 'component')
-                        var index = listItemInWorkspace1.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspace1.splice(index, 1);
-                        }
-                    }
-                    // check role show list version
-                    if (!userOperator.task_manager_version || (userOperator.task_manager_version && !userOperator.task_manager_version.includes("list"))) {
-                        let item = listItemInWorkspace1.find(data => data.name === 'version')
-                        var index = listItemInWorkspace1.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspace1.splice(index, 1);
-                        }
-                    }
-                }
-                //check trong workspace 2
-                if (this.menu.workspace2) {
-                    let listItemInWorkspace2 = this.menu.workspace2.items;
-                        // check role show báo cáo
-                    if (!userOperator.task_manager_report_config || (userOperator.task_manager_report_config && !userOperator.task_manager_report_config.includes("view"))) {
-                        let item = listItemInWorkspace2.find(data => data.name === 'report')
-                        var index = listItemInWorkspace2.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspace2.splice(index, 1);
-                        }
-                    }
-                }
-                //check trong item 3
-                if (this.menu.item3) {
-                    let listItemInItem3 = this.menu.item3.items;
-                        // check role project setting
-                    if (!userOperator.task_manager_project_setting || (userOperator.task_manager_project_setting && !userOperator.task_manager_project_setting.includes("config"))) {
-                        let item = listItemInItem3.find(data => data.name === 'projectSetting')
-                        var index = listItemInItem3.indexOf(item);
-                        if (index > -1) {
-                            listItemInItem3.splice(index, 1);
-                        }
-                    }
-                }
-                //check trong setting project
-                if (this.menu.workspaceProject) {
-                    let listItemInWorkspaceProject = this.menu.workspaceProject.items;
-                        // check role show list access controls
-                    if (!userOperator.task_manager_access || (userOperator.task_manager_access && !userOperator.task_manager_access.includes("list"))) {
-                        let item = listItemInWorkspaceProject.find(data => data.name === "access")
-                        var index = listItemInWorkspaceProject.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspaceProject.splice(index, 1);
-                        }
-                    }
-
-                    // check role show list issue type
-                    if (!userOperator.task_manager_issue_type || (userOperator.task_manager_issue_type && !userOperator.task_manager_issue_type.includes("list"))) {
-                        let item = listItemInWorkspaceProject.find(data => data.name === "issueType")
-                        var index = listItemInWorkspaceProject.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspaceProject.splice(index, 1);
-                        }
-                    }
-
-                    // check role show list workflow
-                    if (!userOperator.task_manager_task_life_cycle || (userOperator.task_manager_task_life_cycle && !userOperator.task_manager_task_life_cycle.includes("list"))) {
-                        let item = listItemInWorkspaceProject.find(data => data.name === "workflow")
-                        var index = listItemInWorkspaceProject.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspaceProject.splice(index, 1);
-                        }
-                    }
-
-                    // check role show list issue link
-                    if (!userOperator.task_manager_issue_link || (userOperator.task_manager_issue_link && !userOperator.task_manager_issue_link.includes("list"))) {
-                        let item = listItemInWorkspaceProject.find(data => data.name === "issueLink")
-                        var index = listItemInWorkspaceProject.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspaceProject.splice(index, 1);
-                        }
-                    }
-                    // check role show list priority
-                    if (!userOperator.task_manager_priority || (userOperator.task_manager_priority && !userOperator.task_manager_priority.includes("list"))) {
-                        let item = listItemInWorkspaceProject.find(data => data.name === "priority")
-                        var index = listItemInWorkspaceProject.indexOf(item);
-                        if (index > -1) {
-                            listItemInWorkspaceProject.splice(index, 1);
-                        }
-                    }
-                }
-            }
-            
-        }
-      
     },
     data() {
         return {

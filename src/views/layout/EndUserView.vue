@@ -1,7 +1,7 @@
 <template>
     <v-app id="symper-platform-app">
-        <ba-sidebar @show-user-detail="showMyInfo = true" v-show="false"/>
-        <v-main style="height:100vh;padding: 0!important">
+        <ba-sidebar @show-user-detail="showMyInfo = true" v-show="true"/>
+        <v-main style="height:100vh;">
             <v-container fluid fill-height class="pa-0">
                 <div class=" app-header-bg-color" style="border-bottom:1px solid #e6e5e5; width: calc(100% - 5px)" v-show="false">
                     <div style="width:calc(100% - 500px)" class="float-left">

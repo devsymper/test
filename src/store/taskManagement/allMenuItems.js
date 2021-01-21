@@ -98,12 +98,12 @@ export default {
                     icon: 'mdi-lan',
                     url:"/task-management/projects/:id/workflow"
                 },
-                {
-                    name:'issueLink',
-                    title:"Issue Link",
-                    icon: 'mdi-link',
-                    url:"/task-management/projects/:id/issue-link"
-                },
+                // {
+                //     name:'issueLink',
+                //     title:"Issue Link",
+                //     icon: 'mdi-link',
+                //     url:"/task-management/projects/:id/issue-link"
+                // },
                 {
                     name:'priority',
                     title:"Priority",
