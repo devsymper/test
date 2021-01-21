@@ -1297,7 +1297,16 @@
 		"dataflow":{
 			"titleShowlist": "Danh sách dataflow",
 			"titleShowlistTrash": "Danh sách dataflow đã xóa"
+		},
+		"dataset":{
+			"titleShowlist": "Danh sách dataset",
+			"titleShowlistTrash": "Danh sách dataset đã xóa"
+		},
+		"relation":{
+			"titleShowlist": "Danh sách relation",
+			"titleShowlistTrash": "Danh sách relation đã xóa"
 		}
+
 	},
     "virtualdoc": {
         "header": {

@@ -1,5 +1,5 @@
 <template>
-	<div :style="{ position: isExpand ? 'relative' : 'absolute' }" class="task-manager-sidebar" @mouseenter="drawer = true" @mouseleave="drawer = false">
+	<div :style="{ position: isExpand ? 'relative' : 'absolute' }" class="report-sidebar" @mouseenter="drawer = true" @mouseleave="drawer = false">
 		<v-btn :class="{ 'collapse-sidebar-icon': true, 'btn-collapsing': isExpand }" class="mt-1" icon tile small @click="expandSidebar">
 			<v-icon v-if="!isExpand && !drawer">mdi-menu</v-icon>
 			<v-icon v-else-if="isExpand">mdi-chevron-double-left</v-icon>
@@ -20,7 +20,7 @@
 							no-action
 							:class="{ 'menu-group': true, 'menu-group-active': item.active == true }"
 							:symper-action="$bindAction(item.action ? item.action : '')"
-							@click="handleItemClick(item)"
+							@click="gotoPage(item)"
 						>
 							<template v-slot:prependIcon>
 								<v-icon class="ml-1 icon-group">
@@ -99,11 +99,31 @@ export default {
 		},
 		expandSidebar() {
 			this.isExpand = !this.isExpand;
-			this.$emit('after-toggle-sidebar', !this.isExpand);
+			this.$emit('after-toggle-sidebar', !this.isExpand );
 		},
-		gotoPage(item, subItem = false , parent){
-
-		}
+		gotoPage(item, subItem = false, parent) {
+			if (!item.children) {
+				this.setActive(item, subItem, parent);
+			}
+			let path = 'common.sidebar.' + item.title;
+			let title = this.$t(path);
+			this.$goToPage(item.link, title, false, false);
+		},
+		setActive(item, subItem, parent) {
+			this.$emit('selecting-show-list', item.title)
+			let self = this;
+			this.reportMenu.forEach(function(e) {
+				if (e.hasOwnProperty('active')) {
+					e.active = false;
+				}
+				if (e.hasOwnProperty('children')) {
+					for (let child in e.children) {
+						self.$set(e.children[child], 'active', false);
+					}
+				}
+			});
+			this.$set(item, 'active', true);
+		},
 	},
 	data() {
 		return {
@@ -112,13 +132,12 @@ export default {
 			reportMenu: [
 				{
 					title: 'dashboard',
-					icon: 'mdi-briefcase-edit-outline',
+					icon: 'mdi-view-dashboard-outline',
 					group: 'My work',
 					children: {
 						listDashboard: {
 							title: 'listDashboards',
 							link: '/report',
-							
 						},
 						listTrashDashboard: {
 							title: 'list-trash-dashboard',
@@ -129,13 +148,12 @@ export default {
 				},
 				{
 					title: 'dataflow',
-					icon: 'mdi-briefcase-edit-outline',
+					icon: 'mdi-database-arrow-right-outline',
 					group: 'My work',
 					children: {
 						listDataflow: {
 							title: 'listDataflows',
 							link: '/report',
-							
 						},
 						listTrashDataflow: {
 							title: 'list-trash-dataflow',
@@ -145,13 +163,12 @@ export default {
 				},
 				{
 					title: 'relation',
-					icon: 'mdi-briefcase-edit-outline',
+					icon: 'mdi-relation-zero-or-many-to-zero-or-one',
 					group: 'My work',
 					children: {
 						listRelation: {
 							title: 'listRelations',
 							link: '/report',
-							
 						},
 						listTrashRelation: {
 							title: 'list-trash-relation',
@@ -167,7 +184,6 @@ export default {
 						listDataset: {
 							title: 'listDatasets',
 							link: '/report',
-							
 						},
 						listTrashDataset: {
 							title: 'list-trash-dataset',
@@ -175,7 +191,6 @@ export default {
 					},
 					active: false,
 				},
-				
 			],
 			showChevIcon: false,
 			menuItemsHeight: '200px',
@@ -190,6 +205,10 @@ export default {
 };
 </script>
 <style scoped>
+.menu-group-active {
+	background-color: #eaeaea;
+	border-radius: 4px;
+}
 .sb-menu-icon .line {
 	width: 18px;
 	height: 2px;
@@ -274,6 +293,9 @@ export default {
 .sidebar-content >>> .v-list-item__action:first-child,
 .sidebar-content >>> .v-list-item__icon:first-child {
 	margin-right: 18px !important;
+}
+.report-sidebar >>> .v-icon{
+	color: black !important;	
 }
 ::v-deep .popup-select-project {
 	position: absolute;
@@ -363,5 +385,10 @@ export default {
 }
 .item-active >>> .v-list-item__title {
 	color: var(--symper-color) !important;
+}
+</style>
+<style>
+.report-sidebar{
+	z-index: 10000
 }
 </style>
