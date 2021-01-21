@@ -10,8 +10,7 @@
             <v-avatar  class="mr-2 my-1" 
               :style="{background:data.displayMode.singleColor.backgroundColor,'background-image':getBackgroundColor(dataIdx)}"
               tile style="border:1px solid grey;margin-left:-12px">
-              <div :style="{color:data.displayMode.singleColor.fontColor}">
-                {{setNumber(dataIdx)}}
+              <div :style="{color:data.displayMode.singleColor.fontColor}">{{setNumber(dataIdx)}}
               </div>
             </v-avatar>
             <v-list-item-content dense>
@@ -25,13 +24,13 @@
                     v-for="(action,actionIdx) in listActions.filter(act=>act.isShow)" 
                     :key="actionIdx" 
                     @click="handleAction(actionIdx,dataIdx)">
-                      {{action.title}}
+                      {{action.name}}
                   </v-btn>
                   <v-btn text x-small  v-if="dataIdx==dataIdxSelected" @click="handleAction(4,dataIdx)">
-                      {{listActions[4].title}}
+                      {{listActions[4].name}}
                   </v-btn>
                    <v-btn text x-small  v-else @click="handleAction(3,dataIdx)">
-                      {{listActions[3].title}}
+                      {{listActions[3].name}}
                   </v-btn>
               </v-list-item-subtitle>
             </v-list-item-content>
@@ -85,6 +84,7 @@ export default {
         index: dataIdx
       }
       this.$emit('change-format',data )
+
     },
       changeToConfig(){
           this.$emit('changeToConfig')
@@ -94,11 +94,11 @@ export default {
     return {
       dataIdxSelected:-1,
       listActions:[
-        {id:0,title:'Xem',name:'view',isShow:true},
-        {id:1,title:'Sửa',name:'edit',isShow:true},
-        {id:2,title:'Xóa',name:'delete',isShow:true},
-        {id:3,title:'Chọn',name:'apply',isShow:false},
-        {id:4,title:'Bỏ chọn',name:'disApply',isShow:false},
+        {id:0,name:'Xem',isShow:true},
+        {id:1,name:'Sửa',isShow:true},
+        {id:2,name:'Xóa',isShow:true},
+        {id:3,name:'Chọn',isShow:false},
+        {id:4,name:'Bỏ chọn',isShow:false},
       ]
     }
   },
