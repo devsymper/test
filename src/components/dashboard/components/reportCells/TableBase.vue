@@ -200,11 +200,15 @@ export default {
                         border-bottom-width: ${headerStyle.borderWidth};
                         text-align: ${headerStyle.textAlign};
                         border-bottom-color: ${headerStyle.borderColor};
+                        border-bottom-style: solid;
+                        border-top-style: solid;
                     }
                     #${idCell} .ag-header-group-cell {
                         border-top-width: ${headerStyle.borderWidth};
                         border-top-color: ${headerStyle.borderColor};
                         border-bottom-color: ${headerStyle.borderColor};
+                        border-bottom-style: solid;
+                        border-top-style: solid;
                     }
                     #${idCell} .ag-header-group-cell .ag-header-group-cell-label,
                     #${idCell} .ag-header-cell .ag-header-cell-label {
@@ -217,6 +221,7 @@ export default {
                         border-top-width: ${headerStyle.borderWidth}!important;
                         border-top-color: ${headerStyle.borderColor}!important;
                         border-bottom-style: inset;
+                        border-top-style: solid;
                     }
                     `;
                 
@@ -227,12 +232,14 @@ export default {
                         #${idCell} .ag-header-cell {
                             border-right-width: ${headerStyle.borderWidth};
                             border-right-color: ${headerStyle.borderColor};
+                            border-right-style: solid;
                         }
                         
                         #${idCell} .ag-floating-bottom .ag-cell{
                             border-right-width: ${headerStyle.borderWidth};
                             border-right-color: ${headerStyle.borderColor};
                             border-bottom-right: inset;
+                            border-right-style: solid;
                         }
                     `;
                 }else {
@@ -241,6 +248,7 @@ export default {
                         #${idCell} .ag-header-cell {
                             border-right-width: 0px;
                             border-right-color: 0px;
+                            border-right-style: solid;
                         }
                     `;
                 }
@@ -264,12 +272,14 @@ export default {
                         #${idCell} .ag-cell {
                             border-right-width: ${cellStyle.borderBottomWidth};
                             border-right-color: ${cellStyle.borderBottomColor};
+                            border-right-style: solid;
                         }`;
                 }else {
                     style += `
                         #${idCell} .ag-cell {
                             border-right-width: 0px;
                             border-right-color: '#00000000';
+                            border-right-style: solid;
                         }`;
                 }
             }
@@ -429,10 +439,12 @@ export default {
 
 .symper-table-report .ag-root .ag-row{
     border-top: none!important;
+    border-bottom-style: solid;
 }
 
 .symper-table-dashboard-header::after{
-    border-right: none!important
+    border-right: none!important;
+    width: 0px!important;
 }
 
 .symper-table-cell .ag-header{
@@ -456,7 +468,8 @@ export default {
 
 .symper-table-cell .ag-header-group-cell::after,
 .symper-table-cell .symper-table-dashboard-header::after{
-    border-right: none!important
+    border-right: none!important;
+    width: 0px!important;
 }
 
 

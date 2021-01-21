@@ -800,3 +800,7 @@ body {
 	content: "\F07F5" !important;
 	font: normal normal normal 15px/1 "Material Design Icons" !important;
 }
+
+.text-align-right {
+    text-align: right;
+}

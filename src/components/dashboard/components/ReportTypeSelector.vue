@@ -79,6 +79,8 @@ import ColumnConfig from "@/components/dashboard/components/reportConfig/ColumnC
 import ConditionConfig from "@/components/dashboard/components/reportConfig/ConditionConfig"
 import StyleConfig from "@/components/dashboard/components/reportConfig/StyleConfig"
 import { util } from '@/plugins/util.js';
+import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
+var mapTypeToClass = autoLoadChartClasses();
 
 export default {
 	props:{
@@ -124,28 +126,7 @@ export default {
 				},
 
 			},
-			chartConfigs:{
-				area:{},
-				card:{},
-				editor:{},
-				clusteredBar:{},
-				clusteredColumn:{},
-				filter:{},
-				global:{},
-				line:{},
-				lineAndClusteredColumn:{},
-				lineAndStackedColumn:{},
-				pie:{},
-				donut:{},
-				pivot:{},
-				stackedArea:{},
-				stackedBar:{},
-				stackedBar100:{},
-				stackedColumn:{},
-				stackedColumn100:{},
-				table:{},
-				treeMap:{},
-			}
+			chartConfigs: mapTypeToClass
 		}
 	},
 	watch:{
@@ -200,5 +181,6 @@ export default {
 }
 .selected-report-type{
 	background-color: #FEEDE1;
+	border: 1px solid orange;
 }
 </style>

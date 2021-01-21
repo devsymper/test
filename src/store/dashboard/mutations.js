@@ -30,7 +30,20 @@ const setSelectedCell = (state, data) => {
     let instanceKey = data.instanceKey;
     let dashboard = state.allDashboard[instanceKey];
     disSelectCurrentCell(state, instanceKey);
-    Vue.set(dashboard, 'currentCellConfigs', dashboard.dashboardConfigs.allCellConfigs[cellId]);
+
+    let cell = dashboard.dashboardConfigs.allCellConfigs[cellId];
+    let selectedColums = {};
+    for(let key in cell.rawConfigs.setting){
+        for(let col of cell.rawConfigs.setting[key].selectedColums){
+            if(!selectedColums[col.dataset]){
+                selectedColums[col.dataset] = {};
+            }
+            selectedColums[col.dataset][col.name] = true;
+            selectedColums[col.dataset][col.columnName] = true;
+        }
+    }
+    Vue.set(cell.viewConfigs, 'selectedDataset', selectedColums);
+    Vue.set(dashboard, 'currentCellConfigs', cell);
     dashboard.currentCellConfigs.viewConfigs.isSelecting = true;
 }
 

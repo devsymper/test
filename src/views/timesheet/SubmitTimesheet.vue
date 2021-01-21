@@ -1,5 +1,5 @@
 <template>
-<div class="w-100 pl-4" >
+<div class="w-100 pl-4 symper-submit-timesheet" >
     <v-row class="submit-view">
         <div style="width:63%;float:left; color: black!important">
             <div class="float-lg-left float-md-left .d-lg-flex .d-lg-none d-none d-lg-block sub-submit-view pt-3">
@@ -232,7 +232,7 @@ export default {
 </script>
 
 <style>
-.ag-theme-balham .ag-cell{
+.symper-submit-timesheet .ag-theme-balham .ag-cell{
     border:none!important;
     line-height:22px!important
 }
@@ -352,7 +352,8 @@ button {
 .submit-groupby ::v-deep .v-input__control {
     margin-right: 4px !important
 }
-</style><style>
+</style>
+<style>
 .v-list-item__title {
     font-size: 13px !important;
     font-family: Roboto !important;

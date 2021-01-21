@@ -1,5 +1,5 @@
 <template>
-     <div :style="{width:contentWidth}" class="h-100 w-100 d-flex flex-column p-2">
+     <div :style="{width:contentWidth}" class="h-100 w-100 d-flex flex-column p-2 symper-list-items ">
 		 <div v-if="showToolbar" class="d-flex mb-2 " ref="topBar">
 			<div 
 			 	class="fs-17 ml-1 mt-1 font-weight-bold align-items-center flex-grow-1" 
@@ -1432,38 +1432,38 @@ export default {
     
 </script>
 <style>
-.ag-row{
+.symper-list-items .ag-row{
 	border-top-style:unset !important;
 }
-.ag-theme-balham .ag-root-wrapper{
+.symper-list-items .ag-theme-balham .ag-root-wrapper{
 	border: unset !important;
 }
-.ag-header{
+.symper-list-items .ag-header{
 	border: unset !important;
 }
-.ag-row{
+.symper-list-items .ag-row{
 	border-radius: 4px;
 }
-.ag-row:hover{
+.symper-list-items .ag-row:hover{
 	border-radius: 4px;
 }
-.ag-theme-balham .ag-cell{
+.symper-list-items .ag-theme-balham .ag-cell{
 	line-height: unset !important
 }
-.ag-header {
+.symper-list-items .ag-header {
 	height: 28px !important;
 	min-height: unset !important;
 	background-color: #ffffff !important;
 	border-top: 1px solid lightgray !important;
 	border-bottom: 1px solid lightgray !important;
 }
-.ag-theme-balham .ag-header-row {
+.symper-list-items .ag-theme-balham .ag-header-row {
     height: 24px !important;
 }
-.ag-row-selected{
+.symper-list-items .ag-row-selected{
 	background-color: #DBE7FE !important;
 }
-.applied-filter {
+.symper-list-items .applied-filter {
     color: #f58634;
     background-color: #ffdfc8;
 }
