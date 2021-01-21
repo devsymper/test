@@ -7,6 +7,7 @@
             :pageTitle="$t('bi.dashboard.title-show-list')"
             :containerHeight="containerHeight"
             :tableContextMenu="tableContextMenu"
+			:showExportButton="false"
 			:customAPIResult="customAPIResult"
             :useDefaultContext="false"
             @after-open-add-panel="addDashboard"

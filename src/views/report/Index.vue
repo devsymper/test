@@ -9,6 +9,10 @@
 				v-if="selectingShowList == 'list-dashboard'"
 				:containerHeight="containerHeight"
 			/>
+			<ListTrashDashboard 
+				v-if="selectingShowList == 'list-trash-dashboard'"
+				:containerHeight="containerHeight"
+			/>
 			<ListDataflow 
 				v-else-if="selectingShowList == 'list-dataflow'"
 				:containerHeight="containerHeight"
@@ -21,13 +25,18 @@
 				v-else-if="selectingShowList == 'list-dataset'"
 				:containerHeight="containerHeight"
 			/>
+			<ListTrashDataset 
+				v-else-if="selectingShowList == 'list-trash-dataset'"
+				:containerHeight="containerHeight"
+			/>
 			<ListRelation 
 				v-else-if="selectingShowList == 'list-relation'"
 				:containerHeight="containerHeight"
 			/>
-			<span v-else class="ml-12">
-				{{selectingShowList}}
-			</span>
+			<ListTrashRelation 
+				v-else-if="selectingShowList == 'list-trash-relation'"
+				:containerHeight="containerHeight"
+			/>
 
 		</div>	
 	</div>
@@ -35,10 +44,13 @@
 
 <script>
 import ListDashboard from '@/views/dashboard/Index'
+import ListTrashDashboard from '@/views/dashboard/ListTrashDashboard'
 import ListDataflow from '@/views/dataflows/ListDataflow'
 import ListTrashDataflow from '@/views/dataflows/ListTrashDataflow'
 import ListDataset from '@/views/dataset/Index'
+import ListTrashDataset from '@/views/dataset/ListTrashDataset'
 import ListRelation from '@/views/relation/Index'
+import ListTrashRelation from '@/views/relation/ListTrashRelation'
 import Sidebar from './ReportSideBar'
 import { util } from '@/plugins/util.js';
 
@@ -49,7 +61,10 @@ export default {
 		ListDataflow,
 		ListTrashDataflow,
 		ListDataset,
-		ListRelation
+		ListRelation,
+		ListTrashRelation,
+		ListTrashDashboard,
+		ListTrashDataset
 	},
 	data: function() {
 		let self = this;

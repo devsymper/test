@@ -1283,7 +1283,8 @@
 	},
 	"bi":{
 		"dashboard":{
-			"title-show-list": "Danh sách báo cáo",
+			"title-show-list": "Danh sách dashboard",
+			"title-show-list-trash": "Danh sách dashboard đã xóa",
 			"title-visualization":"Các loại chart",
 			"column-config":"Cấu hình cột",
 			"style-config":"Cấu hình style",
