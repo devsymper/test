@@ -9,7 +9,7 @@ export default class Donut extends ReportBase {
         super('donut', symperId, columnSettingKeys, styleKeys);
 	}
 	translate(rawConfig,  data, extraData ,changes = {}, oldOutput = {}){
-		let output =  TranslatorHelper.Charts.pie(data.data, rawConfig.setting, rawConfig.style , true, 1)
+		let output =  TranslatorHelper.Charts.pie(data.data, rawConfig.setting, rawConfig.style , true, 1, extraData)
 		return output
 	}
 }

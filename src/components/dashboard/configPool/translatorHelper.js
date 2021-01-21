@@ -47,7 +47,8 @@ export const TranslatorHelper = {
 		 * @param {Object} style Cấu hình hiển thị
 		 * @param {Object} isDonut Loại chart donut false of true 
 		 */
-		pie(data, columns, style, isDonut = false, ratio) {
+		pie(data, columns, style, isDonut = false, ratio, extraData) {
+			debugger
 			let pieDetailLabelFormat = {
 				category: '{point.name}',
 				value: '{point.y}',
@@ -99,12 +100,12 @@ export const TranslatorHelper = {
 				style:{
 					fontFamily: 'roboto'
 				},
-				height:313.70141220092773, //extraData
-				width:335.9930725097656 //extraData
+				height: extraData.size.h,
+				width: extraData.size.w
 			};
 			rsl.contentSize = {
-				h:313.70141220092773, //extraData
-				w:335.9930725097656 //extraData
+				h: extraData.size.h,
+				w: extraData.size.w
 			};
 			rsl.lang = {"numericSymbols":["K","M","B","T","P","E"],"thousandsSep":","} //extraData
 			rsl.xAxis = {"labels":{"autoRotation":[-45,-90]}} //extraData
@@ -117,7 +118,7 @@ export const TranslatorHelper = {
 		 * @param {Object} columns Cấu hình các cột
 		 * @param {Object} style Cấu hình hiển thị
 		 */
-		treeMap(data, columns, style, ratio) {
+		treeMap(data, columns, style, ratio, extraData) {
 			let colors = TranslatorHelper.getColorsFromStyle(style);
 			let groupCol = columns.group.selectedColums[0] ? columns.group.selectedColums[0] : false;
 			let detailCol = columns.detail.selectedColums[0] ? columns.detail.selectedColums[0] : false;
@@ -204,7 +205,7 @@ export const TranslatorHelper = {
 			commonAttr.symperTitle.text = commonAttr.symperTitle.text ? commonAttr.symperTitle.text : selectedColum.as;
 			return Object.assign(commonAttr, rsl);
 		},
-		card(data, columns, style, ratio) {
+		card(data, columns, style, ratio, extraData) {
 			let valueCol = columns.value.selectedColums[0];
 			valueCol = valueCol ? valueCol : {};
 			let rsl = {
