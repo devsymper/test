@@ -5,7 +5,7 @@
             :key="idex"
         >
             <div>
-                <span style="color:#FF8003; font-size:13px;margin-left:16px;margin-top:6px">{{ obj.fromNow}}</span>
+                <span style="color:#FF8003; font-size:13px;margin-left:16px;margin-top:6px">{{getDateFormNow(obj.fromNow)}}</span>
             </div>
             <div>
                 <v-list dense>
@@ -87,6 +87,16 @@ export default {
             this.documentObjectId = issue.document_object_id;
             this.issue = issue;
             this.$refs.issue.show();
+        },
+        getDateFormNow(time){
+            this.$moment().locale("vi")
+            var today = this.$moment().format('YYYY-MM-DD');
+            if (time===today) {
+                return this.$t('myItem.today');
+            }
+            else{
+                return this.$moment(time).fromNow();
+            }
         },
     }
 

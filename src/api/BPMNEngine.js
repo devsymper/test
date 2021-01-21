@@ -239,5 +239,12 @@ export default {
 	
     updateProcessInstance(id, data){
         return bpmneApi.put(appConfigs.apiDomain.bpmne.general +`symper-rest/service/runtime/process-instances/${id}`, JSON.stringify(data), testHeader)
+	},
+	getProcessByProcessKey(defId){
+		return bpmneApi.get(appConfigs.apiDomain.bpmne.models +'process-key/'+ defId)
+    },
+    // lấy danh sách quy trình theo docId
+    getProcessByDocId(docId){
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.models +`related-docs/${docId}/workflows?startDoc=true`)
     }
 };

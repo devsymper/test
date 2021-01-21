@@ -161,7 +161,8 @@ export const getTableColumns = function(columns, forcedReOrder = false , savedOr
 				noFilter: item.noFilter ? item.noFilter : false,
 				filtered: !filteredColumns ? false : filteredColumns[item.name] ? true : false,
 				width: item.name == 'id' ? 50 : item.width ? item.width : false,
-				flex: item.flex ? item.flex : false 
+				flex: item.flex ? item.flex : false,
+				noFilter: item.noFilter ? true : false
 			};
 		}	
 		

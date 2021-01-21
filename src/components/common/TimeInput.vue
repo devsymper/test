@@ -43,10 +43,10 @@ export default {
         },
         // tính toán vị trí của box timepicker 
         calculatorPositionBox(){
-            if(this.curInput.closest('.handsontable').length > 0 ){
+            if(this.curInput.closest('.ag-cell').length > 0 ){
                 let autoEL = $(this.$el).detach();
                 this.curInput.closest('.wrap-table').append(autoEL);
-                let edtos = this.curInput.offset();
+                let edtos = this.curInput.closest('.ag-cell').offset();
                 let tbcos = this.curInput.closest('.wrap-table').find('[s-control-type="table"]').offset();
                 this.positionBox = {'top':edtos.top - tbcos.top + this.curInput.height() + 2 +'px','left':edtos.left - tbcos.left+'px'};
             }
