@@ -1,5 +1,5 @@
 <template>
-    <div  class="w-100">
+    <div  class="w-100 " :class="{'s-pagination-mini': contentSize == 'mini', 's-pagination-normal': contentSize != 'mini'}">
         <v-select
             class="s-select-page-size  float-left"
             style="width:75px"
@@ -19,6 +19,7 @@
                 class="s-pagination"
                 v-model="page"
                 :length="pageLength"
+				small
                 next-icon="mdi-chevron-right"
                 prev-icon="mdi-chevron-left"
                 :total-visible="totalVisible"
@@ -27,7 +28,7 @@
                 @input="onInputPage"
             ></v-pagination>
         </div>
-        <div class="mr-2 fs-13  float-right" style="line-height: 25px" v-show="showRange">
+        <div class="mr-2 float-right" style="line-height: 25px" v-show="showRange">
             {{$t('common.display')}} 
             <span class="font-weight-medium">{{rowRange}}</span> 
             {{$t('common.of')}} 
@@ -62,6 +63,10 @@ export default {
         }
     },
     props:{
+		contentSize:{
+			type: String,
+			default: "normal"
+		},
         total:{
             type:Number,
             default:0
@@ -133,21 +138,21 @@ export default {
     }
     .s-pagination ::v-deep li > button{
         margin: 0 2px !important;
-        font-size: 12px !important;
+        font-size: 12px;
         box-shadow: none !important;
         margin-right: 6px;
         background: white !important;
         transition: all ease-in-out 250ms;
         color: rgb(0 0 0 / 0.6) !important;
         height: 25px;
-        min-width: 25px !important;
+        min-width: 25px;
         padding: 0 !important;
     }
     .s-pagination ::v-deep li > .v-pagination__navigation .mdi{
-        font-size: 20px !important;
+        font-size: 20px ;
     }
     .s-pagination ::v-deep li > .v-select__slot{
-        height: 25px !important;
+        height: 25px ;
     }
     .s-pagination ::v-deep li > .v-pagination__more{
         margin: 0 2px !important;
@@ -175,4 +180,42 @@ export default {
     .s-pagination ::v-deep ul.v-pagination {
         justify-content: start!important;
     }
+	.s-pagination-mini{
+		font-size: 11px !important;
+	}
+	.s-pagination-mini >>> .v-input__control{
+		font-size: 11px !important;
+	}
+	.s-pagination-mini >>> .v-input__control .v-select__selection{
+		font-size: 11px !important;
+	}
+	.s-pagination-mini >>> .v-select__slot{
+		height: 20px !important;
+	}
+	.s-pagination-mini >>> .v-input__slot{
+		width: 66px !important;
+	}
+	.s-pagination-mini >>> ul{
+		height: 20px !important;
+	}
+	.s-pagination-mini >>> li{
+	   	width: 20px;
+		margin-left: 2px;
+		margin-right: 2px;
+	}
+	.s-pagination-mini >>> li button{
+		min-width: 20px !important;
+	}
+	.s-pagination-mini >>> .v-pagination__navigation,
+	.s-pagination-mini >>> .v-pagination__item{
+		height: 20px !important;
+    	font-size: 10px !important;
+		width: 20px !important;
+	}
+	.s-pagination-mini >>> .v-icon{
+    	font-size: 15px !important;
+	}
+	.s-pagination-normal{
+		font-size: 13px !important;
+	}
 </style>
