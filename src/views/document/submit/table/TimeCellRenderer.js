@@ -32,7 +32,7 @@ TimeCellRenderer.prototype.init = function(params) {
             this.eGui.innerHTML = value;
         }
 
-        this.eGui.addEventListener('click', function(e){
+        this.eGui.addEventListener('dblclick', function(e){
             let event = e;
             if(event.target.classList.contains('validate-icon')){
                 return false;
@@ -50,5 +50,5 @@ TimeCellRenderer.prototype.getGui = function(params) {
 }
 
 TimeCellRenderer.prototype.destroy = function(params) {
-    this.eGui.removeEventListener('click', (event));
+    this.eGui.removeEventListener('dblclick', (event));
 }

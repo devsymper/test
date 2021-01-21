@@ -27,5 +27,6 @@ return this.eGui;
 }
 
 CheckboxCellRenderer.prototype.destroy = function(params) {
-this.eGui.removeEventListener('click', this.checkedHandler);
+    if(this.eGui)
+    this.eGui.removeEventListener('click', this.checkedHandler);
 }

@@ -290,34 +290,36 @@ export default class Control {
             tableControlInstance.tableInstance.tableInstance.render()
         }
     }
-    handlerDataAfterRunFormulasValidate(values, rowIndexs = null) {
+    /**
+     * Xử lý sau khi chạy xong công thức validate
+     * trường hợp trong table group thì có columnName
+     */
+    handlerDataAfterRunFormulasValidate(values, rowNodeId = null, columnName = null) {
         if (this.inTable != false) {
             let tableIns = getControlInstanceFromStore(this.curParentInstance, this.inTable);
             if(!this.optionValues['Validate']){
                 this.optionValues['Validate'] = {}
             }
-            if(Object.keys(rowIndexs).length == 1){
+            if(Object.keys(rowNodeId).length == 1){
                 values = (values) ? values : '';
                 values = (typeof values == 'object') ? Object.values(values)[0] : values;
-                if(Object.values(rowIndexs)[0] >= 0){
-                    this.optionValues['Validate'][Object.values(rowIndexs)[0]] = {
-                        msg: values,
-                        isValid:(values != '' && values != null && values != undefined && values != 'f'),
-                    }
+                this.optionValues['Validate'][rowNodeId[0]] = {
+                    msg: values,
+                    isValid:(values != '' && values != null && values != undefined && values != 'f'),
                 }
 
             }
             else{ // trường hợp giá trị cho cả cột
-                for(let rowId in rowIndexs){
-                    let cellValue = values[rowId];
-                    let rowIndex = rowIndexs[rowId];
-                    this.optionValues['Validate'][rowIndex] = {
-                        msg: values,
-                        isValid:(cellValue != '' && cellValue != null && cellValue != undefined && cellValue != 'f'),
-                    }
-                }
+                // for(let rowId in rowIndexs){
+                //     let cellValue = values[rowId];
+                //     let rowIndex = rowIndexs[rowId];
+                //     this.optionValues['Validate'][rowIndex] = {
+                //         msg: values,
+                //         isValid:(cellValue != '' && cellValue != null && cellValue != undefined && cellValue != 'f'),
+                //     }
+                // }
             }
-            tableIns.tableInstance.refreshCells(this.name,rowIndexs)
+            tableIns.tableInstance.refreshCells(columnName,rowNodeId)
         }
         else{
             if(Array.isArray(values)){
@@ -400,24 +402,17 @@ export default class Control {
         }
     }
 
-    handlerDataAfterRunFormulasValue(values,rowIndexs = {}) {
+    handlerDataAfterRunFormulasValue(values,rowNodeId = {}) {
         if (this.inTable != false) {
             let tableIns = getControlInstanceFromStore(this.curParentInstance, this.inTable);
-            if(Object.keys(rowIndexs).length == 1){
+            if(Object.keys(rowNodeId).length == 1){
                 values = (values) ? values : '';
                 values = (typeof values == 'object') ? Object.values(values)[0] : values;
-                if(Object.values(rowIndexs)[0] >= 0)
-                tableIns.tableInstance.setDataAtCell(this.name, values,Object.values(rowIndexs)[0]);
+                tableIns.tableInstance.setDataAtCell(this.name, values,rowNodeId[0]);
             }
             else{ // trường hợp giá trị cho cả cột
                 let mapIndexToValue = {}
-                for(let rowId in rowIndexs){
-                    let cellValue = values[rowId];
-                    let rowIndex = rowIndexs[rowId];
-                    mapIndexToValue[rowIndex] = cellValue
-                }
-                console.log(values, this.name,'xxxxxxxxxxxxxxx');
-                tableIns.tableInstance.updateItems(mapIndexToValue, this.name);
+                tableIns.tableInstance.updateItems(values, this.name);
             }
             /**
              * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
@@ -510,8 +505,8 @@ export default class Control {
         }
     }
 
-    makeErrNoti(rowIndex = null) {
-        return '<span class="mdi mdi-checkbox-blank-circle validate-icon" control-name="'+this.name+'" row-index="'+rowIndex+'"></span>'
+    makeErrNoti(rowNodeId = null) {
+        return '<span class="mdi mdi-checkbox-blank-circle validate-icon" control-name="'+this.name+'" row-node-id="'+rowNodeId+'"></span>'
     }
     renderValidateIcon(message, type) {
         let iconEl = this.makeErrNoti();
