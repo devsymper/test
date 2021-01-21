@@ -865,6 +865,8 @@ export default {
         return {
             typeDelete:'',
             conditionalFormat:[],
+            listId:[],// chứa list Id của table
+			gridApi: null,
             closeBtnFilter:false,
             isUpdateFilter:false,
             filter:[],
@@ -879,7 +881,8 @@ export default {
                 {icon:'mdi-lead-pencil',content:"Edit"},
                 {icon:'mdi mdi-close',content:"Delete"},
             ],
-            gridApi: null,
+            filterContent:"",
+            showDelFilterPopUp:false,
             selectedFilterName:'',
 			listItemsWorker: null,
 			deleteDialogShow: false,
@@ -1382,8 +1385,15 @@ export default {
 			}
             return contextMenu;
 		},
-		
+		getListId(listObject){
+            this.listId = [];
+            listObject.map(obj=>{
+                this.listId.push(obj.id)
+            })
+            this.$emit('get-list-id',this.listId)
+        },
 		handlerGetData(data){
+            this.getListId(data.data.listObject);
 			let self = this
 			if(self.customAPIResult.reformatData){
 				data = self.customAPIResult.reformatData(data);
@@ -1861,7 +1871,7 @@ export default {
 					columnDefs: self.columnDefs
 				}
 			});
-		},
+        },
 		getWidgetIdentifier(){
             let widgetIdentifier = '';
             if(this.widgetIdentifier){

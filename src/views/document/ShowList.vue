@@ -11,6 +11,7 @@
             :actionPanelWidth="actionPanelWidth"
             :showExportButton="false"
             :showImportButton="false"
+            @get-list-id="getListId"
             @cell-mouse-over="getRowSelected"
             @after-open-add-panel="addDocument"
             @close-panel="closePanel"
@@ -131,6 +132,8 @@ export default {
     data(){
         return {
             listWorkflows:[],
+            listId:[],
+            listProcess:[],
             startProcess:{
                 name: "startProcess",
                 subMenu:[],
@@ -356,6 +359,7 @@ export default {
         
     },
     created(){
+   
         let thisCpn = this;
         this.tableContextMenu.startProcess = this.startProcess;
         this.$evtBus.$on('change-user-locale',(locale)=>{
@@ -370,9 +374,38 @@ export default {
     watch:{
         documentId(){
             this.getApiDocument();
+        },
+        listId(){
+            if(this.listId.length>0){
+               this.getAllProcess(this.listId)
+            }
         }
     },
     methods:{
+        getListId(data){
+            this.listId = data;
+        },
+        // lấy ra tất cả các quy trình liên quan dựa theo id doc
+        getAllProcess(data){
+            this.listProcess = [];
+            let listId = data.join(",");
+            const self = this;
+            bpmnApi.getProcessByDocId(listId).then(res=>{
+                if(res.status==200){
+                    Object.keys(res.data).map(idDoc=>{
+                        self.listId.map(l=>{
+                            if(idDoc==l){
+                                this.tableContextMenu.startProcess = this.startProcess;
+                                self.listProcess.push({
+                                    id:idDoc,
+                                    listProcess:res.data[idDoc]
+                                })
+                            }
+                        })
+                    })
+                }
+            })
+        },
          handleTaskSubmited(){
             this.$store.commit("task/setIsStatusSubmit",true);
          },
@@ -495,43 +528,18 @@ export default {
             }
             
         },
-        checkExistWorkflow(docId){
-            let data = {
-                check: false,
-                startProcess:{},
-                data:[]
-            }
-            this.listWorkflows.map(lw=>{
-                if(lw.id==docId){
-                    data.check =  true;
-                    data.startProcess = lw.startProcess;
-                    data.data = lw.data
-                }
-            })
-            return data
-
-        },
         getListWorkFollowName(docId){
-            this.tableContextMenu.startProcess.subMenu=[];
+            this.tableContextMenu.startProcess={};
             const self = this;
-            let check = this.checkExistWorkflow(docId);
-            if(!check.check){
-                 bpmnApi.getProcessByDocId(docId).then(res=>{
-                if(res.status==200){
-                    if(res.data.length==0){
-                        self.tableContextMenu.startProcess={};
-                    }
-                    self.listWorkflows.push({
-                        id: docId,
-                        startProcess: self.startProcess,
-                        data:res.data
-                    })
-                    self.tableContextMenu.startProcess=self.startProcess
-                    res.data.map(data=>{
-                        let row = data;
-                        self.proccessRow = data;
+            this.listProcess.map(process=>{
+               if(process.id==docId){
+                   this.tableContextMenu.startProcess=this.startProcess;
+                   this.tableContextMenu.startProcess.subMenu=[];
+                   process.listProcess.map(p=>{
+                        let row = p;
+                        self.proccessRow = p;
                         self.tableContextMenu.startProcess.subMenu.push({
-                            name:data.name,
+                            name:p.name,
                             action: async function (row, action){
                                 let defData = await getLastestDefinition(self.proccessRow, true);
                                 if(defData.data[0]){
@@ -542,28 +550,11 @@ export default {
                                     self.$snotifyError({},"Can not find process definition having deployment id "+deploymentId);
                                 }
                             }
-                        })
                     })
-                }})
-            }else{
-                check.data.map(data=>{
-                    let row = data;
-                    self.proccessRow = data;
-                    self.tableContextMenu.startProcess.subMenu.push({
-                        name:data.name,
-                        action: async function (row, action){
-                            let defData = await getLastestDefinition(self.proccessRow, true);
-                            if(defData.data[0]){
-                                    self.$refs.listDocument.openactionPanel();
-                                    self.paramId = defData.data[0].id;
-                                self.getFirstNodeData(defData.data[0].id)
-                            }else {
-                                self.$snotifyError({},"Can not find process definition having deployment id "+deploymentId);
-                            }
-                        }
-                    })
+                   
                 })
-            }
+               }
+           })
         },
         onRemoveIndex(indexs, i, index){
             indexs.splice(i,1);
@@ -590,7 +581,6 @@ export default {
                 else{
                     this.$set(doc.control[index],'checked',false)
                 }
-                
             }
             this.$set(index,'active',true)
         },
