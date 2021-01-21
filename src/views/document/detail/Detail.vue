@@ -304,7 +304,7 @@ export default {
                 if(after.docObjId){
                     this.docObjId = Number(after.docObjId);
                     this.documentSize = after.docSize;
-                    this.loadDocumentObject(this.isPrint);z
+                    this.loadDocumentObject(this.isPrint);
                 }
             }
         },
