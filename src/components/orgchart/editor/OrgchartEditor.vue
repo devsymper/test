@@ -67,17 +67,17 @@
                 </v-tooltip>
               <div style="flex-grow:1">
                     <v-btn
-                    v-if="action != 'view' && context == 'department'"
-                    class="float-right mr-1"
-                    style=""
-                    @click="saveOrgchart"
-                    small
-                    depressed
-                    color="primary"
-                >
-                    <v-icon class="mr-2" primary>mdi-content-save</v-icon>
-                    {{$t('common.save')}}
-                </v-btn>
+						v-if="action != 'view' && context == 'department'"
+						class="float-right mr-1"
+						style=""
+						@click="saveOrgchart"
+						small
+						depressed
+						color="primary"
+					>
+						<v-icon class="mr-2" primary>mdi-content-save</v-icon>
+						{{$t('common.save')}}
+					</v-btn>
               </div>
             </div>
             <div v-if="loadingDiagramView" style="
@@ -740,7 +740,9 @@ export default {
                     let allPos = self.$store.state.orgchart.editor[dpm.positionDiagramCells.instanceKey].allNode;
                     let resAllPos = []
                     posNodeIds.forEach(function(e){
-                        resAllPos[e] = allPos[e]
+						if(allPos[e]){
+                       		 resAllPos[e] = allPos[e]
+						}
                     })
                     for(let posId in resAllPos){
                         let attr = allPos[posId].commonAttrs;
