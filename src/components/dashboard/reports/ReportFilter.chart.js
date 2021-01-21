@@ -25,7 +25,7 @@ export default class ReportFilter extends ReportBase {
         super('filter', symperId, columnSettingKeys, styleKeys);
 	}
 	translate(rawConfig,  data, extraData ,changes = {}, oldOutput = {}){
-		let output = TranslatorHelper.Charts.filter(data , rawConfig.setting , rawConfig.style , 1)
+		let output = TranslatorHelper.Charts.filter(data.data , rawConfig.setting , rawConfig.style , 1 , extraData)
 		return output
 	}
 

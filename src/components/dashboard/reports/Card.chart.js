@@ -29,7 +29,7 @@ export default class Card extends ReportBase {
         super('card', symperId, columnSettingKeys, styleKeys);
 	}
 	translate(rawConfig,  data, extraData ,changes = {}, oldOutput = {}){
-		let output = TranslatorHelper.Charts.card(data.data , rawConfig.setting , rawConfig.style , 1)
+		let output = TranslatorHelper.Charts.card(data.data , rawConfig.setting , rawConfig.style , 1 , extraData)
 		return output
 	}
 }
