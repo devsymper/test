@@ -882,7 +882,7 @@ export default {
             isUpdateFilter:false,
             listFilters:[],
             notiFilter:'',
-            conditionIndex : 0,
+            conditionIndex :-1,
             deleteFilterIdx:0,
             contentDelete:"",
             showDelPopUp:false,
@@ -1059,6 +1059,7 @@ export default {
                     this.disApplyConfigFormat(data.index);
                     break;
             };
+                this.getData();
            
 
         },
@@ -1096,7 +1097,6 @@ export default {
         },
         applyConfigFormat(index){
             this.conditionIndex = index;
-		    this.getData()
         },
         editConfigFormat(index){
             this.conditionIndex = index;

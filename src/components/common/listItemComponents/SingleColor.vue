@@ -212,48 +212,7 @@ export default {
                     type:'FontColor'
 
                 }],
-            // value:{
-            //         backgroundColor: '#FFFFFF',
-            //         fontColor: '#000000',
-            //         italic: false,
-            //         bold: false,
-            //         fontSize: 13,
-            //         underline: false,
-            //         strike: false,
-            //         conditionFormat:'',
-            //         originCondition:[]
-            // }
         }
     }
 }
 </script>
-<style >
-/* Khadm: comment lại các phần viết css quá ẩu: làm ảnh hưởng tới những phần hiển thị khác */
-/* .v-input__slot{
-    min-height: 26px!important;
-    max-height:26px!important
-}
-.v-input__icon{
-    margin-top:-15px!important
-}
-.v-select__selections{
-    font-size:13px!important
-} */
-.hight-light{
-    background-color:#f5863417;
-    color:#f58634!important
-}
-.background-orange{
-    background:#f5863417
-}
-/* Khadm: comment lại các phần viết css quá ẩu: làm ảnh hưởng tới những phần hiển thị khác */
-/* .v-btn:not(.v-btn--round).v-size--x-small{
-    padding: 0 2px!important;
-    margin-right:2px!important;
-    min-width:26px!important
-}
-.v-menu__content {
-    background:white!important;
-    left:1237!important
-} */
-</style>

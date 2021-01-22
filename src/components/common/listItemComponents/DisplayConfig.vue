@@ -127,20 +127,18 @@
                 </draggable>
             </div>
         </div>
-        <template v-slot:append>
-            <div class="w-100 pt-2">
-                <v-btn
-                    :loading="savingConfigs"
-                    small
-                    color="primary"
-                    @click="saveTableDisplayConfig()"
-                    class="float-right"
-                >
-                    <v-icon class="mr-2">mdi-content-save-outline</v-icon>
-                    {{$t('common.save')}}
-                </v-btn>
-            </div>
-        </template>
+        <div class="w-100" style="flex-grow: 1">
+            <v-btn
+                :loading="savingConfigs"
+                small
+                color="primary"
+                @click="saveTableDisplayConfig()"
+                class="float-right"
+            >
+                <v-icon class="mr-2">mdi-content-save-outline</v-icon>
+                {{$t('common.save')}}
+            </v-btn>
+        </div>
         </v-tab-item>
          <v-tab-item :key="2" :value="'tab-' + 2" class="tab-item" style="flex-grow: 1">
             <ConditionalFormatting
