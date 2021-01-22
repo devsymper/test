@@ -1834,9 +1834,9 @@ export default {
             if(!isSetEffectedControl){
                 let listInput = getListInputInDocument(this.keyInstance);
                 let mapControlEffected = getMapControlEffected(listInput);
-                this.controlInfinity = checkInfinityControl(mapControlEffected)
-                this.updateEffectedControlToStore(mapControlEffected)
-                this.handleAfterGetMapControlEffected()
+                this.controlInfinity = checkInfinityControl(mapControlEffected);
+                this.updateEffectedControlToStore(mapControlEffected);
+                this.handleAfterGetMapControlEffected();
             }
             else{
                 this.handleBeforeLoadedDocument()
@@ -2261,10 +2261,7 @@ export default {
                     // nếu có công thức nút submit
                     if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
                         let dataInput = getDataInputFormula(thisCpn.sDocumentSubmit.submitFormulas,thisCpn.sDocumentSubmit.listInputInDocument,thisCpn.optionalDataBinding);
-                        thisCpn.formulasWorker.postMessage({action:'runFormula',data:{
-                            formulaInstance:thisCpn.sDocumentSubmit.submitFormulas,
-                            dataInput:dataInput,
-                            keyInstance:thisCpn.keyInstance}})
+                        thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput);
                     }
                     thisCpn.closeFormulasWorker();
                     // nếu submit từ form sub submit thì ko rediect trang
