@@ -1130,6 +1130,7 @@ export default {
         },
     
         getDefaultFilter(){
+            
             if(this.listFilters&&this.listFilters.length>0){
                 this.listFilters.map((fil,i)=>{
                     if(fil.isDefault){
@@ -1169,7 +1170,7 @@ export default {
             this.deleteFilterIdx = filterIdx;
         },
         confirmDeleteFilter(){
-            debugger
+            
             if(this.typeDelete=='filter'){
                 let filter = this.listFilters.filter((item,idx)=>idx!=this.deleteFilterIdx);
                 this.listFilters = filter;
@@ -1197,10 +1198,12 @@ export default {
                 this.listFilters.push({
                     name:this.filterName,
                     isDefault: false,
+                    userId:this.$store.state.app.endUserInfo.id,
                     columns:this.tableFilter.allColumn
                 })
                 this.notiFilter = this.$t("table.success.save_filter");
             }else{
+                
                 this.listFilters[this.filterIdx].name = this.filterName;
                 this.listFilters[this.filterIdx].columns = this.tableFilter.allColumn;
                 this.notiFilter = this.$t("table.success.edit_filter");
@@ -1211,6 +1214,8 @@ export default {
             let tableConfig =  this.getTableDisplayConfigData();
             tableConfig.detail = JSON.parse(tableConfig.detail);
             tableConfig.detail.filter = this.listFilters;
+            
+            // tableConfig.detail.filter.userId = this.$store.state.app.endUserInfo.id;
             tableConfig.detail= JSON.stringify(tableConfig.detail);
             this.listItemsWorker.postMessage({
                 action: 'saveFilter',
@@ -1494,7 +1499,18 @@ export default {
 					this.handleStopDragColumn();
                 }
                 // xử lý phần filter
-                this.listFilters = res.savedConfigs.filter?res.savedConfigs.filter:[];
+                if(res.savedConfigs.filter){
+                    let listFilter = [];
+                    let userId = this.$store.state.app.endUserInfo.id;
+                    res.savedConfigs.filter.map(f=>{
+                        if(f.userId&&f.userId==userId){   
+                            listFilter.push(f)
+                        }
+                    })
+                    this.listFilters = listFilter
+                }else{
+                    this.listFilters = []
+                }
                 this.getDefaultFilter()
                 // xử lý phần format conditional
                 this.conditionalFormat = res.savedConfigs.conditionalFormat;
