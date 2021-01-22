@@ -30,24 +30,33 @@ export default {
     data: function() {
 		let self = this;
         return {
-            apiUrl: appConfigs.apiDomain.biService+"/datasets/get-list",
+            apiUrl: appConfigs.apiDomain.biService+"/relations",
             tableContextMenu: {
                update: {
                     name: "edit",
                     text: this.$t("common.edit"),
                     callback: (obj, callback) => {
+						self.$goToPage( "/relation/" + obj.id + "/edit",
+                            self.$t("common.edit")
+						);
                     },
                 },
                view: {
                     name: "view",
                     text: this.$t("common.view"),
                     callback: (obj, callback) => {
+						self.$goToPage( "/relation/" + obj.id + "/view",
+							self.$t("common.view")
+						);
                     },
                 },
                clone: {
                     name: "clone",
                     text: this.$t("common.clone"),
                     callback: (obj, callback) => {
+						self.$goToPage( "/relation/" + obj.id + "/clone",
+							self.$t("common.clone")
+						);
                     },
                 },
                delete: {

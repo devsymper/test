@@ -9,6 +9,9 @@ export const biApi = {
     },
     getColumnWithDatasetIds(strDatasetIds){
         return api.get("datasets/"+strDatasetIds+"/columns");
-    }
+	},
+	searchDataset(value){
+		return api.get('datasets/get-list?search=' + value)
+	}
 	
 };

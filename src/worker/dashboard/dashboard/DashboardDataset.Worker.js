@@ -83,7 +83,11 @@ var handler = {
         }
      
         return datasetAndColumn;
-    },
+	},
+	async searchDataset(value){
+		let res = await biApi.searchDataset(value.searchKey)
+		self.postMessage({action:'searchDatasetRes', data:{res: res , searchKey: value.searchKey}});
+	},
     postSelectedDatasetBefor(data){
         let selectedDataset = data.selectedDataset;
         this.clearSelectedItemDisplay(data,true); // call function clear
