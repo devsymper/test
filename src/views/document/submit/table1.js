@@ -105,8 +105,8 @@ export default class SymperTable {
             colDefs.push( {
                 field:'index_increment',
                 headerName:"",
-                minWidth:50,
-                width:50,
+                minWidth:90,
+                width:90,
                 valueGetter: "node.rowIndex + 1",
                 pinnedRowCellRenderer:'BottomPinnedRowRenderer',
                 headerCheckboxSelection: true,
@@ -1339,7 +1339,7 @@ export default class SymperTable {
             let controlInstance = getControlInstanceFromStore(this.keyInstance, controlName);
             if (controlInstance.controlFormulas.hasOwnProperty('formulas')) {
                 let formulaInstance = controlInstance.controlFormulas['formulas'].instance;
-                if (controlInstance.type != 'table') {
+                if (controlInstance.type != 'table' && controlInstance.inTable != false) {
                     if (controlInstance.inTable == this.tableName) {
                         this.handleRunFormulaForControlInTable(controlInstance, formulaInstance, rowId);
                         return;
