@@ -411,7 +411,7 @@ export default class Control {
                 tableIns.tableInstance.setDataAtCell(this.name, values,rowNodeId[0]);
             }
             else{ // trường hợp giá trị cho cả cột
-                tableIns.tableInstance.updateItems(values, this.name);
+                tableIns.tableInstance.updateColumnData(values, this.name);
             }
             /**
              * Sau khi chạy xong công thức thì đánh dấu là control đã bind giá trị
@@ -434,7 +434,7 @@ export default class Control {
                         SYMPER_APP.$evtBus.$emit('run-effected-control-when-table-change', controlIns)
                     }
                 }
-            }, 100,this);
+            }, 200,this);
         } 
     }
     setDataTable(data) {

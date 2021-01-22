@@ -53,6 +53,8 @@ export default class ClientSQLManager {
         if (isWithoutReturn) {
             return db.run(sql);
         } else {
+            console.log(sql,'sqlsql');
+            console.log(db.exec('select * from tb1'),'sqlsql1');
             return db.exec(sql);
         }
     }
@@ -82,6 +84,20 @@ export default class ClientSQLManager {
             return
         }
         let sql = `INSERT INTO ${tableName} (${columns}) VALUES ${data}`;
+        if (returnPromise) {
+            return new Promise((resolve, reject) => {
+                try {
+                    let data = this.run(keyInstance, sql, true);
+                    resolve(data);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        } else {
+            return this.run(keyInstance, sql, true);
+        }
+    }
+    static async exeBySql(keyInstance, sql, returnPromise = false){
         if (returnPromise) {
             return new Promise((resolve, reject) => {
                 try {

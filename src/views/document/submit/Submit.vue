@@ -427,7 +427,7 @@ export default {
         }
     },
     mounted() {
-        window.addEventListener('paste', this.insertNewRowsBeforePaste);
+        // window.addEventListener('paste', this.insertNewRowsBeforePaste);
         this.optionalDataBinding = {},
         this.optionalDataBinding['context'] = (this.documentObjectWorkflowId) ? 'inWorkflow' : 'outWorkflow'
         this.optionalDataBinding['document_object_id'] = this.docObjId
