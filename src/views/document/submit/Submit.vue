@@ -1834,9 +1834,9 @@ export default {
             if(!isSetEffectedControl){
                 let listInput = getListInputInDocument(this.keyInstance);
                 let mapControlEffected = getMapControlEffected(listInput);
-                this.controlInfinity = checkInfinityControl(mapControlEffected)
-                this.updateEffectedControlToStore(mapControlEffected)
-                this.handleAfterGetMapControlEffected()
+                this.controlInfinity = checkInfinityControl(mapControlEffected);
+                this.updateEffectedControlToStore(mapControlEffected);
+                this.handleAfterGetMapControlEffected();
             }
             else{
                 this.handleBeforeLoadedDocument()

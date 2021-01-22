@@ -9,6 +9,8 @@ import {
 } from "./../../../api/orgchart";
 import Util from "./util";
 import FormulasEvent from './formulasEvent.js';
+import { str } from '../../../plugins/utilModules/str.js';
+import { util } from '../../../plugins/util.js';
 const BUILD_IN_FUNCTION = ['TODAY', 'BEGIN_WEEK', 'END_WEEK', 'BEGIN_MONTH', 'END_MONTH',
     'BEGIN_YEAR', 'END_YEAR', 'TIMESTAMP', 'PARENT_WORKFLOW', 'CURRENT_WORKFLOW',
     'CURRENT_USER_ID',
@@ -371,7 +373,6 @@ export default class Formulas extends FormulasEvent{
             return formulas;
         }
         let listControlInDoc = this.getListControl();
-        console.trace(formulas,dataInput,'xxxxxxxxxxc')
 
         for (let controlName in dataInput) {
             let regex = new RegExp("{" + controlName + "}", "g");
@@ -497,9 +498,10 @@ export default class Formulas extends FormulasEvent{
          */
     getReferenceFormulas(formulas = false) {
         if (formulas == false) {
-            formulas = this.formulas
+            formulas = util.cloneDeep(this.formulas);
         }
-        let listSyql = formulas.match(/(REF|ref)\s*\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
+        let newFormulas = formulas.replace(/\/\*.*\*\/|\/\/.*/g,'');
+        let listSyql = str.getBoundedSubstr(newFormulas,'ref','(',')',true);
         return listSyql;
     }
 
@@ -507,15 +509,19 @@ export default class Formulas extends FormulasEvent{
      * Hàm tách các công thức local (công thức chạy owr client)
      */
     getLocalFormulas() {
-            let listSqlite = this.formulas.match(/(LOCAL|local)\s*\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
-            return listSqlite;
-        }
+        let formulas = util.cloneDeep(this.formulas);
+        let newFormulas = formulas.replace(/\/\*.*\*\/|\/\/.*/g,'');
+        let listSqlite = str.getBoundedSubstr(newFormulas,'local','(',')',true);
+        return listSqlite;
+    }
         /**
          * Hàm tách các công thức local (công thức chạy owr client)
          */
     getOrgChartFormulas() {
-        let listSqlite = this.formulas.match(/(role|ROLE)\s*\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\((?:[^)(]+|\([^)(]*\))*\))*\))*\))*\))*\))*\))*\))*\))*\)/gm);
-        return listSqlite;
+        let formulas = util.cloneDeep(this.formulas);
+        let newFormulas = formulas.replace(/\/\*.*\*\/|\/\/.*/g,'');
+        let listOrgchart = str.getBoundedSubstr(newFormulas,'role','(',')',true);
+        return listOrgchart;
     }
 
     /**
