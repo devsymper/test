@@ -427,7 +427,7 @@ export default {
         }
     },
     mounted() {
-        // window.addEventListener('paste', this.insertNewRowsBeforePaste);
+        window.addEventListener('paste', this.insertNewRowsBeforePaste);
         this.optionalDataBinding = {},
         this.optionalDataBinding['context'] = (this.documentObjectWorkflowId) ? 'inWorkflow' : 'outWorkflow'
         this.optionalDataBinding['document_object_id'] = this.docObjId
@@ -986,17 +986,21 @@ export default {
             // gets data from clipboard and converts it to an array (1 array element for each line)
             var clipboardData = event.clipboardData || window.clipboardData;
             var pastedData = clipboardData.getData('Text');
-            var dataArray = self.dataToArray(pastedData);
-            let table = getControlInstanceFromStore(this.keyInstance, 'tb_render');
+            let table = getControlInstanceFromStore(this.keyInstance, this.sDocumentSubmit.tableInteractive);
+            var dataArray = self.dataToArray(pastedData, table);
             let gridOptions = table.tableInstance.gridOptions
-
-            // First row is already in the grid and dataToArray returns an empty row at the end of array (maybe you want to validate that it is actually empty)
-            for (var i = 1; i < dataArray.length-1; i++) {
-                gridOptions.api.applyTransaction({ add: [{}], addIndex:i });
+            let cell = table.tableInstance.getFocusedCell();
+            let forcusCellIndex = cell.rowIndex;
+            let count = gridOptions.api.getDisplayedRowCount();
+            if(count - forcusCellIndex < dataArray.length){
+                for (var i = forcusCellIndex; i < dataArray.length + count - 1; i++) {
+                    let rowData = table.tableInstance.getRowDefaultData(false);
+                    rowData[0].s_table_id_sql_lite = Date.now();
+                    table.tableInstance.addNewRow(rowData,i);
+                }
             }
         },
-        dataToArray(strData) {
-            let table = getControlInstanceFromStore(this.keyInstance, 'tb_render');
+        dataToArray(strData, table) {
             let gridOptions = table.tableInstance.gridOptions
             var delimiter = gridOptions.api.gridOptionsWrapper.getClipboardDeliminator();;
             // Create a regular expression to parse the CSV values.

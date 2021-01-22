@@ -534,10 +534,10 @@ export default class SymperTable {
                 onCellKeyDown:this.onCellKeyDown,
                 onRowDataChanged:this.onRowDataChanged,
                 onRowDataUpdated:this.onRowDataUpdated,
-                onPasteStart:this.onPasteStart,
                 onPasteEnd:this.onPasteEnd,
                 onDragStarted:this.onDragStarted,
                 onDragStopped:this.onDragStopped,
+                onCellClicked:this.onCellClicked,
             }
             this.gridOptions = Object.assign(this.gridOptions,moreOptions);
         }
@@ -566,14 +566,10 @@ export default class SymperTable {
         this.caculatorHeight();
         
     }
-
-    onPasteStart(params){
-    }
     /**
      * tinh lại chiều cao table sau khi paste
      */
     onPasteEnd(){
-        this.tableInstance.caculatorHeight();
         let dataForCellpasting = this.tableInstance.dataForCellpasting;
         if(Object.keys(dataForCellpasting).length == 0){
             return;
@@ -602,11 +598,30 @@ export default class SymperTable {
         }
         
     }
+    /**
+     * Click vào cell
+     */
+    onCellClicked(){
+        store.commit("document/addToDocumentSubmitStore", {
+            key: 'tableInteractive',
+            value: this.tableInstance.tableName,
+            instance: this.tableInstance.keyInstance
+        });
+    }
+    /**
+     * Bắt đầu sự kiện kéo thả
+     * @param {*} params 
+     */
     onDragStarted(params){
         if($(params.target).is('div.ag-fill-handle')){
             this.tableInstance.isCellFilling = true;
         }
     }
+    /**
+     * kết thúc sự kiện kéo thả
+     * @param {*} params 
+     */
+
     onDragStopped(params){
 
         if($(params.target).is('div.ag-fill-handle')){
@@ -753,7 +768,6 @@ export default class SymperTable {
      */
     addNewRow(newRow, rowIndex) {
         this.gridOptions.api.applyTransaction({ add: newRow, addIndex:rowIndex });
-        console.log(rowIndex,'rowIndexrowIndex');
         this.formulasWorker.postMessage({action:'executeSQliteDB',data:
                                 {
                                     func:'insertRow',
@@ -763,7 +777,7 @@ export default class SymperTable {
                                     tableName: this.tableName
                                 }
                             })
-        this.caculatorHeight()
+        this.caculatorHeight();
     }
     /**
      * Xóa dòng

@@ -95,7 +95,9 @@ const defaultState = {
              * }}
              */
             dataInputBeforeChange:{},
-            mapValueToTextAutocompleteInput:{}
+            mapValueToTextAutocompleteInput:{},
+            tableInteractive:null
+            
         }
     },
     detail: {

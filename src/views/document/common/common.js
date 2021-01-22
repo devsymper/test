@@ -36,7 +36,6 @@ const minimizeDataAfterRunFormula = function(rs) {
                 value = ""
             }
             else{
-                console.log(data[0],'sadkjsadjk');
                 value=data[0].values[0][0];
             }
         }
