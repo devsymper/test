@@ -721,17 +721,21 @@ export default {
 						if(e.cellRenderer){
 							eval("e.cellRenderer = " + e.cellRenderer)
 						}
+						if(e.cellStyle){
+							eval("e.cellStyle = " + e.cellStyle)
+						}
                     })
-                     self.columnDefs = data.dataAfter;
-                    if(self.conditionalFormat&&self.conditionalFormat.length>0){
-                        self.columnDefs = self.handleConditionalFormat(data.dataAfter);
+                    self.columnDefs = data.dataAfter;
+                    if(self.conditionalFormat&&self.conditionalFormat.length>0&&self.conditionIndex>-1){
+                        self.columnDefs = self.handleConditionalFormat(data.dataAfter)
                     }
+                    
 					break;
                 default:
                     break;
             }
 		});
-		this.getData()
+		this.getData();
 		this.restoreTableDisplayConfig();
         // this.getDefaultFilter();
 	},
@@ -878,12 +882,12 @@ export default {
             isUpdateFilter:false,
             listFilters:[],
             notiFilter:'',
-            conditionIndex : 0,
+            conditionIndex :-1,
             deleteFilterIdx:0,
             contentDelete:"",
             showDelPopUp:false,
             filterContent:"",
-            showDelFilterPopUp:false,
+            showDelPopUp:false,
             selectedFilterName:'',
 			listItemsWorker: null,
 			deleteDialogShow: false,
@@ -1033,7 +1037,7 @@ export default {
                     this.editFilter(data.filterIdx)
                     break;
                 case 'deleteFilter':
-                    data.type="deleteFilter";
+                    this.typeDelete="filter";
                     this.deleteFilter(data.filterIdx)
                     break;
               }
@@ -1055,7 +1059,8 @@ export default {
                     this.disApplyConfigFormat(data.index);
                     break;
             };
-             this.reRender();
+                this.getData();
+           
 
         },
          disApplyConfigFormat(index){
@@ -1063,40 +1068,34 @@ export default {
          },
         handleConditionalFormat(data){
             const self = this;
+                let dataFormat = self.conditionalFormat[self.conditionIndex];
                 data.map(column=>{
-                    column.cellStyle= function(e){
-                        if(self.conditionIndex>-1){//table có format màu
-                            let dataFormat = self.conditionalFormat[self.conditionIndex];
-                            if(eval(dataFormat.tableColumnsJS)){// những cột được set màu
-                                if(dataFormat.displayMode.type=="singleColor"){// nếu là kiểu màu đơn
-                                    let conditionalFormat = dataFormat.displayMode.singleColor.conditionFormat
-                                    if(eval(conditionalFormat)){
-                                        return {color: dataFormat.displayMode.singleColor.fontColor, backgroundColor:dataFormat.displayMode.singleColor.backgroundColor}
-                                    }
-                                }
-                                else{// nếu thang màu
-                                    let field = dataFormat.displayMode.colorScale.applyColumn.field;
-                                    let valueTable = e.data[field];
-                                    let listColors = dataFormat.displayMode.colorScale.listColors;
-                                    let color = '';
-                                    listColors.map(v=>{
-                                        if(v.name==valueTable){
-                                            color = v.backgroundColor
-                                        }
-                                    })
-                                        return {backgroundColor:color}
+                    column.cellStyle = function(e){
+                        if(eval(dataFormat.tableColumnsJS)&&self.conditionalFormat){// những cột được set màu
+                            if(dataFormat.displayMode.type=="singleColor"){// nếu là kiểu màu đơn
+                                let conditionalFormat = dataFormat.displayMode.singleColor.conditionFormat;
+                                if(eval(conditionalFormat)){
+                                    return {color: dataFormat.displayMode.singleColor.fontColor, backgroundColor:dataFormat.displayMode.singleColor.backgroundColor}
                                 }
                             }
-                        }else{// chế độ table mặc định
-                            return {}
+                            else{// nếu thang màu
+                                let field = dataFormat.displayMode.colorScale.applyColumn.field;
+                                let valueTable = e.data[field];
+                                let listColors = dataFormat.displayMode.colorScale.listColors;
+                                let color = '';
+                                listColors.map(v=>{
+                                    if(v.name==valueTable){
+                                        color = v.backgroundColor
+                                    }
+                                })
+                                    return {backgroundColor:color}
+                            }
                         }
                     }
                 })
-                debugger
             return data;
         },
         applyConfigFormat(index){
-            debugger
             this.conditionIndex = index;
         },
         editConfigFormat(index){
@@ -1116,7 +1115,6 @@ export default {
            
         },
         deleteConfigFormat(index){
-            debugger
             this.conditionIndex = index;
             this.typeDelete = 'formatTable';
             this.showDelPopUp = true;
@@ -1130,23 +1128,9 @@ export default {
             this.tableFilter.allColumn={}
             this.getData();
         },
-        selectActionFilter(actionIdx,filterIdx){
-            switch(actionIdx){
-                case 2:
-                    this.setDefaultFilter(filterIdx);
-                    break;
-                case 3:
-                    this.unsetDefaultFilter(filterIdx);
-                    break;
-                case 0:
-                    this.editFilter(filterIdx)
-                    break;
-                case 1:
-                    this.deleteFilter(filterIdx)
-                break;
-            }
-        },
+    
         getDefaultFilter(){
+            
             if(this.listFilters&&this.listFilters.length>0){
                 this.listFilters.map((fil,i)=>{
                     if(fil.isDefault){
@@ -1181,8 +1165,8 @@ export default {
         },
         
         deleteFilter(filterIdx){
-            this.showDelFilterPopUp = true;
-            this.filterContent =" Xóa bộ lọc "+this.listFilters[filterIdx].name+" khỏi danh sách các bộ lọc";
+            this.showDelPopUp = true;
+            this.contentDelete =" Xóa bộ lọc "+this.listFilters[filterIdx].name+" khỏi danh sách các bộ lọc";
             this.deleteFilterIdx = filterIdx;
         },
         confirmDeleteFilter(){
@@ -1213,6 +1197,7 @@ export default {
                 this.listFilters.push({
                     name:this.filterName,
                     isDefault: false,
+                    userId:this.$store.state.app.endUserInfo.id,
                     columns:this.tableFilter.allColumn
                 })
                 this.notiFilter = this.$t("table.success.save_filter");
@@ -1510,7 +1495,18 @@ export default {
 					this.handleStopDragColumn();
                 }
                 // xử lý phần filter
-                this.listFilters = res.savedConfigs.filter?res.savedConfigs.filter:[];
+                if(res.savedConfigs.filter){
+                    let listFilter = [];
+                    let userId = this.$store.state.app.endUserInfo.id;
+                    res.savedConfigs.filter.map(f=>{
+                        if(f.userId&&f.userId==userId){   
+                            listFilter.push(f)
+                        }
+                    })
+                    this.listFilters = listFilter
+                }else{
+                    this.listFilters = []
+                }
                 this.getDefaultFilter()
                 // xử lý phần format conditional
                 this.conditionalFormat = res.savedConfigs.conditionalFormat;
@@ -1538,6 +1534,7 @@ export default {
             }
         },
 		reRender(){
+            // this.agApi.refreshCells();
              this.agApi.redrawRows();
 		},
 		searchAutocompleteItems(vl){
@@ -1617,7 +1614,6 @@ export default {
 			this.$emit("refresh-list", {});
         },
 		showTableDropdownMenu(x, y, colName) {
-            debugger
             var windowWidth = $(window).width()/1.1;
             if(x > windowWidth){
                 x -= 190;
@@ -1706,7 +1702,10 @@ export default {
 			self.columnDefs.forEach(function(e){
 				if(e.cellRenderer){
 					e.cellRenderer = e.cellRenderer.toString()
-				}
+                }
+                if(e.cellStyle){
+					e.cellStyle = e.cellStyle.toString()
+                }
 			})
             obj.columnDefs = self.columnDefs
 			return obj
@@ -1930,7 +1929,7 @@ export default {
 			}
 			dataConfig.lazyLoad = lazyLoad
 			dataConfig.customAPIResult = self.customAPIResult.reformatData ? self.customAPIResult.reformatData.toString() : null
-			dataConfig.filteredColumns = self.filteredColumns
+            dataConfig.filteredColumns = self.filteredColumns
 			this.listItemsWorker.postMessage({
 				action: 'getData',
 				data: dataConfig

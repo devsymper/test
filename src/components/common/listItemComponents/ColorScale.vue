@@ -5,6 +5,7 @@
         </div>
         <div>
             <v-select 
+                class="field-selected-column"
                  item-value="field"
                 item-text="title"
                 return-object
@@ -27,14 +28,15 @@
             </div>
             <v-row>
                 <v-select
+                    class="field-selected-column mr-2"
                     :items="item.lists" 
                     outlined
                     v-model="item.type"
-                    class="mr-2"
                     style="width:100px!important" >
                 </v-select>
                 <v-text-field
                     outlined
+                     class="field-selected-column"
                     dense
                     :disabled="item.disable"
                     v-model="item.value"
@@ -161,3 +163,33 @@ export default {
   },
 }
 </script>
+<style scoped >
+.field-selected-column >>> .v-input__slot{
+    min-height: 26px!important;
+    max-height:26px!important;
+    font-size:13px
+}
+.field-selected-column >>> .v-input__icon{
+    margin-top:-15px!important
+}
+.single-color >>> .v-select__selections{
+    font-size:13px!important
+}
+.hight-light{
+    background-color:#f5863417;
+    color:#f58634!important
+}
+.background-orange{
+    background:#f5863417
+}
+
+.field-selected-column >>>  .v-btn:not(.v-btn--round).v-size--x-small{
+    padding: 0 2px!important;
+    margin-right:2px!important;
+    min-width:26px!important
+}
+.field-selected-column >>> .v-menu__content {
+    background:white!important;
+    left:1237!important
+}
+</style>
