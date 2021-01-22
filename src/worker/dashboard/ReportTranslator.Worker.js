@@ -123,6 +123,9 @@ var handler = {
         let reportObj = new reportClasses[cell.sharedConfigs.type](cell.sharedConfigs.cellId);
         reportObj.assignComputedAttrsValue(cell);
         let rsl = {};
+
+
+
         if(reportObj.canGetDataFromServer()){
             if(typeof reportObj.translate == 'function'){
                 let dataInput = this.getDataInputForReport(cell, extra.relations);
@@ -137,6 +140,28 @@ var handler = {
                 }
                 rsl.originData  = data.data;
             }
+
+
+
+            let dataInput = null;
+            let res = {};
+            let data = null;
+            if (options.cell.sharedConfigs.type != 'editor') {
+                dataInput = this.getDataInputForReport(cell, extra.relations);
+                res = await dashboardApi.getData(dataInput);
+                data = res.data;
+            }
+            if(data && data.error){
+                rsl.error = data.error;
+            }else{
+                let translatedData = reportObj.translate(cell.rawConfigs,  data, extra, {}, oldDisplayOptions);
+                rsl.cellId = cell.sharedConfigs.cellId;
+                rsl.translatedData = translatedData;
+            }
+            rsl.originData  = data ? data.data : null;
+
+
+
         }
         self.postMessage({
             action: 'applyTranslatedConfig',

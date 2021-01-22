@@ -2,7 +2,7 @@
     <div 
         class="w-100 h-100 border-all"
         @click="selectThisCell">
-        <div class="w-100 h-100 cell-placeholder" v-if="cellConfigs.sharedConfigs.data.length == 0">
+        <div class="w-100 h-100 cell-placeholder" v-if="cellConfigs.sharedConfigs.data && cellConfigs.sharedConfigs.data.length == 0">
             <img :src="'img/dashboard/report-builder/'+cellConfigs.sharedConfigs.type+'.png'" height="40px" width="40px">
         </div>
         <div class="h-100 w-100 symper-dashboard-cell" v-else>
@@ -58,17 +58,6 @@ export default {
         selectThisCell(){
             this.$store.commit('dashboard/setSelectedCell', {id: this.cellConfigs.sharedConfigs.cellId, instanceKey: this.instanceKey});
         },
-        applyTitleChange(){
-            this.edditingTitle = false;
-            let titleConfig = null;
-            this.cellConfigs.rawConfigs.style.title.children.titleText.value = this.viewAttrs.symperTitle.text;
-        },
-        editTitleCell(){
-            this.edditingTitle = true;
-            setTimeout((self) => {
-                $(self.$refs.renameTitleInput).focus();            
-            }, 0, this);
-        }
     },
     computed: {
         reportTag(){
@@ -78,9 +67,6 @@ export default {
             }else{
                 return null;
             }
-        },
-        viewAttrs(){
-            return this.cellConfigs.viewConfigs.displayOptions;
         }
     },
     props: {
@@ -97,9 +83,6 @@ export default {
         instanceKey: {
             defaul: ''
         },
-        isView: {
-            default: true
-        }
     }
 }
 </script>

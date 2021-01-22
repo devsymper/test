@@ -9,7 +9,7 @@ export default class Area extends ReportBase {
     }
     translate(rawConfig,  data, extraData = {} ,changes = {}, oldOutput = {}){
         let displayOptions = {};
-        displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,"area",undefined,1);
+        displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,extraData,"area",undefined,1);
         return displayOptions;
 
     }

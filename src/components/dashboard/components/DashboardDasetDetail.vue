@@ -112,6 +112,30 @@ export default {
         datasetAndColumn(){
             return this.$store.state.dashboard.allDashboard[this.instanceKey].allDatasetColumns;
         },
+        selectedDataset(){
+            if (this.$store.state.dashboard.allDashboard[this.instanceKey].currentCellConfigs && this.$store.state.dashboard.allDashboard[this.instanceKey].currentCellConfigs.viewConfigs) {
+                return this.$store.state.dashboard.allDashboard[this.instanceKey].currentCellConfigs.viewConfigs.selectedDataset;
+            }
+        },
+        allDashboard(){
+            return this.$store.state.dashboard;
+        }
+    },
+    watch:{
+        selectedDataset:{
+            deep: true,
+            immediate: true,
+            handler(newVl){
+                if (this.dashboardDatasetWorker) {
+                    if (newVl) {
+                        this.postSelectedDatasetBefor(newVl);
+                    }else{
+                        this.clearSelectedItemDisplay()
+                    }
+                }
+             
+            }
+        }
     },
     props:{
         selectedCell:{

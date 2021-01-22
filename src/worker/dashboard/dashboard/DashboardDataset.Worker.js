@@ -86,6 +86,7 @@ var handler = {
     },
     postSelectedDatasetBefor(data){
         let selectedDataset = data.selectedDataset;
+        this.clearSelectedItemDisplay(data,true); // call function clear
         let datasetAndColumn = data.datasetAndColumn;
         for(let dtsId in selectedDataset){
             let dtsInfo = datasetAndColumn[dtsId];
@@ -107,7 +108,7 @@ var handler = {
         
         self.postMessage({action:'postSelectedDatasetAfter', data :{datasetAndColumn: datasetAndColumn}});
     },
-    clearSelectedItemDisplay(data){
+    clearSelectedItemDisplay(data,flag = false){ // flag check trạng thái để return trong hàm hoặc postMessage
         let datasetAndColumn = data.datasetAndColumn;
         for(let key in datasetAndColumn){
             datasetAndColumn[key].isSelected = false;
@@ -118,7 +119,11 @@ var handler = {
                 }
             }
         }
-        self.postMessage({action:'clearSelectedItemDisplayAfter', data :{datasetAndColumn: datasetAndColumn}});
+        if (flag) {
+            return data;            
+        }else{
+            self.postMessage({action:'clearSelectedItemDisplayAfter', data :{datasetAndColumn: datasetAndColumn}});
+        }
     },
     setOpenPanel(data){
         let datasetAndColumn = data.datasetAndColumn;

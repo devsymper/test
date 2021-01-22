@@ -267,8 +267,7 @@ export const TranslatorHelper = {
 			return Object.assign(commonStyle, rsl);
 		},
 		
-		barChart(rawConfigs,data,displayOptions,typeChart,stacking, ratio) {
-			ratio = 1;
+		barChart(rawConfigs,data,displayOptions,extraData,typeChart,stacking, ratio) {
 			let columns = rawConfigs.setting;
 			let style = util.cloneDeep(rawConfigs.style);
 		  //  let cellSize = SDashboardEditor.getSizeOfCellContent(cell.sharedConfigs.cellId);
@@ -278,15 +277,10 @@ export const TranslatorHelper = {
 			// let viewOptions = translateV2(data.data, columns, style, ratio);
 			let viewOptions = TranslatorHelper.linesAndColumns(data.data,columns,style,typeChart,stacking, ratio);
 			let rsl = viewOptions; // Kết quả trả về
-			// rsl.contentSize = {
-			//     w: cellSize.w,
-			//     h: cellSize.h - 10,
-			// };
-		
 			// translate cho chart
 			let options = JSON.parse(JSON.stringify(staticChartOptions));
 			options.chart.type = typeChart;
-			
+		
 			rsl = options;
 			for (let name in options) {
 				if (viewOptions[name]) {
@@ -295,12 +289,34 @@ export const TranslatorHelper = {
 				}
 			}
 			rsl = Object.assign(options, viewOptions);
-			// rsl.chart.height = rsl.contentSize.h;
-			// rsl.chart.width = rsl.contentSize.w - 5;
+			rsl.chart.height = extraData.size.h;
+			rsl.chart.width = extraData.size.w;
+		
 			return rsl;
-		}
-	},
+		},
+		editor(rawConfigs,displayOptions,extraData,oldOutput,ratio) {
+			let content = oldOutput? oldOutput.content : "";
+			let style = util.cloneDeep(rawConfigs.style);
+		
+			displayOptions.symperExtraDisplay = rawConfigs.extra;
+			let viewOptions = TranslatorHelper.editor(style,content, ratio);
 
+			let rsl = viewOptions; // Kết quả trả về
+			rsl.contentSize = {
+				w: oldOutput.contentSize.w,
+				h: oldOutput.contentSize.h,
+			};
+			return rsl;
+		},
+	},
+    editor(style, content, ratio) {
+        let rsl = {
+            content: content,
+        };
+        let commonAttr = this.getCommonCellStyleAttr(style, ratio);
+        rsl = Object.assign(rsl, commonAttr);
+        return rsl;
+    },
 	    /**
      * Chuyển các cấu hình thành options tương ứng với các loại chart: line, column, bar, combo
      * @param {Array} data mảng dữ liệu của chart
