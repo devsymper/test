@@ -14,6 +14,7 @@
                     :style="{
                         height: 'calc(100 % - 35px)'
                     }"
+                    ref="dashboardWorkspace"
                     :action="action"
                     :instanceKey="instanceKey"/>
             </div>
@@ -23,7 +24,7 @@
                 }">
                 <ReportTypeSelector 
                     :instanceKey="instanceKey"
-					@selected-type="handlerSelectedChartType"
+					@selected-type="handleSelectedChartType"
                 />
                 <ReportConfig 
                     :instanceKey="instanceKey"/>
@@ -165,8 +166,12 @@ export default {
 		toggleRelationDialog(){
 			this.$refs.relationSelector.show()
 		},
-		handlerSelectedChartType(type){
+		handleSelectedChartType(type){
+            if(this.myData.currentCellConfigs.sharedConfigs.type == 'global'){
+                this.$refs.dashboardWorkspace.addCell(type);            
+            }else{
 
+            }
 		},
         listenFromWorker(){
             let self = this;

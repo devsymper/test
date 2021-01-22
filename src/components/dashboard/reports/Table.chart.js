@@ -21,6 +21,8 @@ export default class Table extends ReportBase {
             },
         };
         super('table', symperId, columnSettingKeys, styleKeys);
+        this.sharedConfigs.pageSize = 50;
+        this.sharedConfigs.currentPage = 1;
     }
     
     translate(rawConfig,  resData, extraData, changes = {}, oldOutput = {}){
@@ -35,6 +37,7 @@ export default class Table extends ReportBase {
         let commonAttr = this.getCommonCellStyleAttr(style, ratio);
         let rsl = {
             needTotal: needTotal,
+            totalRowCount: Number(resData.total),
             data: data,
             tableColumnWidthMode: style.headerFormat.children.tableColumnWidthMode.value,
             columns: [],

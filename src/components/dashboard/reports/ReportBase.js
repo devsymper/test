@@ -301,4 +301,20 @@ export default class ReportBase {
         // rsl = treeConditionConverter.addConditionFormatToColDef(rsl, cellStyle.originStyle, mapNameToColumn);
         return rsl;
     }
+
+    /**
+     * Hàm check xem một cấu hình đã đủ điều kiện để gọi về server để lấy dữ liệu hay chưa
+     * Có thể override ở các class con tùy thuộc vào đặc thù của từng loại chart
+     */
+    canGetDataFromServer(){
+        let columnSetting = this.rawConfigs.setting;
+        let canRun = false;
+        for(let key in columnSetting){
+            if(columnSetting[key].selectedColums && columnSetting[key].selectedColums.length > 0){
+                canRun = true;
+                break;
+            }
+        }
+        return canRun;
+    }
 }
