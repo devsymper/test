@@ -721,11 +721,15 @@ export default {
 						if(e.cellRenderer){
 							eval("e.cellRenderer = " + e.cellRenderer)
 						}
+						if(e.cellStyle){
+							eval("e.cellStyle = " + e.cellStyle)
+						}
                     })
-                     self.columnDefs = data.dataAfter;
-                    if(self.conditionalFormat&&self.conditionalFormat.length>0){
-                        self.columnDefs = self.handleConditionalFormat(data.dataAfter);
+                    self.columnDefs = data.dataAfter;
+                    if(self.conditionalFormat&&self.conditionalFormat.length>0&&self.conditionIndex>-1){
+                        self.columnDefs = self.handleConditionalFormat(data.dataAfter)
                     }
+                    
 					break;
                 default:
                     break;
@@ -1055,7 +1059,7 @@ export default {
                     this.disApplyConfigFormat(data.index);
                     break;
             };
-             this.reRender();
+           
 
         },
          disApplyConfigFormat(index){
@@ -1063,41 +1067,36 @@ export default {
          },
         handleConditionalFormat(data){
             const self = this;
+                let dataFormat = self.conditionalFormat[self.conditionIndex];
                 data.map(column=>{
-                    column.cellStyle= function(e){
-                        if(self.conditionIndex>-1){//table có format màu
-                            let dataFormat = self.conditionalFormat[self.conditionIndex];
-                            if(eval(dataFormat.tableColumnsJS)){// những cột được set màu
-                                if(dataFormat.displayMode.type=="singleColor"){// nếu là kiểu màu đơn
-                                    let conditionalFormat = dataFormat.displayMode.singleColor.conditionFormat
-                                    if(eval(conditionalFormat)){
-                                        return {color: dataFormat.displayMode.singleColor.fontColor, backgroundColor:dataFormat.displayMode.singleColor.backgroundColor}
-                                    }
-                                }
-                                else{// nếu thang màu
-                                    let field = dataFormat.displayMode.colorScale.applyColumn.field;
-                                    let valueTable = e.data[field];
-                                    let listColors = dataFormat.displayMode.colorScale.listColors;
-                                    let color = '';
-                                    listColors.map(v=>{
-                                        if(v.name==valueTable){
-                                            color = v.backgroundColor
-                                        }
-                                    })
-                                        return {backgroundColor:color}
+                    column.cellStyle = function(e){
+                        if(eval(dataFormat.tableColumnsJS)&&self.conditionalFormat){// những cột được set màu
+                            if(dataFormat.displayMode.type=="singleColor"){// nếu là kiểu màu đơn
+                                let conditionalFormat = dataFormat.displayMode.singleColor.conditionFormat;
+                                if(eval(conditionalFormat)){
+                                    return {color: dataFormat.displayMode.singleColor.fontColor, backgroundColor:dataFormat.displayMode.singleColor.backgroundColor}
                                 }
                             }
-                        }else{// chế độ table mặc định
-                            return {}
+                            else{// nếu thang màu
+                                let field = dataFormat.displayMode.colorScale.applyColumn.field;
+                                let valueTable = e.data[field];
+                                let listColors = dataFormat.displayMode.colorScale.listColors;
+                                let color = '';
+                                listColors.map(v=>{
+                                    if(v.name==valueTable){
+                                        color = v.backgroundColor
+                                    }
+                                })
+                                    return {backgroundColor:color}
+                            }
                         }
                     }
                 })
-                debugger
             return data;
         },
         applyConfigFormat(index){
-            debugger
             this.conditionIndex = index;
+		    this.getData()
         },
         editConfigFormat(index){
             this.conditionIndex = index;
@@ -1116,7 +1115,6 @@ export default {
            
         },
         deleteConfigFormat(index){
-            debugger
             this.conditionIndex = index;
             this.typeDelete = 'formatTable';
             this.showDelPopUp = true;
@@ -1538,6 +1536,7 @@ export default {
             }
         },
 		reRender(){
+            // this.agApi.refreshCells();
              this.agApi.redrawRows();
 		},
 		searchAutocompleteItems(vl){
@@ -1617,7 +1616,6 @@ export default {
 			this.$emit("refresh-list", {});
         },
 		showTableDropdownMenu(x, y, colName) {
-            debugger
             var windowWidth = $(window).width()/1.1;
             if(x > windowWidth){
                 x -= 190;
@@ -1706,7 +1704,10 @@ export default {
 			self.columnDefs.forEach(function(e){
 				if(e.cellRenderer){
 					e.cellRenderer = e.cellRenderer.toString()
-				}
+                }
+                if(e.cellStyle){
+					e.cellStyle = e.cellStyle.toString()
+                }
 			})
             obj.columnDefs = self.columnDefs
 			return obj
@@ -1930,7 +1931,7 @@ export default {
 			}
 			dataConfig.lazyLoad = lazyLoad
 			dataConfig.customAPIResult = self.customAPIResult.reformatData ? self.customAPIResult.reformatData.toString() : null
-			dataConfig.filteredColumns = self.filteredColumns
+            dataConfig.filteredColumns = self.filteredColumns
 			this.listItemsWorker.postMessage({
 				action: 'getData',
 				data: dataConfig
