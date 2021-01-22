@@ -11,6 +11,8 @@
             :actionPanelWidth="actionPanelWidth"
             :showExportButton="false"
             :showImportButton="false"
+            @get-list-id="getListId"
+            @cell-mouse-over="getRowSelected"
             @after-open-add-panel="addDocument"
             @close-panel="closePanel"
             :headerPrefixKeypath="'document'"
@@ -84,42 +86,79 @@
                         </v-btn>
                     </div>
                 </div>
+                <div v-if="showTaskDetail">
+                    <TaskDetail
+                        :taskInfo="data.taskInfo"
+                        :originData="data.originData"
+                        :parentHeight="taskDetailHeight" 
+                        :allVariableProcess="variableProcess"
+                        @task-submited="handleTaskSubmited"
+                        />
+                </div>
             </div> 
         </list-items>
             <ImportExcelPanel
                 :options="options"
                 :nameRows="listRowDocument"
                 :open="showImportPanel" />
-    
     </div>
 </template>
 <script>
-
+import { runProcessDefinition,extractTaskInfoFromObject,addMoreInfoToTask} from '../../components/process/processAction';
+import { getLastestDefinition } from "./../../components/process/processAction.js";
+import { formulasApi } from '../../api/Formulas';
+import BPMNEApi from "./../../api/BPMNEngine";
+import { taskApi } from "./../..//api/task.js";
 import ImportExcelPanel from "./../../components/document/ImportExelPanel";
 import { documentApi } from "./../../api/Document.js";
+import bpmnApi from "./../../api/BPMNEngine.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import ActionPanel from "./../../views/users/ActionPanel.vue";
 import ChangePassPanel from "./../../views/users/ChangePass.vue";
 import Submit from './submit/Submit'
 import { util } from "./../../plugins/util.js";
 import { appConfigs } from '../../configs';
+import TaskDetail from "./../../components/myItem/TaskDetail";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-
 export default {
     components: {
         ImportExcelPanel: ImportExcelPanel,
         "list-items": ListItems,
         "action-panel": ActionPanel,
         'submit-view':Submit,
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
+        TaskDetail
     },
     data(){
         return {
+            listWorkflows:[],
+            listId:[],
+            listProcess:[],
+            startProcess:{
+                name: "startProcess",
+                subMenu:[],
+                text: "<i class= 'mdi mdi-bike-fast' > </i>&nbsp; Bắt đầu nhanh quy trình",
+            },
+            paramId:'',
+            data: {
+                taskInfo: {},
+                originData: {}
+            },
+            taskDetailHeight: 800,
             sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
             documentId:0,
+            listWorkFollow:[],
             rowActive:null,
+            showTaskDetail:false,
+             variableProcess:[],
+            filterVariables:{
+                names:"symper_application_id",
+                page:1,
+                processInstanceIds:[]
+            },
             options:{
             },
+            proccessRow:{},
             isDocumentIndex:false,
             allIndexSelected:[],
             listControlInDoc:{},
@@ -317,22 +356,206 @@ export default {
     },
     mounted() {
         this.calcContainerHeight();
+        
     },
     created(){
+   
         let thisCpn = this;
+        this.tableContextMenu.startProcess = this.startProcess;
         this.$evtBus.$on('change-user-locale',(locale)=>{
             thisCpn.tableContextMenu = [
                 {name:"passwordsetting",text:this.$t('user.table.contextMenu.passwordSetting')},
                 {name:"edit",text:this.$t('user.table.contextMenu.edit')}
             ]
         });
+       
+
     },
     watch:{
         documentId(){
             this.getApiDocument();
+        },
+        listId(){
+            if(this.listId.length>0){
+               this.getAllProcess(this.listId)
+            }
         }
     },
     methods:{
+        getListId(data){
+            this.listId = data;
+        },
+        // lấy ra tất cả các quy trình liên quan dựa theo id doc
+        getAllProcess(data){
+            this.listProcess = [];
+            let listId = data.join(",");
+            const self = this;
+            bpmnApi.getProcessByDocId(listId).then(res=>{
+                if(res.status==200){
+                    Object.keys(res.data).map(idDoc=>{
+                        self.listId.map(l=>{
+                            if(idDoc==l){
+                                this.tableContextMenu.startProcess = this.startProcess;
+                                self.listProcess.push({
+                                    id:idDoc,
+                                    listProcess:res.data[idDoc]
+                                })
+                            }
+                        })
+                    })
+                }
+            })
+        },
+         handleTaskSubmited(){
+            this.$store.commit("task/setIsStatusSubmit",true);
+         },
+         getRowSelected(param){
+            this.getListWorkFollowName(param.data.id);
+         },
+         async setTaskInfo(taskId){
+            if(taskId){
+                let filter={};
+                filter.taskId = taskId;
+                let res = await BPMNEApi.postTaskHistory(filter);
+                if (res.total>0) {
+                    let task=res.data[0];
+                    let taskInfo = extractTaskInfoFromObject(task);
+                    task = addMoreInfoToTask(task);
+                    this.$set(this.data, 'taskInfo', taskInfo);
+                    this.$set(this.data, 'originData', task);
+                    if (task.processInstanceId && task.processInstanceId!=null) {
+                        await this.getVariablesProcess(task.processInstanceId)
+                    }
+                }
+            }
+        },
+        async getVariablesProcess(processInstanceId){
+            let arrProcess=[];
+            arrProcess.push(processInstanceId);
+            this.filterVariables.processInstanceIds = JSON.stringify(arrProcess);
+            let resVariable = {};
+            resVariable = await taskApi.getVariableWorkflow(this.filterVariables);
+            this.variableProcess = resVariable.data;
+             this.$snotifySuccess("Khởi tạo quy trình  thành công!");
+
+        },
+          async getInstanceName(dataInput, definitionModel){
+            let self = this;
+            return new Promise((resolve, reject) => {
+                let dataObjs = definitionModel.processes[0].dataObjects;
+                let dataObjsMap = {};
+                for(let obj of dataObjs){
+                    let objKey = obj.id.replace(definitionModel.mainProcess.id+'_','');
+                    dataObjsMap[objKey] = obj;
+                }
+                let formula = dataObjsMap.instanceDisplayText ? dataObjsMap.instanceDisplayText.value : '';
+                if(!formula || String(formula).trim() == ''){
+                    resolve('');
+                }else{
+                    if(dataObjsMap.instanceDisplayText){
+                        formulasApi.getDataByAllScriptType(
+                            dataObjsMap.instanceDisplayText.value, 
+                            JSON.stringify(dataInput)
+                        ).then((formulaData) => {
+                            resolve(formulaData);
+                        }).catch(err=>{
+                            reject(err);
+                        });                    
+                    }else{
+                        resolve('');
+                    }
+                }
+
+            })
+        },
+         getStartDocId(definitionModel){
+            return Number(definitionModel.mainProcess.initialFlowElement.formKey);
+        },
+        async getFirstNodeData(paramId){
+            let self=this;
+            let idDefinition = paramId;
+            self.paramId = paramId;
+            let definitionModel = await BPMNEApi.getDefinitionModel(idDefinition);
+            let documentToStart = this.getStartDocId(definitionModel);
+            if(documentToStart && documentToStart != 'null' ){
+                this.taskInfo.action.parameter.documentId = documentToStart;
+            }else{
+                let processDef = await BPMNEApi.getDefinitionData(idDefinition);
+                try {
+                    let instanceName = await self.getInstanceName([],definitionModel);
+                    let newProcessInstance = await runProcessDefinition(this, processDef, [], instanceName);
+                    await self.checkAndGotoMyTask(newProcessInstance);
+                    this.showTaskDetail = true;
+                } catch (error) {
+                    this.$snotifyError(error);
+                }
+            }
+        },
+        async checkAndGotoMyTask(newProcessInstance){
+            let filter={};
+            let arrTask = [];
+            filter.processInstanceId = newProcessInstance.id;
+            let dataTaskNew = await BPMNEApi.getTask(filter); // lấy task theo quy trình hiện tại
+            if (dataTaskNew.total>0) {
+                arrTask = dataTaskNew.data;
+            }else { // lấy task theo quy trình con 
+                let childProcessInstances = await BPMNEApi.getProcessInstance({
+                    superProcessInstanceId: newProcessInstance.id
+                });
+                if(childProcessInstances.data.length > 0){
+                    let myTasks = [];
+                    for(let instance of childProcessInstances.data){
+                        myTasks.push(
+                            BPMNEApi.getTask({
+                                processInstanceId: instance.id,
+                            })
+                        ); 
+                    }
+                    myTasks = await Promise.all(myTasks);
+                    for(let res of myTasks){
+                        arrTask = arrTask.concat(res.data);
+                    }
+                }
+            }
+            for(let task of arrTask){
+                let assignee=task.assignee;
+                if (assignee && assignee.indexOf(":")>0) {
+                    assignee=assignee.split(":")[0];
+                }
+                if (assignee == this.$store.state.app.endUserInfo.id) {
+                    this.setTaskInfo(task.id);
+                }
+            }
+            
+        },
+        getListWorkFollowName(docId){
+            this.tableContextMenu.startProcess={};
+            const self = this;
+            this.listProcess.map(process=>{
+               if(process.id==docId){
+                   this.tableContextMenu.startProcess=this.startProcess;
+                   this.tableContextMenu.startProcess.subMenu=[];
+                   process.listProcess.map(p=>{
+                        let row = p;
+                        self.proccessRow = p;
+                        self.tableContextMenu.startProcess.subMenu.push({
+                            name:p.name,
+                            action: async function (row, action){
+                                let defData = await getLastestDefinition(self.proccessRow, true);
+                                if(defData.data[0]){
+                                    self.$refs.listDocument.openactionPanel();
+                                    self.paramId = defData.data[0].id;
+                                    self.getFirstNodeData(defData.data[0].id)
+                                }else {
+                                    self.$snotifyError({},"Can not find process definition having deployment id "+deploymentId);
+                                }
+                            }
+                    })
+                   
+                })
+               }
+           })
+        },
         onRemoveIndex(indexs, i, index){
             indexs.splice(i,1);
             if(index.uid){
@@ -358,7 +581,6 @@ export default {
                 else{
                     this.$set(doc.control[index],'checked',false)
                 }
-                
             }
             this.$set(index,'active',true)
         },

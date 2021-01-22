@@ -314,7 +314,7 @@ export const genKeyFromDataInput = (dataInput)=>{
  * Hàm lấy dữ liệu của các control đầu vào để chuân bị cho việc run formulas
  * dataInput : {controlName : value}
  */
-export const getDataInputFormula = (formulaInstance, listInput, extraData = null, rowIndex = null, dataAutoComplete = {}) =>{
+export const getDataInputFormula = (formulaInstance, listInput, extraData = null, rowNodeIds = null, dataAutoComplete = {}) =>{
     let inputControl = formulaInstance.getInputControl();
     let dataInput = {};
     for (let inputControlName in inputControl) {
@@ -322,56 +322,54 @@ export const getDataInputFormula = (formulaInstance, listInput, extraData = null
             dataInput[inputControlName] = dataAutoComplete[inputControlName];
         }
         else{
-            if(listInput.hasOwnProperty(inputControlName)){
-                let controlIns = listInput[inputControlName];
-                if(!controlIns){
-                    dataInput[inputControlName] = "";
-                }
-                else{
-                    if(controlIns.inTable != false){
-                        let currentColData = '';
-                        let tableControl = listInput[controlIns.inTable];
-                        if(rowIndex != 'all' && rowIndex.length == 1){
-                            currentColData = tableControl.tableInstance.getCellData(inputControlName, rowIndex[0]);
-                        console.log(rowIndex,currentColData,'rowIndexrowIndex');
-                        }
-                        else if(rowIndex == 'all'){
-                            currentColData = tableControl.tableInstance.getColData(inputControlName);
-                        }
-                        else if(rowIndex.length > 1){
-                            let listRowData = [];
-                            currentColData = tableControl.tableInstance.getColData(inputControlName);
-                            for (let index = 0; index < rowIndex.length; index++) {
-                                let rowInd = rowIndex[index];
-                                let rowData = currentColData[rowInd];
-                                listRowData.push(rowData);
-                            }
-                            currentColData = listRowData;
-                        }
-                        dataInput[inputControlName] = currentColData;
-                    }
-                    else{
-                        dataInput[inputControlName] = controlIns.value;
-                    }
-                    if(controlIns.type == 'inputFilter'){
-                        valueInputControl = dataInput[inputControlName].split(',')
-                    }
-                    if(controlIns.type == 'date'){
-                        dataInput[inputControlName] = controlIns.convertDateToStandard(dataInput[inputControlName])
-                    }
-                    if(controlIns.type == 'time'){
-                        dataInput[inputControlName] = controlIns.convertTimeToStandard(dataInput[inputControlName])
-                    }
-                    if(['number','percent'].includes(controlIns.type) && !dataInput[inputControlName]){
-                        dataInput[inputControlName] = 0
-                    }
-                }
+            if(extraData && extraData[inputControlName]){
+                dataInput[inputControlName] = extraData[inputControlName];
             }
             else{
-                if(extraData && extraData[inputControlName]){
-                    dataInput[inputControlName] = extraData[inputControlName];
+                if(listInput.hasOwnProperty(inputControlName)){
+                    let controlIns = listInput[inputControlName];
+                    if(!controlIns){
+                        dataInput[inputControlName] = "";
+                    }
+                    else{
+                        if(controlIns.inTable != false){
+                            let currentColData = '';
+                            let tableControl = listInput[controlIns.inTable];
+                            if(rowNodeIds != 'all' && rowNodeIds.length == 1){
+                                currentColData = tableControl.tableInstance.getCellDataByNodeId(inputControlName, rowNodeIds[0]);
+                            }
+                            else if(rowNodeIds == 'all'){
+                                currentColData = tableControl.tableInstance.getColData(inputControlName);
+                            }
+                            else if(rowNodeIds.length > 1){
+                                let listRowData = [];
+                                for (let index = 0; index < rowNodeIds.length; index++) {
+                                    let colDataById = tableControl.tableInstance.getCellDataByNodeId(inputControlName, rowNodeIds[index]);
+                                    listRowData.push(colDataById);
+                                }
+                                currentColData = listRowData;
+                            }
+                            dataInput[inputControlName] = currentColData;
+                        }
+                        else{
+                            dataInput[inputControlName] = controlIns.value;
+                        }
+                        if(controlIns.type == 'inputFilter'){
+                            valueInputControl = dataInput[inputControlName].split(',')
+                        }
+                        if(controlIns.type == 'date'){
+                            dataInput[inputControlName] = controlIns.convertDateToStandard(dataInput[inputControlName])
+                        }
+                        if(controlIns.type == 'time'){
+                            dataInput[inputControlName] = controlIns.convertTimeToStandard(dataInput[inputControlName])
+                        }
+                        if(['number','percent'].includes(controlIns.type) && !dataInput[inputControlName]){
+                            dataInput[inputControlName] = 0
+                        }
+                    }
                 }
             }
+            
         }
     }
     return dataInput;

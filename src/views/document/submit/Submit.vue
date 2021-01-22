@@ -414,7 +414,8 @@ export default {
             globalClass:null,
             controlRelationWorker:null,
             formulasWorker:null,
-            optionalDataBinding:null
+            optionalDataBinding:null,
+            tableFocusing:null
         };
 
     },
@@ -426,10 +427,11 @@ export default {
         }
     },
     mounted() {
+        window.addEventListener('paste', this.insertNewRowsBeforePaste);
         this.optionalDataBinding = {},
-        this.optionalDataBinding['context'] = this.docObjId
-        this.optionalDataBinding['document_object_id'] = ""
-        this.optionalDataBinding['action'] = ""
+        this.optionalDataBinding['context'] = (this.documentObjectWorkflowId) ? 'inWorkflow' : 'outWorkflow'
+        this.optionalDataBinding['document_object_id'] = this.docObjId
+        this.optionalDataBinding['action'] = this.action
         let thisCpn = this;
         this.controlRelationWorker = new ControlRelationWorker();
         this.controlRelationWorker.addEventListener("message", function (event) {
@@ -464,31 +466,20 @@ export default {
                     let controlName = data.dataAfter.controlName;
                     let res = data.dataAfter.res;
                     let formulaType = data.dataAfter.formulaType;
-                    let from = data.dataAfter.from;
-                    let dataRowId = data.dataAfter.dataRowId;
+
+                    let rowNodeId = data.dataAfter.rowNodeId;
+                    let columnName = data.dataAfter.columnName;
                     let controlIns = getControlInstanceFromStore(thisCpn.keyInstance, controlName)
-                    if(['rowTable','columnTable'].includes(from)){
+                    if(rowNodeId){
                         let tableControl = getControlInstanceFromStore(thisCpn.keyInstance, controlIns.inTable);
-                        tableControl.tableInstance.afterRunFormula(res, formulaType , controlIns, dataRowId, from);
+                        tableControl.tableInstance.afterRunFormula(res, formulaType , controlIns, rowNodeId, columnName);
                     }
                     else{
-                        thisCpn.handleAfterRunFormulas(res,controlName,formulaType,from);
+                        thisCpn.handleAfterRunFormulas(res,controlName,formulaType);
                     }
                     break;
                 case 'afterCreateSQLiteDB':
                     thisCpn.handleLoadContentDocument();
-                    break;
-                case 'getDataInputFormula':
-                    let dataInputObjectIdentifier = data.dataAfter.dataInputObjectIdentifier
-                    let dataInputTitleObjectFormulas = data.dataAfter.dataInputTitleObjectFormulas
-                    let dataInputFormula = {}
-                    if(dataInputObjectIdentifier){
-                        dataInputFormula['dataInput'] = dataInputObjectIdentifier
-                    }
-                    if(dataInputTitleObjectFormulas){
-                        dataInputFormula['dataInputTitle'] = dataInputTitleObjectFormulas
-                    }
-                    thisCpn.startSubmitDocument(dataInputFormula);
                     break;
                 default:
                 break;
@@ -499,7 +490,7 @@ export default {
             e.stopPropagation();
             let controlName = $(this).attr('control-name');
             let control = getControlInstanceFromStore(thisCpn.keyInstance, controlName);
-            let rowIndex = $(this).attr('row-index');
+            let rowIndex = $(this).attr('row-node-id');
             rowIndex = Number(rowIndex)
             if(!rowIndex){
                 rowIndex = 0   
@@ -507,8 +498,10 @@ export default {
             let validateData = {}
             for (let index = 0; index < control.validateMessageType.length; index++) {
                 const type = control.validateMessageType[index];
-                if(control.optionValues[type] && control.optionValues[type][rowIndex].isValid){
-                    validateData[type] = control.optionValues[type]
+                if(control.optionValues[type] && control.optionValues[type][rowIndex] && control.optionValues[type][rowIndex].isValid){
+                    let item = {};
+                    item[rowIndex] = control.optionValues[type][rowIndex]
+                    validateData[type] = item;
                 }
             }
             thisCpn.$refs.validate.show(e, validateData);
@@ -557,12 +550,6 @@ export default {
         if(this.documentObjectId){
             this.docObjId = this.documentObjectId;
         }
-
-        // đặt trang thái của view là submit => isDetailView = false
-        this.$store.commit("document/changeViewType", {
-            key: this.keyInstance,
-            value: this.action,
-        });
         
         /**
          * Nhận xử lí sự kiện click chuyển đổi dạng table <=> pivot mode
@@ -698,17 +685,18 @@ export default {
         this.$evtBus.$on("document-submit-input-change", controlInstance => {
            if(this._inactive == true) return;
                 let valueControl = controlInstance.value;
-                if(controlInstance.checkAutoCompleteControl()){
-                    clearTimeout(delayTimer);
-                    // delay trong trường hợp chọn dòng trong box autocomplete thì đã kích hoạt sự kiện onchange
-                    // lúc này input chưa có dữ liệu đên phải delay
-                    delayTimer = setTimeout(function() {
-                        thisCpn.handleInputChangeByUser( controlInstance, valueControl);
-                    }, 300);
-                }
-                else{
-                    this.handleInputChangeByUser( controlInstance, valueControl);
-                }
+                // if(controlInstance.checkAutoCompleteControl()){
+                //     clearTimeout(delayTimer);
+                //     // delay trong trường hợp chọn dòng trong box autocomplete thì đã kích hoạt sự kiện onchange
+                //     // lúc này input chưa có dữ liệu đên phải delay
+                //     delayTimer = setTimeout(function() {
+                //         thisCpn.handleInputChangeByUser( controlInstance, valueControl);
+                //     }, 300);
+                // }
+                // else{
+                   
+                // }
+                 this.handleInputChangeByUser( controlInstance, valueControl);
         });
         this.$evtBus.$on("run-effected-control-when-table-change", control => {
             if(this._inactive == true) return;
@@ -814,12 +802,12 @@ export default {
         // hàm nhận sự thay đổi của input select gọi api để chạy công thức lấy dữ liệu
         this.$evtBus.$on("document-submit-select-input", e => {
             if(this._inactive == true) return;
-            try { 
+            try {
                 let controlName = e.controlName;
+                this.$refs.autocompleteInput.setTypeInput(e.type);
                 this.$refs.autocompleteInput.show(e.e, controlName);
                 let controlIns = getControlInstanceFromStore(this.keyInstance, controlName);
                 this.$refs.autocompleteInput.setControlValueKey(controlIns.getAutocompleteKeyValue());
-                this.$refs.autocompleteInput.setTypeInput(e.type);
                 if(e.type == 'combobox'){
                     this.$refs.autocompleteInput.setSingleSelectCombobox(e.isSingleSelect);
                 }
@@ -837,12 +825,14 @@ export default {
             if(thisCpn._inactive == true) return;
             try {
                 if (
-                    !$(evt.target).hasClass("s-control-user") &&
-                    !$(evt.target).hasClass("card-list-user") &&
-                    $(evt.target).closest(".card-list-user").length == 0
+                    !$(evt.target).is(".s-control-select") &&
+                    !$(evt.target).is(".s-control-combobox") &&
+                    !$(evt.target).is(".select-chervon-bottom") &&
+                    $(evt.target).closest(".card-autocomplete").length == 0
                 ) {
-                    thisCpn.$refs.userInput.hide();
+                    thisCpn.$refs.autocompleteInput.hide();
                 }
+                
                 if( !$(evt.target).hasClass("info-control-btn") &&
                     !$(evt.target).hasClass("s-floatting-popup") &&
                     $(evt.target).closest(".s-floatting-popup").length == 0){
@@ -990,6 +980,78 @@ export default {
     },
     
     methods: {
+        insertNewRowsBeforePaste(event){
+            var self = this;
+
+            // gets data from clipboard and converts it to an array (1 array element for each line)
+            var clipboardData = event.clipboardData || window.clipboardData;
+            var pastedData = clipboardData.getData('Text');
+            let table = getControlInstanceFromStore(this.keyInstance, this.sDocumentSubmit.tableInteractive);
+            var dataArray = self.dataToArray(pastedData, table);
+            let gridOptions = table.tableInstance.gridOptions
+            let cell = table.tableInstance.getFocusedCell();
+            let forcusCellIndex = cell.rowIndex;
+            let count = gridOptions.api.getDisplayedRowCount();
+            if(count - forcusCellIndex < dataArray.length){
+                for (var i = forcusCellIndex; i < dataArray.length + count - 1; i++) {
+                    let rowData = table.tableInstance.getRowDefaultData(false);
+                    rowData[0].s_table_id_sql_lite = Date.now();
+                    table.tableInstance.addNewRow(rowData,i);
+                }
+            }
+        },
+        dataToArray(strData, table) {
+            let gridOptions = table.tableInstance.gridOptions
+            var delimiter = gridOptions.api.gridOptionsWrapper.getClipboardDeliminator();;
+            // Create a regular expression to parse the CSV values.
+            var objPattern = new RegExp((
+            // Delimiters.
+            "(\\" + delimiter + "|\\r?\\n|\\r|^)" +
+                // Quoted fields.
+                "(?:\"([^\"]*(?:\"\"[^\"]*)*)\"|" +
+                // Standard fields.
+                "([^\"\\" + delimiter + "\\r\\n]*))"), "gi");
+            // Create an array to hold our data. Give the array
+            // a default empty first row.
+            var arrData = [[]];
+            // Create an array to hold our individual pattern
+            // matching groups.
+            var arrMatches = null;
+            // Keep looping over the regular expression matches
+            // until we can no longer find a match.
+            while (arrMatches = objPattern.exec(strData)) {
+                // Get the delimiter that was found.
+                var strMatchedDelimiter = arrMatches[1];
+                // Check to see if the given delimiter has a length
+                // (is not the start of string) and if it matches
+                // field delimiter. If id does not, then we know
+                // that this delimiter is a row delimiter.
+                if (strMatchedDelimiter.length &&
+                    strMatchedDelimiter !== delimiter) {
+                    // Since we have reached a new row of data,
+                    // add an empty row to our data array.
+                    arrData.push([]);
+                }
+                var strMatchedValue = void 0;
+                // Now that we have our delimiter out of the way,
+                // let's check to see which kind of value we
+                // captured (quoted or unquoted).
+                if (arrMatches[2]) {
+                    // We found a quoted value. When we capture
+                    // this value, unescape any double quotes.
+                    strMatchedValue = arrMatches[2].replace(new RegExp("\"\"", "g"), "\"");
+                }
+                else {
+                    // We found a non-quoted value.
+                    strMatchedValue = arrMatches[3];
+                }
+                // Now that we have our value string, let's add
+                // it to the data array.
+                arrData[arrData.length - 1].push(strMatchedValue);
+            }
+            // Return the parsed data.
+            return arrData;
+        },
         closeFormulasWorker(){
             this.formulasWorker.postMessage({action:'closeDB',data:{keyInstance:this.keyInstance}});
             this.formulasWorker.terminate();
@@ -1004,7 +1066,8 @@ export default {
         },
         checkUpdateByWorkflow(){
             let updateByWorkflowId = this.documentInfo.updateByWorkflowId;
-            if(updateByWorkflowId && this.$getRouteName() == 'updateDocumentObject'){
+            
+            if(updateByWorkflowId && updateByWorkflowId != "0" && this.$getRouteName() == 'updateDocumentObject'){
                 startWorkflowBySubmitedDoc(updateByWorkflowId, {document_id:this.docId})
             }
         },
@@ -1280,7 +1343,7 @@ export default {
                             formulaInstance:formulaIns,
                             dataInput:dataInput, 
                             controlName:aliasControl, 
-                            rowIndex:e.e.rowIndex,
+                            rowNodeId:e.e.rowNodeId,
                             keyInstance:this.keyInstance
                         }
                     })
@@ -1377,8 +1440,9 @@ export default {
             }
             else{
                 let tableControl = getControlInstanceFromStore(this.keyInstance, controlInstance.inTable);
-                let currentCell = tableControl.tableInstance.getForcusCell();
-                tableControl.tableInstance.setDataAtCell(controlName, time, currentCell.rowIndex);
+                let currentCell = tableControl.tableInstance.getFocusedCell();
+                let currentRow = tableControl.tableInstance.getDisplayedRowAtIndex(currentCell.rowIndex);
+                tableControl.tableInstance.setDataAtCell(controlName, time, currentRow.id);
             }
         },
         checkEscKey(event){
@@ -1412,16 +1476,17 @@ export default {
             let controlIns = getControlInstanceFromStore(this.keyInstance, data.controlName);
             if(controlIns.inTable == false){
                 if(data.fromEnterKey){
-                    this.handleInputChangeBySystem(data.controlName,data.value,false, false);
+                    this.handleInputChangeBySystem(data.controlName,data.value,false, true);
                 }
                 else{
-                    this.handleInputChangeBySystem(data.controlName,data.value,false,false);
+                    this.handleInputChangeBySystem(data.controlName,data.value,false,true);
                 }
             }
             else{
                 let tableControl = getControlInstanceFromStore(this.keyInstance, controlIns.inTable);
-                let currentCell = tableControl.tableInstance.getForcusCell();
-                tableControl.tableInstance.setDataAtCell(data.controlName, data.value.inputValue, currentCell.rowIndex);
+                let currentCell = tableControl.tableInstance.getFocusedCell();
+                let currentRow = tableControl.tableInstance.getDisplayedRowAtIndex(currentCell.rowIndex);
+                tableControl.tableInstance.setDataAtCell(currentCell.column.colDef.field, data.value.inputValue, currentRow.id);
             }
         },
 
@@ -1518,7 +1583,6 @@ export default {
                             }
                             else{
                                 this.globalClass['document-form-style-default'] = true;
-                                
                             }
                             thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
                             thisCpn.dataPivotTable = res.data.pivotConfig;
@@ -1825,6 +1889,11 @@ export default {
                         }
                     }
                 }
+                this.$store.commit("document/addToDocumentSubmitStore", {
+                    key: 'readyLoaded',
+                    value: true,
+                    instance: this.keyInstance
+                });
             }
         },
 
@@ -1864,8 +1933,9 @@ export default {
             }
             else{
                 let tableControl = getControlInstanceFromStore(this.keyInstance, controlInstance.inTable);
-                let currentCell = tableControl.tableInstance.getForcusCell();
-                tableControl.tableInstance.setDataAtCell(controlName, data, currentCell.rowIndex);
+                let currentCell = tableControl.tableInstance.getFocusedCell();
+                let currentRow = tableControl.tableInstance.getDisplayedRowAtIndex(currentCell.rowIndex);
+                tableControl.tableInstance.setDataAtCell(controlName, data, currentRow.id);
             }
         },
 
@@ -2068,25 +2138,30 @@ export default {
 
 
         // Hàm chỉ ra control được đánh định danh trong document (sct...)
-        getDataRefreshControl(){
-            let objectIdentiferFormula = null;
-            let titleObjectFormula = null;
+        /**
+         * lấy data để chạy công thức trên server
+         */
+        getDataForRunFormulaOnServer(){
+            let dataInputFormula = {};
+            let listInput = getListInputInDocument(this.keyInstance)
             if(this.objectIdentifier && Object.keys(this.objectIdentifier) > 0){
-                let controlIdentifier = {}
                 let controlNameIdentifier = this.objectIdentifier['name'];
                 let controlInstance = getControlInstanceFromStore(this.keyInstance,controlNameIdentifier);
                 if(controlInstance != false && controlInstance.controlFormulas.hasOwnProperty('formulas')){
                     let formulaInstance = controlInstance.controlFormulas['formulas']['instance'];
                     if(formulaInstance){
-                        objectIdentiferFormula = formulaInstance;
+                        let dataInput = getDataInputFormula(formulaInstance,listInput);
+                        dataInputFormula['dataInput'] = dataInput
                     }
                 }
             }
             
             if(this.titleObjectFormula != null){
-                titleObjectFormula = this.titleObjectFormula
+                let dataInput = getDataInputFormula(this.titleObjectFormula,listInput);
+                dataInputFormula['dataInputTitle'] = dataInput
             }
-            this.formulasWorker.postMessage({action:'getDataInputFormula',data:{titleObjectFormula:titleObjectFormula,objectIdentiferFormula:objectIdentiferFormula,keyInstance:this.keyInstance}})
+            this.startSubmitDocument(dataInputFormula);
+            // this.formulasWorker.postMessage({action:'getDataInputFormula',data:{titleObjectFormula:titleObjectFormula,objectIdentiferFormula:objectIdentiferFormula,keyInstance:this.keyInstance}})
         },
 
         handleRefreshDataBeforeSubmit(){
@@ -2137,7 +2212,7 @@ export default {
          */
         async submitDocument(){
             this.isSubmitting = true;
-            this.getDataRefreshControl();
+            this.getDataForRunFormulaOnServer();
         },
         resetCheckRefreshData(){
             this.$store.commit("document/addToDocumentSubmitStore", {
@@ -2549,7 +2624,6 @@ export default {
                         formulaInstance:formulaInstance, 
                         dataInput:dataInput,
                         controlName:controlName, 
-                        from:from, 
                         keyInstance:this.keyInstance}})
                 }
             } else {
@@ -2564,7 +2638,7 @@ export default {
         /**
          *  Hàm xử lí dứ liệu sau khi chạy công thức
          */
-        handleAfterRunFormulas(res,controlName,formulaType,from){
+        handleAfterRunFormulas(res,controlName,formulaType){
             let controlInstance = getControlInstanceFromStore(this.keyInstance,controlName);
             if(formulaType == 'autocomplete' || formulaType == 'list'){
                 let titleControl = (controlInstance) ? controlInstance.title : "";
@@ -2965,8 +3039,9 @@ export default {
             let controlIns = this.currentFileControl.controlIns;
             if(controlIns.inTable != false){
                 let tableControl = getControlInstanceFromStore(this.keyInstance, controlIns.inTable);
-                let currentCell = tableControl.tableInstance.getForcusCell();
-                tableControl.tableInstance.setDataAtCell(controlIns.name, url, currentCell.rowIndex);
+                let currentCell = tableControl.tableInstance.getFocusedCell();
+                let currentRow = tableControl.tableInstance.getDisplayedRowAtIndex(currentCell.rowIndex);
+                tableControl.tableInstance.setDataAtCell(controlIns.name, url, currentRow.id);
             }
             else{
                 this.currentFileControl.controlIns.setValue(url);

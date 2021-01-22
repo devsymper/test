@@ -242,5 +242,9 @@ export default {
 	},
 	getProcessByProcessKey(defId){
 		return bpmneApi.get(appConfigs.apiDomain.bpmne.models +'process-key/'+ defId)
-	}
+    },
+    // lấy danh sách quy trình theo docId
+    getProcessByDocId(docId){
+        return bpmneApi.get(appConfigs.apiDomain.bpmne.models +`related-docs/${docId}/workflows?startDoc=true`)
+    }
 };

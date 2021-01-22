@@ -108,9 +108,6 @@
                             <span>{{$t('document.instance.showlist.update')}}</span>
                         </v-tooltip>
                     </div>
-                    <v-btn small @click="showDialog" class="delete-record-btn">
-                        <v-icon left>mdi-trash-can-outline</v-icon> {{$t('common.delete')}}
-                    </v-btn>
                 </div>
                 <div  v-else-if="actionOnRightSidebar == 'update'">
                     <span class="title float-left">
@@ -677,11 +674,11 @@ export default {
         color: rgba(0,0,0 / 0.6);
     }
     .panel-body{
-        height: calc(100vh - 55px);
+        height: calc(100vh - 95px);
     }
-    .panel-body >>> .wrap-content-detail{
+    /* .panel-body >>> .wrap-content-detail{
         height: calc(100vh - 65px) !important;
-    }
+    } */
     .right-action{
         margin-left: auto;
         font-size: 15px;

@@ -4,7 +4,7 @@
     v-show="isShowAutoComplete" 
     class="card-autocomplete" :style="positionBox">
         <div v-if="inputType == 'combobox'" class="search-data-input">
-            <input v-model="search" type="text" :placeholder="$t('common.search')">
+            <input v-model="search" type="text" class="sym-small-size sym-style-input" :placeholder="$t('common.search')">
         </div>
         <v-data-table 
         :headers="headers"
@@ -79,11 +79,20 @@ export default {
     methods:{
        
         show(e, controlName){
+            this.dataSelected = {}
             this.isShowAutoComplete = true;
             this.calculatorPositionBox(e);
             this.setEvent();
-            // this.search = $(e.target).val();
-            this.controlForcusing = controlName
+            this.controlForcusing = controlName;
+            if(this.inputType == 'combobox'){
+                this.refreshActive();
+            }
+            
+        },
+        refreshActive(){
+            for (let index = 0; index < this.dataTable.length; index++) {
+                delete this.dataTable[index]['checked']
+            }
         },
         setEvent(){
             let thisCpn = this;
@@ -116,6 +125,9 @@ export default {
         },
         hide(){
             this.isShowAutoComplete = false;
+            if(this.inputType == 'combobox'){
+                this.refreshActive();
+            }
             this.resetData();
         },
         resetData(){
@@ -292,7 +304,7 @@ export default {
         position: relative;
     }
     .search-data-input{
-        width: 150px;
+        width: 100%;
         padding: 8px;
     }
     .search-data-input input{

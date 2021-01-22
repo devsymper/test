@@ -627,7 +627,7 @@ const controlTypes = {
         html: `<input class="s-control s-control-combobox" readonly="readonly" contenteditable="false" title="Combobox" s-control-type="combobox">&nbsp;&nbsp;`,
         title: "Combobox",
         notInProps: ['tableView','isVarchar','autoHeight', 'dataFlowId', 'isPrimaryKey','isInsertRow','isShowHeaderTinyMce', 'minValue', 'maxValue', 'formatNumber', 'isSumTable', 'formatDate', 'isAllowUpdate', 'isDisplayCompact', 'isMultipleValue'],
-        formulas: ['formulas', 'list', 'hidden', 'readOnly', 'linkConfig', 'require']
+        formulas: ['formulas', 'list','validate', 'hidden', 'readOnly', 'linkConfig', 'require']
     },
     documentSelect: {
         icon: "/icon/ic_document_select.png",
