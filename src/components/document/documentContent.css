@@ -659,8 +659,8 @@ button:hover {
     color: #212529 !important;
     font-weight: 500;
 }
-.sym-form-submit .ag-theme-alpine .ag-row:not(.ag-row-group-expanded),
-.sym-form-Detail .ag-theme-alpine .ag-row:not(.ag-row-group-expanded) {
+.sym-form-submit .ag-theme-alpine .ag-row:not(.ag-row-group-expanded):not(.ag-row-selected),
+.sym-form-Detail .ag-theme-alpine .ag-row:not(.ag-row-group-expanded):not(.ag-row-selected) {
     background: white !important;
 }
 .sym-form-submit .ag-row.ag-row-group.ag-row-group-expanded,

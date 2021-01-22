@@ -50,8 +50,8 @@ SelectCellRenderer.prototype.getGui = function() {
     return this.eGui;
 };
 
-SelectCellRenderer.prototype.destroy = function() {
-    if(this.eGui && !this.params.node.rowPinned){
+SelectCellRenderer.prototype.destroy = function(params) {
+    if(this.eGui && params && !params.node.rowPinned){
         this.eGui.querySelector('.select-chervon-bottom').removeEventListener('click',(event));
     }
 };
