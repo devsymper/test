@@ -107,8 +107,12 @@ export default class SymperTable {
                 headerName:"",
                 minWidth:90,
                 width:90,
-                valueGetter: "node.rowIndex + 1",
-                pinnedRowCellRenderer:'BottomPinnedRowRenderer',
+                valueGetter: function(params) {
+                    if(params.node.rowPinned){
+                        return ""
+                    }
+                    return params.node.rowIndex + 1
+                },
                 headerCheckboxSelection: true,
                 checkboxSelection: true,
                 rowDrag: true
@@ -133,6 +137,7 @@ export default class SymperTable {
                 this.tableHasRowSum = true;
                 col['pinnedRowCellRenderer'] = 'BottomPinnedRowRenderer',
                 col['pinnedRowCellRendererParams'] = {
+                    control:controlInstance,
                     style: { 'font-style': 'italic' },
                 }
             }
@@ -197,7 +202,7 @@ export default class SymperTable {
         if(viewType == 'detail'){
             return false;
         }
-        if(['label','select'].includes(control.type)){
+        if(['label'].includes(control.type)){
             return false;
         }
         if(control.checkProps('isReadOnly')){
@@ -584,11 +589,10 @@ export default class SymperTable {
             else{
                 let startRow = columnDataPaste[0].rowIndex;
                 let endRow = columnDataPaste[columnDataPaste.length - 1].rowIndex;
-                console.log(startRow, endRow, 'endRowendRow');
                 let controlIns = getControlInstanceFromStore(this.tableInstance.keyInstance, column);
                 if(this.tableInstance.tableHasRowSum && controlIns.checkProps('isSumTable')){
                     this.tableInstance.pinnedRowNode = params.api.getPinnedBottomRow(0);
-                    let sum = this.tableInstance.getSumColumn(column);
+                    let sum = this.tableInstance.getColData(column);
                     this.tableInstance.pinnedRowNode.setDataValue(column,sum);
                 }
     
@@ -640,7 +644,7 @@ export default class SymperTable {
                 let controlIns = getControlInstanceFromStore(this.tableInstance.keyInstance, colName);
                 if(this.tableInstance.tableHasRowSum && controlIns.checkProps('isSumTable')){
                     this.tableInstance.pinnedRowNode = params.api.getPinnedBottomRow(0);
-                    let sum = this.tableInstance.getSumColumn(colName);
+                    let sum = this.tableInstance.getColData(colName);
                     this.tableInstance.pinnedRowNode.setDataValue(colName,sum);
                 }
 
@@ -1187,7 +1191,7 @@ export default class SymperTable {
             let controlIns = getControlInstanceFromStore(this.tableInstance.keyInstance, columnChange);
             if(this.tableInstance.tableHasRowSum && controlIns.checkProps('isSumTable')){
                 this.tableInstance.pinnedRowNode = event.api.getPinnedBottomRow(0);
-                let sum = this.tableInstance.getSumColumn(columnChange);
+                let sum = this.tableInstance.getColData(columnChange);
                 this.tableInstance.pinnedRowNode.setDataValue(columnChange,sum);
             }
 

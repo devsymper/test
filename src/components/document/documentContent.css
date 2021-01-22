@@ -787,3 +787,21 @@ button:hover {
     width: 100%;
     height: 100%;
 }
+
+
+.select-table-bottom{
+    margin: 0 -6px;
+}
+.select-table-bottom select {
+    position: relative;
+    padding: 0 6px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    width: 90%;
+}
+.select-table-bottom select option{
+    padding: 4px 6px;
+}
+.select-table-bottom select:focus{
+    outline: none;
+}
