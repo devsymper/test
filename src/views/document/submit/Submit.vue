@@ -449,7 +449,7 @@ export default {
                         "document/addToDocumentSubmitStore", { key: 'listControlMappingDatasets', value: controlMapDatasetDataflow, instance: thisCpn.keyInstance }
                     );
                     thisCpn.formulasWorker.postMessage({action:'updateDocumentObjectId',data:{keyInstance:thisCpn.keyInstance,updateDocumentObjectId:thisCpn.docObjId}})
-                    thisCpn.processHtml(thisCpn.contentDocument);
+                    thisCpn.processHtml();
                     thisCpn.controlRelationWorker.terminate();
                     break;
                 default:
@@ -522,7 +522,11 @@ export default {
     },
 
     async created() {
-        tinymce.remove()
+        this.$store.commit("document/changeViewType", {
+            key: this.keyInstance,
+            value: this.action,
+        });
+        tinymce.remove();
         this.formulasWorker = new FormulasWorker();
         this.formulasWorker.postMessage({action:'createSQLiteDB',data:{keyInstance:this.keyInstance}})
         this.formulasWorker.postMessage({action:'addWorkflowVariable',data:{keyInstance:this.keyInstance, workflowVariable:this.workflowVariable}})
@@ -533,17 +537,13 @@ export default {
         if (this.docId != 0) {
             this.documentId = this.docId;
         } else if (this.$getRouteName() == "submitDocument") {
-            this.$store.commit("document/changeViewType", {
-                key: this.keyInstance,
-                value: 'submit',
-            });
             this.documentId = this.$route.params.id;
         } else if (this.$getRouteName() == "updateDocumentObject") {
+            this.docObjId = this.$route.params.id;
             this.$store.commit("document/changeViewType", {
                 key: this.keyInstance,
                 value: 'update',
             });
-            this.docObjId = this.$route.params.id;
         }
 
         // Nếu truyền vào documentObjectId
@@ -1686,7 +1686,7 @@ export default {
          * Khởi tạo các đối tượng control từ html
          * các control được đánh dâu bởi id có frefix: s-contorl-timestamp
          */
-        processHtml(content) {
+        processHtml() {
             $("#sym-submit-" + this.keyInstance).find('.page-content').addClass('d-block');
             $("#sym-submit-" + this.keyInstance).find('.list-page-content').addClass('d-flex');
             

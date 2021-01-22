@@ -53,8 +53,6 @@ export default class ClientSQLManager {
         if (isWithoutReturn) {
             return db.run(sql);
         } else {
-            console.log(sql,'sqlsql');
-            console.log(db.exec('select * from tb1'),'sqlsql1');
             return db.exec(sql);
         }
     }
