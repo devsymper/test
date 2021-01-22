@@ -102,7 +102,39 @@ let reportColumnSettingItems = {
         slot:'1',
         hasAgg:true
 
-    }
+    },
+    taskName:{
+        name: 'Task name',
+        slot:'1'
+    },
+    startDate:{
+        name: 'Start date',
+        slot:'1'
+    },
+    endDate:{
+        name: 'End date',
+        slot:'1'
+    },
+    duration:{
+        name: 'Duration',
+        slot:'1'
+    },
+    progress:{
+        name: 'Progress bar',
+        slot:'1'
+    },
+    milestone:{
+        name: 'Milestone',
+        slot:'1'
+    },
+    parent:{
+        name: 'Parent',
+        slot:'1'
+    },
+    dependency:{
+        name: 'Dependency',
+        slot:'1'
+    },
 };
 
 /**
