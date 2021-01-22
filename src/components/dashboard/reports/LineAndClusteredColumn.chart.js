@@ -9,7 +9,7 @@ export default class LineAndClusteredColumn extends ReportBase {
     }
     translate(rawConfig,  data, extraData = {} ,changes = {}, oldOutput = {}){
         let displayOptions = {};
-        displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,"column",undefined,1);
+        displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,extraData,"column",undefined,1);
         return displayOptions;
 
     }

@@ -11,7 +11,7 @@ export default class StackedBar extends ReportBase {
     
     translate(rawConfig,  data, extraData = {} ,changes = {}, oldOutput = {}){
         let displayOptions = {};
-        displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,"bar",'normal',1);
+        displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,extraData,"bar",'normal',1);
         return displayOptions;
 
     }

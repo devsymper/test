@@ -10,7 +10,7 @@ export default class StackedArea extends ReportBase {
     }
     translate(rawConfig,  data, extraData = {} ,changes = {}, oldOutput = {}){
         let displayOptions = {};
-        displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,"area",'normal',1);
+        displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,extraData,"area",'normal',1);
         return displayOptions;
 
     }

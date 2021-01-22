@@ -2,7 +2,7 @@ import ReportGroupConfig from '@/components/dashboard/configPool/reportGroupConf
 import ReportBase from './ReportBase'
 import {TranslatorHelper} from '@/components/dashboard/configPool/translatorHelper'
 
-export default class Line extends ReportBase {
+export default class ReportLine extends ReportBase {
     constructor(symperId){
         let columnSettingKeys = ReportGroupConfig.Group2.columnSettingKeys
         let styleKeys = ReportGroupConfig.Group2.styleKeys
@@ -10,7 +10,7 @@ export default class Line extends ReportBase {
     }
     translate(rawConfig,  data, extraData = {} ,changes = {}, oldOutput = {}){
         let displayOptions = {};
-        displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,"line",undefined,1);
+        displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,extraData,"line",undefined,1);
         return displayOptions;
     }
 }

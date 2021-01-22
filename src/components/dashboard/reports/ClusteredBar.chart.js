@@ -10,7 +10,7 @@ export default class ClusteredBar extends ReportBase {
     }
     translate(rawConfig,  data, extraData = {} ,changes = {}, oldOutput = {}){
         let displayOptions = {};
-        displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,"bar",undefined,1);
+        displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,extraData,"bar",undefined,1);
         return displayOptions;
 
     }
