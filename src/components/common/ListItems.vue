@@ -1170,7 +1170,6 @@ export default {
             this.deleteFilterIdx = filterIdx;
         },
         confirmDeleteFilter(){
-            
             if(this.typeDelete=='filter'){
                 let filter = this.listFilters.filter((item,idx)=>idx!=this.deleteFilterIdx);
                 this.listFilters = filter;
@@ -1203,7 +1202,6 @@ export default {
                 })
                 this.notiFilter = this.$t("table.success.save_filter");
             }else{
-                
                 this.listFilters[this.filterIdx].name = this.filterName;
                 this.listFilters[this.filterIdx].columns = this.tableFilter.allColumn;
                 this.notiFilter = this.$t("table.success.edit_filter");
@@ -1214,8 +1212,6 @@ export default {
             let tableConfig =  this.getTableDisplayConfigData();
             tableConfig.detail = JSON.parse(tableConfig.detail);
             tableConfig.detail.filter = this.listFilters;
-            
-            // tableConfig.detail.filter.userId = this.$store.state.app.endUserInfo.id;
             tableConfig.detail= JSON.stringify(tableConfig.detail);
             this.listItemsWorker.postMessage({
                 action: 'saveFilter',
