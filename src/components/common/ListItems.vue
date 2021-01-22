@@ -735,7 +735,7 @@ export default {
                     break;
             }
 		});
-		this.getData()
+		this.getData();
 		this.restoreTableDisplayConfig();
         // this.getDefaultFilter();
 	},
@@ -887,7 +887,7 @@ export default {
             contentDelete:"",
             showDelPopUp:false,
             filterContent:"",
-            showDelFilterPopUp:false,
+            showDelPopUp:false,
             selectedFilterName:'',
 			listItemsWorker: null,
 			deleteDialogShow: false,
@@ -1037,7 +1037,7 @@ export default {
                     this.editFilter(data.filterIdx)
                     break;
                 case 'deleteFilter':
-                    data.type="deleteFilter";
+                    this.typeDelete="filter";
                     this.deleteFilter(data.filterIdx)
                     break;
               }
@@ -1128,22 +1128,7 @@ export default {
             this.tableFilter.allColumn={}
             this.getData();
         },
-        selectActionFilter(actionIdx,filterIdx){
-            switch(actionIdx){
-                case 2:
-                    this.setDefaultFilter(filterIdx);
-                    break;
-                case 3:
-                    this.unsetDefaultFilter(filterIdx);
-                    break;
-                case 0:
-                    this.editFilter(filterIdx)
-                    break;
-                case 1:
-                    this.deleteFilter(filterIdx)
-                break;
-            }
-        },
+    
         getDefaultFilter(){
             if(this.listFilters&&this.listFilters.length>0){
                 this.listFilters.map((fil,i)=>{
@@ -1179,11 +1164,12 @@ export default {
         },
         
         deleteFilter(filterIdx){
-            this.showDelFilterPopUp = true;
-            this.filterContent =" Xóa bộ lọc "+this.listFilters[filterIdx].name+" khỏi danh sách các bộ lọc";
+            this.showDelPopUp = true;
+            this.contentDelete =" Xóa bộ lọc "+this.listFilters[filterIdx].name+" khỏi danh sách các bộ lọc";
             this.deleteFilterIdx = filterIdx;
         },
         confirmDeleteFilter(){
+            debugger
             if(this.typeDelete=='filter'){
                 let filter = this.listFilters.filter((item,idx)=>idx!=this.deleteFilterIdx);
                 this.listFilters = filter;
