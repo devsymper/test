@@ -209,14 +209,14 @@ export default {
                     }
                 }
                 //check trong item 3
-                if (currentMenu.item3) {
-                    let listItemInItem3 = currentMenu.item3.items;
+                if (currentMenu.workspace3) {
+                    let listItemInWorkspace3 = currentMenu.workspace3.items;
                         // check role project setting
                     if (!checkPermission('task_manager_project_setting','config')) {
-                        let item = listItemInItem3.find(data => data.name === 'projectSetting')
-                        var index = listItemInItem3.indexOf(item);
+                        let item = listItemInWorkspace3.find(data => data.name === 'projectSetting')
+                        var index = listItemInWorkspace3.indexOf(item);
                         if (index > -1) {
-                            listItemInItem3.splice(index, 1);
+                            listItemInWorkspace3.splice(index, 1);
                         }
                     }
                 }
