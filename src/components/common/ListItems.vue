@@ -267,10 +267,8 @@
 				:frameworkComponents="frameworkComponents"
 				:overlayLoadingTemplate="overlayLoadingTemplate"
 				:overlayNoRowsTemplate="overlayNoRowsTemplate"
-				:modules="modules"
 				@cell-context-menu="cellContextMenu"
                 @cell-mouse-down="cellMouseDown"
-
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
@@ -395,9 +393,11 @@ import { actionHelper } from "@/action/actionHelper";
 import CheckBoxRenderer from "@/components/common/agDataTable/CheckBoxRenderer"
 import SymperDialogConfirm from "@/components/common/SymperDialogConfirm"
 import ConfigFilter from "./ListItemConfigFilter"
+import 'ag-grid-enterprise';
 import AddFilter from "./ListItemAddFilter"
 import CheckBoxRendererListItems from "@/components/common/agDataTable/CheckBoxRendererListItems"
 let CustomHeaderVue = Vue.extend(CustomHeader);
+import  {ClipboardModule} from '@ag-grid-enterprise/clipboard';
 
 var testSelectData = [ ];
 window.tableDropdownClickHandle = function(el, event) {
@@ -887,7 +887,6 @@ export default {
             contentDelete:"",
             showDelPopUp:false,
             filterContent:"",
-            showDelPopUp:false,
             selectedFilterName:'',
 			listItemsWorker: null,
 			deleteDialogShow: false,
@@ -920,7 +919,7 @@ export default {
 			},
 			searchKey: "",
 			modules:[
-				MenuModule
+				MenuModule,
 			],
 			MedalCellRenderer(){
 			},	
@@ -1004,7 +1003,9 @@ export default {
 				if (params.node.rowIndex % 2 != 0) {
 					return { background: '#fbfbfb' };
 				}
-			}
+			},
+			suppressCopyRowsToClipboard: true,
+			modules:[ClipboardModule]
 		},
 		this.frameworkComponents = {
 			agColumnHeader: CustomHeaderVue,
@@ -1388,16 +1389,14 @@ export default {
                         menuItem[0].hasOwnProperty("callback")
                     ) {
                         if(key == 'delete' || key == 'remove'){
-                            thisCpn.deleteItems = [];
-                            let deletedIndexs = {};
-                            for(let item of selection ){
-                                for(let idx = item.start.row ; idx <= item.end.row; idx++){
-                                    if(!deletedIndexs[idx]){
-                                        thisCpn.deleteItems.push(thisCpn.rowData[idx]);
-                                        deletedIndexs[idx] = true;
-                                    }
-                                }
-                            }
+							let allRow = []
+							let allRowRange = thisCpn.agApi.getCellRanges()
+							thisCpn.agApi.forEachNode(node=>{
+								if(node.rowIndex >= allRowRange[0].startRow.rowIndex && node.rowIndex <= allRowRange[0].endRow.rowIndex){
+									allRow.push(node.data)
+								}
+							})
+							thisCpn.deleteItems = allRow;
                             thisCpn.deleteDialogShow = true;
                         }else{
                             thisCpn.exeCallbackOnContextMenu(rowData);
@@ -1613,7 +1612,8 @@ export default {
 			this.getData();
 			this.$emit("refresh-list", {});
         },
-		showTableDropdownMenu(x, y, colName) {
+		showTableDropdownMenu(x, y, colName){
+			this.searchKey = ""
             var windowWidth = $(window).width()/1.1;
             if(x > windowWidth){
                 x -= 190;
@@ -2021,6 +2021,14 @@ export default {
 }
 .symper-list-items >>> .ag-theme-balham .ag-root-wrapper{
 	border: unset !important;
+}
+.symper-list-items >>> .ag-cell{
+	-webkit-touch-callout: none;
+	-webkit-user-select: none; 
+	-khtml-user-select: none; 
+	-moz-user-select: none;
+	-ms-user-select: none; 
+	user-select: none; 
 }
 .symper-list-items >>> .ag-header{
 	border: unset !important;
