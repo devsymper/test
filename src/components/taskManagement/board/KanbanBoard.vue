@@ -294,7 +294,7 @@ export default {
    
     methods:{
         checkUpdateTask(issue){
-            if(issue.tmg_assignee == self.$store.state.app.endUserInfo.id){
+            if(issue.tmg_assignee == this.$store.state.app.endUserInfo.id){
                 let data = {};
                 data.projectId = this.projectId;
                 data.listBoardColumn = this.listBoardColumn;
