@@ -586,18 +586,30 @@ export const startWorkflowBySubmitedDoc = function(idWorkflow, submitedDocData, 
         idWorkflow = idWorkflow + '';
         let res = await BPMNEngine.getModelData(idWorkflow);
         let docId = submitedDocData.document_id;
+        let startNodeId = prefixParam + '_';
+
         if(res.status == 200){
             let defData = await getLastestDefinition(res.data, true);
             if(defData.data[0]){
                 defData = defData.data[0];
                 if(openNewTab){
+                   
+                    let varsForBackend = await getVarsFromSubmitedDoc(submitedDocData, startNodeId, docId);
+                    vars = varsForBackend.vars;
+                    dataInputForFormula = varsForBackend.nameAndValueMap;
+                    vars.push({
+                        name: 'docInstanceFromStartingWorkflow',
+                        type: 'string',
+                        value: submitedDocData.document_object_id
+                    });
                     resolve({
                         message: "Chuyển đến trang khởi tạo quy trình"
                     });
-                    SYMPER_APP.$goToPage(`/workflow/process-definition/${defData.id}/run`,'Bắt đầu quy trình ' + res.data.name);
+                    SYMPER_APP.$goToPage(`/workflow/process-definition/${defData.id}/run`,'Bắt đầu quy trình ' + res.data.name, false, true, {
+                        processInstanceVars: vars
+                    });
                 }else{
                     let vars = []; // các biến cần đưa vào process instance
-                    let startNodeId = prefixParam + '_';
                     let dataInputForFormula = {};
 
                     try {
