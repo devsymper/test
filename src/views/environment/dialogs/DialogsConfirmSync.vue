@@ -69,7 +69,6 @@
 
 <script>
 import EnvironmentWorker from 'worker-loader!@/worker/environment/Environment.Worker.js';
-import {environmentManagementApi} from '@/api/EnvironmentManagement'
 export default {
 	props:{
 		showDialog:{
@@ -151,20 +150,21 @@ export default {
 			let data = {
 				[type]:ids
 			}
-			this.environmentWorker.postMessage({
-				action: 'migrateData',
-				data:{
-					dataGetServerId:{
-						serviceId: currentServiceId,
-						environmentId: currentEnvId
-					},
-					formData:{
-						sourceInstanceId:sourceInstanceId,
-						data: JSON.stringify(data),
-						override: self.override
-					}
-				}
-			});
+			debugger
+			// this.environmentWorker.postMessage({
+			// 	action: 'migrateData',
+			// 	data:{
+			// 		dataGetServerId:{
+			// 			serviceId: currentServiceId,
+			// 			environmentId: currentEnvId
+			// 		},
+			// 		formData:{
+			// 			sourceInstanceId:sourceInstanceId,
+			// 			data: JSON.stringify(data),
+			// 			override: self.override
+			// 		}
+			// 	}
+			// });
 			this.$snotifySuccess("Đang xử lý . Vui lòng chờ kết quả")
 			this.$emit('success')
 

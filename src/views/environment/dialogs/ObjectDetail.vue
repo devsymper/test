@@ -11,38 +11,6 @@
 		>
 			<v-icon dark small>mdi-keyboard-backspace</v-icon>
 		</v-btn>
-		<div class="btn-header-popup">
-			<v-btn 
-				class="mr-2 font-normal fs-13"
-				depressed
-				tile
-				v-if="showBtnAddCheckbox"
-				small
-				@click="addCheckBoxColumn"
-			>
-				Chọn
-			</v-btn>
-			
-			<v-btn 
-				class="mr-2 font-normal fs-13"
-				depressed
-				tile
-				small
-				:disabled="showBtnAddCheckbox"
-				@click="handleSyncClick"
-			>
-				Đồng bộ
-			</v-btn>
-			<v-btn 
-				class="font-normal fs-13 mr-2"
-				depressed
-				tile
-				small
-				@click="handleSyncAll"
-			>
-				Đồng bộ tất cả
-			</v-btn>
-		</div>
 		<ListItem 
 			ref="listObject"
 			:showExportButton="false"
@@ -50,8 +18,11 @@
 			:dialogMode="true"
 			:getDataUrl="getListUrl"
 			@close-popup="handleCloseEvent"
+			:showFilter="false"
+			:customHeaderBtn="customHeaderBtn"
+			@custom-get-all-data="customGetAllData"
 			style="margin-left:10px"
-			@data-loaded="showBtnAddCheckbox = true"
+			@data-loaded="handleDataLoaded"
 			:refreshListWhenChangeUrl="false"
 			:useDefaultContext="false"
 			:tableContextMenu="tableContextMenu"
@@ -127,6 +98,32 @@ export default {
 						total: res.data.total,
 					}
 				}
+			},
+			customHeaderBtn:{
+				showCheckBox:{
+					title: "Chọn",
+					callback(){
+						self.addCheckBoxColumn()
+					}
+				},
+				sync:{
+					title: "Đồng bộ",
+					callback(){
+						self.handleSyncClick()
+					}
+				},
+				syncAll:{
+					title:"Đồng bộ tất cả",
+					callback(){
+						self.handleSyncAll()
+					}
+				},
+				close:{
+					icon: 'mdi-close',
+					callback(){
+						self.handleCloseEvent()
+					}
+				}
 			}
 		}
 	},
@@ -134,11 +131,26 @@ export default {
 		handleCloseEvent(){
 			this.$emit('close-popup')
 		},
+		customGetAllData(data){
+			this.$set(this, 'listItemSelected', data)
+			this.showDialog = true
+		},
+		handleDataLoaded(){
+			if(!this.customHeaderBtn.showCheckBox){
+				let self = this
+				this.customHeaderBtn.showCheckBox = {
+					title: "Chọn",
+					callback(){
+						self.addCheckBoxColumn()
+					}
+				}
+			}
+		},
 		back(){
 			this.$emit('back')
 		},
 		addCheckBoxColumn(){
-			this.showBtnAddCheckbox = false
+			delete this.customHeaderBtn.showCheckBox
 			this.$refs.listObject.addCheckBoxColumn()
 		},
 		handlerSuccess(){
@@ -153,9 +165,9 @@ export default {
 			this.showDialog = true
 		},
 		handleSyncAll(){
-			let items = this.$refs.listObject.getAllData()
-			this.$set(this, 'listItemSelected', items)
-			this.showDialog = true
+			this.$refs.listObject.customGetData()
+			this.$snotifySuccess('Đang lấy dữ liệu....')
+			
 		},
 		handleCheckClick(){
 			this.showDialogRelateData = true

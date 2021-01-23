@@ -93,17 +93,6 @@
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel_history')}}</span>
                         </v-btn>
-                        <v-btn
-                            depressed
-                            small
-							icon
-							tile
-                            @click="handleCloseClick"
-                            class="mr-2"
-                            v-if="dialogMode"
-                        >
-                            <v-icon dark>mdi-close</v-icon>
-                        </v-btn>
                          <v-menu
                             bottom
                             left
@@ -223,17 +212,18 @@
                             </template>
                             <span>{{alwaysShowActionPanel ? $t('common.not_always_show_sidebar') : $t('common.always_show_sidebar')}}</span>
                         </v-tooltip>
+
 						<span v-if="Object.keys(customHeaderBtn).length > 0">
 							 <v-btn
 								depressed
 								small
 								v-for="(item, i) in customHeaderBtn"
 								:key="i"
-								@click="customBtnclick(i)"
+								@click="customBtnClick(i)"
 								class="mr-2"
 							>
-								<v-icon left dark>{{item.icon}}</v-icon>
-								<span> {{item.title}} </span>
+								<v-icon left dark v-if="item.icon">{{item.icon}}</v-icon>
+								<span v-if="item.title"> {{item.title}} </span>
 							</v-btn>
 						</span>
 			 </div>
@@ -695,8 +685,10 @@ export default {
 			let data = event.data;
             switch (data.action) {
                 case 'getData':
-					
 					self.handlerGetData(data.dataAfter)
+					break;
+                case 'customGetData':
+					self.handleCustomGetData(data.dataAfter)
 					break;
                 case 'getItemForValueFilter':
 					self.tableFilter.currentColumn.colFilter.selectItems = data.dataAfter.selectItems
@@ -765,6 +757,7 @@ export default {
                 return "100%";
             }
 		},
+		
 		tableHeight() {
 			let ref = this.$refs;
 			let tbHeight = this.containerHeight;
@@ -1016,6 +1009,9 @@ export default {
       	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
     },
 	methods:{
+		customBtnClick(i){
+			this.customHeaderBtn[i].callback()
+		},
         handleAddFilter(data){
             if(data.type=='save'){
                 this.filterName = data.filterName
@@ -1441,7 +1437,10 @@ export default {
             })
             }
             this.$emit('get-list-id',this.listId)
-        },
+		},
+		handleCustomGetData(data){
+			this.$emit('custom-get-all-data', data.data.listObject)
+		},
 		handlerGetData(data){
             this.getListId(data.data.listObject);
 			let self = this
@@ -1452,13 +1451,7 @@ export default {
 			}
 			this.totalObject = data.total ? parseInt(data.total) : 0;
 			let resData = data.listObject ? data.listObject : []
-			// if(lazyLoad){
-			// 	resData.forEach(function(e){
-			// 		thisCpn.rowData.push(e)
-			// 	})
-			// }else{
 			self.rowData = resData;
-			// }
 			data.columns.forEach(function(e){
 				if(e.cellRenderer){
 					e.cellRenderer = e.cellRenderer.toString()
@@ -1895,6 +1888,10 @@ export default {
             this.getData();
             this.$emit("change-page", vl.page);
 		},
+		customGetData(){
+			this.pageSize = 1000
+			this.getData(false, false, true, false, true);
+		},
 		addItem() {
             if(this.useActionPanel){
                 this.actionPanel = true;
@@ -1919,7 +1916,7 @@ export default {
             this.getData();
             this.$emit("change-page", this.page);
 		},
-		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false ){
+		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false, customGetData = false){
 			let self = this;
 			let dataConfig = this.getConfigApiCall()
 			dataConfig.configs = {
@@ -1929,11 +1926,19 @@ export default {
 			}
 			dataConfig.lazyLoad = lazyLoad
 			dataConfig.customAPIResult = self.customAPIResult.reformatData ? self.customAPIResult.reformatData.toString() : null
-            dataConfig.filteredColumns = self.filteredColumns
-			this.listItemsWorker.postMessage({
-				action: 'getData',
-				data: dataConfig
-			});
+			dataConfig.filteredColumns = self.filteredColumns
+			if(customGetData){
+				this.listItemsWorker.postMessage({
+					action: 'customGetData',
+					data: dataConfig
+				});
+			}else{
+				this.listItemsWorker.postMessage({
+					action: 'getData',
+					data: dataConfig
+				});
+			}	
+			
 		},
 		 /**
          * Khôi phục lại cấu hình của hiển thị của table từ dữ liệu được lưu
