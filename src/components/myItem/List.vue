@@ -250,7 +250,7 @@
                                 >
                                     <div class="pt-3">
                                         <v-chip
-                                            :class="obj.dueDateClass"
+											:color="obj.dueDateClass"
                                             text-color="white"
                                             style="border-radius:4px"
                                             x-small
@@ -929,17 +929,24 @@ export default {
             e.dueDateFromNow = e.dueDate ? this.$moment(e.dueDate).fromNow() : '';
         },
         getDueDateInfo(obj){
-            let overDue = this.checkTimeDueDate(obj);
+			let overDue = this.checkTimeDueDate(obj);
             if(obj.endTime){
                 return {
-                    class: 'task-done' ,
+                    class: 'success' ,
                     text: this.$t('common.done'),
                 }
             }else if(obj.createTime && !overDue){
-                return {
-                    class: 'task-to-do' ,
-                    text: this.$t('myItem.unfinished'),
-                }
+				if(obj.assignee){
+					return {
+						class: 'orange' ,
+						text: this.$t('tasks.assign'),
+					}
+				}else{
+					return {
+						class: 'primary' ,
+						text: this.$t('tasks.unAssign'),
+					}
+				}
             }else{
                 return {
                     class: 'task-over-due' ,
