@@ -150,21 +150,20 @@ export default {
 			let data = {
 				[type]:ids
 			}
-			debugger
-			// this.environmentWorker.postMessage({
-			// 	action: 'migrateData',
-			// 	data:{
-			// 		dataGetServerId:{
-			// 			serviceId: currentServiceId,
-			// 			environmentId: currentEnvId
-			// 		},
-			// 		formData:{
-			// 			sourceInstanceId:sourceInstanceId,
-			// 			data: JSON.stringify(data),
-			// 			override: self.override
-			// 		}
-			// 	}
-			// });
+			this.environmentWorker.postMessage({
+				action: 'migrateData',
+				data:{
+					dataGetServerId:{
+						serviceId: currentServiceId,
+						environmentId: currentEnvId
+					},
+					formData:{
+						sourceInstanceId:sourceInstanceId,
+						data: JSON.stringify(data),
+						override: self.override
+					}
+				}
+			});
 			this.$snotifySuccess("Đang xử lý . Vui lòng chờ kết quả")
 			this.$emit('success')
 

@@ -75,6 +75,7 @@ export default {
 		let self = this
 		return{
 			listItemSelected: [],
+			page:1,
 			showBtnAddCheckbox: true,
 			showDialogRelateData: false,
 			showList: false,
@@ -154,7 +155,6 @@ export default {
 			this.$refs.listObject.addCheckBoxColumn()
 		},
 		handlerSuccess(){
-			this.showBtnAddCheckbox = true
 			this.showDialog = false 
 			this.$refs.listObject.refreshList()
 		},
@@ -165,9 +165,8 @@ export default {
 			this.showDialog = true
 		},
 		handleSyncAll(){
-			this.$refs.listObject.customGetData()
+			this.$refs.listObject.customGetData(this.page)
 			this.$snotifySuccess('Đang lấy dữ liệu....')
-			
 		},
 		handleCheckClick(){
 			this.showDialogRelateData = true

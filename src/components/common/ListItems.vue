@@ -1888,7 +1888,8 @@ export default {
             this.getData();
             this.$emit("change-page", vl.page);
 		},
-		customGetData(){
+		customGetData(page){
+			this.page = page
 			this.pageSize = 1000
 			this.getData(false, false, true, false, true);
 		},
