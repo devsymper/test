@@ -6,38 +6,8 @@ self.onmessage = async function (event) {
     let action = workerDataReceive.action;
     let data = workerDataReceive.data;
 	switch (action) {
-        case 'getAllProject':
-            let itemPro={
-                column : "isDelete",
-                operation : "and",
-                conditions : [
-                    {
-                        name : "in",
-                        value : [0],
-                    }
-                ],
-            }
-            let filterPro={};
-            filterPro.filter = [];
-            filterPro.filter.push(itemPro);
-            filterPro.page = 1;
-            filterPro.pageSize = 200;
-            filterPro.distinct = false;
-            taskManagementApi.getAllProject(filterPro).then(res => {
-                if(res['status'] == 200 && res['data']){
-                    postMessage({action:'getAllProject', dataAfter : res})
-                }
-            });
-            break;
-        case 'getListBoard':
-            if (data) {
-                taskManagementApi.getListBoardInProject(data).then(res => {
-                    if(res['status'] == 200 && res['data']){
-                        postMessage({action:'getListBoard', dataAfter : res})
-                    }
-                });
-            }
-            break;
+        
+        
         case 'getUserInProject':
             if (data) {
                 taskManagementApi.getUserInProject(data).then(res => {
@@ -131,15 +101,7 @@ self.onmessage = async function (event) {
                 });
             }
             break; 
-        case 'getDetailProject':
-            if (data) {
-                taskManagementApi.getDetailProject(data).then(res => {
-                    if(res['status'] == 200 && res['data']){
-                        postMessage({action:'getListDocumentIdsInProject', dataAfter : res})
-                    }
-                });
-            }
-            break;
+       
         case 'getListStatusInProject':
             if (data) {
                 taskManagementApi.getListStatusInProject(data).then(res => {
@@ -256,6 +218,37 @@ self.onmessage = async function (event) {
                 taskManagementApi.addBoardForProject(data).then(res => {
                     if(res['status'] == 200){
                         postMessage({action:'handleAddBoard', dataAfter : res})
+                    }else{
+                        postMessage({action:'actionError'})
+                    }
+                });
+            }
+            break;
+        case 'getDetailBoard':
+            if (data) {
+                taskManagementApi.getDetailBoard(data).then(res => {
+                    if(res['status'] == 200){
+                        let listNewColumn = {}
+                        let listColumn = res.data.listColumn;
+                        for (let index = 0; index < listColumn.length; index++) {
+                            let column = listColumn[index];
+                            if(column.tmg_is_backlog == 0){
+                                if(!listNewColumn[column.tmg_column_id]){
+                                    listNewColumn[column.tmg_column_id] = {
+                                        id:column.tmg_column_id,
+                                        name:column.tmg_column_name,
+                                        isBacklog:column.tmg_is_backlog,
+                                        isHidden:column.tmg_is_hidden,
+                                        statusInColumn:[]
+                                    }
+                                }
+                                listNewColumn[column.tmg_column_id].statusInColumn.push(
+                                    {name:column.tmg_status_name, color:column.tmg_color,id: column.tmg_status_id,nodeId:null,tasks:[]}
+                                )
+                            }
+                        }
+                        postMessage({action:'getDetailBoard', dataAfter : listNewColumn})
+                        
                     }else{
                         postMessage({action:'actionError'})
                     }
@@ -525,25 +518,17 @@ async function setLiskTask(data){
     let allTask = await documentApi.getListObjectByMultipleDocument(data.filter)
     allTask = allTask['data']['listObject'];
     let columns = data.listColumn;
-    if (data.listStatus.length > 0 ) {
-        for (let i = 0; i < data.listStatusColumn.length; i++) {
-            let idColumn = data.listStatusColumn[i].columnId;
-            let statusId = data.listStatusColumn[i].statusId;
-            let taskLifeCircleId = data.listStatusColumn[i].taskLifeCircleId;
-            let item = data.listStatus.find(ele => ele.statusId == statusId &&  ele.taskLifeCircleId == taskLifeCircleId );
-            if (item) {
-                let taskInStatus = allTask.filter(task=>{
-                    return task.tmg_status_id == statusId && task.tmg_task_life_circle_id == taskLifeCircleId ;
-                })
-                item['tasks'] = taskInStatus;
-                let column = columns.find(ele => ele.id == idColumn);
-                if (column) {
-                    column.statusInColumn.push(item);
-                }
-            }
-        }  
+    for (let index = 0; index < columns.length; index++) {
+        let column = columns[index];
+        for (let i = 0; i < column.statusInColumn.length; i++) {
+            let status = column.statusInColumn[i];
+            let taskInStatus = allTask.filter(task=>{
+                return task.tmg_status_id == status.id;
+            })
+            status['tasks'] = taskInStatus;
+        }
+        
     }
-
     return columns;
 }
 

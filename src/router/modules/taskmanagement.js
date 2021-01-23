@@ -94,6 +94,14 @@ export default [
                 }
             },
             {
+                path: "projects/:id/create-filter",
+                meta:{group:'projectSetting'},
+                name: "createFilter",
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/issueLink/List.vue')
+                }
+            },
+            {
                 path: "projects/:id/workflow/create",
                 // meta:{group:'projectSetting'},
                 name: "issueTypeWorkflow",

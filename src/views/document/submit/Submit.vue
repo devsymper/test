@@ -1067,7 +1067,7 @@ export default {
             let updateByWorkflowId = this.documentInfo.updateByWorkflowId;
             
             if(updateByWorkflowId && updateByWorkflowId != "0" && this.$getRouteName() == 'updateDocumentObject'){
-                startWorkflowBySubmitedDoc(updateByWorkflowId, {document_id:this.docId})
+                // startWorkflowBySubmitedDoc(updateByWorkflowId, {document_id:this.docId, document_object_id:})
             }
         },
         afterBlurInputPivot(event){

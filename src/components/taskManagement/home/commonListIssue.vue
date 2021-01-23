@@ -40,7 +40,7 @@
                             <div class="mt-2" style="min-width:120px">
                                 <span v-if="item.infoStatus" style="padding: 2px 4px; border-radius:3px; background:#f2f2f2;font-weight:500;" :style="{'color':item.infoStatus.color}">{{item.infoStatus.name}}</span>
                             </div> 
-                            <div class="mt-2 mx-1" style="min-width:120px" >
+                            <div class="mt-2 mx-1" style="min-width:160px" >
                                 <infoUser v-if="item.tmg_assignee" class="userInfo fs-13" :userId="item.tmg_assignee" :roleInfo="{}" />
                             </div>   
                         </div>

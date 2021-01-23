@@ -19,7 +19,7 @@
                                 <v-icon v-if="!!sCurrentProject.icon && sCurrentProject.icon.indexOf('mdi-') > -1" style="font-size:25px" class="pt-0">{{sCurrentProject.icon}}</v-icon>
                                 <img class="img-fluid" style="object-fit: fill;border-radius:3px" v-else-if="!!sCurrentProject.icon && sCurrentProject.icon.indexOf('mdi-') < 0" :src="sCurrentProject.icon" width="23" height="23">
                                 <div class="project-name" v-if="!mini">
-                                    <div class="mt-2">{{sCurrentProject.name}}</div>
+                                    <div class="mt-3 ml-2">{{sCurrentProject.name}}</div>
                                 </div>
                                 <!-- <v-icon style="height:24px;" v-if="!mini">mdi-chevron-down</v-icon> -->
                             </div>
@@ -84,13 +84,16 @@
 </template>
 <script>
 import _ from 'lodash';
-import { util } from "@/plugins/util.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import ProjectPopup from '@/components/taskManagement/project/ProjectPopup';
 import SelectBoard from '@/components/taskManagement/board/SelectBoard';
 import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
+import HomeWorker from 'worker-loader!@/worker/taskManagement/home/Index.Worker.js';
+import { taskManagementApi } from "@/api/taskManagement.js";
+
 export default {
     created(){
+        this.homeWorker =  new HomeWorker();
         this.$evtBus.$on("symper-app-wrapper-clicked", evt => {
             if (this.$refs.projectPopupView && 
                 ($(evt.target).closest(".project-info").length == 0 &&
@@ -105,12 +108,38 @@ export default {
                 this.$refs.SelectBoard.hide()
             }
         });
-
-        this.$evtBus.$on('selected-item-board', (board) =>{
-            this.menu.workspace1.items[0].title = board.name;
-            this.menu.workspace1.items[0].subTitle = "";
-        });
+        this.$evtBus.$on('task-manager-change-project', ()=>{
+            this.getCurrentProject()
+        })
         
+        let self = this;
+        this.homeWorker.addEventListener("message", function (event){
+			let data = event.data;
+            switch (data.action) {
+                case 'getAllProject':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit('taskManagement/setAllProject', res.data.listObject);
+                        self.getCurrentProject();
+                    }
+                    break;
+                case 'getDetailProject':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/setCurrentProject", res.data);
+                    } 
+                    break;
+                case 'getListBoard':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/setListBoardInProject", res.data.listObject);
+                        self.setCurentBoard();
+                    } 
+                    break;
+                default:
+                    break;
+            }
+        })
         
     },
     components: {
@@ -122,15 +151,18 @@ export default {
         sCurrentProject(){
             return this.$store.state.taskManagement.currentProject
         },
-        sTaskManagement(){
-            return this.$store.state.taskManagement
-        },
         userMenuItems(){
             return this.$store.getters['taskManagement/userMenuItems'];
         },
         listBoardInProject(){
             return this.$store.state.taskManagement.listBoardInProject;
-        }
+        },
+        sTaskManagement(){
+            return this.$store.state.taskManagement;
+        },
+        listBoard(){
+            return this.$store.state.taskManagement.listBoardInProject;
+        },
     },
     watch:{
         mini(vl){
@@ -152,17 +184,23 @@ export default {
                 this.$refs.SelectBoard.hide();
             }
         },
-        // listBoardInProject(vl){
-        //     if(vl.length > 0){
-        //         this.menu.workspace1.items[0].title = vl[0].name;
-        //         this.menu.workspace1.items[0].subTitle = "";
-        //     }
-        // },
-        sCurrentProject(newVl){
-            if (Object.keys(newVl).length > 0) {
+        sCurrentProject(after, before){
+            if(after.id == before.id){
+                return;
+            }
+            if (Object.keys(after).length > 0) {
                 this.checkShowListMenu();
+                this.getAllUserOperations(after.id);
+                this.getListBoard();
+            }
+        },
+        "sTaskManagement.currentBoard":function(after){
+            if(this.$route.meta.group == 'home'){
+                this.menu.workspace1.items[0].title = after.name
+                this.menu.workspace1.items[0].subTitle = after.description;
             }
         }
+        
     },
     mounted(){
         this.checkShowListMenu()
@@ -274,6 +312,8 @@ export default {
         },
         afterSelectBoard(board){
             this.menu.workspace1.items[0].title = board.name
+            this.menu.workspace1.items[0].subTitle = board.description;
+            this.$store.commit("taskManagement/setCurrentBoard",board);
         },
         checkShowSideBar(){
             if(!this.isExpand){
@@ -318,6 +358,49 @@ export default {
                 this.$router.push(link);
             }
         },
+        getAllUserOperations(projectId){
+            let thisCpn = this;
+            taskManagementApi.getAllActionOfProject(projectId).then(res=>{
+                if(res.status == 200){
+                    thisCpn.$store.commit('taskManagement/addToTaskManagementStore',{key:'userOperations',value:res.data})
+                }
+            })
+        },
+        getAllProject(){
+            this.homeWorker.postMessage({
+                action:'getAllProject',
+                data:null
+            });
+        },
+        getCurrentProject(){
+            this.projectId = this.$route.params.id;
+            this.getDetailProject();
+        },
+        getDetailProject(){
+            this.homeWorker.postMessage({
+                action:'getDetailProject',
+                data:this.projectId
+            });
+        },
+        getListBoard(){
+            this.homeWorker.postMessage({
+                action:'getListBoard',
+                data:this.projectId
+            });
+        },
+        setCurentBoard(board=null){
+            let self = this;
+            let currentBoard = null;
+            if (board) {
+                currentBoard = board;
+            }else{
+                let allBoard = this.listBoard;
+                if (allBoard.length>0) {
+                    currentBoard = allBoard[0];  
+                }
+            }
+            self.$store.commit("taskManagement/setCurrentBoard",currentBoard);
+        },
     },
     data() {
         return {
@@ -332,8 +415,16 @@ export default {
             mini: false,
             oldSelected:null,
             originMenu:null,
+            homeWorker:null,
+            projectId:null
         };
-    }
+    },
+    activated(){
+        this.projectId = this.$route.params.id;
+        if (!this.sTaskManagement.allProject || this.sTaskManagement.allProject.length == 0) {
+            this.getAllProject();
+        }
+    },
 };
 </script>
 <style scoped>

@@ -25,7 +25,7 @@
                 </div>
             </div>
             <!-- <v-icon @click="handleHome" style="font-size:24px;color:#5a6061">mdi-home-account</v-icon> -->
-            <div class="pr-3" style="position:relative;padding: 3px 0;margin-top:3px">
+            <!-- <div class="pr-3" style="position:relative;padding: 3px 0;margin-top:3px">
                 <v-menu offset-y>
                     <template v-slot:activator="{ on, attrs }">
                         <v-icon    
@@ -44,26 +44,7 @@
                     </v-list>
                 </v-menu>
             </div>
-            <!-- <div class="user-info">
-                <v-menu offset-y>
-                <template v-slot:activator="{ on, attrs }">
-                    <img
-                    class="user-avatar"
-                    :src="currentUserAvatar"
-                    v-bind="attrs"
-                    v-on="on"
-                    >
-                </template>
-                <v-list>
-                    <v-list-item
-                    v-for="(item, index) in items"
-                    :key="index"
-                    >
-                    <v-list-item-title>{{ item.title }}</v-list-item-title>
-                    </v-list-item>
-                </v-list>
-                </v-menu>
-            </div> -->
+             -->
         </div>
         <popup-issue
             ref="popupIssue"
@@ -74,8 +55,7 @@
 </template>
 <script>
 import { appConfigs } from '../../../configs.js';
-import { taskManagementApi } from "@/api/taskManagement.js";
-import popupIssue from "../../../components/taskManagement/issue/popupIssue"
+import popupIssue from "../../../components/taskManagement/issue/popupIssue";
 export default {
     components:{
         popupIssue
@@ -97,7 +77,8 @@ export default {
                     },
                 },
             ],
-            isLoadedPopup:true
+            isLoadedPopup:true,
+           
             
         }
     },
@@ -108,33 +89,20 @@ export default {
         showPopupCreateIssue(){
             this.$refs.popupIssue.show();
         },
-        getAllUserOperations(projectId){
-            let thisCpn = this;
-            taskManagementApi.getAllActionOfProject(projectId).then(res=>{
-                if(res.status == 200){
-                    thisCpn.$store.commit('taskManagement/addToTaskManagementStore',{key:'userOperations',value:res.data})
-                }
-            })
-        }
+        
     },
-    watch:{
-        sCurrentProject(vl){
-            this.getAllUserOperations(vl.id);
-        }
-    },
+        
     created(){
         this.$store.dispatch("taskManagement/getAllStatusCategory");
-        if (!this.$store.state.taskManagement.allPriority || this.$store.state.taskManagement.allPriority == 0) {
+        if (!this.sTaskManagement.allPriority || this.sTaskManagement.allPriority == 0) {
             this.$store.dispatch("taskManagement/getAllPriority");
         }
         this.$evtBus.$on('add-issue-btn-click',() => {
             this.$refs.popupIssue.show();
         })
+        
     },
     computed:{
-        sCurrentProject(){
-            return this.$store.state.taskManagement.currentProject
-        },
         currentUserAvatar(){
             let userId = this.$store.state.app.endUserInfo.id;
             return appConfigs.apiDomain.fileManagement+'readFile/user_avatar_' + userId;
@@ -154,7 +122,7 @@ export default {
         },
         sTaskManagement(){
             return this.$store.state.taskManagement;
-        }
+        },
     }
 }
 </script>

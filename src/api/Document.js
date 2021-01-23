@@ -6,6 +6,7 @@ var formulasApi = new Api(appConfigs.apiDomain.formulasService);
 var trashApi = new Api(appConfigs.apiDomain.trashService);
 export const documentApi = {
     getListDocument() {
+        console.trace('ok');
         return coreApi.get("documents?pageSize=3000");
     },
     getListDocumentObject(docId) {

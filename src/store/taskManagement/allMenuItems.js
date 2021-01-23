@@ -111,6 +111,12 @@ export default {
                     url:"/task-management/projects/:id/priorities"
                 },
                 {
+                    name:'createFilter',
+                    title:"Create Filter",
+                    icon: 'mdi-filter-plus-outline',
+                    url:"/task-management/projects/:id/create-filter"
+                },
+                {
                     name:'backToKanban',
                     title:"Back to Kanban",
                     icon: 'mdi-keyboard-backspace',
