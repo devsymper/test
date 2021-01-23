@@ -378,7 +378,6 @@ export default {
             let nodeName = this.context == 'department' ? this.$t('orgchart.editor.department') : this.$t('orgchart.editor.position');
             nodeName += ' 1';
             let firstNode = this.context == 'department' ?  createDepartmentNode(nodeName) : createPositionNode(nodeName);
-            debugger
             var treeLayout = new joint.layout.TreeLayout({
                 graph: graph,
                 direction: 'B',

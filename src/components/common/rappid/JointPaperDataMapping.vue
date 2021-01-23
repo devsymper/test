@@ -16,6 +16,10 @@
 <script>
 import { util } from '../../../plugins/util';
 require('./jointjs');
+require('@/components/common/rappid/dataMapping/joint.anchors.mapping')
+require('@/components/common/rappid/dataMapping/joint.linkTools.mapping')
+require('@/components/common/rappid/dataMapping/joint.routers.mapping')
+require('@/components/common/rappid/dataMapping/joint.shapes.mapping')
 export default {
 	data() {
 		return {
@@ -29,11 +33,11 @@ export default {
 	props: {
 		width: {
 			type: [String, Number],
-			default: 800,
+			default: 600,
 		},
 		height: {
 			type: [String, Number],
-			default: 600,
+			default: 400,
 		},
 		gridSize: {
 			type: Number,
@@ -126,10 +130,7 @@ export default {
 			paper: this.paper,
 			autoResizePaper: true,
 		});
-
-		//dung na create
 		var viewportOverlap = 50;
-
 		var viewportRect = paperScroller.getVisibleArea().inflate(viewportOverlap);
 		paperScroller.el.onscroll = function() {
 			viewportRect = paperScroller.getVisibleArea().inflate(viewportOverlap);

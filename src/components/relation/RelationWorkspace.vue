@@ -4,6 +4,7 @@
 
 <script>
 import JointPaperDataMapping from '@/components/common/rappid/JointPaperDataMapping';
+require('@/plugins/rappid/rappid.css');
 export default {
 	props: {
 		action: {

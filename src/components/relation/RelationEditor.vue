@@ -2,7 +2,7 @@
 	<div class="d-flex relation-editor w-100 h-100">
 		<div class="relation-dataset-selector" v-if="action != 'view'">
 			<div class="d-flex flex-column ml-3 mt-2 mr-2">
-				<span class="mb-2">
+				<span class="mb-2 fs-13">
 					{{ $t('bi.relation.selector') }}
 				</span>
 
