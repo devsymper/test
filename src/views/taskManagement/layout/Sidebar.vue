@@ -306,7 +306,6 @@ export default {
                     }
                 }
                 this.menu = currentMenu;
-                console.log(this.menu,'this.menu');
             }
             
         },
@@ -423,6 +422,9 @@ export default {
         this.projectId = this.$route.params.id;
         if (!this.sTaskManagement.allProject || this.sTaskManagement.allProject.length == 0) {
             this.getAllProject();
+        }
+        else if(!this.sCurrentProject.id){
+            this.getCurrentProject();
         }
     },
 };

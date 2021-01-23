@@ -1,7 +1,7 @@
 <template>
     <div class="task-manager-app-header">
         <div class="app-header_left" :class="{ 'breadcrumb-hide-sidebar': hideSidebar }">
-            <v-breadcrumbs :items="headerBreadcrumbs">
+            <v-breadcrumbs :items="headerBreadcrumbs" >
                 <template v-slot:divider>
                     <v-icon>mdi-chevron-right</v-icon>
                 </template>
@@ -112,7 +112,7 @@ export default {
             breadcrumb.unshift({
                     text: 'Home',
                     disabled: false,
-                    to: '/',
+                    to: '/task-management/home',
                 })
                 return breadcrumb
             

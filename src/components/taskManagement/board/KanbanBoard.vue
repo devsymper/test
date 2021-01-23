@@ -83,8 +83,7 @@
                                 'min-height': (dragging) ? '50px' :''
                             }"
                         >
-                            <!-- <p>{{status.name}} - {{status.taskLifeCircleName}}</p> -->
-                            <p>{{status.name}} </p>
+                            <p>{{status.name}} - {{status.taskLifeCircleName}}</p>
                             <draggable 
                             :disabled="nodeMapPermission[status.nodeId] ? nodeMapPermission[status.nodeId].disable : false"
                             :list="status.tasks" 
@@ -214,7 +213,7 @@ export default {
                     title: this.$t("taskManagement.settingBoard"),
                     menuAction: action => {
                         if (Object.keys(this.currentBoard).length > 0) {
-                            this.$router.push("/task-management/projects/"+this.projectId+"/kanban-board/settings/" + this.currentBoard.id);
+                            this.$router.push("/task-management/projects/"+this.sCurrentProject.id+"/kanban-board/settings/" + this.currentBoard.id);
                         }else{
                             console.log("Chưa có data");
                         }
@@ -378,14 +377,19 @@ export default {
         /**
          * 
          */
-        setNodeMap(){
+        getUserPermission(){
             if (!this.sTaskManagement.listRoleUserInProject[this.projectId] || this.sTaskManagement.listRoleUserInProject[this.projectId].length == 0) {
-                self.getListRoleUserInProject();
+                this.getListRoleUserInProject();
             }
             if (!this.sTaskManagement.listOperatorInProject[this.projectId] || this.sTaskManagement.listOperatorInProject[this.projectId].length == 0) {
-                self.getListOperatorInProject();
-
+                this.getListOperatorInProject();
             }
+        },
+        /**
+         * Hàm lấy thông tin mapping của các trạng thái trong các cột
+         * chỉ ra trạng thái nào được kết nối đến trạng thái nào
+         */
+        setMappingColumnDrag(){
             let allOperator = this.sTaskManagement.listOperatorInProject[this.projectId];
             let allNode = this.sTaskManagement.listStatusInProjects[this.projectId];
             if (allOperator.length > 0 && allNode.length > 0) {
@@ -397,7 +401,6 @@ export default {
                     data:data
                 });
             }
-
         },
         getUser(){
             if (this.listUser.length > 1) {
@@ -411,10 +414,9 @@ export default {
             if(event.added){
                 let task = event.added.element;
                 let dataSend = {};
-                dataSend.allIssueTypeInProject = this.allIssueTypeInProject;
+                dataSend.allIssueTypeInProject = this.sCurrentProject.issueTypes;
                 dataSend.task = task;
                 dataSend.status = status;
-
                 this.kanbanWorker.postMessage({
                     action:'handleChangeStatusIssue',
                     data:dataSend
@@ -503,7 +505,9 @@ export default {
             this.$emit('loading');
             this.kanbanWorker.postMessage({
                 action:'getDetailBoard',
-                data:this.currentBoard.id
+                data:{boardId:this.currentBoard.id,
+                allStatus: this.sTaskManagement.listStatusInProjects[this.sCurrentProject.id],
+                projectId: this.sCurrentProject.id}
             });
         },
         addIssueClick(){
@@ -543,7 +547,7 @@ export default {
                     dataToStore = {key:self.currentBoard.id, data:Object.values(data.dataAfter)}
                     self.$store.commit("taskManagement/setListColumnInBoard",dataToStore);
                     self.$emit('loaded-content');
-                    // self.setNodeMap();
+                    self.getUserPermission();
                     break;
                 case 'updateTaskToKanban':
                     self.listBoardColumn = data.dataAfter;
@@ -562,6 +566,7 @@ export default {
                     if (data.dataAfter) {
                         let res = data.dataAfter;
                         self.$store.commit("taskManagement/setListOperatorInProject", res);
+                        self.setMappingColumnDrag();
                     } 
                     break;
                 case 'getListSprintInBoard':
@@ -580,6 +585,9 @@ export default {
                     dataToStore = {key:self.currentBoard.id, data:Object.values(data.dataAfter)}
                     self.$store.commit("taskManagement/setListColumnInBoard",dataToStore);
                     self.getDataForBoard()
+                    break;
+                case 'getListStatusInProject':
+                    self.$store.commit("taskManagement/setListStautsInProject",{key:data.dataAfter.projectId, data:data.dataAfter.data});
                     break;
                 default:
                     break;

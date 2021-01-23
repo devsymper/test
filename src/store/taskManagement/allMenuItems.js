@@ -118,7 +118,7 @@ export default {
                 },
                 {
                     name:'backToKanban',
-                    title:"Back to Kanban",
+                    title:"Quay lại Kanban",
                     icon: 'mdi-keyboard-backspace',
                     url:"/task-management/projects/:id/kanban-board"
                 },
@@ -128,7 +128,7 @@ export default {
     boardSetting:{
         item4:{
             name:'backToKanban',
-            title:"Back to Kanban",
+            title:"Quay lại Kanban",
             icon: 'mdi-keyboard-backspace',
             url:"/task-management/projects/:id/kanban-board"
         },

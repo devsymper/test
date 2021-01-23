@@ -26,7 +26,7 @@ self.onmessage = async function (event) {
                     dataPost['documentId'] = issueType.documentId;
                 }
                 
-                dataControl.tmg_status_id = data.status.statusId;
+                dataControl.tmg_status_id = data.status.id;
                 dataControl.tmg_status_category_id = data.status.statusCategoryId;
                 dataControl.tmg_status = data.status.name;
                 dataPost['documentObjectWorkflowObjectId'] = "";
@@ -225,34 +225,51 @@ self.onmessage = async function (event) {
             }
             break;
         case 'getDetailBoard':
-            if (data) {
-                taskManagementApi.getDetailBoard(data).then(res => {
-                    if(res['status'] == 200){
-                        let listNewColumn = {}
-                        let listColumn = res.data.listColumn;
-                        for (let index = 0; index < listColumn.length; index++) {
-                            let column = listColumn[index];
-                            if(column.tmg_is_backlog == 0){
-                                if(!listNewColumn[column.tmg_column_id]){
-                                    listNewColumn[column.tmg_column_id] = {
-                                        id:column.tmg_column_id,
-                                        name:column.tmg_column_name,
-                                        isBacklog:column.tmg_is_backlog,
-                                        isHidden:column.tmg_is_hidden,
-                                        statusInColumn:[]
-                                    }
-                                }
-                                listNewColumn[column.tmg_column_id].statusInColumn.push(
-                                    {name:column.tmg_status_name, color:column.tmg_color,id: column.tmg_status_id,nodeId:null,tasks:[]}
-                                )
-                            }
+            if (data.boardId) {
+                let res = await taskManagementApi.getDetailBoard(data.boardId)
+                if(res['status'] == 200){
+                    let listNewColumn = {}
+                    let listColumn = res.data.listColumn;
+                    if(!data.allStatus){
+                        let allStatusRes = await taskManagementApi.getListStatusInProject(data.projectId)
+                        if(allStatusRes['status'] == 200 && allStatusRes['data']){
+                            data.allStatus = allStatusRes.data.listObject;
+                            postMessage({action:'getListStatusInProject', dataAfter : {projectId:data.projectId,data:allStatusRes.data.listObject}})
                         }
-                        postMessage({action:'getDetailBoard', dataAfter : listNewColumn})
-                        
-                    }else{
-                        postMessage({action:'actionError'})
                     }
-                });
+                    for (let index = 0; index < listColumn.length; index++) {
+                        let column = listColumn[index];
+                        if(column.tmg_is_backlog == 0){
+                            if(!listNewColumn[column.tmg_column_id]){
+                                listNewColumn[column.tmg_column_id] = {
+                                    id:column.tmg_column_id,
+                                    name:column.tmg_column_name,
+                                    isBacklog:column.tmg_is_backlog,
+                                    isHidden:column.tmg_is_hidden,
+                                    statusInColumn:[]
+                                }
+                            }
+                            let statusItem = {name:column.tmg_status_name, color:column.tmg_color,id: column.tmg_status_id,nodeId:null,tasks:[]};
+                            let fullInfoStatus = data.allStatus.find(el => el.statusId == column.tmg_status_id);
+                            if(fullInfoStatus){
+                                statusItem['nodeId'] = fullInfoStatus.nodeId;
+                                statusItem['taskLifeCircleName'] = fullInfoStatus.taskLifeCircleName;
+                                statusItem['taskLifeCircleId'] = fullInfoStatus.taskLifeCircleId;
+                                statusItem['statusRoleId'] = fullInfoStatus.statusRoleId;
+                                statusItem['statusCategoryId'] = fullInfoStatus.statusCategoryId;
+                                statusItem['roleIds'] = fullInfoStatus.roleIds;
+                            }
+                            listNewColumn[column.tmg_column_id].statusInColumn.push(
+                                statusItem
+                            )
+                        }
+                    }
+                    postMessage({action:'getDetailBoard', dataAfter : listNewColumn})
+                    
+                }else{
+                    postMessage({action:'actionError'})
+                }
+               
             }
             break;
         case 'handleAddSprint':
