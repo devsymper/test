@@ -28,6 +28,10 @@ export default class Util {
         return '<span class="mdi mdi-checkbox-blank-circle  validate-icon" control-title="' + controlTitle + '" title="Không được bỏ trống trường này"></span>'
             // return '<i data-require-sign="' + sign + '" class="fa fa-circle required-markup" title="Bạn phải nhập vào trường này" aria-hidden="true"></i>';
     };
+    static makeRedDot = function() {
+        return '<span class="validate-icon-cell mdi mdi-alert-circle" style="position: absolute;right:8px;top:2px;font-size: 8px;color: red;"></span>'
+            // return '<i data-require-sign="' + sign + '" class="fa fa-circle required-markup" title="Bạn phải nhập vào trường này" aria-hidden="true"></i>';
+    };
     /**
      * Đếm số chữ số tối đa đằng sau dấu phẩy trong dãy các số
      * @param {Array} nums dãy các chữ số

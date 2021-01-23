@@ -8,7 +8,7 @@ import { appConfigs } from "@/configs.js";
 import tinymce from 'tinymce/tinymce';
 import { documentApi } from "../../../api/Document";
 let sDocumentManagementUrl = appConfigs.apiDomain.sdocumentManagement;
-const fileTypes = {
+let fileTypes = {
     'xlsx': 'mdi-microsoft-excel',
     'txt': 'mdi-file-document-outline',
     'csv': 'mdi-file-document-outline',
@@ -42,8 +42,8 @@ const fileTypes = {
 };
 
 export default class BasicControl extends Control {
-    constructor(idField, ele, controlProps, curParentInstance, value) {
-        super(idField, ele, controlProps, curParentInstance, value);
+    constructor(idField, ele, controlProps, keyInstance, value) {
+        super(idField, ele, controlProps, keyInstance, value);
         this.minValue = (this.controlProperties.hasOwnProperty('minValue')) ? this.controlProperties.minValue.value : false;
         this.maxValue = (this.controlProperties.hasOwnProperty('maxValue')) ? this.controlProperties.maxValue.value : false;
         this.colIndex = -1;
@@ -52,7 +52,7 @@ export default class BasicControl extends Control {
 
     render() {
             this.ele.wrap('<span style="position:relative;display:inline-block">');
-            this.ele.attr('key-instance', this.curParentInstance);
+            this.ele.attr('key-instance', this.keyInstance);
             if (!this.checkDetailView() && this.value === "" && this.checkProps('isRequired')) {
                 this.renderValidateIcon("Không được bỏ trống trường thông tin " + this.title, 'Require');
             }
@@ -190,12 +190,16 @@ export default class BasicControl extends Control {
     triggerOnChange() {
         this.ele.trigger('change');
     }
+    unFocusInput(){
+        this.ele.blur();
+    }
     setEvent() {
-            // biến check xem control có đang autocomplete hay ko
-            // nếu đang autocomplete thì ko nhận sự kiện thay đổi khi giá trị đang được gõ
             let thisObj = this;
             this.ele.on('change', function(e) {
                 let valueChange = $(e.target).val();
+                if(thisObj.checkAutoCompleteControl()){
+                    return false;
+                }
                 if (thisObj.type == 'label') {
                     valueChange = $(e.target).text();
                 } else if (thisObj.type == 'checkbox') {
@@ -220,23 +224,7 @@ export default class BasicControl extends Control {
                     }
                 }
                 // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
-                if(thisObj.isRequiredControl()){
-                    if(!valueChange){
-                        thisObj.renderValidateIcon('Không được bỏ trống trường thông tin '+thisObj.title, 'Require')
-                    }
-                    else{
-                        thisObj.removeValidateIcon('Require');
-                    }
-                }
-                else if(thisObj.type == 'time'){
-                    if(!Util.checkTimeValid(valueChange)){
-                        thisObj.renderValidateIcon("Không đúng định dạng thời gian", 'TimeValid')
-                        return false
-                    }
-                    else{
-                        thisObj.removeValidateIcon('TimeValid')
-                    }
-                }
+                thisObj.checkRequire();
                 thisObj.value = valueChange;
                 SYMPER_APP.$evtBus.$emit('document-submit-input-change', thisObj);
             })
@@ -244,7 +232,7 @@ export default class BasicControl extends Control {
                 store.commit("document/addToDocumentSubmitStore", {
                     key: 'rootChangeFieldName',
                     value: thisObj.name,
-                    instance: thisObj.curParentInstance
+                    instance: thisObj.keyInstance
                 });
             })
             // cần xóa dữ liệu của auto complete trong thuộc tính của input nếu un focus
@@ -261,17 +249,7 @@ export default class BasicControl extends Control {
                     }
                     thisObj.traceControl();
                 }
-                if (thisObj.type == 'department') {
-                    e['controlName'] = thisObj.name;
-                    SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
-                        e: e,
-                        formulasInstance: thisObj.controlFormulas.autocomplete.instance,
-                        controlTitle: thisObj.title,
-                        controlName: thisObj.name,
-                        val: $(e.target).val()
-                    })
-                }
-                if (thisObj.checkAutoCompleteControl() && thisObj.type != 'department') {
+                if (thisObj.checkAutoCompleteControl()) {
                     let fromSelect = false;
                     let formulasInstance = (fromSelect) ? thisObj.controlFormulas.formulas.instance : thisObj.controlFormulas.autocomplete.instance;
                     e['controlName'] = thisObj.controlProperties.name.value;
@@ -280,7 +258,7 @@ export default class BasicControl extends Control {
                         autocompleteFormulasInstance: formulasInstance,
                         isSelect: false,
                         controlTitle: thisObj.title,
-                        controlName: thisObj.controlProperties.name.value,
+                        controlName: thisObj.name,
                         val: $(e.target).val()
                     })
                 }
@@ -293,9 +271,6 @@ export default class BasicControl extends Control {
                     SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                         e: e,
                     })
-                    SYMPER_APP.$evtBus.$emit('document-submit-department-key-event', {
-                        e: e,
-                    })
                 }
 
             })
@@ -303,13 +278,7 @@ export default class BasicControl extends Control {
                 store.commit("document/addToDocumentSubmitStore", {
                     key: 'docStatus',
                     value: 'input',
-                    instance: thisObj.curParentInstance
-                });
-
-                store.commit("document/addToDocumentSubmitStore", {
-                    key: 'currentTableInteractive',
-                    value: null,
-                    instance: thisObj.curParentInstance
+                    instance: thisObj.keyInstance
                 });
                 e.controlName = thisObj.name;
                 if (thisObj.type == 'date') {
@@ -337,6 +306,16 @@ export default class BasicControl extends Control {
         SYMPER_APP.$evtBus.$emit('document-submit-show-trace-control', { control: this })
     }
 
+    checkRequire(){
+        if(this.isRequiredControl()){
+            if(this.isEmpty()){
+                this.renderValidateIcon('Không được bỏ trống trường thông tin '+this.name, 'Require')
+            }
+            else{
+                this.removeValidateIcon('Require')
+            }
+        }
+    }
     setValue(value) {
         if (this.type == 'fileUpload') {
             if(!this.value){
@@ -378,7 +357,7 @@ export default class BasicControl extends Control {
                     this.setImageControlValue(value)
                 }        
                 else {
-                    if(value && value.inputDislay){
+                    if(value && value.inputValue){
                         this.ele.val(value.inputDislay);
                     }
                     else{
@@ -386,21 +365,17 @@ export default class BasicControl extends Control {
                     }
                 }
             }
-            if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
+            if (sDocument.state.submit[this.keyInstance].docStatus == 'init') {
                 this.defaultValue = value;
             }
         }
-        console.log(this.value,'asasas');
     }
     getValue() {
         return this.value;
     }
 
-    setValueControl(vl = undefined) {
-        let value = vl;
-        if (vl == undefined) {
-            value = this.value;
-        }
+    setValueControl() {
+        let value = this.value;
         if (!value) {
             value = "";
         } else if (this.type == 'number') {
@@ -438,7 +413,7 @@ export default class BasicControl extends Control {
             this.ele.val(value)
         }
         this.ele.attr('value', value);
-        if (sDocument.state.submit[this.curParentInstance].docStatus == 'init') {
+        if (sDocument.state.submit[this.keyInstance].docStatus == 'init') {
             this.defaultValue = value;
         }
     }
@@ -469,7 +444,7 @@ export default class BasicControl extends Control {
                     controlName: this.name,
                     key: 'value',
                     value: this.value,
-                    instance: this.curParentInstance
+                    instance: this.keyInstance
                 });
                 for (let index = 0; index < url.length; index++) {
                     let fileItem = url[index];
@@ -495,7 +470,7 @@ export default class BasicControl extends Control {
                 controlName: thisObj.name,
                 key: 'value',
                 value: thisObj.value,
-                instance: thisObj.curParentInstance
+                instance: thisObj.keyInstance
             });
         })
     }
@@ -554,9 +529,9 @@ export default class BasicControl extends Control {
                 store.commit("document/addToDocumentSubmitStore", {
                     key: 'controlOpenSubform',
                     value: thisObj,
-                    instance: thisObj.curParentInstance
+                    instance: thisObj.keyInstance
                 });
-                SYMPER_APP.$evtBus.$emit('document-submit-open-subform', { docId: subFormId, instance: thisObj.curParentInstance })
+                SYMPER_APP.$evtBus.$emit('document-submit-open-subform', { docId: subFormId, instance: thisObj.keyInstance })
             })
         } else {
 
@@ -620,7 +595,7 @@ export default class BasicControl extends Control {
                             </div>`
                     thisObj.setDeleteFileEvent(thisObj.ele, thisObj.name);
                     thisObj.ele.find('.upload-file-wrapper-outtb').append(file);
-                    let curValue = sDocument.state.submit[thisObj.curParentInstance].listInputInDocument[thisObj.name].value;
+                    let curValue = sDocument.state.submit[thisObj.keyInstance].listInputInDocument[thisObj.name].value;
                     let tableName = thisObj.inTable;
                     if (tableName != false) {
                         if (!Array.isArray(curValue)) {
@@ -638,10 +613,10 @@ export default class BasicControl extends Control {
                         controlName: thisObj.name,
                         key: 'value',
                         value: curValue,
-                        instance: thisObj.curParentInstance
+                        instance: thisObj.keyInstance
                     });
                     if (tableName != false) {
-                        sDocument.state.submit[thisObj.curParentInstance].listInputInDocument[tableName].tableInstance.tableInstance.render();
+                        sDocument.state.submit[thisObj.keyInstance].listInputInDocument[tableName].tableInstance.tableInstance.render();
                     }
 
                 }
@@ -649,7 +624,7 @@ export default class BasicControl extends Control {
         });
     }
     setDeleteFileEvent(ele, controlName) {
-        let listInputInDocument = sDocument.state.submit[this.curParentInstance].listInputInDocument
+        let listInputInDocument = sDocument.state.submit[this.keyInstance].listInputInDocument
         let value = listInputInDocument[controlName].value;
         let thisObj = this;
         ele.off('click', '.remove-file')
@@ -673,7 +648,7 @@ export default class BasicControl extends Control {
                 controlName: controlName,
                 key: 'value',
                 value: newValue,
-                instance: thisObj.curParentInstance
+                instance: thisObj.keyInstance
             });
         })
     }
@@ -757,11 +732,6 @@ export default class BasicControl extends Control {
         let thisObj = this;
         this.ele.attr('readonly', isReadOnly)
         this.ele.on('click', function(e) {
-            store.commit("document/addToDocumentSubmitStore", {
-                key: 'currentTableInteractive',
-                value: null,
-                instance: thisObj.curParentInstance
-            });
             if (!thisObj.controlFormulas.list) {
                 return;
             }
@@ -770,7 +740,14 @@ export default class BasicControl extends Control {
             if (thisObj.type == 'combobox') {
                 isSingleSelect = thisObj.checkProps('isSingleSelect');
             }
-            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { e: e, selectFormulasInstance: formulasInstance, alias: thisObj.name, controlTitle: thisObj.title, type: thisObj.type, isSingleSelect: isSingleSelect })
+            SYMPER_APP.$evtBus.$emit('document-submit-select-input', { 
+                e: e, 
+                selectFormulasInstance: formulasInstance, 
+                alias: thisObj.name, 
+                controlTitle: thisObj.title, 
+                controlName:thisObj.name,
+                type: thisObj.type, 
+                isSingleSelect: isSingleSelect })
         });
     }
 
@@ -804,13 +781,13 @@ export default class BasicControl extends Control {
         let self = this;
         let toolbar = true;
         if(this.checkViewType('submit') || this.checkViewType('update')){
-            this.ele = $('#sym-submit-'+this.curParentInstance).find("#"+this.id);
+            this.ele = $('#sym-submit-'+this.keyInstance).find("#"+this.id);
             isReadOnly = 0;
-            selector = '#sym-submit-'+this.curParentInstance+" #"+this.id;
+            selector = '#sym-submit-'+this.keyInstance+" #"+this.id;
         }
         else{
-            this.ele = $('#sym-Detail-'+this.curParentInstance).find("#"+this.id);
-            selector = '#sym-Detail-'+this.curParentInstance+" #"+this.id;
+            this.ele = $('#sym-Detail-'+this.keyInstance).find("#"+this.id);
+            selector = '#sym-Detail-'+this.keyInstance+" #"+this.id;
             toolbar = false;
         }
         if(this.controlProperties.isShowHeaderTinyMce.value){

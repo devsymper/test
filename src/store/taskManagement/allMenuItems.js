@@ -46,7 +46,7 @@ export default {
                     name:'hoang_child',
                     title:"Report",
                     icon: 'mdi-chart-bell-curve-cumulative',
-                    url:"/report"
+                    url:"/task-management/projects/:id/report"
                 }
             ]
         },

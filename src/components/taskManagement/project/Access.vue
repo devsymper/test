@@ -8,10 +8,10 @@
                         <div class="d-flex justify-space-between"><span class="fs-13 grey--text">Tổng số thành viên: {{allUserInProject.length}}</span>
                             <div class="list-button">
                                 <v-btn  v-if="checkRole('task_manager_permission','add')"  small depressed @click="handleCreateActionPack">
-                                    Create action pack
+                                    Tạo nhóm Operation
                                 </v-btn>
                                 <v-btn  v-if="checkRole('task_manager_permission','add')"  small  depressed @click="handleCreatePermission">
-                                    <span>Create permission</span>
+                                    <span>Tạo permission</span>
                                 </v-btn>
                                 <v-btn  v-if="checkRole('task_manager_access','add')"  depressed small class="mx-2"  @click="handleClickAddPeople" >
                                     {{$t("taskManagement.addPeople")}}

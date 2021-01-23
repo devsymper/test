@@ -5,7 +5,6 @@ import {
     util
 } from "./../../plugins/util.js";
 
-
 /**
  * Hàm xử lí việc bóc tách dữ liệu của các field từ server để đưa vào store
  * dữ liệu là các thuộc tính và các công thức của các control trong doc
@@ -40,6 +39,9 @@ export const getAllPropFromData = (fields, viewType, allDataDetail)=>{
                     valueControl = 0;
                 }
                 properties[prop].value = valueControl;
+            }
+            if(prop == 'tableView'){
+                properties[prop].value = (properties[prop].value) ? properties[prop].value : 'Flat'
             }
         }
         if (fields[controlId]['formulas'] != false && fields[controlId]['formulas'] != "[]") {
@@ -88,14 +90,14 @@ export const getAllPropFromData = (fields, viewType, allDataDetail)=>{
                 let childId = listField[childFieldId]['properties'].id
                 let childPrepareData = listField[childFieldId].dataPrepareSubmit;
                 for(let childProp in childProperties){
-                    let valueChildControl = listField[childFieldId]['properties'][childProp]
+                    let valueChildProp = listField[childFieldId]['properties'][childProp]
                     if (childType == 'checkbox') {
-                        childProperties[childProp].value = (valueChildControl == 0 || valueChildControl == '0' || valueChildControl == '') ? false : true
+                        childProperties[childProp].value = valueChildProp;
                     } else {
-                        if (childType == "number" && childProp == 'defaultValue' && valueChildControl == "") {
-                            valueChildControl = 0;
+                        if (childType == "number" && childProp == 'defaultValue' && valueChildProp == "") {
+                            valueChildProp = 0;
                         }
-                        childProperties[childProp].value = valueChildControl;
+                        childProperties[childProp].value = valueChildProp;
                     }
                 }
 
@@ -238,7 +240,9 @@ export const checkInfinityControl = (mapControlEffected) => {
         if(['list','formulas'].includes(formulaType)){
             for(let controlName in mapControlEffected[formulaType]){
                 let infinityLoopFound = search(controlName, mapControlEffected[formulaType][controlName], mapControlEffected[formulaType]);
-                controlInfinity.push(infinityLoopFound)
+                if(infinityLoopFound){
+                    controlInfinity.push(infinityLoopFound)
+                }
             }
         }
     }
@@ -308,6 +312,70 @@ export const genKeyFromDataInput = (dataInput)=>{
     }
     return key.join('__');
 }
+ /** 
+ * Hàm lấy dữ liệu của các control đầu vào để chuân bị cho việc run formulas
+ * dataInput : {controlName : value}
+ */
+export const getDataInputFormula = (formulaInstance, listInput, extraData = null, rowNodeIds = null, dataAutoComplete = {}) =>{
+    let inputControl = formulaInstance.getInputControl();
+    let dataInput = {};
+    for (let inputControlName in inputControl) {
+        if(dataAutoComplete[inputControlName]){
+            dataInput[inputControlName] = dataAutoComplete[inputControlName];
+        }
+        else{
+            if(extraData && extraData[inputControlName]){
+                dataInput[inputControlName] = extraData[inputControlName];
+            }
+            else{
+                if(listInput.hasOwnProperty(inputControlName)){
+                    let controlIns = listInput[inputControlName];
+                    if(!controlIns){
+                        dataInput[inputControlName] = "";
+                    }
+                    else{
+                        if(controlIns.inTable != false){
+                            let currentColData = '';
+                            let tableControl = listInput[controlIns.inTable];
+                            if(rowNodeIds != 'all' && rowNodeIds.length == 1){
+                                currentColData = tableControl.tableInstance.getCellDataByNodeId(inputControlName, rowNodeIds[0]);
+                            }
+                            else if(rowNodeIds == 'all'){
+                                currentColData = tableControl.tableInstance.getColData(inputControlName);
+                            }
+                            else if(rowNodeIds.length > 1){
+                                let listRowData = [];
+                                for (let index = 0; index < rowNodeIds.length; index++) {
+                                    let colDataById = tableControl.tableInstance.getCellDataByNodeId(inputControlName, rowNodeIds[index]);
+                                    listRowData.push(colDataById);
+                                }
+                                currentColData = listRowData;
+                            }
+                            dataInput[inputControlName] = currentColData;
+                        }
+                        else{
+                            dataInput[inputControlName] = controlIns.value;
+                        }
+                        if(controlIns.type == 'inputFilter'){
+                            valueInputControl = dataInput[inputControlName].split(',')
+                        }
+                        if(controlIns.type == 'date'){
+                            dataInput[inputControlName] = controlIns.convertDateToStandard(dataInput[inputControlName])
+                        }
+                        if(controlIns.type == 'time'){
+                            dataInput[inputControlName] = controlIns.convertTimeToStandard(dataInput[inputControlName])
+                        }
+                        if(['number','percent'].includes(controlIns.type) && !dataInput[inputControlName]){
+                            dataInput[inputControlName] = 0
+                        }
+                    }
+                }
+            }
+            
+        }
+    }
+    return dataInput;
+}
 /**
  * Ham xử lý data input để đưa ra data post cho hàm chạy công thức nhiều dòng trong table
  * @param {} dataInput 
@@ -321,8 +389,6 @@ export const prepareDataGetMultiple = (dataInput, listIdRow, listInput)=>{
      */
     if (Object.keys(dataInput).length > 0) {
         let allRowDataInput = [];
-        console.log(listInput,'listInputlistInput');
-        console.log(dataInput,'listInputlistInput');
         for (let control in dataInput) {
             if(listInput[control]){
                 let controlType = listInput[control].type;

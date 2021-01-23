@@ -62,6 +62,7 @@ export default class ClientSQLManager {
         if (dataInsert != false && columnInsert != false) {
             sql += `INSERT INTO ${tableName} (${columnInsert}) VALUES ${dataInsert};`
         }
+        console.log(sql, 'xxxxxxxxxxx');
         // this.run(keyInstance, sql, true);
         if (returnPromise) {
             return new Promise((resolve, reject) => {
@@ -77,7 +78,24 @@ export default class ClientSQLManager {
         }
     }
     static async insertDataToTable(keyInstance, tableName, columns, data, returnPromise = false) {
+        if(!data){
+            return
+        }
         let sql = `INSERT INTO ${tableName} (${columns}) VALUES ${data}`;
+        if (returnPromise) {
+            return new Promise((resolve, reject) => {
+                try {
+                    let data = this.run(keyInstance, sql, true);
+                    resolve(data);
+                } catch (error) {
+                    reject(error);
+                }
+            });
+        } else {
+            return this.run(keyInstance, sql, true);
+        }
+    }
+    static async exeBySql(keyInstance, sql, returnPromise = false){
         if (returnPromise) {
             return new Promise((resolve, reject) => {
                 try {

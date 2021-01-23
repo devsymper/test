@@ -145,7 +145,7 @@
                             </VuePerfectScrollbar>
                             <div class="group-config">
                                 <div class="s-title">Rows</div>
-                                <VuePerfectScrollbar class="s-scroll" style="height:200px">
+                                <VuePerfectScrollbar class="s-scroll" style="height:125px">
                                     <draggable
                                             :list="tableGroupConfig.rows"
                                             :animation="200"
@@ -158,7 +158,7 @@
                                     </draggable>
                                 </VuePerfectScrollbar>
                                 <div class="s-title">Columns</div>
-                                <VuePerfectScrollbar class="s-scroll" style="height:200px">
+                                <VuePerfectScrollbar class="s-scroll" style="height:125px">
                                     <draggable
                                             :list="tableGroupConfig.cols"
                                             :animation="200"
@@ -169,6 +169,19 @@
                                             {{item.name}} -- {{item.title}}
                                         </div>
                                     </draggable>
+                                </VuePerfectScrollbar>
+                                <div class="s-title">Values</div>
+                                <VuePerfectScrollbar class="s-scroll" style="height:125px">
+                                    <draggable
+                                        :list="tableGroupConfig.values"
+                                        :animation="200"
+                                        group="control-group"
+                                        class="h-100 p-2"
+                                        >
+                                        <div class="column-value-item" v-for="(item,index) in tableGroupConfig.values" :key="index" >
+                                            {{item.name}} -- {{item.title}}
+                                        </div>
+                                       </draggable>
                                 </VuePerfectScrollbar>
                             </div>
                         </div>
@@ -266,16 +279,24 @@ export default {
             deep:true,
             immediate:true,
             handler:function(vl){
-                if(Object.keys(vl).length > 0 )
-                this.tablePivotConfig = vl;
+                if(Object.keys(vl).length > 0 ){
+                    this.tablePivotConfig.cols = (vl.cols) ? vl.cols : [];
+                    this.tablePivotConfig.rows = (vl.rows) ? vl.rows : [];
+                    this.tablePivotConfig.values = (vl.values) ? vl.values : [];
+                }
+                
             }
         },
         defaultTableGroupConfig:{
             deep:true,
             immediate:true,
             handler:function(vl){
-                if(Object.keys(vl).length > 0 )
-                this.tableGroupConfig = vl;
+                if(Object.keys(vl).length > 0 ){
+                    this.tableGroupConfig.cols = (vl.cols) ? vl.cols : [];
+                    this.tableGroupConfig.rows = (vl.rows) ? vl.rows : [];
+                    this.tableGroupConfig.values = (vl.values) ? vl.values : [];
+                }
+                
             }
         },
      
@@ -297,7 +318,7 @@ export default {
             'Cài đặt chung', 'Pivot table','Group table',
             ],
             tablePivotConfig:{rows:[],cols:[],values:[]},
-            tableGroupConfig:{rows:[],cols:[]},
+            tableGroupConfig:{rows:[],cols:[],values:[]},
             isSetDrag:false,
             headers: [
                 {
