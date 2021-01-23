@@ -24,7 +24,8 @@ SelectCellRenderer.prototype.init = function(params) {
                         <span class="select-chervon-bottom" style="position: absolute;right:8px;top:2px;font-size: 10px;color: #ababab;">▼</span>
                     </div>`
         this.eGui.innerHTML = div;
-        if(control.isRequiredControl()){
+
+        if(control.isRequiredControl() && !value){
             control.optionValues['Require'][params.node.id] = {
                 isValid:true,
                 msg:'Không được bỏ trống trường thông tin '+control.title
@@ -42,6 +43,7 @@ SelectCellRenderer.prototype.init = function(params) {
                 isSingleSelect:(control.type == 'select') ? true : false
             })
         } );
+        console.log(control,'controlcontrolcontrol');
     }
     
 };
@@ -50,8 +52,8 @@ SelectCellRenderer.prototype.getGui = function() {
     return this.eGui;
 };
 
-SelectCellRenderer.prototype.destroy = function() {
-    if(this.eGui && !this.params.node.rowPinned){
+SelectCellRenderer.prototype.destroy = function(params) {
+    if(this.eGui && params && !params.node.rowPinned){
         this.eGui.querySelector('.select-chervon-bottom').removeEventListener('click',(event));
     }
 };

@@ -448,7 +448,7 @@ export default {
                         "document/addToDocumentSubmitStore", { key: 'listControlMappingDatasets', value: controlMapDatasetDataflow, instance: thisCpn.keyInstance }
                     );
                     thisCpn.formulasWorker.postMessage({action:'updateDocumentObjectId',data:{keyInstance:thisCpn.keyInstance,updateDocumentObjectId:thisCpn.docObjId}})
-                    thisCpn.processHtml(thisCpn.contentDocument);
+                    thisCpn.processHtml();
                     thisCpn.controlRelationWorker.terminate();
                     break;
                 default:
@@ -479,18 +479,6 @@ export default {
                     break;
                 case 'afterCreateSQLiteDB':
                     thisCpn.handleLoadContentDocument();
-                    break;
-                case 'getDataInputFormula':
-                    let dataInputObjectIdentifier = data.dataAfter.dataInputObjectIdentifier
-                    let dataInputTitleObjectFormulas = data.dataAfter.dataInputTitleObjectFormulas
-                    let dataInputFormula = {}
-                    if(dataInputObjectIdentifier){
-                        dataInputFormula['dataInput'] = dataInputObjectIdentifier
-                    }
-                    if(dataInputTitleObjectFormulas){
-                        dataInputFormula['dataInputTitle'] = dataInputTitleObjectFormulas
-                    }
-                    thisCpn.startSubmitDocument(dataInputFormula);
                     break;
                 default:
                 break;
@@ -533,7 +521,11 @@ export default {
     },
 
     async created() {
-        tinymce.remove()
+        this.$store.commit("document/changeViewType", {
+            key: this.keyInstance,
+            value: this.action,
+        });
+        tinymce.remove();
         this.formulasWorker = new FormulasWorker();
         this.formulasWorker.postMessage({action:'createSQLiteDB',data:{keyInstance:this.keyInstance}})
         this.formulasWorker.postMessage({action:'addWorkflowVariable',data:{keyInstance:this.keyInstance, workflowVariable:this.workflowVariable}})
@@ -544,29 +536,19 @@ export default {
         if (this.docId != 0) {
             this.documentId = this.docId;
         } else if (this.$getRouteName() == "submitDocument") {
-            this.$store.commit("document/changeViewType", {
-                key: this.keyInstance,
-                value: 'submit',
-            });
             this.documentId = this.$route.params.id;
         } else if (this.$getRouteName() == "updateDocumentObject") {
+            this.docObjId = this.$route.params.id;
             this.$store.commit("document/changeViewType", {
                 key: this.keyInstance,
                 value: 'update',
             });
-            this.docObjId = this.$route.params.id;
         }
 
         // Nếu truyền vào documentObjectId
         if(this.documentObjectId){
             this.docObjId = this.documentObjectId;
         }
-
-        // đặt trang thái của view là submit => isDetailView = false
-        this.$store.commit("document/changeViewType", {
-            key: this.keyInstance,
-            value: this.action,
-        });
         
         /**
          * Nhận xử lí sự kiện click chuyển đổi dạng table <=> pivot mode
@@ -702,17 +684,18 @@ export default {
         this.$evtBus.$on("document-submit-input-change", controlInstance => {
            if(this._inactive == true) return;
                 let valueControl = controlInstance.value;
-                if(controlInstance.checkAutoCompleteControl()){
-                    clearTimeout(delayTimer);
-                    // delay trong trường hợp chọn dòng trong box autocomplete thì đã kích hoạt sự kiện onchange
-                    // lúc này input chưa có dữ liệu đên phải delay
-                    delayTimer = setTimeout(function() {
-                        thisCpn.handleInputChangeByUser( controlInstance, valueControl);
-                    }, 300);
-                }
-                else{
-                    this.handleInputChangeByUser( controlInstance, valueControl);
-                }
+                // if(controlInstance.checkAutoCompleteControl()){
+                //     clearTimeout(delayTimer);
+                //     // delay trong trường hợp chọn dòng trong box autocomplete thì đã kích hoạt sự kiện onchange
+                //     // lúc này input chưa có dữ liệu đên phải delay
+                //     delayTimer = setTimeout(function() {
+                //         thisCpn.handleInputChangeByUser( controlInstance, valueControl);
+                //     }, 300);
+                // }
+                // else{
+                   
+                // }
+                 this.handleInputChangeByUser( controlInstance, valueControl);
         });
         this.$evtBus.$on("run-effected-control-when-table-change", control => {
             if(this._inactive == true) return;
@@ -1002,17 +985,21 @@ export default {
             // gets data from clipboard and converts it to an array (1 array element for each line)
             var clipboardData = event.clipboardData || window.clipboardData;
             var pastedData = clipboardData.getData('Text');
-            var dataArray = self.dataToArray(pastedData);
-            let table = getControlInstanceFromStore(this.keyInstance, 'tb_render');
+            let table = getControlInstanceFromStore(this.keyInstance, this.sDocumentSubmit.tableInteractive);
+            var dataArray = self.dataToArray(pastedData, table);
             let gridOptions = table.tableInstance.gridOptions
-
-            // First row is already in the grid and dataToArray returns an empty row at the end of array (maybe you want to validate that it is actually empty)
-            for (var i = 1; i < dataArray.length-1; i++) {
-                gridOptions.api.applyTransaction({ add: [{}], addIndex:i });
+            let cell = table.tableInstance.getFocusedCell();
+            let forcusCellIndex = cell.rowIndex;
+            let count = gridOptions.api.getDisplayedRowCount();
+            if(count - forcusCellIndex < dataArray.length){
+                for (var i = forcusCellIndex; i < dataArray.length + count - 1; i++) {
+                    let rowData = table.tableInstance.getRowDefaultData(false);
+                    rowData[0].s_table_id_sql_lite = Date.now();
+                    table.tableInstance.addNewRow(rowData,i);
+                }
             }
         },
-        dataToArray(strData) {
-            let table = getControlInstanceFromStore(this.keyInstance, 'tb_render');
+        dataToArray(strData, table) {
             let gridOptions = table.tableInstance.gridOptions
             var delimiter = gridOptions.api.gridOptionsWrapper.getClipboardDeliminator();;
             // Create a regular expression to parse the CSV values.
@@ -1591,7 +1578,6 @@ export default {
                             }
                             else{
                                 this.globalClass['document-form-style-default'] = true;
-                                
                             }
                             thisCpn.objectIdentifier = thisCpn.otherInfo.objectIdentifier;
                             thisCpn.dataPivotTable = res.data.pivotConfig;
@@ -1695,7 +1681,7 @@ export default {
          * Khởi tạo các đối tượng control từ html
          * các control được đánh dâu bởi id có frefix: s-contorl-timestamp
          */
-        processHtml(content) {
+        processHtml() {
             $("#sym-submit-" + this.keyInstance).find('.page-content').addClass('d-block');
             $("#sym-submit-" + this.keyInstance).find('.list-page-content').addClass('d-flex');
             
@@ -1843,9 +1829,9 @@ export default {
             if(!isSetEffectedControl){
                 let listInput = getListInputInDocument(this.keyInstance);
                 let mapControlEffected = getMapControlEffected(listInput);
-                this.controlInfinity = checkInfinityControl(mapControlEffected)
-                this.updateEffectedControlToStore(mapControlEffected)
-                this.handleAfterGetMapControlEffected()
+                this.controlInfinity = checkInfinityControl(mapControlEffected);
+                this.updateEffectedControlToStore(mapControlEffected);
+                this.handleAfterGetMapControlEffected();
             }
             else{
                 this.handleBeforeLoadedDocument()
@@ -1898,6 +1884,11 @@ export default {
                         }
                     }
                 }
+                this.$store.commit("document/addToDocumentSubmitStore", {
+                    key: 'readyLoaded',
+                    value: true,
+                    instance: this.keyInstance
+                });
             }
         },
 
@@ -2142,25 +2133,30 @@ export default {
 
 
         // Hàm chỉ ra control được đánh định danh trong document (sct...)
-        getDataRefreshControl(){
-            let objectIdentiferFormula = null;
-            let titleObjectFormula = null;
+        /**
+         * lấy data để chạy công thức trên server
+         */
+        getDataForRunFormulaOnServer(){
+            let dataInputFormula = {};
+            let listInput = getListInputInDocument(this.keyInstance)
             if(this.objectIdentifier && Object.keys(this.objectIdentifier) > 0){
-                let controlIdentifier = {}
                 let controlNameIdentifier = this.objectIdentifier['name'];
                 let controlInstance = getControlInstanceFromStore(this.keyInstance,controlNameIdentifier);
                 if(controlInstance != false && controlInstance.controlFormulas.hasOwnProperty('formulas')){
                     let formulaInstance = controlInstance.controlFormulas['formulas']['instance'];
                     if(formulaInstance){
-                        objectIdentiferFormula = formulaInstance;
+                        let dataInput = getDataInputFormula(formulaInstance,listInput);
+                        dataInputFormula['dataInput'] = dataInput
                     }
                 }
             }
             
             if(this.titleObjectFormula != null){
-                titleObjectFormula = this.titleObjectFormula
+                let dataInput = getDataInputFormula(this.titleObjectFormula,listInput);
+                dataInputFormula['dataInputTitle'] = dataInput
             }
-            this.formulasWorker.postMessage({action:'getDataInputFormula',data:{titleObjectFormula:titleObjectFormula,objectIdentiferFormula:objectIdentiferFormula,keyInstance:this.keyInstance}})
+            this.startSubmitDocument(dataInputFormula);
+            // this.formulasWorker.postMessage({action:'getDataInputFormula',data:{titleObjectFormula:titleObjectFormula,objectIdentiferFormula:objectIdentiferFormula,keyInstance:this.keyInstance}})
         },
 
         handleRefreshDataBeforeSubmit(){
@@ -2211,7 +2207,7 @@ export default {
          */
         async submitDocument(){
             this.isSubmitting = true;
-            this.getDataRefreshControl();
+            this.getDataForRunFormulaOnServer();
         },
         resetCheckRefreshData(){
             this.$store.commit("document/addToDocumentSubmitStore", {
@@ -2260,10 +2256,7 @@ export default {
                     // nếu có công thức nút submit
                     if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
                         let dataInput = getDataInputFormula(thisCpn.sDocumentSubmit.submitFormulas,thisCpn.sDocumentSubmit.listInputInDocument,thisCpn.optionalDataBinding);
-                        thisCpn.formulasWorker.postMessage({action:'runFormula',data:{
-                            formulaInstance:thisCpn.sDocumentSubmit.submitFormulas,
-                            dataInput:dataInput,
-                            keyInstance:thisCpn.keyInstance}})
+                        thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput);
                     }
                     thisCpn.closeFormulasWorker();
                     // nếu submit từ form sub submit thì ko rediect trang

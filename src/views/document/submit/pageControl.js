@@ -1,7 +1,7 @@
 import LayoutControl from "./layoutControl";
 export default class PageControl extends LayoutControl {
-    constructor(idField, ele, controlProps, curParentInstance, value) {
-        super(idField, ele, controlProps, curParentInstance, value);
+    constructor(idField, ele, controlProps, keyInstance, value) {
+        super(idField, ele, controlProps, keyInstance, value);
     }
     render() {
         this.renderPageControl();
