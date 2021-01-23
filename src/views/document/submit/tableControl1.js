@@ -160,8 +160,6 @@ export default class TableControl1 extends Control {
             if (this.currentDataStore.docStatus == 'init') {
                 this.defaultValue = data;
             }
-            
-
         }
     }
     switchTable() {

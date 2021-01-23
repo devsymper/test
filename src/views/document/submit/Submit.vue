@@ -1068,7 +1068,7 @@ export default {
             let updateByWorkflowId = this.documentInfo.updateByWorkflowId;
             
             if(updateByWorkflowId && updateByWorkflowId != "0" && this.$getRouteName() == 'updateDocumentObject'){
-                startWorkflowBySubmitedDoc(updateByWorkflowId, {document_id:this.docId})
+                startWorkflowBySubmitedDoc(updateByWorkflowId, {document_id:this.documentId,document_object_id:this.documentObjectId})
             }
         },
         afterBlurInputPivot(event){
@@ -1334,7 +1334,6 @@ export default {
                 let dataControlAutocompleting = {};
                 dataControlAutocompleting[controlIns.name] = e.e.target.value;
                 let dataInput = getDataInputFormula(formulaIns,listInput,this.optionalDataBinding, e.rowIndex, dataControlAutocompleting);
-                debugger
                 let aliasControl = formulaIns.autocompleteDetectAliasControl();
                 let dataFromCache = this.getDataAutocompleteFromCache(aliasControl, dataInput);
                 if(dataFromCache == false){
