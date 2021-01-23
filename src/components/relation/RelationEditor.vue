@@ -46,7 +46,10 @@
 					</span>
 				</v-btn>
 			</div>
-			<RelationWorkspace :action="action" />
+			<RelationWorkspace 
+				:action="action"
+			 	style="height: calc(100% - 41px)"
+			 />
 		</div>
 		<div class="relation-link">
 			relation-link
