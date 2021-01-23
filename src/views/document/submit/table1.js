@@ -36,10 +36,10 @@ window.addNewDataPivotTable = function(el, event, type){
 }
 export default class SymperTable {
     constructor(tableControl, keyInstance, groupConfig = {}, pivotConfig = {}, formulasWorker) {
+        this.keyInstance = keyInstance;
         this.init();
         this.tableControl = tableControl;
         this.tableName = tableControl.name;
-        this.keyInstance = keyInstance;
         this.gridOptions = null;
         this.rows = groupConfig.rows;
         this.cols = groupConfig.cols;
@@ -60,6 +60,7 @@ export default class SymperTable {
         
     }
     init(){
+        this.viewType = sDocument.state.viewType[this.keyInstance];
         /**
          * Các loại cell mà table hỗ trợ hiển thị
          */
@@ -121,7 +122,6 @@ export default class SymperTable {
         
         for (let controlName in this.tableControl.controlInTable){
             let controlInstance = this.tableControl.controlInTable[controlName];
-            
             let col = {
                 flex: 1,
                 headerName:controlInstance.title,
@@ -179,7 +179,8 @@ export default class SymperTable {
                 }
             }
             col['cellRendererParams'] = {
-                control:controlInstance
+                control:controlInstance,
+                viewType:this.viewType
             };
             colDefs.push(col);
         }
@@ -198,8 +199,7 @@ export default class SymperTable {
         return colDefs;
     }
     checkEditableCell(control){
-        let viewType = sDocument.state.viewType[this.keyInstance];
-        if(viewType == 'detail'){
+        if(this.viewType == 'detail'){
             return false;
         }
         if(['label'].includes(control.type)){
@@ -331,6 +331,15 @@ export default class SymperTable {
             data = this.getRowDefaultData();
         }
         else{
+            if(data.length == 0){
+                if(this.viewType == 'detail'){
+                    this.gridOptions.api.setRowData([{}]);
+                }
+                else if(this.viewType == 'update'){
+                    this.gridOptions.api.setRowData(this.getRowDefaultData(false));
+                }
+                return;
+            }
             let dataToStore = {};
             let dataToSqlLite = [];
             let columnInsert = [];
@@ -395,8 +404,7 @@ export default class SymperTable {
         if(this.tableHasRowSum){
             this.gridOptions.api.setPinnedBottomRowData(this.createBottomTotalRow(data))
         }
-        let viewType = sDocument.state.viewType[this.keyInstance];
-        if(viewType == 'print'){
+        if(this.viewType == 'print'){
             this.gridOptions.api.setDomLayout('print');
         }
         this.caculatorHeight();
@@ -526,8 +534,7 @@ export default class SymperTable {
             
         };
         
-        let viewType = sDocument.state.viewType[this.keyInstance];
-        if(['submit','update'].includes(viewType)){
+        if(['submit','update'].includes(this.viewType)){
             let moreOptions = {
                 rowData: this.getRowDefaultData(),
                 rowSelection:'multiple',
@@ -554,14 +561,14 @@ export default class SymperTable {
         //                         <a onclick="addNewDataPivotTable(this, event, 'cols')" table-name="`+this.tableName+`">Thêm cột</a>
         //                     </div>
         //                 </div>`;
-        if(['detail','print'].includes(viewType)){
+        if(['detail','print'].includes(this.viewType)){
             actionBtn = ""
         }
         this.tableContainer = $(`<div id="ag-` + this.tableControl.id + `" style="height: `+this.tableHeightDefault+`; width: auto;position:relative;" class="ag-theme-alpine group-table" s-control-type="table">
                                     `+actionBtn+`
                             </div>`)[0];
         this.tableControl.ele.before(this.tableContainer);
-        if(viewType == 'print'){
+        if(this.viewType == 'print'){
             this.tableControl.ele.parent().find('.wrap-s-control-table').remove();
         }
         this.agInstance = new Grid(this.tableContainer, this.gridOptions, { modules: [ClientSideRowModelModule, RowGroupingModule, ClipboardModule] });
@@ -842,7 +849,7 @@ export default class SymperTable {
      * Kiểm tra xem đang ở view detail hay submit
      */
     checkDetailView() {
-        if (sDocument.state.viewType[this.keyInstance] == 'detail') {
+        if (this.viewType == 'detail') {
             return true;
         } else {
             return false;

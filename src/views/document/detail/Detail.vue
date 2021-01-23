@@ -471,7 +471,6 @@ export default {
             }
             // let listTableIns = [];
             let thisCpn = this;
-            console.log(this.sDocumentEditor.allControl,'this.sDocumentEditor.allControl');
             for (let index = 0; index < allInputControl.length; index++) {
                 let id = $(allInputControl[index]).attr('id');
                 let controlType = $(allInputControl[index]).attr('s-control-type');
@@ -479,7 +478,6 @@ export default {
                 if(this.sDocumentEditor.allControl[id] != undefined){   // ton tai id trong store
                     let idField = this.sDocumentEditor.allControl[id].id;
                     let valueInput = this.sDocumentEditor.allControl[id].value;
-                    console.log(valueInput,'valueInputvalueInput');
                     if(controlType == "submit" || controlType == "reset" || controlType == "draft"){
                         $(allInputControl[index]).remove()
                     }
@@ -550,8 +548,9 @@ export default {
                             });
                             tableControl.controlInTable = controlInTable;
                             tableControl.renderTable();
+                            this.addToListInputInDocument(controlName,tableControl);
+                            console.log(valueInput,'valueInputvalueInput');
                             tableControl.setData(valueInput);
-                            this.addToListInputInDocument(controlName,tableControl)
                         }
                     }
                 }
