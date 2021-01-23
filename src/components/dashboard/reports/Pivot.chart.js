@@ -30,6 +30,8 @@ export default class Pivot extends ReportBase {
 			},
 		}
         super('pivot', symperId, columnSettingKeys, styleKeys);
+        this.sharedConfigs.pageSize = 50;
+        this.sharedConfigs.currentPage = 1;
 	}
 	
     getPivotStaticCols(columns, cellStyle) {
@@ -62,6 +64,7 @@ export default class Pivot extends ReportBase {
         let commonAttr = this.getCommonCellStyleAttr(style, ratio);
         let rsl = {
             needTotal: needTotal,
+            totalRowCount: Number(resData.total),
             data: data,
             tableColumnWidthMode: style.headerFormat.children.tableColumnWidthMode.value,
             columns: [],

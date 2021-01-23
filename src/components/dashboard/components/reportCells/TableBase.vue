@@ -26,16 +26,15 @@
             @column-visible="onShowHideColumns"
             @column-pinned="afterPinnedColumns">
         </ag-grid-vue>
-        <div class="symper-table-pagination" >
-            <!-- <el-pagination
-                @size-change="handleSizeChange"
-                @current-change="handleCurrentPageChange"
-                :current-page.sync="currentPage"
-                :page-sizes="[200, 300, 400]"
-                :page-size="100"
-                layout="total, sizes, prev, pager, next"
-                :total="cellConfigs.sharedConfigs.total">
-            </el-pagination> -->
+        <div class="symper-table-pagination pl-1" style="height: 25px; margin-top: 5px" >
+            <Pagination
+                :contentSize="'mini'"
+                :totalVisible="3"
+                @on-change-page-size="handleSizeChange"
+                @on-change-page="handleCurrentPageChange"
+                :total="options.totalRowCount"
+                :shortMode="true">
+            </Pagination>
         </div>
     </div>
 </template> 
@@ -52,6 +51,8 @@ import agDataTypeStyle from '@/components/dashboard/configPool/agCellRenderer.js
 import agCellRenderer from "@/components/dashboard/configPool/agDataTypeStyle.js";
 import PerfectScrollbar from "perfect-scrollbar";
 // import { pivotSupport } from '../configPool/translatorGroups';
+import Pagination from '@/components/common/Pagination.vue';
+
 
 export default {
     props: {
@@ -63,13 +64,13 @@ export default {
     },
 
     methods : {
-        handleCurrentPageChange(currentPage){
-            this.cellConfigs.sharedConfigs.currentPage = currentPage; 
-            SDashboardEditor.onChangeCellConfigs('column', this.cellConfigs.sharedConfigs.cellId);
+        handleCurrentPageChange(data){
+            this.cellConfigs.sharedConfigs.currentPage = data.page; 
+            this.$evtBus.$emit('bi-report-change-display', {type: 'data',id: this.cellConfigs.sharedConfigs.cellId});
         },
-        handleSizeChange(pageSize){
-            this.cellConfigs.sharedConfigs.pageSize = pageSize;
-            SDashboardEditor.onChangeCellConfigs('column', this.cellConfigs.sharedConfigs.cellId);
+        handleSizeChange(data){
+            this.cellConfigs.sharedConfigs.pageSize = data.pageSize;
+            this.$evtBus.$emit('bi-report-change-display', {type: 'data',id: this.cellConfigs.sharedConfigs.cellId});
         },
         onShowHideColumns(){
             let hiddenCols = {};
@@ -323,12 +324,6 @@ export default {
             }
         },
 
-        checkHasVerticalScroll(){
-            let viewportHeight = $(this.$el).find('.ag-body-viewport ').height();
-            let bodyHeight = $(this.$el).find('.ag-center-cols-clipper').height();
-            return bodyHeight > viewportHeight;
-        },
-
         /**
          * Tự động resize chiều rộng các cột theo chiều dài dữ liệu của cột đó
          * @param {Boolean} skipHeader xét việc co chiều rộng có xét tới chiều rộng của header hay không
@@ -363,14 +358,17 @@ export default {
             return this.cellConfigs.viewConfigs.displayOptions;
         },
         tableStyle(){
+            let titleAttr = this.cellConfigs.rawConfigs.style.title.children;
+            let showTitle = titleAttr.show.value && titleAttr.titleText.value;
             return Object.assign({
                 width: '100%', 
-                height: 'calc(100% - 35px)'
-            },this.options.cellStyle);
+                height: showTitle ? 'calc(100% - 60px)' : 'calc(100% - 30px)'
+            }, this.options.cellStyle);
         }
     },
     components:{
-        'ag-grid-vue':AgGridVue,
+        'ag-grid-vue': AgGridVue,
+        Pagination
     },
     beforeMount(){
         this.gridOptions = {

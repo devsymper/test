@@ -1,8 +1,14 @@
 <template>
-    <div  class="w-100 " :class="{'s-pagination-mini': contentSize == 'mini', 's-pagination-normal': contentSize != 'mini'}">
+    <div 
+        :class="{
+            'w-100 position-relative': true,
+            's-pagination-mini': contentSize == 'mini', 
+            's-pagination-normal': contentSize != 'mini',
+            'short-mode': shortMode
+        }">
         <v-select
             class="s-select-page-size  float-left"
-            style="width:75px"
+            :style="shortMode ? 'width:40px' : 'width:75px'"
             v-model="size"
             :items="pageSizeOptions"
             hide-details
@@ -23,17 +29,21 @@
                 next-icon="mdi-chevron-right"
                 prev-icon="mdi-chevron-left"
                 :total-visible="totalVisible"
-                @next="onNextPage"
-                @prev="onPrevPage"
-                @input="onInputPage"
+                @next="emitChangeInfo"
+                @prev="emitChangeInfo"
+                @input="emitChangeInfo"
             ></v-pagination>
         </div>
-        <div class="mr-2 float-right" style="line-height: 25px" v-show="showRange">
+        <div class="mr-2 items-range" style="line-height: 25px" v-if="showRange && !shortMode">
             {{$t('common.display')}} 
             <span class="font-weight-medium">{{rowRange}}</span> 
             {{$t('common.of')}} 
             <span class="font-weight-medium">{{total}}</span> 
             {{$t('common.entries')}}
+        </div>
+        <div class="mr-2 items-range" style="line-height: 25px" v-else-if="showRange && shortMode">
+            <span class="font-weight-medium">{{rowRange}}</span> /
+            <span class="font-weight-medium">{{total}}</span> 
         </div>
     </div>
 </template>
@@ -59,7 +69,7 @@ export default {
             }
         },
         pagesWidth(){
-            return (36 * this.totalVisible + 100) + 'px';
+            return (36 * this.totalVisible + 100 ) + 'px';
         }
     },
     props:{
@@ -84,6 +94,10 @@ export default {
         showRange: {
             type: Boolean,
             default: true
+        },
+        shortMode: {
+            type: Boolean,
+            default: false
         }
     },
     watch:{
@@ -98,14 +112,13 @@ export default {
         this.page = 1;
     },
     methods:{
-        onNextPage(page){
-            this.$emit('on-change-page',{page:this.page,pageSize:this.size})
-        },
-        onPrevPage(page){
-            this.$emit('on-change-page',{page:this.page,pageSize:this.size})
-        },
-        onInputPage(page){
-            this.$emit('on-change-page',{page:this.page,pageSize:this.size})
+        emitChangeInfo(){
+            if(this.debounce){
+                clearTimeout(this.debounce);
+            }
+            this.debounce = setTimeout((self) => {
+                self.$emit('on-change-page',{page:self.page,pageSize:self.size})
+            }, 20, this);
         },
         changePageSize(){
             this.$emit('on-change-page-size',{page:this.page,pageSize:this.size})
@@ -136,7 +149,7 @@ export default {
         margin-left: 8px;
         justify-content: start !important;
     }
-    .s-pagination ::v-deep li > button{
+    .s-pagination ::v-deep li > button, .s-pagination ::v-deep li > .v-pagination__more{
         margin: 0 2px !important;
         font-size: 12px;
         box-shadow: none !important;
@@ -193,7 +206,7 @@ export default {
 		height: 20px !important;
 	}
 	.s-pagination-mini >>> .v-input__slot{
-		width: 66px !important;
+		/* width: 66px !important; */
 	}
 	.s-pagination-mini >>> ul{
 		height: 20px !important;
@@ -207,6 +220,7 @@ export default {
 		min-width: 20px !important;
 	}
 	.s-pagination-mini >>> .v-pagination__navigation,
+	.s-pagination-mini >>> .v-pagination__more,
 	.s-pagination-mini >>> .v-pagination__item{
 		height: 20px !important;
     	font-size: 10px !important;
@@ -217,5 +231,15 @@ export default {
 	}
 	.s-pagination-normal{
 		font-size: 13px !important;
-	}
+    }
+    .items-range {
+        position: absolute;
+        right: 4px;
+        top: 0px;
+    }
+</style>
+<style >
+    .short-mode .s-select-page-size .v-input__append-inner{
+        display: none;
+    }
 </style>

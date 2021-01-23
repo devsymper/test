@@ -99,19 +99,21 @@
                         
                         <v-list>
                             <v-list-item
+                                class="py-1"
                                 v-if="dashboardConfig.info.tabsAndPages.tabs.length > 1"
                                 @click="handleCommandOnTabs({
                                     action: 'remove',
                                     tabIdx: idx
                                 })">
-                                <i class="mdi mdi-trash-can-outline mr-2"></i> Remove
+                                <i class="mdi mdi-trash-can-outline fs-14"></i> <span class="ml-2 fs-13">Xóa</span>
                             </v-list-item>
                             <v-list-item
+                                class="py-1"
                                 @click="handleCommandOnTabs({
                                 action: 'rename',
                                 tabIdx: idx
                             })">
-                                <i class="mdi mdi-lead-pencil mr-2"></i>Rename
+                                <i class="mdi mdi-lead-pencil  fs-14"></i><span class="ml-2 fs-13">Đổi tên</span>
                             </v-list-item>
                         </v-list>
                     </v-menu>
@@ -133,12 +135,19 @@ import ReportRenderManagement from "@/components/dashboard/reports/ReportRenderM
 import ReportTranslatorWorker from 'worker-loader!@/worker/dashboard/ReportTranslator.Worker.js';
 import _isEmpty from "lodash/isEmpty";
 import Sortable from "sortablejs";
+import { getNewCellConfigLayout } from "@/components/dashboard/configPool/cellLayout.js";
+import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
+var mapTypeToClasses = autoLoadChartClasses();
 
 export default {
     created(){
+        let self = this;
         this.reportRenderManagement = new ReportRenderManagement(this);
         this.reportTranslatorWorker = new ReportTranslatorWorker();
         this.listenFromWorker(this.reportTranslatorWorker);
+        this.$evtBus.$on('bi-report-change-display', (data) => {
+            self.translateReportConfig(data.id);
+        });
     },
     components: {
         DashboardCell,
@@ -170,6 +179,22 @@ export default {
         }
     },
     methods: {
+        /**
+         * Thêm cell mới vào dashboard
+         */ 
+        addCell(type, cellSize = {}, active = false){ 
+            let currentLayout = this.dashboardConfig.info.layout[this.dashboardConfig.info.currentTabPageKey];
+            let newCellConfigsLayout = getNewCellConfigLayout(type,currentLayout, false, cellSize, active);
+            currentLayout.push(newCellConfigsLayout);
+            let cellId = newCellConfigsLayout.cellId;
+            let cellConfig = new mapTypeToClasses[type](cellId);
+            this.$set(this.dashboardConfig.allCellConfigs,
+                cellId, 
+                cellConfig
+            );
+            this.$store.commit('dashboard/setSelectedCell', {id: cellId, instanceKey: this.instanceKey});
+            return cellId;
+        },
         onDragTabEnd(evt) {
             let self = this;
             let tabEl = $(self.$refs.dashboardTabs.$el).find('.dashboard-tab-item-name');
@@ -265,10 +290,12 @@ export default {
         },
         applyTranslatedConfig(data){
             if(!_isEmpty(data)){
-                if (this.dashboardConfig.allCellConfigs[data.cellId].sharedConfigs) {
+                if(data.error){
+                    this.$snotifyError(data, "Can not get report data ", data.error);
+                }else{
                     this.dashboardConfig.allCellConfigs[data.cellId].sharedConfigs.data = data.originData;
+                    this.$set(this.dashboardConfig.allCellConfigs[data.cellId].viewConfigs, 'displayOptions', data.translatedData);
                 }
-                this.$set(this.dashboardConfig.allCellConfigs[data.cellId].viewConfigs, 'displayOptions', data.translatedData);
             }
         },
         renderCellsInViewport(){
@@ -410,6 +437,7 @@ export default {
             }, 100, this);
         },
         selectDashboard(){
+            this.$store.commit('dashboard/setSelectedCell', {id: 'global', instanceKey: this.instanceKey});
         },
         handleResizingItem(){
             // if(event.pageY >= (window.innerHeight - 20)){
