@@ -404,18 +404,18 @@ function checkUpdateIssueToBacklog(data){
 }
 function checkUpdateIssueToKanban(data){
     let projectId = data.projectId;
-    let listBoardColumn = data.listBoardColumn;
+    let listColumn = data.listColumn;
     let issue = data.issue;
-    let dataRes ={};
+    let dataRes = {};
     if (issue.tmg_project_id == projectId) {
-        for (let i = 0; i < listBoardColumn.length; i++) {
-            if (listBoardColumn[i].statusInColumn && listBoardColumn[i].statusInColumn.length > 0) {
-                let listStatusInColumn = listBoardColumn[i].statusInColumn;
+        for (let i = 0; i < listColumn.length; i++) {
+            if (listColumn[i].statusInColumn && listColumn[i].statusInColumn.length > 0) {
+                let listStatusInColumn = listColumn[i].statusInColumn;
                 for (let j = 0; j < listStatusInColumn.length; j++) {
                     let status = listStatusInColumn[j];
-                    if (status.statusId == issue.tmg_status_id) {
+                    if (status.id == issue.tmg_status_id) {
                         status.tasks.unshift(issue);
-                        dataRes.data = listBoardColumn;
+                        dataRes.data = listColumn;
                         return dataRes;
                     }            
                 }

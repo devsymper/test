@@ -110,6 +110,7 @@ import draggable from "vuedraggable";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
 import KanbanWorker from 'worker-loader!@/worker/taskManagement/kanban/Kanban.Worker.js';
+import { util } from 'jointjs';
 export default {
     name:"columnSetting",
     components: {
@@ -133,15 +134,26 @@ export default {
             let idBoard=this.currentBoard.id;
             return this.sTaskManagement.listColumnInBoard[idBoard];
         },
+        listStatus(){
+            let allStatus = util.cloneDeep(this.sTaskManagement.listStatusInProjects[this.sCurrentProject.id]);
+            for (let index = 0; index < this.listColumn.length; index++) {
+                for (let i = 0; i < this.listColumn[index].statusInColumn.length; i++) {
+                    let statusItem = this.listColumn[index].statusInColumn[i];
+                    let findItem = allStatus.find(el => el.statusId == statusItem.id);
+                    if(findItem){
+                        let indexItem = allStatus.indexOf(findItem);
+                        allStatus.splice(indexItem,1);   
+                    }
+                }
+            }
+            return allStatus;
+        }
     },
     data(){
         return{
             isLoading:false,
             columns:[],
-            listStatus:[],
             kanbanWorker:null,
-            arrStatusColumn:[],
-
         }
     },
     methods:{
@@ -184,7 +196,7 @@ export default {
             this.isLoading = true;
             let idBoard=this.$route.params.idBoard;
             let data={};
-            data.data = JSON.stringify(this.columns);
+            data.data = JSON.stringify(this.listColumn);
             data.boardId = idBoard;
             
             this.kanbanWorker.postMessage({

@@ -298,8 +298,8 @@ export default {
         checkUpdateTask(issue){
             if(issue.tmg_assignee == this.$store.state.app.endUserInfo.id){
                 let data = {};
-                data.projectId = this.projectId;
-                data.listBoardColumn = this.listBoardColumn;
+                data.projectId = this.sCurrentProject.id;
+                data.listColumn = this.listColumn;
                 data.issue = issue;
                 this.kanbanWorker.postMessage({
                     action:'checkUpdateTaskToKanban',
@@ -519,7 +519,6 @@ export default {
     created(){
         let self = this;
         this.$evtBus.$on('task-manager-submit-issue-success', (issue) =>{
-            console.log("issue-create",issue);
             self.checkUpdateTask(issue);
         })
         this.kanbanWorker = new KanbanWorker();
@@ -550,7 +549,8 @@ export default {
                     self.getUserPermission();
                     break;
                 case 'updateTaskToKanban':
-                    self.listBoardColumn = data.dataAfter;
+                    dataToStore = {key:self.currentBoard.id, data:Object.values(data.dataAfter)}
+                    self.$store.commit("taskManagement/setListColumnInBoard",dataToStore);
                     break;
               
                 case 'getListRoleUserInProject':
