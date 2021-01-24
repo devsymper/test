@@ -27,12 +27,14 @@
                 v-if="!isView"  
                 @click="handleCellAction({action:'copy'})">
                 <i class="mdi fs-14 mdi-content-copy "></i> <span class="ml-2 fs-13">Copy</span>
+                <span style="position: absolute; right: 8px; font-size: 13px; color: grey; margin-left: 8px">Ctrl+C</span>
             </v-list-item>
             <v-list-item 
                 class="py-1 " 
                 v-if="!isView"  
                 @click="handleCellAction({action:'cut'})">
                 <i class="mdi fs-14 mdi-content-cut"></i> <span class="ml-2 fs-13">Cut</span>
+                <span style="position: absolute; right: 8px; font-size: 13px; color: grey; margin-left: 8px">Ctrl+X</span>
             </v-list-item>
 
             <v-list-item 
@@ -110,15 +112,10 @@ export default {
     },
     methods: {
         removeCell(){
-            let cellId = this.cell.sharedConfigs.cellId;
-            let layout = this.dashboardConfigs.info.layout[this.dashboardConfigs.info.currentTabPageKey];
-            for(let i in layout){
-                if(layout[i].cellId == cellId){
-                    layout.splice(i,1);
-                    break;
-                }
-            }
-            this.$delete(this.dashboardConfigs.allCellConfigs, cellId);
+            this.$store.commit('dashboard/removeReport', {
+                instanceKey: this.instanceKey,
+                reportId: this.cell.sharedConfigs.cellId
+            });
         },
         cloneReport(){
             let reportId = this.cell.sharedConfigs.cellId;
@@ -141,7 +138,6 @@ export default {
             });
 
             setTimeout((self) => {
-                
                 let newCellId = currentLayout[currentLayout.length - 1].i;
                 self.$set(self.dashboardConfigs.allCellConfigs[newCellId], 'rawConfigs', _.cloneDeep(cellConfig.rawConfigs));
                 this.$store.commit('dashboard/setSelectedCell', {
@@ -172,14 +168,22 @@ export default {
             }else if(cmd.action == 'clone'){
                 this.cloneReport();
             }else if(cmd.action == 'copy'){
-                // SDashboardEditor.copyReport(this.cellConfigs.sharedConfigs.cellId);
+                this.$store.commit('dashboard/copyReport', {
+                    dashboardConfigs: this.dashboardConfigs,
+                    reportId: this.cell.sharedConfigs.cellId,
+                    instanceKey: this.instanceKey
+                });
             }else if(cmd.action == 'cut'){
-                // SDashboardEditor.cutReport(this.cellConfigs.sharedConfigs.cellId);
+                this.$store.commit('dashboard/cutReport', {
+                    dashboardConfigs: this.dashboardConfigs,
+                    reportId: this.cell.sharedConfigs.cellId,
+                    instanceKey: this.instanceKey
+                });
             }else if(cmd.action == 'download-excel'){
                 // SDashboardEditor.downloadAsExcel(this.cellConfigs.sharedConfigs.cellId);
             }else if(cmd.action == 'print-report'){
-                let headerHTML = this.$refs.cellTitle.outerHTML;
-                this.$refs[this.cellConfigs.sharedConfigs.type].printInnerHTML(headerHTML);
+                // let headerHTML = this.$refs.cellTitle.outerHTML;
+                // this.$refs[this.cellConfigs.sharedConfigs.type].printInnerHTML(headerHTML);
             }
         },
     },

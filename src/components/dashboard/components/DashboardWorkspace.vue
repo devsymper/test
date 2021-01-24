@@ -5,9 +5,12 @@
         :style="{
             height:workspaceHeight
         }" 
+        tabindex="0"
         @ps-scroll-y="handleDashboardScrolled" 
+        @keyup.ctrl.86="checkPasteReport"
         @click="selectDashboard()">
         <grid-layout
+            tabindex="0"
             @layout-updated="handleLayoutRendered"
             ref="gridLayout"
             class="symper-dashboard-layout"
@@ -26,7 +29,14 @@
                 backgroundColor : dashboardStyle.style.background.color
             }">
                             
-            <div v-for="item in currentLayout " @click.stop="selectCell(item.cellId)"  :key="item.i">
+            <div 
+                v-for="item in currentLayout " 
+                tabindex="0"
+                @click.stop="selectCell(item.cellId)"  
+                @keyup.ctrl.67="checkCopyReport"
+                @keyup.ctrl.86="checkPasteReport"
+                @keyup.ctrl.88="checkCutReport"
+                :key="item.i">
                 <grid-item 
                         :x="item.x"
                         :y="item.y"
@@ -182,6 +192,25 @@ export default {
         }
     },
     methods: {
+        checkCopyReport(evt){
+            this.$store.commit('dashboard/copyReport', {
+                dashboardConfigs: this.dashboardConfig,
+                reportId: this.thisDashboardData.currentCellConfigs.sharedConfigs.cellId,
+                instanceKey: this.instanceKey
+            });
+        },
+        checkCutReport(evt){
+            this.$store.commit('dashboard/cutReport', {
+                dashboardConfigs: this.dashboardConfig,
+                reportId: this.thisDashboardData.currentCellConfigs.sharedConfigs.cellId,
+                instanceKey: this.instanceKey
+            });
+        },
+        checkPasteReport(evt){
+            this.$store.commit('dashboard/pasteReport', {
+                instanceKey: this.instanceKey
+            });
+        },
         autoScrollBottom(offset){
             this.$refs.cellContainer.$el.scrollTop = this.$refs.cellContainer.$el.scrollTop + offset;
         },
