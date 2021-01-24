@@ -275,7 +275,7 @@ const getListStatusInProject = async(context,projectId) => {
                     let data={};
                     data.key = projectId;
                     data.data = res.data.listObject;
-                    context.commit('setListStautsInProject',data);
+                    context.commit('setListStatusInProject',data);
                     resolve(data);
                 } else {
                     SYMPER_APP.$snotifyError(error, "Can not get list status in project!");

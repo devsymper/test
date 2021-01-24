@@ -152,7 +152,17 @@ export default {
                 return [];
             }
             let idBoard=this.currentBoard.id;
-            return this.sTaskManagement.listColumnInBoard[idBoard];
+            let columns = this.sTaskManagement.listColumnInBoard[idBoard];
+            if(columns && columns.length > 0){
+                columns = columns.reduce((arr,obj)=>{
+                    if(!obj.isBacklog){
+                        arr.push(obj)
+                    }
+                    return arr;
+                },[])
+            }
+            
+            return columns;
         },
         listStatusColumn(){
             if (!this.currentBoard.id) {
@@ -230,9 +240,6 @@ export default {
         let self = this;
         return {
             sprintStart:{},
-            flagGetListRoleUserInProject:false,  // gán cờ trạng thái: đã được gọi hàm hay chưa
-            flagGetListOperatorInProject:false,  // gán cờ trạng thái: đã được gọi hàm hay chưa
-            isGetListTask:false,
             kanbanWorker:null,
             projectId:null,
             listBoardColumn:null,
@@ -565,18 +572,12 @@ export default {
        
     
         getListRoleUserInProject(){
-            if (this.flagGetListRoleUserInProject) {
-                return;
-            }
             this.kanbanWorker.postMessage({
                 action:'getListRoleUserInProject',
                 data:this.projectId
             });
         },
         getListOperatorInProject(){
-            if (this.flagGetListOperatorInProject) {
-                return;
-            }
             this.kanbanWorker.postMessage({
                 action:'getListOperatorInProject',
                 data:this.projectId
@@ -694,12 +695,18 @@ export default {
                     self.$store.commit("taskManagement/updateSprintToListInStore",self.sprintStart);
                     break;
                 case 'getDetailBoard':
-                    dataToStore = {key:self.currentBoard.id, data:Object.values(data.dataAfter)}
+                    let listNewColumn = data.dataAfter.listNewColumn;
+                    let backLogColumn = data.dataAfter.backLogColumn;
+                    if(Object.keys(backLogColumn).length > 0){
+                        backLogColumn = Object.values(backLogColumn);
+                    }
+                    dataToStore = {key:self.currentBoard.id, data:Object.values(listNewColumn)}
                     self.$store.commit("taskManagement/setListColumnInBoard",dataToStore);
+                    self.$store.commit("taskManagement/addToTaskManagementStore",{key:'backLogData',value:backLogColumn});
                     self.getDataForBoard()
                     break;
                 case 'getListStatusInProject':
-                    self.$store.commit("taskManagement/setListStautsInProject",{key:data.dataAfter.projectId, data:data.dataAfter.data});
+                    self.$store.commit("taskManagement/setListStatusInProject",{key:data.dataAfter.projectId, data:data.dataAfter.data});
                     break;
                 case 'setDataForFilter':
                     if (data.dataAfter) {

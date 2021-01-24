@@ -228,7 +228,8 @@ self.onmessage = async function (event) {
             if (data.boardId) {
                 let res = await taskManagementApi.getDetailBoard(data.boardId)
                 if(res['status'] == 200){
-                    let listNewColumn = {}
+                    let listNewColumn = {};
+                    let backLogColumn = {};
                     let listColumn = res.data.listColumn;
                     if(!data.allStatus){
                         let allStatusRes = await taskManagementApi.getListStatusInProject(data.projectId)
@@ -244,8 +245,8 @@ self.onmessage = async function (event) {
                                 listNewColumn[column.tmg_column_id] = {
                                     id:column.tmg_column_id,
                                     name:column.tmg_column_name,
-                                    isBacklog:column.tmg_is_backlog,
-                                    isHidden:column.tmg_is_hidden,
+                                    isBacklog:column.tmg_is_backlog == 1,
+                                    isHidden:column.tmg_is_hidden  == 1,
                                     statusInColumn:[]
                                 }
                             }
@@ -263,8 +264,32 @@ self.onmessage = async function (event) {
                                 statusItem
                             )
                         }
+                        else{
+                            if(!backLogColumn[column.tmg_column_id]){
+                                backLogColumn[column.tmg_column_id] = {
+                                    id:column.tmg_column_id,
+                                    name:column.tmg_column_name,
+                                    isBacklog:column.tmg_is_backlog == 1,
+                                    isHidden:column.tmg_is_hidden == 1,
+                                    statusInColumn:[]
+                                }
+                            }
+                            let statusItem = {name:column.tmg_status_name, color:column.tmg_color,id: column.tmg_status_id,nodeId:null,tasks:[]};
+                            let fullInfoStatus = data.allStatus.find(el => el.statusId == column.tmg_status_id);
+                            if(fullInfoStatus){
+                                statusItem['nodeId'] = fullInfoStatus.nodeId;
+                                statusItem['taskLifeCircleName'] = fullInfoStatus.taskLifeCircleName;
+                                statusItem['taskLifeCircleId'] = fullInfoStatus.taskLifeCircleId;
+                                statusItem['statusRoleId'] = fullInfoStatus.statusRoleId;
+                                statusItem['statusCategoryId'] = fullInfoStatus.statusCategoryId;
+                                statusItem['roleIds'] = fullInfoStatus.roleIds;
+                            }
+                            backLogColumn[column.tmg_column_id].statusInColumn.push(
+                                statusItem
+                            )
+                        }
                     }
-                    postMessage({action:'getDetailBoard', dataAfter : listNewColumn})
+                    postMessage({action:'getDetailBoard', dataAfter : {listNewColumn:listNewColumn,backLogColumn:backLogColumn}})
                     
                 }else{
                     postMessage({action:'actionError'})
@@ -493,38 +518,32 @@ function groupIssueInSprint(data){
 
 
 async function setLiskTaskBackLog(data){
-    let documentIds = data.allIssueTypeInProject.reduce((arr,obj)=>{
+    let documentIds = data.listIssueType.reduce((arr,obj)=>{
         if(!arr.includes(obj.documentId)){
             arr.push(obj.documentId)
         }
         return arr
     },[])
     data.filter.ids = JSON.stringify(documentIds);
-
+    let backLogData = data.backLogData;
     let allTask = await documentApi.getListObjectByMultipleDocument(data.filter)
     allTask = allTask['data']['listObject'];
-    let column = data.columnBacklog;
-    if (data.listStatus.length > 0 ) {
-        for (let i = 0; i < data.listStatusColumn.length; i++) {
-            let statusId = data.listStatusColumn[i].statusId;
-            let taskLifeCircleId = data.listStatusColumn[i].taskLifeCircleId;
-            let item = data.listStatus.find(ele => ele.statusId == statusId &&  ele.taskLifeCircleId == taskLifeCircleId );
-            if (item) {
-                let taskInStatus = allTask.filter(task=>{
-                    return task.tmg_status_id == statusId && task.tmg_task_life_circle_id == taskLifeCircleId;
-                });
-                if (taskInStatus.length > 0) {
-                    for (let j = 0; j < taskInStatus.length; j++) {
-                        getMoreInfoForTask(taskInStatus[j],data);
-                    }
+    if (data.allStatus.length > 0 ) {
+        for (let i = 0; i < backLogData.statusInColumn.length; i++) {
+            let statusId = backLogData.statusInColumn[i].id;
+            let taskLifeCircleId = backLogData.statusInColumn[i].taskLifeCircleId;
+            let taskInStatus = allTask.filter(task=>{
+                return task.tmg_status_id == statusId && task.tmg_task_life_circle_id == taskLifeCircleId;
+            });
+            if (taskInStatus.length > 0) {
+                for (let j = 0; j < taskInStatus.length; j++) {
+                    getMoreInfoForTask(taskInStatus[j],data);
                 }
-                item['tasks'] = taskInStatus;
-                column.statusInColumn.push(item);
+                backLogData.statusInColumn[i]['tasks'] = taskInStatus
             }
         }  
     }
-
-    return column;
+    return backLogData;
 }
 
 function  getMoreInfoForTask(issue,data){

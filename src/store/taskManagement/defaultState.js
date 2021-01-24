@@ -39,7 +39,8 @@ const defaultState = {
     allWorkflow:[],
     userOperations:{},
     dataSprintAfterMapIssue:{},// có dạng {key : []} , key là boardId,
-    checkBoardChange:[]
+    checkBoardChange:[],
+    backLogData:{}
 };
 
 export default defaultState;

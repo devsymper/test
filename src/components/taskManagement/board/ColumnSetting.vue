@@ -50,11 +50,11 @@
                                     <v-icon style="font-size:20px" @click="removeColumn(index)">mdi-delete-forever-outline</v-icon>
                                 </div>
                                 <div class="d-flex">
-                                    <v-checkbox
+                                    <!-- <v-checkbox
                                         v-model="column.isHidden"
                                         class="sym-small-size sym-style-input mr-2"
                                         label="ẩn"
-                                    ></v-checkbox>
+                                    ></v-checkbox> -->
                                     <v-checkbox
                                         v-model="column.isBacklog"
                                         class="sym-small-size sym-style-input"
@@ -131,8 +131,13 @@ export default {
             if (!this.currentBoard.id) {
                 return [];
             }
-            let idBoard=this.currentBoard.id;
-            return this.sTaskManagement.listColumnInBoard[idBoard];
+            let idBoard = this.currentBoard.id;
+            let columns = this.sTaskManagement.listColumnInBoard[idBoard];
+            let backLogData = this.sTaskManagement.backLogData;
+            if(backLogData.length > 0){
+                columns.push(backLogData[0]);
+            }
+            return columns;
         },
         
     },
