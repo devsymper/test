@@ -205,6 +205,9 @@ export default {
                     data:data
                 });
             }
+            else{
+                this.$emit('loaded-content')
+            }
             
         },
           
@@ -220,6 +223,7 @@ export default {
             switch (data.action) {
                 case 'getListTasksBackLog':
                     self.data = data.dataAfter;
+                    self.$emit('loaded-content')
                     break;
                 case 'updateTaskInBacklog':
                     if (data.dataAfter) {
@@ -252,7 +256,13 @@ export default {
                     disabled: true
                 },
             ]
-        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
+        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs});
+         this.kanbanWorker.postMessage({
+                    action:'getDetailBoard',
+                    data:{boardId:this.sCurrentBoard.id,
+                    allStatus: null,
+                    projectId: this.sCurrentBoard.projectId}
+                });
     }
 
 }

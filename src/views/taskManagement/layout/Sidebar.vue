@@ -598,7 +598,7 @@ export default {
     height: calc(100%);
     left: 0;
     font-size:13px;
-    z-index: 1;
+    z-index: 99;
 }
 .task-sidebar-item{
     padding: 0 !important;

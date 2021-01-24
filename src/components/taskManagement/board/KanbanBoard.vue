@@ -390,7 +390,6 @@ export default {
             let data = {};
             data.allUser = this.$store.state.app.allUsers;
             data.userInProject = this.sTaskManagement.listUserInProject[this.projectId];
-            debugger
             data.allStatusInProject = this.sTaskManagement.listStatusInProjects[this.projectId];
             data.allPriority = this.sTaskManagement.allPriority;
             data.issueType = this.sCurrentProject.issueTypes;
@@ -492,6 +491,8 @@ export default {
             }
             if (!this.sTaskManagement.listOperatorInProject[this.projectId] || this.sTaskManagement.listOperatorInProject[this.projectId].length == 0) {
                 this.getListOperatorInProject();
+            }else{
+                this.setMappingColumnDrag()
             }
         },
         /**
