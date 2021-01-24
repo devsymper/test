@@ -32,7 +32,6 @@ var handler = {
      */
     checkNeedTotal(cell) {
         if (cell.sharedConfigs.type == 'table' || cell.sharedConfigs.type == 'pivot') {
-            let styles = cell.rawConfigs.style;
             return cell.rawConfigs.style.total.children.show.value;
         } else {
             return false;
@@ -124,7 +123,7 @@ var handler = {
         let extra = options.extra;
         let cacheKey = options.dashboardId + '--' + cell.sharedConfigs.cellId;
         let data = {};
-        if(options.changeType == 'style' && cachedReportResponse[cacheKey]){
+        if(options.extra.changeType == 'style' && cachedReportResponse[cacheKey]){
             data = cachedReportResponse[cacheKey];
         }else{
             if (options.cell.sharedConfigs.type != 'editor') {

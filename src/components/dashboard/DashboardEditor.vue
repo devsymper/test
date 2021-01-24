@@ -7,9 +7,12 @@
                 }">
                 <DashboardToolBar 
                     :style="{
-                        height: '35px'
+                        height: '40px'
                     }"
+                    :action="action"
+                    :idDashboard="idObject"
                     :instanceKey="instanceKey"/>
+
                 <DashboardWorkspace 
                     :style="{
                         height: 'calc(100 % - 35px)'
@@ -94,7 +97,10 @@ export default {
         };
 	},
 	mounted(){
-		this.tableHeight = util.getComponentSize(this).h - 100
+        this.tableHeight = util.getComponentSize(this).h - 100;
+        if(this.action == 'create'){
+            this.$store.commit('dashboard/setSelectedCell', {id: 'global', instanceKey: this.instanceKey});
+        }
 	},
 	watch:{
     },
@@ -105,7 +111,6 @@ export default {
     },
     methods: {
         changeSelectedDatasets(datasetIds){
-            
             this.listDatasetSelected = datasetIds;
             this.dashboardEditorWorker.postMessage({
                 action: 'getDatasetInfo',
@@ -113,6 +118,10 @@ export default {
             });
         },
         applySelectedDatasets(datasets){
+            this.myData.dashboardConfigs.info.datasets = datasets.reduce((map, el) => {
+                map[el.id] = true;
+                return map;
+            }, {});
             this.$refs.datasetDetail.getColumnDataset(datasets);
         },
 		handlerCancelSelectDataset(listDatasetIds){
@@ -145,7 +154,6 @@ export default {
             }
         },
         setRestoredDashboardConfigs(data){
-            
             this.changeSelectedDatasets(data.relateDatasetIds);
             this.$set(
                 this.myData.dashboardConfigs,

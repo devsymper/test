@@ -262,7 +262,7 @@ export default {
             });
         },
         onChangeCellConfigs(changeType, cellId){
-            this.translateReportConfig(cellId)
+            this.translateReportConfig(cellId, changeType)
         }, 
         getReportWraperSize(cellId){
             let size = util.getComponentSize(this.$refs[cellId][0]);
@@ -280,21 +280,38 @@ export default {
                 return 0;
             }
         },
+        canReportTranslate(cell){
+            let columnSetting = cell.rawConfigs.setting;
+            let canTranslate = false;
+            for(let key in columnSetting){
+                if(columnSetting[key].selectedColums && columnSetting[key].selectedColums.length > 0){
+                    canTranslate = true;
+                    break;
+                }
+            }
+            return canTranslate;
+        },
         translateReportConfig(cellId, changeType = 'data'){
             // các loại change data hợp lệ
             let validChangeType = {
                 data: true,
                 style: true
             };
+            let cell = this.dashboardConfig.allCellConfigs[cellId];
             if(!validChangeType[changeType]){
                 console.error("Invalid change type!");
                 return;
             }
-            let reportSize = this.getReportWraperSize(cellId);
 
-            if(changeType != 'style'){
-                this.dashboardConfig.allCellConfigs[cellId].viewConfigs.loadingData = true;
+            if(!this.canReportTranslate(cell)){
+                return;
             }
+
+            let reportSize = this.getReportWraperSize(cellId);
+            if(changeType != 'style'){
+                cell.viewConfigs.loadingData = true;
+            }
+
             let dataPost = {
                 action: 'translateReportConfig',
                 data: {
@@ -305,10 +322,10 @@ export default {
                         changeType
                     },
                     cell: {
-                        rawConfigs: this.dashboardConfig.allCellConfigs[cellId].rawConfigs,
-                        sharedConfigs: this.dashboardConfig.allCellConfigs[cellId].sharedConfigs
+                        rawConfigs: cell.rawConfigs,
+                        sharedConfigs: cell.sharedConfigs
                     },
-                    oldDisplayOption: this.dashboardConfig.allCellConfigs[cellId].viewConfigs.displayOptions,
+                    oldDisplayOption: cell.viewConfigs.displayOptions,
                 }
             };
             this.reportTranslatorWorker.postMessage(dataPost);
@@ -518,7 +535,6 @@ export default {
         },
         'thisDashboardData.currentCellConfigs.rawConfigs.setting': {
             deep: true,
-            immediate: true,
             handler(oldVl, newVl){
                 if(newVl){
                     this.$store.commit('dashboard/hightlightSelectedDatasetAndCols', {
