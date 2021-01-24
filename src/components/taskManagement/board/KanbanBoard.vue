@@ -38,7 +38,10 @@
                     :placeholder="$t('common.search')"
                     hide-details
                 ></v-text-field>
-               
+                <filterKanban 
+                    :filters="filterProps"
+                    @apply-filter="applyFilter"
+                />
                 <div class="list-user d-inline-block" v-for="(obj) in getUser()" :key="obj.id">
                     <span class="count-user" v-if="obj.count">{{obj.count}}+</span>
                     <symperAvatar v-else :size="22" class="user-avatar" :userId="obj.userId" />
@@ -126,6 +129,7 @@ import TaskCard from "@/components/taskManagement/board/TaskCard.vue";
 import { util } from '../../../plugins/util';
 import symperAvatar from "@/components/common/SymperAvatar.vue";
 import KanbanWorker from 'worker-loader!@/worker/taskManagement/kanban/Kanban.Worker.js';
+import filterKanban from '../filter/Filter.vue';
 
 export default {
     name: "KanbanBoard",
@@ -133,7 +137,8 @@ export default {
         TaskCard,
         draggable,
         VuePerfectScrollbar,
-        symperAvatar
+        symperAvatar,
+        filterKanban,
     },
     computed:{
         listBoard(){
@@ -257,17 +262,7 @@ export default {
                                 value : '',
                             }
                         ],
-                    },
-                    {
-                        column : "tmg_assignee",
-                        operation : "and",
-                        conditions : [
-                            {
-                                name : "in",
-                                value : [self.$store.state.app.endUserInfo.id],
-                            }
-                        ],
-                    },
+                    }
                 ],
                 page : 1,
                 pageSize: 500,
@@ -291,10 +286,106 @@ export default {
                 pageSize: 500,
                 distinct: true
             },
+            filterProps:{ // bộ lọc
+                tmg_assignee : { 
+                    title: "Thành viên",
+                    type: "autocomplete",
+                    value:"",
+                    options: [],
+                    validateStatus:{
+                        isValid:true,
+                        message:"Error"
+                    },
+                    validate(){
+                      
+                    }
+                },
+                tmg_status_id : {
+                    title: "Trạng thái",
+                    type: "autocomplete",
+                    showId:false,
+                    value:"",
+                    options: [],
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    validate(){
+                    }
+                },
+                tmg_priority_id : {
+                    title: "Mức độ ưu tiên",
+                    type: "autocomplete",
+                    value:"",
+                    showId:false,
+                    options: [],
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    validate(){
+                    }
+                },
+                tmg_issue_type : {
+                    title: "Loại task vụ",
+                    type: "autocomplete",
+                    value:"",
+                    showId:false,
+                    options: [],
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    validate(){
+                    }
+                }
+            },
         };
     },
    
     methods:{
+        applyFilter(){
+            this.$emit('loading');
+            if (this.currentBoard.type == "kanban") {
+                var filter = util.cloneDeep(this.filter);
+            }else{
+                var filter = util.cloneDeep(this.filterScrum);
+            }
+            for (let name in this.filterProps) {
+                if (this.filterProps[name].value) {
+                    let item =   {
+                        column : name,
+                        operation : "and",
+                        conditions : [
+                            {
+                                name : "in",
+                                value : [this.filterProps[name].value],
+                            }
+                        ],
+                    };
+                    filter.filter.push(item);
+                }
+            }
+            this.getListTasks(filter);
+        },
+        setDataForFilter(){
+            //set list user
+            let data = {};
+            data.allUser = this.$store.state.app.allUsers;
+            data.userInProject = this.listUser;
+            data.allStatusInProject = this.sTaskManagement.listStatusInProjects[this.projectId];
+            data.allPriority = this.sTaskManagement.allPriority;
+            data.issueType = this.sCurrentProject.issueTypes;
+            data.optionUser = this.filterProps.tmg_assignee.options;
+            data.optionStatus = this.filterProps.tmg_status_id.options;
+            data.optionPriority = this.filterProps.tmg_priority_id.options;
+            data.optionIssueType = this.filterProps.tmg_issue_type.options;
+            this.kanbanWorker.postMessage({
+                action:'setDataForFilter',
+                data: data
+            });
+
+        },
         checkUpdateTask(issue){
             if(issue.tmg_assignee == this.$store.state.app.endUserInfo.id){
                 let data = {};
@@ -437,14 +528,33 @@ export default {
         /**
          * Hàm lấy danh sách task hiên thị lên kanban board
          */
-        getListTasks(){
+        getListTasks(filter = null){
             let data = {};
             data.listColumn = this.listColumn;
             data.allIssueTypeInProject =  this.sCurrentProject.issueTypes;
             if (this.currentBoard.type == "kanban") {
-                data.filter = this.filter;
+                if (!filter) {
+                    let item = {
+                        column : "tmg_assignee",
+                        operation : "and",
+                        conditions : [
+                            {
+                                name : "in",
+                                value : [this.$store.state.app.endUserInfo.id],
+                            }
+                        ],
+                    };
+                    data.filter = util.cloneDeep(this.filter);
+                    data.filter.filter.push(item);
+                }else{
+                    data.filter = filter;
+                }
             }else{
-                data.filter = this.filterScrum;
+                if (!filter) {
+                    data.filter = util.cloneDeep(this.filterScrum);
+                }else{
+                    data.filter = filter;
+                }
             }
             // đẩy xuống worker xử lý
             this.kanbanWorker.postMessage({
@@ -534,6 +644,7 @@ export default {
                     if (data.dataAfter) {
                         let res = data.dataAfter;
                         self.listUser = res.data.listObject;
+                        self.setDataForFilter();
                     } 
                     break;
                 case 'handleChangeStatusIssue':
@@ -547,6 +658,7 @@ export default {
                     self.$store.commit("taskManagement/setListColumnInBoard",dataToStore);
                     self.$emit('loaded-content');
                     self.getUserPermission();
+                    self.setDataForFilter();
                     break;
                 case 'updateTaskToKanban':
                     dataToStore = {key:self.currentBoard.id, data:Object.values(data.dataAfter)}
@@ -588,6 +700,23 @@ export default {
                     break;
                 case 'getListStatusInProject':
                     self.$store.commit("taskManagement/setListStautsInProject",{key:data.dataAfter.projectId, data:data.dataAfter.data});
+                    break;
+                case 'setDataForFilter':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        if (res.optionUser) {
+                            self.$set(self.filterProps.tmg_assignee,'options',res.optionUser);
+                        }
+                        if (res.optionStatus) {
+                            self.$set(self.filterProps.tmg_status_id,'options',res.optionStatus);
+                        }
+                        if (res.optionPriority) {
+                            self.$set(self.filterProps.tmg_priority_id,'options',res.optionPriority);
+                        }
+                        if (res.optionIssueType) {
+                            self.$set(self.filterProps.tmg_issue_type,'options',res.optionIssueType);
+                        }
+                    }
                     break;
                 default:
                     break;

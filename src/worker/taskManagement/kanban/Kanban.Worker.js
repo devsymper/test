@@ -359,7 +359,14 @@ self.onmessage = async function (event) {
                 }
             }
             break;
-            
+        case 'setDataForFilter':
+            if (data) {
+                let dataReturnFilter = getOptionFilterKanban(data);
+                if (dataReturnFilter) {
+                    postMessage({action:'setDataForFilter', dataAfter:dataReturnFilter})
+                }
+            }
+            break;
         default:
             break;
     }
@@ -380,6 +387,47 @@ function funcCheckUpdateIssueSprint(data){
     }
  
 
+}
+function getOptionFilterKanban(data){
+    let dataRes ={};
+    let allUser = data.allUser;
+    let allStatusInProject = data.allStatusInProject;
+    let allPriority = data.allPriority;
+    let issueType = data.issueType;
+    let userInProject = data.userInProject;
+    let optionStatus = data.optionStatus;
+    let optionUser = data.optionUser;
+    let optionPriority = data.optionPriority;
+    let optionIssueType = data.optionIssueType;
+    if (userInProject.length > 0 && allUser.length >0) {
+        for (let i = 0; i < userInProject.length; i++) {
+            let user=allUser.find(ele => ele.id == userInProject[i].userId );
+            if (user) {
+                optionUser.push({name:user.displayName,id:user.id})
+            }
+        }
+        dataRes.optionUser = optionUser;
+    }
+    if (allStatusInProject && allStatusInProject.length > 0) {
+        for (let i = 0; i < allStatusInProject.length; i++) {
+            optionStatus.push({name:allStatusInProject[i].name,id:allStatusInProject[i].statusId})
+        }
+        dataRes.optionStatus = optionStatus;
+    }
+    if (allPriority.length > 0) {
+        for (let i = 0; i < allPriority.length; i++) {
+            optionPriority.push({name:allPriority[i].name,id:allPriority[i].id})
+        }
+        dataRes.optionPriority = optionPriority;
+    }
+    if (issueType.length > 0) {
+        for (let i = 0; i < issueType.length; i++) {
+            optionIssueType.push({name:issueType[i].name,id:issueType[i].id})
+        }
+        dataRes.optionIssueType = optionIssueType;
+    }
+
+    return dataRes;
 }
 function checkUpdateIssueToBacklog(data){
     let projectId = data.projectId;
