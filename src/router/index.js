@@ -16,10 +16,10 @@ Vue.use(VueRouter);
  */
 
 const systemRoutes = [{
-        path: "/documents",
+        path: "/",
         name: "home",
         component: () =>
-            import ('../views/document/ShowList.vue')
+            import ('../views/taskManagement/home/Index.vue')
     },
     {
         path: "/login",

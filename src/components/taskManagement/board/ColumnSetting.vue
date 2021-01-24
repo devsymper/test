@@ -32,7 +32,7 @@
         </div>
         <div class="d-flex h-100">
             <VuePerfectScrollbar class="wrap-scroll">
-                <draggable :list="columns" :animation="250" class="py-4 h-100 w-100" ghost-class="ghost-columns" group="people">
+                <draggable :list="listColumn" :animation="250" class="py-4 h-100 w-100" ghost-class="ghost-columns" group="people">
                     <transition-group type="transition" name="flip-list" class="wrap-kanban-board">
                         <div
                             v-for="(column,index) in listColumn"
@@ -134,7 +134,30 @@ export default {
             let idBoard=this.currentBoard.id;
             return this.sTaskManagement.listColumnInBoard[idBoard];
         },
-        listStatus(){
+        
+    },
+    data(){
+        return{
+            isLoading:false,
+            columns:[],
+            kanbanWorker:null,
+            listStatus:null
+        }
+    },
+    watch:{
+        
+        '$route':{
+            immediate:true,
+            deep:true,
+            handler(to,from){
+                if(to.name == 'kanbanBoardSetting'){
+                    this.getListStatus()
+                }
+            }
+        }
+    },
+    methods:{
+        getListStatus(){
             let allStatus = util.cloneDeep(this.sTaskManagement.listStatusInProjects[this.sCurrentProject.id]);
             for (let index = 0; index < this.listColumn.length; index++) {
                 for (let i = 0; i < this.listColumn[index].statusInColumn.length; i++) {
@@ -146,17 +169,14 @@ export default {
                     }
                 }
             }
-            return allStatus;
-        }
-    },
-    data(){
-        return{
-            isLoading:false,
-            columns:[],
-            kanbanWorker:null,
-        }
-    },
-    methods:{
+            allStatus = allStatus.reduce((arr,obj)=>{
+                obj['id'] = obj['statusId'];
+                obj['id'] = obj['statusId'];
+                arr.push(obj);
+                return arr;
+            },[])
+            this.listStatus = allStatus;
+        },
         checkRole(objectType,action){
             return checkPermission(objectType,action);
         },
