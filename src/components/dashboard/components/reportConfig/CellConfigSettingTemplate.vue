@@ -136,7 +136,21 @@
         bar:'mdi-chart-timeline',
     };
     export default {
-        props:['settingItem','settingTplAgg','selectedCell'],
+        props: {
+            'settingItem': {
+                default(){
+                    return {}
+                }
+            },
+            'settingTplAgg': {
+                default(){
+                    return {}
+                }
+            },
+            instanceKey: {
+                default: '',
+            },
+        },
         data(){
             return {
 				seryTypes:{
@@ -188,21 +202,24 @@
             }
         },
         watch:{
-            selectedCell:{
-				deep: true,
-				immediate: true,
-				handler(arr){
-				}
-			}
         },
         computed:{
+            selectedCell(){
+                return this.$store.state.dashboard.allDashboard[this.instanceKey].currentCellConfigs;
+            }
         },
         methods:{
+            changeColumnSetting(type = 'data'){
+                this.$evtBus.$emit('bi-report-change-display', {
+                    type: type,
+                    id: this.selectedCell.sharedConfigs.cellId
+                });
+            },
             changeLastLineColumnAgg(item){
                 let agg = item.agg;
                 let column = item.column;
                 this.$set(column, 'lastLineAgg', agg.value);
-                this.$emit('change-column-setting');
+                this.changeColumnSetting('style');
             },
             checkColumnExist(column){
 				return true
@@ -216,9 +233,6 @@
                 }
                 return rsl;
             },
-            addYAxis(){
-                // window.SDashboardEditor.addYAxis();
-            },
             getClassForSeryType(column){
                 let iconType = seryTypeIcons['line'];
                 if(column.seryType){
@@ -228,7 +242,7 @@
             },
             handleChangeSeryType(command){
                 this.$set(command.subItem,'seryType',command.type);
-                this.$emit('change-column-setting');
+                this.changeColumnSetting('style');
             },
             handleAction(command){
                 let name = command.subItem.name;
@@ -241,22 +255,20 @@
                     },100,refs,name);
                 }else{
                     command.subItem.agg = command.agg;
-                    this.$emit('change-column-setting');
+                    this.changeColumnSetting('data');
                 }
             },
             renameColumn(subItem){
                 this.onEditColumn.edit = false;
                 subItem.as = subItem.as.trim().replace(/\s+/,' ');
-                this.$emit('change-column-setting');
+                this.changeColumnSetting('data');
             },
             removeColumn(idx){
                 this.settingItem.selectedColums.splice(idx,1);
-                this.$emit('change-column-setting');
-                SDashboardEditor.recheckSelectedColumn();
+                this.changeColumnSetting('data');
             }, 
             handleChangeColumn(evt){
-                this.$emit('change-column-setting');
-                SDashboardEditor.recheckSelectedColumn();
+                this.changeColumnSetting('data');
             },
             getClassForSelectedColumn(settingItem){
                 return 'column-item-setting d-flex align-center';

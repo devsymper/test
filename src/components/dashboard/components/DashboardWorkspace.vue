@@ -135,9 +135,8 @@ import ReportRenderManagement from "@/components/dashboard/reports/ReportRenderM
 import ReportTranslatorWorker from 'worker-loader!@/worker/dashboard/ReportTranslator.Worker.js';
 import _isEmpty from "lodash/isEmpty";
 import Sortable from "sortablejs";
-import { getNewCellConfigLayout } from "@/components/dashboard/configPool/cellLayout.js";
-import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
-var mapTypeToClasses = autoLoadChartClasses();
+// import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
+// var mapTypeToClasses = autoLoadChartClasses();
 
 export default {
     created(){
@@ -146,7 +145,7 @@ export default {
         this.reportTranslatorWorker = new ReportTranslatorWorker();
         this.listenFromWorker(this.reportTranslatorWorker);
         this.$evtBus.$on('bi-report-change-display', (data) => {
-            self.translateReportConfig(data.id);
+            self.translateReportConfig(data.id, data.type);
         });
     },
     components: {
@@ -159,7 +158,8 @@ export default {
         return {
             workspaceHeight:'',
             invalidTabName: false,
-            showTabOptions: false
+            showTabOptions: false,
+            activeAutoScroll: false
         }
     },
     computed: {
@@ -176,24 +176,25 @@ export default {
         },
         isView(){
             return this.action == 'view';
+        },
+        thisDashboardData(){
+            return this.$store.state.dashboard.allDashboard[this.instanceKey]
         }
     },
     methods: {
+        autoScrollBottom(offset){
+            this.$refs.cellContainer.$el.scrollTop = this.$refs.cellContainer.$el.scrollTop + offset;
+        },
         /**
          * Thêm cell mới vào dashboard
          */ 
-        addCell(type, cellSize = {}, active = false){ 
-            let currentLayout = this.dashboardConfig.info.layout[this.dashboardConfig.info.currentTabPageKey];
-            let newCellConfigsLayout = getNewCellConfigLayout(type,currentLayout, false, cellSize, active);
-            currentLayout.push(newCellConfigsLayout);
-            let cellId = newCellConfigsLayout.cellId;
-            let cellConfig = new mapTypeToClasses[type](cellId);
-            this.$set(this.dashboardConfig.allCellConfigs,
-                cellId, 
-                cellConfig
-            );
-            this.$store.commit('dashboard/setSelectedCell', {id: cellId, instanceKey: this.instanceKey});
-            return cellId;
+        addCell(type, cellSize = {}, active = false){
+            this.$store.commit('dashboard/addCellToLayout', {
+                instanceKey: this.instanceKey,
+                type,
+                cellSize,
+                active
+            });
         },
         onDragTabEnd(evt) {
             let self = this;
@@ -271,14 +272,37 @@ export default {
             }
             return size;
         },
-        translateReportConfig(cellId){
+        getDashboardId(){
+            let cond = this.$route.name == 'editDashboard' || this.$route.name == 'viewDashboard';
+            if(cond){
+                return this.$route.params.id;
+            }else{
+                return 0;
+            }
+        },
+        translateReportConfig(cellId, changeType = 'data'){
+            // các loại change data hợp lệ
+            let validChangeType = {
+                data: true,
+                style: true
+            };
+            if(!validChangeType[changeType]){
+                console.error("Invalid change type!");
+                return;
+            }
             let reportSize = this.getReportWraperSize(cellId);
-            this.reportTranslatorWorker.postMessage({
+
+            if(changeType != 'style'){
+                this.dashboardConfig.allCellConfigs[cellId].viewConfigs.loadingData = true;
+            }
+            let dataPost = {
                 action: 'translateReportConfig',
                 data: {
                     extra: {
                         size: reportSize,
-                        relations: this.dashboardConfig.info.relations 
+                        relations: this.dashboardConfig.info.relations,
+                        dashboardId: this.getDashboardId(),
+                        changeType
                     },
                     cell: {
                         rawConfigs: this.dashboardConfig.allCellConfigs[cellId].rawConfigs,
@@ -286,16 +310,23 @@ export default {
                     },
                     oldDisplayOption: this.dashboardConfig.allCellConfigs[cellId].viewConfigs.displayOptions,
                 }
-            });
+            };
+            this.reportTranslatorWorker.postMessage(dataPost);
         },
         applyTranslatedConfig(data){
-            if(!_isEmpty(data)){
-                if(data.error){
-                    this.$snotifyError(data, "Can not get report data ", data.error);
-                }else{
-                    this.dashboardConfig.allCellConfigs[data.cellId].sharedConfigs.data = data.originData;
-                    this.$set(this.dashboardConfig.allCellConfigs[data.cellId].viewConfigs, 'displayOptions', data.translatedData);
+            try {    
+                if(!_isEmpty(data)){
+                    if(data.error){
+                        this.$snotifyError(data, "Can not get report data ", data.error);
+                    }else{
+                        this.dashboardConfig.allCellConfigs[data.cellId].sharedConfigs.data = data.originData;
+                        this.$set(this.dashboardConfig.allCellConfigs[data.cellId].viewConfigs, 'displayOptions', data.translatedData);
+                    }
                 }
+            } catch (error) {
+                
+            } finally {
+                this.dashboardConfig.allCellConfigs[data.cellId].viewConfigs.loadingData = false;
             }
         },
         renderCellsInViewport(){
@@ -440,17 +471,17 @@ export default {
             this.$store.commit('dashboard/setSelectedCell', {id: 'global', instanceKey: this.instanceKey});
         },
         handleResizingItem(){
-            // if(event.pageY >= (window.innerHeight - 20)){
-            //     this.activeAutoScroll = true;
-            // }else{
-            //     this.activeAutoScroll = false;
-            // }
+            if(event.pageY >= (window.innerHeight - 40)){
+                this.activeAutoScroll = true;
+            }else{
+                this.activeAutoScroll = false;
+            }
         },
         handleResizeItem(i, newH, newW, newHPx, newWPx){
-            // this.activeAutoScroll = false;
-            // setTimeout((newHPx, newWPx, i)=>{
-            //     SDashboardEditor.resetCellSize(i);
-            // },200,newHPx, newWPx, i);
+            this.activeAutoScroll = false;
+            setTimeout(() => {
+                this.translateReportConfig(i, 'style');            
+            }, 0);
         },
     },
     mounted(){
@@ -483,6 +514,18 @@ export default {
                 }, 10, this);
             }else{
                 clearInterval(this.autoScrollAction);
+            }
+        },
+        'thisDashboardData.currentCellConfigs.rawConfigs.setting': {
+            deep: true,
+            immediate: true,
+            handler(oldVl, newVl){
+                if(newVl){
+                    this.$store.commit('dashboard/hightlightSelectedDatasetAndCols', {
+                        id: this.thisDashboardData.currentCellConfigs.sharedConfigs.cellId,
+                        instanceKey: this.instanceKey
+                    });
+                }
             }
         }
     }

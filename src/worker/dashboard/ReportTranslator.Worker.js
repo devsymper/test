@@ -1,3 +1,5 @@
+var cachedReportResponse = {};
+
 onmessage = function (event) {
     let data = event.data;
     let action = data.action;
@@ -116,6 +118,29 @@ var handler = {
         }
         return rsl;
     },
+
+    async getDataFromServer(options){
+        let cell = options.cell;
+        let extra = options.extra;
+        let cacheKey = options.dashboardId + '--' + cell.sharedConfigs.cellId;
+        let data = {};
+        if(options.changeType == 'style' && cachedReportResponse[cacheKey]){
+            data = cachedReportResponse[cacheKey];
+        }else{
+            if (options.cell.sharedConfigs.type != 'editor') {
+                let dataInput = {};                            
+                dataInput = this.getDataInputForReport(cell, extra.relations);
+                dataInput.dashboardId = extra.dashboardId;
+                let res = await dashboardApi.getData(dataInput);
+                data = res.data;
+                if(!data.error){
+                    cachedReportResponse[cacheKey] = data;
+                }
+            }
+        }
+        return data;
+    },
+
     async translateReportConfig(options){
         let cell = options.cell;
         let extra = options.extra;
@@ -123,14 +148,9 @@ var handler = {
         let reportObj = new reportClasses[cell.sharedConfigs.type](cell.sharedConfigs.cellId);
         reportObj.assignComputedAttrsValue(cell);
         let rsl = {};
-
-
-
         if(reportObj.canGetDataFromServer()){
             if(typeof reportObj.translate == 'function'){
-                let dataInput = this.getDataInputForReport(cell, extra.relations);
-                let res = await dashboardApi.getData(dataInput);
-                let data = res.data;
+                let data = await this.getDataFromServer(options);
                 if(data.error){
                     rsl.error = data.error;
                 }else{
@@ -138,30 +158,8 @@ var handler = {
                     rsl.cellId = cell.sharedConfigs.cellId;
                     rsl.translatedData = translatedData;
                 }
-                rsl.originData  = data.data;
+                rsl.originData  = data ? data.data : null;
             }
-
-
-
-            let dataInput = null;
-            let res = {};
-            let data = null;
-            if (options.cell.sharedConfigs.type != 'editor') {
-                dataInput = this.getDataInputForReport(cell, extra.relations);
-                res = await dashboardApi.getData(dataInput);
-                data = res.data;
-            }
-            if(data && data.error){
-                rsl.error = data.error;
-            }else{
-                let translatedData = reportObj.translate(cell.rawConfigs,  data, extra, {}, oldDisplayOptions);
-                rsl.cellId = cell.sharedConfigs.cellId;
-                rsl.translatedData = translatedData;
-            }
-            rsl.originData  = data ? data.data : null;
-
-
-
         }
         self.postMessage({
             action: 'applyTranslatedConfig',

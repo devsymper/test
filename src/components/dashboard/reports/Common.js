@@ -446,9 +446,9 @@ function getColorsFromStyle(style) {
     return style.general.children.colorPalette.value;
 }
 function setFocusingPoint(cellId, rowIndex ) {
-    let focusingPoint = window.SDashboardEditor.dashboardConfigs.info.focusingDataPoint;
-    focusingPoint.cellId = cellId;                
-    focusingPoint.dataRowIndex = rowIndex;   
+    // let focusingPoint = window.SDashboardEditor.dashboardConfigs.info.focusingDataPoint;
+    // focusingPoint.cellId = cellId;                
+    // focusingPoint.dataRowIndex = rowIndex;   
 }
 function getValueDecimal(num, decimalNum, mode, needUnit = false) {
     num = Number(num);
