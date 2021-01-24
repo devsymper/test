@@ -147,7 +147,9 @@ var handler = {
         let oldDisplayOptions = options.oldDisplayOption;
         let reportObj = new reportClasses[cell.sharedConfigs.type](cell.sharedConfigs.cellId);
         reportObj.assignComputedAttrsValue(cell);
-        let rsl = {};
+        let rsl = {
+            cellId: cell.sharedConfigs.cellId,
+        };
         if(reportObj.canGetDataFromServer()){
             if(typeof reportObj.translate == 'function'){
                 let data = await this.getDataFromServer(options);
@@ -155,7 +157,6 @@ var handler = {
                     rsl.error = data.error;
                 }else{
                     let translatedData = reportObj.translate(cell.rawConfigs,  data, extra, {}, oldDisplayOptions);
-                    rsl.cellId = cell.sharedConfigs.cellId;
                     rsl.translatedData = translatedData;
                 }
                 rsl.originData  = data ? data.data : null;
