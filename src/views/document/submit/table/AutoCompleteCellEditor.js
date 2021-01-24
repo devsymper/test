@@ -45,7 +45,7 @@ AutoCompleteCellEditor.prototype.init = function(params) {
             SYMPER_APP.$evtBus.$emit('document-submit-autocomplete-key-event', {
                 e: e,
                 controlName: self.controlName,
-                rowIndex:[self.params.rowIndex]
+                rowIndex:[params.node.id]
             })
         } );
     }

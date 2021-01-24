@@ -1068,7 +1068,7 @@ export default {
             let updateByWorkflowId = this.documentInfo.updateByWorkflowId;
             
             if(updateByWorkflowId && updateByWorkflowId != "0" && this.$getRouteName() == 'updateDocumentObject'){
-                startWorkflowBySubmitedDoc(updateByWorkflowId, {document_id:this.docId})
+                startWorkflowBySubmitedDoc(updateByWorkflowId, {document_id:this.documentId,document_object_id:this.documentObjectId})
             }
         },
         afterBlurInputPivot(event){
@@ -1308,7 +1308,6 @@ export default {
          * Hàm chạy công thức autocomplete để đổ dữ liệu vào box autucomplete, control select cũng dùng trường hợp này
          */
         getDataForAutocomplete(e,type,aliasControl="", controlIns){ 
-            let thisCpn = this
             let listInput = getListInputInDocument(this.keyInstance);
             if(['select','combobox'].includes(type)){
                 let formulaIns = controlIns.getFormulaInstance('list');
@@ -1821,10 +1820,10 @@ export default {
                             });
                             tableControl.controlInTable = controlInTable;
                             tableControl.renderTable();
+                            this.addToListInputInDocument(controlName,tableControl);
                             if(this.viewType !== 'submit'){
                                 tableControl.setData(valueInput);
                             }
-                            this.addToListInputInDocument(controlName,tableControl);
                             // tableControl.renderInfoButtonInRow(this.linkControl);
                         }
                     }
@@ -2489,12 +2488,10 @@ export default {
         },
         
         addToListInputInDocument(name,control){
-            let controlToWorker = {name:control.name,type:control.type,value:control.value}
-            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, keyInstance:this.keyInstance, type:'submit'}})
-             this.$store.commit(
-                            "document/addToListInputInDocument",
-                            { name: name, control: control ,instance: this.keyInstance}
-                        );
+            this.$store.commit(
+                "document/addToListInputInDocument",
+                { name: name, control: control ,instance: this.keyInstance}
+            );
         },
         /**
          * chạy công thức input filter

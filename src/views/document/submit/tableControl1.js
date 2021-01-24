@@ -141,9 +141,6 @@ export default class TableControl1 extends Control {
                 this.agDataTable.setData(dataTable)
             }
         } else {
-            if (data.hasOwnProperty('childObjectId') && Object.keys(data).length == 1) {
-                return;
-            }
             let dataTable = [];
             let rowLength = data[Object.keys(data)[0]].length;
             for (let index = 0; index < rowLength; index++) {
@@ -163,8 +160,6 @@ export default class TableControl1 extends Control {
             if (this.currentDataStore.docStatus == 'init') {
                 this.defaultValue = data;
             }
-            
-
         }
     }
     switchTable() {

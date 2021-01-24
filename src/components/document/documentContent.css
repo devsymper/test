@@ -604,6 +604,11 @@ button:hover {
     padding-left: 6px !important;
     padding-right: 6px !important;
 }
+
+.sym-form-submit .ag-theme-alpine .ag-ltr .ag-header-select-all,
+.sym-form-Detail .ag-theme-alpine .ag-ltr .ag-header-select-all {
+    margin-left: 29px;
+}
 .sym-form-submit .ag-theme-alpine .ag-header-cell, .ag-theme-alpine .ag-header-group-cell,
 .sym-form-Detail .ag-theme-alpine .ag-header-cell, .ag-theme-alpine .ag-header-group-cell {
     padding-left: 6px !important;

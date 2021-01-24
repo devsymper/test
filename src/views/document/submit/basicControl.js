@@ -198,6 +198,7 @@ export default class BasicControl extends Control {
             this.ele.on('change', function(e) {
                 let valueChange = $(e.target).val();
                 if(thisObj.checkAutoCompleteControl()){
+                    thisObj.value = valueChange;
                     return false;
                 }
                 if (thisObj.type == 'label') {
