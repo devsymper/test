@@ -39,10 +39,11 @@
                     hide-details
                 ></v-text-field>
                 <filterKanban 
+                class="mr-2"
                     :filters="filterProps"
                     @apply-filter="applyFilter"
                 />
-                <div class="list-user d-inline-block" v-for="(obj) in getUser()" :key="obj.id">
+                <div class="list-user d-inline-block" v-for="(obj) in listUserShow" :key="obj.id">
                     <span class="count-user" v-if="obj.count">{{obj.count}}+</span>
                     <symperAvatar v-else :size="22" class="user-avatar" :userId="obj.userId" />
                 </div>
@@ -242,9 +243,9 @@ export default {
             sprintStart:{},
             kanbanWorker:null,
             projectId:null,
+            listUserShow:[],
             listBoardColumn:null,
             settingBoardMenuitems: null,
-            listUser:[],
             dragging:false,
             nodeMapPermission:{},
             filter:{
@@ -351,6 +352,15 @@ export default {
     },
    
     methods:{
+        getUserShow(){
+            let users = util.cloneDeep(this.sTaskManagement.listUserInProject[this.projectId]);
+            if (users.length > 1) {
+                let arr = users.slice(0,2);
+                arr.push({count:users.length - arr.length});
+                return arr;    
+            }
+            return users;
+        },
         applyFilter(){
             this.$emit('loading');
             if (this.currentBoard.type == "kanban") {
@@ -379,7 +389,8 @@ export default {
             //set list user
             let data = {};
             data.allUser = this.$store.state.app.allUsers;
-            data.userInProject = this.listUser;
+            data.userInProject = this.sTaskManagement.listUserInProject[this.projectId];
+            debugger
             data.allStatusInProject = this.sTaskManagement.listStatusInProjects[this.projectId];
             data.allPriority = this.sTaskManagement.allPriority;
             data.issueType = this.sCurrentProject.issueTypes;
@@ -500,13 +511,9 @@ export default {
                 });
             }
         },
-        getUser(){
-            if (this.listUser.length > 1) {
-                let arr = this.listUser.slice(0,2);
-                arr.push({count:this.listUser.length - arr.length});
-                return arr;    
-            }
-            return this.listUser;
+        
+        listUserInProject(){
+            return this.sTaskManagement.listUserInProject[this.sCurrentProject.id];
         },
         handleChange(event, status){
             if(event.added){
@@ -644,8 +651,10 @@ export default {
                 case 'getUserInProject':
                     if (data.dataAfter) {
                         let res = data.dataAfter;
-                        self.listUser = res.data.listObject;
-                        self.setDataForFilter();
+                        let listUserInProject = self.sTaskManagement.listUserInProject;
+                        listUserInProject[self.sCurrentProject.id] = res.data.listObject;
+                        self.$store.commit("taskManagement/addToTaskManagementStore",{key:'listUserInProject', value:listUserInProject});
+                        self.listUserShow = self.getUserShow();
                     } 
                     break;
                 case 'handleChangeStatusIssue':
@@ -733,6 +742,10 @@ export default {
     },
     
     activated(){
+        this.projectId = this.$route.params.id;
+        if(this.sTaskManagement.listUserInProject[this.$route.params.id]){
+            this.listUserShow = this.sTaskManagement.listUserInProject[this.$route.params.id]
+        }
         let breadcrumbs = [
                 {
                     text: 'Kanban',

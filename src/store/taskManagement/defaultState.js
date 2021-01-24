@@ -40,7 +40,8 @@ const defaultState = {
     userOperations:{},
     dataSprintAfterMapIssue:{},// có dạng {key : []} , key là boardId,
     checkBoardChange:[],
-    backLogData:{}
+    backLogData:{},
+    listUserInProject:{},
 };
 
 export default defaultState;
