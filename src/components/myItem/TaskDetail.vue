@@ -441,8 +441,9 @@ export default {
 		},
 		refreshMyItem(type) {
 			this.modelDialog[type + 'ShowDialog'] = false;
-			this.$emit('task-submited');
-			// this.$emit('reselect-object')
+			setTimeout(self=>{
+				self.$emit('task-submited');
+			},200 , this)
 		},
 		handlerDelegateSuccess() {
 			this.modelDialog.delegateShowDialog = false;
