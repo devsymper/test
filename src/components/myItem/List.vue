@@ -168,7 +168,9 @@
                                     <div 
                                         v-if="sideBySideMode" 
                                         :class="obj.dueDateClass" 
-                                        style="height: 8px;width: 8px; display: inline-block; border-radius: 50%; margin-top: 8px; margin-left: 3px">
+                                        style="height: 8px;width: 8px; display: inline-block; border-radius: 50%; margin-top: 8px; margin-left: 3px" 
+										:style="{'background-color': obj.dueDateClass }"	
+									>
                                     </div>
                                 </v-col>
                                 <v-col :cols="sideBySideMode ? 10 : compackMode ? 5: 3" :class="{'colName':sideBySideMode==true}" class="pa-1">
@@ -936,17 +938,32 @@ export default {
                     text: this.$t('common.done'),
                 }
             }else if(obj.createTime && !overDue){
-				if(obj.assignee){
-					return {
-						class: 'orange' ,
-						text: this.$t('tasks.assign'),
+				if(!obj.delegation){
+					if(obj.assignee){
+						return {
+							class: 'orange' ,
+							text: this.$t('tasks.assign'),
+						}
+					}else{
+						return {
+							class: 'primary' ,
+							text: this.$t('tasks.unAssign'),
+						}
 					}
 				}else{
-					return {
-						class: 'primary' ,
-						text: this.$t('tasks.unAssign'),
+					if(obj.delegation == "PENDING"){
+						return {
+							class: '#8E2D8C' ,
+							text: this.$t('tasks.delegate'),
+						}
+					}else{
+						return {
+							class: 'orange' ,
+							text: this.$t('tasks.assign'),
+						}
 					}
 				}
+				
             }else{
                 return {
                     class: 'task-over-due' ,

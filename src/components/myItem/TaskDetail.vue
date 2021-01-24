@@ -395,7 +395,7 @@ export default {
 				map[el.id] = el;
 				return map;
 			}, {});
-		},
+		},	
 		taskBreadcrumb() {
 			let bsr = this.breadcrumb.taskName;
 			let allDef = this.$store.state.process.allDefinitions;
