@@ -7,7 +7,7 @@
         >
             <v-card min-height="500">
             <v-card-title>
-                <span class="fs-16">{{statusDetail != true ? 'Thêm action pack' :'Thông tin action pack' }}</span>
+                <span class="fs-16">{{statusDetail != true ? 'Thêm nhóm Operation' :'Thông tin nhóm Operation' }}</span>
             </v-card-title>
             <v-card-text class="pb-0">
                 <v-container class="p-0">

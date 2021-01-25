@@ -112,7 +112,9 @@ export default {
             this.getCurrentProject()
         })
         
+        
         let self = this;
+       
         this.homeWorker.addEventListener("message", function (event){
 			let data = event.data;
             switch (data.action) {
@@ -198,6 +200,7 @@ export default {
             if(this.$route.meta.group == 'home'){
                 this.menu.workspace1.items[0].title = after.name
                 this.menu.workspace1.items[0].subTitle = after.description;
+               
             }
         }
         
@@ -595,7 +598,7 @@ export default {
     height: calc(100%);
     left: 0;
     font-size:13px;
-    z-index: 1;
+    z-index: 99;
 }
 .task-sidebar-item{
     padding: 0 !important;

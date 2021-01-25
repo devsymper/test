@@ -32,7 +32,7 @@ const setAllStatusCategory = (state, allStatusCategory) => {
 const setAllStatus = (state, allStatus) => {
     Vue.set(state, 'allStatus', allStatus);
 }
-const setListStautsInProject = (state, data) => {
+const setListStatusInProject = (state, data) => {
     Vue.set(state.listStatusInProjects, data.key , data.data);
 }
 const setListRoleUserInProject = (state, data) => {
@@ -338,7 +338,7 @@ export {
     removePriorityToStore,
     updatePriorityToStore,
     setAllStatus,
-    setListStautsInProject,
+    setListStatusInProject,
     setListStatusInColumnBoard,
     setListDocumentConfigFieldIssue,
     setListIssueTypeInProjects,
