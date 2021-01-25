@@ -10,6 +10,13 @@ onmessage = function (event) {
 };
 
 var handler = {
+	async getAllDataset(){
+		let res =  biApi.getAllDataset()
+		self.postMessage({
+			action: 'handleGetAllDataset',
+			data: res
+		})
+	},
     async getColumnDataset(data){
         let listDataset = data.listDataset;
         let listColumnInDataset = data.listColumnInDataset;
@@ -195,6 +202,5 @@ var handler = {
        
         self.postMessage({action:'searchDatasetColumnAfter', data :{datasetAndColumn:datasetAndColumn}});
     }
-
 
 }

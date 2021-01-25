@@ -1,14 +1,15 @@
 <template>
 	<div class="dataset-autocomplete">
 		<v-autocomplete
-			v-model="model"
-			:items="listDataset"
-			:search-input.sync="searchKey"
+			v-model="listDatasetSelected"
+			:items="listDatasets"
 			multiple
 			solo
+			hide-selected
 			:placeholder="$t('common.searchPlaceholder')"
-			return-object
 			@change="hanldeChange"
+			item-text="aliasName"
+			return-object
 		>
 			<template v-slot:item="data">
 				<div class="d-flex flex-column">
@@ -16,18 +17,15 @@
 						<v-icon x-small>
 							{{data.item.type == 'dataset_by_dataflow' ? 'mdi-folder': 'mdi-file'}}
 						</v-icon>
-						<span class="fs-13 ml-2">
-							{{data.item.symperId + '-' + data.item.name }}
+						<span class="fs-13 ml-2" v-if="data.item.symperId ">
+							{{data.item.symperId + '-' + data.item.name ? data.item.name : "" }}
 						</span>
 					</div>
-					<div class="fs-13 title-dataset-alias" >
+					<div class="fs-13 title-dataset-alias" v-if="data.item.aliasName">
 						{{data.item.aliasName}}
 					</div>
 				</div>
 			</template>
-			<template v-slot:selection="data">
-               
-              </template>
 		</v-autocomplete>
 	</div>
 </template>
@@ -38,6 +36,12 @@ import DashboardDatasetWorker from 'worker-loader!@/worker/dashboard/dashboard/D
 
 export default {
 	props:{
+		listDatasets:{
+			type: Array, 
+			default(){
+				return []
+			}
+		}
 	},
 	computed:{
 		listDatasetCpt(){
@@ -52,15 +56,17 @@ export default {
 			let action = data.action;
 			if(action == 'searchDatasetRes'){
 				self.searchCache[data.data.searchKey] = data.data.res.data.listObject
-				self.$set(self , 'listDataset', data.data.res.data.listObject)
+				// self.$set(self , 'listDataset', data.data.res.data.listObject)
+			}else if(action == 'handleGetAllDataset'){
+				debugger
+				self.$set(self, 'listDataset', data.res.data.listObject)
 			}
 		});
-		this.searchDataset()
 	},
 	data(){
 		return {
 			isLoading: false,
-			model: [],
+			listDatasetSelected: [],
 			searchKey: "",
 			dashboardDatasetWorker:null,
 			searchCache: {
@@ -70,18 +76,23 @@ export default {
 		}
 	},
 	methods:{
+		getAllDataset(){
+			this.dashboardDatasetWorker.postMessage({
+				action: 'getAllDataset',
+			})
+		},
 		searchDataset(){
-			let val = this.searchKey
-			if(this.searchCache[val]){
-				this.$set(this, 'listDataset',  this.searchCache[val] )
-			}else{
-				this.dashboardDatasetWorker.postMessage({
-					action: 'searchDataset',
-					data:{
-						searchKey: val
-					}
-				})
-			}
+			// let val = this.searchKey
+			// if(this.searchCache[val]){
+			// 	this.$set(this, 'listDataset',  this.searchCache[val] )
+			// }else{
+			// 	this.dashboardDatasetWorker.postMessage({
+			// 		action: 'searchDataset',
+			// 		data:{
+			// 			searchKey: val
+			// 		}
+			// 	})
+			// }
 			
 		},
 		hanldeChange(value){
@@ -113,6 +124,9 @@ export default {
 }
 .dataset-autocomplete >>> input{
 	font-size: 13px !important;
+}
+.dataset-autocomplete >>> .v-select__selection{
+	display: none
 }
 </style>
 <style >

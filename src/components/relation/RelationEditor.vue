@@ -6,7 +6,7 @@
 					{{ $t('bi.relation.selector') }}
 				</span>
 
-				<DatasetAutocomplete @dataset-selector="handleDatasetSelected" />
+				<DatasetAutocomplete @dataset-selector="handleDatasetSelected" :listDatasets="listDatasets" />
 
 				<VuePerfectScrollbar class="mt-2 " :style="{ height: listHeight + 'px' }" v-if="listDatasetSelected.length > 0">
 					<dataset-selected-item v-for="(item, i) in listDatasetSelected" :key="i" class="dataset-selected-item" :item="item" :showRemove="true" @remove-item="removeItem" />
@@ -62,6 +62,9 @@
 import RelationWorkspace from '@/components/relation/RelationWorkspace';
 import DatasetAutocomplete from '@/components/dataset/DatasetAutocomplete';
 import DatasetSelectedItem from '@/components/dataset/DatasetSelectedItem.vue';
+import RelationEditorWorker from 'worker-loader!@/worker/relation/RelationEditor.Worker.js';
+import { util } from '@/plugins/util.js';
+import VuePerfectScrollbar from "vue-perfect-scrollbar";
 export default {
 	props: {
 		action: {
@@ -73,6 +76,7 @@ export default {
 		return {
 			listDatasetSelected: [],
 			listHeight: 0,
+			relationEditoWorker: null,
 			headerActions: {
 				zoomIn: {
 					icon: 'mdi-plus-circle-outline',
@@ -87,23 +91,76 @@ export default {
 					text: 'process.header_bar.focus',
 				},
 			},
+
+			selectingNode: null,
+			listDatasets: null
 		};
 	},
 	components: {
 		RelationWorkspace,
 		DatasetAutocomplete,
 		DatasetSelectedItem,
+		VuePerfectScrollbar
+	},
+	created(){
+		this.relationEditoWorker = new RelationEditorWorker()
+        this.listenFromWorker();
+		this.getAllDataset()
+	},	
+	mounted(){
+		this.listHeight = util.getComponentSize(this).h - 100
 	},
 	methods: {
+		getAllDataset(){
+			this.relationEditoWorker.postMessage({action: 'getAllDataset'})
+		},
+		handleGetAllDataset(data){
+			this.listDatasets = data.data.listObject
+		},
+		listenFromWorker(){
+			let self = this;
+            this.relationEditoWorker.addEventListener("message", function (event) {
+                let data = event.data;
+                let action = data.action;
+                if(self[action]){
+                    self[action](data.data);
+                } else {
+                    console.error(` action ${action} not found `);
+                }
+            });
+		},
 		handleDatasetSelected(arr) {
+			this.handleChangeSelectDataset(arr[arr.length - 1],true);
 			this.listDatasetSelected = arr;
 		},
 		removeItem(item) {
 			this.listDatasetSelected.splice(this.listDatasetSelected.indexOf(item), 1);
+			this.$refs.relationWorkspace.removeDataset(item)
 		},
 		handleHeaderAction(action){
 			 this.$refs.relationWorkspace.handleHeaderAction(action);
-		}
+		},
+		handlerDatasetSelected(dataset){
+			this.$refs.relationWorkspace.updateDatasetColumns(dataset.datasets)
+			this.$refs.relationWorkspace.addDataset(this.selectingNode)
+		},
+		handleChangeSelectDataset(node, isSelected){
+			let self = this;
+			this.selectingNode = node
+			if(isSelected){
+				this.relationEditoWorker.postMessage({action: 'handleChangeSelectDataset' , data:{
+					node: node
+				}})
+			}else{
+				// for(let i in this.selectedDatasetIds){
+				// 	if(node.id == this.selectedDatasetIds[i]){
+				// 		this.selectedDatasetIds.splice(i,1);
+				// 		break;
+				// 	}
+				// }
+				// symperDatasetRelations.removeDataset(node);
+			}
+		},
 	},
 };
 </script>

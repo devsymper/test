@@ -140,7 +140,7 @@ export default {
 		paperScroller.centerContent();
 		this.paper.on('blank:pointerdown', paperScroller.startPanning);
 		this.addToolbar(paperScroller);
-		this.$emit('init', this.graph, this.paper);
+		this.$emit('init', this.graph, this.paper, paperScroller);
 	},
 	methods: {
 		saveSVG() {

@@ -12,6 +12,12 @@ export const biApi = {
 	},
 	searchDataset(value){
 		return api.get('datasets/get-list?search=' + value)
+	},
+	getAllDataset(){
+		return api.get('datasets/get-list?page=1&pageSize=1000')
+	},
+	getDatasetColumn(datasetId){
+		return api.get('datasets/' + datasetId + '/columns')
 	}
 	
 };
