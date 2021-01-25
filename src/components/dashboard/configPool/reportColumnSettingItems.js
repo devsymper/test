@@ -107,55 +107,46 @@ let reportColumnSettingItems = {
         name: 'Task name',
         hasAgg:false,
         slot:'1',
-        defaultAgg: 'not_agg'
     },
     id:{
         name: 'Task id',
         hasAgg:false,
         slot:'1',
-        defaultAgg: 'not_agg'
     },
     start:{
         name: 'Start date',
         hasAgg:false,
         slot:'1',
-        defaultAgg: 'not_agg'
     },
     end:{
         name: 'End date',
         hasAgg:false,
         slot:'1',
-        defaultAgg: 'not_agg'
     },
     duration:{
         name: 'Duration',
-        hasAgg:false,
+        hasAgg:true,
         slot:'1',
-        defaultAgg: 'not_agg'
     },
     completed:{
         name: 'Progress bar',
-        hasAgg:false,
+        hasAgg:true,
         slot:'1',
-        defaultAgg: 'not_agg'
     },
     milestone:{
         name: 'Milestone',
         hasAgg:false,
         slot:'1',
-        defaultAgg: 'not_agg'
     },   
     parent:{
         name: 'Parent',
         hasAgg:false,
         slot:'1',
-        defaultAgg: 'not_agg'
     },
     dependency:{
         hasAgg:false,
         name: 'Dependency',
         slot:'1',
-        defaultAgg: 'not_agg'
     },
 };
 

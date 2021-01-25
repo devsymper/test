@@ -54,7 +54,7 @@
 				</v-tab>
 			</v-tabs>
 		</div>
-		<div>
+		<div style="height: calc(100% - 310px);">
 			<ColumnConfig 
 				v-if="tabs == 0"
 				:instanceKey="instanceKey"

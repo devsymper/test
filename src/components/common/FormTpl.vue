@@ -180,6 +180,7 @@ import DateFormat from "./../common/DateFormat";
 import Editor from "./../common/editor/Editor";
 import ButtonSelect from "./../common/bi/ButtonSelect";
 import ColorPalette from "./../common/bi/ColorPalette";
+import PickColorSingle from "./../common/bi/PickColorSingle";
 import NumberFormat from "./../common/NumberFormat";
 import DataTable from "./../common/customTable/DataTable";
 import SymperDragPanel from "./SymperDragPanel";
@@ -251,17 +252,17 @@ const inputTypeConfigs = {
             };
         }
     },
-    color: {
-        tag: "v-color-picker",
-        props(config) {
-            return {
-                label: config.title,
-                'dot-size':"17",
-                'mode':"hexa",
-                'swatches-max-height':"116"
-            };
-        }
-    },
+    // color: {
+    //     tag: "v-color-picker",
+    //     props(config) {
+    //         return {
+    //             label: config.title,
+    //             'dot-size':"17",
+    //             'mode':"hexa",
+    //             'swatches-max-height':"116"
+    //         };
+    //     }
+    // },
     textarea: {
         tag: "v-textarea",
         props(config) {
@@ -441,6 +442,14 @@ const inputTypeConfigs = {
             }
         }
     },
+    color:{
+        tag:"pick-color-single",
+        props(config){
+            return{
+                value:config.value
+            }
+        }
+    }
 
 };
 export default {
@@ -771,6 +780,7 @@ export default {
         SymperListCombobox,
         'button-select':ButtonSelect,
         'color-palette':ColorPalette,
+        'pick-color-single':PickColorSingle
 
 
     }
