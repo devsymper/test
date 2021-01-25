@@ -48,6 +48,7 @@
 			</div>
 			<RelationWorkspace 
 				:action="action"
+				ref="relationWorkspace"
 			 	style="height: calc(100% - 41px)"
 			 />
 		</div>
@@ -100,6 +101,9 @@ export default {
 		removeItem(item) {
 			this.listDatasetSelected.splice(this.listDatasetSelected.indexOf(item), 1);
 		},
+		handleHeaderAction(action){
+			 this.$refs.relationWorkspace.handleHeaderAction(action);
+		}
 	},
 };
 </script>

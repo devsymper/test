@@ -3,7 +3,7 @@
 		<div ref="symperPaperToolbar" class=" d-none"></div>
 		<div
 			ref="jointWrapper"
-			class="symper-orgchart-paper"
+			class="symper-relation-paper"
 			:style="{
 				height: wrapper.height,
 				width: wrapper.width,
@@ -140,7 +140,7 @@ export default {
 		paperScroller.centerContent();
 		this.paper.on('blank:pointerdown', paperScroller.startPanning);
 		this.addToolbar(paperScroller);
-		this.$emit('init', this.graph);
+		this.$emit('init', this.graph, this.paper);
 	},
 	methods: {
 		saveSVG() {
@@ -182,8 +182,8 @@ export default {
 </script>
 
 <style scoped>
-.symper-orgchart-paper >>> svg,
-.symper-orgchart-paper >>> .paper-scroller-background {
+.symper-relation-paper >>> svg,
+.symper-relation-paper >>> .paper-scroller-background {
 	background-color: #f1f1f1;
 }
 </style>
