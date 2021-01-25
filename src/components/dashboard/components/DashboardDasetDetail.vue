@@ -198,7 +198,7 @@ export default {
             this.openedPanelChild = data.openedPanelChild;
         },
         cloneColumn(item){
-            let agg = item.type == 'number'?'sum':'first';
+            let agg = item.type == 'number' ? 'sum':'first';
             return {
                 name:item.name,
                 type:item.type,
@@ -211,7 +211,8 @@ export default {
                     type:'isall',
                     val:''
                 },
-                origin_type: item.origin_type
+                origin_type: item.origin_type,
+                newClonedColumn: true
             }
         },
         clearSelectedItemDisplay(){
