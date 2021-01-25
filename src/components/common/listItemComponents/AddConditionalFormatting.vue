@@ -27,8 +27,9 @@
                     @click="handleAction(actionIdx,dataIdx)">
                       {{action.title}}
                   </v-btn>
-                  <v-btn text x-small  v-if="dataIdx==dataIdxSelected" @click="handleAction(3,dataIdx)">
-                      {{listActions[3].title}}
+                  <v-btn color="warning" text x-small  v-if="checkIsSelected(dataIdx)" @click="handleAction(3,dataIdx)">
+                      <span>{{listActions[3].title}}</span>
+                      
                   </v-btn>
                    <v-btn text x-small  v-else @click="handleAction(2,dataIdx)">
                       {{listActions[2].title}}
@@ -75,30 +76,43 @@ export default {
     },
     handleAction(actionIdx,dataIdx){
       if(actionIdx==2){
-        this.dataIdxSelected = dataIdx;
+        this.listDataIdSelected.push(dataIdx);
+        this.$emit('change-apply',this.listDataIdSelected )
+      }else{
+          if(actionIdx==3){
+          this.listDataIdSelected = this.listDataIdSelected.filter(i=>i!=dataIdx);
+        }
+        let data={
+          type: this.listActions[actionIdx].name,
+          index: dataIdx
+        }
+        this.$emit('change-format',data )
       }
-      if(actionIdx==3){
-        this.dataIdxSelected = -1;
-      }
-      let data={
-        type: this.listActions[actionIdx].name,
-        index: dataIdx
-      }
-      this.$emit('change-format',data )
+      
     },
       changeToConfig(){
           this.$emit('changeToConfig')
       },
+      checkIsSelected(dataIdxSelected){
+        let check = false;
+        this.listDataIdSelected.map(data=>{
+          if(data==dataIdxSelected){
+            check = true
+          }
+        })
+        return check
+      }
   },
   data () {
     return {
       dataIdxSelected:-1,
+      listDataIdSelected:[],
       listActions:[
         // {id:0,title:'Xem',name:'view',isShow:true},
         {id:1,title:'Sửa',name:'edit',isShow:true},
         {id:2,title:'Xóa',name:'delete',isShow:true},
         {id:3,title:'Chọn',name:'apply',isShow:false},
-        {id:4,title:'Bỏ chọn',name:'disApply',isShow:false},
+        {id:4,title:'Đã chọn',name:'disApply',isShow:false},
       ]
     }
   },

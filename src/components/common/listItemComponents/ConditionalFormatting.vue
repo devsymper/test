@@ -4,6 +4,7 @@
         v-if="typeFormart!='config'"
         :listData="listData"
         @change-format="changeFormat"
+        @change-apply="changeApply"
         @changeToConfig="changeToConfig()"
         @click="typeFormart='config'"/>
     <ConfigConditionalFormatting 
@@ -132,9 +133,9 @@ export default {
           this.update = false;
       },
        changeToAdd(){
-           this.update = true;
-          this.typeFormart='add';
-           this.listData = this.conditionalFormat
+        this.update = true;
+        this.typeFormart='add';
+        this.listData = this.conditionalFormat
       },
       changeFormat(data){
           this.$emit('change-format',data);
@@ -142,6 +143,9 @@ export default {
                this.typeFormart = 'config';
                 this.data = this.listData[data.index];
           }
+      },
+       changeApply(data){
+          this.$emit('change-apply',data);
       },
       save(){
           this.listData.push(this.data)

@@ -279,6 +279,7 @@
 			 <display-config
 				ref="tableDisplayConfig"
                 @change-format="changeFormat"
+                @change-apply="applyConditionFormat"
                 @save-conditional-formatting="saveConditionalFormatting"
 				@drag-columns-stopped="handleStopDragColumn"
 				@change-colmn-display-config="configColumnDisplay"
@@ -695,7 +696,6 @@ export default {
 			let data = event.data;
             switch (data.action) {
                 case 'getData':
-					
 					self.handlerGetData(data.dataAfter)
 					break;
                 case 'getItemForValueFilter':
@@ -726,10 +726,13 @@ export default {
 						}
                     })
                     self.columnDefs = data.dataAfter;
-                    if(self.conditionalFormat&&self.conditionalFormat.length>0&&self.conditionIndex>-1){
-                        self.columnDefs = self.handleConditionalFormat(data.dataAfter)
+                    if(!self.apply){
+                         if(self.conditionalFormat&&self.conditionalFormat.length>0&&self.conditionIndex>-1){
+                            self.columnDefs = self.handleConditionalFormat(data.dataAfter)
+                        }
+                    }else{
+                         self.applyListFormat(data.dataAfter);
                     }
-                    
 					break;
                 default:
                     break;
@@ -874,6 +877,7 @@ export default {
     data(){
 		let self = this;
         return {
+            apply:false,
             typeDelete:'',
             conditionalFormat:[],
             listId:[],// chứa list Id của table
@@ -1042,13 +1046,18 @@ export default {
                     break;
               }
         },
+        applyConditionFormat(listSelectedData){
+            this.applyConfigFormat(listSelectedData);
+            this.apply=true;
+            this.getData();
+        },
         changeFormat(data){
             switch(data.type){
                 case 'view':
                     break;
-                case 'apply':
-                    this.applyConfigFormat(data.index);
-                    break;
+                // case 'apply':
+                //     this.applyConfigFormat(data.index);
+                //     break;
                 case 'edit':
                     this.editConfigFormat(data.index);
                     break
@@ -1058,7 +1067,8 @@ export default {
                 case 'disApply':
                     this.disApplyConfigFormat(data.index);
                     break;
-            };
+            };  
+                this.apply = false;
                 this.getData();
            
 
@@ -1066,15 +1076,36 @@ export default {
          disApplyConfigFormat(index){
              this.conditionIndex = -1;
          },
+         applyListFormat(data){
+             debugger
+             data.map(d=>{
+                 
+             })
+            //  this.conditionIndex = 0;
+            //  this.handleConditionalFormat(data)
+            //    data.map(column=>{
+            //        column.cellStyle = function(e){
+            //            if(column.headerName=='firstName'){
+            //                 return {background:'red'}
+            //            };
+            //            if(column.headerName=='firstName'||column.headerName=='lastName'){
+            //                return {background:"green"}
+            //            }
+            //        }            
+            //    })
+            //  return data;
+         },
         handleConditionalFormat(data){
+            debugger
             const self = this;
-                let dataFormat = self.conditionalFormat[self.conditionIndex];
                 data.map(column=>{
                     column.cellStyle = function(e){
+                        let dataFormat = self.conditionalFormat[self.conditionIndex];
                         if(eval(dataFormat.tableColumnsJS)&&self.conditionalFormat){// những cột được set màu
                             if(dataFormat.displayMode.type=="singleColor"){// nếu là kiểu màu đơn
                                 let conditionalFormat = dataFormat.displayMode.singleColor.conditionFormat;
                                 if(eval(conditionalFormat)){
+                                    debugger
                                     return {color: dataFormat.displayMode.singleColor.fontColor, backgroundColor:dataFormat.displayMode.singleColor.backgroundColor}
                                 }
                             }
@@ -1093,6 +1124,7 @@ export default {
                         }
                     }
                 })
+                debugger
             return data;
         },
         applyConfigFormat(index){
