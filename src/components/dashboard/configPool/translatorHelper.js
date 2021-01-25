@@ -313,7 +313,9 @@ export const TranslatorHelper = {
 			// translate cho chart
 			let options = JSON.parse(JSON.stringify(staticChartOptions));
 			rsl = Object.assign(options, viewOptions);
-
+			rsl.scrollbar = {
+				enabled: true
+			};
 			rsl.chart.height = extraData.size.h;
 			rsl.chart.width = extraData.size.w;
 			return rsl;
@@ -355,6 +357,9 @@ export const TranslatorHelper = {
 		let series = this.getSeriesOptionsForGantt(data, columns, chartType, stacking);
 
 		let rsl = {
+			rangeSelector: {
+				enabled: this.getRangeSelectorGantt(style)
+			},
             series: series
         };
         // rsl.xAxis.categories = series.xAxisCategory;
@@ -364,7 +369,7 @@ export const TranslatorHelper = {
 		};
         return Object.assign(commonAttr, rsl);
 	},
-	    /**
+	/**
      * Chuyển các cấu hình thành options tương ứng với các loại chart: line, column, bar, combo
      * @param {Array} data mảng dữ liệu của chart
      * @param {Object} columns Cấu hình cột của chart
@@ -373,11 +378,7 @@ export const TranslatorHelper = {
      */
     linesAndColumns(data, columns, originStyle, chartType, stacking = undefined, ratio) {
 		data = this.makeValuesToNumber(data, columns);
-		console.log("dataBar",data);
-		
 		columns = this.filterUnuseColumnsForGroup1(columns);
-		console.log("columns",data);
-		
         let style = originStyle;
 		let series = this.getSeriesOptions(data, columns, chartType, stacking);
         series.series = this.applySeriesStyle(series.series, style, ratio);
@@ -441,7 +442,13 @@ export const TranslatorHelper = {
         }
         return data;
 	},
-
+	getRangeSelectorGantt(style){
+		if (style.general.children.rangeSelector && style.general.children.rangeSelector.value == true) {
+			return true;
+		}else{
+			return false;
+		}
+	},
 	getValueDecimal(num, decimalNum, mode, needUnit = false) {
 		num = Number(num);
 		decimalNum = Number(decimalNum);
@@ -713,13 +720,13 @@ export const TranslatorHelper = {
 			let item = {};
 			for (let name in columns) {
 				let timestart = null;
-				if ( name == "start" ) { // convert format datetime to timestamp
+				if ( name == "start" && data[i][columns[name].selectedColums[0].as] ) { // convert format datetime to timestamp
 					item[name] = convertDateToTimestamp(data[i][columns[name].selectedColums[0].as]);
 					timestart = item[name];
-				}else if(name == "end"){ // convert format datetime to timestamp
+				}else if(name == "end" && data[i][columns[name].selectedColums[0].as]){ // convert format datetime to timestamp
 					item[name] = convertDateToTimestamp(data[i][columns[name].selectedColums[0].as]);
 				}
-				else if(name == "duration"){
+				else if(name == "duration" && data[i][columns[name].selectedColums[0].as]){
 					if (!timestart) {
 						timestart = convertDateToTimestamp(data[i][columns["start"].selectedColums[0].as]);
 						let endDate = timestart+Number(data[i][columns[name].selectedColums[0].as])*1000 * 60 * 60 * 24;
@@ -731,7 +738,7 @@ export const TranslatorHelper = {
 					if (progress > 1) {
 						progress = progress/100;
 					}
-					item[name] = progress;
+					item[name] =Math.round(progress * 100) / 100 ;
 				}
 				else if(name == "milestone"){
 					let milestone = data[i][columns[name].selectedColums[0].as];
@@ -742,7 +749,9 @@ export const TranslatorHelper = {
 					}
 					item[name] = milestone;
 				}else{
-					item[name] = data[i][columns[name].selectedColums[0].as];
+					if (data[i][columns[name].selectedColums[0].as]) {
+						item[name] = data[i][columns[name].selectedColums[0].as];
+					}
 				}
 			}
 			rsl.data.push(item)		
