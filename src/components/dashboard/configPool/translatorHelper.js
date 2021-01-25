@@ -303,7 +303,6 @@ export const TranslatorHelper = {
 			return rsl;
 		},
 		ganttChart(rawConfigs,data,displayOptions,extraData,typeChart,stacking, ratio){
-			debugger
 			let columns = rawConfigs.setting;
 			let style = util.cloneDeep(rawConfigs.style);
 			if (columns.name.selectedColums.length == 0 || columns.start.selectedColums.length == 0 ) {
