@@ -1135,7 +1135,7 @@ export default {
         saveConditionalFormatting(data){
             let tableConfig =  this.getTableDisplayConfigData();
             tableConfig.detail = JSON.parse(tableConfig.detail);
-            tableConfig.detail.filter = this.filter;
+            tableConfig.detail.filter = this.listFilters;
             tableConfig.detail.conditionalFormat = data;
             tableConfig.detail= JSON.stringify(tableConfig.detail);
               this.listItemsWorker.postMessage({
@@ -1224,7 +1224,6 @@ export default {
         },
         saveFilter(){
             if(!this.isUpdateFilter){
-              
                 this.listFilters.push({
                     name:this.filterName,
                     isDefault: false,
@@ -1242,6 +1241,7 @@ export default {
             let tableConfig =  this.getTableDisplayConfigData();
             tableConfig.detail = JSON.parse(tableConfig.detail);
             tableConfig.detail.filter = this.listFilters;
+            tableConfig.detail.conditionalFormat = this.conditionalFormat;
             tableConfig.detail= JSON.stringify(tableConfig.detail);
             this.listItemsWorker.postMessage({
                 action: 'saveFilter',
@@ -1489,9 +1489,6 @@ export default {
 					e.cellRenderer = e.cellRenderer.toString()
 				}
 			})
-
-			debugger
-
 			this.listItemsWorker.postMessage({
 				action: 'getTableColumns',
 				data:{
