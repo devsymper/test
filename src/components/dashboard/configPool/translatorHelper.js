@@ -303,7 +303,6 @@ export const TranslatorHelper = {
 			return rsl;
 		},
 		ganttChart(rawConfigs,data,displayOptions,extraData,typeChart,stacking, ratio){
-			debugger
 			let columns = rawConfigs.setting;
 			let style = util.cloneDeep(rawConfigs.style);
 			if (columns.name.selectedColums.length == 0 || columns.start.selectedColums.length == 0 ) {
@@ -359,11 +358,11 @@ export const TranslatorHelper = {
             series: series
         };
         // rsl.xAxis.categories = series.xAxisCategory;
-        // let commonAttr = this.getCommonCellStyleAttr(style, ratio);
-        // rsl.chart = {
-        //     backgroundColor: commonAttr.general.backgroundColor,
-        // };
-        return rsl;
+        let commonAttr = this.getCommonCellStyleAttr(style, ratio);
+        rsl.chart = {
+            backgroundColor: commonAttr.general.backgroundColor,
+		};
+        return Object.assign(commonAttr, rsl);
 	},
 	    /**
      * Chuyển các cấu hình thành options tương ứng với các loại chart: line, column, bar, combo
