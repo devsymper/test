@@ -145,7 +145,8 @@
                 @change-format="changeFormat"
                 :rowData="rowData"
                 :conditionalFormat="conditionalFormat"
-                :tableColumns="tableColumns" 
+                :tableColumns="tableColumns"
+                @change-apply="changeApply"
                 @save="saveConditionalFormatting"
                 :headerPrefixKeypath='headerPrefixKeypath'/>
         </v-tab-item>
@@ -217,6 +218,9 @@ export default {
     methods: {
         changeFormat(data){
              this.$emit('change-format',data)
+        },
+        changeApply(data){
+            this.$emit('change-apply',data)
         },
         saveConditionalFormatting(data){
             this.$emit('save-conditional-formatting',data);
