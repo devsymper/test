@@ -252,11 +252,11 @@
             removeColumn(idx){
                 this.settingItem.selectedColums.splice(idx,1);
                 this.$emit('change-column-setting');
-                SDashboardEditor.recheckSelectedColumn();
+                // SDashboardEditor.recheckSelectedColumn();
             }, 
             handleChangeColumn(evt){
                 this.$emit('change-column-setting');
-                SDashboardEditor.recheckSelectedColumn();
+                // SDashboardEditor.recheckSelectedColumn();
             },
             getClassForSelectedColumn(settingItem){
                 return 'column-item-setting d-flex align-center';

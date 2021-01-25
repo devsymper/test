@@ -2,11 +2,11 @@
     <div 
         class="w-100 h-100 border-all"
         @click="selectThisCell">
-        <div class="w-100 h-100 cell-placeholder" v-if="cellConfigs.sharedConfigs.data && cellConfigs.sharedConfigs.data.length == 0">
+        <div class="w-100 h-100 cell-placeholder" v-if="cellConfigs.sharedConfigs.data && cellConfigs.sharedConfigs.data.length == 0 && cellConfigs.sharedConfigs.type != 'gantt'">
             <img :src="'img/dashboard/report-builder/'+cellConfigs.sharedConfigs.type+'.png'" height="40px" width="40px">
         </div>
         <div class="h-100 w-100 symper-dashboard-cell" v-else>
-            <div ref="cellTitle" class="symper-cell-title  py-1" :symper-cell-id="cellConfigs.sharedConfigs.cellId" :style="viewAttrs.symperTitle.style">
+            <!-- <div ref="cellTitle" class="symper-cell-title  py-1" :symper-cell-id="cellConfigs.sharedConfigs.cellId" :style="viewAttrs.symperTitle.style">
                 <div class="cell-title-text text-ellipsis  d-inline-block pl-2 pr-2" style="width: calc(100% - 10px)">
                     <span style="cursor: text" v-if="isView">{{viewAttrs.symperTitle.text}}</span>
                     <span 
@@ -17,7 +17,7 @@
                     </span>
                     <input class="w-100 border-none" v-else-if="!isView" ref="renameTitleInput" @blur="applyTitleChange" @change="applyTitleChange" type="text" v-model="viewAttrs.symperTitle.text">
                 </div>
-            </div>
+            </div> -->
             <DashboardCellOptions :isView="isView"/>
             <component 
                 :is="reportTag"

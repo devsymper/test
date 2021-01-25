@@ -38,6 +38,14 @@ const yAxisValueFormatter = {
         return eval("(this.value/1000000000000)+'T'");
     }
 };
+function convertDateToTimestamp(date){
+	if (!date) {
+		return;
+	}
+	var newDate = new Date(date);
+	return newDate.getTime();
+}
+
 export const TranslatorHelper = {
 	Charts:{
 		/**
@@ -294,6 +302,18 @@ export const TranslatorHelper = {
 		
 			return rsl;
 		},
+		ganttChart(rawConfigs,data,displayOptions,extraData,typeChart,stacking, ratio){
+			let columns = rawConfigs.setting;
+			let style = util.cloneDeep(rawConfigs.style);
+			if (columns.name.selectedColums.length == 0 || columns.start.selectedColums.length == 0 ) {
+				return;
+			}
+			let viewOptions = TranslatorHelper.getDataGantt(data.data,columns,style,typeChart,stacking, ratio);
+			let rsl = viewOptions; // Kết quả trả về
+			// translate cho chart
+			// let options = JSON.parse(JSON.stringify(staticChartOptions));
+			return rsl;
+		},
 		editor(rawConfigs,displayOptions,extraData,oldOutput,ratio) {
 			let content = oldOutput? oldOutput.content : "";
 			let style = util.cloneDeep(rawConfigs.style);
@@ -316,7 +336,30 @@ export const TranslatorHelper = {
         let commonAttr = this.getCommonCellStyleAttr(style, ratio);
         rsl = Object.assign(rsl, commonAttr);
         return rsl;
-    },
+	},
+	/**
+     * Chuyển các cấu hình thành options tương ứng với các loại chart gantt
+     * @param {Array} data mảng dữ liệu của chart
+     * @param {Object} columns Cấu hình cột của chart
+     * @param {Object} style style của chart
+     * @param {number} ratio tỷ lệ thu phóng của dashboard
+     */
+	getDataGantt(data, columns, originStyle, chartType, stacking = undefined, ratio){
+		data = this.makeValuesToNumber(data, columns);
+        columns = this.clearColumnsNotSelect(columns);
+		let style = originStyle;
+		let series = this.getSeriesOptionsForGantt(data, columns, chartType, stacking);
+
+		let rsl = {
+            series: series
+        };
+        // rsl.xAxis.categories = series.xAxisCategory;
+        // let commonAttr = this.getCommonCellStyleAttr(style, ratio);
+        // rsl.chart = {
+        //     backgroundColor: commonAttr.general.backgroundColor,
+        // };
+        return rsl;
+	},
 	    /**
      * Chuyển các cấu hình thành options tương ứng với các loại chart: line, column, bar, combo
      * @param {Array} data mảng dữ liệu của chart
@@ -325,8 +368,12 @@ export const TranslatorHelper = {
      * @param {number} ratio tỷ lệ thu phóng của dashboard
      */
     linesAndColumns(data, columns, originStyle, chartType, stacking = undefined, ratio) {
-        data = this.makeValuesToNumber(data, columns);
-        columns = this.filterUnuseColumnsForGroup1(columns);
+		data = this.makeValuesToNumber(data, columns);
+		console.log("dataBar",data);
+		
+		columns = this.filterUnuseColumnsForGroup1(columns);
+		console.log("columns",data);
+		
         let style = originStyle;
 		let series = this.getSeriesOptions(data, columns, chartType, stacking);
         series.series = this.applySeriesStyle(series.series, style, ratio);
@@ -356,7 +403,18 @@ export const TranslatorHelper = {
             backgroundColor: commonAttr.general.backgroundColor,
         };
         return Object.assign(commonAttr, rsl);
-    },
+	},
+	clearColumnsNotSelect(column){
+		let allColumn = util.cloneDeep(column);
+		let columns = {};
+		for (let name in allColumn) {
+			if (allColumn[name].selectedColums.length > 0) {
+				columns[name] = allColumn[name];
+			}
+		}
+		return columns;
+		
+	},
 	/**
      * Chuyển giá trị của các row có chứa key bắt buộc là number thành number
      * @param {Array} data mảng dữ liệu của chart
@@ -633,6 +691,59 @@ export const TranslatorHelper = {
 		// chỉ lấy cột đầu tiên của xAxis
 		correctColumnConfigs.xAxis.selectedColums = columns.xAxis.selectedColums.length > 0 ? [columns.xAxis.selectedColums[0]] : [];
 		return correctColumnConfigs;
+	},
+	 /**
+     *  Lấy ra cấu hình của các series trong chart gantt
+     * @param {Array} data mảng dữ liệu của chart
+     * @param {Object} columns cấu hình các cột của chart
+     * @param {Number} ratio tỷ lệ thu phóng của dashboard
+     */
+	getSeriesOptionsForGantt(data, columns, chartType, stacking){
+		if (Object.keys(columns).length == 0) {
+			return {};
+		}
+		let rsl = {
+            data: []
+		};
+		for (let i = 0; i < data.length; i++) {
+			let item = {};
+			for (let name in columns) {
+				let timestart = null;
+				if ( name == "start" ) { // convert format datetime to timestamp
+					item[name] = convertDateToTimestamp(data[i][columns[name].selectedColums[0].as]);
+					timestart = item[name];
+				}else if(name == "end"){ // convert format datetime to timestamp
+					item[name] = convertDateToTimestamp(data[i][columns[name].selectedColums[0].as]);
+				}
+				else if(name == "duration"){
+					if (!timestart) {
+						timestart = convertDateToTimestamp(data[i][columns["start"].selectedColums[0].as]);
+						let endDate = timestart+Number(data[i][columns[name].selectedColums[0].as])*1000 * 60 * 60 * 24;
+						item['end'] = endDate;
+					}
+				}
+				else if(name == "completed"){
+					let progress = Number(data[i][columns[name].selectedColums[0].as]);
+					if (progress > 1) {
+						progress = progress/100;
+					}
+					item[name] = progress;
+				}
+				else if(name == "milestone"){
+					let milestone = data[i][columns[name].selectedColums[0].as];
+					if (milestone == 0) {
+						milestone = false;
+					}else{
+						milestone = true;
+					}
+					item[name] = milestone;
+				}else{
+					item[name] = data[i][columns[name].selectedColums[0].as];
+				}
+			}
+			rsl.data.push(item)		
+		}
+		return rsl;
 	},
 	 /**
      *  Lấy ra cấu hình của các series trong chart

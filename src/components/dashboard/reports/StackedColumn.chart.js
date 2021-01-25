@@ -10,6 +10,7 @@ export default class StackedColumn extends ReportBase {
     }
        
     translate(rawConfig,  data, extraData = {} ,changes = {}, oldOutput = {}){
+        console.log("barcolumn:",rawConfig,data);
         let displayOptions = {};
         displayOptions = TranslatorHelper.Charts.barChart(rawConfig,data,displayOptions,extraData,"column",'normal',1);
         return displayOptions;

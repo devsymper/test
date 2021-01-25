@@ -52,7 +52,7 @@ export default {
 			}
 		},
 		changeColumnSetting() {
-			window.SDashboardEditor.onChangeCellConfigs('column');
+			// window.SDashboardEditor.onChangeCellConfigs('column');
 		},
 	},
 	data() {

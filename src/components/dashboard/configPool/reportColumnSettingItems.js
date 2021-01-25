@@ -103,15 +103,19 @@ let reportColumnSettingItems = {
         hasAgg:true
 
     },
-    taskName:{
+    name:{
         name: 'Task name',
         slot:'1'
     },
-    startDate:{
+    id:{
+        name: 'Task id',
+        slot:'1'
+    },
+    start:{
         name: 'Start date',
         slot:'1'
     },
-    endDate:{
+    end:{
         name: 'End date',
         slot:'1'
     },
@@ -119,14 +123,14 @@ let reportColumnSettingItems = {
         name: 'Duration',
         slot:'1'
     },
-    progress:{
+    completed:{
         name: 'Progress bar',
         slot:'1'
     },
     milestone:{
         name: 'Milestone',
         slot:'1'
-    },
+    },   
     parent:{
         name: 'Parent',
         slot:'1'
