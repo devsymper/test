@@ -63,9 +63,11 @@
     </div>
 </template>
 <script>
+import { systemRoleApi } from "@/api/systemRole.js";
 import {accessControlApi} from './../../api/accessControl';
 export default {
   created () {
+      this.getLastRole()
   },
   watch: {
      
@@ -81,7 +83,7 @@ export default {
       }
   },
   methods: {
-     async addKey(){
+    async addKey(){
         let data = {
               name:this.nameKey,
               description: this.descriptionKey,
@@ -100,8 +102,8 @@ export default {
             title: this.$t("authen.view.add_title"+"authen.notify.error"),
         });
         }
-      },
-       async updateKey(){
+    },
+    async updateKey(){
         let data = {
             name:this.nameKey,
             description: this.descriptionKey,
@@ -120,7 +122,8 @@ export default {
             title: this.$t("authen.view.update_title"+"authen.notify.error"),
         });
         }
-      }
+    },
+  
   },
   data () {
     return {

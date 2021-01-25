@@ -351,7 +351,8 @@
         },
         "notify":{
             "success":" thành công",
-            "error":" thất bại"
+            "error":" thất bại",
+            "error_get_role":"Không thể lấy danh sách quyền"
         }
     },
     

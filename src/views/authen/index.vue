@@ -21,7 +21,8 @@
                 @close-panel="close()"
                 ref="addView" 
                 />
-            <detail-key 
+            <detail-key
+                @close-detail-key="close()"
                 v-show="showDetailView"
                 :detailKey="detailKey"
                 ref="detailView" 
@@ -36,8 +37,12 @@ import AddKeyServer from "./../../components/authen/addKeyServer.vue";
 import DetailKeyServer from "./../../components/authen/detailKeyServer.vue";
 import { util } from "./../../plugins/util.js";
 import { appConfigs } from '../../configs';
+import { systemRoleApi } from "@/api/systemRole.js";
 import {accessControlApi} from './../../api/accessControl';
 export default {
+  created () {
+      this.getRole()
+  },
     components: {
         "list-items": ListItems,
         "add-key":AddKeyServer,
@@ -46,6 +51,7 @@ export default {
     data(){
         const self = this
         return {
+            listRoles:[],
             detailKey:{},
             showDetailView:false,
             listUser:[],
@@ -106,6 +112,19 @@ export default {
         this.calcContainerHeight();
     },
     methods:{
+        getRole(){
+            const self = this;
+            systemRoleApi.getRole().then(res=>{
+                if(res.status==200){
+                    self.listRoles = res.data.listObject
+                }else{
+                    self.$snotify({
+                        type: "error",
+                        title: 'authen.notify.error_get_role',
+                    });
+                }
+            })
+        },
         changeView(addView = false, detailView = true){
             this.showAddView = addView,
             this.showDetailView = detailView;
@@ -120,7 +139,6 @@ export default {
             this.typeView = "add";
         },
         setKeyValue(){
-            debugger
             this.$refs.addView.nameKey = this.detailKey.name;
             this.$refs.addView.descriptionKey = this.detailKey.description;
             this.$refs.addView.statusKey = this.detailKey.status==1?true:false;
@@ -131,15 +149,23 @@ export default {
             this.typeView = "update";
             this.$refs.listServerKey.openactionPanel();
             this.detailKey = key;
+            this.detailKey.idRole = '';
             this.setKeyValue();
-        },
-        getKey(id){
-
         },
         viewKey(key){
             this.changeView(false,true);
             this.actionPanelWidth=500;
             this.detailKey = key;
+            this.detailKey.idRole = this.getIdRole(key)
+        },
+        getIdRole(detailKey){
+            let idRole = '';
+            this.listRoles.map(role=>{
+                if(detailKey.name==role.name){
+                   idRole = role.id
+                }
+            })
+            return idRole
         },
         deleteKey(key){
             key.map(k=>{
