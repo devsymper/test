@@ -1191,10 +1191,10 @@ export default {
         },
         saveFilter(){
             if(!this.isUpdateFilter){
+              
                 this.listFilters.push({
                     name:this.filterName,
                     isDefault: false,
-                    userId:this.$store.state.app.endUserInfo.id,
                     columns:this.tableFilter.allColumn
                 })
                 this.notiFilter = this.$t("table.success.save_filter");
@@ -1490,18 +1490,7 @@ export default {
 					this.handleStopDragColumn();
                 }
                 // xử lý phần filter
-                if(res.savedConfigs.filter){
-                    let listFilter = [];
-                    let userId = this.$store.state.app.endUserInfo.id;
-                    res.savedConfigs.filter.map(f=>{
-                        if(f.userId&&f.userId==userId){   
-                            listFilter.push(f)
-                        }
-                    })
-                    this.listFilters = listFilter
-                }else{
-                    this.listFilters = []
-                }
+                this.listFilters = res.savedConfigs.filter?res.savedConfigs.filter:[];
                 this.getDefaultFilter()
                 // xử lý phần format conditional
                 this.conditionalFormat = res.savedConfigs.conditionalFormat;
@@ -1963,9 +1952,10 @@ export default {
             if(this.widgetIdentifier){
                 widgetIdentifier =  this.widgetIdentifier;
             }else{
-                widgetIdentifier =  this.$route.path;
+                widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
             }
-			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'');
+             widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
+            // this.widgetIdentifier = this.$route.path;
             return widgetIdentifier;
 		},
 		getTableDisplayConfigData(){
