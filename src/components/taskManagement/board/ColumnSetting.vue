@@ -132,7 +132,22 @@ export default {
                 return [];
             }
             let idBoard=this.currentBoard.id;
-            return this.sTaskManagement.listColumnInBoard[idBoard];
+            let allListColumnInBoard = this.sTaskManagement.listColumnInBoard[idBoard];
+            if (allListColumnInBoard.length>0) {
+                for (let i = 0; i < allListColumnInBoard.length; i++) {
+                    if (allListColumnInBoard[i].isBacklog == "0") {
+                        allListColumnInBoard[i].isBacklog = false;
+                    }else{
+                        allListColumnInBoard[i].isBacklog = true;
+                    }
+                    if (allListColumnInBoard[i].isHidden == "0") {
+                        allListColumnInBoard[i].isHidden = false;
+                    }else{
+                        allListColumnInBoard[i].isHidden = true;
+                    }
+                }
+            }
+            return allListColumnInBoard;
         },
         
     },
