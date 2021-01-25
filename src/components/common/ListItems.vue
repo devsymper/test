@@ -724,7 +724,7 @@ export default {
 						if(e.cellStyle){
 							eval("e.cellStyle = " + e.cellStyle)
 						}
-                    })
+					})
                     self.columnDefs = data.dataAfter;
                     if(self.conditionalFormat&&self.conditionalFormat.length>0&&self.conditionIndex>-1){
                         self.columnDefs = self.handleConditionalFormat(data.dataAfter)
@@ -1463,6 +1463,9 @@ export default {
 					e.cellRenderer = e.cellRenderer.toString()
 				}
 			})
+
+			debugger
+
 			this.listItemsWorker.postMessage({
 				action: 'getTableColumns',
 				data:{
