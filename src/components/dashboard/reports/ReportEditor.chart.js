@@ -17,6 +17,9 @@ export default class ReportEditor extends ReportBase {
         let displayOptions = {};
         displayOptions = TranslatorHelper.Charts.editor(rawConfig,displayOptions,extraData,oldOutput,1);
         return displayOptions;
+    }
 
+    canGetDataFromServer(){
+        return true;
     }
 }

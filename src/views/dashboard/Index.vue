@@ -96,7 +96,7 @@ export default {
     },
     methods: {
 		addDashboard(){
-
+            this.$goToPage("/dashboards/create", "Tạo dashboard");
 		}
 	}
 };

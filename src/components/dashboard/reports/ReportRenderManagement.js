@@ -40,7 +40,7 @@ export default class ReportRenderManagement {
                 cell.active = true;
                 setTimeout((self) => {
                     if(!cell.calledAPI){
-                        self.workspace.onChangeCellConfigs('column', cell.cellId);
+                        self.workspace.onChangeCellConfigs('data', cell.cellId);
                         cell.calledAPI = true;
                     }else{
                         self.workspace.onChangeCellConfigs('style', cell.cellId);

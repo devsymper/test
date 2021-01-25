@@ -4,7 +4,7 @@ import {
 } from "./../configs.js";
 import { util } from "../plugins/util";
 
-let api = new Api(appConfigs.apiDomain.dashboard);
+let api = new Api(appConfigs.apiDomain.biService);
 
 export const dashboardApi = {
 	getAllDashboard() {
@@ -27,5 +27,13 @@ export const dashboardApi = {
 	},
 	getData(options){
 		return api.post(`${appConfigs.apiDomain.biService}report-get-data`, options, {}, {contentType: 'application/json'});
-	}
+	},
+	createDashboard(data){
+		return api.post('dashboards', JSON.stringify(data));
+	},
+	updateDashboard(id, data){
+		return api.put('dashboards/' + id, JSON.stringify(data), {
+			"Content-Type": "application/json"
+		});
+	},
 };

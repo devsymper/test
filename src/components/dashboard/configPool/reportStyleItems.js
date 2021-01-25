@@ -510,6 +510,7 @@ export const getStyleItems = function(attrNames) {
     let rsl = {};
     attrNames.forEach(name => {
         rsl[name] = attrItems[name];
+        rsl[name].value = rsl[name].default;
     });
     return _cloneDeep(rsl);
 }
