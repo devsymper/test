@@ -79,7 +79,7 @@ export default {
         this.listDataIdSelected.push(dataIdx);
         this.$emit('change-apply',this.listDataIdSelected )
       }else{
-          if(actionIdx==3){
+        if(actionIdx==3){
           this.listDataIdSelected = this.listDataIdSelected.filter(i=>i!=dataIdx);
         }
         let data={

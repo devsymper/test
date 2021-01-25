@@ -720,8 +720,8 @@ export default {
 					})
                     self.columnDefs = data.dataAfter;
                     if(!self.apply){
-                         if(self.conditionalFormat&&self.conditionalFormat.length>0&&self.conditionIndex>-1){
-                            // self.columnDefs = self.handleConditionalFormat(data.dataAfter)
+                         if(self.conditionalFormat&&self.conditionalFormat.length>0){
+                            self.columnDefs = self.handleConditionalFormat(data.dataAfter)
                         }
                     }else{
                         self.columnDefs = self.handleConditionalFormat(data.dataAfter)
@@ -1052,6 +1052,7 @@ export default {
             this.getData();
         },
         changeFormat(data){
+            debugger
             switch(data.type){
                 case 'view':
                     break;
@@ -1074,7 +1075,14 @@ export default {
 
         },
          disApplyConfigFormat(index){
-             this.conditionIndex = -1;
+            let listSelectedData = [];
+            this.listSelectedData.map(data=>{
+                 if(data!=index){
+                     listSelectedData.push(data)
+                 }
+                 });
+             this.listSelectedData = listSelectedData;
+            //  this.getData();
          },
   
         handleConditionalFormat(data){
