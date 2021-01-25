@@ -73,6 +73,7 @@ export default {
         typeFormart:'add',
         data:{
             nameGroup:'',
+            isSelected:false,
             tableColumns:[],
             tableColumnsJS:'',
             displayMode:{

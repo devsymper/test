@@ -721,10 +721,20 @@ export default {
                     self.columnDefs = data.dataAfter;
                     if(!self.apply){
                          if(self.conditionalFormat&&self.conditionalFormat.length>0){
-                            self.columnDefs = self.handleConditionalFormat(data.dataAfter)
+                             if(self.listSelectedData.length==0){
+                                self.listSelectedData = self.getListSelectedConditionFormat();
+
+                             }
+                            self.columnDefs = self.handleConditionalFormat(data.dataAfter);
+                        
                         }
                     }else{
-                        self.columnDefs = self.handleConditionalFormat(data.dataAfter)
+                           if(self.listSelectedData.length==0){
+                                self.listSelectedData = self.getListSelectedConditionFormat();
+
+                             }
+                        self.columnDefs = self.handleConditionalFormat(data.dataAfter);
+
                     }
 					break;
                 default:
@@ -1016,6 +1026,16 @@ export default {
       	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
     },
 	methods:{
+        getListSelectedConditionFormat(){
+            let result = [];
+            this.conditionalFormat.map((data,index)=>{
+                if(data.isSelected){
+                    result.push(index)
+                }
+            })
+            debugger
+            return result;
+        },
 		customBtnClick(i){
 			this.customHeaderBtn[i].callback()
 		},
@@ -1045,9 +1065,22 @@ export default {
                     break;
               }
         },
+        setSelectedConditional(index, check = true){
+            this.conditionalFormat.map((condition,i)=>{
+                if(i==index){
+                    condition.isSelected = check
+                }
+            })
+            debugger
+        },
         applyConditionFormat(listSelectedData){
-            this.applyConfigFormat(listSelectedData);
+            // this.applyConfigFormat(listSelectedData);
+            this.listSelectedData.map(data=>{
+                this.setSelectedConditional(data)
+
+            });
             this.listSelectedData = listSelectedData;
+            this.saveConditionalFormatting(this.conditionalFormat);
             this.apply=true;
             this.getData();
         },
@@ -1079,8 +1112,11 @@ export default {
             this.listSelectedData.map(data=>{
                  if(data!=index){
                      listSelectedData.push(data)
+                 }else{ 
+                    this.setSelectedConditional(data, false)
                  }
-                 });
+            });
+            this.saveConditionalFormatting(this.conditionalFormat);
              this.listSelectedData = listSelectedData;
             //  this.getData();
          },
@@ -1118,9 +1154,9 @@ export default {
                 })
             return data;
         },
-        applyConfigFormat(index){
-            this.conditionIndex = index;
-        },
+        // applyConfigFormat(index){
+        //     this.conditionIndex = index;
+        // },
         editConfigFormat(index){
             this.conditionIndex = index;
         },
