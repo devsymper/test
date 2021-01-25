@@ -449,7 +449,7 @@ export default {
                         "document/addToDocumentSubmitStore", { key: 'listControlMappingDatasets', value: controlMapDatasetDataflow, instance: thisCpn.keyInstance }
                     );
                     thisCpn.formulasWorker.postMessage({action:'updateDocumentObjectId',data:{keyInstance:thisCpn.keyInstance,updateDocumentObjectId:thisCpn.docObjId}})
-                    thisCpn.processHtml(thisCpn.contentDocument);
+                    thisCpn.processHtml();
                     thisCpn.controlRelationWorker.terminate();
                     break;
                 default:
@@ -522,7 +522,11 @@ export default {
     },
 
     async created() {
-        tinymce.remove()
+        this.$store.commit("document/changeViewType", {
+            key: this.keyInstance,
+            value: this.action,
+        });
+        tinymce.remove();
         this.formulasWorker = new FormulasWorker();
         this.formulasWorker.postMessage({action:'createSQLiteDB',data:{keyInstance:this.keyInstance}})
         this.formulasWorker.postMessage({action:'addWorkflowVariable',data:{keyInstance:this.keyInstance, workflowVariable:this.workflowVariable}})
@@ -533,17 +537,13 @@ export default {
         if (this.docId != 0) {
             this.documentId = this.docId;
         } else if (this.$getRouteName() == "submitDocument") {
-            this.$store.commit("document/changeViewType", {
-                key: this.keyInstance,
-                value: 'submit',
-            });
             this.documentId = this.$route.params.id;
         } else if (this.$getRouteName() == "updateDocumentObject") {
+            this.docObjId = this.$route.params.id;
             this.$store.commit("document/changeViewType", {
                 key: this.keyInstance,
                 value: 'update',
             });
-            this.docObjId = this.$route.params.id;
         }
 
         // Nếu truyền vào documentObjectId
@@ -1068,7 +1068,7 @@ export default {
             let updateByWorkflowId = this.documentInfo.updateByWorkflowId;
             
             if(updateByWorkflowId && updateByWorkflowId != "0" && this.$getRouteName() == 'updateDocumentObject'){
-                startWorkflowBySubmitedDoc(updateByWorkflowId, {document_id:this.docId})
+                startWorkflowBySubmitedDoc(updateByWorkflowId, {document_id:this.documentId,document_object_id:this.documentObjectId})
             }
         },
         afterBlurInputPivot(event){
@@ -1308,7 +1308,6 @@ export default {
          * Hàm chạy công thức autocomplete để đổ dữ liệu vào box autucomplete, control select cũng dùng trường hợp này
          */
         getDataForAutocomplete(e,type,aliasControl="", controlIns){ 
-            let thisCpn = this
             let listInput = getListInputInDocument(this.keyInstance);
             if(['select','combobox'].includes(type)){
                 let formulaIns = controlIns.getFormulaInstance('list');
@@ -1686,7 +1685,7 @@ export default {
          * Khởi tạo các đối tượng control từ html
          * các control được đánh dâu bởi id có frefix: s-contorl-timestamp
          */
-        processHtml(content) {
+        processHtml() {
             $("#sym-submit-" + this.keyInstance).find('.page-content').addClass('d-block');
             $("#sym-submit-" + this.keyInstance).find('.list-page-content').addClass('d-flex');
             
@@ -1821,10 +1820,10 @@ export default {
                             });
                             tableControl.controlInTable = controlInTable;
                             tableControl.renderTable();
+                            this.addToListInputInDocument(controlName,tableControl);
                             if(this.viewType !== 'submit'){
                                 tableControl.setData(valueInput);
                             }
-                            this.addToListInputInDocument(controlName,tableControl);
                             // tableControl.renderInfoButtonInRow(this.linkControl);
                         }
                     }
@@ -1834,9 +1833,9 @@ export default {
             if(!isSetEffectedControl){
                 let listInput = getListInputInDocument(this.keyInstance);
                 let mapControlEffected = getMapControlEffected(listInput);
-                this.controlInfinity = checkInfinityControl(mapControlEffected)
-                this.updateEffectedControlToStore(mapControlEffected)
-                this.handleAfterGetMapControlEffected()
+                this.controlInfinity = checkInfinityControl(mapControlEffected);
+                this.updateEffectedControlToStore(mapControlEffected);
+                this.handleAfterGetMapControlEffected();
             }
             else{
                 this.handleBeforeLoadedDocument()
@@ -2261,10 +2260,7 @@ export default {
                     // nếu có công thức nút submit
                     if(thisCpn.sDocumentSubmit.submitFormulas != undefined){
                         let dataInput = getDataInputFormula(thisCpn.sDocumentSubmit.submitFormulas,thisCpn.sDocumentSubmit.listInputInDocument,thisCpn.optionalDataBinding);
-                        thisCpn.formulasWorker.postMessage({action:'runFormula',data:{
-                            formulaInstance:thisCpn.sDocumentSubmit.submitFormulas,
-                            dataInput:dataInput,
-                            keyInstance:thisCpn.keyInstance}})
+                        thisCpn.sDocumentSubmit.submitFormulas.handleBeforeRunFormulas(dataInput);
                     }
                     thisCpn.closeFormulasWorker();
                     // nếu submit từ form sub submit thì ko rediect trang
@@ -2492,12 +2488,10 @@ export default {
         },
         
         addToListInputInDocument(name,control){
-            let controlToWorker = {name:control.name,type:control.type,value:control.value}
-            this.formulasWorker.postMessage({action:'updateWorkerStore',data:{controlIns: controlToWorker, keyInstance:this.keyInstance, type:'submit'}})
-             this.$store.commit(
-                            "document/addToListInputInDocument",
-                            { name: name, control: control ,instance: this.keyInstance}
-                        );
+            this.$store.commit(
+                "document/addToListInputInDocument",
+                { name: name, control: control ,instance: this.keyInstance}
+            );
         },
         /**
          * chạy công thức input filter

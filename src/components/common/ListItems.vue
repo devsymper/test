@@ -93,17 +93,6 @@
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel_history')}}</span>
                         </v-btn>
-                        <v-btn
-                            depressed
-                            small
-							icon
-							tile
-                            @click="handleCloseClick"
-                            class="mr-2"
-                            v-if="dialogMode"
-                        >
-                            <v-icon dark>mdi-close</v-icon>
-                        </v-btn>
                          <v-menu
                             bottom
                             left
@@ -223,17 +212,18 @@
                             </template>
                             <span>{{alwaysShowActionPanel ? $t('common.not_always_show_sidebar') : $t('common.always_show_sidebar')}}</span>
                         </v-tooltip>
+
 						<span v-if="Object.keys(customHeaderBtn).length > 0">
 							 <v-btn
 								depressed
 								small
 								v-for="(item, i) in customHeaderBtn"
 								:key="i"
-								@click="customBtnclick(i)"
+								@click="customBtnClick(i)"
 								class="mr-2"
 							>
-								<v-icon left dark>{{item.icon}}</v-icon>
-								<span> {{item.title}} </span>
+								<v-icon left dark v-if="item.icon">{{item.icon}}</v-icon>
+								<span v-if="item.title"> {{item.title}} </span>
 							</v-btn>
 						</span>
 			 </div>
@@ -267,10 +257,8 @@
 				:frameworkComponents="frameworkComponents"
 				:overlayLoadingTemplate="overlayLoadingTemplate"
 				:overlayNoRowsTemplate="overlayNoRowsTemplate"
-				:modules="modules"
 				@cell-context-menu="cellContextMenu"
                 @cell-mouse-down="cellMouseDown"
-
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
@@ -396,9 +384,11 @@ import { actionHelper } from "@/action/actionHelper";
 import CheckBoxRenderer from "@/components/common/agDataTable/CheckBoxRenderer"
 import SymperDialogConfirm from "@/components/common/SymperDialogConfirm"
 import ConfigFilter from "./ListItemConfigFilter"
+import 'ag-grid-enterprise';
 import AddFilter from "./ListItemAddFilter"
 import CheckBoxRendererListItems from "@/components/common/agDataTable/CheckBoxRendererListItems"
 let CustomHeaderVue = Vue.extend(CustomHeader);
+import  {ClipboardModule} from '@ag-grid-enterprise/clipboard';
 
 var testSelectData = [ ];
 window.tableDropdownClickHandle = function(el, event) {
@@ -698,6 +688,9 @@ export default {
                 case 'getData':
 					self.handlerGetData(data.dataAfter)
 					break;
+                case 'customGetData':
+					self.handleCustomGetData(data.dataAfter)
+					break;
                 case 'getItemForValueFilter':
 					self.tableFilter.currentColumn.colFilter.selectItems = data.dataAfter.selectItems
 					break;
@@ -724,7 +717,7 @@ export default {
 						if(e.cellStyle){
 							eval("e.cellStyle = " + e.cellStyle)
 						}
-                    })
+					})
                     self.columnDefs = data.dataAfter;
                     if(!self.apply){
                          if(self.conditionalFormat&&self.conditionalFormat.length>0&&self.conditionIndex>-1){
@@ -768,6 +761,7 @@ export default {
                 return "100%";
             }
 		},
+		
 		tableHeight() {
 			let ref = this.$refs;
 			let tbHeight = this.containerHeight;
@@ -891,7 +885,6 @@ export default {
             contentDelete:"",
             showDelPopUp:false,
             filterContent:"",
-            showDelPopUp:false,
             selectedFilterName:'',
 			listItemsWorker: null,
 			deleteDialogShow: false,
@@ -924,7 +917,7 @@ export default {
 			},
 			searchKey: "",
 			modules:[
-				MenuModule
+				MenuModule,
 			],
 			MedalCellRenderer(){
 			},	
@@ -1008,7 +1001,9 @@ export default {
 				if (params.node.rowIndex % 2 != 0) {
 					return { background: '#fbfbfb' };
 				}
-			}
+			},
+			suppressCopyRowsToClipboard: true,
+			modules:[ClipboardModule]
 		},
 		this.frameworkComponents = {
 			agColumnHeader: CustomHeaderVue,
@@ -1020,6 +1015,9 @@ export default {
       	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
     },
 	methods:{
+		customBtnClick(i){
+			this.customHeaderBtn[i].callback()
+		},
         handleAddFilter(data){
             if(data.type=='save'){
                 this.filterName = data.filterName
@@ -1226,10 +1224,10 @@ export default {
         },
         saveFilter(){
             if(!this.isUpdateFilter){
+              
                 this.listFilters.push({
                     name:this.filterName,
                     isDefault: false,
-                    userId:this.$store.state.app.endUserInfo.id,
                     columns:this.tableFilter.allColumn
                 })
                 this.notiFilter = this.$t("table.success.save_filter");
@@ -1420,16 +1418,14 @@ export default {
                         menuItem[0].hasOwnProperty("callback")
                     ) {
                         if(key == 'delete' || key == 'remove'){
-                            thisCpn.deleteItems = [];
-                            let deletedIndexs = {};
-                            for(let item of selection ){
-                                for(let idx = item.start.row ; idx <= item.end.row; idx++){
-                                    if(!deletedIndexs[idx]){
-                                        thisCpn.deleteItems.push(thisCpn.rowData[idx]);
-                                        deletedIndexs[idx] = true;
-                                    }
-                                }
-                            }
+							let allRow = []
+							let allRowRange = thisCpn.agApi.getCellRanges()
+							thisCpn.agApi.forEachNode(node=>{
+								if(node.rowIndex >= allRowRange[0].startRow.rowIndex && node.rowIndex <= allRowRange[0].endRow.rowIndex){
+									allRow.push(node.data)
+								}
+							})
+							thisCpn.deleteItems = allRow;
                             thisCpn.deleteDialogShow = true;
                         }else{
                             thisCpn.exeCallbackOnContextMenu(rowData);
@@ -1473,7 +1469,10 @@ export default {
             })
             }
             this.$emit('get-list-id',this.listId)
-        },
+		},
+		handleCustomGetData(data){
+			this.$emit('custom-get-all-data', data.data.listObject)
+		},
 		handlerGetData(data){
             this.getListId(data.data.listObject);
 			let self = this
@@ -1484,18 +1483,15 @@ export default {
 			}
 			this.totalObject = data.total ? parseInt(data.total) : 0;
 			let resData = data.listObject ? data.listObject : []
-			// if(lazyLoad){
-			// 	resData.forEach(function(e){
-			// 		thisCpn.rowData.push(e)
-			// 	})
-			// }else{
 			self.rowData = resData;
-			// }
 			data.columns.forEach(function(e){
 				if(e.cellRenderer){
 					e.cellRenderer = e.cellRenderer.toString()
 				}
 			})
+
+			debugger
+
 			this.listItemsWorker.postMessage({
 				action: 'getTableColumns',
 				data:{
@@ -1527,18 +1523,7 @@ export default {
 					this.handleStopDragColumn();
                 }
                 // xử lý phần filter
-                if(res.savedConfigs.filter){
-                    let listFilter = [];
-                    let userId = this.$store.state.app.endUserInfo.id;
-                    res.savedConfigs.filter.map(f=>{
-                        if(f.userId&&f.userId==userId){   
-                            listFilter.push(f)
-                        }
-                    })
-                    this.listFilters = listFilter
-                }else{
-                    this.listFilters = []
-                }
+                this.listFilters = res.savedConfigs.filter?res.savedConfigs.filter:[];
                 this.getDefaultFilter()
                 // xử lý phần format conditional
                 this.conditionalFormat = res.savedConfigs.conditionalFormat;
@@ -1645,7 +1630,8 @@ export default {
 			this.getData();
 			this.$emit("refresh-list", {});
         },
-		showTableDropdownMenu(x, y, colName) {
+		showTableDropdownMenu(x, y, colName){
+			this.searchKey = ""
             var windowWidth = $(window).width()/1.1;
             if(x > windowWidth){
                 x -= 190;
@@ -1927,6 +1913,11 @@ export default {
             this.getData();
             this.$emit("change-page", vl.page);
 		},
+		customGetData(page){
+			this.page = page
+			this.pageSize = 1000
+			this.getData(false, false, true, false, true);
+		},
 		addItem() {
             if(this.useActionPanel){
                 this.actionPanel = true;
@@ -1951,7 +1942,7 @@ export default {
             this.getData();
             this.$emit("change-page", this.page);
 		},
-		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false ){
+		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false, customGetData = false){
 			let self = this;
 			let dataConfig = this.getConfigApiCall()
 			dataConfig.configs = {
@@ -1961,11 +1952,19 @@ export default {
 			}
 			dataConfig.lazyLoad = lazyLoad
 			dataConfig.customAPIResult = self.customAPIResult.reformatData ? self.customAPIResult.reformatData.toString() : null
-            dataConfig.filteredColumns = self.filteredColumns
-			this.listItemsWorker.postMessage({
-				action: 'getData',
-				data: dataConfig
-			});
+			dataConfig.filteredColumns = self.filteredColumns
+			if(customGetData){
+				this.listItemsWorker.postMessage({
+					action: 'customGetData',
+					data: dataConfig
+				});
+			}else{
+				this.listItemsWorker.postMessage({
+					action: 'getData',
+					data: dataConfig
+				});
+			}	
+			
 		},
 		 /**
          * Khôi phục lại cấu hình của hiển thị của table từ dữ liệu được lưu
@@ -1986,9 +1985,10 @@ export default {
             if(this.widgetIdentifier){
                 widgetIdentifier =  this.widgetIdentifier;
             }else{
-                widgetIdentifier =  this.$route.path;
+                widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
             }
-			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'');
+             widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
+            // this.widgetIdentifier = this.$route.path;
             return widgetIdentifier;
 		},
 		getTableDisplayConfigData(){
@@ -2053,6 +2053,14 @@ export default {
 }
 .symper-list-items >>> .ag-theme-balham .ag-root-wrapper{
 	border: unset !important;
+}
+.symper-list-items >>> .ag-cell{
+	-webkit-touch-callout: none;
+	-webkit-user-select: none; 
+	-khtml-user-select: none; 
+	-moz-user-select: none;
+	-ms-user-select: none; 
+	user-select: none; 
 }
 .symper-list-items >>> .ag-header{
 	border: unset !important;

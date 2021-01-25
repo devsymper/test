@@ -80,7 +80,6 @@ onmessage = async function (event) {
                  * trường hợp chạy công thức cho các trường hợp còn lại
                  */
                 else{
-                    console.log(dataInput,'dataInputdataInput');
                     formulaIns.handleBeforeRunFormulas(dataInput).then(res=>{
                         if(res && res['data']){
                             postMessage({action:'afterRunFormulasSuccess', dataAfter : 

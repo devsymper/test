@@ -240,7 +240,9 @@ export const checkInfinityControl = (mapControlEffected) => {
         if(['list','formulas'].includes(formulaType)){
             for(let controlName in mapControlEffected[formulaType]){
                 let infinityLoopFound = search(controlName, mapControlEffected[formulaType][controlName], mapControlEffected[formulaType]);
-                controlInfinity.push(infinityLoopFound)
+                if(infinityLoopFound){
+                    controlInfinity.push(infinityLoopFound)
+                }
             }
         }
     }

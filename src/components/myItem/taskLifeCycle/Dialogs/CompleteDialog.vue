@@ -127,7 +127,7 @@ export default {
 					this.$snotify(
 						{
 							type: 'error',
-							title: self.$t("myItem.taskLifeCycle.notify.notSubmit") 
+							title: this.$t("myItem.taskLifeCycle.notify.notSubmit") 
 						}
 					)
 					flag = false

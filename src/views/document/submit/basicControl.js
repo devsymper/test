@@ -194,12 +194,11 @@ export default class BasicControl extends Control {
         this.ele.blur();
     }
     setEvent() {
-            // biến check xem control có đang autocomplete hay ko
-            // nếu đang autocomplete thì ko nhận sự kiện thay đổi khi giá trị đang được gõ
             let thisObj = this;
             this.ele.on('change', function(e) {
                 let valueChange = $(e.target).val();
                 if(thisObj.checkAutoCompleteControl()){
+                    thisObj.value = valueChange;
                     return false;
                 }
                 if (thisObj.type == 'label') {
@@ -227,15 +226,6 @@ export default class BasicControl extends Control {
                 }
                 // sau khi thay đổi giá trị input thì kiểm tra require control nếu có
                 thisObj.checkRequire();
-                if(thisObj.type == 'time'){
-                    if(!Util.checkTimeValid(valueChange)){
-                        thisObj.renderValidateIcon("Không đúng định dạng thời gian", 'TimeValid')
-                        return false
-                    }
-                    else{
-                        thisObj.removeValidateIcon('TimeValid')
-                    }
-                }
                 thisObj.value = valueChange;
                 SYMPER_APP.$evtBus.$emit('document-submit-input-change', thisObj);
             })
