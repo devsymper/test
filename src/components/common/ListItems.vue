@@ -721,10 +721,10 @@ export default {
                     self.columnDefs = data.dataAfter;
                     if(!self.apply){
                          if(self.conditionalFormat&&self.conditionalFormat.length>0&&self.conditionIndex>-1){
-                            self.columnDefs = self.handleConditionalFormat(data.dataAfter)
+                            // self.columnDefs = self.handleConditionalFormat(data.dataAfter)
                         }
                     }else{
-                         self.applyListFormat(data.dataAfter);
+                        self.columnDefs = self.handleConditionalFormat(data.dataAfter)
                     }
 					break;
                 default:
@@ -874,6 +874,7 @@ export default {
             apply:false,
             typeDelete:'',
             conditionalFormat:[],
+            listSelectedData:[],
             listId:[],// chứa list Id của table
 			gridApi: null,
             closeBtnFilter:false,
@@ -1046,6 +1047,7 @@ export default {
         },
         applyConditionFormat(listSelectedData){
             this.applyConfigFormat(listSelectedData);
+            this.listSelectedData = listSelectedData;
             this.apply=true;
             this.getData();
         },
@@ -1074,55 +1076,38 @@ export default {
          disApplyConfigFormat(index){
              this.conditionIndex = -1;
          },
-         applyListFormat(data){
-             debugger
-             data.map(d=>{
-                 
-             })
-            //  this.conditionIndex = 0;
-            //  this.handleConditionalFormat(data)
-            //    data.map(column=>{
-            //        column.cellStyle = function(e){
-            //            if(column.headerName=='firstName'){
-            //                 return {background:'red'}
-            //            };
-            //            if(column.headerName=='firstName'||column.headerName=='lastName'){
-            //                return {background:"green"}
-            //            }
-            //        }            
-            //    })
-            //  return data;
-         },
+  
         handleConditionalFormat(data){
-            debugger
             const self = this;
                 data.map(column=>{
                     column.cellStyle = function(e){
-                        let dataFormat = self.conditionalFormat[self.conditionIndex];
-                        if(eval(dataFormat.tableColumnsJS)&&self.conditionalFormat){// những cột được set màu
-                            if(dataFormat.displayMode.type=="singleColor"){// nếu là kiểu màu đơn
-                                let conditionalFormat = dataFormat.displayMode.singleColor.conditionFormat;
-                                if(eval(conditionalFormat)){
-                                    debugger
-                                    return {color: dataFormat.displayMode.singleColor.fontColor, backgroundColor:dataFormat.displayMode.singleColor.backgroundColor}
-                                }
-                            }
-                            else{// nếu thang màu
-                                let field = dataFormat.displayMode.colorScale.applyColumn.field;
-                                let valueTable = e.data[field];
-                                let listColors = dataFormat.displayMode.colorScale.listColors;
-                                let color = '';
-                                listColors.map(v=>{
-                                    if(v.name==valueTable){
-                                        color = v.backgroundColor
+                        let allColor = {}
+                         self.listSelectedData.map(conditionalIdx=>{
+                             let dataFormat = self.conditionalFormat[conditionalIdx];
+                                if(eval(dataFormat.tableColumnsJS)&&self.conditionalFormat){// những cột được set màu
+                                    if(dataFormat.displayMode.type=="singleColor"){// nếu là kiểu màu đơn
+                                        let conditionalFormat = dataFormat.displayMode.singleColor.conditionFormat;
+                                        if(eval(conditionalFormat)){
+                                            allColor = {color: dataFormat.displayMode.singleColor.fontColor, backgroundColor:dataFormat.displayMode.singleColor.backgroundColor}
+                                        }
                                     }
-                                })
-                                    return {backgroundColor:color}
-                            }
-                        }
+                                    else{// nếu thang màu
+                                        let field = dataFormat.displayMode.colorScale.applyColumn.field;
+                                        let valueTable = e.data[field];
+                                        let listColors = dataFormat.displayMode.colorScale.listColors;
+                                        let color = '';
+                                        listColors.map(v=>{
+                                            if(v.name==valueTable){
+                                                color = v.backgroundColor
+                                            }
+                                        })
+                                            allColor = {backgroundColor:color}
+                                    }
+                                }
+                         })
+                        return allColor
                     }
                 })
-                debugger
             return data;
         },
         applyConfigFormat(index){
