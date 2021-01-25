@@ -1102,7 +1102,7 @@ export default {
         saveConditionalFormatting(data){
             let tableConfig =  this.getTableDisplayConfigData();
             tableConfig.detail = JSON.parse(tableConfig.detail);
-            tableConfig.detail.filter = this.filter;
+            tableConfig.detail.filter = this.listFilters;
             tableConfig.detail.conditionalFormat = data;
             tableConfig.detail= JSON.stringify(tableConfig.detail);
               this.listItemsWorker.postMessage({
@@ -1194,7 +1194,6 @@ export default {
                 this.listFilters.push({
                     name:this.filterName,
                     isDefault: false,
-                    userId:this.$store.state.app.endUserInfo.id,
                     columns:this.tableFilter.allColumn
                 })
                 this.notiFilter = this.$t("table.success.save_filter");
@@ -1209,6 +1208,7 @@ export default {
             let tableConfig =  this.getTableDisplayConfigData();
             tableConfig.detail = JSON.parse(tableConfig.detail);
             tableConfig.detail.filter = this.listFilters;
+            tableConfig.detail.conditionalFormat = this.conditionalFormat;
             tableConfig.detail= JSON.stringify(tableConfig.detail);
             this.listItemsWorker.postMessage({
                 action: 'saveFilter',
@@ -1456,9 +1456,6 @@ export default {
 					e.cellRenderer = e.cellRenderer.toString()
 				}
 			})
-
-			debugger
-
 			this.listItemsWorker.postMessage({
 				action: 'getTableColumns',
 				data:{
@@ -1490,18 +1487,7 @@ export default {
 					this.handleStopDragColumn();
                 }
                 // xử lý phần filter
-                if(res.savedConfigs.filter){
-                    let listFilter = [];
-                    let userId = this.$store.state.app.endUserInfo.id;
-                    res.savedConfigs.filter.map(f=>{
-                        if(f.userId&&f.userId==userId){   
-                            listFilter.push(f)
-                        }
-                    })
-                    this.listFilters = listFilter
-                }else{
-                    this.listFilters = []
-                }
+                this.listFilters = res.savedConfigs.filter?res.savedConfigs.filter:[];
                 this.getDefaultFilter()
                 // xử lý phần format conditional
                 this.conditionalFormat = res.savedConfigs.conditionalFormat;
@@ -1963,9 +1949,10 @@ export default {
             if(this.widgetIdentifier){
                 widgetIdentifier =  this.widgetIdentifier;
             }else{
-                widgetIdentifier =  this.$route.path;
+                widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
             }
-			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'');
+             widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
+            // this.widgetIdentifier = this.$route.path;
             return widgetIdentifier;
 		},
 		getTableDisplayConfigData(){
