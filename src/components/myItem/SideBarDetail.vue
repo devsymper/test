@@ -263,14 +263,14 @@
 			</div>
 			<div 
 				v-if="showHistoryTask" 
-				style="width: 300px"
+				style="width: 300px ; border-left: 1px solid lightgray"
 				class="d-flex flex-column"
 			>
 				<div class="d-flex">
 					<v-btn 
 						tile 
 						x-small 
-						class="mr-1"
+						class="mr-1 ml-1"
 						disabled
 					>
 						<v-icon small class="mr-1">
