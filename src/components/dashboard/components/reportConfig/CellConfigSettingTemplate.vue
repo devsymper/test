@@ -217,6 +217,10 @@
                         if(this.settingItem.defaultAgg){
                             col.agg = this.settingItem.defaultAgg;
                         }
+
+                        if(!this.settingItem.hasAgg){
+                            col.agg = 'not_agg';
+                        }
                     }
                 }
             },
