@@ -66,6 +66,7 @@ export const getItemForValueFilter = function(dataConfig){
 			}
 			resolve(obj);
 		}
+		dataConfig.searchKey = ""
 		prepareFilterAndCallApi(dataConfig.columns , false, true, success, dataConfig.options, dataConfig);
 	})
 	

@@ -238,6 +238,7 @@ export default {
 
     },
     data(){
+		let self = this
         return {
             sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
             dialog:false,
@@ -251,8 +252,16 @@ export default {
             },
             customAPIResult:{
                 reformatData(res){
-                    let thisCpn = util.getClosestVueInstanceFromDom(document.querySelector('.list-object-component'));
-                    let listObject = res.data.listObject;
+					res.data.columns.forEach(function(e){
+						if(e.name == 'tmg_description'){
+							e.cellRenderer = function(params) {
+								let rtf = params.value
+								rtf = rtf.replace(/\\par[d]?/g, "");
+								rtf = rtf.replace(/\{\*?\\[^{}]+}|[{}]|\\\n?[A-Za-z]+\n?(?:-?\d+)?[ ]?/g, "")
+								return rtf.replace(/\\'[0-9a-zA-Z]{2}/g, "").trim();
+							}
+						}					
+					})
                     return{
                         columns:res.data.columns,
                         listObject:res.data.listObject,
@@ -421,6 +430,10 @@ export default {
         }
     },
     methods:{
+		convertToPlain(rtf) {
+			return "<span>value</span>"
+			
+		},
         deleteAll(){
             let dataDoc = {
                 type:'all',
