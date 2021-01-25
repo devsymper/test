@@ -105,41 +105,56 @@ let reportColumnSettingItems = {
     },
     name:{
         name: 'Task name',
+        hasAgg:false,
         slot:'1'
     },
     id:{
         name: 'Task id',
+        hasAgg:false,
         slot:'1'
     },
     start:{
         name: 'Start date',
+        hasAgg:false,
         slot:'1'
     },
     end:{
         name: 'End date',
+        hasAgg:false,
         slot:'1'
     },
     duration:{
         name: 'Duration',
+        hasAgg:false,
         slot:'1'
     },
     completed:{
         name: 'Progress bar',
+        hasAgg:false,
         slot:'1'
     },
     milestone:{
         name: 'Milestone',
+        hasAgg:false,
         slot:'1'
     },   
     parent:{
         name: 'Parent',
+        hasAgg:false,
         slot:'1'
     },
     dependency:{
+        hasAgg:false,
         name: 'Dependency',
         slot:'1'
     },
 };
+
+for(let key in reportColumnSettingItems){
+    if(!reportColumnSettingItems[key].hasAgg){
+        reportColumnSettingItems[key].agg = 'not_agg';
+    }
+}
 
 /**
  * 

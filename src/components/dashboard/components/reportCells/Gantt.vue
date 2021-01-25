@@ -1,6 +1,6 @@
 <template>
     <ganttchart-base 
-        :cellConfigs="cellConfigsss"
+        :cellConfigs="cellConfigs"
     />
 </template>
 

@@ -27,12 +27,14 @@
                 v-if="!isView"  
                 @click="handleCellAction({action:'copy'})">
                 <i class="mdi fs-14 mdi-content-copy "></i> <span class="ml-2 fs-13">Copy</span>
+                <span style="position: absolute; right: 8px; font-size: 13px; color: grey; margin-left: 8px">Ctrl+C</span>
             </v-list-item>
             <v-list-item 
                 class="py-1 " 
                 v-if="!isView"  
                 @click="handleCellAction({action:'cut'})">
                 <i class="mdi fs-14 mdi-content-cut"></i> <span class="ml-2 fs-13">Cut</span>
+                <span style="position: absolute; right: 8px; font-size: 13px; color: grey; margin-left: 8px">Ctrl+X</span>
             </v-list-item>
 
             <v-list-item 
@@ -93,7 +95,7 @@
             </v-list-item>
             <v-list-item  
                 v-if="!isView"  
-                @click="handleCellAction({action:'remove',cell:cellConfigs})" 
+                @click="handleCellAction({action:'remove'})" 
                 class="py-1 red-item">
                 <i class="mdi fs-14 mdi-trash-can-outline"></i> <span class="ml-2 fs-13">Xóa</span>
             </v-list-item>
@@ -103,33 +105,85 @@
 
 <script>
 export default {
+    computed: {
+        dashboardConfigs(){
+            return this.$store.state.dashboard.allDashboard[this.instanceKey].dashboardConfigs;
+        },
+    },
     methods: {
+        removeCell(){
+            this.$store.commit('dashboard/removeReport', {
+                instanceKey: this.instanceKey,
+                reportId: this.cell.sharedConfigs.cellId
+            });
+        },
+        cloneReport(){
+            let reportId = this.cell.sharedConfigs.cellId;
+            let cellConfig = this.dashboardConfigs.allCellConfigs[reportId];
+            let currentLayout = this.dashboardConfigs.info.layout[this.dashboardConfigs.info.currentTabPageKey];
+            let oldCellLayout = currentLayout.filter((el) => {
+                return el.cellId == reportId;
+            })[0];
+
+            let cellSize = {
+                h: oldCellLayout.h,
+                w: oldCellLayout.w,
+            };
+            this.$store.commit('dashboard/addCellToLayout', {
+                instanceKey: this.instanceKey,
+                type: cellConfig.sharedConfigs.type,
+                cellSize,
+                active: true,
+                autoSelectedCell: false
+            });
+
+            setTimeout((self) => {
+                let newCellId = currentLayout[currentLayout.length - 1].i;
+                self.$set(self.dashboardConfigs.allCellConfigs[newCellId], 'rawConfigs', _.cloneDeep(cellConfig.rawConfigs));
+                this.$store.commit('dashboard/setSelectedCell', {
+                    id: newCellId,
+                    instanceKey: this.instanceKey
+                });
+                this.$evtBus.$emit('bi-report-change-display', {
+                    id: newCellId,
+                    type: 'data'
+                });
+            }, 0, this);
+        },
         handleCellAction(cmd){
             if(cmd.action == 'remove'){
-                SDashboardEditor.removeCell(cmd.cell.sharedConfigs.cellId);
+                this.removeCell();
             }else if(cmd.action == 'sort'){
-                this.sortMode = cmd.value; 
-                if($.isEmptyObject(this.sortColumn)){
-                    this.sortColumn = this.getSortableColumns()[0];
-                }
-                this.refreshReportData();
+                // this.sortMode = cmd.value; 
+                // if($.isEmptyObject(this.sortColumn)){
+                //     this.sortColumn = this.getSortableColumns()[0];
+                // }
+                // this.refreshReportData();
             }else if(cmd.action == 'sort-column-select'){
-                this.sortColumn = cmd.column;
-                if(!this.sortMode){
-                    this.sortMode = 'asc';
-                }
-                this.refreshReportData();
+                // this.sortColumn = cmd.column;
+                // if(!this.sortMode){
+                //     this.sortMode = 'asc';
+                // }
+                // this.refreshReportData();
             }else if(cmd.action == 'clone'){
-                SDashboardEditor.cloneReport(this.cellConfigs.sharedConfigs.cellId);
+                this.cloneReport();
             }else if(cmd.action == 'copy'){
-                SDashboardEditor.copyReport(this.cellConfigs.sharedConfigs.cellId);
+                this.$store.commit('dashboard/copyReport', {
+                    dashboardConfigs: this.dashboardConfigs,
+                    reportId: this.cell.sharedConfigs.cellId,
+                    instanceKey: this.instanceKey
+                });
             }else if(cmd.action == 'cut'){
-                SDashboardEditor.cutReport(this.cellConfigs.sharedConfigs.cellId);
+                this.$store.commit('dashboard/cutReport', {
+                    dashboardConfigs: this.dashboardConfigs,
+                    reportId: this.cell.sharedConfigs.cellId,
+                    instanceKey: this.instanceKey
+                });
             }else if(cmd.action == 'download-excel'){
-                SDashboardEditor.downloadAsExcel(this.cellConfigs.sharedConfigs.cellId);
+                // SDashboardEditor.downloadAsExcel(this.cellConfigs.sharedConfigs.cellId);
             }else if(cmd.action == 'print-report'){
-                let headerHTML = this.$refs.cellTitle.outerHTML;
-                this.$refs[this.cellConfigs.sharedConfigs.type].printInnerHTML(headerHTML);
+                // let headerHTML = this.$refs.cellTitle.outerHTML;
+                // this.$refs[this.cellConfigs.sharedConfigs.type].printInnerHTML(headerHTML);
             }
         },
     },
@@ -143,6 +197,9 @@ export default {
             default(){
                 return true
             }
+        },
+        instanceKey: {
+            defaul: ''
         },
     },
     data(){

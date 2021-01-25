@@ -303,6 +303,7 @@ export const TranslatorHelper = {
 			return rsl;
 		},
 		ganttChart(rawConfigs,data,displayOptions,extraData,typeChart,stacking, ratio){
+			debugger
 			let columns = rawConfigs.setting;
 			let style = util.cloneDeep(rawConfigs.style);
 			if (columns.name.selectedColums.length == 0 || columns.start.selectedColums.length == 0 ) {
@@ -311,7 +312,11 @@ export const TranslatorHelper = {
 			let viewOptions = TranslatorHelper.getDataGantt(data.data,columns,style,typeChart,stacking, ratio);
 			let rsl = viewOptions; // Kết quả trả về
 			// translate cho chart
-			// let options = JSON.parse(JSON.stringify(staticChartOptions));
+			let options = JSON.parse(JSON.stringify(staticChartOptions));
+			rsl = Object.assign(options, viewOptions);
+
+			rsl.chart.height = extraData.size.h;
+			rsl.chart.width = extraData.size.w;
 			return rsl;
 		},
 		editor(rawConfigs,displayOptions,extraData,oldOutput,ratio) {

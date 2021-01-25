@@ -149,13 +149,13 @@ export default {
         handleCellMouseDown(evt){
             if($(evt.target).hasClass('ag-header-cell-resize')){
                 this.isResizing = true;
-                SDashboardEditor.lockWorkspace();
+                // SDashboardEditor.lockWorkspace();
             }
         },
         handleCellMouseUp(evt){
             if(this.isResizing){
                 this.isResizing = false;
-                SDashboardEditor.unlockWorkspace();
+                // SDashboardEditor.unlockWorkspace();
                 this.saveColumnWidth();
             }
         },
@@ -318,8 +318,8 @@ export default {
                 if(mode != 'fitCell'){
                     this.autoSizeAll(mode == 'fitData');
                 }else{
-                    let w = SDashboardEditor.getSizeOfCellContent(this.cellConfigs.sharedConfigs.cellId).w;
-                    this.gridColumnApi.sizeColumnsToFit(w);
+                    // let w = SDashboardEditor.getSizeOfCellContent(this.cellConfigs.sharedConfigs.cellId).w;
+                    // this.gridColumnApi.sizeColumnsToFit(w);
                 }
             }
         },
@@ -350,7 +350,7 @@ export default {
                 widths.push(colState.width);
             });
             let cellId = this.cellConfigs.sharedConfigs.cellId;
-            SDashboardEditor.dashboardConfigs.allCellConfigs[cellId].viewConfigs.needSaveExtraOptions.columnWidths = widths;
+            // SDashboardEditor.dashboardConfigs.allCellConfigs[cellId].viewConfigs.needSaveExtraOptions.columnWidths = widths;
         }
     },
     computed : {

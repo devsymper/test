@@ -1,7 +1,7 @@
 <template>
     <div v-show="isShow" class="preloader h-100 w-100" :style="styleLoad">
         <transition name="fade" mode="out-in">
-            <img :src="require('./../../assets/image/symper_loader.jpg')" alt="" height="50px" width="50px">
+            <img :src="require('./../../assets/image/symper_loader.jpg')" alt="" :height="size + 'px'" :width="size + 'px'">
         </transition>
         
     </div>
@@ -10,11 +10,15 @@
 <script>
 export default {
     props:{
-        styleLoad:{
+        styleLoad: {
             type:Object,
             default(){
                 return {position:'absolute'}
             }
+        },
+        size: {
+            type: Number,
+            default: 50
         },
     },
     data(){

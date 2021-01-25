@@ -1,12 +1,17 @@
 <template>
     <div 
-        class="w-100 h-100 border-all"
+        class="w-100 h-100 border-all symper-dashboard-cell"
         @click="selectThisCell">
-        <div class="w-100 h-100 cell-placeholder" v-if="cellConfigs.sharedConfigs.data && cellConfigs.sharedConfigs.data.length == 0 && cellConfigs.sharedConfigs.type != 'gantt'">
+        <DashboardCellOptions 
+            :cell="cellConfigs"
+            :instanceKey="instanceKey" 
+            :isView="isView"/>
+        <preloader v-if="cellConfigs.viewConfigs.loadingData" :size="25"/>
+        <div class="w-100 h-100 cell-placeholder" v-if="cellConfigs.sharedConfigs.data && cellConfigs.sharedConfigs.data.length == 0">
             <img :src="'img/dashboard/report-builder/'+cellConfigs.sharedConfigs.type+'.png'" height="40px" width="40px">
         </div>
-        <div class="h-100 w-100 symper-dashboard-cell" v-else>
-            <!-- <div ref="cellTitle" class="symper-cell-title  py-1" :symper-cell-id="cellConfigs.sharedConfigs.cellId" :style="viewAttrs.symperTitle.style">
+        <div class="h-100 w-100" v-else>
+            <div ref="cellTitle" class="symper-cell-title  py-1" :symper-cell-id="cellConfigs.sharedConfigs.cellId" :style="viewAttrs.symperTitle.style">
                 <div class="cell-title-text text-ellipsis  d-inline-block pl-2 pr-2" style="width: calc(100% - 10px)">
                     <span style="cursor: text" v-if="isView">{{viewAttrs.symperTitle.text}}</span>
                     <span 
@@ -17,8 +22,7 @@
                     </span>
                     <input class="w-100 border-none" v-else-if="!isView" ref="renameTitleInput" @blur="applyTitleChange" @change="applyTitleChange" type="text" v-model="viewAttrs.symperTitle.text">
                 </div>
-            </div> -->
-            <DashboardCellOptions :isView="isView"/>
+            </div>
             <component 
                 :is="reportTag"
                 :cellConfigs="cellConfigs">
@@ -78,6 +82,9 @@ export default {
             }else{
                 return null;
             }
+        },
+        dashboardConfigs(){
+            return this.$store.state.dashboard.allDashboard[this.instanceKey];
         },
         viewAttrs(){
             return this.cellConfigs.viewConfigs.displayOptions;

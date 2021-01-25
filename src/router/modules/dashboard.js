@@ -12,6 +12,12 @@ export default [
             import ('../../views/dashboard/Index.vue'),
     },
     {
+        path: '/dashboards/create',
+        name: "createDashboard",
+        component: () =>
+            import ('../../views/dashboard/CreateDashboard.vue'),
+    },
+    {
         path: '/dashboards/:id/view',
         name: "viewDashboard",
         component: () =>

@@ -63,7 +63,7 @@ export default {
 
 				this.filterAction = setTimeout(
 					(thisCpn, query) => {
-						SDashboardEditor.$emit('change-query-drop-list-filter', { cellId: thisCpn.cellId, query: query });
+						// SDashboardEditor.$emit('change-query-drop-list-filter', { cellId: thisCpn.cellId, query: query });
 					},
 					400,
 					this,

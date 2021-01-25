@@ -1,6 +1,6 @@
 import ReportBase from './ReportBase'
 export default class Global extends ReportBase {
-    constructor(symperId){
+    constructor(){
         let columnSettingKeys = ['value'];
         let styleKeys = {
             "legend":{
@@ -28,7 +28,7 @@ export default class Global extends ReportBase {
                 "items":["show","axistitle","titleText","textSize","alignment","gridLine","gridLineWidth","gridLineColor","gridLineType","unit"]
             }
         };
-        super('global', symperId, columnSettingKeys, styleKeys);
+        super('global', 'global', columnSettingKeys, styleKeys);
         this.viewConfigs.displayOptions = {
             dashboardStyle: {
                 size: {
