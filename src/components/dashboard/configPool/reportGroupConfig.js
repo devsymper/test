@@ -93,29 +93,29 @@ let ReportGroupConfig = {
 	Group4:{
 		columnSettingKeys: ['legend','name','start','end','duration','completed','milestone','id','parent','dependency','tooltips' ],
 		styleKeys: {
-			"legend":{
-				"title":"Legend",
-				"items":["fontColor","legendPosition","name","show","showLegendTitle","textSize","titleText"]
-			},
-			"dataLabel":{
-				"title":"Data label",
-				"items":["bgColor","borderColor","borderWidth","fontColor","show","textSize","tooltipDecimalNumber"]
-			},
-			"xAxis":{
-				"title":"X axis",
-				"items":["alignment","axistitle","gridLine","gridLineColor","gridLineType","gridLineWidth","show","textSize","titleText","unit"]
-			},
-			"yAxis":{
-				"title":"Y Axis",
-				"items":["alignment","axistitle","gridLine","gridLineColor","gridLineType","gridLineWidth","show","textSize","titleText","unit"]
-			},
-			"line":{
-				"title":"Line",
-				"items":["lineWidth","markerEnable","markerSize"]
-			},
+			// "legend":{
+			// 	"title":"Legend",
+			// 	"items":["fontColor","legendPosition","name","show","showLegendTitle","textSize","titleText"]
+			// },
+			// "dataLabel":{
+			// 	"title":"Data label",
+			// 	"items":["bgColor","borderColor","borderWidth","fontColor","show","textSize","tooltipDecimalNumber"]
+			// },
+			// "xAxis":{
+			// 	"title":"X axis",
+			// 	"items":["alignment","axistitle","gridLine","gridLineColor","gridLineType","gridLineWidth","show","textSize","titleText","unit"]
+			// },
+			// "yAxis":{
+			// 	"title":"Y Axis",
+			// 	"items":["alignment","axistitle","gridLine","gridLineColor","gridLineType","gridLineWidth","show","textSize","titleText","unit"]
+			// },
+			// "line":{
+			// 	"title":"Line",
+			// 	"items":["lineWidth","markerEnable","markerSize"]
+			// },
 			"general":{
 				"title":"General",
-				"items":["bgColor","borderColor","borderWidth","colorPalette","fontFamily"]
+				"items":["rangeSelector","bgColor","borderColor","borderWidth","colorPalette","fontFamily"]
 			},
 			"title":{
 				"title":"Title",

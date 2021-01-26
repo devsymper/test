@@ -502,6 +502,11 @@ var attrItems = {
         type: 'conditionalFormatItems',
         default: []
     },
+    rangeSelector:{
+        title: 'Range Selector',
+        type: 'switch',
+        default: false
+    }
 };
 /**
  * lấy ra các attr item với đầu vào là mảng tên của các attr đó

@@ -5,6 +5,7 @@
             <draggable
                 group="drop-column"
                 :list="settingItem.selectedColums"
+                @add="onAddColumn"
                 @change="handleChangeColumn"
                 class="dragArea list-group">
                 <div 
@@ -209,6 +210,20 @@
             }
         },
         methods:{
+            onAddColumn(newIndex, el){
+                for(let col of this.settingItem.selectedColums){
+                    if(col.newClonedColumn){
+                        col.newClonedColumn = false;
+                        if(this.settingItem.defaultAgg){
+                            col.agg = this.settingItem.defaultAgg;
+                        }
+
+                        if(!this.settingItem.hasAgg){
+                            col.agg = 'not_agg';
+                        }
+                    }
+                }
+            },
             changeColumnSetting(type = 'data'){
                 this.$evtBus.$emit('bi-report-change-display', {
                     type: type,
@@ -268,7 +283,9 @@
                 this.changeColumnSetting('data');
             }, 
             handleChangeColumn(evt){
-                this.changeColumnSetting('data');
+                setTimeout((self) => {
+                    self.changeColumnSetting('data');                
+                }, 0, this);
             },
             getClassForSelectedColumn(settingItem){
                 return 'column-item-setting d-flex align-center';
