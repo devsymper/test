@@ -55,14 +55,16 @@
              </v-radio-group>
         </v-row>
         <div v-if="colorType=='singleColor'">
-            <SingleColor style="margin-top:-20px" 
+            <SingleColor style="margin-top:-20px"
+                :isUpdate="isUpdate"
                 ref="singleColor"
                 :rowData="rowData"
                 v-model="value.displayMode.singleColor"
                 :tableColumns="formatTableColumns"/>
         </div>
         <div style="margin-top:-20px" v-else>
-            <ColorScale 
+            <ColorScale
+                :isUpdate="isUpdate"
                 :rowData="rowData"
                 ref="colorScale"
                 v-model="value.displayMode.colorScale"
@@ -83,11 +85,9 @@
 import { appConfigs } from "./../../../configs.js";
 import ColorScale from "./ColorScale";
 import SingleColor from "./SingleColor";
-import TreeSqlConfig from "./../../../views/document/sideright/items/TreeSqlConfig"
 
 export default {
   components:{
-    TreeSqlConfig,
     ColorScale,
     SingleColor,
   },
@@ -154,24 +154,28 @@ export default {
         }
     },
     setTableColumns(){
-        let tableColumns = [{
+        if(!this.isUpdate){
+            let tableColumns = [{
             title:'All',
             name:"All",
             type:"all",
             isSelected:false
-        }];
-        this.tableColumns.map(column=>{
-            tableColumns.push({title:column.headerName,
-                name:this.columnTitle(column.headerName),
-                type:column.type,
-                field:column.field,
-                isSelected:false,
-                headerName:column.headerName
+            }];
+            this.tableColumns.map(column=>{
+                tableColumns.push({title:column.headerName,
+                    name:this.columnTitle(column.headerName),
+                    type:column.type,
+                    field:column.field,
+                    isSelected:false,
+                    headerName:column.headerName
+                })
+                
             })
-            
-        })
-        this.formatTableColumns = tableColumns;
-        this.value.tableColumns=this.formatTableColumns;
+            this.formatTableColumns = tableColumns;
+        }else{
+            this.formatTableColumns = this.value.tableColumns
+        }
+        
 
     },
     getDataTypeIcon(type) {
@@ -191,11 +195,9 @@ export default {
     },
   },
   created(){
-      if(!this.isUpdate){
-          this.refreshAll()
-      }
+     
       this.setTableColumns();
-      this.formatTableColumns = this.value.tableColumns;
+    //   this.formatTableColumns = this.value.tableColumns;
   },
   props: {
       value:{

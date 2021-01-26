@@ -81,7 +81,6 @@ export default {
         this.$emit('change-apply',this.listDataIdSelected )
       }else{
         if(actionIdx==3){// bỏ chọn
-          debugger
           this.listData[dataIdx].isSelected = false;
           this.listDataIdSelected = this.listDataIdSelected.filter(i=>i!=dataIdx);
         }
