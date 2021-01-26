@@ -704,7 +704,11 @@ export default {
 					self.handlerSaveTableDisplayConfigRes(data.dataAfter)
                     break;
                 case 'saveFilter':
-                    self.handlerSaveFilter(data.dataAfter)
+                    if(self.isNotiSuccess){
+                        self.handlerSaveFilter(data.dataAfter, true)
+                    }else{
+                        self.handlerSaveFilter(data.dataAfter, false)
+                    }
                 break;
                 case 'getTableColumns':
 					data.dataAfter.forEach(function(e){
@@ -719,22 +723,12 @@ export default {
 						}
 					})
                     self.columnDefs = data.dataAfter;
-                    if(!self.apply){
-                         if(self.conditionalFormat&&self.conditionalFormat.length>0){
-                             if(self.listSelectedData.length==0){
-                                self.listSelectedData = self.getListSelectedConditionFormat();
-
-                             }
-                            self.columnDefs = self.handleConditionalFormat(data.dataAfter);
-                        
+                    if(self.conditionalFormat&&self.conditionalFormat.length>0){
+                        if(self.listSelectedCondition.length==0){
+                            self.listSelectedCondition = self.getListSelectedConditionFormat();
                         }
-                    }else{
-                           if(self.listSelectedData.length==0){
-                                self.listSelectedData = self.getListSelectedConditionFormat();
-
-                             }
                         self.columnDefs = self.handleConditionalFormat(data.dataAfter);
-
+                    
                     }
 					break;
                 default:
@@ -881,10 +875,10 @@ export default {
     data(){
 		let self = this;
         return {
-            apply:false,
             typeDelete:'',
+            isNotiSuccess:true,// có hoặc không hiển thị thông báo khi lưu thành công 
             conditionalFormat:[],
-            listSelectedData:[],
+            listSelectedCondition:[],//list cấu hình điều kiện được chọn
             listId:[],// chứa list Id của table
 			gridApi: null,
             closeBtnFilter:false,
@@ -903,7 +897,7 @@ export default {
             filterMenu:false,
             addFilter:false,
             filterName:'',
-            savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
+            savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lưu trong db
 			showSearchBox: true,
             loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
             loadingExportExcel: false, // có đang chạy export hay ko
@@ -1026,6 +1020,7 @@ export default {
       	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
     },
 	methods:{
+        // lấy ra danh sách cấu hình format được chọn
         getListSelectedConditionFormat(){
             let result = [];
             this.conditionalFormat.map((data,index)=>{
@@ -1033,7 +1028,6 @@ export default {
                     result.push(index)
                 }
             })
-            debugger
             return result;
         },
 		customBtnClick(i){
@@ -1071,27 +1065,22 @@ export default {
                     condition.isSelected = check
                 }
             })
-            debugger
         },
-        applyConditionFormat(listSelectedData){
-            // this.applyConfigFormat(listSelectedData);
-            this.listSelectedData.map(data=>{
+        applyConditionFormat(listSelectedCondition){
+            // this.applyConfigFormat(listSelectedCondition);
+            this.isNotiSuccess = false;
+            this.listSelectedCondition.map(data=>{
                 this.setSelectedConditional(data)
 
             });
-            this.listSelectedData = listSelectedData;
+            this.listSelectedCondition = listSelectedCondition;
             this.saveConditionalFormatting(this.conditionalFormat);
-            this.apply=true;
             this.getData();
         },
         changeFormat(data){
-            debugger
             switch(data.type){
                 case 'view':
                     break;
-                // case 'apply':
-                //     this.applyConfigFormat(data.index);
-                //     break;
                 case 'edit':
                     this.editConfigFormat(data.index);
                     break
@@ -1102,22 +1091,22 @@ export default {
                     this.disApplyConfigFormat(data.index);
                     break;
             };  
-                this.apply = false;
                 this.getData();
            
 
         },
          disApplyConfigFormat(index){
-            let listSelectedData = [];
-            this.listSelectedData.map(data=>{
+            this.isNotiSuccess = false
+            let listSelectedCondition = [];
+            this.listSelectedCondition.map(data=>{
                  if(data!=index){
-                     listSelectedData.push(data)
+                     listSelectedCondition.push(data)
                  }else{ 
                     this.setSelectedConditional(data, false)
                  }
             });
             this.saveConditionalFormatting(this.conditionalFormat);
-             this.listSelectedData = listSelectedData;
+             this.listSelectedCondition = listSelectedCondition;
             //  this.getData();
          },
   
@@ -1126,7 +1115,7 @@ export default {
                 data.map(column=>{
                     column.cellStyle = function(e){
                         let allColor = {}
-                         self.listSelectedData.map(conditionalIdx=>{
+                         self.listSelectedCondition.map(conditionalIdx=>{
                              let dataFormat = self.conditionalFormat[conditionalIdx];
                                 if(eval(dataFormat.tableColumnsJS)&&self.conditionalFormat){// những cột được set màu
                                     if(dataFormat.displayMode.type=="singleColor"){// nếu là kiểu màu đơn
@@ -1224,6 +1213,7 @@ export default {
         },
         
         deleteFilter(filterIdx){
+            this.isNotiSuccess = false
             this.showDelPopUp = true;
             this.contentDelete =" Xóa bộ lọc "+this.listFilters[filterIdx].name+" khỏi danh sách các bộ lọc";
             this.deleteFilterIdx = filterIdx;
@@ -1563,13 +1553,15 @@ export default {
 				title: this.$t("table.success.save_config")
 			})
         },
-        handlerSaveFilter(res){
+        handlerSaveFilter(res, notiSuccess = true){
             if(res.status==200){
                 this.addFilter = false;
                 this.filterName = '';
-                this.$snotify({
-				type: "success",
-				title: 'Thành công'	})
+                if(notiSuccess){
+                    this.$snotify({
+                    type: "success",
+                    title: 'Thành công'	})
+                }
             }else{
                 this.$snotify({
 				type: "error",
