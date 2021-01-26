@@ -35,10 +35,10 @@ export default {
       }
   },
   created () {
-     this.listData=this.conditionalFormat
+     this.listData=this.conditionalFormat;
   },
     props: {
-         conditionalFormat:{
+        conditionalFormat:{
              type: Array,
                 default(){
                     return []
@@ -121,6 +121,54 @@ export default {
                 }
             }
         },
+        dataOrigin:{ nameGroup:'',
+            isSelected:false,
+            tableColumns:[],
+            tableColumnsJS:'',
+            displayMode:{
+                type:'singleColor',
+                singleColor:{
+                    backgroundColor: '#FFFFFF',
+                    fontColor: '#000000',
+                    italic: false,
+                    bold: false,
+                    fontSize: 13,
+                    underline: false,
+                    strike: false,
+                    conditionFormat:'',
+                    originCondition:[]
+                    },
+                colorScale:{
+                    applyColumn:'',
+                    config:[
+                         {
+                            name:'Min point',
+                            value:'',
+                            disable:false,
+                            type:'Min value',
+                            color:'#FF0000',
+                            lists: ['Min value','Number'],
+                        },
+                        {
+                            name:'Mid point',
+                            value:'',
+                            disable:false,
+                            type:'None',
+                            color:'#FF0000',
+                            lists: ['None','Number'],
+                        },
+                        {
+                            name:'Max point',
+                            value:'',
+                            disable:false,
+                            type:'Max value',
+                            color:'#FFFF00',
+                            lists:['Max value','Number'],
+                        }
+                    ],
+                    listColors:[]
+                }
+            }},
         listData:[]
     }
   },
@@ -130,18 +178,21 @@ export default {
   },
   methods: {
       changeToConfig(){
+          debugger
           this.typeFormart='config';
           this.update = false;
       },
        changeToAdd(){
         this.update = true;
         this.typeFormart='add';
-        this.listData = this.conditionalFormat
+         this.data = this.dataOrigin
+        this.listData = this.conditionalFormat;
       },
       changeFormat(data){
           this.$emit('change-format',data);
           if(data.type == 'edit'){
-               this.typeFormart = 'config';
+              debugger
+                this.typeFormart = 'config';
                 this.data = this.listData[data.index];
           }
       },
@@ -150,7 +201,7 @@ export default {
       },
       save(){
           this.listData.push(this.data)
-          this.$emit('save',this.listData)
+          this.$emit('save',this.listData);
       },
       
   }

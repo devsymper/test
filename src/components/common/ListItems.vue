@@ -1092,8 +1092,6 @@ export default {
                     break;
             };  
                 this.getData();
-           
-
         },
          disApplyConfigFormat(index){
             this.isNotiSuccess = false
