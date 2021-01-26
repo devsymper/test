@@ -12,7 +12,7 @@
 			return-object
 		>
 			<template v-slot:item="data">
-				<div class="d-flex flex-column">
+				<div class="d-flex flex-column mt-1">
 					<div class="d-flex">
 						<v-icon x-small>
 							{{data.item.type == 'dataset_by_dataflow' ? 'mdi-database-arrow-right-outline': 'mdi-file-document-multiple-outline'}}
@@ -21,7 +21,7 @@
 							{{data.item.symperId + '-' + data.item.name ? data.item.name : "" }}
 						</span>
 					</div>
-					<div class="fs-13 title-dataset-alias" v-if="data.item.aliasName">
+					<div class="fs-13 title-dataset-alias" v-if="data.item.aliasName" style="opacity: 0.5">
 						{{data.item.aliasName}}
 					</div>
 				</div>

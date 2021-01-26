@@ -9,7 +9,7 @@
 				<DatasetAutocomplete @dataset-selector="handleDatasetSelected" :listDatasets="listDatasets" />
 
 				<VuePerfectScrollbar class="mt-2 " :style="{ height: listHeight + 'px' }" v-if="listDatasetSelected.length > 0">
-					<dataset-selected-item v-for="(item, i) in listDatasetSelected" :key="i" class="dataset-selected-item" :item="item" :showRemove="true" @remove-item="removeItem" />
+					<dataset-selected-item  v-for="(item, i) in listDatasetSelected" :key="i" class="dataset-selected-item" :item="item" :showRemove="true" @remove-item="removeItem" />
 				</VuePerfectScrollbar>
 			</div>
 		</div>
