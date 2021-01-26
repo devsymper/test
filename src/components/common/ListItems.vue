@@ -93,17 +93,6 @@
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel_history')}}</span>
                         </v-btn>
-                        <v-btn
-                            depressed
-                            small
-							icon
-							tile
-                            @click="handleCloseClick"
-                            class="mr-2"
-                            v-if="dialogMode"
-                        >
-                            <v-icon dark>mdi-close</v-icon>
-                        </v-btn>
                          <v-menu
                             bottom
                             left
@@ -223,17 +212,18 @@
                             </template>
                             <span>{{alwaysShowActionPanel ? $t('common.not_always_show_sidebar') : $t('common.always_show_sidebar')}}</span>
                         </v-tooltip>
+
 						<span v-if="Object.keys(customHeaderBtn).length > 0">
 							 <v-btn
 								depressed
 								small
 								v-for="(item, i) in customHeaderBtn"
 								:key="i"
-								@click="customBtnclick(i)"
+								@click="customBtnClick(i)"
 								class="mr-2"
 							>
-								<v-icon left dark>{{item.icon}}</v-icon>
-								<span> {{item.title}} </span>
+								<v-icon left dark v-if="item.icon">{{item.icon}}</v-icon>
+								<span v-if="item.title"> {{item.title}} </span>
 							</v-btn>
 						</span>
 			 </div>
@@ -267,10 +257,8 @@
 				:frameworkComponents="frameworkComponents"
 				:overlayLoadingTemplate="overlayLoadingTemplate"
 				:overlayNoRowsTemplate="overlayNoRowsTemplate"
-				:modules="modules"
 				@cell-context-menu="cellContextMenu"
                 @cell-mouse-down="cellMouseDown"
-
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
@@ -279,6 +267,7 @@
 			 <display-config
 				ref="tableDisplayConfig"
                 @change-format="changeFormat"
+                @change-apply="applyConditionFormat"
                 @save-conditional-formatting="saveConditionalFormatting"
 				@drag-columns-stopped="handleStopDragColumn"
 				@change-colmn-display-config="configColumnDisplay"
@@ -395,9 +384,11 @@ import { actionHelper } from "@/action/actionHelper";
 import CheckBoxRenderer from "@/components/common/agDataTable/CheckBoxRenderer"
 import SymperDialogConfirm from "@/components/common/SymperDialogConfirm"
 import ConfigFilter from "./ListItemConfigFilter"
+import 'ag-grid-enterprise';
 import AddFilter from "./ListItemAddFilter"
 import CheckBoxRendererListItems from "@/components/common/agDataTable/CheckBoxRendererListItems"
 let CustomHeaderVue = Vue.extend(CustomHeader);
+import  {ClipboardModule} from '@ag-grid-enterprise/clipboard';
 
 var testSelectData = [ ];
 window.tableDropdownClickHandle = function(el, event) {
@@ -695,8 +686,10 @@ export default {
 			let data = event.data;
             switch (data.action) {
                 case 'getData':
-					
 					self.handlerGetData(data.dataAfter)
+					break;
+                case 'customGetData':
+					self.handleCustomGetData(data.dataAfter)
 					break;
                 case 'getItemForValueFilter':
 					self.tableFilter.currentColumn.colFilter.selectItems = data.dataAfter.selectItems
@@ -724,12 +717,25 @@ export default {
 						if(e.cellStyle){
 							eval("e.cellStyle = " + e.cellStyle)
 						}
-                    })
+					})
                     self.columnDefs = data.dataAfter;
-                    if(self.conditionalFormat&&self.conditionalFormat.length>0&&self.conditionIndex>-1){
-                        self.columnDefs = self.handleConditionalFormat(data.dataAfter)
+                    if(!self.apply){
+                         if(self.conditionalFormat&&self.conditionalFormat.length>0){
+                             if(self.listSelectedData.length==0){
+                                self.listSelectedData = self.getListSelectedConditionFormat();
+
+                             }
+                            self.columnDefs = self.handleConditionalFormat(data.dataAfter);
+                        
+                        }
+                    }else{
+                           if(self.listSelectedData.length==0){
+                                self.listSelectedData = self.getListSelectedConditionFormat();
+
+                             }
+                        self.columnDefs = self.handleConditionalFormat(data.dataAfter);
+
                     }
-                    
 					break;
                 default:
                     break;
@@ -765,6 +771,7 @@ export default {
                 return "100%";
             }
 		},
+		
 		tableHeight() {
 			let ref = this.$refs;
 			let tbHeight = this.containerHeight;
@@ -874,8 +881,10 @@ export default {
     data(){
 		let self = this;
         return {
+            apply:false,
             typeDelete:'',
             conditionalFormat:[],
+            listSelectedData:[],
             listId:[],// chứa list Id của table
 			gridApi: null,
             closeBtnFilter:false,
@@ -887,7 +896,6 @@ export default {
             contentDelete:"",
             showDelPopUp:false,
             filterContent:"",
-            showDelPopUp:false,
             selectedFilterName:'',
 			listItemsWorker: null,
 			deleteDialogShow: false,
@@ -920,7 +928,7 @@ export default {
 			},
 			searchKey: "",
 			modules:[
-				MenuModule
+				MenuModule,
 			],
 			MedalCellRenderer(){
 			},	
@@ -1004,7 +1012,9 @@ export default {
 				if (params.node.rowIndex % 2 != 0) {
 					return { background: '#fbfbfb' };
 				}
-			}
+			},
+			suppressCopyRowsToClipboard: true,
+			modules:[ClipboardModule]
 		},
 		this.frameworkComponents = {
 			agColumnHeader: CustomHeaderVue,
@@ -1016,6 +1026,19 @@ export default {
       	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
     },
 	methods:{
+        getListSelectedConditionFormat(){
+            let result = [];
+            this.conditionalFormat.map((data,index)=>{
+                if(data.isSelected){
+                    result.push(index)
+                }
+            })
+            debugger
+            return result;
+        },
+		customBtnClick(i){
+			this.customHeaderBtn[i].callback()
+		},
         handleAddFilter(data){
             if(data.type=='save'){
                 this.filterName = data.filterName
@@ -1042,13 +1065,33 @@ export default {
                     break;
               }
         },
+        setSelectedConditional(index, check = true){
+            this.conditionalFormat.map((condition,i)=>{
+                if(i==index){
+                    condition.isSelected = check
+                }
+            })
+            debugger
+        },
+        applyConditionFormat(listSelectedData){
+            // this.applyConfigFormat(listSelectedData);
+            this.listSelectedData.map(data=>{
+                this.setSelectedConditional(data)
+
+            });
+            this.listSelectedData = listSelectedData;
+            this.saveConditionalFormatting(this.conditionalFormat);
+            this.apply=true;
+            this.getData();
+        },
         changeFormat(data){
+            debugger
             switch(data.type){
                 case 'view':
                     break;
-                case 'apply':
-                    this.applyConfigFormat(data.index);
-                    break;
+                // case 'apply':
+                //     this.applyConfigFormat(data.index);
+                //     break;
                 case 'edit':
                     this.editConfigFormat(data.index);
                     break
@@ -1058,46 +1101,62 @@ export default {
                 case 'disApply':
                     this.disApplyConfigFormat(data.index);
                     break;
-            };
+            };  
+                this.apply = false;
                 this.getData();
            
 
         },
          disApplyConfigFormat(index){
-             this.conditionIndex = -1;
+            let listSelectedData = [];
+            this.listSelectedData.map(data=>{
+                 if(data!=index){
+                     listSelectedData.push(data)
+                 }else{ 
+                    this.setSelectedConditional(data, false)
+                 }
+            });
+            this.saveConditionalFormatting(this.conditionalFormat);
+             this.listSelectedData = listSelectedData;
+            //  this.getData();
          },
+  
         handleConditionalFormat(data){
             const self = this;
-                let dataFormat = self.conditionalFormat[self.conditionIndex];
                 data.map(column=>{
                     column.cellStyle = function(e){
-                        if(eval(dataFormat.tableColumnsJS)&&self.conditionalFormat){// những cột được set màu
-                            if(dataFormat.displayMode.type=="singleColor"){// nếu là kiểu màu đơn
-                                let conditionalFormat = dataFormat.displayMode.singleColor.conditionFormat;
-                                if(eval(conditionalFormat)){
-                                    return {color: dataFormat.displayMode.singleColor.fontColor, backgroundColor:dataFormat.displayMode.singleColor.backgroundColor}
-                                }
-                            }
-                            else{// nếu thang màu
-                                let field = dataFormat.displayMode.colorScale.applyColumn.field;
-                                let valueTable = e.data[field];
-                                let listColors = dataFormat.displayMode.colorScale.listColors;
-                                let color = '';
-                                listColors.map(v=>{
-                                    if(v.name==valueTable){
-                                        color = v.backgroundColor
+                        let allColor = {}
+                         self.listSelectedData.map(conditionalIdx=>{
+                             let dataFormat = self.conditionalFormat[conditionalIdx];
+                                if(eval(dataFormat.tableColumnsJS)&&self.conditionalFormat){// những cột được set màu
+                                    if(dataFormat.displayMode.type=="singleColor"){// nếu là kiểu màu đơn
+                                        let conditionalFormat = dataFormat.displayMode.singleColor.conditionFormat;
+                                        if(eval(conditionalFormat)){
+                                            allColor = {color: dataFormat.displayMode.singleColor.fontColor, backgroundColor:dataFormat.displayMode.singleColor.backgroundColor}
+                                        }
                                     }
-                                })
-                                    return {backgroundColor:color}
-                            }
-                        }
+                                    else{// nếu thang màu
+                                        let field = dataFormat.displayMode.colorScale.applyColumn.field;
+                                        let valueTable = e.data[field];
+                                        let listColors = dataFormat.displayMode.colorScale.listColors;
+                                        let color = '';
+                                        listColors.map(v=>{
+                                            if(v.name==valueTable){
+                                                color = v.backgroundColor
+                                            }
+                                        })
+                                            allColor = {backgroundColor:color}
+                                    }
+                                }
+                         })
+                        return allColor
                     }
                 })
             return data;
         },
-        applyConfigFormat(index){
-            this.conditionIndex = index;
-        },
+        // applyConfigFormat(index){
+        //     this.conditionIndex = index;
+        // },
         editConfigFormat(index){
             this.conditionIndex = index;
         },
@@ -1105,7 +1164,7 @@ export default {
         saveConditionalFormatting(data){
             let tableConfig =  this.getTableDisplayConfigData();
             tableConfig.detail = JSON.parse(tableConfig.detail);
-            tableConfig.detail.filter = this.filter;
+            tableConfig.detail.filter = this.listFilters;
             tableConfig.detail.conditionalFormat = data;
             tableConfig.detail= JSON.stringify(tableConfig.detail);
               this.listItemsWorker.postMessage({
@@ -1197,7 +1256,6 @@ export default {
                 this.listFilters.push({
                     name:this.filterName,
                     isDefault: false,
-                    userId:this.$store.state.app.endUserInfo.id,
                     columns:this.tableFilter.allColumn
                 })
                 this.notiFilter = this.$t("table.success.save_filter");
@@ -1212,6 +1270,7 @@ export default {
             let tableConfig =  this.getTableDisplayConfigData();
             tableConfig.detail = JSON.parse(tableConfig.detail);
             tableConfig.detail.filter = this.listFilters;
+            tableConfig.detail.conditionalFormat = this.conditionalFormat;
             tableConfig.detail= JSON.stringify(tableConfig.detail);
             this.listItemsWorker.postMessage({
                 action: 'saveFilter',
@@ -1388,16 +1447,14 @@ export default {
                         menuItem[0].hasOwnProperty("callback")
                     ) {
                         if(key == 'delete' || key == 'remove'){
-                            thisCpn.deleteItems = [];
-                            let deletedIndexs = {};
-                            for(let item of selection ){
-                                for(let idx = item.start.row ; idx <= item.end.row; idx++){
-                                    if(!deletedIndexs[idx]){
-                                        thisCpn.deleteItems.push(thisCpn.rowData[idx]);
-                                        deletedIndexs[idx] = true;
-                                    }
-                                }
-                            }
+							let allRow = []
+							let allRowRange = thisCpn.agApi.getCellRanges()
+							thisCpn.agApi.forEachNode(node=>{
+								if(node.rowIndex >= allRowRange[0].startRow.rowIndex && node.rowIndex <= allRowRange[0].endRow.rowIndex){
+									allRow.push(node.data)
+								}
+							})
+							thisCpn.deleteItems = allRow;
                             thisCpn.deleteDialogShow = true;
                         }else{
                             thisCpn.exeCallbackOnContextMenu(rowData);
@@ -1441,7 +1498,10 @@ export default {
             })
             }
             this.$emit('get-list-id',this.listId)
-        },
+		},
+		handleCustomGetData(data){
+			this.$emit('custom-get-all-data', data.data.listObject)
+		},
 		handlerGetData(data){
             this.getListId(data.data.listObject);
 			let self = this
@@ -1452,13 +1512,7 @@ export default {
 			}
 			this.totalObject = data.total ? parseInt(data.total) : 0;
 			let resData = data.listObject ? data.listObject : []
-			// if(lazyLoad){
-			// 	resData.forEach(function(e){
-			// 		thisCpn.rowData.push(e)
-			// 	})
-			// }else{
 			self.rowData = resData;
-			// }
 			data.columns.forEach(function(e){
 				if(e.cellRenderer){
 					e.cellRenderer = e.cellRenderer.toString()
@@ -1495,18 +1549,7 @@ export default {
 					this.handleStopDragColumn();
                 }
                 // xử lý phần filter
-                if(res.savedConfigs.filter){
-                    let listFilter = [];
-                    let userId = this.$store.state.app.endUserInfo.id;
-                    res.savedConfigs.filter.map(f=>{
-                        if(f.userId&&f.userId==userId){   
-                            listFilter.push(f)
-                        }
-                    })
-                    this.listFilters = listFilter
-                }else{
-                    this.listFilters = []
-                }
+                this.listFilters = res.savedConfigs.filter?res.savedConfigs.filter:[];
                 this.getDefaultFilter()
                 // xử lý phần format conditional
                 this.conditionalFormat = res.savedConfigs.conditionalFormat;
@@ -1613,7 +1656,8 @@ export default {
 			this.getData();
 			this.$emit("refresh-list", {});
         },
-		showTableDropdownMenu(x, y, colName) {
+		showTableDropdownMenu(x, y, colName){
+			this.searchKey = ""
             var windowWidth = $(window).width()/1.1;
             if(x > windowWidth){
                 x -= 190;
@@ -1895,6 +1939,11 @@ export default {
             this.getData();
             this.$emit("change-page", vl.page);
 		},
+		customGetData(page){
+			this.page = page
+			this.pageSize = 1000
+			this.getData(false, false, true, false, true);
+		},
 		addItem() {
             if(this.useActionPanel){
                 this.actionPanel = true;
@@ -1919,7 +1968,7 @@ export default {
             this.getData();
             this.$emit("change-page", this.page);
 		},
-		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false ){
+		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false, customGetData = false){
 			let self = this;
 			let dataConfig = this.getConfigApiCall()
 			dataConfig.configs = {
@@ -1929,11 +1978,19 @@ export default {
 			}
 			dataConfig.lazyLoad = lazyLoad
 			dataConfig.customAPIResult = self.customAPIResult.reformatData ? self.customAPIResult.reformatData.toString() : null
-            dataConfig.filteredColumns = self.filteredColumns
-			this.listItemsWorker.postMessage({
-				action: 'getData',
-				data: dataConfig
-			});
+			dataConfig.filteredColumns = self.filteredColumns
+			if(customGetData){
+				this.listItemsWorker.postMessage({
+					action: 'customGetData',
+					data: dataConfig
+				});
+			}else{
+				this.listItemsWorker.postMessage({
+					action: 'getData',
+					data: dataConfig
+				});
+			}	
+			
 		},
 		 /**
          * Khôi phục lại cấu hình của hiển thị của table từ dữ liệu được lưu
@@ -1954,9 +2011,10 @@ export default {
             if(this.widgetIdentifier){
                 widgetIdentifier =  this.widgetIdentifier;
             }else{
-                widgetIdentifier =  this.$route.path;
+                widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
             }
-			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'');
+             widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
+            // this.widgetIdentifier = this.$route.path;
             return widgetIdentifier;
 		},
 		getTableDisplayConfigData(){
@@ -2021,6 +2079,14 @@ export default {
 }
 .symper-list-items >>> .ag-theme-balham .ag-root-wrapper{
 	border: unset !important;
+}
+.symper-list-items >>> .ag-cell{
+	-webkit-touch-callout: none;
+	-webkit-user-select: none; 
+	-khtml-user-select: none; 
+	-moz-user-select: none;
+	-ms-user-select: none; 
+	user-select: none; 
 }
 .symper-list-items >>> .ag-header{
 	border: unset !important;

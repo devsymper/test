@@ -1,3 +1,5 @@
+import { util } from "../../plugins/util";
+
 let commonProps = {
     "module": "dashboard",
     "resource": "dashboard",
@@ -34,8 +36,8 @@ export default [{
         ...commonProps,
         "action": "list",
         "handler": function(param) {
-            window.open('https://bi.symper.vn', '_blank');
-        }
+            window.open(util.addEnvToUrl('https://bi.symper.vn'), '_blank');
+        } 
     },
     {
         ...commonProps,
