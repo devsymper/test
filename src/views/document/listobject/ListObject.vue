@@ -256,10 +256,14 @@ export default {
 						res.data.columns.forEach(function(e){
 							if(e.type == "richtext"){
 								e.cellRenderer = function(params) {
+									let content = ""
 									let rtf = params.value
-									rtf = rtf.replace(/\\par[d]?/g, "");
-									rtf = rtf.replace(/\{\*?\\[^{}]+}|[{}]|\\\n?[A-Za-z]+\n?(?:-?\d+)?[ ]?/g, "")
-									return rtf.replace(/\\'[0-9a-zA-Z]{2}/g, "").trim();
+									if(rtf){
+										rtf = rtf.replace(/\\par[d]?/g, "");
+										rtf = rtf.replace(/\{\*?\\[^{}]+}|[{}]|\\\n?[A-Za-z]+\n?(?:-?\d+)?[ ]?/g, "")
+										content = rtf.replace(/\\'[0-9a-zA-Z]{2}/g, "").trim()
+									}
+									return '<span>'+content+'</span>'
 								}
 							}					
 						})
