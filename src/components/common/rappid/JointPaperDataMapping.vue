@@ -5,8 +5,8 @@
 			ref="jointWrapper"
 			class="symper-relation-paper"
 			:style="{
-				height: wrapper.height,
-				width: wrapper.width,
+				height: height + 20 + 'px',
+				width: width + 20 + 'px',
 			}"
 		></div>
 		<a ref="downloadLinkSVG" href></a>
@@ -23,14 +23,20 @@ require('@/components/common/rappid/dataMapping/joint.shapes.mapping')
 export default {
 	data() {
 		return {
-			wrapper: {
-				height: '300px',
-				width: '500px',
-			},
+			
 		};
 	},
 	name: 'JointPaper',
 	props: {
+		wrapper:{
+			type: Object,
+			default(){
+				return {
+					height: '300px',
+					width: '500px',
+				}
+			}
+		},
 		width: {
 			type: [String, Number],
 			default: 600,
@@ -64,9 +70,6 @@ export default {
 	mounted() {
 		let self = this;
 		let thisSize = util.getComponentSize(this);
-		this.wrapper.height = thisSize.h - 80 + 'px';
-		this.wrapper.width = thisSize.w + 'px';
-
 		this.paper = new joint.dia.Paper({
 			cellViewNamespace: joint.shapes,
 			model: this.graph,

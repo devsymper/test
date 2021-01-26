@@ -15,18 +15,21 @@
 		</div>
 		<div class="relation-workspace flex-grow-1 d-flex flex-column">
 			<div class="relation-workspace-toolbar d-flex">
-				<v-icon small>
-					mdi-pencil-box-outline
-				</v-icon>
-				<span class="fs-13 mt-2 ml-2 mr-8">
-					{{relationName}}
-				</span>
+				<div class="dflex" :class="{'flex-grow-1': dialogMode}">
+					<v-icon small>
+						mdi-pencil-box-outline
+					</v-icon>
+					<span class="fs-13 mt-2 ml-2 mr-8">
+						{{relationName}}
+					</span>
+				</div>
+			
 				<!-- <v-text-field
 					solo
 				>
 
 				</v-text-field> -->
-				<div class="flex-grow-1">
+				<div>
 					<v-tooltip bottom v-for="(item, key) in headerActions" :key="key">
 						<template v-slot:activator="{ on }">
 							<v-btn @click="handleHeaderAction(key)" icon tile class="mr-2" style="position:relative; top: -3px">
@@ -37,7 +40,7 @@
 					</v-tooltip>
 				</div>
 
-				<v-btn small class="mr-2 mt-1" @click="saveRelations">
+				<v-btn small class="mr-2 mt-1" @click="saveRelations" v-if="action != 'view'">
 					<v-icon small>
 						mdi-check
 					</v-icon>
@@ -50,9 +53,12 @@
 				:action="action"
 				ref="relationWorkspace"
 			 	style="height: calc(100% - 41px)"
+				:wrapper="wrapper"
+				:width="width"
+				:height="height"
 			 />
 		</div>
-		<div class="relation-link">
+		<div class="relation-link" v-if="action != 'view'">
 			relation-link
 		</div>
 	</div>
@@ -70,6 +76,31 @@ export default {
 		action: {
 			type: String,
 			default: 'edit',
+		},
+		relationId:{
+			type: String,
+			default: ""
+		},
+		dialogMode:{
+			type: Boolean,
+			default: false
+		},
+		wrapper:{
+			type: Object,
+			default(){
+				return {
+					height: '300px',
+					width: '500px',
+				}
+			}
+		},
+		width:{
+			type: Number,
+			default: 800
+		},
+		height:{
+			type: Number,
+			default: 600
 		},
 	},
 	data() {
@@ -115,9 +146,14 @@ export default {
 	mounted(){
 		this.listHeight = util.getComponentSize(this).h - 200
 	},
+	watch:{
+		relationId(val){
+			this.getRelationConfigs()
+		}
+	},
 	methods: {
 		getRelationConfigs(){
-			let id = this.$route.params.id
+			let id = this.relationId != "" ? this.relationId : this.$route.params.id
 			this.relationEditoWorker.postMessage({
 				action: 'getRelationConfigs',
 				data:{
@@ -164,7 +200,6 @@ export default {
 				},
 				datasets: info.dtss
 			};
-			debugger
 			this.relationEditoWorker.postMessage({
 				action: 'saveRelations',
 				data: data

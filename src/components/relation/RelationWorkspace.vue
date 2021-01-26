@@ -1,5 +1,5 @@
 <template>
-	<JointPaperDataMapping :background="background" :gridSize="gridSize" :draw-grid="drawGrid" @init="setupGraph" ref="jointPaper" />
+	<JointPaperDataMapping :background="background" :gridSize="gridSize" :draw-grid="drawGrid" @init="setupGraph" ref="jointPaper" :width="width" :height="height" />
 </template>
 
 <script>
@@ -19,6 +19,23 @@ export default {
 		action: {
 			type: String,
 			default: 'edit',
+		},
+		wrapper:{
+			type: Object,
+			default(){
+				return {
+					height: '300px',
+					width: '500px',
+				}
+			}
+		},
+		width:{
+			type: Number,
+			default: 800
+		},
+		height:{
+			type: Number,
+			default: 600
 		},
 	},
 	components: {

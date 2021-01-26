@@ -58,7 +58,6 @@ export default {
 				self.searchCache[data.data.searchKey] = data.data.res.data.listObject
 				// self.$set(self , 'listDataset', data.data.res.data.listObject)
 			}else if(action == 'handleGetAllDataset'){
-				debugger
 				self.$set(self, 'listDataset', data.res.data.listObject)
 			}
 		});

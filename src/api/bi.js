@@ -24,6 +24,10 @@ export const biApi = {
 	},
 	saveRelations(data){
 		return api.post('relations', data , {}, {contentType: 'application/json'})
+	},
+	getListRelations(searchKey, pageSize = 1000){
+		let searchParam = searchKey != "" ? 'search='+searchKey+"&" : ""
+		return api.get('relations?' + searchParam + 'page=1&pageSize='+ pageSize)
 	}
 	
 };

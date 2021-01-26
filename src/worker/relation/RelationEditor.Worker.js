@@ -1,4 +1,5 @@
 import { biApi } from "@/api/bi.js";
+import { isBuffer } from "lodash";
 
 onmessage = function (event) {
     let data = event.data;
@@ -27,6 +28,19 @@ var handler = {
 			data: res
 		})
 	},
+	async getListRelations(data){
+		let res = await biApi.getListRelations(data.searchKey, data.pageSize)
+		let dataAfter = {}
+		if(res.status == 200){
+			res.data.listObject.forEach(function(e){
+				dataAfter[e.id] = e
+			})
+		}
+		self.postMessage({
+			action: 'handleGetListRelations',
+			data: dataAfter
+		})
+	},
 	getRandomStr(){
 		return (Math.random()*1e20).toString(36);
 	},
@@ -38,7 +52,6 @@ var handler = {
 		}
 		let res = await biApi.getRelationsConfigs(data.id)
 		let configData = res.data
-		debugger
 		obj.relationName = configData.relation.name
 		let datasets = configData.datasets;
 		obj.originDataset = datasets
