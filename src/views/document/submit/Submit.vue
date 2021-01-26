@@ -414,7 +414,7 @@ export default {
             globalClass:null,
             controlRelationWorker:null,
             formulasWorker:null,
-            optionalDataBinding:null,
+            optionalDataBinding:{},
             tableFocusing:null
         };
 
@@ -427,8 +427,7 @@ export default {
         }
     },
     mounted() {
-        window.addEventListener('paste', this.insertNewRowsBeforePaste);
-        this.optionalDataBinding = {},
+        // window.addEventListener('paste', this.insertNewRowsBeforePaste);
         this.optionalDataBinding['context'] = (this.documentObjectWorkflowId) ? 'inWorkflow' : 'outWorkflow'
         this.optionalDataBinding['document_object_id'] = this.docObjId
         this.optionalDataBinding['action'] = this.action
@@ -893,7 +892,7 @@ export default {
             deep: true,
             immediate:true,
             handler: function (after, before) {
-                this.setWorkflowVariableToStore(after)
+                this.setWorkflowVariable(after)
             }
         },
         documentObjectId(after){
@@ -1243,12 +1242,8 @@ export default {
             }
             return dataParams
         },
-        setWorkflowVariableToStore(after){
-            this.$store.commit("document/addToDocumentSubmitStore", {
-                    key: 'workflowVariable',
-                    value: util.cloneDeep(after),
-                    instance: this.keyInstance
-                }); 
+        setWorkflowVariable(after){
+            this.optionalDataBinding = {...this.optionalDataBinding, ...after}
         },
         saveInputFilter(data){
             this.handleInputChangeBySystem(data.controlName,data.value);

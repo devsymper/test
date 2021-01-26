@@ -1,8 +1,13 @@
 <template>
     <div class="w-100 h-100">
         <common-list-issue
+            v-if="!loadding"
             :listItem="listItem"
         />
+        <preloader 
+            v-else
+            style="height:100%"
+            class="mx-auto" />
     </div>
 </template>
 
@@ -60,7 +65,8 @@ export default {
     data(){
         return{
             listItem:[],
-            homeWorker:null
+            homeWorker:null,
+            loadding: true,
         }
     },
     created(){
@@ -82,6 +88,7 @@ export default {
                     if (data.dataAfter) {
                         let res = data.dataAfter;
                         self.listItem = res;
+                        self.loadding = false;
                     }
                     break;
                     

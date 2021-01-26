@@ -7,19 +7,18 @@
                         {{$t("taskManagement.listMember")}} của {{currentProject.name}}
                         <div class="d-flex justify-space-between"><span class="fs-13 grey--text">Tổng số thành viên: {{allUserInProject.length}}</span>
                             <div class="list-button">
-                                <v-btn  v-if="checkRole('task_manager_permission','add')"  small depressed @click="handleCreateActionPack">
+                                <v-btn class="mx-2" v-if="checkRole('task_manager_permission','add')"  small depressed @click="handleCreateActionPack">
                                     Tạo nhóm Operation
                                 </v-btn>
                                 <v-btn  v-if="checkRole('task_manager_permission','add')"  small  depressed @click="handleCreatePermission">
                                     <span>Tạo permission</span>
                                 </v-btn>
-                                <v-btn  v-if="checkRole('task_manager_access','add')"  depressed small class="mx-2"  @click="handleClickAddPeople" >
-                                    {{$t("taskManagement.addPeople")}}
-                                </v-btn>
-                                <v-btn depressed @click="handleRoleManager" small >
+                                <v-btn depressed @click="handleRoleManager" small class="mx-2">
                                     {{$t("taskManagement.managerRole")}}
                                 </v-btn>
-                         
+                                <v-btn  v-if="checkRole('task_manager_access','add')"  depressed small   @click="handleClickAddPeople" >
+                                    {{$t("taskManagement.addPeople")}}
+                                </v-btn>
                             </div>
                         </div>
                     </div>

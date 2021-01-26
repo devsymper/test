@@ -2,10 +2,10 @@
     <div class="h-100 w-100">
         <div style="height:40px">
             <div class="d-flex justify-space-between">
-                <h2 class="ml-4">Column manager</h2>
+                <h2 class="ml-4">Quản lý cột</h2>
                 <div>
                     <v-btn small class="ml-1 px-1" solo depressed color="#999" @click="addColumn">
-                        <span style="color:white">Add column</span>
+                        <span style="color:white">Thêm cột</span>
                     </v-btn>
                     <v-btn
                         class="save-setting-btn"
@@ -32,10 +32,10 @@
         </div>
         <div class="d-flex h-100">
             <VuePerfectScrollbar class="wrap-scroll">
-                <draggable :list="columns" :animation="250" class="py-4 h-100 w-100" ghost-class="ghost-columns" group="people">
+                <draggable :list="listColumn" :animation="250" class="py-4 h-100 w-100" ghost-class="ghost-columns" group="people">
                     <transition-group type="transition" name="flip-list" class="wrap-kanban-board">
                         <div
-                            v-for="(column,index) in columns"
+                            v-for="(column,index) in listColumn"
                             :key="column.id"
                             :style="getColWidth()"
                             class=" board-column-item mr-4"
@@ -50,11 +50,11 @@
                                     <v-icon style="font-size:20px" @click="removeColumn(index)">mdi-delete-forever-outline</v-icon>
                                 </div>
                                 <div class="d-flex">
-                                    <v-checkbox
+                                    <!-- <v-checkbox
                                         v-model="column.isHidden"
                                         class="sym-small-size sym-style-input mr-2"
                                         label="ẩn"
-                                    ></v-checkbox>
+                                    ></v-checkbox> -->
                                     <v-checkbox
                                         v-model="column.isBacklog"
                                         class="sym-small-size sym-style-input"
@@ -108,113 +108,93 @@
 <script>
 import draggable from "vuedraggable";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import { taskManagementApi } from "@/api/taskManagement.js";
 import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
 import KanbanWorker from 'worker-loader!@/worker/taskManagement/kanban/Kanban.Worker.js';
-
-import {
-    util
-} from "@/plugins/util.js";
+import { util } from 'jointjs';
 export default {
     name:"columnSetting",
-    props:{
-        listColumn:{
-            type:Array,
-            default() {
-                return [];
-            }
-        },
-        listStatusColumn:{
-            type:Array,
-            default() {
-                return [];
-            }
-        },
-    },
-    watch:{
-        listStatusColumn:{
-            deep: true,
-            immediate:true,
-            handler(newVl){
-                if (newVl.length > 0 && this.listColumn.length > 0) {
-                    this.getStatusForListColumn();
-                }
-            }
-        },
-        listStatusInProject:{
-            deep: true,
-            immediate:true,
-            handler(newVl){
-                this.listStatus = util.cloneDeep(newVl);
-                this.getStatusForListColumn();
-            }
-        },
-    },
     components: {
         draggable,
         VuePerfectScrollbar
     },
     computed:{
-        listStatusInProject(){
-            let projectId=this.$route.params.id;
-            if (this.$store.state.taskManagement.listStatusInProjects[projectId] && this.$store.state.taskManagement.listStatusInProjects[projectId].length > 0) {
-                return this.$store.state.taskManagement.listStatusInProjects[projectId];
-            }else{
+        sTaskManagement() {
+            return this.$store.state.taskManagement;
+        },
+        currentBoard(){
+            return this.$store.state.taskManagement.currentBoard;
+        },
+        sCurrentProject(){
+            return this.$store.state.taskManagement.currentProject;
+        },
+        listColumn(){
+            if (!this.currentBoard.id) {
                 return [];
             }
-        }
+            let idBoard = this.currentBoard.id;
+            let columns = this.sTaskManagement.listColumnInBoard[idBoard];
+            let backLogData = this.sTaskManagement.backLogData;
+            if(backLogData.length > 0){
+                columns.push(backLogData[0]);
+            }
+            return columns;
+        },
+        
     },
     data(){
-        let self = this;
         return{
             isLoading:false,
             columns:[],
-            listStatus:[],
             kanbanWorker:null,
-
+            listStatus:null
         }
     },
-    mounted(){
-      //  this.columns = util.cloneDeep(this.listColumn)
+    watch:{
+        
+        '$route':{
+            immediate:true,
+            deep:true,
+            handler(to,from){
+                if(to.name == 'kanbanBoardSetting'){
+                    this.getListStatus()
+                }
+            }
+        }
     },
     methods:{
+        getListStatus(){
+            let allStatus = util.cloneDeep(this.sTaskManagement.listStatusInProjects[this.sCurrentProject.id]);
+            for (let index = 0; index < this.listColumn.length; index++) {
+                for (let i = 0; i < this.listColumn[index].statusInColumn.length; i++) {
+                    let statusItem = this.listColumn[index].statusInColumn[i];
+                    let findItem = allStatus.find(el => el.statusId == statusItem.id);
+                    if(findItem){
+                        let indexItem = allStatus.indexOf(findItem);
+                        allStatus.splice(indexItem,1);   
+                    }
+                }
+            }
+            allStatus = allStatus.reduce((arr,obj)=>{
+                obj['id'] = obj['statusId'];
+                obj['id'] = obj['statusId'];
+                arr.push(obj);
+                return arr;
+            },[])
+            this.listStatus = allStatus;
+        },
         checkRole(objectType,action){
             return checkPermission(objectType,action);
         },
-        getStatusForListColumn(){
-            let self = this;
-            self.columns = util.cloneDeep(self.listColumn);
-            if (self.listStatus.length > 0 ) {
-                for (let i = 0; i < self.listStatusColumn.length; i++) {
-                    let idColumn = self.listStatusColumn[i].columnId;
-                    let statusId = self.listStatusColumn[i].statusId;
-                    let taskLifeCircleId = self.listStatusColumn[i].taskLifeCircleId;
-                    let item = self.listStatus.find(ele => ele.statusId == statusId &&  ele.taskLifeCircleId == taskLifeCircleId );
-                    if (item) {
-                        let column = self.columns.find(ele => ele.id == idColumn);
-                        if (column) {
-                            column.statusInColumn.push(item);
-                        }
-                        let index = self.listStatus.indexOf(item);
-                        if (index > -1) {
-                            self.listStatus.splice(index, 1);
-                        }
-                    }
-                    
-                }  
-            }
-
-        },
         removeColumn(index){
-            if (this.columns[index].statusInColumn && this.columns[index].statusInColumn.length > 0 ) {
-                for (let i = 0; i < this.columns[index].statusInColumn.length; i++) {
-                    this.listStatus.push(this.columns[index].statusInColumn[i]);
+            if (this.listColumn[index].statusInColumn && this.listColumn[index].statusInColumn.length > 0 ) {
+                for (let i = 0; i < this.listColumn[index].statusInColumn.length; i++) {
+                    this.listStatus.push(this.listColumn[index].statusInColumn[i]);
                 }
             }
-            this.columns.splice(index,1);
+            this.listColumn.splice(index,1);
         },
         getColWidth(){
-            let colLength = this.columns.length;
+            let colLength = this.listColumn.length;
             if (colLength >= 4) {
                 return {width:25 + '%'};
             }else{
@@ -222,16 +202,13 @@ export default {
             }
         },
         addColumn(){
-            this.columns.push({id:'',name:'new column',isHidden:false,isBacklog:false,statusInColumn:[]})
-        },
-        onKeyDown(){
-            
+            this.listColumn.push({id:'',name:'new column',isHidden:false,isBacklog:false,statusInColumn:[]})
         },
         saveColumn(){
             this.isLoading = true;
             let idBoard=this.$route.params.idBoard;
             let data={};
-            data.data = JSON.stringify(this.columns);
+            data.data = JSON.stringify(this.listColumn);
             data.boardId = idBoard;
             
             this.kanbanWorker.postMessage({
@@ -244,7 +221,7 @@ export default {
             this.isLoading = true;
             let idBoard=this.$route.params.idBoard;
             let data={};
-            data.data = JSON.stringify(this.columns);
+            data.data = JSON.stringify(this.listColumn);
             data.boardId = idBoard;
             
             this.kanbanWorker.postMessage({
@@ -252,24 +229,9 @@ export default {
                 data:data
             });
         },
-        getListColumnInBoard(){
-            let idBoard=this.$route.params.idBoard;
-            this.kanbanWorker.postMessage({
-                action:'getListColumnInBoard',
-                data:idBoard
-            });
-        },
-        getListStatusInColumnBoard(){
-            let idBoard=this.$route.params.idBoard;
-            this.kanbanWorker.postMessage({
-                action:'getListStatusInColumnBoard',
-                data:idBoard
-            });
-        },
     },
     created(){
         let self = this;
-
         this.kanbanWorker = new KanbanWorker();
         this.kanbanWorker.addEventListener("message", function (event) {
 			let data = event.data;
@@ -279,30 +241,12 @@ export default {
                     self.isLoading = false;
                     break;
                 case 'saveColumn':
-                    let idBoard=self.$route.params.idBoard;
                     self.$snotifySuccess("Add column completed!");
-                    self.getListColumnInBoard();
                     self.isLoading = false;
                     break;
                 case 'updateColumn':
-                    let idBoard2=self.$route.params.idBoard;
                     self.$snotifySuccess("Update column completed!");
-                    self.getListColumnInBoard();
                     self.isLoading = false;
-                    break;
-                case 'getListColumnInBoard':
-                    if (data.dataAfter) {
-                        let res = data.dataAfter;
-                        self.$store.commit("taskManagement/setListColumnInBoard", res);
-                        self.getListStatusInColumnBoard();
-                    } 
-                    break;
-                case 'getListStatusInColumnBoard':
-                    if (data.dataAfter) {
-                        let res = data.dataAfter;
-                        self.$store.commit("taskManagement/setListStatusInColumnBoard", res);
-                        self.listStatus =(self.listStatusInProject.length > 0 )? util.cloneDeep(self.listStatusInProject) : [];
-                    } 
                     break;
                 default:
                     break;
