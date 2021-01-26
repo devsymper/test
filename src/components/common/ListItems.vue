@@ -1463,9 +1463,6 @@ export default {
 					e.cellRenderer = e.cellRenderer.toString()
 				}
 			})
-
-			debugger
-
 			this.listItemsWorker.postMessage({
 				action: 'getTableColumns',
 				data:{

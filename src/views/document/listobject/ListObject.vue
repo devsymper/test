@@ -252,21 +252,26 @@ export default {
             },
             customAPIResult:{
                 reformatData(res){
-					res.data.columns.forEach(function(e){
-						if(e.name == 'tmg_description'){
-							e.cellRenderer = function(params) {
-								let rtf = params.value
-								rtf = rtf.replace(/\\par[d]?/g, "");
-								rtf = rtf.replace(/\{\*?\\[^{}]+}|[{}]|\\\n?[A-Za-z]+\n?(?:-?\d+)?[ ]?/g, "")
-								return rtf.replace(/\\'[0-9a-zA-Z]{2}/g, "").trim();
-							}
-						}					
-					})
-                    return{
-                        columns:res.data.columns,
-                        listObject:res.data.listObject,
-                        total:res.data.total,
-                    }
+					if(res.status == 200){
+						res.data.columns.forEach(function(e){
+							if(e.type == "richtext"){
+								e.cellRenderer = function(params) {
+									let rtf = params.value
+									rtf = rtf.replace(/\\par[d]?/g, "");
+									rtf = rtf.replace(/\{\*?\\[^{}]+}|[{}]|\\\n?[A-Za-z]+\n?(?:-?\d+)?[ ]?/g, "")
+									return rtf.replace(/\\'[0-9a-zA-Z]{2}/g, "").trim();
+								}
+							}					
+						})
+						return{
+							columns:res.data.columns,
+							listObject:res.data.listObject,
+							total:res.data.total,
+						}
+					}else{
+						return {}
+					}
+					
                 }
             },
             docId:parseInt(this.$route.params.id),

@@ -103,7 +103,6 @@ export default {
 							})
 						}
 					})
-					debugger
 					return {
 						columns:[
 							{name: "id", title: "id", type: "text", noFilter: true},

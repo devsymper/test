@@ -72,7 +72,6 @@ export default {
         let maxValue = Math.max(...this.listsValue);
         let minValue = Math.min(...this.listsValue);
         if(this.value.config[0].value&&typeof Number(this.value.config[0].value)=='number'){
-            debugger
              minValue = Number(this.value.config[0].value);
         };
         if(this.value.config[2].value&&typeof Number(this.value.config[2].value)=='number'){
