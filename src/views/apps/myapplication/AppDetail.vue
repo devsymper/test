@@ -203,7 +203,7 @@ export default {
 			let define
 			if(type.includes('document')){
 				this.$store.commit('document/setCurrentTitle',item.title)
-				define ={
+				define = {
 					"module": "document",
 					"resource": "document_definition",
 					"scope": "document",
@@ -235,6 +235,11 @@ export default {
 				}
 			}
 			this.$store.commit('appConfig/updateActionDef', define)
+			if(item.objectIdentifier.includes("document_definition:")){
+				let id = item.objectIdentifier.split(":")[1]
+				this.$store.commit('appConfig/updateParam', {id: id ,name: item.name})
+			}
+
 		},
 		rightClickHandler(event,item,type){
 			event.stopPropagation();
