@@ -18,6 +18,9 @@ export const biApi = {
 	},
 	getDatasetColumn(datasetId){
 		return api.get('datasets/' + datasetId + '/columns')
+	},
+	getRelationsConfigs(id){
+		return api.get('relations/' + id + '/get_configs/')
 	}
 	
 };

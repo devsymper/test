@@ -224,6 +224,7 @@ export default {
 			});
 			linkView.addTools(tools);
 		},
+		
 		linkAction(link) {
 			var dialog = new joint.ui.Dialog({
 				title: 'Confirmation',
@@ -380,7 +381,7 @@ export default {
 				o: 1,
 				m: 'n',
 			};
-			distance = {
+			let distance = {
 				source: 0.15,
 				target: 0.85,
 			};
@@ -415,7 +416,7 @@ export default {
 			}
 		},
 		addLink(slink) {
-			link = new joint.shapes.mapping.Link(slink);
+			let link = new joint.shapes.mapping.Link(slink);
 			link.label(0, this.getLabelToLink('source', slink.symperLinkType[0]));
 			link.label(1, this.getLabelToLink('target', slink.symperLinkType[1]));
 			link.addTo(this.graph);
@@ -425,11 +426,11 @@ export default {
 				ele.remove();
 			});
 			for (let dataset of datasets) {
-				dts = dataset.dataset;
+				let dts = dataset.dataset;
 				this.addDataset(dts, items[dts.id], dataset.position);
 			}
 			for (let slink of links) {
-				rsl.addLink(slink);
+				this.addLink(slink);
 			}
 		},
 		getWorkspaceInfo() {

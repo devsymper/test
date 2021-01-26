@@ -106,17 +106,34 @@ export default {
 		this.relationEditoWorker = new RelationEditorWorker()
         this.listenFromWorker();
 		this.getAllDataset()
+		if(this.action == 'edit'){
+			debugger
+			this.getRelationConfigs()
+		}
 	},	
 	mounted(){
 		this.listHeight = util.getComponentSize(this).h - 200
 	},
 	methods: {
+		getRelationConfigs(){
+			let id = this.$route.params.id
+			this.relationEditoWorker.postMessage({
+				action: 'getRelationConfigs',
+				data:{
+					id: id
+				}
+			})
+		},
 		getAllDataset(){
 			this.relationEditoWorker.postMessage({action: 'getAllDataset'})
 		},
 		handleGetAllDataset(data){
 			this.listDatasets = data.data.listObject
 		},
+		handleRelationConfig(data){
+			this.datasets = data.datasetsMap
+			this.$refs.relationWorkspace.loadRelations(data.originDataset , data.items , data.links)
+		},	
 		listenFromWorker(){
 			let self = this;
             this.relationEditoWorker.addEventListener("message", function (event) {
