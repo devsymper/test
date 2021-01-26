@@ -285,6 +285,21 @@
             }
         }
     },
+    "authen":{
+        "table":{
+            "title":"Danh sách các server key",
+            "name":"Tên key",
+            "id":"ID",
+            "description":"Mô tả",
+            "serverKey":"Key server",
+            "status":"Trạng thái",
+            "createAt":"Ngày tạo",
+            "updateAt":"Ngày cập nhập",
+            "userCreate":"Người tạo",
+            "userUpdate":"Người cập nhập"
+
+        }
+    },
     "user": {
         "notification": {
             "email_already_exist!": "Email already exist!",

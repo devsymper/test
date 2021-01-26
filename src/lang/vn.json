@@ -111,6 +111,7 @@
         "createAt": "Thời gian tạo",
         "updateAt": "Thời gian cập nhật",
         "sidebar": {
+            "Authen": "Authen",
             "Notification Config BA": "Cài đặt thông báo",
             "Setting": "Cài đặt",
             "Notification": "Thông báo",
@@ -162,6 +163,7 @@
             "list_work": "Danh sách công việc",
             "syqlFunction": "SYQL Function",
             "environment": "Quản lí môi trường"
+            
         },
         "system": "Vai trò người dùng",
         "copy": "Sao chép"
@@ -323,6 +325,37 @@
             }
         }
     },
+    "authen":{
+        "table":{
+            "title":"Danh sách các server key",
+            "name":"Tên key",
+            "id":"ID",
+            "description":"Mô tả",
+            "serverKey":"Key server",
+            "status":"Trạng thái",
+            "createAt":"Ngày tạo",
+            "updateAt":"Ngày cập nhập",
+            "userCreate":"Người tạo",
+            "userUpdate":"Người cập nhập"
+        },
+        "view":{
+            "add_title":"Thêm key server",
+            "update_title":"Cập nhật key server",
+            "delete_title":"Xóa key server",
+            "view_title":"Chi tiết key server",
+            "save":"Tạo key",
+            "key_name":"Tên key",
+            "key_description":"Mô tả",
+            "key_status":"Trạng thái",
+            "update":"Cập nhật"
+        },
+        "notify":{
+            "success":" thành công",
+            "error":" thất bại",
+            "error_get_role":"Không thể lấy danh sách quyền"
+        }
+    },
+    
     "user": {
         "notification": {
             "email_already_exist!": "Email đã tồn tại!",

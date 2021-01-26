@@ -11,6 +11,10 @@ self.onmessage = async function (event) {
 			let getDataRes = await getData(data);
             postMessage({action:'getData', dataAfter : getDataRes})
             break;
+        case 'customGetData':
+			let customGetDataRes = await getData(data);
+            postMessage({action:'customGetData', dataAfter : customGetDataRes})
+            break;
         case 'getItemForValueFilter':
 			let getItemForValueFilterRes = await getItemForValueFilter(data.dataConfig);
             postMessage({action:'getItemForValueFilter', dataAfter : getItemForValueFilterRes})

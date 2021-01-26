@@ -69,7 +69,6 @@
 
 <script>
 import EnvironmentWorker from 'worker-loader!@/worker/environment/Environment.Worker.js';
-import {environmentManagementApi} from '@/api/EnvironmentManagement'
 export default {
 	props:{
 		showDialog:{

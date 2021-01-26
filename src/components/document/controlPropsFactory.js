@@ -584,7 +584,7 @@ const controlTypes = {
         icon: "/icon/ic_number.png",
         html: `<input class="s-control s-control-number" contenteditable="false"  title="Number" s-control-type="number" type="number">&nbsp;&nbsp;`,
         title: "Number",
-        notInProps: ['tableView','itemValue','isVarchar','isQuickSubmit', 'autoHeight','isInsertRow','isShowHeaderTinyMce', 'dataFlowId', 'isPrimaryKey', 'minValue', 'maxValue', 'formatDate', 'isDisplayCompact', 'isMultipleValue'],
+        notInProps: ['tableView','itemValue','isVarchar','isQuickSubmit', 'autoHeight','isInsertRow','isShowHeaderTinyMce', 'dataFlowId', 'minValue', 'maxValue', 'formatDate', 'isDisplayCompact', 'isMultipleValue'],
         formulas: ['linkConfig', 'formulas', 'hidden', 'readOnly', 'require', 'validate']
     },
     date: {
