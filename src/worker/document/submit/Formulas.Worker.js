@@ -2,9 +2,9 @@
 import { workerStore } from '@/worker/document/submit/WorkerStateManagement';
 import ClientSQLManager from "@/views/document/submit/clientSQLManager";
 import Formulas from "@/views/document/submit/formulas";
-import { prepareDataGetMultiple } from '@/components/document/dataControl';
+import { genKeyFromDataInput } from '@/components/document/dataControl';
 
-onmessage = function (event) {
+onmessage = async function (event) {
     var workerDataReceive = event.data;
     let action = workerDataReceive.action;
     let dataOfAction = workerDataReceive.data;
@@ -13,36 +13,53 @@ onmessage = function (event) {
         case 'runFormula':
             let controlName = dataOfAction.controlName;
             let formulaInstance = dataOfAction.formulaInstance
-            let from = dataOfAction.from
             let formulaIns = new Formulas(formulaInstance.keyInstance,formulaInstance.formulas,formulaInstance.type);
-            let rowIndex = dataOfAction.rowIndex;
-            if(rowIndex == undefined){
-                rowIndex = null
-            }
-            let extraData = dataOfAction.extraData;
-            let sqlRowId = dataOfAction.sqlRowId;
-            let dataInput = {}
+            let rowNodeId = dataOfAction.rowNodeId; // th trong table thì mỗi dòng có 1 id
+            let columnName = dataOfAction.columnName;
+            let runOnColumn = dataOfAction.runOnColumn;
+            let dataInput = {};
             if(dataOfAction.dataInput){
                 dataInput = dataOfAction.dataInput;
             }
-            else{
-                dataInput = formulaIns.getDataInputFormula(rowIndex,extraData);
-            }
-            if(['rowTable','columnTable'].includes(from)){
-                dataInput = dataOfAction.dataInput
-            }
-            
+           
             /**
              * Trương hợp chạy công thức cho cả cột trong table
              */
-            if(from == 'columnTable'){
-                let listIdRow = dataOfAction.listIdRow;
-                let dataPostForGetMultiple = prepareDataGetMultiple(dataInput, listIdRow, workerStore['submit'][keyInstance]['inputData']);
+            if(runOnColumn){
+                let dataPostForGetMultiple = dataInput;
+                let cacheRowData = {};
+                //cache các data input giống nhau -> chỉ chạy 1 lần
+                for(let rowId in dataPostForGetMultiple){
+                    let key = genKeyFromDataInput(dataPostForGetMultiple[rowId]);
+                    if(Object.keys(cacheRowData).includes(key)){
+                        delete dataPostForGetMultiple[rowId];
+                    }
+                    if(!cacheRowData[key]){
+                        cacheRowData[key] = [];
+                    }
+                    if(!cacheRowData[key].includes(rowId)){
+                        cacheRowData[key].push(rowId);
+                    }
+                }
                 formulaIns.getDataMultiple(dataPostForGetMultiple).then(res=>{
-                    if(res && res['data']){
+                    if(res && res['data']['data']){
+                        if(Object.keys(cacheRowData).length > 0){
+                            let data = res['data']['data'];
+                            for(let rowId in data){
+                                for(let key in cacheRowData){
+                                    let rowIdCache = cacheRowData[key];
+                                    if(rowIdCache.includes(rowId)){
+                                        for (let index = 0; index < rowIdCache.length; index++) {
+                                            res['data']['data'][rowIdCache[index]] = data[rowId];
+                                        }
+                                    }
+                                }
+                            }
+                        }
                         postMessage({action:'afterRunFormulasSuccess', dataAfter : 
-                            {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type, dataRowId:listIdRow}
+                            {controlName:controlName, res:res, formulaType:formulaInstance.type, rowNodeId:rowNodeId}
                         })
+                        
                     }
                 })
             }
@@ -54,7 +71,7 @@ onmessage = function (event) {
                     formulaIns.handleRunAutoCompleteFormulas(dataInput).then(res=>{
                         if(res && res['data']){
                             postMessage({action:'afterRunFormulasSuccess', dataAfter : 
-                                {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type}
+                                {controlName:controlName, res:res, formulaType:formulaInstance.type}
                             })
                         }
                     })
@@ -66,7 +83,7 @@ onmessage = function (event) {
                     formulaIns.handleBeforeRunFormulas(dataInput).then(res=>{
                         if(res && res['data']){
                             postMessage({action:'afterRunFormulasSuccess', dataAfter : 
-                                {controlName:controlName, from:from, res:res, formulaType:formulaInstance.type,dataRowId:sqlRowId}
+                                {controlName:controlName, res:res, formulaType:formulaInstance.type,rowNodeId:rowNodeId, columnName:columnName}
                             })
                         }
                     })
@@ -86,6 +103,23 @@ onmessage = function (event) {
             }
             let controlIns = dataOfAction.controlIns;
             workerStore[type][keyInstance]['inputData'][controlIns.name] = controlIns;
+            break;
+        case 'addWorkflowVariable':
+            if(!workerStore['submit'][keyInstance]){
+                workerStore['submit'][keyInstance] = {}
+            }
+            if(!workerStore['submit'][keyInstance]['inputData']){
+                workerStore['submit'][keyInstance]['inputData'] = {}
+            }
+            let workflowVariable = dataOfAction.workflowVariable;
+            for(let inputBinding in workflowVariable){
+                workerStore['submit'][keyInstance]['inputData'][inputBinding] = {
+                    name:inputBinding,
+                    type:'textInput',
+                    value:workflowVariable[inputBinding]
+                }
+            }
+            console.log(workerStore,'workerStoreworkerStore');
             break;
         case 'updateDocumentObjectId':
             workerStore['submit'][keyInstance]['document_object_id'] = dataOfAction.documentObjectId;
@@ -121,6 +155,18 @@ onmessage = function (event) {
             }
             else if(func == 'createTable'){
                 ClientSQLManager.createTable(keyInstance, dataOfAction.tableName, dataOfAction.columns,"","");
+            }
+            else if(func == 'updateMultiRow'){
+                let allData = dataOfAction.allData;
+                let caseWhen = "";
+                for(let key in allData){
+                    caseWhen += ` WHEN ${key} THEN "${allData[key]}" `
+                }
+                if(caseWhen){
+                    caseWhen += " ELSE "+dataOfAction.columnName + " END WHERE s_table_id_sql_lite IN (" + Object.keys(allData).join(',') + " )";
+                    let sql = "UPDATE "+dataOfAction.tableName+" SET "+dataOfAction.columnName+" = CASE s_table_id_sql_lite "+caseWhen
+                    await ClientSQLManager.exeBySql(keyInstance, sql, true);
+                }
             }
             break;
         default:

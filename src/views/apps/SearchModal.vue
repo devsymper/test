@@ -90,8 +90,6 @@ export default {
 	created(){
 		this.applicationWorker = new ApplicationWorker();
 		this.getListSearch('')
-	},
-	mounted(){
 		let self = this
         this.applicationWorker.addEventListener("message", function (event) {
 			let data = event.data;

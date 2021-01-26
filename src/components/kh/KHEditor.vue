@@ -121,7 +121,7 @@ export default {
             .catch(err => {
               console.log("error from edit doc!!!", err);
             })
-            .always(() => {});
+            .finally(() => {});
         }
       } else {
         if (this.content != null) {
@@ -139,7 +139,7 @@ export default {
             .catch(err => {
               console.log("error add document backup!!!", err);
             })
-            .always(() => {});
+            .finally(() => {});
         }
         this.captureImage();
       }
@@ -168,7 +168,7 @@ export default {
             .catch(err => {
               console.log("error add document backup!!!", err);
             })
-            .always(() => {});
+            .finally(() => {});
         }
         this.$store.commit("kh/changeStatusBackup", false);
       }

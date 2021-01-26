@@ -231,10 +231,10 @@ export default {
 				orgchartApi.getRolesByUser([{idUser: after}]).then(res=>{
 					let listRole = res.data[0].roles;
 					if(listRole.length > 0){
-						let curRole = listRole.filter(role=>{
-							return role.id == self.userRole;
-						})
-						self.userRoleInfo = curRole[0].name;
+						let curRole = listRole.find(role=> role.id == self.userRole);
+						if(curRole){
+							self.userRoleInfo = curRole.name;
+						}
 					}
 				});
 			}
@@ -243,7 +243,7 @@ export default {
 			let self = this
 			if(after != "" && after != "0"){
 				bpmnApi.getProcessInstanceData(this.workflowId).then(res=>{
-					self.workflowName = res.data[0].processDefinitionName
+					self.workflowName = res.data.length > 0 ? res.data[0].processDefinitionName : ""
 				});
 			}
 		},
@@ -296,7 +296,7 @@ export default {
 			})
 			.catch(err => {
 			})
-			.always(() => {});
+			.finally(() => {});
 	},
 	mounted() {
 		setTimeout((self) => {
@@ -402,7 +402,7 @@ export default {
 					let mapDocControl = this.$store.state.document.submit[this.keyInstance].listInputInDocument;
 					let table = mapDocControl[tbName];
 					let mapControlToIndex = table.mapControlToIndex;
-					let allColumnId = table.tableInstance.tableInstance.getDataAtProp('childObjectId');
+					let allColumnId = table.tableInstance.getColData('childObjectId');
 					
 					for(let rowId in tbChange){
 						let dataChange = tbChange[rowId];

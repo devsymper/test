@@ -21,6 +21,8 @@ body {
     --symper-font-size-default: 13px;
     --symper-box-shadow-top: 0px -1px 6px #00000029;
     --symper-box-shadow-bottom: 0px 3px 6px #00000029;
+    --symper-box-shadow: 0px 0px 12px #00000029;
+    --symper-color: #f58634;
 }
 
 .symper-bg-orange {
@@ -773,6 +775,9 @@ body {
     position: fixed;
     top: -1000px;
     left: -1000px;
+}
+.overflow-hidden{
+    overflow: hidden;
 }
  /*
 	dev create: dungna

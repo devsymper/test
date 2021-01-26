@@ -192,57 +192,30 @@ export default {
 							{name: "name", title: "name", type: "text"},
 							{name: "startUserName", title: "startUserId", type: "text", noFilter: true},
 							{name: "status", title: "status", type: "date",
-								  renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-										Handsontable.dom.empty(td);
-										let span;
-										span = document.createElement('span');	
-										
-										if(value == '1'){
-											$(span).text("Đang chạy")
-											$(span).css('color', 'blue')
-											td.appendChild(span);
-											return td;
-										}
-										if(value == '2'){
-											$(span).text("Tạm dừng")
-											$(span).css('color', 'orange')
-											td.appendChild(span);
-											return td;
-										}
-										if(value == '3'){
-											$(span).text("Hoàn thành")
-											$(span).css('color', 'green')
-											td.appendChild(span);
-											return td;
-										}
-									},
+								cellRenderer: function(params) {
+									if(params.value == '1'){
+										return  '<span style="color: blue">Đang chạy</span>'
+									}
+									if(params.value == '2'){
+										return  '<span style="color: orange">Tạm dừng</span>'
+									}
+									if(params.value == '3'){
+										return  '<span style="color: green">Hoàn thành</span>'
+									}
+								}
 							},
 							{name: "nameVersion", title: "nameVersion", type: "text", noFilter: true},
 							{name: "startTime", title: "startTime", type: "text",
-								renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-									Handsontable.dom.empty(td);
-									let span;
-									span = document.createElement('span');	
-									if(value != null){
-										let data =  self.$moment(value).format('YYYY-MM-DD HH:mm:ss')
-										$(span).text(data)
-									}	
-									td.appendChild(span);
-									return td;
-								},
+								cellRenderer: function(params) {
+									let newValue = self.$moment(params.value).format('YYYY-MM-DD HH:mm:ss')
+									return  '<span>'+ newValue +'</span>'
+								}
 							},
 							{name: "endTime", title: "endTime", type: "text",
-								renderer:  function(instance, td, row, col, prop, value, cellProperties) {
-									Handsontable.dom.empty(td);
-									let span;
-									span = document.createElement('span');	
-									if(value != null){
-										let data =  self.$moment(value).format('YYYY-MM-DD HH:mm:ss')
-										$(span).text(data)
-									}	
-									td.appendChild(span);
-									return td;
-								},
+								cellRenderer: function(params) {
+									let newValue = self.$moment(params.value).format('YYYY-MM-DD HH:mm:ss')
+									return  '<span>'+ newValue +'</span>'
+								}
 							},
 						 ],
 						 listObject: res.data.listObject, 

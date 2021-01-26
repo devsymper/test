@@ -31,6 +31,7 @@ export const authUtil = {
          *      endUserId: "zzzz"
          * }
          */
+		
 		localStorage.setItem('symper-login-info', JSON.stringify(data));
     },
 

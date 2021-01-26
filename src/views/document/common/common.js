@@ -2,6 +2,7 @@ import store from './../../../store';
 import sDocument from './../../../store/document';
 import { util } from '../../../plugins/util';
 
+export const SQLITE_COLUMN_IDENTIFIER = 's_table_id_sql_lite';
 let listNameValueControl = {};
 const checkControlPropertyProp = function(instance, controlName, type) {
     let control = getControlInstanceFromStore(instance, controlName);
@@ -26,12 +27,17 @@ const getControlInstanceFromStore = function(instance, controlName) {
         return false
     }
 }
-export const minimizeDataAfterRunFormula = function(rs) {
+const minimizeDataAfterRunFormula = function(rs) {
     let value = "";
     if(!rs.server){
         let data = rs.data; 
         if(data.length > 0){
-            value=data[0].values[0][0];
+            if(!data[0]){
+                value = ""
+            }
+            else{
+                value=data[0].values[0][0];
+            }
         }
     }
     else{
@@ -229,5 +235,6 @@ export {
     getListInputInDocument,
     checkNameControl,
     checkTitleControl,
-    mapTypeToEffectedControl
+    mapTypeToEffectedControl,
+    minimizeDataAfterRunFormula
 }

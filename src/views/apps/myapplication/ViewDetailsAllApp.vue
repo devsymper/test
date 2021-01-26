@@ -163,23 +163,7 @@ export default {
         }
 	},
 	mounted() {
-		let self = this
-		this.myApplicationWorker.addEventListener("message", function (event) {
-			let data = event.data;
-			switch (data.action) {
-				case 'getActiveAppSBS':
-					self.handlerGetActiveApp(data.dataAfter)
-					break;
-			
-				case 'getItemByAccessControl':
-					self.updateFavoriteItem(data.dataAfter.data)
-                    self.updateChidrenItemToApp(data.dataAfter.data)
-					break;
-			
-				default:
-					break;
-			}
-		});
+		
 	},
     methods:{
         createTask(){
@@ -222,10 +206,11 @@ export default {
             return i
         },
 		getActiveapps(){
-			let self = this
-			this.applicationWorker.postMessage({
-				action: 'getActiveAppSBS',
-			});
+			this.myApplicationWorker.postMessage(
+				{
+					action:'getActiveAppSBS',
+				}
+			);
         },
         checkChildrenApp(data,idApp){
             let self = this
@@ -380,7 +365,7 @@ export default {
         },
 
 		async getItemByAccessControl(ids){
-			this.applicationWorker.postMessage({
+			this.myApplicationWorker.postMessage({
 				action: 'getItemByAccessControl',
 				data:{
 					ids: ids
@@ -447,7 +432,23 @@ export default {
         }
     },
     created(){
-       	this.myApplicationWorker = new MyApplicationWorker();
+		this.myApplicationWorker = new MyApplicationWorker();
+		let self = this
+		this.myApplicationWorker.addEventListener("message", function (event) {
+			let data = event.data;
+			switch (data.action) {
+				case 'getActiveAppSBS':
+					self.handlerGetActiveApp(data.dataAfter)
+					break;
+				case 'getItemByAccessControl':
+					self.updateFavoriteItem(data.dataAfter.data)
+                    self.updateChidrenItemToApp(data.dataAfter.data)
+					break;
+			
+				default:
+					break;
+			}
+		});
 		if(!Object.keys(this.listApp[0]).length && !Object.keys(this.listApp[1]).length){
 			this.getActiveapps()
 		}else{
@@ -499,9 +500,6 @@ export default {
     margin:0px 32px 0px 16px;
     min-height:unset;
     height:50px;
-}
-.view-details-all-app >>> .content-view-details-all-app .v-expansion-panel-header.v-expansion-panel-header--active{
-    /* border-bottom: 1px solid #FF8003; */
 }
 .view-details-all-app >>> .content-view-details-all-app .v-expansion-panel-header__icon{
     margin-right:12px;

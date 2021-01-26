@@ -1,6 +1,5 @@
 const defaultState = {
     arrFileAttach: [],
-    filter:'notDone',
     arrDocObjId:[],
     listDocumentObjId:[],
     listDocumentObjIdWithUserSubmit:[],
@@ -14,7 +13,10 @@ const defaultState = {
     isStatusSubmit:false,
     allAppActive:[],
     listNodeInProcess:[],
-    variableOfProcess:[],
+	variableOfProcess:[],
+	taskHistory:{},
+	currentTaskId: "",
+	currentTaskHistory: []
 
 
 };

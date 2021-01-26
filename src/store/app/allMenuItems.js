@@ -88,6 +88,7 @@ export default {
         link: "/myitem",
         group: "My work",
     },
+   
     timeTable: {
         icon: "mdi-calendar-month-outline",
         title: "myWork",
@@ -119,6 +120,12 @@ export default {
         title: 'KH',
         icon: 'mdi-file-certificate-outline',
         link: '/knowledge',
+        group: "Applications"
+    },
+    taskManagement: {
+        title: 'Task Management',
+        icon: 'mdi-lock-outline',
+        link: '/task-management',
         group: "Applications"
     },
     fileManagement: {
@@ -237,6 +244,12 @@ export default {
         icon: 'mdi-earth',
 		group: "Setting",
 		link: '/environment-management',
-	}
+    },
+    authen: {
+        title: "Authen",
+        icon: "mdi-account-key",
+        link: "/authen",
+        group: "Setting"
+    }
 
 };

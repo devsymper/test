@@ -31,7 +31,7 @@ export default [
             import ('../../views/document/print/ShowList.vue'),
     },
     {
-        path: "/document/editor",
+        path: "/document/editor/:pageInstanceKey?",
         name: "createDocument",
         component: () =>
             import ('../../views/document/Editor.vue'),

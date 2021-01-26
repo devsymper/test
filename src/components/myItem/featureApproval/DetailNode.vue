@@ -348,11 +348,14 @@ export default {
                 let filter={};
                 filter.sort= "createTime";
                 filter.order= "desc";
+                filter.assigneeLike= "%"+self.$store.state.app.endUserInfo.id+"%";
                 filter.processDefinitionId=self.nodeInfo.process_definition_id;
                 filter.taskDefinitionKey=self.nodeInfo.activity_id;
                 filter.includeProcessVariables=true;
                 let res = await BPMNEngine.getTask(filter);
                 self.allTaskInNode=res.data;
+                self.$emit("size-query-task",res.size);
+
             }
            
         },

@@ -1,8 +1,8 @@
 <template>
     <v-dialog v-model="showDialog" persistent max-width="290" style="z-index:1001">
       <v-card >
-        <v-card-title class="headline"> {{title}} </v-card-title>
-        <v-card-text> {{content}} </v-card-text>
+        <v-card-title class="headline fs-16"> {{title}} </v-card-title>
+        <v-card-text class="fs-13"> {{content}} </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn color="red darken-1" text @click="cancel">Hủy</v-btn>

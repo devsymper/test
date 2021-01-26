@@ -133,7 +133,6 @@ export const getLastData = async function (objId){
     let lastKey = [];
     let res = await importApi.getMapping(objId)
     if (res.status === 200) {
-        debugger
         let mapping = JSON.parse(res.data[0].mapping);    
         mapping = mapping.mapping;
         let row = [];

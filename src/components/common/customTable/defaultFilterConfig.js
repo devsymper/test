@@ -104,7 +104,7 @@ function getOptionForGetList(configs, columns, filterData) {
         pageSize: configs.pageSize ? configs.pageSize : configs.pageSize,
         columns: columns ? columns : [],
         distinct: configs.distinct ? configs.distinct : false,
-        formulaCondition: configs.conditionByFormula
+        formulaCondition: configs.conditionByFormula ? configs.conditionByFormula : null
     };
 
     if(configs.moreApiParam){
@@ -163,16 +163,19 @@ export const getDataFromConfig = function(url, configs, columns, filterData, suc
 	let options = {};
     if(!configs.emptyOption){
         options = getOptionForGetList(configs, columns, filterData);
-    }
-
+	}
+	for(let i in options){
+		if(!options[i] || options[i].length == 0){
+			delete options[i]
+		}
+	}
     if(configs.customDataForApi){
-        options = configs.customDataForApi(configs, columns, filterData);
+		options = configs.customDataForApi
 	}
     apiObj.callApi(method, url, options, header, {})
     .then(data => {
         success(data);
     })
     .catch(err => {
-       
     });
 }

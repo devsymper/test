@@ -165,7 +165,7 @@ export default {
 			.catch(err => {
 				console.log("error from change pass user api!!!", err);
 			})
-			.always(() => {
+			.finally(() => {
 
             });
             //reset pass

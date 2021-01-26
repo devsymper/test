@@ -6,10 +6,6 @@ const addToListAttachStore = (state, item) => {
     currentarrFileAttach.unshift(item)
     Vue.set(state, 'arrFileAttach', currentarrFileAttach);
 }
-const setFilter = (state, item) => {
-    Vue.set(state, 'filter', item);
-}
-
 const setStatusPopupTracking= (state, item) => {
     Vue.set(state, 'statusPopupTracking', item);
 }
@@ -41,6 +37,9 @@ const setListTaskInProcessParent = (state, listTaskInProcessParent) => {
 const setListTaskInProcessSub = (state, listTaskInProcessSub) => {
     Vue.set(state, 'listTaskInProcessSub', listTaskInProcessSub);
 }
+const setTaskHistory = (state, params) => {
+    Vue.set(state,'currentTaskHistory', params.data);
+}
 
 const setListTaskDoneInProcessInstance = (state, listTaskDoneInProcessInstance) => {
     Vue.set(state, 'listTaskDoneInProcessInstance', listTaskDoneInProcessInstance);
@@ -63,11 +62,13 @@ const setListNodeInProcess = (state, listNodeInProcess) => {
 const setVariableOfProcess = (state, variableOfProcess) => {
     Vue.set(state, 'variableOfProcess', variableOfProcess);
 }
+const setCurrentId = (state, id) => {
+    Vue.set(state, 'currentTaskId', id);
+}
 
 export {
     setArrFileAttach,
     addToListAttachStore,
-    setFilter,
     removeFileAttachToStore,
     setArrDocObjId,
     setStatusPopupTracking,
@@ -82,7 +83,9 @@ export {
     setListDocumentObjIdWithUserSubmit,
     setAllAppActive,
     setListNodeInProcess,
-    setVariableOfProcess
+	setVariableOfProcess,
+	setTaskHistory,
+	setCurrentId
 
 
 };

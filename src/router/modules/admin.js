@@ -17,10 +17,4 @@ export default [
     component: () =>
         import ('../../views/admin/ListWorkInProcessInstance.vue'),
 	},
-	{
-    path: "/test/testAg",
-    name: "procesdsdsds",
-    component: () =>
-        import ('@/components/common/agDataTable/TestAg'),
-	},
  ]

@@ -2,10 +2,12 @@
     "common": {
         "number_instance": "Tổng số instance",
         "id": "Id",
+        "format_table":"Định dạng",
         "deleteAll": "Xóa tất cả",
         "required": "Bắt buộc",
         "select_lang": "Thay đổi ngôn ngữ",
         "KH": "Knowledge Management",
+        "taskManagement": "Quản lí công việc",
         "structureManagement": "Quản lí cơ cấu ",
         "reports": "Báo cáo",
         "workflows": "Quy trình",
@@ -35,7 +37,7 @@
         "search": "Tìm kiếm",
         "note": "Ghi chú",
         "quickSearch": "Tìm nhanh",
-        "list_config": "Cấu hình danh sách",
+        "list_config": "Cấu hình",
         "save": "Lưu",
         "confirm": "Xác nhận",
         "check": "Kiểm tra",
@@ -109,6 +111,7 @@
         "createAt": "Thời gian tạo",
         "updateAt": "Thời gian cập nhật",
         "sidebar": {
+            "Authen": "Authen",
             "Notification Config BA": "Cài đặt thông báo",
             "Setting": "Cài đặt",
             "Notification": "Thông báo",
@@ -127,6 +130,7 @@
             "App": "Ứng dụng",
             "Administrator": "Quản trị viên",
             "Account management": "Quản lý tài khoản",
+            "Task Management": "Quản lý công việc",
             "Access Management": "Quản lý truy cập",
             "accessControl": "Quản lý truy cập",
             "accessControlBeta": "Quản lý truy cập beta",
@@ -159,6 +163,7 @@
             "list_work": "Danh sách công việc",
             "syqlFunction": "SYQL Function",
             "environment": "Quản lí môi trường"
+            
         },
         "system": "Vai trò người dùng",
         "copy": "Sao chép"
@@ -187,7 +192,9 @@
         "userCreate": "Người tạo",
         "userUpdate": "Người cập nhât",
         "createAt": "Thời gian tạo",
+        "createdAt": "Thời gian tạo",
         "updateAt": "Thời gian cập nhât",
+        "updatedAt": "Thời gian cập nhât",
         "releaseAt": "Thời gian release",
         "versionName": "Tên version",
         "wrap_text_mode": "Chế độ xuống dòng",
@@ -197,14 +204,33 @@
         "environmentIdentifier": "Định danh môi trường",
         "environmentName": "Tên môi trường",
         "unfreeze_column": "Bỏ cố định cột này",
+        "domainName": "Tên domain",
+        "serviceIdentifier": "Định danh service",
+        "serviceName": "Tên service",
         "hide_column": "Ẩn cột này",
 		"show_column": "Hiện cột này",
 		"processKey": "Process Key",
 		"lastUserUpdate": "Người cập nhât",
+		"userUpdateName": "Người cập nhât",
+		"parameter": "Tham số",
+		"userCreateName": "Người tạo",
+		"startUserName": "Người bắt đầu",
+		"nameVersion": "Tên phiên bản",
 		"lastUpdateTime": "Thời gian cập nhât",
+		"startTime": "Thời gian bắt đầu",
+		"endTime": "Thời gian kết thúc",
+		"checkbox": "Chọn",
 		"git": "Link git",
 		"os": "Hệ điểu hành",
+		"iconName":"Hình ảnh",
 		"ip": "Địa chỉ IP",
+		"number_instance": "Tổng số instance",
+		"baCreate": "Người tạo",
+		"baUpdate": "Người cập nhât",
+		"totalRecord": "Tổng số bản ghi",
+		"code": "Mã",
+		"isDefault":"SĐTC mặc định",
+		"lastUpdateAt": "Thời gian cập nhật",
         "wrap_tex_mode": {
             "wrap": "Xuống dòng",
             "clip": "Cắt bớt"
@@ -218,7 +244,10 @@
             "cannot_get_data": "Không thể lấy dữ liệu từ máy chủ"
         },
         "success": {
-            "save_config": "Lưu cấu hình hiển thị thành công!"
+            "save_config": "Lưu cấu hình hiển thị thành công!",
+            "save_filter": "Lưu bộ lọc cho table thành công!",
+            "delete_filter": "Xóa bộ lọc cho table thành công!",
+            "edit_filter": "Cập nhật bộ lọc cho table thành công!"
         },
         "filter": {
             "none": "Không chọn",
@@ -238,7 +267,11 @@
             "sort_desc": "Sắp xếp giảm dần",
             "clear_filter": "Xóa bộ lọc",
             "filter_by_value": "Lọc bởi giá trị",
-            "filter_by_condition": "Lọc bởi điều kiện"
+            "filter_by_condition": "Lọc bởi điều kiện",
+            "Delete":"Xóa",
+            "Edit":"Cập nhật",
+            "Default":"Để mặc định",
+            "Delete Default":"Bỏ mặc định"
         }
     },
     "admin": {
@@ -292,6 +325,37 @@
             }
         }
     },
+    "authen":{
+        "table":{
+            "title":"Danh sách các server key",
+            "name":"Tên key",
+            "id":"ID",
+            "description":"Mô tả",
+            "serverKey":"Key server",
+            "status":"Trạng thái",
+            "createAt":"Ngày tạo",
+            "updateAt":"Ngày cập nhập",
+            "userCreate":"Người tạo",
+            "userUpdate":"Người cập nhập"
+        },
+        "view":{
+            "add_title":"Thêm key server",
+            "update_title":"Cập nhật key server",
+            "delete_title":"Xóa key server",
+            "view_title":"Chi tiết key server",
+            "save":"Tạo key",
+            "key_name":"Tên key",
+            "key_description":"Mô tả",
+            "key_status":"Trạng thái",
+            "update":"Cập nhật"
+        },
+        "notify":{
+            "success":" thành công",
+            "error":" thất bại",
+            "error_get_role":"Không thể lấy danh sách quyền"
+        }
+    },
+    
     "user": {
         "notification": {
             "email_already_exist!": "Email đã tồn tại!",
@@ -729,6 +793,7 @@
                     "note": "Ghi chú (Phục vụ cho việc tìm kiếm)",
                     "titleObject": "Tiêu đề bản ghi (Phục vụ cho việc hiển thị trên MyItem, công thức chạy trên server)",
                     "titlePrint": "Tiêu đề bản In",
+                    "formStyle": "Chọn style",
                     "systemMapping": {
                         "title": "Liên kết Doc và đối tượng hệ thống",
                         "itemTitle": "Chọn đối tượng để liên kết (Có thể mở được bản ghi của Doc ngay trong đối tượng hệ thống)",
@@ -795,7 +860,9 @@
                         "has": "Có ",
                         "commentNotResolve": " bình luận chưa được giải quyết",
                         "noComment": "Không có bình luận nào",
-                        "id": "Định danh"
+						"id": "Định danh",
+						"listWorks": "Công việc",
+						"clickToViewListWork": "Bấm vào đây để xem công việc"
                     },
                     "worflowInfo": "THÔNG TIN QUY TRÌNH",
                     "userRelated": {
@@ -1296,7 +1363,8 @@
             "showLess": "Thu gọn",
             "showMoreFile": "Xem thêm các tệp",
             "quickView": "Xem nhanh",
-            "openTask": "Mở công việc"
+			"openTask": "Mở công việc",
+			"history":"Lịch sử"
         },
         "alert": {
             "title_aproval": "Thực thi công việc",
@@ -1305,8 +1373,61 @@
         },
         "unfinished": "Chưa hoàn thành",
         "totalTask": "Tổng số tác vụ",
-        "totalWork": "Tổng số công việc"
+        "totalWork": "Tổng số công việc",
+		"taskLifeCycle":{
+			"dialog":{
+				"complete":{
+					"header": "Hoàn thành công việc",
+					"description":"Nhấn áp dụng để hoàn thành công việc này"
+				},
+				"assign":{
+					"header": "Giao lại việc",
+					"description":"Công việc sẽ được giao cho người khác thực hiện, người thực hiện có toàn quyền với công việc",
+					"workStatus":"Công việc đã được giao cho"
+				},
+				"claim":{
+					"header": "Nhận công việc",
+					"description":"Khi nhận công việc bạn sẽ có quyền sở hữu công việc này "
+				},
+				"delegate":{
+					"header": "Ủy quyền công việc",
+					"description":"Công việc sẽ được giao cho người khác thực hiện nhưng không có quyền hoàn thành"
+				},
+				"unClaim":{
+					"header": "Hủy bỏ nhận công việc",
+					"description":"Công việc bạn đã nhận sẽ được hủy bỏ khỏi xanh sách công việc của bạn"
+				},
+				"resolve":{
+					"header": "Thực thi công việc",
+					"description":"Công việc sẽ được thực thi và trả về cho chủ sở hữu của công việc "
+				}
+				
+			},
+			"assignee":"Người được giao việc",
+			"delegateUser":"Người được ủy quyền",
+			"assigneePermission":"Người được giao việc sẽ có quyền xem và thực thi công việc",
+			"currentStatus":"Trạng thái hiện tại",
+			"workDelegated":"Công việc đã được ủy quyền ",
+			"owner":"Chủ sở hữu công việc",
+			"newStatus": "Trạng thái mới",
+			"cancel":"Hủy",
+			"corfirm":"Áp dụng",
+			"snackbar":{
+				"title":"Công việc submit thành công",
+				"description":"Bạn có thể hoàn thành công việc bằng cách thực thi ",
+				"action":"Hãy cập nhật bản ghi bằng cách chọn "
+			},
+			"notify":{
+				"unClaim":"Hủy nhận công việc thành công",
+				"resolve":"Thực thi công việc thành công",
+				"claim":"Nhận công việc thành công",
+				"complete":"Hoàn thành công việc thành công",
+				"notSubmit":"Bạn phải submit doc trước khi hoàn thành",
+				"assign": "Giao việc thành công",
+				"delegate": "Ủy quyền thành công "
 
+			}
+		}
     },
     "tasks": {
         "error": {
@@ -1339,7 +1460,8 @@
             "alertDescription": "Không có mô tả",
             "relatedTask": "CÁC TASK LIÊN QUAN",
             "attachment": "TỆP ĐÍNH KÈM",
-            "status": "Trạng thái"
+			"status": "Trạng thái",
+			"candidateUser":"Nhóm người dùng candidate"
         },
         "filterOptions": {
             "all": "Toàn bộ task",
@@ -1352,8 +1474,15 @@
         "createTask": {
             "title": "Tạo task"
         },
-        "claim": "Claim",
-        "created": "Đã tạo mới task",
+        "claim": "Nhận công việc",
+        "unClaim": "Hủy nhận",
+        "reAssign": "Giao việc",
+        "assign": "Đã giao",
+        "delegate": "Ủy quyền",
+        "resolve": "Giải quyết",
+        "complete": "Hoàn thành",
+		"created": "Đã tạo mới task",
+		"action": "Hành động",
         "relatedPeople": {
             "title": "Những người liên quan"
         },
@@ -1422,5 +1551,50 @@
         "reply": "Trả lời",
         "edited": "Đã chỉnh sửa",
         "search": "Tìm kiếm"
+    },
+    "taskManagement":{
+        "table":{
+            "name": "Tên",
+            "description": "Mô tả",
+            "lead": "Leader",
+            "category": "Danh mục",
+            "createAt":"Ngày tạo",
+            "email":"Email",
+            "role":"Quyền",
+            "workflow":"Workflow",
+            "startDate":"Ngày bắt đầu",
+            "releaseDate":"Ngày phát hành",
+            "unreleased":"Chưa phát hành",
+            "released":"Đã phát hành",
+            "configField":"Cấu hình field"
+        },
+        "listMember":"Danh sách thành viên",
+        "listProject":"Danh sách project",
+        "listCategory":"Danh sách danh mục",
+        "listComponent":"Danh sách component",
+        "listVersion":"Danh sách version",
+        "listIssueType":"Danh sách Issue type",
+        "listWorkflow":"Danh sách Workflow",
+        "listPriority":"Danh sách Priority",
+        "listActionPack":"Danh sách ActionPack",
+        "listPermission":"Danh sách Permission",
+        "listIssueComponent":"Danh sách Issue trong component",
+        "listIssueVersion":"Danh sách Issue trong version",
+        "requiredField":"Trường bắt buộc nhập",
+        "detailProject":"Thông tin project",
+        "addPeople":"Thêm thành viên",
+        "managerRole":"Quản lý vai trò",
+        "createRole":"Tạo role",
+        "dialog":{
+            "removeUser": "Bạn sẽ xóa thành viên khỏi project này",
+            "removeRole": "Bạn sẽ xóa role này khỏi danh sách.",
+            "removeCategory": "Bạn sẽ xóa danh mục này khỏi danh sách.",
+            "removeComponent": "Bạn sẽ xóa component này khỏi danh sách.",
+            "removeWorkflow": "Bạn sẽ xóa workflow này khỏi danh sách.",
+            "removePriority": "Bạn sẽ xóa priority này khỏi danh sách.",
+            "removeVersion": "Bạn sẽ xóa version này khỏi danh sách"
+        },
+        "settingBoard":"Cài đặt Board"
+
     }
 }

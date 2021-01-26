@@ -11,12 +11,9 @@
 		:useDefaultContext="false"
 		:headerPrefixKeypath="'admin.table'"
 		:useActionPanel="true"
-		@row-selected="getDetails"
 		:actionPanelWidth="1000"
-		:actionPanelType="'elastic'"
 		:containerHeight="containerHeight"
 		:showImportHistoryBtn="false"
-		:showActionPanelInDisplayConfig="true"
 	> 
 		<template slot="right-panel-content">  
 			<DetailWorkflow 
@@ -73,11 +70,11 @@ export default {
 						 total: listWork.listObject.length,
                          columns: [
                             {name: "id", title: "id", type: "numeric"},
-							{name: "processKey", title: "key", type: "text"},
-							{name: "name", title: "name", type: "text"},
-							{name: "description", title: "description", type: "text"},
-							{name: "lastUpdateTime", title: "last_update_at", type: "date"},
-							{name: "number_instance", title: "number_instance", type: "text"},
+							{name: "processKey", title: "key", type: "text", flex:1},
+							{name: "name", title: "name", type: "text", flex:1},
+							{name: "description", title: "description", type: "text" ,flex:1},
+							{name: "lastUpdateTime", title: "last_update_at", type: "date" , flex:1},
+							{name: "number_instance", title: "number_instance", type: "text", flex:1},
                          ],
                    }
                 }

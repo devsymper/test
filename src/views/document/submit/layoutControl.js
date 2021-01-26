@@ -1,8 +1,8 @@
 import Control from "./control";
 import sDocument from './../../../store/document'
 export default class LayoutControl extends Control {
-    constructor(idField, ele, controlProps, curParentInstance, value) {
-        super(idField, ele, controlProps, curParentInstance, value);
+    constructor(idField, ele, controlProps, keyInstance, value) {
+        super(idField, ele, controlProps, keyInstance, value);
     }
     render() {
         if (this.type == 'tabPage') {
@@ -77,9 +77,9 @@ export default class LayoutControl extends Control {
         let tableInTab = elTarget.closest('.s-control-tab-page').find('.list-page-content .page-content').find('[s-control-type="table"]');
         $.each(tableInTab, function(k, v) {
             let tableId = $(v).attr('id');
-            let control = sDocument.state.editor[self.curParentInstance].allControl[tableId];
+            let control = sDocument.state.editor[self.keyInstance].allControl[tableId];
             let controlName = control.properties.name.value;
-            let controlInstance = sDocument.state.submit[self.curParentInstance].listInputInDocument[controlName];
+            let controlInstance = sDocument.state.submit[self.keyInstance].listInputInDocument[controlName];
             controlInstance.tableInstance.tableInstance.render()
         })
     }

@@ -59,6 +59,11 @@ import { userApi } from "./../api/user.js";
 import { util } from "./../plugins/util.js";
 
 export default {
+    created(){
+        if(util.auth.checkLogin()){
+            this.$router.push("/");
+        }
+    },
     methods: {
         forgotPass(){
               this.$router.push("login/forgot-pass");
@@ -90,15 +95,19 @@ export default {
                         if (res.status == 200) {
                             this.$store.commit('app/setAccountType', res.data.profile.type)
                             this.$store.dispatch('app/setUserInfo', res.data);
-                            thisCpn.$router.push('/');
+                            if(this.$route.query.redirect){
+                                window.location.href = this.$route.query.redirect;
+                            }else{
+                                this.$router.push('/');
+                            }
                         } else {
-                            thisCpn.$snotifyError( {}, "Không thể đăng nhập","Tài khoản hoặc mật khẩu không chính xác!");
+                            this.$snotifyError( {}, "Không thể đăng nhập","Tài khoản hoặc mật khẩu không chính xác!");
                         }
                     })
                     .catch(err => {
                         console.log("error from login api!!!", err);
                     })
-                    .always(() => {
+                    .finally(() => {
                         setTimeout(() => {
                             thisCpn.checkingUser = false;
                         }, 1000);

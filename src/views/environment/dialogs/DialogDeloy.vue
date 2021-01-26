@@ -67,10 +67,10 @@ export default {
 		}
 	},
 	created(){
-		this.environmentWorker = new EnvironmentWorker()
 		this.$store.dispatch('environmentManagement/getAllEnvirontment')
 	},
 	mounted(){
+		this.environmentWorker = new EnvironmentWorker()
 		let self = this
         this.environmentWorker.addEventListener("message", function (event) {
 			let data = event.data;

@@ -5,44 +5,12 @@
 			small
 			icon
 			tile
-			style="position:absolute; left:0; top:11px"
+			style="position:absolute; left:0; top:6px"
 			@click="back"
 			class="mr-2 ml-1"
 		>
 			<v-icon dark small>mdi-keyboard-backspace</v-icon>
 		</v-btn>
-		<span class="btn-header-popup">
-			<v-btn 
-				class="mr-2 font-normal fs-13"
-				depressed
-				tile
-				v-if="showBtnAddCheckbox"
-				small
-				@click="addCheckBoxColumn"
-			>
-				Chọn
-			</v-btn>
-			<!-- <v-btn 
-				class="mr-2 font-normal fs-13"
-				depressed
-				tile
-				small
-				:disabled="showBtnAddCheckbox"
-				@click="handleCheckClick"
-			>
-				Kiểm tra
-			</v-btn> -->
-			<v-btn 
-				class="mr-2 font-normal fs-13"
-				depressed
-				tile
-				small
-				:disabled="showBtnAddCheckbox"
-				@click="handleSyncClick"
-			>
-				Đồng bộ
-			</v-btn>
-		</span>
 		<ListItem 
 			ref="listObject"
 			:showExportButton="false"
@@ -50,7 +18,11 @@
 			:dialogMode="true"
 			:getDataUrl="getListUrl"
 			@close-popup="handleCloseEvent"
+			:showFilter="false"
+			:customHeaderBtn="customHeaderBtn"
+			@custom-get-all-data="customGetAllData"
 			style="margin-left:10px"
+			@data-loaded="handleDataLoaded"
 			:refreshListWhenChangeUrl="false"
 			:useDefaultContext="false"
 			:tableContextMenu="tableContextMenu"
@@ -63,6 +35,7 @@
 			@cancel="showDialog = false"
 			:listItemSelected="listItemSelected"
 			:currentObjectType="currentObjectType"
+			@success="handlerSuccess"
 		/>
 		<DialogDataRelate 
 			:showDialog="showDialogRelateData"
@@ -93,11 +66,16 @@ export default {
 		currentObjectType:{
 			type: String
 		},
+		tab:{
+			type: String,
+			default: ""
+		}
 	},
 	data(){
 		let self = this
 		return{
-			listItemSelected: {},
+			listItemSelected: [],
+			page:1,
 			showBtnAddCheckbox: true,
 			showDialogRelateData: false,
 			showList: false,
@@ -115,11 +93,36 @@ export default {
 			},
 			customAPIResult:{
 				reformatData(res){
-					self.$refs.listObject.rerenderTable();
 					return{
 						columns:res.data.columns ? res.data.columns : [],
 						listObject:res.data.listObject ? res.data.listObject : [],
-						total: res.data.listObject ? res.data.listObject.length : 0,
+						total: res.data.total,
+					}
+				}
+			},
+			customHeaderBtn:{
+				showCheckBox:{
+					title: "Chọn",
+					callback(){
+						self.addCheckBoxColumn()
+					}
+				},
+				sync:{
+					title: "Đồng bộ",
+					callback(){
+						self.handleSyncClick()
+					}
+				},
+				syncAll:{
+					title:"Đồng bộ tất cả",
+					callback(){
+						self.handleSyncAll()
+					}
+				},
+				close:{
+					icon: 'mdi-close',
+					callback(){
+						self.handleCloseEvent()
 					}
 				}
 			}
@@ -129,18 +132,41 @@ export default {
 		handleCloseEvent(){
 			this.$emit('close-popup')
 		},
+		customGetAllData(data){
+			this.$set(this, 'listItemSelected', data)
+			this.showDialog = true
+		},
+		handleDataLoaded(){
+			if(!this.customHeaderBtn.showCheckBox){
+				let self = this
+				this.customHeaderBtn.showCheckBox = {
+					title: "Chọn",
+					callback(){
+						self.addCheckBoxColumn()
+					}
+				}
+			}
+		},
 		back(){
 			this.$emit('back')
 		},
 		addCheckBoxColumn(){
-			this.showBtnAddCheckbox = false
+			delete this.customHeaderBtn.showCheckBox
 			this.$refs.listObject.addCheckBoxColumn()
+		},
+		handlerSuccess(){
+			this.showDialog = false 
+			this.$refs.listObject.refreshList()
 		},
 		afterSelectedRow(items){
 			this.$set(this, 'listItemSelected', items)
 		},
 		handleSyncClick(){
 			this.showDialog = true
+		},
+		handleSyncAll(){
+			this.$refs.listObject.customGetData(this.page)
+			this.$snotifySuccess('Đang lấy dữ liệu....')
 		},
 		handleCheckClick(){
 			this.showDialogRelateData = true
@@ -153,7 +179,11 @@ export default {
 			setTimeout((self)=>{
 				self.$refs.listObject.getData()
 			},200,this)
-			this.listItemSelected = {},
+			this.listItemSelected = [],
+			this.showBtnAddCheckbox = true
+		},
+		tab(val){
+			this.$refs.listObject.removeCheckBoxColumn()
 			this.showBtnAddCheckbox = true
 		}
 	}
@@ -166,7 +196,7 @@ export default {
 }
 .btn-header-popup{
 	position: absolute;
-	top: 15px;
+	top: 6px; 
 	right: 235px;
 }
 </style>

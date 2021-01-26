@@ -8,6 +8,12 @@ export const documentApi = {
     getListDocument() {
         return coreApi.get("documents?pageSize=3000");
     },
+    getListDocumentObject(docId) {
+        return coreApi.get("documents/"+docId+"/objects");
+    },
+    getListObjectByMultipleDocument(data) {
+        return coreApi.post("documents/objects-by-multiple-document",data,{},{'contentType': 'application/json'});
+    },
     getBatchDocument(data) {
         return coreApi.post("documents/batch", data);
     },
@@ -145,5 +151,22 @@ export const documentApi = {
     },
     deleteObjectInTrash(data) {
         return trashApi.post('items/delete-multi', data)
+    },
+
+
+    /**
+     * index column
+     */
+    saveColumnIndex(data){
+        return coreApi.post("documents/indexs", data);
+    },
+    deleteIndex(uid, data){
+        return coreApi.delete("documents/indexs/"+uid, data);
+    },
+    getColumnIndex(documentId){
+        return coreApi.get("documents/"+documentId+"/indexs");
+    },
+    getFieldStruct(documentId){
+        return coreApi.get("documents/"+documentId+"/fields/struct");
     }
 };

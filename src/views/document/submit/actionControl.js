@@ -4,8 +4,8 @@ import store from './../../../store';
 import { SYMPER_APP } from './../../../main.js'
 
 export default class ActionControl extends Control {
-    constructor(idField, ele, controlProps, curParentInstance, value) {
-        super(idField, ele, controlProps, curParentInstance, value);
+    constructor(idField, ele, controlProps, keyInstance, value) {
+        super(idField, ele, controlProps, keyInstance, value);
     }
     render() {
         if (this.type == 'approvalHistory') {
@@ -17,7 +17,7 @@ export default class ActionControl extends Control {
                 store.commit("document/addToDocumentSubmitStore", {
                     key: 'submitFormulas',
                     value: formulas,
-                    instance: this.curParentInstance
+                    instance: this.keyInstance
                 });
             }
             if (this.controlFormulas.hasOwnProperty('update')) {
@@ -25,7 +25,7 @@ export default class ActionControl extends Control {
                 store.commit("document/addToDocumentSubmitStore", {
                     key: 'updateFormulas',
                     value: formulas,
-                    instance: this.curParentInstance
+                    instance: this.keyInstance
                 });
             }
         } else {
@@ -71,7 +71,7 @@ export default class ActionControl extends Control {
                 .catch(err => {
 
                 })
-                .always(() => {});
+                .finally(() => {});
         } else {
             this.ele.remove();
         }

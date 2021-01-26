@@ -168,7 +168,8 @@ import {
     VCheckbox,
     VRadio,
     VSwitch,
-    VTextarea
+    VTextarea,
+    VColorPicker
 } from "vuetify/lib";
 import TreeValidate from "./../../views/document/sideright/items/FormValidateTpl.vue";
 import ConfigTime from "./../common/ConfigTime.vue";;
@@ -185,6 +186,7 @@ import OrgchartSelector from "./../user/OrgchartSelector";
 import DateTimePicker from './../common/DateTimePicker.vue';
 import SymperListOrdering from "./../common/symperInputs/SymperListOrdering";
 import SymperListAutocomplete from "./../common/symperInputs/SymperListAutocomplete";
+import SymperListCombobox from "./../common/symperInputs/SymperListCombobox";
 import SymperColorPicker from "@/components/common/symperInputs/SymperColorPicker.vue";
 import SymperDefaultControlDocument from "@/components/common/symperInputs/SymperDefaultControlDocument.vue";
 
@@ -238,6 +240,17 @@ const inputTypeConfigs = {
             };
         }
     },
+    color: {
+        tag: "v-color-picker",
+        props(config) {
+            return {
+                label: config.title,
+                'dot-size':"17",
+                'mode':"hexa",
+                'swatches-max-height':"116"
+            };
+        }
+    },
     textarea: {
         tag: "v-textarea",
         props(config) {
@@ -286,6 +299,35 @@ const inputTypeConfigs = {
                 data: config.value,
                 minSpareRows: 1
             };
+        }
+    },
+    combobox: {
+        tag: "SymperListCombobox",
+        props(config) {
+            let props = {
+                columns: config.columns,
+                data: config.value,
+                multipleSelection: config.multipleSelection,
+                showId: config.hasOwnProperty('showId') ? config.showId : true,
+                isSelectionChip:(config.isSelectionChip == false) ? false : true,
+                value: config.value
+                
+            };
+            if(config.onSearch){
+                props.onSearch  = config.onSearch;
+            }
+            if(config.properties){
+                props.properties = config.properties
+            }
+
+            if(config.textKey){
+                props.textKey = config.textKey;
+            }
+
+            if(config.valueKey){
+                props.valueKey = config.valueKey;
+            }
+            return props;
         }
     },
     autocomplete: {
@@ -342,14 +384,6 @@ const inputTypeConfigs = {
     },
     numberFormat:{
         tag:"number-format",
-        props(config){
-            return{
-                value:config.value
-            }
-        }
-    },
-    color:{
-        tag:"symper-color-picker",
         props(config){
             return{
                 value:config.value
@@ -551,10 +585,10 @@ export default {
             if(this.isShowDebugMode){
                 this.hideDebugMode();
             }
-            let info = this.largeFormulaEditor;
-            setTimeout((self) => {
-                self.largeFormulaEditor.name = '';
-            }, 500, this);
+            // let info = this.largeFormulaEditor;
+            // setTimeout((self) => {
+            //     self.largeFormulaEditor.name = '';
+            // }, 500, this);
         },
         openLargeValueEditor(inputInfo, name) {
             this.$set(this.largeFormulaEditor, "data", inputInfo);
@@ -684,6 +718,7 @@ export default {
     },
     components: {
         VTextField,
+        VColorPicker,
         VSelect,
         VCheckbox,
         VRadio,
@@ -705,7 +740,8 @@ export default {
         "datetime-picker" : DateTimePicker,
         SymperColorPicker: SymperColorPicker,
         "default-control-document":SymperDefaultControlDocument,
-        'symper-editor':Editor
+        'symper-editor':Editor,
+        SymperListCombobox
 
 
     }

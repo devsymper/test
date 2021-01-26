@@ -7,7 +7,7 @@
                     class="mx-auto"
                 ></v-skeleton-loader>
         </div>
-        <div v-else class="h-100 w-100">
+        <div v-else-if="startWorkflowStatus == 'success'" class="h-100 w-100">
             <taskDetail 
                 v-if="taskInfo.action.parameter.documentId > 0"
                 :isInitInstance="true" 
@@ -21,6 +21,10 @@
                 <i class="mdi mdi-check mr-2 d-inline-block"  style="color: green; font-size: 25px"></i>
                 <h1 class="d-inline-block">{{$t('process.instance.startSuccessfully')}}</h1>
             </div>
+        </div>
+        <div v-else style="text-align: center" class="mt-10">
+            <i class="mdi mdi-close-octagon-outline mr-2 d-inline-block"  style="color: red; font-size: 25px"></i>
+            <h1 class="d-inline-block">{{$t('process.instance.startFailed')}}</h1>
         </div>
     </div>
 </template>
@@ -84,14 +88,19 @@ export default {
                 let processDef = await BPMNEApi.getDefinitionData(this.$route.params.id);
                 try {
                     let instanceName = await self.getInstanceName([]);
-                    let newProcessInstance = await runProcessDefinition(this, processDef, [], instanceName);
+                    let vars = [];
+                    if(this.$route.extraData){
+                        vars = this.$route.params.extraData;
+                    }
+                    let newProcessInstance = await runProcessDefinition(this, processDef, vars, instanceName);
                     await self.checkAndGotoMyTask(newProcessInstance);
-                    this.$snotifySuccess("Workfow started successfully!");
+                    this.$snotifySuccess("Khởi tạo quy trình  thành công!");
+                    this.startWorkflowStatus = 'success';
                 } catch (error) {
-                    this.$snotifyError(error ,"Error on run process definition ");
+                    this.$snotifyError(error);
+                    this.startWorkflowStatus = 'failed';
                 }
             }
-            this.startWorkflowStatus = 'started';
         },
         async checkAndGotoMyTask(newProcessInstance){
             let filter={};
@@ -121,7 +130,7 @@ export default {
             }
             for(let task of arrTask){
                 let assignee=task.assignee;
-                if (assignee.indexOf(":")>0) {
+                if (assignee && assignee.indexOf(":")>0) {
                     assignee=assignee.split(":")[0];
                 }
                 if (assignee == this.$store.state.app.endUserInfo.id) {
@@ -182,7 +191,7 @@ export default {
                     dataObjsMap[objKey] = obj;
                 }
 
-                let formula = dataObjsMap.instanceDisplayText.value;
+                let formula = dataObjsMap.instanceDisplayText ? dataObjsMap.instanceDisplayText.value : '';
                 if(!formula || String(formula).trim() == ''){
                     resolve('');
                 }else{

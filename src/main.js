@@ -125,7 +125,6 @@ Vue.prototype.$evtBus.$on('symper-app-call-action-handler', (action, context, ex
     }
 })
 
-
 function checkCanAddTab(context) {
     let rsl = true;
     let urlMap = context.$store.state.app.urlToTabTitleMap;

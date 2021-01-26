@@ -4,15 +4,15 @@
     "reportVersion": 2,
     "event": "Allocation failed - JavaScript heap out of memory",
     "trigger": "FatalError",
-    "filename": "report.20201228.121250.12904.0.001.json",
-    "dumpEventTime": "2020-12-28T12:12:50Z",
-    "dumpEventTimeStamp": "1609132370727",
-    "processId": 12904,
+    "filename": "report.20210106.160621.8276.0.001.json",
+    "dumpEventTime": "2021-01-06T16:06:21Z",
+    "dumpEventTimeStamp": "1609923981558",
+    "processId": 8276,
     "threadId": null,
-    "cwd": "E:\\WORK\\SYMPER\\PROJECT\\P11 - common",
+    "cwd": "E:\\WORK\\SYMPER\\PROJECT\\P8-enviroment",
     "commandLine": [
       "node",
-      "E:\\WORK\\SYMPER\\PROJECT\\P11 - common\\node_modules\\.bin\\\\..\\@vue\\cli-service\\bin\\vue-cli-service.js",
+      "E:\\WORK\\SYMPER\\PROJECT\\P8-enviroment\\node_modules\\.bin\\\\..\\@vue\\cli-service\\bin\\vue-cli-service.js",
       "serve"
     ],
     "nodejsVersion": "v12.16.3",
@@ -52,38 +52,38 @@
       {
         "model": "Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz",
         "speed": 2400,
-        "user": 2333890,
+        "user": 6897640,
         "nice": 0,
-        "sys": 830437,
-        "idle": 8166781,
-        "irq": 94515
+        "sys": 2242859,
+        "idle": 13855890,
+        "irq": 303562
       },
       {
         "model": "Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz",
         "speed": 2400,
-        "user": 1870031,
+        "user": 6236562,
         "nice": 0,
-        "sys": 578156,
-        "idle": 8882609,
-        "irq": 12250
+        "sys": 1524406,
+        "idle": 15235093,
+        "irq": 29328
       },
       {
         "model": "Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz",
         "speed": 2400,
-        "user": 2496218,
+        "user": 7746515,
         "nice": 0,
-        "sys": 687546,
-        "idle": 8147000,
-        "irq": 12187
+        "sys": 1666703,
+        "idle": 13582828,
+        "irq": 28015
       },
       {
         "model": "Intel(R) Core(TM) i5-6200U CPU @ 2.30GHz",
         "speed": 2400,
-        "user": 2278515,
+        "user": 7868265,
         "nice": 0,
-        "sys": 604359,
-        "idle": 8447890,
-        "irq": 15406
+        "sys": 1464218,
+        "idle": 13663562,
+        "irq": 26437
       }
     ],
     "networkInterfaces": [
@@ -91,7 +91,7 @@
         "name": "Wi-Fi",
         "internal": false,
         "mac": "34:de:1a:e3:74:0c",
-        "address": "2001:ee0:41c1:6610:705c:f6ce:7124:ef63",
+        "address": "2001:ee0:41c1:7045:705c:f6ce:7124:ef63",
         "netmask": "ffff:ffff:ffff:ffff::",
         "family": "IPv6",
         "scopeid": 0
@@ -100,7 +100,7 @@
         "name": "Wi-Fi",
         "internal": false,
         "mac": "34:de:1a:e3:74:0c",
-        "address": "2001:ee0:41c1:6610:f455:486c:f2fb:1b41",
+        "address": "2001:ee0:41c1:7045:a146:5d2d:593a:2a2c",
         "netmask": "ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff",
         "family": "IPv6",
         "scopeid": 0
@@ -118,7 +118,7 @@
         "name": "Wi-Fi",
         "internal": false,
         "mac": "34:de:1a:e3:74:0c",
-        "address": "192.168.1.11",
+        "address": "192.168.1.20",
         "netmask": "255.255.255.0",
         "family": "IPv4"
       },
@@ -150,91 +150,71 @@
   },
   "nativeStack": [
     {
-      "pc": "0x00007ff6792b2449",
+      "pc": "0x00007ff643ce2449",
       "symbol": "std::basic_ostream<char,std::char_traits<char> >::operator<<+11577"
     },
     {
-      "pc": "0x00007ff6792b69a9",
+      "pc": "0x00007ff643ce69a9",
       "symbol": "std::basic_ostream<char,std::char_traits<char> >::operator<<+29337"
     },
     {
-      "pc": "0x00007ff6792b5828",
+      "pc": "0x00007ff643ce5828",
       "symbol": "std::basic_ostream<char,std::char_traits<char> >::operator<<+24856"
     },
     {
-      "pc": "0x00007ff6793ed8c2",
+      "pc": "0x00007ff643e1d8c2",
       "symbol": "v8::base::CPU::has_sse+68658"
     },
     {
-      "pc": "0x00007ff679c09bbe",
+      "pc": "0x00007ff644639bbe",
       "symbol": "v8::Isolate::ReportExternalAllocationLimitReached+94"
     },
     {
-      "pc": "0x00007ff679bf1c91",
+      "pc": "0x00007ff644621c91",
       "symbol": "v8::SharedArrayBuffer::Externalize+833"
     },
     {
-      "pc": "0x00007ff679abe1ec",
+      "pc": "0x00007ff6444ee1ec",
       "symbol": "v8::internal::Heap::EphemeronKeyWriteBarrierFromCode+1436"
     },
     {
-      "pc": "0x00007ff679ac9420",
+      "pc": "0x00007ff6444f9420",
       "symbol": "v8::internal::Heap::ProtectUnprotectedMemoryChunks+1312"
     },
     {
-      "pc": "0x00007ff679ac5f44",
+      "pc": "0x00007ff6444f5f44",
       "symbol": "v8::internal::Heap::PageFlagsAreConsistent+3204"
     },
     {
-      "pc": "0x00007ff679abb743",
+      "pc": "0x00007ff6444eb743",
       "symbol": "v8::internal::Heap::CollectGarbage+1283"
     },
     {
-      "pc": "0x00007ff679ab9db4",
+      "pc": "0x00007ff6444e9db4",
       "symbol": "v8::internal::Heap::AddRetainedMap+2452"
     },
     {
-      "pc": "0x00007ff679adafbd",
+      "pc": "0x00007ff64450afbd",
       "symbol": "v8::internal::Factory::NewFillerObject+61"
     },
     {
-      "pc": "0x00007ff679841871",
+      "pc": "0x00007ff644271871",
       "symbol": "v8::internal::interpreter::JumpTableTargetOffsets::iterator::operator=+1665"
     },
     {
-      "pc": "0x00007ff67a056c4d",
+      "pc": "0x00007ff644a86c4d",
       "symbol": "v8::internal::SetupIsolateDelegate::SetupHeap+546637"
     },
     {
-      "pc": "0x00007ff67a03ca4f",
-      "symbol": "v8::internal::SetupIsolateDelegate::SetupHeap+439631"
-    },
-    {
-      "pc": "0x00007ff679fdbbfc",
-      "symbol": "v8::internal::SetupIsolateDelegate::SetupHeap+42748"
-    },
-    {
-      "pc": "0x00007ff679fdbbfc",
-      "symbol": "v8::internal::SetupIsolateDelegate::SetupHeap+42748"
-    },
-    {
-      "pc": "0x00007ff679fdbbfc",
-      "symbol": "v8::internal::SetupIsolateDelegate::SetupHeap+42748"
-    },
-    {
-      "pc": "0x00007ff679fdbbfc",
-      "symbol": "v8::internal::SetupIsolateDelegate::SetupHeap+42748"
-    },
-    {
-      "pc": "0x000000b517330d09",
+      "pc": "0x000000f39b965f05",
       "symbol": ""
     }
   ],
   "javascriptHeap": {
-    "totalMemory": 2152030208,
-    "totalCommittedMemory": 2152030208,
-    "usedMemory": 2129032304,
-    "availableMemory": 49185048,
+    "totalMemory": 2171228160,
+    "totalCommittedMemory": 2171228160,
+    "usedMemory": 2104236384,
+    "availableMemory": 60308712,
     "memoryLimit": 2197815296,
     "heapSpaces": {
       "read_only_space": {
@@ -245,38 +225,38 @@
         "available": 0
       },
       "new_space": {
-        "memorySize": 2097152,
-        "committedMemory": 2097152,
-        "capacity": 1047456,
-        "used": 40,
-        "available": 1047416
+        "memorySize": 33554432,
+        "committedMemory": 33554432,
+        "capacity": 16759296,
+        "used": 933224,
+        "available": 15826072
       },
       "old_space": {
-        "memorySize": 1710370816,
-        "committedMemory": 1710370816,
-        "capacity": 1701935536,
-        "used": 1700630448,
-        "available": 1305088
+        "memorySize": 1536569344,
+        "committedMemory": 1536569344,
+        "capacity": 1508787280,
+        "used": 1507651072,
+        "available": 1136208
       },
       "code_space": {
-        "memorySize": 3837952,
-        "committedMemory": 3837952,
-        "capacity": 3352704,
-        "used": 3352704,
+        "memorySize": 5410816,
+        "committedMemory": 5410816,
+        "capacity": 4768928,
+        "used": 4768928,
         "available": 0
       },
       "map_space": {
-        "memorySize": 19927040,
-        "committedMemory": 19927040,
-        "capacity": 10698240,
-        "used": 10698240,
+        "memorySize": 15208448,
+        "committedMemory": 15208448,
+        "capacity": 11825600,
+        "used": 11825600,
         "available": 0
       },
       "large_object_space": {
-        "memorySize": 414330880,
-        "committedMemory": 414330880,
-        "capacity": 413223632,
-        "used": 413223632,
+        "memorySize": 579018752,
+        "committedMemory": 579018752,
+        "capacity": 577930320,
+        "used": 577930320,
         "available": 0
       },
       "code_large_object_space": {
@@ -289,24 +269,24 @@
       "new_large_object_space": {
         "memorySize": 0,
         "committedMemory": 0,
-        "capacity": 1047456,
+        "capacity": 16759296,
         "used": 0,
-        "available": 1047456
+        "available": 16759296
       }
     }
   },
   "resourceUsage": {
-    "userCpuSeconds": 382.39,
-    "kernelCpuSeconds": 21.468,
-    "cpuConsumptionPercent": 59.4784,
-    "maxRss": 2145271808,
+    "userCpuSeconds": 690.484,
+    "kernelCpuSeconds": 57.546,
+    "cpuConsumptionPercent": 30.1625,
+    "maxRss": 2173382656,
     "pageFaults": {
-      "IORequired": 1394478,
+      "IORequired": 2492289,
       "IONotRequired": 0
     },
     "fsActivity": {
-      "reads": 26114,
-      "writes": 39
+      "reads": 27081,
+      "writes": 1598
     }
   },
   "libuv": [
@@ -314,18 +294,18 @@
   "workers": [
   ],
   "environmentVariables": {
-    "=E:": "E:\\WORK\\SYMPER\\PROJECT\\P11 - common",
+    "=E:": "E:\\WORK\\SYMPER\\PROJECT\\P8-enviroment",
     "ALLUSERSPROFILE": "C:\\ProgramData",
     "APPDATA": "C:\\Users\\DELL\\AppData\\Roaming",
     "BABEL_ENV": "development",
-    "CHROME_CRASHPAD_PIPE_NAME": "\\\\.\\pipe\\crashpad_5172_AEXFWJEZEJHDYJWJ",
+    "CHROME_CRASHPAD_PIPE_NAME": "\\\\.\\pipe\\crashpad_10372_QGHICOKIENVKOKYK",
     "COLORTERM": "truecolor",
     "COMMONPROGRAMFILES": "C:\\Program Files\\Common Files",
     "CommonProgramFiles(x86)": "C:\\Program Files (x86)\\Common Files",
     "CommonProgramW6432": "C:\\Program Files\\Common Files",
     "COMPUTERNAME": "DESKTOP-EP7I167",
     "COMSPEC": "C:\\WINDOWS\\system32\\cmd.exe",
-    "dp0": "E:\\WORK\\SYMPER\\PROJECT\\P11 - common\\node_modules\\.bin\\",
+    "dp0": "E:\\WORK\\SYMPER\\PROJECT\\P8-enviroment\\node_modules\\.bin\\",
     "DriverData": "C:\\Windows\\System32\\Drivers\\DriverData",
     "EXEPATH": "C:\\Program Files\\Git\\bin",
     "FPS_BROWSER_APP_PROFILE_STRING": "Internet Explorer",
@@ -334,7 +314,7 @@
     "HOME": "C:\\Users\\DELL",
     "HOMEDRIVE": "C:",
     "HOMEPATH": "\\Users\\DELL",
-    "INIT_CWD": "E:\\WORK\\SYMPER\\PROJECT\\P11 - common",
+    "INIT_CWD": "E:\\WORK\\SYMPER\\PROJECT\\P8-enviroment",
     "LANG": "en_US.UTF-8",
     "LOCALAPPDATA": "C:\\Users\\DELL\\AppData\\Local",
     "LOGONSERVER": "\\\\DESKTOP-EP7I167",
@@ -529,7 +509,7 @@
     "npm_package_devDependencies__vue_cli_plugin_vuex": "~4.2.0",
     "npm_package_devDependencies__vue_cli_service": "^4.2.3",
     "npm_package_devDependencies__vue_eslint_config_prettier": "^6.0.0",
-    "npm_package_gitHead": "7922c237c7cf55a0672b4d69c49c65e916f70ad0",
+    "npm_package_gitHead": "b34e3d57cb5c19824f5db30605276af34efcdbef",
     "npm_package_name": "frontend",
     "npm_package_private": "true",
     "npm_package_readmeFilename": "README.md",
@@ -544,8 +524,8 @@
     "OneDriveConsumer": "C:\\Users\\DELL\\OneDrive",
     "ORIGINAL_XDG_CURRENT_DESKTOP": "undefined",
     "OS": "Windows_NT",
-    "Path": "C:\\Users\\DELL\\AppData\\Roaming\\npm\\node_modules\\npm\\node_modules\\npm-lifecycle\\node-gyp-bin;E:\\WORK\\SYMPER\\PROJECT\\P11 - common\\node_modules\\.bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\DELL\\bin;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;E:\\DevSuiteHome_2\\jdk\\jre\\bin\\classic;E:\\DevSuiteHome_2\\jdk\\jre\\bin;E:\\DevSuiteHome_2\\jdk\\jre\\bin\\client;E:\\DevSuiteHome_2\\jlib;E:\\DevSuiteHome_2\\bin;E:\\DevSuiteHome_2\\jre\\1.4.2\\bin\\client;E:\\DevSuiteHome_2\\jre\\1.4.2\\bin;E:\\oracle\\product\\10.2.0\\db_1\\bin;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0;C:\\WINDOWS\\System32\\OpenSSH;C:\\xampp\\php;C:\\ProgramData\\ComposerSetup\\bin;C:\\Program Files (x86)\\ATI Technologies\\ATI.ACE\\Core-Static;C:\\Program Files\\nodejs;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\DELL\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\DELL\\AppData\\Roaming\\Composer\\vendor\\bin;C:\\Users\\DELL\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Users\\DELL\\AppData\\Roaming\\npm;E:\\flutter\\bin",
-    "PATH": "C:\\Users\\DELL\\AppData\\Roaming\\npm\\node_modules\\npm\\node_modules\\npm-lifecycle\\node-gyp-bin;E:\\WORK\\SYMPER\\PROJECT\\P11 - common\\node_modules\\.bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\DELL\\bin;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;E:\\DevSuiteHome_2\\jdk\\jre\\bin\\classic;E:\\DevSuiteHome_2\\jdk\\jre\\bin;E:\\DevSuiteHome_2\\jdk\\jre\\bin\\client;E:\\DevSuiteHome_2\\jlib;E:\\DevSuiteHome_2\\bin;E:\\DevSuiteHome_2\\jre\\1.4.2\\bin\\client;E:\\DevSuiteHome_2\\jre\\1.4.2\\bin;E:\\oracle\\product\\10.2.0\\db_1\\bin;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0;C:\\WINDOWS\\System32\\OpenSSH;C:\\xampp\\php;C:\\ProgramData\\ComposerSetup\\bin;C:\\Program Files (x86)\\ATI Technologies\\ATI.ACE\\Core-Static;C:\\Program Files\\nodejs;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\DELL\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\DELL\\AppData\\Roaming\\Composer\\vendor\\bin;C:\\Users\\DELL\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Users\\DELL\\AppData\\Roaming\\npm;E:\\flutter\\bin",
+    "Path": "C:\\Users\\DELL\\AppData\\Roaming\\npm\\node_modules\\npm\\node_modules\\npm-lifecycle\\node-gyp-bin;E:\\WORK\\SYMPER\\PROJECT\\P8-enviroment\\node_modules\\.bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\DELL\\bin;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;E:\\DevSuiteHome_2\\jdk\\jre\\bin\\classic;E:\\DevSuiteHome_2\\jdk\\jre\\bin;E:\\DevSuiteHome_2\\jdk\\jre\\bin\\client;E:\\DevSuiteHome_2\\jlib;E:\\DevSuiteHome_2\\bin;E:\\DevSuiteHome_2\\jre\\1.4.2\\bin\\client;E:\\DevSuiteHome_2\\jre\\1.4.2\\bin;E:\\oracle\\product\\10.2.0\\db_1\\bin;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0;C:\\WINDOWS\\System32\\OpenSSH;C:\\xampp\\php;C:\\ProgramData\\ComposerSetup\\bin;C:\\Program Files (x86)\\ATI Technologies\\ATI.ACE\\Core-Static;C:\\Program Files\\nodejs;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\DELL\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\DELL\\AppData\\Roaming\\Composer\\vendor\\bin;C:\\Users\\DELL\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Users\\DELL\\AppData\\Roaming\\npm;E:\\flutter\\bin",
+    "PATH": "C:\\Users\\DELL\\AppData\\Roaming\\npm\\node_modules\\npm\\node_modules\\npm-lifecycle\\node-gyp-bin;E:\\WORK\\SYMPER\\PROJECT\\P8-enviroment\\node_modules\\.bin;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\DELL\\bin;C:\\Program Files (x86)\\Common Files\\Oracle\\Java\\javapath;E:\\DevSuiteHome_2\\jdk\\jre\\bin\\classic;E:\\DevSuiteHome_2\\jdk\\jre\\bin;E:\\DevSuiteHome_2\\jdk\\jre\\bin\\client;E:\\DevSuiteHome_2\\jlib;E:\\DevSuiteHome_2\\bin;E:\\DevSuiteHome_2\\jre\\1.4.2\\bin\\client;E:\\DevSuiteHome_2\\jre\\1.4.2\\bin;E:\\oracle\\product\\10.2.0\\db_1\\bin;C:\\WINDOWS\\system32;C:\\WINDOWS;C:\\WINDOWS\\System32\\Wbem;C:\\WINDOWS\\System32\\WindowsPowerShell\\v1.0;C:\\WINDOWS\\System32\\OpenSSH;C:\\xampp\\php;C:\\ProgramData\\ComposerSetup\\bin;C:\\Program Files (x86)\\ATI Technologies\\ATI.ACE\\Core-Static;C:\\Program Files\\nodejs;C:\\Program Files\\Git\\cmd;C:\\Program Files\\Git\\mingw64\\bin;C:\\Program Files\\Git\\usr\\bin;C:\\Users\\DELL\\AppData\\Local\\Microsoft\\WindowsApps;C:\\Users\\DELL\\AppData\\Roaming\\Composer\\vendor\\bin;C:\\Users\\DELL\\AppData\\Local\\Programs\\Microsoft VS Code\\bin;C:\\Users\\DELL\\AppData\\Roaming\\npm;E:\\flutter\\bin",
     "PATHEXT": ".COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JSE;.WSF;.WSH;.MSC",
     "PERL5LIB": "E:\\oracle\\product\\10.2.0\\db_1\\perl\\5.8.3\\lib\\MSWin32-x86;E:\\oracle\\product\\10.2.0\\db_1\\perl\\5.8.3\\lib;E:\\oracle\\product\\10.2.0\\db_1\\perl\\5.8.3\\lib\\MSWin32-x86;E:\\oracle\\product\\10.2.0\\db_1\\perl\\site\\5.8.3;E:\\oracle\\product\\10.2.0\\db_1\\perl\\site\\5.8.3\\lib;E:\\oracle\\product\\10.2.0\\db_1\\sysman\\admin\\scripts;",
     "PLINK_PROTOCOL": "ssh",
@@ -560,7 +540,7 @@
     "PROMPT": "$P$G",
     "PSModulePath": "C:\\Program Files\\WindowsPowerShell\\Modules;C:\\WINDOWS\\system32\\WindowsPowerShell\\v1.0\\Modules",
     "PUBLIC": "C:\\Users\\Public",
-    "PWD": "E:/WORK/SYMPER/PROJECT/P11 - common",
+    "PWD": "E:/WORK/SYMPER/PROJECT/P8-enviroment",
     "SESSIONNAME": "Console",
     "SHLVL": "2",
     "SYSTEMDRIVE": "C:",
@@ -576,8 +556,8 @@
     "USERPROFILE": "C:\\Users\\DELL",
     "VSCODE_GIT_ASKPASS_MAIN": "c:\\Users\\DELL\\AppData\\Local\\Programs\\Microsoft VS Code\\resources\\app\\extensions\\git\\dist\\askpass-main.js",
     "VSCODE_GIT_ASKPASS_NODE": "C:\\Users\\DELL\\AppData\\Local\\Programs\\Microsoft VS Code\\Code.exe",
-    "VSCODE_GIT_IPC_HANDLE": "\\\\.\\pipe\\vscode-git-823160f908-sock",
-    "VUE_CLI_ENTRY_FILES": "[\"E:\\\\WORK\\\\SYMPER\\\\PROJECT\\\\P11 - common\\\\src\\\\main.js\"]",
+    "VSCODE_GIT_IPC_HANDLE": "\\\\.\\pipe\\vscode-git-9da46e8053-sock",
+    "VUE_CLI_ENTRY_FILES": "[\"E:\\\\WORK\\\\SYMPER\\\\PROJECT\\\\P8-enviroment\\\\src\\\\main.js\"]",
     "VUE_CLI_TRANSPILE_BABEL_RUNTIME": "true",
     "WEBPACK_DEV_SERVER": "true",
     "WINDIR": "C:\\WINDOWS",
@@ -594,19 +574,19 @@
     "C:\\WINDOWS\\System32\\PSAPI.DLL",
     "C:\\WINDOWS\\System32\\ADVAPI32.dll",
     "C:\\WINDOWS\\System32\\msvcrt.dll",
-    "C:\\WINDOWS\\SYSTEM32\\dbghelp.dll",
     "C:\\WINDOWS\\System32\\sechost.dll",
-    "C:\\WINDOWS\\System32\\ucrtbase.dll",
     "C:\\WINDOWS\\System32\\USER32.dll",
     "C:\\WINDOWS\\System32\\win32u.dll",
     "C:\\WINDOWS\\System32\\GDI32.dll",
     "C:\\WINDOWS\\System32\\gdi32full.dll",
     "C:\\WINDOWS\\System32\\msvcp_win.dll",
+    "C:\\WINDOWS\\System32\\ucrtbase.dll",
     "C:\\WINDOWS\\System32\\CRYPT32.dll",
-    "C:\\WINDOWS\\SYSTEM32\\IPHLPAPI.DLL",
     "C:\\WINDOWS\\System32\\MSASN1.dll",
-    "C:\\WINDOWS\\SYSTEM32\\USERENV.dll",
     "C:\\WINDOWS\\System32\\bcrypt.dll",
+    "C:\\WINDOWS\\SYSTEM32\\dbghelp.dll",
+    "C:\\WINDOWS\\SYSTEM32\\IPHLPAPI.DLL",
+    "C:\\WINDOWS\\SYSTEM32\\USERENV.dll",
     "C:\\WINDOWS\\System32\\profapi.dll",
     "C:\\WINDOWS\\SYSTEM32\\WINMM.dll",
     "C:\\WINDOWS\\SYSTEM32\\winmmbase.dll",
