@@ -15,7 +15,7 @@
 				<div class="d-flex flex-column">
 					<div class="d-flex">
 						<v-icon x-small>
-							{{data.item.type == 'dataset_by_dataflow' ? 'mdi-folder': 'mdi-file'}}
+							{{data.item.type == 'dataset_by_dataflow' ? 'mdi-database-arrow-right-outline': 'mdi-file-document-multiple-outline'}}
 						</v-icon>
 						<span class="fs-13 ml-2" v-if="data.item.symperId ">
 							{{data.item.symperId + '-' + data.item.name ? data.item.name : "" }}

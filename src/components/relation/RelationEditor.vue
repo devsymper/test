@@ -108,7 +108,7 @@ export default {
 		this.getAllDataset()
 	},	
 	mounted(){
-		this.listHeight = util.getComponentSize(this).h - 100
+		this.listHeight = util.getComponentSize(this).h - 200
 	},
 	methods: {
 		getAllDataset(){
@@ -135,30 +135,20 @@ export default {
 		},
 		removeItem(item) {
 			this.listDatasetSelected.splice(this.listDatasetSelected.indexOf(item), 1);
-			this.$refs.relationWorkspace.removeDataset(item)
+			this.$refs.relationWorkspace.removeDataset(item, true)
 		},
 		handleHeaderAction(action){
 			 this.$refs.relationWorkspace.handleHeaderAction(action);
 		},
 		handlerDatasetSelected(dataset){
 			this.$refs.relationWorkspace.updateDatasetColumns(dataset.datasets)
-			this.$refs.relationWorkspace.addDataset(this.selectingNode)
 		},
 		handleChangeSelectDataset(node, isSelected){
-			let self = this;
-			this.selectingNode = node
 			if(isSelected){
+				this.$refs.relationWorkspace.addDataset(JSON.parse(JSON.stringify(node)))
 				this.relationEditoWorker.postMessage({action: 'handleChangeSelectDataset' , data:{
 					node: node
 				}})
-			}else{
-				// for(let i in this.selectedDatasetIds){
-				// 	if(node.id == this.selectedDatasetIds[i]){
-				// 		this.selectedDatasetIds.splice(i,1);
-				// 		break;
-				// 	}
-				// }
-				// symperDatasetRelations.removeDataset(node);
 			}
 		},
 	},

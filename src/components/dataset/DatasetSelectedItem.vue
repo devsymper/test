@@ -1,10 +1,10 @@
 <template>
-    <div :title="item.aliasName" style="position:relative">
-		<v-icon small class="ml-1">
-			{{item.type == 'doc' ? 'mdi-folder' : 'mdi-file'}}
+    <div :title="item.aliasName" style="position:relative; width: 95%">
+		<v-icon x-small >
+			{{item.type == 'doc' ? 'mdi-file-document-multiple-outline' : 'mdi-database-arrow-right-outline'}}
 		</v-icon>
-        <span class="fs-13">{{item.symperId +' - '+ item.name}}</span>
-        <div class="pl-2 pb-2 pt-1 secondary-text fs-13">{{item.aliasName}}</div> 
+        <span class="fs-13 ml-1 mt-1">{{item.symperId +' - '+ item.name}}</span>
+        <div class=" pb-2 pt-1 secondary-text fs-13" style="opacity: 0.6">{{item.aliasName}}</div> 
         <v-icon @click="handleRemoveItem" class="icon-remove-dataset-item" v-if="showRemove" small >mdi-close</v-icon>
     </div>
 </template>

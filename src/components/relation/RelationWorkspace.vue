@@ -6,6 +6,14 @@
 import JointPaperDataMapping from '@/components/common/rappid/JointPaperDataMapping';
 require('@/plugins/rappid/rappid.css');
 
+let relaventIcon = {
+	number:'image/relations/number.svg',
+	text:'image/relations/text.svg',
+	time:'image/relations/time.svg',
+	date:'image/relations/date.svg',
+	datetime:'image/relations/datetime.svg',
+	table:'image/relations/table.svg'
+};
 export default {
 	props: {
 		action: {
@@ -28,24 +36,24 @@ export default {
 			drawGrid: {
 				name: 'mesh',
 			},
-			datasets: []
+			datasets: {},
 		};
 	},
 	methods: {
-		setupGraph(graph , paper, paperScroller) {
-			this.graph = graph
-			this.paper = paper
-			this.paperScroller = paperScroller
+		setupGraph(graph, paper, paperScroller) {
+			this.graph = graph;
+			this.paper = paper;
+			this.paperScroller = paperScroller;
 			this.listenPaperEvent();
 		},
-		handleHeaderAction(action){
-            this.$refs.jointPaper.actionOnToolbar(action);
+		handleHeaderAction(action) {
+			this.$refs.jointPaper.actionOnToolbar(action);
 		},
 		showElementTools(elementView) {
 			var element = elementView.model;
 			var transform = new joint.ui.FreeTransform({
 				cellView: elementView,
-				allowRotation: false
+				allowRotation: false,
 			});
 			transform.render();
 			transform.listenTo(element, 'change', updateMinSize);
@@ -57,26 +65,212 @@ export default {
 				transform.options.minWidth = minSize.width;
 			}
 		},
-		listenPaperEvent() {
+		removeRelateColumn(linkView) {
+			let linkAttr = linkView.model.attributes;
+			let sourceId = linkAttr.source.port;
+			let targetId = linkAttr.target.port;
+
+			$('.record-item-body[item-id=' + sourceId + ']').css('fill', '#00000000');
+			$('.record-item-body[item-id=' + targetId + ']').css('fill', '#00000000');
+		},
+		showRelateColumn(linkView) {
+			let linkAttr = linkView.model.attributes;
+			let sourceId = linkAttr.source.port;
+			let targetId = linkAttr.target.port;
+
+			$('.record-item-body[item-id=' + sourceId + ']').css('fill', '#ffbc58');
+			$('.record-item-body[item-id=' + targetId + ']').css('fill', '#ffbc58');
+		},
+		itemEditAction(element, itemId) {
+			var config = element.getInspectorConfig(itemId);
+			if (!config) return;
+
+			var inspector = new joint.ui.Inspector({
+				cell: element,
+				live: false,
+				inputs: joint.util.setByPath({}, element.getItemPathArray(itemId), config),
+			});
+
+			inspector.render();
+			inspector.el.style.position = 'relative';
+			inspector.el.style.overflow = 'hidden';
+
+			var dialog = new joint.ui.Dialog({
+				width: 300,
+				title: 'Edit Item',
+				closeButton: false,
+				content: inspector.el,
+				buttons: [
+					{
+						content: 'Cancel',
+						action: 'cancel',
+					},
+					{
+						content: '<span style="color:#fe854f">Change</span>',
+						action: 'change',
+					},
+				],
+			});
+
+			dialog.open();
+			dialog.on({
+				'action:cancel': function() {
+					inspector.remove();
+					dialog.close();
+				},
+				'action:change': function() {
+					inspector.updateCell();
+					inspector.remove();
+					dialog.close();
+				},
+			});
+
+			var input = inspector.el.querySelector('[contenteditable]');
+			var selection = window.getSelection();
+			var range = document.createRange();
+			range.selectNodeContents(input);
+			selection.removeAllRanges();
+			selection.addRange(range);
+		},
+		itemActionPicker(target, elementView, itemId, tools) {
+			var element = elementView.model;
+			var toolbar = new joint.ui.ContextToolbar({
+				target: target,
+				padding: 5,
+				vertical: true,
+				tools: tools,
+			});
+
+			toolbar.render();
+			toolbar.on({
+				'action:remove': function() {
+					element.removeItem(itemId);
+					element.removeInvalidLinks();
+					toolbar.remove();
+				},
+				'action:edit': function() {
+					toolbar.remove();
+					itemEditAction(element, itemId);
+				},
+				'action:add-child': function() {
+					toolbar.remove();
+					element.addItemAtIndex(itemId, Infinity, element.getDefaultItem());
+					if (element.isItemCollapsed(itemId)) element.toggleItemCollapse(itemId);
+				},
+				'action:add-next-sibling': function() {
+					toolbar.remove();
+					element.addNextSibling(itemId, element.getDefaultItem());
+				},
+				'action:add-prev-sibling': function() {
+					toolbar.remove();
+					element.addPrevSibling(itemId, element.getDefaultItem());
+				},
+			});
+		},
+		changeLinkType(evt, linkView, buttonView) {
+			let pos = buttonView.options.pos;
+			let postToIdx = {
+				target: 1,
+				source: 0,
+			};
+			let revertType = {
+				o: 'n',
+				m: 1,
+			};
+			let linkTypeRevert = {
+				1: 'o',
+				n: 'm',
+			};
+			console.log(pos, postToIdx[pos], linkView, buttonView);
+			let linkAttr = linkView.model.attributes;
+			let currType = linkAttr.symperLinkType[postToIdx[pos]];
+			linkView.model.label(postToIdx[pos], {
+				attrs: {
+					text: {
+						text: revertType[currType],
+					},
+				},
+			});
+			let lbs = linkView.model.labels();
+			linkAttr.symperLinkType = linkTypeRevert[lbs[0].attrs.text.text] + linkTypeRevert[lbs[1].attrs.text.text];
+		},
+		showLinkTools(linkView) {
 			let self = this
+			var tools = new joint.dia.ToolsView({
+				tools: [
+					new joint.linkTools.mapping.SourceArrowhead(),
+					new joint.linkTools.mapping.TargetArrowhead(),
+					new joint.linkTools.mapping.Label2({
+						distance: '15%',
+						pos: 'source',
+						action: function(evt, linkView, buttonView) {
+							self.changeLinkType(evt, linkView, buttonView);
+						},
+					}),
+					new joint.linkTools.mapping.Label1({
+						distance: '85%',
+						pos: 'target',
+						action: function(evt, linkView, buttonView) {
+							self.changeLinkType(evt, linkView, buttonView);
+						},
+					}),
+					new joint.linkTools.mapping.Remove({
+						distance: '50%',
+						action: function() {
+							self.linkAction(this.model);
+						},
+					}),
+				],
+			});
+			linkView.addTools(tools);
+		},
+		linkAction(link) {
+			var dialog = new joint.ui.Dialog({
+				title: 'Confirmation',
+				width: 300,
+				content: 'Are you sure you want to delete this link?',
+				buttons: [
+					{ action: 'cancel', content: 'Cancel' },
+					{ action: 'remove', content: '<span style="color:#fe854f">Remove</span>' }
+				]
+			});
+
+			dialog.open();
+			dialog.on({
+				'action:remove': function() {
+					for(let cb of rsl.onLinkRemove){
+						if(typeof cb == 'function'){
+							cb(link);
+						}
+					}
+					link.remove();
+					dialog.remove();
+				},
+				'action:cancel': function() {
+					dialog.remove();
+				}
+			});
+		},
+		listenPaperEvent() {
+			let self = this;
 			let paper = this.$refs.jointPaper.paper;
 			let graph = this.$refs.jointPaper.graph;
 			paper.on('blank:pointerdown', this.paperScroller.startPanning);
 
 			paper.on('link:mouseenter', function(linkView) {
 				this.removeTools();
-				showLinkTools(linkView);
-				rsl.showRelateColumn(linkView);
+				self.showLinkTools(linkView);
+				self.showRelateColumn(linkView);
 			});
 
 			paper.on('link:mouseleave', function(linkView) {
 				this.removeTools();
-				rsl.removeRelateColumn(linkView);
+				self.removeRelateColumn(linkView);
 			});
 
 			paper.on('element:magnet:pointerdblclick', function(elementView, evt, magnet) {
 				evt.stopPropagation();
-				itemEditAction(elementView.model, elementView.findAttribute('item-id', magnet));
+				self.itemEditAction(elementView.model, elementView.findAttribute('item-id', magnet));
 			});
 
 			paper.on('element:magnet:contextmenu', function(elementView, evt, magnet) {
@@ -84,7 +278,7 @@ export default {
 				var tools = elementView.model.getItemTools(itemId);
 				if (tools) {
 					evt.stopPropagation();
-					itemActionPicker(magnet, elementView, elementView.findAttribute('item-id', magnet), tools);
+					this.itemActionPicker(magnet, elementView, elementView.findAttribute('item-id', magnet), tools);
 				}
 			});
 
@@ -101,7 +295,7 @@ export default {
 					});
 				} else {
 					var bbox = view.model.getBBox();
-					var ghost = V('rect');
+					var ghost = joint.V('rect');
 					ghost.attr(bbox);
 					ghost.attr({
 						fill: 'transparent',
@@ -135,134 +329,148 @@ export default {
 				this
 			);
 		},
-		addDataset(datasetData,items = [],pos = {}) {
+		addDataset(datasetData, items = [], pos = {}) {
+			console.log(datasetData, 'datasetDatadatasetDatadatasetData')
 			debugger
 			let dataset = new joint.shapes.mapping.Record({
 				items: [items],
-				id:datasetData.id,
-				symperDatasetConfigs:{
-					id:datasetData.id,
-					label:datasetData.label
-				}
+				id: datasetData.id,
+				icon: datasetData.type ? relaventIcon[datasetData.type] : "",
+				symperDatasetConfigs: {
+					id: datasetData.id,
+					label: datasetData.label ? datasetData.label : datasetData.tableName,
+					icon: datasetData.type ? relaventIcon[datasetData.type] : "",
+				},
 			});
-
-			pos.x = pos.x?pos.x:50;
-			pos.y = pos.y?pos.y:130;
+			pos.x = pos.x ? pos.x : 50;
+			pos.y = pos.y ? pos.y : 130;
 			dataset.position(pos.x, pos.y);
-			dataset.setName(datasetData.label);
+			dataset.setName(datasetData.label ? datasetData.label : datasetData.aliasName);
 			dataset.addTo(this.graph);
 			this.datasets[datasetData.id] = {
-				label:datasetData.label,
-				obj:dataset
+				label: datasetData.label ? datasetData.label : datasetData.aliasName,
+				obj: dataset,
 			};
 		},
-		removeDataset(datasetData) {
-			this.datasets[datasetData.id].obj.remove();
+		removeDataset(datasetData, isSymperId = false) {
+			let id = isSymperId ? datasetData.id + 'symper' : datasetData.id;
+			this.datasets[id].obj.remove();
 		},
-		searchColumns(vl){
-			if(vl){
-				let items  = $(".record-item-body");
-				$(".record-item-label").each((index,ele)=>{
-					if($(ele).text().toLowerCase().includes(vl)){
-						$(items[index]).css('fill','#ffbc58');
-					}else{
-						$(items[index]).css('fill','#00000000');
+		searchColumns(vl) {
+			if (vl) {
+				let items = $('.record-item-body');
+				$('.record-item-label').each((index, ele) => {
+					if (
+						$(ele)
+							.text()
+							.toLowerCase()
+							.includes(vl)
+					) {
+						$(items[index]).css('fill', '#ffbc58');
+					} else {
+						$(items[index]).css('fill', '#00000000');
 					}
 				});
-			}else{
-				$(".record-item-body").css('fill','#00000000');
+			} else {
+				$('.record-item-body').css('fill', '#00000000');
 			}
 		},
-		getLabelToLink(pos = 'source',type){
+		getLabelToLink(pos = 'source', type) {
 			let linkType = {
-				o:1,
-				m:'n'
+				o: 1,
+				m: 'n',
 			};
 			distance = {
-				source:0.15,
-				target:0.85
+				source: 0.15,
+				target: 0.85,
 			};
 			return {
 				attrs: {
 					text: {
-						text: linkType[type]
+						text: linkType[type],
 					},
 				},
 				position: {
-					distance: distance[pos]
-				}
-			}
+					distance: distance[pos],
+				},
+			};
 		},
 		updateDatasetColumns(datasetColumns) {
-			for(let idDts in datasetColumns){
+			for (let idDts in datasetColumns) {
 				let dts = this.datasets[idDts];
-				if(!dts){
+				if (!dts) {
 					continue;
 				}
 				let dtsLabel = dts.label;
 				let dtsPos = dts.obj.position();
-				this.removeDataset({id:idDts});
-				this.addDataset({
-						id:idDts,
-						label:dtsLabel
+				this.removeDataset({ id: idDts });
+				this.addDataset(
+					{
+						id: idDts + 'symper',
+						label: dtsLabel,
 					},
 					datasetColumns[idDts],
 					dtsPos
 				);
 			}
 		},
-		addLink(slink){
+		addLink(slink) {
 			link = new joint.shapes.mapping.Link(slink);
-			link.label(0,this.getLabelToLink('source',slink.symperLinkType[0]));
-			link.label(1,this.getLabelToLink('target',slink.symperLinkType[1]));
+			link.label(0, this.getLabelToLink('source', slink.symperLinkType[0]));
+			link.label(1, this.getLabelToLink('target', slink.symperLinkType[1]));
 			link.addTo(this.graph);
 		},
-		loadRelations(datasets,items,links){
-			this.graph.getCells().map((ele)=>{
+		loadRelations(datasets, items, links) {
+			this.graph.getCells().map((ele) => {
 				ele.remove();
 			});
-			for(let dataset of datasets){
+			for (let dataset of datasets) {
 				dts = dataset.dataset;
-				this.addDataset(dts,items[dts.id],dataset.position);
+				this.addDataset(dts, items[dts.id], dataset.position);
 			}
-			for(let slink of links){
+			for (let slink of links) {
 				rsl.addLink(slink);
 			}
 		},
-		getWorkspaceInfo(){
+		getWorkspaceInfo() {
 			//mapping.Link
 			let childs = this.graph.getCells();
 			let dataLink = [];
 			let dtss = [];
 
-			for(let c of childs){
-				if(c.attributes.type == 'mapping.Link'){
+			for (let c of childs) {
+				if (c.attributes.type == 'mapping.Link') {
 					dataLink.push({
-						from:c.attributes.source.port,
-						to:c.attributes.target.port,
-						type:c.attributes.symperLinkType
-					}); 
-				}else{
+						from: c.attributes.source.port,
+						to: c.attributes.target.port,
+						type: c.attributes.symperLinkType,
+					});
+				} else {
 					dtss.push({
-						position:c.attributes.position,
-						dataset:c.attributes.symperDatasetConfigs
+						position: c.attributes.position,
+						dataset: c.attributes.symperDatasetConfigs,
 					});
 				}
 			}
 
-			
 			return {
-				links:dataLink,
-				dtss:dtss
+				links: dataLink,
+				dtss: dtss,
 			};
 		},
-		getAllLinks(){
-			return this.graph.getCells().filter((ele)=>{
+		getAllLinks() {
+			return this.graph.getCells().filter((ele) => {
 				return ele.attributes.type.includes('Link');
-			});   
-		}
+			});
+		},
 	},
 };
 </script>
 
-<style></style>
+<style>
+.record-item-icon{
+	width: 13px;
+	height: 13px;
+	margin-right: 2px;
+}
+</style>

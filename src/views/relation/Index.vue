@@ -9,7 +9,7 @@
             :tableContextMenu="tableContextMenu"
 			:customAPIResult="customAPIResult"
             :useDefaultContext="false"
-            @after-open-add-panel="addDataset"
+			@on-add-item-clicked="goToCreatePage"
         >
         </ListItems>
     </div>
@@ -87,9 +87,9 @@ export default {
 		this.tableHeight = util.getComponentSize(this).h;
     },
     methods: {
-		addDataset(){
-			
-		}
+		goToCreatePage(){
+            this.$goToPage('/relation/add',this.$t("orgchart.create.title"));
+		}	
 	}
 };
 </script>

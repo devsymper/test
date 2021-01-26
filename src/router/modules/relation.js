@@ -6,6 +6,12 @@ export default [
 			import ('@/views/relation/EditRelation.vue'),
 	},
 	{
+		path: "/relation/add",
+		name: "addRelation",
+		component: () =>
+			import ('@/views/relation/AddRelation.vue'),
+	},
+	{
 		path: "/relation/:id/view",
 		name: "viewRelation",
 		component: () =>

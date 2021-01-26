@@ -12,12 +12,12 @@ onmessage = function (event) {
 };
 
 let relaventIcon = {
-	number:'image/relations/number.svg',
-	text:'image/relations/text.svg',
-	time:'image/relations/time.svg',
-	date:'image/relations/date.svg',
-	datetime:'image/relations/datetime.svg',
-	table:'image/relations/table.svg'
+	number:'img/relation/number.svg',
+	text:'img/relation/text.svg',
+	time:'img/relation/time.svg',
+	date:'img/relation/date.svg',
+	datetime:'img/relation/datetime.svg',
+	table:'img/relation/table.svg'
 };
 var handler = {
 	async getAllDataset(){
@@ -42,13 +42,13 @@ var handler = {
 	},
 	getRappidItems(dtsColumns,subDatasets){
 		let datasets = {};
-		for(let dtsId in dtsColumns ){
+		for(let dtsId in dtsColumns){
 			datasets[dtsId] = [];
 			for(let column of dtsColumns[dtsId]){
 				datasets[dtsId].push({
-					id:dtsId+'_'+column.name,
-					label:column.title?column.title:column.name,
-					icon:relaventIcon[column.type]
+					id: dtsId+'_'+column.name,
+					label: column.title?column.title:column.name,
+					icon: relaventIcon[column.type]
 				});
 			}
 		}
