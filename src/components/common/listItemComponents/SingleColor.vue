@@ -29,7 +29,8 @@
        </v-menu>
         </div>
      <TreeSqlConfig style="margin-left:-15px"
-        ref="treeConfig" 
+        ref="treeConfig"
+         :defaultData="treeConfigData" 
         :listColumn="tableColumnsForTree" 
      />
        
@@ -143,8 +144,12 @@ export default {
                 this.tableColumnsForTree[index-1].title=column.name;
             }
       });
-    //    if(this.value.originCondition){
-    //       this.$refs.treeConfig.treeData[0] = this.value.originCondition};
+      if(this.isUpdate){
+        let lastTree = [];
+        lastTree.push(this.value.originCondition);
+        this.treeConfigData = lastTree;
+      };
+  
   },
   props: {
       tableColumns:{
@@ -152,6 +157,9 @@ export default {
             default(){
                 return []
             }
+      },
+      isUpdate:{
+          type: Boolean,
       },
       value:{
           type:Object,
@@ -163,6 +171,7 @@ export default {
      data(){
         return {
             treeData:[],
+            treeConfigData:null,
             listOperators:[
                 {
                     name:'=',

@@ -69,7 +69,7 @@ export default {
   },
   data () {
     return {
-        update:true,
+        update:false,
         typeFormart:'add',
         data:{
             nameGroup:'',
@@ -121,6 +121,7 @@ export default {
                 }
             }
         },
+        dataUpdateIdx:0,
         dataOrigin:{ nameGroup:'',
             isSelected:false,
             tableColumns:[],
@@ -169,6 +170,7 @@ export default {
                     listColors:[]
                 }
             }},
+            
         listData:[]
     }
   },
@@ -178,30 +180,39 @@ export default {
   },
   methods: {
       changeToConfig(){
-          debugger
           this.typeFormart='config';
-          this.update = false;
+          this.update = false
       },
        changeToAdd(){
-        this.update = true;
         this.typeFormart='add';
-         this.data = this.dataOrigin
+        this.data = this.dataOrigin
         this.listData = this.conditionalFormat;
+        this.update = false
       },
       changeFormat(data){
           this.$emit('change-format',data);
           if(data.type == 'edit'){
-              debugger
+              this.update = true;
                 this.typeFormart = 'config';
                 this.data = this.listData[data.index];
+                this.dataUpdateIdx = data.index
+          }else{
+              this.update = false
           }
       },
        changeApply(data){
           this.$emit('change-apply',data);
+          this.update = false
       },
       save(){
-          this.listData.push(this.data)
-          this.$emit('save',this.listData);
+          if(!this.update){
+            this.listData.push(this.data)
+            
+          }else{
+              this.listData[this.dataUpdateIdx] = this.data
+          }
+         this.$emit('save',this.listData);
+        this.changeToAdd()
       },
       
   }
