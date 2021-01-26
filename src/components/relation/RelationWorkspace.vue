@@ -330,9 +330,8 @@ export default {
 				this
 			);
 		},
+		
 		addDataset(datasetData, items = [], pos = {}) {
-			console.log(datasetData, 'datasetDatadatasetDatadatasetData')
-			debugger
 			let dataset = new joint.shapes.mapping.Record({
 				items: [items],
 				id: datasetData.id,
@@ -407,7 +406,7 @@ export default {
 				this.removeDataset({ id: idDts });
 				this.addDataset(
 					{
-						id: idDts + 'symper',
+						id: idDts+":symper",
 						label: dtsLabel,
 					},
 					datasetColumns[idDts],

@@ -20,6 +20,13 @@ let relaventIcon = {
 	table:'img/relation/table.svg'
 };
 var handler = {
+	async saveRelations(data){
+		let res = await biApi.saveRelations(data)
+		self.postMessage({
+			action: 'handleSaveRelation',
+			data: res
+		})
+	},
 	getRandomStr(){
 		return (Math.random()*1e20).toString(36);
 	},
@@ -31,6 +38,7 @@ var handler = {
 		}
 		let res = await biApi.getRelationsConfigs(data.id)
 		let configData = res.data
+		debugger
 		obj.relationName = configData.relation.name
 		let datasets = configData.datasets;
 		obj.originDataset = datasets

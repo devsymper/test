@@ -19,7 +19,7 @@
 					mdi-pencil-box-outline
 				</v-icon>
 				<span class="fs-13 mt-2 ml-2 mr-8">
-					Tên relation
+					{{relationName}}
 				</span>
 				<!-- <v-text-field
 					solo
@@ -37,7 +37,7 @@
 					</v-tooltip>
 				</div>
 
-				<v-btn small class="mr-2 mt-1">
+				<v-btn small class="mr-2 mt-1" @click="saveRelations">
 					<v-icon small>
 						mdi-check
 					</v-icon>
@@ -93,7 +93,9 @@ export default {
 			},
 
 			selectingNode: null,
-			listDatasets: null
+			listDatasets: null,
+			selectedDatasetIds: null,
+			relationName: ""
 		};
 	},
 	components: {
@@ -107,7 +109,6 @@ export default {
         this.listenFromWorker();
 		this.getAllDataset()
 		if(this.action == 'edit'){
-			debugger
 			this.getRelationConfigs()
 		}
 	},	
@@ -128,10 +129,51 @@ export default {
 			this.relationEditoWorker.postMessage({action: 'getAllDataset'})
 		},
 		handleGetAllDataset(data){
+			let self = this
 			this.listDatasets = data.data.listObject
+			if(self.selectedDatasetIds && self.selectedDatasetIds.length > 0){
+				self.listDatasets.forEach(function(e){
+					if(self.selectedDatasetIds.includes(e.id)){
+						self.listDatasetSelected.push(e)
+					}
+				})
+			}	
+			
+		},
+		handleSaveRelation(data){
+			if(data.status == 200){
+				this.$snotifySuccess("Lưu thành công")
+			}else{
+				this.$snotifyError("Có lỗi xảy ra")
+			}
+		},
+		saveRelations(){
+			let info = this.$refs.relationWorkspace.getWorkspaceInfo()
+			info.dtss.forEach(function(e){
+				if(e.dataset.id.includes(":symper")){
+					let arr = e.dataset.id.split(":")
+					e.dataset.id = arr[0]
+				}
+			})
+			let data = {
+				links: info.links,
+				relation:{
+					name: this.relationName,
+					id: this.$route.params.id,
+					action: this.action
+				},
+				datasets: info.dtss
+			};
+			debugger
+			this.relationEditoWorker.postMessage({
+				action: 'saveRelations',
+				data: data
+			})
 		},
 		handleRelationConfig(data){
 			this.datasets = data.datasetsMap
+			this.selectedDatasetIds = data.selectedDatasetIds 
+			this.relationName = data.relationName
 			this.$refs.relationWorkspace.loadRelations(data.originDataset , data.items , data.links)
 		},	
 		listenFromWorker(){

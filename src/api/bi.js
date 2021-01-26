@@ -21,6 +21,9 @@ export const biApi = {
 	},
 	getRelationsConfigs(id){
 		return api.get('relations/' + id + '/get_configs/')
+	},
+	saveRelations(data){
+		return api.post('relations', data , {}, {contentType: 'application/json'})
 	}
 	
 };
