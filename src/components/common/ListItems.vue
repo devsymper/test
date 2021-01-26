@@ -1092,8 +1092,6 @@ export default {
                     break;
             };  
                 this.getData();
-           
-
         },
          disApplyConfigFormat(index){
             this.isNotiSuccess = false
@@ -1163,6 +1161,7 @@ export default {
            
         },
         deleteConfigFormat(index){
+            this.isNotiSuccess = false
             this.conditionIndex = index;
             this.typeDelete = 'formatTable';
             this.showDelPopUp = true;
@@ -1227,7 +1226,7 @@ export default {
             }else{
                 this.conditionalFormat = this.conditionalFormat.filter((c,i)=>i!=this.conditionIndex)
                  this.saveConditionalFormatting(this.conditionalFormat);
-                 this.reRender()
+                //  this.getData()
             }
             this.showDelPopUp=false;
         },
