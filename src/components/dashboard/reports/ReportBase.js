@@ -294,4 +294,17 @@ export default class ReportBase {
         }
         return canRun;
     }
+
+
+    /**
+     * Hàm chỉnh sửa data sau khi đã đi qua hàm translate của class, 
+     * có thêm hàm này do: hàm translate được chạy ở worker, 
+     * khi muốn set callback cho hành động nào đó mà cần ở trong option của thư viện thì cần phải set ở main process
+     * 
+     * ******** Lưu ý: ko lạm dụng hàm này để tính toán data, mà chỉ để set những thuộc tính mà worker ko thể truyền cho main process được ********
+     * @param {Object} translatedData data đã được translate ở hàm translate 
+     */
+    static editTranslatedData(translatedData){
+        return translatedData;
+    }
 }
