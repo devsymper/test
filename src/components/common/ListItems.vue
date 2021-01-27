@@ -891,7 +891,7 @@ export default {
 		let self = this;
         return {
             typeDelete:'',
-            isNotiSuccess:true,// có hoặc không hiển thị thông báo khi lưu thành công 
+            isNotiSuccess:false,// có hoặc không hiển thị thông báo khi lưu thành công 
             conditionalFormat:[],
             listSelectedCondition:[],//list cấu hình điều kiện được chọn
             listId:[],// chứa list Id của table
