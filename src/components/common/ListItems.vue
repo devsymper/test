@@ -372,6 +372,10 @@ window.tableDropdownClickHandle = function(el, event) {
 export default {
     name: "SymperListItem",
     props:{
+		flexMode:{
+			type: Boolean, 
+			default: false
+		},
 		/**
          * Mặc định context menu chứa các options: remove, view, edit
          */
@@ -676,9 +680,13 @@ export default {
 					self.handlerSaveTableDisplayConfigRes(data.dataAfter)
 					break;
                 case 'getTableColumns':
+					
 					data.dataAfter.forEach(function(e){
 						if(e.cellRenderer){
 							eval("e.cellRenderer = " + e.cellRenderer)
+						}
+						if(self.flexMode){
+							e.flex = 1
 						}
 					})
 					self.columnDefs = data.dataAfter
