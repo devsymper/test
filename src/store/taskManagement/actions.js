@@ -15,7 +15,7 @@ const getLogProjectAccess = async(context,userId) => {
                     },
                     {
                         "term": {
-                            "userId.keyword": userId
+                            "logUser": userId
                         }
                     }
                 ]  
@@ -31,6 +31,7 @@ const getLogProjectAccess = async(context,userId) => {
         "size":100
     }
     try {
+
         let res = await taskManagementApi.getDataLogService(data);
         if (res.status == 200) {
             context.commit('setListProjectRecentAccess', res.data);
@@ -101,7 +102,7 @@ const getLogIssueRecentAccess = async(context,userId) => {
                     },
                     {
                         "term": {
-                            "userAccess": userId
+                            "logUser": userId
                         }
                     }
                 ]  
@@ -266,7 +267,7 @@ const getAllRole = async(context,projectId) => {
         SYMPER_APP.$snotifyError(error, "Can not get all role!");
     }
 }
-const getListStautsInProject = async(context,projectId) => {
+const getListStatusInProject = async(context,projectId) => {
     return new Promise((resolve, reject) => {
         try {
             taskManagementApi.getListStatusInProject(projectId).then(res=>{
@@ -274,7 +275,7 @@ const getListStautsInProject = async(context,projectId) => {
                     let data={};
                     data.key = projectId;
                     data.data = res.data.listObject;
-                    context.commit('setListStautsInProject',data);
+                    context.commit('setListStatusInProject',data);
                     resolve(data);
                 } else {
                     SYMPER_APP.$snotifyError(error, "Can not get list status in project!");
@@ -489,7 +490,7 @@ export {
     getAllRole,
     getListWorkflowInProject,
     getAllPriority,
-    getListStautsInProject,
+    getListStatusInProject,
     getListColumnInBoard,
     getListStatusInColumnBoard,
     getListDocumentConfigFieldIssue,

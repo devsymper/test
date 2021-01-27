@@ -30,7 +30,8 @@
                     @click:row="handleClickRow"
                 >
                     <template v-slot:[`item.name`]="{ item }">
-                        <span class="name-title fs-13">{{item.name}}</span>
+                        <v-icon class="fs-16">mdi-shield-check-outline</v-icon>
+                        <span class="name-title fs-13 pl-2">{{item.name}}</span>
                     </template>
                     <template v-slot:[`item.status`]="{ item }">
                         <v-chip class="px-2" style="border-radius:4px" v-if="item.status == 0" color="#0760D9" text-color="white" x-small>{{$t('taskManagement.table.unreleased')}}</v-chip>
@@ -76,7 +77,7 @@
             <v-card-text>{{$t("taskManagement.dialog.removeVersion")}}</v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="red darken-1" text @click="removeVersion">Xóa</v-btn>
+                <v-btn color="red darken-1" :loading="loading" text @click="removeVersion">Xóa</v-btn>
                 <v-btn color="green darken-1" text @click="dialogRemoveVersion = false">Hủy</v-btn>
             </v-card-actions>
             </v-card>
@@ -90,6 +91,7 @@ import modalAddOrDetailVersion from "./ModalAddOrDetailVersion";
 import { util } from "@/plugins/util";
 import infoUser from "@/components/common/user/InfoUser";
 import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
+import VersionWorker from 'worker-loader!@/worker/taskManagement/version/Version.Worker.js';
 
 export default {
     name:"listVersion",
@@ -115,6 +117,8 @@ export default {
     },
     data(){
         return{
+            versionWorker:null,
+            loading:false,
             dataProgess:{
                 total:6,
                 item:{
@@ -214,20 +218,11 @@ export default {
             this.dialogRemoveVersion=true;
         },
         removeVersion(){
-            taskManagementApi
-                .removeVersion(this.versionSelected.id)
-                .then(res => {
-                    if (res.status == 200) {
-                        this.$snotifySuccess("Remove Version success!");
-                        this.$emit("add-Version");
-                    }else{
-                        this.$snotifyError("", "Error! Have error !!!");
-                    }
-                })
-                .catch(err => {
-                    this.$snotifyError("", "Error! Have error !!!", err);
-                });
-            this.dialogRemoveVersion=false;  
+            this.loading = true;
+            this.versionWorker.postMessage({
+                action:'removeVersion',
+                data:this.versionSelected.id
+            });
         },
      
         handleCreate(){
@@ -258,6 +253,25 @@ export default {
      
     },
     created(){
+        let self = this;
+        this.versionWorker = new VersionWorker();
+        this.versionWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'actionError':
+                    self.dialogRemoveVersion=false;
+                    self.loading=false;
+                    break;
+                case 'removeVersion':
+                    self.$snotifySuccess("Remove Version success!");
+                    self.$emit("add-version");
+                    self.dialogRemoveVersion = false;  
+                    self.loading = false;
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
 }

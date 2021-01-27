@@ -135,6 +135,7 @@
 <script>
 import FormTpl from "@/components/common/FormTpl.vue";
 import { taskManagementApi } from "@/api/taskManagement.js";
+import VersionWorker from 'worker-loader!@/worker/taskManagement/version/Version.Worker.js';
 
 export default {
     components:{
@@ -265,6 +266,7 @@ export default {
     },
     data(){
         return{
+            versionWorker:null,
             msgErrStartTime:'',
             msgErrEndTime:'',
             dateStart: "",
@@ -323,22 +325,14 @@ export default {
                     data.endTime=this.dateEnd;
                 }
                 data.projectId=projectId;
-                taskManagementApi
-                    .addVersionForProject(data)
-                    .then(res => {
-                        if (res.status == 200) {
-                            this.$emit("add-version");
-                            this.$snotifySuccess("Add version completed!");
-                            this.isShow=false;
-                        }else{
-                            this.$snotifyError("", "Can not add version!");
-                        }
-                    })
-                    .catch(err => {
-                        this.$snotifyError("", "Can not add version!", err);
-                    });
+                // đẩy xuống worker xử lý
+                this.versionWorker.postMessage({
+                    action:'handleAddVersion',
+                    data:data
+                });
+            }else{
+                this.isLoadingAdd=false;
             }
-            this.isLoadingAdd=false;
         },
         handleUpdateVersion(){
             this.isLoadingAdd = true;
@@ -354,24 +348,15 @@ export default {
                 if (this.dateEnd) {
                     data.endTime=this.dateEnd;
                 }
-                taskManagementApi
-                    .updateVersionForProject(this.infoVersion.id,data)
-                    .then(res => {
-                        if (res.status == 200) {
-                            this.$snotifySuccess("Update version success!");
-                            this.$emit("add-version"); // emit sự kiện để reload data
-                            this.isShow=false;
-                        }else{
-                            this.$snotifyError("", "Can not update version!");
-                        }
-                    })
-                    .catch(err => {
-                        this.$snotifyError("", "Can not update version!", err);
-                    });
+                // đẩy xuống worker xử lý
+                this.versionWorker.postMessage({
+                    action:'handleUpdateVersion',
+                    data:{id:this.infoVersion.id,data:data}
+                });
             }else{
                 this.$snotifyError("", "Have error!");
+                this.isLoadingAdd=false;
             }
-            this.isLoadingAdd=false;
         },
         show(){
             this.isShow=true;
@@ -391,7 +376,30 @@ export default {
         },
     },
     created(){
-   
+        let self = this;
+        this.versionWorker = new VersionWorker();
+        this.versionWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'actionError':
+                    self.isShow=false;
+                    self.isLoadingAdd=false;
+                case 'handleUpdateVersion':
+                    self.$snotifySuccess("Update version success!");
+                    self.$emit("add-version"); // emit sự kiện để reload data
+                    self.isShow=false;
+                    self.isLoadingAdd=false;
+                    break;
+                case 'handleAddVersion':
+                    self.$emit("add-version");
+                    self.$snotifySuccess("Add version completed!");
+                    self.isShow=false;
+                    self.isLoadingAdd=false;
+                    break;
+                default:
+                    break;
+            }
+        });
     }
     
 }

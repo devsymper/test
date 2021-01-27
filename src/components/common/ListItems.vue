@@ -1,5 +1,5 @@
 <template>
-     <div :style="{width:contentWidth}" class="h-100 w-100 d-flex flex-column p-2">
+     <div :style="{width:contentWidth}" class="symper-list-items h-100 w-100 d-flex flex-column p-2">
 		 <div v-if="showToolbar" class="d-flex mb-2 " ref="topBar">
 			<div 
 			 	class="align-items-center flex-grow-1" 
@@ -93,17 +93,6 @@
                             <v-icon left dark>mdi-database-import</v-icon>
                             <span>{{$t('common.import_excel_history')}}</span>
                         </v-btn>
-                        <v-btn
-                            depressed
-                            small
-							icon
-							tile
-                            @click="handleCloseClick"
-                            class="mr-2"
-                            v-if="dialogMode"
-                        >
-                            <v-icon dark>mdi-close</v-icon>
-                        </v-btn>
                          <v-menu
                             bottom
                             left
@@ -167,7 +156,7 @@
                             <slot name="extra-button"></slot>
                         </component>
                         <!-- filter button -->
-                        <v-menu offset-y nudge-bottom='8' :close-on-click="false" :close-on-content-click="true" >
+                            <v-menu offset-y nudge-bottom='8' :max-width="210" :min-width="210" :close-on-click="false" >
                             <template v-slot:activator="{ on:menu }">
                                 <v-tooltip top>
                                     <template v-slot:activator="{ on:tooltip }">
@@ -178,7 +167,7 @@
                                             v-if="showFilter"
                                             class="mr-2"
                                             v-on="{ ...tooltip, ...menu }">
-                                            <v-icon   left dark class="ml-1 mr-0" :style="{color:selectedFilterName?'#FF8C00!important':'black'}">mdi-filter</v-icon>
+                                            <v-icon left dark class="mr-0" :style="{color:selectedFilterName?'#FF8C00!important':'black'}">mdi-filter</v-icon>
                                             <span style="color:#FF8C00!important;" >{{selectedFilterName}}</span>
                                             <div v-if="closeBtnFilter"  class="ml-2" style="border-right:1px solid #E0E0E0; height:27px"></div>
                                             <v-icon v-if="closeBtnFilter" class="ml-2" style="font-size:14px" @click="hideCloseBtnFilter()">mdi-close</v-icon>
@@ -188,50 +177,11 @@
                                     <span>{{ $t('common.filter')}}</span>
                                 </v-tooltip>
                             </template>
-                            <v-list dense class="px-2"  :style="{display:isClose?'block':'none'}">
-                                <v-list-item dense class=" filter-menu fs-13" v-for="(item,key) in filter" :key="key">
-                                    <!--  -->
-                                    <v-list-item-content @click="setTable(key)" dense style="margin-left:-29px!important">
-                                        <v-list-item-title class="col-md-10 fw-400" style="margin-top:-5px">
-                                            <span class="ml-2" >{{item.name}}</span>
-                                        </v-list-item-title>
-                                        <v-list-item-subtitle  class="fw-400 ml-5" style="font-size:9px!important;margin-top:-19px">
-                                            <span :style="{opacity:item.isDefault?1:0}">Mặc định</span>
-                                        </v-list-item-subtitle>
-                                    </v-list-item-content>
-                                     <v-list-item-icon class="show-icon col-md-2" style="margin-right:-20px">
-                                            <v-menu offset-y nudge-left='343' nudge-top="28" >
-                                                    <template v-slot:activator="{ on:config }">
-                                                        <i class="mdi mdi-cog-outline config-filter-icon mr-1" v-on="{ ...config}"></i>
-                                                    </template>
-                                                    <v-list dense >
-                                                        <v-list-item  v-if="!item.isDefault" class="action-filter" @click="selectActionFilter(2,key)">
-                                                            <v-icon  class=" mr-1 " style="font-size:14px!important">mdi-check-box-multiple-outline</v-icon>
-                                                            <span class="fs-13"> 
-                                                                {{$t('table.filter.Default')}}
-                                                            </span>
-                                                        </v-list-item>
-                                                        <v-list-item v-else class="action-filter" @click="selectActionFilter(3,key)">
-                                                            <v-icon  class=" mr-1 " style="font-size:14px!important">mdi-check-box-multiple-outline</v-icon>
-                                                            <span class="fs-13"> 
-                                                                {{$t('table.filter.Delete Default')}}
-                                                            </span>
-                                                        </v-list-item>
-                                                        <v-list-item class="action-filter" v-for="(action,keyAction) in actionFilter" :key="keyAction" @click="selectActionFilter(keyAction,key)">
-                                                            <v-icon  class=" mr-1 " style="font-size:14px!important">{{action.icon}}</v-icon>
-                                                            <span class="fs-13"> 
-                                                                {{$t('table.filter.'+action.content)}}
-                                                            </span>
-                                                        </v-list-item>
-                                                    </v-list>
-                                            </v-menu>
-                                        </v-list-item-icon>
-                                </v-list-item>
-                                <v-list-item  class="w-100 fs-13 add-filter" @click="addFilter= true"> 
-                                    <i style="margin-left:-12px" class="mdi mdi-plus mr-1 color-green"></i>
-                                    <span class="color-green"> Thêm bộ lọc</span>
-                                </v-list-item>
-                            </v-list>
+                            <config-filter 
+                                @set-table="setTable"
+                                @config-filter-action="configFilterAction"
+                                @add-filter-config="addFilterConfig"
+                                :filter="listFilters"/>
                         </v-menu>
                         <!-- filter button -->
                         <v-tooltip top>
@@ -240,7 +190,7 @@
                                     @click="openTableDisplayConfigPanel"
                                     depressed
                                     small
-									v-if="!dialogMode"
+									v-if="!dialogMode && showDisplayConfig"
                                     v-on="on"
                                 >
                                     <v-icon left dark class="ml-1 mr-0 ">mdi-table-cog</v-icon>
@@ -263,27 +213,24 @@
                             </template>
                             <span>{{alwaysShowActionPanel ? $t('common.not_always_show_sidebar') : $t('common.always_show_sidebar')}}</span>
                         </v-tooltip>
+
+						<span v-if="Object.keys(customHeaderBtn).length > 0">
+							 <v-btn
+								depressed
+								small
+								v-for="(item, i) in customHeaderBtn"
+								:key="i"
+								@click="customBtnClick(i)"
+								class="mr-2"
+							>
+								<v-icon left dark v-if="item.icon">{{item.icon}}</v-icon>
+								<span v-if="item.title"> {{item.title}} </span>
+							</v-btn>
+						</span>
 			 </div>
 		 </div>
          <!-- add filter -->
-         <v-row v-if="addFilter" class="w-100" style="background:rgb(230, 229, 229)">
-             <v-col class="col-md-11" style="margin-top:-5px;margin-bottom:-8px">
-                  <span class="ml-1 fs-13">Tên bộ lọc</span>
-                    <v-text-field
-                        class="d-inline-block ml-2 sym-small-size"
-                        single-line
-                        v-model="filterName"
-                        style="background:white"
-                        v-if="showSearchBox"
-                        outlined
-                        dense
-                    ></v-text-field>
-             </v-col>
-            <v-col class="col-md-1" style="margin-top:-5px; margin-bottom:-8px">
-                <span class="mdi mdi-check color-green mx-6" @click="saveFilter()"></span>
-                <span class="mdi mdi-close" @click="addFilter=false"></span>
-            </v-col>
-        </v-row>
+         <add-filter v-if="addFilter" :filterName="filterName" @add-filter="handleAddFilter"/>
          <!-- add filter -->
 		 <div
 		 	:class="{
@@ -309,11 +256,11 @@
                 @columnResized="columnResized()"
 				@rowClicked="handlerRowClicked"
 				:rowData="rowData"
-                :rowSelection="rowSelection"
 				:frameworkComponents="frameworkComponents"
 				:overlayLoadingTemplate="overlayLoadingTemplate"
 				:overlayNoRowsTemplate="overlayNoRowsTemplate"
-				:modules="modules"
+				@cell-context-menu="cellContextMenu"
+                @cell-mouse-down="cellMouseDown"
 				@selection-changed="onSelectionChanged"
 				@cell-mouse-over="cellMouseOver"
 				@grid-ready="onGridReady"
@@ -321,10 +268,15 @@
 			</ag-grid-vue>
 			 <display-config
 				ref="tableDisplayConfig"
+                @change-format="changeFormat"
+                @change-apply="applyConditionFormat"
+                @save-conditional-formatting="saveConditionalFormatting"
 				@drag-columns-stopped="handleStopDragColumn"
 				@change-colmn-display-config="configColumnDisplay"
 				@save-list-display-config="saveTableDisplayConfig"
 				@re-render="reRender"
+                :rowData="rowData"
+                :conditionalFormat="conditionalFormat"
 				:tableDisplayConfig="tableDisplayConfig"
 				:tableColumns="columnDefs"
 				:headerPrefixKeypath="headerPrefixKeypath"
@@ -404,10 +356,10 @@
         </v-dialog>
         <SymperDialogConfirm 
             @confirm="confirmDeleteFilter()"
-            @cancel="showDelFilterPopUp=false"
-            :title="'Xóa bộ lọc'" 
-            :content="filterContent" 
-            :showDialog="showDelFilterPopUp"
+            @cancel="showDelPopUp=false"
+            :title="'Xóa'" 
+            :content="contentDelete" 
+            :showDialog="showDelPopUp"
         />
 	 </div>
 </template>
@@ -433,8 +385,12 @@ import ListItemsWorker from 'worker-loader!@/worker/common/listItems/ListItems.W
 import { actionHelper } from "@/action/actionHelper";
 import CheckBoxRenderer from "@/components/common/agDataTable/CheckBoxRenderer"
 import SymperDialogConfirm from "@/components/common/SymperDialogConfirm"
-
+import ConfigFilter from "./ListItemConfigFilter"
+import 'ag-grid-enterprise';
+import AddFilter from "./ListItemAddFilter"
+import CheckBoxRendererListItems from "@/components/common/agDataTable/CheckBoxRendererListItems"
 let CustomHeaderVue = Vue.extend(CustomHeader);
+import  {ClipboardModule} from '@ag-grid-enterprise/clipboard';
 
 var testSelectData = [ ];
 window.tableDropdownClickHandle = function(el, event) {
@@ -458,6 +414,21 @@ export default {
             type: Boolean,
             default: false
         },
+        /**
+		 * Custom thêm các action trong header show list 
+		 */
+		customHeaderBtn:{
+			type: Object,
+			default(){
+				return {}
+			}
+		},
+		checkedRows:{
+			type: Array,
+			default(){
+				return []
+			}
+		},
 		/**
 		 * Truyeenf vao row height
 		 * 
@@ -465,7 +436,24 @@ export default {
 		rowHeight:{
 			type: Number,
 			default:21
-		},
+        },
+        showDisplayConfig:{
+            type:Boolean,
+            default: true
+        },
+         flexMode: {
+            type: Boolean,
+            default: false
+        },
+         /**
+         * flexColumns : true of false, nếu đúng thì colmn sẽ có thêm thược tính flex đê full màn hinh
+         * dev created : dungna
+         * 
+         */
+        flexColumns:{
+            type: Boolean,
+            default: false
+        },
 		/**
          * * Các contextmenu cho các item trong list, có dạng:
          * [
@@ -683,22 +671,30 @@ export default {
 		
 	},
 	created(){
-		let self = this
+        this.listItemsWorker = new ListItemsWorker()
+		this.restoreTableDisplayConfig();
+        let self = this;
 		this.$evtBus.$on('list-items-ag-grid-on-change-checkbox',data=>{
+            self.$set(data.data, 'checked', true)
 			if(!self.allRowChecked.includes(data.data)){
 				self.allRowChecked.push(data.data)
 			}else{
+                data.checked = false
 				self.allRowChecked.splice(self.allRowChecked.indexOf(data.data), 1)
 			}
 			self.$emit('after-selected-row',self.allRowChecked)
         })
-		this.listItemsWorker = new ListItemsWorker()
+        
+      
+        
         this.listItemsWorker.addEventListener("message", function (event) {
 			let data = event.data;
             switch (data.action) {
                 case 'getData':
-					
-					self.handlerGetData(data.dataAfter)
+                    self.handlerGetData(data.dataAfter)
+					break;
+                case 'customGetData':
+					self.handleCustomGetData(data.dataAfter)
 					break;
                 case 'getItemForValueFilter':
 					self.tableFilter.currentColumn.colFilter.selectItems = data.dataAfter.selectItems
@@ -713,36 +709,40 @@ export default {
 					self.handlerSaveTableDisplayConfigRes(data.dataAfter)
                     break;
                 case 'saveFilter':
-                    self.handlerSaveFilter(data.dataAfter)
+                    if(self.isNotiSuccess){
+                        self.handlerSaveFilter(data.dataAfter, true)
+                    }else{
+                        self.handlerSaveFilter(data.dataAfter, false)
+                    }
                 break;
                 case 'saveWidthColumns':
-                    self.handlerSaveWidthColumns(data.dataAfter)
+                    self.handlerSaveWidthColumns(data.dataAfter, true)
                 case 'getTableColumns':
 					data.dataAfter.forEach(function(e){
+                         if(self.flexColumns){
+                            e.flex = 1
+                        }
 						if(e.cellRenderer){
 							eval("e.cellRenderer = " + e.cellRenderer)
 						}
+						if(e.cellStyle){
+							eval("e.cellStyle = " + e.cellStyle)
+						}
                     })
-                    debugger
-                    self.columnDefs = data.dataAfter
-                    self.columnDefs.map(column=>{
-                    self.widthColumns.map(c=>{
-                        if(c){
-                             if(column.field==c.colId){
-                             column.width=c.width
-                         }
+                    self.columnDefs = data.dataAfter;
+                    if(self.conditionalFormat&&self.conditionalFormat.length>0){
+                        if(self.listSelectedCondition.length==0){
+                            self.listSelectedCondition = self.getListSelectedConditionFormat();
                         }
-                        
-                    })
-                   
-                })
+                        self.columnDefs = self.handleConditionalFormat(data.dataAfter);
+                    
+                    }
 					break;
                 default:
                     break;
             }
-		});
-		this.getData()
-		this.restoreTableDisplayConfig();
+        });
+        this.getData();
         // this.getDefaultFilter();
 	},
 	computed:{
@@ -771,6 +771,7 @@ export default {
                 return "100%";
             }
 		},
+		
 		tableHeight() {
 			let ref = this.$refs;
 			let tbHeight = this.containerHeight;
@@ -800,6 +801,15 @@ export default {
             }else{
 				this.showSearchBox = true
 			}
+        },
+        checkedRows:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				if(arr.length > 0){
+					this.allRowChecked = arr
+				}
+			}
 		},
 		rowData:{
 			deep: true,
@@ -812,11 +822,9 @@ export default {
         },
         
 		columnDefs:{
-           
 			deep: true,
 			immediate: true,
 			handler(arr){
-               debugger
 				let self = this
 				if(arr.length > 0){
 					arr.forEach(function(e){
@@ -834,6 +842,13 @@ export default {
 		'tableDisplayConfig.show'(value){
 			if(value = false){
 				this.agApi.sizeColumnsToFit()
+			}
+		},
+		tableContextMenu:{
+			deep: true,
+			immediate: true,
+			handler(arr){
+				this.relistContextmenu();
 			}
 		},
         'tableDisplayConfig.value.alwaysShowSidebar'(value) {
@@ -867,22 +882,23 @@ export default {
     data(){
 		let self = this;
         return {
+            typeDelete:'',
+            isNotiSuccess:true,// có hoặc không hiển thị thông báo khi lưu thành công 
+            conditionalFormat:[],
+            listSelectedCondition:[],//list cấu hình điều kiện được chọn
+            listId:[],// chứa list Id của table
+			gridApi: null,
             closeBtnFilter:false,
             isUpdateFilter:false,
-            filter:[],
             widthColumns:[],
             isClose:true,
+            listFilters:[],
             notiFilter:'',
+            conditionIndex :-1,
             deleteFilterIdx:0,
+            contentDelete:"",
+            showDelPopUp:false,
             filterContent:"",
-            showDelFilterPopUp:false,
-            actionFilter:[
-                // {icon:'mdi-check-box-multiple-outline',content:"Delete Default"},
-                // {icon:'mdi-check-box-multiple-outline',content:"Default"},
-                {icon:'mdi-lead-pencil',content:"Edit"},
-                {icon:'mdi mdi-close',content:"Delete"},
-            ],
-            gridApi: null,
             selectedFilterName:'',
 			listItemsWorker: null,
 			deleteDialogShow: false,
@@ -890,7 +906,7 @@ export default {
             filterMenu:false,
             addFilter:false,
             filterName:'',
-            savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lueu trong db
+            savedTableDisplayConfig: [], // cấu hình hiển thị của table đã được lưu trong db
 			showSearchBox: true,
             loadingRefresh: false, // có đang chạy refresh dữ liệu hay ko
             loadingExportExcel: false, // có đang chạy export hay ko
@@ -908,7 +924,6 @@ export default {
 			fixedCols:[],
 			defaultColDef:null,
 			arrContextMenu: [],
-			rowSelection: null,
 			selectedContextItem: null,
 			getContextMenuItems(param){
 				self.paramOnContextMenu = param;
@@ -916,7 +931,7 @@ export default {
 			},
 			searchKey: "",
 			modules:[
-				MenuModule
+				MenuModule,
 			],
 			MedalCellRenderer(){
 			},	
@@ -963,12 +978,15 @@ export default {
 		AgGridVue,
         Pagination,
         SymperDialogConfirm,
-		DisplayConfig,
+        DisplayConfig,
+        "add-filter":AddFilter,
+        "config-filter" : ConfigFilter,
 		"symper-drag-panel": SymperDragPanel,
 		VNavigationDrawer,
 		VDialog,
 		TableFilter,
-		CheckBoxRenderer
+        CheckBoxRenderer,
+        CheckBoxRendererListItems
 
 	},
 	mounted(){
@@ -978,7 +996,7 @@ export default {
     beforeMount(){
 		this.defaultColDef = {
             minWidth: 40,
-			filter: true,
+            filter: true,
 			suppressMenu : true,
 			sortable: true,
 			resizable: true,
@@ -986,26 +1004,179 @@ export default {
 			autoHeight: true,
 			headerComponentParams :{
 				headerPrefixKeypath: this.headerPrefixKeypath
-			}
+            },
+            
         };
-		this.gridOptions = {};
-		// this.gridOptions.rowHeight =  this.rowHeight
-		this.gridOptions.getRowStyle = function(params) {
-			if (params.node.rowIndex % 2 != 0) {
-				return { background: '#fbfbfb' };
-			}
-		}
+		this.gridOptions = {
+			enableRangeSelection: true,
+			// rowSelection: 'multiple',
+			onCellKeyDown: this.onCellKeyPress,
+			getRowStyle: function(params) {
+				if (params.node.rowIndex % 2 != 0) {
+					return { background: '#fbfbfb' };
+				}
+			},
+			suppressCopyRowsToClipboard: true,
+			modules:[ClipboardModule]
+		},
 		this.frameworkComponents = {
 			agColumnHeader: CustomHeaderVue,
-			CheckBoxRenderer: CheckBoxRenderer
+			CheckBoxRendererListitems: CheckBoxRendererListItems
 		};
 		this.overlayLoadingTemplate =
 		  '<span class="ag-overlay-loading-center">Đang tải dữ liệu vui lòng chờ </span>';
 		this.overlayNoRowsTemplate =
       	'<span style="padding: 10px; border: 2px solid #444; background: lightgoldenrodyellow;">Không có dữ liệu</span>';
-		this.rowSelection = 'single';
     },
 	methods:{
+        // lấy ra danh sách cấu hình format được chọn
+        getListSelectedConditionFormat(){
+            let result = [];
+            this.conditionalFormat.map((data,index)=>{
+                if(data.isSelected){
+                    result.push(index)
+                }
+            })
+            return result;
+        },
+		customBtnClick(i){
+			this.customHeaderBtn[i].callback()
+		},
+        handleAddFilter(data){
+            if(data.type=='save'){
+                this.filterName = data.filterName
+                this.saveFilter()
+            }else{
+                this.addFilter = false;
+            }
+        },
+        configFilterAction(data){
+            let type = data.type;
+              switch(type){
+                case 'setDefaultFilter':
+                    this.setDefaultFilter(data.filterIdx);
+                    break;
+                case 'unsetDefaultFilter':
+                    this.unsetDefaultFilter(data.filterIdx);
+                    break;
+                case 'editFilter':
+                    this.editFilter(data.filterIdx)
+                    break;
+                case 'deleteFilter':
+                    this.typeDelete="filter";
+                    this.deleteFilter(data.filterIdx)
+                    break;
+              }
+        },
+        setSelectedConditional(index, check = true){
+            this.conditionalFormat.map((condition,i)=>{
+                if(i==index){
+                    condition.isSelected = check
+                }
+            })
+        },
+        applyConditionFormat(listSelectedCondition){
+            // this.applyConfigFormat(listSelectedCondition);
+            this.isNotiSuccess = false;
+            this.listSelectedCondition.map(data=>{
+                this.setSelectedConditional(data)
+
+            });
+            this.listSelectedCondition = listSelectedCondition;
+            this.saveConditionalFormatting(this.conditionalFormat);
+            this.getData();
+        },
+        changeFormat(data){
+            switch(data.type){
+                case 'view':
+                    break;
+                case 'edit':
+                    this.editConfigFormat(data.index);
+                    break
+                case 'delete':
+                    this.deleteConfigFormat(data.index);
+                    break
+                case 'disApply':
+                    this.disApplyConfigFormat(data.index);
+                    break;
+            };  
+                this.getData();
+        },
+         disApplyConfigFormat(index){
+            this.isNotiSuccess = false
+            let listSelectedCondition = [];
+            this.listSelectedCondition.map(data=>{
+                 if(data!=index){
+                     listSelectedCondition.push(data)
+                 }else{ 
+                    this.setSelectedConditional(data, false)
+                 }
+            });
+            this.saveConditionalFormatting(this.conditionalFormat);
+             this.listSelectedCondition = listSelectedCondition;
+            //  this.getData();
+         },
+  
+        handleConditionalFormat(data){
+            const self = this;
+                data.map(column=>{
+                    column.cellStyle = function(e){
+                        let allColor = {}
+                         self.listSelectedCondition.map(conditionalIdx=>{
+                             let dataFormat = self.conditionalFormat[conditionalIdx];
+                                if(eval(dataFormat.tableColumnsJS)&&self.conditionalFormat){// những cột được set màu
+                                    if(dataFormat.displayMode.type=="singleColor"){// nếu là kiểu màu đơn
+                                        let conditionalFormat = dataFormat.displayMode.singleColor.conditionFormat;
+                                        if(eval(conditionalFormat)){
+                                            allColor = {color: dataFormat.displayMode.singleColor.fontColor, backgroundColor:dataFormat.displayMode.singleColor.backgroundColor}
+                                        }
+                                    }
+                                    else{// nếu thang màu
+                                        let field = dataFormat.displayMode.colorScale.applyColumn.field;
+                                        let valueTable = e.data[field];
+                                        let listColors = dataFormat.displayMode.colorScale.listColors;
+                                        let color = '';
+                                        listColors.map(v=>{
+                                            if(v.name==valueTable){
+                                                color = v.backgroundColor
+                                            }
+                                        })
+                                            allColor = {backgroundColor:color}
+                                    }
+                                }
+                         })
+                        return allColor
+                    }
+                })
+            return data;
+        },
+        // applyConfigFormat(index){
+        //     this.conditionIndex = index;
+        // },
+        editConfigFormat(index){
+            this.conditionIndex = index;
+        },
+          // lưu cấu hình formatting Table
+        saveConditionalFormatting(data){
+            let tableConfig =  this.getTableDisplayConfigData();
+            tableConfig.detail = JSON.parse(tableConfig.detail);
+            tableConfig.detail.filter = this.listFilters;
+            tableConfig.detail.conditionalFormat = data;
+            tableConfig.detail= JSON.stringify(tableConfig.detail);
+              this.listItemsWorker.postMessage({
+                action: 'saveFilter',
+                data: tableConfig
+			})
+           
+        },
+        deleteConfigFormat(index){
+            this.isNotiSuccess = false
+            this.conditionIndex = index;
+            this.typeDelete = 'formatTable';
+            this.showDelPopUp = true;
+            this.contentDelete =" Xóa định dạng "+this.conditionalFormat[index].nameGroup+" khỏi danh sách các định dạng";
+            
+        },
         hideCloseBtnFilter(){
             this.selectedFilterName = '';
             this.closeBtnFilter = false;
@@ -1017,6 +1188,7 @@ export default {
 
         },
         columnResized(){
+            debugger
             this.widthColumns=[];
             this.gridOptions.columnApi.columnController.allDisplayedColumns.map(column=>{
                 this.widthColumns.push({
@@ -1024,16 +1196,10 @@ export default {
                     width: column.actualWidth
                 })
             })
-            let test = this.widthColumns
             let tableConfig =  this.getTableDisplayConfigData();
             tableConfig.detail = JSON.parse(tableConfig.detail);
-            tableConfig.detail.filter = this.filter;
-            debugger
-            this.filter.map(fil=>{
-                if(fil.name==this.selectedFilterName){
-                    fil.widthColumns= this.widthColumns;
-                }
-            })
+            tableConfig.detail.filter = this.listFilters;
+            tableConfig.detail.widthColumns = this.widthColumns;
             tableConfig.detail= JSON.stringify(tableConfig.detail);
             this.listItemsWorker.postMessage({
                 action: 'saveWidthColumns',
@@ -1041,27 +1207,13 @@ export default {
 			})
             
         },
-        selectActionFilter(actionIdx,filterIdx){
-            switch(actionIdx){
-                case 2:
-                    this.setDefaultFilter(filterIdx);
-                    break;
-                case 3:
-                    this.unsetDefaultFilter(filterIdx);
-                    break;
-                case 0:
-                    this.editFilter(filterIdx)
-                    break;
-                case 1:
-                    this.deleteFilter(filterIdx)
-                break;
-            }
-        },
+    
         getDefaultFilter(){
-            if(this.filter.length>0){
-                this.filter.map((fil,i)=>{
+            if(this.listFilters&&this.listFilters.length>0){
+                this.listFilters.map((fil,i)=>{
                     if(fil.isDefault){
-                        this.selectedFilterName = fil.name
+                        this.selectedFilterName = fil.name;
+                        this.closeBtnFilter = true;
                         this.tableFilter.allColumn = fil.columns;
                         this.getData();
                         this.closeBtnFilter = true;
@@ -1070,57 +1222,67 @@ export default {
             }
         },
         setDefaultFilter(filterIdx){
-            this.filter[filterIdx].isDefault= true;
-            this.filter.map((fil,i)=>{
+            this.listFilters[filterIdx].isDefault= true;
+            this.listFilters.map((fil,i)=>{
                 if(i!==filterIdx){
                     fil.isDefault=false;
                 }
             })
             this.sendFilterWorker();
-            this.notiFilter = this.$t("table.success.save_filter");
+            this.notiFiltert("table.success.save_filter");
         },
         unsetDefaultFilter(filterIdx){
-            this.filter[filterIdx].isDefault= false;
+            this.listFilters[filterIdx].isDefault= false;
             this.sendFilterWorker();
             this.notiFilter = this.$t("table.success.save_filter");
         },
         editFilter(filterIdx){
             this.addFilter = true;
-            this.filterName = this.filter[filterIdx].name;
+            this.filterName = this.listFilters[filterIdx].name;
             this.isUpdateFilter= true;
             this.filterIdx = filterIdx;
         },
         
         deleteFilter(filterIdx){
-            this.showDelFilterPopUp = true;
-            this.filterContent =" Xóa bộ lọc "+this.filter[filterIdx].name+" khỏi danh sách các bộ lọc";
+            this.isNotiSuccess = false
+            this.showDelPopUp = true;
+            this.contentDelete =" Xóa bộ lọc "+this.listFilters[filterIdx].name+" khỏi danh sách các bộ lọc";
             this.deleteFilterIdx = filterIdx;
         },
         confirmDeleteFilter(){
-            let filter = this.filter.filter((item,idx)=>idx!=this.deleteFilterIdx);
-            this.filter = filter;
-            this.sendFilterWorker();
-            this.notiFilter = this.$t("table.success.delete_filter");
-            this.showDelFilterPopUp=false;
+            if(this.typeDelete=='filter'){
+                let filter = this.listFilters.filter((item,idx)=>idx!=this.deleteFilterIdx);
+                this.listFilters = filter;
+                this.sendFilterWorker();
+                this.notiFilter = this.$t("table.success.delete_filter");
+            }else{
+                this.conditionalFormat = this.conditionalFormat.filter((c,i)=>i!=this.conditionIndex)
+                 this.saveConditionalFormatting(this.conditionalFormat);
+                //  this.getData()
+            }
+            this.showDelPopUp=false;
         },
-        setTable(filterIdx){
+       setTable(filterIdx){
             this.closeBtnFilter = true;
-            this.selectedFilterName = this.filter[filterIdx].name;
-            let filter = this.filter;
-            this.tableFilter.allColumn = this.filter[filterIdx].columns;
+            this.selectedFilterName = this.listFilters[filterIdx].name;
+            let filter = this.listFilters;
+            this.tableFilter.allColumn = this.listFilters[filterIdx].columns;
             this.getData()
+        },
+        addFilterConfig(){
+            this.addFilter = true;
         },
         saveFilter(){
             if(!this.isUpdateFilter){
-                this.filter.push({
+                this.listFilters.push({
                     name:this.filterName,
                     isDefault: false,
                     columns:this.tableFilter.allColumn
                 })
                 this.notiFilter = this.$t("table.success.save_filter");
             }else{
-                this.filter[this.filterIdx].name = this.filterName;
-                this.filter[this.filterIdx].columns = this.tableFilter.allColumn;
+                this.listFilters[this.filterIdx].name = this.filterName;
+                this.listFilters[this.filterIdx].columns = this.tableFilter.allColumn;
                 this.notiFilter = this.$t("table.success.edit_filter");
             }
             this.sendFilterWorker()
@@ -1128,12 +1290,13 @@ export default {
         sendFilterWorker(){
             let tableConfig =  this.getTableDisplayConfigData();
             tableConfig.detail = JSON.parse(tableConfig.detail);
-            tableConfig.detail.filter = this.filter;
+            tableConfig.detail.filter = this.listFilters;
+            tableConfig.detail.conditionalFormat = this.conditionalFormat;
             tableConfig.detail= JSON.stringify(tableConfig.detail);
             this.listItemsWorker.postMessage({
                 action: 'saveFilter',
                 data: tableConfig
-			})
+            })
         },
 		getAllData(){
 			return this.rowData
@@ -1160,7 +1323,30 @@ export default {
 		hideOverlay() {
 			this.agApi.hideOverlay();
 		},
-		
+		cellContextMenu(params){
+			this.changeSelectionRow()
+			this.$emit('cell-context-menu', params)
+        },
+        cellMouseDown(params){
+			this.$emit('after-cell-mouse-down', params)
+		},
+		changeSelectionRow(){
+			let arr = document.getElementsByClassName('ag-row-selected')
+			for(let i = 0; i < arr.length ; i++){
+				$(arr[i]).removeClass('ag-row-selected')
+			}
+			if(arr.length > 0){
+				for(let i = 0; i < arr.length ; i++){
+					$(arr[i]).removeClass('ag-row-selected')
+				}
+			}
+			if(document.getElementsByClassName('ag-row-selected').length > 0){
+			 	$(document.getElementsByClassName('ag-row-selected')[0]).removeClass('ag-row-selected')
+			}	
+			$(document.getElementsByClassName('ag-row-focus')).each(function(e){
+				$(document.getElementsByClassName('ag-row-focus')[e]).addClass('ag-row-selected')
+			}) 
+		},
 		cellMouseOver(params){
 			this.cellAboutSelecting = params.data
 			if(this.debounceRelistContextmenu){
@@ -1168,7 +1354,8 @@ export default {
 			}
 			this.debounceRelistContextmenu = setTimeout((self) => {
 				self.relistContextmenu();
-			}, 100, this);
+            }, 100, this);
+             this.$emit('cell-mouse-over',params)
 		},
 		isShowCheckedRow(){
             return this.hasColumnsChecked
@@ -1178,10 +1365,10 @@ export default {
             this.hasColumnsChecked = true;
             this.columnDefs.unshift(
 				{ 
-					headerName: 'checkbox', 
+					headerName: 'Chọn', 
 					field: 'checkbox', 
 					editable:true,
-					cellRendererFramework : 'CheckBoxRenderer',
+					cellRendererFramework : 'CheckBoxRendererListItems',
 					width: 50
 				}	
 			)
@@ -1219,8 +1406,11 @@ export default {
 			let arr = []
 			let self = this
 			for(let i in tmpTableContextMenu.items){
-				let obj = {}
-				obj.name =  tmpTableContextMenu.items[i].name
+                let obj = {};
+                 obj.name =  tmpTableContextMenu.items[i].name;
+                if(tmpTableContextMenu.items[i].subMenu){
+                    obj.subMenu = tmpTableContextMenu.items[i].subMenu
+                };
 				obj.action = () => {
 					let param = self.paramOnContextMenu;
 					let selection = [{
@@ -1278,16 +1468,14 @@ export default {
                         menuItem[0].hasOwnProperty("callback")
                     ) {
                         if(key == 'delete' || key == 'remove'){
-                            thisCpn.deleteItems = [];
-                            let deletedIndexs = {};
-                            for(let item of selection ){
-                                for(let idx = item.start.row ; idx <= item.end.row; idx++){
-                                    if(!deletedIndexs[idx]){
-                                        thisCpn.deleteItems.push(thisCpn.rowData[idx]);
-                                        deletedIndexs[idx] = true;
-                                    }
-                                }
-                            }
+							let allRow = []
+							let allRowRange = thisCpn.agApi.getCellRanges()
+							thisCpn.agApi.forEachNode(node=>{
+								if(node.rowIndex >= allRowRange[0].startRow.rowIndex && node.rowIndex <= allRowRange[0].endRow.rowIndex){
+									allRow.push(node.data)
+								}
+							})
+							thisCpn.deleteItems = allRow;
                             thisCpn.deleteDialogShow = true;
                         }else{
                             thisCpn.exeCallbackOnContextMenu(rowData);
@@ -1317,11 +1505,26 @@ export default {
                 contextMenu.items[item.name] = {
                     name: item.text
                 };
+                if(item.subMenu&&item.subMenu.length>0){
+                    contextMenu.items[item.name].subMenu = item.subMenu
+                }
 			}
             return contextMenu;
 		},
-		
+		getListId(listObject){
+            this.listId = [];
+            if(listObject){
+                listObject.map(obj=>{
+                this.listId.push(obj.id)
+            })
+            }
+            this.$emit('get-list-id',this.listId)
+		},
+		handleCustomGetData(data){
+			this.$emit('custom-get-all-data', data.data.listObject)
+		},
 		handlerGetData(data){
+            this.getListId(data.data.listObject);
 			let self = this
 			if(self.customAPIResult.reformatData){
 				data = self.customAPIResult.reformatData(data);
@@ -1330,31 +1533,27 @@ export default {
 			}
 			this.totalObject = data.total ? parseInt(data.total) : 0;
 			let resData = data.listObject ? data.listObject : []
-			// if(lazyLoad){
-			// 	resData.forEach(function(e){
-			// 		thisCpn.rowData.push(e)
-			// 	})
-			// }else{
 			self.rowData = resData;
-			// }
 			data.columns.forEach(function(e){
 				if(e.cellRenderer){
 					e.cellRenderer = e.cellRenderer.toString()
 				}
-			})
+            })
 			this.listItemsWorker.postMessage({
 				action: 'getTableColumns',
 				data:{
 					column: data.columns,
 					forcedReOrder: false,
 					savedOrderCols: self.savedTableDisplayConfig,
-					filteredColumns: self.filteredColumns
+                    filteredColumns: self.filteredColumns,
 				}
 			})
 			this.hideOverlay()
+			this.$emit('data-loaded', resData)
+
 		},
 		handlerRestoreTableDisplayConfigRes(res){
-            this.filter = [];
+            this.listFilters = [];
 			if(res.savedConfigs){
 				if(res.savedConfigs.wrapTextMode){
 					this.tableDisplayConfig.value.wrapTextMode =  res.savedConfigs.wrapTextMode;
@@ -1367,22 +1566,30 @@ export default {
 				}
 				this.savedTableDisplayConfig = res.savedConfigs.columns;
 				if(res.columnDefs){
-                    debugger
 					this.columnDefs = res.columnDefs
 					this.handleStopDragColumn();
                 }
                 // xử lý phần filter
-                this.filter = res.savedConfigs.filter;
+                this.listFilters = res.savedConfigs.filter?res.savedConfigs.filter:[];
                 this.getDefaultFilter()
                 //xử lý set độ rộng cho cột
-                this.widthColumns = [];
-                res.savedConfigs.filter.map(fil=>{
-                    if(fil.name==this.selectedFilterName){
-                        debugger
-                        this.widthColumns=fil.widthColumns
-                    }
-                });
-              
+                this.widthColumns = res.savedConfigs.widthColumns?res.savedConfigs.widthColumns:[];
+                if(this.widthColumns){
+                    this.columnDefs.map(column=>{
+                        this.widthColumns.map(c=>{
+                            if(c){
+                                if(column.field==c.colId){
+                                    column.width=c.width
+                                }
+                            }
+                        
+                        })
+                    })
+                    this.gridOptions.api.setColumnDefs(this.columnDefs);
+                 }
+                // xử lý phần format conditional
+                this.conditionalFormat = res.savedConfigs.conditionalFormat?res.savedConfigs.conditionalFormat:[];
+
 			}
 		},
 		handlerSaveTableDisplayConfigRes(res){
@@ -1392,20 +1599,15 @@ export default {
 				title: this.$t("table.success.save_config")
 			})
         },
-        handlerSaveFilter(res){
+        handlerSaveFilter(res, notiSuccess = true){
             if(res.status==200){
                 this.addFilter = false;
                 this.filterName = '';
-            }else{
-                this.$snotify({
-				type: "error",
-				title: "Lỗi"	})
-            }
-        },
-        handlerSaveWidthColumns(res){
-             if(res.status==200){
-                this.addFilter = false;
-                this.filterName = '';
+                  if(notiSuccess){
+                    this.$snotify({
+                    type: "success",
+                    title: 'Thành công'	})
+                }
             }else{
                 this.$snotify({
 				type: "error",
@@ -1413,7 +1615,10 @@ export default {
             }
         },
 		reRender(){
-			// this.agApi.sizeColumnsToFit()
+            debugger
+            // this.gridOptions.api.setColumnWidth('id', '200', true);
+            // this.gridOptions.api.setColumnDefs(this.columnDefs);
+             this.agApi.redrawRows();
 		},
 		searchAutocompleteItems(vl){
             this.tableFilter.currentColumn.colFilter.searchKey = vl;
@@ -1441,8 +1646,9 @@ export default {
                 this.$delete(this.tableFilter.allColumn, colName);
                 icon.removeClass("applied-filter");
 			}
-			this.filteredColumns
-			this.$store.commit('app/setFilteredColumns', this.filteredColumns)
+			let widgetIdentifier = this.getWidgetIdentifier()
+			this.$store.commit('app/setFilteredColumns', {filteredColumns: this.filteredColumns, widgetIdentifier: widgetIdentifier})
+
 		},
 		confirmDeleteItems(){
             this.deleteDialogShow = false;
@@ -1490,7 +1696,8 @@ export default {
 			this.getData();
 			this.$emit("refresh-list", {});
         },
-		showTableDropdownMenu(x, y, colName) {
+		showTableDropdownMenu(x, y, colName){
+			this.searchKey = ""
             var windowWidth = $(window).width()/1.1;
             if(x > windowWidth){
                 x -= 190;
@@ -1579,9 +1786,12 @@ export default {
 			self.columnDefs.forEach(function(e){
 				if(e.cellRenderer){
 					e.cellRenderer = e.cellRenderer.toString()
-				}
+                }
+                if(e.cellStyle){
+					e.cellStyle = e.cellStyle.toString()
+                }
 			})
-			obj.columnDefs = self.columnDefs
+            obj.columnDefs = self.columnDefs
 			return obj
 		},
 		importExcel(){
@@ -1621,14 +1831,22 @@ export default {
         },
 		handlerRowClicked(params){
 			this.$emit('row-selected', params.data);
+        },
+        onCellClicked(params){
+			this.changeSelectionRow()
+			this.$emit('row-selected', params.data);
+        },
+        onCellKeyPress(params){
+			if(params.event.keyCode == 67){
+				this.agApi.copySelectedRowsToClipboard();
+			}
 		},
 		onSelectionChanged() {
 			var selectedRows = this.agApi.getSelectedRows();
 			document.querySelector('.ag-row-selected').innerHTML = selectedRows.length === 1 ? selectedRows[0].athlete : ''
    		 },
 		onGridReady(params){
-            debugger
-			params.api.autoSizeColumns()
+			params.api.sizeColumnsToFit()
 			this.agApi = params.api
 			this.agApi.showLoadingOverlay()
 			setTimeout(self=>{
@@ -1651,13 +1869,11 @@ export default {
 			}
 		},
 		configColumnDisplay(type, idx) {
-            debugger
             let column = this.columnDefs[idx];
             column[type] = !column[type];
             let isValue = column[type];
             if (type == "symperHide") {
 				this.gridOptions.columnApi.setColumnVisible(column.field, !isValue)
-				this.agApi.sizeColumnsToFit()
 				this.resetHiddenColumns();
             } else {
 				if(isValue){
@@ -1666,8 +1882,20 @@ export default {
 					delete column.pinned
 				}
 				this.reOrderFixedCols();
-				this.gridOptions.api.setColumnDefs([]);
+				
+				let flag = false
+				this.columnDefs.forEach(function(e){
+					if(e.symperFixed){
+						flag = true
+						return
+					}
+				})
+				if(!flag){
+					this.refreshList()
+				}
 			}
+			this.agApi.refreshCells()
+
 		},
 		resetHiddenColumns(){
 		 	let hiddenColumns = {};
@@ -1740,14 +1968,21 @@ export default {
             this.allRowChecked = []
         },
 		changePageSize(vl){
-            this.pageSize = vl.pageSize
+            this.pageSize = vl.pageSize;
+			this.showLoadingOverlay()
             this.getData();
             this.$emit("change-page-size", vl.pageSize);
 		},
 		changePage(vl){
-            this.page = vl.page
+            this.page = vl.page;
+			this.showLoadingOverlay()
             this.getData();
             this.$emit("change-page", vl.page);
+		},
+		customGetData(page){
+			this.page = page
+			this.pageSize = 1000
+			this.getData(false, false, true, false, true);
 		},
 		addItem() {
             if(this.useActionPanel){
@@ -1773,7 +2008,7 @@ export default {
             this.getData();
             this.$emit("change-page", this.page);
 		},
-		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false ){
+		getData(columns = false, cache = false, applyFilter = true, lazyLoad = false, customGetData = false){
 			let self = this;
 			let dataConfig = this.getConfigApiCall()
 			dataConfig.configs = {
@@ -1784,16 +2019,24 @@ export default {
 			dataConfig.lazyLoad = lazyLoad
 			dataConfig.customAPIResult = self.customAPIResult.reformatData ? self.customAPIResult.reformatData.toString() : null
 			dataConfig.filteredColumns = self.filteredColumns
-			this.listItemsWorker.postMessage({
-				action: 'getData',
-				data: dataConfig
-			});
+			if(customGetData){
+				this.listItemsWorker.postMessage({
+					action: 'customGetData',
+					data: dataConfig
+				});
+			}else{
+				this.listItemsWorker.postMessage({
+					action: 'getData',
+					data: dataConfig
+				});
+			}	
+			
 		},
 		 /**
          * Khôi phục lại cấu hình của hiển thị của table từ dữ liệu được lưu
          */
         restoreTableDisplayConfig() {
-            let test = this.columnsDefs;
+            debugger
 			let widgetIdentifier = this.getWidgetIdentifier();
 			let self = this
 			this.listItemsWorker.postMessage({
@@ -1803,15 +2046,16 @@ export default {
 					columnDefs: self.columnDefs
 				}
 			});
-		},
+        },
 		getWidgetIdentifier(){
             let widgetIdentifier = '';
             if(this.widgetIdentifier){
                 widgetIdentifier =  this.widgetIdentifier;
             }else{
-                widgetIdentifier =  this.$route.path;
+                widgetIdentifier =  this.$route.path+':'+this.$store.state.app.endUserInfo.id;
             }
-			widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'');
+             widgetIdentifier = widgetIdentifier.replace(/(\/|\?|=)/g,'') ;
+            // this.widgetIdentifier = this.$route.path;
             return widgetIdentifier;
 		},
 		getTableDisplayConfigData(){
@@ -1840,7 +2084,7 @@ export default {
             let thisCpn = this;
             let dataToSave =  this.getTableDisplayConfigData();
             dataToSave.detail = JSON.parse(dataToSave.detail);
-            dataToSave.detail.filter = this.filter;
+            dataToSave.detail.filter = this.listFilters;
             dataToSave.detail= JSON.stringify(dataToSave.detail);
             //dataToSave.filter = this.filter;
 			this.listItemsWorker.postMessage({
@@ -1849,7 +2093,8 @@ export default {
 					dataToSave: dataToSave
 				}
 			});
-		},
+        },
+      
 		 /**
          * Xử lý việc sau khi kết thúc kéo thả các cột ở thanh cấu hình hiển thị danh sách
          */
@@ -1868,47 +2113,56 @@ export default {
     
     
 </script>
-<style>
-.ag-row{
+<style scoped>
+
+.symper-list-items >>> .ag-row{
 	border-top-style:unset !important;
 }
-.ag-theme-balham .ag-root-wrapper{
+.symper-list-items >>> .ag-theme-balham .ag-root-wrapper{
 	border: unset !important;
 }
-.ag-header{
+.symper-list-items >>> .ag-cell{
+	-webkit-touch-callout: none;
+	-webkit-user-select: none; 
+	-khtml-user-select: none; 
+	-moz-user-select: none;
+	-ms-user-select: none; 
+	user-select: none; 
+}
+.symper-list-items >>> .ag-header{
 	border: unset !important;
 }
-.ag-row{
+.symper-list-items >>> .ag-row{
 	border-radius: 4px;
 }
-.ag-row:hover{
+.symper-list-items >>> .ag-row:hover{
 	border-radius: 4px;
 }
-.ag-theme-balham .ag-cell{
+.symper-list-items >>> .ag-theme-balham .ag-cell{
 	line-height: unset !important
 }
-.ag-header {
+.symper-list-items >>> .ag-header {
 	height: 28px !important;
 	min-height: unset !important;
 	background-color: #ffffff !important;
 	border-top: 1px solid lightgray !important;
 	border-bottom: 1px solid lightgray !important;
 }
-.ag-theme-balham .ag-header-row {
+.symper-list-items >>> .ag-theme-balham .ag-header-row {
     height: 24px !important;
 }
-.ag-row-selected{
+.symper-list-items >>> .ag-row-selected{
 	background-color: #DBE7FE !important;
 }
-.clip-text .ag-cell{
+.symper-list-items >>> .clip-text .ag-cell{
 	text-overflow: ellipsis !important;
     white-space: nowrap !important;
 }
-.applied-filter {
+.symper-list-items >>> .applied-filter {
     color: #f58634;
     background-color: #ffdfc8;
 }
-.ag-menu-option-text{
+.symper-list-items >>> .ag-menu-option-text{
 	line-height: 12px !important;
 	padding-left: unset !important;
 }

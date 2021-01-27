@@ -59,10 +59,7 @@ const defaultState = {
             impactedFieldsList: {},
             impactedFieldsListWhenStart: {},
             rootChangeFieldName: null,
-            //biến phục vụ cho autocomplete trong table
-            currentTableInteractive: null, //chỉ ra table đang được tương tác
             currentControlActive: null, // biến chỉ ra control nào đang active
-            currentControlAutoComplete: null, // biến chỉ ra control nào đang autocomplete
             submitFormulas: null,
             updateFormulas:null,
             listUser: null,
@@ -97,8 +94,10 @@ const defaultState = {
              *      message:'khong được bỏ trống'
              * }}
              */
-            validateMessage:{},
-            dataInputBeforeChange:{}
+            dataInputBeforeChange:{},
+            mapValueToTextAutocompleteInput:{},
+            tableInteractive:null
+            
         }
     },
     detail: {

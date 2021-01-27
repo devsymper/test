@@ -30,7 +30,8 @@
                     @click:row="handleClickRow"
                 >
                     <template v-slot:[`item.name`]="{ item }">
-                        <span class="name-title">{{item.name}}</span>
+                        <v-icon class="fs-16">mdi-hexagon-multiple-outline</v-icon>
+                        <span class="name-title pl-2">{{item.name}}</span>
                     </template>
                     <template v-slot:[`item.user`]="{ item }">
                         <infoUser class="userInfo fs-13" :userId="item.userCreate" :roleInfo="{}" />
@@ -65,7 +66,7 @@
             <v-card-text>{{$t("taskManagement.dialog.removeComponent")}}</v-card-text>
             <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn color="red darken-1" text @click="removeComponent">Xóa</v-btn>
+                <v-btn color="red darken-1" :loading="loading" text @click="removeComponent">Xóa</v-btn>
                 <v-btn color="green darken-1" text @click="dialogRemoveComponent = false">Hủy</v-btn>
             </v-card-actions>
             </v-card>
@@ -79,6 +80,7 @@ import modalAddOrDetailComponent from "./ModalAddOrDetailComponent";
 import { util } from "@/plugins/util";
 import infoUser from "@/components/common/user/InfoUser";
 import { checkPermission } from "@/views/taskManagement/common/taskManagerCommon";
+import ComponentWorker from 'worker-loader!@/worker/taskManagement/component/Component.Worker.js';
 
 export default {
     name:"listComponent",
@@ -89,7 +91,6 @@ export default {
     computed:{
         allComponent(){
             let listComponent=util.cloneDeep(this.listComponent);
-            console.log("components",listComponent);
             return listComponent; 
         },
     },
@@ -104,6 +105,8 @@ export default {
     },
     data(){
         return{
+            loading:false,
+            componentWorker:null,
             componentSelected:{},
             currentUserLeader:{id:''},
             statusDetail:false,
@@ -183,20 +186,11 @@ export default {
             this.dialogRemoveComponent=true;
         },
         removeComponent(){
-            taskManagementApi
-                .removeComponent(this.componentSelected.id)
-                .then(res => {
-                    if (res.status == 200) {
-                        this.$snotifySuccess("Remove component success!");
-                        this.$emit("add-component");
-                    }else{
-                        this.$snotifyError("", "Error! Have error !!!");
-                    }
-                })
-                .catch(err => {
-                    this.$snotifyError("", "Error! Have error !!!", err);
-                });
-            this.dialogRemoveComponent=false;  
+            this.loading = true;
+            this.componentWorker.postMessage({
+                action:'removeComponent',
+                data:this.componentSelected.id
+            });
         },
      
         handleCreate(){
@@ -226,6 +220,26 @@ export default {
      
     },
     created(){
+        let self = this;
+        this.componentWorker = new ComponentWorker();
+
+        this.componentWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'actionError':
+                    self.dialogRemoveComponent=false;
+                    self.loading=false;
+                    break;
+                case 'removeComponent':
+                    self.$snotifySuccess("Remove component success!");
+                    self.$emit("add-component");
+                    self.dialogRemoveComponent=false;  
+                    self.loading = false;
+                    break;
+                default:
+                    break;
+            }
+        });
     }
 
 }

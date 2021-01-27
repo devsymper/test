@@ -179,17 +179,17 @@ const objectActionControls = { // mức ngoài cùng là group
             },
             "task_manager_task_life_cycle":{
                 "title":"Task life cycle",
-                "icon":"",
+                "icon":"mdi-lan",
                 "actions":util.cloneDeep(actionDefault)
             },
             "task_manager_field":{
                 "title":"Field",
-                "icon":"",
+                "icon":"mdi-clipboard-text-outline",
                 "actions":util.cloneDeep(actionDefault)
             },
             "task_manager_time_tracking":{
                 "title":"Time tracking",
-                "icon":"",
+                "icon":"mdi-clock-time-three-outline",
                 "actions":[
                     {
                         "name":"config",
@@ -200,17 +200,17 @@ const objectActionControls = { // mức ngoài cùng là group
             },
             "task_manager_issue_link":{
                 "title":"Issue link",
-                "icon":"",
+                "icon":"mdi-link",
                 "actions":util.cloneDeep(actionDefault)
             },
             "task_manager_status":{
                 "title":"Status",
-                "icon":"",
+                "icon":"mdi-atom-variant",
                 "actions":util.cloneDeep(actionDefault)
             },
             "task_manager_priority":{
                 "title":"Priorities",
-                "icon":"",
+                "icon":"mdi-priority-high",
                 "actions":util.cloneDeep(actionDefault)
             },
             "task_manager_issue":{

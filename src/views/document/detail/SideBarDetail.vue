@@ -243,7 +243,7 @@ export default {
 			let self = this
 			if(after != "" && after != "0"){
 				bpmnApi.getProcessInstanceData(this.workflowId).then(res=>{
-					self.workflowName = res.data[0].processDefinitionName
+					self.workflowName = res.data.length > 0 ? res.data[0].processDefinitionName : ""
 				});
 			}
 		},
@@ -402,7 +402,7 @@ export default {
 					let mapDocControl = this.$store.state.document.submit[this.keyInstance].listInputInDocument;
 					let table = mapDocControl[tbName];
 					let mapControlToIndex = table.mapControlToIndex;
-					let allColumnId = table.tableInstance.tableInstance.getDataAtProp('childObjectId');
+					let allColumnId = table.tableInstance.getColData('childObjectId');
 					
 					for(let rowId in tbChange){
 						let dataChange = tbChange[rowId];

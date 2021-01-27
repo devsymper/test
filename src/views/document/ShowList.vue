@@ -11,6 +11,8 @@
             :actionPanelWidth="actionPanelWidth"
             :showExportButton="false"
             :showImportButton="false"
+            @get-list-id="getListId"
+            @cell-mouse-over="getRowSelected"
             @after-open-add-panel="addDocument"
             @close-panel="closePanel"
             :headerPrefixKeypath="'document'"
@@ -37,27 +39,42 @@
                                     <v-expansion-panel-header class="v-expand-header">
                                         <div class="d-flex">
                                             <div>
-                                                {{doc.name + '-' + doc.title}}
-                                            </div>
-                                            <div class="ml-auto">
-                                                <span class="fs-13">Tên index</span>
-                                                <input @keyup.stop.prevent @click.stop.prevent type="text" 
-                                                v-model="doc.indexName" 
-                                                :style="{
-                                                    border:(doc.isNotValidName) ? '1px solid red !important' : ''
-                                                }"
-                                                class="sym-small-size sym-style-input index-name">
+                                                {{doc.name + ' - ' + doc.title}}
                                             </div>
                                         </div>
 
                                     </v-expansion-panel-header>
                                     <v-expansion-panel-content class="sym-v-expand-content">
-                                        <div class="control" v-for="control in doc.control" :key="control.name" @click="onClickControl(doc,control)">
-                                            <div>
-                                                {{control.name}} - {{control.title}}                            
-                                            </div>
-                                            <v-icon v-if="control.checked" size="16" color="green">mdi-check-bold</v-icon>
-                                        </div>
+                                        <table class="w-100">
+                                            <tr style="text-align: left;background: #f2f2f2;">
+                                                <th style="padding: 8px;width: 200px;">Index 
+                                                    <v-btn height="20" width="20" min-width="25" depressed @click="onCreateIndexClick(doc)">
+                                                        <v-icon size="16">mdi-plus</v-icon>
+                                                    </v-btn>
+                                                </th>
+                                                <th style="padding: 8px;">Danh sách cột</th>
+                                            </tr>
+                                            <tr>
+                                                <td style="display: flex;flex-flow: column;">
+                                                    <div v-for="(index,i) in doc.indexs" 
+                                                    :key="i" 
+                                                    class="index-item" 
+                                                    :style="{background:(index.active) ? '#f2f2f2' : ''}"
+                                                    @click="onIndexItemClick(doc,index)">
+                                                        <span>{{index.name}}</span>
+                                                        <v-icon size="16" @click="onRemoveIndex(doc.indexs,i,index)">mdi-trash-can-outline</v-icon>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <div class="control" v-for="control in doc.control" :key="control.name" @click="onClickControl(doc,control)">
+                                                        <div>
+                                                            {{control.name}} - {{control.title}}                            
+                                                        </div>
+                                                        <v-icon v-if="control.checked" size="16" color="green">mdi-check-bold</v-icon>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        </table>
                                     </v-expansion-panel-content>
                                 </v-expansion-panel>
                                 
@@ -69,42 +86,79 @@
                         </v-btn>
                     </div>
                 </div>
+                <div v-if="showTaskDetail">
+                    <TaskDetail
+                        :taskInfo="data.taskInfo"
+                        :originData="data.originData"
+                        :parentHeight="taskDetailHeight" 
+                        :allVariableProcess="variableProcess"
+                        @task-submited="handleTaskSubmited"
+                        />
+                </div>
             </div> 
         </list-items>
             <ImportExcelPanel
                 :options="options"
                 :nameRows="listRowDocument"
                 :open="showImportPanel" />
-    
     </div>
 </template>
 <script>
-
+import { runProcessDefinition,extractTaskInfoFromObject,addMoreInfoToTask} from '../../components/process/processAction';
+import { getLastestDefinition } from "./../../components/process/processAction.js";
+import { formulasApi } from '../../api/Formulas';
+import BPMNEApi from "./../../api/BPMNEngine";
+import { taskApi } from "./../..//api/task.js";
 import ImportExcelPanel from "./../../components/document/ImportExelPanel";
 import { documentApi } from "./../../api/Document.js";
+import bpmnApi from "./../../api/BPMNEngine.js";
 import ListItems from "./../../components/common/ListItems.vue";
 import ActionPanel from "./../../views/users/ActionPanel.vue";
 import ChangePassPanel from "./../../views/users/ChangePass.vue";
 import Submit from './submit/Submit'
 import { util } from "./../../plugins/util.js";
 import { appConfigs } from '../../configs';
+import TaskDetail from "./../../components/myItem/TaskDetail";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-
 export default {
     components: {
         ImportExcelPanel: ImportExcelPanel,
         "list-items": ListItems,
         "action-panel": ActionPanel,
         'submit-view':Submit,
-        VuePerfectScrollbar
+        VuePerfectScrollbar,
+        TaskDetail
     },
     data(){
         return {
+            listWorkflows:[],
+            listId:[],
+            listProcess:[],
+            startProcess:{
+                name: "startProcess",
+                subMenu:[],
+                text: "<i class= 'mdi mdi-bike-fast' > </i>&nbsp; Bắt đầu nhanh quy trình",
+            },
+            paramId:'',
+            data: {
+                taskInfo: {},
+                originData: {}
+            },
+            taskDetailHeight: 800,
             sDocumentManagementUrl:appConfigs.apiDomain.sdocumentManagement,
             documentId:0,
+            listWorkFollow:[],
             rowActive:null,
+            showTaskDetail:false,
+             variableProcess:[],
+            filterVariables:{
+                names:"symper_application_id",
+                page:1,
+                processInstanceIds:[]
+            },
             options:{
             },
+            proccessRow:{},
             isDocumentIndex:false,
             allIndexSelected:[],
             listControlInDoc:{},
@@ -286,6 +340,7 @@ export default {
                     callback: (document, callback) => {
                         this.rowActive = document;
                         this.isDocumentIndex = true;
+                        this.allIndexSelected = []
                         this.$refs.listDocument.openactionPanel();
                         this.getListControl(document);
                         
@@ -301,90 +356,269 @@ export default {
     },
     mounted() {
         this.calcContainerHeight();
+        
     },
     created(){
+   
         let thisCpn = this;
+        this.tableContextMenu.startProcess = this.startProcess;
         this.$evtBus.$on('change-user-locale',(locale)=>{
             thisCpn.tableContextMenu = [
                 {name:"passwordsetting",text:this.$t('user.table.contextMenu.passwordSetting')},
                 {name:"edit",text:this.$t('user.table.contextMenu.edit')}
             ]
         });
+       
+
     },
     watch:{
         documentId(){
             this.getApiDocument();
+        },
+        listId(){
+            if(this.listId.length>0){
+               this.getAllProcess(this.listId)
+            }
         }
     },
     methods:{
+        getListId(data){
+            this.listId = data;
+        },
+        // lấy ra tất cả các quy trình liên quan dựa theo id doc
+        getAllProcess(data){
+            this.listProcess = [];
+            let listId = data.join(",");
+            const self = this;
+            bpmnApi.getProcessByDocId(listId).then(res=>{
+                if(res.status==200){
+                    Object.keys(res.data).map(idDoc=>{
+                        self.listId.map(l=>{
+                            if(idDoc==l){
+                                this.tableContextMenu.startProcess = this.startProcess;
+                                self.listProcess.push({
+                                    id:idDoc,
+                                    listProcess:res.data[idDoc]
+                                })
+                            }
+                        })
+                    })
+                }
+            })
+        },
+         handleTaskSubmited(){
+            this.$store.commit("task/setIsStatusSubmit",true);
+         },
+         getRowSelected(param){
+            this.getListWorkFollowName(param.data.id);
+         },
+         async setTaskInfo(taskId){
+            if(taskId){
+                let filter={};
+                filter.taskId = taskId;
+                let res = await BPMNEApi.postTaskHistory(filter);
+                if (res.total>0) {
+                    let task=res.data[0];
+                    let taskInfo = extractTaskInfoFromObject(task);
+                    task = addMoreInfoToTask(task);
+                    this.$set(this.data, 'taskInfo', taskInfo);
+                    this.$set(this.data, 'originData', task);
+                    if (task.processInstanceId && task.processInstanceId!=null) {
+                        await this.getVariablesProcess(task.processInstanceId)
+                    }
+                }
+            }
+        },
+        async getVariablesProcess(processInstanceId){
+            let arrProcess=[];
+            arrProcess.push(processInstanceId);
+            this.filterVariables.processInstanceIds = JSON.stringify(arrProcess);
+            let resVariable = {};
+            resVariable = await taskApi.getVariableWorkflow(this.filterVariables);
+            this.variableProcess = resVariable.data;
+             this.$snotifySuccess("Khởi tạo quy trình  thành công!");
+
+        },
+          async getInstanceName(dataInput, definitionModel){
+            let self = this;
+            return new Promise((resolve, reject) => {
+                let dataObjs = definitionModel.processes[0].dataObjects;
+                let dataObjsMap = {};
+                for(let obj of dataObjs){
+                    let objKey = obj.id.replace(definitionModel.mainProcess.id+'_','');
+                    dataObjsMap[objKey] = obj;
+                }
+                let formula = dataObjsMap.instanceDisplayText ? dataObjsMap.instanceDisplayText.value : '';
+                if(!formula || String(formula).trim() == ''){
+                    resolve('');
+                }else{
+                    if(dataObjsMap.instanceDisplayText){
+                        formulasApi.getDataByAllScriptType(
+                            dataObjsMap.instanceDisplayText.value, 
+                            JSON.stringify(dataInput)
+                        ).then((formulaData) => {
+                            resolve(formulaData);
+                        }).catch(err=>{
+                            reject(err);
+                        });                    
+                    }else{
+                        resolve('');
+                    }
+                }
+
+            })
+        },
+         getStartDocId(definitionModel){
+            return Number(definitionModel.mainProcess.initialFlowElement.formKey);
+        },
+        async getFirstNodeData(paramId){
+            let self=this;
+            let idDefinition = paramId;
+            self.paramId = paramId;
+            let definitionModel = await BPMNEApi.getDefinitionModel(idDefinition);
+            let documentToStart = this.getStartDocId(definitionModel);
+            if(documentToStart && documentToStart != 'null' ){
+                this.taskInfo.action.parameter.documentId = documentToStart;
+            }else{
+                let processDef = await BPMNEApi.getDefinitionData(idDefinition);
+                try {
+                    let instanceName = await self.getInstanceName([],definitionModel);
+                    let newProcessInstance = await runProcessDefinition(this, processDef, [], instanceName);
+                    await self.checkAndGotoMyTask(newProcessInstance);
+                    this.showTaskDetail = true;
+                } catch (error) {
+                    this.$snotifyError(error);
+                }
+            }
+        },
+        async checkAndGotoMyTask(newProcessInstance){
+            let filter={};
+            let arrTask = [];
+            filter.processInstanceId = newProcessInstance.id;
+            let dataTaskNew = await BPMNEApi.getTask(filter); // lấy task theo quy trình hiện tại
+            if (dataTaskNew.total>0) {
+                arrTask = dataTaskNew.data;
+            }else { // lấy task theo quy trình con 
+                let childProcessInstances = await BPMNEApi.getProcessInstance({
+                    superProcessInstanceId: newProcessInstance.id
+                });
+                if(childProcessInstances.data.length > 0){
+                    let myTasks = [];
+                    for(let instance of childProcessInstances.data){
+                        myTasks.push(
+                            BPMNEApi.getTask({
+                                processInstanceId: instance.id,
+                            })
+                        ); 
+                    }
+                    myTasks = await Promise.all(myTasks);
+                    for(let res of myTasks){
+                        arrTask = arrTask.concat(res.data);
+                    }
+                }
+            }
+            for(let task of arrTask){
+                let assignee=task.assignee;
+                if (assignee && assignee.indexOf(":")>0) {
+                    assignee=assignee.split(":")[0];
+                }
+                if (assignee == this.$store.state.app.endUserInfo.id) {
+                    this.setTaskInfo(task.id);
+                }
+            }
+            
+        },
+        getListWorkFollowName(docId){
+            this.tableContextMenu.startProcess={};
+            const self = this;
+            this.listProcess.map(process=>{
+               if(process.id==docId){
+                   this.tableContextMenu.startProcess=this.startProcess;
+                   this.tableContextMenu.startProcess.subMenu=[];
+                   process.listProcess.map(p=>{
+                        let row = p;
+                        self.proccessRow = p;
+                        self.tableContextMenu.startProcess.subMenu.push({
+                            name:p.name,
+                            action: async function (row, action){
+                                let defData = await getLastestDefinition(self.proccessRow, true);
+                                if(defData.data[0]){
+                                    self.$refs.listDocument.openactionPanel();
+                                    self.paramId = defData.data[0].id;
+                                    self.getFirstNodeData(defData.data[0].id)
+                                }else {
+                                    self.$snotifyError({},"Can not find process definition having deployment id "+deploymentId);
+                                }
+                            }
+                    })
+                   
+                })
+               }
+           })
+        },
+        onRemoveIndex(indexs, i, index){
+            indexs.splice(i,1);
+            if(index.uid){
+                let indexRemove = [];
+                indexRemove.push({parent:index.parent, name:index.name});
+                documentApi.deleteIndex(index.uid, {indexs:JSON.stringify(indexRemove)}).then(res=>{
+                })
+            }
+            
+        },
+        onIndexItemClick(doc,index){
+            this.$set(doc,'indexActive',index);
+            for (let index = 0; index < doc.indexs.length; index++) {
+                if(doc.indexs[index].active){
+                    doc.indexs[index].active = false;
+                }
+            }
+            let columnActive = index.column;
+            for (let index = 0; index < doc.control.length; index++) {
+                if(columnActive.includes(doc.control[index].name)){
+                    this.$set(doc.control[index],'checked',true)
+                }
+                else{
+                    this.$set(doc.control[index],'checked',false)
+                }
+            }
+            this.$set(index,'active',true)
+        },
+        onCreateIndexClick(doc){
+            doc.indexs.push({
+                name:'new_index_'+ eval(doc.indexs.length + 1),
+                parent:doc.key,
+                column:[]
+            });
+        },
         getListControl(document){
             let self = this;
             documentApi.getFieldStruct(document.id).then(res=>{
                 if(res.status == 200){
                     console.log(res);
                     self.listControlInDoc = res.data;
-                    self.getListControlChecked(document.id);
                 }
             });
         },
-        getListControlChecked(docId){
-            let self = this;
-            documentApi.getColumnIndex(docId).then(res=>{
-                if(res.status == 200 && res.data.length > 0){
-                   let indexs = res.data[0].indexs;
-                   if(indexs){
-                       try {
-                            indexs = JSON.parse(indexs);
-                            for (let i = 0; i < indexs.length; i++) {
-                                const element = indexs[i];
-                                self.$set(self.listControlInDoc[element.parent],'indexName',element.name)
-                                let columns = element.column;
-                                for (let j = 0; j < columns.length; j++) {
-                                    const listControl = self.listControlInDoc[element.parent].control;
-                                    for (let l = 0; l < listControl.length; l++) {
-                                        if(listControl[l].name == columns[j]){
-                                            self.$set(self.listControlInDoc[element.parent].control[l],'checked',true)
-                                            break;
-                                        }
-                                    }
-                                }
-                                
-                            }
-
-                       } catch (error) {
-                           console.warn(error);
-                       }
-                   }
-                }
-            });
-        },
+      
         onSaveIndex(){
             for(let key in this.listControlInDoc){
                 let document = this.listControlInDoc[key];
-                if(!document.indexName){
+                if(document.indexs.length == 0){
                     continue;
                 }
-                let controlChecked = [];
-                for (let i = 0; i < document.control.length; i++) {
-                    const control = document.control[i];
-                    if(control.checked){
-                        controlChecked.push(control.name)
+                for (let i = 0; i < document.indexs.length; i++) {
+                    const index = document.indexs[i];
+                    if(index.hasChange && index.column.length > 0){
+                        this.allIndexSelected.push(index);
                     }
-                    
-                }
-                if(controlChecked.length > 0){
-                    let item = {};
-                    item['parent'] = (document.isTable) ? document.name : 'document';
-                    item['name'] = document.indexName;
-                    item['column'] = controlChecked;
-                    this.allIndexSelected.push(item);
                 }
             }
             if(this.allIndexSelected.length == 0){
                 return;
             }
             let self = this;
-            let dataPost = {documentId:this.rowActive.id,indexs:JSON.stringify(this.allIndexSelected)}
+            let dataPost = {documentName:this.rowActive.name,indexs:JSON.stringify(this.allIndexSelected)}
             documentApi.saveColumnIndex(dataPost).then(res=>{
                 if(res.status == 200){
                     self.$refs.listDocument.closeactionPanel();
@@ -402,7 +636,16 @@ export default {
             });
         },
         onClickControl(doc,control){
-            this.$set(control,'checked',!control.checked );
+            if(doc.indexActive){
+                this.$set(control,'checked',!control.checked );
+                if(control.checked){
+                    doc.indexActive.column.push(control.name);
+                }
+                else{
+                    doc.indexActive.column.splice(doc.indexActive.column.indexOf(control.name), 1);
+                }
+                this.$set(doc.indexActive,'hasChange',true );
+            }
         },
         closePanel(){
             this.isShowQuickSubmit = false;
@@ -516,7 +759,7 @@ export default {
             return controls;
         },
         addDocument(){
-            this.$router.push('/document/editor');
+            this.$goToPage('/document/editor/'+Date.now(),"Danh sách bản in");
         },
      
         calcContainerHeight() {
@@ -535,7 +778,7 @@ export default {
         height: 25px;
         padding: 5px 4px;
         cursor: pointer;
-        transition: background ease-in-out 250ms;
+        transition: background ease-in-out 200ms;
     }
     .control:hover{
         background: var(--symper-background-hover);
@@ -569,5 +812,26 @@ export default {
     ::v-deep .v-expand-header{
         padding: 12px 4px;
     }
+    table {
+        border-collapse: collapse;
+        width: 100%;
+    }
+
+   ::v-deep .v-expansion-panel-content__wrap{
+       padding: 0 !important;
+   }
+   .index-item{
+        padding: 8px;
+        margin: 1px 0;
+        display: flex;
+        cursor: pointer;
+        transition: background ease-in-out 200ms;
+   }
+   .index-item:hover{
+        background: var(--symper-background-hover);
+   }
+   .index-item >>> .v-icon{
+       margin-left: auto;
+   }
 </style>
 

@@ -37,7 +37,8 @@ export default {
     },
     watch:{
         '$route' (to, from){
-            this.routerKey = to.fullPath;
+            this.routerKey = Date.now();
+            // this.routerKey = to.fullPath;
         }
     },
     data(){

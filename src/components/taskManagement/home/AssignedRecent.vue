@@ -1,13 +1,20 @@
 <template>
     <div class="w-100 h-100">
         <common-list-issue
+            v-if="!loadding"
             :listItem="listItem"
         />
+        <preloader 
+            v-else
+            style="height:100%"
+            class="mx-auto" />
     </div>
 </template>
 
 <script>
 import CommonListIssue from './commonListIssue.vue';
+import HomeWorker from 'worker-loader!@/worker/taskManagement/home/Index.Worker.js';
+
 export default {
     components: {
         CommonListIssue
@@ -21,104 +28,74 @@ export default {
         },
     },
     computed:{   
-        listItem(){
-            let listIssue = this.listIssueAssignRecent;
-            let allPriority = this.$store.state.taskManagement.allPriority;
-            let listIssueType = this.$store.state.taskManagement.allIssueType;
-            let allStatus = this.$store.state.taskManagement.allStatus;
-
-            const groups = listIssue.reduce((groups, issue) => {
-                let date = issue.document_object_create_time.split(" ")[0];
-                let fromNow = this.getDateFormNow(date);
-                if (!groups[fromNow]) {
-                    groups[fromNow] = [];
-                }
-
-                if (issue.tmg_priority_id) { 
-                    let priority = allPriority.find(ele => ele.id == issue.tmg_priority_id);
-                    if (priority) {
-                        let infoPriority = {};
-                        infoPriority.id = priority.id;
-                        infoPriority.name = priority.name;
-                        infoPriority.color = priority.color;
-                        infoPriority.icon = priority.icon;
-
-                        issue["infoPriority"] = infoPriority;
-                    }
-                }    
-                // get info issue type
-                if (issue.tmg_issue_type) { 
-                    let issueType = listIssueType.find(ele => ele.id == issue.tmg_issue_type);
-                    if (issueType) {
-                        let infoIssueType = {};
-                        infoIssueType.id = issueType.id;
-                        infoIssueType.name = issueType.name;
-                        infoIssueType.icon = issueType.icon;
-
-                        issue["infoIssueType"] = infoIssueType;
-                    }
-                }    
-                // get staus issue
-                if (issue.tmg_status_id) { 
-                    let status = allStatus.find(ele => ele.id == issue.tmg_status_id);
-                    if (status) {
-                        let infoStatus = {};
-                        infoStatus.id = status.id;
-                        infoStatus.name = status.name;
-                        infoStatus.color = status.color;
-                        issue["infoStatus"] = infoStatus;
-                    }
-                } 
-                groups[fromNow].push(issue);
-                return groups;
-            }, {});
-            const groupArraysIssue = Object.keys(groups).map(fromNow => {
-                return {
-                  fromNow,
-                  issues: groups[fromNow]
-                };
-            });
-            return groupArraysIssue;
-        },
         sTaskManagement() {
             return this.$store.state.taskManagement;
         },
-        listIssueAssignRecent(){
-            return this.$store.state.taskManagement.listIssueAssignRecent;
-        }
     },
     watch:{
-        documentIds: {
-            deep: true,
-            immediate: true,
-            handler(after) {
-                if (after.length>0) {
-                    this.getData();
-                }
-            }
-        },
     },
     methods:{
+        getListAssigneeIssueGroupDateTime(){
+            let data = {};
+            data.listIssue = this.$store.state.taskManagement.listIssueAssignRecent;
+            data.allPriority = this.$store.state.taskManagement.allPriority;
+            data.listIssueType = this.$store.state.taskManagement.allIssueType;
+            data.allStatus = this.$store.state.taskManagement.allStatus;
+            if (this.homeWorker) {
+                this.homeWorker.postMessage({
+                    action:'getListAssigneeIssueGroupDateTime',
+                    data:data
+                });    
+            }
+            
+        },
         getData(){
             let data = {};
             data.documentIds=this.documentIds;
             data.userId=this.$store.state.app.endUserInfo.id;
-            this.$store.dispatch("taskManagement/getIssueAssignRecent",data);
-        },
-        getDateFormNow(time){
-            var today = this.$moment().format('YYYY-MM-DD');
-            if (time===today) {
-                return this.$t('myItem.today');
+            if (this.homeWorker) {
+                this.homeWorker.postMessage({
+                    action:'getDataAssigneeIssue',
+                    data:data
+                });
             }
-            else{
-                return this.$moment(time).fromNow();
-            }
+
         },
     },
     data(){
         return{
-
+            listItem:[],
+            homeWorker:null,
+            loadding: true,
         }
+    },
+    created(){
+        let self = this;
+        this.homeWorker = new HomeWorker();
+        this.getData();
+
+        this.homeWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getDataAssigneeIssue':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit('taskManagement/setIssueAssignRecent', res.data.listObject);
+                        self.getListAssigneeIssueGroupDateTime();
+                    }
+                    break;
+                case 'getListAssigneeIssueGroupDateTime':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.listItem = res;
+                        self.loadding = false;
+                    }
+                    break;
+                    
+                default:
+                    break;
+            }
+        });
     }
 }
 </script>

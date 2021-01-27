@@ -32,7 +32,7 @@ const setAllStatusCategory = (state, allStatusCategory) => {
 const setAllStatus = (state, allStatus) => {
     Vue.set(state, 'allStatus', allStatus);
 }
-const setListStautsInProject = (state, data) => {
+const setListStatusInProject = (state, data) => {
     Vue.set(state.listStatusInProjects, data.key , data.data);
 }
 const setListRoleUserInProject = (state, data) => {
@@ -64,6 +64,15 @@ const setListVersion = (state, listVersionInProject) => {
 const setListColumnInBoard = (state, data) => {
     Vue.set(state.listColumnInBoard, data.key , data.data);
 }
+
+
+const setListDataSprintAfterAfterMapIssue = (state, data) => {
+    Vue.set(state.dataSprintAfterMapIssue, data.key , data.data);
+}
+const setListIssueInSprintProject = (state, data) => {
+    Vue.set(state.listIssueInSprintProject, data.key , data.data);
+}
+
 const setListStatusInColumnBoard = (state, data) => {
     Vue.set(state.listStatusInColumnBoard, data.key , data.data);
 }
@@ -114,7 +123,7 @@ const addWorkflowToStore = (state, item) => {
 }
 const addBoardToStore = (state, item) => {
     let currentListBoard = state.listBoardInProject;
-    currentListBoard.unshift(item)
+    currentListBoard.push(item)
     Vue.set(state, 'listBoardInProject', currentListBoard);
 }
 
@@ -122,6 +131,36 @@ const addPriorityToStore = (state, item) => {
     let currentAllPriority = state.allPriority;
     currentAllPriority.push(item); // đẩy vào vị trí cuối
     Vue.set(state, 'allPriority', currentAllPriority);
+}
+
+const addSprintToListInStore = (state, item) => {
+    let boardId = item.boardId;
+    let currentListSprintInBoard = state.dataSprintAfterMapIssue;
+    if (!currentListSprintInBoard[boardId]) {
+        currentListSprintInBoard[boardId] = [];
+    }
+    currentListSprintInBoard[boardId].push(item); // đẩy vào vị trí cuối
+    Vue.set(state, 'dataSprintAfterMapIssue', currentListSprintInBoard);
+}
+
+const updateSprintToListInStore = (state, item) => {
+    let boardId = item.boardId;
+    let currentListSprintInBoard = state.dataSprintAfterMapIssue;
+    if (!currentListSprintInBoard[boardId]) {
+        currentListSprintInBoard[boardId].push(item);
+    }else{
+        let obj = currentListSprintInBoard[boardId].find(data => data.id === item.id)
+        var index = currentListSprintInBoard[boardId].indexOf(obj);
+    
+        if (index > -1) {
+            currentListSprintInBoard[boardId][index].name = item.name;
+            currentListSprintInBoard[boardId][index].description = item.description;
+            currentListSprintInBoard[boardId][index].status = item.status;
+            currentListSprintInBoard[boardId][index].startTime = item.startTime;
+            currentListSprintInBoard[boardId][index].endTime= item.endTime;
+        }
+    }
+    Vue.set(state, 'dataSprintAfterMapIssue', currentListSprintInBoard);
 }
 const updateStatusFavoriteProject = (state, id) => {
     let currentListProject = state.allProject;
@@ -248,8 +287,25 @@ const removePriorityToStore = (state, id) => {
 const addToTaskManagementStore = (state, data) =>{
     let key = data.key;
     let value = data.value;
-    console.log(value,'value');
     Vue.set(state, key, value)
+}
+/**
+ * Hàm đánh dấu các thay đổi trong kanban board từ đó load lại data cần thiết cho kanban
+ * @param {*} state 
+ * @param {*} params 
+ */
+const updateCheckBoardChange = (state, params) => {
+    let oldData = state.checkBoardChange;
+    let value = params.value;
+    oldData = oldData.concat(value)
+    Vue.set(state, 'checkBoardChange', oldData)
+}
+const removeCheckBoardChange = (state, params) => {
+    let oldData = state.checkBoardChange;
+    let value = params.value;
+    let index = oldData.indexOf(value);
+    oldData.splice(index,1);
+    Vue.set(state, 'checkBoardChange', oldData)
 }
 export {
     setAllCategory,
@@ -282,7 +338,7 @@ export {
     removePriorityToStore,
     updatePriorityToStore,
     setAllStatus,
-    setListStautsInProject,
+    setListStatusInProject,
     setListStatusInColumnBoard,
     setListDocumentConfigFieldIssue,
     setListIssueTypeInProjects,
@@ -295,5 +351,10 @@ export {
     setCurrentBoard,
     setListRoleUserInProject,
     setListOperatorInProject,
-
+    addSprintToListInStore,
+    setListIssueInSprintProject,
+    updateSprintToListInStore,
+    setListDataSprintAfterAfterMapIssue,
+    updateCheckBoardChange,
+    removeCheckBoardChange
 };

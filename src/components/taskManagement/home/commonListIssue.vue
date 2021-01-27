@@ -5,7 +5,7 @@
             :key="idex"
         >
             <div>
-                <span style="color:#FF8003; font-size:13px;margin-left:16px;margin-top:6px">{{ obj.fromNow}}</span>
+                <span style="color:#FF8003; font-size:13px;margin-left:16px;margin-top:6px">{{getDateFormNow(obj.fromNow)}}</span>
             </div>
             <div>
                 <v-list dense>
@@ -40,7 +40,7 @@
                             <div class="mt-2" style="min-width:120px">
                                 <span v-if="item.infoStatus" style="padding: 2px 4px; border-radius:3px; background:#f2f2f2;font-weight:500;" :style="{'color':item.infoStatus.color}">{{item.infoStatus.name}}</span>
                             </div> 
-                            <div class="mt-2 mx-1" style="min-width:120px" >
+                            <div class="mt-2 mx-1" style="min-width:160px" >
                                 <infoUser v-if="item.tmg_assignee" class="userInfo fs-13" :userId="item.tmg_assignee" :roleInfo="{}" />
                             </div>   
                         </div>
@@ -87,6 +87,16 @@ export default {
             this.documentObjectId = issue.document_object_id;
             this.issue = issue;
             this.$refs.issue.show();
+        },
+        getDateFormNow(time){
+            this.$moment().locale("vi")
+            var today = this.$moment().format('YYYY-MM-DD');
+            if (time===today) {
+                return this.$t('myItem.today');
+            }
+            else{
+                return this.$moment(time).fromNow();
+            }
         },
     }
 

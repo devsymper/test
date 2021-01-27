@@ -9,6 +9,7 @@
             :tableContextMenu="tableContextMenu"
             :useDefaultContext="false"
             :actionPanelWidth="600" 
+            :flexColumns="true"
             @after-open-add-panel="showAddModal"
             :customAPIResult="customAPIResult"
             :showActionPanelInDisplayConfig="true"
@@ -99,7 +100,7 @@ export default {
 										return  '<span>'+ newValue +'</span>'
 									}
 								},
-								{name: "updatedAt", title: "updated_at", type: "text",
+								{name: "updatedAt", title: "updated_at", type: "text", 
 									cellRenderer: function(params) {
 										let newValue = params.value.slice(0, params.value.length - 3)
 										return  '<span>'+ newValue +'</span>'

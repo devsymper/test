@@ -7,10 +7,10 @@ let log = new Api(appConfigs.apiDomain.log);
 
 export const taskManagementApi = {
     getDataLogService(data){
-        return log.post("query",data);
+        return log.post("query",data,{},{'contentType': 'application/json'});
     },
     getIssueFilter(data){
-        return document.post("documents/objects-by-multiple-document",data);
+        return document.post("documents/objects-by-multiple-document",data,{},{'contentType': 'application/json'});
     },
     countIssueInListProject(projectIds){
         return taskManagement.get("count",{projectIds:JSON.stringify(projectIds)});
@@ -89,7 +89,7 @@ export const taskManagementApi = {
         return taskManagement.get("issue-types",filter);
     },
     getListIssueTypeInProject(projectId){
-        return taskManagement.get("issue-types/"+projectId);
+        return taskManagement.get("issue-types-in-project/"+projectId);
     },
     addIssueTypeForProject(data){
         return taskManagement.post("issue-types",data);
@@ -109,10 +109,10 @@ export const taskManagementApi = {
         return taskManagement.post("boards",data);
     },
     getListBoardInProject(projectId){
-        return taskManagement.get("boards/"+projectId);
+        return taskManagement.get("boards-in-project/"+projectId);
     },
     getDetailBoard(id){
-        return taskManagement.get("boards-detail/"+id);
+        return taskManagement.get("boards/"+id);
     },
     updateBoard(id,data){
         return taskManagement.put("boards/"+id,data);
@@ -152,13 +152,25 @@ export const taskManagementApi = {
     removeVersion(id){
         return taskManagement.delete("versions/"+id);
     }, 
-
+    //// sprint
+    addSprintForBoard(data){
+        return taskManagement.post("sprints",data);
+    },
+    updateSprintForBoard(id,data){
+        return taskManagement.put("sprints/"+id,data);
+    },
+    getListSprint(boardId){
+        return taskManagement.get("sprints/"+boardId);
+    },
+    removeSprint(id){
+        return taskManagement.delete("sprints/"+id);
+    }, 
     //// column in board
     getListColumn(boardId){
         return taskManagement.get("columns/"+boardId);
     },
     addColumnInBoard(data){
-        return taskManagement.post("columns",data);
+        return taskManagement.post("columns",data,{},{'contentType': 'application/json'});
     },
     updateColumnInBoard(data){
         return taskManagement.put("columns/"+data.boardId,data);

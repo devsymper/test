@@ -11,6 +11,8 @@
 <script>
 import Index from '@/components/taskManagement/home/Index.vue';
 import Preloader from '../../../components/common/Preloader.vue';
+import HomeWorker from 'worker-loader!@/worker/taskManagement/home/Index.Worker.js';
+
 export default {
     components: { Index,Preloader },
     computed:{
@@ -29,31 +31,121 @@ export default {
     },
     data(){
         return{
-            
+            homeWorker: null,
         }
     },
     methods:{
-        async getData(){
-            await this.$store.dispatch("taskManagement/getLogProjectAccess",this.endUserInfo.id);
-            await this.$store.dispatch("taskManagement/getLogIssueRecentAccess",this.endUserInfo.id);
-            if (!this.staskManagement.allPriority || this.staskManagement.allPriority == 0) {
-                await this.$store.dispatch("taskManagement/getAllPriority");
-            }
-            if (!this.$store.state.taskManagement.allProject || this.$store.state.taskManagement.allProject.length == 0) {
-                await this.$store.dispatch("taskManagement/getAllProject");
-            }
-            // get all issue type để show icon trong list task in home
-            if (!this.$store.state.taskManagement.allIssueType || this.$store.state.taskManagement.allIssueType == 0) {
-                this.$store.dispatch("taskManagement/getAllIssueType");
-            }
-            await this.$store.dispatch("taskManagement/getAllStatus");
-            this.$refs.preLoaderView.hide();
+        getData(){
+            this.homeWorker.postMessage({
+                action:'getLogProjectAccess',
+                data:this.$store.state.app.endUserInfo.id
+            });
 
-        }
+            this.homeWorker.postMessage({
+                action:'getLogIssueRecentAccess',
+                data:this.$store.state.app.endUserInfo.id
+            });
+
+        },
+        getAllPriority(){
+            if (!this.staskManagement.allPriority || this.staskManagement.allPriority == 0) {
+                this.homeWorker.postMessage({
+                    action:'getAllPriority',
+                    data:null
+                });
+            }else{
+                this.getData();
+            }
+        },
+        getAllProject(){
+            if (!this.$store.state.taskManagement.allProject || this.$store.state.taskManagement.allProject.length == 0) {
+                this.homeWorker.postMessage({
+                    action:'getAllProject',
+                    data:null
+                });
+            }else{
+                this.getAllIssueType();
+            }
+        },
+        getAllIssueType(){
+            if (!this.$store.state.taskManagement.allIssueType || this.$store.state.taskManagement.allIssueType.length == 0) {
+                this.homeWorker.postMessage({
+                    action:'getAllIssueType',
+                    data:null
+                });
+            }else{
+                this.getAllStatus();
+            }
+        },
+        getAllStatus(){
+            if (!this.$store.state.taskManagement.allStatus || this.$store.state.taskManagement.allStatus.length == 0) {
+                this.homeWorker.postMessage({
+                    action:'getAllStatus',
+                    data:null
+                });
+            }else{
+                this.getAllPriority();
+            }
+        },
+
     },  
     created(){
-        this.getData();
+      	this.homeWorker = new HomeWorker();
+        let self = this;
+        this.homeWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getLogProjectAccess':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit('taskManagement/setListProjectRecentAccess', res.data);
+                        self.$refs.preLoaderView.hide();
+                    }
+                    break;
+                case 'getLogIssueRecentAccess':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit('taskManagement/setLogIssueRecentAccess', res.data);
+                        self.$refs.preLoaderView.hide();
+                    }
+                    break;
+                case 'getAllPriority':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit('taskManagement/setAllPriority', res.data.listObject);
+                    }
+                    self.getData();
+                    break;
+                case 'getAllProject':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit('taskManagement/setAllProject', res.data.listObject);
+                    }
+                    self.getAllIssueType();
+                    break;
+                case 'getAllIssueType':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit('taskManagement/setAllIssueType', res.data.listObject);
+                    }
+                    self.getAllStatus();
+                    break;
+                case 'getAllStatus':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit('taskManagement/setAllStatus', res.data.listObject);
+                    }
+                    self.getAllPriority();
+                    break
+                default:
+                    break;
+            }
+        });
+    },
+    activated(){
+        this.getAllProject();
     }
+
 
 }
 </script>

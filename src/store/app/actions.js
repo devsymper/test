@@ -184,7 +184,7 @@ function checkAndRefreshCurrentRole(data, context) {
                 });
                 resolve();
             } else {
-                SYMPER_APP.$snotifyError(res, "Can not get role detail");
+                // SYMPER_APP.$snotifyError(res, "Can not get role detail");
                 reject();
             }
         } else {

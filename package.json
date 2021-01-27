@@ -11,6 +11,7 @@
     },
     "dependencies": {
         "@ag-grid-community/client-side-row-model": "^24.1.0",
+        "@ag-grid-enterprise/clipboard": "^24.1.0",
         "@ag-grid-enterprise/menu": "^24.1.0",
         "@ag-grid-enterprise/row-grouping": "^24.1.0",
         "@firebase/app": "^0.6.13",
@@ -19,6 +20,7 @@
         "@tinymce/tinymce-vue": "^3.2.6",
         "@types/rappid": "^1.5.32",
         "ag-grid-community": "^24.1.0",
+        "ag-grid-enterprise": "^24.1.0",
         "ag-grid-vue": "^23.1.0",
         "backbone": "^1.4.0",
         "bpmn-js": "^6.4.2",
@@ -26,6 +28,7 @@
         "dayjs": "^1.8.35",
         "handsontable": "^7.4.2",
         "heatmap.js": "^2.0.5",
+        "javascript-color-gradient": "^1.3.2",
         "jointjs": "^3.2.0",
         "jquery": "^3.4.1",
         "lodash": "^4.17.15",

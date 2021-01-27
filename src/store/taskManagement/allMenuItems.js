@@ -6,6 +6,7 @@ export default {
             items:[
                 {
                     title:"Board",
+                    name:"selectBoard",
                     subTitle:'Board',
                     type:'select',
                     component:'SelectBoard',
@@ -13,26 +14,31 @@ export default {
                 },
                 {
                     title:"Kanban board",
+                    name:"board",
                     icon: 'mdi-view-week-outline',
                     url:"/task-management/projects/:id/kanban-board"
                 },
                 {
                     title:"Backlog",
+                    name:"backlog",
                     icon: 'mdi-view-carousel-outline',
                     url:"/task-management/projects/:id/backlog"
                 },
                 {
                     title:"Component",
+                    name:"component",
                     icon: 'mdi-hexagon-multiple-outline',
                     url:"/task-management/projects/:id/components"
                 },
                 {
                     title:"Version",
+                    name:"version",
                     icon: 'mdi-shield-check-outline',
                     url:"/task-management/projects/:id/versions"
                 },
                 {
                     title:"TimeSheet",
+                    name:"timesheet",
                     icon: 'mdi-calendar-month',
                     url:"/task-management/projects/:id/timesheets"
                 },
@@ -43,19 +49,25 @@ export default {
             title:"BÁO CÁO",
             items:[
                 {
-                    name:'hoang_child',
+                    name:'report',
                     title:"Report",
                     icon: 'mdi-chart-bell-curve-cumulative',
-                    url:"/report"
+                    url:"/task-management/projects/:id/report"
                 }
             ]
         },
-        item3:{
-            isWorkSpace:false,
-            title:"Project Setting",
-            url:"/task-management/projects/:id/settings/details",
-            icon: 'mdi-cog-outline'
-        }
+        workspace3:{
+            isWorkSpace:true,
+            title:"CÀI ĐẶT",
+            items:[
+                {
+                    title:"Project Setting",
+                    name:"projectSetting",
+                    url:"/task-management/projects/:id/settings/details",
+                    icon: 'mdi-cog-outline'
+                }
+            ]
+        },
     },
     projectSetting:{
         workspaceProject:{
@@ -83,24 +95,30 @@ export default {
                 {
                     name:'workflow',
                     title:"workflow",
-                    icon: 'mdi-graph',
+                    icon: 'mdi-lan',
                     url:"/task-management/projects/:id/workflow"
                 },
+                // {
+                //     name:'issueLink',
+                //     title:"Issue Link",
+                //     icon: 'mdi-link',
+                //     url:"/task-management/projects/:id/issue-link"
+                // },
                 {
-                    name:'IssueLink',
-                    title:"Issue Link",
-                    icon: 'mdi-link',
-                    url:"/task-management/projects/:id/issue-link"
-                },
-                {
-                    name:'Priority',
+                    name:'priority',
                     title:"Priority",
                     icon: 'mdi-priority-low',
                     url:"/task-management/projects/:id/priorities"
                 },
                 {
+                    name:'createFilter',
+                    title:"Create Filter",
+                    icon: 'mdi-filter-plus-outline',
+                    url:"/task-management/projects/:id/create-filter"
+                },
+                {
                     name:'backToKanban',
-                    title:"Back to Kanban",
+                    title:"Quay lại Kanban",
                     icon: 'mdi-keyboard-backspace',
                     url:"/task-management/projects/:id/kanban-board"
                 },
@@ -110,7 +128,7 @@ export default {
     boardSetting:{
         item4:{
             name:'backToKanban',
-            title:"Back to Kanban",
+            title:"Quay lại Kanban",
             icon: 'mdi-keyboard-backspace',
             url:"/task-management/projects/:id/kanban-board"
         },

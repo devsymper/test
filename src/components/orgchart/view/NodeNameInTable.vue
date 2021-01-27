@@ -12,7 +12,7 @@ import Detail from '@/views/document/detail/Detail.vue'
 let mapNodeTypeIcon = {
     position: 'mdi-briefcase-outline',
     department: 'mdi-office-building-outline',
-    none: 'mdi-book-multiple-outline'
+    // none: 'mdi-book-multiple-outline'
 };
 export default {
     components:{
@@ -33,12 +33,12 @@ export default {
     mounted() {
         this.params.data.orgchartId = this.$route.params.id
         let type = this.params.data ? this.params.data.nodeType : 'none';
-        this.icon = mapNodeTypeIcon[type] ;
         this.text = this.getValue();
-        this.$store.dispatch('orgchart/getUserByVizId', this.params.data)
+		this.$store.dispatch('orgchart/getUserByVizId', this.params.data)
         let listUser = this.$store.getters['orgchart/listUserInCurrentNode']
         this.count = listUser.length
-        this.permission = this.checkPermission()
+		this.permission = this.checkPermission()
+		this.icon = mapNodeTypeIcon[type];
     },
     methods: {
         getIcon() {

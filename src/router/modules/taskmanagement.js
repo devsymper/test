@@ -1,5 +1,11 @@
 export default [
     {
+        path: "/task-management/home",
+        name: "taskManagerHome",
+        component: () =>
+            import ('../../views/taskManagement/home/Index.vue')
+    },
+    {
         path: "/task-management",
         name: "taskManagerHome",
         component: () =>
@@ -94,6 +100,14 @@ export default [
                 }
             },
             {
+                path: "projects/:id/create-filter",
+                meta:{group:'projectSetting'},
+                name: "createFilter",
+                components:{
+                    TaskManagement: () => import ('../../views/taskManagement/issueLink/List.vue')
+                }
+            },
+            {
                 path: "projects/:id/workflow/create",
                 // meta:{group:'projectSetting'},
                 name: "issueTypeWorkflow",
@@ -118,11 +132,9 @@ export default [
                 }
                     
             },
-        
-        
             //report
             {
-                path: "report",
+                path: "projects/:id/report",
                 name: "Report",
                 meta:{group:'home'},
                 components:{

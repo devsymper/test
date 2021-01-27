@@ -2,8 +2,19 @@
   <div class="w-100 h-100">
     <div style="height:40px; font-size:20px" class="font-weight-medium pl-3 pt-2">
         Backlog
+        <span v-if="sCurrentBoard.type == 'scrum'" class="float-right">
+            <v-btn small class="px-1 ml-1" solo depressed @click="showPopupSprint" >
+                <span>Create Sprint</span>
+            </v-btn>
+        </span>
     </div>
-    <div v-if="data" class="fs-13" style="height:calc(100% - 41px)">
+    <div v-if="sCurrentBoard.type == 'scrum'" style="height:calc(100% - 41px)" >
+        <sprint 
+            ref="sprint"
+            :currentBoard="sCurrentBoard"
+        />
+    </div>
+    <div v-else-if="sCurrentBoard.type == 'kanban' && data" class="fs-13" style="height:calc(100% - 41px)">
         <VuePerfectScrollbar
             style="height:100%"
         >
@@ -11,6 +22,7 @@
                 v-model="panel"
                 multiple
                 style="overflow: hidden;"
+                
             >
                 <v-expansion-panel class="sym-expand-panel" v-for="(status,index) in data.statusInColumn" :key="index">
                     <v-expansion-panel-header class="v-expand-header px-4 py-0">{{status.name +'-'+ status.taskLifeCircleName}}</v-expansion-panel-header>
@@ -45,9 +57,9 @@
                                         </div>
                                     </div>  
                                     <div class="mt-2" style="min-width:120px">
-                                        <span v-if="item.infoStatus" style="padding: 2px 4px; border-radius:3px; background:#f2f2f2;" :style="{'color':item.infoStatus.color}">{{item.infoStatus.name}}</span>
+                                        <span style="padding: 2px 4px; border-radius:3px; background:#f2f2f2;" :style="{'color':status.color}">{{status.name}}</span>
                                     </div> 
-                                    <div class="mt-2 mx-1" style="min-width:120px" >
+                                    <div class="mt-2 mx-1" style="min-width:160px" >
                                         <infoUser v-if="item.tmg_assignee" class="userInfo fs-13" :userId="item.tmg_assignee" :roleInfo="{}" />
                                     </div>   
                                 </div>
@@ -71,39 +83,26 @@
 
 <script>
 import { util } from '@/plugins/util';
-import { documentApi } from "@/api/Document.js";
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
 import CommonListIssue from '../home/commonListIssue.vue';
 import infoUser from "@/components/common/user/InfoUser";
 import DetailIssue from '@/components/taskManagement/issue/DetailIssue.vue';
+import KanbanWorker from 'worker-loader!@/worker/taskManagement/kanban/Kanban.Worker.js';
+import Sprint from './Sprint.vue';
+
 export default {
     components:{
         VuePerfectScrollbar,
         CommonListIssue,
         infoUser,
-        DetailIssue
+        DetailIssue,
+        Sprint
     },
     computed:{
-  
-        currentBoard(){
-            return this.$store.state.taskManagement.currentBoard;
-        },
         sTaskManagement(){
             return this.$store.state.taskManagement;
         },
-        columnBacklog(){
-            if (!this.currentBoard.id) {
-                return {};
-            }
-            let idBoard=this.currentBoard.id;
-            let backlogColumn = {};
-            if (this.sTaskManagement.listColumnInBoard[idBoard] && this.sTaskManagement.listColumnInBoard[idBoard].length >= 0 ) {
-                let columns = util.cloneDeep(this.sTaskManagement.listColumnInBoard[idBoard]);
-                backlogColumn = columns.find(ele => ele.isBacklog == 1 && ele.isHidden == 0);
-                backlogColumn.statusInColumn = [];
-            }
-            return backlogColumn;
-        },
+       
         listStatus(){
             let listStatus = [];
             if (this.sTaskManagement.listStatusInProjects[this.projectId] && this.sTaskManagement.listStatusInProjects[this.projectId].length >= 0 ) {
@@ -111,153 +110,159 @@ export default {
             }
             return listStatus;
         },
-        listStatusColumn(){
-            if (!this.currentBoard.id) {
-                return [];
-            }
-            let idBoard=this.currentBoard.id;
-            let listStatusColumn = [];
-            if (this.columnBacklog.id) {
-                if (this.sTaskManagement.listStatusInColumnBoard[idBoard] && this.sTaskManagement.listStatusInColumnBoard[idBoard].length >= 0 ) {
-                    let allStatusInBoard = this.sTaskManagement.listStatusInColumnBoard[idBoard];
-                    for (let i = 0; i < allStatusInBoard.length; i++) {
-                        if (allStatusInBoard[i].columnId == this.columnBacklog.id) {
-                            listStatusColumn.push(allStatusInBoard[i]);
-                        }
-                    }
-                }
-            }
-            return listStatusColumn;
-        },
+      
         allIssueTypeInProject(){
-            return this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId];
+            return this.sTaskManagement.currentProject.issueTypes;
+        },
+        sCurrentBoard(){
+            return this.sTaskManagement.currentBoard;
+        }
+    },
+    watch:{
+        sCurrentBoard:function(after){
+             this.kanbanWorker.postMessage({
+                    action:'getDetailBoard',
+                    data:{boardId:after.id,
+                    allStatus: null,
+                    projectId: after.projectId}
+                });
         },
     },
     data(){
+        let self = this;
         return{
+            kanbanWorker:null,
             data:null,
             projectId:null,
             documentObjectId:null,
             issue:null,
             panel: [0, 1 , 2, 3],
-
+            filter:{
+                ids: null,
+                filter:[
+                    {
+                        column : "tmg_project_id",
+                        operation : "and",
+                        conditions : [
+                            {
+                                name : "in",
+                                value : [self.$route.params.id],
+                            }
+                        ],
+                    },
+                    {
+                        column : "tmg_sprint_id",
+                        operation : "and",
+                        conditions : [
+                            {
+                                name : "empty",
+                                value : '',
+                            }
+                        ],
+                    },
+                ],
+                page : 1,
+                pageSize: 500,
+                distinct: true
+            },
         }
     },  
     methods:{
-        getMoreInfoForTask(issue){
-            let allPriority = this.$store.state.taskManagement.allPriority;
-            let listIssueType = this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId];
-            let allStatus = this.$store.state.taskManagement.allStatus;
-
-            if (issue.tmg_priority_id) { 
-                let priority = allPriority.find(ele => ele.id == issue.tmg_priority_id);
-                if (priority) {
-                    let infoPriority = {};
-                    infoPriority.id = priority.id;
-                    infoPriority.name = priority.name;
-                    infoPriority.color = priority.color;
-                    infoPriority.icon = priority.icon;
-
-                    issue["infoPriority"] = infoPriority;
-                }
-            }    
-            // get info issue type
-            if (issue.tmg_issue_type) { 
-                let issueType = listIssueType.find(ele => ele.id == issue.tmg_issue_type);
-                if (issueType) {
-                    let infoIssueType = {};
-                    infoIssueType.id = issueType.id;
-                    infoIssueType.name = issueType.name;
-                    infoIssueType.icon = issueType.icon;
-
-                    issue["infoIssueType"] = infoIssueType;
-                }
-            }    
-            // get staus issue
-            if (issue.tmg_status_id) { 
-                let status = allStatus.find(ele => ele.id == issue.tmg_status_id);
-                if (status) {
-                    let infoStatus = {};
-                    infoStatus.id = status.id;
-                    infoStatus.name = status.name;
-                    infoStatus.color = status.color;
-                    issue["infoStatus"] = infoStatus;
-                }
-            } 
+        checkUpdateTaskInBacklog(issue){
+            if (!issue.tmg_sprint_id) {
+                let data = {};
+                data.dataSend = this.data;
+                data.projectId = this.projectId;
+                data.issue = issue;
+                data.allPriority = this.$store.state.taskManagement.allPriority;
+                data.listIssueType = this.$store.state.taskManagement.listIssueTypeInProjects[this.projectId];
+                data.allStatus = this.$store.state.taskManagement.allStatus;
+                this.kanbanWorker.postMessage({
+                    action:'checkUpdateTaskInBacklog',
+                    data: data
+                });
+            }
+        },
+        showPopupSprint(){
+            this.$refs.sprint.show();
         },
         handleShowDetailIssue(issue){
             this.documentObjectId = issue.document_object_id;
             this.issue = issue;
             this.$refs.issue.show();
         },
-        async getListTasks(){
-            let documentId = this.allIssueTypeInProject.reduce((arr,obj)=>{
-                if(!arr.includes(obj.documentId)){
-                    arr.push(obj.documentId)
-                }
-                return arr
-            },[])
-            let allTask = await documentApi.getListObjectByMultipleDocument({ids:JSON.stringify(documentId)})
-            allTask = allTask['data']['listObject'];
-            let column = this.columnBacklog;
-            if (this.listStatus.length > 0 ) {
-                for (let i = 0; i < this.listStatusColumn.length; i++) {
-                    let idColumn = this.listStatusColumn[i].columnId;
-                    let statusId = this.listStatusColumn[i].statusId;
-                    let taskLifeCircleId = this.listStatusColumn[i].taskLifeCircleId;
-                    let item = this.listStatus.find(ele => ele.statusId == statusId &&  ele.taskLifeCircleId == taskLifeCircleId );
-                    if (item) {
-                        let taskInStatus = allTask.filter(task=>{
-                            return task.tmg_status_id == statusId && task.tmg_task_life_circle_id == taskLifeCircleId;
-                        });
-                        if (taskInStatus.length > 0) {
-                            for (let j = 0; j < taskInStatus.length; j++) {
-                                this.getMoreInfoForTask(taskInStatus[j]);
-                            }
-                        }
-                        item['tasks'] = taskInStatus;
-                        column.statusInColumn.push(item);
-                    }
-                }  
+        getListTasks(backLogColumn){
+            let data = {};
+            if(backLogColumn.length > 0){
+                data.backLogData = backLogColumn[0]
+                data.allStatus = this.listStatus;
+                data.listIssueType =  this.allIssueTypeInProject;
+                data.allPriority = this.$store.state.taskManagement.allPriority;
+                data.filter = this.filter;
+                // đẩy xuống worker xử lý
+                this.kanbanWorker.postMessage({
+                    action:'getListTasksBackLog',
+                    data:data
+                });
             }
-            this.data = column;
-           // this.$emit('loaded-content')
+            else{
+                this.$emit('loaded-content')
+            }
+            
         },
-        async getDataForBoard(){
-            let self = this;
-            if (this.$store.state.taskManagement.currentBoard) {
-                let idBoard =  this.$store.state.taskManagement.currentBoard.id;
-                if (!this.sTaskManagement.listColumnInBoard[idBoard] || this.sTaskManagement.listColumnInBoard[idBoard].length == 0) {
-                    await this.$store.dispatch("taskManagement/getListColumnInBoard",idBoard);
-                }
-                if (!this.sTaskManagement.listStatusInColumnBoard[idBoard] || this.sTaskManagement.listStatusInColumnBoard[idBoard].length == 0) {
-                    await this.$store.dispatch("taskManagement/getListStatusInColumnBoard",idBoard);
-                }
-            }
-            if (!this.sTaskManagement.listStatusInProjects[this.projectId] || this.sTaskManagement.listStatusInProjects[this.projectId].length == 0) {
-                await this.$store.dispatch("taskManagement/getListStautsInProject", this.projectId);
-            }
           
-            if(!this.allIssueTypeInProject){
-                await this.$store.dispatch("taskManagement/getListIssueTypeInProjects", this.projectId);
+    },
+    created(){
+        let self = this;
+        this.$evtBus.$on('task-manager-submit-issue-success', (issue) =>{
+            self.checkUpdateTaskInBacklog(issue);
+        })
+        this.kanbanWorker = new KanbanWorker();
+        this.kanbanWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'getListTasksBackLog':
+                    self.data = data.dataAfter;
+                    self.$emit('loaded-content')
+                    break;
+                case 'updateTaskInBacklog':
+                    if (data.dataAfter) {
+                        self.data = data.dataAfter;
+                    }
+                case 'getListStatusInProject':
+                    self.$store.commit("taskManagement/setListStatusInProject",{key:data.dataAfter.projectId, data:data.dataAfter.data});
+                    break;
+                case 'getDetailBoard':
+                    let listNewColumn = data.dataAfter.listNewColumn;
+                    let backLogColumn = data.dataAfter.backLogColumn;
+                    if(Object.keys(backLogColumn).length > 0){
+                        backLogColumn = Object.values(backLogColumn);
+                    }
+                    let dataToStore = {key:self.sTaskManagement.currentBoard.id, data:Object.values(listNewColumn)}
+                    self.$store.commit("taskManagement/setListColumnInBoard",dataToStore);
+                    self.$store.commit("taskManagement/addToTaskManagementStore",{key:'backLogData',value:backLogColumn});
+                    self.getListTasks(backLogColumn);
+                    break;
+                default:
+                    break;
             }
-            this.getListTasks();
-        },
-        loadData(){
-            this.projectId = this.$route.params.id;
-            let breadcrumbs = [
-                    {
-                        text: 'Backlog',
-                        disabled: true
-                    },
-                ]
-            this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs})
-            let self = this;
-            this.getDataForBoard();
-        }
+        });
     },
     activated(){
-        this.loadData()
+        this.projectId = this.$route.params.id;
+        let breadcrumbs = [
+                {
+                    text: 'Backlog',
+                    disabled: true
+                },
+            ]
+        this.$store.commit("taskManagement/addToTaskManagementStore",{key:"headerBreadcrumbs",value:breadcrumbs});
+         this.kanbanWorker.postMessage({
+                    action:'getDetailBoard',
+                    data:{boardId:this.sCurrentBoard.id,
+                    allStatus: null,
+                    projectId: this.sCurrentBoard.projectId}
+                });
     }
 
 }
@@ -282,6 +287,13 @@ export default {
 }
 .v-expand-header{
     min-height: 40px;
+}
+.sym-expand-panel::before{
+    box-shadow: none !important;
+}
+.sym-expand-panel{
+    border-radius: 4px !important;
+    border:var(--symper-border)
 }
 
 </style>

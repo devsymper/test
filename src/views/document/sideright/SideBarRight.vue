@@ -231,6 +231,9 @@ export default {
                 input.value = {id:input.value}
                 this.handleValidateControl(name, input, data);
             }
+            else if(input.type == 'select'){
+                this.handleValidateControl(name, input, data);
+            }
         },
         /**
          * Hàm lấy id của table chứa control

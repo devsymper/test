@@ -71,8 +71,8 @@
 </template>
 <script>
 import VuePerfectScrollbar from "vue-perfect-scrollbar";
-import { taskManagementApi } from "@/api/taskManagement.js";
 import FormTpl from "@/components/common/FormTpl.vue";
+import KanbanWorker from 'worker-loader!@/worker/taskManagement/kanban/Kanban.Worker.js';
 
 export default {
     components:{
@@ -92,6 +92,7 @@ export default {
     },
     data(){
         return {
+            kanbanWorker:null,
             isLoadingAdd:false,
             dialogAddBoard:false,
             isShow:false,
@@ -126,6 +127,25 @@ export default {
                     validate(){
                     }
                 },
+                type : {
+                    title: "Loại board",
+                    type: "select",
+                    value: 'kanban',
+                    validateStatus:{
+                        isValid:true,
+                        message:""
+                    },
+                    options:[{value:'kanban',text:'kanban'},{value:'scrum',text:'scrum'}],
+                    validate(){
+                        if (this.value=="") {
+                            this.validateStatus.isValid=false;
+                            this.validateStatus.message="Không bỏ trống";
+                        }else{
+                            this.validateStatus.isValid=true;
+                            this.validateStatus.message="";
+                        }
+                    }
+                }
             }
         }
     },
@@ -143,7 +163,7 @@ export default {
             console.log("ádasdasdsa",e);
         },
         onItemClick(item){
-            this.$evtBus.$emit("selected-item-board", item);
+            this.$emit("selected-item-board", item);
             this.hide();
         },
         handleAddBoard(){
@@ -153,24 +173,13 @@ export default {
                 let data={};
                 data.name=this.dataBoardProps.name.value;
                 data.description=this.dataBoardProps.description.value;
+                data.type=this.dataBoardProps.type.value;
                 data.projectId=this.$route.params.id;
 
-                taskManagementApi
-                    .addBoardForProject(data)
-                    .then(res => {
-                        if (res.status == 200) {
-                            this.$store.commit("taskManagement/addBoardToStore", res.data);
-                            this.$snotifySuccess("Add board type success!");
-                            this.dialogAddBoard=false;
-                        }else{
-                            this.$snotifyError("", "Can not add board type!");
-                        }
-                        this.isLoadingAdd=false;
-                    })
-                    .catch(err => {
-                        this.$snotifyError("", "Can not add board type!", err);
-                        this.isLoadingAdd=false;
-                    });
+                this.kanbanWorker.postMessage({
+                    action:'handleAddBoard',
+                    data:data
+                });
             }else{
                 this.$snotifyError("", "Have error!");
                 this.isLoadingAdd=false;
@@ -188,7 +197,30 @@ export default {
         },
     },
     created(){
-       
+        let self = this;
+        this.kanbanWorker = new KanbanWorker();
+        this.kanbanWorker.addEventListener("message", function (event) {
+			let data = event.data;
+            switch (data.action) {
+                case 'actionError':
+                    self.$snotifyError("", "Update status error!");
+                    self.isLoadingAdd = false;
+                    break;
+                case 'handleAddBoard':
+                    if (data.dataAfter) {
+                        let res = data.dataAfter;
+                        self.$store.commit("taskManagement/addBoardToStore", res.data);
+                        self.$snotifySuccess("Add board type success!");
+                        self.dialogAddBoard=false;
+                        self.isLoadingAdd = false;
+                    }
+                    break;
+             
+                default:
+                    break;
+            }
+        });
+
     }
 }
 </script>
