@@ -30,7 +30,7 @@ export default {
     data: function() {
 		let self = this;
         return {
-            apiUrl: appConfigs.apiDomain.biService+"/datasets/get-list",
+            apiUrl: appConfigs.apiDomain.biService+"/relations/trash",
             tableContextMenu: {
                update: {
                     name: "edit",

@@ -145,8 +145,8 @@ import ReportRenderManagement from "@/components/dashboard/reports/ReportRenderM
 import ReportTranslatorWorker from 'worker-loader!@/worker/dashboard/ReportTranslator.Worker.js';
 import _isEmpty from "lodash/isEmpty";
 import Sortable from "sortablejs";
-// import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
-// var mapTypeToClasses = autoLoadChartClasses();
+import { autoLoadChartClasses } from "@/components/dashboard/configPool/reportConfig.js";
+var mapTypeToClasses = autoLoadChartClasses();
 
 export default {
     created(){
@@ -365,8 +365,11 @@ export default {
                     if(data.error){
                         this.$snotifyError(data, "Can not get report data ", data.error);
                     }else{
-                        this.dashboardConfig.allCellConfigs[data.cellId].sharedConfigs.data = data.originData;
-                        this.$set(this.dashboardConfig.allCellConfigs[data.cellId].viewConfigs, 'displayOptions', data.translatedData);
+                        let cell = this.dashboardConfig.allCellConfigs[data.cellId];
+                        cell.sharedConfigs.data = data.originData;
+                        let classOfType = mapTypeToClasses[cell.sharedConfigs.type];
+                        data.translatedData = classOfType.editTranslatedData(data.translatedData);
+                        this.$set(cell.viewConfigs, 'displayOptions', data.translatedData);
                     }
                 }
             } catch (error) {

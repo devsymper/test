@@ -12,7 +12,8 @@
         "select_lang": "Thay đổi ngôn ngữ",
         "KH": "Knowledge Management",
         "taskManagement": "Quản lí công việc",
-        "structureManagement": "Quản lí cơ cấu ",
+		"structureManagement": "Quản lí cơ cấu ",
+		"searchPlaceholder": "Tìm kiếm",
         "reports": "Báo cáo",
         "workflows": "Quy trình",
         "documents": "Văn bản",
@@ -1305,7 +1306,8 @@
 		},
 		"relation":{
 			"title-show-list": "Danh sách relation",
-			"title-show-list-trash": "Danh sách relation đã xóa"
+			"title-show-list-trash": "Danh sách relation đã xóa",
+			"selector": "Lựa chọn relation"
 		}
 
 	},

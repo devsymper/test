@@ -10,6 +10,13 @@ onmessage = function (event) {
 };
 
 var handler = {
+	async getAllDataset(){
+		let res =  biApi.getAllDataset()
+		self.postMessage({
+			action: 'handleGetAllDataset',
+			data: res
+		})
+	},
     async getColumnDataset(data){
         let listDataset = data.listDataset;
         let listColumnInDataset = data.listColumnInDataset;
@@ -83,7 +90,11 @@ var handler = {
         }
      
         return datasetAndColumn;
-    },
+	},
+	async searchDataset(value){
+		let res = await biApi.searchDataset(value.searchKey)
+		self.postMessage({action:'searchDatasetRes', data:{res: res , searchKey: value.searchKey}});
+	},
     postSelectedDatasetBefor(data){
         let selectedDataset = data.selectedDataset;
         this.clearSelectedItemDisplay(data,true); // call function clear
@@ -191,6 +202,5 @@ var handler = {
        
         self.postMessage({action:'searchDatasetColumnAfter', data :{datasetAndColumn:datasetAndColumn}});
     }
-
 
 }

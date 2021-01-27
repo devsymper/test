@@ -1,29 +1,6 @@
 import { getStyleItems } from "@/components/dashboard/configPool/reportStyleItems.js";
 import { getColumnConfigItems } from "@/components/dashboard/configPool/reportColumnSettingItems.js";
 
-/**
- * các loại chart
- *  area:Object
-    card:Object
-    clusteredBar:Object
-    clusteredColumn:Object
-    donut:Object
-    editor:Object
-    filter:Object
-    global:Object
-    line:Object
-    lineAndClusteredColumn:Object
-    lineAndStackedColumn:Object
-    pie:Object
-    pivot:Object
-    stackedArea:Object
-    stackedBar:Object
-    stackedBar100:Object
-    stackedColumn:Object
-    stackedColumn100:Object
-    table:Object
-    treeMap:Object
- */
 var commonStyleAttrItems = {
     general: {
         title: 'General',
@@ -316,5 +293,18 @@ export default class ReportBase {
             }
         }
         return canRun;
+    }
+
+
+    /**
+     * Hàm chỉnh sửa data sau khi đã đi qua hàm translate của class, 
+     * có thêm hàm này do: hàm translate được chạy ở worker, 
+     * khi muốn set callback cho hành động nào đó mà cần ở trong option của thư viện thì cần phải set ở main process
+     * 
+     * ******** Lưu ý: ko lạm dụng hàm này để tính toán data, mà chỉ để set những thuộc tính mà worker ko thể truyền cho main process được ********
+     * @param {Object} translatedData data đã được translate ở hàm translate 
+     */
+    static editTranslatedData(translatedData){
+        return translatedData;
     }
 }
