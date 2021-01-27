@@ -1,29 +1,6 @@
 import { getStyleItems } from "@/components/dashboard/configPool/reportStyleItems.js";
 import { getColumnConfigItems } from "@/components/dashboard/configPool/reportColumnSettingItems.js";
 
-/**
- * các loại chart
- *  area:Object
-    card:Object
-    clusteredBar:Object
-    clusteredColumn:Object
-    donut:Object
-    editor:Object
-    filter:Object
-    global:Object
-    line:Object
-    lineAndClusteredColumn:Object
-    lineAndStackedColumn:Object
-    pie:Object
-    pivot:Object
-    stackedArea:Object
-    stackedBar:Object
-    stackedBar100:Object
-    stackedColumn:Object
-    stackedColumn100:Object
-    table:Object
-    treeMap:Object
- */
 var commonStyleAttrItems = {
     general: {
         title: 'General',

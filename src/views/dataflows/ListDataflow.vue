@@ -45,7 +45,11 @@ export default {
 				update: {
 					name: 'edit',
 					text: this.$t('apps.contextMenu.edit'),
-					callback: (app, callback) => {},
+					callback: (obj, callback) => {
+						self.$goToPage("/dataflows/" + obj.id + "/edit",
+                            self.$t('common.edit')+ " " + (obj.name ? obj.name : "")
+						)
+					},
 				},
 				remove: {
 					name: 'remove',
