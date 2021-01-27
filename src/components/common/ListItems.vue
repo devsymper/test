@@ -372,6 +372,10 @@ window.tableDropdownClickHandle = function(el, event) {
 export default {
     name: "SymperListItem",
     props:{
+		customContentType:{
+			type: Boolean,
+			default: false
+		},
 		flexMode:{
 			type: Boolean, 
 			default: false
@@ -1384,7 +1388,8 @@ export default {
 				page: self.page,
 				pageSize: self.pageSize,
 				conditionByFormula: self.conditionByFormula,
-				savedTableDisplayConfig: self.savedTableDisplayConfig
+				savedTableDisplayConfig: self.savedTableDisplayConfig,
+				customContentType: self.customContentType
 			}
 			self.columnDefs.forEach(function(e){
 				if(e.cellRenderer){

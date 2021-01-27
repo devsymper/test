@@ -28,6 +28,6 @@ export const biApi = {
 	getListRelations(searchKey, pageSize = 1000){
 		let searchParam = searchKey != "" ? 'search='+searchKey+"&" : ""
 		return api.get('relations?' + searchParam + 'page=1&pageSize='+ pageSize)
-	}
+	},
 	
 };
