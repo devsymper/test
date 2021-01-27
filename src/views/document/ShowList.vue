@@ -88,6 +88,8 @@
                 </div>
                 <div v-if="showTaskDetail">
                     <TaskDetail
+                        @repeated-submit="repeatedSubmit()"
+                        :repeatedSubmit="true"
                         :taskInfo="data.taskInfo"
                         :originData="data.originData"
                         :parentHeight="taskDetailHeight" 
@@ -382,6 +384,17 @@ export default {
         }
     },
     methods:{
+        async repeatedSubmit(){
+            debugger
+            let defData = await getLastestDefinition(this.proccessRow, true);
+            if(defData.data[0]){
+                this.$refs.listDocument.openactionPanel();
+                this.paramId = defData.data[0].id;
+                this.getFirstNodeData(defData.data[0].id)
+            }else {
+                self.$snotifyError({},"Can not find process definition having deployment id ");
+            }
+        },
         getListId(data){
             this.listId = data;
         },
@@ -547,7 +560,7 @@ export default {
                                     self.paramId = defData.data[0].id;
                                     self.getFirstNodeData(defData.data[0].id)
                                 }else {
-                                    self.$snotifyError({},"Can not find process definition having deployment id "+deploymentId);
+                                    self.$snotifyError({},"Can not find process definition having deployment id ");
                                 }
                             }
                     })
