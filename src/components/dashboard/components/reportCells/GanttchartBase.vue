@@ -9,9 +9,10 @@
 
 import Highcharts from 'highcharts';
 import Gantt from "highcharts/modules/gantt";
-import {Chart} from 'highcharts-vue'
+import {Chart} from 'highcharts-vue';
+import DragDrop from "highcharts/modules/draggable-points"
 Gantt(Highcharts);
-
+DragDrop(Highcharts);
 export default {
     components: {
         Highcharts: Chart
