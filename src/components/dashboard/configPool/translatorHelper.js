@@ -303,7 +303,6 @@ export const TranslatorHelper = {
 			return rsl;
 		},
 		ganttChart(rawConfigs,data,displayOptions,extraData,typeChart,stacking, ratio){
-			var  day = 1000 * 60 * 60 * 24;
 			let columns = rawConfigs.setting;
 			let style = util.cloneDeep(rawConfigs.style);
 			if (columns.name.selectedColums.length == 0 || columns.start.selectedColums.length == 0 ) {
@@ -335,26 +334,7 @@ export const TranslatorHelper = {
 			rsl.credits= {
 				enabled: false
 			};
-			rsl.plotOptions = {
-				series: {
-					animation: false, // Do not animate dependency connectors
-					dragDrop: {
-						draggableX: true,
-						draggableY: true,
-						dragMinY: 0,
-						dragMaxY: 2,
-						dragPrecisionX: day / 3 // Snap to eight hours
-					},
-					allowPointSelect: true,
-					point: {
-						// events: {
-						//   select: updateRemoveButtonStatus,
-						//   unselect: updateRemoveButtonStatus,
-						//   remove: updateRemoveButtonStatus
-						// }
-					}
-				}
-			};
+	
 			rsl.chart.height = extraData.size.h;
 			rsl.chart.width = extraData.size.w;
 			return rsl;

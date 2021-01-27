@@ -21,6 +21,15 @@
                         {{viewAttrs.symperTitle.text}}
                     </span>
                     <input class="w-100 border-none" v-else-if="!isView" ref="renameTitleInput" @blur="applyTitleChange" @change="applyTitleChange" type="text" v-model="viewAttrs.symperTitle.text">
+                    
+                    <div v-if="reportTag=='Gantt'" class="mr-4" style="float:right">
+                        <v-btn small depressed >
+                            Create task
+                        </v-btn>
+                        <v-icon class="fs-16 mx-2">mdi-pen</v-icon>
+                        <v-icon class="fs-16">mdi-cog-outline</v-icon>
+                    </div>
+
                 </div>
             </div>
             <component 
@@ -106,7 +115,7 @@ export default {
         },
         isView: {
             default: true
-        }
+        },
     }
 }
 </script>
