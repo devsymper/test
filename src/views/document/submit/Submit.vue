@@ -415,7 +415,8 @@ export default {
             controlRelationWorker:null,
             formulasWorker:null,
             optionalDataBinding:{},
-            tableFocusing:null
+            tableFocusing:null,
+            rootControlFromWorkflow:[],
         };
 
     },
@@ -2308,14 +2309,8 @@ export default {
 						});    
 					}
                     if(thisCpn.sDocumentSubmit.updateFormulas != undefined){
-                        // let dataInput = thisCpn.getDataInputFormula(thisCpn.sDocumentSubmit.updateFormulas);
                         let dataInput = getDataInputFormula(thisCpn.sDocumentSubmit.updateFormulas,thisCpn.sDocumentSubmit.listInputInDocument,thisCpn.optionalDataBinding);
-                        thisCpn.formulasWorker.postMessage({action:'runFormula',data:{
-                            formulaInstance:thisCpn.sDocumentSubmit.updateFormulas,
-                            dataInput:dataInput,
-                            keyInstance:thisCpn.keyInstance}})
-
-                        // thisCpn.sDocumentSubmit.updateFormulas.handleBeforeRunFormulas(dataInput).then(rs=>{});
+                        thisCpn.sDocumentSubmit.updateFormulas.handleBeforeRunFormulas(dataInput);
                     }
                     thisCpn.closeFormulasWorker();
                     if(thisCpn.$getRouteName() == 'updateDocumentObject')
@@ -2838,6 +2833,7 @@ export default {
 			}
 			else{
                 let listInput = getListInputInDocument(this.keyInstance);
+                listRootControl = this.rootControlFromWorkflow
 				for(let controlName in listInput){
 					this.setAllImpactedFieldsList(controlName);
                     let controlInstance = listInput[controlName];
@@ -2870,6 +2866,7 @@ export default {
                 }
                 // lưu lại các mối quan hệ cho lần submit sau ko phải thực hiện các bước tìm quan hê này (các root control , các luồng chạy công thức)
                 let dataPost = {impactedFieldsList:impactedFieldsList,impactedFieldsListWhenStart:impactedFieldsListWhenStart,rootControl:listRootControl,tableRootControl:listTableRootControl};
+                console.log(dataPost,'dataPostdataPost');
                 documentApi.updatePreDataForDoc({documentId:this.documentId,prepareData:JSON.stringify(dataPost)})
             }
             this.hidePreloader();
@@ -3010,8 +3007,12 @@ export default {
          */
         checkOverrideFormulas(controlName, field){
             if(Object.keys(this.overrideControls).length > 0 && Object.keys(this.overrideControls).includes(controlName)){
-                this.preDataSubmit.rootControl.push(controlName)
-
+                if(this.preDataSubmit && this.preDataSubmit.rootControl){
+                    this.preDataSubmit.rootControl.push(controlName);
+                }
+                else{
+                    this.rootControlFromWorkflow.push(controlName);
+                }
                 if(!field.formulas.formulas){
                     field.formulas['formulas'] = {
                         value:{}
