@@ -217,9 +217,10 @@ export default {
                                      returnObjSearch.displayName = data.title?data.title:"Không có tên";
                                      returnObjSearch.description = data.note?data.note:'Chưa điền mô tả';
                                 }else if(data.type=='document_instance'){
-                                     let description = JSON.parse(JSON.parse(data.values).new);
                                      returnObjSearch.displayName = data.values?JSON.parse(data.values).document_name:"Không có tên";
-                                     returnObjSearch.description = data.values?description.description:'Chưa điền mô tả';
+                                    //  returnObjSearch.description = data.values?JSON.parse(JSON.parse(data.values).data).mo_ta:'Chưa điền mô tả';
+                                     returnObjSearch.description = returnObjSearch.displayName;
+
                                 
                                  }else if(data.type=='workflow_definition'||data.type=="knowledge"){
                                      returnObjSearch.displayName = data.name?data.name:"Không có tên";
